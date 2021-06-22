@@ -5,6 +5,8 @@ import com.gameplat.admin.model.dto.MemberInfoQueryDto;
 import com.gameplat.admin.model.entity.MemberInfo;
 import com.gameplat.admin.model.vo.MemberInfoVo;
 import com.gameplat.admin.service.MemberInfoService;
+import com.gameplat.common.constant.ServiceApi;
+import com.gameplat.common.constant.ServiceName;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -13,7 +15,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/gameplat-admin-service/api/internal/memberInfo")
+@RequestMapping(ServiceApi.OPEN_API +"/memberInfo")
 public class MemberInfoController {
 
   @Autowired

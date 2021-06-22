@@ -17,6 +17,7 @@ import com.gameplat.admin.service.SysAuthIpService;
 import com.gameplat.admin.service.SysDictDataService;
 import com.gameplat.admin.service.SysUserService;
 import com.gameplat.admin.utils.HttpUtils;
+import com.gameplat.common.constant.ServiceApi;
 import com.gameplat.common.exception.BusinessException;
 import com.gameplat.common.util.GoogleAuth;
 import com.gameplat.common.web.Result;
@@ -42,7 +43,7 @@ import org.springframework.web.bind.annotation.RestController;
 /** 管理员 */
 @Slf4j
 @RestController
-@RequestMapping("/user")
+@RequestMapping(ServiceApi.OPEN_API + "/user")
 public class SysUserController {
 
   @Autowired

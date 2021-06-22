@@ -10,6 +10,7 @@ import com.gameplat.admin.model.dto.SysDictDataQueryDto;
 import com.gameplat.admin.model.entity.SysDictData;
 import com.gameplat.admin.model.vo.SysDictDataVo;
 import com.gameplat.admin.service.SysDictDataService;
+import com.gameplat.common.constant.ServiceApi;
 import com.gameplat.common.web.Result;
 import com.gameplat.ds.core.context.DyDataSourceContextHolder;
 import io.swagger.annotations.ApiOperation;
@@ -26,7 +27,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/dictData")
+@RequestMapping(ServiceApi.OPEN_API + "/dictData")
 public class SysDictDataController {
 
   @Autowired

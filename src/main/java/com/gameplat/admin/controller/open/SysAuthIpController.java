@@ -7,6 +7,7 @@ import com.gameplat.admin.model.dto.SysAuthIpQueryDto;
 import com.gameplat.admin.model.entity.SysAuthIp;
 import com.gameplat.admin.model.vo.SysAuthIpVo;
 import com.gameplat.admin.service.SysAuthIpService;
+import com.gameplat.common.constant.ServiceApi;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,7 +18,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/authIp")
+@RequestMapping(ServiceApi.OPEN_API + "/authIp")
 public class SysAuthIpController {
 
   @Autowired private SysAuthIpService sysAuthIpService;

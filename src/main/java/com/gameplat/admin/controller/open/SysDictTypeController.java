@@ -8,6 +8,7 @@ import com.gameplat.admin.model.dto.SysDictTypeQueryDto;
 import com.gameplat.admin.model.entity.SysDictType;
 import com.gameplat.admin.model.vo.SysDictTypeVo;
 import com.gameplat.admin.service.SysDictTypeService;
+import com.gameplat.common.constant.ServiceApi;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,7 +19,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/dictType")
+@RequestMapping(ServiceApi.OPEN_API + "/dictType")
 public class SysDictTypeController {
 
   @Autowired

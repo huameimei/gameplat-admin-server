@@ -12,6 +12,7 @@ import com.gameplat.admin.model.vo.SysMenuVo;
 import com.gameplat.admin.model.vo.SysMyMenuVo;
 import com.gameplat.admin.service.SysMenuService;
 import com.gameplat.admin.service.SysUserService;
+import com.gameplat.common.constant.ServiceApi;
 import com.gameplat.common.util.BeanUtils;
 import com.gameplat.common.web.Result;
 import java.util.ArrayList;
@@ -28,7 +29,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/menus")
+@RequestMapping(ServiceApi.OPEN_API + "/menus")
 @Slf4j
 public class SysMenuController {
 

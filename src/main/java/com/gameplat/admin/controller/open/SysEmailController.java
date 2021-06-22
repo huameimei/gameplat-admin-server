@@ -6,6 +6,7 @@ import com.gameplat.admin.model.dto.SysEmailQueryDto;
 import com.gameplat.admin.model.entity.SysEmail;
 import com.gameplat.admin.model.vo.SysEmailVo;
 import com.gameplat.admin.service.SysEmailService;
+import com.gameplat.common.constant.ServiceApi;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -13,7 +14,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping( "/sysEmail")
+@RequestMapping( ServiceApi.OPEN_API + "/sysEmail")
 public class SysEmailController {
 
   @Autowired private SysEmailService sysEmailService;

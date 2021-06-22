@@ -1,8 +1,13 @@
 package com.gameplat.admin.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.dao.MemberInfoMapper;
+import com.gameplat.admin.model.dto.MemberInfoQueryDto;
 import com.gameplat.admin.model.entity.MemberInfo;
+import com.gameplat.admin.model.vo.MemberInfoVo;
 import com.gameplat.admin.service.MemberInfoService;
 import com.gameplat.admin.utils.TreeUtils;
 import lombok.RequiredArgsConstructor;
@@ -142,5 +147,12 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
   public void deleteBoth(Long id) {
     TreeUtils.checkEffective(memberInfoMapper.deleteById(id));
     memberInfoMapper.deletePath(id);
+  }
+
+  @Override
+  public IPage<MemberInfoVo> queryPage(IPage<MemberInfo> page,
+      MemberInfoQueryDto memberInfoQueryDto) {
+    LambdaQueryWrapper<MemberInfo> query = Wrappers.lambdaQuery();
+    return null;
   }
 }

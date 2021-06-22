@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/gameplat-admin-service/api/internal/sysSms")
+@RequestMapping( "/sysSms")
 public class SysSmsController {
 
   @Autowired private SysSmsService sysSmsService;

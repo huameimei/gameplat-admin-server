@@ -1,10 +1,11 @@
 package com.gameplat.admin.controller.open;
 
-import com.gameplat.admin.convert.SysEmailConvert;
+
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.gameplat.admin.model.dto.SysEmailQueryDto;
+import com.gameplat.admin.model.entity.SysEmail;
+import com.gameplat.admin.model.vo.SysEmailVo;
 import com.gameplat.admin.service.SysEmailService;
-import com.gameplat.common.web.Result;
-import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -12,19 +13,14 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/gameplat-admin-service/api/internal/sysEmail")
+@RequestMapping( "/sysEmail")
 public class SysEmailController {
 
   @Autowired private SysEmailService sysEmailService;
 
-  @Autowired private SysEmailConvert sysEmailConvert;
-
   @GetMapping(value = "/queryAll")
   @ResponseBody
-  public Result queryAll(SysEmailQueryDto sysEmailQueryDto) {
-    return Result.succeed(
-        sysEmailService.listByQueryDto(sysEmailQueryDto).stream()
-            .map(i -> sysEmailConvert.toVo(i))
-            .collect(Collectors.toList()));
+  public IPage<SysEmailVo> queryPage(IPage<SysEmail> page,SysEmailQueryDto sysEmailQueryDto) {
+    return sysEmailService.queryPage(page, sysEmailQueryDto);
   }
 }

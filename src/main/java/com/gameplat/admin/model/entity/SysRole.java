@@ -10,7 +10,7 @@ import lombok.Data;
  */
 @Data
 @TableName("sys_role")
-public class SysRole extends BaseEntity implements Serializable {
+public class SysRole extends BaseEntity{
 
   /**
    * 角色编码

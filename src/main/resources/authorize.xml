@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<permit-uri>
+    <!-- 允许不带token 也可以访问的uri路径列表 -->
+    <uri-list>
+        <uri>/webjars/springfox-swagger-ui/**</uri>
+        <uri>/v2/api-docs**</uri>
+        <uri>/swagger-resources/**</uri>
+        <uri>/doc.html</uri>
+        <uri>/webjars/bycdao-ui/**</uri>
+        <uri>/api/open/user-server/oauth/login.json</uri>
+    </uri-list>
+</permit-uri>

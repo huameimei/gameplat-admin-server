@@ -1,25 +1,21 @@
 package com.gameplat.admin.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.cache.AdminCache;
 import com.gameplat.admin.constant.Constants;
 import com.gameplat.admin.dao.SysMenuMapper;
 import com.gameplat.admin.dao.SysRoleMapper;
 import com.gameplat.admin.dao.SysUserMapper;
-import com.gameplat.admin.enums.AdminTypeEnum;
 import com.gameplat.admin.enums.DictTypeEnum;
 import com.gameplat.admin.enums.UserStateEnum;
 import com.gameplat.admin.model.bean.AdminLoginLimit;
 import com.gameplat.admin.model.bean.AdminRedisBean;
 import com.gameplat.admin.model.bean.TokenInfo;
-import com.gameplat.admin.model.entity.SysMenu;
 import com.gameplat.admin.model.entity.SysRole;
 import com.gameplat.admin.model.entity.SysUser;
 import com.gameplat.admin.model.vo.UserEquipmentVO;
 import com.gameplat.admin.service.SysDictDataService;
 import com.gameplat.admin.service.SysUserService;
-import com.gameplat.admin.utils.TokenManager;
 import com.gameplat.common.exception.BusinessException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -70,8 +66,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
       String password,
       String requestIp,
       UserEquipmentVO equipment,
-      String userAgentString)
-      throws Exception {
+      String userAgentString) throws BusinessException {
     SysUser admin = this.getUserByAccount(account);
     if (admin == null) {
       throw new BusinessException("账号不存在");
@@ -120,11 +115,11 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
     Long roleId = sysUser.getRoleId();
     SysRole sysRole = sysRoleMapper.selectById(roleId);
     List<String> list = new ArrayList<>();
-    if (AdminTypeEnum.isSuperAdmin(sysUser.getUserType())) {
+  /*  if (AdminTypeEnum.isSuperAdmin(sysUser.getUserType())) {
       list.add("*:*:*");
     } else {
-      list = sysMenuMapper.selectMenuByRoleId(sysRole.getId());
-    }
+      list = sysMenuMapper.selectMenusByRoleId(sysRole.getId());
+    }*/
     AdminRedisBean adminRedisBean = new AdminRedisBean();
     adminRedisBean.setAdminId(id);
     adminRedisBean.setMenuList(list);

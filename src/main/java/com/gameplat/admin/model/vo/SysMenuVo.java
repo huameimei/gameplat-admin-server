@@ -1,6 +1,5 @@
 package com.gameplat.admin.model.vo;
 
-import com.baomidou.mybatisplus.annotation.TableName;
 import com.gameplat.common.model.entity.BaseEntity;
 import java.util.List;
 import lombok.Data;
@@ -11,11 +10,10 @@ import lombok.Data;
  * @author Lenovo
  */
 @Data
-@TableName("sys_menu")
 public class SysMenuVo extends BaseEntity {
 
   /** 父类ID */
-  private String parentId;
+  private Long parentId;
 
   /** 组件名称 */
   private String name;
@@ -60,4 +58,13 @@ public class SysMenuVo extends BaseEntity {
 
   /** 权限标识 */
   private String authMark;
+
+  private Long halfId;
+
+  private MetaVo meta;
+
+  /**
+   * 子菜单集合
+   */
+  private List<SysMenuVo> subMenus;
 }

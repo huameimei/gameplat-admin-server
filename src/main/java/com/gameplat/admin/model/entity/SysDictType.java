@@ -15,7 +15,7 @@ import lombok.Data;
 public class SysDictType implements Serializable {
 
     @ApiModelProperty(value = "字典主键")
-    @TableId(value = "dict_id", type = IdType.AUTO)
+    @TableId(value = "id", type = IdType.AUTO)
     private Long dictId;
 
     @ApiModelProperty(value = "字典名称")

@@ -2,8 +2,6 @@ package com.gameplat.admin.model.entity;
 
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.gameplat.common.model.entity.BaseEntity;
-import io.swagger.annotations.ApiModelProperty;
-import java.util.List;
 import lombok.Data;
 
 /**
@@ -16,7 +14,7 @@ import lombok.Data;
 public class SysMenu extends BaseEntity {
 
   /** 父类ID */
-  private String parentId;
+  private Long parentId;
 
   /** 组件名称 */
   private String name;

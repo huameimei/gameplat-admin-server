@@ -1,14 +1,13 @@
 package com.gameplat.admin.model.dto;
 
 import com.gameplat.common.model.entity.BaseEntity;
-import java.io.Serializable;
 import lombok.Data;
 
 /**
  * Banner信息
  */
 @Data
-public class SysBannerInfoAddDto implements Serializable {
+public class SysBannerInfoAddDto extends BaseEntity {
 
   /**
    * banner类型

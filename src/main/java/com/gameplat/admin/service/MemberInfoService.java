@@ -1,8 +1,12 @@
 package com.gameplat.admin.service;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.service.IService;
+import com.gameplat.admin.model.dto.MemberInfoQueryDto;
 import com.gameplat.admin.model.entity.MemberInfo;
+import com.gameplat.admin.model.vo.MemberInfoVo;
 
-public interface MemberInfoService {
+public interface MemberInfoService extends IService<MemberInfo> {
 
   /**
    * 根据指定的id，获取分类的全部属性。
@@ -74,4 +78,6 @@ public interface MemberInfoService {
    * @param id 分类id
    */
   void deleteBoth(Long id);
+
+  IPage<MemberInfoVo> queryPage(IPage<MemberInfo> page, MemberInfoQueryDto memberInfoQueryDto);
 }

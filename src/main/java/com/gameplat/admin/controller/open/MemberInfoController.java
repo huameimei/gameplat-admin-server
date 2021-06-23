@@ -1,7 +1,9 @@
 package com.gameplat.admin.controller.open;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.gameplat.admin.model.dto.MemberInfoAddDto;
 import com.gameplat.admin.model.dto.MemberInfoQueryDto;
+import com.gameplat.admin.model.dto.SysAuthIpAddDto;
 import com.gameplat.admin.model.entity.MemberInfo;
 import com.gameplat.admin.model.vo.MemberInfoVo;
 import com.gameplat.admin.service.MemberInfoService;
@@ -9,6 +11,7 @@ import com.gameplat.common.constant.ServiceApi;
 import com.gameplat.common.constant.ServiceName;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -33,6 +36,9 @@ public class MemberInfoController {
   }
 
 
-
-
+  @PostMapping(value = "/save")
+  @ResponseBody
+  public void save(MemberInfoAddDto memberInfoAddDto){
+    memberInfoService.save(memberInfoAddDto);
+  }
 }

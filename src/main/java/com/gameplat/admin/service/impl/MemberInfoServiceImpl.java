@@ -1,27 +1,34 @@
 package com.gameplat.admin.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.dao.MemberInfoMapper;
+import com.gameplat.admin.dao.MemberTreeMapper;
+import com.gameplat.admin.model.dto.MemberInfoAddDto;
 import com.gameplat.admin.model.dto.MemberInfoQueryDto;
 import com.gameplat.admin.model.entity.MemberInfo;
 import com.gameplat.admin.model.vo.MemberInfoVo;
 import com.gameplat.admin.service.MemberInfoService;
 import com.gameplat.admin.utils.TreeUtils;
-import lombok.RequiredArgsConstructor;
+import com.gameplat.common.exception.ServiceException;
 import org.apache.ibatis.exceptions.PersistenceException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
  * @author Lenovo
  */
 @Service
-@RequiredArgsConstructor
 public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberInfo>  implements MemberInfoService{
 
-  private final MemberInfoMapper memberInfoMapper;
+  @Autowired
+  private  MemberInfoMapper memberInfoMapper;
+
+  @Autowired
+  private MemberTreeMapper memberTreeMapper;
 
   /**
    * 根据指定的id，获取分类的全部属性。
@@ -33,7 +40,7 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
   @Override
   public MemberInfo findById(Long id) {
     TreeUtils.checkNotNegative(id, "id");
-    return memberInfoMapper.selectAttributes(id);
+    return memberInfoMapper.selectById(id);
   }
 
   /**
@@ -46,18 +53,6 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
     return this.lambdaQuery().count() - 1;
   }
 
-  /**
-   * 获取某一级分类的数量，参数从1开始，表示第一级分类（根分类的子类）。
-   *
-   * @param layer 层级（从1开始）
-   * @return 数量
-   * @throws IllegalArgumentException 如果layer不是正数
-   */
-  @Override
-  public int countOfLayer(int layer) {
-    TreeUtils.checkPositive(layer, "layer");
-    return memberInfoMapper.selectCountByLayer(layer);
-  }
 
   /**
    * 新增一个分类，其ID属性将自动生成或计算，并返回。 新增分类的继承关系由parent属性指定，parent为0表示该分类为一级分类。
@@ -69,13 +64,13 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
   @Override
   public Long add(MemberInfo memberInfo, Long parent) {
     TreeUtils.checkNotNegative(parent, "parent");
-    if (parent > 0 && memberInfoMapper.contains(parent) == null) {
+    if (parent > 0 &&  memberInfoMapper.contains(parent) == null) {
       throw new IllegalArgumentException("指定的上级分类不存在");
     }
     try {
       memberInfoMapper.insert(memberInfo);
-      memberInfoMapper.insertPath(memberInfo.getId(), parent);
-      memberInfoMapper.insertNode(memberInfo.getId());
+      memberTreeMapper.insertPath(memberInfo.getId(), parent);
+      memberTreeMapper.insertNode(memberInfo.getId());
     } catch (PersistenceException ex) {
       throw new IllegalArgumentException(ex);
     }
@@ -110,7 +105,7 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
     if (memberInfoMapper.contains(id) == null) {
       throw new IllegalArgumentException("指定的分类不存在");
     }
-    Long parent = memberInfoMapper.selectAncestor(id, 1);
+    Long parent = memberTreeMapper.selectAncestor(id, 1);
     if (parent == null) {
       parent = 0L;
     }
@@ -133,7 +128,7 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
       throw new IllegalArgumentException("指定的分类不存在");
     }
     deleteBoth(id);
-    for (Long des : memberInfoMapper.selectDescendantId(id)) {
+    for (Long des : memberTreeMapper.selectDescendantId(id)) {
       deleteBoth(des);
     }
   }
@@ -146,7 +141,7 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
   @Override
   public void deleteBoth(Long id) {
     TreeUtils.checkEffective(memberInfoMapper.deleteById(id));
-    memberInfoMapper.deletePath(id);
+    memberTreeMapper.deletePath(id);
   }
 
   @Override
@@ -154,5 +149,19 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
       MemberInfoQueryDto memberInfoQueryDto) {
     LambdaQueryWrapper<MemberInfo> query = Wrappers.lambdaQuery();
     return null;
+  }
+
+  @Override
+  public void save(MemberInfoAddDto memberInfoAddDto) {
+    //判断账号是否已存在
+    if (this.lambdaQuery().eq(MemberInfo::getUserName,memberInfoAddDto.getUserName()).count() > 0){
+      throw new ServiceException("该账户已经存在，请确认后再添加");
+    }
+    if(memberInfoAddDto.getParentId() == null){
+
+    }
+
+
+
   }
 }

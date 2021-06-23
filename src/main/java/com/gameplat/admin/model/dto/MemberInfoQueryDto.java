@@ -27,7 +27,6 @@ public class MemberInfoQueryDto implements Serializable {
   /** 账号状态(0-- 停用，1-- 正常，2 --- 冻结) */
   private Integer status;
 
-
   /** 代理账号 */
   private String agentAccount;
 

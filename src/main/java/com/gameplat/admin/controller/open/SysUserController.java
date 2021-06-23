@@ -4,19 +4,20 @@ import com.gameplat.admin.constant.Constants;
 import com.gameplat.admin.enums.DictTypeEnum;
 import com.gameplat.admin.enums.limit.TrueFalseEnum;
 import com.gameplat.admin.interceptor.Session;
+import com.gameplat.admin.model.bean.AdminLoginLimit;
 import com.gameplat.admin.model.bean.AdminRedisBean;
-import com.gameplat.admin.model.dto.AdminLoginDto;
 import com.gameplat.admin.model.bean.TokenInfo;
+import com.gameplat.admin.model.dto.AdminLoginDto;
 import com.gameplat.admin.model.entity.GoogleConfig;
 import com.gameplat.admin.model.entity.SysUser;
 import com.gameplat.admin.model.vo.SysUserVo;
 import com.gameplat.admin.model.vo.UserEquipmentVO;
-import com.gameplat.admin.model.bean.AdminLoginLimit;
 import com.gameplat.admin.service.SysAuthIpService;
 import com.gameplat.admin.service.SysDictDataService;
 import com.gameplat.admin.service.SysUserService;
 import com.gameplat.admin.utils.HttpUtils;
-import com.gameplat.common.exception.ServiceException;
+import com.gameplat.common.constant.ServiceApi;
+import com.gameplat.common.exception.BusinessException;
 import com.gameplat.common.util.GoogleAuth;
 import com.gameplat.common.web.Result;
 import eu.bitwalker.useragentutils.UserAgent;
@@ -31,6 +32,7 @@ import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -40,7 +42,7 @@ import org.springframework.web.bind.annotation.RestController;
 /** 管理员 */
 @Slf4j
 @RestController
-@RequestMapping("/gameplat-admin-service/api/open/user")
+@RequestMapping(ServiceApi.OPEN_API + "/user")
 public class SysUserController {
 
   @Autowired
@@ -54,7 +56,7 @@ public class SysUserController {
 
   @RequestMapping(value = "/login", method = RequestMethod.POST)
   @ResponseBody
-  public Result getUserTokenInfo(AdminLoginDto adminLoginDto,
+  public Result getUserTokenInfo(@RequestBody  AdminLoginDto adminLoginDto,
       HttpServletRequest request, HttpServletResponse response,@RequestParam(value = "userAgent", required = false) String userAgentString, UserAgent clientUserAgent)
       throws ServiceException {
     String requestIp = HttpUtils.getRemoteIP(request);
@@ -111,7 +113,7 @@ public class SysUserController {
         HttpUtils.removeCookie(request,response,Constants.ADMIN_TOKEN_NAME);
         HttpUtils.setSessionCookieNotDomain(request, response, Constants.ADMIN_TOKEN_NAME,loginAppUser.getToken());
     }catch (Exception e) {
-        log.error(e.getMessage(), e);
+        log.error(e.getMessage());
         return Result.failed(e.getMessage());
     }
     return Result.succeed();

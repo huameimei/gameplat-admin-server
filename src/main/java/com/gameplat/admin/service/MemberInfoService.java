@@ -1,8 +1,13 @@
 package com.gameplat.admin.service;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.service.IService;
+import com.gameplat.admin.model.dto.MemberInfoAddDto;
+import com.gameplat.admin.model.dto.MemberInfoQueryDto;
 import com.gameplat.admin.model.entity.MemberInfo;
+import com.gameplat.admin.model.vo.MemberInfoVo;
 
-public interface MemberInfoService {
+public interface MemberInfoService extends IService<MemberInfo> {
 
   /**
    * 根据指定的id，获取分类的全部属性。
@@ -20,14 +25,6 @@ public interface MemberInfoService {
    */
   int count();
 
-  /**
-   * 获取某一级分类的数量，参数从1开始，表示第一级分类（根分类的子类）。
-   *
-   * @param layer 层级（从1开始）
-   * @return 数量
-   * @throws IllegalArgumentException 如果layer不是正数
-   */
-  int countOfLayer(int layer) ;
 
   /**
    * 新增一个分类，其ID属性将自动生成或计算，并返回。
@@ -74,4 +71,8 @@ public interface MemberInfoService {
    * @param id 分类id
    */
   void deleteBoth(Long id);
+
+  IPage<MemberInfoVo> queryPage(IPage<MemberInfo> page, MemberInfoQueryDto memberInfoQueryDto);
+
+  void save(MemberInfoAddDto memberInfoAddDto);
 }

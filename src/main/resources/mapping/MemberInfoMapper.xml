@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gameplat.admin.dao.MemberInfoMapper">
+
+  <select id="selectDescendant" resultType="com.gameplat.admin.model.entity.MemberInfo">
+    SELECT B.*
+    FROM member_tree AS A
+           JOIN member_info AS B ON A.descendant = B.id
+    WHERE ancestor = #{id}
+      AND distance > 0
+  </select>
+
+  <select id="selectSubLayer" resultType="com.gameplat.admin.model.entity.MemberInfo">
+    SELECT B.*
+    FROM member_tree AS A
+           JOIN member_info AS B ON A.descendant = B.id
+    WHERE A.ancestor = #{ancestor}
+      AND A.distance = #{n}
+  </select>
+
+  <select id="selectPathToRoot" resultType="com.gameplat.admin.model.entity.MemberInfo">
+    SELECT B.*
+    FROM member_tree AS A
+           JOIN member_info AS B ON A.ancestor = B.id
+    WHERE descendant = #{id}
+      AND ancestor > 0
+    ORDER BY distance DESC
+
+  </select>
+
+  <select id="selectPathToAncestor"
+    resultType="com.gameplat.admin.model.entity.MemberInfo">
+    <![CDATA[
+    SELECT B.*
+    FROM member_tree AS A
+           JOIN member_info AS B ON A.ancestor = B.id
+    WHERE descendant = #{id}
+      AND distance <
+          (SELECT distance FROM member_tree WHERE descendant = #{id} AND ancestor = #{ancestor})
+    ORDER BY distance DESC
+    ]]>
+  </select>
+
+  <select id="contains" resultType="java.lang.Boolean">
+    SELECT 1
+    FROM member_info
+    WHERE id = #{id}
+  </select>
+
+</mapper>

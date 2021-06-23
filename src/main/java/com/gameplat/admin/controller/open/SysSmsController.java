@@ -3,6 +3,7 @@ package com.gameplat.admin.controller.open;
 import com.gameplat.admin.convert.SysSmsConvert;
 import com.gameplat.admin.model.dto.SysSmsQueryDto;
 import com.gameplat.admin.service.SysSmsService;
+import com.gameplat.common.constant.ServiceApi;
 import com.gameplat.common.web.Result;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +13,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/gameplat-admin-service/api/internal/sysSms")
+@RequestMapping( ServiceApi.OPEN_API + "/sysSms")
 public class SysSmsController {
 
   @Autowired private SysSmsService sysSmsService;

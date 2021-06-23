@@ -1,6 +1,7 @@
 package com.gameplat.admin.model.entity;
 
 import com.gameplat.admin.dao.MemberInfoMapper;
+import com.gameplat.admin.dao.MemberTreeMapper;
 import com.gameplat.admin.utils.TreeUtils;
 import io.swagger.annotations.ApiModelProperty;
 import java.util.Date;
@@ -21,6 +22,9 @@ public class MemberInfo{
 
   @Autowired
   private MemberInfoMapper memberInfoMapper;
+
+  @Autowired
+  private MemberTreeMapper memberTreeMapper;
 
   public Long id;
 
@@ -112,8 +116,8 @@ public class MemberInfo{
    */
   public MemberInfo getAncestor(int n) {
     TreeUtils.checkPositive(n, "distant");
-    Long parent = memberInfoMapper.selectAncestor(id, n);
-    return parent == null ? null : memberInfoMapper.selectAttributes(parent);
+    Long parent = memberTreeMapper.selectAncestor(id, n);
+    return parent == null ? null : memberInfoMapper.selectById(parent);
   }
 
   /**
@@ -168,7 +172,7 @@ public class MemberInfo{
    * @return 级别
    */
   int getLevel() {
-    return memberInfoMapper.selectDistance(0L, id);
+    return memberTreeMapper.selectDistance(0L, id);
   }
 
   /**
@@ -197,7 +201,7 @@ public class MemberInfo{
     if(target > 0 && memberInfoMapper.contains(target) == null) {
       throw new IllegalArgumentException("指定的上级分类不存在");
     }
-    moveSubTree(id, memberInfoMapper.selectAncestor(id, 1));
+    moveSubTree(id, memberTreeMapper.selectAncestor(id, 1));
     moveNode(id, target);
   }
 
@@ -229,7 +233,7 @@ public class MemberInfo{
     }
 
     /* 移动分移到自己子树下和无关节点下两种情况 */
-    Integer distance = memberInfoMapper.selectDistance(id, target);
+    Integer distance = memberTreeMapper.selectDistance(id, target);
 
     // noinspection StatementWithEmptyBody
     if (distance == null) {
@@ -238,7 +242,7 @@ public class MemberInfo{
       throw new IllegalArgumentException("不能移动到自己下面");
     } else {
       // 如果移动的目标是其子类，需要先把子类移动到本类的位置
-      Long parent = memberInfoMapper.selectAncestor(id, 1);
+      Long parent = memberTreeMapper.selectAncestor(id, 1);
       moveNode(target, parent);
       moveSubTree(target, target);
     }
@@ -255,9 +259,9 @@ public class MemberInfo{
    * @param parent 某节点id
    */
   private void moveNode(Long id, Long parent) {
-    memberInfoMapper.deletePath(id);
-    memberInfoMapper.insertPath(id, parent);
-    memberInfoMapper.insertNode(id);
+    memberTreeMapper.deletePath(id);
+    memberTreeMapper.insertPath(id, parent);
+    memberTreeMapper.insertNode(id);
   }
 
   public void moveSubTree(Long parent) {
@@ -272,7 +276,7 @@ public class MemberInfo{
    * @param parent 某节点id
    */
   private void moveSubTree(Long id, Long parent) {
-    Long[] subs = memberInfoMapper.selectSubId(id);
+    Long[] subs = memberTreeMapper.selectSubId(id);
     for (Long sub : subs) {
       moveNode(sub, parent);
       moveSubTree(sub, sub);

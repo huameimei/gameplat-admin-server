@@ -2,7 +2,6 @@ package com.gameplat.admin.dao;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.gameplat.admin.model.entity.SysRole;
-import com.gameplat.admin.model.entity.SysUser;
 import org.apache.ibatis.annotations.Select;
 
 /**

@@ -1,6 +1,5 @@
 package com.gameplat.admin.controller.open;
 
-import cn.hutool.http.HttpUtil;
 import com.gameplat.admin.constant.Constants;
 import com.gameplat.admin.enums.DictTypeEnum;
 import com.gameplat.admin.enums.limit.TrueFalseEnum;
@@ -58,7 +57,7 @@ public class SysUserController {
   public Result getUserTokenInfo(AdminLoginDto adminLoginDto,
       HttpServletRequest request, HttpServletResponse response,@RequestParam(value = "userAgent", required = false) String userAgentString, UserAgent clientUserAgent)
       throws ServiceException {
-    String requestIp = HttpUtil.getClientIP(request);
+    String requestIp = HttpUtils.getRemoteIP(request);
     if (StringUtils.isBlank(userAgentString)) {
         userAgentString = Optional.ofNullable(request.getHeader(HttpHeaders.USER_AGENT)).orElse("");
     }

@@ -21,8 +21,8 @@
         <maven.compiler.target>8</maven.compiler.target>
         <spring-cloud.version>Hoxton.SR8</spring-cloud.version>
         <spring-cloud-alibaba.version>2.2.5.RELEASE</spring-cloud-alibaba.version>
+        <gameplat-dependencies.version>0.0.1-SNAPSHOT</gameplat-dependencies.version>
         <org.mapstruct.version>1.4.2.Final</org.mapstruct.version>
-        <hutool.version>4.1.13</hutool.version>
         <poi.version>3.17</poi.version>
     </properties>
 
@@ -40,6 +40,14 @@
                 <groupId>com.alibaba.cloud</groupId>
                 <artifactId>spring-cloud-alibaba-dependencies</artifactId>
                 <version>${spring-cloud-alibaba.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>com.gameplat</groupId>
+                <artifactId>gameplat-dependencies</artifactId>
+                <version>${gameplat-dependencies.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -70,49 +78,41 @@
         <dependency>
             <groupId>com.gameplat</groupId>
             <artifactId>web-spring-boot-starter</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
         </dependency>
 
         <dependency>
             <groupId>com.gameplat</groupId>
             <artifactId>log-spring-boot-starter</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
         </dependency>
 
         <dependency>
             <groupId>com.gameplat</groupId>
             <artifactId>rocketmq-spring-boot-starter</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
         </dependency>
 
         <dependency>
             <groupId>com.gameplat</groupId>
             <artifactId>redis-spring-boot-starter</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
         </dependency>
 
         <dependency>
             <groupId>com.gameplat</groupId>
             <artifactId>datasource-tenant-manage-spring-boot-starter</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
         </dependency>
 
         <dependency>
             <groupId>com.gameplat</groupId>
             <artifactId>gray-release-spring-boot-starter</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
         </dependency>
 
         <dependency>
             <groupId>com.gameplat</groupId>
             <artifactId>security-spring-boot-starter</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
         </dependency>
 
         <dependency>
             <groupId>com.gameplat</groupId>
             <artifactId>common-spring-boot-starter</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
         </dependency>
 
         <dependency>
@@ -134,11 +134,9 @@
             <version>4.3.0</version>
         </dependency>
 
-        <!--hutool -->
         <dependency>
             <groupId>cn.hutool</groupId>
             <artifactId>hutool-all</artifactId>
-            <version>${hutool.version}</version>
         </dependency>
 
         <dependency>

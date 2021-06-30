@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gameplat.admin.dao.TpPayChannelMapper">
+
+  <resultMap type="TpPayChannel" id="TpPayChannelMap">
+    <result property="id" column="id"/>
+    <result property="name" column="name"/>
+    <result property="merchantId" column="merchant_id"/>
+    <result property="tpPayType" column="tp_pay_type"/>
+    <result property="userLevels" column="user_levels"/>
+    <result property="remarks" column="remarks"/>
+    <result property="chanDesc" column="chan_desc"/>
+    <result property="sort" column="sort"/>
+    <result property="status" column="status"/>
+    <result property="rechargeTimes" column="recharge_times"/>
+    <result property="rechargeAmount" column="recharge_amount"/>
+    <result property="limitInfo" column="limit_info"/>
+    <result property="payChannelTip" column="pay_channel_tip"/>
+    <result property="createBy" column="create_by"/>
+    <result property="createTime" column="create_time"/>
+    <result property="updateBy" column="update_by"/>
+    <result property="updateTime" column="update_time"/>
+  </resultMap>
+
+  <resultMap type="TpPayChannelVO" id="TpPayChannelVOMap" extends="TpPayChannelMap">
+    <result property="interfaceName" column="interfaceName"/>
+    <result property="payTypeName" column="payTypeName"/>
+    <result property="tpMerchantName" column="tpMerchantName"/>
+    <result property="tpInterfaceId" column="tpInterfaceId"/>
+    <result property="tpPayTypeName" column="tpPayTypeName"/>
+    <result property="payType" column="payType"/>
+  </resultMap>
+
+  <sql id="where">
+    <where>
+      <if test="dto.tpInterfaceId != null and dto.tpInterfaceId != ''">
+        and i.id =#{dto.tpInterfaceId}
+      </if>
+      <if test="dto.payType != null and dto.payType != ''">
+        and t.pay_type = #{dto.payType}
+      </if>
+      <if test="dto.status != null ">
+        and c.status = #{dto.status}
+      </if>
+      <if test="dto.userLevelList !=null and dto.userLevelList.size() > 0">
+        and (
+        <foreach collection="dto.userLevelList" item="userLevel" index="index">
+          INSTR(CONCAT(',' , user_levels, ','), #{userLevel}) > 0 OR
+        </foreach>
+        user_levels = '' )
+      </if>
+    </where>
+  </sql>
+
+  <select id="findTpPayChannelPage" resultMap="TpPayChannelVOMap">
+    SELECT
+    c.name,c.pay_channel_tip,c.limit_info,c.remarks,c.user_levels,
+    c.chan_desc,c.sort,c.status,c.recharge_times,c.recharge_amount,
+    c.pay_channel_tip,t.pay_type AS payType, t.name
+    AS tpPayTypeName, i.id AS tpInterfaceId, m.name
+    AS tpMerchantName, p.name AS payTypeName,i.name AS interfaceName
+    FROM tp_pay_channel c
+    LEFT JOIN tp_merchant m ON m.id = c.merchant_id
+    LEFT JOIN tp_interface i ON i.code = m.tp_interface_code
+    LEFT JOIN tp_pay_type t ON t.interface_code = i.code AND t.code = c.tp_pay_type
+    LEFT JOIN pay_type p ON t.pay_type = p.code
+    <include refid="where"/>
+    ORDER BY c.sort ASC
+  </select>
+
+</mapper>

@@ -8,5 +8,6 @@
         <uri>/doc.html</uri>
         <uri>/webjars/bycdao-ui/**</uri>
         <uri>/api/open/user-server/oauth/login.json</uri>
+        <uri>/api/open/**</uri>
     </uri-list>
 </permit-uri>

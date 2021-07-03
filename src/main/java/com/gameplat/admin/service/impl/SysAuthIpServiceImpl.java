@@ -53,7 +53,7 @@ public class SysAuthIpServiceImpl extends ServiceImpl<AuthIpMapper, SysAuthIp>
   }
 
   @Override
-  public void save(SysAuthIpAddDto sysAuthIpAddDto) {
+  public void save(SysAuthIpAddDto sysAuthIpAddDto) throws ServiceException {
     LambdaQueryWrapper<SysAuthIp> query = Wrappers.lambdaQuery();
     query.eq(SysAuthIp::getAllowIp, sysAuthIpAddDto.getAllowIp());
     if (this.count(query) > 0) {

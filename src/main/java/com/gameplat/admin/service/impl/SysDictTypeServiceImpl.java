@@ -38,7 +38,7 @@ public class SysDictTypeServiceImpl extends ServiceImpl<SysDictTypeMapper, SysDi
 
 
   @Override
-  public void save(SysDictTypeAddDto sysDictTypeAddDto) {
+  public void save(SysDictTypeAddDto sysDictTypeAddDto) throws ServiceException {
     LambdaQueryWrapper<SysDictType> query = Wrappers.lambdaQuery();
     query.eq(SysDictType::getDictType, sysDictTypeAddDto.getDictType());
     if (this.count(query) > 0) {
@@ -63,7 +63,7 @@ public class SysDictTypeServiceImpl extends ServiceImpl<SysDictTypeMapper, SysDi
   }
 
   @Override
-  public void update(SysDictTypeEditDto sysDictTypeEditDto) {
+  public void update(SysDictTypeEditDto sysDictTypeEditDto) throws ServiceException {
     sysDictTypeEditDto.setUpdateTime(new Date());
     if (!this.updateById(sysDictTypeConvert.toEntity(sysDictTypeEditDto))) {
       throw new ServiceException("更新失败!");

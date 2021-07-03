@@ -8,14 +8,17 @@
   </insert>
 
   <insert id="insertNode">
-    INSERT INTO member_tree(ancestor,descendant,distance) VALUES(#{id},#{id},0)
+    INSERT INTO member_tree(ancestor, descendant, distance)
+    VALUES (#{id}, #{id}, 0)
   </insert>
 
   <delete id="deletePath">
-    DELETE FROM member_tree WHERE descendant=#{id}
+    DELETE
+    FROM member_tree
+    WHERE descendant = #{id}
   </delete>
 
-  <select id="selectDescendantId" resultType="java.lang.Long">
+  <select id="selectDescendantId">
     SELECT descendant
     FROM member_tree
     WHERE ancestor = #{id}
@@ -42,6 +45,4 @@
     WHERE descendant = #{id}
       AND ancestor = #{ancestor}
   </select>
-
-
 </mapper>

@@ -14,7 +14,8 @@ public enum DictTypeEnum {
   USER_LOGIN_LIMIT("USER_LOGIN_LIMIT", "会员登录"),
   USER_REGISTRY_CONFIG("USER_REGISTRY_CONFIG","会员注册配置"),
   USER_CASH_CONFIG("USER_CASH_CONFIG","会员提现配置"),
-  GOOGLE_CONFIG("GOOGLE_CONFIG","谷歌验证器参数配置")
+  GOOGLE_CONFIG("GOOGLE_CONFIG","谷歌验证器参数配置"),
+  SYSTEM_CONFIG("SYSTEM_CONFIG","系统配置")
   ;
   private String value;
   private String text;

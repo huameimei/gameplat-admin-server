@@ -1,6 +1,5 @@
 package com.gameplat.admin.controller.open;
 
-
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.gameplat.admin.model.dto.SysDictTypeAddDto;
 import com.gameplat.admin.model.dto.SysDictTypeEditDto;
@@ -15,41 +14,31 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping(ServiceApi.OPEN_API + "/dictType")
 public class SysDictTypeController {
 
-  @Autowired
-  private SysDictTypeService sysDictTypeService;
-
+  @Autowired private SysDictTypeService sysDictTypeService;
 
   @GetMapping(value = "/queryAll")
-  @ResponseBody
   public IPage<SysDictTypeVo> queryAll(IPage<SysDictType> page, SysDictTypeQueryDto queryDto) {
-    return sysDictTypeService.queryPage(page,queryDto);
+    return sysDictTypeService.queryPage(page, queryDto);
   }
 
-
   @PostMapping(value = "/save")
-  @ResponseBody
-  public void save(SysDictTypeAddDto sysDictTypeAddDto){
+  public void save(SysDictTypeAddDto sysDictTypeAddDto) {
     sysDictTypeService.save(sysDictTypeAddDto);
   }
 
   @PostMapping(value = "/update")
-  @ResponseBody
-  public void update(SysDictTypeEditDto sysDictTypeEditDto){
+  public void update(SysDictTypeEditDto sysDictTypeEditDto) {
     sysDictTypeService.update(sysDictTypeEditDto);
   }
 
   @DeleteMapping(value = "/delete/{id}")
-  @ResponseBody
   public void delete(@PathVariable("id") Long id) {
     sysDictTypeService.delete(id);
   }
-
-
 }

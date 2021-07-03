@@ -9,11 +9,10 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping( ServiceApi.OPEN_API + "/sysSms")
+@RequestMapping(ServiceApi.OPEN_API + "/sysSms")
 public class SysSmsController {
 
   @Autowired private SysSmsService sysSmsService;
@@ -21,7 +20,6 @@ public class SysSmsController {
   @Autowired private SysSmsConvert sysSmsConvert;
 
   @GetMapping(value = "/queryAll")
-  @ResponseBody
   public Result queryAll(SysSmsQueryDto sysSmsQueryDto) {
     return Result.succeed(
         sysSmsService.listByQueryDto(sysSmsQueryDto).stream()

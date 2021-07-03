@@ -3,6 +3,7 @@ package com.gameplat.admin.service;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.gameplat.admin.model.dto.MemberInfoAddDto;
+import com.gameplat.admin.model.dto.MemberInfoEditDto;
 import com.gameplat.admin.model.dto.MemberInfoQueryDto;
 import com.gameplat.admin.model.entity.MemberInfo;
 import com.gameplat.admin.model.vo.MemberInfoVo;
@@ -75,4 +76,6 @@ public interface MemberInfoService extends IService<MemberInfo> {
   IPage<MemberInfoVo> queryPage(IPage<MemberInfo> page, MemberInfoQueryDto memberInfoQueryDto);
 
   void save(MemberInfoAddDto memberInfoAddDto);
+
+  void update(MemberInfoEditDto memberInfoEditDto);
 }

@@ -1,6 +1,7 @@
 package com.gameplat.admin.cache;
 
 import com.gameplat.admin.enums.AdminTypeEnum;
+import com.gameplat.admin.enums.DictDataEnum;
 import com.gameplat.admin.model.bean.TokenInfo;
 import com.gameplat.admin.model.entity.SysDictData;
 import com.gameplat.admin.service.SysDictDataService;
@@ -36,8 +37,12 @@ public class AdminCache {
   @PostConstruct
   public void init() {
     SysDictData tokenExpiredTime =
-        sysDictDataService.getDictValue("SYSTEM_CONFIG", "token_expired_time");
-    long expiredTime = Optional.ofNullable(tokenExpiredTime.getDictValue()).isPresent() ? Long.parseLong(tokenExpiredTime.getDictValue()) : 6;
+        sysDictDataService.getSysDictData(
+            DictDataEnum.tokenExpiredTime.getType(), DictDataEnum.tokenExpiredTime.getLabel());
+    long expiredTime =
+        Optional.ofNullable(tokenExpiredTime.getDictValue()).isPresent()
+            ? Long.parseLong(tokenExpiredTime.getDictValue())
+            : 6;
     loginExpiredTime = expiredTime * 3600;
   }
 

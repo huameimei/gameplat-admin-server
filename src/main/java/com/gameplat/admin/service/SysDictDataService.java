@@ -16,7 +16,7 @@ public interface SysDictDataService extends IService<SysDictData> {
 
   <T> T getDictData(String dictType, Class<T> t);
 
-  SysDictData getDictValue(String dictType, String dictLabel);
+  SysDictData getSysDictData(String dictType, String dictLabel);
 
   IPage<SysDictDataVo> queryPage(IPage<SysDictData> page, SysDictDataQueryDto queryDto);
 
@@ -25,4 +25,13 @@ public interface SysDictDataService extends IService<SysDictData> {
   void delete(Long id);
 
   void update(SysDictDataEditDto sysDictDataEditDto);
+
+  /**
+   * 找出数据并存到JSON文件中
+   * @param dictType
+   */
+  void findDataInitFile(String dictType);
+
+  String getDefaultJson();
+
 }

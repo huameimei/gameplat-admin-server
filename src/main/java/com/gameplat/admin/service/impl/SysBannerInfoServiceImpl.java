@@ -41,7 +41,7 @@ public class SysBannerInfoServiceImpl extends
   }
 
   @Override
-  public void save(SysBannerInfoAddDto sysBannerInfoAddDto) {
+  public void save(SysBannerInfoAddDto sysBannerInfoAddDto) throws ServiceException {
     sysBannerInfoAddDto.setCreateTime(new Date());
     sysBannerInfoAddDto.setUpdateTime(new Date());
     if (!this.save(sysBannerInfoConvert.toEntity(sysBannerInfoAddDto))) {
@@ -55,7 +55,7 @@ public class SysBannerInfoServiceImpl extends
   }
 
   @Override
-  public void update(SysBannerInfoEditDto sysBannerInfoEditDto) {
+  public void update(SysBannerInfoEditDto sysBannerInfoEditDto) throws ServiceException {
     sysBannerInfoEditDto.setUpdateTime(new Date());
     if (!this.updateById(sysBannerInfoConvert.toEntity(sysBannerInfoEditDto))) {
       throw new ServiceException("更新失败!");

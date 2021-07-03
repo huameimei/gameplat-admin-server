@@ -5,15 +5,18 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.gameplat.admin.convert.MemberInfoConvert;
 import com.gameplat.admin.dao.MemberInfoMapper;
 import com.gameplat.admin.dao.MemberTreeMapper;
 import com.gameplat.admin.model.dto.MemberInfoAddDto;
+import com.gameplat.admin.model.dto.MemberInfoEditDto;
 import com.gameplat.admin.model.dto.MemberInfoQueryDto;
 import com.gameplat.admin.model.entity.MemberInfo;
 import com.gameplat.admin.model.vo.MemberInfoVo;
 import com.gameplat.admin.service.MemberInfoService;
 import com.gameplat.admin.utils.TreeUtils;
 import com.gameplat.common.exception.ServiceException;
+import java.util.Optional;
 import org.apache.ibatis.exceptions.PersistenceException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -29,6 +32,9 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
 
   @Autowired
   private MemberTreeMapper memberTreeMapper;
+
+  @Autowired
+  private MemberInfoConvert memberInfoConvert;
 
   /**
    * 根据指定的id，获取分类的全部属性。
@@ -152,16 +158,25 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
   }
 
   @Override
-  public void save(MemberInfoAddDto memberInfoAddDto) {
+  public void save(MemberInfoAddDto memberInfoAddDto) throws ServiceException {
     //判断账号是否已存在
     if (this.lambdaQuery().eq(MemberInfo::getUserName,memberInfoAddDto.getUserName()).count() > 0){
       throw new ServiceException("该账户已经存在，请确认后再添加");
     }
-    if(memberInfoAddDto.getParentId() == null){
-
-    }
-
-
-
+    //默认添加到根下面
+    this.add(memberInfoConvert.toEntity(memberInfoAddDto), Optional.ofNullable(memberInfoAddDto.getParentId()).orElse(0L));
   }
+
+  @Override
+  public void update(MemberInfoEditDto memberInfoEditDto) {
+    MemberInfo memberInfo = this.findById(memberInfoEditDto.getId());
+    if (memberInfo == null){
+      throw new ServiceException("该账户已经不存在，请确认后再修改");
+    }
+    this.update(memberInfoConvert.toEntity(memberInfoEditDto));
+  }
+
+
+
+
 }

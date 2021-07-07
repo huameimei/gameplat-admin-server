@@ -1,10 +1,10 @@
 package com.gameplat.admin.controller.open;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.gameplat.admin.model.dto.SysAuthIpAddDto;
-import com.gameplat.admin.model.dto.SysAuthIpQueryDto;
+import com.gameplat.admin.model.dto.SysAuthIpAddDTO;
+import com.gameplat.admin.model.dto.SysAuthIpQueryDTO;
 import com.gameplat.admin.model.entity.SysAuthIp;
-import com.gameplat.admin.model.vo.SysAuthIpVo;
+import com.gameplat.admin.model.vo.SysAuthIpVO;
 import com.gameplat.admin.service.SysAuthIpService;
 import com.gameplat.common.constant.ServiceApi;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,12 +23,12 @@ public class SysAuthIpController {
 
   /** 查询所有IP白名单 */
   @GetMapping(value = "/queryAll")
-  public IPage<SysAuthIpVo> queryAll(IPage<SysAuthIp> sysAuthIp, SysAuthIpQueryDto queryDto) {
+  public IPage<SysAuthIpVO> queryAll(IPage<SysAuthIp> sysAuthIp, SysAuthIpQueryDTO queryDto) {
     return sysAuthIpService.queryPage(sysAuthIp, queryDto);
   }
 
   @PostMapping(value = "/save")
-  public void save(SysAuthIpAddDto sysAuthIpAddDto) {
+  public void save(SysAuthIpAddDTO sysAuthIpAddDto) {
     sysAuthIpService.save(sysAuthIpAddDto);
   }
 

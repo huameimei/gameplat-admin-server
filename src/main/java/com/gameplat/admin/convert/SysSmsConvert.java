@@ -1,12 +1,11 @@
 package com.gameplat.admin.convert;
 
 import com.gameplat.admin.model.entity.SysSms;
-import com.gameplat.admin.model.vo.SysSmsVo;
+import com.gameplat.admin.model.vo.SysSmsVO;
 import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")
 public interface SysSmsConvert {
 
-  SysSmsVo toVo(SysSms sysSms);
-
+  SysSmsVO toVo(SysSms sysSms);
 }

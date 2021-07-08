@@ -21,7 +21,7 @@ public class MemberInfoVO implements Serializable {
   /** 充值层级 */
   private String rechLevel;
 
-  /** 账户余额 */
+  /** 账户余额 单位分 */
   private Long balance;
 
   /** 会员积分 */
@@ -53,4 +53,21 @@ public class MemberInfoVO implements Serializable {
 
   /** 最近登录时间 */
   private Date lastLoginTime;
+  /** 最近登录IP */
+  private String lastLoginIp;
+
+  /** 当前登录时间 */
+  private Date loginTime;
+
+  /** 当前登录IP */
+  private String loginIP;
+
+  /** 上级代理账号 */
+  private String agentAccount;
+  // 成长等级
+  private Integer growthLevel;
+  // 成长值
+  private Integer growthValue;
+  /** 在线情况 */
+  private Boolean isOnline;
 }

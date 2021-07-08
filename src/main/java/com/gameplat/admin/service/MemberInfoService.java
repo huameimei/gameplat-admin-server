@@ -6,6 +6,7 @@ import com.gameplat.admin.model.dto.MemberInfoAddDTO;
 import com.gameplat.admin.model.dto.MemberInfoEditDTO;
 import com.gameplat.admin.model.dto.MemberInfoQueryDTO;
 import com.gameplat.admin.model.entity.MemberInfo;
+import com.gameplat.admin.model.entity.SysUser;
 import com.gameplat.admin.model.vo.MemberInfoVO;
 
 public interface MemberInfoService extends IService<MemberInfo> {
@@ -69,7 +70,8 @@ public interface MemberInfoService extends IService<MemberInfo> {
    */
   void deleteBoth(Long id);
 
-  IPage<MemberInfoVO> queryPage(IPage<MemberInfo> page, MemberInfoQueryDTO memberInfoQueryDto);
+  IPage<MemberInfoVO> queryPage(
+      IPage<MemberInfo> page, MemberInfoQueryDTO memberInfoQueryDto, SysUser sysUser);
 
   void save(MemberInfoAddDTO memberInfoAddDto);
 

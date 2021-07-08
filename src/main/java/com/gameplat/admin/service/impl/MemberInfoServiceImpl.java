@@ -1,7 +1,9 @@
 package com.gameplat.admin.service.impl;
 
+import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.convert.MemberInfoConvert;
@@ -11,11 +13,16 @@ import com.gameplat.admin.model.dto.MemberInfoAddDTO;
 import com.gameplat.admin.model.dto.MemberInfoEditDTO;
 import com.gameplat.admin.model.dto.MemberInfoQueryDTO;
 import com.gameplat.admin.model.entity.MemberInfo;
+import com.gameplat.admin.model.entity.SysUser;
 import com.gameplat.admin.model.vo.MemberInfoVO;
 import com.gameplat.admin.service.MemberInfoService;
 import com.gameplat.admin.utils.TreeUtils;
+import com.gameplat.admin.utils.UserLevelUtils;
 import com.gameplat.common.exception.ServiceException;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import org.apache.ibatis.exceptions.PersistenceException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -146,9 +153,44 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
 
   @Override
   public IPage<MemberInfoVO> queryPage(
-      IPage<MemberInfo> page, MemberInfoQueryDTO memberInfoQueryDto) {
+      IPage<MemberInfo> page, MemberInfoQueryDTO memberInfoQueryDto, SysUser sysUser) {
     LambdaQueryWrapper<MemberInfo> query = Wrappers.lambdaQuery();
+    // 检测当前是否可以进行模糊查询
+    // 查询代理线处理
+    // 多账号处理
+    handleMultiAccount(memberInfoQueryDto);
+    memberInfoQueryDto.setLevelList(UserLevelUtils.getAdminUserLevels(sysUser));
+    // 设置会员是否在线  处理数据查询后上线的情况
     return null;
+  }
+
+  private void handleMultiAccount(MemberInfoQueryDTO queryDTO) {
+    if (queryDTO != null) {
+      if (CollectionUtils.isEmpty(queryDTO.getAccountList())
+          && StrUtil.isNotBlank(queryDTO.getAccount())) {
+        List<String> accountList =
+            Arrays.stream(
+                    queryDTO
+                        .getAccount()
+                        .replace(StrUtil.SPACE, StrUtil.EMPTY)
+                        .replace("，", StrUtil.COMMA)
+                        .split(StrUtil.COMMA))
+                .filter(StrUtil::isNotBlank)
+                .collect(Collectors.toList());
+        if (CollectionUtils.isNotEmpty(accountList)) {
+          if (accountList.size() > 500) {
+            throw new ServiceException("账号超限，最多支持500个账号查询");
+          }
+          if (accountList.size() == 1) {
+            queryDTO.setAccountList(null);
+            queryDTO.setAccount(accountList.get(0));
+          } else {
+            queryDTO.setAccountList(accountList);
+            queryDTO.setAccount(null);
+          }
+        }
+      }
+    }
   }
 
   @Override

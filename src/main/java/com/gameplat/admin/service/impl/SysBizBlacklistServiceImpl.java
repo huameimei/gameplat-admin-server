@@ -29,9 +29,13 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.annotation.Resource;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 @Service
+@CacheConfig(cacheNames = "biz_blacklists")
 public class SysBizBlacklistServiceImpl extends ServiceImpl<SysBizBlacklistMapper, SysBizBlacklist>
     implements SysBizBlacklistService {
 
@@ -78,6 +82,7 @@ public class SysBizBlacklistServiceImpl extends ServiceImpl<SysBizBlacklistMappe
   }
 
   @Override
+  @CacheEvict(allEntries = true)
   public void save(SysBizBlacklistAddDTO sysBizBlacklistAddDTO) {
     validateBizBlacklist(sysBizBlacklistAddDTO);
     LambdaQueryWrapper<SysBizBlacklist> query = Wrappers.lambdaQuery();
@@ -107,6 +112,7 @@ public class SysBizBlacklistServiceImpl extends ServiceImpl<SysBizBlacklistMappe
     }
   }
 
+  @CacheEvict(allEntries = true)
   @Override
   public void delete(Long id) {
     Optional.ofNullable(id).orElseThrow(() -> new ServiceException("无效的ID"));
@@ -115,6 +121,7 @@ public class SysBizBlacklistServiceImpl extends ServiceImpl<SysBizBlacklistMappe
     }
   }
 
+  @CacheEvict(allEntries = true)
   @Override
   public void update(SysBizBlacklistUpdateDTO sysBizBlacklistUpdateDTO) {
     validateBizBlacklist(sysBizBlacklistUpdateDTO);
@@ -164,14 +171,16 @@ public class SysBizBlacklistServiceImpl extends ServiceImpl<SysBizBlacklistMappe
     return types;
   }
 
-  public Set<String> getBizBlacklistTypesByUserId(Long userId) throws ServiceException {
-    return getBizBlacklistTypesByUser(
-        Optional.ofNullable(userId)
+  @Cacheable(key = "'member_' + #memberId")
+  public Set<String> getBizBlacklistTypesByMemberId(Long memberId) throws ServiceException {
+    return getBizBlacklistTypesByMember(
+        Optional.ofNullable(memberId)
             .map(memberInfoService::getById)
             .orElseThrow(() -> new ServiceException("无效的用户ID")));
   }
 
-  public Set<String> getBizBlacklistTypesByUser(MemberInfo memberInfo) throws ServiceException {
+  @Cacheable(key = "'member_' + #memberInfo.id")
+  public Set<String> getBizBlacklistTypesByMember(MemberInfo memberInfo) throws ServiceException {
     return Optional.ofNullable(memberInfo)
         .map(
             u -> {

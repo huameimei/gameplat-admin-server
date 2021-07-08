@@ -11,7 +11,7 @@ public class MemberInfoQueryDTO implements Serializable {
   /** 会员账号 */
   public String account;
   /** 多账号 */
-  private List<String> accoutList;
+  private List<String> accountList;
   /** 账号模糊查询 */
   private boolean accountFuzzy;
   /** 真实名称 */
@@ -27,8 +27,14 @@ public class MemberInfoQueryDTO implements Serializable {
   /** 账号状态(0-- 停用，1-- 正常，2 --- 冻结) */
   private Integer status;
 
-  /** 代理账号 */
+  /** 代理账号 只查看下级时 有值 */
   private String agentAccount;
+
+  /** 代理账号，查看所有代理线上的账号时 有值 */
+  private String superPathByAccount;
+
+  /** 权限控制 账号可以查看的会员层级 */
+  private List<String> levelList;
 
   /** 代理等级 */
   private Integer userLevel;

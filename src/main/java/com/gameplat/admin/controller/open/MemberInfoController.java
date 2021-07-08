@@ -5,6 +5,7 @@ import com.gameplat.admin.model.dto.MemberInfoAddDTO;
 import com.gameplat.admin.model.dto.MemberInfoEditDTO;
 import com.gameplat.admin.model.dto.MemberInfoQueryDTO;
 import com.gameplat.admin.model.entity.MemberInfo;
+import com.gameplat.admin.model.entity.SysUser;
 import com.gameplat.admin.model.vo.MemberInfoVO;
 import com.gameplat.admin.service.MemberInfoService;
 import com.gameplat.common.constant.ServiceApi;
@@ -24,10 +25,10 @@ public class MemberInfoController {
   /** 查询会员信息 */
   @GetMapping(value = "/queryAll")
   public IPage<MemberInfoVO> queryPage(
-      IPage<MemberInfo> page, @RequestBody MemberInfoQueryDTO memberInfoQueryDto) {
+      IPage<MemberInfo> page, @RequestBody MemberInfoQueryDTO memberInfoQueryDto, SysUser sysUser) {
     // 当前登录用户权限检查
     // 是否允许账号模糊查询
-    return memberInfoService.queryPage(page, memberInfoQueryDto);
+    return memberInfoService.queryPage(page, memberInfoQueryDto, sysUser);
   }
 
   /**

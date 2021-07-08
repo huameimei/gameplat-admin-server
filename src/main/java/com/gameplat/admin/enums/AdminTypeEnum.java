@@ -4,10 +4,10 @@ import java.util.Arrays;
 
 /**
  * 管理员类型枚举
+ *
  * @author Lenovo
  */
 public enum AdminTypeEnum {
-
   SUPER(1, "超级管理员"),
   ADMIN(2, "管理员"),
   NORMAL(3, "子账号");
@@ -28,7 +28,9 @@ public enum AdminTypeEnum {
   }
 
   public static AdminTypeEnum get(int type) {
-    return Arrays.stream(AdminTypeEnum.values()).filter(e -> e.getValue() == type).findFirst()
+    return Arrays.stream(AdminTypeEnum.values())
+        .filter(e -> e.getValue() == type)
+        .findFirst()
         .orElse(null);
   }
 
@@ -37,13 +39,15 @@ public enum AdminTypeEnum {
     return states != null ? states.getDesc() : defaultValue;
   }
 
-
   public static boolean isAdmin(Integer value) {
-    return ADMIN.getValue().equals(value) || NORMAL.getValue().equals(value);
+    return ADMIN.getValue().equals(value);
   }
 
-  public static boolean isSuperAdmin(Integer value){
+  public static boolean isSuperAdmin(Integer value) {
     return SUPER.getValue().equals(value);
   }
 
+  public static boolean isNormal(Integer value) {
+    return NORMAL.getValue().equals(value);
+  }
 }

@@ -1,15 +1,14 @@
 package com.gameplat.admin.controller.open;
 
-
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.gameplat.admin.convert.SysMenuConvert;
 import com.gameplat.admin.enums.AdminTypeEnum;
 import com.gameplat.admin.interceptor.Session;
 import com.gameplat.admin.model.entity.SysMenu;
 import com.gameplat.admin.model.entity.SysUser;
-import com.gameplat.admin.model.vo.MetaVo;
-import com.gameplat.admin.model.vo.SysMenuVo;
-import com.gameplat.admin.model.vo.SysMyMenuVo;
+import com.gameplat.admin.model.vo.MetaVO;
+import com.gameplat.admin.model.vo.SysMenuVO;
+import com.gameplat.admin.model.vo.SysMyMenuVO;
 import com.gameplat.admin.service.SysMenuService;
 import com.gameplat.admin.service.SysUserService;
 import com.gameplat.common.constant.ServiceApi;
@@ -53,27 +52,28 @@ public class SysMenuController {
           sysMenuService.list().stream()
               .filter(s -> s.getHidden() == 0)
               .collect(Collectors.toList());
-      List<SysMenuVo> sysMenus = TreeBuilderNoButton(menus);
-      List<SysMyMenuVo> sysMyMenuVOS = BeanUtils.mapList(sysMenus, SysMyMenuVo.class);
-      return Result.succeed(sysMyMenuVOS,"操作成功");
+      List<SysMenuVO> sysMenus = TreeBuilderNoButton(menus);
+      List<SysMyMenuVO> sysMyMenuVOS = BeanUtils.mapList(sysMenus, SysMyMenuVO.class);
+      return Result.succeed(sysMyMenuVOS, "操作成功");
     }
     return Result.succeed(authTrees);
   }
 
-  public List<SysMenuVo> TreeBuilderNoButton(List<SysMenu> sysMenus) {
+  public List<SysMenuVO> TreeBuilderNoButton(List<SysMenu> sysMenus) {
     // 数据格式转换
-    List<SysMenuVo> sysMenuVoList = sysMenus.stream().map(i -> sysMenuConvert.toVo(i)).collect(Collectors.toList());
-    List<SysMenuVo> menus = new ArrayList<>();
-    for (SysMenuVo sysMenu : sysMenuVoList) {
+    List<SysMenuVO> sysMenuVoList =
+        sysMenus.stream().map(i -> sysMenuConvert.toVo(i)).collect(Collectors.toList());
+    List<SysMenuVO> menus = new ArrayList<>();
+    for (SysMenuVO sysMenu : sysMenuVoList) {
       // 顶级菜单
       if (ObjectUtils.equals(-1L, sysMenu.getParentId())) {
         menus.add(sysMenu);
       }
-      MetaVo metaVo = new MetaVo();
+      MetaVO metaVo = new MetaVO();
       metaVo.setIcon(sysMenu.getIcon());
       metaVo.setTitle(sysMenu.getTitle());
       sysMenu.setMeta(metaVo);
-      for (SysMenuVo menu : sysMenuVoList) {
+      for (SysMenuVO menu : sysMenuVoList) {
         if (menu.getType() == 0) { // 如果是目录层级（布局设置成菜单名称）
           menu.setComponent(menu.getPath());
           menu.setHidden(menu.getHidden());
@@ -83,7 +83,7 @@ public class SysMenuController {
             if (sysMenu.getSubMenus() == null) {
               sysMenu.setSubMenus(new ArrayList<>());
             }
-            metaVo = new MetaVo();
+            metaVo = new MetaVO();
             metaVo.setIcon(menu.getIcon());
             metaVo.setTitle(menu.getTitle());
             menu.setMeta(metaVo);
@@ -96,7 +96,7 @@ public class SysMenuController {
   }
 
   @DeleteMapping("delete/{id}")
-  public void deleteMenu(@PathVariable("id") Long id){
+  public void deleteMenu(@PathVariable("id") Long id) {
     sysMenuService.deleteMenu(id);
   }
 }

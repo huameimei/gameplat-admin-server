@@ -2,15 +2,15 @@ package com.gameplat.admin.enums;
 
 import java.util.Arrays;
 
-/**
- * 管理员用户状态
- */
+/** 管理员用户状态 */
 public enum UserStateEnum {
-  DEFAULT(1, "正常"), DISABLE(2, "停用"), FROZEN(3, "冻结");
+  DEFAULT(1, "正常"),
+  DISABLE(2, "停用"),
+  FROZEN(3, "冻结");
   private Integer value;
   private String desc;
 
-  private UserStateEnum(Integer value, String desc) {
+  UserStateEnum(Integer value, String desc) {
     this.value = value;
     this.desc = desc;
   }
@@ -24,7 +24,10 @@ public enum UserStateEnum {
   }
 
   public static UserStateEnum get(int type) {
-    return Arrays.stream(UserStateEnum.values()).filter(e->e.getValue()==type).findFirst().orElse(null);
+    return Arrays.stream(UserStateEnum.values())
+        .filter(e -> e.getValue() == type)
+        .findFirst()
+        .orElse(null);
   }
 
   public static String getDescInfo(int type, String defaultValue) {

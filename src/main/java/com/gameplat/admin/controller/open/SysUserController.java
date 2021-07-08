@@ -7,10 +7,10 @@ import com.gameplat.admin.interceptor.Session;
 import com.gameplat.admin.model.bean.AdminLoginLimit;
 import com.gameplat.admin.model.bean.AdminRedisBean;
 import com.gameplat.admin.model.bean.TokenInfo;
-import com.gameplat.admin.model.dto.AdminLoginDto;
+import com.gameplat.admin.model.dto.AdminLoginDTO;
 import com.gameplat.admin.model.entity.GoogleConfig;
 import com.gameplat.admin.model.entity.SysUser;
-import com.gameplat.admin.model.vo.SysUserVo;
+import com.gameplat.admin.model.vo.SysUserVO;
 import com.gameplat.admin.model.vo.UserEquipmentVO;
 import com.gameplat.admin.service.SysAuthIpService;
 import com.gameplat.admin.service.SysDictDataService;
@@ -53,7 +53,7 @@ public class SysUserController {
   @RequestMapping(value = "/login", method = RequestMethod.POST)
   @ResponseBody
   public Result getUserTokenInfo(
-      @RequestBody AdminLoginDto adminLoginDto,
+      @RequestBody AdminLoginDTO adminLoginDto,
       HttpServletRequest request,
       HttpServletResponse response,
       @RequestParam(value = "userAgent", required = false) String userAgentString,
@@ -127,11 +127,11 @@ public class SysUserController {
   /** 当前登录用户信息 */
   @RequestMapping(value = "/info", method = RequestMethod.GET)
   @ResponseBody
-  public SysUserVo info(@Session Long adminId) throws Exception {
+  public SysUserVO info(@Session Long adminId) throws Exception {
     if (adminId == null) {
       return null;
     }
-    SysUserVo adminInfo = new SysUserVo();
+    SysUserVO adminInfo = new SysUserVO();
     SysUser admin = this.sysUserService.getById(adminId);
     BeanUtils.copyProperties(adminInfo, admin);
     AdminRedisBean adminBean = sysUserService.getPrivilege(adminId);

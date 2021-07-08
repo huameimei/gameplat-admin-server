@@ -1,9 +1,9 @@
 package com.gameplat.admin.controller.open;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.gameplat.admin.model.dto.SysEmailQueryDto;
+import com.gameplat.admin.model.dto.SysEmailQueryDTO;
 import com.gameplat.admin.model.entity.SysEmail;
-import com.gameplat.admin.model.vo.SysEmailVo;
+import com.gameplat.admin.model.vo.SysEmailVO;
 import com.gameplat.admin.service.SysEmailService;
 import com.gameplat.common.constant.ServiceApi;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +18,7 @@ public class SysEmailController {
   @Autowired private SysEmailService sysEmailService;
 
   @GetMapping(value = "/queryAll")
-  public IPage<SysEmailVo> queryPage(IPage<SysEmail> page, SysEmailQueryDto sysEmailQueryDto) {
+  public IPage<SysEmailVO> queryPage(IPage<SysEmail> page, SysEmailQueryDTO sysEmailQueryDto) {
     return sysEmailService.queryPage(page, sysEmailQueryDto);
   }
 }

@@ -6,9 +6,9 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.convert.SysEmailConvert;
 import com.gameplat.admin.dao.SysEmailMapper;
-import com.gameplat.admin.model.dto.SysEmailQueryDto;
+import com.gameplat.admin.model.dto.SysEmailQueryDTO;
 import com.gameplat.admin.model.entity.SysEmail;
-import com.gameplat.admin.model.vo.SysEmailVo;
+import com.gameplat.admin.model.vo.SysEmailVO;
 import com.gameplat.admin.service.SysEmailService;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +22,7 @@ public class SysEmailServiceImpl extends ServiceImpl<SysEmailMapper, SysEmail>
   @Autowired private SysEmailConvert sysEmailConvert;
 
   @Override
-  public IPage<SysEmailVo> queryPage(IPage<SysEmail> page, SysEmailQueryDto queryDto) {
+  public IPage<SysEmailVO> queryPage(IPage<SysEmail> page, SysEmailQueryDTO queryDto) {
     LambdaQueryWrapper<SysEmail> query = Wrappers.lambdaQuery();
     if (StringUtils.isNotBlank(queryDto.getTitle())) {
       query.like(SysEmail::getTitle, queryDto.getTitle());

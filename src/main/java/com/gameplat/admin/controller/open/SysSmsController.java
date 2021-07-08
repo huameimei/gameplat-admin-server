@@ -1,7 +1,7 @@
 package com.gameplat.admin.controller.open;
 
 import com.gameplat.admin.convert.SysSmsConvert;
-import com.gameplat.admin.model.dto.SysSmsQueryDto;
+import com.gameplat.admin.model.dto.SysSmsQueryDTO;
 import com.gameplat.admin.service.SysSmsService;
 import com.gameplat.common.constant.ServiceApi;
 import com.gameplat.common.web.Result;
@@ -20,7 +20,7 @@ public class SysSmsController {
   @Autowired private SysSmsConvert sysSmsConvert;
 
   @GetMapping(value = "/queryAll")
-  public Result queryAll(SysSmsQueryDto sysSmsQueryDto) {
+  public Result queryAll(SysSmsQueryDTO sysSmsQueryDto) {
     return Result.succeed(
         sysSmsService.listByQueryDto(sysSmsQueryDto).stream()
             .map(i -> sysSmsConvert.toVo(i))

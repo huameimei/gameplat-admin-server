@@ -1,24 +1,20 @@
 package com.gameplat.admin.service.impl;
 
 import cn.hutool.json.JSONUtil;
-import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.gameplat.admin.constant.Constants;
 import com.gameplat.admin.convert.SysDictDataConvert;
 import com.gameplat.admin.dao.SysDictDataMapper;
 import com.gameplat.admin.enums.DictDataEnum;
-import com.gameplat.admin.model.dto.SysDictDataAddDto;
-import com.gameplat.admin.model.dto.SysDictDataEditDto;
-import com.gameplat.admin.model.dto.SysDictDataQueryDto;
+import com.gameplat.admin.model.dto.SysDictDataAddDTO;
+import com.gameplat.admin.model.dto.SysDictDataEditDTO;
+import com.gameplat.admin.model.dto.SysDictDataQueryDTO;
 import com.gameplat.admin.model.entity.SysDictData;
-import com.gameplat.admin.model.vo.SysDictDataVo;
+import com.gameplat.admin.model.vo.SysDictDataVO;
 import com.gameplat.admin.service.SysDictDataService;
-import com.gameplat.admin.utils.JsonFileUtil;
 import com.gameplat.common.exception.ServiceException;
-import com.gameplat.ds.core.context.DyDataSourceContextHolder;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -60,7 +56,7 @@ public class SysDictDataServiceImpl extends ServiceImpl<SysDictDataMapper, SysDi
   }
 
   @Override
-  public IPage<SysDictDataVo> queryPage(IPage<SysDictData> page, SysDictDataQueryDto queryDto) {
+  public IPage<SysDictDataVO> queryPage(IPage<SysDictData> page, SysDictDataQueryDTO queryDto) {
     LambdaQueryWrapper<SysDictData> query = Wrappers.lambdaQuery();
     if (StringUtils.isNotBlank(queryDto.getDictLabel())) {
       query.like(SysDictData::getDictLabel, queryDto.getDictLabel());
@@ -72,7 +68,7 @@ public class SysDictDataServiceImpl extends ServiceImpl<SysDictDataMapper, SysDi
   }
 
   @Override
-  public void save(SysDictDataAddDto sysDictDataAddDto) throws ServiceException {
+  public void save(SysDictDataAddDTO sysDictDataAddDto) throws ServiceException {
     LambdaQueryWrapper<SysDictData> query = Wrappers.lambdaQuery();
     query.eq(SysDictData::getDictLabel, sysDictDataAddDto.getDictLabel());
     if (this.count(query) > 0) {
@@ -93,7 +89,7 @@ public class SysDictDataServiceImpl extends ServiceImpl<SysDictDataMapper, SysDi
   }
 
   @Override
-  public void update(SysDictDataEditDto sysDictDataEditDto) throws ServiceException {
+  public void update(SysDictDataEditDTO sysDictDataEditDto) throws ServiceException {
     sysDictDataEditDto.setUpdateTime(new Date());
     if (!this.updateById(sysDictDataConvert.toEntity(sysDictDataEditDto))) {
       throw new ServiceException("更新失败!");
@@ -112,17 +108,5 @@ public class SysDictDataServiceImpl extends ServiceImpl<SysDictDataMapper, SysDi
     return this.getSysDictData(
             DictDataEnum.defaultUserLevel.getType(), DictDataEnum.defaultUserLevel.getLabel())
         .getDictValue();
-  }
-
-  @Override
-  public void findDataInitFile(String dictType) {
-    List<SysDictData> sysDictDataList = this.selectDictDataListByType(dictType);
-    JSONObject json = new JSONObject();
-    for (SysDictData data : sysDictDataList) {
-      json.put(data.getDictLabel(), data.getDictValue());
-    }
-    String prefix = getDefaultJson() + Constants.TENANT + DyDataSourceContextHolder.getDBSuffix();
-    JsonFileUtil.clear(prefix, dictType);
-    JsonFileUtil.setToFile(json, prefix, dictType);
   }
 }

@@ -1,17 +1,17 @@
 package com.gameplat.admin.convert;
 
-import com.gameplat.admin.model.dto.SysDictDataAddDto;
-import com.gameplat.admin.model.dto.SysDictDataEditDto;
+import com.gameplat.admin.model.dto.SysDictDataAddDTO;
+import com.gameplat.admin.model.dto.SysDictDataEditDTO;
 import com.gameplat.admin.model.entity.SysDictData;
-import com.gameplat.admin.model.vo.SysDictDataVo;
+import com.gameplat.admin.model.vo.SysDictDataVO;
 import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")
 public interface SysDictDataConvert {
 
-  SysDictData toEntity(SysDictDataAddDto sysDictDataAddDto);
+  SysDictData toEntity(SysDictDataAddDTO sysDictDataAddDto);
 
-  SysDictDataVo toVo(SysDictData sysDictData);
+  SysDictDataVO toVo(SysDictData sysDictData);
 
-  SysDictData toEntity(SysDictDataEditDto sysDictDataEditDto);
+  SysDictData toEntity(SysDictDataEditDTO sysDictDataEditDto);
 }

@@ -1,13 +1,12 @@
 package com.gameplat.admin.service;
 
-
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.gameplat.admin.model.dto.SysDictDataAddDto;
-import com.gameplat.admin.model.dto.SysDictDataEditDto;
-import com.gameplat.admin.model.dto.SysDictDataQueryDto;
+import com.gameplat.admin.model.dto.SysDictDataAddDTO;
+import com.gameplat.admin.model.dto.SysDictDataEditDTO;
+import com.gameplat.admin.model.dto.SysDictDataQueryDTO;
 import com.gameplat.admin.model.entity.SysDictData;
-import com.gameplat.admin.model.vo.SysDictDataVo;
+import com.gameplat.admin.model.vo.SysDictDataVO;
 import java.util.List;
 
 public interface SysDictDataService extends IService<SysDictData> {
@@ -18,20 +17,13 @@ public interface SysDictDataService extends IService<SysDictData> {
 
   SysDictData getSysDictData(String dictType, String dictLabel);
 
-  IPage<SysDictDataVo> queryPage(IPage<SysDictData> page, SysDictDataQueryDto queryDto);
+  IPage<SysDictDataVO> queryPage(IPage<SysDictData> page, SysDictDataQueryDTO queryDto);
 
-  void save(SysDictDataAddDto sysDictDataAddDto);
+  void save(SysDictDataAddDTO sysDictDataAddDto);
 
   void delete(Long id);
 
-  void update(SysDictDataEditDto sysDictDataEditDto);
-
-  /**
-   * 找出数据并存到JSON文件中
-   * @param dictType
-   */
-  void findDataInitFile(String dictType);
+  void update(SysDictDataEditDTO sysDictDataEditDto);
 
   String getDefaultJson();
-
 }

@@ -13,26 +13,28 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * 会员信息
+ *
  * @author Lenovo
  */
 @EqualsAndHashCode(of = "id")
 @Data
 @NoArgsConstructor
-public class MemberInfo{
+public class MemberInfo {
 
-  @Autowired
-  private MemberInfoMapper memberInfoMapper;
+  @Autowired private MemberInfoMapper memberInfoMapper;
 
-  @Autowired
-  private MemberTreeMapper memberTreeMapper;
+  @Autowired private MemberTreeMapper memberTreeMapper;
 
   public Long id;
 
   @ApiModelProperty(value = "会员名")
-  private String userName;
+  private String account;
 
   @ApiModelProperty(value = "会员昵称")
   private String nickName;
+
+  @ApiModelProperty(value = "会员层级或代理层级")
+  private Integer userLevel;
 
   @ApiModelProperty(value = "上级ID")
   private Long parentId;
@@ -93,6 +95,7 @@ public class MemberInfo{
 
   @ApiModelProperty(value = "创建人")
   private Long createBy;
+
   @ApiModelProperty(value = "更新人")
   private Long updateBy;
 
@@ -144,8 +147,7 @@ public class MemberInfo{
   }
 
   /**
-   * 获取由顶级分类到此分类(含)路径上的所有的分类对象。
-   * 如果指定的分类不存在，则返回空列表。
+   * 获取由顶级分类到此分类(含)路径上的所有的分类对象。 如果指定的分类不存在，则返回空列表。
    *
    * @return 分类实体列表，越靠上的分类在列表中的位置越靠前
    */
@@ -154,8 +156,7 @@ public class MemberInfo{
   }
 
   /**
-   * 获取此分类(含)到其某个的上级分类（不含）之间的所有分类的实体对象（仅查询id和name属性）。
-   * 如果指定的分类、上级分类不存在，或是上级分类不是指定分类的上级，则返回空列表
+   * 获取此分类(含)到其某个的上级分类（不含）之间的所有分类的实体对象（仅查询id和name属性）。 如果指定的分类、上级分类不存在，或是上级分类不是指定分类的上级，则返回空列表
    *
    * @param ancestor 上级分类的id，若为0则表示获取到一级分类（含）的列表。
    * @return 分类实体列表，越靠上的分类在列表中的位置越靠前。
@@ -176,29 +177,20 @@ public class MemberInfo{
   }
 
   /**
-   * 将一个分类移动到目标分类下面（成为其子分类）。被移动分类的子类将自动上浮（成为指定分类
-   * 父类的子分类），即使目标是指定分类原本的父类。
-   * <p>
-   * 例如下图(省略顶级分类)：
-   *       1                                    1
-   *       |                                  / | \
-   *       2                                 3  4  5
-   *     / | \         (id=2).moveTo(7)           / \
-   *    3  4  5       ----------------->         6   7
-   *         / \                                /  / | \
-   *       6    7                              8  9  10 2
-   *      /    /  \
-   *     8    9    10
+   * 将一个分类移动到目标分类下面（成为其子分类）。被移动分类的子类将自动上浮（成为指定分类 父类的子分类），即使目标是指定分类原本的父类。
+   *
+   * <p>例如下图(省略顶级分类)： 1 1 | / | \ 2 3 4 5 / | \ (id=2).moveTo(7) / \ 3 4 5 -----------------> 6 7 /
+   * \ / / | \ 6 7 8 9 10 2 / / \ 8 9 10
    *
    * @param target 目标分类的id
    * @throws IllegalArgumentException 如果target所表示的分类不存在、或此分类的id==target
    */
   public void moveTo(Long target) {
-    if(id.equals(target)) {
+    if (id.equals(target)) {
       throw new IllegalArgumentException("不能移动到自己下面");
     }
     TreeUtils.checkNotNegative(target, "target");
-    if(target > 0 && memberInfoMapper.contains(target) == null) {
+    if (target > 0 && memberInfoMapper.contains(target) == null) {
       throw new IllegalArgumentException("指定的上级分类不存在");
     }
     moveSubTree(id, memberTreeMapper.selectAncestor(id, 1));
@@ -206,29 +198,18 @@ public class MemberInfo{
   }
 
   /**
-   * 将一个分类移动到目标分类下面（成为其子分类），被移动分类的子分类也会随着移动。
-   * 如果目标分类是被移动分类的子类，则先将目标分类（连带子类）移动到被移动分类原来的
+   * 将一个分类移动到目标分类下面（成为其子分类），被移动分类的子分类也会随着移动。 如果目标分类是被移动分类的子类，则先将目标分类（连带子类）移动到被移动分类原来的
    * 的位置，再移动需要被移动的分类。
-   * <p>
-   * 例如下图(省略顶级分类)：
-   *       1                                      1
-   *       |                                      |
-   *       2                                      7
-   *     / | \        (id=2).moveTreeTo(7)      / | \
-   *    3  4  5      -------------------->     9  10  2
-   *         / \                                  / | \
-   *       6    7                                3  4  5
-   *      /    /  \                                    |
-   *     8    9    10                                  6
-   *                                                   |
-   *                                                   8
+   *
+   * <p>例如下图(省略顶级分类)： 1 1 | | 2 7 / | \ (id=2).moveTreeTo(7) / | \ 3 4 5 --------------------> 9 10
+   * 2 / \ / | \ 6 7 3 4 5 / / \ | 8 9 10 6 | 8
    *
    * @param target 目标分类的id
    * @throws IllegalArgumentException 如果id或target所表示的分类不存在、或id==target
    */
   public void moveTreeTo(Long target) {
     TreeUtils.checkNotNegative(target, "target");
-    if(target > 0 && memberInfoMapper.contains(target) == null) {
+    if (target > 0 && memberInfoMapper.contains(target) == null) {
       throw new IllegalArgumentException("指定的上级分类不存在");
     }
 
@@ -252,8 +233,7 @@ public class MemberInfo{
   }
 
   /**
-   * 将指定节点移动到另某节点下面，该方法不修改子节点的相关记录，
-   * 为了保证数据的完整性，需要与moveSubTree()方法配合使用。
+   * 将指定节点移动到另某节点下面，该方法不修改子节点的相关记录， 为了保证数据的完整性，需要与moveSubTree()方法配合使用。
    *
    * @param id 指定节点id
    * @param parent 某节点id
@@ -269,10 +249,9 @@ public class MemberInfo{
   }
 
   /**
-   * 将指定节点的所有子树移动到某节点下
-   * 如果两个参数相同，则相当于重建子树，用于父节点移动后更新路径
+   * 将指定节点的所有子树移动到某节点下 如果两个参数相同，则相当于重建子树，用于父节点移动后更新路径
    *
-   * @param id     指定节点id
+   * @param id 指定节点id
    * @param parent 某节点id
    */
   private void moveSubTree(Long id, Long parent) {

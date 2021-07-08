@@ -1,11 +1,11 @@
 package com.gameplat.admin.controller.open;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.gameplat.admin.model.dto.SysDictTypeAddDto;
-import com.gameplat.admin.model.dto.SysDictTypeEditDto;
-import com.gameplat.admin.model.dto.SysDictTypeQueryDto;
+import com.gameplat.admin.model.dto.SysDictTypeAddDTO;
+import com.gameplat.admin.model.dto.SysDictTypeEditDTO;
+import com.gameplat.admin.model.dto.SysDictTypeQueryDTO;
 import com.gameplat.admin.model.entity.SysDictType;
-import com.gameplat.admin.model.vo.SysDictTypeVo;
+import com.gameplat.admin.model.vo.SysDictTypeVO;
 import com.gameplat.admin.service.SysDictTypeService;
 import com.gameplat.common.constant.ServiceApi;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,17 +23,17 @@ public class SysDictTypeController {
   @Autowired private SysDictTypeService sysDictTypeService;
 
   @GetMapping(value = "/queryAll")
-  public IPage<SysDictTypeVo> queryAll(IPage<SysDictType> page, SysDictTypeQueryDto queryDto) {
+  public IPage<SysDictTypeVO> queryAll(IPage<SysDictType> page, SysDictTypeQueryDTO queryDto) {
     return sysDictTypeService.queryPage(page, queryDto);
   }
 
   @PostMapping(value = "/save")
-  public void save(SysDictTypeAddDto sysDictTypeAddDto) {
+  public void save(SysDictTypeAddDTO sysDictTypeAddDto) {
     sysDictTypeService.save(sysDictTypeAddDto);
   }
 
   @PostMapping(value = "/update")
-  public void update(SysDictTypeEditDto sysDictTypeEditDto) {
+  public void update(SysDictTypeEditDTO sysDictTypeEditDto) {
     sysDictTypeService.update(sysDictTypeEditDto);
   }
 

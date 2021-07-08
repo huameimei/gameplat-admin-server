@@ -4,11 +4,11 @@ import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.gameplat.admin.constant.Constants;
 import com.gameplat.admin.enums.DictTypeEnum;
-import com.gameplat.admin.model.dto.SysDictDataAddDto;
-import com.gameplat.admin.model.dto.SysDictDataEditDto;
-import com.gameplat.admin.model.dto.SysDictDataQueryDto;
+import com.gameplat.admin.model.dto.SysDictDataAddDTO;
+import com.gameplat.admin.model.dto.SysDictDataEditDTO;
+import com.gameplat.admin.model.dto.SysDictDataQueryDTO;
 import com.gameplat.admin.model.entity.SysDictData;
-import com.gameplat.admin.model.vo.SysDictDataVo;
+import com.gameplat.admin.model.vo.SysDictDataVO;
 import com.gameplat.admin.service.SysDictDataService;
 import com.gameplat.admin.utils.JsonFileUtil;
 import com.gameplat.common.constant.ServiceApi;
@@ -33,19 +33,19 @@ public class SysDictDataController {
 
   @GetMapping(value = "/queryAll")
   @ResponseBody
-  public IPage<SysDictDataVo> queryAll(IPage<SysDictData> page, SysDictDataQueryDto queryDto) {
+  public IPage<SysDictDataVO> queryAll(IPage<SysDictData> page, SysDictDataQueryDTO queryDto) {
     return sysDictDataService.queryPage(page, queryDto);
   }
 
   @PostMapping(value = "/save")
   @ResponseBody
-  public void save(SysDictDataAddDto sysDictDataAddDto) {
+  public void save(SysDictDataAddDTO sysDictDataAddDto) {
     sysDictDataService.save(sysDictDataAddDto);
   }
 
   @PostMapping(value = "/update")
   @ResponseBody
-  public void update(SysDictDataEditDto sysDictDataEditDto) {
+  public void update(SysDictDataEditDTO sysDictDataEditDto) {
     sysDictDataService.update(sysDictDataEditDto);
   }
 

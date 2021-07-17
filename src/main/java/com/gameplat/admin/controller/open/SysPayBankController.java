@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping(ServiceApi.OPEN_API + "/sysPayBanks")
+@RequestMapping(ServiceApi.API + "/sysPayBanks")
 public class SysPayBankController {
 
   @Autowired private SysPayBankService sysPayBankService;

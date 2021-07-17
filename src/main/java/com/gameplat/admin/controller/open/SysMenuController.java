@@ -28,7 +28,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping(ServiceApi.OPEN_API + "/menus")
+@RequestMapping(ServiceApi.API + "/menus")
 @Slf4j
 public class SysMenuController {
 
@@ -54,7 +54,7 @@ public class SysMenuController {
               .collect(Collectors.toList());
       List<SysMenuVO> sysMenus = TreeBuilderNoButton(menus);
       List<SysMyMenuVO> sysMyMenuVOS = BeanUtils.mapList(sysMenus, SysMyMenuVO.class);
-      return Result.succeed(sysMyMenuVOS, "操作成功");
+      return Result.succeed(sysMyMenuVOS);
     }
     return Result.succeed(authTrees);
   }

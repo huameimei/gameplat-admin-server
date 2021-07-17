@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping(ServiceApi.OPEN_API + "/tpPayTypes")
+@RequestMapping(ServiceApi.API + "/tpPayTypes")
 public class TpPayTypeController {
 
   @Autowired private TpPayTypeService payTypeService;

@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping(ServiceApi.OPEN_API + "/bannerInfo")
+@RequestMapping(ServiceApi.API + "/bannerInfo")
 public class SysBannerInfoController {
 
   @Autowired private SysBannerInfoService sysBannerInfoService;

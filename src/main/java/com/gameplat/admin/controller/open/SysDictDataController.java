@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping(ServiceApi.OPEN_API + "/dictData")
+@RequestMapping(ServiceApi.API + "/dictData")
 public class SysDictDataController {
 
   @Autowired private SysDictDataService sysDictDataService;

@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping(ServiceApi.OPEN_API + "/sysEmail")
+@RequestMapping(ServiceApi.API + "/sysEmail")
 public class SysEmailController {
 
   @Autowired private SysEmailService sysEmailService;

@@ -41,7 +41,7 @@ import org.springframework.web.bind.annotation.RestController;
 /** 管理员 */
 @Slf4j
 @RestController
-@RequestMapping(ServiceApi.OPEN_API + "/user")
+@RequestMapping(ServiceApi.API + "/user")
 public class SysUserController {
 
   @Autowired private SysDictDataService sysDictDataService;

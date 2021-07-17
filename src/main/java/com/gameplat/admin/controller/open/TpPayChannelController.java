@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping(ServiceApi.OPEN_API + "/tpPayChannels")
+@RequestMapping(ServiceApi.API + "/tpPayChannels")
 public class TpPayChannelController {
 
   @Autowired private TpPayChannelService tpPayChannelService;

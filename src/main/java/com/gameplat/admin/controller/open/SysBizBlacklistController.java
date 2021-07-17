@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping(value = ServiceApi.OPEN_API + "/sysBizBlacklist")
+@RequestMapping(value = ServiceApi.API + "/sysBizBlacklist")
 public class SysBizBlacklistController {
 
   @Autowired private SysBizBlacklistService sysBizBlacklistService;

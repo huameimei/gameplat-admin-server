@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping(ServiceApi.OPEN_API + "/tpMerchants")
+@RequestMapping(ServiceApi.API + "/tpMerchants")
 public class TpMerchantController {
 
   @Autowired private TpMerchantService tpMerchantService;

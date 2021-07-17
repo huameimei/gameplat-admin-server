@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping(ServiceApi.OPEN_API + "/tpInterfaces")
+@RequestMapping(ServiceApi.API + "/tpInterfaces")
 public class TpInterfaceController {
 
   @Autowired private TpInterfaceService tpInterfaceService;

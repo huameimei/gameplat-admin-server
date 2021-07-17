@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping(ServiceApi.OPEN_API + "/sysQuickReply")
+@RequestMapping(ServiceApi.API + "/sysQuickReply")
 public class SysQuickReplayController {
 
   @Autowired private SysQuickReplyService sysQuickReplyService;

@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping(ServiceApi.OPEN_API + "/payTypes")
+@RequestMapping(ServiceApi.API + "/payTypes")
 public class PayTypeController {
 
   @Autowired private PayTypeService payTypeService;

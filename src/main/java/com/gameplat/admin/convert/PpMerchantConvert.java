@@ -13,5 +13,5 @@ public interface PpMerchantConvert {
 
   PpMerchant toEntity(PpMerchantAddDTO ppInterfaceAddDTO);
 
-  PpMerchant toEntity(PpMerchantEditDTO ppMerchaneUpdateDTO);
+  PpMerchant toEntity(PpMerchantEditDTO ppMerchaneEditDTO);
 }

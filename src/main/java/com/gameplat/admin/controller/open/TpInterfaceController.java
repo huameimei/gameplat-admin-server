@@ -1,5 +1,6 @@
 package com.gameplat.admin.controller.open;
 
+import com.gameplat.admin.model.entity.TpInterface;
 import com.gameplat.admin.model.vo.TpInterfaceVO;
 import com.gameplat.admin.service.TpInterfaceService;
 import com.gameplat.common.constant.ServiceApi;
@@ -18,5 +19,10 @@ public class TpInterfaceController {
   @GetMapping("/queryAll")
   public List<TpInterfaceVO> getAll() {
     return tpInterfaceService.queryAll();
+  }
+
+  @GetMapping("/queryList")
+  public List<TpInterface> getList() {
+    return tpInterfaceService.list();
   }
 }

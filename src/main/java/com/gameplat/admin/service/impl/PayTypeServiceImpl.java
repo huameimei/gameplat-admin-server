@@ -1,6 +1,7 @@
 package com.gameplat.admin.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -9,6 +10,7 @@ import com.gameplat.admin.convert.PayTypeConvert;
 import com.gameplat.admin.dao.PayTypeMapper;
 import com.gameplat.admin.model.dto.PayTypeAddDTO;
 import com.gameplat.admin.model.dto.PayTypeEditDTO;
+import com.gameplat.admin.model.entity.PayAccount;
 import com.gameplat.admin.model.entity.PayType;
 import com.gameplat.admin.model.vo.PayTypeVO;
 import com.gameplat.admin.service.PayTypeService;
@@ -44,10 +46,6 @@ public class PayTypeServiceImpl extends ServiceImpl<PayTypeMapper, PayType>
       throw new ServiceException("支付方式已存在");
     }
     dto.setIsSysCode(0);
-    dto.setCreateBy(SecurityUtil.getUserName());
-    dto.setCreateTime(new Date());
-    dto.setUpdateBy(SecurityUtil.getUserName());
-    dto.setUpdateTime(new Date());
     if (!this.save(payTypeConvert.toEntity(dto))) {
       throw new ServiceException("添加失败!");
     }
@@ -66,11 +64,20 @@ public class PayTypeServiceImpl extends ServiceImpl<PayTypeMapper, PayType>
       payType = payTypeConvert.toEntity(dto);
       payType.setIsSysCode(0);
     }
-    dto.setUpdateBy(SecurityUtil.getUserName());
-    dto.setUpdateTime(new Date());
     if (!this.updateById(payType)) {
       throw new ServiceException("更新失败!");
     }
+  }
+
+  @Override
+  public void updateStatus(Long id, Integer status) {
+    if (null == status) {
+      throw new ServiceException("状态不能为空!");
+    }
+    LambdaUpdateWrapper<PayType> update = Wrappers.lambdaUpdate();
+    update.set(PayType::getStatus, status);
+    update.eq(PayType::getId, id);
+    this.update(update);
   }
 
   @Override

@@ -92,7 +92,6 @@ public class SysBizBlacklistServiceImpl extends ServiceImpl<SysBizBlacklistMappe
     if (exists != null) {
       SysBizBlacklist update = new SysBizBlacklist();
       update.setId(exists.getId());
-      update.setUpdateBy(null);
       if (sysBizBlacklistAddDTO.isReplaceExists()) {
         update.setTypes(sysBizBlacklistAddDTO.getTypes());
       } else {
@@ -106,8 +105,6 @@ public class SysBizBlacklistServiceImpl extends ServiceImpl<SysBizBlacklistMappe
       sysBizBlacklistMapper.updateById(update);
     } else {
       SysBizBlacklist sysBizBlacklist = sysBizBlacklistConvert.toEntity(sysBizBlacklistAddDTO);
-      sysBizBlacklist.setCreateBy("");
-      sysBizBlacklist.setUpdateBy("");
       sysBizBlacklistMapper.insert(sysBizBlacklist);
     }
   }
@@ -129,7 +126,6 @@ public class SysBizBlacklistServiceImpl extends ServiceImpl<SysBizBlacklistMappe
         .map(sysBizBlacklistMapper::selectById)
         .orElseThrow(() -> new ServiceException("无效的ID"));
     SysBizBlacklist update = sysBizBlacklistConvert.toEntity(sysBizBlacklistUpdateDTO);
-    update.setUpdateBy("");
     sysBizBlacklistMapper.updateById(update);
   }
 

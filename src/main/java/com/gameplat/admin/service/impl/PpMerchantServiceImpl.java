@@ -72,8 +72,6 @@ public class PpMerchantServiceImpl extends ServiceImpl<PpMerchantMapper, PpMerch
             }
           });
     }
-    dto.setUpdateBy(SecurityUtil.getUserName());
-    dto.setUpdateTime(new Date());
     dto.setParameters(JsonUtils.toJson(oriMerchantParameters));
     this.conver2PpMerchant(dto);
     if (!this.updateById(ppMerchantConvert.toEntity(dto))) {
@@ -84,10 +82,6 @@ public class PpMerchantServiceImpl extends ServiceImpl<PpMerchantMapper, PpMerch
   @Override
   public void save(PpMerchantAddDTO dto) {
     this.conver2PpMerchant(dto);
-    dto.setCreateBy(SecurityUtil.getUserName());
-    dto.setCreateTime(new Date());
-    dto.setUpdateBy(SecurityUtil.getUserName());
-    dto.setUpdateTime(new Date());
     if (!this.save(ppMerchantConvert.toEntity(dto))) {
       throw new ServiceException("接口添加失败!");
     }
@@ -135,8 +129,6 @@ public class PpMerchantServiceImpl extends ServiceImpl<PpMerchantMapper, PpMerch
     }
     LambdaUpdateWrapper<PpMerchant> update = Wrappers.lambdaUpdate();
     update.set(PpMerchant::getStatus, status);
-    update.set(PpMerchant::getUpdateBy, SecurityUtil.getUserName());
-    update.set(PpMerchant::getUpdateTime, new Date());
     update.eq(PpMerchant::getId, id);
     this.update(update);
   }

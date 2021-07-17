@@ -16,5 +16,5 @@ public interface PayTypeConvert {
 
   PayType toEntity(PayTypeQueryDTO payTypeQueryDTO);
 
-  PayType toEntity(PayTypeEditDTO payTypeUpdateDTO);
+  PayType toEntity(PayTypeEditDTO payTypeEditDTO);
 }

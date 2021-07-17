@@ -74,10 +74,6 @@ public class SysDictDataServiceImpl extends ServiceImpl<SysDictDataMapper, SysDi
     if (this.count(query) > 0) {
       throw new ServiceException("字典标签，请勿重复添加");
     }
-    //    sysAuthIpAddDto.setCreateBy(SecurityUtil.getUserName());
-    sysDictDataAddDto.setCreateTime(new Date());
-    //    sysAuthIpAddDto.setUpdateBy(SecurityUtil.getUserName());
-    sysDictDataAddDto.setUpdateTime(new Date());
     if (!this.save(sysDictDataConvert.toEntity(sysDictDataAddDto))) {
       throw new ServiceException("添加失败!");
     }
@@ -90,7 +86,6 @@ public class SysDictDataServiceImpl extends ServiceImpl<SysDictDataMapper, SysDi
 
   @Override
   public void update(SysDictDataEditDTO sysDictDataEditDto) throws ServiceException {
-    sysDictDataEditDto.setUpdateTime(new Date());
     if (!this.updateById(sysDictDataConvert.toEntity(sysDictDataEditDto))) {
       throw new ServiceException("更新失败!");
     }

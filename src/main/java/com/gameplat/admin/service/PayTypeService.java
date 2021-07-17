@@ -18,6 +18,8 @@ public interface PayTypeService extends IService<PayType> {
    */
   void update(PayTypeEditDTO dto);
 
+  void updateStatus(Long id, Integer status);
+
   /**
    * 保存
    *

@@ -16,5 +16,5 @@ public interface TpPayChannelConvert {
 
   TpPayChannel toEntity(TpPayChannelQueryDTO payTypeQueryDTO);
 
-  TpPayChannel toEntity(TpPayChannelEditDTO payTypeUpdateDTO);
+  TpPayChannel toEntity(TpPayChannelEditDTO payTypeEditDTO);
 }

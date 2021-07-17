@@ -57,10 +57,6 @@ public class SysAuthIpServiceImpl extends ServiceImpl<AuthIpMapper, SysAuthIp>
     if (this.count(query) > 0) {
       throw new ServiceException("IP已经存在，请勿重复添加");
     }
-    //    sysAuthIpAddDto.setCreateBy(SecurityUtil.getUserName());
-    sysAuthIpAddDto.setCreateTime(new Date());
-    //    sysAuthIpAddDto.setUpdateBy(SecurityUtil.getUserName());
-    sysAuthIpAddDto.setUpdateTime(new Date());
     if (!this.save(sysAuthIpConvert.toEntity(sysAuthIpAddDto))) {
       throw new ServiceException("添加失败!");
     }

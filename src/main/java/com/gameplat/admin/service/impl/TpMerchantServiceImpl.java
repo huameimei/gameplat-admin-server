@@ -80,8 +80,6 @@ public class TpMerchantServiceImpl extends ServiceImpl<TpMerchantMapper, TpMerch
             }
           });
     }
-    dto.setUpdateBy(SecurityUtil.getUserName());
-    dto.setUpdateTime(new Date());
     dto.setParameters(JsonUtils.toJson(oriMerchantParameters));
     if (!this.updateById(tpMerchantConvert.toEntity(dto))) {
       throw new ServiceException("商户信息更新失败!");
@@ -90,10 +88,6 @@ public class TpMerchantServiceImpl extends ServiceImpl<TpMerchantMapper, TpMerch
 
   @Override
   public void save(TpMerchantAddDTO dto) {
-    dto.setCreateBy(SecurityUtil.getUserName());
-    dto.setCreateTime(new Date());
-    dto.setUpdateBy(SecurityUtil.getUserName());
-    dto.setUpdateTime(new Date());
     if (!this.save(tpMerchantConvert.toEntity(dto))) {
       throw new ServiceException("接口添加失败!");
     }
@@ -102,7 +96,7 @@ public class TpMerchantServiceImpl extends ServiceImpl<TpMerchantMapper, TpMerch
   @Override
   public void delete(Long id) {
     this.getById(id).deleteById();
-    tpPayChannelService.deleteByMerchantId(id);
+//    tpPayChannelService.deleteByMerchantId(id);
   }
 
   @Override
@@ -143,8 +137,6 @@ public class TpMerchantServiceImpl extends ServiceImpl<TpMerchantMapper, TpMerch
     }
     LambdaUpdateWrapper<TpMerchant> update = Wrappers.lambdaUpdate();
     update.set(TpMerchant::getStatus, status);
-    update.set(TpMerchant::getUpdateBy, SecurityUtil.getUserName());
-    update.set(TpMerchant::getUpdateTime, new Date());
     update.eq(TpMerchant::getId, id);
     this.update(update);
   }

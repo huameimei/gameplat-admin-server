@@ -9,13 +9,13 @@ import lombok.Data;
 public class SysAuthIp {
 
   private Long id;
-  /**IP白名单 */
+  /** IP白名单 */
   private String allowIp;
 
-  /**类型*/
-  private Integer ipType;
+  /** 类型 0-后端， 1-前端 多个逗号隔开 */
+  private String ipType;
 
-  private Date  createTime;
+  private Date createTime;
 
   private String createBy;
 

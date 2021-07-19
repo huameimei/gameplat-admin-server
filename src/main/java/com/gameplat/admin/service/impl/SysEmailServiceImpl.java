@@ -3,6 +3,7 @@ package com.gameplat.admin.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.convert.SysEmailConvert;
 import com.gameplat.admin.dao.SysEmailMapper;
@@ -22,7 +23,7 @@ public class SysEmailServiceImpl extends ServiceImpl<SysEmailMapper, SysEmail>
   @Autowired private SysEmailConvert sysEmailConvert;
 
   @Override
-  public IPage<SysEmailVO> queryPage(IPage<SysEmail> page, SysEmailQueryDTO queryDto) {
+  public IPage<SysEmailVO> queryPage(Page<SysEmail> page, SysEmailQueryDTO queryDto) {
     LambdaQueryWrapper<SysEmail> query = Wrappers.lambdaQuery();
     if (StringUtils.isNotBlank(queryDto.getTitle())) {
       query.like(SysEmail::getTitle, queryDto.getTitle());

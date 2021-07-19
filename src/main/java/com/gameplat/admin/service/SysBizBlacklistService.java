@@ -1,6 +1,7 @@
 package com.gameplat.admin.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.gameplat.admin.model.dto.SysBizBlackListQueryDTO;
 import com.gameplat.admin.model.dto.SysBizBlacklistAddDTO;
@@ -12,7 +13,7 @@ import com.gameplat.admin.model.vo.SysBizBlacklistVO;
 public interface SysBizBlacklistService extends IService<SysBizBlacklist> {
 
   IPage<SysBizBlacklistVO> queryPage(
-      IPage<SysBizBlacklist> sysBizBlacklist, SysBizBlackListQueryDTO queryDTO);
+      Page<SysBizBlacklist> sysBizBlacklist, SysBizBlackListQueryDTO queryDTO);
 
   void save(SysBizBlacklistAddDTO sysBizBlacklistAddDTO);
 

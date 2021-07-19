@@ -1,7 +1,9 @@
 package com.gameplat.admin.controller.open;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.gameplat.admin.convert.SysSmsConvert;
 import com.gameplat.admin.model.dto.SysSmsQueryDTO;
+import com.gameplat.admin.model.entity.SysSms;
 import com.gameplat.admin.service.SysSmsService;
 import com.gameplat.common.constant.ServiceApi;
 import com.gameplat.common.web.Result;
@@ -20,7 +22,7 @@ public class SysSmsController {
   @Autowired private SysSmsConvert sysSmsConvert;
 
   @GetMapping(value = "/queryAll")
-  public Result queryAll(SysSmsQueryDTO sysSmsQueryDto) {
+  public Result queryAll(Page<SysSms> page, SysSmsQueryDTO sysSmsQueryDto) {
     return Result.succeed(
         sysSmsService.listByQueryDto(sysSmsQueryDto).stream()
             .map(i -> sysSmsConvert.toVo(i))

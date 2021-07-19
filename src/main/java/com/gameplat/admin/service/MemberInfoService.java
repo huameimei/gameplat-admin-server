@@ -1,12 +1,12 @@
 package com.gameplat.admin.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.gameplat.admin.model.dto.MemberInfoAddDTO;
 import com.gameplat.admin.model.dto.MemberInfoEditDTO;
 import com.gameplat.admin.model.dto.MemberInfoQueryDTO;
 import com.gameplat.admin.model.entity.MemberInfo;
-import com.gameplat.admin.model.entity.SysUser;
 import com.gameplat.admin.model.vo.MemberInfoVO;
 
 public interface MemberInfoService extends IService<MemberInfo> {
@@ -70,8 +70,7 @@ public interface MemberInfoService extends IService<MemberInfo> {
    */
   void deleteBoth(Long id);
 
-  IPage<MemberInfoVO> queryPage(
-      IPage<MemberInfo> page, MemberInfoQueryDTO memberInfoQueryDto, SysUser sysUser);
+  IPage<MemberInfoVO> queryPage(Page<MemberInfo> page, MemberInfoQueryDTO memberInfoQueryDto);
 
   void save(MemberInfoAddDTO memberInfoAddDto);
 

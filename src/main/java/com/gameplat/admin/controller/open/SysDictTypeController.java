@@ -1,6 +1,7 @@
 package com.gameplat.admin.controller.open;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.gameplat.admin.model.dto.SysDictTypeAddDTO;
 import com.gameplat.admin.model.dto.SysDictTypeEditDTO;
 import com.gameplat.admin.model.dto.SysDictTypeQueryDTO;
@@ -23,7 +24,7 @@ public class SysDictTypeController {
   @Autowired private SysDictTypeService sysDictTypeService;
 
   @GetMapping(value = "/queryAll")
-  public IPage<SysDictTypeVO> queryAll(IPage<SysDictType> page, SysDictTypeQueryDTO queryDto) {
+  public IPage<SysDictTypeVO> queryAll(Page<SysDictType> page, SysDictTypeQueryDTO queryDto) {
     return sysDictTypeService.queryPage(page, queryDto);
   }
 

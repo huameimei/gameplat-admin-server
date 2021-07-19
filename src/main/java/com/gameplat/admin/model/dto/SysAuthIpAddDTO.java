@@ -10,7 +10,7 @@ public class SysAuthIpAddDTO extends BaseEntity {
   private String allowIp;
 
   /** 类型 */
-  private Integer ipType;
+  private String ipType;
 
   private String remark;
 }

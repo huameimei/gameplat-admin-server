@@ -1,6 +1,7 @@
 package com.gameplat.admin.controller.open;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.gameplat.admin.enums.BizBlackListTypeEnum;
 import com.gameplat.admin.model.dto.OptionDTO;
 import com.gameplat.admin.model.dto.SysBizBlackListQueryDTO;
@@ -41,7 +42,7 @@ public class SysBizBlacklistController {
 
   @GetMapping(value = "/list")
   public IPage<SysBizBlacklistVO> queryAll(
-      IPage<SysBizBlacklist> sysBizBlacklist, SysBizBlackListQueryDTO queryDto) {
+      Page<SysBizBlacklist> sysBizBlacklist, SysBizBlackListQueryDTO queryDto) {
     return sysBizBlacklistService.queryPage(sysBizBlacklist, queryDto);
   }
 

@@ -3,6 +3,7 @@ package com.gameplat.admin.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.convert.SysBannerInfoConvert;
 import com.gameplat.admin.dao.SysBannerInfoMapper;
@@ -13,7 +14,6 @@ import com.gameplat.admin.model.entity.SysBannerInfo;
 import com.gameplat.admin.model.vo.SysBannerInfoVO;
 import com.gameplat.admin.service.SysBannerInfoService;
 import com.gameplat.common.exception.ServiceException;
-import java.util.Date;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -28,7 +28,7 @@ public class SysBannerInfoServiceImpl extends ServiceImpl<SysBannerInfoMapper, S
 
   @Override
   public IPage<SysBannerInfoVO> queryPage(
-      IPage<SysBannerInfo> page, SysBannerInfoQueryDTO queryDto) {
+      Page<SysBannerInfo> page, SysBannerInfoQueryDTO queryDto) {
     LambdaQueryWrapper<SysBannerInfo> query = Wrappers.lambdaQuery();
     if (StringUtils.isNotBlank(queryDto.getLanguage())) {
       query.like(SysBannerInfo::getLanguage, queryDto.getLanguage());

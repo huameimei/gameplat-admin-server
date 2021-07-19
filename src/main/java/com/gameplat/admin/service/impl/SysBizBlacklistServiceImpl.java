@@ -47,7 +47,7 @@ public class SysBizBlacklistServiceImpl extends ServiceImpl<SysBizBlacklistMappe
 
   @Override
   public IPage<SysBizBlacklistVO> queryPage(
-      IPage<SysBizBlacklist> page, SysBizBlackListQueryDTO queryDTO) {
+      Page<SysBizBlacklist> page, SysBizBlackListQueryDTO queryDTO) {
     if (StringUtils.isNotBlank(queryDTO.getAccount())) {
       LambdaQueryWrapper<MemberInfo> memberInfoQuery = Wrappers.lambdaQuery();
       memberInfoQuery.eq(MemberInfo::getAccount, queryDTO.getAccount());

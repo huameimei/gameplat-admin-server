@@ -1,6 +1,7 @@
 package com.gameplat.admin.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.gameplat.admin.model.dto.SysAuthIpAddDTO;
 import com.gameplat.admin.model.dto.SysAuthIpQueryDTO;
@@ -18,7 +19,7 @@ public interface SysAuthIpService extends IService<SysAuthIp> {
 
   boolean isExist(String ip);
 
-  IPage<SysAuthIpVO> queryPage(IPage<SysAuthIp> sysAuthIp, SysAuthIpQueryDTO queryDto);
+  IPage<SysAuthIpVO> queryPage(Page<SysAuthIp> sysAuthIp, SysAuthIpQueryDTO queryDto);
 
   void save(SysAuthIpAddDTO sysAuthIpAddDto);
 

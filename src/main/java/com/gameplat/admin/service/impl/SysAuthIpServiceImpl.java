@@ -3,6 +3,7 @@ package com.gameplat.admin.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.convert.SysAuthIpConvert;
 import com.gameplat.admin.dao.AuthIpMapper;
@@ -12,7 +13,6 @@ import com.gameplat.admin.model.entity.SysAuthIp;
 import com.gameplat.admin.model.vo.SysAuthIpVO;
 import com.gameplat.admin.service.SysAuthIpService;
 import com.gameplat.common.exception.ServiceException;
-import java.util.Date;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.apache.commons.lang.StringUtils;
@@ -42,7 +42,7 @@ public class SysAuthIpServiceImpl extends ServiceImpl<AuthIpMapper, SysAuthIp>
   }
 
   @Override
-  public IPage<SysAuthIpVO> queryPage(IPage<SysAuthIp> page, SysAuthIpQueryDTO queryDto) {
+  public IPage<SysAuthIpVO> queryPage(Page<SysAuthIp> page, SysAuthIpQueryDTO queryDto) {
     LambdaQueryWrapper<SysAuthIp> query = Wrappers.lambdaQuery();
     if (StringUtils.isNotBlank(queryDto.getAuthIp())) {
       query.like(SysAuthIp::getAllowIp, queryDto.getAuthIp());

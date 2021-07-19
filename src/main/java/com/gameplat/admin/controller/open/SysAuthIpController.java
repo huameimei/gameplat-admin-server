@@ -1,6 +1,7 @@
 package com.gameplat.admin.controller.open;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.gameplat.admin.model.dto.SysAuthIpAddDTO;
 import com.gameplat.admin.model.dto.SysAuthIpQueryDTO;
 import com.gameplat.admin.model.entity.SysAuthIp;
@@ -23,7 +24,7 @@ public class SysAuthIpController {
 
   /** 查询所有IP白名单 */
   @GetMapping(value = "/queryAll")
-  public IPage<SysAuthIpVO> queryAll(IPage<SysAuthIp> sysAuthIp, SysAuthIpQueryDTO queryDto) {
+  public IPage<SysAuthIpVO> queryAll(Page<SysAuthIp> sysAuthIp, SysAuthIpQueryDTO queryDto) {
     return sysAuthIpService.queryPage(sysAuthIp, queryDto);
   }
 

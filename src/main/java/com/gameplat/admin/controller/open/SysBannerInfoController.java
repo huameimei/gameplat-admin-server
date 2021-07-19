@@ -1,6 +1,7 @@
 package com.gameplat.admin.controller.open;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.gameplat.admin.model.dto.SysBannerInfoAddDTO;
 import com.gameplat.admin.model.dto.SysBannerInfoEditDTO;
 import com.gameplat.admin.model.dto.SysBannerInfoQueryDTO;
@@ -24,8 +25,7 @@ public class SysBannerInfoController {
   @Autowired private SysBannerInfoService sysBannerInfoService;
 
   @GetMapping(value = "/queryAll")
-  public IPage<SysBannerInfoVO> queryAll(
-      IPage<SysBannerInfo> page, SysBannerInfoQueryDTO queryDto) {
+  public IPage<SysBannerInfoVO> queryAll(Page<SysBannerInfo> page, SysBannerInfoQueryDTO queryDto) {
     return sysBannerInfoService.queryPage(page, queryDto);
   }
 

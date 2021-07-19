@@ -1,19 +1,18 @@
 package com.gameplat.admin.controller.open;
 
-import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.gameplat.admin.constant.Constants;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.gameplat.admin.enums.DictTypeEnum;
+import com.gameplat.admin.model.dto.OptionDTO;
 import com.gameplat.admin.model.dto.SysDictDataAddDTO;
 import com.gameplat.admin.model.dto.SysDictDataEditDTO;
 import com.gameplat.admin.model.dto.SysDictDataQueryDTO;
 import com.gameplat.admin.model.entity.SysDictData;
 import com.gameplat.admin.model.vo.SysDictDataVO;
 import com.gameplat.admin.service.SysDictDataService;
-import com.gameplat.admin.utils.JsonFileUtil;
 import com.gameplat.common.constant.ServiceApi;
 import com.gameplat.common.web.Result;
-import com.gameplat.ds.core.context.DyDataSourceContextHolder;
+import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -33,7 +32,7 @@ public class SysDictDataController {
 
   @GetMapping(value = "/queryAll")
   @ResponseBody
-  public IPage<SysDictDataVO> queryAll(IPage<SysDictData> page, SysDictDataQueryDTO queryDto) {
+  public IPage<SysDictDataVO> queryAll(Page<SysDictData> page, SysDictDataQueryDTO queryDto) {
     return sysDictDataService.queryPage(page, queryDto);
   }
 
@@ -65,17 +64,9 @@ public class SysDictDataController {
   }
 
   @RequestMapping(value = "/getDictData/{dictType}", method = RequestMethod.GET)
-  public Result get(@PathVariable String dictType) throws Exception {
-    String prefix =
-        sysDictDataService.getDefaultJson()
-            + Constants.TENANT
-            + DyDataSourceContextHolder.getDBSuffix();
-    JSONObject json = JsonFileUtil.getJson(prefix, dictType);
-    if (json == null) {
-      return Result.succeed(
-          sysDictDataService.selectDictDataListByType(dictType).stream()
-              .collect(Collectors.toMap(SysDictData::getDictLabel, SysDictData::getDictValue)));
-    }
-    return Result.succeed(json);
+  public List<OptionDTO> get(@PathVariable String dictType) throws Exception {
+    return sysDictDataService.selectDictDataListByType(dictType).stream()
+        .map(i -> new OptionDTO<>(i.getDictLabel(), i.getDictValue()))
+        .collect(Collectors.toList());
   }
 }

@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.convert.MemberInfoConvert;
 import com.gameplat.admin.dao.MemberInfoMapper;
@@ -13,11 +14,9 @@ import com.gameplat.admin.model.dto.MemberInfoAddDTO;
 import com.gameplat.admin.model.dto.MemberInfoEditDTO;
 import com.gameplat.admin.model.dto.MemberInfoQueryDTO;
 import com.gameplat.admin.model.entity.MemberInfo;
-import com.gameplat.admin.model.entity.SysUser;
 import com.gameplat.admin.model.vo.MemberInfoVO;
 import com.gameplat.admin.service.MemberInfoService;
 import com.gameplat.admin.utils.TreeUtils;
-import com.gameplat.admin.utils.UserLevelUtils;
 import com.gameplat.common.exception.ServiceException;
 import java.util.Arrays;
 import java.util.List;
@@ -153,14 +152,16 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
 
   @Override
   public IPage<MemberInfoVO> queryPage(
-      IPage<MemberInfo> page, MemberInfoQueryDTO memberInfoQueryDto, SysUser sysUser) {
+      Page<MemberInfo> page, MemberInfoQueryDTO memberInfoQueryDto) {
     LambdaQueryWrapper<MemberInfo> query = Wrappers.lambdaQuery();
     // 检测当前是否可以进行模糊查询
     // 查询代理线处理
     // 多账号处理
     handleMultiAccount(memberInfoQueryDto);
-    memberInfoQueryDto.setLevelList(UserLevelUtils.getAdminUserLevels(sysUser));
+    // 当前用户可查询层级过滤
+    //    memberInfoQueryDto.setLevelList(UserLevelUtils.getAdminUserLevels(null));
     // 设置会员是否在线  处理数据查询后上线的情况
+
     return null;
   }
 

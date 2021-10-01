@@ -1,6 +1,6 @@
 package com.gameplat.admin.interceptor;
 
-import com.gameplat.ds.core.context.DyDataSourceContextHolder;
+//import com.gameplat.ds.core.context.DyDataSourceContextHolder;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -11,7 +11,7 @@ public class DbSuffixInterceptor implements HandlerInterceptor {
   @Override
   public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
       throws Exception {
-    DyDataSourceContextHolder.setDBSuffix("kgsit");
+    //DyDataSourceContextHolder.setDBSuffix("kgsit");
     return true;
   }
 

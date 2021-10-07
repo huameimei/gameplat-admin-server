@@ -9,9 +9,9 @@ import org.mapstruct.Mapper;
 @Mapper(componentModel = "spring")
 public interface SysBannerInfoConvert {
 
-  SysBannerInfo toEntity(SysBannerInfoAddDTO sysBannerInfoAddDto);
+    SysBannerInfo toEntity(SysBannerInfoAddDTO sysBannerInfoAddDto);
 
-  SysBannerInfo toEntity(SysBannerInfoEditDTO sysBannerInfoEditDto);
+    SysBannerInfo toEntity(SysBannerInfoEditDTO sysBannerInfoEditDto);
 
-  SysBannerInfoVO toVo(SysBannerInfo sysBannerInfo);
+    SysBannerInfoVO toVo(SysBannerInfo sysBannerInfo);
 }

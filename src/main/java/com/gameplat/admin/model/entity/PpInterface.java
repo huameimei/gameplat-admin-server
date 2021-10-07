@@ -10,33 +10,33 @@ import lombok.EqualsAndHashCode;
 @TableName("pp_interface")
 public class PpInterface extends BaseEntity<PpInterface> {
 
-  private String name;
+    private String name;
 
-  private String code;
+    private String code;
 
-  private String version;
+    private String version;
 
-  private String charset;
+    private String charset;
 
-  private Integer dispatchType;
+    private Integer dispatchType;
 
-  private String dispatchUrl;
+    private String dispatchUrl;
 
-  private String dispatchMethod;
+    private String dispatchMethod;
 
-  private Integer status;
+    private Integer status;
 
-  private String parameters;
+    private String parameters;
 
-  private Integer orderQueryEnabled;
+    private Integer orderQueryEnabled;
 
-  private String orderQueryVersion;
+    private String orderQueryVersion;
 
-  private String orderQueryUrl;
+    private String orderQueryUrl;
 
-  private String orderQueryMethod;
+    private String orderQueryMethod;
 
-  private String limtInfo;
+    private String limtInfo;
 
-  private Integer asynNotifyStatus;
+    private Integer asynNotifyStatus;
 }

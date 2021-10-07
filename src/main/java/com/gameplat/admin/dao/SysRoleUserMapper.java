@@ -9,6 +9,4 @@ import com.gameplat.admin.model.entity.SysRoleUser;
 public interface SysRoleUserMapper extends BaseMapper<SysRoleUser> {
 
 
-
-
 }

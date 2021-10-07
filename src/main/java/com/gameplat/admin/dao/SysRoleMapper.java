@@ -9,7 +9,7 @@ import org.apache.ibatis.annotations.Select;
  */
 public interface SysRoleMapper extends BaseMapper<SysRole> {
 
-  @Select("select * from sys_role_user where user_Id = #{userId}")
-  SysRole selectRoleByUserId(Long userId);
+    @Select("select * from sys_role_user where user_Id = #{userId}")
+    SysRole selectRoleByUserId(Long userId);
 
 }

@@ -12,14 +12,14 @@ import com.gameplat.admin.model.vo.UserEquipmentVO;
 public interface SysUserService extends IService<SysUser> {
 
 
-  SysUser getUserByAccount(String account);
+    SysUser getUserByAccount(String account);
 
-  TokenInfo login(String account, String password, String requestIp, UserEquipmentVO equipment, String userAgentString)
-      throws Exception;
+    TokenInfo login(String account, String password, String requestIp, UserEquipmentVO equipment, String userAgentString)
+            throws Exception;
 
-  void logout(Long adminId);
+    void logout(Long adminId);
 
-  TokenInfo getTokenInfo(Long uid);
+    TokenInfo getTokenInfo(Long uid);
 
-  AdminRedisBean getPrivilege(Long adminId);
+    AdminRedisBean getPrivilege(Long adminId);
 }

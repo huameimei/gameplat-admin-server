@@ -6,13 +6,17 @@ import lombok.Data;
 @Data
 public class SysDictTypeAddDTO extends BaseEntity {
 
-  /** 字典名称 */
-  private String dictName;
+    /**
+     * 字典名称
+     */
+    private String dictName;
 
-  /** 字典类型 */
-  private String dictType;
+    /**
+     * 字典类型
+     */
+    private String dictType;
 
-  private String remark;
+    private String remark;
 
-  private String dictSort;
+    private String dictSort;
 }

@@ -7,5 +7,5 @@ import org.mapstruct.Mapper;
 @Mapper(componentModel = "spring")
 public interface TpPayTypeConvert {
 
-  TpPayTypeVO toVo(TpPayType entity);
+    TpPayTypeVO toVo(TpPayType entity);
 }

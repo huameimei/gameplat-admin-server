@@ -16,10 +16,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping(ServiceApi.API + "/sysQuickReply")
 public class SysQuickReplayController {
 
-  @Autowired private SysQuickReplyService sysQuickReplyService;
+    @Autowired
+    private SysQuickReplyService sysQuickReplyService;
 
-  @GetMapping("/list")
-  public IPage<SysQuickReplyVO> list(Page<SysQuickReply> page, SysQuickReplayQueryDTO queryDto) {
-    return sysQuickReplyService.queryPage(page, queryDto);
-  }
+    @GetMapping("/list")
+    public IPage<SysQuickReplyVO> list(Page<SysQuickReply> page, SysQuickReplayQueryDTO queryDto) {
+        return sysQuickReplyService.queryPage(page, queryDto);
+    }
 }

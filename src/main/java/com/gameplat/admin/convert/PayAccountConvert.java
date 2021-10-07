@@ -10,11 +10,11 @@ import org.mapstruct.Mapper;
 @Mapper(componentModel = "spring")
 public interface PayAccountConvert {
 
-  PayAccountVO toVo(PayAccount entity);
+    PayAccountVO toVo(PayAccount entity);
 
-  PayAccount toEntity(PayAccountAddDTO payTypeAddDTO);
+    PayAccount toEntity(PayAccountAddDTO payTypeAddDTO);
 
-  PayAccount toEntity(PayAccountQueryDTO payTypeQueryDTO);
+    PayAccount toEntity(PayAccountQueryDTO payTypeQueryDTO);
 
-  PayAccount toEntity(PayAccountEditDTO payTypeEditDTO);
+    PayAccount toEntity(PayAccountEditDTO payTypeEditDTO);
 }

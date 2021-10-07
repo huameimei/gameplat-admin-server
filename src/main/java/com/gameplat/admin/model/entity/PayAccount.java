@@ -11,39 +11,39 @@ import lombok.EqualsAndHashCode;
 @TableName("pay_account")
 public class PayAccount extends BaseEntity<PayAccount> {
 
-  private String name;
+    private String name;
 
-  private String account;
+    private String account;
 
-  private String owner;
+    private String owner;
 
-  private String payType;
+    private String payType;
 
-  private String bankName;
+    private String bankName;
 
-  private String bankAddress;
+    private String bankAddress;
 
-  private String qrCode;
+    private String qrCode;
 
-  private String userLevels;
+    private String userLevels;
 
-  private String remarks;
+    private String remarks;
 
-  private Integer sort;
+    private Integer sort;
 
-  @ApiModelProperty(value = "状态: [0 - 启用, 1 - 禁用]")
-  private Integer status;
+    @ApiModelProperty(value = "状态: [0 - 启用, 1 - 禁用]")
+    private Integer status;
 
-  private Long rechargeTimes;
+    private Long rechargeTimes;
 
-  private Long rechargeAmount;
+    private Long rechargeAmount;
 
-  private String orderRemark;
+    private String orderRemark;
 
-  @ApiModelProperty(value = "0:启用，1：关闭")
-  private Integer orderRemarkStatus;
+    @ApiModelProperty(value = "0:启用，1：关闭")
+    private Integer orderRemarkStatus;
 
-  private String limitInfo;
+    private String limitInfo;
 
-  private String handleTip;
+    private String handleTip;
 }

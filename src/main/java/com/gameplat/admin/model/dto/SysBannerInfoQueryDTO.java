@@ -1,10 +1,11 @@
 package com.gameplat.admin.model.dto;
 
-import java.io.Serializable;
 import lombok.Data;
+
+import java.io.Serializable;
 
 @Data
 public class SysBannerInfoQueryDTO implements Serializable {
 
-  private String language;
+    private String language;
 }

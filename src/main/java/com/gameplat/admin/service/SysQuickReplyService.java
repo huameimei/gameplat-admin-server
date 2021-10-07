@@ -14,12 +14,12 @@ import com.gameplat.admin.model.vo.SysQuickReplyVO;
  */
 public interface SysQuickReplyService extends IService<SysQuickReply> {
 
-  /**
-   * 代付接口列表
-   *
-   * @param page Page
-   * @param queryDto PpInterfaceQueryDTO
-   * @return IPage
-   */
-  IPage<SysQuickReplyVO> queryPage(Page<SysQuickReply> page, SysQuickReplayQueryDTO queryDto);
+    /**
+     * 代付接口列表
+     *
+     * @param page     Page
+     * @param queryDto PpInterfaceQueryDTO
+     * @return IPage
+     */
+    IPage<SysQuickReplyVO> queryPage(Page<SysQuickReply> page, SysQuickReplayQueryDTO queryDto);
 }

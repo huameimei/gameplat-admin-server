@@ -2,7 +2,6 @@ package com.gameplat.admin.model.entity;
 
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.gameplat.common.model.entity.BaseEntity;
-import java.io.Serializable;
 import lombok.Data;
 
 /**
@@ -10,21 +9,21 @@ import lombok.Data;
  */
 @Data
 @TableName("sys_role")
-public class SysRole extends BaseEntity{
+public class SysRole extends BaseEntity {
 
-  /**
-   * 角色编码
-   */
-  private String  code;
+    /**
+     * 角色编码
+     */
+    private String code;
 
-  /**
-   *  角色名称
-   */
-  private String  name;
+    /**
+     * 角色名称
+     */
+    private String name;
 
-  /**
-   * 角色类型
-   */
-  private Integer roleType;
+    /**
+     * 角色类型
+     */
+    private Integer roleType;
 
 }

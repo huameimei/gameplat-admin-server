@@ -9,5 +9,5 @@ import com.gameplat.admin.model.vo.TpPayChannelVO;
 
 public interface TpPayChannelMapper extends BaseMapper<TpPayChannel> {
 
-  IPage<TpPayChannelVO> findTpPayChannelPage(Page<TpPayChannelVO> page, TpPayChannelQueryDTO dto);
+    IPage<TpPayChannelVO> findTpPayChannelPage(Page<TpPayChannelVO> page, TpPayChannelQueryDTO dto);
 }

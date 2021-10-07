@@ -11,15 +11,15 @@ import com.gameplat.admin.model.vo.TpPayChannelVO;
 
 public interface TpPayChannelService extends IService<TpPayChannel> {
 
-  void deleteByMerchantId(Long merchantId);
+    void deleteByMerchantId(Long merchantId);
 
-  void update(TpPayChannelEditDTO dto);
+    void update(TpPayChannelEditDTO dto);
 
-  void updateStatus(Long id, Integer status);
+    void updateStatus(Long id, Integer status);
 
-  void save(TpPayChannelAddDTO dto);
+    void save(TpPayChannelAddDTO dto);
 
-  void delete(Long id);
+    void delete(Long id);
 
-  IPage<TpPayChannelVO> findTpPayChannelPage(Page<TpPayChannelVO> page, TpPayChannelQueryDTO dto);
+    IPage<TpPayChannelVO> findTpPayChannelPage(Page<TpPayChannelVO> page, TpPayChannelQueryDTO dto);
 }

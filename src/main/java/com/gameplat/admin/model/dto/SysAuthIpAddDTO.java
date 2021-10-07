@@ -6,11 +6,15 @@ import lombok.Data;
 @Data
 public class SysAuthIpAddDTO extends BaseEntity {
 
-  /** IP白名单 */
-  private String allowIp;
+    /**
+     * IP白名单
+     */
+    private String allowIp;
 
-  /** 类型 */
-  private String ipType;
+    /**
+     * 类型
+     */
+    private String ipType;
 
-  private String remark;
+    private String remark;
 }

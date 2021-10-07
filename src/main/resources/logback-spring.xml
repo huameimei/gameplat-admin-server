@@ -2,17 +2,48 @@
 <configuration scan="true" scanPeriod="60 seconds" debug="false">
     <contextName>logback</contextName>
     <springProperty scope="context" name="app.name" source="spring.application.name"/>
+    <springProperty scope="context" name="log.host" source="graylog.host"/>
+    <springProperty scope="context" name="log.port" source="graylog.port"/>
+    <conversionRule conversionWord="ip" converterClass="com.gameplat.web.config.loger.LogIpConfig"/>
     <property name="APP_NAME" value="${app.name}"/>
     <property name="LOG_HOME" value="logs/${APP_NAME}"/>
+    <property name="LOG_HOST" value="${log.host}"/>
+    <property name="LOG_PORT" value="${log.port}"/>
+
 
     <!-- 彩色日志 -->
-    <include resource="org/springframework/boot/logging/logback/defaults.xml" />
+    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
 
     <!-- 控制台日志输出 -->
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <encoder charset="UTF-8">
             <pattern>%d{yyyy-MM-dd HH:mm:ss} %5p %c:%L %m%n</pattern>
             <pattern>${CONSOLE_LOG_PATTERN}</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="GELF" class="de.siegmar.logbackgelf.GelfUdpAppender">
+        <graylogHost>${LOG_HOST}</graylogHost>
+        <graylogPort>${LOG_PORT}</graylogPort>
+        <useCompression>true</useCompression>
+        <encoder class="de.siegmar.logbackgelf.GelfEncoder">
+            <!-- 是否发送原生的日志信息 -->
+            <includeRawMessage>false</includeRawMessage>
+            <includeMarker>true</includeMarker>
+            <includeMdcData>true</includeMdcData>
+            <includeCallerData>false</includeCallerData>
+            <includeRootCauseData>false</includeRootCauseData>
+            <!-- 是否发送日志级别的名称，否则默认以数字代表日志级别 -->
+            <includeLevelName>true</includeLevelName>
+            <shortPatternLayout class="ch.qos.logback.classic.PatternLayout">
+                <pattern>[%ip] %m%nopex</pattern>
+            </shortPatternLayout>
+            <fullPatternLayout class="ch.qos.logback.classic.PatternLayout">
+                <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%ip] [%thread] - [%-5level] [%logger{50} : %line] - %msg%n
+                </pattern>
+            </fullPatternLayout>
+            <!-- 配置应用名称（服务名称），通过staticField标签可以自定义一些固定的日志字段 -->
+            <staticField>app_name:${APP_NAME}</staticField>
         </encoder>
     </appender>
 
@@ -78,5 +109,6 @@
         <appender-ref ref="FILE"/>
         <appender-ref ref="INFO_FILE"/>
         <appender-ref ref="ERROR_FILE"/>
+        <appender-ref ref="GELF"/>
     </root>
 </configuration>

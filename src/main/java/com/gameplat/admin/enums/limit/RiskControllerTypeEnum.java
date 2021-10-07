@@ -2,45 +2,47 @@ package com.gameplat.admin.enums.limit;
 
 import java.util.Arrays;
 
-/** 风控金额设置 */
+/**
+ * 风控金额设置
+ */
 public enum RiskControllerTypeEnum {
-  ANY_AMOUNT(0, "任意金额"),
-  FLOAT_AMOUNT(1, "浮动金额"),
-  FIXED_ACCOUNT(2, "固定金额"),
-  FLOAT_FIXED_ACCOUNT(3, "固定金额");
+    ANY_AMOUNT(0, "任意金额"),
+    FLOAT_AMOUNT(1, "浮动金额"),
+    FIXED_ACCOUNT(2, "固定金额"),
+    FLOAT_FIXED_ACCOUNT(3, "固定金额");
 
-  private Integer type;
-  private String name;
+    private Integer type;
+    private String name;
 
-  private RiskControllerTypeEnum(Integer type, String name) {
-    this.type = type;
-    this.name = name;
-  }
+    private RiskControllerTypeEnum(Integer type, String name) {
+        this.type = type;
+        this.name = name;
+    }
 
-  public Integer getType() {
-    return type;
-  }
+    public static RiskControllerTypeEnum get(Integer type) {
+        return Arrays.stream(RiskControllerTypeEnum.values())
+                .filter(em -> (em.getType() == type))
+                .findFirst()
+                .get();
+    }
 
-  public void setType(Integer type) {
-    this.type = type;
-  }
+    public static String getName(int code) {
+        return RiskControllerTypeEnum.get(code).getName();
+    }
 
-  public String getName() {
-    return name;
-  }
+    public Integer getType() {
+        return type;
+    }
 
-  public void setName(String name) {
-    this.name = name;
-  }
+    public void setType(Integer type) {
+        this.type = type;
+    }
 
-  public static RiskControllerTypeEnum get(Integer type) {
-    return Arrays.stream(RiskControllerTypeEnum.values())
-        .filter(em -> (em.getType() == type))
-        .findFirst()
-        .get();
-  }
+    public String getName() {
+        return name;
+    }
 
-  public static String getName(int code) {
-    return RiskControllerTypeEnum.get(code).getName();
-  }
+    public void setName(String name) {
+        this.name = name;
+    }
 }

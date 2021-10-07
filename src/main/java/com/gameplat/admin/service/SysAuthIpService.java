@@ -15,13 +15,13 @@ import com.gameplat.admin.model.vo.SysAuthIpVO;
  */
 public interface SysAuthIpService extends IService<SysAuthIp> {
 
-  boolean isPermitted(String ip);
+    boolean isPermitted(String ip);
 
-  boolean isExist(String ip);
+    boolean isExist(String ip);
 
-  IPage<SysAuthIpVO> queryPage(Page<SysAuthIp> sysAuthIp, SysAuthIpQueryDTO queryDto);
+    IPage<SysAuthIpVO> queryPage(Page<SysAuthIp> sysAuthIp, SysAuthIpQueryDTO queryDto);
 
-  void save(SysAuthIpAddDTO sysAuthIpAddDto);
+    void save(SysAuthIpAddDTO sysAuthIpAddDto);
 
-  void delete(Long id);
+    void delete(Long id);
 }

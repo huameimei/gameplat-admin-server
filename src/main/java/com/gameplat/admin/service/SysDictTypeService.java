@@ -10,11 +10,11 @@ import com.gameplat.admin.model.vo.SysDictTypeVO;
 
 public interface SysDictTypeService extends IService<SysDictType> {
 
-  void delete(Long id);
+    void delete(Long id);
 
-  void save(SysDictTypeAddDTO sysDictTypeAddDto);
+    void save(SysDictTypeAddDTO sysDictTypeAddDto);
 
-  IPage<SysDictTypeVO> queryPage(IPage<SysDictType> page, SysDictTypeQueryDTO queryDto);
+    IPage<SysDictTypeVO> queryPage(IPage<SysDictType> page, SysDictTypeQueryDTO queryDto);
 
-  void update(SysDictTypeEditDTO sysDictTypeEditDto);
+    void update(SysDictTypeEditDTO sysDictTypeEditDto);
 }

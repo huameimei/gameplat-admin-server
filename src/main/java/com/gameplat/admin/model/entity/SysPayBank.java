@@ -10,15 +10,15 @@ import lombok.EqualsAndHashCode;
 @TableName("sys_pay_bank")
 public class SysPayBank extends BaseEntity<SysPayBank> {
 
-  private String bankName;
+    private String bankName;
 
-  private String bankCode;
+    private String bankCode;
 
-  private Integer sort;
+    private Integer sort;
 
-  private Integer status;
+    private Integer status;
 
-  private Integer bankType;
+    private Integer bankType;
 
-  private String img;
+    private String img;
 }

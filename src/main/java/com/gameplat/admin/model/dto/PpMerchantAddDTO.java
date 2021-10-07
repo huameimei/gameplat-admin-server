@@ -1,31 +1,30 @@
 package com.gameplat.admin.model.dto;
 
 import com.gameplat.common.model.entity.BaseEntity;
-import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 @Data
 public class PpMerchantAddDTO extends BaseEntity {
 
-  private String name;
+    private String name;
 
-  private String ppInterfaceCode;
+    private String ppInterfaceCode;
 
-  private Integer status;
+    private Integer status;
 
-  private Long proxyTimes;
+    private Long proxyTimes;
 
-  private Long proxyAmount;
+    private Long proxyAmount;
 
-  private String parameters;
+    private String parameters;
 
-  private Integer sort;
+    private Integer sort;
 
-  private String merLimits;
+    private String merLimits;
 
-  private Long maxLimitCash; // 最大金额限制
+    private Long maxLimitCash; // 最大金额限制
 
-  private Long minLimitCash; // 最小金额限制
+    private Long minLimitCash; // 最小金额限制
 
-  private String userLever; // 用户层级
+    private String userLever; // 用户层级
 }

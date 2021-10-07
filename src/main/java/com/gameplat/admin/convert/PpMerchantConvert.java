@@ -9,9 +9,9 @@ import org.mapstruct.Mapper;
 @Mapper(componentModel = "spring")
 public interface PpMerchantConvert {
 
-  PpMerchantVO toVo(PpMerchant entity);
+    PpMerchantVO toVo(PpMerchant entity);
 
-  PpMerchant toEntity(PpMerchantAddDTO ppInterfaceAddDTO);
+    PpMerchant toEntity(PpMerchantAddDTO ppInterfaceAddDTO);
 
-  PpMerchant toEntity(PpMerchantEditDTO ppMerchaneEditDTO);
+    PpMerchant toEntity(PpMerchantEditDTO ppMerchaneEditDTO);
 }

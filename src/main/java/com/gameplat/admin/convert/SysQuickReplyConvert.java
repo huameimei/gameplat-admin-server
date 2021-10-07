@@ -7,5 +7,5 @@ import org.mapstruct.Mapper;
 @Mapper(componentModel = "spring")
 public interface SysQuickReplyConvert {
 
-  SysQuickReplyVO toVo(SysQuickReply sysQuickReply);
+    SysQuickReplyVO toVo(SysQuickReply sysQuickReply);
 }

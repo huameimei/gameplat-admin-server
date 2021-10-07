@@ -4,5 +4,5 @@ import lombok.Data;
 
 @Data
 public class SysDictTypeQueryDTO {
-  private String dictName;
+    private String dictName;
 }

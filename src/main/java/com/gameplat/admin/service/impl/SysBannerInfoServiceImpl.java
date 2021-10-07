@@ -20,38 +20,40 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class SysBannerInfoServiceImpl extends ServiceImpl<SysBannerInfoMapper, SysBannerInfo>
-    implements SysBannerInfoService {
+        implements SysBannerInfoService {
 
-  @Autowired private SysBannerInfoMapper sysBannerInfoMapper;
+    @Autowired
+    private SysBannerInfoMapper sysBannerInfoMapper;
 
-  @Autowired private SysBannerInfoConvert sysBannerInfoConvert;
+    @Autowired
+    private SysBannerInfoConvert sysBannerInfoConvert;
 
-  @Override
-  public IPage<SysBannerInfoVO> queryPage(
-      Page<SysBannerInfo> page, SysBannerInfoQueryDTO queryDto) {
-    LambdaQueryWrapper<SysBannerInfo> query = Wrappers.lambdaQuery();
-    if (StringUtils.isNotBlank(queryDto.getLanguage())) {
-      query.like(SysBannerInfo::getLanguage, queryDto.getLanguage());
+    @Override
+    public IPage<SysBannerInfoVO> queryPage(
+            Page<SysBannerInfo> page, SysBannerInfoQueryDTO queryDto) {
+        LambdaQueryWrapper<SysBannerInfo> query = Wrappers.lambdaQuery();
+        if (StringUtils.isNotBlank(queryDto.getLanguage())) {
+            query.like(SysBannerInfo::getLanguage, queryDto.getLanguage());
+        }
+        return this.page(page, query).convert(sysBannerInfoConvert::toVo);
     }
-    return this.page(page, query).convert(sysBannerInfoConvert::toVo);
-  }
 
-  @Override
-  public void save(SysBannerInfoAddDTO sysBannerInfoAddDto) throws ServiceException {
-    if (!this.save(sysBannerInfoConvert.toEntity(sysBannerInfoAddDto))) {
-      throw new ServiceException("添加失败!");
+    @Override
+    public void save(SysBannerInfoAddDTO sysBannerInfoAddDto) throws ServiceException {
+        if (!this.save(sysBannerInfoConvert.toEntity(sysBannerInfoAddDto))) {
+            throw new ServiceException("添加失败!");
+        }
     }
-  }
 
-  @Override
-  public void delete(Long id) {
-    sysBannerInfoMapper.deleteById(id);
-  }
-
-  @Override
-  public void update(SysBannerInfoEditDTO sysBannerInfoEditDto) throws ServiceException {
-    if (!this.updateById(sysBannerInfoConvert.toEntity(sysBannerInfoEditDto))) {
-      throw new ServiceException("更新失败!");
+    @Override
+    public void delete(Long id) {
+        sysBannerInfoMapper.deleteById(id);
     }
-  }
+
+    @Override
+    public void update(SysBannerInfoEditDTO sysBannerInfoEditDto) throws ServiceException {
+        if (!this.updateById(sysBannerInfoConvert.toEntity(sysBannerInfoEditDto))) {
+            throw new ServiceException("更新失败!");
+        }
+    }
 }

@@ -7,5 +7,5 @@ import org.mapstruct.Mapper;
 @Mapper(componentModel = "spring")
 public interface PpInterfaceConvert {
 
-  PpInterfaceVO toVo(PpInterface entity);
+    PpInterfaceVO toVo(PpInterface entity);
 }

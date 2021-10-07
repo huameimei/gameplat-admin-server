@@ -4,7 +4,7 @@ import lombok.Data;
 
 @Data
 public class SysDictDataQueryDTO {
-  private String dictLabel;
+    private String dictLabel;
 
-  private Integer status;
+    private Integer status;
 }

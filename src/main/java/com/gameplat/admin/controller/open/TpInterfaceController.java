@@ -4,25 +4,27 @@ import com.gameplat.admin.model.entity.TpInterface;
 import com.gameplat.admin.model.vo.TpInterfaceVO;
 import com.gameplat.admin.service.TpInterfaceService;
 import com.gameplat.common.constant.ServiceApi;
-import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @RestController
 @RequestMapping(ServiceApi.API + "/tpInterfaces")
 public class TpInterfaceController {
 
-  @Autowired private TpInterfaceService tpInterfaceService;
+    @Autowired
+    private TpInterfaceService tpInterfaceService;
 
-  @GetMapping("/queryAll")
-  public List<TpInterfaceVO> getAll() {
-    return tpInterfaceService.queryAll();
-  }
+    @GetMapping("/queryAll")
+    public List<TpInterfaceVO> getAll() {
+        return tpInterfaceService.queryAll();
+    }
 
-  @GetMapping("/queryList")
-  public List<TpInterface> getList() {
-    return tpInterfaceService.list();
-  }
+    @GetMapping("/queryList")
+    public List<TpInterface> getList() {
+        return tpInterfaceService.list();
+    }
 }

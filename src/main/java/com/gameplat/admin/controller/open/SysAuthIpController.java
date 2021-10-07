@@ -9,32 +9,30 @@ import com.gameplat.admin.model.vo.SysAuthIpVO;
 import com.gameplat.admin.service.SysAuthIpService;
 import com.gameplat.common.constant.ServiceApi;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping(ServiceApi.API + "/authIp")
 public class SysAuthIpController {
 
-  @Autowired private SysAuthIpService sysAuthIpService;
+    @Autowired
+    private SysAuthIpService sysAuthIpService;
 
-  /** 查询所有IP白名单 */
-  @GetMapping(value = "/queryAll")
-  public IPage<SysAuthIpVO> queryAll(Page<SysAuthIp> sysAuthIp, SysAuthIpQueryDTO queryDto) {
-    return sysAuthIpService.queryPage(sysAuthIp, queryDto);
-  }
+    /**
+     * 查询所有IP白名单
+     */
+    @GetMapping(value = "/queryAll")
+    public IPage<SysAuthIpVO> queryAll(Page<SysAuthIp> sysAuthIp, SysAuthIpQueryDTO queryDto) {
+        return sysAuthIpService.queryPage(sysAuthIp, queryDto);
+    }
 
-  @PostMapping(value = "/save")
-  public void save(SysAuthIpAddDTO sysAuthIpAddDto) {
-    sysAuthIpService.save(sysAuthIpAddDto);
-  }
+    @PostMapping(value = "/save")
+    public void save(SysAuthIpAddDTO sysAuthIpAddDto) {
+        sysAuthIpService.save(sysAuthIpAddDto);
+    }
 
-  @DeleteMapping(value = "/delete/{id}")
-  public void delete(@PathVariable("id") Long id) {
-    sysAuthIpService.delete(id);
-  }
+    @DeleteMapping(value = "/delete/{id}")
+    public void delete(@PathVariable("id") Long id) {
+        sysAuthIpService.delete(id);
+    }
 }

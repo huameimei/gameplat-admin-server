@@ -7,8 +7,10 @@ import com.gameplat.admin.model.dto.SysEmailQueryDTO;
 import com.gameplat.admin.model.entity.SysEmail;
 import com.gameplat.admin.model.vo.SysEmailVO;
 
-/** @author Lenovo */
+/**
+ * @author Lenovo
+ */
 public interface SysEmailService extends IService<SysEmail> {
 
-  IPage<SysEmailVO> queryPage(Page<SysEmail> page, SysEmailQueryDTO sysEmailQueryDto);
+    IPage<SysEmailVO> queryPage(Page<SysEmail> page, SysEmailQueryDTO sysEmailQueryDto);
 }

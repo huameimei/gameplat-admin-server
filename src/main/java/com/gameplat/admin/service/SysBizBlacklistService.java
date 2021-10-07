@@ -9,15 +9,17 @@ import com.gameplat.admin.model.dto.SysBizBlacklistUpdateDTO;
 import com.gameplat.admin.model.entity.SysBizBlacklist;
 import com.gameplat.admin.model.vo.SysBizBlacklistVO;
 
-/** 业务黑名单 */
+/**
+ * 业务黑名单
+ */
 public interface SysBizBlacklistService extends IService<SysBizBlacklist> {
 
-  IPage<SysBizBlacklistVO> queryPage(
-      Page<SysBizBlacklist> sysBizBlacklist, SysBizBlackListQueryDTO queryDTO);
+    IPage<SysBizBlacklistVO> queryPage(
+            Page<SysBizBlacklist> sysBizBlacklist, SysBizBlackListQueryDTO queryDTO);
 
-  void save(SysBizBlacklistAddDTO sysBizBlacklistAddDTO);
+    void save(SysBizBlacklistAddDTO sysBizBlacklistAddDTO);
 
-  void delete(Long id);
+    void delete(Long id);
 
-  void update(SysBizBlacklistUpdateDTO sysBizBlacklistUpdateDTO);
+    void update(SysBizBlacklistUpdateDTO sysBizBlacklistUpdateDTO);
 }

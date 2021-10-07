@@ -10,11 +10,11 @@ import org.mapstruct.Mapper;
 @Mapper(componentModel = "spring")
 public interface TpPayChannelConvert {
 
-  TpPayChannelVO toVo(TpPayChannel entity);
+    TpPayChannelVO toVo(TpPayChannel entity);
 
-  TpPayChannel toEntity(TpPayChannelAddDTO payTypeAddDTO);
+    TpPayChannel toEntity(TpPayChannelAddDTO payTypeAddDTO);
 
-  TpPayChannel toEntity(TpPayChannelQueryDTO payTypeQueryDTO);
+    TpPayChannel toEntity(TpPayChannelQueryDTO payTypeQueryDTO);
 
-  TpPayChannel toEntity(TpPayChannelEditDTO payTypeEditDTO);
+    TpPayChannel toEntity(TpPayChannelEditDTO payTypeEditDTO);
 }

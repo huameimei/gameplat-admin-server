@@ -8,6 +8,6 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class SysLayerConfigServiceImpl extends
-    ServiceImpl<SysLayerConfigMapper, SysLayerConfig> implements SysLayerConfigService {
+        ServiceImpl<SysLayerConfigMapper, SysLayerConfig> implements SysLayerConfigService {
 
 }

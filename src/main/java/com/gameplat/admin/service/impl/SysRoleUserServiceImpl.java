@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
  * @author Lenovo
  */
 @Service
-public class SysRoleUserServiceImpl extends ServiceImpl<SysRoleUserMapper,SysRoleUser> implements
-    SysRoleUserService {
+public class SysRoleUserServiceImpl extends ServiceImpl<SysRoleUserMapper, SysRoleUser> implements
+        SysRoleUserService {
 
 }

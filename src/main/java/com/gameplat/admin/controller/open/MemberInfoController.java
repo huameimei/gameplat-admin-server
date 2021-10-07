@@ -19,34 +19,37 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping(ServiceApi.API + "/memberInfo")
 public class MemberInfoController {
 
-  @Autowired private MemberInfoService memberInfoService;
+    @Autowired
+    private MemberInfoService memberInfoService;
 
-  /** 查询会员信息 */
-  @GetMapping(value = "/queryAll")
-  public IPage<MemberInfoVO> queryPage(
-      Page<MemberInfo> page, MemberInfoQueryDTO memberInfoQueryDto) {
-    // 当前登录用户权限检查
-    // 是否允许账号模糊查询
-    return memberInfoService.queryPage(page, memberInfoQueryDto);
-  }
+    /**
+     * 查询会员信息
+     */
+    @GetMapping(value = "/queryAll")
+    public IPage<MemberInfoVO> queryPage(
+            Page<MemberInfo> page, MemberInfoQueryDTO memberInfoQueryDto) {
+        // 当前登录用户权限检查
+        // 是否允许账号模糊查询
+        return memberInfoService.queryPage(page, memberInfoQueryDto);
+    }
 
-  /**
-   * 新增会员
-   *
-   * @param memberInfoAddDto
-   */
-  @PostMapping(value = "/save")
-  public void save(MemberInfoAddDTO memberInfoAddDto) {
-    memberInfoService.save(memberInfoAddDto);
-  }
+    /**
+     * 新增会员
+     *
+     * @param memberInfoAddDto
+     */
+    @PostMapping(value = "/save")
+    public void save(MemberInfoAddDTO memberInfoAddDto) {
+        memberInfoService.save(memberInfoAddDto);
+    }
 
-  /**
-   * 更新会员信息
-   *
-   * @param memberInfoEditDto
-   */
-  @PostMapping(value = "/update")
-  public void update(MemberInfoEditDTO memberInfoEditDto) {
-    memberInfoService.update(memberInfoEditDto);
-  }
+    /**
+     * 更新会员信息
+     *
+     * @param memberInfoEditDto
+     */
+    @PostMapping(value = "/update")
+    public void update(MemberInfoEditDTO memberInfoEditDto) {
+        memberInfoService.update(memberInfoEditDto);
+    }
 }

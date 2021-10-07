@@ -1,16 +1,15 @@
 package com.gameplat.admin.model.dto;
 
-import com.gameplat.common.model.dto.BaseDto;
-import java.io.Serializable;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
+
+import java.io.Serializable;
 
 @Data
 public class PayTypeQueryDTO implements Serializable {
 
-  private Integer isSystemCode;
+    private Integer isSystemCode;
 
-  private Integer status;
+    private Integer status;
 
-  private Integer onlinePayEnabled;
+    private Integer onlinePayEnabled;
 }

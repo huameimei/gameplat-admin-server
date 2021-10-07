@@ -7,5 +7,5 @@ import org.mapstruct.Mapper;
 @Mapper(componentModel = "spring")
 public interface SysEmailConvert {
 
-  SysEmailVO toVo(SysEmail sysEmail);
+    SysEmailVO toVo(SysEmail sysEmail);
 }

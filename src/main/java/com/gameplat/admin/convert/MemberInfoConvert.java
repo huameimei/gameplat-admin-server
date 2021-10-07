@@ -8,7 +8,7 @@ import org.mapstruct.Mapper;
 @Mapper(componentModel = "spring")
 public interface MemberInfoConvert {
 
-  MemberInfo toEntity(MemberInfoAddDTO dto);
+    MemberInfo toEntity(MemberInfoAddDTO dto);
 
-  MemberInfo toEntity(MemberInfoEditDTO dto);
+    MemberInfo toEntity(MemberInfoEditDTO dto);
 }

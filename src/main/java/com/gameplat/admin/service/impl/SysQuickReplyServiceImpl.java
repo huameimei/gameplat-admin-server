@@ -15,20 +15,23 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-/** @author Lenovo */
+/**
+ * @author Lenovo
+ */
 @Service
 public class SysQuickReplyServiceImpl extends ServiceImpl<SysQuickReplyMapper, SysQuickReply>
-    implements SysQuickReplyService {
+        implements SysQuickReplyService {
 
-  @Autowired private SysQuickReplyConvert sysQuickReplyConvert;
+    @Autowired
+    private SysQuickReplyConvert sysQuickReplyConvert;
 
-  @Override
-  public IPage<SysQuickReplyVO> queryPage(
-      Page<SysQuickReply> page, SysQuickReplayQueryDTO queryDto) {
-    LambdaQueryWrapper<SysQuickReply> query = Wrappers.lambdaQuery();
-    if (StringUtils.isNotBlank(queryDto.getMessage())) {
-      query.like(SysQuickReply::getMessage, queryDto.getMessage());
+    @Override
+    public IPage<SysQuickReplyVO> queryPage(
+            Page<SysQuickReply> page, SysQuickReplayQueryDTO queryDto) {
+        LambdaQueryWrapper<SysQuickReply> query = Wrappers.lambdaQuery();
+        if (StringUtils.isNotBlank(queryDto.getMessage())) {
+            query.like(SysQuickReply::getMessage, queryDto.getMessage());
+        }
+        return this.page(page, query).convert(sysQuickReplyConvert::toVo);
     }
-    return this.page(page, query).convert(sysQuickReplyConvert::toVo);
-  }
 }

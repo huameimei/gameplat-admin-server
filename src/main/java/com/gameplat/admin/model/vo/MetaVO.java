@@ -1,12 +1,13 @@
 package com.gameplat.admin.model.vo;
 
-import java.io.Serializable;
 import lombok.Data;
+
+import java.io.Serializable;
 
 @Data
 public class MetaVO implements Serializable {
 
-  private String title;
+    private String title;
 
-  private String icon;
+    private String icon;
 }

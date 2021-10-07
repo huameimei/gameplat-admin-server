@@ -9,5 +9,5 @@ import com.gameplat.admin.model.vo.PayAccountVO;
 
 public interface PayAccountMapper extends BaseMapper<PayAccount> {
 
-  IPage<PayAccountVO> findPayAccountPage(Page<PayAccountVO> page, PayAccountQueryDTO dto);
+    IPage<PayAccountVO> findPayAccountPage(Page<PayAccountVO> page, PayAccountQueryDTO dto);
 }

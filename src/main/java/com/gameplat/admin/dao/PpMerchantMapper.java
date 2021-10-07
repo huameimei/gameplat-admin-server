@@ -8,5 +8,5 @@ import com.gameplat.admin.model.vo.PpMerchantVO;
 
 public interface PpMerchantMapper extends BaseMapper<PpMerchant> {
 
-  IPage<PpMerchantVO> findPpMerchantPage(Page<PpMerchantVO> page, Integer status, String name);
+    IPage<PpMerchantVO> findPpMerchantPage(Page<PpMerchantVO> page, Integer status, String name);
 }

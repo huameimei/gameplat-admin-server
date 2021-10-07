@@ -9,5 +9,4 @@ import com.gameplat.admin.model.entity.SysRoleMenu;
 public interface SysRoleMenuMapper extends BaseMapper<SysRoleMenu> {
 
 
-
 }

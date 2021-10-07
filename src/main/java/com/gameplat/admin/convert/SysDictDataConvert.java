@@ -9,9 +9,9 @@ import org.mapstruct.Mapper;
 @Mapper(componentModel = "spring")
 public interface SysDictDataConvert {
 
-  SysDictData toEntity(SysDictDataAddDTO sysDictDataAddDto);
+    SysDictData toEntity(SysDictDataAddDTO sysDictDataAddDto);
 
-  SysDictDataVO toVo(SysDictData sysDictData);
+    SysDictDataVO toVo(SysDictData sysDictData);
 
-  SysDictData toEntity(SysDictDataEditDTO sysDictDataEditDto);
+    SysDictData toEntity(SysDictDataEditDTO sysDictDataEditDto);
 }

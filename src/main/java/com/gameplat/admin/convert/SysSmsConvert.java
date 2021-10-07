@@ -7,5 +7,5 @@ import org.mapstruct.Mapper;
 @Mapper(componentModel = "spring")
 public interface SysSmsConvert {
 
-  SysSmsVO toVo(SysSms sysSms);
+    SysSmsVO toVo(SysSms sysSms);
 }

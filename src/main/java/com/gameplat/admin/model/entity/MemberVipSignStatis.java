@@ -9,36 +9,36 @@ import lombok.Data;
 @Data
 public class MemberVipSignStatis extends BaseEntity {
 
-  /**
-   * 会员ID
-   */
-  private String memberId;
+    /**
+     * 会员ID
+     */
+    private String memberId;
 
-  /**
-   * 会员名称
-   */
-  private String memberName;
+    /**
+     * 会员名称
+     */
+    private String memberName;
 
-  /**
-   * 总签到数
-   */
-  private String signCount;
+    /**
+     * 总签到数
+     */
+    private String signCount;
 
-  /**
-   * 七天连续签到次数
-   */
-  private  Integer continueWeekSign;
-
-
-  /**
-   * 十五天连续签到次数
-   */
-  private Integer continueHalfMonthSign;
+    /**
+     * 七天连续签到次数
+     */
+    private Integer continueWeekSign;
 
 
-  /**
-   * 三十天连续签到次数
-   */
-  private Integer continueMonthSign;
+    /**
+     * 十五天连续签到次数
+     */
+    private Integer continueHalfMonthSign;
+
+
+    /**
+     * 三十天连续签到次数
+     */
+    private Integer continueMonthSign;
 
 }

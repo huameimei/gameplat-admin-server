@@ -18,140 +18,142 @@ import com.gameplat.admin.model.vo.PayAccountVO;
 import com.gameplat.admin.service.PayAccountService;
 import com.gameplat.common.exception.ServiceException;
 import com.gameplat.common.json.JsonUtils;
-import java.util.Date;
-import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)
 public class PayAccountServiceImpl extends ServiceImpl<PayAccountMapper, PayAccount>
-    implements PayAccountService {
+        implements PayAccountService {
 
-  @Autowired private PayAccountConvert payAccountConvert;
+    @Autowired
+    private PayAccountConvert payAccountConvert;
 
-  @Autowired private PayAccountMapper payAccountMapper;
+    @Autowired
+    private PayAccountMapper payAccountMapper;
 
-  @Override
-  public void deleteByPayType(String payType) {
-    LambdaQueryWrapper<PayAccount> query = Wrappers.lambdaQuery();
-    query.eq(PayAccount::getPayType, payType);
-    List<PayAccount> list = this.list(query);
-    if (null != list && list.size() > 0) {
-      if (0 == payAccountMapper.delete(query)) {
-        throw new ServiceException("支付账号删除失败!");
-      }
+    @Override
+    public void deleteByPayType(String payType) {
+        LambdaQueryWrapper<PayAccount> query = Wrappers.lambdaQuery();
+        query.eq(PayAccount::getPayType, payType);
+        List<PayAccount> list = this.list(query);
+        if (null != list && list.size() > 0) {
+            if (0 == payAccountMapper.delete(query)) {
+                throw new ServiceException("支付账号删除失败!");
+            }
+        }
     }
-  }
 
-  @Override
-  public void update(PayAccountEditDTO dto) {
-    /** 检验风控金额的合法性 */
-    String riskControlValue =
-        ChannelLimitsBean.validateRiskControlValue(
-            dto.getRiskControlValue(), dto.getRiskControlType());
-    dto.setRiskControlValue(riskControlValue);
-    PayAccount usedPayaccount = payAccountMapper.selectById(dto.getId());
-    if (null == usedPayaccount) {
-      throw new ServiceException("收款账号不存在，请刷新页面重试！");
+    @Override
+    public void update(PayAccountEditDTO dto) {
+        /** 检验风控金额的合法性 */
+        String riskControlValue =
+                ChannelLimitsBean.validateRiskControlValue(
+                        dto.getRiskControlValue(), dto.getRiskControlType());
+        dto.setRiskControlValue(riskControlValue);
+        PayAccount usedPayaccount = payAccountMapper.selectById(dto.getId());
+        if (null == usedPayaccount) {
+            throw new ServiceException("收款账号不存在，请刷新页面重试！");
+        }
+        conver2PayAccount(dto);
+        if (!this.updateById(payAccountConvert.toEntity(dto))) {
+            throw new ServiceException("更新失败!");
+        }
     }
-    conver2PayAccount(dto);
-    if (!this.updateById(payAccountConvert.toEntity(dto))) {
-      throw new ServiceException("更新失败!");
+
+    @Override
+    public void updateStatus(Long id, Integer status) {
+        if (null == status) {
+            throw new ServiceException("状态不能为空!");
+        }
+        LambdaUpdateWrapper<PayAccount> update = Wrappers.lambdaUpdate();
+        update.set(PayAccount::getStatus, status);
+        update.eq(PayAccount::getId, id);
+        this.update(update);
     }
-  }
 
-  @Override
-  public void updateStatus(Long id, Integer status) {
-    if (null == status) {
-      throw new ServiceException("状态不能为空!");
+    @Override
+    public void save(PayAccountAddDTO dto) {
+        /** 检验风控金额的合法性 */
+        String riskControlValue =
+                ChannelLimitsBean.validateRiskControlValue(
+                        dto.getRiskControlValue(), dto.getRiskControlType());
+        dto.setRiskControlValue(riskControlValue);
+        conver2PayAccount(dto);
+        dto.setStatus(0);
+        dto.setRechargeTimes(0L);
+        dto.setRechargeAmount(0L);
+        if (!this.save(payAccountConvert.toEntity(dto))) {
+            throw new ServiceException("添加失败!");
+        }
     }
-    LambdaUpdateWrapper<PayAccount> update = Wrappers.lambdaUpdate();
-    update.set(PayAccount::getStatus, status);
-    update.eq(PayAccount::getId, id);
-    this.update(update);
-  }
 
-  @Override
-  public void save(PayAccountAddDTO dto) {
-    /** 检验风控金额的合法性 */
-    String riskControlValue =
-        ChannelLimitsBean.validateRiskControlValue(
-            dto.getRiskControlValue(), dto.getRiskControlType());
-    dto.setRiskControlValue(riskControlValue);
-    conver2PayAccount(dto);
-    dto.setStatus(0);
-    dto.setRechargeTimes(0L);
-    dto.setRechargeAmount(0L);
-    if (!this.save(payAccountConvert.toEntity(dto))) {
-      throw new ServiceException("添加失败!");
+    @Override
+    public void delete(Long id) {
+        this.getById(id).deleteById();
     }
-  }
 
-  @Override
-  public void delete(Long id) {
-    this.getById(id).deleteById();
-  }
+    @Override
+    public IPage<PayAccountVO> findPayAccountPage(Page<PayAccountVO> page, PayAccountQueryDTO dto) {
+        IPage<PayAccountVO> ipage = payAccountMapper.findPayAccountPage(page, dto);
+        List<PayAccountVO> list = ipage.getRecords();
+        list.stream()
+                .forEach(
+                        (vo -> {
+                            this.conver2LimitInfo(vo);
+                        }));
+        return ipage;
+    }
 
-  @Override
-  public IPage<PayAccountVO> findPayAccountPage(Page<PayAccountVO> page, PayAccountQueryDTO dto) {
-    IPage<PayAccountVO> ipage = payAccountMapper.findPayAccountPage(page, dto);
-    List<PayAccountVO> list = ipage.getRecords();
-    list.stream()
-        .forEach(
-            (vo -> {
-              this.conver2LimitInfo(vo);
-            }));
-    return ipage;
-  }
+    private void conver2LimitInfo(PayAccountVO vo) {
+        JSONObject limitInfo = JSONObject.parseObject(vo.getLimitInfo());
+        vo.setLimitStatus(limitInfo.getInteger("limitStatus"));
+        vo.setLimitAmount(limitInfo.getLong("limitAmount"));
+        vo.setChannelTimeStatus(limitInfo.getInteger("channelTimeStatus"));
+        vo.setChannelTimeStart(limitInfo.getInteger("channelTimeStart"));
+        vo.setChannelTimeEnd(limitInfo.getInteger("channelTimeEnd"));
+        vo.setChannelShows(limitInfo.getString("channelShows"));
+        vo.setMinAmountPerOrder(limitInfo.getLong("minAmountPerOrder"));
+        vo.setMaxAmountPerOrder(limitInfo.getLong("maxAmountPerOrder"));
+        vo.setRiskControlType(limitInfo.getInteger("riskControlType"));
+        vo.setRiskControlValue(limitInfo.getString("riskControlValue"));
+    }
 
-  private void conver2LimitInfo(PayAccountVO vo) {
-    JSONObject limitInfo = JSONObject.parseObject(vo.getLimitInfo());
-    vo.setLimitStatus(limitInfo.getInteger("limitStatus"));
-    vo.setLimitAmount(limitInfo.getLong("limitAmount"));
-    vo.setChannelTimeStatus(limitInfo.getInteger("channelTimeStatus"));
-    vo.setChannelTimeStart(limitInfo.getInteger("channelTimeStart"));
-    vo.setChannelTimeEnd(limitInfo.getInteger("channelTimeEnd"));
-    vo.setChannelShows(limitInfo.getString("channelShows"));
-    vo.setMinAmountPerOrder(limitInfo.getLong("minAmountPerOrder"));
-    vo.setMaxAmountPerOrder(limitInfo.getLong("maxAmountPerOrder"));
-    vo.setRiskControlType(limitInfo.getInteger("riskControlType"));
-    vo.setRiskControlValue(limitInfo.getString("riskControlValue"));
-  }
+    private void conver2PayAccount(PayAccountAddDTO dto) {
+        ChannelLimitsBean merBean =
+                new ChannelLimitsBean(
+                        dto.getLimitStatus(),
+                        dto.getLimitAmount(),
+                        dto.getChannelTimeStatus(),
+                        dto.getChannelTimeStart(),
+                        dto.getChannelTimeEnd(),
+                        dto.getChannelShows(),
+                        dto.getMinAmountPerOrder(),
+                        dto.getMaxAmountPerOrder(),
+                        dto.getRiskControlType(),
+                        dto.getRiskControlValue(),
+                        null);
+        dto.setLimitInfo(JsonUtils.toJson(merBean));
+    }
 
-  private void conver2PayAccount(PayAccountAddDTO dto) {
-    ChannelLimitsBean merBean =
-        new ChannelLimitsBean(
-            dto.getLimitStatus(),
-            dto.getLimitAmount(),
-            dto.getChannelTimeStatus(),
-            dto.getChannelTimeStart(),
-            dto.getChannelTimeEnd(),
-            dto.getChannelShows(),
-            dto.getMinAmountPerOrder(),
-            dto.getMaxAmountPerOrder(),
-            dto.getRiskControlType(),
-            dto.getRiskControlValue(),
-            null);
-    dto.setLimitInfo(JsonUtils.toJson(merBean));
-  }
-
-  private void conver2PayAccount(PayAccountEditDTO dto) {
-    ChannelLimitsBean merBean =
-        new ChannelLimitsBean(
-            dto.getLimitStatus(),
-            dto.getLimitAmount(),
-            dto.getChannelTimeStatus(),
-            dto.getChannelTimeStart(),
-            dto.getChannelTimeEnd(),
-            dto.getChannelShows(),
-            dto.getMinAmountPerOrder(),
-            dto.getMaxAmountPerOrder(),
-            dto.getRiskControlType(),
-            dto.getRiskControlValue(),
-            null);
-    dto.setLimitInfo(JsonUtils.toJson(merBean));
-  }
+    private void conver2PayAccount(PayAccountEditDTO dto) {
+        ChannelLimitsBean merBean =
+                new ChannelLimitsBean(
+                        dto.getLimitStatus(),
+                        dto.getLimitAmount(),
+                        dto.getChannelTimeStatus(),
+                        dto.getChannelTimeStart(),
+                        dto.getChannelTimeEnd(),
+                        dto.getChannelShows(),
+                        dto.getMinAmountPerOrder(),
+                        dto.getMaxAmountPerOrder(),
+                        dto.getRiskControlType(),
+                        dto.getRiskControlValue(),
+                        null);
+        dto.setLimitInfo(JsonUtils.toJson(merBean));
+    }
 }

@@ -10,11 +10,11 @@ import org.mapstruct.Mapper;
 @Mapper(componentModel = "spring")
 public interface TpMerchantConvert {
 
-  TpMerchantVO toVo(TpMerchant entity);
+    TpMerchantVO toVo(TpMerchant entity);
 
-  TpMerchantPayTypeVO toPayTypeVo(TpMerchant entity);
+    TpMerchantPayTypeVO toPayTypeVo(TpMerchant entity);
 
-  TpMerchant toEntity(TpMerchantAddDTO tpInterfaceAddDTO);
+    TpMerchant toEntity(TpMerchantAddDTO tpInterfaceAddDTO);
 
-  TpMerchant toEntity(TpMerchantEditDTO tpMerchaneEditDTO);
+    TpMerchant toEntity(TpMerchantEditDTO tpMerchaneEditDTO);
 }

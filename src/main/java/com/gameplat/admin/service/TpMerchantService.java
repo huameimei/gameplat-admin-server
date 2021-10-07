@@ -8,21 +8,22 @@ import com.gameplat.admin.model.dto.TpMerchantEditDTO;
 import com.gameplat.admin.model.entity.TpMerchant;
 import com.gameplat.admin.model.vo.TpMerchantPayTypeVO;
 import com.gameplat.admin.model.vo.TpMerchantVO;
+
 import java.util.List;
 
 public interface TpMerchantService extends IService<TpMerchant> {
 
-  void update(TpMerchantEditDTO dto);
+    void update(TpMerchantEditDTO dto);
 
-  void save(TpMerchantAddDTO dto);
+    void save(TpMerchantAddDTO dto);
 
-  void delete(Long id);
+    void delete(Long id);
 
-  void updateStatus(Long id, Integer status);
+    void updateStatus(Long id, Integer status);
 
-  TpMerchantPayTypeVO getTpMerchantById(Long id);
+    TpMerchantPayTypeVO getTpMerchantById(Long id);
 
-  IPage<TpMerchantVO> queryPage(Page<TpMerchantVO> page, Integer status, String name);
+    IPage<TpMerchantVO> queryPage(Page<TpMerchantVO> page, Integer status, String name);
 
-  List<TpMerchantVO> queryAllMerchant(Integer status);
+    List<TpMerchantVO> queryAllMerchant(Integer status);
 }

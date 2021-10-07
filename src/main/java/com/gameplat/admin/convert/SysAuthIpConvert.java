@@ -8,7 +8,7 @@ import org.mapstruct.Mapper;
 @Mapper(componentModel = "spring")
 public interface SysAuthIpConvert {
 
-  SysAuthIp toEntity(SysAuthIpAddDTO dto);
+    SysAuthIp toEntity(SysAuthIpAddDTO dto);
 
-  SysAuthIpVO toVo(SysAuthIp sysAuthIp);
+    SysAuthIpVO toVo(SysAuthIp sysAuthIp);
 }

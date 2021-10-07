@@ -13,57 +13,62 @@ import com.gameplat.admin.model.entity.SysAuthIp;
 import com.gameplat.admin.model.vo.SysAuthIpVO;
 import com.gameplat.admin.service.SysAuthIpService;
 import com.gameplat.common.exception.ServiceException;
-import java.util.Set;
-import java.util.stream.Collectors;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-/** @author Lenovo */
+import java.util.Set;
+import java.util.stream.Collectors;
+
+/**
+ * @author Lenovo
+ */
 @Service
 public class SysAuthIpServiceImpl extends ServiceImpl<AuthIpMapper, SysAuthIp>
-    implements SysAuthIpService {
-  @Autowired private AuthIpMapper authIpMapper;
+        implements SysAuthIpService {
+    @Autowired
+    private AuthIpMapper authIpMapper;
 
-  @Autowired private SysAuthIpConvert sysAuthIpConvert;
+    @Autowired
+    private SysAuthIpConvert sysAuthIpConvert;
 
-  @Override
-  public boolean isPermitted(String ip) {
-    Set<String> permittedIpSet =
-        this.lambdaQuery().list().stream().map(SysAuthIp::getAllowIp).collect(Collectors.toSet());
-    return StringUtils.isNotEmpty(ip) && (permittedIpSet.isEmpty() || permittedIpSet.contains(ip));
-  }
-
-  @Override
-  public boolean isExist(String ip) {
-    Set<String> permittedIpSet =
-        this.lambdaQuery().list().stream().map(SysAuthIp::getAllowIp).collect(Collectors.toSet());
-    return !permittedIpSet.isEmpty() && permittedIpSet.contains(ip);
-  }
-
-  @Override
-  public IPage<SysAuthIpVO> queryPage(Page<SysAuthIp> page, SysAuthIpQueryDTO queryDto) {
-    LambdaQueryWrapper<SysAuthIp> query = Wrappers.lambdaQuery();
-    if (StringUtils.isNotBlank(queryDto.getAuthIp())) {
-      query.like(SysAuthIp::getAllowIp, queryDto.getAuthIp());
+    @Override
+    public boolean isPermitted(String ip) {
+        Set<String> permittedIpSet =
+                this.lambdaQuery().list().stream().map(SysAuthIp::getAllowIp).collect(Collectors.toSet());
+        return StringUtils.isNotEmpty(ip) && (permittedIpSet.isEmpty() || permittedIpSet.contains(ip));
     }
-    return this.page(page, query).convert(sysAuthIpConvert::toVo);
-  }
 
-  @Override
-  public void save(SysAuthIpAddDTO sysAuthIpAddDto) throws ServiceException {
-    LambdaQueryWrapper<SysAuthIp> query = Wrappers.lambdaQuery();
-    query.eq(SysAuthIp::getAllowIp, sysAuthIpAddDto.getAllowIp());
-    if (this.count(query) > 0) {
-      throw new ServiceException("IP已经存在，请勿重复添加");
+    @Override
+    public boolean isExist(String ip) {
+        Set<String> permittedIpSet =
+                this.lambdaQuery().list().stream().map(SysAuthIp::getAllowIp).collect(Collectors.toSet());
+        return !permittedIpSet.isEmpty() && permittedIpSet.contains(ip);
     }
-    if (!this.save(sysAuthIpConvert.toEntity(sysAuthIpAddDto))) {
-      throw new ServiceException("添加失败!");
-    }
-  }
 
-  @Override
-  public void delete(Long id) {
-    authIpMapper.deleteById(id);
-  }
+    @Override
+    public IPage<SysAuthIpVO> queryPage(Page<SysAuthIp> page, SysAuthIpQueryDTO queryDto) {
+        LambdaQueryWrapper<SysAuthIp> query = Wrappers.lambdaQuery();
+        if (StringUtils.isNotBlank(queryDto.getAuthIp())) {
+            query.like(SysAuthIp::getAllowIp, queryDto.getAuthIp());
+        }
+        return this.page(page, query).convert(sysAuthIpConvert::toVo);
+    }
+
+    @Override
+    public void save(SysAuthIpAddDTO sysAuthIpAddDto) throws ServiceException {
+        LambdaQueryWrapper<SysAuthIp> query = Wrappers.lambdaQuery();
+        query.eq(SysAuthIp::getAllowIp, sysAuthIpAddDto.getAllowIp());
+        if (this.count(query) > 0) {
+            throw new ServiceException("IP已经存在，请勿重复添加");
+        }
+        if (!this.save(sysAuthIpConvert.toEntity(sysAuthIpAddDto))) {
+            throw new ServiceException("添加失败!");
+        }
+    }
+
+    @Override
+    public void delete(Long id) {
+        authIpMapper.deleteById(id);
+    }
 }

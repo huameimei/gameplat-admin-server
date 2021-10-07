@@ -11,11 +11,11 @@ import com.gameplat.admin.model.vo.SysBannerInfoVO;
 
 public interface SysBannerInfoService extends IService<SysBannerInfo> {
 
-  IPage<SysBannerInfoVO> queryPage(Page<SysBannerInfo> page, SysBannerInfoQueryDTO queryDto);
+    IPage<SysBannerInfoVO> queryPage(Page<SysBannerInfo> page, SysBannerInfoQueryDTO queryDto);
 
-  void save(SysBannerInfoAddDTO sysBannerInfoAddDto);
+    void save(SysBannerInfoAddDTO sysBannerInfoAddDto);
 
-  void delete(Long id);
+    void delete(Long id);
 
-  void update(SysBannerInfoEditDTO sysBannerInfoEditDto);
+    void update(SysBannerInfoEditDTO sysBannerInfoEditDto);
 }

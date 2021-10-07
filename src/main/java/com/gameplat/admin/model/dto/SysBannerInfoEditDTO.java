@@ -6,15 +6,15 @@ import lombok.Data;
 @Data
 public class SysBannerInfoEditDTO extends BaseEntity {
 
-  private Integer bannerType;
+    private Integer bannerType;
 
-  private String childName;
+    private String childName;
 
-  private String childType;
+    private String childType;
 
-  private String pcPicUrl;
+    private String pcPicUrl;
 
-  private String appPicUrl;
+    private String appPicUrl;
 
-  private Integer status;
+    private Integer status;
 }

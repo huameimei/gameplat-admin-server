@@ -1,17 +1,18 @@
 package com.gameplat.admin.model.dto;
 
 import com.gameplat.common.model.entity.BaseEntity;
-import java.util.List;
 import lombok.Data;
+
+import java.util.List;
 
 @Data
 public class PayAccountQueryDTO extends BaseEntity {
 
-  private String account;
+    private String account;
 
-  private String payType;
+    private String payType;
 
-  private List<String> userLevelList;
+    private List<String> userLevelList;
 
-  private Integer status;
+    private Integer status;
 }

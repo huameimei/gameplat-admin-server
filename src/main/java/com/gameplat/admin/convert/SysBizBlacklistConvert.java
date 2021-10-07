@@ -8,9 +8,9 @@ import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")
 public interface SysBizBlacklistConvert {
-  SysBizBlacklist toEntity(SysBizBlacklistAddDTO sysBizBlacklistAddDTO);
+    SysBizBlacklist toEntity(SysBizBlacklistAddDTO sysBizBlacklistAddDTO);
 
-  SysBizBlacklistVO toVo(SysBizBlacklist sysBizBlacklist);
+    SysBizBlacklistVO toVo(SysBizBlacklist sysBizBlacklist);
 
-  SysBizBlacklist toEntity(SysBizBlacklistUpdateDTO sysBizBlacklistUpdateDTO);
+    SysBizBlacklist toEntity(SysBizBlacklistUpdateDTO sysBizBlacklistUpdateDTO);
 }

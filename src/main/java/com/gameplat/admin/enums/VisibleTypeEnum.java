@@ -1,23 +1,25 @@
 package com.gameplat.admin.enums;
 
-/** 默认enum */
+/**
+ * 默认enum
+ */
 public enum VisibleTypeEnum {
-  SHOW(0, "可见"),
-  REQUIRED(1, "必填"),
-  HIDE(2, "隐藏");
-  private Integer value;
-  private String name;
+    SHOW(0, "可见"),
+    REQUIRED(1, "必填"),
+    HIDE(2, "隐藏");
+    private Integer value;
+    private String name;
 
-  VisibleTypeEnum(Integer value, String name) {
-    this.value = value;
-    this.name = name;
-  }
+    VisibleTypeEnum(Integer value, String name) {
+        this.value = value;
+        this.name = name;
+    }
 
-  public Integer getValue() {
-    return value;
-  }
+    public Integer getValue() {
+        return value;
+    }
 
-  public String getName() {
-    return name;
-  }
+    public String getName() {
+        return name;
+    }
 }

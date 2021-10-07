@@ -9,9 +9,9 @@ import org.mapstruct.Mapper;
 @Mapper(componentModel = "spring")
 public interface SysDictTypeConvert {
 
-  SysDictType toEntity(SysDictTypeAddDTO sysDictTypeAddDto);
+    SysDictType toEntity(SysDictTypeAddDTO sysDictTypeAddDto);
 
-  SysDictTypeVO toVo(SysDictType sysDictType);
+    SysDictTypeVO toVo(SysDictType sysDictType);
 
-  SysDictType toEntity(SysDictTypeEditDTO sysDictTypeEditDto);
+    SysDictType toEntity(SysDictTypeEditDTO sysDictTypeEditDto);
 }

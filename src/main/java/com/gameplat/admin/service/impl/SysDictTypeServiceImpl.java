@@ -13,50 +13,53 @@ import com.gameplat.admin.model.entity.SysDictType;
 import com.gameplat.admin.model.vo.SysDictTypeVO;
 import com.gameplat.admin.service.SysDictTypeService;
 import com.gameplat.common.exception.ServiceException;
-import java.util.Date;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-/** @author Lenovo */
+/**
+ * @author Lenovo
+ */
 @Service
 public class SysDictTypeServiceImpl extends ServiceImpl<SysDictTypeMapper, SysDictType>
-    implements SysDictTypeService {
+        implements SysDictTypeService {
 
-  @Autowired private SysDictTypeMapper sysDictTypeMapper;
+    @Autowired
+    private SysDictTypeMapper sysDictTypeMapper;
 
-  @Autowired private SysDictTypeConvert sysDictTypeConvert;
+    @Autowired
+    private SysDictTypeConvert sysDictTypeConvert;
 
-  @Override
-  public void delete(Long id) {
-    sysDictTypeMapper.deleteById(id);
-  }
-
-  @Override
-  public void save(SysDictTypeAddDTO sysDictTypeAddDto) throws ServiceException {
-    LambdaQueryWrapper<SysDictType> query = Wrappers.lambdaQuery();
-    query.eq(SysDictType::getDictType, sysDictTypeAddDto.getDictType());
-    if (this.count(query) > 0) {
-      throw new ServiceException("字典标签，请勿重复添加");
+    @Override
+    public void delete(Long id) {
+        sysDictTypeMapper.deleteById(id);
     }
-    if (!this.save(sysDictTypeConvert.toEntity(sysDictTypeAddDto))) {
-      throw new ServiceException("添加失败!");
-    }
-  }
 
-  @Override
-  public IPage<SysDictTypeVO> queryPage(IPage<SysDictType> page, SysDictTypeQueryDTO queryDto) {
-    LambdaQueryWrapper<SysDictType> query = Wrappers.lambdaQuery();
-    if (StringUtils.isNotBlank(queryDto.getDictName())) {
-      query.like(SysDictType::getDictName, queryDto.getDictName());
+    @Override
+    public void save(SysDictTypeAddDTO sysDictTypeAddDto) throws ServiceException {
+        LambdaQueryWrapper<SysDictType> query = Wrappers.lambdaQuery();
+        query.eq(SysDictType::getDictType, sysDictTypeAddDto.getDictType());
+        if (this.count(query) > 0) {
+            throw new ServiceException("字典标签，请勿重复添加");
+        }
+        if (!this.save(sysDictTypeConvert.toEntity(sysDictTypeAddDto))) {
+            throw new ServiceException("添加失败!");
+        }
     }
-    return this.page(page, query).convert(sysDictTypeConvert::toVo);
-  }
 
-  @Override
-  public void update(SysDictTypeEditDTO sysDictTypeEditDto) throws ServiceException {
-    if (!this.updateById(sysDictTypeConvert.toEntity(sysDictTypeEditDto))) {
-      throw new ServiceException("更新失败!");
+    @Override
+    public IPage<SysDictTypeVO> queryPage(IPage<SysDictType> page, SysDictTypeQueryDTO queryDto) {
+        LambdaQueryWrapper<SysDictType> query = Wrappers.lambdaQuery();
+        if (StringUtils.isNotBlank(queryDto.getDictName())) {
+            query.like(SysDictType::getDictName, queryDto.getDictName());
+        }
+        return this.page(page, query).convert(sysDictTypeConvert::toVo);
     }
-  }
+
+    @Override
+    public void update(SysDictTypeEditDTO sysDictTypeEditDto) throws ServiceException {
+        if (!this.updateById(sysDictTypeConvert.toEntity(sysDictTypeEditDto))) {
+            throw new ServiceException("更新失败!");
+        }
+    }
 }

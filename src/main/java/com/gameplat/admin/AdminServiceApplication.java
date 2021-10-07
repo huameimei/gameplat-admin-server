@@ -21,18 +21,18 @@ import org.springframework.core.env.Environment;
 @SpringBootApplication(scanBasePackages = "com.gameplat")
 public class AdminServiceApplication implements ApplicationListener<WebServerInitializedEvent> {
 
-  public static void main(String[] args) {
-    SpringApplication.run(AdminServiceApplication.class, args);
-  }
+    public static void main(String[] args) {
+        SpringApplication.run(AdminServiceApplication.class, args);
+    }
 
 
-  @Override
-  public void onApplicationEvent(WebServerInitializedEvent event) {
-    WebServer server = event.getWebServer();
-    WebServerApplicationContext context = event.getApplicationContext();
-    Environment env = context.getEnvironment();
-    int port = server.getPort();
-    String contextPath = env.getProperty("server.servlet.context-path");
-    System.out.println(String.format("\n\n------------------------  AdminService is Running,the port %s ,the contextPath %s  --------------------\n\n", port, contextPath));
-  }
+    @Override
+    public void onApplicationEvent(WebServerInitializedEvent event) {
+        WebServer server = event.getWebServer();
+        WebServerApplicationContext context = event.getApplicationContext();
+        Environment env = context.getEnvironment();
+        int port = server.getPort();
+        String contextPath = env.getProperty("server.servlet.context-path");
+        System.out.println(String.format("\n\n------------------------  AdminService is Running,the port %s ,the contextPath %s  --------------------\n\n", port, contextPath));
+    }
 }

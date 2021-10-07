@@ -9,6 +9,4 @@ import com.gameplat.admin.model.entity.SysUser;
 public interface SysUserMapper extends BaseMapper<SysUser> {
 
 
-
-
 }

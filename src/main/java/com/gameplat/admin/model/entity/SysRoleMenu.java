@@ -1,15 +1,16 @@
 package com.gameplat.admin.model.entity;
 
-import java.io.Serializable;
 import lombok.Data;
+
+import java.io.Serializable;
 
 @Data
 public class SysRoleMenu implements Serializable {
 
-  private Integer roleId;
+    private Integer roleId;
 
-  private Integer menuId;
+    private Integer menuId;
 
-  private Integer halfId;
+    private Integer halfId;
 
 }

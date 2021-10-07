@@ -7,5 +7,5 @@ import org.mapstruct.Mapper;
 @Mapper(componentModel = "spring")
 public interface SysMenuConvert {
 
-  SysMenuVO toVo(SysMenu sysMenu);
+    SysMenuVO toVo(SysMenu sysMenu);
 }

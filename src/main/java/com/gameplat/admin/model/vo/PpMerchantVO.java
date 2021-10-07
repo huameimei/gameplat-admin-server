@@ -6,31 +6,31 @@ import lombok.Data;
 @Data
 public class PpMerchantVO extends Model<PpMerchantVO> {
 
-  private Long id;
+    private Long id;
 
-  private String name;
+    private String name;
 
-  private String ppInterfaceCode;
+    private String ppInterfaceCode;
 
-  private String parameters;
+    private String parameters;
 
-  private Integer status;
+    private Integer status;
 
-  private Long proxyTimes;
+    private Long proxyTimes;
 
-  private Long proxyAmount;
+    private Long proxyAmount;
 
-  private String interfaceName;
+    private String interfaceName;
 
-  private Integer sort;
+    private Integer sort;
 
-  private String merLimits;
+    private String merLimits;
 
-  private Long maxLimitCash; // 最大金额限制
+    private Long maxLimitCash; // 最大金额限制
 
-  private Long minLimitCash; // 最小金额限制
+    private Long minLimitCash; // 最小金额限制
 
-  private String userLever; // 用户层级
+    private String userLever; // 用户层级
 
-  private PpInterfaceVO ppInterfaceVO;
+    private PpInterfaceVO ppInterfaceVO;
 }

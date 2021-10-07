@@ -8,7 +8,7 @@ import org.mapstruct.Mapper;
 @Mapper(componentModel = "spring")
 public interface SysPayBankConvert {
 
-  SysPayBank toEntity(SysPayBankAddDTO payTypeAddDTO);
+    SysPayBank toEntity(SysPayBankAddDTO payTypeAddDTO);
 
-  SysPayBank toEntity(SysPayBankEditDTO configEditDTO);
+    SysPayBank toEntity(SysPayBankEditDTO configEditDTO);
 }

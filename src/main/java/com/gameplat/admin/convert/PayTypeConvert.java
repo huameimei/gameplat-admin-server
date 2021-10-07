@@ -10,11 +10,11 @@ import org.mapstruct.Mapper;
 @Mapper(componentModel = "spring")
 public interface PayTypeConvert {
 
-  PayTypeVO toVo(PayType entity);
+    PayTypeVO toVo(PayType entity);
 
-  PayType toEntity(PayTypeAddDTO payTypeAddDTO);
+    PayType toEntity(PayTypeAddDTO payTypeAddDTO);
 
-  PayType toEntity(PayTypeQueryDTO payTypeQueryDTO);
+    PayType toEntity(PayTypeQueryDTO payTypeQueryDTO);
 
-  PayType toEntity(PayTypeEditDTO payTypeEditDTO);
+    PayType toEntity(PayTypeEditDTO payTypeEditDTO);
 }

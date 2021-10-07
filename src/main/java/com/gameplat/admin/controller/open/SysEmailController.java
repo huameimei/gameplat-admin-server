@@ -16,10 +16,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping(ServiceApi.API + "/sysEmail")
 public class SysEmailController {
 
-  @Autowired private SysEmailService sysEmailService;
+    @Autowired
+    private SysEmailService sysEmailService;
 
-  @GetMapping(value = "/queryAll")
-  public IPage<SysEmailVO> queryPage(Page<SysEmail> page, SysEmailQueryDTO sysEmailQueryDto) {
-    return sysEmailService.queryPage(page, sysEmailQueryDto);
-  }
+    @GetMapping(value = "/queryAll")
+    public IPage<SysEmailVO> queryPage(Page<SysEmail> page, SysEmailQueryDTO sysEmailQueryDto) {
+        return sysEmailService.queryPage(page, sysEmailQueryDto);
+    }
 }

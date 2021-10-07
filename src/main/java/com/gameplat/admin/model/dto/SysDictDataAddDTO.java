@@ -6,19 +6,19 @@ import lombok.Data;
 @Data
 public class SysDictDataAddDTO extends BaseEntity {
 
-  private String dictType;
+    private String dictType;
 
-  private String dictName;
+    private String dictName;
 
-  private String dictLabel;
+    private String dictLabel;
 
-  private String dictValue;
+    private String dictValue;
 
-  private Integer dictSort;
+    private Integer dictSort;
 
-  private String remark;
+    private String remark;
 
-  private Integer isVisible;
+    private Integer isVisible;
 
-  private Integer isDefault;
+    private Integer isDefault;
 }

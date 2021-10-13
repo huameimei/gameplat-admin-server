@@ -42,6 +42,7 @@ public class AdminCache {
                 sysDictDataService.getSysDictData(
                         DictDataEnum.tokenExpiredTime.getType(), DictDataEnum.tokenExpiredTime.getLabel());
         long expiredTime =
+                tokenExpiredTime != null &&
                 Optional.ofNullable(tokenExpiredTime.getDictValue()).isPresent()
                         ? Long.parseLong(tokenExpiredTime.getDictValue())
                         : 6;

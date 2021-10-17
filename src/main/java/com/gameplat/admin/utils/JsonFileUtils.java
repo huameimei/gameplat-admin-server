@@ -11,7 +11,7 @@ import java.io.*;
  */
 @Slf4j
 @Component
-public class JsonFileUtil {
+public class JsonFileUtils {
 
     /**
      * 定义文件后缀

@@ -4,11 +4,13 @@
     <springProperty scope="context" name="app.name" source="spring.application.name"/>
     <springProperty scope="context" name="log.host" source="graylog.host"/>
     <springProperty scope="context" name="log.port" source="graylog.port"/>
+    <springProperty scope="context" name="log.tenant" source="graylog.tenant"/>
     <conversionRule conversionWord="ip" converterClass="com.gameplat.web.config.loger.LogIpConfig"/>
     <property name="APP_NAME" value="${app.name}"/>
     <property name="LOG_HOME" value="logs/${APP_NAME}"/>
     <property name="LOG_HOST" value="${log.host}"/>
     <property name="LOG_PORT" value="${log.port}"/>
+    <property name="LOG_TENANT" value="${log.tenant}"/>
 
 
     <!-- 彩色日志 -->
@@ -44,6 +46,7 @@
             </fullPatternLayout>
             <!-- 配置应用名称（服务名称），通过staticField标签可以自定义一些固定的日志字段 -->
             <staticField>app_name:${APP_NAME}</staticField>
+            <staticField>tenant:${LOG_TENANT}</staticField>
         </encoder>
     </appender>
 

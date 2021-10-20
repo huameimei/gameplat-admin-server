@@ -9,7 +9,7 @@
     </parent>
 
     <groupId>com.gameplat</groupId>
-    <version>1-0-0</version>
+    <version>${gameplat-common.version}</version>
     <modelVersion>4.0.0</modelVersion>
     <packaging>jar</packaging>
     <name>gameplat-admin-server</name>
@@ -23,6 +23,7 @@
         <spring-cloud-alibaba.version>2.2.5.RELEASE</spring-cloud-alibaba.version>
         <gameplat-dependencies.version>0.0.1-SNAPSHOT</gameplat-dependencies.version>
         <org.mapstruct.version>1.4.2.Final</org.mapstruct.version>
+        <gameplat-common.version>1-0-0-SNAPSHOT</gameplat-common.version>
         <poi.version>3.17</poi.version>
     </properties>
 
@@ -155,7 +156,7 @@
         <dependency>
             <groupId>com.gameplat</groupId>
             <artifactId>gameplat-common</artifactId>
-            <version>1-0-0</version>
+            <version>${gameplat-common.version}</version>
         </dependency>
 
         <dependency>

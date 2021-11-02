@@ -16,4 +16,4 @@ spring:
         namespace: prod
         group: DEFAULT_GROUP
         refresh-enabled: true
-        shared-dataids: redis.yml,rocketmq-config.yml,spring-kafka-producer-config.yml
+        shared-dataids: redis.yml,spring-kafka-producer-config.yml

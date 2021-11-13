@@ -1,18 +1,15 @@
 package com.gameplat.admin.model.dto;
 
-import com.gameplat.common.model.entity.BaseEntity;
 import lombok.Data;
 
+import java.io.Serializable;
+
 @Data
-public class TpMerchantEditDTO extends BaseEntity {
+public class TpMerchantEditDTO implements Serializable {
+
+  public Long id;
 
   private String name;
-
-  private Integer status;
-
-  private Long rechargeTimes;
-
-  private Long rechargeAmount;
 
   private String parameters;
 

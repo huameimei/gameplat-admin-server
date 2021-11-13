@@ -1,11 +1,13 @@
 package com.gameplat.admin.model.bean;
 
-import com.gameplat.admin.enums.limit.RiskControllerTypeEnum;
+import com.gameplat.admin.enums.RiskControllerTypeEnum;
 import com.gameplat.common.exception.ServiceException;
+import com.gameplat.common.json.JsonUtils;
+import org.apache.commons.lang3.StringUtils;
+
+import java.math.BigDecimal;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.apache.commons.lang3.StringUtils;
-import com.gameplat.common.json.JsonUtils;
 
 /** 转换类 */
 public class ChannelLimitsBean {
@@ -14,7 +16,7 @@ public class ChannelLimitsBean {
   private Integer limitStatus;
 
   /** 通道金额收款上限 */
-  private Long limitAmount;
+  private BigDecimal limitAmount;
 
   /** 通道时间设置标识，0为启用时间设置，1位禁用时间设置 */
   private Integer channelTimeStatus;
@@ -29,10 +31,10 @@ public class ChannelLimitsBean {
   private String channelShows;
 
   /** 通道单笔金额金额最小值 */
-  private Long minAmountPerOrder;
+  private BigDecimal minAmountPerOrder;
 
   /** 通道单笔金额金额最小值 */
-  private Long maxAmountPerOrder;
+  private BigDecimal maxAmountPerOrder;
 
   /** 通道风控金额类型 0.任何金额 1.浮动金额 2.固定金额 3浮动固定金额 */
   private Integer riskControlType;
@@ -47,13 +49,13 @@ public class ChannelLimitsBean {
 
   public ChannelLimitsBean(
       Integer limitStatus,
-      Long limitAmount,
+      BigDecimal limitAmount,
       Integer channelTimeStatus,
       Integer channelTimeStart,
       Integer channelTimeEnd,
       String channelShows,
-      Long minAmountPerOrder,
-      Long maxAmountPerOrder,
+      BigDecimal minAmountPerOrder,
+      BigDecimal maxAmountPerOrder,
       Integer riskControlType,
       String riskControlValue,
       String currencyType) {
@@ -81,14 +83,14 @@ public class ChannelLimitsBean {
     this.limitStatus = limitStatus;
   }
 
-  public Long getLimitAmount() {
+  public BigDecimal getLimitAmount() {
     if (null == limitAmount) {
-      return 0L;
+      return BigDecimal.ZERO;
     }
     return limitAmount;
   }
 
-  public void setLimitAmount(Long limitAmount) {
+  public void setLimitAmount(BigDecimal limitAmount) {
     this.limitAmount = limitAmount;
   }
 
@@ -136,25 +138,25 @@ public class ChannelLimitsBean {
     this.channelShows = channelShows;
   }
 
-  public Long getMinAmountPerOrder() {
+  public BigDecimal getMinAmountPerOrder() {
     if (null == minAmountPerOrder) {
-      return 0L;
+      return BigDecimal.ZERO;
     }
     return minAmountPerOrder;
   }
 
-  public void setMinAmountPerOrder(Long minAmountPerOrder) {
+  public void setMinAmountPerOrder(BigDecimal minAmountPerOrder) {
     this.minAmountPerOrder = minAmountPerOrder;
   }
 
-  public Long getMaxAmountPerOrder() {
+  public BigDecimal getMaxAmountPerOrder() {
     if (null == maxAmountPerOrder) {
-      return 99999L;
+      return BigDecimal.valueOf(99999);
     }
     return maxAmountPerOrder;
   }
 
-  public void setMaxAmountPerOrder(Long maxAmountPerOrder) {
+  public void setMaxAmountPerOrder(BigDecimal maxAmountPerOrder) {
     this.maxAmountPerOrder = maxAmountPerOrder;
   }
 
@@ -192,7 +194,7 @@ public class ChannelLimitsBean {
     if (StringUtils.isBlank(beanStr)) {
       return new ChannelLimitsBean();
     }
-    return JsonUtils.toObject(beanStr, ChannelLimitsBean.class);
+    return JsonUtils.parse(beanStr, ChannelLimitsBean.class);
   }
 
   /**
@@ -244,9 +246,8 @@ public class ChannelLimitsBean {
 
   private static String rebuildValues(String values) throws ServiceException {
     String[] arrays = values.split("\\|");
-    StringBuffer resultBuff = new StringBuffer();
+    StringBuilder resultBuff = new StringBuilder();
     for (int i = 0; i < arrays.length; i++) {
-
       if (StringUtils.isNotBlank(arrays[i])) {
         /** 允许有小数点 */
         String[] moneys = arrays[i].split(".");
@@ -264,15 +265,14 @@ public class ChannelLimitsBean {
 
   private static boolean isCompaire(String riskControlValue) {
     String[] values = riskControlValue.split("@")[0].split("-");
-    Integer min = Integer.valueOf(values[0]) * 100;
-    Integer max = Integer.valueOf(values[1]) * 100;
+    int min = Integer.parseInt(values[0]) * 100;
+    int max = Integer.parseInt(values[1]) * 100;
     return max > min;
   }
 
   /** 选择随机加减开关 */
   public static Integer selectAddOrSubSwitch() {
     Integer[] symbol = {0, 1};
-    Integer number = symbol[(int) (0 + Math.random() * (symbol.length - 1 + 1))];
-    return number;
+    return symbol[(int) (0 + Math.random() * (symbol.length - 1 + 1))];
   }
 }

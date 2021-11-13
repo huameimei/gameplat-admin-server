@@ -1,21 +1,18 @@
 package com.gameplat.admin.model.dto;
 
-import com.gameplat.common.model.entity.BaseEntity;
-import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import java.io.Serializable;
+import java.math.BigDecimal;
+
 @Data
-public class PpMerchantEditDTO extends BaseEntity {
+public class PpMerchantEditDTO implements Serializable {
+
+  public Long id;
 
   private String name;
 
   private String ppInterfaceCode;
-
-  private Integer status;
-
-  private Long proxyTimes;
-
-  private Long proxyAmount;
 
   private String parameters;
 
@@ -23,9 +20,9 @@ public class PpMerchantEditDTO extends BaseEntity {
 
   private String merLimits;
 
-  private Long maxLimitCash; // 最大金额限制
+  private BigDecimal maxLimitCash; // 最大金额限制
 
-  private Long minLimitCash; // 最小金额限制
+  private BigDecimal minLimitCash; // 最小金额限制
 
   private String userLever; // 用户层级
 }

@@ -7,22 +7,21 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.convert.PayTypeConvert;
-import com.gameplat.admin.dao.PayTypeMapper;
+import com.gameplat.admin.enums.SwitchStatusEnum;
+import com.gameplat.admin.mapper.PayTypeMapper;
+import com.gameplat.admin.model.domain.PayType;
 import com.gameplat.admin.model.dto.PayTypeAddDTO;
 import com.gameplat.admin.model.dto.PayTypeEditDTO;
-import com.gameplat.admin.model.entity.PayAccount;
-import com.gameplat.admin.model.entity.PayType;
 import com.gameplat.admin.model.vo.PayTypeVO;
 import com.gameplat.admin.service.PayTypeService;
 import com.gameplat.common.exception.ServiceException;
-import com.gameplat.security.util.SecurityUtil;
-import java.util.Date;
-import java.util.List;
-import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)
@@ -39,7 +38,7 @@ public class PayTypeServiceImpl extends ServiceImpl<PayTypeMapper, PayType>
   }
 
   @Override
-  public void save(PayTypeAddDTO dto) throws ServiceException {
+  public void save(PayTypeAddDTO dto) {
     LambdaQueryWrapper<PayType> query = Wrappers.lambdaQuery();
     query.eq(PayType::getCode, dto.getCode());
     if (this.count(query) > 0) {
@@ -75,8 +74,7 @@ public class PayTypeServiceImpl extends ServiceImpl<PayTypeMapper, PayType>
       throw new ServiceException("状态不能为空!");
     }
     LambdaUpdateWrapper<PayType> update = Wrappers.lambdaUpdate();
-    update.set(PayType::getStatus, status);
-    update.eq(PayType::getId, id);
+    update.set(PayType::getStatus, status).eq(PayType::getId, id);
     this.update(update);
   }
 
@@ -86,13 +84,20 @@ public class PayTypeServiceImpl extends ServiceImpl<PayTypeMapper, PayType>
     if (1 == payType.getIsSysCode()) {
       throw new ServiceException("系统支付编码无法删除!");
     }
-    payType.deleteById();
+    this.removeById(id);
   }
 
   @Override
   public IPage<PayType> queryPage(Page<PayType> page) {
     LambdaQueryWrapper<PayType> query = Wrappers.lambdaQuery();
     query.orderByAsc(PayType::getSort);
-    return this.page(page);
+    return this.page(page, query);
+  }
+
+  @Override
+  public List<PayTypeVO> queryEnablePayTypes() {
+    LambdaQueryWrapper<PayType> query = Wrappers.lambdaQuery();
+    query.eq(PayType::getStatus, SwitchStatusEnum.ENABLED).orderByAsc(PayType::getSort);
+    return this.list(query).stream().map(e -> payTypeConvert.toVo(e)).collect(Collectors.toList());
   }
 }

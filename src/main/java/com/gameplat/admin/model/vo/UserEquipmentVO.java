@@ -1,14 +1,18 @@
 package com.gameplat.admin.model.vo;
 
-import com.gameplat.admin.utils.HttpUtils;
+import com.gameplat.common.ip.IpAddressParser;
+import com.gameplat.common.util.ServletUtils;
+import com.gameplat.common.util.StringUtils;
 import eu.bitwalker.useragentutils.Browser;
 import eu.bitwalker.useragentutils.DeviceType;
 import eu.bitwalker.useragentutils.OperatingSystem;
 import eu.bitwalker.useragentutils.UserAgent;
-import java.lang.reflect.Field;
-import javax.servlet.http.HttpServletRequest;
-import jodd.util.StringUtil;
+import lombok.Data;
 
+import javax.servlet.http.HttpServletRequest;
+import java.lang.reflect.Field;
+
+@Data
 public class UserEquipmentVO {
 
   /**
@@ -37,80 +41,19 @@ public class UserEquipmentVO {
    */
   private boolean isMobileDevice;
 
-  private boolean isInnerEnvirornment = false;//是否是我们网站和app对应的请求 true 是 false 否
+  /**
+   * 是否是我们网站和app对应的请求 true 是 false 否
+   */
+  private boolean isInnerEnvirornment = false;
 
-  public UserEquipmentVO() {
-
-  }
-
-  public String getBrowserMemo() {
-    return browserMemo;
-  }
-
-  public void setBrowserMemo(String browserMemo) {
-    this.browserMemo = browserMemo;
-  }
-
-  public String getMacOs() {
-    return macOs;
-  }
-
-  public void setMacOs(String macOs) {
-    this.macOs = macOs;
-  }
-
-  public String getUserAgent() {
-    return userAgent;
-  }
-
-  public void setUserAgent(String userAgent) {
-    this.userAgent = userAgent;
-  }
-
-  public String getIpAddress() {
-    return ipAddress;
-  }
-
-  public void setIpAddress(String ipAddress) {
-    this.ipAddress = ipAddress;
-  }
-
-
-  public boolean isInnerEnvirornment() {
-    return isInnerEnvirornment;
-  }
-
-  public void setInnerEnvirornment(boolean innerEnvirornment) {
-    isInnerEnvirornment = innerEnvirornment;
-  }
-
-  public boolean isMobileDevice() {
-	return isMobileDevice;
-  }
-
-  public void setMobileDevice(boolean isMobileDevice) {
-	this.isMobileDevice = isMobileDevice;
-  }
-
-public String getBaseURL() {
-    return baseURL;
-  }
-
-  public void setBaseURL(String baseURL) {
-    this.baseURL = baseURL;
-  }
-
-  public static UserEquipmentVO create(String userAgentString, UserAgent clientUserAgent,
+  public static UserEquipmentVO create(UserAgent userAgent,
       HttpServletRequest request) {
     UserEquipmentVO userEquipmentVO = new UserEquipmentVO();
     // 操作系统、浏览器
-    UserAgent userAgent = StringUtil.isBlank(userAgentString) ? clientUserAgent
-        : UserAgent.parseUserAgentString(userAgentString);
-
     Browser browser = userAgent.getBrowser();
     OperatingSystem operatingSystem = userAgent.getOperatingSystem();
-
-    userEquipmentVO.setMobileDevice(DeviceType.MOBILE.equals(operatingSystem.getDeviceType()));//设置是否为手机设备
+    //设置是否为手机设备
+    userEquipmentVO.setMobileDevice(DeviceType.MOBILE.equals(operatingSystem.getDeviceType()));
     userEquipmentVO.setBrowserMemo(browser.getName() + userAgent.getBrowserVersion());
     userEquipmentVO.setMacOs(operatingSystem.getName());
     String uaString = userAgent.toString();
@@ -126,8 +69,9 @@ public String getBaseURL() {
       // TODO: handle exception
     }
     userEquipmentVO.setUserAgent(uaString);
-    userEquipmentVO.setIpAddress(HttpUtils.getforwardedForIP(request));
-    userEquipmentVO.setBaseURL(HttpUtils.getBaseUrl(request));
+    userEquipmentVO.setIpAddress(IpAddressParser.getClientIp(request));
+    userEquipmentVO.setBaseURL(ServletUtils.getBaseUrl(request));
     return userEquipmentVO;
   }
+
 }

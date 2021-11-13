@@ -1,8 +1,9 @@
 package com.gameplat.admin.convert;
 
+
+import com.gameplat.admin.model.domain.PpMerchant;
 import com.gameplat.admin.model.dto.PpMerchantAddDTO;
 import com.gameplat.admin.model.dto.PpMerchantEditDTO;
-import com.gameplat.admin.model.entity.PpMerchant;
 import com.gameplat.admin.model.vo.PpMerchantVO;
 import org.mapstruct.Mapper;
 

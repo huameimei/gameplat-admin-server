@@ -8,32 +8,29 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.convert.TpMerchantConvert;
-import com.gameplat.admin.dao.TpMerchantMapper;
+import com.gameplat.admin.mapper.TpMerchantMapper;
+import com.gameplat.admin.model.domain.TpMerchant;
 import com.gameplat.admin.model.dto.TpMerchantAddDTO;
 import com.gameplat.admin.model.dto.TpMerchantEditDTO;
-import com.gameplat.admin.model.entity.TpMerchant;
-import com.gameplat.admin.model.entity.TpPayType;
 import com.gameplat.admin.model.vo.TpInterfaceVO;
 import com.gameplat.admin.model.vo.TpMerchantPayTypeVO;
 import com.gameplat.admin.model.vo.TpMerchantVO;
 import com.gameplat.admin.service.TpInterfaceService;
 import com.gameplat.admin.service.TpMerchantService;
-import com.gameplat.admin.service.TpPayChannelService;
 import com.gameplat.admin.service.TpPayTypeService;
-import com.gameplat.admin.utils.EncryptUtils;
+import com.gameplat.admin.util.EncryptUtils;
 import com.gameplat.common.exception.ServiceException;
 import com.gameplat.common.json.JsonUtils;
-import com.gameplat.security.util.SecurityUtil;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)
@@ -46,8 +43,6 @@ public class TpMerchantServiceImpl extends ServiceImpl<TpMerchantMapper, TpMerch
 
   @Autowired private TpPayTypeService tpPayTypeService;
 
-  @Autowired private TpPayChannelService tpPayChannelService;
-
   @Autowired private TpInterfaceService tpInterfaceService;
 
   @Override
@@ -55,15 +50,16 @@ public class TpMerchantServiceImpl extends ServiceImpl<TpMerchantMapper, TpMerch
     TpMerchant tpMerchant = this.getById(dto.getId());
     TpInterfaceVO tpInterfaceVO =
         tpInterfaceService.queryTpInterface(tpMerchant.getTpInterfaceCode());
-    Map<String, String> oriMerchantParameters = JsonUtils.toMapObject(tpMerchant.getParameters());
+    Map<String, String> oriMerchantParameters =
+        JsonUtils.toObject(tpMerchant.getParameters(), Map.class);
     List<String> tpInterfaceParameters =
         JSON.parseArray(tpInterfaceVO.getParameters(), String.class);
-    Map<String, String> parametersMap = JsonUtils.toMapObject(dto.getParameters());
+    Map<String, String> parametersMap = JsonUtils.toObject(dto.getParameters(), Map.class);
     // 如果加密字段没变，过滤字段不加密,如果加密字段在原基础上修改，抛异常重新处理
     if (CollectionUtils.isNotEmpty(tpInterfaceParameters)) {
       tpInterfaceParameters.forEach(
           paramJsonStr -> {
-            Map<String, Object> config = JsonUtils.toMapObject(paramJsonStr);
+            Map<String, Object> config = JsonUtils.toObject(paramJsonStr, Map.class);
             if (config != null) {
               String key = String.valueOf(config.get("name"));
               String result = oriMerchantParameters.get(key);
@@ -95,8 +91,8 @@ public class TpMerchantServiceImpl extends ServiceImpl<TpMerchantMapper, TpMerch
 
   @Override
   public void delete(Long id) {
-    this.getById(id).deleteById();
-//    tpPayChannelService.deleteByMerchantId(id);
+    this.removeById(id);
+    //    tpPayChannelService.deleteByMerchantId(id);
   }
 
   @Override
@@ -111,14 +107,14 @@ public class TpMerchantServiceImpl extends ServiceImpl<TpMerchantMapper, TpMerch
         tpInterfaceService.queryTpInterface(tpMerchantPayTypeVO.getTpInterfaceCode());
     tpMerchantPayTypeVO.setTpInterfaceVO(tpInterfaceVO);
     Map<String, String> merchantParameters =
-        JsonUtils.toMapObject(tpMerchantPayTypeVO.getParameters());
+        JsonUtils.toObject(tpMerchantPayTypeVO.getParameters(), Map.class);
     List<String> tpInterfaceParameters =
         JSON.parseArray(tpInterfaceVO.getParameters(), String.class);
     // 商户号秘钥等信息加密展示处理
     if (CollectionUtils.isNotEmpty(tpInterfaceParameters)) {
       tpInterfaceParameters.forEach(
           jsonStrParam -> {
-            Map<String, Object> config = JsonUtils.toMapObject(jsonStrParam);
+            Map<String, Object> config = JsonUtils.toObject(jsonStrParam, Map.class);
             if (config != null && !"0".equals(String.valueOf(config.get("encrypted")))) {
               String key = String.valueOf(config.get("name"));
               String result = EncryptUtils.summaryEncrypt(merchantParameters.get(key));
@@ -136,13 +132,12 @@ public class TpMerchantServiceImpl extends ServiceImpl<TpMerchantMapper, TpMerch
       throw new ServiceException("状态不能为空!");
     }
     LambdaUpdateWrapper<TpMerchant> update = Wrappers.lambdaUpdate();
-    update.set(TpMerchant::getStatus, status);
-    update.eq(TpMerchant::getId, id);
+    update.set(TpMerchant::getStatus, status).eq(TpMerchant::getId, id);
     this.update(update);
   }
 
   @Override
-  public IPage<TpMerchantVO> queryPage(Page<TpMerchantVO> page, Integer status, String name) {
+  public IPage<TpMerchantVO> queryPage(Page<TpMerchant> page, Integer status, String name) {
     return tpMerchantMapper.findTpMerchantPage(page, status, name);
   }
 

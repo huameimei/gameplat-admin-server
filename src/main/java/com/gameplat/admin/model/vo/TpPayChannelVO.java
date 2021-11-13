@@ -3,10 +3,18 @@ package com.gameplat.admin.model.vo;
 import com.baomidou.mybatisplus.extension.activerecord.Model;
 import lombok.Data;
 
+import java.math.BigDecimal;
+
 @Data
 public class TpPayChannelVO extends Model<TpPayChannelVO> {
 
+  private Long id;
+
   private String name;
+
+  private Long merchantId;
+
+  private String tpPayType;
 
   private String userLevels;
 
@@ -20,7 +28,7 @@ public class TpPayChannelVO extends Model<TpPayChannelVO> {
 
   private Long rechargeTimes;
 
-  private Long rechargeAmount;
+  private BigDecimal rechargeAmount;
 
   private String limitInfo;
 
@@ -31,8 +39,6 @@ public class TpPayChannelVO extends Model<TpPayChannelVO> {
   private String payTypeName;
 
   private String tpMerchantName;
-
-  private Long tpInterfaceId;
 
   private String tpPayTypeName;
 
@@ -57,10 +63,10 @@ public class TpPayChannelVO extends Model<TpPayChannelVO> {
   private String channelShows;
 
   /** 通道单笔金额金额最小值 */
-  private Long minAmountPerOrder;
+  private BigDecimal minAmountPerOrder;
 
   /** 通道单笔金额金额最小值 */
-  private Long maxAmountPerOrder;
+  private BigDecimal maxAmountPerOrder;
 
   /** 通道风控金额类型 0.任何金额 1.浮动金额 2.固定金额 3浮动固定金额 */
   private Integer riskControlType;

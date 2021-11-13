@@ -1,11 +1,13 @@
 package com.gameplat.admin.model.dto;
 
-import com.gameplat.common.model.entity.BaseEntity;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import java.io.Serializable;
+import java.math.BigDecimal;
+
 @Data
-public class PayAccountAddDTO extends BaseEntity {
+public class PayAccountAddDTO implements Serializable {
 
   private String name;
 
@@ -32,7 +34,7 @@ public class PayAccountAddDTO extends BaseEntity {
 
   private Long rechargeTimes;
 
-  private Long rechargeAmount;
+  private BigDecimal rechargeAmount;
 
   private String orderRemark;
 
@@ -43,11 +45,13 @@ public class PayAccountAddDTO extends BaseEntity {
 
   private String handleTip;
 
+  private String emailAddress;
+
   /** 通道金额设置标识，0位禁用 */
   private Integer limitStatus;
 
   /** 通道金额收款上限 */
-  private Long limitAmount;
+  private BigDecimal limitAmount;
 
   /** 通道时间设置标识，0为启用时间设置，1位禁用时间设置 */
   private Integer channelTimeStatus;
@@ -62,10 +66,10 @@ public class PayAccountAddDTO extends BaseEntity {
   private String channelShows;
 
   /** 通道单笔金额金额最小值 */
-  private Long minAmountPerOrder;
+  private BigDecimal minAmountPerOrder;
 
   /** 通道单笔金额金额最小值 */
-  private Long maxAmountPerOrder;
+  private BigDecimal maxAmountPerOrder;
 
   /** 通道风控金额类型 0.任何金额 1.浮动金额 2.固定金额 3浮动固定金额 */
   private Integer riskControlType;

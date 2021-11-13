@@ -13,4 +13,8 @@ public class PpInterfaceVO extends Model<PpInterfaceVO> {
   private String code;
 
   private String parameters;
+
+  private Integer status;
+
+  private String limitInfo;
 }

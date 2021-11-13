@@ -1,6 +1,7 @@
 package com.gameplat.admin.service.impl;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -8,23 +9,18 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.convert.PpMerchantConvert;
-import com.gameplat.admin.dao.PpMerchantMapper;
+import com.gameplat.admin.mapper.PpMerchantMapper;
 import com.gameplat.admin.model.bean.ProxyPayMerBean;
+import com.gameplat.admin.model.domain.PpMerchant;
 import com.gameplat.admin.model.dto.PpMerchantAddDTO;
 import com.gameplat.admin.model.dto.PpMerchantEditDTO;
-import com.gameplat.admin.model.entity.PpMerchant;
 import com.gameplat.admin.model.vo.PpInterfaceVO;
 import com.gameplat.admin.model.vo.PpMerchantVO;
 import com.gameplat.admin.service.PpInterfaceService;
 import com.gameplat.admin.service.PpMerchantService;
-import com.gameplat.admin.utils.EncryptUtils;
+import com.gameplat.admin.util.EncryptUtils;
 import com.gameplat.common.exception.ServiceException;
 import com.gameplat.common.json.JsonUtils;
-import com.gameplat.security.util.SecurityUtil;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,30 +28,38 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 @Service
 @Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)
 public class PpMerchantServiceImpl extends ServiceImpl<PpMerchantMapper, PpMerchant>
     implements PpMerchantService {
 
-  @Autowired private PpMerchantConvert ppMerchantConvert;
+  @Autowired
+  private PpMerchantConvert ppMerchantConvert;
 
-  @Autowired private PpMerchantMapper ppMerchantMapper;
+  @Autowired
+  private PpMerchantMapper ppMerchantMapper;
 
-  @Autowired private PpInterfaceService ppInterfaceService;
+  @Autowired
+  private PpInterfaceService ppInterfaceService;
 
   @Override
   public void update(PpMerchantEditDTO dto) {
     PpMerchant ppMerchant = this.getById(dto.getId());
     PpInterfaceVO ppInterfaceVO = ppInterfaceService.queryPpInterface(dto.getPpInterfaceCode());
-    Map<String, String> oriMerchantParameters = JsonUtils.toMapObject(ppMerchant.getParameters());
+    Map<String, String> oriMerchantParameters = JSONObject
+        .parseObject(ppMerchant.getParameters(), Map.class);
     List<String> ppInterfaceParameters =
         JSON.parseArray(ppInterfaceVO.getParameters(), String.class);
-    Map<String, String> parametersMap = JsonUtils.toMapObject(dto.getParameters());
+    Map<String, String> parametersMap = JSONObject.parseObject(dto.getParameters(), Map.class);
     // 如果加密字段没变，过滤字段不加密,如果加密字段在原基础上修改，抛异常重新处理
     if (CollectionUtils.isNotEmpty(ppInterfaceParameters)) {
       ppInterfaceParameters.forEach(
           paramJsonStr -> {
-            Map<String, Object> config = JsonUtils.toMapObject(paramJsonStr);
+            Map<String, Object> config = JSONObject.parseObject(paramJsonStr, Map.class);
             if (config != null) {
               String key = String.valueOf(config.get("name"));
               String result = oriMerchantParameters.get(key);
@@ -89,7 +93,7 @@ public class PpMerchantServiceImpl extends ServiceImpl<PpMerchantMapper, PpMerch
 
   @Override
   public void delete(Long id) {
-    this.getById(id).deleteById();
+    this.removeById(id);
   }
 
   @Override
@@ -103,14 +107,15 @@ public class PpMerchantServiceImpl extends ServiceImpl<PpMerchantMapper, PpMerch
     PpInterfaceVO ppInterfaceVO =
         ppInterfaceService.queryPpInterface(ppMerchantVO.getPpInterfaceCode());
     ppMerchantVO.setPpInterfaceVO(ppInterfaceVO);
-    Map<String, String> merchantParameters = JsonUtils.toMapObject(ppMerchantVO.getParameters());
+    Map<String, String> merchantParameters = JSONObject
+        .parseObject(ppMerchantVO.getParameters(), Map.class);
     List<String> ppInterfaceParameters =
         JSON.parseArray(ppInterfaceVO.getParameters(), String.class);
     // 商户号秘钥等信息加密展示处理
     if (CollectionUtils.isNotEmpty(ppInterfaceParameters)) {
       ppInterfaceParameters.forEach(
           jsonStrParam -> {
-            Map<String, Object> config = JsonUtils.toMapObject(jsonStrParam);
+            Map<String, Object> config = JSONObject.parseObject(jsonStrParam, Map.class);
             if (config != null && !"0".equals(String.valueOf(config.get("encrypted")))) {
               String key = String.valueOf(config.get("name"));
               String result = EncryptUtils.summaryEncrypt(merchantParameters.get(key));
@@ -128,13 +133,12 @@ public class PpMerchantServiceImpl extends ServiceImpl<PpMerchantMapper, PpMerch
       throw new ServiceException("状态不能为空!");
     }
     LambdaUpdateWrapper<PpMerchant> update = Wrappers.lambdaUpdate();
-    update.set(PpMerchant::getStatus, status);
-    update.eq(PpMerchant::getId, id);
+    update.set(PpMerchant::getStatus, status).eq(PpMerchant::getId, id);
     this.update(update);
   }
 
   @Override
-  public IPage<PpMerchantVO> queryPage(Page<PpMerchantVO> page, Integer status, String name) {
+  public IPage<PpMerchantVO> queryPage(Page<PpMerchant> page, Integer status, String name) {
     return ppMerchantMapper.findPpMerchantPage(page, status, name);
   }
 
@@ -144,6 +148,7 @@ public class PpMerchantServiceImpl extends ServiceImpl<PpMerchantMapper, PpMerch
     query.eq(PpMerchant::getStatus, status);
     return this.list(query).stream()
         .map(e -> ppMerchantConvert.toVo(e))
+        .map(this::conver2MerVo)
         .collect(Collectors.toList());
   }
 
@@ -167,10 +172,11 @@ public class PpMerchantServiceImpl extends ServiceImpl<PpMerchantMapper, PpMerch
     return ppMerchantEditDTO;
   }
 
-  private void conver2MerVo(PpMerchantVO vo) {
+  public PpMerchantVO conver2MerVo(PpMerchantVO vo) {
     ProxyPayMerBean merBean = ProxyPayMerBean.conver2Bean(vo.getMerLimits());
     vo.setMaxLimitCash(merBean.getMaxLimitCash());
     vo.setMinLimitCash(merBean.getMinLimitCash());
     vo.setUserLever(merBean.getUserLever());
+    return vo;
   }
 }

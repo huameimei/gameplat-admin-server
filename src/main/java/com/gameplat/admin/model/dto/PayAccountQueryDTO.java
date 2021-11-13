@@ -1,11 +1,13 @@
 package com.gameplat.admin.model.dto;
 
-import com.gameplat.common.model.entity.BaseEntity;
-import java.util.List;
 import lombok.Data;
 
+import java.io.Serializable;
+import java.util.List;
+
 @Data
-public class PayAccountQueryDTO extends BaseEntity {
+public class PayAccountQueryDTO implements Serializable {
+
 
   private String account;
 

@@ -67,11 +67,6 @@
         </dependency>
 
         <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-stream-binder-kafka</artifactId>
-        </dependency>
-
-        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-cache</artifactId>
         </dependency>
@@ -83,7 +78,7 @@
 
         <dependency>
             <groupId>com.gameplat</groupId>
-            <artifactId>log-spring-boot-starter</artifactId>
+            <artifactId>log-annotation-spring-boot-starter</artifactId>
         </dependency>
 
         <dependency>
@@ -145,6 +140,12 @@
             <artifactId>json-lib</artifactId>
             <version>2.4</version>
             <classifier>jdk15</classifier>
+        </dependency>
+
+        <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-sentinel</artifactId>
+            <version>${spring-cloud-alibaba.version}</version>
         </dependency>
 
         <!-- SpringBoot集成quartz定時任務 -->

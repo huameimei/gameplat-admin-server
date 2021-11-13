@@ -1,6 +1,6 @@
 spring:
   application:
-    name: gameplat-admin-server
+    name: admin-server
   profiles:
     active: @profiles.active@
   main:
@@ -9,11 +9,11 @@ spring:
     nacos:
       config:
         enabled: true
-        server-addr: 192.168.3.210:8848
+        server-addr: 127.0.0.1:8848
         username: nacos
         password: nacos
         file-extension: yml
         namespace: dev
-        group: DEFAULT_GROUP
+        group: SERVICE_GROUP
         refresh-enabled: true
-        shared-dataids: redis.yml,spring-kafka-log.yml
+        shared-dataids: redis.yml,rocketmq-config.yml,spring-kafka-producer-config.yml

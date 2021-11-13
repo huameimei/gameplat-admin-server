@@ -1,9 +1,9 @@
 package com.gameplat.admin.convert;
 
+import com.gameplat.admin.model.domain.PayType;
 import com.gameplat.admin.model.dto.PayTypeAddDTO;
 import com.gameplat.admin.model.dto.PayTypeEditDTO;
 import com.gameplat.admin.model.dto.PayTypeQueryDTO;
-import com.gameplat.admin.model.entity.PayType;
 import com.gameplat.admin.model.vo.PayTypeVO;
 import org.mapstruct.Mapper;
 

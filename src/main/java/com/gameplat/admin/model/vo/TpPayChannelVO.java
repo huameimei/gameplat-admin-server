@@ -3,88 +3,74 @@ package com.gameplat.admin.model.vo;
 import com.baomidou.mybatisplus.extension.activerecord.Model;
 import lombok.Data;
 
+import java.math.BigDecimal;
+
 @Data
 public class TpPayChannelVO extends Model<TpPayChannelVO> {
 
-    private String name;
+  private Long id;
 
-    private String userLevels;
+  private String name;
 
-    private String remarks;
+  private Long merchantId;
 
-    private String chanDesc;
+  private String tpPayType;
 
-    private Integer sort;
+  private String userLevels;
 
-    private Integer status;
+  private String remarks;
 
-    private Long rechargeTimes;
+  private String chanDesc;
 
-    private Long rechargeAmount;
+  private Integer sort;
 
-    private String limitInfo;
+  private Integer status;
 
-    private String payChannelTip;
+  private Long rechargeTimes;
 
-    private String interfaceName;
+  private BigDecimal rechargeAmount;
 
-    private String payTypeName;
+  private String limitInfo;
 
-    private String tpMerchantName;
+  private String payChannelTip;
 
-    private Long tpInterfaceId;
+  private String interfaceName;
 
-    private String tpPayTypeName;
+  private String payTypeName;
 
-    private String payType;
+  private String tpMerchantName;
 
-    /**
-     * 通道金额设置标识，0位禁用
-     */
-    private Integer limitStatus;
+  private String tpPayTypeName;
 
-    /**
-     * 通道金额收款上限
-     */
-    private Long limitAmount;
+  private String payType;
 
-    /**
-     * 通道时间设置标识，0为启用时间设置，1位禁用时间设置
-     */
-    private Integer channelTimeStatus;
+  /** 通道金额设置标识，0位禁用 */
+  private Integer limitStatus;
 
-    /**
-     * 通道显示开始时间
-     */
-    private Integer channelTimeStart;
+  /** 通道金额收款上限 */
+  private Long limitAmount;
 
-    /**
-     * 通道显示结束时间
-     */
-    private Integer channelTimeEnd;
+  /** 通道时间设置标识，0为启用时间设置，1位禁用时间设置 */
+  private Integer channelTimeStatus;
 
-    /**
-     * 通道展示端，1展示在电脑，2展示在安卓，3展示在IOS
-     */
-    private String channelShows;
+  /** 通道显示开始时间 */
+  private Integer channelTimeStart;
 
-    /**
-     * 通道单笔金额金额最小值
-     */
-    private Long minAmountPerOrder;
+  /** 通道显示结束时间 */
+  private Integer channelTimeEnd;
 
-    /**
-     * 通道单笔金额金额最小值
-     */
-    private Long maxAmountPerOrder;
+  /** 通道展示端，1展示在电脑，2展示在安卓，3展示在IOS */
+  private String channelShows;
 
-    /**
-     * 通道风控金额类型 0.任何金额 1.浮动金额 2.固定金额 3浮动固定金额
-     */
-    private Integer riskControlType;
+  /** 通道单笔金额金额最小值 */
+  private BigDecimal minAmountPerOrder;
 
-    /**
-     * 风控值
-     */
-    private String riskControlValue;
+  /** 通道单笔金额金额最小值 */
+  private BigDecimal maxAmountPerOrder;
+
+  /** 通道风控金额类型 0.任何金额 1.浮动金额 2.固定金额 3浮动固定金额 */
+  private Integer riskControlType;
+
+  /** 风控值 */
+  private String riskControlValue;
 }

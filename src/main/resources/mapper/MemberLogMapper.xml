@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.gameplat.admin.mapper.MemberLogMapper">
+
+    <resultMap id="BaseResultMap" type="SysLogOper" >
+        <id property="id"                   column="id"             />
+        <result property="userName"         column="user_name"      />
+        <result property="userType"         column="user_type"      />
+        <result property="userLevel"        column="user_level"     />
+        <result property="realName"         column="real_name"      />
+        <result property="module"           column="module"         />
+        <result property="doTime"           column="do_time"        />
+        <result property="method"           column="method"         />
+        <result property="path"             column="path"           />
+        <result property="params"           column="params"         />
+        <result property="userAgent"        column="user_agent"     />
+        <result property="deviceType"       column="device_type"    />
+        <result property="domain"           column="domain"         />
+        <result property="flag"             column="flag"           />
+        <result property="registerTime"     column="register_time"  />
+        <result property="logType"          column="log_type"       />
+        <result property="ipAddress"        column="ip_address"     />
+        <result property="ipDesc"           column="ip_desc"        />
+        <result property="createTime"       column="create_time"    />
+        <result property="desc"             column="desc"           />
+        <result property="remark"           column="remark"         />
+    </resultMap>
+
+    <select id="selectLogList" resultMap="BaseResultMap" resultType="SysLogOper">
+        SELECT l.id, l.user_name, m.account, m.real_name, m.user_level, m.user_type, m.register_time, l.log_type, l.device_type, l.domain, l.create_time, l.ip_address, l.ip_desc, l.desc
+        FROM ${mark} AS l
+        LEFT JOIN member_info AS m ON m.account = l.user_name
+        <where>
+            <choose>
+                <when test="userName != null and userName != '' and userNameFuzzy == 1">
+                    AND l.user_name LIKE concat('%', #{userName}, '%')
+                </when>
+                <otherwise>
+                    <if test="userName != null and userName != ''">
+                        AND l.user_name = #{userName}
+                    </if>
+                </otherwise>
+            </choose>
+            <if test="userName != null and userName != ''">
+                AND l.user_name LIKE concat('%', #{userName}, '%')
+            </if>
+            <choose>
+                <when test="ipAddress != null and ipAddress != '' and ipAddressFuzzy == 1">
+                    AND l.ip_address = LIKE concat('%', #{ipAddress}, '%')
+                </when>
+                <when test="ipAddress != null and ipAddress != ''">
+                    AND l.ip_address = #{ipAddress}
+                </when>
+            </choose>
+            <choose>
+                <when test="deviceType != null and deviceType != '' and deviceTypeFuzzy == 1">
+                    AND l.device_type LIKE concat('%', #{deviceType}, '%')
+                </when>
+                <when test="deviceType != null and deviceType != ''">
+                    AND l.device_type = #{deviceType}
+                </when>
+            </choose>
+            <choose>
+                <when test="desc != null and desc != '' and descFuzzy == 1">
+                    AND l.desc LIKE concat('%', #{desc}, '%')
+                </when>
+                <when test="desc != null and desc != ''">
+                    AND l.desc = #{desc}
+                </when>
+            </choose>
+            <if test="domain != null and doamin != ''">
+                AND l.domain = #{doamin}
+            </if>
+            <if test="logType != null and logType != ''">
+                AND l.log_type = #{logType}
+            </if>
+            <if test="userType != null and userType != ''">
+                AND m.user_type = #{userType}
+            </if>
+            <if test="userLevel != null and userLevel != ''">
+                AND m.user_level = #{userLevel}
+            </if>
+            <if test="paramVal.beginTime != null and  paramVal.beginTime != ''"><!-- 开始时间检索 -->
+                AND date_format(l.create_time,'%y%m%d') &gt;= date_format(#{paramVal.beginTime},'%y%m%d')
+            </if>
+            <if test="paramVal.endTime != null and  paramVal.endTime != ''"><!-- 结束时间检索 -->
+                AND date_format(l.create_time,'%y%m%d') &lt;= date_format(#{paramVal.endTime},'%y%m%d')
+            </if>
+        </where>
+        ORDER BY create_time DESC
+    </select>
+
+</mapper>

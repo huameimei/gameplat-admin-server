@@ -1,30 +1,55 @@
 package com.gameplat.admin.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.gameplat.admin.model.dto.SysDictDataAddDTO;
-import com.gameplat.admin.model.dto.SysDictDataEditDTO;
-import com.gameplat.admin.model.dto.SysDictDataQueryDTO;
-import com.gameplat.admin.model.entity.SysDictData;
-import com.gameplat.admin.model.vo.SysDictDataVO;
+import com.gameplat.admin.enums.DictTypeEnum;
+import com.gameplat.admin.model.bean.UserWithdrawLimitInfo;
+import com.gameplat.admin.model.domain.SysDictData;
+import com.gameplat.admin.model.dto.OperDictDataDTO;
+import com.gameplat.admin.model.dto.SysDictDataDTO;
+import com.gameplat.admin.model.vo.DictDataVo;
+import com.gameplat.admin.model.vo.MemberWithdrawDictDataVo;
 
 import java.util.List;
 
+/**
+ * 字典数据
+ *
+ * @author three
+ */
 public interface SysDictDataService extends IService<SysDictData> {
 
-    List<SysDictData> selectDictDataListByType(String dictType);
+  IPage<DictDataVo> selectDictDataList(PageDTO<SysDictData> page, SysDictDataDTO dictData);
 
-    <T> T getDictData(String dictType, Class<T> t);
+  List<SysDictData> getDictList(SysDictData dictData);
 
-    SysDictData getSysDictData(String dictType, String dictLabel);
+  SysDictData getDictDataByType(String dictType);
 
-    IPage<SysDictDataVO> queryPage(IPage<SysDictData> page, SysDictDataQueryDTO queryDto);
+  List<SysDictData> getDictDataByTypes(List<String> dictTypes);
 
-    void save(SysDictDataAddDTO sysDictDataAddDto);
+  <T> T getDictData(DictTypeEnum dictType, Class<T> t);
 
-    void delete(Long id);
+  DictDataVo selectDictData(SysDictDataDTO dictData);
 
-    void update(SysDictDataEditDTO sysDictDataEditDto);
+  void insertDictData(OperDictDataDTO operDictDataDTO);
 
-    String getDefaultJson();
+  void updateDictData(OperDictDataDTO operDictDataDTO);
+
+  void deleteDictDataById(String id);
+
+  void deleteDictDataByIds(List<Long> ids);
+
+  void updateStatus(Long id, Integer status);
+
+  IPage<MemberWithdrawDictDataVo> queryWithdrawPage(Page<SysDictData> page);
+
+  void insertOrUpdate(UserWithdrawLimitInfo userWithdrawLimitInfo);
+
+  void deleteByDictLabel(Long timesForWithdrawal);
+
+  SysDictData getDictList(String dictType, String dictLabel);
+
+  List<SysDictData> getDictListAll(SysDictDataDTO dictData);
 }

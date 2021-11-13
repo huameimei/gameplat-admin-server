@@ -7,7 +7,8 @@
         <uri>/swagger-resources/**</uri>
         <uri>/doc.html</uri>
         <uri>/webjars/bycdao-ui/**</uri>
-        <uri>/api/open/user-server/oauth/login.json</uri>
-        <uri>/api/**</uri>
+        <uri>/api/admin/auth/login</uri>
+        <uri>/api/admin/auth/logout</uri>
+        <uri>/api/admin/common/**</uri>
     </uri-list>
 </permit-uri>

@@ -1,88 +1,72 @@
 package com.gameplat.admin.model.dto;
 
 import com.alibaba.fastjson.JSON;
-import com.gameplat.common.model.entity.BaseEntity;
 import lombok.Data;
 
+import java.io.Serializable;
+import java.math.BigDecimal;
+
 @Data
-public class TpPayChannelEditDTO extends BaseEntity {
+public class TpPayChannelEditDTO implements Serializable {
 
-    private String name;
+  private Long id;
 
-    private Integer merchantId;
+  private String name;
 
-    private String tpPayType;
+  private Integer merchantId;
 
-    private String userLevels;
+  private String tpPayType;
 
-    private String remarks;
+  private String userLevels;
 
-    private String chanDesc;
+  private String remarks;
 
-    private Integer sort;
+  private String chanDesc;
 
-    private Integer status;
+  private Integer sort;
 
-    private Long rechargeTimes;
+  private Integer status;
 
-    private Long rechargeAmount;
+  private Long rechargeTimes;
 
-    private String limitInfo;
+  private BigDecimal rechargeAmount;
 
-    private String payChannelTip;
+  private String limitInfo;
 
-    /**
-     * 通道金额设置标识，0位禁用
-     */
-    private Integer limitStatus;
+  private String payChannelTip;
 
-    /**
-     * 通道金额收款上限
-     */
-    private Long limitAmount;
+  /** 通道金额设置标识，0位禁用 */
+  private Integer limitStatus;
 
-    /**
-     * 通道时间设置标识，0为启用时间设置，1位禁用时间设置
-     */
-    private Integer channelTimeStatus;
+  /** 通道金额收款上限 */
+  private BigDecimal limitAmount;
 
-    /**
-     * 通道显示开始时间
-     */
-    private Integer channelTimeStart;
+  /** 通道时间设置标识，0为启用时间设置，1位禁用时间设置 */
+  private Integer channelTimeStatus;
 
-    /**
-     * 通道显示结束时间
-     */
-    private Integer channelTimeEnd;
+  /** 通道显示开始时间 */
+  private Integer channelTimeStart;
 
-    /**
-     * 通道展示端，1展示在电脑，2展示在安卓，3展示在IOS
-     */
-    private String channelShows;
+  /** 通道显示结束时间 */
+  private Integer channelTimeEnd;
 
-    /**
-     * 通道单笔金额金额最小值
-     */
-    private Long minAmountPerOrder;
+  /** 通道展示端，1展示在电脑，2展示在安卓，3展示在IOS */
+  private String channelShows;
 
-    /**
-     * 通道单笔金额金额最小值
-     */
-    private Long maxAmountPerOrder;
+  /** 通道单笔金额金额最小值 */
+  private BigDecimal minAmountPerOrder;
 
-    /**
-     * 通道风控金额类型 0.任何金额 1.浮动金额 2.固定金额 3浮动固定金额
-     */
-    private Integer riskControlType;
+  /** 通道单笔金额金额最小值 */
+  private BigDecimal maxAmountPerOrder;
 
-    /**
-     * 风控值
-     */
-    private String riskControlValue;
+  /** 通道风控金额类型 0.任何金额 1.浮动金额 2.固定金额 3浮动固定金额 */
+  private Integer riskControlType;
 
-    @Override
-    public String toString() {
-        return JSON.toJSONString(this);
-    }
+  /** 风控值 */
+  private String riskControlValue;
+
+  @Override
+  public String toString() {
+    return JSON.toJSONString(this);
+  }
 }

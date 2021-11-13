@@ -14,7 +14,7 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 @EnableCaching(basePackages = "com.gameplat")
 @EnableDiscoveryClient
 @EnableFeignClients
-@MapperScan("com.gameplat.admin.**.dao")
+@MapperScan("com.gameplat.admin.mapper")
 @SpringBootApplication(scanBasePackages = "com.gameplat")
 public class AdminServiceApplication {
 

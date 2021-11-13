@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gameplat.admin.mapper.MemberMapper">
+    <select id="queryPage" resultType="MemberVO">
+        SELECT t1.id,
+               t1.account,
+               t1.nickname,
+               t1.user_level,
+               t1.agent_level,
+               t1.super_path,
+               t1.user_type,
+               t1.parent_name,
+               t1.status,
+               t1.remark,
+               t1.qq,
+               t1.wechat,
+               t1.email,
+               t1.dial_code,
+               t1.phone,
+               t1.register_ip,
+               t1.register_host,
+               t1.register_source,
+               t1.register_browser,
+               t1.register_os,
+               t1.create_time,
+               t1.real_name,
+               t1.lower_num,
+               t2.last_login_ip,
+               t2.last_login_time,
+               t2.balance,
+               t2.freeze,
+               t2.invitation_code,
+               t2.total_rech_amount,
+               t2.total_rech_times,
+               t2.total_withdraw_amount,
+               t2.total_withdraw_times
+        FROM member t1
+                 LEFT JOIN member_info t2 ON t1.id = t2.member_id
+            ${ew.customSqlSegment}
+    </select>
+
+    <select id="getMemberInfo" parameterType="java.lang.Long" resultType="MemberInfoVO">
+        SELECT t1.id,
+               t1.account,
+               t1.nickname,
+               t1.user_level,
+               t1.agent_level,
+               t1.user_type,
+               t1.withdraw_flag,
+               t1.parent_name,
+               t1.status,
+               t1.language,
+               t1.remark,
+               t1.sex,
+               t1.qq,
+               t1.wechat,
+               t1.email,
+               t1.phone,
+               t1.dial_code,
+               t1.birthday,
+               t1.register_ip,
+               t1.register_host,
+               t1.register_source,
+               t1.register_browser,
+               t1.register_os,
+               t1.create_time,
+               t1.real_name,
+               t2.last_login_ip,
+               t2.last_login_time,
+               t2.balance,
+               t2.freeze,
+               t2.rebate,
+               t2.invitation_code,
+               t2.last_rech_time,
+               t2.last_withdraw_time,
+               t2.total_rech_amount,
+               t2.total_rech_times,
+               t2.total_withdraw_amount,
+               t2.total_withdraw_times
+        FROM member t1
+                 LEFT JOIN member_info t2 ON t1.id = t2.member_id
+        WHERE t1.id = #{id}
+    </select>
+
+    <sql id="batchUpdateSuperPathSql">
+        UPDATE member
+        SET super_path  = CONCAT(#{superPath}, account, "/"),
+            agent_level = agent_level + ((#{superAgentLevel} - #{agentLevel}) + 1)
+    </sql>
+
+    <!-- 仅转移下级-->
+    <select id="batchUpdateSuperPathExcludeSelf" parameterType="Member">
+        <include refid="batchUpdateSuperPathSql"/>
+        WHERE parent_name = #{account}
+    </select>
+
+    <select id="batchUpdateSuperPath" parameterType="Member">
+        <include refid="batchUpdateSuperPathSql"/>
+        WHERE parent_name = #{account} OR account = #{account}
+    </select>
+
+    <update id="updateLowerNumByAccount">
+        UPDATE member SET lower_num = lower_num + #{lowerNum} WHERE account = #{account}
+    </update>
+
+    <select id="getMemberInfoByAccount" parameterType="java.lang.String" resultType="MemberInfoVO">
+        SELECT t1.id,
+               t1.account,
+               t1.nickname,
+               t1.user_level,
+               t1.agent_level,
+               t1.parent_id,
+               t1.user_type,
+               t1.parent_name,
+               t1.status,
+               t1.remark,
+               t1.sex,
+               t1.qq,
+               t1.wechat,
+               t1.email,
+               t1.phone,
+               t1.birthday,
+               t1.register_ip,
+               t1.register_source,
+               t1.register_device,
+               t1.create_time,
+               t1.real_name,
+               t2.employee_num,
+               t2.last_login_ip,
+               t2.last_login_time,
+               t2.balance,
+               t2.invitation_code,
+               t2.last_rech_time,
+               t2.last_withdraw_time,
+               t2.total_rech_amount,
+               t2.total_rech_times,
+               t2.total_withdraw_amount,
+               t2.total_withdraw_times
+        FROM member t1
+                 LEFT JOIN member_info t2 ON t1.id = t2.member_id
+        WHERE t1.account = #{account}
+    </select>
+</mapper>

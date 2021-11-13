@@ -1,24 +1,28 @@
 package com.gameplat.admin.model.dto;
 
-import com.gameplat.common.model.entity.BaseEntity;
+
 import lombok.Data;
 
+import java.io.Serializable;
+
 @Data
-public class PayTypeEditDTO extends BaseEntity {
+public class PayTypeEditDTO implements Serializable {
 
-    private String name;
+  public Long id;
 
-    private String code;
+  private String name;
 
-    private String bankFlag;
+  private String code;
 
-    private Integer transferEnabled;
+  private String bankFlag;
 
-    private Integer onlinePayEnabled;
+  private Integer transferEnabled;
 
-    private String rechargeDesc;
+  private Integer onlinePayEnabled;
 
-    private Integer isSysCode;
+  private String rechargeDesc;
 
-    private Integer sort;
+  private Integer isSysCode;
+
+  private Integer sort;
 }

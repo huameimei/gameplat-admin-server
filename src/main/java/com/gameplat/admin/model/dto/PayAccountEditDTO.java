@@ -1,95 +1,81 @@
 package com.gameplat.admin.model.dto;
 
-import com.gameplat.common.model.entity.BaseEntity;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import java.io.Serializable;
+import java.math.BigDecimal;
+
 @Data
-public class PayAccountEditDTO extends BaseEntity {
+public class PayAccountEditDTO implements Serializable {
 
-    private String name;
+  public Long id;
 
-    private String account;
+  private String name;
 
-    private String owner;
+  private String account;
 
-    private String payType;
+  private String owner;
 
-    private String bankName;
+  private String payType;
 
-    private String bankAddress;
+  private String bankName;
 
-    private String qrCode;
+  private String bankAddress;
 
-    private String userLevels;
+  private String qrCode;
 
-    private String remarks;
+  private String userLevels;
 
-    private Integer sort;
+  private String remarks;
 
-    @ApiModelProperty(value = "状态: [0 - 启用, 1 - 禁用]")
-    private Integer status;
+  private Integer sort;
 
-    private Long rechargeTimes;
+  @ApiModelProperty(value = "状态: [0 - 启用, 1 - 禁用]")
+  private Integer status;
 
-    private Long rechargeAmount;
+  private Long rechargeTimes;
 
-    private String orderRemark;
+  private BigDecimal rechargeAmount;
 
-    @ApiModelProperty(value = "0:启用，1：关闭")
-    private Integer orderRemarkStatus;
+  private String orderRemark;
 
-    private String limitInfo;
+  @ApiModelProperty(value = "0:启用，1：关闭")
+  private Integer orderRemarkStatus;
 
-    private String handleTip;
+  private String limitInfo;
 
-    /**
-     * 通道金额设置标识，0位禁用
-     */
-    private Integer limitStatus;
+  private String handleTip;
 
-    /**
-     * 通道金额收款上限
-     */
-    private Long limitAmount;
+  private String emailAddress;
 
-    /**
-     * 通道时间设置标识，0为启用时间设置，1位禁用时间设置
-     */
-    private Integer channelTimeStatus;
+  /** 通道金额设置标识，0位禁用 */
+  private Integer limitStatus;
 
-    /**
-     * 通道显示开始时间
-     */
-    private Integer channelTimeStart;
+  /** 通道金额收款上限 */
+  private BigDecimal limitAmount;
 
-    /**
-     * 通道显示结束时间
-     */
-    private Integer channelTimeEnd;
+  /** 通道时间设置标识，0为启用时间设置，1位禁用时间设置 */
+  private Integer channelTimeStatus;
 
-    /**
-     * 通道展示端，1展示在电脑，2展示在安卓，3展示在IOS
-     */
-    private String channelShows;
+  /** 通道显示开始时间 */
+  private Integer channelTimeStart;
 
-    /**
-     * 通道单笔金额金额最小值
-     */
-    private Long minAmountPerOrder;
+  /** 通道显示结束时间 */
+  private Integer channelTimeEnd;
 
-    /**
-     * 通道单笔金额金额最小值
-     */
-    private Long maxAmountPerOrder;
+  /** 通道展示端，1展示在电脑，2展示在安卓，3展示在IOS */
+  private String channelShows;
 
-    /**
-     * 通道风控金额类型 0.任何金额 1.浮动金额 2.固定金额 3浮动固定金额
-     */
-    private Integer riskControlType;
+  /** 通道单笔金额金额最小值 */
+  private BigDecimal minAmountPerOrder;
 
-    /**
-     * 风控值
-     */
-    private String riskControlValue;
+  /** 通道单笔金额金额最小值 */
+  private BigDecimal maxAmountPerOrder;
+
+  /** 通道风控金额类型 0.任何金额 1.浮动金额 2.固定金额 3浮动固定金额 */
+  private Integer riskControlType;
+
+  /** 风控值 */
+  private String riskControlValue;
 }

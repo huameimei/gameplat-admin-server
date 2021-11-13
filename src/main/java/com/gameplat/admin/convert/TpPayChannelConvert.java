@@ -1,9 +1,9 @@
 package com.gameplat.admin.convert;
 
+import com.gameplat.admin.model.domain.TpPayChannel;
 import com.gameplat.admin.model.dto.TpPayChannelAddDTO;
 import com.gameplat.admin.model.dto.TpPayChannelEditDTO;
 import com.gameplat.admin.model.dto.TpPayChannelQueryDTO;
-import com.gameplat.admin.model.entity.TpPayChannel;
 import com.gameplat.admin.model.vo.TpPayChannelVO;
 import org.mapstruct.Mapper;
 

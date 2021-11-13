@@ -1,8 +1,0 @@
-package com.gameplat.admin.dao;
-
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.gameplat.admin.model.entity.SysQuickReply;
-
-public interface SysQuickReplyMapper extends BaseMapper<SysQuickReply> {
-
-}

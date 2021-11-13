@@ -6,11 +6,13 @@ import lombok.Data;
 @Data
 public class TpPayTypeVO extends Model<TpInterfaceVO> {
 
-    private String payType;
+  private Long id;
 
-    private String interfaceCode;
+  private String payType;
 
-    private String name;
+  private String interfaceCode;
 
-    private String code;
+  private String name;
+
+  private String code;
 }

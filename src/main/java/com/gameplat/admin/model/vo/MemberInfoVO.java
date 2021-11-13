@@ -8,107 +8,91 @@ import java.util.Date;
 @Data
 public class MemberInfoVO implements Serializable {
 
-    private Long id;
+  private Long id;
 
-    /**
-     * 会员账号
-     */
-    private String userName;
+  /** 会员账号 */
+  private String account;
 
-    /**
-     * 真实姓名
-     */
-    private String fullName;
+  /** 会员昵称 */
+  private String nickname;
 
-    /**
-     * 会员层级
-     */
-    private String userLevel;
+  /** 真实姓名 */
+  private String realName;
 
-    /**
-     * 充值层级
-     */
-    private String rechLevel;
+  /** 会员层级/代理等级 */
+  private Integer userLevel;
 
-    /**
-     * 账户余额 单位分
-     */
-    private Long balance;
+  /** 用户类型 */
+  private String userType;
 
-    /**
-     * 会员积分
-     */
-    private Long totalPoints;
+  /** 会员状态 */
+  private Integer status;
 
-    /**
-     * 余宝金额
-     */
-    private Long yuBaoMoney;
+  private String withdrawFlag;
 
-    /**
-     * 累计充值金额
-     */
-    private Long totalRechMoney;
+  private Character sex;
 
-    /**
-     * 累计充值次数
-     */
-    private Integer totalRechTimes;
+  private String qq;
 
-    /**
-     * 累计出款金额
-     */
-    private Long totalWithdrawMoney;
+  private String email;
 
-    /**
-     * 累计出款次数
-     */
-    private Integer totalWithdrawTimes;
+  private String phone;
 
-    /**
-     * 注册时间
-     */
-    private Date registerTime;
+  private String dialCode;
 
-    /**
-     * 会员状态
-     */
-    private Integer status;
+  private String wechat;
 
-    /**
-     * 是否在线
-     */
-    private Integer online;
+  private String birthday;
 
-    /**
-     * 最近登录时间
-     */
-    private Date lastLoginTime;
-    /**
-     * 最近登录IP
-     */
-    private String lastLoginIp;
+  /** 上级代理 */
+  private String parentName;
 
-    /**
-     * 当前登录时间
-     */
-    private Date loginTime;
+  /** 邀请码 */
+  private String invitationCode;
 
-    /**
-     * 当前登录IP
-     */
-    private String loginIP;
+  /** 账户余额 单位分 */
+  private Long balance;
 
-    /**
-     * 上级代理账号
-     */
-    private String agentAccount;
-    // 成长等级
-    private Integer growthLevel;
-    // 成长值
-    private Integer growthValue;
-    /**
-     * 在线情况
-     */
-    private Boolean isOnline;
+  private String rebate;
+
+  /** 累计充值金额 */
+  private Long totalRechAmount;
+
+  /** 累计充值次数 */
+  private Integer totalRechTimes;
+
+  /** 累计出款金额 */
+  private Long totalWithdrawAmount;
+
+  /** 累计出款次数 */
+  private Integer totalWithdrawTimes;
+
+  private Date lastRechTime;
+
+  private Date lastWithdrawTime;
+
+  private String language;
+
+  private String registerIp;
+
+  private String registerHost;
+
+  /** 注册来源 */
+  private Integer registerSource;
+
+  private String registerBrowser;
+
+  private String registerOs;
+
+  /** 注册时间 */
+  private Date createTime;
+
+  /** 最近登录时间 */
+  private Date lastLoginTime;
+
+  /** 最近登录IP */
+  private String lastLoginIp;
+
+  /** 会员备注 */
+  private String remark;
 }

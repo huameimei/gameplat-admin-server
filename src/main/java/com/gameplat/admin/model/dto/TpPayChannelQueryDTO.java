@@ -8,11 +8,9 @@ import java.util.List;
 @Data
 public class TpPayChannelQueryDTO implements Serializable {
 
-    private Long tpInterfaceId;
+  private Integer status;
 
-    private Integer status;
+  private String payType;
 
-    private String payType;
-
-    private List<String> userLevelList;
+  private List<String> userLevelList;
 }

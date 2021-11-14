@@ -23,7 +23,7 @@
         <spring-cloud-alibaba.version>2.2.5.RELEASE</spring-cloud-alibaba.version>
         <gameplat-dependencies.version>1-0-0-SNAPSHOT</gameplat-dependencies.version>
         <org.mapstruct.version>1.4.2.Final</org.mapstruct.version>
-        <gameplat-common.version>1-0-0-SNAPSHOT</gameplat-common.version>
+        <gameplat-common.version>1.0-SNAPSHOT</gameplat-common.version>
         <poi.version>3.17</poi.version>
     </properties>
 

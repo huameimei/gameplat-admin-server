@@ -10,7 +10,6 @@ import com.gameplat.admin.model.domain.SysUser;
 import com.gameplat.admin.model.dto.ChangePasswordDTO;
 import com.gameplat.admin.model.dto.UserSettingDTO;
 import com.gameplat.admin.model.vo.ProFileVo;
-import com.gameplat.common.constant.SystemConstant;
 import com.gameplat.common.enums.SystemCodeType;
 import com.gameplat.common.exception.ServiceException;
 import com.gameplat.common.json.JsonUtils;
@@ -154,8 +153,7 @@ public class UserCenterService {
   @SentinelResource(value = "getPermisList")
   private List<String> getPermisList(SysUser user) {
     List<String> list = new ArrayList<>();
-    if (SysUserEnums.UserType.isAdmin(user.getUserType())
-        || SystemConstant.SYSTEM_USER_DEFAULT.equals(user.getUserName())) {
+    if (SysUserEnums.UserType.isAdmin(user.getUserType())) {
       list.add("*:*:*");
     } else {
       list = menuMapper.selectPermsByUserId(user.getUserId());

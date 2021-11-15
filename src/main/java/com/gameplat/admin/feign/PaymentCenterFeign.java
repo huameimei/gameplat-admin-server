@@ -11,6 +11,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 public interface PaymentCenterFeign {
 
    @PostMapping("/api/internal/proxy-pay-server/proxyPay/onlineProxyPay/{code}/{name}")
-   void onlineProxyPay(@RequestBody ProxyDispatchContext context,@PathVariable String code,@PathVariable String name);
+   void onlineProxyPay(@RequestBody ProxyDispatchContext context,@PathVariable("code") String code,@PathVariable("name") String name);
 
 }

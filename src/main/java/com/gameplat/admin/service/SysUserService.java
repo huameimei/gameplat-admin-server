@@ -45,11 +45,11 @@ public interface SysUserService extends IService<SysUser> {
   void updateUser(OperUserDTO userDTO);
 
   /**
-   * 批量删除用户信息
+   * 删除用户信息
    *
-   * @param ids String
+   * @param ids Long
    */
-  void deleteUserByIds(String ids);
+  void deleteUserById(Long ids);
 
   List<RoleVo> getRoleList();
 

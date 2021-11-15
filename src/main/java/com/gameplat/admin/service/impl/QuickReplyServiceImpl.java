@@ -1,6 +1,5 @@
 package com.gameplat.admin.service.impl;
 
-import cn.hutool.core.convert.Convert;
 import com.alibaba.csp.sentinel.annotation.SentinelResource;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
@@ -16,7 +15,6 @@ import com.gameplat.common.exception.ServiceException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
 import java.util.Objects;
 
 /**
@@ -74,9 +72,8 @@ public class QuickReplyServiceImpl extends ServiceImpl<QuickReplyMapper, QuickRe
 
   @Override
   @SentinelResource(value = "deleteQuickReply")
-  public void deleteQuickReply(String ids) {
-    Long[] arrIds = Convert.toLongArray(ids);
-    if (!this.removeByIds(Arrays.asList(arrIds))) {
+  public void deleteQuickReply(Long id) {
+    if (!this.removeById(id)) {
       throw new ServiceException("批量删除失败!");
     }
   }

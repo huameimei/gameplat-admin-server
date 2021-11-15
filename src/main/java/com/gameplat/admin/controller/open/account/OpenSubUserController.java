@@ -11,6 +11,7 @@ import com.gameplat.admin.model.vo.UserVo;
 import com.gameplat.admin.service.SysUserService;
 import com.gameplat.common.constant.ServiceName;
 import com.gameplat.common.exception.ServiceException;
+import com.gameplat.common.group.Groups;
 import com.gameplat.common.util.StringUtils;
 import com.gameplat.log.annotation.Log;
 import com.gameplat.log.enums.LogType;
@@ -47,16 +48,7 @@ public class OpenSubUserController {
       type = LogType.ADMIN,
       desc = "'添加后台账号【'+#userDTO.account+'】'")
   @PreAuthorize("hasAuthority('account:subUser:add')")
-  public void add(@RequestBody OperUserDTO userDTO) {
-    if (StringUtils.isBlank(userDTO.getAccount())) {
-      throw new ServiceException("账号不能为空");
-    }
-    if (StringUtils.isBlank(userDTO.getPassword())) {
-      throw new ServiceException("密码不能为空");
-    }
-    if (StringUtils.isBlank(userDTO.getUserType())) {
-      throw new ServiceException("账号类型不能为空");
-    }
+  public void add(@Validated(Groups.INSERT.class) @RequestBody OperUserDTO userDTO) {
     userService.insertUser(userDTO);
   }
 
@@ -65,27 +57,16 @@ public class OpenSubUserController {
   @Log(
       module = ServiceName.ADMIN_SERVICE,
       type = LogType.ADMIN,
-      desc = "'修改后台账号【'+#userDTO.account+'】'")
-  public void edit(@RequestBody OperUserDTO userDTO) {
-    if (StringUtils.isBlank(userDTO.getAccount())) {
-      throw new ServiceException("账号不能为空");
-    }
-
-    if (StringUtils.isBlank(userDTO.getUserType())) {
-      throw new ServiceException("账号类型不能为空");
-    }
-
-    userService.updateUser(userDTO);
+      desc = "'修改后台账号【'+#dto.account+'】'")
+  public void edit(@Validated(Groups.UPDATE.class) @RequestBody OperUserDTO dto) {
+    userService.updateUser(dto);
   }
 
-  @DeleteMapping("/delete")
+  @DeleteMapping("/delete/{id}")
   @PreAuthorize("hasAuthority('account:subUser:remove')")
-  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.ADMIN, desc = "'删除后台账号id='+#ids")
-  public void remove(@RequestBody String ids) {
-    if (StringUtils.isBlank(ids)) {
-      throw new ServiceException("参数不全");
-    }
-    userService.deleteUserByIds(ids);
+  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.ADMIN, desc = "'删除后台账号id='+#id")
+  public void remove(@PathVariable Long id) {
+    userService.deleteUserById(id);
   }
 
   /**

@@ -11,6 +11,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.cache.AdminCache;
 import com.gameplat.admin.constant.RsaConstant;
 import com.gameplat.admin.convert.UserConvert;
+import com.gameplat.admin.enums.SysUserEnums;
 import com.gameplat.admin.mapper.SysRoleMapper;
 import com.gameplat.admin.mapper.SysUserMapper;
 import com.gameplat.admin.mapper.SysUserRoleMapper;
@@ -100,20 +101,20 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
 
   @Override
   @SentinelResource(value = "insertUser")
-  public void insertUser(OperUserDTO userDTO) {
-    int count = this.lambdaQuery().eq(SysUser::getUserName, userDTO.getAccount()).count();
-    if (count > 0) {
+  public void insertUser(OperUserDTO dto) {
+    if (this.lambdaQuery().eq(SysUser::getUserName, dto.getAccount()).exists()) {
       throw new ServiceException("账号已存在");
     }
+
     AdminLoginLimit limit = commonService.getLoginLimit();
     if (null == limit) {
       throw new ServiceException("登录配置信息未配置");
     }
 
-    SysUser user = BeanUtils.map(userDTO, SysUser.class);
-    if (UserTypes.isAdmin(userDTO.getUserType())) {
+    SysUser user = userConvert.toEntity(dto);
+    if (UserTypes.isAdmin(dto.getUserType())) {
       // 超级管理员但不是特殊的管理员统一设置roleId=1
-      if (StringUtils.isNull(userDTO.getRoleId())) {
+      if (StringUtils.isNull(dto.getRoleId())) {
         user.setRoleId(1L);
       }
     }
@@ -121,8 +122,9 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
     // 初始化账号设置信息
     UserSetting setting = new UserSetting();
     user.setSettings(JsonUtils.toJson(setting));
+
     // 生成密码
-    String rsaPassword = RSAUtils.decrypt(userDTO.getPassword(), RsaConstant.PRIVATE_KEY);
+    String rsaPassword = RSAUtils.decrypt(dto.getPassword(), RsaConstant.PRIVATE_KEY);
     user.setPassword(passwordEncoder.encode(rsaPassword));
     user.setChangeFlag(limit.getChangeFlag() == 1 ? 0 : 1);
 
@@ -130,23 +132,15 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
       // 删除用户角色表
       userRoleMapper.deleteUserRoleByUserId(user.getUserId());
       insertUserRole(user.getUserId(), user.getRoleId());
+    } else {
+      throw new ServiceException("添加用户失败!");
     }
   }
 
   @Override
   @SentinelResource(value = "updateUser")
-  public void updateUser(OperUserDTO userDTO) {
-    if (StringUtils.isNull(userDTO.getId())) {
-      throw new ServiceException("缺少参数");
-    }
-    SysUser user = BeanUtils.map(userDTO, SysUser.class);
-    if (StringUtils.isNotBlank(user.getPassword())) {
-      AdminLoginLimit limit = commonService.getLoginLimit();
-      if (null == limit) {
-        throw new ServiceException("登录配置信息未配置");
-      }
-    }
-
+  public void updateUser(OperUserDTO dto) {
+    SysUser user = userConvert.toEntity(dto);
     if (!this.updateById(user)) {
       throw new ServiceException("修改用户信息失败!");
     }
@@ -157,22 +151,20 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
   }
 
   @Override
-  @SentinelResource(value = "deleteUserByIds")
-  public void deleteUserByIds(String ids) {
-    Long[] userIds = Convert.toLongArray(StringUtils.split(ids, ","));
-    for (Long userId : userIds) {
-      if (userId == 1) {
-        throw new ServiceException("不允许删除超级管理员用户");
-      }
-      if (userId.equals(SecurityUserHolder.getUserId())) {
-        throw new ServiceException("不允许操作自己账号");
-      }
+  @SentinelResource(value = "deleteUserById")
+  public void deleteUserById(Long id) {
+    if (1 == id) {
+      throw new ServiceException("不允许删除超级管理员用户");
+    }
+
+    if (id.equals(SecurityUserHolder.getUserId())) {
+      throw new ServiceException("不允许操作自己账号");
     }
 
     // 删除用户角色表
-    userRoleMapper.deleteUserRole(userIds);
-    if (!this.removeByIds(Arrays.asList(userIds))) {
-      throw new ServiceException("删除失败!");
+    userRoleMapper.deleteUserRole(new Long[] {id});
+    if (!this.removeById(id)) {
+      throw new ServiceException("删除用户失败!");
     }
   }
 

@@ -14,5 +14,5 @@ public interface QuickReplyService extends IService<QuickReply> {
 
   void updateQuickReply(QuickReplyDTO replyDTO);
 
-  void deleteQuickReply(String ids);
+  void deleteQuickReply(Long id);
 }

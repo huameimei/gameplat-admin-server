@@ -27,7 +27,7 @@ public class MemberWithdraw {
   private String account;
 
   @ApiModelProperty(value = "会员真实姓名")
-  private String nickname;
+  private String realName;
 
   @ApiModelProperty(value = "用户提现时账户余额(提现前的余额)")
   private BigDecimal accountMoney;

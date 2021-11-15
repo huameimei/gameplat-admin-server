@@ -10,24 +10,50 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.constant.WithdrawTypeConstant;
 import com.gameplat.admin.convert.MemberWithdrawConvert;
-import com.gameplat.admin.enums.*;
-import com.gameplat.admin.feign.PaymentCenterFeign;
+import com.gameplat.admin.enums.AllowOthersOperateEnums;
+import com.gameplat.admin.enums.CashEnum;
+import com.gameplat.admin.enums.LimitEnums;
+import com.gameplat.admin.enums.ProxyPayStatusEnum;
+import com.gameplat.admin.enums.UserStates;
+import com.gameplat.admin.enums.WithdrawStatus;
 import com.gameplat.admin.mapper.MemberWithdrawMapper;
 import com.gameplat.admin.model.bean.AdminLimitInfo;
-import com.gameplat.admin.model.bean.ProxyDispatchContext;
-import com.gameplat.admin.model.domain.*;
+import com.gameplat.admin.model.bean.PageExt;
+import com.gameplat.admin.model.bean.ProxyPayMerBean;
+import com.gameplat.admin.model.domain.Member;
+import com.gameplat.admin.model.domain.MemberInfo;
+import com.gameplat.admin.model.domain.MemberWithdraw;
+import com.gameplat.admin.model.domain.MemberWithdrawHistory;
+import com.gameplat.admin.model.domain.PpInterface;
+import com.gameplat.admin.model.domain.PpMerchant;
+import com.gameplat.admin.model.domain.SysUser;
 import com.gameplat.admin.model.domain.limit.MemberRechargeLimit;
 import com.gameplat.admin.model.dto.UserWithdrawQueryDTO;
 import com.gameplat.admin.model.vo.MemberWithdrawVO;
-import com.gameplat.admin.model.vo.PpMerchantVO;
-import com.gameplat.admin.service.*;
+import com.gameplat.admin.model.vo.SummaryVO;
+import com.gameplat.admin.service.LimitInfoService;
+import com.gameplat.admin.service.MemberBalanceService;
+import com.gameplat.admin.service.MemberInfoService;
+import com.gameplat.admin.service.MemberService;
+import com.gameplat.admin.service.MemberWithdrawHistoryService;
+import com.gameplat.admin.service.MemberWithdrawService;
+import com.gameplat.admin.service.PpInterfaceService;
+import com.gameplat.admin.service.PpMerchantService;
+import com.gameplat.admin.service.SysUserService;
 import com.gameplat.admin.util.MoneyUtils;
+import com.gameplat.security.context.UserCredential;
 import com.gameplat.common.enums.UserTypes;
-import com.gameplat.common.exception.ServiceException;
 import com.gameplat.common.json.JsonUtils;
 import com.gameplat.common.snowflake.IdGeneratorSnowflake;
 import com.gameplat.common.util.StringUtils;
-import com.gameplat.security.context.UserCredential;
+import com.gameplat.common.exception.ServiceException;
+import java.math.BigDecimal;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.BeanUtils;
@@ -35,9 +61,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.math.BigDecimal;
-import java.util.*;
 
 @Slf4j
 @Service
@@ -47,7 +70,7 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
 
   @Autowired private MemberWithdrawConvert userWithdrawConvert;
 
-  @Autowired private MemberWithdrawMapper userWithdrawMapper;
+  @Autowired private MemberWithdrawMapper memberWithdrawMapper;
 
   @Autowired private MemberWithdrawHistoryService memberWithdrawHistoryService;
 
@@ -65,20 +88,15 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
 
   @Autowired private MemberInfoService memberInfoService;
 
-  @Autowired private PaymentCenterFeign paymentCenterFeign;
-
   @Override
-  public IPage<MemberWithdrawVO> findPage(Page<MemberWithdraw> page, UserWithdrawQueryDTO dto) {
+  public PageExt<MemberWithdrawVO, SummaryVO> findPage(
+      Page<MemberWithdraw> page, UserWithdrawQueryDTO dto) {
     LambdaQueryWrapper<MemberWithdraw> query = Wrappers.lambdaQuery();
     query
         .in(
             ObjectUtils.isNotNull(dto.getBankNameList()),
             MemberWithdraw::getBankName,
             dto.getBankNameList())
-        .in(
-            ObjectUtils.isNotNull(dto.getCashStatusList()),
-            MemberWithdraw::getCashStatus,
-            dto.getCashStatusList())
         .eq(
             ObjectUtils.isNotEmpty(dto.getSuperName()),
             MemberWithdraw::getSuperName,
@@ -133,11 +151,19 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
               "DIRECT")
           .gt(dto.getRechargeStatusList().contains(6), MemberWithdraw::getCounterFee, 0);
     }
+    if (ObjectUtils.isNotNull(dto.getCashStatusList())) {
+      query.in(MemberWithdraw::getCashStatus, dto.getCashStatusList());
+    } else {
+      query.le(MemberWithdraw::getCashStatus, WithdrawStatus.HANDLED.getValue());
+    }
     query.orderBy(
         ObjectUtils.isNotEmpty(dto.getOrder()),
         dto.getOrder().equals("ASC"),
         MemberWithdraw::getCreateTime);
-    return this.page(page, query).convert(userWithdrawConvert::toVo);
+    IPage<MemberWithdrawVO> data = this.page(page, query).convert(userWithdrawConvert::toVo);
+    // 统计受理订单总金额、未受理订单总金额
+    SummaryVO summaryVO = amountSum();
+    return new PageExt<MemberWithdrawVO, SummaryVO>(data, summaryVO);
   }
 
   @Override
@@ -183,10 +209,10 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
       boolean isDirect,
       String approveReason,
       UserCredential userCredential) {
-    if (cashStatus.equals(curStatus) || null == id || null == curStatus) {
+    if (cashStatus.equals(curStatus) || null == id || null == cashStatus || null == curStatus) {
       throw new ServiceException("错误的参数.");
     }
-    MemberWithdraw memberWithdraw = userWithdrawMapper.selectById(id);
+    MemberWithdraw memberWithdraw = memberWithdrawMapper.selectById(id);
 
     if (memberWithdraw == null) {
       throw new ServiceException("UW/ORDER_NULL,充值订单不存在或订单已处理", null);
@@ -217,11 +243,14 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
     }
     /** 校验子账号当天受理会员取款审核额度 */
     if (null != userCredential.getUsername()
-        && StringUtils.equals(UserTypes.SUBUSER.value(), userCredential.getUsername())
+        && StringUtils.equals(UserTypes.SUBUSER.value(), userCredential.getUserType())
         && WithdrawStatus.SUCCESS.getValue() == cashStatus) {
       SysUser sysUser = null;
-      sysUser = sysUserService.getByUsername(userCredential.getUsername());
-      AdminLimitInfo adminLimitInfo = JsonUtils.parse(sysUser.getLimitInfo(), AdminLimitInfo.class);
+      if (null != userCredential) {
+        sysUser = sysUserService.getByUsername(userCredential.getUsername());
+      }
+      AdminLimitInfo adminLimitInfo =
+          JsonUtils.parse(sysUser.getLimitInfo(), AdminLimitInfo.class);
       checkZzhWithdrawAmountAudit(
           adminLimitInfo,
           memberWithdraw.getCashMode(),
@@ -316,107 +345,9 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
     }
   }
 
-  @Override
-  public void proxyPay(
-      Long id,
-      Long ppMerchantId,
-      String asyncCallbackUrl,
-      String sysPath,
-      UserCredential userCredential)
-      throws Exception {
-    MemberWithdraw memberWithdraw = this.getById(id);
-    if (null == memberWithdraw) {
-      throw new ServiceException("不存在的记录");
-    }
-    // 校验已受理出款是否允许其他人操作
-    crossAccountCheck(userCredential, memberWithdraw);
-
-    // 校验子账号当天取款审核额度
-    SysUser sysUser = sysUserService.getByUsername(userCredential.getUsername());
-    AdminLimitInfo adminLimitInfo = JsonUtils.parse(sysUser.getLimitInfo(), AdminLimitInfo.class);
-    if (null != adminLimitInfo
-        && StringUtils.equals(UserTypes.SUBUSER.value(), sysUser.getUserType())) {
-      checkZzhWithdrawAmountAudit(
-          adminLimitInfo,
-          memberWithdraw.getCashMode(),
-          memberWithdraw.getCashMoney(),
-          userCredential.getUsername());
-    }
-
-    // 第三方代付商户
-    PpMerchantVO ppMerchantVO = ppMerchantService.getPpMerchantById(ppMerchantId);
-    if (!Optional.ofNullable(ppMerchantVO).isPresent()) {
-      throw new ServiceException("请确认出款商户是否存在！");
-    }
-
-    // 代付接口信息
-    PpInterface ppInterface = ppInterfaceService.get(ppMerchantVO.getPpInterfaceCode());
-    verifyPpInterface(ppInterface);
-    if (verifyPpMerchant(memberWithdraw, ppMerchantVO, ppInterface)) {
-      throw new ServiceException("出款商户限制，请选择其他方式出款！");
-    }
-
-    // 封装第三方代付接口调用信息
-    ProxyDispatchContext context = new ProxyDispatchContext();
-    String asyncUrl = asyncCallbackUrl.replace("relProxyPay", "proxyPayAsyncCallback");
-    context.setAsyncCallbackUrl(asyncUrl + "/" + memberWithdraw.getCashOrderNo());
-    context.setSysPath(sysPath);
-    // 设置会员真实姓名
-    context.setName(memberWithdraw.getNickname());
-    // 设置第三方接口信息
-    fillProxyDispatchContext(context, ppInterface);
-    // 设置银行编码,名称
-    context.setBankCode(getProxyPayBankCode(memberWithdraw, ppMerchantVO, ppInterface));
-    context.setBankName(memberWithdraw.getBankName());
-
-    // 设置第三方商户参数
-    context.setMerchantParameters(JSONObject.parseObject(ppMerchantVO.getParameters(), Map.class));
-
-    // 设置客户请求地址
-    context.setUserIpAddress(userCredential.getLoginIp());
-    // 设置第三方商户出款数据
-    buildWithdrawWithProxyMsg(memberWithdraw, ppMerchantVO, ppInterface);
-    /** 第三方订单提交成功，将订单状态改为已出款 */
-    memberWithdraw.setApproveReason(ppMerchantVO.getName() + "代付出款");
-    memberWithdraw.setOperatorTime(new Date());
-    memberWithdraw.setOperatorAccount(userCredential.getUsername());
-    updateProxyWithdrawStatus(memberWithdraw, WithdrawStatus.SUCCESS.getValue());
-
-    /** 请求第三方代付接口 */
-    log.info("进入第三方出入款中心出款订单号: {}", memberWithdraw.getCashOrderNo());
-    paymentCenterFeign.onlineProxyPay(
-        context, memberWithdraw.getPpInterface(), memberWithdraw.getPpInterfaceName());
-    /** 不需要异步通知，直接将状态改成第三方出款完成 */
-    if (0 != ppInterface.getAsynNotifyStatus()) {
-      setProxyPayStatus(memberWithdraw);
-      this.lambdaUpdate()
-          .set(MemberWithdraw::getCashStatus, WithdrawStatus.SUCCESS.getValue())
-          .eq(MemberWithdraw::getId, memberWithdraw.getId())
-          .update();
-
-      /** 历史提现订单记录 */
-      memberWithdrawHistoryService
-          .lambdaUpdate()
-          .set(MemberWithdrawHistory::getCashStatus, WithdrawStatus.SUCCESS.getValue())
-          .eq(MemberWithdrawHistory::getId, memberWithdraw.getId())
-          .update();
-
-      /** 更新代付商户出款次数和金额 */
-      ppMerchantService
-          .lambdaUpdate()
-          .set(PpMerchant::getProxyTimes, ppMerchantVO.getProxyTimes() + 1)
-          .set(
-              PpMerchant::getProxyAmount,
-              ppMerchantVO.getProxyAmount().add(memberWithdraw.getCashMoney()))
-          .eq(PpMerchant::getId, ppMerchantVO.getId())
-          .update();
-      log.info("第三方出款成功,出款商户为:{} ,出款订单信息为：{}", memberWithdraw.getPpMerchantName(), memberWithdraw);
-    }
-  }
-
   /** 过滤不符合规则的第三方出款商户 */
   @Override
-  public List<PpMerchantVO> queryProxyMerchant(Long id) {
+  public List<PpMerchant> queryProxyMerchant(Long id) {
     // 根据体现记录查询用户的层级和出款金额
     MemberWithdraw memberWithdraw = this.getById(id);
     if (null == memberWithdraw) {
@@ -424,29 +355,33 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
     }
 
     // 获取所有的可用代付商户
-    List<PpMerchantVO> merchantVOList = ppMerchantService.queryAllMerchant(1);
-    if (CollectionUtils.isEmpty(merchantVOList)) {
+    List<PpMerchant> merchantList = ppMerchantService.queryAllMerchant(0);
+    if (CollectionUtils.isEmpty(merchantList)) {
       throw new ServiceException("没有可用的代付商户");
     }
     // 根据用户体现信息，过滤相关代付相符
-    Iterator<PpMerchantVO> iterator = merchantVOList.iterator();
+    Iterator<PpMerchant> iterator = merchantList.iterator();
     while (iterator.hasNext()) {
-      PpMerchantVO ppMerchantVO = iterator.next();
-      PpInterface ppInterface = ppInterfaceService.get(ppMerchantVO.getPpInterfaceCode());
+      PpMerchant ppMerchant = iterator.next();
+      PpInterface ppInterface = ppInterfaceService.get(ppMerchant.getPpInterfaceCode());
 
-      if (verifyPpMerchant(memberWithdraw, ppMerchantVO, ppInterface)) {
+      if (verifyPpMerchant(memberWithdraw, ppMerchant, ppInterface)) {
         iterator.remove();
       }
     }
-    return merchantVOList;
+    return merchantList;
   }
 
   @Override
   public void save(
-      BigDecimal cashMoney, String cashReason, Integer handPoints, UserCredential userCredential)
+      BigDecimal cashMoney,
+      String cashReason,
+      Integer handPoints,
+      UserCredential userCredential,
+      Long memberId)
       throws Exception {
-    Member member = memberService.getById(userCredential.getUserId()); // 更新金额，从数据库中重新获取
-    MemberInfo memberInfo = memberInfoService.getById(userCredential.getUserId()); // 更新金额，从数据库中重新获取
+    Member member = memberService.getById(memberId); // 更新金额，从数据库中重新获取
+    MemberInfo memberInfo = memberInfoService.getById(memberId); // 更新金额，从数据库中重新获取
     // 校验用户状态
     checkUserInfo(member, memberInfo, false);
     // 判断金额是否为负数或者为0
@@ -461,7 +396,8 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
 
     /** 校验子账号当天受理人工取款审核额度 */
     SysUser sysUser = sysUserService.getByUsername(userCredential.getUsername());
-    AdminLimitInfo adminLimitInfo = JsonUtils.parse(sysUser.getLimitInfo(), AdminLimitInfo.class);
+    AdminLimitInfo adminLimitInfo =
+        JsonUtils.parse(sysUser.getLimitInfo(), AdminLimitInfo.class);
     if (null != adminLimitInfo
         && StringUtils.equals(UserTypes.SUBUSER.value(), userCredential.getUserType())) {
       checkZzhWithdrawAmountAudit(
@@ -474,9 +410,9 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
     // 下面开始添加后台出款记录
     MemberWithdraw memberWithdraw = new MemberWithdraw();
     memberWithdraw.setCashOrderNo(String.valueOf(IdGeneratorSnowflake.getInstance().nextId()));
-    memberWithdraw.setMemberId(userCredential.getUserId());
-    memberWithdraw.setAccount(userCredential.getUsername());
-    memberWithdraw.setNickname(userCredential.getRealName());
+    memberWithdraw.setMemberId(memberId);
+    memberWithdraw.setAccount(member.getAccount());
+    memberWithdraw.setRealName(member.getRealName());
     memberWithdraw.setAccountMoney(memberInfo.getBalance());
     memberWithdraw.setCashMoney(cashMoney);
     memberWithdraw.setCashReason(cashReason);
@@ -576,7 +512,6 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
         .set(MemberWithdraw::getOperatorAccount, memberWithdraw.getOperatorAccount())
         .eq(MemberWithdraw::getId, memberWithdraw.getId())
         .eq(MemberWithdraw::getCashStatus, origCashStatus);
-    this.update(update);
     if (!this.update(update)) {
       log.error(
           "修改提现订单异常：memberWithdraw="
@@ -613,34 +548,26 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
     }
   }
 
-  private void verifyPpInterface(PpInterface ppInterface) {
-    if (ppInterface == null) {
-      throw new ServiceException("第三方代付接口已关闭。");
-    }
-    if (ppInterface.getStatus() != SwitchStatusEnum.ENABLED.getValue()) {
-      throw new ServiceException("第三方代付接口已关闭。");
-    }
-  }
-
   private static boolean verifyPpMerchant(
-      MemberWithdraw memberWithdraw, PpMerchantVO ppMerchantVO, PpInterface ppInterface) {
-    if (memberWithdraw.getCashMoney().compareTo(ppMerchantVO.getMinLimitCash()) < 0
-        || memberWithdraw.getCashMoney().compareTo(ppMerchantVO.getMaxLimitCash()) > 0) {
-      log.info("用户出款金额超出商户出款金额范围，过滤此商户，商户名称为：" + ppMerchantVO.getName());
+      MemberWithdraw memberWithdraw, PpMerchant ppMerchant, PpInterface ppInterface) {
+    ProxyPayMerBean proxyPayMerBean = ProxyPayMerBean.conver2Bean(ppMerchant.getMerLimits());
+    if (memberWithdraw.getCashMoney().compareTo(proxyPayMerBean.getMinLimitCash()) < 0
+        || memberWithdraw.getCashMoney().compareTo(proxyPayMerBean.getMaxLimitCash()) > 0) {
+      log.info("用户出款金额超出商户出款金额范围，过滤此商户，商户名称为：" + ppMerchant.getName());
       return true;
     }
 
-    if (StringUtils.isNotEmpty(ppMerchantVO.getUserLever())) {
+    if (StringUtils.isNotEmpty(proxyPayMerBean.getUserLever())) {
       if (!StringUtils.contains(
-          "," + ppMerchantVO.getUserLever() + ",",
+          "," + proxyPayMerBean.getUserLever() + ",",
           String.format("%s" + memberWithdraw.getMemberLevel() + "%s", ",", ","))) {
-        log.info("用户层级不在此代付商户设置的层级中，过滤此商户，商户名称为：" + ppMerchantVO.getName());
+        log.info("用户层级不在此代付商户设置的层级中，过滤此商户，商户名称为：" + ppMerchant.getName());
         return true;
       }
     }
 
     Map<String, String> banksMap =
-        JsonUtils.toObject(
+        JSONObject.parseObject(
             JSONObject.parseObject(ppInterface.getLimtInfo()).getString("banks"), Map.class);
     /** 模糊匹配银行名称 */
     boolean isBankName = true;
@@ -658,112 +585,15 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
       }
     }
     if (isBankName) {
-      log.info("代付商户不支持用户银行卡出款，过滤此商户，商户名称为：" + ppMerchantVO.getName());
+      log.info("代付商户不支持用户银行卡出款，过滤此商户，商户名称为：" + ppMerchant.getName());
       return true;
     }
     return false;
   }
 
-  private void fillProxyDispatchContext(ProxyDispatchContext context, PpInterface ppInterface) {
-    context.setName(ppInterface.getName());
-    context.setVersion(ppInterface.getVersion());
-    context.setCharset(ppInterface.getCharset());
-    context.setDispatchType(ppInterface.getDispatchType());
-    context.setDispatchUrl(ppInterface.getDispatchUrl());
-    context.setDispatchMethod(ppInterface.getDispatchMethod());
-  }
-
-  private String getProxyPayBankCode(
-      MemberWithdraw memberWithdraw, PpMerchantVO merchantVO, PpInterface ppinterface) {
-    if (null == merchantVO || SwitchStatusEnum.DISABLED.match(merchantVO.getStatus())) {
-      throw new ServiceException("第三方代付商户已关闭");
-    }
-
-    String bankCode = "";
-    String bankName = memberWithdraw.getBankName();
-    Map<String, String> banksMap =
-        JsonUtils.toObject(
-            JSONObject.parseObject(ppinterface.getLimtInfo()).getString("banks"), Map.class);
-    for (Map.Entry<String, String> entry : banksMap.entrySet()) {
-      if (StringUtils.contains(entry.getValue(), bankName)
-          || StringUtils.contains(bankName, entry.getValue())) {
-        bankCode = entry.getKey();
-      }
-      if (StringUtils.contains(entry.getValue(), "邮政") && StringUtils.contains(bankName, "邮政")) {
-        bankCode = entry.getKey();
-      }
-      // 处理银行名称模糊匹配无法正确设置对应code
-      if (StringUtils.equals(bankName, entry.getValue())) {
-        bankCode = entry.getKey();
-        break;
-      }
-    }
-
-    if (StringUtils.isBlank(bankCode)) {
-      throw new ServiceException("银行编码错误，请检查银行配置信息！");
-    }
-    return bankCode;
-  }
-
-  private void buildWithdrawWithProxyMsg(
-      MemberWithdraw memberWithdraw, PpMerchantVO ppMerchantVO, PpInterface ppInterface) {
-    memberWithdraw.setProxyPayDesc("第三方出款中。。。");
-    memberWithdraw.setProxyPayStatus(ProxyPayStatusEnum.PAY_PROGRESS.getCode());
-    memberWithdraw.setPpInterface(ppInterface.getCode());
-    memberWithdraw.setPpInterfaceName(ppInterface.getName());
-    memberWithdraw.setPpMerchantId(ppInterface.getId());
-    memberWithdraw.setPpMerchantName(ppInterface.getName());
-  }
-
-  /**
-   * 第三方出款成功，改变出款状态
-   *
-   * @param memberWithdraw MemberWithdraw
-   */
-  public void updateProxyWithdrawStatus(MemberWithdraw memberWithdraw, Integer cashStatus) {
-    // 修改订单状态
-    LambdaUpdateWrapper<MemberWithdraw> updateMemberWithdraw = Wrappers.lambdaUpdate();
-    updateMemberWithdraw
-        .set(MemberWithdraw::getCashStatus, cashStatus)
-        .set(MemberWithdraw::getApproveReason, memberWithdraw.getApproveReason())
-        .set(MemberWithdraw::getOperatorAccount, memberWithdraw.getOperatorAccount())
-        .set(MemberWithdraw::getOperatorTime, memberWithdraw.getOperatorTime())
-        .set(MemberWithdraw::getProxyPayDesc, memberWithdraw.getProxyPayDesc())
-        .set(MemberWithdraw::getProxyPayStatus, memberWithdraw.getProxyPayStatus())
-        .set(MemberWithdraw::getPpInterface, memberWithdraw.getPpInterface())
-        .set(MemberWithdraw::getPpInterfaceName, memberWithdraw.getPpInterfaceName())
-        .set(MemberWithdraw::getPpMerchantId, memberWithdraw.getPpMerchantId())
-        .set(MemberWithdraw::getPpMerchantName, memberWithdraw.getPpMerchantName())
-        .eq(MemberWithdraw::getId, memberWithdraw.getId())
-        .eq(MemberWithdraw::getCashStatus, memberWithdraw.getCashStatus());
-    if (!this.update(updateMemberWithdraw)) {
-      log.error(
-          "修改提现订单异常：UserWithdraw="
-              + memberWithdraw.toString()
-              + ",origCashStatus="
-              + memberWithdraw.getCashStatus());
-      throw new ServiceException("UW/UPDATE_ERROR, 订单已处理", null);
-    }
-    // 更新会员信息表
-    MemberInfo memberInfo = memberInfoService.getById(memberWithdraw.getMemberId());
-    memberInfoService.updateMemberWithdraw(memberInfo, memberWithdraw.getCashMoney());
-
-    // 删除出款验证打码量记录的数据
-    //    validWithdrawService.remove(userWithdraw.getUserId(), userWithdraw.getAddTime());
-    //
-    // 添加取现历史记录
-    memberWithdraw.setCashStatus(cashStatus);
-    insertWithdrawHistory(memberWithdraw);
-  }
-
-  private void setProxyPayStatus(MemberWithdraw memberWithdraw) {
-    memberWithdraw.setApproveReason("第三方出款成功");
-    memberWithdraw.setProxyPayDesc("第三方出款成功");
-    memberWithdraw.setProxyPayStatus(ProxyPayStatusEnum.PAY_SUCCESS.getCode());
-  }
-
   /** 检查用户，封装用户信息 */
-  private void checkUserInfo(Member member, MemberInfo memberInfo, boolean checkUserState) {
+  private void checkUserInfo(Member member, MemberInfo memberInfo, boolean checkUserState)
+      throws Exception {
     // 查询用户是否存在
     if (member == null) {
       throw new ServiceException("UC/USER_NOT_EXIST, uc.user_not_exist", null);
@@ -781,5 +611,17 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
     if (member.getUserType().equals(UserTypes.TEST.value())) {
       throw new ServiceException("用户为试玩会员");
     }
+  }
+
+  private SummaryVO amountSum() {
+    LambdaQueryWrapper<MemberWithdraw> queryHandle = Wrappers.lambdaQuery();
+    SummaryVO summaryVO = new SummaryVO();
+    queryHandle.eq(MemberWithdraw::getCashStatus, WithdrawStatus.HANDLED.getValue());
+    summaryVO.setAllHandledSum(memberWithdrawMapper.summaryMemberWithdraw(queryHandle));
+
+    LambdaQueryWrapper<MemberWithdraw> queryUnHandle = Wrappers.lambdaQuery();
+    queryUnHandle.eq(MemberWithdraw::getCashStatus, WithdrawStatus.UNHANDLED.getValue());
+    summaryVO.setAllUnhandledSum(memberWithdrawMapper.summaryMemberWithdraw(queryUnHandle));
+    return summaryVO;
   }
 }

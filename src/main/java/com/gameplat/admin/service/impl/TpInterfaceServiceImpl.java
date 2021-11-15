@@ -12,27 +12,32 @@ import com.gameplat.admin.model.vo.TpInterfacePayTypeVo;
 import com.gameplat.admin.model.vo.TpInterfaceVO;
 import com.gameplat.admin.service.TpInterfaceService;
 import com.gameplat.admin.service.TpPayTypeService;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
 import com.gameplat.common.exception.ServiceException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 @Service
 @Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)
 public class TpInterfaceServiceImpl extends ServiceImpl<TpInterfaceMapper, TpInterface>
     implements TpInterfaceService {
 
-  @Autowired private TpInterfaceConvert tpInterfaceConvert;
+  @Autowired
+  private TpInterfaceConvert tpInterfaceConvert;
 
-  @Autowired private TpInterfaceMapper tpInterfaceMapper;
+  @Autowired
+  private TpInterfaceMapper tpInterfaceMapper;
 
-  @Autowired private TpPayTypeMapper tpPayTypeMapper;
+  @Autowired
+  private TpPayTypeMapper tpPayTypeMapper;
 
-  @Autowired private TpPayTypeService tpPayTypeService;
+  @Autowired
+  private TpPayTypeService tpPayTypeService;
 
   @Override
   public List<TpInterfaceVO> queryAll() {
@@ -48,8 +53,8 @@ public class TpInterfaceServiceImpl extends ServiceImpl<TpInterfaceMapper, TpInt
 
   @Override
   public TpInterfacePayTypeVo queryTpInterfacePayType(Long id) {
-    TpInterfacePayTypeVo tpInterfacePayTypeVo =
-        tpInterfaceConvert.toTpInterfacePayTypeVo(tpInterfaceMapper.selectById(id));
+    TpInterfacePayTypeVo tpInterfacePayTypeVo = tpInterfaceConvert
+        .toTpInterfacePayTypeVo(tpInterfaceMapper.selectById(id));
     if (null == tpInterfacePayTypeVo) {
       throw new ServiceException("第三方接口不存在!");
     }
@@ -73,12 +78,12 @@ public class TpInterfaceServiceImpl extends ServiceImpl<TpInterfaceMapper, TpInt
             .filter(
                 a ->
                     !tpInterface.getTpPayTypeList().stream()
-                        .map(TpPayType::getId)
+                        .map(b -> b.getId())
                         .collect(Collectors.toList())
                         .contains(a.getId()))
             .collect(Collectors.toList());
     tpPayTypeService.saveOrUpdateBatch(tpInterface.getTpPayTypeList());
-    if (resultList.size() > 0) {
+    if (null != resultList && resultList.size() > 0) {
       tpPayTypeService.deleteBatchIds(
           resultList.stream().map(TpPayType::getId).collect(Collectors.toList()));
     }
@@ -99,12 +104,14 @@ public class TpInterfaceServiceImpl extends ServiceImpl<TpInterfaceMapper, TpInt
 
   @Override
   public void synchronization(TpInterface tpInterface) {
-    this.lambdaUpdate().eq(TpInterface::getCode, tpInterface.getCode()).remove();
-
+    LambdaQueryWrapper<TpInterface> query = Wrappers.lambdaQuery();
+    query.eq(TpInterface::getCode, tpInterface.getCode());
+    tpInterfaceMapper.delete(query);
     LambdaQueryWrapper<TpPayType> tpPayType = Wrappers.lambdaQuery();
     tpPayType.eq(TpPayType::getInterfaceCode, tpInterface.getCode());
     tpPayTypeService.remove(tpPayType);
     tpInterfaceMapper.insert(tpInterface);
     tpPayTypeService.saveBatch(tpInterface.getTpPayTypeList());
   }
+
 }

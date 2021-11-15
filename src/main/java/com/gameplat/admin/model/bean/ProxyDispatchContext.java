@@ -1,10 +1,10 @@
 package com.gameplat.admin.model.bean;
 
 import com.alibaba.fastjson.JSON;
-import lombok.Data;
-
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.Map;
+import lombok.Data;
 
 /**
  * 第三方代付参数封装类
@@ -42,7 +42,7 @@ public class ProxyDispatchContext {
   /**
    * 代付金额
    */
-  private Double proxyAmount;
+  private BigDecimal proxyAmount;
 
   /**
    * 订单时间

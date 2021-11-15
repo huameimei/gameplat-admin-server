@@ -17,16 +17,15 @@ import com.gameplat.admin.model.dto.PayAccountEditDTO;
 import com.gameplat.admin.model.dto.PayAccountQueryDTO;
 import com.gameplat.admin.model.vo.PayAccountVO;
 import com.gameplat.admin.service.PayAccountService;
-import com.gameplat.common.exception.ServiceException;
 import com.gameplat.common.json.JsonUtils;
+import com.gameplat.common.exception.ServiceException;
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.math.BigDecimal;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)
@@ -78,7 +77,7 @@ public class PayAccountServiceImpl extends ServiceImpl<PayAccountMapper, PayAcco
 
   @Override
   public void save(PayAccountAddDTO dto) {
-    // 检验风控金额的合法性
+    /** 检验风控金额的合法性 */
     String riskControlValue =
         ChannelLimitsBean.validateRiskControlValue(
             dto.getRiskControlValue(), dto.getRiskControlType());
@@ -99,17 +98,25 @@ public class PayAccountServiceImpl extends ServiceImpl<PayAccountMapper, PayAcco
 
   @Override
   public IPage<PayAccountVO> findPayAccountPage(Page<PayAccount> page, PayAccountQueryDTO dto) {
-    return payAccountMapper.findPayAccountPage(page, dto).convert(this::conver2LimitInfo);
+    IPage<PayAccountVO> ipage = payAccountMapper.findPayAccountPage(page, dto);
+    List<PayAccountVO> list = ipage.getRecords();
+    list.stream()
+        .forEach(
+            (vo -> {
+              this.conver2LimitInfo(vo);
+            }));
+    return ipage;
   }
 
   @Override
   public List<String> queryOwners() {
     QueryWrapper<PayAccount> query = Wrappers.query();
     query.select("distinct owner");
-    return this.list(query).stream().map(PayAccount::getOwner).collect(Collectors.toList());
+    List<String> list = this.list(query).stream().map(a->a.getOwner()).collect(Collectors.toList());
+    return list;
   }
 
-  private PayAccountVO conver2LimitInfo(PayAccountVO vo) {
+  private void conver2LimitInfo(PayAccountVO vo) {
     JSONObject limitInfo = JSONObject.parseObject(vo.getLimitInfo());
     vo.setLimitStatus(limitInfo.getInteger("limitStatus"));
     vo.setLimitAmount(limitInfo.getBigDecimal("limitAmount"));
@@ -121,7 +128,6 @@ public class PayAccountServiceImpl extends ServiceImpl<PayAccountMapper, PayAcco
     vo.setMaxAmountPerOrder(limitInfo.getBigDecimal("maxAmountPerOrder"));
     vo.setRiskControlType(limitInfo.getInteger("riskControlType"));
     vo.setRiskControlValue(limitInfo.getString("riskControlValue"));
-    return vo;
   }
 
   private void conver2PayAccount(PayAccountAddDTO dto) {

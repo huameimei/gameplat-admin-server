@@ -8,14 +8,15 @@ import com.gameplat.admin.mapper.TpPayTypeMapper;
 import com.gameplat.admin.model.domain.TpPayType;
 import com.gameplat.admin.model.vo.TpPayTypeVO;
 import com.gameplat.admin.service.TpPayTypeService;
+
 import com.gameplat.common.exception.ServiceException;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)

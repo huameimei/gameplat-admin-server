@@ -18,13 +18,12 @@ import com.gameplat.admin.model.vo.TpPayChannelVO;
 import com.gameplat.admin.service.TpPayChannelService;
 import com.gameplat.common.exception.ServiceException;
 import com.gameplat.common.json.JsonUtils;
+import java.math.BigDecimal;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.math.BigDecimal;
-import java.util.List;
 
 @Service
 @Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)
@@ -94,10 +93,17 @@ public class TpPayChannelServiceImpl extends ServiceImpl<TpPayChannelMapper, TpP
   @Override
   public IPage<TpPayChannelVO> findTpPayChannelPage(
       Page<TpPayChannel> page, TpPayChannelQueryDTO dto) {
-    return tpPayChannelMapper.findTpPayChannelPage(page, dto).convert(this::conver2LimitInfo);
+    IPage<TpPayChannelVO> ipage = tpPayChannelMapper.findTpPayChannelPage(page, dto);
+    List<TpPayChannelVO> list = ipage.getRecords();
+    list.stream()
+        .forEach(
+            (a -> {
+              this.conver2LimitInfo(a);
+            }));
+    return ipage;
   }
 
-  private TpPayChannelVO conver2LimitInfo(TpPayChannelVO vo) {
+  private void conver2LimitInfo(TpPayChannelVO vo) {
     JSONObject limitInfo = JSONObject.parseObject(vo.getLimitInfo());
     vo.setLimitStatus(limitInfo.getInteger("limitStatus"));
     vo.setLimitAmount(limitInfo.getLong("limitAmount"));
@@ -109,7 +115,6 @@ public class TpPayChannelServiceImpl extends ServiceImpl<TpPayChannelMapper, TpP
     vo.setMaxAmountPerOrder(limitInfo.getBigDecimal("maxAmountPerOrder"));
     vo.setRiskControlType(limitInfo.getInteger("riskControlType"));
     vo.setRiskControlValue(limitInfo.getString("riskControlValue"));
-    return vo;
   }
 
   private void conver2TpPayChannel(TpPayChannelAddDTO dto) {

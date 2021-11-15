@@ -8,7 +8,6 @@ import com.gameplat.admin.model.dto.PayAccountAddDTO;
 import com.gameplat.admin.model.dto.PayAccountEditDTO;
 import com.gameplat.admin.model.dto.PayAccountQueryDTO;
 import com.gameplat.admin.model.vo.PayAccountVO;
-
 import java.util.List;
 
 public interface PayAccountService extends IService<PayAccount> {

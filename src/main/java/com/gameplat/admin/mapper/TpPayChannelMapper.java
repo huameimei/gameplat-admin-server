@@ -6,7 +6,9 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.gameplat.admin.model.domain.TpPayChannel;
 import com.gameplat.admin.model.dto.TpPayChannelQueryDTO;
 import com.gameplat.admin.model.vo.TpPayChannelVO;
+import org.springframework.stereotype.Repository;
 
+@Repository
 public interface TpPayChannelMapper extends BaseMapper<TpPayChannel> {
 
   IPage<TpPayChannelVO> findTpPayChannelPage(Page<TpPayChannel> page, TpPayChannelQueryDTO dto);

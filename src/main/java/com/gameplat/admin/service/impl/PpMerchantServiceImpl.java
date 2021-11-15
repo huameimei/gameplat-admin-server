@@ -19,18 +19,19 @@ import com.gameplat.admin.model.vo.PpMerchantVO;
 import com.gameplat.admin.service.PpInterfaceService;
 import com.gameplat.admin.service.PpMerchantService;
 import com.gameplat.admin.util.EncryptUtils;
-import com.gameplat.common.exception.ServiceException;
 import com.gameplat.common.json.JsonUtils;
+
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import com.gameplat.common.exception.ServiceException;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)
@@ -143,13 +144,10 @@ public class PpMerchantServiceImpl extends ServiceImpl<PpMerchantMapper, PpMerch
   }
 
   @Override
-  public List<PpMerchantVO> queryAllMerchant(Integer status) {
+  public List<PpMerchant> queryAllMerchant(Integer status) {
     LambdaQueryWrapper<PpMerchant> query = Wrappers.lambdaQuery();
     query.eq(PpMerchant::getStatus, status);
-    return this.list(query).stream()
-        .map(e -> ppMerchantConvert.toVo(e))
-        .map(this::conver2MerVo)
-        .collect(Collectors.toList());
+    return this.list(query);
   }
 
   private PpMerchantAddDTO conver2PpMerchant(PpMerchantAddDTO ppMerchantAddDTO) {

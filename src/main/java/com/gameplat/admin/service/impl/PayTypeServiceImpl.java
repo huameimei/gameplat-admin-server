@@ -14,14 +14,15 @@ import com.gameplat.admin.model.dto.PayTypeAddDTO;
 import com.gameplat.admin.model.dto.PayTypeEditDTO;
 import com.gameplat.admin.model.vo.PayTypeVO;
 import com.gameplat.admin.service.PayTypeService;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
 import com.gameplat.common.exception.ServiceException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)
@@ -38,7 +39,7 @@ public class PayTypeServiceImpl extends ServiceImpl<PayTypeMapper, PayType>
   }
 
   @Override
-  public void save(PayTypeAddDTO dto) {
+  public void save(PayTypeAddDTO dto) throws ServiceException {
     LambdaQueryWrapper<PayType> query = Wrappers.lambdaQuery();
     query.eq(PayType::getCode, dto.getCode());
     if (this.count(query) > 0) {
@@ -91,7 +92,7 @@ public class PayTypeServiceImpl extends ServiceImpl<PayTypeMapper, PayType>
   public IPage<PayType> queryPage(Page<PayType> page) {
     LambdaQueryWrapper<PayType> query = Wrappers.lambdaQuery();
     query.orderByAsc(PayType::getSort);
-    return this.page(page, query);
+    return this.page(page,query);
   }
 
   @Override

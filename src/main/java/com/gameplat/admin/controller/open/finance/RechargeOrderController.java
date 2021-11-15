@@ -1,15 +1,19 @@
 package com.gameplat.admin.controller.open.finance;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
+
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.gameplat.admin.model.bean.PageExt;
 import com.gameplat.admin.model.bean.ManualRechargeOrderBo;
 import com.gameplat.admin.model.domain.RechargeOrder;
 import com.gameplat.admin.model.dto.RechargeOrderQueryDTO;
 import com.gameplat.admin.model.vo.RechargeOrderVO;
+import com.gameplat.admin.model.vo.SummaryVO;
 import com.gameplat.admin.service.RechargeOrderService;
 import com.gameplat.common.exception.ServiceException;
 import com.gameplat.security.SecurityUserHolder;
 import com.gameplat.security.context.UserCredential;
+import java.math.BigDecimal;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -17,20 +21,19 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.math.BigDecimal;
-import java.util.List;
-
 @Slf4j
 @RestController
 @RequestMapping("/api/admin/finance/rechargeOrder")
 public class RechargeOrderController {
 
-  @Autowired private RechargeOrderService rechargeOrderService;
+  @Autowired
+  private RechargeOrderService rechargeOrderService;
 
   @PostMapping("/handle")
   @PreAuthorize("hasAuthority('finance:rechargeOrder:handle')")
   public void handle(Long id) {
-    rechargeOrderService.handle(id, SecurityUserHolder.getCredential());
+    UserCredential userCredential = SecurityUserHolder.getCredential();
+    rechargeOrderService.handle(id, userCredential);
   }
 
   @PostMapping("/unHandle")
@@ -80,6 +83,7 @@ public class RechargeOrderController {
     for (Long id : ids) {
       rechargeOrderService.unHandle(id, userCredential);
     }
+
   }
 
   @PostMapping("/batchAccept")
@@ -112,8 +116,8 @@ public class RechargeOrderController {
 
   @PostMapping("/editDiscount")
   @PreAuthorize("hasAuthority('finance:rechargeOrder:editDiscount')")
-  public void updateDiscount(
-      Long id, Integer discountType, BigDecimal discountAmount, BigDecimal discountDml) {
+  public void updateDiscount(Long id, Integer discountType, BigDecimal discountAmount,
+      BigDecimal discountDml) {
     rechargeOrderService.updateDiscount(id, discountType, discountAmount, discountDml);
   }
 
@@ -125,7 +129,7 @@ public class RechargeOrderController {
 
   @PostMapping("/page")
   @PreAuthorize("hasAuthority('finance:rechargeOrder:page')")
-  public IPage<RechargeOrderVO> queryPage(Page<RechargeOrder> page, RechargeOrderQueryDTO dto) {
+  public PageExt<RechargeOrderVO, SummaryVO> queryPage(Page<RechargeOrder> page, RechargeOrderQueryDTO dto) {
     return rechargeOrderService.findPage(page, dto);
   }
 

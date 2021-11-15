@@ -1,6 +1,7 @@
 package com.gameplat.admin.service.impl;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -21,6 +22,9 @@ import com.gameplat.admin.service.TpPayTypeService;
 import com.gameplat.admin.util.EncryptUtils;
 import com.gameplat.common.exception.ServiceException;
 import com.gameplat.common.json.JsonUtils;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,38 +32,38 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
 @Service
 @Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)
 public class TpMerchantServiceImpl extends ServiceImpl<TpMerchantMapper, TpMerchant>
     implements TpMerchantService {
 
-  @Autowired private TpMerchantConvert tpMerchantConvert;
+  @Autowired
+  private TpMerchantConvert tpMerchantConvert;
 
-  @Autowired private TpMerchantMapper tpMerchantMapper;
+  @Autowired
+  private TpMerchantMapper tpMerchantMapper;
 
-  @Autowired private TpPayTypeService tpPayTypeService;
+  @Autowired
+  private TpPayTypeService tpPayTypeService;
 
-  @Autowired private TpInterfaceService tpInterfaceService;
+  @Autowired
+  private TpInterfaceService tpInterfaceService;
 
   @Override
   public void update(TpMerchantEditDTO dto) {
     TpMerchant tpMerchant = this.getById(dto.getId());
     TpInterfaceVO tpInterfaceVO =
         tpInterfaceService.queryTpInterface(tpMerchant.getTpInterfaceCode());
-    Map<String, String> oriMerchantParameters =
-        JsonUtils.toObject(tpMerchant.getParameters(), Map.class);
+    Map<String, String> oriMerchantParameters = JSONObject
+        .parseObject(tpMerchant.getParameters(), Map.class);
     List<String> tpInterfaceParameters =
         JSON.parseArray(tpInterfaceVO.getParameters(), String.class);
-    Map<String, String> parametersMap = JsonUtils.toObject(dto.getParameters(), Map.class);
+    Map<String, String> parametersMap = JSONObject.parseObject(dto.getParameters(), Map.class);
     // 如果加密字段没变，过滤字段不加密,如果加密字段在原基础上修改，抛异常重新处理
     if (CollectionUtils.isNotEmpty(tpInterfaceParameters)) {
       tpInterfaceParameters.forEach(
           paramJsonStr -> {
-            Map<String, Object> config = JsonUtils.toObject(paramJsonStr, Map.class);
+            Map<String, Object> config = JSONObject.parseObject(paramJsonStr, Map.class);
             if (config != null) {
               String key = String.valueOf(config.get("name"));
               String result = oriMerchantParameters.get(key);
@@ -92,7 +96,7 @@ public class TpMerchantServiceImpl extends ServiceImpl<TpMerchantMapper, TpMerch
   @Override
   public void delete(Long id) {
     this.removeById(id);
-    //    tpPayChannelService.deleteByMerchantId(id);
+//    tpPayChannelService.deleteByMerchantId(id);
   }
 
   @Override
@@ -106,15 +110,15 @@ public class TpMerchantServiceImpl extends ServiceImpl<TpMerchantMapper, TpMerch
     TpInterfaceVO tpInterfaceVO =
         tpInterfaceService.queryTpInterface(tpMerchantPayTypeVO.getTpInterfaceCode());
     tpMerchantPayTypeVO.setTpInterfaceVO(tpInterfaceVO);
-    Map<String, String> merchantParameters =
-        JsonUtils.toObject(tpMerchantPayTypeVO.getParameters(), Map.class);
+    Map<String, String> merchantParameters = JSONObject
+        .parseObject(tpMerchantPayTypeVO.getParameters(), Map.class);
     List<String> tpInterfaceParameters =
         JSON.parseArray(tpInterfaceVO.getParameters(), String.class);
     // 商户号秘钥等信息加密展示处理
     if (CollectionUtils.isNotEmpty(tpInterfaceParameters)) {
       tpInterfaceParameters.forEach(
           jsonStrParam -> {
-            Map<String, Object> config = JsonUtils.toObject(jsonStrParam, Map.class);
+            Map<String, Object> config = JSONObject.parseObject(jsonStrParam, Map.class);
             if (config != null && !"0".equals(String.valueOf(config.get("encrypted")))) {
               String key = String.valueOf(config.get("name"));
               String result = EncryptUtils.summaryEncrypt(merchantParameters.get(key));
@@ -149,4 +153,5 @@ public class TpMerchantServiceImpl extends ServiceImpl<TpMerchantMapper, TpMerch
         .map(e -> tpMerchantConvert.toVo(e))
         .collect(Collectors.toList());
   }
+
 }

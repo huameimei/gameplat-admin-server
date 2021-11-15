@@ -1,9 +1,8 @@
 package com.gameplat.admin.model.vo;
 
-import lombok.Data;
-
 import java.math.BigDecimal;
 import java.util.Date;
+import lombok.Data;
 
 @Data
 public class RechargeOrderHistoryVO {
@@ -69,4 +68,6 @@ public class RechargeOrderHistoryVO {
   private Integer mode;
 
   private String payType;
+
+  private String currencyCount;
 }

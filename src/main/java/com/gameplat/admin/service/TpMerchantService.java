@@ -8,7 +8,6 @@ import com.gameplat.admin.model.dto.TpMerchantAddDTO;
 import com.gameplat.admin.model.dto.TpMerchantEditDTO;
 import com.gameplat.admin.model.vo.TpMerchantPayTypeVO;
 import com.gameplat.admin.model.vo.TpMerchantVO;
-
 import java.util.List;
 
 public interface TpMerchantService extends IService<TpMerchant> {

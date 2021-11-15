@@ -1,9 +1,8 @@
 package com.gameplat.admin.model.vo;
 
-import lombok.Data;
-
 import java.math.BigDecimal;
 import java.util.Date;
+import lombok.Data;
 
 @Data
 public class MemberWithdrawVO {
@@ -14,7 +13,7 @@ public class MemberWithdrawVO {
 
   private String account;
 
-  private String nickname;
+  private String realName;
 
   private BigDecimal accountMoney;
 
@@ -51,5 +50,7 @@ public class MemberWithdrawVO {
   private Date createTime;
 
   private BigDecimal counterFee;
+
+  private String cashReason;
 
 }

@@ -9,7 +9,7 @@ import com.gameplat.admin.model.dto.LimitInfoDTO;
 import com.gameplat.admin.service.LimitInfoService;
 import com.gameplat.common.exception.ServiceException;
 import com.gameplat.common.json.JsonUtils;
-import com.gameplat.common.security.SecurityUserHolder;
+import com.gameplat.security.SecurityUserHolder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

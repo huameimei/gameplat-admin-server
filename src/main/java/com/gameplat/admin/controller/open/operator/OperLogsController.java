@@ -10,7 +10,7 @@ import com.gameplat.common.model.vo.MemberLogVO;
 import com.gameplat.common.util.EasyExcelUtil;
 import com.gameplat.log.annotation.Log;
 import com.gameplat.log.enums.LogType;
-import com.gameplat.web.idempoten.AutoIdempotent;
+import com.gameplat.redis.idempoten.AutoIdempotent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

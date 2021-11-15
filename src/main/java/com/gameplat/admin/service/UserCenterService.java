@@ -10,10 +10,10 @@ import com.gameplat.admin.model.domain.SysUser;
 import com.gameplat.admin.model.dto.ChangePasswordDTO;
 import com.gameplat.admin.model.dto.UserSettingDTO;
 import com.gameplat.admin.model.vo.ProFileVo;
+import com.gameplat.common.context.GlobalContextHolder;
 import com.gameplat.common.enums.SystemCodeType;
 import com.gameplat.common.exception.ServiceException;
 import com.gameplat.common.json.JsonUtils;
-import com.gameplat.common.security.SecurityUserHolder;
 import com.gameplat.common.util.RSAUtils;
 import com.gameplat.common.util.StringUtils;
 import com.gameplat.security.service.JwtTokenService;
@@ -76,7 +76,7 @@ public class UserCenterService {
 
   @SentinelResource(value = "saveUserSetting")
   public void saveUserSetting(UserSettingDTO settingDTO) {
-    String username = SecurityUserHolder.getUsername();
+    String username = GlobalContextHolder.getContext().getUsername();
     SysUser user = userMapper.selectUserByUserName(username);
     if (StringUtils.isNull(user)) {
       log.info("未找到用户信息[{}]", username);
@@ -115,7 +115,7 @@ public class UserCenterService {
    */
   @SentinelResource(value = "changePassword")
   public void changePassword(ChangePasswordDTO changePassword) {
-    String username = SecurityUserHolder.getUsername();
+    String username = GlobalContextHolder.getContext().getUsername();
     SysUser user = userMapper.selectUserByUserName(username);
     if (StringUtils.isNull(user)) {
       log.info("未找到用户信息[{}]", username);

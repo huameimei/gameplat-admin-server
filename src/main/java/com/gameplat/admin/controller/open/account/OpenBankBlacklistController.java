@@ -18,30 +18,31 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/admin/account/bankBlack")
 public class OpenBankBlacklistController {
 
-  @Autowired private BankBlacklistService bankBlacklistService;
+    @Autowired
+    private BankBlacklistService bankBlacklistService;
 
-  @DeleteMapping("/del/{id}")
-  @PreAuthorize("hasAuthority('account:bankBlack:del')")
-  public void delete(@PathVariable Long id) {
-    bankBlacklistService.delete(id);
-  }
+    @DeleteMapping("/del/{id}")
+    @PreAuthorize("hasAuthority('account:bankBlack:del')")
+    public void delete(@PathVariable Long id) {
+        bankBlacklistService.delete(id);
+    }
 
-  @GetMapping("/list")
-  @PreAuthorize("hasAuthority('account:bankBlack:list')")
-  public IPage<BankBlacklist> findBankBlacklist(PageDTO<BankBlacklist> page,
-      BankBlacklistQueryDTO bankBlacklistQueryDTO) {
-    return bankBlacklistService.queryBankBlacklistList(page,bankBlacklistQueryDTO);
-  }
+    @GetMapping("/list")
+    @PreAuthorize("hasAuthority('account:bankBlack:list')")
+    public IPage<BankBlacklist> findBankBlacklist(PageDTO<BankBlacklist> page,
+                                                  BankBlacklistQueryDTO bankBlacklistQueryDTO) {
+        return bankBlacklistService.queryBankBlacklistList(page, bankBlacklistQueryDTO);
+    }
 
-  @PostMapping("/add")
-  @PreAuthorize("hasAuthority('account:bankBlack:add')")
-  public void add(@RequestBody OperBankBlacklistDTO dto) {
-    bankBlacklistService.save(dto);
-  }
+    @PostMapping("/add")
+    @PreAuthorize("hasAuthority('account:bankBlack:add')")
+    public void add(@RequestBody OperBankBlacklistDTO dto) {
+        bankBlacklistService.save(dto);
+    }
 
-  @PutMapping("/edit")
-  @PreAuthorize("hasAuthority('account:bankBlack:edit')")
-  public void edit(@RequestBody OperBankBlacklistDTO dto) {
-    bankBlacklistService.update(dto);
-  }
+    @PutMapping("/edit")
+    @PreAuthorize("hasAuthority('account:bankBlack:edit')")
+    public void edit(@RequestBody OperBankBlacklistDTO dto) {
+        bankBlacklistService.update(dto);
+    }
 }

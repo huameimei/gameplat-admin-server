@@ -7,7 +7,7 @@ import com.gameplat.admin.model.bean.ManualRechargeOrderBo;
 import com.gameplat.admin.model.domain.RechargeOrder;
 import com.gameplat.admin.model.dto.RechargeOrderQueryDTO;
 import com.gameplat.admin.model.vo.RechargeOrderVO;
-import com.gameplat.common.base.UserCredential;
+import com.gameplat.security.context.UserCredential;
 
 import java.math.BigDecimal;
 

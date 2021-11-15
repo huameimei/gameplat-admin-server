@@ -9,7 +9,6 @@ import com.gameplat.admin.model.vo.ProFileVo;
 import com.gameplat.admin.service.PermissionService;
 import com.gameplat.admin.service.SysLogService;
 import com.gameplat.admin.service.UserCenterService;
-import com.gameplat.common.base.UserCredential;
 import com.gameplat.common.constant.ServiceName;
 import com.gameplat.common.exception.ServiceException;
 import com.gameplat.common.model.dto.LogDTO;
@@ -17,14 +16,11 @@ import com.gameplat.common.model.vo.UserLogVO;
 import com.gameplat.common.util.StringUtils;
 import com.gameplat.log.annotation.Log;
 import com.gameplat.log.enums.LogType;
-import com.gameplat.security.util.SecurityUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.annotation.CurrentSecurityContext;
 import org.springframework.web.bind.annotation.*;
 
-import java.security.Principal;
 import java.util.ArrayList;
 
 /**

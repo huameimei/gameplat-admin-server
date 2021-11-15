@@ -5,7 +5,7 @@ import com.gameplat.admin.model.domain.SysUser;
 import com.gameplat.admin.service.SysMenuService;
 import com.gameplat.admin.service.SysRoleService;
 import com.gameplat.admin.service.SysUserService;
-import com.gameplat.common.base.UserCredential;
+import com.gameplat.security.context.UserCredential;
 import com.gameplat.security.util.SecurityUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;

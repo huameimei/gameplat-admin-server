@@ -25,13 +25,12 @@ import com.gameplat.admin.model.dto.RechargeOrderQueryDTO;
 import com.gameplat.admin.model.vo.RechargeOrderVO;
 import com.gameplat.admin.service.*;
 import com.gameplat.admin.util.MoneyUtils;
-import com.gameplat.common.base.UserCredential;
+import com.gameplat.common.context.GlobalContextHolder;
 import com.gameplat.common.enums.UserTypes;
 import com.gameplat.common.exception.ServiceException;
 import com.gameplat.common.json.JsonUtils;
-import com.gameplat.common.security.SecurityUserHolder;
 import com.gameplat.common.snowflake.IdGeneratorSnowflake;
-import com.gameplat.security.util.SecurityUtil;
+import com.gameplat.security.context.UserCredential;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
@@ -157,7 +156,7 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
             discountAmount)
         .set(ObjectUtils.isNotEmpty(discountDml), RechargeOrder::getDiscountDml, discountDml)
         .set(RechargeOrder::getDiscountRechargeFlag, discountRechargeFlag)
-        .set(RechargeOrder::getAuditorAccount, SecurityUserHolder.getUsername())
+        .set(RechargeOrder::getAuditorAccount, GlobalContextHolder.getContext().getUsername())
         .set(RechargeOrder::getAuditTime, new Date())
         .eq(RechargeOrder::getId, id);
     this.update(new RechargeOrder(), update);
@@ -171,7 +170,7 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
     LambdaUpdateWrapper<RechargeOrder> update = Wrappers.lambdaUpdate();
     update
         .set(RechargeOrder::getAuditRemarks, auditRemarks)
-        .set(RechargeOrder::getAuditorAccount, SecurityUserHolder.getUsername())
+        .set(RechargeOrder::getAuditorAccount, GlobalContextHolder.getContext().getUsername())
         .set(RechargeOrder::getAuditTime, new Date())
         .eq(RechargeOrder::getId, id);
     this.update(new RechargeOrder(), update);

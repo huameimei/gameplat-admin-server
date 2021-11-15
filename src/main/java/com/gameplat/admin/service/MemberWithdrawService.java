@@ -7,7 +7,7 @@ import com.gameplat.admin.model.domain.MemberWithdraw;
 import com.gameplat.admin.model.dto.UserWithdrawQueryDTO;
 import com.gameplat.admin.model.vo.MemberWithdrawVO;
 import com.gameplat.admin.model.vo.PpMerchantVO;
-import com.gameplat.common.base.UserCredential;
+import com.gameplat.security.context.UserCredential;
 
 import java.math.BigDecimal;
 import java.util.List;

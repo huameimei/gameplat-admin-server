@@ -14,7 +14,7 @@ import com.gameplat.admin.model.dto.LiveBlacklistQueryDTO;
 import com.gameplat.admin.model.dto.OperLiveBlacklistDTO;
 import com.gameplat.admin.service.LiveBlacklistService;
 import com.gameplat.common.exception.ServiceException;
-import com.gameplat.common.security.SecurityUserHolder;
+import com.gameplat.security.SecurityUserHolder;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;

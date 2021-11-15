@@ -72,13 +72,18 @@
         </dependency>
 
         <dependency>
-            <groupId>com.gameplat</groupId>
-            <artifactId>log-spring-boot-starter</artifactId>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-stream-binder-kafka</artifactId>
         </dependency>
 
         <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-stream-binder-kafka</artifactId>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.gameplat</groupId>
+            <artifactId>log-stream-spring-boot-starter</artifactId>
         </dependency>
 
         <dependency>
@@ -88,7 +93,7 @@
 
         <dependency>
             <groupId>com.gameplat</groupId>
-            <artifactId>datasource-dynamic-spring-boot-starter</artifactId>
+            <artifactId>datasource-standalone-spring-boot-starter</artifactId>
         </dependency>
 
         <dependency>
@@ -103,7 +108,7 @@
 
         <dependency>
             <groupId>com.gameplat</groupId>
-            <artifactId>common-spring-boot-starter</artifactId>
+            <artifactId>web-spring-boot-starter</artifactId>
         </dependency>
 
         <dependency>

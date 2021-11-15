@@ -1,6 +1,5 @@
 package com.gameplat.admin.controller.open.operator;
 
-import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.gameplat.admin.enums.SpreadTypes;
@@ -17,6 +16,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 代理推广管理
@@ -86,7 +86,7 @@ public class OpenSpreadConfigController {
   }
 
   @GetMapping("/spreadTypeList")
-  public List<JSONObject> getSpreadTypesList() {
+  public List<Map<String, Object>> getSpreadTypesList() {
     return SpreadTypes.getAllList();
   }
 }

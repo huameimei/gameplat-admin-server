@@ -2,14 +2,13 @@ package com.gameplat.admin.service.impl;
 
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.gameplat.admin.constant.ConfigConstant;
 import com.gameplat.admin.convert.SysFileConfigConvert;
 import com.gameplat.admin.convert.SysSmsAreaConvert;
@@ -26,6 +25,7 @@ import com.gameplat.admin.service.SysDictDataService;
 import com.gameplat.admin.service.SysSmsAreaService;
 import com.gameplat.admin.service.SystemConfigService;
 import com.gameplat.common.exception.ServiceException;
+import com.gameplat.common.json.JsonUtils;
 import com.gameplat.common.security.SecurityUserHolder;
 import com.gameplat.common.util.BeanUtils;
 import com.gameplat.common.util.StringUtils;
@@ -64,7 +64,8 @@ public class SystemConfigServiceImpl implements SystemConfigService {
     SysDictData sysDictData = sysDictDataService.getOne(query);
     if (sysDictData != null && StringUtils.isNotBlank(sysDictData.getDictValue())) {
       // 得到本地短信运营商
-      list = JSONArray.parseArray(sysDictData.getDictValue(), SysSmsConfigVO.class);
+      list =
+          JsonUtils.parse(sysDictData.getDictValue(), new TypeReference<List<SysSmsConfigVO>>() {});
     }
     return list;
   }
@@ -79,7 +80,9 @@ public class SystemConfigServiceImpl implements SystemConfigService {
     SysDictData sysDictData = sysDictDataService.getOne(query);
     if (sysDictData != null && StringUtils.isNotBlank(sysDictData.getDictValue())) {
       // 得到本地短信运营商
-      list = JSONArray.parseArray(sysDictData.getDictValue(), SysFileConfigVO.class);
+      list =
+          JsonUtils.parse(
+              sysDictData.getDictValue(), new TypeReference<List<SysFileConfigVO>>() {});
     }
     return list;
   }
@@ -110,7 +113,8 @@ public class SystemConfigServiceImpl implements SystemConfigService {
       if (StringUtils.isBlank(sysDictData.getDictValue())) {
         sysDictData.setDictValue("[]");
       }
-      sysSmsConfigList = JSONArray.parseArray(sysDictData.getDictValue(), SysSmsConfig.class);
+      sysSmsConfigList =
+          JsonUtils.parse(sysDictData.getDictValue(), new TypeReference<List<SysSmsConfig>>() {});
       if (!CollectionUtils.isEmpty(sysSmsConfigList)) {
         boolean flag = true;
         for (SysSmsConfig item : sysSmsConfigList) {
@@ -128,7 +132,7 @@ public class SystemConfigServiceImpl implements SystemConfigService {
         sysSmsConfigList.add(sysSmsConfig);
       }
       // 将list数据set进短信值，修改短信配置
-      sysDictData.setDictValue(JSON.toJSONString(sysSmsConfigList));
+      sysDictData.setDictValue(JsonUtils.toJson(sysSmsConfigList));
       sysDictData.setUpdateBy(SecurityUserHolder.getUsername());
       sysDictData.setUpdateTime(new Date());
       if (!sysDictDataService.updateById(sysDictData)) {
@@ -165,7 +169,8 @@ public class SystemConfigServiceImpl implements SystemConfigService {
       if (StringUtils.isBlank(sysDictData.getDictValue())) {
         sysDictData.setDictValue("[]");
       }
-      sysFileConfigList = JSONArray.parseArray(sysDictData.getDictValue(), SysFileConfig.class);
+      sysFileConfigList =
+          JsonUtils.parse(sysDictData.getDictValue(), new TypeReference<List<SysFileConfig>>() {});
       if (!CollectionUtils.isEmpty(sysFileConfigList)) {
         boolean flag = true;
         for (SysFileConfig item : sysFileConfigList) {
@@ -183,7 +188,7 @@ public class SystemConfigServiceImpl implements SystemConfigService {
         sysFileConfigList.add(sysFileConfig);
       }
       // 将list数据set进短信值，修改短信配置
-      sysDictData.setDictValue(JSON.toJSONString(sysFileConfigList));
+      sysDictData.setDictValue(JsonUtils.toJson(sysFileConfigList));
       sysDictData.setUpdateBy(SecurityUserHolder.getUsername());
       sysDictData.setUpdateTime(new Date());
       if (!sysDictDataService.updateById(sysDictData)) {

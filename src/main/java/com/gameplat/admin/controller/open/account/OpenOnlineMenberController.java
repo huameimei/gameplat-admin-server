@@ -1,7 +1,5 @@
 package com.gameplat.admin.controller.open.account;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.gameplat.admin.model.dto.OnlineUserDTO;
 import com.gameplat.admin.model.vo.OnlineUserVo;
@@ -55,16 +53,6 @@ public class OpenOnlineMenberController {
   @PreAuthorize("hasAuthority('account:online:kickAll')")
   @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.ADMIN, desc = "踢出所有在线账号")
   public void kickAllUser(@RequestBody String sign) {
-    if (StringUtils.isBlank(sign)) {
-      throw new ServiceException("缺少签名");
-    }
-
-    JSONObject json = JSON.parseObject(sign);
-    String key = json.get("sign").toString();
-    if (StringUtils.isBlank(key)) {
-      throw new ServiceException("签名不正确");
-    }
-
-    menberService.kickAllUser(key);
+    menberService.kickAllUser(sign);
   }
 }

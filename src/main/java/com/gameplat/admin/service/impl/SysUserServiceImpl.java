@@ -22,6 +22,7 @@ import com.gameplat.admin.model.domain.SysUserRole;
 import com.gameplat.admin.model.dto.GoogleAuthDTO;
 import com.gameplat.admin.model.dto.OperUserDTO;
 import com.gameplat.admin.model.dto.UserDTO;
+import com.gameplat.admin.model.dto.UserResetPasswordDTO;
 import com.gameplat.admin.model.vo.RoleVo;
 import com.gameplat.admin.model.vo.UserVo;
 import com.gameplat.admin.service.SysCommonService;
@@ -196,21 +197,21 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
 
   @Override
   @SentinelResource(value = "resetUserPassword")
-  public void resetUserPassword(OperUserDTO userDTO) {
-    SysUser user = BeanUtils.map(userDTO, SysUser.class);
+  public void resetUserPassword(UserResetPasswordDTO dto) {
+    SysUser user = userConvert.toEntity(dto);
     AdminLoginLimit loginLimit = commonService.getLoginLimit();
 
     // RSA私钥解密
-    String newPassword = RSAUtils.decrypt(userDTO.getPassword(), RsaConstant.PRIVATE_KEY);
+    String newPassword = RSAUtils.decrypt(dto.getPassword(), RsaConstant.PRIVATE_KEY);
     user.setPassword(passwordEncoder.encode(newPassword));
     user.setChangeFlag(loginLimit.getChangeFlag() == 1 ? 0 : 1);
 
-    if (!this.updateById(user)) {
+    if (this.updateById(user)) {
+      // 重置用户密码错误次数
+      adminCache.cleanErrorPasswordCount(user.getUserName());
+    } else {
       throw new ServiceException("更新用户信息失败!");
     }
-
-    // 重置用户密码错误次数
-    adminCache.cleanErrorPasswordCount(user.getUserName());
   }
 
   @Override

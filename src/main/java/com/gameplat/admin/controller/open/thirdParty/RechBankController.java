@@ -8,9 +8,11 @@ import com.gameplat.admin.model.dto.SysDictDataDTO;
 import com.gameplat.admin.model.vo.DictDataVo;
 import com.gameplat.admin.service.SysDictDataService;
 import com.gameplat.common.exception.ServiceException;
+import com.gameplat.common.group.Groups;
 import com.gameplat.common.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.lang.reflect.Array;
@@ -23,7 +25,7 @@ public class RechBankController {
 
   @Autowired private SysDictDataService dictDataService;
 
-  @DeleteMapping("/delete/{ids}")
+  @DeleteMapping("/delete")
   @PreAuthorize("hasAuthority('thirdParty:rechBank:delete')")
   public void remove(@RequestBody List<Long> ids) {
     dictDataService.deleteDictDataByIds(ids);
@@ -31,31 +33,13 @@ public class RechBankController {
 
   @PostMapping("/add")
   @PreAuthorize("hasAuthority('thirdParty:rechBank:add')")
-  public void save(OperDictDataDTO dictData) {
-    if (StringUtils.isBlank(dictData.getDictLabel())) {
-      throw new ServiceException("标签不能为空");
-    }
-    if (StringUtils.isBlank(dictData.getDictValue())) {
-      throw new ServiceException("值不能为空");
-    }
-    if (StringUtils.isBlank(dictData.getDictType())) {
-      throw new ServiceException("类型不能为空");
-    }
+  public void save(@Validated(Groups.INSERT.class) @RequestBody OperDictDataDTO dictData) {
     dictDataService.insertDictData(dictData);
   }
 
   @PutMapping("/edit")
   @PreAuthorize("hasAuthority('thirdParty:rechBank:edit')")
-  public void update(@RequestBody OperDictDataDTO dictData) {
-    if (StringUtils.isBlank(dictData.getDictLabel())) {
-      throw new ServiceException("标签不能为空");
-    }
-    if (StringUtils.isBlank(dictData.getDictValue())) {
-      throw new ServiceException("值不能为空");
-    }
-    if (StringUtils.isBlank(dictData.getDictType())) {
-      throw new ServiceException("类型不能为空");
-    }
+  public void update(@Validated(Groups.UPDATE.class) @RequestBody OperDictDataDTO dictData) {
     dictDataService.updateDictData(dictData);
   }
 

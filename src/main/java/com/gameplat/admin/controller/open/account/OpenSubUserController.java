@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.gameplat.admin.model.domain.SysUser;
 import com.gameplat.admin.model.dto.OperUserDTO;
 import com.gameplat.admin.model.dto.UserDTO;
+import com.gameplat.admin.model.dto.UserResetPasswordDTO;
 import com.gameplat.admin.model.vo.RoleVo;
 import com.gameplat.admin.model.vo.UserVo;
 import com.gameplat.admin.service.SysUserService;
@@ -16,6 +17,7 @@ import com.gameplat.log.enums.LogType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -104,18 +106,9 @@ public class OpenSubUserController {
    */
   @PostMapping("/resetPassword")
   @PreAuthorize("hasAuthority('account:subUser:changePassword')")
-  @Log(
-      module = ServiceName.ADMIN_SERVICE,
-      type = LogType.ADMIN,
-      desc = "'重置后台账号密码,id='+#userDTO.id")
-  public void resetPassword(OperUserDTO userDTO) {
-    if (StringUtils.isNull(userDTO.getId())) {
-      throw new ServiceException("缺少参数");
-    }
-    if (StringUtils.isBlank(userDTO.getPassword())) {
-      throw new ServiceException("缺少参数");
-    }
-    userService.resetUserPassword(userDTO);
+  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.ADMIN, desc = "'重置后台账号密码,id='+#dto.id")
+  public void resetPassword(@Validated @RequestBody UserResetPasswordDTO dto) {
+    userService.resetUserPassword(dto);
   }
 
   /**

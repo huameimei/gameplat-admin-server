@@ -1,6 +1,5 @@
 package com.gameplat.admin.controller.open.common;
 
-import com.alibaba.fastjson.JSONObject;
 import com.gameplat.admin.model.dto.AdminLoginDTO;
 import com.gameplat.admin.model.dto.GoogleAuthDTO;
 import com.gameplat.admin.model.vo.RefreshToken;
@@ -8,10 +7,8 @@ import com.gameplat.admin.model.vo.UserToken;
 import com.gameplat.admin.service.AuthenticationService;
 import com.gameplat.admin.service.SysUserService;
 import com.gameplat.common.constant.ServiceName;
-import com.gameplat.common.exception.ServiceException;
 import com.gameplat.common.util.GoogleAuthenticator;
 import com.gameplat.common.util.ServletUtils;
-import com.gameplat.common.util.StringUtils;
 import com.gameplat.log.annotation.Log;
 import com.gameplat.web.idempoten.AutoIdempotent;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +18,8 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 用户授权管理控制类
@@ -66,15 +65,17 @@ public class OpenAuthorityController {
    */
   @AutoIdempotent(spelKey = "'authCode_'+#userName", expir = 1000L)
   @GetMapping(value = "/authCode")
-  public JSONObject getAuthCode(@RequestParam String userName, HttpServletRequest request) {
+  public Map<String, Object> getAuthCode(
+      @RequestParam String userName, HttpServletRequest request) {
     String cDomain = ServletUtils.getBaseUrl(request);
     // 生成密钥
     String secret = GoogleAuthenticator.genSecret(userName, cDomain);
     String url = GoogleAuthenticator.getQRBarcodeURL(userName, "KgSport", secret);
-    JSONObject jsonObject = new JSONObject();
-    jsonObject.put("url", url);
-    jsonObject.put("secret", secret);
-    return jsonObject;
+
+    Map<String, Object> map = new HashMap<>(2);
+    map.put("url", url);
+    map.put("secret", secret);
+    return map;
   }
 
   /**

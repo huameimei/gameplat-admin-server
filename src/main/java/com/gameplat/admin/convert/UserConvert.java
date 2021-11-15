@@ -3,6 +3,7 @@ package com.gameplat.admin.convert;
 import com.gameplat.admin.model.domain.SysUser;
 import com.gameplat.admin.model.dto.OperUserDTO;
 import com.gameplat.admin.model.dto.UserInfoDTO;
+import com.gameplat.admin.model.dto.UserResetPasswordDTO;
 import com.gameplat.admin.model.vo.UserInfoVo;
 import com.gameplat.admin.model.vo.UserVo;
 import org.mapstruct.Mapper;
@@ -29,4 +30,7 @@ public interface UserConvert {
   @Mapping(source = "userId", target = "id")
   @Mapping(source = "userName", target = "account")
   UserVo toUserVo(SysUser entity);
+
+  @Mapping(source = "id", target = "userId")
+  SysUser toEntity(UserResetPasswordDTO dto);
 }

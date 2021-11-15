@@ -144,9 +144,7 @@ public class SysDictDataServiceImpl extends ServiceImpl<SysDictDataMapper, SysDi
   @Override
   @SentinelResource(value = "insertDictData")
   public void insertDictData(OperDictDataDTO operDictDataDTO) {
-    int count =
-        this.lambdaQuery().eq(SysDictData::getDictLabel, operDictDataDTO.getDictLabel()).count();
-    if (count > 0) {
+    if (this.lambdaQuery().eq(SysDictData::getDictLabel, operDictDataDTO.getDictLabel()).exists()) {
       throw new ServiceException("字典标签，请勿重复添加");
     }
 

@@ -7,6 +7,7 @@ import com.gameplat.admin.model.domain.SysUser;
 import com.gameplat.admin.model.dto.GoogleAuthDTO;
 import com.gameplat.admin.model.dto.OperUserDTO;
 import com.gameplat.admin.model.dto.UserDTO;
+import com.gameplat.admin.model.dto.UserResetPasswordDTO;
 import com.gameplat.admin.model.vo.RoleVo;
 import com.gameplat.admin.model.vo.UserVo;
 
@@ -57,7 +58,7 @@ public interface SysUserService extends IService<SysUser> {
    *
    * @param userDTO OperUserDTO
    */
-  void resetUserPassword(OperUserDTO userDTO);
+  void resetUserPassword(UserResetPasswordDTO dto);
 
   /**
    * 重置谷歌验证码

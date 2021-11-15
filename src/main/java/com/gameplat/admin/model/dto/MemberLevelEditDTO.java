@@ -13,10 +13,10 @@ public class MemberLevelEditDTO implements Serializable {
   private Long id;
 
   @Range(min = 0, max = 9999999, message = "充值总次数阀值范围必须在0~9999999之间")
-  private Integer rechargeTotalTime;
+  private Integer totalRechTimes;
 
   @Range(min = 0, max = 9999999, message = "充值总金额阀值范围必须在0~9999999之间")
-  private Integer rechargeAmountTotal;
+  private Integer totalRechAmount;
 
   @Range(min = 0, max = 9999, message = "每日提现次数范围必须在0~9999之间")
   private Integer dayOfWithdraw;

@@ -1,9 +1,9 @@
 package com.gameplat.admin.enums;
 
-import com.alibaba.fastjson.JSONObject;
-
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -51,14 +51,14 @@ public enum SpreadTypes {
     return null;
   }
 
-  public static List<JSONObject> getAllList() {
+  public static List<Map<String, Object>> getAllList() {
     return Arrays.stream(values())
         .map(
             item -> {
-              JSONObject jsonObject = new JSONObject();
-              jsonObject.put("title", item.getValue());
-              jsonObject.put("value", item.getCode());
-              return jsonObject;
+              Map<String, Object> map = new HashMap<>();
+              map.put("title", item.getValue());
+              map.put("value", item.getCode());
+              return map;
             })
         .collect(Collectors.toList());
   }

@@ -9,7 +9,7 @@
     </parent>
 
     <groupId>com.gameplat</groupId>
-    <version>${gameplat-common.version}</version>
+    <version>1.0-SNAPSHOT</version>
     <modelVersion>4.0.0</modelVersion>
     <packaging>jar</packaging>
     <name>gameplat-admin-server</name>
@@ -24,7 +24,7 @@
         <gameplat-dependencies.version>1-0-0-SNAPSHOT</gameplat-dependencies.version>
         <org.mapstruct.version>1.4.2.Final</org.mapstruct.version>
         <gameplat-common.version>1.0-SNAPSHOT</gameplat-common.version>
-        <poi.version>3.17</poi.version>
+        <easy-poi.version>4.4.0</easy-poi.version>
     </properties>
 
     <dependencyManagement>
@@ -111,23 +111,11 @@
             <artifactId>web-spring-boot-starter</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>org.apache.poi</groupId>
-            <artifactId>poi</artifactId>
-            <version>${poi.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.poi</groupId>
-            <artifactId>poi-ooxml</artifactId>
-            <version>${poi.version}</version>
-        </dependency>
-
         <!-- easypoi -->
         <dependency>
             <groupId>cn.afterturn</groupId>
             <artifactId>easypoi-spring-boot-starter</artifactId>
-            <version>4.3.0</version>
+            <version>${easy-poi.version}</version>
         </dependency>
 
         <dependency>
@@ -145,7 +133,6 @@
         <dependency>
             <groupId>com.alibaba.cloud</groupId>
             <artifactId>spring-cloud-starter-alibaba-sentinel</artifactId>
-            <version>${spring-cloud-alibaba.version}</version>
         </dependency>
 
         <!-- SpringBoot集成quartz定時任務 -->

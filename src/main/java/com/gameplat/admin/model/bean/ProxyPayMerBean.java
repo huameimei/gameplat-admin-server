@@ -1,6 +1,6 @@
 package com.gameplat.admin.model.bean;
 
-import com.alibaba.fastjson.JSON;
+import com.gameplat.common.json.JsonUtils;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -24,15 +24,15 @@ public class ProxyPayMerBean {
   }
 
   public static ProxyPayMerBean conver2Bean(String beanStr) {
-    return JSON.parseObject(beanStr, ProxyPayMerBean.class);
+    return JsonUtils.parse(beanStr, ProxyPayMerBean.class);
   }
 
   public static String conver2LimitStr(ProxyPayMerBean proxyPayMerBean) {
-    return JSON.toJSONString(proxyPayMerBean);
+    return JsonUtils.toJson(proxyPayMerBean);
   }
 
   @Override
   public String toString() {
-    return JSON.toJSONString(this);
+    return JsonUtils.toJson(this);
   }
 }

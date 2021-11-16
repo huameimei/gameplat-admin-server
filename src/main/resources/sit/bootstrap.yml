@@ -1,0 +1,27 @@
+spring:
+  application:
+    name: admin-server
+  profiles:
+    active: @profiles.active@
+  main:
+    web-application-type: none
+    allow-bean-definition-overriding: true
+  cloud:
+    nacos:
+      config:
+        enabled: true
+        server-addr: 185.167.14.92:8848
+        username: nacos
+        password: qsaw12!@
+        file-extension: yml
+        namespace: dev
+        group: SERVICE_GROUP
+        refresh-enabled: true
+        shared-dataids: redis.yml,spring-kafka-producer-config.yml
+      discovery:
+        service: admin-server
+        namespace: ${spring.cloud.nacos.config.namespace}
+        group: SERVICE_GROUP
+        server-addr: ${spring.cloud.nacos.config.server-addr}
+        username: ${spring.cloud.nacos.config.username}
+        password: ${spring.cloud.nacos.config.password}

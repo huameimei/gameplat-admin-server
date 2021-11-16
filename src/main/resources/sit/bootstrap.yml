@@ -14,7 +14,7 @@ spring:
         username: nacos
         password: qsaw12!@
         file-extension: yml
-        namespace: dev
+        namespace: sit
         group: SERVICE_GROUP
         refresh-enabled: true
         shared-dataids: redis.yml,spring-kafka-producer-config.yml

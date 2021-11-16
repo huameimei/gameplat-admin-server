@@ -1,4 +1,4 @@
-package com.gameplat.admin.controller.notice.announcement;
+package com.gameplat.admin.controller.open.notice;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;

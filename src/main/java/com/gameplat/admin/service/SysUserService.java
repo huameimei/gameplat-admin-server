@@ -65,14 +65,15 @@ public interface SysUserService extends IService<SysUser> {
    *
    * @param userDTO OperUserDTO
    */
-  void resetGoogleSecret(OperUserDTO userDTO);
+  void resetGoogleSecret(Long id);
 
   /**
    * 修改账号状态
    *
-   * @param userDTO OperUserDTO
+   * @param id Long
+   * @param status Integer
    */
-  void changeStatus(OperUserDTO userDTO);
+  void changeStatus(Long id, Integer status);
 
   /**
    * 用户绑定谷歌密钥

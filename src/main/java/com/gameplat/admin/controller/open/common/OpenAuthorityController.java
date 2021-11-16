@@ -31,64 +31,58 @@ import javax.servlet.http.HttpServletRequest;
 @RequestMapping("/api/admin/auth")
 public class OpenAuthorityController {
 
-    @Autowired
-    private SysUserService userService;
+  @Autowired private SysUserService userService;
 
-    @Autowired
-    private AuthenticationService authenticationService;
+  @Autowired private AuthenticationService authenticationService;
 
-    @AutoIdempotent(spelKey = "'login_'+#dto.account", expir = 3000L)
-    @RequestMapping(value = "/login", method = RequestMethod.POST)
-    @Log(module = ServiceName.ADMIN_SERVICE, desc = "'账号'+#dto.account+'登录系统'")
-    public UserToken login(@Validated @RequestBody AdminLoginDTO dto, HttpServletRequest request) {
-        return authenticationService.login(dto, request);
-    }
+  @AutoIdempotent(spelKey = "'login_'+#dto.account", expir = 3000L)
+  @RequestMapping(value = "/login", method = RequestMethod.POST)
+  @Log(module = ServiceName.ADMIN_SERVICE, desc = "'账号'+#dto.account+'登录系统'")
+  public UserToken login(@Validated @RequestBody AdminLoginDTO dto, HttpServletRequest request) {
+    return authenticationService.login(dto, request);
+  }
 
-    /**
-     * 账号登出
-     */
-    @GetMapping("/logout")
-    @Log(module = ServiceName.ADMIN_SERVICE, desc = "账号登出系统")
-    public void logout() {
-        authenticationService.logout();
-    }
+  /** 账号登出 */
+  @GetMapping("/logout")
+  @Log(module = ServiceName.ADMIN_SERVICE, desc = "账号登出系统")
+  public void logout() {
+    authenticationService.logout();
+  }
 
-    /**
-     * 刷新token
-     */
-    @PostMapping("/refreshToken")
-    @Log(module = ServiceName.ADMIN_SERVICE, desc = "刷新token")
-    public RefreshToken refreshToken(@RequestParam String refreshToken) {
-        return authenticationService.refreshToken(refreshToken);
-    }
+  /** 刷新token */
+  @PostMapping("/refreshToken")
+  @Log(module = ServiceName.ADMIN_SERVICE, desc = "刷新token")
+  public RefreshToken refreshToken(@RequestParam String refreshToken) {
+    return authenticationService.refreshToken(refreshToken);
+  }
 
-    /**
-     * 获取二维码路径
-     *
-     * @param userName String
-     * @return JSONObject
-     */
-    @AutoIdempotent(spelKey = "'authCode_'+#userName", expir = 1000L)
-    @GetMapping(value = "/authCode")
-    public JSONObject getAuthCode(@RequestParam String userName, HttpServletRequest request) {
-        String cDomain = ServletUtils.getBaseUrl(request);
-        // 生成密钥
-        String secret = GoogleAuthenticator.genSecret(userName, cDomain);
-        String url = GoogleAuthenticator.getQRBarcodeURL(userName, "KgSport", secret);
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("url", url);
-        jsonObject.put("secret", secret);
-        return jsonObject;
-    }
+  /**
+   * 获取二维码路径
+   *
+   * @param userName String
+   * @return JSONObject
+   */
+  @AutoIdempotent(spelKey = "'authCode_'+#userName", expir = 1000L)
+  @GetMapping(value = "/authCode")
+  public JSONObject getAuthCode(@RequestParam String userName, HttpServletRequest request) {
+    String cDomain = ServletUtils.getBaseUrl(request);
+    // 生成密钥
+    String secret = GoogleAuthenticator.genSecret(userName, cDomain);
+    String url = GoogleAuthenticator.getQRBarcodeURL(userName, "KgSport", secret);
+    JSONObject jsonObject = new JSONObject();
+    jsonObject.put("url", url);
+    jsonObject.put("secret", secret);
+    return jsonObject;
+  }
 
-    /**
-     * 为用户绑定谷歌密钥
-     *
-     * @param dto GoogleAuthDTO
-     */
-    @PostMapping("bindAuth")
-    @AutoIdempotent(spelKey = "'bindAuth_'+#authDTO.loginName", expir = 1000L)
-    public void bindSecret(@Validated GoogleAuthDTO dto) {
-        userService.bindSecret(dto);
-    }
+  /**
+   * 为用户绑定谷歌密钥
+   *
+   * @param dto GoogleAuthDTO
+   */
+  @PostMapping("bindAuth")
+  @AutoIdempotent(spelKey = "'bindAuth_'+#authDTO.loginName", expir = 1000L)
+  public void bindSecret(@Validated GoogleAuthDTO dto) {
+    userService.bindSecret(dto);
+  }
 }

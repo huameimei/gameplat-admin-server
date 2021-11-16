@@ -98,33 +98,21 @@ public class OpenSubUserController {
    * @param userDTO
    * @return
    */
-  @PostMapping("/resetSafeCode")
+  @PostMapping("/resetSafeCode/{id}")
   @PreAuthorize("hasAuthority('account.subUser:restAuth')")
-  @Log(
-      module = ServiceName.ADMIN_SERVICE,
-      type = LogType.ADMIN,
-      desc = "'重置后台账号谷歌验证器,id='+#userDTO.id")
-  public void resetAuth(OperUserDTO userDTO) {
-    if (StringUtils.isNull(userDTO.getId())) {
-      throw new ServiceException("缺少参数");
-    }
-    userService.resetGoogleSecret(userDTO);
+  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.ADMIN, desc = "'重置后台账号谷歌验证器,id='+#id")
+  public void resetAuth(@PathVariable Long id) {
+    userService.resetGoogleSecret(id);
   }
 
-  @PostMapping("/changeStatus")
+  @PutMapping("/changeStatus/{id}/{status}")
   @PreAuthorize("hasAuthority('account.subUser.enable')")
   @Log(
       module = ServiceName.ADMIN_SERVICE,
       type = LogType.ADMIN,
-      desc = "'修改后台账号状态,id='+#userDTO.id +',状态='+#userDTO.status")
-  public void changeStatus(OperUserDTO userDTO) {
-    if (StringUtils.isNull(userDTO.getId())) {
-      throw new ServiceException("缺少参数");
-    }
-    if (StringUtils.isNull(userDTO.getStatus())) {
-      throw new ServiceException("缺少参数");
-    }
-    userService.changeStatus(userDTO);
+      desc = "'修改后台账号状态,id='+#id +',状态='+#status")
+  public void changeStatus(@PathVariable Long id, @PathVariable Integer status) {
+    userService.changeStatus(id, status);
   }
 
   @GetMapping("/checkUserNameUnique/{username}")

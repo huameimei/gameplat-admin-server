@@ -93,14 +93,4 @@
         <include refid="selectUserVo"/>
         where u.user_id = #{userId}
     </select>
-
-    <update id="resetUserAuth" parameterType="com.gameplat.admin.model.domain.SysUser">
-        UPDATE sys_user
-        <set>
-            <if test="safeCode != null and safeCode != ''">safe_code = #{safeCode},</if>
-            <if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
-            update_time = sysdate()
-        </set>
-        WHERE user_id = #{userId}
-    </update>
 </mapper>

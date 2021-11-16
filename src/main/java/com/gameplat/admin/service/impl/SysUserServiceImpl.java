@@ -1,6 +1,5 @@
 package com.gameplat.admin.service.impl;
 
-import cn.hutool.core.convert.Convert;
 import com.alibaba.csp.sentinel.annotation.SentinelResource;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -11,7 +10,6 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.cache.AdminCache;
 import com.gameplat.admin.constant.RsaConstant;
 import com.gameplat.admin.convert.UserConvert;
-import com.gameplat.admin.enums.SysUserEnums;
 import com.gameplat.admin.mapper.SysRoleMapper;
 import com.gameplat.admin.mapper.SysUserMapper;
 import com.gameplat.admin.mapper.SysUserRoleMapper;
@@ -44,7 +42,6 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -208,22 +205,31 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
 
   @Override
   @SentinelResource(value = "resetGoogleSecret")
-  public void resetGoogleSecret(OperUserDTO userDTO) {
-    SysUser user = BeanUtils.map(userDTO, SysUser.class);
-    int count = userMapper.resetUserAuth(user);
-    if (count <= 0) {
-      throw new ServiceException("重置失败!");
+  public void resetGoogleSecret(Long id) {
+    SysUser user = this.getById(id);
+    if (null == user) {
+      throw new ServiceException("用户不存在!");
+    }
+
+    user.setSafeCode(null);
+    if (!this.updateById(user)) {
+      throw new ServiceException("重置安全码失败!");
     }
   }
 
   @Override
   @SentinelResource(value = "resetGoogleSecret")
-  public void changeStatus(OperUserDTO userDTO) {
-    if (userDTO.getId().equals(SecurityUserHolder.getUserId())) {
+  public void changeStatus(Long id, Integer status) {
+    if (id.equals(SecurityUserHolder.getUserId())) {
       throw new ServiceException("不允许操作自己账号");
     }
 
-    SysUser user = BeanUtils.map(userDTO, SysUser.class);
+    SysUser user = this.getById(id);
+    if (null == user) {
+      throw new ServiceException("用户不存在!");
+    }
+
+    user.setStatus(status);
     if (!this.updateById(user)) {
       throw new ServiceException("修改状态失败!");
     }

@@ -27,12 +27,4 @@ public interface SysUserMapper extends BaseMapper<SysUser> {
    * @return 用户对象信息
    */
   SysUser selectUserByUserName(String userName);
-
-  /**
-   * 重置用户安全码
-   *
-   * @param user
-   * @return
-   */
-  int resetUserAuth(SysUser user);
 }

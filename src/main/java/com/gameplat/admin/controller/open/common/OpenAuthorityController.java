@@ -11,6 +11,7 @@ import com.gameplat.common.constant.ServiceName;
 import com.gameplat.common.util.GoogleAuthenticator;
 import com.gameplat.common.util.ServletUtils;
 import com.gameplat.log.annotation.Log;
+import com.gameplat.log.annotation.LoginLog;
 import com.gameplat.redis.idempoten.AutoIdempotent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -37,7 +38,7 @@ public class OpenAuthorityController {
 
   @AutoIdempotent(spelKey = "'login_'+#dto.account", expir = 3000L)
   @RequestMapping(value = "/login", method = RequestMethod.POST)
-  @Log(module = ServiceName.ADMIN_SERVICE, desc = "'账号'+#dto.account+'登录系统'")
+  @LoginLog(module = ServiceName.ADMIN_SERVICE, desc = "'账号'+#dto.account+'登录系统'")
   public UserToken login(@Validated @RequestBody AdminLoginDTO dto, HttpServletRequest request) {
     return authenticationService.login(dto, request);
   }

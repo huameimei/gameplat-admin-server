@@ -9,10 +9,7 @@ import com.gameplat.admin.model.domain.SysUser;
 import com.gameplat.admin.model.dto.AdminLoginDTO;
 import com.gameplat.admin.model.vo.RefreshToken;
 import com.gameplat.admin.model.vo.UserToken;
-import com.gameplat.admin.service.AuthenticationService;
-import com.gameplat.admin.service.SysAuthIpService;
-import com.gameplat.admin.service.SysDictDataService;
-import com.gameplat.admin.service.SysUserService;
+import com.gameplat.admin.service.*;
 import com.gameplat.common.enums.SystemCodeType;
 import com.gameplat.common.exception.ServiceException;
 import com.gameplat.common.ip.IpAddressParser;
@@ -53,6 +50,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
   @Autowired private AuthenticationManager authenticationManager;
 
   @Autowired private JwtTokenService jwtTokenService;
+
+  @Autowired private PermissionService permissionService;
 
   @Override
   public UserToken login(AdminLoginDTO dto, HttpServletRequest request) {
@@ -112,6 +111,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         .clientType(operatingSystem.getDeviceType().name())
         .deviceType(operatingSystem.name())
         .account(user.getUserName())
+        .accessLogToken(permissionService.getAccessLogToken())
         .build();
   }
 

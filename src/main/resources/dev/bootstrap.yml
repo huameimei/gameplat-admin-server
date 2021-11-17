@@ -16,7 +16,7 @@ spring:
         namespace: dev
         group: SERVICE_GROUP
         refresh-enabled: true
-        shared-dataids: redis.yml,rocketmq-config.yml,spring-kafka-producer-config.yml
+        shared-dataids: redis.yml,spring-kafka-producer-config.yml
       discovery:
         service: ${USERDOMAIN}-admin-server
         namespace: ${spring.cloud.nacos.config.namespace}

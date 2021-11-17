@@ -7,11 +7,11 @@ import com.gameplat.admin.model.bean.router.VueRouter;
 import com.gameplat.admin.model.domain.SysMenu;
 import com.gameplat.admin.service.PermissionService;
 import com.gameplat.admin.service.SysCommonService;
-import com.gameplat.common.context.GlobalContextHolder;
 import com.gameplat.common.util.StringUtils;
 import com.gameplat.redis.captcha.CaptchaImage;
 import com.gameplat.redis.captcha.CaptchaProducer;
 import com.gameplat.redis.idempoten.AutoIdempotent;
+import com.gameplat.security.SecurityUserHolder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -67,7 +67,7 @@ public class OpenCommonController {
   @GetMapping("/menuList")
   @AutoIdempotent(key = "menuList", expir = 1000L)
   public ArrayList<VueRouter<SysMenu>> menuList() {
-    return permissionService.getMenuList(GlobalContextHolder.getContext().getUsername());
+    return permissionService.getMenuList(SecurityUserHolder.getUsername());
   }
 
   /** 获取字典数据 */

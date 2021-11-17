@@ -1,23 +1,27 @@
-package com.gameplat.admin.model.vo;
+package com.gameplat.admin.model.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.io.Serializable;
-import java.sql.Timestamp;
 import java.util.Date;
 
 /**
  * @author lily
- * @description 消息公告出参
+ * @description 修改公告消息入参
  * @date 2021/11/16
  */
 
 @Data
-public class NoticeVO implements Serializable {
+public class NoticeEditDTO implements Serializable {
 
     private Integer id;
+
+    /**
+     * 类型 (1滚动公告、2登录公告、3推广公告、4注册公告、5彩票公告、6体育公告)
+     */
+    private Integer noticeType;
 
     /**
      * 公告标题
@@ -28,11 +32,6 @@ public class NoticeVO implements Serializable {
      * 内容
      */
     private String noticeContent;
-
-    /**
-     * 类型 (1滚动公告、2登录公告、3推广公告、4注册公告、5彩票公告、6体育公告)
-     */
-    private Integer noticeType;
 
     /**
      * 公告的开始日期
@@ -49,25 +48,13 @@ public class NoticeVO implements Serializable {
     private Date endDate;
 
     /**
-     * 操作人的账号
-     */
-    private String operator;
-
-    /**
-     * 启用状态 (0.启用、1.禁用)
-     */
-    private Integer status;
-
-    /**
      * 排序
      */
     private Integer sort;
 
     /**
-     * 修改时间
+     * 操作人的账号
      */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-    @DateTimeFormat(pattern = "yy-MM-dd HH:mm:ss")
-    private Date updateTime;
+    private String operator;
 
 }

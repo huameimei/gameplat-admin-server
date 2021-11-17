@@ -65,4 +65,6 @@ public class MemberWithdrawHistoryVO {
 
   private Long id;
 
+  private Long memberId;
+
 }

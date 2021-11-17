@@ -70,4 +70,6 @@ public class RechargeOrderHistoryVO {
   private String payType;
 
   private String currencyCount;
+
+  private Long memberId;
 }

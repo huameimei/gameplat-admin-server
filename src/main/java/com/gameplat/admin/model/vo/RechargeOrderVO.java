@@ -71,4 +71,6 @@ public class RechargeOrderVO {
 
   private String payType;
 
+  private Long memberId;
+
 }

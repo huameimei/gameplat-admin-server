@@ -3,8 +3,6 @@ spring:
     name: admin-server
   profiles:
     active: @profiles.active@
-  main:
-    allow-bean-definition-overriding: true
   cloud:
     nacos:
       config:

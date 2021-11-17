@@ -32,9 +32,9 @@ public class UserWithdrawQueryDTO implements Serializable {
 
   private String operatorAccount;
 
-  private Date createTimeFrom;
+  private String createTimeFrom;
 
-  private Date createTimeTo;
+  private String createTimeTo;
 
   private String order;
 

@@ -3,9 +3,6 @@ spring:
     name: admin-server
   profiles:
     active: @profiles.active@
-  main:
-    web-application-type: none
-    allow-bean-definition-overriding: true
   cloud:
     nacos:
       config:
@@ -14,7 +11,7 @@ spring:
         username: nacos
         password: qsaw12!@
         file-extension: yml
-        namespace: sit
+        namespace: ea9f2fb3-4fce-4cc9-a820-4508330af65b
         group: SERVICE_GROUP
         refresh-enabled: true
         shared-dataids: redis.yml,spring-kafka-producer-config.yml

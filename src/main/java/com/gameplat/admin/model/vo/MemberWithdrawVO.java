@@ -53,4 +53,6 @@ public class MemberWithdrawVO {
 
   private String cashReason;
 
+  private Long memberId;
+
 }

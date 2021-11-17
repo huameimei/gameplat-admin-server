@@ -25,6 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -81,6 +82,10 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     // 校验安全码
     SysUser user = userService.getByUsername(dto.getAccount());
+    if (null == user) {
+      throw new UsernameNotFoundException("用户不存在或密码不正确！");
+    }
+
     if (SystemCodeType.YES.match(limit.getOpenGoogleAuth())) {
       this.checkGoogleAuthCode(user.getSafeCode(), dto.getGoogleCode());
     }

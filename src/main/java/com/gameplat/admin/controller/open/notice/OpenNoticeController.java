@@ -20,19 +20,19 @@ import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/notice/announcement")
+@RequestMapping("/api/notice/official-news")
 public class OpenNoticeController {
 
     @Autowired private NoticeService noticeService;
 
     @GetMapping("/list")
-    @PreAuthorize("hasAuthority('notice:announcement:list')")
+    @PreAuthorize("hasAuthority('notice:official-news:list')")
     public IPage<NoticeVO> findAccountBlacklist(PageDTO<Notice> page, NoticeQueryDTO noticeQueryDTO) {
         return noticeService.selectNoticeList(page, noticeQueryDTO);
     }
 
     @PostMapping("/add")
-    @PreAuthorize("hasAuthority('notice:announcement:add')")
+    @PreAuthorize("hasAuthority('notice:official-news:add')")
     public void add(@RequestBody NoticeAddDTO noticeAddDTO) {
         noticeAddDTO.setOperator(GlobalContextHolder.getContext().getUsername());
         noticeAddDTO.setStatus(0);
@@ -40,20 +40,20 @@ public class OpenNoticeController {
     }
 
     @PutMapping("/edit")
-    @PreAuthorize("hasAuthority('notice:announcement:edit')")
+    @PreAuthorize("hasAuthority('notice:official-news:edit')")
     public void edit(@RequestBody NoticeEditDTO noticeEditDTO) {
         noticeEditDTO.setOperator(GlobalContextHolder.getContext().getUsername());
         noticeService.updateNotice(noticeEditDTO);
     }
 
     @DeleteMapping("/delete/{id}")
-    @PreAuthorize("hasAuthority('notice:announcement:remove')")
+    @PreAuthorize("hasAuthority('notice:official-news:remove')")
     public void remove(@PathVariable("id") Integer id) {
         noticeService.deleteNotice(id);
     }
 
     @PostMapping("/disable")
-    @PreAuthorize("hasAuthority('notice:announcement:disable')")
+    @PreAuthorize("hasAuthority('notice:official-news:disable')")
     public void disableStatus(@RequestBody NoticeUpdateStatusDTO updateStatusDTO) {
         updateStatusDTO.setOperator(GlobalContextHolder.getContext().getUsername());
         updateStatusDTO.setStatus(1);
@@ -61,7 +61,7 @@ public class OpenNoticeController {
     }
 
     @PostMapping("/enable")
-    @PreAuthorize("hasAuthority('notice:announcement:enable')")
+    @PreAuthorize("hasAuthority('notice:official-news:enable')")
     public void enableStatus(@RequestBody NoticeUpdateStatusDTO updateStatusDTO) {
         updateStatusDTO.setOperator(GlobalContextHolder.getContext().getUsername());
         updateStatusDTO.setStatus(0);

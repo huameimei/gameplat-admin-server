@@ -1,9 +1,7 @@
 package com.gameplat.admin.model.domain;
 
 import com.baomidou.mybatisplus.annotation.*;
-import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
-import org.springframework.format.annotation.DateTimeFormat;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -39,15 +37,11 @@ public class Notice implements Serializable {
     /**
      * 公告的开始日期
      */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-    @DateTimeFormat(pattern = "yy-MM-dd HH:mm:ss")
     private Date beginDate;
 
     /**
      * 公告的结束日期
      */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-    @DateTimeFormat(pattern = "yy-MM-dd HH:mm:ss")
     private Date endDate;
 
     /**
@@ -68,16 +62,12 @@ public class Notice implements Serializable {
     /**
      * 修改时间
      */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-    @DateTimeFormat(pattern = "yy-MM-dd HH:mm:ss")
     @TableField(fill = FieldFill.INSERT_UPDATE)
     private Date updateTime;
 
     /**
      * 添加时间
      */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-    @DateTimeFormat(pattern = "yy-MM-dd HH:mm:ss")
     @TableField(fill = FieldFill.INSERT)
     private Date createTime;
 }

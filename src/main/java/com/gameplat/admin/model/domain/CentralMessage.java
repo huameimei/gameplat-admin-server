@@ -3,6 +3,7 @@ package com.gameplat.admin.model.domain;
 import com.baomidou.mybatisplus.annotation.*;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -63,26 +64,30 @@ public class CentralMessage implements Serializable {
     /**
      * 添加时间
      */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yy-MM-dd HH:mm:ss")
     private Date addTime;
 
     /**
      * 修改时间
      */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yy-MM-dd HH:mm:ss")
     @TableField(fill = FieldFill.UPDATE)
     private Date updateTime;
 
     /**
      * 生效时间
      */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yy-MM-dd HH:mm:ss")
     private Date effectTime;
 
     /**
      * 失效时间
      */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yy-MM-dd HH:mm:ss")
     private Date expireTime;
 
     /**

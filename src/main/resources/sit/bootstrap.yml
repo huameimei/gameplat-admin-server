@@ -14,7 +14,7 @@ spring:
         namespace: ea9f2fb3-4fce-4cc9-a820-4508330af65b
         group: SERVICE_GROUP
         refresh-enabled: true
-        shared-dataids: redis.yml,spring-kafka-producer-config.yml
+        shared-dataids: redis.yml,spring-kafka-log.yml,spring-kafka-producer-config.yml
       discovery:
         service: admin-server
         namespace: ${spring.cloud.nacos.config.namespace}

@@ -18,27 +18,35 @@ import java.util.Optional;
  */
 public interface MemberService extends IService<Member> {
 
-  IPage<MemberVO> queryPage(Page<Member> page, MemberQueryDTO dto);
+    IPage<MemberVO> queryPage(Page<Member> page, MemberQueryDTO dto);
 
-  MemberInfoVO getInfo(Long id);
+    MemberInfoVO getInfo(Long id);
 
-  Optional<Member> getByAccount(String account);
+    Optional<Member> getByAccount(String account);
 
-  Optional<Member> getAgentByAccount(String account);
+    Optional<Member> getAgentByAccount(String account);
 
-  List<Member> getByParentName(String parentName);
+    List<Member> getByParentName(String parentName);
 
-  MemberInfoVO getMemberInfo(String account);
+    MemberInfoVO getMemberInfo(String account);
 
-  void add(MemberAddDTO dto);
+    void add(MemberAddDTO dto);
 
-  void update(MemberEditDTO dto);
+    void update(MemberEditDTO dto);
 
-  void disable(List<Long> ids);
+    void disable(List<Long> ids);
 
-  void enable(List<Long> ids);
+    void enable(List<Long> ids);
 
-  void clearContact(MemberContactCleanDTO dto);
+    void clearContact(MemberContactCleanDTO dto);
 
-  void updateContact(MemberContactUpdateDTO dto);
+    void updateContact(MemberContactUpdateDTO dto);
+
+    /**
+     * 通过用户层级查询用户list
+     *
+     * @param userLevelList
+     * @return
+     */
+    List<Member> getListByUserLevel(List<String> userLevelList);
 }

@@ -1,6 +1,5 @@
 package com.gameplat.admin.model.vo;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -35,13 +34,11 @@ public class NoticeVO implements Serializable {
     /**
      * 公告的开始日期
      */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date beginDate;
 
     /**
      * 公告的结束日期
      */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date endDate;
 
     /**
@@ -62,7 +59,6 @@ public class NoticeVO implements Serializable {
     /**
      * 修改时间
      */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date updateTime;
 
 }

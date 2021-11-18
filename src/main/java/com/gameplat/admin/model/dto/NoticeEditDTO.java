@@ -36,15 +36,11 @@ public class NoticeEditDTO implements Serializable {
     /**
      * 公告的开始日期
      */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-    @DateTimeFormat(pattern = "yy-MM-dd HH:mm:ss")
     private Date beginDate;
 
     /**
      * 公告的结束日期
      */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-    @DateTimeFormat(pattern = "yy-MM-dd HH:mm:ss")
     private Date endDate;
 
     /**

@@ -26,13 +26,12 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 
 @Service
 @RequiredArgsConstructor
-public class NoticeServiceImpl  extends ServiceImpl<NoticeMapper, Notice> implements NoticeService {
+public class NoticeServiceImpl extends ServiceImpl<NoticeMapper, Notice> implements NoticeService {
 
-    @Autowired private NoticeMapper noticeMapper;
     @Autowired private NoticeConvert noticeConvert;
 
     @Override
-    public IPage<NoticeVO> selectGameList(IPage<Notice> page, NoticeQueryDTO noticeQueryDTO) {
+    public IPage<NoticeVO> selectNoticeList(IPage<Notice> page, NoticeQueryDTO noticeQueryDTO) {
         LambdaQueryChainWrapper<Notice> queryWrapper =
                 this.lambdaQuery()
                     .eq(ObjectUtils.isNotEmpty(noticeQueryDTO.getNoticeType()), Notice::getNoticeType, noticeQueryDTO.getNoticeType())

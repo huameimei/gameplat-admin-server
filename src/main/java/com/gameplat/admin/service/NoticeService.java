@@ -11,7 +11,7 @@ import com.gameplat.admin.model.vo.NoticeVO;
 
 public interface NoticeService extends IService<Notice> {
 
-    IPage<NoticeVO> selectGameList(IPage<Notice> page, NoticeQueryDTO noticeQueryDTO);
+    IPage<NoticeVO> selectNoticeList(IPage<Notice> page, NoticeQueryDTO noticeQueryDTO);
 
     void insertNotice(NoticeAddDTO noticeAddDTO);
 

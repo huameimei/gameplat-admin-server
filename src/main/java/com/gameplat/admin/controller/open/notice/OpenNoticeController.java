@@ -21,22 +21,20 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @RestController
 @RequestMapping("/api/notice/announcement")
-public class OpenAnnouncementController {
+public class OpenNoticeController {
 
     @Autowired private NoticeService noticeService;
-
-    private static String username = GlobalContextHolder.getContext().getUsername();
 
     @GetMapping("/list")
     @PreAuthorize("hasAuthority('notice:announcement:list')")
     public IPage<NoticeVO> findAccountBlacklist(PageDTO<Notice> page, NoticeQueryDTO noticeQueryDTO) {
-        return noticeService.selectGameList(page, noticeQueryDTO);
+        return noticeService.selectNoticeList(page, noticeQueryDTO);
     }
 
     @PostMapping("/add")
     @PreAuthorize("hasAuthority('notice:announcement:add')")
     public void add(@RequestBody NoticeAddDTO noticeAddDTO) {
-        noticeAddDTO.setOperator(username);
+        noticeAddDTO.setOperator(GlobalContextHolder.getContext().getUsername());
         noticeAddDTO.setStatus(0);
         noticeService.insertNotice(noticeAddDTO);
     }
@@ -44,7 +42,7 @@ public class OpenAnnouncementController {
     @PutMapping("/edit")
     @PreAuthorize("hasAuthority('notice:announcement:edit')")
     public void edit(@RequestBody NoticeEditDTO noticeEditDTO) {
-        noticeEditDTO.setOperator(username);
+        noticeEditDTO.setOperator(GlobalContextHolder.getContext().getUsername());
         noticeService.updateNotice(noticeEditDTO);
     }
 
@@ -57,7 +55,7 @@ public class OpenAnnouncementController {
     @PostMapping("/disable")
     @PreAuthorize("hasAuthority('notice:announcement:disable')")
     public void disableStatus(@RequestBody NoticeUpdateStatusDTO updateStatusDTO) {
-        updateStatusDTO.setOperator(username);
+        updateStatusDTO.setOperator(GlobalContextHolder.getContext().getUsername());
         updateStatusDTO.setStatus(1);
         noticeService.disableStatus(updateStatusDTO);
     }
@@ -65,7 +63,7 @@ public class OpenAnnouncementController {
     @PostMapping("/enable")
     @PreAuthorize("hasAuthority('notice:announcement:enable')")
     public void enableStatus(@RequestBody NoticeUpdateStatusDTO updateStatusDTO) {
-        updateStatusDTO.setOperator(username);
+        updateStatusDTO.setOperator(GlobalContextHolder.getContext().getUsername());
         updateStatusDTO.setStatus(0);
         noticeService.enableStatus(updateStatusDTO);
     }

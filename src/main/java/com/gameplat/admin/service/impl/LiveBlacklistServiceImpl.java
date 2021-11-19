@@ -15,6 +15,7 @@ import com.gameplat.admin.model.dto.OperLiveBlacklistDTO;
 import com.gameplat.admin.service.LiveBlacklistService;
 import com.gameplat.common.exception.ServiceException;
 import com.gameplat.security.SecurityUserHolder;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -116,4 +117,15 @@ public class LiveBlacklistServiceImpl extends ServiceImpl<LiveBlacklistMapper, L
       throw new ServiceException("删除真人黑名单失败!");
     }
   }
+
+  @Override
+  public List<LiveBlacklist> selectLiveBlackList(LiveBlacklist black){
+    return this.lambdaQuery()
+        .eq(ObjectUtils.isNotEmpty(black.getBlackType()),LiveBlacklist::getBlackType,black.getBlackType())
+        .like(ObjectUtils.isNotEmpty(black.getLiveCategory()),LiveBlacklist::getLiveCategory,","+black.getLiveCategory()+",")
+        .eq(ObjectUtils.isNotEmpty(black.getTargetType()),LiveBlacklist::getTargetType,black.getTargetType())
+        .eq(ObjectUtils.isNotEmpty(black.getTarget()),LiveBlacklist::getTarget, black.getTarget())
+        .list();
+  }
+
 }

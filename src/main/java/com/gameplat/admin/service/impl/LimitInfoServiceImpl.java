@@ -48,7 +48,6 @@ public class LimitInfoServiceImpl extends ServiceImpl<LimitInfoMapper, LimitInfo
       limit.setLimit(obj);
       limit.setValue(JsonUtils.toJson(obj));
       limit.setValueClass(LimitEnums.getClass(limitInfoDTO.getName()).getName());
-      limit.setAddTime(new Date());
       result = this.limitInfoMapper.insert(limit);
     }
     if (result <= 0) {

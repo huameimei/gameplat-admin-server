@@ -41,4 +41,6 @@ public interface MemberService extends IService<Member> {
   void clearContact(MemberContactCleanDTO dto);
 
   void updateContact(MemberContactUpdateDTO dto);
+
+  List<String> findAccountByUserLevelIn(List<String> levelsLists);
 }

@@ -17,6 +17,7 @@ import com.gameplat.admin.model.vo.MemberVO;
 import com.gameplat.admin.service.MemberInfoService;
 import com.gameplat.admin.service.MemberService;
 import com.gameplat.common.exception.ServiceException;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -148,6 +149,13 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
   @Override
   public List<Member> getByParentName(String parentName) {
     return this.lambdaQuery().eq(Member::getParentName, parentName).list();
+  }
+
+  @Override
+  public List<String> findAccountByUserLevelIn(List<String> levelsLists) {
+    return this.lambdaQuery().select(Member::getAccount)
+        .in(Member::getUserLevel,levelsLists)
+        .list().stream().map(Member::getAccount).collect(Collectors.toList());
   }
 
   @Override

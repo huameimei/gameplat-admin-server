@@ -173,6 +173,16 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
         return queryWrapper.list();
     }
 
+    @Override
+    public List<Member> getListByAgentAccout(String agentAccout) {
+        return memberMapper.getListByAgentAccout(agentAccout);
+    }
+
+    @Override
+    public List<Member> findListByAccountList(List<String> accountList) {
+        return memberMapper.findListByAccountList(accountList);
+    }
+
     /**
      * 批量修改会员状态
      *

@@ -49,4 +49,18 @@ public interface MemberService extends IService<Member> {
      * @return
      */
     List<Member> getListByUserLevel(List<String> userLevelList);
+
+    /**
+     * 查询代理线的会员列表
+     * @param agentAccout
+     * @return
+     */
+    List<Member> getListByAgentAccout(String agentAccout);
+
+    /**
+     * 通过账号批量查询会员账号
+     * @param accountList
+     * @return
+     */
+    List<Member> findListByAccountList(List<String> accountList);
 }

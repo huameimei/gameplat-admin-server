@@ -21,4 +21,10 @@ public interface PushMessageService extends IService<PushMessage> {
     void deleteBatchPushMessage(Long[] ids);
 
     void deleteByCondition(PushMessageRemoveDTO pushMessageRemoveDTO);
+
+    /**
+     * 设置消息已读
+     * @param id
+     */
+    void readMsg(Long id);
 }

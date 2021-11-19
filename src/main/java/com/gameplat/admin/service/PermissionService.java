@@ -10,7 +10,7 @@ import com.gameplat.admin.model.bean.router.VueRouter;
 import com.gameplat.admin.model.domain.SysMenu;
 import com.gameplat.admin.model.domain.SysUser;
 import com.gameplat.common.constant.ContextConstant;
-import com.gameplat.common.enums.SubjectEnum;
+//import com.gameplat.common.enums.SubjectEnum;
 import com.gameplat.common.enums.SystemCodeType;
 import com.gameplat.common.enums.UserTypes;
 import com.gameplat.common.util.JwtUtils;
@@ -95,7 +95,7 @@ public class PermissionService extends ServiceImpl<SysMenuMapper, SysMenu> {
       }
       map.put(ContextConstant.USERNAME,username);
       map.put(ContextConstant.USER_TYPE,type.key());
-      map.put(ContextConstant.SUBJECT, SubjectEnum.ADMIN.getKey());
+//      map.put(ContextConstant.SUBJECT, SubjectEnum.ADMIN.getKey());
       //TODO 暂时写死日志访问权限
       map.put(ContextConstant.AUTHORITY,"operator:logs:logininfoLog,operator:logs:operationLog");
       String secret = JwtUtils.getDefaultSecret();

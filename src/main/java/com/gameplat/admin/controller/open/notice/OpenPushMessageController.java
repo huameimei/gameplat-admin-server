@@ -71,7 +71,7 @@ public class OpenPushMessageController {
      */
     @DeleteMapping("/deleteBatch")
     @PreAuthorize("hasAuthority('notice:pushmessage:remove')")
-    public void remove(@RequestBody Long[] ids) {
+    public void remove(Long[] ids) {
         pushMessageService.deleteBatchPushMessage(ids);
     }
 
@@ -86,5 +86,16 @@ public class OpenPushMessageController {
         pushMessageService.deleteByCondition(pushMessageRemoveDTO);
     }
 
+
+    /**
+     * 消息已读
+     *
+     * @param id
+     */
+    @PutMapping("/readMsg/{id}")
+    @PreAuthorize("hasAuthority('notice:pushmessage:view')")
+    public void readMsg(@PathVariable("id") Long id) {
+        pushMessageService.readMsg(id);
+    }
 
 }

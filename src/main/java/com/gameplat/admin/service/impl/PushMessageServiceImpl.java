@@ -1,25 +1,24 @@
 package com.gameplat.admin.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.core.toolkit.ArrayUtils;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.convert.PushMessageConvert;
+import com.gameplat.admin.enums.NoticeEnum;
 import com.gameplat.admin.mapper.PushMessageMapper;
 import com.gameplat.admin.model.domain.Member;
 import com.gameplat.admin.model.domain.PushMessage;
-import com.gameplat.admin.model.dto.PushMessageAddDTO;
-import com.gameplat.admin.model.dto.PushMessageDTO;
-import com.gameplat.admin.model.dto.PushMessageRemoveDTO;
-import com.gameplat.admin.model.vo.MemberInfoVO;
-import com.gameplat.admin.model.vo.PushMessageVO;
+import com.gameplat.admin.model.dto.*;
+import com.gameplat.admin.model.vo.*;
 import com.gameplat.admin.service.MemberService;
+import com.gameplat.admin.service.OnlineMenberService;
 import com.gameplat.admin.service.PushMessageService;
 import com.gameplat.common.exception.ServiceException;
+import com.gameplat.common.util.BeanUtils;
 import com.gameplat.common.util.DateUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,6 +40,9 @@ public class PushMessageServiceImpl extends ServiceImpl<PushMessageMapper, PushM
 
     @Autowired
     private MemberService memberService;
+
+    @Autowired
+    private OnlineMenberService onlineMenberService;
 
 
     @Override
@@ -84,6 +86,7 @@ public class PushMessageServiceImpl extends ServiceImpl<PushMessageMapper, PushM
         if (pushMessageAddDTO.getUserRange() == null || pushMessageAddDTO.getUserRange() == 0) {
             throw new ServiceException("推送范围不能为空");
         }
+        int perSize = 1000;
         List<PushMessage> pushMessageList = new ArrayList<>();
         //根据不同的类型，进行新增消息
         switch (pushMessageAddDTO.getUserRange()) {
@@ -108,22 +111,73 @@ public class PushMessageServiceImpl extends ServiceImpl<PushMessageMapper, PushM
                     PushMessage pushMessage = pushMessageConvert.toEntity(pushMessageAddDTO);
                     pushMessage.setUserId(memberInfo.getId());
                     pushMessage.setUserAccount(userAccount);
-                    pushMessage.setAcceptRemoveFlag(0);
-                    pushMessage.setSendRemoveFlag(0);
-                    pushMessage.setReadStatus(0);
+                    pushMessage.setAcceptRemoveFlag(NoticeEnum.ACCEPT_REMOVE_FLAG_NO.getValue());
+                    pushMessage.setSendRemoveFlag(NoticeEnum.SEND_REMOVE_FLAG_NO.getValue());
+                    pushMessage.setReadStatus(NoticeEnum.READ_STATUS_UNREAD.getValue());
                     if (pushMessageAddDTO.getImmediateFlag() == null) {
-                        pushMessage.setImmediateFlag(0);
+                        pushMessage.setImmediateFlag(NoticeEnum.IMMEDIATE_FLAG_NO.getValue());
                     }
                     pushMessageList.add(pushMessage);
                 }
                 break;
             case 2://2-所有会有
+                Page<Member> page1 = new Page<>();
+                page1.setCurrent(1);
+                page1.setSize(perSize);
+                MemberQueryDTO memberQueryDTO = new MemberQueryDTO();
+                IPage<MemberVO> memberVOIPage = memberService.queryPage(page1, memberQueryDTO);
+                if (memberVOIPage != null && memberVOIPage.getTotal() > 0) {
+                    long total = memberVOIPage.getTotal();
+                    //总页数
+                    long pageTotal = total / perSize + 1;
+                    for (int i = 1; i <= pageTotal; i++) {
+                        if (i != 1) {
+                            page1.setCurrent(i);
+                            memberVOIPage = memberService.queryPage(page1, memberQueryDTO);
+                        }
+                        if (CollectionUtils.isNotEmpty(memberVOIPage.getRecords())) {
+                            for (MemberVO memberVO : memberVOIPage.getRecords()) {
+                                Member member = new Member();
+                                BeanUtils.copyBeanProp(member, memberVO);
+                                buildPushMessage(pushMessageAddDTO, pushMessageList, member);
+                            }
+                        }
 
-
+                    }
+                }
                 break;
             case 3://3-在线会员
+                PageDTO<UserToken> page = new PageDTO<>();
+                page.setCurrent(1);
+                page.setSize(perSize);
+                OnlineUserDTO userDTO = new OnlineUserDTO();
+                OnlineUserVo onlineUserVo = onlineMenberService.selectOnlineList(page, userDTO);
 
-
+                if (onlineUserVo != null && onlineUserVo.getPage().getTotal() > 0) {
+                    long total = onlineUserVo.getPage().getTotal();
+                    //总页数
+                    long pageTotal = total / perSize + 1;
+                    for (int i = 1; i <= pageTotal; i++) {
+                        if (i != 1) {
+                            page.setCurrent(i);
+                            onlineUserVo = onlineMenberService.selectOnlineList(page, userDTO);
+                        }
+                        List<String> accountList = new ArrayList<>(1000);
+                        List<UserToken> records = onlineUserVo.getPage().getRecords();
+                        if (CollectionUtils.isNotEmpty(records)) {
+                            for (UserToken userToken : records) {
+                                accountList.add(userToken.getAccount());
+                            }
+                        }
+                        //批量查询对应的会员账号
+                        List<Member> memberList = memberService.findListByAccountList(accountList);
+                        if (CollectionUtils.isNotEmpty(memberList)) {
+                            for (Member member : memberList) {
+                                buildPushMessage(pushMessageAddDTO, pushMessageList, member);
+                            }
+                        }
+                    }
+                }
                 break;
             case 4://4-指定层级
                 if (StringUtils.isBlank(pushMessageAddDTO.getUserLevel())) {
@@ -139,16 +193,7 @@ public class PushMessageServiceImpl extends ServiceImpl<PushMessageMapper, PushM
                 List<Member> memberList = memberService.getListByUserLevel(userLevelList);
                 if (CollectionUtils.isNotEmpty(memberList)) {
                     for (Member member : memberList) {
-                        PushMessage pushMessage = pushMessageConvert.toEntity(pushMessageAddDTO);
-                        pushMessage.setUserId(member.getId());
-                        pushMessage.setUserAccount(member.getAccount());
-                        pushMessage.setAcceptRemoveFlag(0);
-                        pushMessage.setSendRemoveFlag(0);
-                        pushMessage.setReadStatus(0);
-                        if (pushMessageAddDTO.getImmediateFlag() == null) {
-                            pushMessage.setImmediateFlag(0);
-                        }
-                        pushMessageList.add(pushMessage);
+                        buildPushMessage(pushMessageAddDTO, pushMessageList, member);
                     }
                 }
                 break;
@@ -156,18 +201,25 @@ public class PushMessageServiceImpl extends ServiceImpl<PushMessageMapper, PushM
                 if (StringUtils.isBlank(pushMessageAddDTO.getAgentAccount())) {
                     throw new ServiceException("代理帐号不能为空");
                 }
-                List<String> agentAccountList = new ArrayList<>();
-                if (pushMessageAddDTO.getAgentAccount().contains(",")) {
-                    agentAccountList.addAll(Arrays.asList(pushMessageAddDTO.getAgentAccount().split(",")));
-                } else {
-                    agentAccountList.add(pushMessageAddDTO.getAgentAccount());
-                }
-
                 //通过代理账号查询对应的会员信息
-
-
+                String agentAccout = pushMessageAddDTO.getAgentAccount();
+                MemberInfoVO agnetMemberInfo = memberService.getMemberInfo(agentAccout);
+                if (agnetMemberInfo == null || !"A".equals(agnetMemberInfo.getUserType())) {
+                    throw new ServiceException("代理帐号不存在");
+                }
+                //查询管理的所有代理线的会员信息
+                List<Member> memberList1 = memberService.getListByAgentAccout(agentAccout);
+                if (CollectionUtils.isNotEmpty(memberList1)) {
+                    for (Member member : memberList1) {
+                        String superPath = member.getSuperPath();
+                        superPath = superPath.substring(0, superPath.length() - 1);
+                        //会员收到的消息不包含账号agentAccout
+                        if (!superPath.endsWith(agentAccout)) {
+                            buildPushMessage(pushMessageAddDTO, pushMessageList, member);
+                        }
+                    }
+                }
                 break;
-
         }
         //批量保存需要发送的消息
         if (!this.saveBatch(pushMessageList)) {
@@ -175,12 +227,31 @@ public class PushMessageServiceImpl extends ServiceImpl<PushMessageMapper, PushM
         }
     }
 
+    private void buildPushMessage(PushMessageAddDTO pushMessageAddDTO, List<PushMessage> pushMessageList, Member member) {
+        PushMessage pushMessage = pushMessageConvert.toEntity(pushMessageAddDTO);
+        pushMessage.setUserId(member.getId());
+        pushMessage.setUserAccount(member.getAccount());
+        pushMessage.setAcceptRemoveFlag(NoticeEnum.ACCEPT_REMOVE_FLAG_NO.getValue());
+        pushMessage.setSendRemoveFlag(NoticeEnum.SEND_REMOVE_FLAG_NO.getValue());
+        pushMessage.setReadStatus(NoticeEnum.READ_STATUS_UNREAD.getValue());
+        if (pushMessageAddDTO.getImmediateFlag() == null) {
+            pushMessage.setImmediateFlag(NoticeEnum.IMMEDIATE_FLAG_NO.getValue());
+        }
+        pushMessageList.add(pushMessage);
+    }
+
     @Override
     public void deletePushMessage(Long id) {
         if (ObjectUtils.isEmpty(id)) {
             throw new ServiceException("id不能为空!");
         }
-        if (!this.removeById(id)) {
+        PushMessage pushMessage = this.getById(id);
+        if (pushMessage == null) {
+            throw new ServiceException("该消息不存在!");
+        }
+        pushMessage.setAcceptRemoveFlag(NoticeEnum.ACCEPT_REMOVE_FLAG_YES.getValue());
+        pushMessage.setSendRemoveFlag(NoticeEnum.SEND_REMOVE_FLAG_YES.getValue());
+        if (!this.saveOrUpdate(pushMessage)) {
             throw new ServiceException("删除公告信息失败！");
         }
     }
@@ -191,7 +262,7 @@ public class PushMessageServiceImpl extends ServiceImpl<PushMessageMapper, PushM
             throw new ServiceException("ids不能为空!");
         }
         for (Long id : ids) {
-            deletePushMessage(id);
+            this.deletePushMessage(id);
         }
     }
 
@@ -209,8 +280,23 @@ public class PushMessageServiceImpl extends ServiceImpl<PushMessageMapper, PushM
         //再进行删除操作
         if (CollectionUtils.isNotEmpty(pushMessageList)) {
             for (PushMessage pushMessage : pushMessageList) {
-                this.removeById(pushMessage.getId());
+                pushMessage.setAcceptRemoveFlag(NoticeEnum.ACCEPT_REMOVE_FLAG_YES.getValue());
+                pushMessage.setSendRemoveFlag(NoticeEnum.SEND_REMOVE_FLAG_YES.getValue());
+                this.saveOrUpdate(pushMessage);
             }
         }
+    }
+
+    @Override
+    public void readMsg(Long id) {
+        if (ObjectUtils.isEmpty(id)) {
+            throw new ServiceException("id不能为空!");
+        }
+        PushMessage pushMessage = this.getById(id);
+        if (pushMessage == null) {
+            throw new ServiceException("该消息不存在!");
+        }
+        pushMessage.setReadStatus(1);
+        this.saveOrUpdate(pushMessage);
     }
 }

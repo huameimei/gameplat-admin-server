@@ -41,4 +41,9 @@ public class UserToken implements Serializable {
   private String loginIp;
 
   private Date loginDate;
+
+  /**
+   * 访问日志Token
+   */
+  private String accessLogToken;
 }

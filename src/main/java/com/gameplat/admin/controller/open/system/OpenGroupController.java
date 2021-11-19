@@ -12,10 +12,10 @@ import com.gameplat.admin.model.vo.RoleVo;
 import com.gameplat.admin.service.PermissionService;
 import com.gameplat.admin.service.SysRoleService;
 import com.gameplat.common.constant.ServiceName;
-import com.gameplat.common.context.GlobalContextHolder;
 import com.gameplat.common.group.Groups;
 import com.gameplat.log.annotation.Log;
 import com.gameplat.log.enums.LogType;
+import com.gameplat.security.SecurityUserHolder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -75,7 +75,7 @@ public class OpenGroupController {
 
   @GetMapping("/menuList")
   public ArrayList<VueRouter<SysMenu>> menuList() {
-    return permissionService.getMenuList(GlobalContextHolder.getContext().getUsername());
+    return permissionService.getMenuList(SecurityUserHolder.getUsername());
   }
 
   @GetMapping("/groupMenuList/{id}")

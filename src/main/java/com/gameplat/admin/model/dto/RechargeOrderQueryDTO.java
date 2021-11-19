@@ -34,9 +34,9 @@ public class RechargeOrderQueryDTO implements Serializable {
 
   private List<Integer> statusList;
 
-  private Date createTimeFrom;
+  private String createTimeFrom;
 
-  private Date createTimeTo;
+  private String createTimeTo;
 
   private String memberType;
 

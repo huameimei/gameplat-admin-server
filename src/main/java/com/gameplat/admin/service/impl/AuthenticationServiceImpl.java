@@ -9,10 +9,7 @@ import com.gameplat.admin.model.domain.SysUser;
 import com.gameplat.admin.model.dto.AdminLoginDTO;
 import com.gameplat.admin.model.vo.RefreshToken;
 import com.gameplat.admin.model.vo.UserToken;
-import com.gameplat.admin.service.AuthenticationService;
-import com.gameplat.admin.service.SysAuthIpService;
-import com.gameplat.admin.service.SysDictDataService;
-import com.gameplat.admin.service.SysUserService;
+import com.gameplat.admin.service.*;
 import com.gameplat.common.enums.SystemCodeType;
 import com.gameplat.common.exception.ServiceException;
 import com.gameplat.common.ip.IpAddressParser;
@@ -28,6 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -53,6 +51,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
   @Autowired private AuthenticationManager authenticationManager;
 
   @Autowired private JwtTokenService jwtTokenService;
+
+  @Autowired private PermissionService permissionService;
 
   @Override
   public UserToken login(AdminLoginDTO dto, HttpServletRequest request) {
@@ -82,6 +82,10 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     // 校验安全码
     SysUser user = userService.getByUsername(dto.getAccount());
+    if (null == user) {
+      throw new UsernameNotFoundException("用户不存在或密码不正确！");
+    }
+
     if (SystemCodeType.YES.match(limit.getOpenGoogleAuth())) {
       this.checkGoogleAuthCode(user.getSafeCode(), dto.getGoogleCode());
     }
@@ -112,6 +116,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         .clientType(operatingSystem.getDeviceType().name())
         .deviceType(operatingSystem.name())
         .account(user.getUserName())
+        .accessLogToken(permissionService.getAccessLogToken())
         .build();
   }
 

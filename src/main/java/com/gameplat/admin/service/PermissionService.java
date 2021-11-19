@@ -9,15 +9,22 @@ import com.gameplat.admin.model.bean.router.RouterMeta;
 import com.gameplat.admin.model.bean.router.VueRouter;
 import com.gameplat.admin.model.domain.SysMenu;
 import com.gameplat.admin.model.domain.SysUser;
+import com.gameplat.common.constant.ContextConstant;
+import com.gameplat.common.enums.SubjectEnum;
 import com.gameplat.common.enums.SystemCodeType;
+import com.gameplat.common.enums.UserTypes;
+import com.gameplat.common.util.JwtUtils;
 import com.gameplat.common.util.StringUtils;
+import com.gameplat.security.SecurityUserHolder;
 import com.google.common.collect.Lists;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -76,6 +83,25 @@ public class PermissionService extends ServiceImpl<SysMenuMapper, SysMenu> {
     return buildVueRouter(vueRouters, 0L);
   }
 
+
+  public String getAccessLogToken(){
+      String username = SecurityUserHolder.getUsername();
+      Map<String,String> map = new HashMap<>();
+      UserTypes type = null;
+      if(SecurityUserHolder.isSuperAdmin()){
+          type = UserTypes.ADMIN;
+      }else{
+          type = UserTypes.SUBUSER;
+      }
+      map.put(ContextConstant.USERNAME,username);
+      map.put(ContextConstant.USER_TYPE,type.key());
+      map.put(ContextConstant.SUBJECT, SubjectEnum.ADMIN.getKey());
+      //TODO 暂时写死日志访问权限
+      map.put(ContextConstant.AUTHORITY,"operator:logs:logininfoLog,operator:logs:operationLog");
+      String secret = JwtUtils.getDefaultSecret();
+      String token = JwtUtils.sign(secret, SecurityUserHolder.getCredential().getTokenExpireIn(), map);
+      return token;
+  }
   /**
    * 构造前端路由
    *

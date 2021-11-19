@@ -104,7 +104,7 @@
 
     <!--开发环境:打印控制台-->
     <springProfile name="dev">
-        <logger name="com.gameplat.collector" level="debug"/>
+        <logger name="com.gameplat" level="debug"/>
     </springProfile>
 
     <root level="INFO">

@@ -36,7 +36,7 @@ public class NoticeServiceImpl extends ServiceImpl<NoticeMapper, Notice> impleme
                 this.lambdaQuery()
                     .eq(ObjectUtils.isNotEmpty(noticeQueryDTO.getNoticeType()), Notice::getNoticeType, noticeQueryDTO.getNoticeType())
                     .eq(ObjectUtils.isNotEmpty(noticeQueryDTO.getStatus()), Notice::getStatus, noticeQueryDTO.getStatus())
-                 .eq(ObjectUtils.isNotEmpty(noticeQueryDTO.getNoticeTitle()), Notice::getNoticeTitle, noticeQueryDTO.getNoticeTitle());
+                 .like(ObjectUtils.isNotEmpty(noticeQueryDTO.getNoticeTitle()), Notice::getNoticeTitle, noticeQueryDTO.getNoticeTitle());
 
         return queryWrapper.page(page).convert(noticeConvert::toVo);
     }

@@ -2,6 +2,7 @@ package com.gameplat.admin.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.commpent.MemberQueryCondition;
@@ -11,6 +12,7 @@ import com.gameplat.admin.enums.MemberEnums;
 import com.gameplat.admin.mapper.MemberMapper;
 import com.gameplat.admin.model.domain.Member;
 import com.gameplat.admin.model.domain.MemberInfo;
+import com.gameplat.admin.model.domain.PushMessage;
 import com.gameplat.admin.model.dto.*;
 import com.gameplat.admin.model.vo.MemberInfoVO;
 import com.gameplat.admin.model.vo.MemberVO;
@@ -165,22 +167,42 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
     }
   }
 
-  /**
-   * 批量修改会员状态
-   *
-   * @param ids List
-   * @param status int
-   */
-  private void changeStatus(List<Long> ids, int status) {
-    if (CollectionUtil.isEmpty(ids)) {
-      throw new ServiceException("会员ID不能为空");
+    @Override
+    public List<Member> getListByUserLevel(List<String> userLevelList) {
+        if (CollectionUtil.isEmpty(userLevelList)) {
+            return null;
+        }
+        LambdaQueryChainWrapper<Member> queryWrapper = this.lambdaQuery();
+        queryWrapper.in(Member::getUserLevel, userLevelList);
+        return queryWrapper.list();
     }
 
-    if (!this.lambdaUpdate()
-        .set(Member::getStatus, status)
-        .in(Member::getId, ids)
-        .update(new Member())) {
-      throw new ServiceException("批量启用失败");
+    @Override
+    public List<Member> getListByAgentAccout(String agentAccout) {
+        return memberMapper.getListByAgentAccout(agentAccout);
     }
-  }
+
+    @Override
+    public List<Member> findListByAccountList(List<String> accountList) {
+        return memberMapper.findListByAccountList(accountList);
+    }
+
+    /**
+     * 批量修改会员状态
+     *
+     * @param ids    List
+     * @param status int
+     */
+    private void changeStatus(List<Long> ids, int status) {
+        if (CollectionUtil.isEmpty(ids)) {
+            throw new ServiceException("会员ID不能为空");
+        }
+
+        if (!this.lambdaUpdate()
+                .set(Member::getStatus, status)
+                .in(Member::getId, ids)
+                .update(new Member())) {
+            throw new ServiceException("批量启用失败");
+        }
+    }
 }

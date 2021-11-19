@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gameplat.admin.mapper.LiveRebateDetailMapper">
+
+
+  <select id="queryAllLiveRebateReport"
+    resultType="com.gameplat.admin.model.domain.LiveRebateDetail"
+    parameterType="com.gameplat.admin.model.dto.LiveRebateReportQueryDTO">
+    select
+    SUM(rebate_money) AS rebate_money,
+    SUM(real_rebate_money) AS real_rebate_money,
+    SUM(valid_amount) as validAmount
+    from live_rebate_detail
+    WHERE 1 = 1
+    <if test="beginDate != null and beginDate != ''">
+      <![CDATA[
+         AND begin_date >= STR_TO_DATE(#{beginDate}, '%Y-%m-%d')
+      ]]>
+    </if>
+    <if test="endDate != null and endDate != ''">
+      <![CDATA[
+          AND end_date <= STR_TO_DATE(#{endDate}, '%Y-%m-%d')
+      ]]>
+    </if>
+    <if test="userAccount != null and userAccount != ''">
+      AND account = #{userAccount}
+    </if>
+  </select>
+</mapper>

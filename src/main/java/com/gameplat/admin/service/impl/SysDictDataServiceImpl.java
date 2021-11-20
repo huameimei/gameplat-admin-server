@@ -1,6 +1,5 @@
 package com.gameplat.admin.service.impl;
 
-import cn.hutool.json.JSONUtil;
 import com.alibaba.csp.sentinel.annotation.SentinelResource;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -11,6 +10,7 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.gameplat.admin.convert.DictDataConvert;
 import com.gameplat.admin.enums.DictTypeEnum;
 import com.gameplat.admin.mapper.SysDictDataMapper;
@@ -28,7 +28,10 @@ import com.gameplat.common.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * 字典数据 服务实现层
@@ -89,11 +92,42 @@ public class SysDictDataServiceImpl extends ServiceImpl<SysDictDataMapper, SysDi
   @Override
   @SentinelResource(value = "getDictData")
   public <T> T getDictData(DictTypeEnum dictType, Class<T> t) {
-    SysDictData dictData = this.lambdaQuery().eq(SysDictData::getDictType, dictType.getKey()).one();
-    if (StringUtils.isNotNull(dictData)) {
-      return JSONUtil.toBean(dictData.getDictValue(), t);
-    }
-    return null;
+    return this.lambdaQuery()
+        .eq(SysDictData::getDictType, dictType.getKey())
+        .oneOpt()
+        .map(SysDictData::getDictValue)
+        .map(c -> JsonUtils.parse(c, t))
+        .orElse(null);
+  }
+
+  @Override
+  @SentinelResource(value = "getDictData")
+  public <T> T getDictData(DictTypeEnum dictType, TypeReference<T> t) {
+    return this.lambdaQuery()
+        .eq(SysDictData::getDictType, dictType.getKey())
+        .oneOpt()
+        .map(SysDictData::getDictValue)
+        .map(c -> JsonUtils.parse(c, t))
+        .orElse(null);
+  }
+
+  @Override
+  @SentinelResource(value = "getDictData")
+  public String getDictData(DictTypeEnum dictType) {
+    return this.lambdaQuery()
+        .eq(SysDictData::getDictType, dictType.getKey())
+        .oneOpt()
+        .map(SysDictData::getDictValue)
+        .orElse(null);
+  }
+
+  @Override
+  @SentinelResource(value = "getDictData")
+  public List<String> getDictData(DictTypeEnum dictType, String separatorChar) {
+    return Optional.ofNullable(this.getDictData(dictType))
+        .map(c -> StringUtils.split(c, separatorChar))
+        .map(Arrays::asList)
+        .orElseGet(Collections::emptyList);
   }
 
   @Override

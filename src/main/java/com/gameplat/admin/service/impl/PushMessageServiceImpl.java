@@ -15,11 +15,12 @@ import com.gameplat.admin.model.domain.PushMessage;
 import com.gameplat.admin.model.dto.*;
 import com.gameplat.admin.model.vo.*;
 import com.gameplat.admin.service.MemberService;
-import com.gameplat.admin.service.OnlineMenberService;
+import com.gameplat.admin.service.OnlineUserService;
 import com.gameplat.admin.service.PushMessageService;
 import com.gameplat.common.exception.ServiceException;
 import com.gameplat.common.util.BeanUtils;
 import com.gameplat.common.util.DateUtils;
+import com.gameplat.security.context.UserCredential;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -42,8 +43,7 @@ public class PushMessageServiceImpl extends ServiceImpl<PushMessageMapper, PushM
     private MemberService memberService;
 
     @Autowired
-    private OnlineMenberService onlineMenberService;
-
+    private OnlineUserService onlineUserService;
 
     @Override
     public IPage<PushMessageVO> findPushMessageList(PageDTO<PushMessage> page, PushMessageDTO pushMessageDTO) {
@@ -146,40 +146,14 @@ public class PushMessageServiceImpl extends ServiceImpl<PushMessageMapper, PushM
                     }
                 }
                 break;
-            case 3://3-在线会员
-                PageDTO<UserToken> page = new PageDTO<>();
-                page.setCurrent(1);
-                page.setSize(perSize);
-                OnlineUserDTO userDTO = new OnlineUserDTO();
-                OnlineUserVo onlineUserVo = onlineMenberService.selectOnlineList(page, userDTO);
-
-                if (onlineUserVo != null && onlineUserVo.getPage().getTotal() > 0) {
-                    long total = onlineUserVo.getPage().getTotal();
-                    //总页数
-                    long pageTotal = total / perSize + 1;
-                    for (int i = 1; i <= pageTotal; i++) {
-                        if (i != 1) {
-                            page.setCurrent(i);
-                            onlineUserVo = onlineMenberService.selectOnlineList(page, userDTO);
-                        }
-                        List<String> accountList = new ArrayList<>(1000);
-                        List<UserToken> records = onlineUserVo.getPage().getRecords();
-                        if (CollectionUtils.isNotEmpty(records)) {
-                            for (UserToken userToken : records) {
-                                accountList.add(userToken.getAccount());
-                            }
-                        }
-                        //批量查询对应的会员账号
-                        List<Member> memberList = memberService.findListByAccountList(accountList);
-                        if (CollectionUtils.isNotEmpty(memberList)) {
-                            for (Member member : memberList) {
-                                buildPushMessage(pushMessageAddDTO, pushMessageList, member);
-                            }
-                        }
-                    }
-                }
+            case 3:
+                // 3-在线会员
+                onlineUserService
+                    .getOnlineUsers()
+                    .forEach(user -> buildPushMessage(pushMessageAddDTO, pushMessageList, user));
                 break;
-            case 4://4-指定层级
+            case 4:
+                //4-指定层级
                 if (StringUtils.isBlank(pushMessageAddDTO.getUserLevel())) {
                     throw new ServiceException("充值层级不能为空");
                 }
@@ -208,7 +182,7 @@ public class PushMessageServiceImpl extends ServiceImpl<PushMessageMapper, PushM
                     throw new ServiceException("代理帐号不存在");
                 }
                 //查询管理的所有代理线的会员信息
-                List<Member> memberList1 = memberService.getListByAgentAccout(agentAccout);
+                List<Member> memberList1 = memberService.getListByAgentAccount(agentAccout);
                 if (CollectionUtils.isNotEmpty(memberList1)) {
                     for (Member member : memberList1) {
                         String superPath = member.getSuperPath();
@@ -220,6 +194,7 @@ public class PushMessageServiceImpl extends ServiceImpl<PushMessageMapper, PushM
                     }
                 }
                 break;
+            default:
         }
         //批量保存需要发送的消息
         if (!this.saveBatch(pushMessageList)) {
@@ -227,10 +202,18 @@ public class PushMessageServiceImpl extends ServiceImpl<PushMessageMapper, PushM
         }
     }
 
+    private void buildPushMessage(PushMessageAddDTO pushMessageAddDTO, List<PushMessage> pushMessageList, UserCredential credential) {
+        buildPushMessage(pushMessageAddDTO,pushMessageList,credential.getUserId(),credential.getUsername());
+    }
+
     private void buildPushMessage(PushMessageAddDTO pushMessageAddDTO, List<PushMessage> pushMessageList, Member member) {
+        buildPushMessage(pushMessageAddDTO,pushMessageList,member.getId(),member.getAccount());
+    }
+
+    private void buildPushMessage(PushMessageAddDTO pushMessageAddDTO, List<PushMessage> pushMessageList, Long userId, String username) {
         PushMessage pushMessage = pushMessageConvert.toEntity(pushMessageAddDTO);
-        pushMessage.setUserId(member.getId());
-        pushMessage.setUserAccount(member.getAccount());
+        pushMessage.setUserId(userId);
+        pushMessage.setUserAccount(username);
         pushMessage.setAcceptRemoveFlag(NoticeEnum.ACCEPT_REMOVE_FLAG_NO.getValue());
         pushMessage.setSendRemoveFlag(NoticeEnum.SEND_REMOVE_FLAG_NO.getValue());
         pushMessage.setReadStatus(NoticeEnum.READ_STATUS_UNREAD.getValue());

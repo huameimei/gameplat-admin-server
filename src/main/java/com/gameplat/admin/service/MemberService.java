@@ -18,27 +18,27 @@ import java.util.Optional;
  */
 public interface MemberService extends IService<Member> {
 
-    IPage<MemberVO> queryPage(Page<Member> page, MemberQueryDTO dto);
+  IPage<MemberVO> queryPage(Page<Member> page, MemberQueryDTO dto);
 
-    MemberInfoVO getInfo(Long id);
+  MemberInfoVO getInfo(Long id);
 
-    Optional<Member> getByAccount(String account);
+  Optional<Member> getByAccount(String account);
 
-    Optional<Member> getAgentByAccount(String account);
+  Optional<Member> getAgentByAccount(String account);
 
-    List<Member> getByParentName(String parentName);
+  List<Member> getByParentName(String parentName);
 
-    MemberInfoVO getMemberInfo(String account);
+  MemberInfoVO getMemberInfo(String account);
 
-    void add(MemberAddDTO dto);
+  void add(MemberAddDTO dto);
 
-    void update(MemberEditDTO dto);
+  void update(MemberEditDTO dto);
 
-    void disable(List<Long> ids);
+  void disable(List<Long> ids);
 
-    void enable(List<Long> ids);
+  void enable(List<Long> ids);
 
-    void clearContact(MemberContactCleanDTO dto);
+  void clearContact(MemberContactCleanDTO dto);
 
   void updateContact(MemberContactUpdateDTO dto);
 
@@ -47,24 +47,16 @@ public interface MemberService extends IService<Member> {
   /**
    * 通过用户层级查询用户list
    *
-   * @param userLevelList
-   * @return
+   * @param userLevelList List
+   * @return List
    */
   List<Member> getListByUserLevel(List<String> userLevelList);
 
   /**
    * 查询代理线的会员列表
-   * @param agentAccout
-   * @return
+   *
+   * @param agentAccount
+   * @return List
    */
-  List<Member> getListByAgentAccout(String agentAccout);
-
-  /**
-   * 通过账号批量查询会员账号
-   * @param accountList
-   * @return
-   */
-  List<Member> findListByAccountList(List<String> accountList);
-
-
+  List<Member> getListByAgentAccount(String agentAccount);
 }

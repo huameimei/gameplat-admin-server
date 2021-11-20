@@ -155,9 +155,13 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
 
   @Override
   public List<String> findAccountByUserLevelIn(List<String> levelsLists) {
-    return this.lambdaQuery().select(Member::getAccount)
-        .in(Member::getUserLevel,levelsLists)
-        .list().stream().map(Member::getAccount).collect(Collectors.toList());
+    return this.lambdaQuery()
+        .select(Member::getAccount)
+        .in(Member::getUserLevel, levelsLists)
+        .list()
+        .stream()
+        .map(Member::getAccount)
+        .collect(Collectors.toList());
   }
 
   @Override
@@ -167,42 +171,35 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
     }
   }
 
-    @Override
-    public List<Member> getListByUserLevel(List<String> userLevelList) {
-        if (CollectionUtil.isEmpty(userLevelList)) {
-            return null;
-        }
-        LambdaQueryChainWrapper<Member> queryWrapper = this.lambdaQuery();
-        queryWrapper.in(Member::getUserLevel, userLevelList);
-        return queryWrapper.list();
+  @Override
+  public List<Member> getListByUserLevel(List<String> userLevelList) {
+    if (CollectionUtil.isEmpty(userLevelList)) {
+      return null;
+    }
+    return this.lambdaQuery().in(Member::getUserLevel, userLevelList).list();
+  }
+
+  @Override
+  public List<Member> getListByAgentAccount(String agentAccout) {
+    return memberMapper.getListByAgentAccout(agentAccout);
+  }
+
+  /**
+   * 批量修改会员状态
+   *
+   * @param ids List
+   * @param status int
+   */
+  private void changeStatus(List<Long> ids, int status) {
+    if (CollectionUtil.isEmpty(ids)) {
+      throw new ServiceException("会员ID不能为空");
     }
 
-    @Override
-    public List<Member> getListByAgentAccout(String agentAccout) {
-        return memberMapper.getListByAgentAccout(agentAccout);
+    if (!this.lambdaUpdate()
+        .set(Member::getStatus, status)
+        .in(Member::getId, ids)
+        .update(new Member())) {
+      throw new ServiceException("批量启用失败");
     }
-
-    @Override
-    public List<Member> findListByAccountList(List<String> accountList) {
-        return memberMapper.findListByAccountList(accountList);
-    }
-
-    /**
-     * 批量修改会员状态
-     *
-     * @param ids    List
-     * @param status int
-     */
-    private void changeStatus(List<Long> ids, int status) {
-        if (CollectionUtil.isEmpty(ids)) {
-            throw new ServiceException("会员ID不能为空");
-        }
-
-        if (!this.lambdaUpdate()
-                .set(Member::getStatus, status)
-                .in(Member::getId, ids)
-                .update(new Member())) {
-            throw new ServiceException("批量启用失败");
-        }
-    }
+  }
 }

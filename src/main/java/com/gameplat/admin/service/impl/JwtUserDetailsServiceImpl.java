@@ -41,8 +41,10 @@ public class JwtUserDetailsServiceImpl implements UserDetailsService {
 
     return UserCredential.builder()
         .userId(user.getUserId())
-        .status(user.getStatus())
         .username(username)
+        .nickname(user.getNickName())
+        .userType(user.getUserType())
+        .status(user.getStatus())
         .roles(roles)
         .isSuperAdmin(SysUserEnums.UserType.isAdmin(user.getUserType()))
         .password(user.getPassword())

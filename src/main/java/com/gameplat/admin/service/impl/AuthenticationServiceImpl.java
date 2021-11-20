@@ -12,19 +12,15 @@ import com.gameplat.admin.model.vo.UserToken;
 import com.gameplat.admin.service.*;
 import com.gameplat.common.enums.SystemCodeType;
 import com.gameplat.common.exception.ServiceException;
-import com.gameplat.common.ip.IpAddressParser;
 import com.gameplat.common.util.GoogleAuthenticator;
+import com.gameplat.common.util.IPUtils;
 import com.gameplat.common.util.RSAUtils;
 import com.gameplat.common.util.StringUtils;
 import com.gameplat.redis.captcha.CaptchaProducer;
 import com.gameplat.security.context.UserCredential;
 import com.gameplat.security.service.JwtTokenService;
-import eu.bitwalker.useragentutils.OperatingSystem;
-import eu.bitwalker.useragentutils.UserAgent;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -48,8 +44,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
   @Autowired private AdminCache adminCache;
 
-  @Autowired private AuthenticationManager authenticationManager;
-
   @Autowired private JwtTokenService jwtTokenService;
 
   @Autowired private PermissionService permissionService;
@@ -64,7 +58,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     // 是否开启后台白名单
-    String requestIp = IpAddressParser.getClientIp(request);
+    String requestIp = IPUtils.getIpAddress(request);
     if (SystemCodeType.YES.match(limit.getOpenIpWhiteList())) {
       if (!authIpService.isPermitted(requestIp)) {
         throw new ServiceException("当前IP不允许登录：" + requestIp);
@@ -92,8 +86,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     // 解密密码并登陆
     String password = RSAUtils.decrypt(dto.getPassword(), RsaConstant.PRIVATE_KEY);
-    UserCredential credential =
-        jwtTokenService.signIn(authenticationManager, user.getUserName(), password);
+    UserCredential credential = jwtTokenService.signIn(request, user.getUserName(), password);
 
     // 删除密码错误次数记录
     adminCache.cleanErrorPasswordCount(user.getUserName());
@@ -103,18 +96,13 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     user.setLoginDate(new Date());
     userService.updateById(user);
 
-    UserAgent userAgent = UserAgent.parseUserAgentString(request.getHeader(HttpHeaders.USER_AGENT));
-    OperatingSystem operatingSystem = userAgent.getOperatingSystem();
-
     return UserToken.builder()
         .nickName(user.getNickName())
         .accessToken(credential.getAccessToken())
         .refreshToken(credential.getRefreshToken())
         .tokenExpireIn(credential.getTokenExpireIn())
-        .loginIp(requestIp)
-        .loginDate(new Date())
-        .clientType(operatingSystem.getDeviceType().name())
-        .deviceType(operatingSystem.name())
+        .clientType(credential.getClientType())
+        .deviceType(credential.getDeviceType())
         .account(user.getUserName())
         .accessLogToken(permissionService.getAccessLogToken())
         .build();

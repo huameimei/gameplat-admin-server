@@ -50,15 +50,9 @@ public interface MemberMapper extends BaseMapper<Member> {
 
   /**
    * 查询代理线的会员
+   *
    * @param agentAccout
    * @return
    */
-    List<Member> getListByAgentAccout(String agentAccout);
-
-  /**
-   * 通过账号list批量查询会员信息
-   * @param accountList
-   * @return
-   */
-    List<Member> findListByAccountList(List<String> accountList);
+  List<Member> getListByAgentAccout(String agentAccout);
 }

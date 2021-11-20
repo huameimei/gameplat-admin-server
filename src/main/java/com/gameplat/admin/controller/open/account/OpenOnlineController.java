@@ -1,10 +1,12 @@
 package com.gameplat.admin.controller.open.account;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
+import com.gameplat.admin.model.bean.OnlineCount;
+import com.gameplat.admin.model.bean.PageExt;
 import com.gameplat.admin.model.dto.OnlineUserDTO;
 import com.gameplat.admin.model.vo.OnlineUserVo;
-import com.gameplat.admin.model.vo.UserToken;
-import com.gameplat.admin.service.OnlineMenberService;
+import com.gameplat.admin.service.OnlineUserService;
 import com.gameplat.common.constant.ServiceName;
 import com.gameplat.common.exception.ServiceException;
 import com.gameplat.common.util.StringUtils;
@@ -24,35 +26,26 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/admin/account/online")
-public class OpenOnlineMenberController {
+public class OpenOnlineController {
 
-  private final OnlineMenberService menberService;
+  private final OnlineUserService onlineUserService;
 
   @GetMapping("/list")
-  public OnlineUserVo onlineList(PageDTO<UserToken> page, OnlineUserDTO userDTO) {
-    return menberService.selectOnlineList(page, userDTO);
+  public IPage<OnlineUserVo> onlineList(PageDTO<OnlineUserVo> page, OnlineUserDTO dto) {
+    return onlineUserService.selectOnlineList(page, dto);
   }
 
-  @PostMapping("/kick")
+  @PutMapping("/kick/{username}")
   @PreAuthorize("hasAuthority('account:online:kick')")
-  @Log(
-      module = ServiceName.ADMIN_SERVICE,
-      type = LogType.ADMIN,
-      desc = "'将【'+#userDTO.userName+'】踢下线' ")
-  public void kickUser(OnlineUserDTO userDTO) {
-    if (StringUtils.isBlank(userDTO.getUserName())) {
-      throw new ServiceException("缺少账号名");
-    }
-    if (StringUtils.isNull(userDTO.getClientType())) {
-      throw new ServiceException("缺少账号标示");
-    }
-    menberService.kickUser(userDTO);
+  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.ADMIN, desc = "'将【'+#username+'】踢下线' ")
+  public void kick(@PathVariable String username) {
+    onlineUserService.kick(username);
   }
 
   @PutMapping("/kickAll")
   @PreAuthorize("hasAuthority('account:online:kickAll')")
   @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.ADMIN, desc = "踢出所有在线账号")
-  public void kickAllUser(@RequestBody String sign) {
-    menberService.kickAllUser(sign);
+  public void kickAll() {
+    onlineUserService.kickAll();
   }
 }

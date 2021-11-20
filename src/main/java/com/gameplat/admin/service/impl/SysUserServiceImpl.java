@@ -109,7 +109,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
     }
 
     SysUser user = userConvert.toEntity(dto);
-    if (UserTypes.isAdmin(dto.getUserType())) {
+    if (UserTypes.ADMIN.match(dto.getUserType())) {
       // 超级管理员但不是特殊的管理员统一设置roleId=1
       if (StringUtils.isNull(dto.getRoleId())) {
         user.setRoleId(1L);

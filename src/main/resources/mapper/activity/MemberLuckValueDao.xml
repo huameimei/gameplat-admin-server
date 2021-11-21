@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.gameplat.admin.mapper.activity.MemberLuckValueDao">
+
+    <!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.gameplat.admin.model.domain.activity.MemberLuckValue" id="memberLuckValueMap">
+        <result property="id" column="id"/>
+        <result property="userId" column="user_id"/>
+        <result property="turntableId" column="turntable_id"/>
+        <result property="luckyValue" column="lucky_value"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="remark" column="remark"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+		id, user_id, turntable_id, lucky_value, create_by, create_time, update_by, update_time, remark
+	</sql>
+
+    <!-- 通用查询条件 -->
+    <sql id="where">
+        <where>
+            <if test="userId != null">
+                and user_id = #{userId}
+            </if>
+            <if test="turntableId != null">
+                and turntable_id = #{turntableId}
+            </if>
+        </where>
+    </sql>
+
+    <select id="findList" resultMap="memberLuckValueMap">
+        select
+        <include refid="Base_Column_List"/>
+        from member_luck_value
+        <include refid="where"/>
+    </select>
+
+    <select id="findMemberLuckValue" resultMap ="memberLuckValueMap">
+     select <include refid="Base_Column_List"/> from member_luck_value <include refid="where"/>
+    </select>
+
+    <insert id="save" parameterType="com.gameplat.admin.model.domain.activity.MemberLuckValue" >
+        insert into member_luck_value
+        (
+        <if test="id != null">
+            `id`,
+        </if>
+        <if test="userId != null">
+            `user_id`,
+        </if>
+        <if test="turntableId != null and turntableId != ''">
+            `turntable_id`,
+        </if>
+        <if test="luckyValue != null and luckyValue != ''">
+            `lucky_value`,
+        </if>
+        <if test="createBy != null and createBy != ''">
+            `create_by`,
+        </if>
+
+        <if test="remark != null and remark != ''">
+            `remark`,
+        </if>
+         `create_time`
+        )
+        values
+        (
+        <if test="id != null">
+            #{id},
+        </if>
+        <if test="userId != null">
+            #{userId},
+        </if>
+        <if test="turntableId != null and turntableId != ''">
+            #{turntableId},
+        </if>
+        <if test="luckyValue != null and luckyValue != ''">
+            #{luckyValue},
+        </if>
+        <if test="createBy != null and createBy != ''">
+            #{createBy},
+        </if>
+                <if test="remark != null and remark != ''">
+            #{remark},
+        </if>
+        sysdate()
+
+        )
+    </insert>
+
+    <update id="update" parameterType="com.gameplat.admin.model.domain.activity.MemberLuckValue">
+        update member_luck_value
+        <set>
+            <if test="userId != null and userId != ''">`user_id` = #{userId},</if>
+            <if test="turntableId != null">`turntable_id` = #{turntableId},</if>
+            <if test="luckyValue != null">`lucky_value` = #{luckyValue},</if>
+            <if test="updateBy != null and updateBy != ''">`update_by` = #{updateBy},</if>
+            <if test="updateTime != null">`update_time` =  sysdate(),</if>
+            <if test="remark != null and remark != ''">`remark` = #{remark}</if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteBatch">
+        delete from member_luck_value where id in
+        <foreach item="id" collection="ids" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+</mapper>

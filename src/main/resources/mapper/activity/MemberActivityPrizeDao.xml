@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gameplat.admin.mapper.activity.MemberActivityPrizeDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.gameplat.admin.model.domain.activity.MemberActivityPrize">
+        <id column="id" property="id" />
+        <result column="activity_prize_id" property="activityPrizeId" />
+        <result column="activity_id" property="activityId" />
+        <result column="type" property="type" />
+        <result column="prize_chance" property="prizeChance" />
+        <result column="prize_repertory" property="prizeRepertory" />
+        <result column="give_amount" property="giveAmount" />
+        <result column="create_by" property="createBy" />
+        <result column="create_time" property="createTime" />
+        <result column="update_by" property="updateBy" />
+        <result column="update_time" property="updateTime" />
+        <result column="remark" property="remark" />
+        <result column="is_group" property="isGroup" />
+        <result column="group_id" property="groupId" />
+        <result column="once_total_num" property="onceTotalNum" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, activity_prize_id, activity_id, type, prize_chance, prize_repertory, give_amount,once_total_num, create_by, create_time, update_by, update_time, remark,group_id,is_group
+    </sql>
+
+	<sql id="where">
+		<where>
+			<if test="activityId != null">
+				and a.activity_id = #{activityId}
+			</if>
+			<if test="type != null">
+				and a.type = #{type}
+			</if>
+		</where>
+	</sql>
+
+	<!-- 查询已上线转盘列表 -->
+	<select id="findActivityPrizeList" resultType="com.gameplat.admin.model.vo.activity.AppActivityPrizeVO">
+		SELECT a.activity_prize_id as activityPrizeId,
+			a.activity_id as activityId,
+			a.type as type,
+			a.give_amount as giveAmount,
+			a.prize_chance as prizeChance,
+			b.prize_type as prizeType,
+			b.prize_level as prizeLevel,
+			b.prize_icon as prizeIcon,
+			b.prize_name as prizeName,
+			b.ticket_yard as ticketYard,
+			a.once_total_num as onceTotalNum
+		from member_activity_prize a
+		LEFT JOIN member_prize b on a.activity_prize_id = b.prize_id
+		<include refid="where"></include>
+	</select>
+
+    <insert id="saveBatchActivityPrize">
+    	insert into member_activity_prize(id,
+    	activity_prize_id,activity_id,type,prize_chance,prize_repertory,give_amount,
+    	once_total_num,remark,is_group,group_id,create_by,create_time
+		)
+		values
+		<foreach collection="list" item="obj" separator="," >
+		(#{obj.id},#{obj.activityPrizeId},
+		#{obj.activityId},
+		#{obj.type},
+		#{obj.prizeChance},
+		#{obj.prizeRepertory},
+		#{obj.giveAmount},
+		#{obj.onceTotalNum},
+		#{obj.remark},
+		#{obj.isGroup},
+		#{obj.groupId},
+		#{obj.createBy},
+		#{obj.createTime})
+		</foreach>
+    </insert>
+
+	<update id="updateBatchActivityPrize">
+		<foreach collection="list" item="item" index="index" open="" close="" separator=";">
+			update member_activity_prize
+			<set>
+				<if test="item.activityPrizeId != null">activity_prize_id = #{item.activityPrizeId },</if>
+				<if test="item.activityId != null">activity_id = #{item.activityId},</if>
+				<if test="item.type != null">type = #{item.type},</if>
+				<if test="item.prizeChance != null">prize_chance = #{item.prizeChance},</if>
+				<if test="item.prizeRepertory != null">prize_repertory = #{item.prizeRepertory},</if>
+				<if test="item.giveAmount != null">give_amount = #{item.giveAmount},</if>
+				<if test="item.onceTotalNum != null">once_total_num = #{item.onceTotalNum},</if>
+				<if test="item.remark != null">remark = #{item.remark},</if>
+				<if test="item.isGroup != null">is_group = #{item.isGroup},</if>
+				<if test="item.groupId != null">group_id = #{item.groupId},</if>
+				<if test="item.updateBy != null">update_by = #{item.updateBy},</if>
+				update_time = sysdate()
+			</set>
+			WHERE id = #{item.id}
+		</foreach>
+	</update>
+
+	<delete id="deleteBatchActivityPrize">
+		delete from member_activity_prize where id in
+		<foreach collection="array" item="id" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</delete>
+
+	<delete id="deleteActivityPrize">
+		delete from member_activity_prize where activity_id = #{activityId} and type = #{type}
+	</delete>
+</mapper>

@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gameplat.admin.mapper.activity.MemberChargeDiscountDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.gameplat.admin.model.domain.activity.MemberChargeDiscount">
+        <id column="discount_id" property="discountId" />
+        <result column="charge_id" property="chargeId" />
+        <result column="amount" property="amount" />
+        <result column="img" property="img" />
+        <result column="discount_num" property="discountNum" />
+        <result column="create_by" property="createBy" />
+        <result column="create_time" property="createTime" />
+        <result column="update_by" property="updateBy" />
+        <result column="update_time" property="updateTime" />
+        <result column="remark" property="remark" />
+        <result column="is_group" property="isGroup" />
+        <result column="group_id" property="groupId" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        discount_id, charge_id, amount,img, discount_num, create_by, create_time, update_by, update_time, remark,is_group,group_id
+    </sql>
+
+    <select id="findList" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from member_charge_discount
+		<where>
+		1=1
+			<if test="chargeId!=null">
+				and charge_id=#{chargeId}
+			</if>
+			<if test="isGroup!=null">
+				and is_group=#{isGroup}
+			</if>
+			<if test="groupId!=null">
+				and group_id=#{groupId}
+			</if>
+		</where>
+	</select>
+
+	<insert id="insertBatch">
+		insert into
+		member_charge_discount(discount_id,
+		charge_id,amount,img,discount_num,is_group,group_id,
+		create_by,create_time)
+		values
+		<foreach collection="list" item="obj" separator=",">
+		(#{obj.discountId},#{obj.chargeId},#{obj.amount},#{obj.img},#{obj.discountNum},#{obj.isGroup},#{obj.groupId},
+		#{obj.createBy},#{obj.createTime})
+		</foreach>
+	</insert>
+
+	<update id="updateBatch">
+		<foreach collection="list" item="item" index="index" open="" close="" separator=";">
+			update member_charge_discount
+			<set>
+				<if test="item.amount != null">amount = #{item.amount},</if>
+				<if test="item.img != null and item.img!=''">img = #{item.img},</if>
+				<if test="item.discountNum != null">discount_num = #{item.discountNum},</if>
+				<if test="item.isGroup != null">is_group = #{item.isGroup},</if>
+				<if test="item.groupId != null">group_id = #{item.groupId},</if>
+				<if test="item.updateBy != null and item.updateBy != ''">update_by = #{item.updateBy},</if>
+				update_time = #{item.updateTime}
+			</set>
+			WHERE discount_id = #{item.discountId}
+		</foreach>
+	</update>
+
+   <delete id="deleteByIds" parameterType="int">
+		delete from member_charge_discount where discount_id in
+		<foreach collection="array" item="id" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</delete>
+
+	<select id="findChargeDiscountByChargeId" resultMap="BaseResultMap">
+		select <include refid="Base_Column_List" /> from member_charge_discount
+		<where>
+			1=1
+		<if test="chargeId != null"> and charge_id=#{chargeId}</if>
+		<if test="groupId != null"> and group_id=#{groupId}</if>
+		<if test="isGroup != null"> and is_group=#{isGroup}</if>
+		</where>
+	</select>
+
+	<delete id="deleteChargeId">
+		delete from member_charge_discount where charge_id = #{chargeId}
+	</delete>
+</mapper>

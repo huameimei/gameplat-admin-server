@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gameplat.admin.mapper.activity.MemberRedPacketDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.gameplat.admin.model.domain.activity.MemberRedPacket">
+        <id column="packet_id" property="packetId" />
+        <result column="week_time" property="weekTime" />
+        <result column="begin_time" property="beginTime" />
+        <result column="end_time" property="endTime" />
+        <result column="status" property="status" />
+        <result column="create_by" property="createBy" />
+        <result column="create_time" property="createTime" />
+        <result column="update_by" property="updateBy" />
+        <result column="update_time" property="updateTime" />
+        <result column="remark" property="remark" />
+        <result column="real_title" property="realTitle" />
+        <result column="real_location" property="realLocation" />
+        <result column="frequency" property="frequency" />
+        <result column="duration" property="duration" />
+        <result column="packet_type" property="packetType" />
+        <result column="packet_total_num" property="packetTotalNum" />
+        <result column="packet_draw_limit" property="packetDrawLimit" />
+        <result column="start_time" property="startTime" />
+        <result column="stop_time" property="stopTime" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        packet_id, week_time, begin_time, end_time, status,real_title,real_location, create_by, create_time, update_by,
+        update_time, remark,frequency,duration,packet_type,packet_total_num,packet_draw_limit,start_time,stop_time
+    </sql>
+
+    <select id="getConfig" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from member_red_packet
+		limit 1
+	</select>
+
+	<insert id="saveRedPacket">
+		insert into
+		member_red_packet(
+		<if test="packetId != null">packet_id,</if>
+		<if test="weekTime != null">week_time,</if>
+		<if test="beginTime != null">begin_time,</if>
+		<if test="endTime != null">end_time,</if>
+		<if test="remark != null and remark != ''">remark,</if>
+		<if test="status != null">status,</if>
+		<if test="realTitle != null">real_title,</if>
+		<if test="realLocation != null">real_location,</if>
+		<if test="frequency != null">frequency,</if>
+		<if test="duration != null">duration,</if>
+		<if test="packetType != null">packet_type,</if>
+		<if test="packetTotalNum != null">packet_total_num,</if>
+		<if test="packetDrawLimit != null">packet_draw_limit,</if>
+		<if test="startTime != null">start_time,</if>
+		<if test="stopTime != null">stop_time,</if>
+		create_by,create_time)
+		values
+		(
+		<if test="packetId != null">#{packetId},</if>
+		<if test="weekTime != null">#{weekTime},</if>
+		<if test="beginTime != null">#{beginTime},</if>
+		<if test="endTime != null">#{endTime},</if>
+		<if test="remark != null and remark != ''">#{remark},</if>
+		<if test="status != null">#{status},</if>
+		<if test="realTitle != null">#{realTitle},</if>
+		<if test="realLocation != null">#{realLocation},</if>
+		<if test="frequency != null">#{frequency},</if>
+		<if test="duration != null">#{duration},</if>
+		<if test="packetType != null">#{packetType},</if>
+		<if test="packetTotalNum != null">#{packetTotalNum},</if>
+		<if test="packetDrawLimit != null">#{packetDrawLimit},</if>
+		<if test="startTime != null">#{startTime},</if>
+		<if test="stopTime != null">#{stopTime},</if>
+		#{createBy},#{createTime})
+	</insert>
+
+	<update id="updateRedPacket">
+		update member_red_packet
+		<set>
+			<if test="weekTime != null and weekTime!=''">week_time=#{weekTime},</if>
+			<if test="beginTime != null">begin_time=#{beginTime},</if>
+			<if test="endTime != null">end_time=#{endTime},</if>
+			<if test="realTitle != null">real_title=#{realTitle},</if>
+			<if test="remark != null">remark=#{remark},</if>
+			<if test="realLocation != null">real_location=#{realLocation},</if>
+			<if test="frequency != null">frequency=#{frequency},</if>
+			<if test="duration != null">duration=#{duration},</if>
+			<if test="packetType != null">packet_type=#{packetType},</if>
+			<if test="packetTotalNum != null">packet_total_num=#{packetTotalNum},</if>
+			<if test="packetDrawLimit != null">packet_draw_limit=#{packetDrawLimit},</if>
+			<if test="startTime != null">start_time=#{startTime},</if>
+			<if test="stopTime != null">stop_time=#{stopTime},</if>
+			<if test="status != null">status=#{status},</if>
+			<if test="updateBy != null and updateBy != ''">update_by=#{updateBy},</if>
+			update_time = sysdate()
+		</set>
+		WHERE packet_id = #{packetId}
+	</update>
+
+	<select id="findRedPacketList" resultMap="BaseResultMap">
+		select <include refid="Base_Column_List" /> from member_red_packet t where 1=1
+		<if test="beginTime != null and beginTime != 'null' and beginTime != ''">
+	      and t.`create_time` <![CDATA[>= ]]> #{beginTime}
+		</if>
+
+		<if test="endTime != null and endTime != 'null' and endTime != ''">
+		  and t.`create_time` <![CDATA[<= ]]> #{endTime}
+		</if>
+
+		<if test="realTitle != null and realTitle != 'null' and realTitle != ''">
+		  and t.`real_title` LIKE CONCAT('%',#{realTitle},'%')
+		</if>
+
+		<if test="realLocation != null and realLocation != 'null' and realLocation != ''">
+		  and t.`real_location` LIKE CONCAT('%',#{realLocation},'%')
+		</if>
+		<if test="status != null">
+		  and t.`status` = #{status}
+		</if>
+		<if test="packetType != null">
+		  and t.`packet_type` = #{packetType}
+		</if>
+	</select>
+
+	<delete id="deleteRedPacket">
+		DELETE from member_red_packet where status=2 and  packet_id = #{packetId}
+	</delete>
+
+	<select id="findRedPacketStatus" resultType="int">
+		SELECT t.`status` from member_red_packet t where t.packet_id IN(
+		SELECT DISTINCT a.activity_id from member_prize p
+		LEFT JOIN member_activity_prize a
+		ON p.prize_id=a.activity_prize_id
+		where p.prize_id in
+		<foreach collection="list" item="id" separator="," open="(" close=")">
+            #{id}
+         </foreach>
+		and a.type=1)  and t.`status` != 0
+	</select>
+
+	<select id="findRedPacketById" resultMap="BaseResultMap">
+		select <include refid="Base_Column_List" /> from member_red_packet where packet_id=#{packetId}
+	</select>
+
+	<update id="updateRedPacketStatus">
+		update member_red_packet set status=0 WHERE packet_id = #{packetId}
+	</update>
+
+	<update id="online">
+		update member_red_packet set status=1 where status=2
+		and NOW() &gt;= begin_time
+		and NOW() &lt;= end_time
+	</update>
+
+	<update id="offline">
+		update member_red_packet set status=0 where status=1
+		and NOW() &gt; end_time
+	</update>
+
+	<select id="getArriveRain" resultMap="BaseResultMap">
+	SELECT <include refid="Base_Column_List" />
+		from member_red_packet
+		where
+	    packet_type = #{type}
+		and status <![CDATA[ <> ]]> 0
+		and NOW() &gt;= begin_time
+		and NOW() &lt;= end_time
+		and locate(DAYOFWEEK(NOW()),week_time)>0
+		and time(NOW()) &gt;= time(start_time)
+		and time(NOW()) &lt;= time(stop_time)
+	</select>
+
+	<select id="getCurrentTimeRedPacket" resultMap="BaseResultMap">
+		SELECT <include refid="Base_Column_List" />
+		from member_red_packet
+		where
+		packet_type = #{type}
+		and DATE_FORMAT(begin_time, '%Y-%m-%d') = DATE_FORMAT(NOW(), '%Y-%m-%d')
+		and status <![CDATA[ <> ]]> 0
+		and NOW() &gt;= begin_time
+		and NOW() &lt;= end_time
+		and locate(DAYOFWEEK(NOW()),week_time)>0
+		and time(NOW()) &gt;= time(start_time)
+		and time(NOW()) &lt;= time(stop_time)
+	</select>
+
+</mapper>

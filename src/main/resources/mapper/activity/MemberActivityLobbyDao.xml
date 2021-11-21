@@ -1,0 +1,431 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.gameplat.admin.mapper.activity.MemberActivityLobbyDao">
+
+    <!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.gameplat.admin.model.domain.activity.MemberActivityLobby" id="memberActivityLobbyMap">
+        <result property="id" column="id"/>
+        <result property="title" column="title"/>
+        <result property="startTime" column="start_time"/>
+        <result property="endTime" column="end_time"/>
+        <result property="type" column="type"/>
+        <result property="activityType" column="activity_type"/>
+        <result property="describe" column="describe"/>
+        <result property="statisItem" column="statis_item"/>
+        <result property="payType" column="pay_type"/>
+        <result property="statisDate" column="statis_date"/>
+        <result property="detailDate" column="detail_date"/>
+        <result property="graded" column="graded"/>
+        <result property="applyWay" column="apply_way"/>
+        <result property="auditWay" column="audit_way"/>
+        <result property="nextDayApply" column="next_day_apply"/>
+        <result property="multipleHandsel" column="multiple_handsel"/>
+        <result property="accountBlacklist" column="account_blacklist"/>
+        <result property="ipBlacklist" column="ip_blacklist"/>
+        <result property="remark" column="remark"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="applyUrl" column="apply_url"/>
+        <result property="getWay" column="get_way"/>
+        <result property="userLevel" column="user_level"/>
+        <result property="status" column="status"/>
+        <result property="gameType" column="game_type"/>
+        <result property="gameList" column="game_list"/>
+        <result property="rechargeValidAmount" column="recharge_valid_amount"/>
+        <result property="sportValidAmount" column="sport_valid_amount"/>
+        <result property="matchId" column="match_id"/>
+        <result property="matchType" column="match_type"/>
+        <result property="isRepeat" column="is_repeat"/>
+        <result property="isAutoDistribute" column="is_auto_distribute"/>
+        <result property="applyDateList" column="apply_date_list"/>
+
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+	id, title, start_time, end_time, `type`, `describe`, statis_item, pay_type, statis_date, detail_date, graded, apply_way, audit_way, next_day_apply, multiple_handsel, account_blacklist, ip_blacklist, remark, create_by, create_time, update_by, update_time ,apply_url ,get_way ,user_level,status, game_list,recharge_valid_amount, sport_valid_amount, match_id, match_type, is_repeat, is_auto_distribute, apply_date_list,activity_type,game_type</sql>
+
+    <!-- 通用查询条件 -->
+    <sql id="where">
+        <where>
+            <if test="title != null and title != ''">
+                and `title` like concat('%',#{title},'%')
+            </if>
+            <if test="startTime != null">
+                and `start_time` = #{startTime}
+            </if>
+            <if test="endTime != null">
+                and `end_time` = #{endTime}
+            </if>
+            <if test="type != null">
+                and `type` = #{type}
+            </if>
+            <if test="describe != null and describe != ''">
+                and `describe` = #{describe}
+            </if>
+            <if test="statisItem != null and statisItem != ''">
+                and `statis_item` = #{statisItem}
+            </if>
+            <if test="payType != null and payType != ''">
+                and `pay_type` = #{payType}
+            </if>
+            <if test="statisDate != null and statisDate != ''">
+                and `statis_date` = #{statisDate}
+            </if>
+            <if test="detailDate != null and detailDate != ''">
+                and `detail_date` = #{detailDate}
+            </if>
+            <if test="graded != null and graded != ''">
+                and `graded` = #{graded}
+            </if>
+            <if test="applyWay != null and applyWay != ''">
+                and `apply_way` = #{applyWay}
+            </if>
+            <if test="auditWay != null and auditWay != ''">
+                and `audit_way` = #{auditWay}
+            </if>
+            <if test="nextDayApply != null and nextDayApply != ''">
+                and `next_day_apply` = #{nextDayApply}
+            </if>
+            <if test="multipleHandsel != null and multipleHandsel != ''">
+                and `multiple_handsel` = #{multipleHandsel}
+            </if>
+            <if test="accountBlacklist != null and accountBlacklist != ''">
+                and `account_blacklist` = #{accountBlacklist}
+            </if>
+            <if test="ipBlacklist != null and ipBlacklist != ''">
+                and `ip_blacklist` = #{ipBlacklist}
+            </if>
+            <if test="remark != null and remark != ''">
+                and `remark` = #{remark}
+            </if>
+            <if test="createBy != null and createBy != ''">
+                and `create_by` = #{createBy}
+            </if>
+            <if test="createTime != null">
+                and `create_time` = #{createTime}
+            </if>
+            <if test="updateBy != null and updateBy != ''">
+                and `update_by` = #{updateBy}
+            </if>
+            <if test="updateTime != null">
+                and `update_time` = #{updateTime}
+            </if>
+            <if test="failure != null">
+                and `type` != #{failure}
+            </if>
+            <if test="getWay != null">
+                and `get_way` != #{getWay}
+            </if>
+            <if test="userLevel != null and userLevel != ''">
+                and `user_level` != #{userLevel}
+            </if>
+            <if test="status != null">
+                and `status` = #{status}
+            </if>
+            <if test="isRepeat != null">
+                and `is_repeat` = #{isRepeat}
+            </if>
+            <if test="isAutoDistribute != null">
+                and `is_auto_distribute` = #{isAutoDistribute}
+            </if>
+        </where>
+    </sql>
+
+    <select id="findActivityLobbyList" resultMap="memberActivityLobbyMap">
+        select
+        <include refid="Base_Column_List"/>
+        from member_activity_lobby
+        <include refid="where"/>
+        order by create_time desc
+    </select>
+
+    <insert id="saveActivityLobby" useGeneratedKeys="true" keyProperty="id" parameterType="com.gameplat.admin.model.domain.activity.MemberActivityLobby">
+        insert into member_activity_lobby
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="title != null and title != ''">
+                `title`,
+            </if>
+            <if test="startTime != null">
+                `start_time`,
+            </if>
+            <if test="endTime != null">
+                `end_time`,
+            </if>
+            <if test="type != null">
+                `type`,
+            </if>
+            <if test="activityType != null">
+                `activity_type`,
+            </if>
+            <if test="describe != null and describe != ''">
+                `describe`,
+            </if>
+            <if test="statisItem != null">
+                `statis_item`,
+            </if>
+            <if test="payType != null and payType != ''">
+                `pay_type`,
+            </if>
+            <if test="statisDate != null">
+                `statis_date`,
+            </if>
+            <if test="detailDate != null">
+                `detail_date`,
+            </if>
+            <if test="graded != null and graded != ''">
+                `graded`,
+            </if>
+            <if test="applyWay != null">
+                `apply_way`,
+            </if>
+            <if test="auditWay != null">
+                `audit_way`,
+            </if>
+            <if test="nextDayApply != null">
+                `next_day_apply`,
+            </if>
+            <if test="multipleHandsel != null">
+                `multiple_handsel`,
+            </if>
+            <if test="accountBlacklist != null and accountBlacklist != ''">
+                `account_blacklist`,
+            </if>
+            <if test="ipBlacklist != null and ipBlacklist != ''">
+                `ip_blacklist`,
+            </if>
+            <if test="remark != null and remark != ''">
+                `remark`,
+            </if>
+            <if test="createBy != null and createBy != ''">
+                `create_by`,
+            </if>
+            <if test="applyUrl != null">
+                `apply_url`,
+            </if>
+            <if test="getWay != null">
+                `get_way`,
+            </if>
+            <if test="userLevel != null and userLevel != ''">
+                `user_level`,
+            </if>
+            <if test="status != null">
+                `status`,
+            </if>
+            <if test="gameType != null">
+                `game_type`,
+            </if>
+            <if test="gameList != null and gameList != ''">
+                `game_list`,
+            </if>
+            <if test="rechargeValidAmount != null">
+                `recharge_valid_amount`,
+            </if>
+            <if test="sportValidAmount != null">
+                `sport_valid_amount`,
+            </if>
+            <if test="matchId != null">
+                `match_id`,
+            </if>
+            <if test="matchType != null">
+                `match_type`,
+            </if>
+            <if test="isRepeat != null">
+                `is_repeat`,
+            </if>
+            <if test="isAutoDistribute != null">
+                `is_auto_distribute`,
+            </if>
+            <if test="applyDateList != null and applyDateList != ''">
+                `apply_date_list`,
+            </if>
+            `create_time`
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="title != null and title != ''">
+                #{title},
+            </if>
+            <if test="startTime != null">
+                #{startTime},
+            </if>
+            <if test="endTime != null">
+                #{endTime},
+            </if>
+            <if test="type != null">
+                #{type},
+            </if>
+            <if test="activityType != null">
+                #{activityType},
+            </if>
+            <if test="describe != null and describe != ''">
+                #{describe},
+            </if>
+            <if test="statisItem != null">
+                #{statisItem},
+            </if>
+            <if test="payType != null and payType != ''">
+                #{payType},
+            </if>
+            <if test="statisDate != null">
+                #{statisDate},
+            </if>
+            <if test="detailDate != null">
+                #{detailDate},
+            </if>
+            <if test="graded != null and graded != ''">
+                #{graded},
+            </if>
+            <if test="applyWay != null">
+                #{applyWay},
+            </if>
+            <if test="auditWay != null">
+                #{auditWay},
+            </if>
+            <if test="nextDayApply != null">
+                #{nextDayApply},
+            </if>
+            <if test="multipleHandsel != null">
+                #{multipleHandsel},
+            </if>
+            <if test="accountBlacklist != null and accountBlacklist != ''">
+                #{accountBlacklist},
+            </if>
+            <if test="ipBlacklist != null and ipBlacklist != ''">
+                #{ipBlacklist},
+            </if>
+            <if test="remark != null and remark != ''">
+                #{remark},
+            </if>
+            <if test="createBy != null and createBy != ''">
+                #{createBy},
+            </if>
+            <if test="applyUrl != null">
+                #{applyUrl},
+            </if>
+            <if test="getWay != null">
+                #{getWay},
+            </if>
+            <if test="userLevel != null and userLevel != ''">
+                #{userLevel},
+            </if>
+            <if test="status != null">
+                #{status},
+            </if>
+            <if test="gameType != null">
+                #{gameType},
+            </if>
+            <if test="gameList != null and gameList != ''">
+                #{gameList},
+            </if>
+            <if test="rechargeValidAmount != null">
+                #{rechargeValidAmount},
+            </if>
+            <if test="sportValidAmount != null">
+                #{sportValidAmount},
+            </if>
+            <if test="matchId != null">
+                #{matchId},
+            </if>
+            <if test="matchType != null">
+                #{matchType},
+            </if>
+            <if test="isRepeat != null">
+                #{isRepeat},
+            </if>
+            <if test="isAutoDistribute != null">
+                #{isAutoDistribute},
+            </if>
+            <if test="applyDateList != null and applyDateList != ''">
+                #{applyDateList},
+            </if>
+            sysdate()
+        </trim>
+    </insert>
+
+    <update id="updateActivityLobby" parameterType="com.gameplat.admin.model.domain.activity.MemberActivityLobby">
+        update member_activity_lobby
+        <set>
+            <if test="title != null and title != ''">`title` = #{title},</if>
+            <if test="startTime != null">`start_time` = #{startTime},</if>
+            <if test="endTime != null">`end_time` = #{endTime},</if>
+            <if test="type != null">`type` = #{type},</if>
+            <if test="activityType != null">`activity_type` = #{activityType},</if>
+            <if test="describe != null and describe != ''">`describe` = #{describe},</if>
+            <if test="statisItem != null">`statis_item` = #{statisItem},</if>
+            <if test="payType != null and payType != ''">`pay_type` = #{payType},</if>
+            <if test="statisDate != null">`statis_date` = #{statisDate},</if>
+            <if test="detailDate != null">`detail_date` = #{detailDate},</if>
+            <if test="graded != null and graded != ''">`graded` = #{graded},</if>
+            <if test="applyWay != null">`apply_way` = #{applyWay},</if>
+            <if test="auditWay != null">`audit_way` = #{auditWay},</if>
+            <if test="nextDayApply != null">`next_day_apply` = #{nextDayApply},</if>
+            <if test="multipleHandsel != null">`multiple_handsel` = #{multipleHandsel},</if>
+            <if test="accountBlacklist != null and accountBlacklist != ''">`account_blacklist` = #{accountBlacklist}, </if>
+            <if test="ipBlacklist != null and ipBlacklist != ''">`ip_blacklist` = #{ipBlacklist},</if>
+            <if test="remark != null and remark != ''">`remark` = #{remark},</if>
+            <if test="updateBy != null and updateBy != ''">`update_by` = #{updateBy},</if>
+            <if test="applyUrl != null">`apply_url` = #{applyUrl},</if>
+            <if test="getWay != null">`get_way` = #{getWay},</if>
+            <if test="userLevel != null and userLevel != ''">`user_level` = #{userLevel},</if>
+            <if test="status != null">`status` = #{status},</if>
+            <if test="gameType != null">`game_type` = #{gameType},</if>
+            <if test="gameList != null and gameList != ''">`game_list` = #{gameList},</if>
+            <if test="rechargeValidAmount != null">`recharge_valid_amount` = #{rechargeValidAmount},</if>
+            <if test="sportValidAmount != null">`sport_valid_amount` = #{sportValidAmount},</if>
+            <if test="matchId != null">`match_id` = #{matchId},</if>
+            <if test="matchType != null">`match_type` = #{matchType},</if>
+            <if test="isRepeat != null">`is_repeat` = #{isRepeat},</if>
+            <if test="isAutoDistribute != null">`is_auto_distribute` = #{isAutoDistribute},</if>
+            <if test="applyDateList != null and applyDateList != ''">`apply_date_list` = #{applyDateList},</if>
+            `update_time` = sysdate()
+        </set>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteActivityLobby">
+        delete from member_activity_lobby where id in
+        <foreach collection="list" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <select id="findActivityLobbyById" resultMap="memberActivityLobbyMap">
+        select <include refid="Base_Column_List"/> from member_activity_lobby where id = #{id}
+    </select>
+
+    <select id="findActivityLobbyListByTime" resultMap="memberActivityLobbyMap">
+        select
+        <include refid="Base_Column_List"/>
+        from member_activity_lobby
+        where end_time >= #{time} and start_time &lt;= #{time} and type =1
+    </select>
+    <select id="findNewActivity" resultMap="memberActivityLobbyMap">
+        select
+        <include refid="Base_Column_List"/>
+        from member_activity_lobby
+        where start_time >= #{time} and next_day_apply =0
+    </select>
+    <select id="findAllValid" resultMap="memberActivityLobbyMap">
+        select
+        <include refid="Base_Column_List"/>
+        from member_activity_lobby
+        where end_time >= #{time} and start_time &lt;= #{time} and type =1
+    </select>
+    <select id="findExpireLobby" resultType="java.lang.Long">
+        SELECT ad.distribute_id
+        FROM activity_distribute ad ,member_activity_lobby mal
+        WHERE ad.activity_id=mal.id AND mal.type=1 AND ad.status=1
+        AND  DATE_FORMAT(NOW(),"%Y-%m-%d") >= date_add(DATE_FORMAT(mal.end_time,"%Y-%m-%d"), interval 3 day)
+    </select>
+    <select id="findExpireRed" resultType="java.lang.Long">
+        SELECT ad.distribute_id
+        FROM activity_distribute ad ,member_red_packet mrp
+        WHERE ad.activity_id=mrp.packet_id AND mrp.status=1 AND ad.status=1
+        AND  DATE_FORMAT(NOW(),"%Y-%m-%d") >= date_add(DATE_FORMAT(mrp.end_time,"%Y-%m-%d"), interval 3 day)
+    </select>
+
+
+</mapper>

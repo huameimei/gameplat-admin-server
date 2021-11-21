@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.gameplat.admin.mapper.activity.MemberLobbyDiscountDao">
+
+    <!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.gameplat.admin.model.domain.activity.MemberLobbyDiscount" id="memberLobbyDiscountMap">
+        <result property="lobbyDiscountId" column="lobby_discount_id"/>
+        <result property="lobbyId" column="lobby_id"/>
+        <result property="discountUrl" column="discount_url"/>
+        <result property="targetValue" column="target_value"/>
+        <result property="presenterValue" column="presenter_value"/>
+        <result property="presenterDml" column="presenter_dml"/>
+        <result property="withdrawDml" column="withdraw_dml"/>
+        <result property="remark" column="remark"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+	lobby_discount_id, lobby_id, discount_url, target_value, presenter_value, presenter_dml, withdraw_dml, remark, create_by, create_time, update_by, update_time    </sql>
+
+    <!-- 通用查询条件 -->
+    <sql id="where">
+        <where>
+            <if test="lobbyId != null and lobbyId != ''">
+                and `lobby_id` = #{lobbyId}
+            </if>
+            <if test="discountUrl != null and discountUrl != ''">
+                and `discount_url` = #{discountUrl}
+            </if>
+            <if test="targetValue != null and targetValue != ''">
+                and `target_value` = #{targetValue}
+            </if>
+            <if test="presenterValue != null and presenterValue != ''">
+                and `presenter_value` = #{presenterValue}
+            </if>
+            <if test="presenterDml != null and presenterDml != ''">
+                and `presenter_dml` = #{presenterDml}
+            </if>
+            <if test="withdrawDml != null and withdrawDml != ''">
+                and `withdraw_dml` = #{withdrawDml}
+            </if>
+            <if test="remark != null and remark != ''">
+                and `remark` = #{remark}
+            </if>
+            <if test="createBy != null and createBy != ''">
+                and `create_by` = #{createBy}
+            </if>
+            <if test="createTime != null">
+                and `create_time` = #{createTime}
+            </if>
+            <if test="updateBy != null and updateBy != ''">
+                and `update_by` = #{updateBy}
+            </if>
+            <if test="updateTime != null">
+                and `update_time` = #{updateTime}
+            </if>
+        </where>
+    </sql>
+
+    <select id="findLobbyDiscountList" resultMap="memberLobbyDiscountMap">
+        select
+        <include refid="Base_Column_List"/>
+        from member_lobby_discount
+        <include refid="where"/>
+    </select>
+
+    <select id="findLobbyDiscountListByLobbyId" resultMap="memberLobbyDiscountMap">
+        select
+        <include refid="Base_Column_List"/>
+        from member_lobby_discount
+        where lobby_id = #{lobbyId}
+    </select>
+
+    <insert id="saveLobbyDiscount" parameterType="com.gameplat.admin.model.domain.activity.MemberLobbyDiscount">
+        insert into member_lobby_discount
+        (`lobby_id`,`discount_url`,`target_value`,`presenter_value`,`presenter_dml`,`withdraw_dml`,`remark`,`create_by`,`create_time`)
+        values
+        <foreach collection="list" item="obj" separator=",">
+        (#{obj.lobbyId},#{obj.discountUrl},#{obj.targetValue},#{obj.presenterValue},#{obj.presenterDml},#{obj.withdrawDml},#{obj.remark},#{obj.createBy},#{obj.createTime})
+        </foreach>
+    </insert>
+
+
+    <update id="updateLobbyDiscount" parameterType="com.gameplat.admin.model.domain.activity.MemberLobbyDiscount">
+        <foreach collection="list" item="item" index="index" open="" close="" separator=";">
+        update member_lobby_discount
+        <set>
+            <if test="item.lobbyId != null">`lobby_id` = #{item.lobbyId},</if>
+            <if test="item.discountUrl != null and item.discountUrl != ''">`discount_url` = #{item.discountUrl},</if>
+            <if test="item.targetValue != null">`target_value` = #{item.targetValue},</if>
+            <if test="item.presenterValue != null">`presenter_value` = #{item.presenterValue},</if>
+            <if test="item.presenterDml != null">`presenter_dml` = #{item.presenterDml},</if>
+            <if test="item.withdrawDml != null">`withdraw_dml` = #{item.withdrawDml},</if>
+            <if test="item.remark != null and item.remark != ''">`remark` = #{item.remark},</if>
+            <if test="item.createBy != null and item.createBy != ''">`create_by` = #{item.createBy},</if>
+            <if test="item.createTime != null">`create_time` = #{item.createTime},</if>
+            <if test="item.updateBy != null and item.updateBy != ''">`update_by` = #{item.updateBy},</if>
+            <if test="item.updateTime != null">`update_time` = #{item.updateTime}</if>
+        </set>
+        where lobby_discount_id = #{item.lobbyDiscountId}
+        </foreach>
+    </update>
+
+    <delete id="deleteBatchLobbyDiscount">
+        delete from member_lobby_discount where lobby_discount_id in
+        <foreach item="lobby_discount_id" collection="list" open="(" separator="," close=")">
+            #{lobby_discount_id}
+        </foreach>
+    </delete>
+
+    <delete id="deleteBatchLobbyDiscountByLobbyId">
+        delete from member_lobby_discount where lobby_id in
+        <foreach item="lobby_discount_id" collection="list" open="(" separator="," close=")">
+            #{lobby_discount_id}
+        </foreach>
+    </delete>
+
+    <select id="findLobbyDiscountListByLobbyIds" resultMap="memberLobbyDiscountMap">
+        select
+        <include refid="Base_Column_List"/>
+        from member_lobby_discount
+        where lobby_id in
+        <foreach item="item" collection="list" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+
+</mapper>

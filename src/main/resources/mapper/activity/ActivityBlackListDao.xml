@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gameplat.admin.mapper.activity.ActivityBlackListDao">
+
+    <resultMap type="com.gameplat.admin.model.vo.activity.ActivityBlackListVO" id="BaseResultMap">
+        <result property="id" column="id"/>
+        <result property="activityId" column="activity_id"/>
+        <result property="limitedContent" column="limited_content"/>
+        <result property="limitedType" column="limited_type"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+    </resultMap>
+
+    <select id="findActivityBlackList" resultMap="BaseResultMap">
+        select
+        id,
+        activity_id,
+        limited_content,
+        limited_type,
+        create_by,
+        create_time
+        from activity_black_list
+        <where>
+            <if test="activityId != null">
+                and activity_id = #{activityId}
+            </if>
+            <if test="limitedContent != null and limitedContent != ''">
+                and limited_content = #{limitedContent}
+            </if>
+            <if test="limitedType != null">
+                and limited_type = #{limitedType}
+            </if>
+        </where>
+    </select>
+
+    <insert id="insertActivityBlackList">
+        insert into activity_black_list(
+        <if test="activityId != null">activity_id,</if>
+        <if test="limitedContent != null and limitedContent != ''">limited_content,</if>
+        <if test="limitedType != null">limited_type,</if>
+        <if test="createBy != null and createBy != ''">create_by,</if>
+        create_time
+        ) values (
+        <if test="activityId != null">#{activityId},</if>
+        <if test="limitedContent != null and limitedContent != ''">#{limitedContent},</if>
+        <if test="limitedType != null ">#{limitedType},</if>
+        <if test="createBy != null and createBy != ''">#{createBy},</if>
+        sysdate()
+        )
+    </insert>
+
+    <delete id="deleteActivityBlackList">
+        delete from activity_black_list where id in
+        <foreach collection="list" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <select id="checkActivityBlack" resultType="java.lang.Integer">
+        select
+        count(*)
+        from activity_black_list
+        <where>
+            <if test="activityId != null">
+                and activity_id = #{activityId}
+            </if>
+            <if test="limitedContent != null and limitedContent != ''">
+                and limited_content = #{limitedContent}
+            </if>
+            <if test="limitedType != null">
+                and limited_type = #{limitedType}
+            </if>
+            <if test="userName != null and userName != '' and ipAddress != null and ipAddress != ''">
+                and (limited_content = #{userName} or limited_content = #{ipAddress})
+            </if>
+        </where>
+    </select>
+
+</mapper>

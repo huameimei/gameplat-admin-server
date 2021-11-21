@@ -1,0 +1,507 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.gameplat.admin.mapper.activity.QualificationManageDao">
+
+    <!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.gameplat.admin.model.domain.activity.QualificationManage" id="qualificationManageMap">
+        <result property="qualificationId" column="qualification_id"/>
+        <result property="activityName" column="activity_name"/>
+        <result property="activityType" column="activity_type"/>
+        <result property="activityId" column="activity_id"/>
+        <result property="userId" column="user_id"/>
+        <result property="username" column="username"/>
+        <result property="applyTime" column="apply_time"/>
+        <result property="auditPerson" column="audit_person"/>
+        <result property="auditTime" column="audit_time"/>
+        <result property="auditRemark" column="audit_remark"/>
+        <result property="status" column="status"/>
+        <result property="activityStartTime" column="activity_start_time"/>
+        <result property="activityEndTime" column="activity_end_time"/>
+        <result property="deleteFlag" column="delete_flag"/>
+        <result property="remark" column="remark"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="drawNum" column="draw_num"/>
+        <result property="employNum" column="employ_num"/>
+        <result property="minMoney" column="min_money"/>
+        <result property="maxMoney" column="max_money"/>
+        <result property="qualificationStatus" column="qualification_status"/>
+        <result property="employTime" column="employ_time"/>
+        <result property="qualificationActivityId" column="qualification_activity_id"/>
+        <result property="soleIdentifier" column="sole_identifier"/>
+        <result property="statisItem" column="statis_item"/>
+        <result property="withdrawDml" column="withdraw_dml"/>
+        <result property="statisStartTime" column="statis_start_time"/>
+        <result property="statisEndTime" column="statis_end_time"/>
+        <result property="awardDetail" column="award_detail"/>
+        <result property="getWay" column="get_way"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+	qualification_id, activity_name, activity_type, activity_id, user_id, username, apply_time, audit_person, audit_time,
+	audit_remark, status, activity_start_time, activity_end_time, delete_flag, remark, create_by, create_time,
+	update_by, update_time, draw_num, employ_num, min_money, max_money, qualification_status,employ_time,qualification_activity_id,
+	sole_identifier,statis_item,withdraw_dml, statis_start_time, statis_end_time,award_detail,get_way</sql>
+    <!-- 通用查询条件 -->
+    <sql id="where">
+        <if test="activityName != null and activityName != ''">
+            and `activity_name` = #{activityName}
+        </if>
+        <if test="activityType != null">
+            and `activity_type` = #{activityType}
+        </if>
+        <if test="activityId != null">
+            and `activity_id` = #{activityId}
+        </if>
+        <if test="userId != null">
+            and `user_id` = #{userId}
+        </if>
+        <if test="username != null and username != ''">
+            and `username` LIKE CONCAT('%',#{username},'%')
+        </if>
+        <if test="applyStartTime != null and applyStartTime != ''">
+            and `apply_time` <![CDATA[ >= ]]> #{applyStartTime}
+        </if>
+        <if test="applyEndTime != null and applyEndTime != ''">
+            and `apply_time` <![CDATA[ <= ]]> #{applyEndTime}
+        </if>
+        <if test="auditPerson != null and auditPerson != ''">
+            and `audit_person` = #{auditPerson}
+        </if>
+        <if test="auditTime != null">
+            and `audit_time` = #{auditTime}
+        </if>
+        <if test="auditRemark != null and auditRemark != ''">
+            and `audit_remark` = #{auditRemark}
+        </if>
+        <if test="status == null ">
+            and `status` <![CDATA[ <> ]]> 0
+        </if>
+        <if test="status != null ">
+            and `status` = #{status}
+        </if>
+        <if test="activityStartTime != null">
+            and `activity_start_time` <![CDATA[ >= ]]> #{activityStartTime}
+        </if>
+        <if test="activityEndTime != null">
+            and `activity_end_time` = #{activityEndTime}
+        </if>
+        <if test="abortTime != null">
+            and `activity_start_time` <![CDATA[ <= ]]> #{abortTime}
+        </if>
+        <if test="qualificationStatus != null">
+            and `qualification_status` = #{qualificationStatus}
+        </if>
+        <if test="drawNum != null">
+            and `draw_num` = #{drawNum}
+        </if>
+        <if test="employNum != null">
+            and `employ_num` = #{employNum}
+        </if>
+        <if test="minMoney != null">
+            and `min_money` = #{minMoney}
+        </if>
+        <if test="maxMoney != null">
+            and `max_money` = #{maxMoney}
+        </if>
+        <if test="deleteFlag != null">
+            and `delete_flag` = #{deleteFlag}
+        </if>
+        <if test="statisItem != null">
+            and `statis_item` = #{statisItem}
+        </if>
+    </sql>
+
+    <select id="findQualificationManageList" resultMap="qualificationManageMap">
+        select
+        <include refid="Base_Column_List"/>
+        from qualification_manage where delete_flag = 1
+        <include refid="where"/>
+        ORDER BY status,apply_time desc
+    </select>
+
+    <insert id="saveQualificationManage" parameterType="com.gameplat.admin.model.domain.activity.QualificationManage">
+        insert into qualification_manage
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="qualificationId != null">
+                `qualification_id`,
+            </if>
+            <if test="activityName != null and activityName != ''">
+                `activity_name`,
+            </if>
+            <if test="activityType != null">
+                `activity_type`,
+            </if>
+            <if test="activityId != null">
+                `activity_id`,
+            </if>
+            <if test="userId != null">
+                `user_id`,
+            </if>
+            <if test="username != null and username != ''">
+                `username`,
+            </if>
+            <if test="applyTime != null">
+                `apply_time`,
+            </if>
+            <if test="auditPerson != null and auditPerson != ''">
+                `audit_person`,
+            </if>
+            <if test="auditTime != null">
+                `audit_time`,
+            </if>
+            <if test="auditRemark != null and auditRemark != ''">
+                `audit_remark`,
+            </if>
+            <if test="status != null">
+                `status`,
+            </if>
+            <if test="activityStartTime != null">
+                `activity_start_time`,
+            </if>
+            <if test="activityEndTime != null">
+                `activity_end_time`,
+            </if>
+            <if test="qualificationStatus != null">
+                `qualification_status`,
+            </if>
+            <if test="remark != null and remark != ''">
+                `remark`,
+            </if>
+            <if test="createBy != null and createBy != ''">
+                `create_by`,
+            </if>
+            <if test="createTime != null">
+                `create_time`,
+            </if>
+            <if test="updateBy != null and updateBy != ''">
+                `update_by`,
+            </if>
+            <if test="updateTime != null">
+                `update_time`,
+            </if>
+            <if test="drawNum != null">
+                `draw_num`,
+            </if>
+            <if test="employNum != null">
+                `employ_num`,
+            </if>
+            <if test="minMoney != null">
+                `min_money`,
+            </if>
+            <if test="maxMoney != null">
+                `max_money`,
+            </if>
+            <if test="deleteFlag != null">
+                `delete_flag`,
+            </if>
+            <if test="employTime != null">
+                `employ_time`,
+            </if>
+            <if test="qualificationActivityId != null">
+                qualification_activity_id,
+            </if>
+            <if test="soleIdentifier != null">
+                sole_identifier,
+            </if>
+            <if test="statisItem != null">
+                statis_item,
+            </if>
+            <if test="withdrawDml != null">
+                withdraw_dml,
+            </if>
+            <if test="statisStartTime != null">
+                statis_start_time,
+            </if>
+            <if test="statisEndTime != null">
+                statis_end_time,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="qualificationId != null">
+                #{qualificationId},
+            </if>
+            <if test="activityName != null and activityName != ''">
+                #{activityName},
+            </if>
+            <if test="activityType != null">
+                #{activityType},
+            </if>
+            <if test="activityId != null">
+                #{activityId},
+            </if>
+            <if test="userId != null">
+                #{userId},
+            </if>
+            <if test="username != null and username != ''">
+                #{username},
+            </if>
+            <if test="applyTime != null">
+                #{applyTime},
+            </if>
+            <if test="auditPerson != null and auditPerson != ''">
+                #{auditPerson},
+            </if>
+            <if test="auditTime != null">
+                #{auditTime},
+            </if>
+            <if test="auditRemark != null and auditRemark != ''">
+                #{auditRemark},
+            </if>
+            <if test="status != null">
+                #{status},
+            </if>
+            <if test="activityStartTime != null">
+                #{activityStartTime},
+            </if>
+            <if test="activityEndTime != null">
+                #{activityEndTime},
+            </if>
+            <if test="qualificationStatus != null">
+                #{qualificationStatus},
+            </if>
+            <if test="remark != null and remark != ''">
+                #{remark},
+            </if>
+            <if test="createBy != null and createBy != ''">
+                #{createBy},
+            </if>
+            <if test="createTime != null">
+                #{createTime},
+            </if>
+            <if test="updateBy != null and updateBy != ''">
+                #{updateBy},
+            </if>
+            <if test="updateTime != null">
+                #{updateTime},
+            </if>
+            <if test="drawNum != null">
+                #{drawNum},
+            </if>
+            <if test="employNum != null">
+                #{employNum},
+            </if>
+            <if test="minMoney != null">
+                #{minMoney},
+            </if>
+            <if test="maxMoney != null">
+                #{maxMoney},
+            </if>
+            <if test="deleteFlag != null">
+                #{deleteFlag},
+            </if>
+            <if test="employTime != null">
+                #{employTime},
+            </if>
+            <if test="qualificationActivityId != null">
+                #{qualificationActivityId},
+            </if>
+            <if test="soleIdentifier != null">
+                #{soleIdentifier},
+            </if>
+            <if test="statisItem != null">
+                #{statisItem},
+            </if>
+            <if test="withdrawDml != null">
+                #{withdrawDml},
+            </if>
+            <if test="statisStartTime != null">
+                #{statisStartTime},
+            </if>
+            <if test="statisEndTime != null">
+                #{statisEndTime},
+            </if>
+        </trim>
+        ON DUPLICATE KEY UPDATE
+        update_time = sysdate()
+    </insert>
+
+
+    <update id="updateQualificationManage" parameterType="com.gameplat.admin.model.domain.activity.QualificationManage">
+        update qualification_manage
+        <set>
+            <if test="applyTime != null">`apply_time` = #{applyTime},</if>
+            <if test="auditPerson != null and auditPerson != ''">`audit_person` = #{auditPerson},</if>
+            <if test="auditTime != null">`audit_time` = #{auditTime},</if>
+            <if test="auditRemark != null and auditRemark != ''">`audit_remark` = #{auditRemark},</if>
+            <if test="status != null">`status` = #{status},</if>
+            <if test="qualificationStatus != null">`qualification_status` = #{qualificationStatus},</if>
+            <if test="remark != null and remark != ''">`remark` = #{remark},</if>
+            <if test="updateBy != null and updateBy != ''">`update_by` = #{updateBy},</if>
+            <if test="updateTime != null">`update_time` = #{updateTime},</if>
+            <if test="drawNum != null">`draw_num` = #{drawNum},</if>
+            <if test="employNum != null">`employ_num` = #{employNum},</if>
+            <if test="minMoney != null">`min_money` = #{minMoney},</if>
+            <if test="maxMoney != null">`max_money` = #{maxMoney},</if>
+            <if test="deleteFlag != null">`delete_flag` = #{deleteFlag},</if>
+            <if test="employTime != null">`employ_time` = #{employTime},</if>
+            <if test="soleIdentifier != null">`sole_identifier` = #{soleIdentifier}</if>
+        </set>
+        <where>
+            <if test="qualificationId != null">
+                and qualification_id = #{qualificationId},
+            </if>
+            <if test="qualificationActivityId != null">
+                and qualification_activity_id = #{qualificationActivityId}
+            </if>
+        </where>
+    </update>
+
+    <delete id="deleteBatchQualificationManage">
+        delete from qualification_manage where qualification_id in
+        <foreach item="qualification_id" collection="list" open="(" separator="," close=")">
+            #{qualification_id}
+        </foreach>
+    </delete>
+
+    <update id="updateQualificationManageList">
+        <foreach collection="list" item="item" index="index" open="" close="" separator=";">
+            update qualification_manage
+            <set>
+                <if test="auditPerson != null and auditPerson != ''">`audit_person` = #{item.auditPerson},</if>
+                <if test="auditTime != null">`audit_time` = #{item.auditTime},</if>
+                <if test="auditRemark != null and auditRemark != ''">`audit_remark` = #{item.auditRemark},</if>
+                <if test="status != null">`status` = #{item.status},</if>
+                <if test="remark != null and remark != ''">`remark` = #{item.remark},</if>
+                <if test="updateBy != null and updateBy != ''">`update_by` = #{item.updateBy}</if>
+            </set>
+            where id = ${item.id}
+        </foreach>
+    </update>
+
+    <insert id="insertBatchQualificationManageList">
+        insert into qualification_manage
+        (activity_name, activity_type, activity_id, user_id,username,
+        apply_time, audit_person, audit_time, audit_remark, status,
+        activity_start_time, activity_end_time, qualification_status, remark,
+        create_by, update_by,draw_num,employ_num,min_money,
+        max_money,delete_flag,employ_time,qualification_activity_id,sole_identifier,statis_item,withdraw_dml,
+        statis_start_time,statis_end_time,award_detail,get_way
+        )
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.activityName}, #{item.activityType}, #{item.activityId}, #{item.userId},#{item.username},
+             #{item.applyTime}, #{item.auditPerson}, #{item.auditTime}, #{item.auditRemark},#{item.status},
+            #{item.activityStartTime},#{item.activityEndTime}, #{item.qualificationStatus},#{item.remark},
+             #{item.createBy},#{item.updateBy}, #{item.drawNum}, #{item.employNum}, #{item.minMoney},
+            #{item.maxMoney},#{item.deleteFlag}, #{item.employTime},#{item.qualificationActivityId},#{item.soleIdentifier},
+            #{item.statisItem},#{item.withdrawDml},#{item.statisStartTime},#{item.statisEndTime},#{item.awardDetail},#{item.getWay}
+            )
+        </foreach>
+        ON DUPLICATE KEY UPDATE
+        update_time = sysdate()
+    </insert>
+
+    <update id="updateQualificationManageStatus">
+        update qualification_manage
+        <set>
+            <if test="qualificationStatus != null">`qualification_status` = #{qualificationStatus},</if>
+            <if test="deleteFlag != null">`delete_flag` = #{deleteFlag},</if>
+            <if test="updateBy != null and updateBy != ''">`update_by` = #{updateBy},</if>
+            update_time = sysdate()
+        </set>
+        where qualification_id in
+        <foreach collection="qualificationIds" item="qualificationIds" open="(" separator="," close=")">
+            #{qualificationIds}
+        </foreach>
+    </update>
+
+    <update id="passAuditQualificationManage">
+        update qualification_manage
+        <set>
+            <if test="status != null">`status` = #{status},</if>
+            <if test="auditPerson != null and auditPerson != ''">`audit_person` = #{auditPerson},</if>
+            audit_time = sysdate()
+        </set>
+        where qualification_id in
+        <foreach collection="qualificationIds" item="qualificationIds" open="(" separator="," close=")">
+            #{qualificationIds}
+        </foreach>
+    </update>
+
+    <select id="findQualificationManageStatusList" resultMap="qualificationManageMap">
+        select
+        <include refid="Base_Column_List"/>
+        from qualification_manage where qualification_id in
+        <foreach collection="list" item="qualificationIds" open="(" separator="," close=")">
+            #{qualificationIds}
+        </foreach>
+    </select>
+    <select id="findUniques" resultMap="qualificationManageMap">
+        select
+        <include refid="Base_Column_List"/>
+        from qualification_manage
+        where
+        <foreach collection="list" item="item" open="(" separator="or" close=")">
+            activity_id=#{item.activityId} and
+            activity_type=#{item.activityType} and
+            user_id=#{item.userId} and
+            max_money=#{item.maxMoney} and
+            sole_identifier=#{item.soleIdentifier}
+        </foreach>
+    </select>
+    <select id="findUnique" resultType="com.gameplat.admin.model.domain.activity.QualificationManage">
+        select
+        <include refid="Base_Column_List"/>
+        from qualification_manage
+        where
+        activity_id=#{activityId} and
+        activity_type=#{activityType} and
+        user_id=#{userId} and
+        max_money=#{maxMoney}
+    </select>
+
+    <update id="updateBatchQualificationManageEmploy">
+        <foreach collection="list" item="qualificationActivityId" separator=";" >
+        update qualification_manage set employ_num = employ_num+1,employ_time = NOW()
+        where qualification_activity_id = #{qualificationActivityId}
+        </foreach>
+    </update>
+
+    <select id="checkRepetition" resultType="java.lang.Integer">
+        select
+        count(*)
+        from qualification_manage
+        <where>
+        <if test="activityId != null ">
+            and activity_id = #{activityId}
+        </if>
+        <if test="activityType != null ">
+            and activity_type = #{activityType}
+        </if>
+        <if test="soleIdentifier != null and soleIdentifier != ''">
+            and sole_identifier = #{soleIdentifier}
+        </if>
+        <if test="userId != null ">
+            and user_id = #{userId}
+        </if>
+        </where>
+    </select>
+
+    <select id="checkOtherRepetition" resultType="java.lang.Integer">
+        select
+        count(*)
+        from qualification_manage
+        where
+        activity_type = #{activityType}
+        and user_id = #{userId}
+        and employ_num = 0
+        and status in (1,2)
+        and qualification_status = 1
+    </select>
+
+<!--    <select id="checkRepetition1" resultType="java.lang.Integer">-->
+<!--        select-->
+<!--        count(*)-->
+<!--        from qualification_manage-->
+<!--        where-->
+<!--        user_id = #{userId}-->
+<!--        and -->
+<!--    </select>-->
+
+
+</mapper>

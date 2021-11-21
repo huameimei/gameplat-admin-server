@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gameplat.admin.mapper.activity.MemberFirstChargeDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.gameplat.admin.model.domain.activity.MemberFirstCharge">
+        <id column="charge_id" property="chargeId" />
+        <result column="begin_time" property="beginTime" />
+        <result column="end_time" property="endTime" />
+        <result column="charge_type" property="chargeType" />
+        <result column="charge_term" property="chargeTerm" />
+        <result column="charge_display" property="chargeDisplay" />
+        <result column="status" property="status" />
+        <result column="create_by" property="createBy" />
+        <result column="create_time" property="createTime" />
+        <result column="update_by" property="updateBy" />
+        <result column="update_time" property="updateTime" />
+        <result column="remark" property="remark" />
+        <result column="charge_title" property="chargeTitle" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        charge_id, begin_time, end_time, charge_type, charge_term, charge_display, status, create_by, create_time, update_by, update_time, remark,charge_title
+    </sql>
+
+    <select id="getConfig" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from member_first_charge
+		where charge_type=#{type}
+		limit 1
+	</select>
+
+	<insert id="insert">
+		insert into
+		member_first_charge(
+		<if test="chargeId != null">charge_id,</if>
+		<if test="beginTime != null">begin_time,</if>
+		<if test="endTime != null">end_time,</if>
+		<if test="chargeType != null">charge_type,</if>
+		<if test="chargeTerm != null">charge_term,</if>
+		<if test="chargeDisplay != null">charge_display,</if>
+		<if test="status != null">status,</if>
+		<if test="chargeTitle != null">charge_title,</if>
+		<if test="remark != null and remark != ''">remark,</if>
+		create_by,create_time)
+		values
+		(
+		<if test="chargeId != null">#{chargeId},</if>
+		<if test="beginTime != null">#{beginTime},</if>
+		<if test="endTime != null">#{endTime},</if>
+		<if test="chargeType != null">#{chargeType},</if>
+		<if test="chargeTerm != null">#{chargeTerm},</if>
+		<if test="chargeDisplay != null">#{chargeDisplay},</if>
+		<if test="status != null">#{status},</if>
+		<if test="chargeTitle != null">#{chargeTitle},</if>
+		<if test="remark != null and remark != ''">#{remark},</if>
+		#{createBy},#{createTime})
+	</insert>
+
+	<update id="update">
+		update member_first_charge
+		<set>
+			<if test="beginTime != null">begin_time = #{beginTime},</if>
+			<if test="endTime != null">end_time = #{endTime},</if>
+			<if test="chargeType != null">charge_type = #{chargeType},</if>
+			<if test="chargeTerm != null and chargeTerm != ''">charge_term = #{chargeTerm},</if>
+			<if test="chargeDisplay != null and chargeDisplay != ''">charge_display = #{chargeDisplay},</if>
+			<if test="chargeTitle != null and chargeTitle != ''">charge_title = #{chargeTitle},</if>
+			<if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
+			update_time = sysdate()
+		</set>
+		WHERE charge_id = #{chargeId}
+	</update>
+
+	<delete id="deleteFirstCharge" parameterType="Long">
+		delete from member_first_charge where status=2 and  charge_id = #{chargeId}
+	</delete>
+
+	<select id="findFirstChargeList" resultMap="BaseResultMap">
+		select <include refid="Base_Column_List" /> from member_first_charge t where 1=1
+		<if test="chargeTitle != null and chargeTitle != 'null' and chargeTitle != ''">
+		  and t.`charge_title` LIKE CONCAT('%',#{chargeTitle},'%')
+		</if>
+		<if test="chargeDisplay != null and chargeDisplay != 'null' and chargeDisplay != ''">
+		  and t.`charge_display` LIKE CONCAT('%',#{chargeDisplay},'%')
+		</if>
+	</select>
+
+	<select id="findFirstChargeById" resultMap="BaseResultMap">
+		select <include refid="Base_Column_List" /> from member_first_charge where charge_id = #{chargeId}
+	</select>
+
+	<update id="updateFirstChargeStatus">
+		update member_first_charge set status=0 where charge_id = #{chargeId}
+	</update>
+</mapper>

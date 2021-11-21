@@ -10,6 +10,8 @@ import com.gameplat.admin.model.vo.MemberInfoVO;
 import com.gameplat.admin.model.vo.MemberVO;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.List;
+
 public interface MemberMapper extends BaseMapper<Member> {
 
   IPage<MemberVO> queryPage(Page<Member> page, @Param(Constants.WRAPPER) Wrapper<Member> wrapper);
@@ -45,4 +47,12 @@ public interface MemberMapper extends BaseMapper<Member> {
    * @return MemberInfoVO
    */
   MemberInfoVO getMemberInfoByAccount(String account);
+
+  /**
+   * 查询代理线的会员
+   *
+   * @param agentAccout
+   * @return
+   */
+  List<Member> getListByAgentAccout(String agentAccout);
 }

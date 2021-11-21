@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gameplat.admin.mapper.LiveRebateDataMapper">
+
+  <resultMap id="liveRebateDataVO" type="com.gameplat.admin.model.vo.LiveRebateDataVO">
+    <result property="id" column="id"/>
+    <result property="memberId" column="member_id"/>
+    <result property="account" column="account"/>
+    <result property="realName" column="real_name"/>
+    <result property="userPaths" column="user_paths"/>
+    <result property="gameCode" column="game_code"/>
+    <result property="gameKind" column="game_kind"/>
+    <result property="statTime" column="stat_time"/>
+    <result property="createTime" column="create_time"/>
+    <result property="betAmount" column="bet_amount"/>
+    <result property="validAmount" column="valid_amount"/>
+    <result property="winAmount" column="win_amount"/>
+    <result property="betCount" column="bet_count"/>
+    <result property="winCount" column="win_count"/>
+    <result property="firstKind" column="first_kind"/>
+    <result property="name" column="name"/>
+  </resultMap>
+
+
+  <select id="queryBetRecordList" resultMap="liveRebateDataVO">
+    SELECT tb.name,ta.account,ta.game_code,ta.bet_amount,ta.valid_amount,ta.win_amount,ta.stat_time
+    from live_rebate_data ta
+    LEFT JOIN game_kind tb
+    on ta.game_code = tb.platform_code and ta.game_kind = tb.code
+    WHERE 1 = 1
+    <if test="account != null">
+      AND ta.account = #{account}
+    </if>
+    and ta.user_paths LIKE contat(#{user_paths},'%')
+    AND ta.game_code IN
+    <foreach collection="liveCodeList" item="item" open="(" separator="," close=")">
+      #{item}
+    </foreach>
+    AND ta.game_kind IN
+    <foreach collection="gameKindList" item="item" open="(" separator="," close=")">
+      #{item}
+    </foreach>
+    <if test="betStartDate != null">
+      AND ta.stat_time &gt;= STR_TO_DATE(#{betStartDate}, '%Y-%m-%d')
+    </if>
+    <if test="betEndDate != null">
+      AND ta.stat_time &lt;= STR_TO_DATE(#{betEndDate}, '%Y-%m-%d')
+    </if>
+  </select>
+
+  <select id="getDayCount" resultType="java.lang.Integer">
+    SELECT COUNT(1) AS ts
+    FROM
+      contat('live_', #{gamePlatform.code}, '_bet_record')
+    WHERE settle = 1
+      and stat_time = #{statTime}
+  </select>
+
+  <insert id="saveDayReport">
+    INSERT INTO live_rebate_data (account, bet_amount, valid_amount, win_amount, stat_time,
+                                  game_code, game_kind, first_kind, add_time, bet_count, win_count,
+                                  member_id, real_name, user_paths)
+    select ts.*,
+           u.member_id,
+           u.real_name,
+           u.super_path AS user_paths
+    from (SELECT re.account,
+                 SUM(re.bet_amount)   AS bet_amount,
+                 SUM(re.valid_amount) AS valid_amount,
+                 SUM(re.win_amount)   AS win_amount,
+                 #{statTime}          as stat_time,
+                 #{gamePlatform.code} as game_code,
+                 re.game_kind,
+                 re.first_kind,
+                 SYSDATE()            AS add_time,
+                 COUNT(1)             AS bet_count,
+          from contat('live_', #{gamePlatform.code}, '_bet_record') re
+          WHERE 1 = 1
+            and #{statTimeType} between DATE_FORMAT(#{statTime}, '%Y-%m-%d %00:%00:%00')
+            and DATE_FORMAT(#{statTime}, '%Y-%m-%d %23:%59:%59')
+            AND re.settle = 1
+          GROUP BY re.account, re.game_kind
+         ) ts
+           JOIN member u on ts.account = u.account
+  </insert>
+
+  <select id="queryLiveReport" resultType="com.gameplat.admin.model.vo.LiveReportVO"
+    parameterType="com.gameplat.admin.model.dto.LiveRebateDataQueryDTO">
+    SELECT s1.betAmount,
+    s1.validAmount,
+    s1.gameCount,
+    s1.winAmount,
+    s1.userNumber,
+    s1.game_code gameCode,
+    IF(s2.rebateMoney is null,0,s2.rebateMoney) rebateMoney,
+    s1.winAmount-IF(s2.rebateMoney is null,0,s2.rebateMoney)
+    companyAmount from (
+    SELECT
+    sum(dr.bet_amount) betAmount,
+    sum(dr.valid_amount) validAmount,
+    sum(dr.bet_count) gameCount,
+    sum(dr.win_amount) winAmount,
+    count(DISTINCT dr.account) userNumber,
+    dr.game_code
+    FROM
+    live_rebate_data dr where 1=1
+    <if test="betStartDate != null">
+      <![CDATA[
+         and dr.stat_time >= #{betStartDate}
+       ]]>
+    </if>
+    <if test="betEndDate != null">
+      <![CDATA[
+         and dr.stat_time <= #{betEndDate}
+       ]]>
+    </if>
+    <if test="user_paths != null and user_paths != ''">
+      and dr.user_paths like #{user_paths}
+    </if>
+    <if test="account != null and account != ''">
+      and dr.account like #{account}
+    </if>
+    GROUP BY dr.game_code) s1 left Join (
+    SELECT
+    sum(rr.real_rebate_money) rebateMoney,
+    rr.game_code
+    FROM
+    live_rebate_report rr where 1=1
+    <if test="betStartDate != null">
+      <![CDATA[
+         and rr.stat_time >= #{betStartDate}
+      ]]>
+    </if>
+    <if test="betEndDate != null">
+      <![CDATA[
+         and rr.stat_time <= #{betEndDate}
+      ]]>
+    </if>
+    <if test="user_paths != null and user_paths != ''">
+      and rr.user_paths like #{user_paths}
+    </if>
+    <if test="account != null and account != ''">
+      and rr.account like #{account}
+    </if>
+    GROUP BY rr.game_code) s2 on s1.game_code=s2.game_code
+  </select>
+</mapper>

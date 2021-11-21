@@ -1,11 +1,11 @@
 package com.gameplat.admin.model.vo;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.gameplat.admin.model.bean.OnlineCount;
 import lombok.Builder;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
+import java.util.Date;
 
 /**
  * 在线用户VO
@@ -16,7 +16,23 @@ import java.io.Serializable;
 @Builder
 public class OnlineUserVo implements Serializable {
 
-  private IPage<UserToken> page;
+  private String username;
 
-  private OnlineCount onlineCount;
+  private String nickname;
+
+  private String realName;
+
+  private String parentName;
+
+  private String userType;
+
+  private BigDecimal balance;
+
+  private Date lastLoginDate;
+
+  private String loginIp;
+
+  private String clientType;
+
+  private String deviceType;
 }

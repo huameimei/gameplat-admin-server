@@ -2,6 +2,7 @@ package com.gameplat.admin.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.commpent.MemberQueryCondition;
@@ -11,12 +12,14 @@ import com.gameplat.admin.enums.MemberEnums;
 import com.gameplat.admin.mapper.MemberMapper;
 import com.gameplat.admin.model.domain.Member;
 import com.gameplat.admin.model.domain.MemberInfo;
+import com.gameplat.admin.model.domain.PushMessage;
 import com.gameplat.admin.model.dto.*;
 import com.gameplat.admin.model.vo.MemberInfoVO;
 import com.gameplat.admin.model.vo.MemberVO;
 import com.gameplat.admin.service.MemberInfoService;
 import com.gameplat.admin.service.MemberService;
 import com.gameplat.common.exception.ServiceException;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -151,10 +154,34 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
   }
 
   @Override
+  public List<String> findAccountByUserLevelIn(List<String> levelsLists) {
+    return this.lambdaQuery()
+        .select(Member::getAccount)
+        .in(Member::getUserLevel, levelsLists)
+        .list()
+        .stream()
+        .map(Member::getAccount)
+        .collect(Collectors.toList());
+  }
+
+  @Override
   public void updateContact(MemberContactUpdateDTO dto) {
     if (!this.updateById(memberConvert.toEntity(dto))) {
       throw new ServiceException("更新会员联系方式失败!");
     }
+  }
+
+  @Override
+  public List<Member> getListByUserLevel(List<String> userLevelList) {
+    if (CollectionUtil.isEmpty(userLevelList)) {
+      return null;
+    }
+    return this.lambdaQuery().in(Member::getUserLevel, userLevelList).list();
+  }
+
+  @Override
+  public List<Member> getListByAgentAccount(String agentAccout) {
+    return memberMapper.getListByAgentAccout(agentAccout);
   }
 
   /**

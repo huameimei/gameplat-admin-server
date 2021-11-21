@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.gameplat.admin.enums.DictTypeEnum;
 import com.gameplat.admin.model.bean.UserWithdrawLimitInfo;
 import com.gameplat.admin.model.domain.SysDictData;
@@ -30,6 +31,12 @@ public interface SysDictDataService extends IService<SysDictData> {
   List<SysDictData> getDictDataByTypes(List<String> dictTypes);
 
   <T> T getDictData(DictTypeEnum dictType, Class<T> t);
+
+  <T> T getDictData(DictTypeEnum dictType, TypeReference<T> t);
+
+  String getDictData(DictTypeEnum dictType);
+
+  List<String> getDictData(DictTypeEnum dictType, String separatorChar);
 
   DictDataVo selectDictData(SysDictDataDTO dictData);
 

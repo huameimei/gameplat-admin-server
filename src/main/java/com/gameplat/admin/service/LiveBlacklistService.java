@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.gameplat.admin.model.domain.LiveBlacklist;
 import com.gameplat.admin.model.dto.LiveBlacklistQueryDTO;
 import com.gameplat.admin.model.dto.OperLiveBlacklistDTO;
+import java.util.List;
 
 public interface LiveBlacklistService extends IService<LiveBlacklist> {
 
@@ -17,4 +18,6 @@ public interface LiveBlacklistService extends IService<LiveBlacklist> {
   void save(OperLiveBlacklistDTO dto);
 
   void delete(Long id);
+
+  List<LiveBlacklist> selectLiveBlackList(LiveBlacklist example);
 }

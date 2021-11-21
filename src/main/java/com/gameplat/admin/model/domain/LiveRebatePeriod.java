@@ -1,14 +1,14 @@
 package com.gameplat.admin.model.domain;
 
+import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import lombok.Data;
-
+import com.fasterxml.jackson.annotation.JsonFormat;
 import java.io.Serializable;
-import java.math.BigDecimal;
 import java.util.Date;
-import java.util.List;
+import lombok.Data;
 
 @Data
 @TableName("live_rebate_periods")
@@ -19,8 +19,10 @@ public class LiveRebatePeriod implements Serializable {
 
   private String name;
 
+  @JsonFormat(pattern = "yyyy-MM-dd")
   private Date beginDate;
 
+  @JsonFormat(pattern = "yyyy-MM-dd")
   private Date endDate;
 
   private String blackAccounts;
@@ -29,17 +31,10 @@ public class LiveRebatePeriod implements Serializable {
 
   private Integer status;
 
-  private Date addTime;
+  @TableField(fill = FieldFill.INSERT)
+  @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+  private Date createTime;
 
+  @JsonFormat(pattern = "yyyy-MM-dd")
   private Date statTime;
-
-  private List<Member> blackAccountList;
-
-  //返水人数
-  private int liveRebateCount;
-
-  /**
-   * 实际返水金额
-   */
-  private BigDecimal realRebateMoney;
 }

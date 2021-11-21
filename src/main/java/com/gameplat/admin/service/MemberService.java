@@ -41,4 +41,22 @@ public interface MemberService extends IService<Member> {
   void clearContact(MemberContactCleanDTO dto);
 
   void updateContact(MemberContactUpdateDTO dto);
+
+  List<String> findAccountByUserLevelIn(List<String> levelsLists);
+
+  /**
+   * 通过用户层级查询用户list
+   *
+   * @param userLevelList List
+   * @return List
+   */
+  List<Member> getListByUserLevel(List<String> userLevelList);
+
+  /**
+   * 查询代理线的会员列表
+   *
+   * @param agentAccount
+   * @return List
+   */
+  List<Member> getListByAgentAccount(String agentAccount);
 }

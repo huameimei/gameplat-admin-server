@@ -123,10 +123,8 @@
                t1.birthday,
                t1.register_ip,
                t1.register_source,
-               t1.register_device,
                t1.create_time,
                t1.real_name,
-               t2.employee_num,
                t2.last_login_ip,
                t2.last_login_time,
                t2.balance,
@@ -140,5 +138,41 @@
         FROM member t1
                  LEFT JOIN member_info t2 ON t1.id = t2.member_id
         WHERE t1.account = #{account}
+    </select>
+
+    <select id="getListByAgentAccout" resultType="com.gameplat.admin.model.domain.Member">
+        SELECT t1.id,
+               t1.account,
+               t1.nickname,
+               t1.user_level,
+               t1.agent_level,
+               t1.parent_id,
+               t1.user_type,
+               t1.parent_name,
+               t1.status,
+               t1.remark,
+               t1.sex,
+               t1.qq,
+               t1.wechat,
+               t1.email,
+               t1.phone,
+               t1.birthday,
+               t1.register_ip,
+               t1.register_source,
+               t1.create_time,
+               t1.real_name,
+               t2.last_login_ip,
+               t2.last_login_time,
+               t2.balance,
+               t2.invitation_code,
+               t2.last_rech_time,
+               t2.last_withdraw_time,
+               t2.total_rech_amount,
+               t2.total_rech_times,
+               t2.total_withdraw_amount,
+               t2.total_withdraw_times
+        FROM member t1
+                 LEFT JOIN member_info t2 ON t1.id = t2.member_id
+        WHERE t1.super_path LIKE concat('%', #{agentAccout},'%')
     </select>
 </mapper>

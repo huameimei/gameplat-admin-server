@@ -56,22 +56,11 @@ public class OpenPushMessageController {
     /**
      * 单个删除
      *
-     * @param id
-     */
-    @DeleteMapping("/delete/{id}")
-    @PreAuthorize("hasAuthority('notice:pushmessage:remove')")
-    public void remove(@PathVariable("id") Long id) {
-        pushMessageService.deletePushMessage(id);
-    }
-
-    /**
-     * 批量删除
-     *
      * @param ids
      */
-    @DeleteMapping("/deleteBatch")
+    @DeleteMapping("/delete")
     @PreAuthorize("hasAuthority('notice:pushmessage:remove')")
-    public void remove(Long[] ids) {
+    public void remove(@RequestBody String ids) {
         pushMessageService.deleteBatchPushMessage(ids);
     }
 

@@ -45,7 +45,7 @@ public class OpenAuthorityController {
 
   /** 账号登出 */
   @GetMapping("/logout")
-  @Log(module = ServiceName.ADMIN_SERVICE, desc = "账号登出系统")
+  @LoginLog(isLogout = true,module = ServiceName.ADMIN_SERVICE, desc = "账号登出系统")
   public void logout() {
     authenticationService.logout();
   }

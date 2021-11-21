@@ -3,7 +3,7 @@
 <mapper namespace="com.gameplat.admin.mapper.activity.MemberActivityDao">
 
     <!-- 通用查询映射结果 -->
-    <resultMap id="BaseResultMap" type="com.gameplat.admin.model.domain.activity.MemberActivity">
+    <resultMap id="BaseResultMap" type="com.gameplat.admin.model.domain.Activity">
         <id column="activity_id" property="activityId" />
         <result column="activity_name" property="activityName" />
         <result column="is_package" property="isPackage" />

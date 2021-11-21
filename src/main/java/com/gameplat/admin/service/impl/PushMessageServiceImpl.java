@@ -53,7 +53,9 @@ public class PushMessageServiceImpl extends ServiceImpl<PushMessageMapper, PushM
                 .like(ObjectUtils.isNotEmpty(pushMessageDTO.getMessageTitle()), PushMessage::getMessageTitle, pushMessageDTO.getMessageTitle())
                 .eq(ObjectUtils.isNotEmpty(pushMessageDTO.getUserAccount()), PushMessage::getUserAccount, pushMessageDTO.getUserAccount())
                 .eq(ObjectUtils.isNotEmpty(pushMessageDTO.getImmediateFlag()), PushMessage::getImmediateFlag, pushMessageDTO.getImmediateFlag())
-                .eq(ObjectUtils.isNotEmpty(pushMessageDTO.getReadStatus()), PushMessage::getReadStatus, pushMessageDTO.getReadStatus());
+                .eq(ObjectUtils.isNotEmpty(pushMessageDTO.getReadStatus()), PushMessage::getReadStatus, pushMessageDTO.getReadStatus())
+                .ne(PushMessage::getAcceptRemoveFlag, 1)
+                .ne(PushMessage::getSendRemoveFlag, 1);
         //推送时间
         addPushTimeCondition(queryWrapper, pushMessageDTO.getBeginDate(), pushMessageDTO.getEndDate());
         return queryWrapper.page(page).convert(pushMessageConvert::toVo);
@@ -149,8 +151,8 @@ public class PushMessageServiceImpl extends ServiceImpl<PushMessageMapper, PushM
             case 3:
                 // 3-在线会员
                 onlineUserService
-                    .getOnlineUsers()
-                    .forEach(user -> buildPushMessage(pushMessageAddDTO, pushMessageList, user));
+                        .getOnlineUsers()
+                        .forEach(user -> buildPushMessage(pushMessageAddDTO, pushMessageList, user));
                 break;
             case 4:
                 //4-指定层级
@@ -203,11 +205,11 @@ public class PushMessageServiceImpl extends ServiceImpl<PushMessageMapper, PushM
     }
 
     private void buildPushMessage(PushMessageAddDTO pushMessageAddDTO, List<PushMessage> pushMessageList, UserCredential credential) {
-        buildPushMessage(pushMessageAddDTO,pushMessageList,credential.getUserId(),credential.getUsername());
+        buildPushMessage(pushMessageAddDTO, pushMessageList, credential.getUserId(), credential.getUsername());
     }
 
     private void buildPushMessage(PushMessageAddDTO pushMessageAddDTO, List<PushMessage> pushMessageList, Member member) {
-        buildPushMessage(pushMessageAddDTO,pushMessageList,member.getId(),member.getAccount());
+        buildPushMessage(pushMessageAddDTO, pushMessageList, member.getId(), member.getAccount());
     }
 
     private void buildPushMessage(PushMessageAddDTO pushMessageAddDTO, List<PushMessage> pushMessageList, Long userId, String username) {
@@ -224,28 +226,16 @@ public class PushMessageServiceImpl extends ServiceImpl<PushMessageMapper, PushM
     }
 
     @Override
-    public void deletePushMessage(Long id) {
-        if (ObjectUtils.isEmpty(id)) {
-            throw new ServiceException("id不能为空!");
-        }
-        PushMessage pushMessage = this.getById(id);
-        if (pushMessage == null) {
-            throw new ServiceException("该消息不存在!");
-        }
-        pushMessage.setAcceptRemoveFlag(NoticeEnum.ACCEPT_REMOVE_FLAG_YES.getValue());
-        pushMessage.setSendRemoveFlag(NoticeEnum.SEND_REMOVE_FLAG_YES.getValue());
-        if (!this.saveOrUpdate(pushMessage)) {
-            throw new ServiceException("删除公告信息失败！");
-        }
-    }
-
-    @Override
-    public void deleteBatchPushMessage(Long[] ids) {
+    public void deleteBatchPushMessage(String ids) {
         if (ObjectUtils.isNull(ids)) {
             throw new ServiceException("ids不能为空!");
         }
-        for (Long id : ids) {
-            this.deletePushMessage(id);
+        List<String> idArr = Arrays.asList(com.gameplat.common.util.StringUtils.split(ids, ","));
+        for (String id : idArr) {
+            PushMessage pushMessage = this.getById(Long.valueOf(id));
+            pushMessage.setAcceptRemoveFlag(NoticeEnum.ACCEPT_REMOVE_FLAG_YES.getValue());
+            pushMessage.setSendRemoveFlag(NoticeEnum.SEND_REMOVE_FLAG_YES.getValue());
+            this.saveOrUpdate(pushMessage);
         }
     }
 

@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gameplat.admin.mapper.MemberGrowthLevelMapper">
+
+	<resultMap type="com.gameplat.admin.model.domain.MemberGrowthLevel" id="memberGrowthLevelResult">
+        <result property="id" column="id"/>
+        <result property="level" column="level"/>
+        <result property="levelName" column="level_name"/>
+        <result property="growth" column="growth"/>
+        <result property="limitGrowth" column="limit_growth"/>
+        <result property="upReward" column="up_reward"/>
+        <result property="weekWage" column="week_wage"/>
+        <result property="monthWage" column="month_wage"/>
+        <result property="birthGiftMoney" column="birth_gift_money"/>
+        <result property="redEnvelope" column="red_envelope"/>
+        <result property="creditMoney" column="credit_money"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="createBy" column="create_by"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="remark" column="remark"/>
+        <result property="mobileVipImage" column="mobile_vip_image"/>
+        <result property="webVipImage" column="web_vip_image"/>
+        <result property="mobileReachBackImage" column="mobile_reach_back_image"/>
+        <result property="mobileUnreachBackImage" column="mobile_unreach_back_image"/>
+        <result property="mobileReachVipImage" column="mobile_reach_vip_image"/>
+        <result property="mobileUnreachVipImage" column="mobile_unreach_vip_image"/>
+        <result property="webReachVipImage" column="web_reach_vip_image"/>
+        <result property="webUnreachVipImage" column="web_unreach_vip_image"/>
+    </resultMap>
+
+    <sql id="base_column">
+        id,
+        `level`,
+        JSON_UNQUOTE(json_extract(level_name, concat('$.',concat('"',concat(#{language},'"'))))) as level_name,
+        growth,
+        limit_growth,
+        up_reward,
+        week_wage,
+        month_wage,
+        birth_gift_money,
+        red_envelope,
+        credit_money,
+        create_by,
+        create_time,
+        update_by,
+        update_time,
+        remark,
+        mobile_vip_image,
+        web_vip_image,
+        mobile_reach_back_image,
+        mobile_unreach_back_image,
+        mobile_reach_vip_image,
+        mobile_unreach_vip_image,
+        web_reach_vip_image,
+        web_unreach_vip_image
+    </sql>
+
+    <select id="findList" resultMap="memberGrowthLevelResult">
+        select <include refid="base_column"/> from member_growth_level order by `level` asc
+        <if test="limitLevel != null">limit #{limitLevel}</if>
+    </select>
+
+</mapper>

@@ -1,6 +1,8 @@
 package com.gameplat.admin.model.vo;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.gameplat.admin.util.Date2LongSerializerUtils;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -38,15 +40,18 @@ public class CentralMessageVO implements Serializable {
     /**
      * 生效时间
      */
+    @JsonSerialize(using = Date2LongSerializerUtils.class)
     private Date effectTime;
 
     /**
      * 失效时间
      */
+    @JsonSerialize(using = Date2LongSerializerUtils.class)
     private Date expireTime;
 
     /**
      * 更新时间
      */
+    @JsonSerialize(using = Date2LongSerializerUtils.class)
     private Date updateTime;
 }

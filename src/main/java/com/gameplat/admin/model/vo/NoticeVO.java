@@ -1,5 +1,7 @@
 package com.gameplat.admin.model.vo;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.gameplat.admin.util.Date2LongSerializerUtils;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -34,11 +36,13 @@ public class NoticeVO implements Serializable {
     /**
      * 公告的开始日期
      */
+    @JsonSerialize(using = Date2LongSerializerUtils.class)
     private Date beginDate;
 
     /**
      * 公告的结束日期
      */
+    @JsonSerialize(using = Date2LongSerializerUtils.class)
     private Date endDate;
 
     /**
@@ -59,6 +63,7 @@ public class NoticeVO implements Serializable {
     /**
      * 修改时间
      */
+    @JsonSerialize(using = Date2LongSerializerUtils.class)
     private Date updateTime;
 
 }

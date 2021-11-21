@@ -52,7 +52,6 @@ public class MemberGrowthLevelVO {
     private BigDecimal creditMoney;
 
     @ApiModelProperty(value = "创建人")
-    @JsonSerialize(using = Date2LongSerializerUtils.class)
     private String createBy;
 
     @ApiModelProperty(value = "创建时间")

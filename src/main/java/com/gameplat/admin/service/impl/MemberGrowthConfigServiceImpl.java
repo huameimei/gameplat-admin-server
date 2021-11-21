@@ -6,6 +6,7 @@ import com.gameplat.admin.convert.MemberGrowthConfigConvert;
 import com.gameplat.admin.enums.LanguageEnum;
 import com.gameplat.admin.mapper.MemberGrowthConfigMapper;
 import com.gameplat.admin.model.domain.MemberGrowthConfig;
+import com.gameplat.admin.model.dto.MemberGrowthConfigEditDto;
 import com.gameplat.admin.model.vo.MemberGrowthConfigVO;
 import com.gameplat.admin.service.MemberGrowthConfigService;
 import lombok.RequiredArgsConstructor;
@@ -32,4 +33,14 @@ public class MemberGrowthConfigServiceImpl extends ServiceImpl<MemberGrowthConfi
         MemberGrowthConfig config = configMapper.findOneConfig(language);
         return configConvert.toVo(config);
     }
+
+    /**
+     * 修改成长值配置
+     * */
+    @Override
+    public void updateGrowthConfig(MemberGrowthConfigEditDto configEditDto) {
+        configMapper.updateGrowthConfig(configEditDto);
+    }
+
+
 }

@@ -14,6 +14,7 @@ import com.gameplat.admin.enums.AllowOthersOperateEnums;
 import com.gameplat.admin.enums.CashEnum;
 import com.gameplat.admin.enums.LimitEnums;
 import com.gameplat.admin.enums.ProxyPayStatusEnum;
+import com.gameplat.admin.enums.TranTypes;
 import com.gameplat.admin.enums.UserStates;
 import com.gameplat.admin.enums.WithdrawStatus;
 import com.gameplat.admin.mapper.MemberWithdrawMapper;
@@ -21,6 +22,7 @@ import com.gameplat.admin.model.bean.AdminLimitInfo;
 import com.gameplat.admin.model.bean.PageExt;
 import com.gameplat.admin.model.bean.ProxyPayMerBean;
 import com.gameplat.admin.model.domain.Member;
+import com.gameplat.admin.model.domain.MemberBill;
 import com.gameplat.admin.model.domain.MemberInfo;
 import com.gameplat.admin.model.domain.MemberWithdraw;
 import com.gameplat.admin.model.domain.MemberWithdrawHistory;
@@ -33,6 +35,7 @@ import com.gameplat.admin.model.vo.MemberWithdrawVO;
 import com.gameplat.admin.model.vo.SummaryVO;
 import com.gameplat.admin.service.LimitInfoService;
 import com.gameplat.admin.service.MemberBalanceService;
+import com.gameplat.admin.service.MemberBillService;
 import com.gameplat.admin.service.MemberInfoService;
 import com.gameplat.admin.service.MemberService;
 import com.gameplat.admin.service.MemberWithdrawHistoryService;
@@ -41,6 +44,7 @@ import com.gameplat.admin.service.PpInterfaceService;
 import com.gameplat.admin.service.PpMerchantService;
 import com.gameplat.admin.service.SysUserService;
 import com.gameplat.admin.util.MoneyUtils;
+import com.gameplat.common.util.DateUtil;
 import com.gameplat.security.context.UserCredential;
 import com.gameplat.common.enums.UserTypes;
 import com.gameplat.common.json.JsonUtils;
@@ -87,6 +91,8 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
   @Autowired private PpMerchantService ppMerchantService;
 
   @Autowired private MemberInfoService memberInfoService;
+
+  @Autowired private MemberBillService memberBillService;
 
   @Override
   public PageExt<MemberWithdrawVO, SummaryVO> findPage(
@@ -208,7 +214,7 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
       Integer curStatus,
       boolean isDirect,
       String approveReason,
-      UserCredential userCredential) {
+      UserCredential userCredential) throws Exception{
     if (cashStatus.equals(curStatus) || null == id || null == cashStatus || null == curStatus) {
       throw new ServiceException("错误的参数.");
     }
@@ -231,8 +237,9 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
       throw new ServiceException("UW/ORDER_NULL,出款订单已完成,请确认再试", null);
     }
 
-    Member info = memberService.getById(memberWithdraw.getMemberId());
-    if (info == null) {
+    Member member = memberService.getById(memberWithdraw.getMemberId());
+    MemberInfo memberInfo = memberInfoService.getById(memberWithdraw.getMemberId());
+    if (member == null || memberInfo == null) {
       log.error("用户ID不存在:" + memberWithdraw.getMemberId());
       throw new ServiceException("UC/EXT_INFO_NULL,用户不存在", null);
     }
@@ -280,7 +287,7 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
     } else if (toFinishCurrentOrder) {
       if (WithdrawStatus.SUCCESS.getValue() == cashStatus) {
         // 扣除会员余额
-        memberBalanceService.updateBalance(info.getId(), memberWithdraw.getCashMoney().negate());
+        memberBalanceService.updateBalance(member.getId(), memberWithdraw.getCashMoney().negate());
         // 更新充提报表,如果是推广账户不进入报表
         // TODO: 2021/11/2  未完成
         // 删除出款验证打码量记录的数据
@@ -292,25 +299,22 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
         //        }
 
       } else if (WithdrawStatus.CANCELLED.getValue() == cashStatus) { // 取消出款操作
-        //        UserMoneyBean userMoneyBean = new UserMoneyBean(userWithdraw.getUserId());
-        //        userMoneyBean.setMoney(userWithdraw.getCashMoney());
-        //        this.userService.updateMoney(userMoneyBean);
         // 释放会员提现金额
-        memberBalanceService.updateBalance(info.getId(), memberWithdraw.getCashMoney());
-        //        String billContent = String.format("管理员于%s向用户%s提现失败退回%.3f元,账户余额变更为:%.3f元",
-        //            DateUtil.getNowTime(),
-        //            info.getAccount(),
-        //            userWithdraw.getCashMoney(),
-        //            (userExtInfo.getMoney() + userWithdraw.getCashMoney())
-        //        );
-        //        UserBill bill = new UserBill();
-        //        bill.setBalance(userExtInfo.getMoney());
-        //        bill.setOrderNo(userWithdraw.getCashOrderNo());
-        //        bill.setTranType(TranTypes.WITHDRAW_FAIL.getValue());
-        //        bill.setMoney(userWithdraw.getCashMoney());
-        //        bill.setContent(billContent);
-        //        bill.setOperateName(operatorAccount.getAccount());
-        //        userBillService.save(userService.getUserInfo(info.getUserId()), bill);
+        memberBalanceService.updateBalance(member.getId(), memberWithdraw.getCashMoney());
+                String billContent = String.format("管理员于%s向用户%s提现失败退回%.3f元,账户余额变更为:%.3f元",
+                    DateUtil.getNowTime(),
+                    member.getAccount(),
+                    memberWithdraw.getCashMoney(),
+                    (memberInfo.getBalance().add(memberWithdraw.getCashMoney()))
+                );
+                MemberBill bill = new MemberBill();
+                bill.setBalance(memberInfo.getBalance());
+                bill.setOrderNo(memberWithdraw.getCashOrderNo());
+                bill.setTranType(TranTypes.WITHDRAW_FAIL.getValue());
+                bill.setAmount(memberWithdraw.getCashMoney());
+                bill.setContent(billContent);
+                bill.setOperator(userCredential.getUsername());
+                memberBillService.save(member, bill);
         //        if (isPush) {
         //          String content = String.format("您于%s提交的取现订单被取消，订单号为%s",
         //              DateUtil.getDateToString(userWithdraw.getAddTime(),
@@ -322,19 +326,19 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
         //          pushMessageService.saveByCashier(userWithdraw.getUserId(), content);
         //        }
       } else if (WithdrawStatus.REFUSE.getValue() == cashStatus) {
-        //        String content = String.format("您于%s提交的取现订单被没收，订单号为%s，金额：%s",
-        //            DateUtil.getDateToString(userWithdraw.getAddTime(),
-        // DateUtil.YYYY_MM_DD_HH_MM_SS),
-        //            userWithdraw.getCashOrderNo(),
-        //            userWithdraw.getCashMoney());
-        //        UserBill bill = new UserBill();
-        //        bill.setBalance(userExtInfo.getMoney());
-        //        bill.setOrderNo(userWithdraw.getCashOrderNo());
-        //        bill.setTranType(TranTypes.WITHDRAW_FAIL.getValue());
-        //        bill.setMoney(0D);
-        //        bill.setContent(content);
-        //        bill.setOperateName(operatorAccount.getAccount());
-        //        userBillService.save(userService.getUserInfo(info.getUserId()), bill);
+                String content = String.format("您于%s提交的取现订单被没收，订单号为%s，金额：%s",
+                    DateUtil.getDateToString(memberWithdraw.getCreateTime(),
+         DateUtil.YYYY_MM_DD_HH_MM_SS),
+                    memberWithdraw.getCashOrderNo(),
+                    memberWithdraw.getCashMoney());
+                MemberBill bill = new MemberBill();
+                bill.setBalance(memberInfo.getBalance());
+                bill.setOrderNo(memberWithdraw.getCashOrderNo());
+                bill.setTranType(TranTypes.WITHDRAW_FAIL.getValue());
+                bill.setAmount(BigDecimal.ZERO);
+                bill.setContent(content);
+                bill.setOperator(userCredential.getUsername());
+                memberBillService.save(member, bill);
         //        if (isPush) {
         //          pushMessageService.saveByCashier(userWithdraw.getUserId(), content);
         //        }
@@ -443,20 +447,20 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
         memberWithdraw.getMemberId(), memberWithdraw.getCashMoney().negate());
     memberInfoService.updateMemberWithdraw(memberInfo, memberWithdraw.getCashMoney());
 
-    //    // 添加用户账户金额的变更记录
-    //    String content = "管理员" /*+ admin.getAccount() */ + "于" + DateUtil.getNowTime() + "向用户"
-    //        + userInfoVO.getUserInfo().getAccount() + "成功通过后台转出" + String.format("%.3f",
-    // cashMoney)
-    //        + "元,账户余额变更为:" + String.format("%.3f", (ext.getMoney() - cashMoney))
-    //        + "元";
-    //    UserBill bill = new UserBill();
-    //    bill.setBalance(ext.getMoney());
-    //    bill.setOrderNo(userWithdraw.getCashOrderNo());
-    //    bill.setTranType(TranTypes.TRANSFER_OUT.getValue());
-    //    bill.setMoney(-cashMoney);
-    //    bill.setContent(content);
-    //    bill.setOperateName(admin.getAccount());
-    //    this.userBillService.save(userInfoVO.getUserInfo(), bill);
+        // 添加用户账户金额的变更记录
+        String content = "管理员" /*+ admin.getAccount() */ + "于" + DateUtil.getNowTime() + "向用户"
+            + member.getAccount() + "成功通过后台转出" + String.format("%.3f",
+     cashMoney)
+            + "元,账户余额变更为:" + String.format("%.3f", (memberInfo.getBalance().subtract(cashMoney)))
+            + "元";
+        MemberBill bill = new MemberBill();
+        bill.setBalance(memberInfo.getBalance());
+        bill.setOrderNo(memberWithdraw.getCashOrderNo());
+        bill.setTranType(TranTypes.TRANSFER_OUT.getValue());
+        bill.setAmount(cashMoney.negate());
+        bill.setContent(content);
+        bill.setOperator(userCredential.getUsername());
+        memberBillService.save(member, bill);
   }
 
   private void insertWithdrawHistory(MemberWithdraw memberWithdraw) {

@@ -7,17 +7,23 @@ import com.gameplat.admin.model.dto.QuickReplyDTO;
 import com.gameplat.admin.model.vo.QuickReplyVO;
 import com.gameplat.admin.service.QuickReplyService;
 import com.gameplat.common.constant.ServiceName;
-import com.gameplat.common.exception.ServiceException;
 import com.gameplat.common.group.Groups;
-import com.gameplat.common.util.StringUtils;
 import com.gameplat.log.annotation.Log;
 import com.gameplat.log.enums.LogType;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * 快捷回复控制器
@@ -64,4 +70,11 @@ public class OpenQuickReplyController {
   public void remove(@PathVariable Long id) {
     replyService.deleteQuickReply(id);
   }
+
+  @GetMapping("/getByType/{messageType}")
+  @PreAuthorize("hasAuthority('system:quickReply:getByType')")
+  public List<QuickReply> getByType(@PathVariable String messageType) {
+    return replyService.getByType(messageType);
+  }
+
 }

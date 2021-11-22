@@ -22,7 +22,7 @@ public interface MemberWithdrawService extends IService<MemberWithdraw> {
 
   void modify(Long id, Integer cashStatus, Integer curStatus, boolean isDirect,
       String approveReason,
-      UserCredential userCredential);
+      UserCredential userCredential) throws Exception;
 
   List<PpMerchant> queryProxyMerchant(Long id);
 

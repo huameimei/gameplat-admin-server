@@ -29,7 +29,7 @@ public class MemberWithdrawController {
   @PostMapping("/modifyCashStatus")
   @PreAuthorize("hasAuthority('finance:memberWithdraw:modifyCashStatus')")
   public void modifyCashStatus(Long id, Integer cashStatus, Integer curStatus, boolean isDirect,
-      String approveReason) {
+      String approveReason) throws Exception{
     UserCredential userCredential = SecurityUserHolder.getCredential();
 
     userWithdrawService.modify(id, cashStatus, curStatus, isDirect, approveReason, userCredential);

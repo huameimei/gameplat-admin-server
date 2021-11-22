@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.gameplat.admin.mapper.activity.QualificationManageDao">
+<mapper namespace="com.gameplat.admin.mapper.ActivityQualificationDao">
 
     <!-- 可根据自己的需求，是否要使用 -->
-    <resultMap type="com.gameplat.admin.model.domain.activity.QualificationManage" id="qualificationManageMap">
-        <result property="qualificationId" column="qualification_id"/>
+    <resultMap type="com.gameplat.admin.model.domain.ActivityQualification" id="qualificationManageMap">
         <result property="activityName" column="activity_name"/>
         <result property="activityType" column="activity_type"/>
         <result property="activityId" column="activity_id"/>
@@ -32,12 +31,7 @@
         <result property="employTime" column="employ_time"/>
         <result property="qualificationActivityId" column="qualification_activity_id"/>
         <result property="soleIdentifier" column="sole_identifier"/>
-        <result property="statisItem" column="statis_item"/>
-        <result property="withdrawDml" column="withdraw_dml"/>
         <result property="statisStartTime" column="statis_start_time"/>
-        <result property="statisEndTime" column="statis_end_time"/>
-        <result property="awardDetail" column="award_detail"/>
-        <result property="getWay" column="get_way"/>
     </resultMap>
 
     <!-- 通用查询结果列 -->
@@ -119,13 +113,13 @@
     <select id="findQualificationManageList" resultMap="qualificationManageMap">
         select
         <include refid="Base_Column_List"/>
-        from qualification_manage where delete_flag = 1
+        from activity_qualification where delete_flag = 1
         <include refid="where"/>
         ORDER BY status,apply_time desc
     </select>
 
-    <insert id="saveQualificationManage" parameterType="com.gameplat.admin.model.domain.activity.QualificationManage">
-        insert into qualification_manage
+    <insert id="saveQualificationManage" parameterType="com.gameplat.admin.model.domain.ActivityQualification">
+        insert into activity_qualification
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="qualificationId != null">
                 `qualification_id`,
@@ -321,8 +315,8 @@
     </insert>
 
 
-    <update id="updateQualificationManage" parameterType="com.gameplat.admin.model.domain.activity.QualificationManage">
-        update qualification_manage
+    <update id="updateQualificationManage" parameterType="com.gameplat.admin.model.domain.ActivityQualification">
+        update activity_qualification
         <set>
             <if test="applyTime != null">`apply_time` = #{applyTime},</if>
             <if test="auditPerson != null and auditPerson != ''">`audit_person` = #{auditPerson},</if>
@@ -352,7 +346,7 @@
     </update>
 
     <delete id="deleteBatchQualificationManage">
-        delete from qualification_manage where qualification_id in
+        delete from activity_qualification where qualification_id in
         <foreach item="qualification_id" collection="list" open="(" separator="," close=")">
             #{qualification_id}
         </foreach>
@@ -360,7 +354,7 @@
 
     <update id="updateQualificationManageList">
         <foreach collection="list" item="item" index="index" open="" close="" separator=";">
-            update qualification_manage
+            update activity_qualification
             <set>
                 <if test="auditPerson != null and auditPerson != ''">`audit_person` = #{item.auditPerson},</if>
                 <if test="auditTime != null">`audit_time` = #{item.auditTime},</if>
@@ -374,7 +368,7 @@
     </update>
 
     <insert id="insertBatchQualificationManageList">
-        insert into qualification_manage
+        insert into activity_qualification
         (activity_name, activity_type, activity_id, user_id,username,
         apply_time, audit_person, audit_time, audit_remark, status,
         activity_start_time, activity_end_time, qualification_status, remark,
@@ -397,7 +391,7 @@
     </insert>
 
     <update id="updateQualificationManageStatus">
-        update qualification_manage
+        update activity_qualification
         <set>
             <if test="qualificationStatus != null">`qualification_status` = #{qualificationStatus},</if>
             <if test="deleteFlag != null">`delete_flag` = #{deleteFlag},</if>
@@ -411,7 +405,7 @@
     </update>
 
     <update id="passAuditQualificationManage">
-        update qualification_manage
+        update activity_qualification
         <set>
             <if test="status != null">`status` = #{status},</if>
             <if test="auditPerson != null and auditPerson != ''">`audit_person` = #{auditPerson},</if>
@@ -426,7 +420,7 @@
     <select id="findQualificationManageStatusList" resultMap="qualificationManageMap">
         select
         <include refid="Base_Column_List"/>
-        from qualification_manage where qualification_id in
+        from activity_qualification where qualification_id in
         <foreach collection="list" item="qualificationIds" open="(" separator="," close=")">
             #{qualificationIds}
         </foreach>
@@ -434,7 +428,7 @@
     <select id="findUniques" resultMap="qualificationManageMap">
         select
         <include refid="Base_Column_List"/>
-        from qualification_manage
+        from activity_qualification
         where
         <foreach collection="list" item="item" open="(" separator="or" close=")">
             activity_id=#{item.activityId} and
@@ -444,10 +438,10 @@
             sole_identifier=#{item.soleIdentifier}
         </foreach>
     </select>
-    <select id="findUnique" resultType="com.gameplat.admin.model.domain.activity.QualificationManage">
+    <select id="findUnique" resultType="com.gameplat.admin.model.domain.ActivityQualification">
         select
         <include refid="Base_Column_List"/>
-        from qualification_manage
+        from activity_qualification
         where
         activity_id=#{activityId} and
         activity_type=#{activityType} and
@@ -457,7 +451,7 @@
 
     <update id="updateBatchQualificationManageEmploy">
         <foreach collection="list" item="qualificationActivityId" separator=";" >
-        update qualification_manage set employ_num = employ_num+1,employ_time = NOW()
+        update activity_qualification set employ_num = employ_num+1,employ_time = NOW()
         where qualification_activity_id = #{qualificationActivityId}
         </foreach>
     </update>
@@ -465,7 +459,7 @@
     <select id="checkRepetition" resultType="java.lang.Integer">
         select
         count(*)
-        from qualification_manage
+        from activity_qualification
         <where>
         <if test="activityId != null ">
             and activity_id = #{activityId}
@@ -485,7 +479,7 @@
     <select id="checkOtherRepetition" resultType="java.lang.Integer">
         select
         count(*)
-        from qualification_manage
+        from activity_qualification
         where
         activity_type = #{activityType}
         and user_id = #{userId}
@@ -497,7 +491,7 @@
 <!--    <select id="checkRepetition1" resultType="java.lang.Integer">-->
 <!--        select-->
 <!--        count(*)-->
-<!--        from qualification_manage-->
+<!--        from activity_qualification-->
 <!--        where-->
 <!--        user_id = #{userId}-->
 <!--        and -->

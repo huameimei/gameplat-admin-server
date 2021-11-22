@@ -1,6 +1,8 @@
 package com.gameplat.admin.model.vo;
 
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.gameplat.admin.util.Date2LongSerializerUtils;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -33,9 +35,11 @@ public class PushMessageVO {
     @ApiModelProperty(value = "是否已读: 0-未读; 1-已读")
     public Integer readStatus;
 
+    @JsonSerialize(using = Date2LongSerializerUtils.class)
     @ApiModelProperty(value = "添加时间")
     public Date createTime;
 
+    @JsonSerialize(using = Date2LongSerializerUtils.class)
     @ApiModelProperty(value = "接收者阅读消息的时间")
     public Date readTime;
 

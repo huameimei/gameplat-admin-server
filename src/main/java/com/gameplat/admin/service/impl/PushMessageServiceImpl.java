@@ -156,15 +156,10 @@ public class PushMessageServiceImpl extends ServiceImpl<PushMessageMapper, PushM
                 break;
             case 4:
                 //4-指定层级
-                if (StringUtils.isBlank(pushMessageAddDTO.getUserLevel())) {
+                if (ObjectUtils.isNull(pushMessageAddDTO.getUserLevel()) || pushMessageAddDTO.getUserLevel().length < 1) {
                     throw new ServiceException("充值层级不能为空");
                 }
-                List<String> userLevelList = new ArrayList<>();
-                if (pushMessageAddDTO.getUserLevel().contains(",")) {
-                    userLevelList.addAll(Arrays.asList(pushMessageAddDTO.getUserLevel().split(",")));
-                } else {
-                    userLevelList.add(pushMessageAddDTO.getUserLevel());
-                }
+                List<String> userLevelList = Arrays.asList(pushMessageAddDTO.getUserLevel());
                 //查询指定层级的用户
                 List<Member> memberList = memberService.getListByUserLevel(userLevelList);
                 if (CollectionUtils.isNotEmpty(memberList)) {
@@ -241,6 +236,11 @@ public class PushMessageServiceImpl extends ServiceImpl<PushMessageMapper, PushM
 
     @Override
     public void deleteByCondition(PushMessageRemoveDTO pushMessageRemoveDTO) {
+        if (pushMessageRemoveDTO.getReadStatus() == null
+                && StringUtils.isBlank(pushMessageRemoveDTO.getBeginDate())
+                && StringUtils.isBlank(pushMessageRemoveDTO.getEndDate())) {
+            throw new ServiceException("按条件删除消息，消息状态和推送时间必须填写");
+        }
         //  先查询满足条件的数据
         LambdaQueryChainWrapper<PushMessage> queryWrapper = this.lambdaQuery();
         queryWrapper

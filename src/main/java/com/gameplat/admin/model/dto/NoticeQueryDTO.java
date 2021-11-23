@@ -11,7 +11,7 @@ import java.io.Serializable;
  */
 
 @Data
-public class NoticeQueryDTO  implements Serializable {
+public class NoticeQueryDTO implements Serializable {
 
     /**
      * 公告标题

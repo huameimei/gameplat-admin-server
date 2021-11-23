@@ -15,7 +15,7 @@ import java.util.List;
 @Mapper
 public interface ActivityQualificationDao {
 
-    List<ActivityQualification> findQualificationManageList(ActivityQualificationDTO qualificationManage);
+    List<ActivityQualification> findActivityQualificationList(ActivityQualificationDTO qualificationManage);
 
     int saveQualificationManage(ActivityQualification qualificationManage);
 

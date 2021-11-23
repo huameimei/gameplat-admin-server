@@ -1,4 +1,4 @@
-package com.gameplat.admin.enums.activity;
+package com.gameplat.admin.enums;
 
 /**
  * 游戏类型枚举

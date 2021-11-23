@@ -110,7 +110,7 @@
         </if>
     </sql>
 
-    <select id="findQualificationManageList" resultMap="qualificationManageMap">
+    <select id="findActivityQualificationList" resultMap="qualificationManageMap">
         select
         <include refid="Base_Column_List"/>
         from activity_qualification where delete_flag = 1

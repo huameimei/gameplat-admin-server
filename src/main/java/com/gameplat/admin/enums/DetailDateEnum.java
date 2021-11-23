@@ -1,4 +1,4 @@
-package com.gameplat.admin.enums.activity;
+package com.gameplat.admin.enums;
 
 /**
  * 活动详细日期枚举

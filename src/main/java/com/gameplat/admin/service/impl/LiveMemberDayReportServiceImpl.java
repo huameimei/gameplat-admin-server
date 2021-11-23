@@ -106,7 +106,8 @@ public class LiveMemberDayReportServiceImpl extends
   @Override
   public void saveMemberDayReport(String statTime, GamePlatform gamePlatform) {
       log.info("{}[{}],statTime:[{}]> Start save live_user_day_report", gamePlatform.getName(), gamePlatform.getCode(), statTime);
-     int count = this.liveMemberDayReportMapper.getDayCount(statTime, gamePlatform);
+      String tableName = String.format("live_%s_bet_record",gamePlatform.getCode());
+     int count = this.liveMemberDayReportMapper.getDayCount(statTime, tableName);
      if (count > 0) {
         log.info("{}[{}],statTime:[{}] > live_user_day_report bet record data size:[{}]", gamePlatform.getName(), gamePlatform.getCode(), statTime, count);
         QueryWrapper<LiveMemberDayReport> queryWrapper = Wrappers.query();
@@ -114,7 +115,7 @@ public class LiveMemberDayReportServiceImpl extends
         queryWrapper.eq("stat_time",statTime);
         int deleted = liveMemberDayReportMapper.delete(queryWrapper);
         log.info("{}[{}],statTime:[{}] > live_user_day_report delete exists data size:[{}]", gamePlatform.getName(), gamePlatform.getCode(), statTime, deleted);
-        int generate = this.liveMemberDayReportMapper.saveMemberDayReport(statTime, gamePlatform);
+        int generate = this.liveMemberDayReportMapper.saveMemberDayReport(statTime, gamePlatform,tableName);
         log.info("{}[{}],statTime:[{}] > live_user_day_report generate data size:[{}]", gamePlatform.getName(), gamePlatform.getCode(), statTime, generate);
       } else {
         log.info("{}[{}],statTime:[{}]> no data save to live_user_day_report", gamePlatform.getName(), gamePlatform.getCode(), statTime);

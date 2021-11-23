@@ -38,7 +38,4 @@ public class LiveMemberDayReportQueryDTO implements Serializable {
 
   /***参数****/
   private String userPaths;
-
-
-
 }

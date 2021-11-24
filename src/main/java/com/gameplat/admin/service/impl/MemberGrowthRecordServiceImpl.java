@@ -34,13 +34,13 @@ public class MemberGrowthRecordServiceImpl extends ServiceImpl<MemberGrowthRecor
 
     @Override
     public IPage<MemberGrowthRecordVO> findRecordList(PageDTO<MemberGrowthRecord> page, MemberGrowthRecordDTO dto) {
-        String language = dto.getLanguage();
 
         IPage<MemberGrowthRecordVO> result = this.lambdaQuery()
                 .like(ObjectUtils.isNotEmpty(dto.getUserName()), MemberGrowthRecord::getUserName, dto.getUserName())
                 .eq(ObjectUtils.isNotEmpty(dto.getType()), MemberGrowthRecord::getType, dto.getType())
                 .ge(ObjectUtils.isNotEmpty(dto.getStartTime()), MemberGrowthRecord::getCreateTime, dto.getStartTime())
                 .le(ObjectUtils.isNotEmpty(dto.getEndTime()), MemberGrowthRecord::getCreateTime, dto.getEndTime())
+                .orderByDesc(MemberGrowthRecord::getCreateTime)
                 .page(page)
                 .convert(recordConvert::toVo);
 

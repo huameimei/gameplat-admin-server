@@ -26,10 +26,8 @@ public class MemberWealDTO implements Serializable {
     private Integer status;
 
     @ApiModelProperty(value = "周期  开始时间")
-    @JsonFormat(pattern = "yyyy-MM-dd")
-    private Date startDate;
+    private String startDate;
 
     @ApiModelProperty(value = "周期  结束时间")
-    @JsonFormat(pattern = "yyyy-MM-dd")
-    private Date endDate;
+    private String endDate;
 }

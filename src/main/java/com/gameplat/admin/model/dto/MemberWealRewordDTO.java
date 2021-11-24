@@ -34,10 +34,8 @@ public class MemberWealRewordDTO implements Serializable {
     private Integer type;
 
     @ApiModelProperty("开始时间")
-    @JsonFormat(pattern = "yyyy-MM-dd")
-    private Date startTime;
+    private String startTime;
 
     @ApiModelProperty("结束时间")
-    @JsonFormat(pattern = "yyyy-MM-dd")
-    private Date endTime;
+    private String endTime;
 }

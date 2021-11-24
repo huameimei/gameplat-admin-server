@@ -1,11 +1,9 @@
 package com.gameplat.admin.model.dto;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.io.Serializable;
-import java.util.Date;
 
 /**
  * @author lily
@@ -22,12 +20,10 @@ public class MemberVipSignStatisDTO implements Serializable {
     private String userName;
 
     @ApiModelProperty(value = "最后签到开始时间")
-    @JsonFormat(pattern = "yyyy-MM-dd")
-    private Date beginTime;
+    private String beginTime;
 
     @ApiModelProperty(value = "最后签到结束时间")
-    @JsonFormat(pattern = "yyyy-MM-dd")
-    private Date endTime;
+    private String endTime;
 
 
 }

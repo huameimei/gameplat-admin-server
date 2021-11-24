@@ -48,6 +48,11 @@ public class MemberVipSignStatis implements Serializable {
     @TableField(fill = FieldFill.INSERT)
     private String createBy;
 
+    @ApiModelProperty(value = "更新时间")
+    @TableField(fill = FieldFill.UPDATE)
+    @Excel(name = "最后签到时间", databaseFormat = "yyyyMMddHHmmss", format = "yyyy-MM-dd HH:mm:ss", isImportField = "true_st", width = 20)
+    private Date updateTime;
+
     @ApiModelProperty(value = "创建时间")
     @TableField(fill = FieldFill.INSERT)
     @Excel(name = "创建时间", databaseFormat = "yyyyMMddHHmmss", format = "yyyy-MM-dd HH:mm:ss", isImportField = "true_st", width = 20)
@@ -56,11 +61,6 @@ public class MemberVipSignStatis implements Serializable {
     @ApiModelProperty(value = "更新人")
     @TableField(fill = FieldFill.UPDATE)
     private String updateBy;
-
-    @ApiModelProperty(value = "更新时间")
-    @TableField(fill = FieldFill.UPDATE)
-    @Excel(name = "最后签到时间", databaseFormat = "yyyyMMddHHmmss", format = "yyyy-MM-dd HH:mm:ss", isImportField = "true_st", width = 20)
-    private Date updateTime;
 
     @ApiModelProperty(value = "备注")
     private String remark;

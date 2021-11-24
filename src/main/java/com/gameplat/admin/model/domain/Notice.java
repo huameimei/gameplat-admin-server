@@ -15,7 +15,6 @@ import java.util.Date;
 @TableName("notice")
 public class Notice implements Serializable {
 
-
     @TableId(type = IdType.AUTO)
     private Integer id;
 

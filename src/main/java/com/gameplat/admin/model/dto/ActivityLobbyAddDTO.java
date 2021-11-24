@@ -4,6 +4,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import javax.validation.constraints.NotBlank;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
@@ -19,12 +20,15 @@ public class ActivityLobbyAddDTO implements Serializable {
 
     private static final long serialVersionUID = 6060013282905693277L;
 
+    @NotBlank(message = "标题不能为空")
     @ApiModelProperty(value = "标题")
     private String title;
 
+    @NotBlank(message = "开始时间不能为空")
     @ApiModelProperty(value = "开始时间")
     private Date startTime;
 
+    @NotBlank(message = "结束时间不能为空")
     @ApiModelProperty(value = "结束时间")
     private Date endTime;
 
@@ -89,6 +93,7 @@ public class ActivityLobbyAddDTO implements Serializable {
     @ApiModelProperty(value = "用户等级")
     private String userLevel;
 
+    @NotBlank(message = "活动状态必选")
     @ApiModelProperty(value = "活动状态（0 关闭，1 开启，2 失效）")
     private Integer status;
 

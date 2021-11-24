@@ -9,11 +9,13 @@ import com.gameplat.admin.model.dto.ActivityLobbyDTO;
 import com.gameplat.admin.model.vo.ActivityLobbyVO;
 import com.gameplat.admin.service.ActivityLobbyService;
 import com.gameplat.common.context.GlobalContextHolder;
+import com.gameplat.common.exception.ServiceException;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -45,7 +47,10 @@ public class ActivityLobbyController {
      */
     @PostMapping("/add")
     @PreAuthorize("hasAuthority('activity:lobby:add')")
-    public void add(@RequestBody ActivityLobbyAddDTO activityLobbyAddDTO) {
+    public void add(@RequestBody ActivityLobbyAddDTO activityLobbyAddDTO, BindingResult results) {
+        if (results.hasErrors()) {
+            throw new ServiceException(results.getFieldError().getDefaultMessage());
+        }
         activityLobbyAddDTO.setCreateBy(GlobalContextHolder.getContext().getUsername());
         activityLobbyService.add(activityLobbyAddDTO);
     }

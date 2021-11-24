@@ -51,11 +51,12 @@ public class MemberWealRewordServiceImpl extends ServiceImpl<MemberWealRewordMap
                 return this.lambdaQuery()
                         .eq(ObjectUtils.isNotEmpty(queryDTO.getUserId()), MemberWealReword::getUserId, queryDTO.getUserId())
                         .eq(ObjectUtils.isNotEmpty(queryDTO.getSerialNumber()), MemberWealReword::getSerialNumber, queryDTO.getSerialNumber())
-                        .eq(ObjectUtils.isNotEmpty(queryDTO.getUserName()), MemberWealReword::getUserName, queryDTO.getUserName())
+                        .like(ObjectUtils.isNotEmpty(queryDTO.getUserName()), MemberWealReword::getUserName, queryDTO.getUserName())
                         .eq(ObjectUtils.isNotEmpty(queryDTO.getStatus()), MemberWealReword::getStatus, queryDTO.getStatus())
                         .eq(ObjectUtils.isNotEmpty(queryDTO.getType()), MemberWealReword::getType, queryDTO.getType())
                         .ge(ObjectUtils.isNotEmpty(queryDTO.getStartTime()), MemberWealReword::getCreateTime, queryDTO.getStartTime())
                         .le(ObjectUtils.isNotEmpty(queryDTO.getEndTime()), MemberWealReword::getCreateTime, queryDTO.getEndTime())
+                        .orderByDesc(MemberWealReword::getCreateTime)
                         .page(page)
                         .convert(rewordConvert::toVo);
     }

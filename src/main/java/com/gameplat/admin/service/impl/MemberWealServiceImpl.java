@@ -43,6 +43,7 @@ public class MemberWealServiceImpl extends ServiceImpl<MemberWealMapper, MemberW
                 .eq(ObjectUtils.isNotEmpty(queryDTO.getType()), MemberWeal::getType, queryDTO.getType())
                 .ge(ObjectUtils.isNotEmpty(queryDTO.getStartDate()), MemberWeal::getCreateTime, queryDTO.getStartDate())
                 .le(ObjectUtils.isNotEmpty(queryDTO.getEndDate()), MemberWeal::getCreateTime, queryDTO.getEndDate())
+                .orderByDesc(MemberWeal::getCreateTime)
                 .page(page)
                 .convert(wealConvert::toVo);
     }

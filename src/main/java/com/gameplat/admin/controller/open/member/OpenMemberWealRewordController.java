@@ -31,10 +31,6 @@ public class OpenMemberWealRewordController {
     @ApiOperation(value = "vip福利记录列表")
     @PreAuthorize("hasAuthority('member:wealReword:list')")
     public IPage<MemberWealRewordVO> listWealReword(PageDTO<MemberWealReword> page, MemberWealRewordDTO dto) {
-
-        if(ObjectUtils.isNotEmpty(dto.getStartTime()) && ObjectUtils.isEmpty(dto.getEndTime())){
-            dto.setEndTime(dto.getStartTime());
-        }
         return rewordService.findWealRewordList(page, dto);
     }
 

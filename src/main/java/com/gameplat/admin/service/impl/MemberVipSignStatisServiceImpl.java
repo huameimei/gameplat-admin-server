@@ -46,6 +46,7 @@ public class MemberVipSignStatisServiceImpl extends ServiceImpl<MemberVipSignSta
                         .like(ObjectUtils.isNotEmpty(queryDTO.getUserName()), MemberVipSignStatis::getUserName, queryDTO.getUserName())
                         .ge(ObjectUtils.isNotEmpty(queryDTO.getBeginTime()), MemberVipSignStatis::getCreateTime, queryDTO.getBeginTime())
                         .le(ObjectUtils.isNotEmpty(queryDTO.getEndTime()), MemberVipSignStatis::getCreateTime, queryDTO.getEndTime())
+                        .orderByDesc(MemberVipSignStatis::getCreateTime)
                         .page(page)
                         .convert(signStatisConvert::toVo);
     }

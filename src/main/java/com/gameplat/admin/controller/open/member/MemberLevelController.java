@@ -20,7 +20,7 @@ public class MemberLevelController {
   @Autowired private MemberLevelService memberLevelService;
 
   @GetMapping("/list")
-  public List<MemberLevelVO> getLevelList() {
+  public List<MemberLevelVO> getList() {
     return memberLevelService.getList();
   }
 

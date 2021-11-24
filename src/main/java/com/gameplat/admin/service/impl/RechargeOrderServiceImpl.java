@@ -13,7 +13,6 @@ import com.gameplat.admin.constant.TrueFalse;
 import com.gameplat.admin.convert.RechargeOrderConvert;
 import com.gameplat.admin.enums.AllowOthersOperateEnums;
 import com.gameplat.admin.enums.BlacklistConstant.BizBlacklistType;
-import com.gameplat.admin.enums.LimitEnums;
 import com.gameplat.admin.enums.MemberEnums.Type;
 import com.gameplat.admin.enums.RechargeStatus;
 import com.gameplat.admin.enums.SwitchStatusEnum;
@@ -35,7 +34,7 @@ import com.gameplat.admin.model.domain.SysDictData;
 import com.gameplat.admin.model.domain.SysUser;
 import com.gameplat.admin.model.domain.TpMerchant;
 import com.gameplat.admin.model.domain.TpPayChannel;
-import com.gameplat.admin.model.domain.limit.MemberRechargeLimit;
+import com.gameplat.common.model.bean.limit.MemberRechargeLimit;
 import com.gameplat.admin.model.dto.RechargeOrderQueryDTO;
 import com.gameplat.admin.model.vo.RechargeOrderVO;
 import com.gameplat.admin.model.vo.SummaryVO;
@@ -53,6 +52,7 @@ import com.gameplat.admin.service.TpMerchantService;
 import com.gameplat.admin.service.TpPayChannelService;
 import com.gameplat.admin.service.ValidWithdrawService;
 import com.gameplat.admin.util.MoneyUtils;
+import com.gameplat.common.enums.LimitEnums;
 import com.gameplat.common.exception.ServiceException;
 import com.gameplat.security.SecurityUserHolder;
 import com.gameplat.security.context.UserCredential;
@@ -390,7 +390,7 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
       throws ServiceException {
     boolean toCheck = (!Objects.equals(AllowOthersOperateEnums.YES.getValue(),
         limitInfoService
-            .getLimitInfo(LimitEnums.MEMBER_RECHARGE_LIMIT.getName(), MemberRechargeLimit.class)
+            .getLimitInfo(LimitEnums.MEMBER_RECHARGE_LIMIT, MemberRechargeLimit.class)
             .getIsHandledAllowOthersOperate())
         && !userCredential.isSuperAdmin());
     if (toCheck) {

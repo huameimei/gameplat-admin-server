@@ -3,7 +3,10 @@ package com.gameplat.admin.model.domain;
 import com.baomidou.mybatisplus.annotation.*;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.util.Date;
@@ -14,8 +17,11 @@ import java.util.Date;
  * @author three
  */
 @Data
-@TableName("spread_link_config")
-public class SpreadConfig {
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+@TableName("spread_link_info")
+public class SpreadLinkInfo {
 
   @TableId(type = IdType.AUTO)
   private Long id;

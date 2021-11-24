@@ -2,11 +2,11 @@ package com.gameplat.admin.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.gameplat.admin.enums.LimitEnums;
 import com.gameplat.admin.mapper.LimitInfoMapper;
 import com.gameplat.admin.model.domain.LimitInfo;
 import com.gameplat.admin.model.dto.LimitInfoDTO;
 import com.gameplat.admin.service.LimitInfoService;
+import com.gameplat.common.enums.LimitEnums;
 import com.gameplat.common.exception.ServiceException;
 import com.gameplat.common.json.JsonUtils;
 import com.gameplat.security.SecurityUserHolder;
@@ -66,12 +66,12 @@ public class LimitInfoServiceImpl extends ServiceImpl<LimitInfoMapper, LimitInfo
   }
 
   @Override
-  @SuppressWarnings("unchecked")
-  public <T> T getLimitInfo(String name, Class<T> t) {
-    LimitInfo<?> info = lambdaQuery().eq(LimitInfo::getName, name).one();
-    if (info != null && info.getLimit() != null) {
-      return (T) info.getLimit();
-    }
-    return null;
+  public <T> T getLimitInfo(LimitEnums limit, Class<T> t) {
+    return lambdaQuery()
+        .eq(LimitInfo::getName, limit.name())
+        .oneOpt()
+        .map(LimitInfo::getValue)
+        .map(v -> JsonUtils.parse(v, t))
+        .orElse(null);
   }
 }

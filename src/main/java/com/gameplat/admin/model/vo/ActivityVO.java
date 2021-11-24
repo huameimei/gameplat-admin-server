@@ -1,35 +1,34 @@
-package com.gameplat.admin.model.domain;
+package com.gameplat.admin.model.vo;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
-import io.swagger.annotations.ApiModel;
+
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.dozer.Mapping;
 
 import java.io.Serializable;
 import java.util.Date;
 
 /**
  * <p>
- * 活动实体类
+ * 活动VO
  * </p>
  *
  * @author 沙漠
- * @since 2020-05-28
+ * @since 2020-05-26
  */
-@TableName("activity")
 @Data
 @EqualsAndHashCode(callSuper = false)
-@ApiModel(value = "Activity对象", description = "活动表")
-public class Activity implements Serializable {
+public class ActivityVO implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    @JsonSerialize(using = ToStringSerializer.class)
     @ApiModelProperty(value = "主键")
-    @TableId(value = "activity_id", type = IdType.AUTO)
-    private Long activityId;
+    @Mapping(value = "activityId")
+    private Long id;
 
     @ApiModelProperty(value = "活动名称")
     private String activityName;

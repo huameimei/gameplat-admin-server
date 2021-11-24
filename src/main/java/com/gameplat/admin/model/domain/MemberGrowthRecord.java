@@ -33,9 +33,8 @@ public class MemberGrowthRecord implements Serializable {
     @ApiModelProperty(value = "变动游戏分类编码")
     private String kindCode;
 
-    @TableField(typeHandler = JacksonTypeHandler.class)
     @ApiModelProperty(value = "变动游戏分类名称")
-    private List<RecordKindName> kindName;
+    private String kindName;
 
     @ApiModelProperty(value = "类型：0:充值  1:签到 2:投注打码量 3:后台修改 4:完善资料 5：绑定银行卡")
     private Integer type;

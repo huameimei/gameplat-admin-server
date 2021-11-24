@@ -1,11 +1,9 @@
 package com.gameplat.admin.model.dto;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.io.Serializable;
-import java.util.Date;
 
 /**
  * @author lily
@@ -23,13 +21,10 @@ public class MemberGrowthRecordDTO implements Serializable {
     private Integer type;
 
     @ApiModelProperty(value = "开始时间")
-    @JsonFormat(pattern = "yyyy-MM-dd")
-    private Date startTime;
+    private String startTime;
 
     @ApiModelProperty(value = "结束时间")
-    @JsonFormat(pattern = "yyyy-MM-dd")
-    private Date endTime;
+    private String endTime;
 
-    @ApiModelProperty(value = "状态： 0：待审核   1：未领取 2：已完成 3：已失效")
-    private Integer status;
+    private String language;
 }

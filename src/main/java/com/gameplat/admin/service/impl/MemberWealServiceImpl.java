@@ -1,16 +1,25 @@
 package com.gameplat.admin.service.impl;
 
+import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.date.DateUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.convert.MemberWealConvert;
-import com.gameplat.admin.mapper.MemberWealMapper;
+import com.gameplat.admin.mapper.*;
+import com.gameplat.admin.model.domain.Member;
+import com.gameplat.admin.model.domain.MemberBlackList;
 import com.gameplat.admin.model.domain.MemberWeal;
+import com.gameplat.admin.model.domain.MemberWealDetail;
+import com.gameplat.admin.model.dto.MemberEditDTO;
 import com.gameplat.admin.model.dto.MemberWealAddDTO;
 import com.gameplat.admin.model.dto.MemberWealDTO;
 import com.gameplat.admin.model.dto.MemberWealEditDTO;
 import com.gameplat.admin.model.vo.MemberWealVO;
+import com.gameplat.admin.service.MemberBlackListService;
+import com.gameplat.admin.service.MemberWealDetailService;
 import com.gameplat.admin.service.MemberWealService;
+import com.gameplat.common.context.GlobalContextHolder;
 import com.gameplat.common.exception.ServiceException;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
@@ -18,6 +27,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
+import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.toList;
 
 /**
  * @author lily
@@ -31,6 +48,12 @@ public class MemberWealServiceImpl extends ServiceImpl<MemberWealMapper, MemberW
 
     @Autowired private MemberWealConvert wealConvert;
     @Autowired private MemberWealMapper mapper;
+    @Autowired private MemberGrowthStatisMapper statisMapper;
+    @Autowired private RechargeOrderMapper rechargeOrderMapper;
+    @Autowired private MemberDayReportMapper dayReportMapper;
+    @Autowired private MemberMapper memberMapper;
+    @Autowired private MemberBlackListService blackListService;
+    @Autowired private MemberWealDetailService wealDetailService;
 
     /**
      * 获取等级俸禄达标会员
@@ -50,7 +73,7 @@ public class MemberWealServiceImpl extends ServiceImpl<MemberWealMapper, MemberW
 
 
     /**
-     * 修改会员俸禄
+     * 添加
      */
     @Override
     public void addMemberWeal(MemberWealAddDTO dto) {
@@ -123,6 +146,101 @@ public class MemberWealServiceImpl extends ServiceImpl<MemberWealMapper, MemberW
         Integer status = memberWeal.getStatus();
         if (status != 0 && status != 1){
             throw new IllegalArgumentException("福利状态异常,不能结算！");
+        }
+        //获取会员对应等级的福利金额
+        List<MemberWealDetail> memberSalaryInfoList = statisMapper.getMemberSalaryInfo(type);
+
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        //查找符合充值金额和打码量资格的会员
+        List<String> rechargeAccountList = new ArrayList<>();
+        if (memberWeal.getMinRechargeAmount() != null && memberWeal.getMinRechargeAmount().compareTo(new BigDecimal("0")) > 0) {
+            rechargeAccountList = rechargeOrderMapper.getSatisfyRechargeAccount(
+                    String.valueOf(memberWeal.getMinRechargeAmount()),
+                    formatter.format(memberWeal.getStartDate()),
+                    formatter.format(memberWeal.getEndDate()));
+        } else {
+            rechargeAccountList = memberSalaryInfoList.stream().map(MemberWealDetail::getUserName).collect(toList());
+        }
+
+        //获取达到有效投注金额的会员账号
+        List<String> betAccountList = new ArrayList<>();
+        if(memberWeal.getMinBetAmount() != null && memberWeal.getMinBetAmount().compareTo(new BigDecimal("0")) > 0){
+            betAccountList = dayReportMapper.getSatisfyBetAccount(
+                    String.valueOf(memberWeal.getMinBetAmount()),
+                    formatter.format(memberWeal.getStartDate()),
+                    formatter.format(memberWeal.getEndDate())
+            );
+        } else {
+            betAccountList = memberSalaryInfoList.stream().map(MemberWealDetail::getUserName).collect(toList());
+        }
+
+        //取达到充值金额的会员账号&&达到有效投注金额的会员账号的交集
+        List<String> intersectionList = rechargeAccountList.stream().filter(betAccountList::contains).collect(toList());
+
+        if (type == 0 || type == 1) {
+            //周 月 俸禄 结算
+        } else if (type == 2){
+            // 生日礼金
+            //过滤每个会员的生日是否在周期内
+            if (intersectionList != null && intersectionList.size() > 0){
+                List<Member> users = memberMapper.findByUserNameList(intersectionList);
+                intersectionList = users.stream().filter(item -> item.getBirthday() != null && DateUtil.parse(DateUtil.format(item.getBirthday(),"MM-dd"),"MM-dd").compareTo(DateUtil.parse(DateUtil.format(memberWeal.getStartDate(),"MM-dd"),"MM-dd")) >= 0
+                        && DateUtil.parse(DateUtil.format(item.getBirthday(),"MM-dd"),"MM-dd").compareTo(DateUtil.parse(DateUtil.format(memberWeal.getEndDate(),"MM-dd"),"MM-dd")) <= 0).map(item -> item.getNickname())
+                        .filter(intersectionList::contains).collect(toList());
+            }
+        } else if (type == 3){//每月红包
+
+        }
+        //取享有福利的会员账号，再次跟上面 intersectionList 集合账号取交集
+        List<String> finalIntersectionList1 = intersectionList;
+        List<MemberWealDetail> finalIntersectionList = new ArrayList<>();
+        finalIntersectionList = memberSalaryInfoList.stream()
+                .filter(item -> finalIntersectionList1.stream().map(String::toString).collect(Collectors.toList()).contains(item.getUserName())).collect(Collectors.toList());
+
+        List<MemberWealDetail> list = new ArrayList<>();
+
+        if(CollectionUtil.isNotEmpty(finalIntersectionList)) {
+            //过滤黑名单
+            List<String> blackList = new ArrayList<>();
+            List<MemberBlackList> memberBlackList = blackListService.findMemberBlackList(new MemberBlackList());
+            if (CollectionUtil.isNotEmpty(memberBlackList)) {
+                blackList = memberBlackList.stream().map(memberBlack -> memberBlack.getUserAccount()).collect(Collectors.toList());
+            }
+            if (CollectionUtil.isNotEmpty(blackList)) {
+                for (String userAccount : blackList) {
+                    finalIntersectionList = finalIntersectionList.stream().filter(item1 -> !item1.getUserName().equalsIgnoreCase(userAccount)).collect(Collectors.toList());
+                }
+            }
+            //装配福利详情等字段
+            int totalUserCount = 0;
+            BigDecimal totalPayMoney = new BigDecimal("0");
+            for (MemberWealDetail memberWealDetail : finalIntersectionList) {
+                MemberWealDetail model = new MemberWealDetail();
+                model.setWealId(id);
+                model.setUserId(memberWealDetail.getUserId());
+                model.setUserName(memberWealDetail.getUserName());
+                model.setLevel(memberWealDetail.getLevel());
+                model.setRewordAmount(memberWealDetail.getRewordAmount());
+                model.setStatus(1);
+                model.setCreateBy(GlobalContextHolder.getContext().getUsername());
+                list.add(model);
+                totalUserCount++;
+                totalPayMoney = totalPayMoney.add(memberWealDetail.getRewordAmount());
+            }
+            memberWeal.setTotalUserCount(totalUserCount);
+            memberWeal.setTotalPayMoney(totalPayMoney);
+        }
+        //先删除，后保存
+        wealDetailService.removeWealDetail(id);
+        if (list != null && list.size() > 0){
+            wealDetailService.batchSave(list);
+        }
+        memberWeal.setSettleTime(new Date());
+        memberWeal.setStatus(1);
+        memberWeal.setUpdateBy(GlobalContextHolder.getContext().getUsername());
+        memberWeal.setUpdateTime(new Date());
+        if (!this.updateById(memberWeal)){
+            throw new ServiceException("结算失败!");
         }
     }
 

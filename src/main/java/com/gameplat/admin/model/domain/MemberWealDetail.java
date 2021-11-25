@@ -5,21 +5,25 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Date;
 
 /**
  * @author lily
- * @description 会员成长值汇总实体类
- * @date 2021/11/23
+ * @description 会员俸禄派发详情实体类
+ * @date 2021/11/22
  */
-
 @Data
-@TableName("member_growth_statis")
-public class MemberGrowthStatis implements Serializable {
+@TableName("member_weal_detail")
+public class MemberWealDetail implements Serializable {
+    private static final long serialVersionUID = 1L;
 
     @ApiModelProperty(value = "主键")
     @TableId(type = IdType.AUTO)
     private Long id;
+
+    @ApiModelProperty(value = "福利表主键")
+    private Long wealId;
 
     @ApiModelProperty(value = "会员id")
     private Long userId;
@@ -27,32 +31,14 @@ public class MemberGrowthStatis implements Serializable {
     @ApiModelProperty(value = "会员账号")
     private String userName;
 
-    @ApiModelProperty(value = "会员当前等级")
+    @ApiModelProperty(value = "会员层级")
     private Integer level;
 
-    @ApiModelProperty(value = "会员当前的成长值")
-    private Integer growth;
+    @ApiModelProperty(value = "派发金额")
+    private BigDecimal rewordAmount;
 
-    @ApiModelProperty(value = "充值累计成长值")
-    private Integer rechargeGrowth;
-
-    @ApiModelProperty(value = "签到累计成长值")
-    private Integer signGrowth;
-
-    @ApiModelProperty(value = "打码量累计成长值")
-    private Integer damaGrowth;
-
-    @ApiModelProperty(value = "后台修改累计成长值")
-    private Integer backGrowth;
-
-    @ApiModelProperty(value = "完善资料累计成长值")
-    private Integer infoGrowth;
-
-    @ApiModelProperty(value = "绑定银行卡累计成长值")
-    private Integer bindGrowth;
-
-    @ApiModelProperty(value = "未达到保底累计扣除成长值")
-    private Integer demoteGrowth;
+    @ApiModelProperty(value = "1：未派发   2：已派发  3:已回收")
+    private Integer status;
 
     @ApiModelProperty(value = "创建人")
     @TableField(fill = FieldFill.INSERT)
@@ -72,5 +58,4 @@ public class MemberGrowthStatis implements Serializable {
 
     @ApiModelProperty(value = "备注")
     private String remark;
-
 }

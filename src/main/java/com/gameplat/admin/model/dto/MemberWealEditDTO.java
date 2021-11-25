@@ -1,5 +1,7 @@
 package com.gameplat.admin.model.dto;
 
+import com.baomidou.mybatisplus.annotation.FieldFill;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -42,4 +44,28 @@ public class MemberWealEditDTO implements Serializable {
 
     @ApiModelProperty(value = "备注")
     private String remark;
+
+    @ApiModelProperty(value = "资格会员数")
+    private Integer totalUserCount;
+
+    @ApiModelProperty(value = "总的派发金额")
+    private BigDecimal totalPayMoney;
+
+    @ApiModelProperty(value = "流水号")
+    private String serialNumber;
+
+    @ApiModelProperty(value = "结算时间")
+    private Date settleTime;
+
+    @ApiModelProperty(value = "派发时间")
+    private Date payTime;
+
+    @ApiModelProperty(value = "修改人")
+    private String updateBy;
+
+    @ApiModelProperty(value = "修改时间")
+    private Date updateTime;
+
+    @ApiModelProperty(value = "状态")
+    private Integer status;
 }

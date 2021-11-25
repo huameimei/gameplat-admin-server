@@ -1,12 +1,14 @@
 package com.gameplat.admin.controller.open.member;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.gameplat.admin.enums.LanguageEnum;
 import com.gameplat.admin.model.domain.MemberWeal;
 import com.gameplat.admin.model.dto.MemberWealAddDTO;
 import com.gameplat.admin.model.dto.MemberWealDTO;
 import com.gameplat.admin.model.dto.MemberWealEditDTO;
+import com.gameplat.admin.model.dto.MemberWealSettleDTO;
 import com.gameplat.admin.model.vo.MemberGrowthConfigVO;
 import com.gameplat.admin.model.vo.MemberWealVO;
 import com.gameplat.admin.service.MemberGrowthConfigService;
@@ -80,11 +82,21 @@ public class OpenMemberWealController {
         wealService.deleteMemberWeal(id);
     }
 
-//    @PutMapping("/settle")
-//    @ApiOperation(value = "福利结算")
-//    public void settleWeal(Long id) {
-//
-//    }
+    @PutMapping("/settle")
+    @ApiOperation(value = "福利结算")
+    @PreAuthorize("hasAuthority('member:weal:settle')")
+    public void settleWeal(@RequestBody MemberWealSettleDTO settleDTO) {
+
+        if(ObjectUtils.isEmpty(settleDTO.getId())){
+            throw new ServiceException("id不能为空");
+        }
+        //判断是否开启了VIP
+        MemberGrowthConfigVO isVip = configService.findOneConfig(LanguageEnum.app_zh_CN.getCode());
+        if (isVip.getIsEnableVip() == 0) {
+            throw new ServiceException("未开启VIP功能");
+        }
+        wealService.settleWeal(settleDTO.getId());
+    }
 //
 //    @PostMapping("/distribute")
 //    @ApiOperation(value = "福利派发")
@@ -94,6 +106,11 @@ public class OpenMemberWealController {
 //    @PostMapping("/recycle")
 //    @ApiOperation(value = "福利回收")
 //    public void recycleSalary(@RequestBody UserWealDetail dto, HttpServletRequest request) {
+//        //判断是否开启了VIP
+//        MemberGrowthConfigVO isVip = configService.findOneConfig(LanguageEnum.app_zh_CN.getCode());
+//        if (isVip.getIsEnableVip() == 0) {
+//            throw new ServiceException("未开启VIP功能");
+//        }
 //    }
 //
 //    @PostMapping("/details")

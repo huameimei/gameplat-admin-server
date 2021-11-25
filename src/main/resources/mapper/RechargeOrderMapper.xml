@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gameplat.admin.mapper.RechargeOrderMapper">
+
+    <!--获取充值金额达标的会员账号-->
+    <select id="getSatisfyRechargeAccount" parameterType="java.lang.String" resultType="java.lang.String">
+        SELECT
+        t.account
+        FROM
+        (
+        SELECT
+        account,
+        sum( amount ) rechargeMoney
+        FROM recharge_order
+        <where>
+            AND status = 3
+            <if test="startTime != null and startTime != ''">
+                AND create_time &gt;= #{startTime}
+            </if>
+            <if test="endTime != null and endTime != ''">
+                AND create_time &lt;= #{endTime}
+            </if>
+        </where>
+        GROUP BY member_id, account ) t
+        WHERE rechargeMoney >= #{minRechargeAmount}
+    </select>
+</mapper>

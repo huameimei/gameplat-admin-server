@@ -1,7 +1,9 @@
 package com.gameplat.admin.mapper;
 
 
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.gameplat.admin.model.domain.ActivityDistribute;
+import com.gameplat.admin.model.domain.ActivityQualification;
 import com.gameplat.admin.model.dto.ActivityDistributeDTO;
 import com.gameplat.admin.model.vo.ActivitySendVO;
 import org.apache.ibatis.annotations.Mapper;
@@ -15,7 +17,7 @@ import java.util.List;
  * @date 2020-08-20 11:30:39
  */
 @Mapper
-public interface ActivityDistributeDao {
+public interface ActivityDistributeDao extends BaseMapper<ActivityDistribute> {
 
     int deleteByPrimaryKey(Long distributeId);
 

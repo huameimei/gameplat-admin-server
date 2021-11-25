@@ -35,12 +35,15 @@ public class ActivityLobbyAddDTO implements Serializable {
     @ApiModelProperty(value = "活动大类（1 活动大厅，2 红包雨，3 转盘）")
     private Integer type;
 
+    @NotBlank(message = "活动类型必选")
     @ApiModelProperty(value = "活动类型（1 充值活动，2 游戏活动")
     private Integer activityType;
 
+    @NotBlank(message = "活动状态必选")
     @ApiModelProperty(value = "描述")
-    private String describe;
+    private String description;
 
+    @NotBlank(message = "统计项目必选")
     @ApiModelProperty(value = "统计项目（1 累计充值金额，2 累计充值天数，3 连续充值天数，4 单日首充金额，5 首充金额，6 累计彩票打码金额，7 累计彩票打码天数，" +
             "8 连续彩票打码天数，9 单日彩票亏损金额，10 累计体育打码金额，11累计体育打码天数，11 连续体育打码天数，12 单日体育亏损金额）")
     private Integer statisItem;
@@ -79,7 +82,7 @@ public class ActivityLobbyAddDTO implements Serializable {
     private String applyUrl;
 
     @ApiModelProperty(value = "活动大厅优惠")
-    private List<ActivityLobbyDiscountDTO> lobbyDiscount;
+    private List<ActivityLobbyDiscountDTO> lobbyDiscountList;
 
     @ApiModelProperty(value = "删除活动大厅优惠id")
     private List<Long> delDiscountIdList;
@@ -129,4 +132,5 @@ public class ActivityLobbyAddDTO implements Serializable {
 
     @ApiModelProperty(value = "创建人")
     private String createBy;
+
 }

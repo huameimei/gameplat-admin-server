@@ -13,6 +13,7 @@ import java.util.List;
 
 /**
  * 活动大厅VO
+ *
  * @Author: lyq
  * @Date: 2020/8/14 15:22
  * @Description:
@@ -23,7 +24,7 @@ public class ActivityLobbyVO implements Serializable {
 
     private static final long serialVersionUID = 3763472307641460049L;
 
-    @JsonSerialize(using= ToStringSerializer.class)
+    @JsonSerialize(using = ToStringSerializer.class)
     @ApiModelProperty(value = "主键")
     private Long id;
 
@@ -43,7 +44,7 @@ public class ActivityLobbyVO implements Serializable {
     private Integer activityType;
 
     @ApiModelProperty(value = "描述")
-    private String describe;
+    private String description;
 
     @ApiModelProperty(value = "统计项目（1 累计充值金额，2 累计充值天数，3 连续充值天数，4 单日首充金额，5 首充金额）")
     private Integer statisItem;
@@ -100,7 +101,7 @@ public class ActivityLobbyVO implements Serializable {
     private Integer getWay;
 
     @ApiModelProperty(value = "活动大厅优惠")
-    private List<ActivityLobbyDiscountVO> lobbyDiscount;
+    private List<ActivityLobbyDiscountVO> lobbyDiscountList;
 
     @ApiModelProperty(value = "用户等级")
     private String userLevel;

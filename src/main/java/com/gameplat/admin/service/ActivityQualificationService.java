@@ -17,59 +17,10 @@ import java.util.List;
 public interface ActivityQualificationService {
 
     /**
-     * 查询活动资格列表
+     * 根据条件查询资格列表
      *
-     * @param activityQualificationDTO
+     * @param activityQualification
      * @return
      */
-    List<ActivityQualification> findActivityQualificationList(ActivityQualificationDTO activityQualificationDTO);
-
-    /**
-     * 保存活动资格
-     *
-     * @param activityQualification
-     */
-    void saveActivityQualification(ActivityQualification activityQualification);
-
-    /**
-     * 更新活动资格
-     *
-     * @param activityQualification
-     */
-    void updateActivityQualification(ActivityQualification activityQualification);
-
-    /**
-     * 批量删除活动资格
-     *
-     * @param qualificationIds
-     */
-    void deleteBatchActivityQualification(List<Long> qualificationIds);
-
-    /**
-     * 检查是否有参加活动的资格
-     *
-     * @param qualificationIds
-     */
-    void chick(List<Long> qualificationIds);
-
-    /**
-     * 通过资格审核
-     *
-     * @param activityQualification
-     */
-    void passAuditActivityQualification(ActivityQualification activityQualification);
-
-    /**
-     * 更新活动资格状态
-     *
-     * @param activityQualification
-     */
-    void updateQualificationStatus(ActivityQualification activityQualification);
-
-    /**
-     * 更新删除状态
-     *
-     * @param activityQualification
-     */
-    void updateDeleteStatus(ActivityQualification activityQualification);
+    List<ActivityQualification> findQualificationList(ActivityQualification activityQualification);
 }

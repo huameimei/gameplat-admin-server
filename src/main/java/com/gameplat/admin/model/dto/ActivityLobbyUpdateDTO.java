@@ -1,50 +1,54 @@
-package com.gameplat.admin.model.domain;
+package com.gameplat.admin.model.dto;
 
-import com.baomidou.mybatisplus.annotation.FieldFill;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableName;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
+import javax.validation.constraints.NotBlank;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
-
+import java.util.List;
 
 /**
- * 活动大厅
- *
- * @author lyq
- * @Description 实体层
- * @date 2020-08-14 14:50:01
+ * @Author: kenvin
+ * @Description:
  */
 @Data
-@TableName("activity_lobby")
-public class ActivityLobby implements Serializable {
-    private static final long serialVersionUID = 1L;
+@EqualsAndHashCode(callSuper = false)
+public class ActivityLobbyUpdateDTO implements Serializable {
+
+    private static final long serialVersionUID = 6060013282905693277L;
 
     @ApiModelProperty(value = "主键")
     private Long id;
 
+    @NotBlank(message = "标题不能为空")
     @ApiModelProperty(value = "标题")
     private String title;
 
+    @NotBlank(message = "开始时间不能为空")
     @ApiModelProperty(value = "开始时间")
     private Date startTime;
 
+    @NotBlank(message = "结束时间不能为空")
     @ApiModelProperty(value = "结束时间")
     private Date endTime;
 
     @ApiModelProperty(value = "活动大类（1 活动大厅，2 红包雨，3 转盘）")
     private Integer type;
 
+    @NotBlank(message = "活动类型必选")
     @ApiModelProperty(value = "活动类型（1 充值活动，2 游戏活动")
     private Integer activityType;
 
+    @NotBlank(message = "活动状态必选")
     @ApiModelProperty(value = "描述")
     private String description;
 
-    @ApiModelProperty(value = "统计项目（1 累计充值金额，2 累计充值天数，3 连续充值天数，4 单日首充金额，5 首充金额）")
+    @NotBlank(message = "统计项目必选")
+    @ApiModelProperty(value = "统计项目（1 累计充值金额，2 累计充值天数，3 连续充值天数，4 单日首充金额，5 首充金额，6 累计彩票打码金额，7 累计彩票打码天数，" +
+            "8 连续彩票打码天数，9 单日彩票亏损金额，10 累计体育打码金额，11累计体育打码天数，11 连续体育打码天数，12 单日体育亏损金额）")
     private Integer statisItem;
 
     @ApiModelProperty(value = "充值类型（1 转账汇款，2 在线支付，3 人工入款）")
@@ -77,37 +81,25 @@ public class ActivityLobby implements Serializable {
     @ApiModelProperty(value = "ip黑名单")
     private String ipBlacklist;
 
-    @ApiModelProperty(value = "备注")
-    private String remark;
-
-    @TableField(fill = FieldFill.INSERT)
-    @ApiModelProperty(value = "创建人")
-    private String createBy;
-
-    @TableField(fill = FieldFill.INSERT)
-    @ApiModelProperty(value = "创建时间")
-    private Date createTime;
-
-    @TableField(fill = FieldFill.INSERT_UPDATE)
-    @ApiModelProperty(value = "更新人")
-    private String updateBy;
-
-    @TableField(fill = FieldFill.INSERT_UPDATE)
-    @ApiModelProperty(value = "更新时间")
-    private Date updateTime;
-
     @ApiModelProperty(value = "申请路径")
     private String applyUrl;
+
+    @ApiModelProperty(value = "活动大厅优惠")
+    private List<ActivityLobbyDiscountDTO> lobbyDiscountList;
+
+    @ApiModelProperty(value = "删除活动大厅优惠id")
+    private List<Long> delDiscountIdList;
 
     @ApiModelProperty(value = "失效活動")
     private Integer failure;
 
-    @ApiModelProperty(value = "领取方式（1 直接发放，2 福利中心）")
+    @ApiModelProperty(value = "领取方式（1 红包，2 通知）")
     private Integer getWay;
 
     @ApiModelProperty(value = "用户等级")
     private String userLevel;
 
+    @NotBlank(message = "活动状态必选")
     @ApiModelProperty(value = "活动状态（0 关闭，1 开启，2 失效）")
     private Integer status;
 
@@ -126,6 +118,9 @@ public class ActivityLobby implements Serializable {
     @ApiModelProperty(value = "指定比赛ID")
     private Long matchId;
 
+    @ApiModelProperty(value = "指定比赛时间")
+    private Date matchTime;
+
     @ApiModelProperty(value = "指定比赛类型")
     private Integer matchType;
 
@@ -137,4 +132,5 @@ public class ActivityLobby implements Serializable {
 
     @ApiModelProperty(value = "申请日期集合")
     private String applyDateList;
+
 }

@@ -10,15 +10,20 @@ import com.gameplat.admin.service.LimitInfoService;
 import com.gameplat.common.exception.ServiceException;
 import com.gameplat.common.json.JsonUtils;
 import com.gameplat.security.SecurityUserHolder;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 
 /** 全局限制配置操作 */
 @Slf4j
 @Service
+@RequiredArgsConstructor
+@Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)
 public class LimitInfoServiceImpl extends ServiceImpl<LimitInfoMapper, LimitInfo>
     implements LimitInfoService {
 

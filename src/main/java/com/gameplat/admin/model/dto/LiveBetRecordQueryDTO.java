@@ -1,5 +1,6 @@
 package com.gameplat.admin.model.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import java.io.Serializable;
 import java.util.Date;
 import lombok.Data;
@@ -18,9 +19,11 @@ public class LiveBetRecordQueryDTO implements Serializable {
   /** 报表统计时间 */
   private String statTime;
   /** 下注开始时间*/
-  private Date betStartDate;
+  @JsonFormat(locale ="zh", timezone ="GMT+8", pattern = "yyyy-MM-dd")
+  private String betStartDate;
   /** 下注结束时间*/
-  private Date betEndDate;
+  @JsonFormat(locale ="zh", timezone ="GMT+8", pattern = "yyyy-MM-dd")
+  private String betEndDate;
 
   /**
    *  0 -- 下注时间,
@@ -42,4 +45,9 @@ public class LiveBetRecordQueryDTO implements Serializable {
   private String liveGameKindList;
 
   private String liveGameSuperType;
+
+  /**
+   *  游戏平台
+   */
+  private String liveCode;
 }

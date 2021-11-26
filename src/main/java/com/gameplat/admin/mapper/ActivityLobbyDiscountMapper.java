@@ -9,7 +9,6 @@ import org.apache.ibatis.annotations.Mapper;
  * @Description 数据层
  * @date 2020-08-14 14:50:01
  */
-@Mapper
-public interface ActivityLobbyDiscountDao extends BaseMapper<ActivityLobbyDiscount> {
+public interface ActivityLobbyDiscountMapper extends BaseMapper<ActivityLobbyDiscount> {
 
 }

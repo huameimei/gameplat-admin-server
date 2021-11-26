@@ -1,7 +1,7 @@
 package com.gameplat.admin.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.gameplat.admin.mapper.ActivityDistributeDao;
+import com.gameplat.admin.mapper.ActivityDistributeMapper;
 import com.gameplat.admin.model.domain.ActivityDistribute;
 import com.gameplat.admin.service.ActivityDistributeService;
 import com.gameplat.common.exception.ServiceException;
@@ -13,7 +13,7 @@ import java.util.List;
 
 @Service
 public class ActivityDistributeServiceImpl
-        extends ServiceImpl<ActivityDistributeDao, ActivityDistribute>
+        extends ServiceImpl<ActivityDistributeMapper, ActivityDistribute>
         implements ActivityDistributeService {
 
 

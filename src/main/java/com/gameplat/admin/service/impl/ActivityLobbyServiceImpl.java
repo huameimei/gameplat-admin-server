@@ -9,7 +9,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.convert.ActivityLobbyConvert;
 import com.gameplat.admin.convert.ActivityLobbyDiscountConvert;
 import com.gameplat.admin.enums.DetailDateEnum;
-import com.gameplat.admin.mapper.ActivityLobbyDao;
+import com.gameplat.admin.mapper.ActivityLobbyMapper;
 import com.gameplat.admin.model.domain.ActivityDistribute;
 import com.gameplat.admin.model.domain.ActivityLobby;
 import com.gameplat.admin.model.domain.ActivityLobbyDiscount;
@@ -40,7 +40,7 @@ import java.util.stream.Collectors;
  */
 @Service
 @Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)
-public class ActivityLobbyServiceImpl extends ServiceImpl<ActivityLobbyDao, ActivityLobby>
+public class ActivityLobbyServiceImpl extends ServiceImpl<ActivityLobbyMapper, ActivityLobby>
         implements ActivityLobbyService {
 
     @Autowired

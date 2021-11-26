@@ -2,7 +2,7 @@ package com.gameplat.admin.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.convert.ActivityLobbyDiscountConvert;
-import com.gameplat.admin.mapper.ActivityLobbyDiscountDao;
+import com.gameplat.admin.mapper.ActivityLobbyDiscountMapper;
 import com.gameplat.admin.model.domain.ActivityLobbyDiscount;
 import com.gameplat.admin.model.vo.ActivityLobbyDiscountVO;
 import com.gameplat.admin.service.ActivityLobbyDiscountService;
@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-public class ActivityLobbyDiscountServiceImpl extends ServiceImpl<ActivityLobbyDiscountDao, ActivityLobbyDiscount>
+public class ActivityLobbyDiscountServiceImpl extends ServiceImpl<ActivityLobbyDiscountMapper, ActivityLobbyDiscount>
         implements ActivityLobbyDiscountService {
 
     @Autowired

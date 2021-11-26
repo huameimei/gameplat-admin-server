@@ -8,23 +8,21 @@ import org.dozer.Mapping;
 import java.io.Serializable;
 
 /**
- *
- *@author lyq
- *@Description 活动奖品DTO
- *@date 2020年6月9日 下午6:40:09
+ * @author lyq
+ * @Description 活动奖品DTO
+ * @date 2020年6月9日 下午6:40:09
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class ActivityPrizeDTO implements Serializable{/**
-	 *
-	 */
-	private static final long serialVersionUID = 1L;
+public class ActivityPrizeDTO implements Serializable {
+    
+    private static final long serialVersionUID = 1L;
 
-	@ApiModelProperty(value = "活动奖品id")
-	@Mapping(value = "id")
+    @ApiModelProperty(value = "活动奖品id")
+    @Mapping(value = "id")
     private Long id;
 
-	@ApiModelProperty(value = "奖品id")
+    @ApiModelProperty(value = "奖品id")
     private Long activityPrizeId;
 
     @ApiModelProperty(value = "活动id")

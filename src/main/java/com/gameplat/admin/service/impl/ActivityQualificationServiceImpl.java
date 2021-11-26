@@ -1,7 +1,7 @@
 package com.gameplat.admin.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.gameplat.admin.mapper.ActivityQualificationDao;
+import com.gameplat.admin.mapper.ActivityQualificationMapper;
 import com.gameplat.admin.model.domain.ActivityQualification;
 import com.gameplat.admin.service.ActivityQualificationService;
 import org.springframework.stereotype.Service;
@@ -10,7 +10,7 @@ import java.util.List;
 
 @Service
 public class ActivityQualificationServiceImpl extends
-        ServiceImpl<ActivityQualificationDao, ActivityQualification>
+        ServiceImpl<ActivityQualificationMapper, ActivityQualification>
         implements ActivityQualificationService {
 
     @Override

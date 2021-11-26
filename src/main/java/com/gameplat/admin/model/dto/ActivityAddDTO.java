@@ -9,13 +9,13 @@ import java.io.Serializable;
 import java.util.Date;
 
 /**
- * 活动查询DTO
+ * 添加活动DTO
  *
  * @author 沙漠
  * @date 2020年5月28日
  */
 @Data
-public class ActivityDTO implements Serializable {
+public class ActivityAddDTO implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -55,5 +55,14 @@ public class ActivityDTO implements Serializable {
 
     @ApiModelProperty(value = "转盘")
     private ActivityTurntableDTO memberTurntableDTO;
+
+    public void setBeginTime(String beginTime) {
+        this.beginTime = DateUtil.strToDate(beginTime, DateUtil.YYYY_MM_DD_HH_MM_SS);
+    }
+
+    public void setEndTime(String endTime) {
+        this.endTime = DateUtil.strToDate(endTime, DateUtil.YYYY_MM_DD_HH_MM_SS);
+    }
+
 
 }

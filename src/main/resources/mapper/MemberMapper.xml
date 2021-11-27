@@ -16,6 +16,7 @@
                t1.qq,
                t1.wechat,
                t1.email,
+               t1.withdraw_flag,
                t1.dial_code,
                t1.phone,
                t1.register_ip,

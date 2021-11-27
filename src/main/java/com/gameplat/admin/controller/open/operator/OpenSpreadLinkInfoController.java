@@ -27,7 +27,7 @@ import java.util.Map;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/admin/operator/diffusion/spreadConfig")
-public class OpenSpreadConfigController {
+public class OpenSpreadLinkInfoController {
 
   @Autowired private SpreadLinkInfoService configService;
 
@@ -73,13 +73,13 @@ public class OpenSpreadConfigController {
     configService.changeReleaseTime(id);
   }
 
-  @GetMapping("/batchEnableStatus")
+  @PutMapping("/batchEnableStatus")
   @PreAuthorize("hasAuthority('diffusion:spreadConfig:batchEnableStatus')")
   public void batchEnableStatus(@RequestBody List<Long> ids) {
     configService.batchEnableStatus(ids);
   }
 
-  @GetMapping("/batchDisableStatus")
+  @PutMapping("/batchDisableStatus")
   @PreAuthorize("hasAuthority('diffusion:spreadConfig:batchDisableStatus')")
   public void batchDisableStatus(@RequestBody List<Long> ids) {
     configService.batchDisableStatus(ids);

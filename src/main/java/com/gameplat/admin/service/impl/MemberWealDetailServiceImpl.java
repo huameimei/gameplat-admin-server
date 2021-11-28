@@ -2,6 +2,7 @@ package com.gameplat.admin.service.impl;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
+import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.convert.MemberWealDetailConvert;
 import com.gameplat.admin.mapper.MemberWealDetailMapper;
@@ -29,7 +30,7 @@ public class MemberWealDetailServiceImpl extends ServiceImpl<MemberWealDetailMap
     @Autowired private MemberWealDetailMapper detailMapper;
 
     @Override
-    public IPage<MemberWealDetailVO> findWealDetailList(IPage<MemberWealDetail> page, MemberWealDetailDTO queryDTO) {
+    public IPage<MemberWealDetailVO> findWealDetailList(PageDTO<MemberWealDetail> page, MemberWealDetailDTO queryDTO) {
         return this.lambdaQuery()
                 .eq(ObjectUtils.isNotEmpty(queryDTO.getWealId()), MemberWealDetail::getWealId, queryDTO.getWealId())
                 .like(ObjectUtils.isNotEmpty(queryDTO.getUserName()), MemberWealDetail::getUserName, queryDTO.getUserName())

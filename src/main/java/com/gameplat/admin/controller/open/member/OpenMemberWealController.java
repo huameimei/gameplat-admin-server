@@ -130,9 +130,9 @@ public class OpenMemberWealController {
         wealService.recycleWeal(dto.getId(), request);
     }
 
-    @PostMapping("/details")
+    @GetMapping("/details")
     @ApiOperation(value = "详情")
-    public IPage<MemberWealDetailVO> getDetails(@RequestBody IPage<MemberWealDetail> page, MemberWeal dto) {
+    public IPage<MemberWealDetailVO> getDetails(PageDTO<MemberWealDetail> page, MemberWeal dto) {
         //判断是否开启了VIP
         MemberGrowthConfigVO isVip = configService.findOneConfig(LanguageEnum.app_zh_CN.getCode());
         if (isVip.getIsEnableVip() == 0) {

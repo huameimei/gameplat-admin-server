@@ -4,12 +4,14 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.mapper.SysBannerInfoMapper;
 import com.gameplat.admin.model.domain.SysBannerInfo;
 import com.gameplat.admin.service.SysBannerInfoService;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 /**
  * @author admin
  */
+@Service
 public class SysBannerInfoServiceImpl
         extends ServiceImpl<SysBannerInfoMapper, SysBannerInfo> implements SysBannerInfoService {
 

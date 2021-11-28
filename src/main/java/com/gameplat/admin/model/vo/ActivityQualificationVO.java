@@ -8,6 +8,8 @@ import lombok.Data;
 import java.util.Date;
 
 /**
+ * 活动资格VO
+ *
  * @Author: whh
  * @Date: 2020/8/25 15:48
  * @Description: 资格检测 VO
@@ -51,5 +53,8 @@ public class ActivityQualificationVO {
 
     @ApiModelProperty(value = "更新人")
     private String updateBy;
+
+    @ApiModelProperty(value = "统计项目（1 累计充值金额，2 累计充值天数，3 连续充值天数，4 单日首充金额，5 首充金额）")
+    private Integer statisItem;
 
 }

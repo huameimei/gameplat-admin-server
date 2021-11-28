@@ -183,4 +183,16 @@
         </foreach>
 
     </select>
+
+    <update id="updateAccountChange" parameterType="com.live.cloud.common.model.SysMoneyUser">
+        update sys_user
+        <set>
+            <if test="counterfeitMoney !=null">counterfeit_money=#{counterfeitMoney},</if>
+            <if test="goodMoney !=null and goodMoney !=''">good_money=#{goodMoney},</if>
+            <if test="extMoney !=null and extMoney !=''">ext_money=#{extMoney},</if>
+            <if test="freezeMoney !=null and freezeMoney !=''">freeze_money=#{freezeMoney},</if>
+            <if test="rewardMoney !=null and rewardMoney !=''">reward_money=#{rewardMoney},</if>
+        </set>
+        where id = #{userId}
+    </update>
 </mapper>

@@ -1,6 +1,7 @@
 package com.gameplat.admin.convert;
 
 import com.gameplat.admin.model.domain.MemberWealReword;
+import com.gameplat.admin.model.dto.MemberWealRewordAddDTO;
 import com.gameplat.admin.model.vo.MemberWealRewordVO;
 import org.mapstruct.Mapper;
 
@@ -11,5 +12,7 @@ import org.mapstruct.Mapper;
 public interface MemberWealRewordConvert {
 
     MemberWealRewordVO toVo(MemberWealReword reword);
+
+    MemberWealReword toEntity (MemberWealRewordAddDTO dto);
 
 }

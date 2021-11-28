@@ -1,9 +1,13 @@
 package com.gameplat.admin.service.impl;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.gameplat.admin.convert.MemberWealDetailConvert;
 import com.gameplat.admin.mapper.MemberWealDetailMapper;
 import com.gameplat.admin.model.domain.MemberWealDetail;
+import com.gameplat.admin.model.dto.MemberWealDetailDTO;
+import com.gameplat.admin.model.vo.MemberWealDetailVO;
 import com.gameplat.admin.service.MemberWealDetailService;
 import com.gameplat.common.exception.ServiceException;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +25,19 @@ import java.util.List;
 @RequiredArgsConstructor
 public class MemberWealDetailServiceImpl extends ServiceImpl<MemberWealDetailMapper, MemberWealDetail> implements MemberWealDetailService{
 
+    @Autowired private MemberWealDetailConvert detailConvert;
     @Autowired private MemberWealDetailMapper detailMapper;
+
+    @Override
+    public IPage<MemberWealDetailVO> findWealDetailList(IPage<MemberWealDetail> page, MemberWealDetailDTO queryDTO) {
+        return this.lambdaQuery()
+                .eq(ObjectUtils.isNotEmpty(queryDTO.getWealId()), MemberWealDetail::getWealId, queryDTO.getWealId())
+                .like(ObjectUtils.isNotEmpty(queryDTO.getUserName()), MemberWealDetail::getUserName, queryDTO.getUserName())
+                .eq(ObjectUtils.isNotEmpty(queryDTO.getStatus()), MemberWealDetail::getStatus, queryDTO.getStatus())
+                .orderByDesc(MemberWealDetail::getCreateTime)
+                .page(page)
+                .convert(detailConvert::toVo);
+    }
 
     @Override
     public void removeWealDetail(Long wealId) {
@@ -36,5 +52,26 @@ public class MemberWealDetailServiceImpl extends ServiceImpl<MemberWealDetailMap
     @Override
     public int batchSave(List<MemberWealDetail> list) {
         return detailMapper.batchSave(list);
+    }
+
+    @Override
+    public List<MemberWealDetail> findSatisfyMember(MemberWealDetail wealDetail) {
+        return this.lambdaQuery()
+                .eq(ObjectUtils.isNotEmpty(wealDetail.getWealId()), MemberWealDetail::getWealId, wealDetail.getWealId())
+                .like(ObjectUtils.isNotEmpty(wealDetail.getUserName()), MemberWealDetail::getUserName, wealDetail.getUserName())
+                .eq(ObjectUtils.isNotEmpty(wealDetail.getStatus()), MemberWealDetail::getStatus, wealDetail.getStatus())
+                .orderByDesc(MemberWealDetail::getCreateTime)
+                .list();
+    }
+
+    @Override
+    public void updateByWealStatus(Long id, Integer status) {
+        MemberWealDetail memberWealDetail = new MemberWealDetail(){{
+            setId(id);
+            setStatus(status);
+        }};
+        if (!this.updateById(memberWealDetail)){
+            throw new ServiceException("更新福利记录状态失败");
+        }
     }
 }

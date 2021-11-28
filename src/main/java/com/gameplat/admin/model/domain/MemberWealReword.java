@@ -1,9 +1,7 @@
 package com.gameplat.admin.model.domain;
 
 import cn.afterturn.easypoi.excel.annotation.Excel;
-import com.baomidou.mybatisplus.annotation.FieldFill;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
@@ -24,6 +22,7 @@ public class MemberWealReword implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @ApiModelProperty("主键")
+    @TableId(type = IdType.AUTO)
     private Long id;
 
     @ApiModelProperty("用户ID")

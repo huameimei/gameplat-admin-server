@@ -1,8 +1,9 @@
 package com.gameplat.admin.constant;
 
 /**
- * 用户服 redisKey
+ * 会员redisKey
  * @author lily
+ *
  */
 public class MemberServiceKeyConstant {
 
@@ -28,10 +29,9 @@ public class MemberServiceKeyConstant {
     public static final String MEMBER_FINANCIAL_LOCK = "lock:member_financial:{0}";
 
     /**
-     * 日结派发锁 0 租户标识
+     * 日结派发锁 0 用户名
      */
     public static final String AGENCY_DAYDISTRIBUTEALL_LOCK="lock:agency_daydistributeall:{0}";
-
 
     // 开元棋牌登录、上分、下分并发锁
     public static final String KY_CHESS_LOCK = "lock:ky_chess:{0}:{1}";

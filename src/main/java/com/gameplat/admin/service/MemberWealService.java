@@ -3,12 +3,14 @@ package com.gameplat.admin.service;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.gameplat.admin.model.domain.MemberWeal;
+import com.gameplat.admin.model.domain.MemberWealDetail;
 import com.gameplat.admin.model.dto.MemberWealAddDTO;
 import com.gameplat.admin.model.dto.MemberWealDTO;
 import com.gameplat.admin.model.dto.MemberWealEditDTO;
 import com.gameplat.admin.model.vo.MemberWealVO;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 /**
  * @author lily
@@ -52,5 +54,7 @@ public interface MemberWealService extends IService<MemberWeal> {
      * 福利回收
      */
     void recycleWeal(Long wealId, HttpServletRequest request);
+
+
 
 }

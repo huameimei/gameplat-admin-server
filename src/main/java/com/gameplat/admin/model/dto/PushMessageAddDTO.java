@@ -33,7 +33,7 @@ public class PushMessageAddDTO {
     private Integer showType;
 
     @ApiModelProperty("充值层级,保存多个层级的值")
-    private String userLevel;
+    private String[] userLevel;
 
     @ApiModelProperty(value = "是否即时消息,0:否,1:是")
     public Integer immediateFlag;

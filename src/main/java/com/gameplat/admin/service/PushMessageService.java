@@ -16,9 +16,7 @@ public interface PushMessageService extends IService<PushMessage> {
 
     void insertPushMessage(PushMessageAddDTO pushMessageAddDTO);
 
-    void deletePushMessage(Long id);
-
-    void deleteBatchPushMessage(Long[] ids);
+    void deleteBatchPushMessage(String ids);
 
     void deleteByCondition(PushMessageRemoveDTO pushMessageRemoveDTO);
 

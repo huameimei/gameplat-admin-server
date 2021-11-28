@@ -1,16 +1,18 @@
 package com.gameplat.admin.model.dto;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.FieldFill;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
+import java.util.Date;
 
 /**
  * @author lily
- * @description 会员等级福利入参
+ * @description 修改福利入参
  * @date 2021/11/22
  */
 
@@ -26,14 +28,44 @@ public class MemberWealEditDTO implements Serializable {
     @ApiModelProperty(value = "类型 0：周俸禄  1：月俸禄  2：生日礼金 3：每月红包")
     private Integer type;
 
-    @ApiModelProperty(value = "状态 0:未结算  1：未派发   2：已派发  3：已回收")
-    private Integer status;
-
     @ApiModelProperty(value = "周期  开始时间")
-    @JsonFormat(pattern = "yyyy-MM-dd")
-    private String startDate;
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", timezone = "UTC")
+    private Date startDate;
 
     @ApiModelProperty(value = "周期  结束时间")
-    @JsonFormat(pattern = "yyyy-MM-dd")
-    private String endDate;
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", timezone = "UTC")
+    private Date endDate;
+
+    @ApiModelProperty(value = "最低充值金额")
+    private BigDecimal minRechargeAmount;
+
+    @ApiModelProperty(value = "最低有效投注金额")
+    private BigDecimal minBetAmount;
+
+    @ApiModelProperty(value = "备注")
+    private String remark;
+
+    @ApiModelProperty(value = "资格会员数")
+    private Integer totalUserCount;
+
+    @ApiModelProperty(value = "总的派发金额")
+    private BigDecimal totalPayMoney;
+
+    @ApiModelProperty(value = "流水号")
+    private String serialNumber;
+
+    @ApiModelProperty(value = "结算时间")
+    private Date settleTime;
+
+    @ApiModelProperty(value = "派发时间")
+    private Date payTime;
+
+    @ApiModelProperty(value = "修改人")
+    private String updateBy;
+
+    @ApiModelProperty(value = "修改时间")
+    private Date updateTime;
+
+    @ApiModelProperty(value = "状态")
+    private Integer status;
 }

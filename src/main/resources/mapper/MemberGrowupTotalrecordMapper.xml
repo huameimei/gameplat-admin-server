@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gameplat.admin.mapper.MemberGrowupTotalrecordMapper">
+    <!-- 通用查询映射结果 -->
+       
+    <resultMap id="BaseResultMapTotal" type="com.gameplat.admin.model.domain.MemberGrowupTotalrecord">
+		<id column="id" property="id" />
+		<result column="user_id" property="userId" />
+        <result column="member_account" property="memberAccount" />
+        <result column="member_name" property="memberName" />
+        <result column="growup_now" property="growupNow" />
+        <result column="total_amount" property="totalAmount" />
+        <result column="create_by" property="createBy" />
+        <result column="create_time" property="createTime" />
+        <result column="update_by" property="updateBy" />
+        <result column="update_time" property="updateTime" />
+        <result column="remark" property="remark" />
+        <result column="level_now" property="levelNow" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List4">
+     id,user_id,member_account,member_name,growup_now,level_now,total_amount,create_by,create_time,update_by,update_time,remark
+    </sql>
+
+    <select id="searchGrowUpToalByMemberId" parameterType="java.lang.Long" resultMap="BaseResultMapTotal">
+		select<include refid="Base_Column_List4"/>from member_growup_totalrecord
+		where 1=1 and user_id =#{userId}		
+	</select>
+
+</mapper>

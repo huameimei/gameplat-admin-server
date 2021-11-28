@@ -176,4 +176,12 @@
                  LEFT JOIN member_info t2 ON t1.id = t2.member_id
         WHERE t1.super_path LIKE concat('%', #{agentAccout},'%')
     </select>
+
+    <select id="findByUserNameList" resultType="com.gameplat.admin.model.domain.Member">
+        select * from member t where t.nickname in
+        <foreach item="userName" collection="userNames" open="(" separator="," close=")">
+            #{userName}
+        </foreach>
+
+    </select>
 </mapper>

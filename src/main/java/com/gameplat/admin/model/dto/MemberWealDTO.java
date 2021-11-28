@@ -9,7 +9,7 @@ import java.util.Date;
 
 /**
  * @author lily
- * @description 会员等级福利入参
+ * @description 查询福利入参
  * @date 2021/11/22
  */
 
@@ -26,10 +26,8 @@ public class MemberWealDTO implements Serializable {
     private Integer status;
 
     @ApiModelProperty(value = "周期  开始时间")
-    @JsonFormat(pattern = "yyyy-MM-dd")
     private String startDate;
 
     @ApiModelProperty(value = "周期  结束时间")
-    @JsonFormat(pattern = "yyyy-MM-dd")
     private String endDate;
 }

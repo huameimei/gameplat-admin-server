@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gameplat.admin.mapper.MemberWealDetailMapper">
+
+    <insert id="batchSave" parameterType="list" useGeneratedKeys="true" keyProperty="id">
+        insert into member_weal_detail
+        (weal_id,user_id, user_name, `level`, reword_amount, `status`, create_by, create_time, remark)
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (
+            #{item.wealId}, #{item.userId}, #{item.userName}, #{item.level},
+            #{item.rewordAmount},#{item.status}, #{item.createBy}, now(), #{item.remark}
+            )
+        </foreach>
+    </insert>
+
+
+</mapper>

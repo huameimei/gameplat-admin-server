@@ -55,4 +55,10 @@ public interface MemberMapper extends BaseMapper<Member> {
    * @return
    */
   List<Member> getListByAgentAccout(String agentAccout);
+
+  /**
+   * 根据用户名查生日信息
+   * */
+  List<Member> findByUserNameList(List<String> userNames);
+
 }

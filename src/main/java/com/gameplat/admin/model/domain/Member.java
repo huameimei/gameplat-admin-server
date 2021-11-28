@@ -95,7 +95,7 @@ public class Member extends Model<Member> {
   private String qq;
 
   @ApiModelProperty(value = "生日(格式0706)")
-  private String birthday;
+  private Date birthday;
 
   @ApiModelProperty(value = "注册IP")
   private String registerIp;

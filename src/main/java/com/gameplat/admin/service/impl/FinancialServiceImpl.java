@@ -13,8 +13,10 @@ import com.gameplat.admin.service.SysCashConfigService;
 import com.gameplat.admin.service.SysCurrencyRateService;
 import com.gameplat.common.exception.ServiceException;
 import com.gameplat.common.util.RandomUtil;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.Date;
@@ -25,6 +27,9 @@ import java.util.Map;
  * @description 流水
  * @date 2021/11/27
  */
+
+@Service
+@RequiredArgsConstructor
 public class FinancialServiceImpl extends ServiceImpl<FinancialMapper, Financial> implements FinancialService {
 
     @Autowired private FinancialMapper financialMapper;

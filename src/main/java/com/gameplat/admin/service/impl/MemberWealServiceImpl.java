@@ -4,9 +4,7 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
-import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.core.metadata.OrderItem;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.constant.MemberServiceKeyConstant;
@@ -286,20 +284,26 @@ public class MemberWealServiceImpl extends ServiceImpl<MemberWealMapper, MemberW
                 list = list.stream().filter(item -> item.getStatus() == 1).collect(toList());
                 //0：周俸禄  1：月俸禄  2：生日礼金 3：每月红包
                 Integer type = memberWeal.getType();
-                MemberGrowthConfig growthConfig = growthConfigMapper.findOneConfig(LanguageEnum.app_zh_CN.getCode());  //查询成长值配置
-                Integer limitLevel = growthConfig.getLimitLevel();        //先计算出升级奖励的金额  可能会连升几级
+                //查询成长值配置
+                MemberGrowthConfig growthConfig = growthConfigMapper.findOneConfig(LanguageEnum.app_zh_CN.getCode());
+                //先计算出升级奖励的金额  可能会连升几级
+                Integer limitLevel = growthConfig.getLimitLevel();
                 if (limitLevel == null) {
                     limitLevel = 50;
                 }
-                List<MemberGrowthLevel> levels = growthLevelMapper.findList(limitLevel + 1, LanguageEnum.app_zh_CN.getCode());   //查询会员成长等级
-                Integer pageSize = 7000; //每次7000条执行
-                Integer size = list.size();  //需要派发的会员记录数
+                //查询会员成长等级
+                List<MemberGrowthLevel> levels = growthLevelMapper.findList(limitLevel + 1, LanguageEnum.app_zh_CN.getCode());
+                //每次7000条执行
+                Integer pageSize = 7000;
+                //需要派发的会员记录数
+                Integer size = list.size();
                 log.info("需要派发的会员记录数:" + size);
-                Integer part = size / pageSize;    //开始执行第几批
+                Integer part = size / pageSize;
                 for (int j = 1; j <= part + 1; j++){
                     Integer fromIndex = (j - 1) * pageSize;
                     Integer toIndex = j * pageSize;
-                    if (size < toIndex){//不需要分页
+                    //不需要分页
+                    if (size < toIndex){
                         toIndex = size;
                     }
                     log.info("当前fromIndex和toIndex：（{}），（{}）",fromIndex,toIndex);
@@ -343,7 +347,8 @@ public class MemberWealServiceImpl extends ServiceImpl<MemberWealMapper, MemberW
                                 memberWealReword.setOldLevel(item.getLevel());
                                 memberWealReword.setCurrentLevel(item.getLevel());
                                 memberWealReword.setRewordAmount(item.getRewordAmount());
-                                memberWealReword.setType(type+1);//0 升级奖励  1：周俸禄  2：月俸禄  3：生日礼金  4：每月红包
+                                //0 升级奖励  1：周俸禄  2：月俸禄  3：生日礼金  4：每月红包
+                                memberWealReword.setType(type+1);
                                 memberWealReword.setSerialNumber(serialNumber);
                                 //自动派发
                                 if (growthConfig.getIsAutoPayReword() == YseOrNoEnum.YES.getCode()) {
@@ -428,7 +433,7 @@ public class MemberWealServiceImpl extends ServiceImpl<MemberWealMapper, MemberW
                         //本批次执行完 睡眠下
                         try {
                             log.info("开始分批睡眠执行派发");
-                            Thread.sleep(10000);//睡眠10s
+                            Thread.sleep(10000);
                         } catch (InterruptedException e) {
                             log.info("睡眠时发生错误了!");
                             e.printStackTrace();
@@ -438,7 +443,8 @@ public class MemberWealServiceImpl extends ServiceImpl<MemberWealMapper, MemberW
             }
             log.info("会员派发处理完毕!当前时间:{}", DateTime.now());
             //修改福利表状态
-            memberWeal.setStatus(2);//不管需不需要领取 福利和详情都应为 已完成 状态
+            //不管需不需要领取 福利和详情都应为 已完成 状态
+            memberWeal.setStatus(2);
             memberWeal.setPayTime(DateTime.now());
             memberWeal.setSerialNumber(serialNumber);
             if(!this.updateById(memberWeal)){

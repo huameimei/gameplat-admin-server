@@ -71,4 +71,12 @@ public interface ActivityInfoService {
      * @return
      */
     List<ActivityInfo> list(ActivityInfo activityInfo);
+
+    /**
+     * 通过活动类型查询活动列表
+     *
+     * @param id
+     * @return
+     */
+    List<ActivityInfo> findByTypeId(Long id);
 }

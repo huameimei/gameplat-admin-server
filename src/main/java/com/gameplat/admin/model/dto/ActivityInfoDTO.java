@@ -31,7 +31,7 @@ public class ActivityInfoDTO implements Serializable {
     private String title;
 
     @ApiModelProperty(value = "活动类型")//体育1、彩票2、真人3、棋牌4、电竞5、电游6、捕鱼7、动物竞技8
-    private Integer type;
+    private Long type;
 
     @ApiModelProperty(value = "活动类型名称")
     private String typeName;

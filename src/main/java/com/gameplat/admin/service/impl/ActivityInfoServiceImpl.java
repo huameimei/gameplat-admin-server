@@ -21,7 +21,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author admin
@@ -124,16 +126,31 @@ public class ActivityInfoServiceImpl
         List<Long> activityTypeIdList = new ArrayList<>();
         if (CollectionUtils.isNotEmpty(activityInfoList)) {
             for (ActivityInfo activityInfo1 : activityInfoList) {
-                activityTypeIdList.add(activityInfo1.getActivityType());
+                activityTypeIdList.add(activityInfo1.getType());
             }
         }
 
         List<ActivityType> activityTypeList = activityTypeService.findByTypeIdList(activityTypeIdList);
+        Map<Long, ActivityType> activityTypeMap = new HashMap<>();
+        if (CollectionUtils.isNotEmpty(activityTypeList)) {
+            for (ActivityType activityType : activityTypeList) {
+                activityTypeMap.put(activityType.getId(), activityType);
+            }
+        }
 
         List<ActivityInfoVO> activityInfoVOList = new ArrayList<>();
-
-
-        return null;
+        if (CollectionUtils.isNotEmpty(activityInfoList)) {
+            for (ActivityInfo activityInfo1 : activityInfoList) {
+                ActivityInfoVO activityInfoVO = activityInfoConvert.toVo(activityInfo1);
+                ActivityType activityType = activityTypeMap.get(activityInfo1.getActivityType());
+                if (activityType != null) {
+                    activityInfoVO.setTypeCode(activityType.getTypeCode());
+                    activityInfoVO.setTypeName(activityType.getTypeName());
+                }
+                activityInfoVOList.add(activityInfoVO);
+            }
+        }
+        return activityInfoVOList;
     }
 
     @Override
@@ -144,6 +161,11 @@ public class ActivityInfoServiceImpl
 //                .eq()
         ;
         return queryWrapper.list();
+    }
+
+    @Override
+    public List<ActivityInfo> findByTypeId(Long id) {
+        return this.lambdaQuery().eq(ActivityInfo::getType, id).list();
     }
 
 

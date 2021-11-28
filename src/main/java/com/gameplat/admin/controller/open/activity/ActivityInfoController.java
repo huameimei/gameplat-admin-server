@@ -47,12 +47,14 @@ public class ActivityInfoController {
 
     @ApiOperation(value = "查询活动详情")
     @GetMapping("/detail")
+    @PreAuthorize("hasAuthority('activity:info:view')")
     public ActivityInfoVO detail(Long id) {
         return activityInfoService.detail(id);
     }
 
     @ApiOperation(value = "新增活动")
     @PostMapping("/add")
+    @PreAuthorize("hasAuthority('activity:info:add')")
     public void add(@RequestBody ActivityInfoAddDTO activityInfoAddDTO,
                     @RequestHeader(value = "country", required = false, defaultValue = "zh-CN") String country) {
         if (StringUtils.isNotNull(activityInfoAddDTO.getActivityLobbyId())) {
@@ -63,6 +65,7 @@ public class ActivityInfoController {
 
     @ApiOperation(value = "获取关联了活动规则的全部活动信息")
     @GetMapping("/getAllSysActivityWithRule")
+    @PreAuthorize("hasAuthority('activity:info:list')")
     public List<ActivityInfoVO> getAllSysActivityWithRule() {
         List<ActivityInfoVO> activityList = activityInfoService.getAllSysActivityWithRule();
         if (CollectionUtils.isEmpty(activityList)) {
@@ -71,21 +74,21 @@ public class ActivityInfoController {
         ArrayList<ActivityInfoVO> result = new ArrayList<>();
         long nowTime = System.currentTimeMillis();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-//        activityList.forEach(o -> {
-//            if (o.getValidStatus() == 1) {
-//                result.add(o);
-//            } else if (o.getValidStatus() == 2) {
-//                String beginDate = o.getBeginTime().concat(" 00:00:00");
-//                String endDate = o.getEndTime().concat(" 23:59:59");
-//                try {
-//                    if (nowTime > sdf.parse(beginDate).getTime() && nowTime < sdf.parse(endDate).getTime()) {
-//                        result.add(o);
-//                    }
-//                } catch (ParseException e) {
-//                    log.info("获取关联了活动规则的全部活动信息,时间转换报错，原因{}", e);
-//                }
-//            }
-//        });
+        activityList.forEach(o -> {
+            if (o.getValidStatus() == 1) {
+                result.add(o);
+            } else if (o.getValidStatus() == 2) {
+                String beginDate = o.getBeginTime().concat(" 00:00:00");
+                String endDate = o.getEndTime().concat(" 23:59:59");
+                try {
+                    if (nowTime > sdf.parse(beginDate).getTime() && nowTime < sdf.parse(endDate).getTime()) {
+                        result.add(o);
+                    }
+                } catch (ParseException e) {
+                    log.info("获取关联了活动规则的全部活动信息,时间转换报错，原因{}", e);
+                }
+            }
+        });
         return result;
     }
 

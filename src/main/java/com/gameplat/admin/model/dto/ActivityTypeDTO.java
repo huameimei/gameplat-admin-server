@@ -63,4 +63,7 @@ public class ActivityTypeDTO implements Serializable {
     @ApiModelProperty(value = "浮窗url")
     private String floatUrl;
 
+    @ApiModelProperty(value = "语言")
+    private String language;
+
 }

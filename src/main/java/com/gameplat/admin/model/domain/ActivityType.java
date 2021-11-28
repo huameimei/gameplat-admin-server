@@ -62,5 +62,9 @@ public class ActivityType implements Serializable {
 
     @ApiModelProperty(value = "浮窗url")
     private String floatUrl;
+    /**
+     * 语言
+     */
+    private String language;
 
 }

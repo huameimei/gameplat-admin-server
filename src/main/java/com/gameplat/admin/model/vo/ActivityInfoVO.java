@@ -13,7 +13,7 @@ import java.util.Date;
 /**
  * 活动类
  *
- * @author aguai
+ * @author admin
  * @since 2020-08-14
  */
 @Data
@@ -31,10 +31,13 @@ public class ActivityInfoVO implements Serializable {
     private String title;
 
     @ApiModelProperty(value = "活动类型")
-    private Integer type;
+    private Long type;
 
     @ApiModelProperty(value = "活动类型名称")
-    private Integer typeName;
+    private String typeName;
+
+    @ApiModelProperty(value = "活动类型编码")
+    private String typeCode;
 
     @ApiModelProperty(value = "APP副图片路径")
     private String viceAppPic;
@@ -72,5 +75,14 @@ public class ActivityInfoVO implements Serializable {
 
     @ApiModelProperty(value = "关联活动大厅ID")
     private Long activityLobbyId;
+
+    @ApiModelProperty(value = "活动有效状态")
+    private Integer validStatus;
+
+    @ApiModelProperty(value = "活动开始时间")
+    private String beginTime;
+
+    @ApiModelProperty(value = "活动结束时间")
+    private String endTime;
 
 }

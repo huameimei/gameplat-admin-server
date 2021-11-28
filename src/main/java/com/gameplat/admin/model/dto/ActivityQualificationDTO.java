@@ -9,6 +9,7 @@ import java.util.Date;
 import java.util.List;
 
 /**
+ * 活动资格DTO
  * @Author: lyq
  * @Date: 2020/8/20 11:50
  * @Description:

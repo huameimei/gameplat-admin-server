@@ -1,7 +1,7 @@
 package com.gameplat.admin.convert;
 
 import com.gameplat.admin.model.domain.MemberWithdrawHistory;
-import com.gameplat.admin.model.dto.UserWithdrawHistoryQueryDTO;
+import com.gameplat.admin.model.dto.MemberWithdrawHistoryQueryDTO;
 import com.gameplat.admin.model.vo.MemberWithdrawHistoryVO;
 import org.mapstruct.Mapper;
 
@@ -10,6 +10,6 @@ public interface MemberWithdrawHistoryConvert {
 
   MemberWithdrawHistoryVO toVo(MemberWithdrawHistory entity);
 
-  MemberWithdrawHistory toEntity(UserWithdrawHistoryQueryDTO dto);
+  MemberWithdrawHistory toEntity(MemberWithdrawHistoryQueryDTO dto);
 
 }

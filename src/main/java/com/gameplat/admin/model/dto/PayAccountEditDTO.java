@@ -25,7 +25,7 @@ public class PayAccountEditDTO implements Serializable {
 
   private String qrCode;
 
-  private String userLevels;
+  private String memberLevels;
 
   private String remarks;
 

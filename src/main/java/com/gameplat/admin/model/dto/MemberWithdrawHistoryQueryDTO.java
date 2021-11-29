@@ -8,7 +8,7 @@ import java.util.Date;
 import java.util.List;
 
 @Data
-public class UserWithdrawHistoryQueryDTO implements Serializable {
+public class MemberWithdrawHistoryQueryDTO implements Serializable {
 
   private Integer cashMode;
 

@@ -8,7 +8,7 @@ import java.util.Date;
 import java.util.List;
 
 @Data
-public class UserWithdrawQueryDTO implements Serializable {
+public class MemberWithdrawQueryDTO implements Serializable {
 
   private BigDecimal cashMoneyFrom;
 

@@ -3,7 +3,7 @@ package com.gameplat.admin.controller.open.finance;
 
 import com.gameplat.admin.model.bean.ReturnMessage;
 import com.gameplat.admin.service.ProxyPayService;
-import com.gameplat.admin.util.WebUtils;
+import com.gameplat.common.util.ServletUtils;
 import com.gameplat.security.SecurityUserHolder;
 import com.gameplat.security.context.UserCredential;
 import javax.servlet.http.HttpServletRequest;
@@ -28,7 +28,7 @@ public class ProxyPayController {
       @NotNull(message = "{NoNull}") Long ppMerchantId, HttpServletRequest request)
       throws Exception {
     String sysPath = request.getSession().getServletContext().getRealPath("");
-    String urL = WebUtils.getBaseUrl(request);
+    String urL = ServletUtils.getRequestDomain(request);
     String realUrl = "";
     String scheme = request.getHeader("X-Forwarded-Scheme");
     UserCredential userCredential = SecurityUserHolder.getCredential();

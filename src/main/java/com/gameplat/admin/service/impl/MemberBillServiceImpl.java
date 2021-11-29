@@ -18,7 +18,7 @@ public class MemberBillServiceImpl extends ServiceImpl<MemberBillMapper, MemberB
   @Override
   public void save(Member member, MemberBill memberBill) throws Exception {
     memberBill.setAccount(member.getAccount());
-    memberBill.setMemberPaths(member.getSuperPath());
+    memberBill.setMemberPath(member.getSuperPath());
     memberBill.setTableIndex(member.getTableIndex());
     memberBill.setMemberId(member.getId());
     this.save(memberBill);

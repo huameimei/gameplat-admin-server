@@ -15,7 +15,6 @@ import com.gameplat.admin.enums.AllowOthersOperateEnums;
 import com.gameplat.admin.enums.BlacklistConstant.BizBlacklistType;
 import com.gameplat.admin.enums.MemberEnums.Type;
 import com.gameplat.admin.enums.RechargeStatus;
-import com.gameplat.admin.enums.SwitchStatusEnum;
 import com.gameplat.admin.enums.UserStates;
 import com.gameplat.admin.mapper.RechargeOrderHistoryMapper;
 import com.gameplat.admin.mapper.RechargeOrderMapper;
@@ -70,6 +69,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
+import com.gameplat.common.enums.SwitchStatusEnum;
 
 @Slf4j
 @Service

@@ -7,7 +7,6 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.convert.PayTypeConvert;
-import com.gameplat.admin.enums.SwitchStatusEnum;
 import com.gameplat.admin.mapper.PayTypeMapper;
 import com.gameplat.admin.model.domain.PayType;
 import com.gameplat.admin.model.dto.PayTypeAddDTO;
@@ -15,6 +14,7 @@ import com.gameplat.admin.model.dto.PayTypeEditDTO;
 import com.gameplat.admin.model.vo.PayTypeVO;
 import com.gameplat.admin.service.PayTypeService;
 
+import com.gameplat.common.enums.SwitchStatusEnum;
 import java.util.List;
 import java.util.stream.Collectors;
 

@@ -12,7 +12,7 @@
     <result property="bankName" column="bank_name"/>
     <result property="bankAddress" column="bank_address"/>
     <result property="qrCode" column="qr_code"/>
-    <result property="userLevels" column="user_levels"/>
+    <result property="memberLevels" column="member_levels"/>
     <result property="remarks" column="remarks"/>
     <result property="sort" column="sort"/>
     <result property="status" column="status"/>
@@ -43,18 +43,18 @@
       <if test="dto.status != null ">
         and status = #{dto.status}
       </if>
-      <if test="dto.userLevelList !=null and dto.userLevelList.size() > 0">
+      <if test="dto.memberLevelList !=null and dto.memberLevelList.size() > 0">
         and (
-        <foreach collection="dto.userLevelList" item="userLevel" index="index">
-          INSTR(CONCAT(',' , user_levels, ','), #{userLevel}) > 0 OR
+        <foreach collection="dto.memberLevelList" item="memberLevel" index="index">
+          INSTR(CONCAT(',' , member_levels, ','), #{memberLevel}) > 0 OR
         </foreach>
-        user_levels = '' )
+        member_levels = '' )
       </if>
     </where>
   </sql>
 
   <select id="findPayAccountPage" resultMap="PayAccountVOMap">
-    SELECT id,name,account,owner,pay_type,bank_name,bank_address,qr_code,user_levels,remarks,
+    SELECT id,name,account,owner,pay_type,bank_name,bank_address,qr_code,member_levels,remarks,
     sort,status,recharge_times,recharge_amount,order_remark,order_remark_status,limit_info,
     handle_tip,create_by,create_time,update_by,update_time,email_address
     FROM pay_account

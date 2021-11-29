@@ -16,7 +16,7 @@ public class TpPayChannelVO extends Model<TpPayChannelVO> {
 
   private String tpPayType;
 
-  private String userLevels;
+  private String memberLevels;
 
   private String remarks;
 
@@ -39,6 +39,8 @@ public class TpPayChannelVO extends Model<TpPayChannelVO> {
   private String payTypeName;
 
   private String tpMerchantName;
+
+  private Long tpInterfaceId;
 
   private String tpPayTypeName;
 

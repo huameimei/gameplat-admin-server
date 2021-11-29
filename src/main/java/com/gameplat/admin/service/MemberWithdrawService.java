@@ -5,7 +5,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.gameplat.admin.model.bean.PageExt;
 import com.gameplat.admin.model.domain.MemberWithdraw;
 import com.gameplat.admin.model.domain.PpMerchant;
-import com.gameplat.admin.model.dto.UserWithdrawQueryDTO;
+import com.gameplat.admin.model.dto.MemberWithdrawQueryDTO;
 import com.gameplat.admin.model.vo.MemberWithdrawVO;
 import com.gameplat.admin.model.vo.SummaryVO;
 import com.gameplat.security.context.UserCredential;
@@ -14,7 +14,7 @@ import java.util.List;
 
 public interface MemberWithdrawService extends IService<MemberWithdraw> {
 
-  PageExt<MemberWithdrawVO, SummaryVO> findPage(Page<MemberWithdraw> page, UserWithdrawQueryDTO dto);
+  PageExt<MemberWithdrawVO, SummaryVO> findPage(Page<MemberWithdraw> page, MemberWithdrawQueryDTO dto);
 
   void updateCounterFee(Long id, BigDecimal afterCounterFee);
 

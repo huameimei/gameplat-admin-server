@@ -51,4 +51,5 @@ public interface PayTypeService extends IService<PayType> {
   IPage<PayType> queryPage(Page<PayType> page);
 
   List<PayTypeVO> queryEnablePayTypes();
+
 }

@@ -21,7 +21,7 @@ public class MemberBill {
 
   private String account;
 
-  private String memberPaths;
+  private String memberPath;
 
   private Integer tranType;
 

@@ -82,6 +82,7 @@ public class ActivityDistributeDTO implements Serializable {
     @ApiModelProperty(value = "是否失效（0 失效，1 未失效）")
     private Integer disabled;
 
+    @ApiModelProperty(value = "过期时间")
     private String expired;
 
     @ApiModelProperty(value = "领取方式（1 直接发放，2 福利中心）")

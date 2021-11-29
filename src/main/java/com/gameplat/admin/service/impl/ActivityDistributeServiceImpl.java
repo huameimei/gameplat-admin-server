@@ -41,4 +41,9 @@ public class ActivityDistributeServiceImpl
         }
         this.removeByIds(idList);
     }
+
+    @Override
+    public boolean saveBatch(List<ActivityDistribute> activityDistributeList) {
+        return this.saveBatch(activityDistributeList);
+    }
 }

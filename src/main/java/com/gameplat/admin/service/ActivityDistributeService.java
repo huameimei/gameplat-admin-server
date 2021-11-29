@@ -20,4 +20,12 @@ public interface ActivityDistributeService {
      * @param ids
      */
     void deleteByLobbyIds(String ids);
+
+    /**
+     * 批量保存
+     *
+     * @param activityDistributeList
+     * @return
+     */
+    boolean saveBatch(List<ActivityDistribute> activityDistributeList);
 }

@@ -9,7 +9,7 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * 活动资格DTO
+ * 活动资格更新状态DTO
  *
  * @Author: lyq
  * @Date: 2020/8/20 11:50
@@ -17,12 +17,18 @@ import java.util.List;
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class ActivityQualificationDTO implements Serializable {
+public class ActivityQualificationUpdateStatusDTO implements Serializable {
 
     private static final long serialVersionUID = -3594282509149807621L;
 
+    @ApiModelProperty(value = "批量资格id")
+    private List<Long> qualificationIds;
+
     @ApiModelProperty(value = "资格id")
     private Long qualificationId;
+
+    @ApiModelProperty(value = "资格id")
+    private Long id;
 
     @ApiModelProperty(value = "活动名称")
     private String activityName;
@@ -92,15 +98,6 @@ public class ActivityQualificationDTO implements Serializable {
 
     @ApiModelProperty(value = "统计项目（1 累计充值金额，2 累计充值天数，3 连续充值天数，4 单日首充金额，5 首充金额）")
     private Integer statisItem;
-
-    @ApiModelProperty(value = "提现打码量")
-    private Integer withdrawDml;
-
-    @ApiModelProperty(value = "奖励详情")
-    private String awardDetail;
-
-    @ApiModelProperty(value = "领取方式（1 直接发放，2 福利中心）")
-    private Integer getWay;
 
     @ApiModelProperty(value = "页面大小")
     private Integer pageSize;

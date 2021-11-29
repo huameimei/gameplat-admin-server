@@ -11,6 +11,8 @@ import java.util.List;
 
 
 /**
+ * 活动分发
+ *
  * @author lyq
  * @Description 实体层
  * @date 2020-08-20 11:30:39

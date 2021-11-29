@@ -6,6 +6,7 @@ import com.gameplat.admin.model.domain.ActivityQualification;
 import com.gameplat.admin.model.dto.ActivityQualificationAddDTO;
 import com.gameplat.admin.model.dto.ActivityQualificationDTO;
 import com.gameplat.admin.model.dto.ActivityQualificationUpdateDTO;
+import com.gameplat.admin.model.dto.ActivityQualificationUpdateStatusDTO;
 import com.gameplat.admin.model.vo.ActivityQualificationVO;
 import org.springframework.stereotype.Service;
 
@@ -51,4 +52,18 @@ public interface ActivityQualificationService {
      * @param activityQualificationUpdateDTO
      */
     void update(ActivityQualificationUpdateDTO activityQualificationUpdateDTO);
+
+    /**
+     * 更新活动资格状态
+     *
+     * @param activityQualificationUpdateStatusDTO
+     */
+    void updateStatus(ActivityQualificationUpdateStatusDTO activityQualificationUpdateStatusDTO);
+
+    /**
+     * 更新状态
+     *
+     * @param activityQualificationUpdateStatusDTO
+     */
+    void updateQualificationStatus(ActivityQualificationUpdateStatusDTO activityQualificationUpdateStatusDTO);
 }

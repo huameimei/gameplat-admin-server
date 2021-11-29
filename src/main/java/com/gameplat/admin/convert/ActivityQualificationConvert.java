@@ -4,6 +4,7 @@ import com.gameplat.admin.model.domain.ActivityQualification;
 import com.gameplat.admin.model.dto.ActivityQualificationAddDTO;
 import com.gameplat.admin.model.dto.ActivityQualificationDTO;
 import com.gameplat.admin.model.dto.ActivityQualificationUpdateDTO;
+import com.gameplat.admin.model.dto.ActivityQualificationUpdateStatusDTO;
 import com.gameplat.admin.model.vo.ActivityQualificationVO;
 import org.mapstruct.Mapper;
 
@@ -20,5 +21,7 @@ public interface ActivityQualificationConvert {
     ActivityQualification toEntity(ActivityQualificationAddDTO activityQualificationAddDTO);
 
     ActivityQualification toEntity(ActivityQualificationUpdateDTO activityQualificationUpdateDTO);
+
+    ActivityQualification toEntity(ActivityQualificationUpdateStatusDTO activityQualificationUpdateStatusDTO);
 
 }

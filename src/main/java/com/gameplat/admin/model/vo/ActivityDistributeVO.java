@@ -11,6 +11,7 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 /**
+ * 活动分发
  * @Author: lyq
  * @Date: 2020/8/20 11:46
  * @Description:

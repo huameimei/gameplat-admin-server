@@ -12,6 +12,7 @@ import java.util.Date;
 
 /**
  * 活动分发
+ *
  * @Author: lyq
  * @Date: 2020/8/20 11:46
  * @Description:
@@ -22,7 +23,7 @@ public class ActivityDistributeVO implements Serializable {
 
     private static final long serialVersionUID = -3023519898125789485L;
 
-    @JsonSerialize(using= ToStringSerializer.class)
+    @JsonSerialize(using = ToStringSerializer.class)
     @ApiModelProperty(value = "派发id")
     private Long distributeId;
 
@@ -32,11 +33,11 @@ public class ActivityDistributeVO implements Serializable {
     @ApiModelProperty(value = "活动类型（1 活动大厅，2 红包雨，3 转盘）")
     private Integer activityType;
 
-    @JsonSerialize(using= ToStringSerializer.class)
+    @JsonSerialize(using = ToStringSerializer.class)
     @ApiModelProperty(value = "活动ID")
     private Long activityId;
 
-    @JsonSerialize(using= ToStringSerializer.class)
+    @JsonSerialize(using = ToStringSerializer.class)
     @ApiModelProperty(value = "用户id")
     private Long userId;
 
@@ -99,4 +100,8 @@ public class ActivityDistributeVO implements Serializable {
 
     @ApiModelProperty(value = "领取方式（1 直接发放，2 福利中心）")
     private Integer getWay;
+
+    @ApiModelProperty(value = "提现打码量")
+    private Integer withdrawDml;
+
 }

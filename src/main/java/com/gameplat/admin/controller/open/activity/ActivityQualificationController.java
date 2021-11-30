@@ -94,7 +94,7 @@ public class ActivityQualificationController {
      *
      * @param ids
      */
-    @PutMapping("/delete")
+    @DeleteMapping("/delete")
     @PreAuthorize("hasAuthority('activity:qualification:remove')")
     public void delete(@RequestBody String ids) {
         activityQualificationService.delete(ids);

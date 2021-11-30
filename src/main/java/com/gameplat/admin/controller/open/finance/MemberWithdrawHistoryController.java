@@ -4,7 +4,7 @@ package com.gameplat.admin.controller.open.finance;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.gameplat.admin.model.domain.MemberWithdrawHistory;
-import com.gameplat.admin.model.dto.UserWithdrawHistoryQueryDTO;
+import com.gameplat.admin.model.dto.MemberWithdrawHistoryQueryDTO;
 import com.gameplat.admin.model.vo.MemberWithdrawHistorySummaryVO;
 import com.gameplat.admin.model.vo.MemberWithdrawHistoryVO;
 import com.gameplat.admin.service.MemberWithdrawHistoryService;
@@ -23,13 +23,14 @@ public class MemberWithdrawHistoryController {
   
   @PostMapping("/page")
   @PreAuthorize("hasAuthority('finance:memberWithdrawHistory:page')")
-  public IPage<MemberWithdrawHistoryVO> queryPage(Page<MemberWithdrawHistory> page, UserWithdrawHistoryQueryDTO dto) {
+  public IPage<MemberWithdrawHistoryVO> queryPage(Page<MemberWithdrawHistory> page, MemberWithdrawHistoryQueryDTO dto) {
     return userWithdrawHistoryService.findPage(page, dto);
   }
 
   @PostMapping("/findSumMemberWithdrawHistory")
   @PreAuthorize("hasAuthority('finance:memberWithdrawHistory:findSumMemberWithdrawHistory')")
-  public MemberWithdrawHistorySummaryVO findSumMemberWithdrawHistory(UserWithdrawHistoryQueryDTO dto) {
+  public MemberWithdrawHistorySummaryVO findSumMemberWithdrawHistory(
+      MemberWithdrawHistoryQueryDTO dto) {
     return userWithdrawHistoryService.findSumMemberWithdrawHistory(dto);
   }
 

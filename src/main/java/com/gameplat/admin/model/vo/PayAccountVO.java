@@ -27,7 +27,7 @@ public class PayAccountVO extends Model<PayAccountVO> {
 
   private String qrCode;
 
-  private String userLevels;
+  private String memberLevels;
 
   private String remarks;
 

@@ -1,5 +1,7 @@
 package com.gameplat.admin.service.impl;
 
+import com.alicp.jetcache.anno.CacheInvalidate;
+import com.alicp.jetcache.anno.Cached;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.convert.MemberRemarkConvert;
 import com.gameplat.admin.mapper.MemberRemarkMapper;
@@ -9,6 +11,7 @@ import com.gameplat.admin.model.dto.MemberRemarkAddDTO;
 import com.gameplat.admin.model.vo.MemberRemarkVO;
 import com.gameplat.admin.service.MemberRemarkService;
 import com.gameplat.admin.service.MemberService;
+import com.gameplat.admin.constant.CachedKeys;
 import com.gameplat.common.exception.ServiceException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -28,6 +31,7 @@ public class MemberRemarkServiceImpl extends ServiceImpl<MemberRemarkMapper, Mem
   @Autowired private MemberRemarkConvert memberRemarkConvert;
 
   @Override
+  @CacheInvalidate(name = CachedKeys.MEMBER_REMARK_CACHE, key = "#dto.ids", multi = true)
   public void update(MemberRemarkAddDTO dto) {
     if (!memberService
         .lambdaUpdate()
@@ -49,6 +53,7 @@ public class MemberRemarkServiceImpl extends ServiceImpl<MemberRemarkMapper, Mem
   }
 
   @Override
+  @Cached(name = CachedKeys.MEMBER_REMARK_CACHE, key = "#memberId", expire = 7200)
   public List<MemberRemarkVO> getByMemberId(Long memberId) {
     return this.lambdaQuery()
         .eq(MemberRemark::getMemberId, memberId)

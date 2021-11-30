@@ -5,7 +5,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.gameplat.admin.model.bean.PageExt;
 import com.gameplat.admin.model.domain.MemberWithdraw;
 import com.gameplat.admin.model.domain.PpMerchant;
-import com.gameplat.admin.model.dto.UserWithdrawQueryDTO;
+import com.gameplat.admin.model.dto.MemberWithdrawQueryDTO;
 import com.gameplat.admin.model.vo.MemberWithdrawVO;
 import com.gameplat.admin.model.vo.SummaryVO;
 import com.gameplat.admin.service.MemberWithdrawService;
@@ -29,7 +29,7 @@ public class MemberWithdrawController {
   @PostMapping("/modifyCashStatus")
   @PreAuthorize("hasAuthority('finance:memberWithdraw:modifyCashStatus')")
   public void modifyCashStatus(Long id, Integer cashStatus, Integer curStatus, boolean isDirect,
-      String approveReason) {
+      String approveReason) throws Exception{
     UserCredential userCredential = SecurityUserHolder.getCredential();
 
     userWithdrawService.modify(id, cashStatus, curStatus, isDirect, approveReason, userCredential);
@@ -49,7 +49,7 @@ public class MemberWithdrawController {
 
   @PostMapping("/page")
   @PreAuthorize("hasAuthority('finance:memberWithdraw:page')")
-  public PageExt<MemberWithdrawVO, SummaryVO> queryPage(Page<MemberWithdraw> page, UserWithdrawQueryDTO dto) {
+  public PageExt<MemberWithdrawVO, SummaryVO> queryPage(Page<MemberWithdraw> page, MemberWithdrawQueryDTO dto) {
     return userWithdrawService.findPage(page, dto);
   }
 

@@ -2,10 +2,8 @@ package com.gameplat.admin.controller.open.finance;
 
 
 import com.gameplat.admin.model.bean.NameValuePair;
-import com.gameplat.admin.model.bean.UserEquipment;
 import com.gameplat.admin.service.ProxyPayService;
-import com.gameplat.admin.util.WebUtils;
-import eu.bitwalker.useragentutils.UserAgent;
+import com.gameplat.common.util.IPUtils;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -34,20 +32,15 @@ public class WithdrawAsyncCallbackController {
   public void onlineProxyPayAsyncCallback(
       @PathVariable String cashOrderNo,
       @RequestBody(required = false) String requestBody,
-      HttpServletRequest request, HttpServletResponse response,
-      String userAgentString,
-      UserAgent clientUserAgent)
+      HttpServletRequest request, HttpServletResponse response)
       throws Exception {
-    String url = WebUtils.getCurUrl(request);
+    String url = request.getRequestURI();
     //获取请求头数据
     List<NameValuePair> headers = getHeaders(request);
-    //获取请求来源服务器数据
-    UserEquipment clientInfo = UserEquipment
-        .create(userAgentString, clientUserAgent, request);
     // 获取请求数据
     Map<String, String> requestParameters = getRequestParameterMap(request);
     String msg = proxyPayService.proxyPayAsyncCallback(
-        cashOrderNo, url, request.getMethod(), headers, clientInfo.getIpAddress(),
+        cashOrderNo, url, request.getMethod(), headers, IPUtils.getIpAddress(request),
         requestParameters, requestBody);
     response.getWriter().print(msg);
   }

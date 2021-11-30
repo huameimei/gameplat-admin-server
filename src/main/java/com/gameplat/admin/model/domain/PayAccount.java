@@ -29,7 +29,7 @@ public class PayAccount {
 
   private String qrCode;
 
-  private String userLevels;
+  private String memberLevels;
 
   private String remarks;
 

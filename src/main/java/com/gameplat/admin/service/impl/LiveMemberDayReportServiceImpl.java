@@ -1,6 +1,8 @@
 package com.gameplat.admin.service.impl;
 
+import cn.hutool.db.sql.Order;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.enums.SqlKeyword;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -17,6 +19,7 @@ import com.gameplat.admin.service.MemberService;
 import com.gameplat.common.enums.UserTypes;
 import com.gameplat.common.exception.ServiceException;
 import com.gameplat.common.util.StringUtils;
+import com.google.common.collect.Lists;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -25,10 +28,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)
 public class LiveMemberDayReportServiceImpl extends
     ServiceImpl<LiveMemberDayReportMapper, LiveMemberDayReport> implements
     LiveMemberDayReportService {
@@ -55,7 +61,25 @@ public class LiveMemberDayReportServiceImpl extends
       }
     }
     QueryWrapper<LiveMemberDayReport> queryWrapper = Wrappers.query();
-    queryWrapper.eq(ObjectUtils.isNotEmpty(dto.getAccount()),"account",dto.getAccount());
+    fillQueryWrapper(dto,queryWrapper);
+    queryWrapper.orderByDesc(Lists.newArrayList("stat_time","id"));
+
+    Page<LiveMemberDayReport> result = liveMemberDayReportMapper.selectPage(page,queryWrapper);
+
+    QueryWrapper<LiveMemberDayReport> queryOne = Wrappers.query();
+    queryOne.select("sum(bet_amount) as bet_amount,sum(valid_amount) as valid_amount,sum(win_amount) as win_amount,sum(revenue) as revenue");
+    fillQueryWrapper(dto,queryOne);
+    LiveMemberDayReport liveMemberDayReport =  liveMemberDayReportMapper.selectOne(queryOne);
+    Map<String, Object> otherData = new HashMap<>();
+    otherData.put("totalData", liveMemberDayReport);
+    pageDtoVO.setPage(result);
+    pageDtoVO.setOtherData(otherData);
+    return pageDtoVO;
+  }
+
+  private void fillQueryWrapper(LiveMemberDayReportQueryDTO dto,
+      QueryWrapper<LiveMemberDayReport> queryWrapper) {
+    queryWrapper.eq(ObjectUtils.isNotEmpty(dto.getAccount()),"account", dto.getAccount());
     if(StringUtils.isNotEmpty(dto.getUserPaths())) {
       queryWrapper.likeRight("user_paths", dto.getUserPaths());
     }
@@ -67,46 +91,20 @@ public class LiveMemberDayReportServiceImpl extends
       queryWrapper.in("game_kind",
           Arrays.asList(dto.getLiveGameKindList().split(",")));
     }
-    queryWrapper.eq(ObjectUtils.isNotEmpty(dto.getLiveGameKind()),"game_kind",dto.getLiveGameKind());
-    queryWrapper.eq(ObjectUtils.isNotEmpty(dto.getLiveGameSuperType()),"first_kind",dto.getLiveGameSuperType());
-    queryWrapper.apply(ObjectUtils.isNotEmpty(dto.getBetStartDate()),"stat_time >= STR_TO_DATE({0}, '%Y-%m-%d')",dto.getBetStartDate());
-    queryWrapper.apply(ObjectUtils.isNotEmpty(dto.getBetEndDate()),"stat_time <= STR_TO_DATE({0}, '%Y-%m-%d')",dto.getBetEndDate());
-    queryWrapper.orderByDesc("stat_time","id");
-
-    Page<LiveMemberDayReport> result = liveMemberDayReportMapper.selectPage(page,queryWrapper);
-
-    QueryWrapper<LiveMemberDayReport> queryOne = Wrappers.query();
-    queryOne.select("sum(bet_amount) as bet_amount,sum(valid_amount) as valid_amount,sum(win_amount) as win_amount,sum(revenue) as revenue");
-    if(StringUtils.isNotEmpty(dto.getUserPaths())) {
-      queryOne.likeRight("user_paths", dto.getUserPaths());
-    }
-    queryOne.eq(ObjectUtils.isNotEmpty(dto.getAccount()),"account",dto.getAccount());
-    if(ObjectUtils.isNotEmpty(dto.getGameCode())){
-      queryOne.in("game_code",
-          Arrays.asList(dto.getGameCode().split(",")));
-    }
-    if(ObjectUtils.isNotEmpty(dto.getGameKindList())){
-      queryOne.in("game_kind",
-          Arrays.asList(dto.getLiveGameKindList().split(",")));
-    }
-
-    queryOne.eq(ObjectUtils.isNotEmpty(dto.getLiveGameKind()),"game_kind",dto.getLiveGameKind());
-    queryOne.eq(ObjectUtils.isNotEmpty(dto.getLiveGameSuperType()),"first_kind",dto.getLiveGameSuperType());
-    queryOne.apply(ObjectUtils.isNotEmpty(dto.getBetStartDate()),"stat_time >= STR_TO_DATE({0}, '%Y-%m-%d')",dto.getBetStartDate());
-    queryOne.apply(ObjectUtils.isNotEmpty(dto.getBetEndDate()),"stat_time <= STR_TO_DATE({0}, '%Y-%m-%d')",dto.getBetEndDate());
-    LiveMemberDayReport liveMemberDayReport =  liveMemberDayReportMapper.selectOne(queryOne);
-    Map<String, Object> otherData = new HashMap<String, Object>();
-    otherData.put("totalData", liveMemberDayReport);
-    pageDtoVO.setPage(result);
-    pageDtoVO.setOtherData(otherData);
-    return pageDtoVO;
+    queryWrapper.eq(ObjectUtils.isNotEmpty(dto.getLiveGameKind()),"game_kind", dto.getLiveGameKind());
+    queryWrapper.eq(ObjectUtils.isNotEmpty(dto.getLiveGameSuperType()),"first_kind", dto.getLiveGameSuperType());
+    queryWrapper.apply(ObjectUtils.isNotEmpty(dto.getBetStartDate()),"stat_time >= STR_TO_DATE({0}, '%Y-%m-%d')",
+        dto.getBetStartDate());
+    queryWrapper.apply(ObjectUtils.isNotEmpty(dto.getBetEndDate()),"stat_time <= STR_TO_DATE({0}, '%Y-%m-%d')",
+        dto.getBetEndDate());
   }
 
 
   @Override
   public void saveMemberDayReport(String statTime, GamePlatform gamePlatform) {
       log.info("{}[{}],statTime:[{}]> Start save live_user_day_report", gamePlatform.getName(), gamePlatform.getCode(), statTime);
-     int count = this.liveMemberDayReportMapper.getDayCount(statTime, gamePlatform);
+      String tableName = String.format("live_%s_bet_record",gamePlatform.getCode());
+     int count = this.liveMemberDayReportMapper.getDayCount(statTime, tableName);
      if (count > 0) {
         log.info("{}[{}],statTime:[{}] > live_user_day_report bet record data size:[{}]", gamePlatform.getName(), gamePlatform.getCode(), statTime, count);
         QueryWrapper<LiveMemberDayReport> queryWrapper = Wrappers.query();
@@ -114,7 +112,7 @@ public class LiveMemberDayReportServiceImpl extends
         queryWrapper.eq("stat_time",statTime);
         int deleted = liveMemberDayReportMapper.delete(queryWrapper);
         log.info("{}[{}],statTime:[{}] > live_user_day_report delete exists data size:[{}]", gamePlatform.getName(), gamePlatform.getCode(), statTime, deleted);
-        int generate = this.liveMemberDayReportMapper.saveMemberDayReport(statTime, gamePlatform);
+        int generate = this.liveMemberDayReportMapper.saveMemberDayReport(statTime, gamePlatform,tableName);
         log.info("{}[{}],statTime:[{}] > live_user_day_report generate data size:[{}]", gamePlatform.getName(), gamePlatform.getCode(), statTime, generate);
       } else {
         log.info("{}[{}],statTime:[{}]> no data save to live_user_day_report", gamePlatform.getName(), gamePlatform.getCode(), statTime);

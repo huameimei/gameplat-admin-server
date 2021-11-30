@@ -28,7 +28,6 @@ import javax.servlet.http.HttpServletRequest;
  */
 @Slf4j
 @RestController
-@RequiredArgsConstructor
 @RequestMapping("/api/admin/auth")
 public class OpenAuthorityController {
 
@@ -45,7 +44,7 @@ public class OpenAuthorityController {
 
   /** 账号登出 */
   @GetMapping("/logout")
-  @LoginLog(isLogout = true,module = ServiceName.ADMIN_SERVICE, desc = "账号登出系统")
+  @LoginLog(isLogout = true, module = ServiceName.ADMIN_SERVICE, desc = "账号登出系统")
   public void logout() {
     authenticationService.logout();
   }

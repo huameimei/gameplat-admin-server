@@ -6,7 +6,7 @@ import lombok.*;
 
 import java.util.Date;
 
-/** 会员银行 */
+/** 会员备注 */
 @Data
 @Builder
 @AllArgsConstructor

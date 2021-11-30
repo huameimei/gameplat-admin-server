@@ -81,12 +81,4 @@ public interface SysUserService extends IService<SysUser> {
    * @param authDTO GoogleAuthDTO
    */
   void bindSecret(GoogleAuthDTO authDTO);
-
-  /**
-   * 校验用户名称是否唯一
-   *
-   * @param loginName String
-   * @return boolean
-   */
-  boolean checkLoginNameUnique(String loginName);
 }

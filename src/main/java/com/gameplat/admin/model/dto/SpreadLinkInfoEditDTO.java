@@ -2,14 +2,20 @@ package com.gameplat.admin.model.dto;
 
 import lombok.Data;
 
+import java.math.BigDecimal;
+
 @Data
-public class SpreadConfigDTO {
+public class SpreadLinkInfoEditDTO {
 
     private Long id;
     /**
      * 代理账号
      */
     private String agentAccount;
+    /**
+     * 推广地址
+     */
+    private String externalUrl;
     /**
      * 推广码
      */
@@ -23,17 +29,24 @@ public class SpreadConfigDTO {
      */
     private Integer userType;
     /**
+     * 用户层级
+     */
+    private Integer userLevel;
+    /**
+     * 彩票反水比率
+     */
+    private double rebate;
+    /**
      * 状态
      */
     private Integer status;
-
     /**
-     * 排序列
+     * 有效天数
      */
-    private String orderByColumn;
+    private Integer effectiveDays;
     /**
-     * 排序
+     * 注册送彩金
      */
-    private String sortBy;
+    private BigDecimal discountAmount;
 
 }

@@ -10,9 +10,7 @@ import com.gameplat.admin.model.vo.RoleVo;
 import com.gameplat.admin.model.vo.UserVo;
 import com.gameplat.admin.service.SysUserService;
 import com.gameplat.common.constant.ServiceName;
-import com.gameplat.common.exception.ServiceException;
 import com.gameplat.common.group.Groups;
-import com.gameplat.common.util.StringUtils;
 import com.gameplat.log.annotation.Log;
 import com.gameplat.log.enums.LogType;
 import lombok.RequiredArgsConstructor;
@@ -38,18 +36,18 @@ public class OpenSubUserController {
 
   @GetMapping("/list")
   @PreAuthorize("hasAuthority('account:subUser:view')")
-  public IPage<UserVo> list(PageDTO<SysUser> page, UserDTO userDTO) {
-    return userService.selectUserList(page, userDTO);
+  public IPage<UserVo> list(PageDTO<SysUser> page, UserDTO dto) {
+    return userService.selectUserList(page, dto);
   }
 
   @PostMapping("/add")
   @Log(
       module = ServiceName.ADMIN_SERVICE,
       type = LogType.ADMIN,
-      desc = "'添加后台账号【'+#userDTO.account+'】'")
+      desc = "'添加后台账号【'+#dto.account+'】'")
   @PreAuthorize("hasAuthority('account:subUser:add')")
-  public void add(@Validated(Groups.INSERT.class) @RequestBody OperUserDTO userDTO) {
-    userService.insertUser(userDTO);
+  public void add(@Validated(Groups.INSERT.class) @RequestBody OperUserDTO dto) {
+    userService.insertUser(dto);
   }
 
   @PutMapping("/edit")
@@ -72,7 +70,7 @@ public class OpenSubUserController {
   /**
    * 权限列表
    *
-   * @return
+   * @return List
    */
   @GetMapping("/roleList")
   public List<RoleVo> roleList() {
@@ -82,8 +80,7 @@ public class OpenSubUserController {
   /**
    * 重置用户密码
    *
-   * @param userDTO
-   * @return
+   * @param dto UserResetPasswordDTO
    */
   @PostMapping("/resetPassword")
   @PreAuthorize("hasAuthority('account:subUser:changePassword')")
@@ -95,12 +92,11 @@ public class OpenSubUserController {
   /**
    * 重置用户安全码
    *
-   * @param userDTO
-   * @return
+   * @param id Long
    */
   @PostMapping("/resetSafeCode/{id}")
   @PreAuthorize("hasAuthority('account.subUser:restAuth')")
-  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.ADMIN, desc = "'重置后台账号谷歌验证器,id='+#id")
+  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.ADMIN, desc = "'重置谷歌验证器,id='+#id")
   public void resetAuth(@PathVariable Long id) {
     userService.resetGoogleSecret(id);
   }
@@ -113,10 +109,5 @@ public class OpenSubUserController {
       desc = "'修改后台账号状态,id='+#id +',状态='+#status")
   public void changeStatus(@PathVariable Long id, @PathVariable Integer status) {
     userService.changeStatus(id, status);
-  }
-
-  @GetMapping("/checkUserNameUnique/{username}")
-  public boolean checkUserNameUnique(@RequestParam String username) {
-    return userService.checkLoginNameUnique(username);
   }
 }

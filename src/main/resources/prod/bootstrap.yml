@@ -17,3 +17,10 @@ spring:
         group: DEFAULT_GROUP
         refresh-enabled: true
         shared-dataids: redis.yml,spring-kafka-producer-config.yml
+      discovery:
+        service: ${USERDOMAIN}-admin-server
+        namespace: ${spring.cloud.nacos.config.namespace}
+        group: SERVICE_GROUP
+        server-addr: ${spring.cloud.nacos.config.server-addr}
+        username: ${spring.cloud.nacos.config.username}
+        password: ${spring.cloud.nacos.config.password}

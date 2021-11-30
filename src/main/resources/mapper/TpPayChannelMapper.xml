@@ -8,7 +8,7 @@
     <result property="name" column="name"/>
     <result property="merchantId" column="merchant_id"/>
     <result property="tpPayType" column="tp_pay_type"/>
-    <result property="userLevels" column="user_levels"/>
+    <result property="memberLevels" column="member_levels"/>
     <result property="remarks" column="remarks"/>
     <result property="chanDesc" column="chan_desc"/>
     <result property="sort" column="sort"/>
@@ -43,19 +43,19 @@
       <if test="dto.status != null ">
         and c.status = #{dto.status}
       </if>
-      <if test="dto.userLevelList !=null and dto.userLevelList.size() > 0">
+      <if test="dto.memberLevelList !=null and dto.memberLevelList.size() > 0">
         and (
-        <foreach collection="dto.userLevelList" item="userLevel" index="index">
-          INSTR(CONCAT(',' , user_levels, ','), #{userLevel}) > 0 OR
+        <foreach collection="dto.memberLevelList" item="memberLevel" index="index">
+          INSTR(CONCAT(',' , member_levels, ','), #{memberLevel}) > 0 OR
         </foreach>
-        user_levels = '' )
+        member_levels = '' )
       </if>
     </where>
   </sql>
 
   <select id="findTpPayChannelPage" resultMap="TpPayChannelVOMap">
     SELECT
-    c.name,c.pay_channel_tip,c.limit_info,c.remarks,c.user_levels,
+    c.name,c.pay_channel_tip,c.limit_info,c.remarks,c.member_levels,
     c.chan_desc,c.sort,c.status,c.recharge_times,c.recharge_amount,
     c.pay_channel_tip,t.pay_type AS payType, t.name AS tpPayTypeName,
     i.id AS tpInterfaceId, m.name AS tpMerchantName,c.id,c.merchant_id,

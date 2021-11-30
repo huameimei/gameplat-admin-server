@@ -5,21 +5,25 @@ import lombok.Data;
 import java.math.BigDecimal;
 
 @Data
-public class SpreadConfigEditDTO {
+public class SpreadLinkInfoAddDTO {
 
-    private Long id;
+    /**
+     * 代理Id
+     */
+    private Long agentId;
     /**
      * 代理账号
      */
     private String agentAccount;
-    /**
-     * 推广地址
-     */
-    private String externalUrl;
+
     /**
      * 推广码
      */
     private String code;
+    /**
+     * 推广地址
+     */
+    private String externalUrl;
     /**
      * 推广类型
      */
@@ -37,10 +41,6 @@ public class SpreadConfigEditDTO {
      */
     private double rebate;
     /**
-     * 状态
-     */
-    private Integer status;
-    /**
      * 有效天数
      */
     private Integer effectiveDays;
@@ -48,5 +48,4 @@ public class SpreadConfigEditDTO {
      * 注册送彩金
      */
     private BigDecimal discountAmount;
-
 }

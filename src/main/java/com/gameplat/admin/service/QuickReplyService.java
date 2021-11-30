@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.gameplat.admin.model.domain.QuickReply;
 import com.gameplat.admin.model.dto.QuickReplyDTO;
 import com.gameplat.admin.model.vo.QuickReplyVO;
+import java.util.List;
 
 public interface QuickReplyService extends IService<QuickReply> {
 
@@ -15,4 +16,7 @@ public interface QuickReplyService extends IService<QuickReply> {
   void updateQuickReply(QuickReplyDTO replyDTO);
 
   void deleteQuickReply(Long id);
+
+  List<QuickReply> getByType(String messageType);
+
 }

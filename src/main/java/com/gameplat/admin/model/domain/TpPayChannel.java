@@ -26,7 +26,7 @@ public class TpPayChannel {
   private String tpPayType;
 
   @ApiModelProperty(value = "用户层级: 以半角逗号 , 分隔")
-  private String userLevels;
+  private String memberLevels;
 
   @ApiModelProperty(value = "备注信息")
   private String remarks;

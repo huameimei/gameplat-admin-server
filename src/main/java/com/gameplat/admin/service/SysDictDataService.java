@@ -44,8 +44,6 @@ public interface SysDictDataService extends IService<SysDictData> {
 
   void updateDictData(OperDictDataDTO operDictDataDTO);
 
-  void deleteDictDataById(String id);
-
   void deleteDictDataByIds(List<Long> ids);
 
   void updateStatus(Long id, Integer status);
@@ -54,7 +52,7 @@ public interface SysDictDataService extends IService<SysDictData> {
 
   void insertOrUpdate(UserWithdrawLimitInfo userWithdrawLimitInfo);
 
-  void deleteByDictLabel(Long timesForWithdrawal);
+  void deleteByDictLabel(String dictLabel);
 
   SysDictData getDictList(String dictType, String dictLabel);
 

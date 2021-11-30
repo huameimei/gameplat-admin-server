@@ -1,5 +1,7 @@
 package com.gameplat.admin.model.domain;
 
+import com.baomidou.mybatisplus.annotation.FieldFill;
+import com.baomidou.mybatisplus.annotation.TableField;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -15,9 +17,11 @@ public class MemberBill {
 
   private Long id;
 
+  private Long memberId;
+
   private String account;
 
-  private String memberPaths;
+  private String memberPath;
 
   private Integer tranType;
 
@@ -35,5 +39,6 @@ public class MemberBill {
 
   private Integer tableIndex;
 
+  @TableField(fill = FieldFill.INSERT)
   private Date createTime;
 }

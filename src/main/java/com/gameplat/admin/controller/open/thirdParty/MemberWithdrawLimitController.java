@@ -3,6 +3,7 @@ package com.gameplat.admin.controller.open.thirdParty;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.gameplat.admin.enums.DictTypeEnum;
 import com.gameplat.admin.model.bean.UserWithdrawLimitInfo;
 import com.gameplat.admin.model.domain.SysDictData;
 import com.gameplat.admin.model.vo.MemberWithdrawDictDataVo;
@@ -26,7 +27,8 @@ public class MemberWithdrawLimitController {
   @DeleteMapping("/remove/{timesForWithdrawal}")
   @PreAuthorize("hasAuthority('thirdParty:memberWithdrawLimit:remove')")
   public void remove(@PathVariable Long timesForWithdrawal) {
-    dictDataService.deleteByDictLabel(timesForWithdrawal);
+    dictDataService.deleteByDictLabel(
+        DictTypeEnum.USER_WITHDRAW_LIMIT.getValue() + timesForWithdrawal);
   }
 
   @PostMapping("/addOrEdit")

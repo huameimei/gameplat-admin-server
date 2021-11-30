@@ -259,13 +259,6 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
     }
   }
 
-  @Override
-  @SentinelResource(value = "checkLoginNameUnique")
-  public boolean checkLoginNameUnique(String loginName) {
-    SysUser user = userMapper.selectUserByUserName(loginName);
-    return StringUtils.isNull(user);
-  }
-
   /**
    * 新增用户角色信息
    *

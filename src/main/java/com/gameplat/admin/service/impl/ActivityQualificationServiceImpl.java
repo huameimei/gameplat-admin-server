@@ -1,7 +1,9 @@
 package com.gameplat.admin.service.impl;
 
 import cn.hutool.core.util.NumberUtil;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -9,6 +11,7 @@ import com.gameplat.admin.convert.ActivityQualificationConvert;
 import com.gameplat.admin.mapper.ActivityQualificationMapper;
 import com.gameplat.admin.model.domain.ActivityDistribute;
 import com.gameplat.admin.model.domain.ActivityQualification;
+import com.gameplat.admin.model.domain.MemberInfo;
 import com.gameplat.admin.model.dto.ActivityQualificationAddDTO;
 import com.gameplat.admin.model.dto.ActivityQualificationDTO;
 import com.gameplat.admin.model.dto.ActivityQualificationUpdateDTO;
@@ -188,6 +191,15 @@ public class ActivityQualificationServiceImpl extends
         if (!this.updateById(activityQualification)) {
             throw new ServiceException("修改失败！");
         }
+    }
+
+    @Override
+    public void updateQualificationStatus(ActivityQualification activityQualification) {
+        LambdaUpdateWrapper<ActivityQualification> update = Wrappers.lambdaUpdate();
+        update.set(ActivityQualification::getEmployNum, activityQualification.getEmployNum());
+        update.set(ActivityQualification::getEmployTime, activityQualification.getEmployTime());
+        update.eq(ActivityQualification::getQualificationActivityId, activityQualification.getQualificationActivityId());
+        this.update(update);
     }
 
     @Override

@@ -68,9 +68,15 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
     }
 
     @Override
-    public BigDecimal getUserbalance(String username) {
-        MemberInfoVO memberInfo = memberService.getMemberInfo(username);
-        //默认保存的是分
-        return new BigDecimal(memberInfo.getBalance()).divide(BigDecimal.valueOf(100));
+    public boolean updateMemberBalance(String username, BigDecimal discountsMoney) {
+        MemberInfoVO memberInfoVO = memberService.getMemberInfo(username);
+        MemberInfo memberInfo = new MemberInfo();
+        memberInfo.setMemberId(memberInfoVO.getId());
+        BigDecimal balance = memberInfo.getBalance();
+        balance = balance==null ? BigDecimal.ZERO : balance;
+        discountsMoney = discountsMoney==null ? BigDecimal.ZERO : discountsMoney;
+        balance = balance.add(discountsMoney).setScale(2,BigDecimal.ROUND_HALF_UP);
+        memberInfo.setBalance(balance);
+        return this.updateById(memberInfo);
     }
 }

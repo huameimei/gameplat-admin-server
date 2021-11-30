@@ -118,7 +118,7 @@ public class ActivityQualification implements Serializable {
     private Date employTime;
 
     @ApiModelProperty(value = "与活动派发关联id")
-    private String qualificationActivityId;
+    private Long qualificationActivityId;
 
     @ApiModelProperty(value = "唯一标识")
     private String soleIdentifier;

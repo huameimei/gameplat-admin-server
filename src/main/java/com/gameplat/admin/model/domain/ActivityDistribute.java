@@ -1,5 +1,7 @@
 package com.gameplat.admin.model.domain;
 
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -18,14 +20,13 @@ import java.util.List;
  * @date 2020-08-20 11:30:39
  */
 @Data
+@TableName("activity_distribute")
 @EqualsAndHashCode(callSuper = false)
 public class ActivityDistribute implements Serializable {
 
     private static final long serialVersionUID = -1005615158531421103L;
 
-    @ApiModelProperty(value = "派发id集合")
-    private List<Long> distributeIds;
-
+    @TableId("distribute_id")
     @ApiModelProperty(value = "派发id")
     private Long distributeId;
 
@@ -90,7 +91,7 @@ public class ActivityDistribute implements Serializable {
     private Integer memberPayLevel;
 
     @ApiModelProperty(value = "与资格管理关联id")
-    private String qualificationActivityId;
+    private Long qualificationActivityId;
 
     @ApiModelProperty(value = "唯一标识")
     private String soleIdentifier;

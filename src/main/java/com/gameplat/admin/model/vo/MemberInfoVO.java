@@ -57,13 +57,13 @@ public class MemberInfoVO implements Serializable {
   private String rebate;
 
   /** 累计充值金额 */
-  private Long totalRechAmount;
+  private BigDecimal totalRechAmount;
 
   /** 累计充值次数 */
   private Integer totalRechTimes;
 
   /** 累计出款金额 */
-  private Long totalWithdrawAmount;
+  private BigDecimal totalWithdrawAmount;
 
   /** 累计出款次数 */
   private Integer totalWithdrawTimes;

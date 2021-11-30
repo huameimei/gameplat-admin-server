@@ -30,6 +30,8 @@ import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
@@ -53,6 +55,7 @@ import static java.util.stream.Collectors.toList;
 @Service
 @Slf4j
 @RequiredArgsConstructor
+@Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)
 public class MemberWealServiceImpl extends ServiceImpl<MemberWealMapper, MemberWeal> implements MemberWealService {
 
     @Autowired private MemberWealConvert wealConvert;
@@ -192,7 +195,6 @@ public class MemberWealServiceImpl extends ServiceImpl<MemberWealMapper, MemberW
 
         //取达到充值金额的会员账号&&达到有效投注金额的会员账号的交集
         List<String> intersectionList = rechargeAccountList.stream().filter(betAccountList::contains).collect(toList());
-
         if (type == 2){
             // 生日礼金
             //过滤每个会员的生日是否在周期内
@@ -243,7 +245,7 @@ public class MemberWealServiceImpl extends ServiceImpl<MemberWealMapper, MemberW
             memberWeal.setTotalUserCount(totalUserCount);
             memberWeal.setTotalPayMoney(totalPayMoney);
         }
-        //先删除，后保存
+        //先删除福利，后保存
         wealDetailService.removeWealDetail(id);
         if (list != null && list.size() > 0){
             wealDetailService.batchSave(list);
@@ -271,14 +273,16 @@ public class MemberWealServiceImpl extends ServiceImpl<MemberWealMapper, MemberW
         distributedLocker.lock(key);
 
         try {
+            MemberWealDetail memberWealDetail = new MemberWealDetail();
+            memberWealDetail.setWealId(wealId);
             //获取本次福利需要派发的会员
-            List<MemberWealDetail> list = wealDetailService.findSatisfyMember(new MemberWealDetail() {{
-                settleWeal(wealId);
-            }});
+            List<MemberWealDetail> list = wealDetailService.findSatisfyMember(memberWealDetail);
             String serialNumber = RandomUtil.generateNumber(18);
             //根据福利id查询该福利
             MemberWeal memberWeal = mapper.selectById(wealId);
-
+            if(memberWeal == null){
+                throw new ServiceException("该福利不存在!");
+            }
             if (CollectionUtil.isNotEmpty(list)) {
                 //过滤出已派发或已取消的
                 list = list.stream().filter(item -> item.getStatus() == 1).collect(toList());

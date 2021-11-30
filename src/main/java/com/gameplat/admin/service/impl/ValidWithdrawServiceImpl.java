@@ -25,9 +25,11 @@ public class ValidWithdrawServiceImpl extends ServiceImpl<ValidWithdrawMappper, 
 @Autowired private ValidWithdrawMappper mappper;
     @Override
     public int saveValidWithdraw(ValidWithdraw validWithdraw) {
-        ValidWithdraw validWithdraw1 = mappper.findValidWithdraw(new ValidWithdraw() {{
-            setMemberId(validWithdraw.getMemberId());
-        }});
+        //根据会员id查找
+        ValidWithdraw query = new ValidWithdraw();
+        query.setMemberId(validWithdraw.getMemberId());
+        ValidWithdraw validWithdraw1 = mappper.findValidWithdraw(query);
+
         int save = mappper.save(validWithdraw);
         if (save > 0) {
             if (validWithdraw1 != null) {

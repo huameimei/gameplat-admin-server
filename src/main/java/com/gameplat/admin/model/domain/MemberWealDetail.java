@@ -1,6 +1,8 @@
 package com.gameplat.admin.model.domain;
 
 import com.baomidou.mybatisplus.annotation.*;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.gameplat.admin.util.Date2LongSerializerUtils;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
@@ -46,6 +48,7 @@ public class MemberWealDetail implements Serializable {
 
     @ApiModelProperty(value = "创建时间")
     @TableField(fill = FieldFill.INSERT)
+    @JsonSerialize(using = Date2LongSerializerUtils.class)
     private Date createTime;
 
     @ApiModelProperty(value = "修改人")
@@ -54,6 +57,7 @@ public class MemberWealDetail implements Serializable {
 
     @ApiModelProperty(value = "修改时间")
     @TableField(fill = FieldFill.UPDATE)
+    @JsonSerialize(using = Date2LongSerializerUtils.class)
     private Date updateTime;
 
     @ApiModelProperty(value = "备注")

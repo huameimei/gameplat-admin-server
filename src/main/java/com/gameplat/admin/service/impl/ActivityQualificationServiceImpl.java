@@ -190,6 +190,27 @@ public class ActivityQualificationServiceImpl extends
         }
     }
 
+    @Override
+    public void delete(String ids) {
+        if (StringUtils.isBlank(ids)) {
+            throw new ServiceException("ids不能为空");
+        }
+        String[] idArr = ids.split(",");
+        List<Long> idList = new ArrayList<>();
+        for (String idStr : idArr) {
+            idList.add(Long.parseLong(idStr));
+        }
+        List<ActivityQualification> qualificationList = this.lambdaQuery().in(ActivityQualification::getId).list();
+        if (CollectionUtils.isNotEmpty(qualificationList)) {
+            for (ActivityQualification activityQualification : qualificationList) {
+                activityQualification.setDeleteFlag(0);
+            }
+            boolean result = this.updateBatchById(qualificationList);
+            if (!result) {
+                throw new ServiceException("删除失败");
+            }
+        }
+    }
 
 
 }

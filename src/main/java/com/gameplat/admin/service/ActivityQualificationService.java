@@ -66,4 +66,11 @@ public interface ActivityQualificationService {
      * @param activityQualificationUpdateStatusDTO
      */
     void updateQualificationStatus(ActivityQualificationUpdateStatusDTO activityQualificationUpdateStatusDTO);
+
+    /**
+     * 删除活动资格
+     *
+     * @param ids
+     */
+    void delete(String ids);
 }

@@ -92,13 +92,13 @@ public class ActivityQualificationController {
     /**
      * 更新状态
      *
-     * @param activityQualificationUpdateStatusDTO
+     * @param ids
      */
-//    @PutMapping("/updateQualificationStatus")
-//    @PreAuthorize("hasAuthority('activity:qualification:edit')")
-//    public void updateQualificationStatus(@RequestBody ActivityQualificationUpdateStatusDTO activityQualificationUpdateStatusDTO) {
-//        activityQualificationService.updateQualificationStatus(activityQualificationUpdateStatusDTO);
-//    }
+    @PutMapping("/delete")
+    @PreAuthorize("hasAuthority('activity:qualification:remove')")
+    public void delete(@RequestBody String ids) {
+        activityQualificationService.delete(ids);
+    }
 
 
 }

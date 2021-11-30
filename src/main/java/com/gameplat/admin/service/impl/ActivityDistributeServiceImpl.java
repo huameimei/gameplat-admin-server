@@ -1,12 +1,9 @@
 package com.gameplat.admin.service.impl;
 
-import cn.hutool.core.util.NumberUtil;
-import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.gameplat.admin.constant.MemberServiceKeyConstant;
 import com.gameplat.admin.convert.ActivityDistributeConvert;
 import com.gameplat.admin.mapper.ActivityDistributeMapper;
 import com.gameplat.admin.model.domain.ActivityDistribute;
@@ -25,10 +22,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.text.MessageFormat;
-import java.util.*;
-import java.util.concurrent.TimeUnit;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 活动分发类
@@ -154,23 +149,15 @@ public class ActivityDistributeServiceImpl
 //                    Integer status = null;
 //                    String remark = null;
 //                    Double amount = null;
-            // 获取用户余额
-//                    Double userbalance = memberInfoService.getUserbalance(activityDistribute.getUsername());
-
-//                    JSONObject jsonObject = (JSONObject) JSONObject.toJSON(ajaxResult);
-//                    // 获取用户余额异常，释放资金锁，并进入下一次循环
-//                    if (null == jsonObject || !"200".equals(jsonObject.getString("code"))) {
-//                        throw new ServiceException("获取平台钱包异常");
-//                    }
-//                    JSONObject object = jsonObject.getJSONObject("data");
-//                    amount = object.getDouble("balance");
+////                    获取用户余额
+//                    BigDecimal userbalance = memberInfoService.getUserbalance(activityDistribute.getUsername());
+//                    amount = userbalance.doubleValue();
 //                    // 账变
 //                    Map<String, String> map1 = new HashMap<>();
 //                    map1.put("type", "1");
 //                    map1.put("money", String.valueOf(activityDistribute.getDiscountsMoney()));
 //                    map1.put("id", activityDistribute.getUserId().toString());
-//                    map1.put("dbSuffix", suffix);
-//                    map1.put("nonce", IdWorker.getInstance().nextSId());
+////                    map1.put("nonce", IdWorker.getInstance().nextSId());
 //                    map1.put("kind", String.valueOf(14));
 //                    AjaxResult addMoenyAjaxResult = sysUserFeignService.addMoeny(map1);
 //                    JSONObject object1 = (JSONObject) JSONObject.toJSON(addMoenyAjaxResult);
@@ -261,7 +248,7 @@ public class ActivityDistributeServiceImpl
 //
 //                }
 //            } else if (getWay == 2) {
-            //如果领取方式是2,则将活动奖励记录插入福利中心,会员需自己点击领取
+////                如果领取方式是2, 则将活动奖励记录插入福利中心, 会员需自己点击领取
 //                wealReword.setStatus(1);
 //                userActivityFeignService.insertWealReword(wealReword);
 //

@@ -4,10 +4,8 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.gameplat.admin.enums.LanguageEnum;
-import com.gameplat.admin.model.domain.Financial;
 import com.gameplat.admin.model.domain.MemberWeal;
 import com.gameplat.admin.model.domain.MemberWealDetail;
-import com.gameplat.admin.model.domain.ValidWithdraw;
 import com.gameplat.admin.model.dto.*;
 import com.gameplat.admin.model.vo.MemberGrowthConfigVO;
 import com.gameplat.admin.model.vo.MemberWealDetailVO;
@@ -144,14 +142,6 @@ public class OpenMemberWealController {
         MemberWealDetailDTO wealDetailDTO = new MemberWealDetailDTO();
         wealDetailDTO.setWealId(dto.getId());
         return memberWealDetailService.findWealDetailList(page, wealDetailDTO);
-    }
-
-
-    @Autowired
-    FinancialService financialService;
-    @PostMapping("/test")
-    public int saveValidWithdraw(@RequestBody Financial financial){
-        return financialService.insert(financial);
     }
 
 }

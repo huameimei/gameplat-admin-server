@@ -3,6 +3,7 @@ package com.gameplat.admin.model.vo;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Date;
 
 @Data
@@ -50,8 +51,8 @@ public class MemberInfoVO implements Serializable {
   /** 邀请码 */
   private String invitationCode;
 
-  /** 账户余额 单位分 */
-  private Long balance;
+  /** 账户余额*/
+  private BigDecimal balance;
 
   private String rebate;
 

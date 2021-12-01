@@ -30,7 +30,7 @@ public class ValidWithdraw implements Serializable {
   /**
    * 对应充值记录ID
    */
-  private Long rechId;
+  private String rechId;
   private BigDecimal rechMoney;
   private BigDecimal discountMoney;
   /**
@@ -51,7 +51,7 @@ public class ValidWithdraw implements Serializable {
   private Integer type;
   @TableField(fill = FieldFill.INSERT)
   private Date createTime;
-  @TableField(fill = FieldFill.INSERT)
+  @TableField(fill = FieldFill.UPDATE)
   private Date updateTime;
 
   private String remark;

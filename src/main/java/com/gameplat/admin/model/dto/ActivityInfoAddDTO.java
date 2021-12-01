@@ -22,6 +22,9 @@ public class ActivityInfoAddDTO implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    @ApiModelProperty(value = "编号")
+    private Integer id;
+
     @ApiModelProperty(value = "类型")
     private Integer activityType;
 

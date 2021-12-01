@@ -53,7 +53,7 @@ public class ActivityLobbyController {
      */
     @PostMapping("/add")
     @PreAuthorize("hasAuthority('activity:lobby:add')")
-    public void add(@RequestBody @Validated ActivityLobbyAddDTO activityLobbyAddDTO) {
+    public void add(@RequestBody ActivityLobbyAddDTO activityLobbyAddDTO) {
         if (StringUtils.isNull(activityLobbyAddDTO.getStatisDate())) {
             throw new ServiceException("请选择统计日期");
         }

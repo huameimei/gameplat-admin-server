@@ -1,5 +1,7 @@
 package com.gameplat.admin.model.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.gameplat.common.util.DateUtil;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -26,10 +28,12 @@ public class ActivityLobbyAddDTO implements Serializable {
 
     @NotBlank(message = "开始时间不能为空")
     @ApiModelProperty(value = "开始时间")
+    @JsonFormat(pattern = DateUtil.YYYY_MM_DD_HH_MM_SS)
     private Date startTime;
 
     @NotBlank(message = "结束时间不能为空")
     @ApiModelProperty(value = "结束时间")
+    @JsonFormat(pattern = DateUtil.YYYY_MM_DD_HH_MM_SS)
     private Date endTime;
 
     @ApiModelProperty(value = "活动大类（1 活动大厅，2 红包雨，3 转盘）")

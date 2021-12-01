@@ -63,8 +63,7 @@ public class ActivityLobbyServiceImpl extends ServiceImpl<ActivityLobbyMapper, A
     public IPage<ActivityLobbyVO> findActivityLobbyList(PageDTO<ActivityLobby> page, ActivityLobbyDTO activityLobbyDTO) {
         LambdaQueryChainWrapper<ActivityLobby> queryWrapper = this.lambdaQuery();
         queryWrapper.like(StringUtils.isNotBlank(activityLobbyDTO.getTitle()), ActivityLobby::getTitle, activityLobbyDTO.getTitle())
-                .eq(activityLobbyDTO.getStatus() != null && activityLobbyDTO.getStatus() != 0
-                        , ActivityLobby::getStatus, activityLobbyDTO.getStatus());
+                .eq(activityLobbyDTO.getStatus() != null, ActivityLobby::getStatus, activityLobbyDTO.getStatus());
 
         IPage<ActivityLobbyVO> activityLobbyVOIPage = queryWrapper.page(page).convert(activityLobbyConvert::toVo);
         if (CollectionUtils.isNotEmpty(activityLobbyVOIPage.getRecords())) {
@@ -215,9 +214,6 @@ public class ActivityLobbyServiceImpl extends ServiceImpl<ActivityLobbyMapper, A
         int saveLobbyDiscount = activityLobbyDiscountService.saveBatch(activityLobbyDiscounts);
         if (saveLobbyDiscount < 1) {
             throw new ServiceException("添加优惠失败！");
-        }
-        if (!this.save(activityLobby)) {
-            throw new ServiceException("保存活动大厅异常");
         }
     }
 

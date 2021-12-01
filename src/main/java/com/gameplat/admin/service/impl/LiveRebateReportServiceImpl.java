@@ -2,7 +2,6 @@ package com.gameplat.admin.service.impl;
 
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.NumberUtil;
-import cn.hutool.json.JSON;
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -21,7 +20,6 @@ import com.gameplat.admin.model.domain.LiveRebateConfig;
 import com.gameplat.admin.model.domain.LiveRebateDetail;
 import com.gameplat.admin.model.domain.LiveRebatePeriod;
 import com.gameplat.admin.model.domain.LiveRebateReport;
-import com.gameplat.admin.model.domain.MemberBill;
 import com.gameplat.admin.model.dto.LiveRebateReportQueryDTO;
 import com.gameplat.admin.model.vo.LiveMemberDayReportVO;
 import com.gameplat.admin.model.vo.PageDtoVO;
@@ -35,7 +33,6 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -46,15 +43,17 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)
 public class LiveRebateReportServiceImpl extends
     ServiceImpl<LiveRebateReportMapper, LiveRebateReport> implements LiveRebateReportService {
 

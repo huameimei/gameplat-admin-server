@@ -25,7 +25,7 @@ import java.util.List;
 /**
  * 用户活动大厅
  *
- * @author admin
+ * @author kevin
  */
 @Api(tags = "活动大厅管理")
 @Slf4j

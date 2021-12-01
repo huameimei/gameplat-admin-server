@@ -30,7 +30,7 @@ public enum DictTypeEnum {
   SYSTEM_CONFIG("SYSTEM_CONFIG", "系统配置"),
   /** 提款限额配置 */
   USER_WITHDRAW_LIMIT("USER_WITHDRAW_LIMIT", "提款限额配置"),
-  /** 提款限额配置 */
+  /** 虚拟货币 */
   RECH_VIRTUAL("RECH_VIRTUAL", "虚拟货币");
 
   private final String key;

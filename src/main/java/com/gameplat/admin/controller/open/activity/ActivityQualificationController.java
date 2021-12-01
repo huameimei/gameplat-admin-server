@@ -3,17 +3,18 @@ package com.gameplat.admin.controller.open.activity;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
-import com.gameplat.admin.model.domain.ActivityInfo;
 import com.gameplat.admin.model.domain.ActivityQualification;
-import com.gameplat.admin.model.dto.*;
-import com.gameplat.admin.model.vo.ActivityInfoVO;
+import com.gameplat.admin.model.dto.ActivityQualificationAddDTO;
+import com.gameplat.admin.model.dto.ActivityQualificationDTO;
+import com.gameplat.admin.model.dto.ActivityQualificationUpdateDTO;
+import com.gameplat.admin.model.dto.ActivityQualificationUpdateStatusDTO;
 import com.gameplat.admin.model.vo.ActivityQualificationVO;
 import com.gameplat.admin.service.ActivityQualificationService;
 import com.gameplat.common.exception.ServiceException;
-import com.gameplat.common.util.StringUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -61,6 +62,42 @@ public class ActivityQualificationController {
             throw new ServiceException("id不能为空");
         }
         activityQualificationService.update(activityQualificationUpdateDTO);
+    }
+
+    /**
+     * 更新状态
+     *
+     * @param activityQualificationUpdateStatusDTO
+     */
+    @PutMapping("/updateStatus")
+    @PreAuthorize("hasAuthority('activity:qualification:edit')")
+    public void updateStatus(@RequestBody ActivityQualificationUpdateStatusDTO activityQualificationUpdateStatusDTO) {
+        if (CollectionUtils.isEmpty(activityQualificationUpdateStatusDTO.getQualificationIds())) {
+            throw new ServiceException("qualificationIds不能为空");
+        }
+        activityQualificationService.updateStatus(activityQualificationUpdateStatusDTO);
+    }
+
+    /**
+     * 更新状态
+     *
+     * @param activityQualificationUpdateStatusDTO
+     */
+    @PutMapping("/updateQualificationStatus")
+    @PreAuthorize("hasAuthority('activity:qualification:edit')")
+    public void updateQualificationStatus(@RequestBody ActivityQualificationUpdateStatusDTO activityQualificationUpdateStatusDTO) {
+        activityQualificationService.updateQualificationStatus(activityQualificationUpdateStatusDTO);
+    }
+
+    /**
+     * 更新状态
+     *
+     * @param ids
+     */
+    @DeleteMapping("/delete")
+    @PreAuthorize("hasAuthority('activity:qualification:remove')")
+    public void delete(@RequestBody String ids) {
+        activityQualificationService.delete(ids);
     }
 
 

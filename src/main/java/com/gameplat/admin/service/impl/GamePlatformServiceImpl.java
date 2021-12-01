@@ -14,9 +14,12 @@ import com.gameplat.common.exception.ServiceException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)
 public class GamePlatformServiceImpl extends ServiceImpl<GamePlatformMapper, GamePlatform>
     implements GamePlatformService {
 

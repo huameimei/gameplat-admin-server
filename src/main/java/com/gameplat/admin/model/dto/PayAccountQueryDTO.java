@@ -13,7 +13,7 @@ public class PayAccountQueryDTO implements Serializable {
 
   private String payType;
 
-  private List<String> userLevelList;
+  private List<String> memberLevelList;
 
   private Integer status;
 }

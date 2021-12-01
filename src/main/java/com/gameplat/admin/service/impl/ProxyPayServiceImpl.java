@@ -6,12 +6,9 @@ import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.gameplat.admin.enums.AllowOthersOperateEnums;
 import com.gameplat.admin.enums.CashEnum;
-import com.gameplat.admin.enums.LimitEnums;
 import com.gameplat.admin.enums.ProxyPayStatusEnum;
-import com.gameplat.admin.enums.SwitchStatusEnum;
 import com.gameplat.admin.enums.WithdrawStatus;
 import com.gameplat.admin.feign.PaymentCenterFeign;
-import com.gameplat.admin.mapper.MemberWithdrawMapper;
 import com.gameplat.admin.model.bean.AdminLimitInfo;
 import com.gameplat.admin.model.bean.NameValuePair;
 import com.gameplat.admin.model.bean.ProxyCallbackContext;
@@ -26,9 +23,9 @@ import com.gameplat.admin.model.domain.MemberWithdrawHistory;
 import com.gameplat.admin.model.domain.PpInterface;
 import com.gameplat.admin.model.domain.PpMerchant;
 import com.gameplat.admin.model.domain.SysUser;
-import com.gameplat.admin.model.domain.limit.MemberRechargeLimit;
+import com.gameplat.common.enums.LimitEnums;
+import com.gameplat.common.model.bean.limit.MemberRechargeLimit;
 import com.gameplat.admin.service.LimitInfoService;
-import com.gameplat.admin.service.MemberBalanceService;
 import com.gameplat.admin.service.MemberInfoService;
 import com.gameplat.admin.service.MemberService;
 import com.gameplat.admin.service.MemberWithdrawHistoryService;
@@ -38,6 +35,7 @@ import com.gameplat.admin.service.PpMerchantService;
 import com.gameplat.admin.service.ProxyPayService;
 import com.gameplat.admin.service.SysUserService;
 import com.gameplat.admin.util.MoneyUtils;
+import com.gameplat.common.enums.SwitchStatusEnum;
 import com.gameplat.common.exception.ServiceException;
 import com.gameplat.security.context.UserCredential;
 import com.gameplat.common.enums.UserTypes;
@@ -280,7 +278,7 @@ public class ProxyPayServiceImpl implements ProxyPayService {
       MemberRechargeLimit limitInfo =
           Optional.ofNullable(
                   limitInfoService.getLimitInfo(
-                      LimitEnums.MEMBER_RECHARGE_LIMIT.getName(), MemberRechargeLimit.class))
+                      LimitEnums.MEMBER_RECHARGE_LIMIT, MemberRechargeLimit.class))
               .orElseThrow(() -> new ServiceException("加载出入款配置信息失败，请联系客服！"));
       boolean toCheck =
           (!Objects.equals(

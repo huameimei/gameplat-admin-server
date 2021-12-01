@@ -131,4 +131,6 @@ public class Member extends Model<Member> {
 
   @TableField(exist = false)
   private Integer superAgentLevel;
+
+  private Integer tableIndex;
 }

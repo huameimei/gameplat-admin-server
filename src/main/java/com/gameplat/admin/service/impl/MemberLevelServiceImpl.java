@@ -2,6 +2,8 @@ package com.gameplat.admin.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.map.MapUtil;
+import com.alicp.jetcache.anno.CacheInvalidate;
+import com.alicp.jetcache.anno.Cached;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.convert.MemberLevelConvert;
 import com.gameplat.admin.enums.MemberLevelEnums;
@@ -15,6 +17,7 @@ import com.gameplat.admin.model.dto.MemberLevelEditDTO;
 import com.gameplat.admin.model.vo.MemberLevelVO;
 import com.gameplat.admin.service.MemberLevelService;
 import com.gameplat.admin.service.MemberService;
+import com.gameplat.admin.constant.CachedKeys;
 import com.gameplat.common.exception.ServiceException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,11 +41,13 @@ public class MemberLevelServiceImpl extends ServiceImpl<MemberLevelMapper, Membe
   @Autowired private MemberLevelMapper memberLevelMapper;
 
   @Override
+  @Cached(name = CachedKeys.MEMBER_LEVEL_CACHE, key = "'all'", expire = 3600)
   public List<MemberLevelVO> getList() {
     return this.list().stream().map(memberLevelConvert::toVo).collect(Collectors.toList());
   }
 
   @Override
+  @CacheInvalidate(name = CachedKeys.MEMBER_LEVEL_CACHE, key = "'all'")
   public void add(MemberLevelAddDTO dto) {
     // 检查层级名称和值是否存在
     if (this.lambdaQuery().eq(MemberLevel::getLevelName, dto.getLevelName()).count() > 0) {
@@ -64,11 +69,13 @@ public class MemberLevelServiceImpl extends ServiceImpl<MemberLevelMapper, Membe
   }
 
   @Override
+  @CacheInvalidate(name = CachedKeys.MEMBER_LEVEL_CACHE, key = "'all'")
   public void update(MemberLevelEditDTO dto) {
     this.updateById(memberLevelConvert.toEntity(dto));
   }
 
   @Override
+  @CacheInvalidate(name = CachedKeys.MEMBER_LEVEL_CACHE, key = "'all'")
   public void delete(Long id) {
     MemberLevel level =
         Optional.ofNullable(this.getById(id)).orElseThrow(() -> new ServiceException("层级不存在!"));
@@ -85,6 +92,7 @@ public class MemberLevelServiceImpl extends ServiceImpl<MemberLevelMapper, Membe
   }
 
   @Override
+  @CacheInvalidate(name = CachedKeys.MEMBER_LEVEL_CACHE, key = "'all'")
   public void lock(Long id) {
     this.lambdaUpdate()
         .eq(MemberLevel::getId, id)
@@ -93,6 +101,7 @@ public class MemberLevelServiceImpl extends ServiceImpl<MemberLevelMapper, Membe
   }
 
   @Override
+  @CacheInvalidate(name = CachedKeys.MEMBER_LEVEL_CACHE, key = "'all'")
   public void unlock(Long id) {
     this.lambdaUpdate()
         .eq(MemberLevel::getId, id)
@@ -101,6 +110,7 @@ public class MemberLevelServiceImpl extends ServiceImpl<MemberLevelMapper, Membe
   }
 
   @Override
+  @CacheInvalidate(name = CachedKeys.MEMBER_LEVEL_CACHE, key = "'all'")
   public void enable(Long id) {
     this.lambdaUpdate()
         .eq(MemberLevel::getId, id)
@@ -109,6 +119,7 @@ public class MemberLevelServiceImpl extends ServiceImpl<MemberLevelMapper, Membe
   }
 
   @Override
+  @CacheInvalidate(name = CachedKeys.MEMBER_LEVEL_CACHE, key = "'all'")
   public void disable(Long id) {
     this.lambdaUpdate()
         .eq(MemberLevel::getId, id)
@@ -117,6 +128,7 @@ public class MemberLevelServiceImpl extends ServiceImpl<MemberLevelMapper, Membe
   }
 
   @Override
+  @CacheInvalidate(name = CachedKeys.MEMBER_LEVEL_CACHE, key = "'all'")
   public void enableWithdraw(Long id) {
     this.lambdaUpdate()
         .eq(MemberLevel::getId, id)
@@ -125,6 +137,7 @@ public class MemberLevelServiceImpl extends ServiceImpl<MemberLevelMapper, Membe
   }
 
   @Override
+  @CacheInvalidate(name = CachedKeys.MEMBER_LEVEL_CACHE, key = "'all'")
   public void disableWithdraw(Long id) {
     this.lambdaUpdate()
         .eq(MemberLevel::getId, id)

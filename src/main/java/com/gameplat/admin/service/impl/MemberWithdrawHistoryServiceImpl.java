@@ -10,7 +10,7 @@ import com.gameplat.admin.convert.MemberWithdrawHistoryConvert;
 import com.gameplat.admin.enums.OprateMode;
 import com.gameplat.admin.mapper.MemberWithdrawHistoryMapper;
 import com.gameplat.admin.model.domain.MemberWithdrawHistory;
-import com.gameplat.admin.model.dto.UserWithdrawHistoryQueryDTO;
+import com.gameplat.admin.model.dto.MemberWithdrawHistoryQueryDTO;
 import com.gameplat.admin.model.vo.MemberWithdrawHistorySummaryVO;
 import com.gameplat.admin.model.vo.MemberWithdrawHistoryVO;
 import com.gameplat.admin.service.MemberWithdrawHistoryService;
@@ -33,7 +33,7 @@ public class MemberWithdrawHistoryServiceImpl extends
 
   @Override
   public IPage<MemberWithdrawHistoryVO> findPage(Page<MemberWithdrawHistory> page,
-      UserWithdrawHistoryQueryDTO dto) {
+      MemberWithdrawHistoryQueryDTO dto) {
     LambdaQueryWrapper<MemberWithdrawHistory> query = buildSql(dto);
     query.orderBy(ObjectUtils.isNotEmpty(dto.getOrder()),
         ObjectUtils.isEmpty(dto.getOrder()) ? false : dto.getOrder().equals("ASC"),
@@ -43,12 +43,13 @@ public class MemberWithdrawHistoryServiceImpl extends
   }
 
   @Override
-  public MemberWithdrawHistorySummaryVO findSumMemberWithdrawHistory(UserWithdrawHistoryQueryDTO dto) {
+  public MemberWithdrawHistorySummaryVO findSumMemberWithdrawHistory(
+      MemberWithdrawHistoryQueryDTO dto) {
     LambdaQueryWrapper<MemberWithdrawHistory> query = buildSql(dto);
     return memberWithdrawHistoryMapper.summaryMemberWithdrawHistory(query);
   }
 
-  private LambdaQueryWrapper buildSql(UserWithdrawHistoryQueryDTO dto) {
+  private LambdaQueryWrapper buildSql(MemberWithdrawHistoryQueryDTO dto) {
     LambdaQueryWrapper<MemberWithdrawHistory> query = Wrappers.lambdaQuery();
     query.in(ObjectUtils.isNotNull(dto.getBankNameList()), MemberWithdrawHistory::getBankName,
         dto.getBankNameList())

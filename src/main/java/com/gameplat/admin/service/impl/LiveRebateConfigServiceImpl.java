@@ -16,9 +16,12 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)
 public class LiveRebateConfigServiceImpl
     extends ServiceImpl<LiveRebateConfigMapper, LiveRebateConfig>
     implements LiveRebateConfigService {

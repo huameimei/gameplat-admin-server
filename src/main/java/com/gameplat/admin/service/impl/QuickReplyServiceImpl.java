@@ -12,6 +12,7 @@ import com.gameplat.admin.model.dto.QuickReplyDTO;
 import com.gameplat.admin.model.vo.QuickReplyVO;
 import com.gameplat.admin.service.QuickReplyService;
 import com.gameplat.common.exception.ServiceException;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -76,5 +77,14 @@ public class QuickReplyServiceImpl extends ServiceImpl<QuickReplyMapper, QuickRe
     if (!this.removeById(id)) {
       throw new ServiceException("批量删除失败!");
     }
+  }
+
+  @Override
+  public List<QuickReply> getByType(String messageType) {
+    if (!ObjectUtils.isNotEmpty(messageType)) {
+      throw new ServiceException("快速回复类型不能为空!");
+    }
+    return this.lambdaQuery()
+        .eq(QuickReply::getMessageType, messageType).list();
   }
 }

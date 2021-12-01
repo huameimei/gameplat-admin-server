@@ -13,10 +13,8 @@ import com.gameplat.admin.constant.TrueFalse;
 import com.gameplat.admin.convert.RechargeOrderConvert;
 import com.gameplat.admin.enums.AllowOthersOperateEnums;
 import com.gameplat.admin.enums.BlacklistConstant.BizBlacklistType;
-import com.gameplat.admin.enums.LimitEnums;
 import com.gameplat.admin.enums.MemberEnums.Type;
 import com.gameplat.admin.enums.RechargeStatus;
-import com.gameplat.admin.enums.SwitchStatusEnum;
 import com.gameplat.admin.enums.UserStates;
 import com.gameplat.admin.mapper.RechargeOrderHistoryMapper;
 import com.gameplat.admin.mapper.RechargeOrderMapper;
@@ -26,6 +24,7 @@ import com.gameplat.admin.model.bean.PageExt;
 import com.gameplat.admin.model.bean.ManualRechargeOrderBo;
 import com.gameplat.admin.model.domain.DiscountType;
 import com.gameplat.admin.model.domain.Member;
+import com.gameplat.admin.model.domain.MemberBill;
 import com.gameplat.admin.model.domain.MemberInfo;
 import com.gameplat.admin.model.domain.PayAccount;
 import com.gameplat.admin.model.domain.RechargeOrder;
@@ -34,13 +33,14 @@ import com.gameplat.admin.model.domain.SysDictData;
 import com.gameplat.admin.model.domain.SysUser;
 import com.gameplat.admin.model.domain.TpMerchant;
 import com.gameplat.admin.model.domain.TpPayChannel;
-import com.gameplat.admin.model.domain.limit.MemberRechargeLimit;
+import com.gameplat.common.model.bean.limit.MemberRechargeLimit;
 import com.gameplat.admin.model.dto.RechargeOrderQueryDTO;
 import com.gameplat.admin.model.vo.RechargeOrderVO;
 import com.gameplat.admin.model.vo.SummaryVO;
 import com.gameplat.admin.service.DiscountTypeService;
 import com.gameplat.admin.service.LimitInfoService;
 import com.gameplat.admin.service.MemberBalanceService;
+import com.gameplat.admin.service.MemberBillService;
 import com.gameplat.admin.service.MemberInfoService;
 import com.gameplat.admin.service.MemberService;
 import com.gameplat.admin.service.PayAccountService;
@@ -49,7 +49,9 @@ import com.gameplat.admin.service.SysDictDataService;
 import com.gameplat.admin.service.SysUserService;
 import com.gameplat.admin.service.TpMerchantService;
 import com.gameplat.admin.service.TpPayChannelService;
+import com.gameplat.admin.service.ValidWithdrawService;
 import com.gameplat.admin.util.MoneyUtils;
+import com.gameplat.common.enums.LimitEnums;
 import com.gameplat.common.exception.ServiceException;
 import com.gameplat.security.SecurityUserHolder;
 import com.gameplat.security.context.UserCredential;
@@ -67,6 +69,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
+import com.gameplat.common.enums.SwitchStatusEnum;
 
 @Slf4j
 @Service
@@ -115,6 +118,12 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
 
   @Autowired
   private DiscountTypeService discountTypeService;
+
+  @Autowired
+  private MemberBillService memberBillService;
+
+  @Autowired
+  private ValidWithdrawService validWithdrawService;
 
   @Override
   public PageExt<RechargeOrderVO, SummaryVO> findPage(Page<RechargeOrder> page, RechargeOrderQueryDTO dto) {
@@ -255,13 +264,13 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
 //    // 更新充提报表
 //    updateRWReport(rechargeOrder, userInfo, userExtInfo);
 //
-//    if (rechargeOrder.getDmlFlag() == TrueFalse.TRUE.getValue()) {
-//      // 计算打码量
-//      updateDml(rechargeOrder, userExtInfo);
-//    }
+    if (rechargeOrder.getDmlFlag() == TrueFalse.TRUE.getValue()) {
+      // 计算打码量
+      validWithdrawService.addRechargeOrder(rechargeOrder);
+    }
 //
 //    // 添加会员账变
-//    addUserBill(rechargeOrder, userInfo, userExtInfo, operator);
+    addUserBill(rechargeOrder, member, memberInfo.getBalance(), userCredential.getUsername());
 //
     // 更新充值金额累积
     updateRechargeMoney(rechargeOrder, member.getUserType());
@@ -274,7 +283,7 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
 //    aj.doWeekendRedPacketJob(rechargeOrder.getAmount(), userInfo);
 //
 //    //人工入款超过阈值告警
-//    if(rechargeOrder.getMode() == RechargeMode.MANUAL.getValue() && userInfo.getType().equalsIgnoreCase(SysUserTypes.HY.getCode())){
+//    if(rechargeOrder.getMode() == RechargeMode.MANUAL.getValue() && member.getUserType().equalsIgnoreCase(UserTypes.MEMBER.value())){
 //      Config config = configService.getByNameAndKey("system_config","manual_recharge_warnlimit");
 //      if(config !=null) {
 //        Double manualRechargeWarnLimit = Double.valueOf(StringUtils.isNotEmpty(config.getConfigValue()) ? config.getConfigValue() : "0");
@@ -381,7 +390,7 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
       throws ServiceException {
     boolean toCheck = (!Objects.equals(AllowOthersOperateEnums.YES.getValue(),
         limitInfoService
-            .getLimitInfo(LimitEnums.MEMBER_RECHARGE_LIMIT.getName(), MemberRechargeLimit.class)
+            .getLimitInfo(LimitEnums.MEMBER_RECHARGE_LIMIT, MemberRechargeLimit.class)
             .getIsHandledAllowOthersOperate())
         && !userCredential.isSuperAdmin());
     if (toCheck) {
@@ -460,7 +469,7 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
     }
     rechargeOrder.setDiscountAmount(BigDecimal.ZERO);
     rechargeOrder.setDiscountDml(BigDecimal.ZERO);
-    rechargeOrder.setDiscountRechargeFlag(null);
+    rechargeOrder.setDiscountRechargeFlag(0);
     rechargeOrder.setDiscountType(null);
     rechargeOrder.setTotalAmount(rechargeOrder.getAmount());
   }
@@ -703,6 +712,49 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
         .in(ObjectUtils.isNotNull(dto.getMemberLevelList()),RechargeOrder::getMemberLevel,dto.getMemberLevelList());
     summaryVO.setAllUnhandledSum(rechargeOrderMapper.summaryRechargeOrder(queryUnHandle));
     return summaryVO;
+  }
+
+  private void addUserBill(RechargeOrder rechargeOrder, Member member, BigDecimal balance,
+      String operator) throws Exception{
+    StringBuilder sb = new StringBuilder();
+    java.text.DecimalFormat df = new java.text.DecimalFormat("0.00");
+    sb.append("订单编号 ").append(rechargeOrder.getOrderNo()).append("，充值金额 ")
+        .append(rechargeOrder.getAmount())
+        .append("，优惠金额 ").append(rechargeOrder.getDiscountAmount()).append("，余额 ")
+        .append(df.format(balance.add(rechargeOrder.getTotalAmount())));
+    if (StringUtils.isNotEmpty(rechargeOrder.getPayType())) {
+      sb.append("，支付类型 ").append(rechargeOrder.getPayTypeName());
+    }
+    if (rechargeOrder.getPayAccountId() != null) {
+      sb.append("，收款账号 ").append(rechargeOrder.getPayAccountAccount());
+      if (StringUtils.isNotEmpty(rechargeOrder.getPayAccountOwner())){
+        sb.append("，收款人 ")
+            .append(rechargeOrder.getPayAccountOwner());
+      }
+      if (StringUtils.isNotEmpty(rechargeOrder.getPayAccountBankName())) {
+        sb.append("，收款银行 ").append(rechargeOrder.getPayAccountBankName());
+      }
+    }
+    sb.append("。");
+    if (StringUtils.isNotEmpty(rechargeOrder.getTpInterfaceCode())) {
+      sb.append("第三方接口 ").append(rechargeOrder.getTpInterfaceName());
+    }
+    add(member, balance, rechargeOrder, sb.toString(),
+        operator,"");
+  }
+
+  public void add(Member member, BigDecimal balance, RechargeOrder rechargeOrder,String content,String operator,String... remark) throws Exception{
+    MemberBill bill = new MemberBill();
+    bill.setBalance(balance);
+    bill.setOrderNo(rechargeOrder.getOrderNo());
+    bill.setTranType(RechargeMode.getTranType(rechargeOrder.getMode()));
+    bill.setAmount(rechargeOrder.getAmount());
+    bill.setContent(content);
+    bill.setOperator(operator);
+    if (remark != null && remark.length > 0 && StringUtils.isNotEmpty(remark[0])) {
+      bill.setRemark(remark[0]);
+    }
+    memberBillService.save(member,bill);
   }
 
 }

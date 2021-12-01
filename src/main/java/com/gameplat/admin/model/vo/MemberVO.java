@@ -45,6 +45,8 @@ public class MemberVO implements Serializable {
 
   private String qq;
 
+  private String withdrawFlag;
+
   /** 邀请码 */
   private String invitationCode;
 

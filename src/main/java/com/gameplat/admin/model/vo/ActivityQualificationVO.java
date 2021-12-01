@@ -57,4 +57,19 @@ public class ActivityQualificationVO {
     @ApiModelProperty(value = "统计项目（1 累计充值金额，2 累计充值天数，3 连续充值天数，4 单日首充金额，5 首充金额）")
     private Integer statisItem;
 
+    @ApiModelProperty(value = "提现打码量")
+    private Integer withdrawDml;
+
+    @ApiModelProperty(value = "奖励详情")
+    private String awardDetail;
+
+    @ApiModelProperty(value = "领取方式（1 直接发放，2 福利中心）")
+    private Integer getWay;
+
+    @ApiModelProperty(value = "统计开始时间")
+    private Date statisStartTime;
+
+    @ApiModelProperty(value = "统计结束时间")
+    private Date statisEndTime;
+
 }

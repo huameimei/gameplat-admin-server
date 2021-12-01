@@ -11,4 +11,11 @@ public interface MemberInfoService extends IService<MemberInfo> {
 
   void updateMemberRech(MemberInfo memberInfo, BigDecimal momey);
 
+  /**
+   * 更新会员余额
+   * @param username
+   * @param discountsMoney
+   * @return
+   */
+  boolean updateMemberBalance(String username, BigDecimal discountsMoney);
 }

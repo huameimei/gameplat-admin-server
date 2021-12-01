@@ -15,7 +15,7 @@ public class TpPayChannelAddDTO implements Serializable {
 
   private String tpPayType;
 
-  private String userLevels;
+  private String memberLevels;
 
   private String remarks;
 

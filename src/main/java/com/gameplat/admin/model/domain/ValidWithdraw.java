@@ -1,71 +1,80 @@
 package com.gameplat.admin.model.domain;
 
-import com.baomidou.mybatisplus.annotation.*;
-import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
-
+import com.baomidou.mybatisplus.annotation.FieldFill;
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
+import lombok.Data;
 
 /**
- * @Description : 打码量表
- * @Author : lily
- * @Date : 2021/11/27
+ * 提现限制说明 每笔充值都要对应个打码量,只有会员有效打码量达到才可以提现 条件：首先必须先达到最近一笔的打码量,在次总打码量必须达到,两个条件必须满足
  */
 @Data
 @TableName("valid_withdraw")
 public class ValidWithdraw implements Serializable {
 
-    @ApiModelProperty("主键")
-    @TableId(type = IdType.AUTO)
-    private Long id;
+  @TableId(type = IdType.AUTO)
+  private Long id;
+  /**
+   * 会员ID
+   */
+  private Long memberId;
+  /**
+   * 会员账号
+   */
+  private String account;
+  /**
+   * 对应充值记录ID
+   */
+  private Long rechId;
+  private BigDecimal rechMoney;
+  private BigDecimal discountMoney;
+  /**
+   * 常态打码量
+   */
+  private BigDecimal mormDml;
+  /**
+   * 优惠打码量
+   */
+  private BigDecimal discountDml;
+  private BigDecimal cpDml;
+  private BigDecimal sportsDml;
+  private BigDecimal videoDml;
+  private Integer status;
+  /**
+   * 0表示最新一笔充值1表示其它
+   */
+  private Integer type;
+  @TableField(fill = FieldFill.INSERT)
+  private Date createTime;
+  @TableField(fill = FieldFill.INSERT)
+  private Date updateTime;
 
-    @ApiModelProperty(value = "用户id")
-    private Long memberId;
+  private String remark;
 
-    @ApiModelProperty(value = "会员账号")
-    private String account;
-
-    @ApiModelProperty(value = "充值记录ID(来源id)")
-    private String rechId;
-
-    @ApiModelProperty(value = "充值金额")
-    private BigDecimal rechMoney;
-
-    @ApiModelProperty(value = "优惠金额")
-    private BigDecimal discountMoney;
-
-    @ApiModelProperty(value = "类型： 0表示最新一笔充值1表示其它")
-    private Integer type;
-
-    @ApiModelProperty(value = "创建时间")
-    @TableField(fill = FieldFill.INSERT)
-    private Date createTime;
-
-    @ApiModelProperty(value = "修改时间")
-    @TableField(fill = FieldFill.UPDATE)
-    private Date updateTime;
-
-    @ApiModelProperty(value = "常态打码量")
-    private BigDecimal mormDml;
-
-    @ApiModelProperty(value = "优惠打码量")
-    private BigDecimal discountDml;
-
-    @ApiModelProperty(value = "彩票打码量")
-    private BigDecimal cpDml;
-
-    @ApiModelProperty(value = "体育打码量")
-    private BigDecimal sportsDml;
-
-    @ApiModelProperty(value = "真人打码量")
-    private BigDecimal videoDml;
-
-    @ApiModelProperty(value = "状态: 0正常,1表示已出款")
-    private Integer status;
-
-    @ApiModelProperty(value = "备注")
-    private String remark;
-
+  @Override
+  public String toString() {
+    return "ValidWithdraw{" +
+        "id=" + id +
+        ", memberId=" + memberId +
+        ", account='" + account + '\'' +
+        ", rechId=" + rechId +
+        ", rechMoney=" + rechMoney +
+        ", discountMoney=" + discountMoney +
+        ", mormDml=" + mormDml +
+        ", discountDml=" + discountDml +
+        ", cpDml=" + cpDml +
+        ", sportsDml=" + sportsDml +
+        ", videoDml=" + videoDml +
+        ", status=" + status +
+        ", type=" + type +
+        ", createTime=" + createTime +
+        ", updateTime=" + updateTime +
+        ", remark='" + remark + '\'' +
+        '}';
+  }
 }

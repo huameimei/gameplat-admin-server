@@ -49,7 +49,7 @@ public class LiveRebateDataController {
   }
 
   @GetMapping(value = "queryReport")
-  public List<LiveReportVO> queryLiveReport(LiveRebateDataQueryDTO dto) throws Exception {
+  public List<LiveReportVO> queryLiveReport(LiveRebateDataQueryDTO dto){
     return liveRebateDataService.queryLiveReport(dto);
   }
 

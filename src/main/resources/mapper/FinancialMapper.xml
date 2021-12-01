@@ -41,7 +41,7 @@
 
     <insert id="saveFinancial">
         insert into financial
-        (flow_no, username, user_id, source_type, source_id,'state', mode,
+        (flow_no, username, user_id, source_type, source_id,state, mode,
         currency_name,currency_type, amount, dis_amount, bankNo, bankName,
         <if test="amountCny != null">amount_cny,</if>
         remark,ip_address, is_less,

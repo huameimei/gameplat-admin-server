@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.gameplat.admin.mapper.ValidWithdrawMappper">
+<mapper namespace="com.gameplat.admin.mapper.ValidWithdrawMapper">
 
     <resultMap id="BaseResultMap" type="com.gameplat.admin.model.domain.ValidWithdraw">
         <id column="id" property="id"/>
@@ -88,6 +88,9 @@
             <if test="discountMoney != null">
                 discount_money,
             </if>
+            <if test="status != null">
+                status,
+            </if>
             <if test="type != null">
                 type,
             </if>
@@ -97,74 +100,40 @@
             <if test="updateTime != null">
                 update_time,
             </if>
-            <if test="mormDml != null">
-                morm_dml,
-            </if>
-            <if test="discountDml != null">
-                discount_dml,
-            </if>
-            <if test="cpDml != null">
-                cp_dml,
-            </if>
-            <if test="sportsDml != null">
-                sports_dml,
-            </if>
-            <if test="videoDml != null">
-                video_dml,
-            </if>
-            <if test="status != null">
-                status,
-            </if>
             <if test="remark != null">
                 remark,
             </if>
-
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="memberId != null">
-                #{memberId}
+                #{memberId},
             </if>
             <if test="account != null">
-                #{account}
+                #{account},
             </if>
             <if test="rechId != null">
-                #{rechId}
+                #{rechId},
             </if>
             <if test="rechMoney != null">
-                #{rechMoney}
+                #{rechMoney},
             </if>
             <if test="discountMoney != null">
-                #{discountMoney}
-            </if>
-            <if test="type != null">
-                #{type}
-            </if>
-            <if test="createTime != null">
-                #{createTime}
-            </if>
-            <if test="updateTime != null">
-                #{updateTime}
-            </if>
-            <if test="mormDml != null">
-                #{mormDml}
-            </if>
-            <if test="discountDml != null">
-                #{discountDml}
-            </if>
-            <if test="cpDml != null">
-                #{cpDml}
-            </if>
-            <if test="sportsDml != null">
-                #{sportsDml}
-            </if>
-            <if test="videoDml != null">
-                #{videoDml}
+                #{discountMoney},
             </if>
             <if test="status != null">
-                #{status}
+                #{status},
+            </if>
+            <if test="type != null">
+                #{type},
+            </if>
+            <if test="createTime != null">
+                #{createTime},
+            </if>
+            <if test="updateTime != null">
+                #{updateTime},
             </if>
             <if test="remark != null">
-                #{remark}
+                #{remark},
             </if>
         </trim>
     </insert>
@@ -173,32 +142,33 @@
         update valid_withdraw
         <set>
             <if test="account != null">
-                account = #{account}
+                account = #{account},
             </if>
             <if test="rechId != null">
-                rech_id = #{rechId}
+                rech_id = #{rechId},
             </if>
             <if test="rechMoney != null">
-                rech_money = #{rechMoney}
+                rech_money = #{rechMoney},
             </if>
             <if test="discountMoney != null">
-                discount_money = #{discountMoney}
-            </if>
-            <if test="type != null">
-                type = #{type}
-            </if>
-            <if test="createTime != null">
-                create_time = #{createTime}
-            </if>
-            <if test="updateTime != null">
-                update_time = #{updateTime}
+                discount_money = #{discountMoney},
             </if>
             <if test="status != null">
-                status = #{status}
+                status = #{status},
+            </if>
+            <if test="type != null">
+                type = #{type},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime},
             </if>
             <if test="remark != null">
                 remark = #{remark},
             </if>
+
         </set>
         where (type = 0 or status = 1)
         <if test="account != null and account != ''" >

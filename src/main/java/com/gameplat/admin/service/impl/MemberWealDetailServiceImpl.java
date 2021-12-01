@@ -1,5 +1,7 @@
 package com.gameplat.admin.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
@@ -45,7 +47,9 @@ public class MemberWealDetailServiceImpl extends ServiceImpl<MemberWealDetailMap
         if (ObjectUtils.isEmpty(wealId)) {
             throw new ServiceException("福利编号不能为空!");
         }
-        if (!this.removeById(wealId)){
+        LambdaQueryWrapper<MemberWealDetail> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(MemberWealDetail::getWealId, wealId);
+        if (!this.remove(wrapper)){
             throw new ServiceException("删除失败！");
         }
     }
@@ -67,12 +71,14 @@ public class MemberWealDetailServiceImpl extends ServiceImpl<MemberWealDetailMap
 
     @Override
     public void updateByWealStatus(Long id, Integer status) {
-        MemberWealDetail memberWealDetail = new MemberWealDetail(){{
-            setId(id);
-            setStatus(status);
-        }};
-        if (!this.updateById(memberWealDetail)){
-            throw new ServiceException("更新福利记录状态失败");
+        if (ObjectUtils.isEmpty(id)){
+            throw new ServiceException("福利编号不能为空!");
+        }
+
+        if (!this.update(new LambdaUpdateWrapper<MemberWealDetail>()
+                .eq(ObjectUtils.isNotEmpty(id), MemberWealDetail::getWealId, id)
+                .set( MemberWealDetail::getStatus, status))){
+            throw new ServiceException("更新福利记录状态失败:");
         }
     }
 }

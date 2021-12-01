@@ -5,4 +5,10 @@ import com.gameplat.admin.model.domain.ValidWithdraw;
 
 public interface ValidWithdrawMapper extends BaseMapper<ValidWithdraw> {
 
+    ValidWithdraw findValidWithdraw(ValidWithdraw validWithdraw);
+
+    int save(ValidWithdraw validWithdraw);
+
+    int updateByUserId(ValidWithdraw validWithdraw);
+
 }

@@ -1,6 +1,6 @@
 package com.gameplat.admin.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.mapper.MemberBlackListMapper;
 import com.gameplat.admin.model.domain.MemberBlackList;
@@ -25,11 +25,10 @@ public class MemberBlackListServiceImpl extends ServiceImpl<MemberBlackListMappe
 
     @Override
     public List<MemberBlackList> findMemberBlackList(MemberBlackList memberBlack) {
-
-        QueryWrapper wrapper = new QueryWrapper(memberBlack);
-        List list = blackListMapper.selectList(wrapper);
-        return list;
-
+        return this.lambdaQuery()
+                .eq(ObjectUtils.isNotEmpty(memberBlack.getUserAccount()), MemberBlackList::getUserAccount, memberBlack.getUserAccount())
+                .orderByDesc(MemberBlackList::getCreateTime)
+                .list();
     }
 }
 

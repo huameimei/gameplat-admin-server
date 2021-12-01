@@ -12,4 +12,5 @@ public interface ValidWithdrawService extends IService<ValidWithdraw> {
 
   void remove(Long memberId, Date cashDate) throws Exception;
 
+  int saveValidWithdraw(ValidWithdraw validWithdraw);
 }

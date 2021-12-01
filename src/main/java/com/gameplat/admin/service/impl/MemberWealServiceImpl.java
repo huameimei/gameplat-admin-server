@@ -5,6 +5,7 @@ import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.constant.MemberServiceKeyConstant;
@@ -277,7 +278,7 @@ public class MemberWealServiceImpl extends ServiceImpl<MemberWealMapper, MemberW
             memberWealDetail.setWealId(wealId);
             //获取本次福利需要派发的会员
             List<MemberWealDetail> list = wealDetailService.findSatisfyMember(memberWealDetail);
-            String serialNumber = RandomUtil.generateNumber(18);
+            String serialNumber = IdWorker.getIdStr();
             //根据福利id查询该福利
             MemberWeal memberWeal = mapper.selectById(wealId);
             if(memberWeal == null){
@@ -326,16 +327,20 @@ public class MemberWealServiceImpl extends ServiceImpl<MemberWealMapper, MemberW
                                     level = levels.size()-1;
                                 }
                                 String content = "";
-                                if (type == 0){//周俸禄
+                                //周俸禄
+                                if (type == 0){
                                     sourceType = FinancialSourceTypeEnum.WEEK_WEAL.getCode();
                                     content = "本周俸禄奖励已派发 金额:" + item.getRewordAmount() + "，请领取";
-                                } else if(type == 1){//月俸禄
+                                    //月俸禄
+                                } else if(type == 1){
                                     sourceType = FinancialSourceTypeEnum.MONTH_WEAL.getCode();
                                     content = "本月俸禄奖励已派发 金额:" + item.getRewordAmount() + "，请领取";
-                                } else if(type == 2){//生日礼金
+                                    //生日礼金
+                                } else if(type == 2){
                                     sourceType = FinancialSourceTypeEnum.BIRTH_WEAL.getCode();
                                     content = "您的生日礼金奖励已派发 金额:" + item.getRewordAmount() + "，请领取";
-                                } else if(type == 3){//每月红包
+                                    //每月红包
+                                } else if(type == 3){
                                     sourceType = FinancialSourceTypeEnum.RED_ENVELOPE_WEAL.getCode();
                                     content = "当月红包奖励已派发 金额:" + item.getRewordAmount() + "，请领取";
                                 }
@@ -365,7 +370,6 @@ public class MemberWealServiceImpl extends ServiceImpl<MemberWealMapper, MemberW
                                     validWithdraw.setMemberId(member.getId());
                                     validWithdraw.setRechId(sourceId);
                                     validWithdraw.setRechMoney(item.getRewordAmount().setScale(2, RoundingMode.HALF_UP));
-//                                validWithdraw.setDmlClaim(item.getRewordAmount().setScale(2, RoundingMode.HALF_UP)); 打码量要求
                                     validWithdraw.setCreateTime(new Date());
                                     validWithdraw.setType(0);
                                     validWithdraw.setStatus(0);
@@ -400,7 +404,8 @@ public class MemberWealServiceImpl extends ServiceImpl<MemberWealMapper, MemberW
                                         financialService.insert(financial);
                                         //已完成
                                         memberWealReword.setStatus(2);
-                                        memberWealReword.setDrawTime(DateTime.now());//默认当前时间为领取时间  实际上不需要领取
+                                        //默认当前时间为领取时间  实际上不需要领取
+                                        memberWealReword.setDrawTime(DateTime.now());
                                     } catch (Exception e) {
                                         log.error(MessageFormat.format("会员{0}，VIP资金变动, 失败原因：{1}",
                                                 member.getAccount(), e));
@@ -455,7 +460,9 @@ public class MemberWealServiceImpl extends ServiceImpl<MemberWealMapper, MemberW
                 throw new ServiceException("操作失败");
             };
             log.info("福利:{}派发完毕!", wealId);
-        } finally {
+        } catch (Exception e){
+            throw new RuntimeException(e);
+        }finally {
             distributedLocker.unlock(key);
         }
 

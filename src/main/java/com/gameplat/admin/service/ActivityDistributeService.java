@@ -8,6 +8,11 @@ import com.gameplat.admin.model.vo.ActivityDistributeVO;
 
 import java.util.List;
 
+/**
+ * 活动分发管理
+ *
+ * @author admin
+ */
 public interface ActivityDistributeService {
 
     /**
@@ -48,4 +53,11 @@ public interface ActivityDistributeService {
      * @param ids
      */
     void updateStatus(String ids);
+
+    /**
+     * 删除活动分发
+     *
+     * @param ids
+     */
+    void remove(String ids);
 }

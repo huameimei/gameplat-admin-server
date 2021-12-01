@@ -25,7 +25,9 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.MessageFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -62,6 +64,7 @@ public class ActivityDistributeServiceImpl
 
     @Autowired
     private PushMessageService pushMessageService;
+
 
     @Override
     public List<ActivityDistribute> findActivityDistributeList(ActivityDistribute activityDistribute) {
@@ -278,6 +281,16 @@ public class ActivityDistributeServiceImpl
             }
         }
         log.info("派发活动奖励结束", System.currentTimeMillis());
+    }
+
+    @Override
+    public void remove(String ids) {
+        String[] idArr = ids.split(",");
+        List<Long> adList = new ArrayList<>();
+        for (String idStr : idArr) {
+            adList.add(Long.parseLong(idStr));
+        }
+        this.removeByIds(adList);
     }
 
     /**

@@ -13,7 +13,7 @@ import java.util.Date;
 /**
  * 新增活动DTO
  *
- * @author admin
+ * @author kenvin
  * @since 2020-08-14
  */
 @Data
@@ -21,9 +21,6 @@ import java.util.Date;
 public class ActivityInfoAddDTO implements Serializable {
 
     private static final long serialVersionUID = 1L;
-
-    @ApiModelProperty(value = "编号")
-    private Integer id;
 
     @ApiModelProperty(value = "类型")
     private Integer activityType;

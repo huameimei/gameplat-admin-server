@@ -81,9 +81,6 @@ public class ActivityDistribute implements Serializable {
     @ApiModelProperty(value = "是否失效（0 失效，1 未失效）")
     private Integer disabled;
 
-    @ApiModelProperty(value = "截止时间")
-    private Date abortTime;
-
     @ApiModelProperty(value = "删除（0 已删除，1 未删除）")
     private Integer deleteFlag;
 

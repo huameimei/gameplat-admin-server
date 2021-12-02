@@ -1,5 +1,9 @@
 package com.gameplat.admin.model.domain;
 
+import com.baomidou.mybatisplus.annotation.FieldFill;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -17,6 +21,7 @@ import java.util.Date;
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
+@TableName("activity_type")
 @ApiModel(value = "ActivityType", description = "活动类型")
 public class ActivityType implements Serializable {
 
@@ -31,17 +36,21 @@ public class ActivityType implements Serializable {
     @ApiModelProperty(value = "活动类型名称")
     private String typeName;
 
+    @TableField(fill = FieldFill.INSERT)
     @DateTimeFormat(pattern = "yyyy-MM-dd hh:mm:ss")
     @ApiModelProperty(value = "创建时间")
     private Date createTime;
 
+    @TableField(fill = FieldFill.INSERT_UPDATE)
     @DateTimeFormat(pattern = "yyyy-MM-dd hh:mm:ss")
     @ApiModelProperty(value = "更新时间")
     private Date updateTime;
 
+    @TableField(fill = FieldFill.INSERT)
     @ApiModelProperty(value = "创建人")
     private String createBy;
 
+    @TableField(fill = FieldFill.INSERT_UPDATE)
     @ApiModelProperty(value = "更新人")
     private String updateBy;
 

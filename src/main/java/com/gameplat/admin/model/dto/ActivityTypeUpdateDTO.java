@@ -17,7 +17,7 @@ import java.util.Date;
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
-@ApiModel(value = "ActivityType", description = "活动类型")
+@ApiModel(value = "ActivityTypeUpdateDTO", description = "活动类型DTO")
 public class ActivityTypeUpdateDTO implements Serializable {
 
     private static final long serialVersionUID = 1L;

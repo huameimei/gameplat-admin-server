@@ -29,7 +29,7 @@ public class ActivityInfo implements Serializable {
     /**
      * 类型
      */
-    private Long activityType;
+//    private Long activityType;
 
     /**
      * 活动标题
@@ -45,12 +45,12 @@ public class ActivityInfo implements Serializable {
     /**
      * 活动类型名称
      */
-    private String typeName;
+//    private String typeName;
 
     /**
      * 活动类型编码
      */
-    private String typeCode;
+//    private String typeCode;
 
     /**
      * 主图片名称
@@ -120,7 +120,7 @@ public class ActivityInfo implements Serializable {
     /**
      * 活动有效期
      */
-    private String validPeriod;
+//    private String validPeriod;
 
     /**
      * 活动状态
@@ -367,7 +367,7 @@ public class ActivityInfo implements Serializable {
     /**
      * html兼容模式 0关闭1开启
      */
-    private Integer htmlCompatibleMode;
+//    private Integer htmlCompatibleMode;
 
     /**
      * 活动说明html
@@ -377,10 +377,10 @@ public class ActivityInfo implements Serializable {
     /**
      * web活动说明html
      */
-    private String webExplainHtml;
+//    private String webExplainHtml;
 
     /**
      * h5活动说明html
      */
-    private String h5ExplainHtml;
+//    private String h5ExplainHtml;
 }

@@ -99,8 +99,9 @@ public class ActivityDistributeServiceImpl
     @Override
     public IPage<ActivityDistributeVO> list(PageDTO<ActivityDistribute> page, ActivityDistributeDTO activityDistributeDTO) {
         LambdaQueryChainWrapper<ActivityDistribute> lambdaQuery = this.lambdaQuery();
-        lambdaQuery.like(StringUtils.isNotBlank(activityDistributeDTO.getUsername())
-                , ActivityDistribute::getUsername, activityDistributeDTO.getUsername())
+        lambdaQuery.eq(ActivityDistribute::getDeleteFlag, 1)
+                .like(StringUtils.isNotBlank(activityDistributeDTO.getUsername())
+                        , ActivityDistribute::getUsername, activityDistributeDTO.getUsername())
                 .eq(activityDistributeDTO.getActivityId() != null && activityDistributeDTO.getActivityId() != 0
                         , ActivityDistribute::getActivityId, activityDistributeDTO.getActivityId())
                 .eq(activityDistributeDTO.getStatus() != null && activityDistributeDTO.getStatus() != 0
@@ -291,6 +292,19 @@ public class ActivityDistributeServiceImpl
             adList.add(Long.parseLong(idStr));
         }
         this.removeByIds(adList);
+    }
+
+    @Override
+    public boolean updateDeleteStatus(String ids) {
+        String[] idArr = ids.split(",");
+        List<ActivityDistribute> activityDistributeList = new ArrayList<>();
+        for (String idStr : idArr) {
+            ActivityDistribute activityDistribute = new ActivityDistribute();
+            activityDistribute.setDistributeId(Long.parseLong(idStr));
+            activityDistribute.setDeleteFlag(0);
+            activityDistributeList.add(activityDistribute);
+        }
+        return this.updateBatchById(activityDistributeList);
     }
 
     /**

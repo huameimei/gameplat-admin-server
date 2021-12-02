@@ -17,7 +17,6 @@ import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -25,7 +24,7 @@ import java.util.List;
 /**
  * 用户活动大厅
  *
- * @author kevin
+ * @author kenvin
  */
 @Api(tags = "活动大厅管理")
 @Slf4j
@@ -99,7 +98,7 @@ public class ActivityLobbyController {
 
 
     /**
-     * 删除
+     * 更新状态
      *
      * @param activityLobbyUpdateStatusDTO
      */

@@ -18,14 +18,6 @@ public interface ActivityLobbyDiscountService {
 
 
     /**
-     * 批量保存活动大厅打折数据
-     *
-     * @param activityLobbyDiscounts
-     * @return
-     */
-    int saveBatch(List<ActivityLobbyDiscount> activityLobbyDiscounts);
-
-    /**
      * 通过大厅id查询优惠信息列表
      *
      * @param activityLobbyId
@@ -45,7 +37,7 @@ public interface ActivityLobbyDiscountService {
      *
      * @param activityLobbyDiscountList
      */
-    void saveBatchLobbyDiscount(List<ActivityLobbyDiscount> activityLobbyDiscountList);
+    boolean saveBatchLobbyDiscount(List<ActivityLobbyDiscount> activityLobbyDiscountList);
 
     /**
      * 批量删除

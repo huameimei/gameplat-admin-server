@@ -2,6 +2,7 @@ package com.gameplat.admin.model.domain;
 
 import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -22,6 +23,7 @@ public class ActivityLobbyDiscount implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @ApiModelProperty(value = "大厅优惠id")
+    @TableId("lobby_discount_id")
     private Long lobbyDiscountId;
 
     @ApiModelProperty(value = "活动大厅id")

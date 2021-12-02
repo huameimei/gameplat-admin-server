@@ -55,13 +55,13 @@ public class ActivityDistributeController {
      * @param ids
      */
     @ApiOperation(value = "删除分发")
-    @PutMapping("/delete")
+    @DeleteMapping("/delete")
     @PreAuthorize("hasAuthority('activity:distribute:remove')")
     public void remove(@RequestBody String ids) {
         if (StringUtils.isBlank(ids)) {
             throw new ServiceException("删除活动分发时，ids不能为空");
         }
-        activityDistributeService.remove(ids);
+        activityDistributeService.updateDeleteStatus(ids);
     }
 
 

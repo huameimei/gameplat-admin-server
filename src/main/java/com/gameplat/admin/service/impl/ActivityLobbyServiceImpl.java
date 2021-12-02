@@ -72,7 +72,6 @@ public class ActivityLobbyServiceImpl extends ServiceImpl<ActivityLobbyMapper, A
                 activityLobbyVO.setLobbyDiscountList(activityLobbyDiscounts);
             }
         }
-
         return activityLobbyVOIPage;
     }
 
@@ -211,8 +210,8 @@ public class ActivityLobbyServiceImpl extends ServiceImpl<ActivityLobbyMapper, A
 //            activityLobbyDiscount.setCreateBy(SysUserUtil.getUserName());
             activityLobbyDiscount.setCreateTime(new Date());
         }
-        int saveLobbyDiscount = activityLobbyDiscountService.saveBatch(activityLobbyDiscounts);
-        if (saveLobbyDiscount < 1) {
+        boolean isSaveLobbyDiscount = activityLobbyDiscountService.saveBatchLobbyDiscount(activityLobbyDiscounts);
+        if (!isSaveLobbyDiscount) {
             throw new ServiceException("添加优惠失败！");
         }
     }
@@ -221,6 +220,9 @@ public class ActivityLobbyServiceImpl extends ServiceImpl<ActivityLobbyMapper, A
     public void update(ActivityLobbyUpdateDTO activityLobbyUpdateDTO) {
         //根据id查询活动大厅
         ActivityLobby activityLobbyOrigin = this.getById(activityLobbyUpdateDTO.getId());
+        if (activityLobbyOrigin == null) {
+            throw new ServiceException("该活动大厅不存在！");
+        }
         //判断活动是否已上线
         if (activityLobbyOrigin.getStatus() == 1 || activityLobbyOrigin.getStatus() == 0) {
             boolean b = DateUtil2.compareCurrentDate(activityLobbyOrigin.getStartTime());

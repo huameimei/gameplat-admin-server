@@ -60,4 +60,12 @@ public interface ActivityDistributeService {
      * @param ids
      */
     void remove(String ids);
+
+    /**
+     * 更新删除状态
+     *
+     * @param ids
+     * @return
+     */
+    boolean updateDeleteStatus(String ids);
 }

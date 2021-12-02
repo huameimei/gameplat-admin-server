@@ -19,9 +19,6 @@ public class ActivityBlacklistAddDTO implements Serializable {
 
     private static final long serialVersionUID = -1005615158531421103L;
 
-    @ApiModelProperty(value = "主键ID")
-    private Long id;
-
     @ApiModelProperty(value = "活动ID")
     private Long activityId;
 

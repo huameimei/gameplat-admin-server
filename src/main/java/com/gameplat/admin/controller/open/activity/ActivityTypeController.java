@@ -52,7 +52,7 @@ public class ActivityTypeController {
     @ApiOperation(value = "活动板块管理->新增活动类型")
     @PostMapping("/add")
     @PreAuthorize("hasAuthority('activity:type:add')")
-    public void add(ActivityTypeAddDTO activityTypeAddDTO,
+    public void add(@RequestBody ActivityTypeAddDTO activityTypeAddDTO,
                     @RequestHeader(value = "country", defaultValue = "zh-CN", required = false) String country) {
         if (StringUtils.isBlank(activityTypeAddDTO.getLanguage())) {
             activityTypeAddDTO.setLanguage(country);
@@ -74,7 +74,7 @@ public class ActivityTypeController {
     @ApiOperation(value = "更新活动类型")
     @PutMapping("/update")
     @PreAuthorize("hasAuthority('activity:type:edit')")
-    public void update(ActivityTypeUpdateDTO activityTypeUpdateDTO,
+    public void update(@RequestBody ActivityTypeUpdateDTO activityTypeUpdateDTO,
                        @RequestHeader(value = "country", defaultValue = "zh-CN", required = false) String country) {
         if (activityTypeUpdateDTO.getId() == null || activityTypeUpdateDTO.getId() == 0) {
             throw new ServiceException("更新活动类型，ID不能为空");

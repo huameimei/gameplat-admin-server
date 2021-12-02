@@ -13,18 +13,17 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * 活动大厅业务
+ *
+ * @author admin
+ */
 @Service
 public class ActivityLobbyDiscountServiceImpl extends ServiceImpl<ActivityLobbyDiscountMapper, ActivityLobbyDiscount>
         implements ActivityLobbyDiscountService {
 
     @Autowired
     private ActivityLobbyDiscountConvert activityLobbyDiscountConvert;
-
-
-    @Override
-    public int saveBatch(List<ActivityLobbyDiscount> activityLobbyDiscounts) {
-        return this.saveBatch(activityLobbyDiscounts);
-    }
 
     @Override
     public List<ActivityLobbyDiscountVO> listByActivityLobbyId(Long activityLobbyId) {
@@ -49,8 +48,8 @@ public class ActivityLobbyDiscountServiceImpl extends ServiceImpl<ActivityLobbyD
     }
 
     @Override
-    public void saveBatchLobbyDiscount(List<ActivityLobbyDiscount> activityLobbyDiscountList) {
-        this.saveBatch(activityLobbyDiscountList);
+    public boolean saveBatchLobbyDiscount(List<ActivityLobbyDiscount> activityLobbyDiscountList) {
+       return this.saveBatch(activityLobbyDiscountList);
     }
 
     @Override

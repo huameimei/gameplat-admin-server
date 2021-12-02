@@ -38,8 +38,8 @@ public class ActivityLobby implements Serializable {
     @ApiModelProperty(value = "活动大类（1 活动大厅，2 红包雨，3 转盘）")
     private Integer type;
 
-    @ApiModelProperty(value = "活动类型（1 充值活动，2 游戏活动")
-    private Integer activityType;
+//    @ApiModelProperty(value = "活动类型（1 充值活动，2 游戏活动")
+//    private Integer activityType;
 
     @ApiModelProperty(value = "描述")
     private String description;
@@ -99,8 +99,8 @@ public class ActivityLobby implements Serializable {
     @ApiModelProperty(value = "申请路径")
     private String applyUrl;
 
-    @ApiModelProperty(value = "失效活動")
-    private Integer failure;
+//    @ApiModelProperty(value = "失效活動")
+//    private Integer failure;
 
     @ApiModelProperty(value = "领取方式（1 直接发放，2 福利中心）")
     private Integer getWay;
@@ -111,8 +111,8 @@ public class ActivityLobby implements Serializable {
     @ApiModelProperty(value = "活动状态（0 关闭，1 开启，2 失效）")
     private Integer status;
 
-    @ApiModelProperty(value = "游戏类型（1体育 2真人 3棋牌 4彩票 5电子 6电竞 7动物竞技 8捕鱼）")
-    private Integer gameType;
+//    @ApiModelProperty(value = "游戏类型（1体育 2真人 3棋牌 4彩票 5电子 6电竞 7动物竞技 8捕鱼）")
+//    private Integer gameType;
 
     @ApiModelProperty(value = "游戏列表")
     private String gameList;

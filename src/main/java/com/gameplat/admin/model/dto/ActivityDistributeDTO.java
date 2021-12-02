@@ -1,5 +1,6 @@
 package com.gameplat.admin.model.dto;
 
+import com.baomidou.mybatisplus.annotation.TableName;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -9,21 +10,18 @@ import java.util.Date;
 import java.util.List;
 
 /**
+ * 活动分发
+ *
  * @Author: lyq
  * @Date: 2020/8/20 11:45
  * @Description:
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
+@TableName("activity_distribute")
 public class ActivityDistributeDTO implements Serializable {
 
     private static final long serialVersionUID = 4142676336119312814L;
-
-    @ApiModelProperty(value = "页面大小")
-    private Integer pageSize;
-
-    @ApiModelProperty(value = "第几页")
-    private Integer pageNum;
 
     @ApiModelProperty(value = "派发id集合")
     private List<Long> distributeIds;
@@ -64,7 +62,7 @@ public class ActivityDistributeDTO implements Serializable {
     @ApiModelProperty(value = "结算时间")
     private Date settlementTime;
 
-    @ApiModelProperty(value = "状态（1 结算中，2 已结算） ")
+    @ApiModelProperty(value = "状态（1 结算中，2 已结算）")
     private Integer status;
 
     @ApiModelProperty(value = "截止时间")

@@ -142,7 +142,7 @@ public class ActivityInfoServiceImpl
         if (CollectionUtils.isNotEmpty(activityInfoList)) {
             for (ActivityInfo activityInfo1 : activityInfoList) {
                 ActivityInfoVO activityInfoVO = activityInfoConvert.toVo(activityInfo1);
-                ActivityType activityType = activityTypeMap.get(activityInfo1.getActivityType());
+                ActivityType activityType = activityTypeMap.get(activityInfo1.getType());
                 if (activityType != null) {
                     activityInfoVO.setTypeCode(activityType.getTypeCode());
                     activityInfoVO.setTypeName(activityType.getTypeName());
@@ -164,8 +164,8 @@ public class ActivityInfoServiceImpl
     }
 
     @Override
-    public List<ActivityInfo> findByTypeId(Long id) {
-        return this.lambdaQuery().eq(ActivityInfo::getType, id).list();
+    public List<ActivityInfo> findByTypeId(Long typeId) {
+        return this.lambdaQuery().eq(ActivityInfo::getType, typeId).list();
     }
 
 

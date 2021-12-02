@@ -85,23 +85,6 @@ public class RechargeConfig implements Serializable {
   // 风控金额
   private String riskMoney;
 
-  //会员入款提示
-  private String rechargeTip;
-
-  //入款备注颜色
-  private String rechargeRemarkColor;
-
-  //前台扫码转账文字描述
-  private String scanRemark;
-
-  /**
-   * 会员充值金额输入框提示信息
-   */
-  private String rechargeInputTip;
-
-  //充值是否需要绑定银行卡，0-不需要，1-需要
-  private Integer isBindingBank;
-
   // 每笔充值优惠开关
   private Integer eachRechargeDiscountDisabled;
 

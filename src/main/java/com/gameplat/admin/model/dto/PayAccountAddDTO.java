@@ -76,4 +76,10 @@ public class PayAccountAddDTO implements Serializable {
 
   /** 风控值 */
   private String riskControlValue;
+
+  /**
+   * 虚拟货币类型
+   */
+  private String currencyType;
+
 }

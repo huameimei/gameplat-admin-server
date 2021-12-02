@@ -14,7 +14,6 @@ import com.gameplat.admin.convert.MemberWithdrawConvert;
 import com.gameplat.admin.enums.AllowOthersOperateEnums;
 import com.gameplat.admin.enums.BlacklistConstant.BizBlacklistType;
 import com.gameplat.admin.enums.CashEnum;
-import com.gameplat.admin.enums.LimitEnums;
 import com.gameplat.admin.enums.ProxyPayStatusEnum;
 import com.gameplat.admin.enums.TranTypes;
 import com.gameplat.admin.enums.UserStates;
@@ -34,7 +33,6 @@ import com.gameplat.admin.model.domain.PpInterface;
 import com.gameplat.admin.model.domain.PpMerchant;
 import com.gameplat.admin.model.domain.SysDictData;
 import com.gameplat.admin.model.domain.SysUser;
-import com.gameplat.admin.model.domain.limit.MemberRechargeLimit;
 import com.gameplat.admin.model.dto.MemberWithdrawQueryDTO;
 import com.gameplat.admin.model.vo.MemberWithdrawVO;
 import com.gameplat.admin.model.vo.SummaryVO;
@@ -52,7 +50,9 @@ import com.gameplat.admin.service.SysDictDataService;
 import com.gameplat.admin.service.SysUserService;
 import com.gameplat.admin.service.ValidWithdrawService;
 import com.gameplat.admin.util.MoneyUtils;
+import com.gameplat.common.enums.LimitEnums;
 import com.gameplat.common.model.bean.Builder;
+import com.gameplat.common.model.bean.limit.MemberRechargeLimit;
 import com.gameplat.common.util.DateUtil;
 import com.gameplat.security.context.UserCredential;
 import com.gameplat.common.enums.UserTypes;
@@ -576,7 +576,7 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
       MemberRechargeLimit limitInfo =
           Optional.ofNullable(
               limitInfoService.getLimitInfo(
-                  LimitEnums.MEMBER_RECHARGE_LIMIT.getName(), MemberRechargeLimit.class))
+                  LimitEnums.MEMBER_RECHARGE_LIMIT, MemberRechargeLimit.class))
               .orElseThrow(() -> new ServiceException("加载出入款配置信息失败，请联系客服！"));
       boolean toCheck =
           (!Objects.equals(

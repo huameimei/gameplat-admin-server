@@ -143,7 +143,7 @@ public class PayAccountServiceImpl extends ServiceImpl<PayAccountMapper, PayAcco
             dto.getMaxAmountPerOrder(),
             dto.getRiskControlType(),
             dto.getRiskControlValue(),
-            null);
+            dto.getCurrencyType());
     dto.setLimitInfo(JsonUtils.toJson(merBean));
   }
 
@@ -160,7 +160,7 @@ public class PayAccountServiceImpl extends ServiceImpl<PayAccountMapper, PayAcco
             dto.getMaxAmountPerOrder(),
             dto.getRiskControlType(),
             dto.getRiskControlValue(),
-            null);
+            dto.getCurrencyType());
     dto.setLimitInfo(JsonUtils.toJson(merBean));
   }
 }

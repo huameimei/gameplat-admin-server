@@ -4,7 +4,6 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.gameplat.admin.model.domain.MemberBill;
 import com.gameplat.admin.model.dto.MemberBillDTO;
-import com.gameplat.admin.model.dto.MemberVipSignStatisDTO;
 import com.gameplat.admin.model.vo.MemberBillVO;
 import com.gameplat.admin.service.MemberBillService;
 import io.swagger.annotations.Api;

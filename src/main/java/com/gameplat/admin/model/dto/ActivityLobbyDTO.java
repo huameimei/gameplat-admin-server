@@ -1,5 +1,6 @@
 package com.gameplat.admin.model.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.gameplat.common.util.DateUtil;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -21,12 +22,6 @@ public class ActivityLobbyDTO implements Serializable {
 
     private static final long serialVersionUID = 6060013282905693277L;
 
-    @ApiModelProperty(value = "页面大小")
-    private Integer pageSize;
-
-    @ApiModelProperty(value = "第几页")
-    private Integer pageNum;
-
     @ApiModelProperty(value = "主键")
     private List<Long> ids;
 
@@ -36,9 +31,11 @@ public class ActivityLobbyDTO implements Serializable {
     @ApiModelProperty(value = "标题")
     private String title;
 
+    @JsonFormat(pattern = DateUtil.YYYY_MM_DD_HH_MM_SS)
     @ApiModelProperty(value = "开始时间")
     private Date startTime;
 
+    @JsonFormat(pattern = DateUtil.YYYY_MM_DD_HH_MM_SS)
     @ApiModelProperty(value = "结束时间")
     private Date endTime;
 
@@ -56,7 +53,7 @@ public class ActivityLobbyDTO implements Serializable {
     private Integer statisItem;
 
     @ApiModelProperty(value = "充值类型（1 转账汇款，2 在线支付，3 人工入款）")
-    private Integer payType;
+    private String payType;
 
     @ApiModelProperty(value = "统计日期（1 每日，2 每周，3 每月，4 每周X，5 每月X日）")
     private Integer statisDate;
@@ -89,7 +86,7 @@ public class ActivityLobbyDTO implements Serializable {
     private String applyUrl;
 
     @ApiModelProperty(value = "活动大厅优惠")
-    private List<ActivityLobbyDiscountDTO> lobbyDiscount;
+    private List<ActivityLobbyDiscountDTO> lobbyDiscountList;
 
     @ApiModelProperty(value = "删除活动大厅优惠id")
     private List<Long> delDiscountIdList;
@@ -121,6 +118,7 @@ public class ActivityLobbyDTO implements Serializable {
     @ApiModelProperty(value = "指定比赛ID")
     private Long matchId;
 
+    @JsonFormat(pattern = DateUtil.YYYY_MM_DD_HH_MM_SS)
     @ApiModelProperty(value = "指定比赛时间")
     private Date matchTime;
 
@@ -136,11 +134,4 @@ public class ActivityLobbyDTO implements Serializable {
     @ApiModelProperty(value = "申请日期集合")
     private String applyDateList;
 
-    public void setStartTime(String startTime) {
-        this.startTime = DateUtil.strToDate(startTime, DateUtil.YYYY_MM_DD_HH_MM_SS);
-    }
-
-    public void setEndTime(String endTime) {
-        this.endTime = DateUtil.strToDate(endTime, DateUtil.YYYY_MM_DD_HH_MM_SS);
-    }
 }

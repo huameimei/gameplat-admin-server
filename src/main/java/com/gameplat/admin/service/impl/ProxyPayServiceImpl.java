@@ -479,8 +479,7 @@ public class ProxyPayServiceImpl implements ProxyPayService {
       throw new ServiceException("UW/UPDATE_ERROR, 订单已处理", null);
     }
     // 更新会员信息表
-    MemberInfo memberInfo = memberInfoService.getById(memberWithdraw.getMemberId());
-    memberInfoService.updateMemberWithdraw(memberInfo, memberWithdraw.getCashMoney());
+    memberInfoService.updateBalanceWithWithdraw(memberWithdraw.getMemberId(), memberWithdraw.getCashMoney());
 
     // 删除出款验证打码量记录的数据
     //    validWithdrawService.remove(userWithdraw.getUserId(), userWithdraw.getAddTime());

@@ -11,7 +11,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.constant.WithdrawTypeConstant;
 import com.gameplat.admin.convert.MemberWithdrawConvert;
-import com.gameplat.admin.enums.AllowOthersOperateEnums;
+import com.gameplat.admin.enums.*;
 import com.gameplat.admin.enums.BlacklistConstant.BizBlacklistType;
 import com.gameplat.admin.enums.CashEnum;
 import com.gameplat.admin.enums.ProxyPayStatusEnum;
@@ -19,6 +19,8 @@ import com.gameplat.admin.enums.TranTypes;
 import com.gameplat.admin.enums.UserStates;
 import com.gameplat.admin.enums.WithdrawStatus;
 import com.gameplat.admin.mapper.MemberWithdrawMapper;
+import com.gameplat.admin.model.bean.*;
+import com.gameplat.admin.model.domain.*;
 import com.gameplat.admin.model.bean.AdminLimitInfo;
 import com.gameplat.admin.model.bean.DirectCharge;
 import com.gameplat.admin.model.bean.ManualRechargeOrderBo;
@@ -36,40 +38,23 @@ import com.gameplat.admin.model.domain.SysUser;
 import com.gameplat.admin.model.dto.MemberWithdrawQueryDTO;
 import com.gameplat.admin.model.vo.MemberWithdrawVO;
 import com.gameplat.admin.model.vo.SummaryVO;
-import com.gameplat.admin.service.LimitInfoService;
-import com.gameplat.admin.service.MemberBalanceService;
-import com.gameplat.admin.service.MemberBillService;
-import com.gameplat.admin.service.MemberInfoService;
-import com.gameplat.admin.service.MemberService;
-import com.gameplat.admin.service.MemberWithdrawHistoryService;
-import com.gameplat.admin.service.MemberWithdrawService;
-import com.gameplat.admin.service.PpInterfaceService;
-import com.gameplat.admin.service.PpMerchantService;
-import com.gameplat.admin.service.RechargeOrderService;
-import com.gameplat.admin.service.SysDictDataService;
-import com.gameplat.admin.service.SysUserService;
-import com.gameplat.admin.service.ValidWithdrawService;
+import com.gameplat.admin.service.*;
 import com.gameplat.admin.util.MoneyUtils;
+import com.gameplat.common.enums.LimitEnums;
 import com.gameplat.common.enums.LimitEnums;
 import com.gameplat.common.model.bean.Builder;
 import com.gameplat.common.model.bean.limit.MemberRechargeLimit;
 import com.gameplat.common.util.DateUtil;
 import com.gameplat.security.context.UserCredential;
 import com.gameplat.common.enums.UserTypes;
-import com.gameplat.common.json.JsonUtils;
-import com.gameplat.common.snowflake.IdGeneratorSnowflake;
-import com.gameplat.common.util.StringUtils;
 import com.gameplat.common.exception.ServiceException;
-import com.google.common.collect.Lists;
-import java.math.BigDecimal;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import javax.annotation.Resource;
+import com.gameplat.common.json.JsonUtils;
+import com.gameplat.common.model.bean.Builder;
+import com.gameplat.common.model.bean.limit.MemberRechargeLimit;
+import com.gameplat.common.snowflake.IdGeneratorSnowflake;
+import com.gameplat.common.util.DateUtil;
+import com.gameplat.common.util.StringUtils;
+import com.gameplat.security.context.UserCredential;
 import jodd.util.StringUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
@@ -78,6 +63,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.math.BigDecimal;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -99,9 +87,6 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
 
   @Autowired
   private SysUserService sysUserService;
-
-  @Autowired
-  private MemberBalanceService memberBalanceService;
 
   @Autowired
   private LimitInfoService limitInfoService;
@@ -254,7 +239,7 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
     if (cashStatus.equals(curStatus) || null == id || null == cashStatus || null == curStatus) {
       throw new ServiceException("错误的参数.");
     }
-    MemberWithdraw memberWithdraw = memberWithdrawMapper.selectById(id);
+    MemberWithdraw memberWithdraw = this.getById(id);
 
     if (memberWithdraw == null) {
       throw new ServiceException("UW/ORDER_NULL,充值订单不存在或订单已处理", null);
@@ -324,7 +309,7 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
     } else if (toFinishCurrentOrder) {
       if (WithdrawStatus.SUCCESS.getValue() == cashStatus) {
         // 扣除会员余额
-        memberBalanceService.updateBalance(member.getId(), memberWithdraw.getCashMoney().negate());
+        memberInfoService.updateBalance(member.getId(), memberWithdraw.getCashMoney().negate());
         // 更新充提报表,如果是推广账户不进入报表
         // TODO: 2021/11/2  未完成
         // 删除出款验证打码量记录的数据
@@ -336,7 +321,7 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
 
       } else if (WithdrawStatus.CANCELLED.getValue() == cashStatus) { // 取消出款操作
         // 释放会员提现金额
-        memberBalanceService.updateBalance(member.getId(), memberWithdraw.getCashMoney());
+        memberInfoService.updateBalance(member.getId(), memberWithdraw.getCashMoney());
         String billContent = String.format("管理员于%s向用户%s提现失败退回%.3f元,账户余额变更为:%.3f元",
             DateUtil.getNowTime(),
             member.getAccount(),
@@ -481,9 +466,7 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
     insertWithdrawHistory(memberWithdraw);
 
     // 修改用户金额信息、扣除用户出款金额
-    memberBalanceService.updateBalance(
-        memberWithdraw.getMemberId(), memberWithdraw.getCashMoney().negate());
-    memberInfoService.updateMemberWithdraw(memberInfo, memberWithdraw.getCashMoney());
+    memberInfoService.updateBalanceWithWithdraw(memberId, memberWithdraw.getCashMoney());
 
     // 添加用户账户金额的变更记录
     String content = "管理员" /*+ admin.getAccount() */ + "于" + DateUtil.getNowTime() + "向用户"

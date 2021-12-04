@@ -20,48 +20,23 @@ import com.gameplat.admin.mapper.RechargeOrderHistoryMapper;
 import com.gameplat.admin.mapper.RechargeOrderMapper;
 import com.gameplat.admin.model.bean.AdminLimitInfo;
 import com.gameplat.admin.model.bean.ChannelLimitsBean;
-import com.gameplat.admin.model.bean.PageExt;
 import com.gameplat.admin.model.bean.ManualRechargeOrderBo;
-import com.gameplat.admin.model.domain.DiscountType;
-import com.gameplat.admin.model.domain.Member;
-import com.gameplat.admin.model.domain.MemberBill;
-import com.gameplat.admin.model.domain.MemberInfo;
-import com.gameplat.admin.model.domain.PayAccount;
-import com.gameplat.admin.model.domain.RechargeOrder;
-import com.gameplat.admin.model.domain.RechargeOrderHistory;
-import com.gameplat.admin.model.domain.SysDictData;
-import com.gameplat.admin.model.domain.SysUser;
-import com.gameplat.admin.model.domain.TpMerchant;
-import com.gameplat.admin.model.domain.TpPayChannel;
-import com.gameplat.common.model.bean.limit.MemberRechargeLimit;
+import com.gameplat.admin.model.bean.PageExt;
+import com.gameplat.admin.model.domain.*;
 import com.gameplat.admin.model.dto.RechargeOrderQueryDTO;
 import com.gameplat.admin.model.vo.RechargeOrderVO;
 import com.gameplat.admin.model.vo.SummaryVO;
-import com.gameplat.admin.service.DiscountTypeService;
-import com.gameplat.admin.service.LimitInfoService;
-import com.gameplat.admin.service.MemberBalanceService;
-import com.gameplat.admin.service.MemberBillService;
-import com.gameplat.admin.service.MemberInfoService;
-import com.gameplat.admin.service.MemberService;
-import com.gameplat.admin.service.PayAccountService;
-import com.gameplat.admin.service.RechargeOrderService;
-import com.gameplat.admin.service.SysDictDataService;
-import com.gameplat.admin.service.SysUserService;
-import com.gameplat.admin.service.TpMerchantService;
-import com.gameplat.admin.service.TpPayChannelService;
-import com.gameplat.admin.service.ValidWithdrawService;
+import com.gameplat.admin.service.*;
 import com.gameplat.admin.util.MoneyUtils;
 import com.gameplat.common.enums.LimitEnums;
+import com.gameplat.common.enums.SwitchStatusEnum;
+import com.gameplat.common.enums.UserTypes;
 import com.gameplat.common.exception.ServiceException;
+import com.gameplat.common.json.JsonUtils;
+import com.gameplat.common.model.bean.limit.MemberRechargeLimit;
+import com.gameplat.common.snowflake.IdGeneratorSnowflake;
 import com.gameplat.security.SecurityUserHolder;
 import com.gameplat.security.context.UserCredential;
-import com.gameplat.common.enums.UserTypes;
-import com.gameplat.common.json.JsonUtils;
-import com.gameplat.common.snowflake.IdGeneratorSnowflake;
-import java.math.BigDecimal;
-import java.util.Date;
-import java.util.Objects;
-import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
@@ -69,7 +44,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
-import com.gameplat.common.enums.SwitchStatusEnum;
+
+import java.math.BigDecimal;
+import java.util.Date;
+import java.util.Objects;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -97,9 +76,6 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
 
   @Autowired
   private MemberInfoService memberInfoService;
-
-  @Autowired
-  private MemberBalanceService memberBalanceService;
 
   @Autowired
   private PayAccountService payAccountService;
@@ -275,10 +251,8 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
     // 更新充值金额累积
     updateRechargeMoney(rechargeOrder, member.getUserType());
 
-    // 更新会员余额
-    memberBalanceService.updateBalance(rechargeOrder.getMemberId(), rechargeOrder.getTotalAmount());
     //更新会员充值信息
-    memberInfoService.updateMemberRech(memberInfo, rechargeOrder.getAmount());
+    memberInfoService.updateBalanceWithRecharge(memberInfo.getMemberId(), rechargeOrder.getTotalAmount());
 //    //异步统计是否满足周末红包规则
 //    aj.doWeekendRedPacketJob(rechargeOrder.getAmount(), userInfo);
 //

@@ -10,7 +10,7 @@ import com.gameplat.admin.model.dto.ActivityQualificationUpdateDTO;
 import com.gameplat.admin.model.dto.ActivityQualificationUpdateStatusDTO;
 import com.gameplat.admin.model.vo.ActivityQualificationVO;
 import com.gameplat.admin.service.ActivityQualificationService;
-import com.gameplat.common.exception.ServiceException;
+import com.gameplat.base.common.exception.ServiceException;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;

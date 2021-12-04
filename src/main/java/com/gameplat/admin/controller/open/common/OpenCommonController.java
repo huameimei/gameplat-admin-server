@@ -7,7 +7,7 @@ import com.gameplat.admin.model.bean.router.VueRouter;
 import com.gameplat.admin.model.domain.SysMenu;
 import com.gameplat.admin.service.PermissionService;
 import com.gameplat.admin.service.SysCommonService;
-import com.gameplat.common.util.StringUtils;
+import com.gameplat.base.common.util.StringUtils;
 import com.gameplat.redis.captcha.CaptchaImage;
 import com.gameplat.redis.captcha.CaptchaProducer;
 import com.gameplat.redis.idempoten.AutoIdempotent;

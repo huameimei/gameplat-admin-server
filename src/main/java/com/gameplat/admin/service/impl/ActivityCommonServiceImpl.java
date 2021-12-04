@@ -3,7 +3,7 @@ package com.gameplat.admin.service.impl;
 import com.gameplat.admin.enums.GameTypeEnum;
 import com.gameplat.admin.model.dto.ActivityLobbyDTO;
 import com.gameplat.admin.service.ActivityCommonService;
-import com.gameplat.common.util.StringUtils;
+import com.gameplat.base.common.util.StringUtils;
 import org.springframework.stereotype.Service;
 
 /**

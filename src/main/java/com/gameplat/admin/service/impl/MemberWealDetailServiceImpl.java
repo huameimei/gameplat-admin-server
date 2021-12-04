@@ -12,7 +12,7 @@ import com.gameplat.admin.model.domain.MemberWealDetail;
 import com.gameplat.admin.model.dto.MemberWealDetailDTO;
 import com.gameplat.admin.model.vo.MemberWealDetailVO;
 import com.gameplat.admin.service.MemberWealDetailService;
-import com.gameplat.common.exception.ServiceException;
+import com.gameplat.base.common.exception.ServiceException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

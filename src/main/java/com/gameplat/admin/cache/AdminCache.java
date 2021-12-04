@@ -1,7 +1,7 @@
 package com.gameplat.admin.cache;
 
-import com.gameplat.common.constant.RedisCacheKey;
-import com.gameplat.common.util.StringUtils;
+import com.gameplat.base.common.constant.RedisCacheKey;
+import com.gameplat.base.common.util.StringUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;

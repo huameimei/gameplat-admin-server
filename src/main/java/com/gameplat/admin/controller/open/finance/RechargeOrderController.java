@@ -9,7 +9,7 @@ import com.gameplat.admin.model.dto.RechargeOrderQueryDTO;
 import com.gameplat.admin.model.vo.RechargeOrderVO;
 import com.gameplat.admin.model.vo.SummaryVO;
 import com.gameplat.admin.service.RechargeOrderService;
-import com.gameplat.common.exception.ServiceException;
+import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.security.SecurityUserHolder;
 import com.gameplat.security.context.UserCredential;
 import java.math.BigDecimal;

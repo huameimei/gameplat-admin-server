@@ -12,7 +12,7 @@ import com.gameplat.admin.model.vo.MemberRemarkVO;
 import com.gameplat.admin.service.MemberRemarkService;
 import com.gameplat.admin.service.MemberService;
 import com.gameplat.admin.constant.CachedKeys;
-import com.gameplat.common.exception.ServiceException;
+import com.gameplat.base.common.exception.ServiceException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;

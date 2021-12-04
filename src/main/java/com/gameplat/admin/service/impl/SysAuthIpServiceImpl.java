@@ -11,8 +11,8 @@ import com.gameplat.admin.model.dto.AuthIpDTO;
 import com.gameplat.admin.model.dto.OperAuthIpDTO;
 import com.gameplat.admin.model.vo.AuthIpVo;
 import com.gameplat.admin.service.SysAuthIpService;
-import com.gameplat.common.exception.ServiceException;
-import com.gameplat.common.util.StringUtils;
+import com.gameplat.base.common.exception.ServiceException;
+import com.gameplat.base.common.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

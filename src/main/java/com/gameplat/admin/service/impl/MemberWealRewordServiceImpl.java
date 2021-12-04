@@ -14,7 +14,7 @@ import com.gameplat.admin.model.dto.MemberWealRewordDTO;
 import com.gameplat.admin.model.vo.MemberWealRewordVO;
 import com.gameplat.admin.service.MemberService;
 import com.gameplat.admin.service.MemberWealRewordService;
-import com.gameplat.common.exception.ServiceException;
+import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.redis.redisson.DistributedLocker;
 import lombok.Cleanup;
 import lombok.RequiredArgsConstructor;

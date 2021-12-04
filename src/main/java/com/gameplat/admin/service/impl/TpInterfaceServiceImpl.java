@@ -16,7 +16,7 @@ import com.gameplat.admin.service.TpPayTypeService;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.gameplat.common.exception.ServiceException;
+import com.gameplat.base.common.exception.ServiceException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;

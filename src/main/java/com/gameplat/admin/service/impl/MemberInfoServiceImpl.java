@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.mapper.MemberInfoMapper;
 import com.gameplat.admin.model.domain.MemberInfo;
 import com.gameplat.admin.service.MemberInfoService;
-import com.gameplat.common.exception.ServiceException;
+import com.gameplat.base.common.exception.ServiceException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;

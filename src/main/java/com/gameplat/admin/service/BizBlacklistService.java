@@ -7,7 +7,7 @@ import com.gameplat.admin.model.domain.BizBlacklist;
 import com.gameplat.admin.model.domain.Member;
 import com.gameplat.admin.model.dto.BizBlacklistQueryDTO;
 import com.gameplat.admin.model.dto.OperBizBlacklistDTO;
-import com.gameplat.common.exception.ServiceException;
+import com.gameplat.base.common.exception.ServiceException;
 
 import java.util.Set;
 

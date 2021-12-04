@@ -7,7 +7,7 @@ import com.gameplat.common.model.dto.LogDTO;
 import com.gameplat.common.model.entity.MemberLogLogin;
 import com.gameplat.common.model.entity.MemberLogOper;
 import com.gameplat.common.model.vo.MemberLogVO;
-import com.gameplat.common.util.EasyExcelUtil;
+import com.gameplat.base.common.util.EasyExcelUtil;
 import com.gameplat.log.annotation.Log;
 import com.gameplat.log.enums.LogType;
 import com.gameplat.redis.idempoten.AutoIdempotent;

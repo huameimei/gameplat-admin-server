@@ -2,13 +2,12 @@ package com.gameplat.admin.service.impl;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.gameplat.admin.enums.LiveGame;
-import com.gameplat.admin.model.domain.LiveMemberDayReport;
 import com.gameplat.admin.model.dto.LiveBetRecordQueryDTO;
 import com.gameplat.admin.model.vo.LiveBetRecordVO;
 import com.gameplat.admin.model.vo.LiveGameResultVO;
 import com.gameplat.admin.model.vo.PageDtoVO;
 import com.gameplat.admin.service.LiveBetRecordService;
-import com.gameplat.common.exception.ServiceException;
+import com.gameplat.base.common.exception.ServiceException;
 import java.util.HashMap;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;

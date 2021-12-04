@@ -7,7 +7,7 @@ import com.gameplat.admin.model.domain.SysCashConfig;
 import com.gameplat.admin.model.domain.SysDictData;
 import com.gameplat.admin.model.domain.SysLayerConfig;
 import com.gameplat.admin.model.vo.CashConfigVO;
-import com.gameplat.common.util.BeanUtils;
+import com.gameplat.base.common.util.BeanUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;

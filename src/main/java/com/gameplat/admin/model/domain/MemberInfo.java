@@ -2,6 +2,7 @@ package com.gameplat.admin.model.domain;
 
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.Version;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -57,7 +58,7 @@ public class MemberInfo {
   private String cashSalt;
 
   @ApiModelProperty(value = "会员积分")
-  private String totalPoint;
+  private Integer totalPoint;
 
   @ApiModelProperty(value = "返点百分比")
   private String rebate;
@@ -107,4 +108,6 @@ public class MemberInfo {
   private BigDecimal totalWithdrawAmount;
 
   private Integer totalWithdrawTimes;
+
+  @Version private Integer version;
 }

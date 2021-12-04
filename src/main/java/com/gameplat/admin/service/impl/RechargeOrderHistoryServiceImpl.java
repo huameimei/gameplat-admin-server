@@ -49,7 +49,7 @@ public class RechargeOrderHistoryServiceImpl extends
     return rechargeOrderHistoryMapper.summaryRechargeOrderHistory(query);
   }
 
-  private LambdaQueryWrapper buildSql(RechargeOrderHistoryQueryDTO dto) {
+  private LambdaQueryWrapper<RechargeOrderHistory> buildSql(RechargeOrderHistoryQueryDTO dto) {
     LambdaQueryWrapper<RechargeOrderHistory> query = Wrappers.lambdaQuery();
     query.in(ObjectUtils.isNotNull(dto.getModeList()), RechargeOrderHistory::getMode,
         dto.getModeList())

@@ -7,7 +7,7 @@ import com.gameplat.admin.model.dto.SmsDTO;
 import com.gameplat.admin.model.vo.SMSVO;
 import com.gameplat.admin.service.SysSmsService;
 import com.gameplat.common.constant.ServiceName;
-import com.gameplat.common.enums.SmsCodeType;
+import com.gameplat.base.common.enums.SmsCodeType;
 import com.gameplat.log.annotation.Log;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

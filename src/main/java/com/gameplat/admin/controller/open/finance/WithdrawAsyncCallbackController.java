@@ -3,7 +3,7 @@ package com.gameplat.admin.controller.open.finance;
 
 import com.gameplat.admin.model.bean.NameValuePair;
 import com.gameplat.admin.service.ProxyPayService;
-import com.gameplat.common.util.IPUtils;
+import com.gameplat.base.common.util.IPUtils;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;

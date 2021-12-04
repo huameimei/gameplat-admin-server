@@ -8,7 +8,7 @@ import com.gameplat.admin.model.dto.PushMessageDTO;
 import com.gameplat.admin.model.dto.PushMessageRemoveDTO;
 import com.gameplat.admin.model.vo.PushMessageVO;
 import com.gameplat.admin.service.PushMessageService;
-import com.gameplat.common.context.GlobalContextHolder;
+import com.gameplat.base.common.context.GlobalContextHolder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;

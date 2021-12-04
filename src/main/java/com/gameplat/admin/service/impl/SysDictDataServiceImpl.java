@@ -24,10 +24,10 @@ import com.gameplat.admin.model.vo.DictDataVo;
 import com.gameplat.admin.model.vo.MemberWithdrawDictDataVo;
 import com.gameplat.admin.service.SysDictDataService;
 import com.gameplat.admin.constant.CachedKeys;
-import com.gameplat.common.enums.SystemCodeType;
-import com.gameplat.common.exception.ServiceException;
-import com.gameplat.common.json.JsonUtils;
-import com.gameplat.common.util.StringUtils;
+import com.gameplat.base.common.enums.SystemCodeType;
+import com.gameplat.base.common.exception.ServiceException;
+import com.gameplat.base.common.json.JsonUtils;
+import com.gameplat.base.common.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

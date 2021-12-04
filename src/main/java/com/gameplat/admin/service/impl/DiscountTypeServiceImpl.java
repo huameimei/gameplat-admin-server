@@ -12,7 +12,7 @@ import com.gameplat.admin.model.domain.DiscountType;
 import com.gameplat.admin.model.dto.DiscountTypeAddDTO;
 import com.gameplat.admin.model.dto.DiscountTypeEditDTO;
 import com.gameplat.admin.service.DiscountTypeService;
-import com.gameplat.common.exception.ServiceException;
+import com.gameplat.base.common.exception.ServiceException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;

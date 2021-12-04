@@ -72,4 +72,6 @@ public class RechargeOrderHistoryVO {
   private String currencyCount;
 
   private Long memberId;
+
+  private Integer memberLevel;
 }

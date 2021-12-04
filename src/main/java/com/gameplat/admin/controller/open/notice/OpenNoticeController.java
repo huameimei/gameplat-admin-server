@@ -6,7 +6,7 @@ import com.gameplat.admin.model.domain.Notice;
 import com.gameplat.admin.model.dto.*;
 import com.gameplat.admin.model.vo.NoticeVO;
 import com.gameplat.admin.service.NoticeService;
-import com.gameplat.common.context.GlobalContextHolder;
+import com.gameplat.base.common.context.GlobalContextHolder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;

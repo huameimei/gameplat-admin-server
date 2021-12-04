@@ -13,7 +13,7 @@ import com.gameplat.admin.model.domain.LiveBlacklist;
 import com.gameplat.admin.model.dto.LiveBlacklistQueryDTO;
 import com.gameplat.admin.model.dto.OperLiveBlacklistDTO;
 import com.gameplat.admin.service.LiveBlacklistService;
-import com.gameplat.common.exception.ServiceException;
+import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.security.SecurityUserHolder;
 import java.util.List;
 import lombok.RequiredArgsConstructor;

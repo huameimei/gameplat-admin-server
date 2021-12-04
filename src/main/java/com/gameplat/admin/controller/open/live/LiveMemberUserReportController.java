@@ -9,7 +9,7 @@ import com.gameplat.admin.model.vo.LiveReportVO;
 import com.gameplat.admin.model.vo.PageDtoVO;
 import com.gameplat.admin.service.GamePlatformService;
 import com.gameplat.admin.service.LiveMemberDayReportService;
-import com.gameplat.common.exception.ServiceException;
+import com.gameplat.base.common.exception.ServiceException;
 import java.util.List;
 import javax.annotation.Resource;
 import lombok.RequiredArgsConstructor;

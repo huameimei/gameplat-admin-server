@@ -1,6 +1,5 @@
 package com.gameplat.admin.model.dto;
 
-import com.gameplat.common.util.DateUtil;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import org.dozer.Mapping;

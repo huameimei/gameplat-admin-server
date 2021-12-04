@@ -11,7 +11,7 @@ import com.gameplat.admin.model.domain.QuickReply;
 import com.gameplat.admin.model.dto.QuickReplyDTO;
 import com.gameplat.admin.model.vo.QuickReplyVO;
 import com.gameplat.admin.service.QuickReplyService;
-import com.gameplat.common.exception.ServiceException;
+import com.gameplat.base.common.exception.ServiceException;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

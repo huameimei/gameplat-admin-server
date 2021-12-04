@@ -11,7 +11,7 @@ import com.gameplat.admin.mapper.MemberBackupMapper;
 import com.gameplat.admin.model.domain.MemberBackup;
 import com.gameplat.admin.model.vo.MemberBackupVO;
 import com.gameplat.admin.service.MemberBackupService;
-import com.gameplat.common.json.JsonUtils;
+import com.gameplat.base.common.json.JsonUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;

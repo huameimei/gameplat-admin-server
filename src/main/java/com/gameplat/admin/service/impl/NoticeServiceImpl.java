@@ -11,7 +11,7 @@ import com.gameplat.admin.model.dto.NoticeQueryDTO;
 import com.gameplat.admin.model.dto.NoticeUpdateStatusDTO;
 import com.gameplat.admin.model.vo.NoticeVO;
 import com.gameplat.admin.service.NoticeService;
-import com.gameplat.common.exception.ServiceException;
+import com.gameplat.base.common.exception.ServiceException;
 import lombok.RequiredArgsConstructor;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;

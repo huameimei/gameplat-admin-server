@@ -1,8 +1,8 @@
 package com.gameplat.admin.model.bean;
 
 import com.gameplat.admin.enums.RiskControllerTypeEnum;
-import com.gameplat.common.exception.ServiceException;
-import com.gameplat.common.json.JsonUtils;
+import com.gameplat.base.common.exception.ServiceException;
+import com.gameplat.base.common.json.JsonUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.math.BigDecimal;

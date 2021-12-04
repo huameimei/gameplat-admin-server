@@ -12,8 +12,8 @@ import com.gameplat.admin.model.vo.ActivityBlacklistVO;
 import com.gameplat.admin.model.vo.MemberInfoVO;
 import com.gameplat.admin.service.ActivityBlacklistService;
 import com.gameplat.admin.service.MemberService;
-import com.gameplat.common.exception.ServiceException;
-import com.gameplat.common.util.StringUtils;
+import com.gameplat.base.common.exception.ServiceException;
+import com.gameplat.base.common.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

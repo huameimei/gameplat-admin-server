@@ -169,10 +169,8 @@ public class ActivityDistributeServiceImpl
                     String remark = null;
                     Double amount = null;
                     //更新用户的金额
-                    boolean result = memberInfoService.updateMemberBalance(activityDistribute.getUsername(), activityDistribute.getDiscountsMoney());
-                    if (!result) {
-                        throw new ServiceException("用户添加金额失败");
-                    }
+                    memberInfoService.updateBalance(activityDistribute.getUserId(), activityDistribute.getDiscountsMoney());
+
                     //账号余额更新成功,修改派发状态
                     ActivityDistribute distribute = new ActivityDistribute();
                     distribute.setDistributeId(activityDistribute.getDistributeId());

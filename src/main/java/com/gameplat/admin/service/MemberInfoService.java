@@ -33,11 +33,4 @@ public interface MemberInfoService extends IService<MemberInfo> {
    * @param amount 扣除传负数，增加传正数
    */
   void updateBalance(Long memberId, BigDecimal amount);
-  /**
-   * 更新会员余额
-   * @param username
-   * @param discountsMoney
-   * @return
-   */
-  boolean updateMemberBalance(String username, BigDecimal discountsMoney);
 }

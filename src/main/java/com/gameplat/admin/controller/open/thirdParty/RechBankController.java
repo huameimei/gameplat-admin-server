@@ -7,16 +7,12 @@ import com.gameplat.admin.model.dto.OperDictDataDTO;
 import com.gameplat.admin.model.dto.SysDictDataDTO;
 import com.gameplat.admin.model.vo.DictDataVo;
 import com.gameplat.admin.service.SysDictDataService;
-import com.gameplat.common.exception.ServiceException;
 import com.gameplat.common.group.Groups;
-import com.gameplat.common.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.lang.reflect.Array;
-import java.util.Arrays;
 import java.util.List;
 
 @RestController

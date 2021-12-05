@@ -3,7 +3,7 @@ package com.gameplat.admin.controller.open.finance;
 
 import com.gameplat.admin.model.bean.ReturnMessage;
 import com.gameplat.admin.service.ProxyPayService;
-import com.gameplat.common.util.ServletUtils;
+import com.gameplat.base.common.util.ServletUtils;
 import com.gameplat.security.SecurityUserHolder;
 import com.gameplat.security.context.UserCredential;
 import javax.servlet.http.HttpServletRequest;

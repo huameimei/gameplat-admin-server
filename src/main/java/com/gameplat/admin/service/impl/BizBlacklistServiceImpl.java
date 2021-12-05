@@ -17,7 +17,7 @@ import com.gameplat.admin.model.dto.BizBlacklistQueryDTO;
 import com.gameplat.admin.model.dto.OperBizBlacklistDTO;
 import com.gameplat.admin.service.BizBlacklistService;
 import com.gameplat.admin.service.MemberService;
-import com.gameplat.common.exception.ServiceException;
+import com.gameplat.base.common.exception.ServiceException;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;

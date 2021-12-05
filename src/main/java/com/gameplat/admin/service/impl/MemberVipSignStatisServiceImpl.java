@@ -11,7 +11,7 @@ import com.gameplat.admin.model.domain.MemberVipSignStatis;
 import com.gameplat.admin.model.dto.MemberVipSignStatisDTO;
 import com.gameplat.admin.model.vo.MemberVipSignStatisVO;
 import com.gameplat.admin.service.MemberVipSignStatisService;
-import com.gameplat.common.exception.ServiceException;
+import com.gameplat.base.common.exception.ServiceException;
 import lombok.Cleanup;
 import lombok.RequiredArgsConstructor;
 import org.apache.poi.ss.usermodel.Workbook;

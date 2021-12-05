@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * 扩展工具类
  */
-public class DateUtil2 extends com.gameplat.common.util.DateUtil {
+public class DateUtil2 extends com.gameplat.base.common.util.DateUtil {
 
     /**
      * 获取当前时间星期

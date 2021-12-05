@@ -8,7 +8,7 @@ import com.gameplat.admin.mapper.SysVersionMapper;
 import com.gameplat.admin.model.domain.SysVersion;
 import com.gameplat.admin.model.dto.VersionDTO;
 import com.gameplat.admin.service.SysVersionService;
-import com.gameplat.common.enums.SystemCodeType;
+import com.gameplat.base.common.enums.SystemCodeType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

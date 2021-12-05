@@ -18,9 +18,9 @@ import com.gameplat.admin.model.vo.*;
 import com.gameplat.admin.service.MemberService;
 import com.gameplat.admin.service.OnlineUserService;
 import com.gameplat.admin.service.PushMessageService;
-import com.gameplat.common.exception.ServiceException;
-import com.gameplat.common.util.BeanUtils;
-import com.gameplat.common.util.DateUtils;
+import com.gameplat.base.common.exception.ServiceException;
+import com.gameplat.base.common.util.BeanUtils;
+import com.gameplat.base.common.util.DateUtils;
 import com.gameplat.security.context.UserCredential;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -228,7 +228,7 @@ public class PushMessageServiceImpl extends ServiceImpl<PushMessageMapper, PushM
         if (ObjectUtils.isNull(ids)) {
             throw new ServiceException("ids不能为空!");
         }
-        List<String> idArr = Arrays.asList(com.gameplat.common.util.StringUtils.split(ids, ","));
+        List<String> idArr = Arrays.asList(com.gameplat.base.common.util.StringUtils.split(ids, ","));
         for (String id : idArr) {
             PushMessage pushMessage = this.getById(Long.valueOf(id));
             pushMessage.setAcceptRemoveFlag(NoticeEnum.ACCEPT_REMOVE_FLAG_YES.getValue());

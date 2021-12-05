@@ -3,7 +3,7 @@ package com.gameplat.admin.model.domain;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.gameplat.common.json.JsonUtils;
+import com.gameplat.base.common.json.JsonUtils;
 import lombok.Data;
 import org.apache.commons.lang.StringUtils;
 

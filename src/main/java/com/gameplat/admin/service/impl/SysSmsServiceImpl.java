@@ -11,7 +11,7 @@ import com.gameplat.admin.model.dto.OperSmsDTO;
 import com.gameplat.admin.model.dto.SmsDTO;
 import com.gameplat.admin.model.vo.SMSVO;
 import com.gameplat.admin.service.SysSmsService;
-import com.gameplat.common.exception.ServiceException;
+import com.gameplat.base.common.exception.ServiceException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

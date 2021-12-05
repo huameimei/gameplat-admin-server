@@ -10,7 +10,7 @@ import com.gameplat.admin.model.domain.AccountBlacklist;
 import com.gameplat.admin.model.dto.AccountBlacklistQueryDTO;
 import com.gameplat.admin.model.dto.OperAccountBlacklistDTO;
 import com.gameplat.admin.service.AccountBlacklistService;
-import com.gameplat.common.exception.ServiceException;
+import com.gameplat.base.common.exception.ServiceException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

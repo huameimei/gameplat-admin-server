@@ -8,7 +8,7 @@ import com.gameplat.common.model.entity.MemberLogLogin;
 import com.gameplat.common.model.entity.MemberLogOper;
 import com.gameplat.common.model.vo.MemberLogVO;
 import com.gameplat.common.model.vo.UserLogVO;
-import com.gameplat.common.util.BeanUtils;
+import com.gameplat.base.common.util.BeanUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

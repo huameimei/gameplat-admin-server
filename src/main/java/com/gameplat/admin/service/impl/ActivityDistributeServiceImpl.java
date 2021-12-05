@@ -17,9 +17,9 @@ import com.gameplat.admin.model.dto.ActivityDistributeDTO;
 import com.gameplat.admin.model.dto.PushMessageAddDTO;
 import com.gameplat.admin.model.vo.ActivityDistributeVO;
 import com.gameplat.admin.service.*;
-import com.gameplat.common.exception.ServiceException;
-import com.gameplat.common.util.IPUtils;
-import com.gameplat.common.util.StringUtils;
+import com.gameplat.base.common.exception.ServiceException;
+import com.gameplat.base.common.util.IPUtils;
+import com.gameplat.base.common.util.StringUtils;
 import com.gameplat.redis.redisson.DistributedLocker;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
@@ -175,10 +175,8 @@ public class ActivityDistributeServiceImpl
                     String remark = null;
                     Double amount = null;
                     //更新用户的金额
-                    boolean result = memberInfoService.updateMemberBalance(activityDistribute.getUsername(), activityDistribute.getDiscountsMoney());
-                    if (!result) {
-                        throw new ServiceException("用户添加金额失败");
-                    }
+                    memberInfoService.updateBalance(activityDistribute.getUserId(), activityDistribute.getDiscountsMoney());
+
                     //账号余额更新成功,修改派发状态
                     ActivityDistribute distribute = new ActivityDistribute();
                     distribute.setDistributeId(activityDistribute.getDistributeId());

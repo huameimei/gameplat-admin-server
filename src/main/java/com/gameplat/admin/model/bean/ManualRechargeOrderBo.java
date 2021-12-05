@@ -1,7 +1,7 @@
 package com.gameplat.admin.model.bean;
 
 
-import com.gameplat.common.json.JsonUtils;
+import com.gameplat.base.common.json.JsonUtils;
 import lombok.Data;
 
 import javax.validation.constraints.NotNull;

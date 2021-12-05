@@ -10,7 +10,7 @@ import com.gameplat.admin.model.domain.BankBlacklist;
 import com.gameplat.admin.model.dto.BankBlacklistQueryDTO;
 import com.gameplat.admin.model.dto.OperBankBlacklistDTO;
 import com.gameplat.admin.service.BankBlacklistService;
-import com.gameplat.common.exception.ServiceException;
+import com.gameplat.base.common.exception.ServiceException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

@@ -5,7 +5,7 @@ import com.gameplat.admin.constant.RechargeMode;
 import com.gameplat.admin.mapper.RechargeConfigMapper;
 import com.gameplat.admin.model.domain.RechargeConfig;
 import com.gameplat.admin.service.RechargeConfigService;
-import com.gameplat.common.exception.ServiceException;
+import com.gameplat.base.common.exception.ServiceException;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

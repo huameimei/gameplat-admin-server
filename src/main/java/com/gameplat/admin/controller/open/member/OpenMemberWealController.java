@@ -11,7 +11,7 @@ import com.gameplat.admin.model.vo.MemberGrowthConfigVO;
 import com.gameplat.admin.model.vo.MemberWealDetailVO;
 import com.gameplat.admin.model.vo.MemberWealVO;
 import com.gameplat.admin.service.*;
-import com.gameplat.common.exception.ServiceException;
+import com.gameplat.base.common.exception.ServiceException;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;

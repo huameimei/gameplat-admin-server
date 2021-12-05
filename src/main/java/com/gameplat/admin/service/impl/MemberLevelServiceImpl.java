@@ -18,7 +18,7 @@ import com.gameplat.admin.model.vo.MemberLevelVO;
 import com.gameplat.admin.service.MemberLevelService;
 import com.gameplat.admin.service.MemberService;
 import com.gameplat.admin.constant.CachedKeys;
-import com.gameplat.common.exception.ServiceException;
+import com.gameplat.base.common.exception.ServiceException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

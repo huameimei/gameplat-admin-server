@@ -9,7 +9,7 @@ import com.gameplat.admin.model.domain.TpPayType;
 import com.gameplat.admin.model.vo.TpPayTypeVO;
 import com.gameplat.admin.service.TpPayTypeService;
 
-import com.gameplat.common.exception.ServiceException;
+import com.gameplat.base.common.exception.ServiceException;
 import java.util.List;
 import java.util.stream.Collectors;
 

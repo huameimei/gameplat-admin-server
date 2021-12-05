@@ -13,7 +13,7 @@ import com.gameplat.admin.model.domain.MemberBill;
 import com.gameplat.admin.model.dto.MemberBillDTO;
 import com.gameplat.admin.model.vo.MemberBillVO;
 import com.gameplat.admin.service.MemberBillService;
-import com.gameplat.common.exception.ServiceException;
+import com.gameplat.base.common.exception.ServiceException;
 import lombok.Cleanup;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -164,6 +164,7 @@ public class MemberBillServiceImpl extends ServiceImpl<MemberBillMapper, MemberB
               dto.getBeginTime(),
               dto.getEndTime(),
               tableIndex);
+
       return voList;
     }
   }

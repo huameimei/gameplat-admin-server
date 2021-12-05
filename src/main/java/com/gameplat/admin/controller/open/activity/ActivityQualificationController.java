@@ -55,6 +55,7 @@ public class ActivityQualificationController {
      *
      * @param activityQualificationUpdateDTO
      */
+    @ApiOperation(value = "修改活动资格")
     @PutMapping("/update")
     @PreAuthorize("hasAuthority('activity:qualification:edit')")
     public void update(@RequestBody ActivityQualificationUpdateDTO activityQualificationUpdateDTO) {
@@ -69,6 +70,7 @@ public class ActivityQualificationController {
      *
      * @param activityQualificationUpdateStatusDTO
      */
+    @ApiOperation(value = "更新活动资格状态")
     @PutMapping("/updateStatus")
     @PreAuthorize("hasAuthority('activity:qualification:edit')")
     public void updateStatus(@RequestBody ActivityQualificationUpdateStatusDTO activityQualificationUpdateStatusDTO) {
@@ -83,6 +85,7 @@ public class ActivityQualificationController {
      *
      * @param activityQualificationUpdateStatusDTO
      */
+    @ApiOperation(value = "更新活动资格状态")
     @PutMapping("/updateQualificationStatus")
     @PreAuthorize("hasAuthority('activity:qualification:edit')")
     public void updateQualificationStatus(@RequestBody ActivityQualificationUpdateStatusDTO activityQualificationUpdateStatusDTO) {
@@ -90,10 +93,11 @@ public class ActivityQualificationController {
     }
 
     /**
-     * 更新状态
+     * 删除活动资格
      *
      * @param ids
      */
+    @ApiOperation(value = "删除活动资格")
     @DeleteMapping("/delete")
     @PreAuthorize("hasAuthority('activity:qualification:remove')")
     public void delete(@RequestBody String ids) {

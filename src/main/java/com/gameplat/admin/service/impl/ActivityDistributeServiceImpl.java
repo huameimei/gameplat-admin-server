@@ -7,6 +7,10 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.constant.MemberServiceKeyConstant;
 import com.gameplat.admin.convert.ActivityDistributeConvert;
+import com.gameplat.admin.enums.ActivityDistributeEnum;
+import com.gameplat.admin.enums.FinancialModeEnum;
+import com.gameplat.admin.enums.MemberWealRewordEnums;
+import com.gameplat.admin.enums.PushMessageEnum;
 import com.gameplat.admin.mapper.ActivityDistributeMapper;
 import com.gameplat.admin.model.domain.*;
 import com.gameplat.admin.model.dto.ActivityDistributeDTO;
@@ -71,9 +75,9 @@ public class ActivityDistributeServiceImpl
         return this.lambdaQuery()
                 .eq(activityDistribute.getActivityId() != null && activityDistribute.getActivityId() != 0
                         , ActivityDistribute::getActivityId, activityDistribute.getActivityId())
-                .eq(activityDistribute.getDeleteFlag() != null && activityDistribute.getDeleteFlag() != 0
+                .eq(activityDistribute.getDeleteFlag() != null
                         , ActivityDistribute::getDeleteFlag, activityDistribute.getDeleteFlag())
-                .eq(activityDistribute.getStatus() != null && activityDistribute.getStatus() != 0
+                .eq(activityDistribute.getStatus() != null
                         , ActivityDistribute::getStatus, activityDistribute.getStatus())
                 .list();
     }
@@ -104,7 +108,7 @@ public class ActivityDistributeServiceImpl
                         , ActivityDistribute::getUsername, activityDistributeDTO.getUsername())
                 .eq(activityDistributeDTO.getActivityId() != null && activityDistributeDTO.getActivityId() != 0
                         , ActivityDistribute::getActivityId, activityDistributeDTO.getActivityId())
-                .eq(activityDistributeDTO.getStatus() != null && activityDistributeDTO.getStatus() != 0
+                .eq(activityDistributeDTO.getStatus() != null
                         , ActivityDistribute::getStatus, activityDistributeDTO.getStatus())
                 .eq(activityDistributeDTO.getGetWay() != null && activityDistributeDTO.getGetWay() != 0
                         , ActivityDistribute::getGetWay, activityDistributeDTO.getGetWay())
@@ -125,16 +129,16 @@ public class ActivityDistributeServiceImpl
                 .in(ActivityDistribute::getDistributeId, ids.split(",")).list();
         if (CollectionUtils.isNotEmpty(activityDistributeList)) {
             for (ActivityDistribute activityDistribute : activityDistributeList) {
-                if (activityDistribute.getStatus() == 0) {
+                if (activityDistribute.getStatus() == ActivityDistributeEnum.ActivityDistributeStatus.INVALID.getValue()) {
                     throw new ServiceException("无效状态不能结算！");
                 }
-                if (activityDistribute.getStatus() == 2) {
+                if (activityDistribute.getStatus() == ActivityDistributeEnum.ActivityDistributeStatus.SETTLED.getValue()) {
                     throw new ServiceException("已结算的不能重复结算！");
                 }
             }
         }
 
-        log.info("开始派发活动奖励", System.currentTimeMillis());
+        log.info("开始派发活动奖励,{}", System.currentTimeMillis());
         //修改用户真币、资金流水
         for (ActivityDistribute activityDistribute : activityDistributeList) {
             Integer getWay = activityDistribute.getGetWay();
@@ -145,11 +149,13 @@ public class ActivityDistributeServiceImpl
             wealReword.setRewordAmount(activityDistribute.getDiscountsMoney());
             wealReword.setWithdrawDml(new BigDecimal(activityDistribute.getWithdrawDml()));
             wealReword.setType(5);//5 活动大厅奖励
+
+
             wealReword.setSerialNumber(activityDistribute.getDistributeId().toString());
             wealReword.setActivityTitle(activityDistribute.getActivityName());
 
             //如果领取方式是1,则直接派发金额到会员账户
-            if (getWay == 1) {
+            if (getWay == ActivityDistributeEnum.ActivityDistributeGetWayEnum.DIRECT_RELEASE.getValue()) {
                 // 账户资金锁
                 String lockKey = MessageFormat.format(MemberServiceKeyConstant.MEMBER_FINANCIAL_LOCK, activityDistribute.getUsername());
                 try {
@@ -160,7 +166,7 @@ public class ActivityDistributeServiceImpl
                         continue;
                     }
                     ActivityDistribute activityDistribute1 = this.getById(activityDistribute.getDistributeId());
-                    if (activityDistribute1.getStatus() != 1) {
+                    if (activityDistribute1.getStatus() != ActivityDistributeEnum.ActivityDistributeStatus.SETTLEMENT.getValue()) {
                         continue;
                     }
                     // 初始化参数
@@ -176,7 +182,7 @@ public class ActivityDistributeServiceImpl
                     //账号余额更新成功,修改派发状态
                     ActivityDistribute distribute = new ActivityDistribute();
                     distribute.setDistributeId(activityDistribute.getDistributeId());
-                    distribute.setStatus(2);
+                    distribute.setStatus(ActivityDistributeEnum.ActivityDistributeStatus.SETTLED.getValue());
                     distribute.setSettlementTime(new Date());
                     this.updateById(distribute);
 
@@ -217,7 +223,7 @@ public class ActivityDistributeServiceImpl
                     financial.setSourceType(50);
                     financial.setSourceId(String.valueOf(sourceId));
                     financial.setState(status);
-                    financial.setMode(3);
+                    financial.setMode(FinancialModeEnum.BACKSTAGE_DEPOSIT.getValue());
                     financial.setRemark(remark);
                     financial.setCreateTime(new Date());
                     financial.setUserId(activityDistribute.getUserId());
@@ -229,14 +235,14 @@ public class ActivityDistributeServiceImpl
                     financialService.insert(financial);
 
                     //插入福利中心记录(已领取)
-                    wealReword.setStatus(2);
+                    wealReword.setStatus(MemberWealRewordEnums.MemberWealRewordStatus.COMPLETED.getValue());
                     memberWealRewordService.save(wealReword);
 
                     //通知 发个人消息
                     PushMessageAddDTO pushMessage = new PushMessageAddDTO();
                     pushMessage.setMessageContent(getInformationContent(activityDistribute, getWay));
                     pushMessage.setMessageTitle("活动派发");
-                    pushMessage.setUserRange(1);
+                    pushMessage.setUserRange(PushMessageEnum.UserRange.SOME_MEMBERS.getValue());
                     pushMessage.setUserAccount(activityDistribute.getUsername());
                     pushMessageService.insertPushMessage(pushMessage);
 
@@ -249,17 +255,17 @@ public class ActivityDistributeServiceImpl
                     distributedLocker.unlock(lockKey);
                     continue;
                 } finally {
-
+                    distributedLocker.unlock(lockKey);
                 }
-            } else if (getWay == 2) {
+            } else if (getWay == ActivityDistributeEnum.ActivityDistributeGetWayEnum.WELFARE_CENTER.getValue()) {
 //                如果领取方式是2, 则将活动奖励记录插入福利中心, 会员需自己点击领取
-                wealReword.setStatus(1);
+                wealReword.setStatus(MemberWealRewordEnums.MemberWealRewordStatus.UNACCALIMED.getValue());
                 memberWealRewordService.save(wealReword);
 
                 //账变成功,修改派发状态
                 ActivityDistribute distribute = new ActivityDistribute();
                 distribute.setDistributeId(activityDistribute.getDistributeId());
-                distribute.setStatus(2);
+                distribute.setStatus(ActivityDistributeEnum.ActivityDistributeStatus.SETTLED.getValue());
                 distribute.setSettlementTime(new Date());
                 this.updateById(distribute);
 
@@ -274,14 +280,14 @@ public class ActivityDistributeServiceImpl
                 PushMessageAddDTO pushMessage = new PushMessageAddDTO();
                 pushMessage.setMessageContent(getInformationContent(activityDistribute, getWay));
                 pushMessage.setMessageTitle("活动派发");
-                pushMessage.setUserRange(1);
+                pushMessage.setUserRange(PushMessageEnum.UserRange.SOME_MEMBERS.getValue());
                 pushMessage.setUserAccount(activityDistribute.getUsername());
                 pushMessageService.insertPushMessage(pushMessage);
             } else {
                 throw new ServiceException("无效的领取方式参数");
             }
         }
-        log.info("派发活动奖励结束", System.currentTimeMillis());
+        log.info("派发活动奖励结束,{}", System.currentTimeMillis());
     }
 
     @Override
@@ -333,18 +339,17 @@ public class ActivityDistributeServiceImpl
      */
     private String getInformationContent(ActivityDistribute distributeVO, Integer getWay) {
         StringBuilder str = new StringBuilder();
-        if (getWay == 1) {
+        if (ActivityDistributeEnum.ActivityDistributeGetWayEnum.DIRECT_RELEASE.getValue() == getWay) {
             str.append(distributeVO.getUsername())
                     .append("奖励已派发,金额:")
                     .append(distributeVO.getDiscountsMoney())
                     .append("。");
-        } else if (getWay == 2) {
+        } else if (ActivityDistributeEnum.ActivityDistributeGetWayEnum.WELFARE_CENTER.getValue() == getWay) {
             str.append(distributeVO.getUsername())
                     .append(",奖励已发送到福利中心,请到福利中心领取,金额:")
                     .append(distributeVO.getDiscountsMoney())
                     .append("。");
         }
-
         return str.toString();
     }
 }

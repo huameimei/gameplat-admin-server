@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapp
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.convert.ActivityInfoConvert;
+import com.gameplat.admin.enums.SysBannerInfoEnum;
 import com.gameplat.admin.mapper.ActivityInfoMapper;
 import com.gameplat.admin.model.domain.ActivityInfo;
 import com.gameplat.admin.model.domain.ActivityType;
@@ -81,11 +82,12 @@ public class ActivityInfoServiceImpl
                 SysBannerInfo banner = new SysBannerInfo();
                 banner.setChildType(activityInfo.getId());
                 banner.setLanguage(country);
-                banner.setStatus(1);
+                banner.setStatus(SysBannerInfoEnum.Status.VALID.getValue());
+
                 List<SysBannerInfo> bannerList = sysBannerInfoService.getByBanner(banner);
                 bannerList.forEach(sysBannerInfo -> {
                     if (sysBannerInfo.getStatus() != 0 && !activityInfo.getStatus().equals(sysBannerInfo.getStatus())) {
-                        sysBannerInfo.setStatus(0);
+                        sysBannerInfo.setStatus(SysBannerInfoEnum.Status.INVALID.getValue());
                         sysBannerInfoService.save(sysBannerInfo);
                     }
                 });

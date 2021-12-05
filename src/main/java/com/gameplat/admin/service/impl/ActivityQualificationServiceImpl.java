@@ -10,12 +10,11 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.gameplat.admin.constant.ActivityConst;
 import com.gameplat.admin.convert.ActivityLobbyConvert;
 import com.gameplat.admin.convert.ActivityQualificationConvert;
-import com.gameplat.admin.enums.GameTypeEnum;
 import com.gameplat.admin.mapper.ActivityQualificationMapper;
 import com.gameplat.admin.model.domain.ActivityDistribute;
-import com.gameplat.admin.model.domain.ActivityLobby;
 import com.gameplat.admin.model.domain.ActivityQualification;
 import com.gameplat.admin.model.dto.*;
 import com.gameplat.admin.model.vo.ActivityQualificationVO;
@@ -180,17 +179,17 @@ public class ActivityQualificationServiceImpl extends
                 this.lambdaQuery().in(ActivityQualification::getId
                         , activityQualificationUpdateStatusDTO.getQualificationIds()).list();
         for (ActivityQualification qualification : qualificationManageStatusList) {
-            if (qualification.getStatus() == 0) {
+            if (qualification.getStatus() == ActivityConst.QUALIFICATION_STATUS_INVALID) {
                 throw new ServiceException("您选择的数据有无效数据，无效数据不能审核！");
             }
-            if (qualification.getStatus() == 2) {
+            if (qualification.getStatus() == ActivityConst.QUALIFICATION_STATUS_AUDIT) {
                 throw new ServiceException("您选择的数据有已审核的数据，请勿重复审核！");
             }
-            if (qualification.getQualificationStatus() == 0) {
+            if (qualification.getQualificationStatus() == ActivityConst.QUALIFICATION_STATUS_INVALID) {
                 throw new ServiceException("您选择的数据有资格状态被禁用的数据，禁用状态不能审核！");
             }
             //更新数据
-            qualification.setStatus(2);
+            qualification.setStatus(ActivityConst.QUALIFICATION_STATUS_AUDIT);
             qualification.setAuditPerson(GlobalContextHolder.getContext().getUsername());
             qualification.setAuditTime(new Date());
         }

@@ -9,6 +9,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.convert.PushMessageConvert;
 import com.gameplat.admin.enums.NoticeEnum;
+import com.gameplat.admin.enums.PushMessageEnum;
 import com.gameplat.admin.mapper.PushMessageMapper;
 import com.gameplat.admin.model.domain.Member;
 import com.gameplat.admin.model.domain.PushMessage;
@@ -91,8 +92,10 @@ public class PushMessageServiceImpl extends ServiceImpl<PushMessageMapper, PushM
         int perSize = 1000;
         List<PushMessage> pushMessageList = new ArrayList<>();
         //根据不同的类型，进行新增消息
-        switch (pushMessageAddDTO.getUserRange()) {
-            case 1://1-部分会员,获取部分会有账号
+
+        PushMessageEnum.UserRange userRange = PushMessageEnum.UserRange.get(pushMessageAddDTO.getUserRange());
+        switch (userRange) {
+            case SOME_MEMBERS://1-部分会员,获取部分会有账号
                 if (StringUtils.isBlank(pushMessageAddDTO.getUserAccount())) {
                     throw new ServiceException("会员帐号不能为空");
                 }
@@ -122,7 +125,7 @@ public class PushMessageServiceImpl extends ServiceImpl<PushMessageMapper, PushM
                     pushMessageList.add(pushMessage);
                 }
                 break;
-            case 2://2-所有会有
+            case ALL_MEMBERS://2-所有会有
                 Page<Member> page1 = new Page<>();
                 page1.setCurrent(1);
                 page1.setSize(perSize);
@@ -148,13 +151,13 @@ public class PushMessageServiceImpl extends ServiceImpl<PushMessageMapper, PushM
                     }
                 }
                 break;
-            case 3:
+            case ONLINE_MEMBER:
                 // 3-在线会员
                 onlineUserService
                         .getOnlineUsers()
                         .forEach(user -> buildPushMessage(pushMessageAddDTO, pushMessageList, user));
                 break;
-            case 4:
+            case SPECIFY_LEVEL:
                 //4-指定层级
                 if (ObjectUtils.isNull(pushMessageAddDTO.getUserLevel()) || pushMessageAddDTO.getUserLevel().length < 1) {
                     throw new ServiceException("充值层级不能为空");
@@ -168,7 +171,7 @@ public class PushMessageServiceImpl extends ServiceImpl<PushMessageMapper, PushM
                     }
                 }
                 break;
-            case 5://5-代理线
+            case AGENT_LINE://5-代理线
                 if (StringUtils.isBlank(pushMessageAddDTO.getAgentAccount())) {
                     throw new ServiceException("代理帐号不能为空");
                 }

@@ -8,6 +8,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.convert.ActivityLobbyConvert;
 import com.gameplat.admin.convert.ActivityLobbyDiscountConvert;
+import com.gameplat.admin.enums.ActivityLobbyEnum;
 import com.gameplat.admin.enums.DetailDateEnum;
 import com.gameplat.admin.mapper.ActivityLobbyMapper;
 import com.gameplat.admin.model.domain.ActivityDistribute;
@@ -80,7 +81,7 @@ public class ActivityLobbyServiceImpl extends ServiceImpl<ActivityLobbyMapper, A
         ActivityLobby activityLobby = activityLobbyConvert.toEntity(activityLobbyAddDTO);
         //优惠打折列表
         List<ActivityLobbyDiscount> activityLobbyDiscounts = BeanUtils.mapList(activityLobbyAddDTO.getLobbyDiscountList(), ActivityLobbyDiscount.class);
-        if (activityLobbyAddDTO.getStatisItem() == 10) {
+        if (activityLobbyAddDTO.getStatisItem() == ActivityLobbyEnum.StatisItem.CUMULATIVE_SPORTS_RECHARGE_AMOUNT.getValue()) {
             if (StringUtils.isNull(activityLobbyAddDTO.getMatchId())) {
                 throw new ServiceException("指定比赛不能为空");
             }
@@ -191,8 +192,11 @@ public class ActivityLobbyServiceImpl extends ServiceImpl<ActivityLobbyMapper, A
             throw new ServiceException("奖励赠送列表中,设定的赠送金额不能重复");
         }
 
-        if (activityLobbyAddDTO.getStatisItem() == 2 || activityLobbyAddDTO.getStatisItem() == 3
-                || activityLobbyAddDTO.getStatisItem() == 7 || activityLobbyAddDTO.getStatisItem() == 8) {
+
+        if (activityLobbyAddDTO.getStatisItem() == ActivityLobbyEnum.StatisItem.CUMULATIVE_RECHARGE_DAYS.getValue()
+                || activityLobbyAddDTO.getStatisItem() == ActivityLobbyEnum.StatisItem.CONTINUOUS_RECHARGE_DAYS.getValue()
+                || activityLobbyAddDTO.getStatisItem() == ActivityLobbyEnum.StatisItem.ACCUMULATED_LOTTERY_CODING_DAYS.getValue()
+                || activityLobbyAddDTO.getStatisItem() == ActivityLobbyEnum.StatisItem.NUMBER_OF_CONSECUTIVE_LOTTERY_RECHARGE_DAYS.getValue()) {
             for (ActivityLobbyDiscount activityLobbyDiscount : activityLobbyDiscounts) {
                 if (activityLobbyDiscount.getTargetValue() < 2) {
                     throw new ServiceException("奖励赠送列表中,设定的目标天数最小值为2");
@@ -207,7 +211,6 @@ public class ActivityLobbyServiceImpl extends ServiceImpl<ActivityLobbyMapper, A
 
         for (ActivityLobbyDiscount activityLobbyDiscount : activityLobbyDiscounts) {
             activityLobbyDiscount.setLobbyId(activityLobby.getId());
-//            activityLobbyDiscount.setCreateBy(SysUserUtil.getUserName());
             activityLobbyDiscount.setCreateTime(new Date());
         }
         boolean isSaveLobbyDiscount = activityLobbyDiscountService.saveBatchLobbyDiscount(activityLobbyDiscounts);
@@ -236,7 +239,7 @@ public class ActivityLobbyServiceImpl extends ServiceImpl<ActivityLobbyMapper, A
             throw new ServiceException("该活动已过期，如要创建一个新的活动，请点击新增添加");
         }
 
-        if (activityLobbyUpdateDTO.getStatisItem() == 10) {
+        if (activityLobbyUpdateDTO.getStatisItem() == ActivityLobbyEnum.StatisItem.CUMULATIVE_SPORTS_RECHARGE_AMOUNT.getValue()) {
             if (StringUtils.isNull(activityLobbyUpdateDTO.getMatchId())) {
                 throw new ServiceException("指定比赛不能为空");
             }
@@ -388,8 +391,10 @@ public class ActivityLobbyServiceImpl extends ServiceImpl<ActivityLobbyMapper, A
             }
         }
 
-        if (activityLobbyUpdateDTO.getStatisItem() == 2 || activityLobbyUpdateDTO.getStatisItem() == 3
-                || activityLobbyUpdateDTO.getStatisItem() == 7 || activityLobbyUpdateDTO.getStatisItem() == 8) {
+        if (activityLobbyUpdateDTO.getStatisItem() == ActivityLobbyEnum.StatisItem.CUMULATIVE_RECHARGE_DAYS.getValue()
+                || activityLobbyUpdateDTO.getStatisItem() == ActivityLobbyEnum.StatisItem.CONTINUOUS_RECHARGE_DAYS.getValue()
+                || activityLobbyUpdateDTO.getStatisItem() == ActivityLobbyEnum.StatisItem.ACCUMULATED_LOTTERY_CODING_DAYS.getValue()
+                || activityLobbyUpdateDTO.getStatisItem() == ActivityLobbyEnum.StatisItem.NUMBER_OF_CONSECUTIVE_LOTTERY_RECHARGE_DAYS.getValue()) {
             for (ActivityLobbyDiscountDTO activityLobbyDiscountDTO : lobbyDiscountList) {
                 if (activityLobbyDiscountDTO.getTargetValue() < 2) {
                     throw new ServiceException("奖励赠送列表中,设定的目标天数最小值为2");

@@ -130,18 +130,16 @@ public class OpenMemberWealController {
 
     @GetMapping("/details")
     @ApiOperation(value = "详情")
-    public IPage<MemberWealDetailVO> getDetails(PageDTO<MemberWealDetail> page, MemberWeal dto) {
+    public IPage<MemberWealDetailVO> getDetails(PageDTO<MemberWealDetail> page, MemberWealDetailDTO dto) {
         //判断是否开启了VIP
         MemberGrowthConfigVO isVip = configService.findOneConfig(LanguageEnum.app_zh_CN.getCode());
         if (isVip.getIsEnableVip() == 0) {
             throw new ServiceException("未开启VIP功能");
         }
-        if (ObjectUtils.isEmpty(dto.getId())){
-            throw new ServiceException("id不能为空");
+        if (ObjectUtils.isEmpty(dto.getWealId())){
+            throw new ServiceException("福利id不能为空");
         }
-        MemberWealDetailDTO wealDetailDTO = new MemberWealDetailDTO();
-        wealDetailDTO.setWealId(dto.getId());
-        return memberWealDetailService.findWealDetailList(page, wealDetailDTO);
+        return memberWealDetailService.findWealDetailList(page, dto);
     }
 
 }

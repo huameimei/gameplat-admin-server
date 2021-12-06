@@ -1,9 +1,14 @@
 package com.gameplat.admin.controller.open.member;
 
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.json.JSONArray;
+import cn.hutool.json.JSONObject;
+import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
+import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.gameplat.admin.enums.LanguageEnum;
 import com.gameplat.admin.model.dto.MemberGrowthConfigEditDto;
+import com.gameplat.admin.model.dto.MemberGrowthLevelEditDto;
 import com.gameplat.admin.model.vo.MemberConfigLevelVO;
 import com.gameplat.admin.model.vo.MemberGrowthConfigVO;
 import com.gameplat.admin.model.vo.MemberGrowthLevelVO;
@@ -13,6 +18,7 @@ import com.gameplat.base.common.context.GlobalContextHolder;
 import com.gameplat.base.common.exception.ServiceException;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -26,7 +32,7 @@ import java.util.List;
  * @date 2021/11/20
  */
 
-@Api(tags = "用户成长值等级API")
+@Api(tags = "VIP等级配置")
 @Slf4j
 @RestController
 @RequestMapping("/api/admin/member/growthLevel")
@@ -36,10 +42,11 @@ public class OpenMemberGrowthLevelController {
 
     @Autowired private MemberGrowthConfigService configService;
 
-    @ApiOperation(value = "获取成长等级和配置")
+    @ApiOperation(value = "VIP配置和VIP等级列表")
     @GetMapping("/config")
     @PreAuthorize("hasAuthority('member:growthLevel:config')")
-    public MemberConfigLevelVO getLevelConfig(@RequestParam(required = false) String language) {
+    public MemberConfigLevelVO getLevelConfig(@ApiParam(name="language",value="语言",required=false)
+                                              @RequestParam(required = false) String language) {
         try {
             if (StrUtil.isBlank(language)){
                 language = LanguageEnum.app_zh_CN.getCode();
@@ -62,10 +69,11 @@ public class OpenMemberGrowthLevelController {
         }
     }
 
-    @ApiOperation(value = "后台修改成长值配置")
+    @ApiOperation(value = "修改VIP配置")
     @PreAuthorize("hasAuthority('member:growthLevel:edit')")
     @PutMapping("/update")
-    public void update(@RequestBody MemberGrowthConfigEditDto configEditDto) {
+    public void update(@ApiParam(name="修改VIP配置入参",value="传入json格式",required=true)
+                       @RequestBody MemberGrowthConfigEditDto configEditDto) {
 
         if(ObjectUtils.isEmpty(configEditDto.getId())){
             throw new ServiceException(" 编号不能为空");
@@ -75,5 +83,18 @@ public class OpenMemberGrowthLevelController {
            configEditDto.setLanguage(LanguageEnum.app_zh_CN.getCode());
         }
         configService.updateGrowthConfig(configEditDto);
+    }
+
+
+    @ApiOperation(value = "后台批量修改VIP等级")
+    @PreAuthorize("hasAuthority('member:growthLevel:updateLevel')")
+    @PutMapping("/updateLevel.json")
+    public void batchUpdateLevel(@RequestBody JSONObject obj) {
+        String language = obj.get("language").toString();
+        language = StrUtil.isBlank(language) ? "zh-CN" : language;
+        Object levels = obj.get("levels");
+        JSONArray jsonArray = JSONUtil.parseArray(levels);
+        List<MemberGrowthLevelEditDto> list = jsonArray.toList(MemberGrowthLevelEditDto.class);
+        levelService.batchUpdateLevel(list,language);
     }
 }

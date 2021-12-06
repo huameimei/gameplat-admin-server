@@ -51,4 +51,50 @@
     </select>
 
 
+    <insert id="insertOrUpdate">
+        insert into member_growth_statis
+        (
+        <if test="userId != null">user_id,</if>
+        <if test="userName != null and userName != ''">user_name,</if>
+        <if test="level != null">`level`,</if>
+        <if test="growth != null">growth,</if>
+        <if test="rechargeGrowth != null">recharge_growth,</if>
+        <if test="signGrowth != null">sign_growth,</if>
+        <if test="damaGrowth != null">dama_growth,</if>
+        <if test="backGrowth != null">back_growth,</if>
+        <if test="infoGrowth != null">info_growth,</if>
+        <if test="bindGrowth != null">bind_growth,</if>
+        <if test="demoteGrowth != null">demote_growth,</if>
+        <if test="createBy != null and createBy != ''">create_by,</if>
+        create_time
+        ) values (
+        <if test="userId != null">#{userId},</if>
+        <if test="userName != null and userName != ''">#{userName},</if>
+        <if test="level != null">#{level},</if>
+        <if test="growth != null">#{growth},</if>
+        <if test="rechargeGrowth != null">#{rechargeGrowth},</if>
+        <if test="signGrowth != null">#{signGrowth},</if>
+        <if test="damaGrowth != null">#{damaGrowth},</if>
+        <if test="backGrowth != null">#{backGrowth},</if>
+        <if test="infoGrowth != null">#{infoGrowth},</if>
+        <if test="bindGrowth != null">#{bindGrowth},</if>
+        <if test="demoteGrowth != null">#{demoteGrowth},</if>
+        <if test="createBy != null and createBy != ''">#{createBy},</if>
+        now()
+        )
+        on duplicate key update
+        <if test="userId != null">user_id = values(user_id),</if>
+        <if test="userName != null and userName != ''">user_name = values(user_name),</if>
+        <if test="level != null">`level` = values(`level`),</if>
+        <if test="growth != null">growth = values(growth),</if>
+        <if test="rechargeGrowth != null">recharge_growth = values(recharge_growth),</if>
+        <if test="signGrowth != null">sign_growth = values(sign_growth),</if>
+        <if test="damaGrowth != null">dama_growth = values(dama_growth),</if>
+        <if test="backGrowth != null">back_growth = values(back_growth),</if>
+        <if test="infoGrowth != null">info_growth = values(info_growth),</if>
+        <if test="bindGrowth != null">bind_growth = values(bind_growth),</if>
+        <if test="demoteGrowth != null">demote_growth = values(demote_growth),</if>
+        <if test="remark != null">remark = values(remark),</if>
+        update_time = now()
+    </insert>
 </mapper>

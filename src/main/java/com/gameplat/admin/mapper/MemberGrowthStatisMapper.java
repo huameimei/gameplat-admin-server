@@ -12,4 +12,7 @@ public interface MemberGrowthStatisMapper extends BaseMapper<MemberGrowthStatis>
      * 获取达到有效投注金额的会员账号
      */
     List<MemberWealDetail> getMemberSalaryInfo(Integer type);
+
+
+    int insertOrUpdate(MemberGrowthStatis memberGrowthStatis);
 }

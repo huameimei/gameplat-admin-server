@@ -1,5 +1,6 @@
 package com.gameplat.admin.model.dto;
 
+import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
@@ -14,84 +15,67 @@ import java.math.BigDecimal;
  */
 
 @Data
+@ApiModel(value="修改VIP配置入参",description="修改VIP配置入参")
 public class MemberGrowthConfigEditDto implements Serializable {
 
-    @ApiModelProperty("主键")
+    @ApiModelProperty(value = "主键", name = "id", required = true)
     @NotNull(message = "编号不能为空")
     private Long id;
 
-    @ApiModelProperty("是否开启VIP 1：开启   0：关闭")
+    @ApiModelProperty(value = "是否开启VIP功能 1：开启   0：关闭", name = "isEnableVip", required = false)
     private Integer isEnableVip;
 
-    @ApiModelProperty("是否开启充值 增加成长值 策略 1：开启   0：关闭")
+    @ApiModelProperty(value = "是否开启充值计算 1：开启   0：关闭", name = "isEnableRecharge", required = false)
     private Integer isEnableRecharge;
 
-    @ApiModelProperty("是否开启签到 增加成长值 策略 1：开启   0：关闭")
-    private Integer isEnableSign;
-
-    @ApiModelProperty("是否开启 打码量增加 增长成长值 策略")
+    @ApiModelProperty(value = "是否开启打码量计算 1：开启   0：关闭", name = "isEnableDama", required = false)
     private Integer isEnableDama;
 
-    @ApiModelProperty("是否发放升级奖励")
-    private Integer isPayUpReword;
+    @ApiModelProperty(value = "是否开启签到计算 1：开启   0：关闭", name = "isEnableSign", required = false)
+    private Integer isEnableSign;
 
-    @ApiModelProperty("是否重复发放升级奖励")
-    private Integer isRepeatPayUpReword;
-
-    @ApiModelProperty("是否自动派发升级奖励:1：是  0：否")
-    private Integer isAutoPayReword;
-
-    @ApiModelProperty("每日签到奖励成长值")
-    private Integer signEveryDayGrowth;
-
-    @ApiModelProperty("单个会员总的签到最大成长值")
-    private Integer signMaxGrowth;
-
-    @ApiModelProperty("每日签到最少充值金额")
-    private BigDecimal signDayMinRechargeAmount;
-
-    @ApiModelProperty("单个会员至少充值此金额才能签到增长成长值")
+    @ApiModelProperty(value = "开始签到最少充值金额", name = "signMinRechargeAmount", required = false)
     private BigDecimal signMinRechargeAmount;
 
-    @ApiModelProperty("每日签到的IP限制")
+    @ApiModelProperty(value = "同IP最多签到用户数", name = "signIpLimitCount", required = false)
     private Integer signIpLimitCount;
 
-    @ApiModelProperty("充值金额成长值兑换比例")
-    private BigDecimal rechageRate;
+    @ApiModelProperty(value = "是否发放升级奖励", name = "isPayUpReword", required = false)
+    private Integer isPayUpReword;
 
-    @ApiModelProperty("打码量兑换成长值比例")
-    private BigDecimal damaRate;
+    @ApiModelProperty(value = "是否自动派发升级奖励:1：是  0：否", name = "isAutoPayReword", required = false)
+    private Integer isAutoPayReword;
 
-    @ApiModelProperty("绑定银行卡奖励成长值")
-    private Integer bindBankGrowth;
-
-    @ApiModelProperty("完善用户资料奖励成长值")
-    private Integer perfectUserInfoGrowth;
-
-    @ApiModelProperty("所需完善用户的资料列")
-    private String perfectUserInfoField;
-
-    @ApiModelProperty("保级周期")
-    private Integer demoteCycle;
-
-    @ApiModelProperty("最高等级")
-    private Integer limitLevel;
-
-    @ApiModelProperty("轮播图  多张用,分割")
-    private String carousel;
-
-    @ApiModelProperty(value = "更新人")
-    private String updateBy;
-
-    @ApiModelProperty("VIP经验值描述")
-    private String growthDesc;
-
-    @ApiModelProperty("其它提示")
-    private String otherDesc;
-
-    @ApiModelProperty("未领取失效周期")
+    @ApiModelProperty(value = "未领取失效周期(天)", name = "receiveLimitCycle", required = false)
     private String receiveLimitCycle;
 
-    @ApiModelProperty("语言")
+    @ApiModelProperty(value = "充值金额成长值兑换比例", name = "rechageRate", required = false)
+    private BigDecimal rechageRate;
+
+    @ApiModelProperty(value = "打码量兑换成长值比例", name = "damaRate", required = false)
+    private BigDecimal damaRate;
+
+    @ApiModelProperty(value = "每日签到奖励成长值", name = "signEveryDayGrowth", required = false)
+    private Integer signEveryDayGrowth;
+
+    @ApiModelProperty(value = "每日签到最少充值金额", name = "signDayMinRechargeAmount", required = false)
+    private BigDecimal signDayMinRechargeAmount;
+
+    @ApiModelProperty(value = "签到最大成长值", name = "signMaxGrowth", required = false)
+    private Integer signMaxGrowth;
+
+    @ApiModelProperty(value = "是否重复发放升级奖励", name = "isRepeatPayUpReword", required = false)
+    private Integer isRepeatPayUpReword;
+
+    @ApiModelProperty(value = "最高等级配置", name = "limitLevel", required = false)
+    private Integer limitLevel;
+
+    @ApiModelProperty(value = "保级周期", name = "demoteCycle", required = false)
+    private Integer demoteCycle;
+
+    @ApiModelProperty(value = "更新人", hidden = true)
+    private String updateBy;
+
+    @ApiModelProperty(value = "语言", hidden = true)
     private String language;
 }

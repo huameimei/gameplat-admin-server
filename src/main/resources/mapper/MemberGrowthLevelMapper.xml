@@ -62,4 +62,41 @@
         <if test="limitLevel != null">limit #{limitLevel}</if>
     </select>
 
+
+    <select id="findLevelName" parameterType="integer" resultType="string">
+        select level_name from member_growth_level where `level` = #{level}
+    </select>
+
+    <!--  配置没有改  批量修改不了  -->
+    <update id="batchUpdateLevel">
+        <if test="list != null">
+            <foreach collection="list" item="item" index="index" separator=";">
+                update member_growth_level
+                <set>
+                    <if test="item.level != null">`level` = #{item.level},</if>
+                    <if test="item.levelName != null and item.levelName != ''">level_name = #{item.levelName},</if>
+                    <if test="item.growth != null">growth = #{item.growth},</if>
+                    <if test="item.limitGrowth != null">limit_growth = #{item.limitGrowth},</if>
+                    <if test="item.upReward != null">up_reward = #{item.upReward},</if>
+                    <if test="item.weekWage != null">week_wage = #{item.weekWage},</if>
+                    <if test="item.monthWage != null">month_wage = #{item.monthWage},</if>
+                    <if test="item.birthGiftMoney != null">birth_gift_money = #{item.birthGiftMoney},</if>
+                    <if test="item.redEnvelope != null">red_envelope = #{item.redEnvelope},</if>
+<!--                    <if test="item.creditMoney != null">credit_money = #{item.creditMoney},</if>-->
+                    <if test="item.updateBy != null and item.updateBy != ''">update_by = #{item.updateBy},</if>
+<!--                    <if test="item.mobileVipImage != null and item.mobileVipImage != ''">mobile_vip_image = #{item.mobileVipImage},</if>-->
+<!--                    <if test="item.webVipImage != null and item.webVipImage != ''">web_vip_image = #{item.webVipImage},</if>-->
+<!--                    <if test="item.mobileReachBackImage != null and item.mobileReachBackImage != ''">mobile_reach_back_image = #{item.mobileReachBackImage},</if>-->
+<!--                    <if test="item.mobileUnreachBackImage != null and item.mobileUnreachBackImage != ''">mobile_unreach_back_image = #{item.mobileUnreachBackImage},</if>-->
+<!--                    <if test="item.mobileReachVipImage != null and item.mobileReachVipImage != ''">mobile_reach_vip_image = #{item.mobileReachVipImage},</if>-->
+<!--                    <if test="item.mobileUnreachVipImage != null and item.mobileUnreachVipImage != ''">mobile_unreach_vip_image = #{item.mobileUnreachVipImage},</if>-->
+<!--                    <if test="item.webReachVipImage != null and item.webReachVipImage != ''">web_reach_vip_image = #{item.webReachVipImage},</if>-->
+<!--                    <if test="item.webUnreachVipImage != null and item.webUnreachVipImage != ''">web_unreach_vip_image = #{item.webUnreachVipImage},</if>-->
+                    update_time = now()
+                </set>
+                where id = #{item.id}
+            </foreach>
+        </if>
+    </update>
+
 </mapper>

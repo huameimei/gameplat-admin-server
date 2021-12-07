@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @RestController
 @RequestMapping("/api/admin/activity/blacklist")
-@Api(tags = "黑名单管理")
+@Api(tags = "活动黑名单管理")
 public class ActivityBlacklistController {
 
     @Autowired
@@ -61,6 +61,7 @@ public class ActivityBlacklistController {
      *
      * @param ids
      */
+    @ApiOperation(value = "删除活动黑名单")
     @DeleteMapping("/delete")
     @PreAuthorize("hasAuthority('activity:blacklist:remove')")
     public void remove(@RequestBody String ids) {

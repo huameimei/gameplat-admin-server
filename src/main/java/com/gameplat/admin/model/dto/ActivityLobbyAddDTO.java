@@ -137,4 +137,8 @@ public class ActivityLobbyAddDTO implements Serializable {
     @ApiModelProperty(value = "创建人")
     private String createBy;
 
+    @ApiModelProperty(value = "创建人")
+    private String targetValue;
+
+
 }

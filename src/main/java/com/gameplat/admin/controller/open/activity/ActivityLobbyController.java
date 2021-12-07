@@ -50,6 +50,7 @@ public class ActivityLobbyController {
      *
      * @param activityLobbyAddDTO
      */
+    @ApiOperation(value = "新增活动大厅")
     @PostMapping("/add")
     @PreAuthorize("hasAuthority('activity:lobby:add')")
     public void add(@RequestBody ActivityLobbyAddDTO activityLobbyAddDTO) {
@@ -67,6 +68,7 @@ public class ActivityLobbyController {
      *
      * @param activityLobbyUpdateDTO
      */
+    @ApiOperation(value = "修改活动大厅")
     @PutMapping("/update")
     @PreAuthorize("hasAuthority('activity:lobby:edit')")
     public void update(@RequestBody ActivityLobbyUpdateDTO activityLobbyUpdateDTO) {
@@ -87,6 +89,7 @@ public class ActivityLobbyController {
      *
      * @param ids
      */
+    @ApiOperation(value = "删除活动大厅")
     @DeleteMapping("/delete")
     @PreAuthorize("hasAuthority('activity:lobby:remove')")
     public void remove(@RequestBody String ids) {
@@ -102,6 +105,7 @@ public class ActivityLobbyController {
      *
      * @param activityLobbyUpdateStatusDTO
      */
+    @ApiOperation(value = "更新活动大厅状态")
     @PutMapping("/updateStatus")
     @PreAuthorize("hasAuthority('activity:lobby:edit')")
     public void updateStatus(@RequestBody ActivityLobbyUpdateStatusDTO activityLobbyUpdateStatusDTO) {

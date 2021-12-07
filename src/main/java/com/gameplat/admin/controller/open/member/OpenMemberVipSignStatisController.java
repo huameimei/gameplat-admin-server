@@ -4,14 +4,10 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.gameplat.admin.model.domain.MemberVipSignHistory;
 import com.gameplat.admin.model.domain.MemberVipSignStatis;
-import com.gameplat.admin.model.domain.MemberWeal;
 import com.gameplat.admin.model.dto.MemberVipSignHistoryDTO;
 import com.gameplat.admin.model.dto.MemberVipSignStatisDTO;
-import com.gameplat.admin.model.dto.MemberWealDTO;
-import com.gameplat.admin.model.dto.MemberWealRewordDTO;
 import com.gameplat.admin.model.vo.MemberVipSignHistoryVO;
 import com.gameplat.admin.model.vo.MemberVipSignStatisVO;
-import com.gameplat.admin.model.vo.MemberWealVO;
 import com.gameplat.admin.service.MemberVipSignHistoryService;
 import com.gameplat.admin.service.MemberVipSignStatisService;
 import io.swagger.annotations.Api;
@@ -22,7 +18,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
-import java.util.List;
 
 
 /**

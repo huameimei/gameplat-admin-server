@@ -6,5 +6,7 @@ public interface PasswordService {
 
   String encode(String password, String salt);
 
-  String encode(String password, PrivateKey privateKey);
+  String decode(String password, String privateKey);
+
+  String decode(String password, PrivateKey privateKey);
 }

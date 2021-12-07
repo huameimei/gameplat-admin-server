@@ -1,6 +1,5 @@
 package com.gameplat.admin.service.impl;
 
-import cn.hutool.crypto.KeyUtil;
 import com.gameplat.admin.cache.AdminCache;
 import com.gameplat.admin.constant.RsaConstant;
 import com.gameplat.admin.enums.DictTypeEnum;
@@ -13,7 +12,6 @@ import com.gameplat.admin.model.vo.UserToken;
 import com.gameplat.admin.service.*;
 import com.gameplat.base.common.enums.SystemCodeType;
 import com.gameplat.base.common.exception.ServiceException;
-import com.gameplat.base.common.util.Base64;
 import com.gameplat.base.common.util.GoogleAuthenticator;
 import com.gameplat.base.common.util.IPUtils;
 import com.gameplat.base.common.util.StringUtils;
@@ -28,7 +26,6 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
-import java.security.PrivateKey;
 import java.util.Date;
 
 @Slf4j
@@ -89,8 +86,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     // 解密密码并登陆
-    PrivateKey privateKey = KeyUtil.generateRSAPrivateKey(Base64.decode(RsaConstant.PRIVATE_KEY));
-    String password = passwordService.encode(dto.getPassword(), privateKey);
+    String password = passwordService.decode(dto.getPassword(), RsaConstant.PRIVATE_KEY);
     UserCredential credential = jwtTokenService.signIn(request, user.getUserName(), password);
 
     // 删除密码错误次数记录

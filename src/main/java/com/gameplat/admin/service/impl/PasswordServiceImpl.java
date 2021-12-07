@@ -24,8 +24,7 @@ public class PasswordServiceImpl implements PasswordService {
 
   @Override
   public String decode(String password, String privateKey) {
-    PrivateKey key = KeyUtil.generateRSAPrivateKey(Base64.decode(privateKey));
-    return this.decode(password, key);
+    return this.decode(password, KeyUtil.generateRSAPrivateKey(Base64.decode(privateKey)));
   }
 
   @Override

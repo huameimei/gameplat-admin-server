@@ -102,6 +102,7 @@ public class OpenMemberWealController {
 
     @PostMapping("/distribute")
     @ApiOperation(value = "福利派发")
+    @PreAuthorize("hasAuthority('member:weal:distribute')")
     public void distributeSalary(@RequestBody MemberWeal dto, HttpServletRequest request) {
         if(ObjectUtils.isEmpty(dto.getId())){
             throw new ServiceException("id不能为空");
@@ -116,6 +117,7 @@ public class OpenMemberWealController {
 
     @PostMapping("/recycle")
     @ApiOperation(value = "福利回收")
+    @PreAuthorize("hasAuthority('member:weal:recycle')")
     public void recycleSalary(@RequestBody MemberWeal dto, HttpServletRequest request) {
         if(ObjectUtils.isEmpty(dto.getId())){
             throw new ServiceException("id不能为空");
@@ -130,6 +132,7 @@ public class OpenMemberWealController {
 
     @GetMapping("/details")
     @ApiOperation(value = "详情")
+    @PreAuthorize("hasAuthority('member:weal:details')")
     public IPage<MemberWealDetailVO> getDetails(PageDTO<MemberWealDetail> page, MemberWealDetailDTO dto) {
         //判断是否开启了VIP
         MemberGrowthConfigVO isVip = configService.findOneConfig(LanguageEnum.app_zh_CN.getCode());
@@ -140,6 +143,26 @@ public class OpenMemberWealController {
             throw new ServiceException("福利id不能为空");
         }
         return memberWealDetailService.findWealDetailList(page, dto);
+    }
+
+    /**
+     *删除详情中的用户
+     */
+    @DeleteMapping("/delete")
+    @ApiOperation(value = "删除详情中的用户")
+    @PreAuthorize("hasAuthority('member:weal:remove')")
+    public void deleteByUserId(Long id){
+        memberWealDetailService.deleteById(id);
+    }
+
+    /**
+     *删除详情中的用户
+     */
+    @PutMapping("/updateRewordAmount")
+    @ApiOperation(value = "编辑详情中的用户信息")
+    @PreAuthorize("hasAuthority('member:weal:edit')")
+    public void editRewordAmount(@RequestBody MemberWealDetailEditDTO dto) {
+        memberWealDetailService.editRewordAmount(dto);
     }
 
 }

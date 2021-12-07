@@ -1,6 +1,7 @@
 package com.gameplat.admin.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
@@ -10,6 +11,8 @@ import com.gameplat.admin.convert.MemberWealDetailConvert;
 import com.gameplat.admin.mapper.MemberWealDetailMapper;
 import com.gameplat.admin.model.domain.MemberWealDetail;
 import com.gameplat.admin.model.dto.MemberWealDetailDTO;
+import com.gameplat.admin.model.dto.MemberWealDetailEditDTO;
+import com.gameplat.admin.model.dto.MemberWealDetailRemoveDTO;
 import com.gameplat.admin.model.vo.MemberWealDetailVO;
 import com.gameplat.admin.service.MemberWealDetailService;
 import com.gameplat.base.common.exception.ServiceException;
@@ -79,6 +82,28 @@ public class MemberWealDetailServiceImpl extends ServiceImpl<MemberWealDetailMap
                 .eq(ObjectUtils.isNotEmpty(id), MemberWealDetail::getWealId, id)
                 .set( MemberWealDetail::getStatus, status))){
             throw new ServiceException("更新福利记录状态失败:");
+        }
+    }
+
+    @Override
+    public void deleteById(Long id) {
+        if (ObjectUtils.isNull(id)){
+            throw new ServiceException("id不能为空");
+        }
+        if (!this.removeById(id)){
+            throw new ServiceException("删除失败");
+        }
+    }
+
+    @Override
+    public void editRewordAmount(MemberWealDetailEditDTO dto) {
+        if (ObjectUtils.isNull(dto.getId())){
+            throw new ServiceException("id不能为空");
+        }
+        if (!this.update(new LambdaUpdateWrapper<MemberWealDetail>()
+                        .eq(MemberWealDetail::getId, dto.getId())
+                        .set(MemberWealDetail::getRewordAmount, dto.getRewordAmount()))){
+            throw new ServiceException("编辑失败！");
         }
     }
 }

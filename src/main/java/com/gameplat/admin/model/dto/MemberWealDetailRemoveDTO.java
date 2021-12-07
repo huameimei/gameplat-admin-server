@@ -12,21 +12,13 @@ import java.io.Serializable;
  */
 
 @Data
-public class MemberWealDetailDTO implements Serializable {
+public class MemberWealDetailRemoveDTO implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     @ApiModelProperty(value = "福利表主键")
     private Long wealId;
 
-    @ApiModelProperty(value = "会员账号")
-    private String userName;
-
-    @ApiModelProperty(value = "1：未派发   2：已派发  3:已回收")
-    private Integer status;
-
-
-
-
-
+    @ApiModelProperty(value = "会员id")
+    private Long userId;
 }

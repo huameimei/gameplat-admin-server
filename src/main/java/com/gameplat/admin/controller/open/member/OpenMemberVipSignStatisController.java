@@ -2,10 +2,13 @@ package com.gameplat.admin.controller.open.member;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
+import com.gameplat.admin.model.domain.MemberVipSignHistory;
 import com.gameplat.admin.model.domain.MemberVipSignStatis;
+import com.gameplat.admin.model.dto.MemberVipSignHistoryDTO;
 import com.gameplat.admin.model.dto.MemberVipSignStatisDTO;
-import com.gameplat.admin.model.dto.MemberWealRewordDTO;
+import com.gameplat.admin.model.vo.MemberVipSignHistoryVO;
 import com.gameplat.admin.model.vo.MemberVipSignStatisVO;
+import com.gameplat.admin.service.MemberVipSignHistoryService;
 import com.gameplat.admin.service.MemberVipSignStatisService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -31,6 +34,8 @@ public class OpenMemberVipSignStatisController {
 
 @Autowired
 private MemberVipSignStatisService signStatisService;
+@Autowired
+private MemberVipSignHistoryService memberVipSignHistoryService;
 
     @GetMapping("/list")
     @ApiOperation(value = "查询VIP会员签到记录列表")
@@ -39,11 +44,19 @@ private MemberVipSignStatisService signStatisService;
         return signStatisService.findSignList(page, dto);
     }
 
-    @PutMapping("/exportSign")
+    @GetMapping("/exportSign")
     @ApiOperation(value = "导出VIP福利记录列表")
     @PreAuthorize("hasAuthority('member:sign:export')")
-    public void exportSign(@RequestBody MemberVipSignStatisDTO queryDTO, HttpServletResponse response){
+    public void exportSign(MemberVipSignStatisDTO queryDTO, HttpServletResponse response){
         signStatisService.exportSignStatis(queryDTO, response);
+    }
+
+
+    @GetMapping("/history")
+    @ApiOperation(value = "会员签到记录")
+    @PreAuthorize("hasAuthority('member:sign:history')")
+    public IPage<MemberVipSignHistoryVO> getHistoryList(PageDTO<MemberVipSignHistory> page, MemberVipSignHistoryDTO dto) {
+        return memberVipSignHistoryService.findPageList(page, dto);
     }
 
 }

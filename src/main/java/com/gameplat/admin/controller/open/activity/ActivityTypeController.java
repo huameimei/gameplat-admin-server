@@ -19,7 +19,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 /**
- * 活动类型管理
+ * 活动类型、活动板块管理
  *
  * @author kevin
  * @since 2020-08-17
@@ -36,6 +36,11 @@ public class ActivityTypeController {
 
     /**
      * 活动类型列表
+     *
+     * @param page
+     * @param activityTypeDTO
+     * @param country
+     * @return
      */
     @ApiOperation(value = "活动类型列表")
     @GetMapping("/list")
@@ -49,7 +54,13 @@ public class ActivityTypeController {
     }
 
 
-    @ApiOperation(value = "活动板块管理->新增活动类型")
+    /**
+     * 新增活动类型
+     *
+     * @param activityTypeAddDTO
+     * @param country
+     */
+    @ApiOperation(value = "新增活动类型")
     @PostMapping("/add")
     @PreAuthorize("hasAuthority('activity:type:add')")
     public void add(@RequestBody ActivityTypeAddDTO activityTypeAddDTO,
@@ -71,6 +82,12 @@ public class ActivityTypeController {
         activityTypeService.add(activityTypeAddDTO);
     }
 
+    /**
+     * 更新活动类型
+     *
+     * @param activityTypeUpdateDTO
+     * @param country
+     */
     @ApiOperation(value = "更新活动类型")
     @PutMapping("/update")
     @PreAuthorize("hasAuthority('activity:type:edit')")
@@ -93,7 +110,12 @@ public class ActivityTypeController {
         activityTypeService.update(activityTypeUpdateDTO);
     }
 
-    @ApiOperation(value = "删除活动类型，单个或者多个")
+    /**
+     * 删除活动类型
+     *
+     * @param ids
+     */
+    @ApiOperation(value = "删除活动类型")
     @DeleteMapping("/delete")
     @PreAuthorize("hasAuthority('activity:type:remove')")
     public void remove(@RequestBody String ids) {

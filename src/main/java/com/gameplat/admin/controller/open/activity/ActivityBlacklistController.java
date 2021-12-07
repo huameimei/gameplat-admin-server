@@ -17,9 +17,9 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 /**
- * 黑名单管理
+ * 活动黑名单管理
  *
- * @author admin
+ * @author kenvin
  */
 @Slf4j
 @RestController
@@ -31,7 +31,10 @@ public class ActivityBlacklistController {
     private ActivityBlacklistService activityBlacklistService;
 
     /**
-     * 活动列表
+     * 活动黑名单列表
+     * @param page
+     * @param activityBlacklistDTO
+     * @return
      */
     @ApiOperation(value = "活动黑名单列表")
     @GetMapping("/list")
@@ -40,6 +43,10 @@ public class ActivityBlacklistController {
         return activityBlacklistService.list(page, activityBlacklistDTO);
     }
 
+    /**
+     * 新增活动黑名单
+     * @param activityBlacklistAddDTO
+     */
     @ApiOperation(value = "新增活动黑名单")
     @PostMapping("/add")
     @PreAuthorize("hasAuthority('activity:blacklist:add')")
@@ -57,7 +64,7 @@ public class ActivityBlacklistController {
     }
 
     /**
-     * 删除
+     * 删除活动黑名单
      *
      * @param ids
      */

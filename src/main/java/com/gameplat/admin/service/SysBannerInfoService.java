@@ -1,7 +1,6 @@
 package com.gameplat.admin.service;
 
 import com.gameplat.admin.model.domain.SysBannerInfo;
-
 import java.util.List;
 
 /**

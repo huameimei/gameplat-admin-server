@@ -5,9 +5,8 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.gameplat.admin.util.Date2LongSerializerUtils;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
-
 import java.util.Date;
+import lombok.Data;
 
 @ApiModel("个人消息")
 @Data

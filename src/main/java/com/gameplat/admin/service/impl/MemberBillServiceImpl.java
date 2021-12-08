@@ -14,12 +14,6 @@ import com.gameplat.admin.model.dto.MemberBillDTO;
 import com.gameplat.admin.model.vo.MemberBillVO;
 import com.gameplat.admin.service.MemberBillService;
 import com.gameplat.base.common.exception.ServiceException;
-import lombok.Cleanup;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.text.ParseException;
@@ -27,6 +21,11 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import javax.servlet.http.HttpServletResponse;
+import lombok.Cleanup;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 @Service
 public class MemberBillServiceImpl extends ServiceImpl<MemberBillMapper, MemberBill> implements  MemberBillService {
@@ -112,6 +111,14 @@ public class MemberBillServiceImpl extends ServiceImpl<MemberBillMapper, MemberB
     }catch (IOException e) {
       throw new ServiceException("导出失败:"+e);
     }
+  }
+
+  @Override
+  public MemberBill queryLiveBill(Long id, String orderNo, int transType) {
+
+
+
+    return null;
   }
 
   public List<MemberBillVO> getList(MemberBillDTO dto) {

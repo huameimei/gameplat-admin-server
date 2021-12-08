@@ -7,11 +7,10 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.extension.activerecord.Model;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
-
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import lombok.Data;
 
 /**
  * 菜单权限表 sys_menu

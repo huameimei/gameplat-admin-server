@@ -3,12 +3,11 @@ package com.gameplat.admin.model.vo;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /**
  * 活动分发

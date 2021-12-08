@@ -1,7 +1,6 @@
 package com.gameplat.admin.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
@@ -12,15 +11,13 @@ import com.gameplat.admin.mapper.MemberWealDetailMapper;
 import com.gameplat.admin.model.domain.MemberWealDetail;
 import com.gameplat.admin.model.dto.MemberWealDetailDTO;
 import com.gameplat.admin.model.dto.MemberWealDetailEditDTO;
-import com.gameplat.admin.model.dto.MemberWealDetailRemoveDTO;
 import com.gameplat.admin.model.vo.MemberWealDetailVO;
 import com.gameplat.admin.service.MemberWealDetailService;
 import com.gameplat.base.common.exception.ServiceException;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 /**
  * @author lily

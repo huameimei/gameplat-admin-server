@@ -1,8 +1,7 @@
 package com.gameplat.admin.model.bean;
 
-import lombok.Data;
-
 import java.math.BigDecimal;
+import lombok.Data;
 
 /**
  * 子账号限制信息

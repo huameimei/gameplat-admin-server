@@ -2,10 +2,9 @@ package com.gameplat.admin.model.bean;
 
 
 import com.gameplat.base.common.json.JsonUtils;
-import lombok.Data;
-
-import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
+import javax.validation.constraints.NotNull;
+import lombok.Data;
 
 /**
  * 人工入款，数据封装对象

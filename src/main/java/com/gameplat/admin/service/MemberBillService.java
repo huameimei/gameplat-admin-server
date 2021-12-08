@@ -7,7 +7,6 @@ import com.gameplat.admin.model.domain.Member;
 import com.gameplat.admin.model.domain.MemberBill;
 import com.gameplat.admin.model.dto.MemberBillDTO;
 import com.gameplat.admin.model.vo.MemberBillVO;
-
 import javax.servlet.http.HttpServletResponse;
 
 public interface MemberBillService extends IService<MemberBill> {
@@ -17,4 +16,6 @@ public interface MemberBillService extends IService<MemberBill> {
   IPage<MemberBillVO> findMemberBilllist(PageDTO<MemberBill> page, MemberBillDTO dto);
 
   void exportList(MemberBillDTO dto, HttpServletResponse response);
+
+  MemberBill queryLiveBill(Long id, String orderNo, int transType);
 }

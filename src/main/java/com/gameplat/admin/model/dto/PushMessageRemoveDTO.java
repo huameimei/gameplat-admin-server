@@ -3,8 +3,6 @@ package com.gameplat.admin.model.dto;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
-import java.util.Date;
-
 /**
  * 个人消息删除DTO
  */

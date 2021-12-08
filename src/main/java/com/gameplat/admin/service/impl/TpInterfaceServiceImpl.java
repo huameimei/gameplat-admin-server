@@ -12,11 +12,9 @@ import com.gameplat.admin.model.vo.TpInterfacePayTypeVo;
 import com.gameplat.admin.model.vo.TpInterfaceVO;
 import com.gameplat.admin.service.TpInterfaceService;
 import com.gameplat.admin.service.TpPayTypeService;
-
+import com.gameplat.base.common.exception.ServiceException;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import com.gameplat.base.common.exception.ServiceException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;

@@ -1,14 +1,14 @@
 package com.gameplat.admin.model.domain;
 
-import com.baomidou.mybatisplus.annotation.*;
-import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
-import com.gameplat.admin.model.bean.RecordKindName;
+import com.baomidou.mybatisplus.annotation.FieldFill;
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
-
 import java.io.Serializable;
 import java.util.Date;
-import java.util.List;
+import lombok.Data;
 
 /**
  * @author lily

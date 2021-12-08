@@ -6,8 +6,6 @@ import com.gameplat.admin.model.dto.ActivityLobbyDiscountDTO;
 import com.gameplat.admin.model.vo.ActivityLobbyDiscountVO;
 import org.mapstruct.Mapper;
 
-import java.util.List;
-
 @Mapper(componentModel = "spring")
 public interface ActivityLobbyDiscountConvert {
 

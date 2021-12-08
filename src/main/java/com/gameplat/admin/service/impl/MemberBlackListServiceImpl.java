@@ -5,11 +5,10 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.mapper.MemberBlackListMapper;
 import com.gameplat.admin.model.domain.MemberBlackList;
 import com.gameplat.admin.service.MemberBlackListService;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 /**
  * @author lily

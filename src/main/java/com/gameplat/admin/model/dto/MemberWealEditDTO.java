@@ -1,14 +1,11 @@
 package com.gameplat.admin.model.dto;
 
-import com.baomidou.mybatisplus.annotation.FieldFill;
-import com.baomidou.mybatisplus.annotation.TableField;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
-
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
+import lombok.Data;
 
 /**
  * @author lily

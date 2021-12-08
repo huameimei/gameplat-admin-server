@@ -6,7 +6,6 @@ import com.gameplat.admin.model.dto.MemberLevelAddDTO;
 import com.gameplat.admin.model.dto.MemberLevelAllocateDTO;
 import com.gameplat.admin.model.dto.MemberLevelEditDTO;
 import com.gameplat.admin.model.vo.MemberLevelVO;
-
 import java.util.List;
 
 public interface MemberLevelService extends IService<MemberLevel> {

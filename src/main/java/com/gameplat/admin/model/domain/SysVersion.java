@@ -1,9 +1,8 @@
 package com.gameplat.admin.model.domain;
 
 import com.baomidou.mybatisplus.annotation.TableName;
-import lombok.Data;
-
 import java.util.Date;
+import lombok.Data;
 
 /**
  * 系统版本记录表 sys_version

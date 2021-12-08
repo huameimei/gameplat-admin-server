@@ -7,12 +7,11 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /**
  * @author lily

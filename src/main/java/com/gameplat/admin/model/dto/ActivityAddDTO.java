@@ -2,11 +2,10 @@ package com.gameplat.admin.model.dto;
 
 import com.gameplat.base.common.util.DateUtil;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
-import org.dozer.Mapping;
-
 import java.io.Serializable;
 import java.util.Date;
+import lombok.Data;
+import org.dozer.Mapping;
 
 /**
  * 添加活动DTO

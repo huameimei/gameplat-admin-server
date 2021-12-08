@@ -4,10 +4,9 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.gameplat.base.common.json.JsonUtils;
+import java.util.Date;
 import lombok.Data;
 import org.apache.commons.lang.StringUtils;
-
-import java.util.Date;
 
 /**
  * 全局限制数据配置

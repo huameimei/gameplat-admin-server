@@ -1,7 +1,5 @@
 package com.gameplat.admin.enums;
 
-import lombok.val;
-
 /**
  * 活动推送类型
  */

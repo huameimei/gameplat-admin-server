@@ -2,13 +2,12 @@ package com.gameplat.admin.model.dto;
 
 import com.gameplat.base.common.util.DateUtil;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import org.dozer.Mapping;
-
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import org.dozer.Mapping;
 
 /**
  * @author lyq

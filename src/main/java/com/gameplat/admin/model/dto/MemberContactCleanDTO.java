@@ -1,12 +1,11 @@
 package com.gameplat.admin.model.dto;
 
-import lombok.Data;
-import org.hibernate.validator.constraints.Length;
-
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotEmpty;
 import java.io.Serializable;
 import java.util.List;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotEmpty;
+import lombok.Data;
+import org.hibernate.validator.constraints.Length;
 
 /**
  * 批量清理会员联系方式

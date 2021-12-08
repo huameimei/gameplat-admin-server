@@ -1,12 +1,10 @@
 package com.gameplat.admin.model.vo;
 
-import com.baomidou.mybatisplus.annotation.*;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
-
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
+import lombok.Data;
 
 /**
  * @Description : 打码量出参

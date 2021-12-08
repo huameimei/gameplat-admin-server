@@ -5,7 +5,6 @@ import com.gameplat.admin.model.dto.EmailDTO;
 import com.gameplat.admin.model.dto.OperEmailDTO;
 import com.gameplat.admin.model.vo.EmailVO;
 import org.mapstruct.Mapper;
-import org.springframework.stereotype.Repository;
 
 @Mapper(componentModel = "spring")
 public interface EmailConvert {

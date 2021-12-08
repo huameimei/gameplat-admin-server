@@ -27,21 +27,20 @@ import com.gameplat.admin.model.vo.UserVo;
 import com.gameplat.admin.service.SysCommonService;
 import com.gameplat.admin.service.SysUserService;
 import com.gameplat.base.common.enums.SystemCodeType;
-import com.gameplat.common.enums.UserTypes;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.json.JsonUtils;
 import com.gameplat.base.common.util.GoogleAuthenticator;
 import com.gameplat.base.common.util.RSAUtils;
 import com.gameplat.base.common.util.StringUtils;
+import com.gameplat.common.enums.UserTypes;
 import com.gameplat.security.SecurityUserHolder;
+import java.util.ArrayList;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Service
 @Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)

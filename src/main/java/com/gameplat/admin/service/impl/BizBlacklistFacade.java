@@ -3,10 +3,9 @@ package com.gameplat.admin.service.impl;
 import com.gameplat.admin.enums.BlacklistConstant.BizBlacklistType;
 import com.gameplat.admin.model.domain.Member;
 import com.gameplat.admin.service.BizBlacklistService;
-import org.springframework.stereotype.Component;
-
-import javax.annotation.Resource;
 import java.util.Set;
+import javax.annotation.Resource;
+import org.springframework.stereotype.Component;
 
 @Component
 public class BizBlacklistFacade {

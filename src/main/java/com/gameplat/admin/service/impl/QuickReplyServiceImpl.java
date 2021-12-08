@@ -13,10 +13,9 @@ import com.gameplat.admin.model.vo.QuickReplyVO;
 import com.gameplat.admin.service.QuickReplyService;
 import com.gameplat.base.common.exception.ServiceException;
 import java.util.List;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
-import java.util.Objects;
 
 /**
  * 快捷回复 服务实现层

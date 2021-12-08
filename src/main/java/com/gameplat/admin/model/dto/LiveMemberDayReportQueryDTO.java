@@ -1,7 +1,6 @@
 package com.gameplat.admin.model.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.gameplat.admin.model.domain.LiveMemberDayReport;
 import java.io.Serializable;
 import java.util.List;
 import lombok.Data;

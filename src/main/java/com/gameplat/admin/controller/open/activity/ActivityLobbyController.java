@@ -38,7 +38,7 @@ public class ActivityLobbyController {
     /**
      * 活动大厅列表
      */
-    @ApiOperation(value = "列表")
+    @ApiOperation(value = "活动大厅列表")
     @GetMapping("/list")
     @PreAuthorize("hasAuthority('activity:lobby:list')")
     public IPage<ActivityLobbyVO> list(PageDTO<ActivityLobby> page, ActivityLobbyDTO activityLobbyDTO) {
@@ -46,7 +46,7 @@ public class ActivityLobbyController {
     }
 
     /**
-     * 新增
+     * 新增活动大厅
      *
      * @param activityLobbyAddDTO
      */
@@ -64,7 +64,7 @@ public class ActivityLobbyController {
     }
 
     /**
-     * 修改
+     * 修改活动大厅
      *
      * @param activityLobbyUpdateDTO
      */
@@ -85,7 +85,7 @@ public class ActivityLobbyController {
     }
 
     /**
-     * 删除
+     * 删除活动大厅
      *
      * @param ids
      */

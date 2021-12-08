@@ -37,6 +37,10 @@ public class ActivityInfoController {
 
     /**
      * 活动列表
+     *
+     * @param page
+     * @param activityInfoDTO
+     * @return
      */
     @ApiOperation(value = "活动列表")
     @GetMapping("/list")
@@ -45,13 +49,23 @@ public class ActivityInfoController {
         return activityInfoService.list(page, activityInfoDTO);
     }
 
-    @ApiOperation(value = "查询活动详情")
+    /**
+     * 活动详情
+     * @param id
+     * @return
+     */
+    @ApiOperation(value = "活动详情")
     @GetMapping("/detail")
     @PreAuthorize("hasAuthority('activity:info:view')")
     public ActivityInfoVO detail(Long id) {
         return activityInfoService.detail(id);
     }
 
+    /**
+     * 新增活动
+     * @param activityInfoAddDTO
+     * @param country
+     */
     @ApiOperation(value = "新增活动")
     @PostMapping("/add")
     @PreAuthorize("hasAuthority('activity:info:add')")
@@ -63,7 +77,11 @@ public class ActivityInfoController {
         activityInfoService.add(activityInfoAddDTO, country);
     }
 
-    @ApiOperation(value = "获取关联了活动规则的全部活动信息")
+    /**
+     * 获取关联活动规则的全部活动
+     * @return
+     */
+    @ApiOperation(value = "获取关联活动规则的全部活动")
     @GetMapping("/getAllSysActivityWithRule")
     @PreAuthorize("hasAuthority('activity:info:list')")
     public List<ActivityInfoVO> getAllSysActivityWithRule() {

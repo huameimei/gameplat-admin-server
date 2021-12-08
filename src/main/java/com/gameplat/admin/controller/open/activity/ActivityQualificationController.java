@@ -34,7 +34,11 @@ public class ActivityQualificationController {
     private ActivityQualificationService activityQualificationService;
 
     /**
-     * 活动列表
+     * 活动资格列表
+     *
+     * @param page
+     * @param activityQualificationDTO
+     * @return
      */
     @ApiOperation(value = "活动资格列表")
     @GetMapping("/list")
@@ -43,6 +47,11 @@ public class ActivityQualificationController {
         return activityQualificationService.list(page, activityQualificationDTO);
     }
 
+    /**
+     * 新增活动资格
+     *
+     * @param activityQualificationAddDTO
+     */
     @ApiOperation(value = "新增活动资格")
     @PostMapping("/add")
     @PreAuthorize("hasAuthority('activity:qualification:add')")
@@ -51,7 +60,7 @@ public class ActivityQualificationController {
     }
 
     /**
-     * 修改
+     * 修改活动资格
      *
      * @param activityQualificationUpdateDTO
      */
@@ -66,7 +75,7 @@ public class ActivityQualificationController {
     }
 
     /**
-     * 更新状态
+     * 更新活动资格状态
      *
      * @param activityQualificationUpdateStatusDTO
      */
@@ -81,7 +90,7 @@ public class ActivityQualificationController {
     }
 
     /**
-     * 更新状态
+     * 更新活动资格状态
      *
      * @param activityQualificationUpdateStatusDTO
      */

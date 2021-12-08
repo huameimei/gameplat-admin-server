@@ -16,7 +16,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 /**
- * @author admin
+ * 活动分发管理
+ * @author kenvin
  */
 @Slf4j
 @RestController
@@ -28,7 +29,10 @@ public class ActivityDistributeController {
     private ActivityDistributeService activityDistributeService;
 
     /**
-     * 活动列表
+     * 活动分发列表
+     * @param page
+     * @param activityDistributeDTO
+     * @return
      */
     @ApiOperation(value = "活动分发列表")
     @GetMapping("/list")

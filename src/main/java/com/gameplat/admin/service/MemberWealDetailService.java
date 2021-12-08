@@ -28,5 +28,5 @@ public interface MemberWealDetailService extends IService<MemberWealDetail> {
 
     void deleteById(Long id);
 
-    void editRewordAmount(MemberWealDetailEditDTO dto);
+    void editRewordAmount(Long id, BigDecimal rewordAmount);
 }

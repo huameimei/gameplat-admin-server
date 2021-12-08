@@ -149,9 +149,14 @@ public class OpenMemberWealController {
      *删除详情中的用户
      */
     @DeleteMapping("/delete")
-    @ApiOperation(value = "删除详情中的用户")
+    @ApiOperation(value = "删除会员俸禄")
     @PreAuthorize("hasAuthority('member:weal:remove')")
     public void deleteByUserId(Long id){
+        //判断是否开启了VIP
+        MemberGrowthConfigVO isVip = configService.findOneConfig(LanguageEnum.app_zh_CN.getCode());
+        if (isVip.getIsEnableVip() == 0) {
+            throw new ServiceException("未开启VIP功能");
+        }
         memberWealDetailService.deleteById(id);
     }
 
@@ -159,10 +164,15 @@ public class OpenMemberWealController {
      *删除详情中的用户
      */
     @PutMapping("/updateRewordAmount")
-    @ApiOperation(value = "编辑详情中的用户信息")
+    @ApiOperation(value = "修改会员俸禄")
     @PreAuthorize("hasAuthority('member:weal:edit')")
     public void editRewordAmount(@RequestBody MemberWealDetailEditDTO dto) {
-        memberWealDetailService.editRewordAmount(dto);
+        //判断是否开启了VIP
+        MemberGrowthConfigVO isVip = configService.findOneConfig(LanguageEnum.app_zh_CN.getCode());
+        if (isVip.getIsEnableVip() == 0) {
+            throw new ServiceException("未开启VIP功能");
+        }
+        memberWealDetailService.editRewordAmount(dto.getId(), dto.getRewordAmount());
     }
 
 }

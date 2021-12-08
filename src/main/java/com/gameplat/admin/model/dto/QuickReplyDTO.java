@@ -1,10 +1,9 @@
 package com.gameplat.admin.model.dto;
 
 import com.gameplat.common.group.Groups;
-import lombok.Data;
-
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import lombok.Data;
 
 /**
  * 快捷回复配置DTO

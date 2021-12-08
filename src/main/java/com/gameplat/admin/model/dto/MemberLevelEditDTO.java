@@ -1,10 +1,9 @@
 package com.gameplat.admin.model.dto;
 
+import java.io.Serializable;
+import javax.validation.constraints.NotNull;
 import lombok.Data;
 import org.hibernate.validator.constraints.Range;
-
-import javax.validation.constraints.NotNull;
-import java.io.Serializable;
 
 @Data
 public class MemberLevelEditDTO implements Serializable {

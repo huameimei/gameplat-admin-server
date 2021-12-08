@@ -1,9 +1,8 @@
 package com.gameplat.admin.model.vo;
 
 import com.baomidou.mybatisplus.extension.activerecord.Model;
-import lombok.Data;
-
 import java.math.BigDecimal;
+import lombok.Data;
 
 @Data
 public class TpPayChannelVO extends Model<TpPayChannelVO> {

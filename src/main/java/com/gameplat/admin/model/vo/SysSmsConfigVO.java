@@ -2,9 +2,8 @@ package com.gameplat.admin.model.vo;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
-
 import java.io.Serializable;
+import lombok.Data;
 
 @Data
 @ApiModel(value = "短信运营商VO", description = "短信运营商VO")

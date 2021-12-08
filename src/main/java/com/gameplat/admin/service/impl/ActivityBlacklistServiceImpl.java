@@ -3,7 +3,6 @@ package com.gameplat.admin.service.impl;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.gameplat.admin.constant.ActivityConst;
 import com.gameplat.admin.convert.ActivityBlacklistConvert;
 import com.gameplat.admin.enums.ActivityBlacklistEnum;
 import com.gameplat.admin.mapper.ActivityBlacklistMapper;
@@ -16,11 +15,10 @@ import com.gameplat.admin.service.ActivityBlacklistService;
 import com.gameplat.admin.service.MemberService;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import java.util.ArrayList;
 import java.util.List;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 /**
  * 活动黑名单业务处理

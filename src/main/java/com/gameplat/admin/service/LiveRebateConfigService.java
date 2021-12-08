@@ -2,7 +2,6 @@ package com.gameplat.admin.service;
 
 import com.gameplat.admin.model.domain.LiveRebateConfig;
 import com.gameplat.admin.model.dto.OperLiveRebateConfigDTO;
-
 import java.util.List;
 
 public interface LiveRebateConfigService {

@@ -4,10 +4,9 @@ import com.gameplat.admin.model.domain.Member;
 import com.gameplat.admin.model.domain.MemberBank;
 import com.gameplat.admin.model.domain.MemberInfo;
 import com.gameplat.admin.model.domain.MemberRemark;
-import lombok.Data;
-
 import java.io.Serializable;
 import java.util.List;
+import lombok.Data;
 
 @Data
 public class MemberProfile implements Serializable {

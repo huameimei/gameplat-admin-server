@@ -8,7 +8,6 @@ import com.gameplat.admin.model.dto.ActivityLobbyDTO;
 import com.gameplat.admin.model.dto.ActivityLobbyUpdateDTO;
 import com.gameplat.admin.model.dto.ActivityLobbyUpdateStatusDTO;
 import com.gameplat.admin.model.vo.ActivityLobbyVO;
-
 import java.util.List;
 
 /**

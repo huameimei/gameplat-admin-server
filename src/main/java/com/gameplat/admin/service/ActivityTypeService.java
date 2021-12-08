@@ -7,7 +7,6 @@ import com.gameplat.admin.model.dto.ActivityTypeAddDTO;
 import com.gameplat.admin.model.dto.ActivityTypeDTO;
 import com.gameplat.admin.model.dto.ActivityTypeUpdateDTO;
 import com.gameplat.admin.model.vo.ActivityTypeVO;
-
 import java.util.List;
 
 /**

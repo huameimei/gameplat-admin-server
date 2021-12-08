@@ -3,10 +3,9 @@ package com.gameplat.admin.model.vo;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.gameplat.admin.util.Date2LongSerializerUtils;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
-
 import java.io.Serializable;
 import java.util.Date;
+import lombok.Data;
 
 /**
  * @author lily

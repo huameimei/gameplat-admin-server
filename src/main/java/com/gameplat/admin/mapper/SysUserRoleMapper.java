@@ -1,9 +1,8 @@
 package com.gameplat.admin.mapper;
 
 import com.gameplat.admin.model.domain.SysUserRole;
-import org.apache.ibatis.annotations.Param;
-
 import java.util.List;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * 用户和角色关联表 数据层

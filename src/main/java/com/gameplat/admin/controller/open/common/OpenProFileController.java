@@ -16,12 +16,14 @@ import com.gameplat.common.model.dto.LogDTO;
 import com.gameplat.common.model.vo.UserLogVO;
 import com.gameplat.log.annotation.Log;
 import com.gameplat.log.enums.LogType;
+import java.util.ArrayList;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.ArrayList;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * 个人信息

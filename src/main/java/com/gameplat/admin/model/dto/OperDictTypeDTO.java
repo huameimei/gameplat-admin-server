@@ -1,13 +1,10 @@
 package com.gameplat.admin.model.dto;
 
 import com.gameplat.common.group.Groups;
-import com.gameplat.common.model.entity.BaseEntity;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-
+import java.io.Serializable;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-import java.io.Serializable;
+import lombok.Data;
 
 /**
  * 字典类型操作DTO

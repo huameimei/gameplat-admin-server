@@ -1,6 +1,5 @@
 package com.gameplat.admin.model.dto;
 
-import cn.hutool.system.UserInfo;
 import com.gameplat.admin.model.domain.Member;
 import java.io.Serializable;
 import java.util.Map;

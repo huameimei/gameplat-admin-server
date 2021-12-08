@@ -1,9 +1,8 @@
 package com.gameplat.admin.model.vo;
 
-import lombok.Data;
-
 import java.util.Date;
 import java.util.List;
+import lombok.Data;
 
 /**
  * 用戶信息Vo

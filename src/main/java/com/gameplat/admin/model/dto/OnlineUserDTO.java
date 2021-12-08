@@ -1,8 +1,7 @@
 package com.gameplat.admin.model.dto;
 
-import lombok.Data;
-
 import java.util.Set;
+import lombok.Data;
 
 /**
  * 在线用户DTO

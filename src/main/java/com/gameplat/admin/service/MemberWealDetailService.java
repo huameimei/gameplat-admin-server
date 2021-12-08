@@ -6,13 +6,10 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.gameplat.admin.model.domain.MemberWealDetail;
 import com.gameplat.admin.model.dto.MemberWealDetailDTO;
 import com.gameplat.admin.model.dto.MemberWealDetailEditDTO;
-import com.gameplat.admin.model.dto.MemberWealDetailRemoveDTO;
 import com.gameplat.admin.model.vo.MemberWealDetailVO;
-import io.swagger.annotations.ApiModelProperty;
-import org.apache.ibatis.annotations.Param;
-
 import java.math.BigDecimal;
 import java.util.List;
+import org.apache.ibatis.annotations.Param;
 
 public interface MemberWealDetailService extends IService<MemberWealDetail> {
 

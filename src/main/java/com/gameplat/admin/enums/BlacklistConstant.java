@@ -1,9 +1,8 @@
 package com.gameplat.admin.enums;
 
-import org.apache.commons.lang3.StringUtils;
-
 import java.util.Optional;
 import java.util.stream.Stream;
+import org.apache.commons.lang3.StringUtils;
 
 public class BlacklistConstant {
 

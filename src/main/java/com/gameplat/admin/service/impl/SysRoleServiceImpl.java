@@ -16,18 +16,16 @@ import com.gameplat.admin.model.dto.OperRoleDTO;
 import com.gameplat.admin.model.dto.RoleDTO;
 import com.gameplat.admin.model.vo.RoleVo;
 import com.gameplat.admin.service.SysRoleService;
-import com.gameplat.base.common.enums.EnableEnum;
 import com.gameplat.base.common.enums.SystemCodeType;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.StringUtils;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 /**
  * 角色管理 业务层处理

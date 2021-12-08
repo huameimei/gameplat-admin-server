@@ -1,8 +1,7 @@
 package com.gameplat.admin.model.vo;
 
-import lombok.Data;
-
 import java.util.List;
+import lombok.Data;
 
 /**
  * @author lily

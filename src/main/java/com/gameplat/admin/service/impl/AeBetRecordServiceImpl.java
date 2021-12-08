@@ -4,14 +4,13 @@ import com.gameplat.admin.mapper.AeBetRecordMapper;
 import com.gameplat.admin.model.domain.AeBetRecord;
 import com.gameplat.admin.service.GameBetRecordService;
 import com.gameplat.admin.service.MemberDmlService;
-import com.gameplat.common.enums.GameCode;
+import com.gameplat.common.enums.GameCodeEnum;
+import java.util.Date;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Date;
-import java.util.List;
 
 @Service("aeBetRecordService")
 @Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)
@@ -30,6 +29,6 @@ public class AeBetRecordServiceImpl implements GameBetRecordService<AeBetRecord>
   @Override
   public void calcGameDml() {
     // 计算打码量
-    memberDmlService.calcGameDml(GameCode.AE_LIVE);
+    memberDmlService.calcGameDml(GameCodeEnum.AE_LIVE);
   }
 }

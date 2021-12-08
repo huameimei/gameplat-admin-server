@@ -1,9 +1,8 @@
 package com.gameplat.admin.model.dto;
 
-import lombok.Data;
-
 import java.io.Serializable;
 import java.util.Map;
+import lombok.Data;
 
 @Data
 public class LimitInfoDTO implements Serializable {

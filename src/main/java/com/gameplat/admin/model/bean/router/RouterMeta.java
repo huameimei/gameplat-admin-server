@@ -1,7 +1,6 @@
 package com.gameplat.admin.model.bean.router;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-
 import java.io.Serializable;
 
 /**

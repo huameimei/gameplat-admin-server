@@ -2,10 +2,9 @@ package com.gameplat.admin.model.dto;
 
 import com.gameplat.common.group.Groups;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
-
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import lombok.Data;
 
 /**
  * 操作菜单信息DTO

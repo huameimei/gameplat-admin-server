@@ -11,6 +11,7 @@ import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.gameplat.admin.constant.ConfigConstant;
+import com.gameplat.admin.constant.TrueFalse;
 import com.gameplat.admin.convert.SysFileConfigConvert;
 import com.gameplat.admin.convert.SysSmsAreaConvert;
 import com.gameplat.admin.convert.SysSmsConfigConvert;
@@ -18,7 +19,11 @@ import com.gameplat.admin.model.domain.SysDictData;
 import com.gameplat.admin.model.domain.SysFileConfig;
 import com.gameplat.admin.model.domain.SysSmsArea;
 import com.gameplat.admin.model.domain.SysSmsConfig;
-import com.gameplat.admin.model.dto.*;
+import com.gameplat.admin.model.dto.OperSysSmsAreaDTO;
+import com.gameplat.admin.model.dto.OperSystemConfigDTO;
+import com.gameplat.admin.model.dto.SysFileConfigDTO;
+import com.gameplat.admin.model.dto.SysSmsAreaQueryDTO;
+import com.gameplat.admin.model.dto.SysSmsConfigDTO;
 import com.gameplat.admin.model.vo.SysFileConfigVO;
 import com.gameplat.admin.model.vo.SysSmsAreaVO;
 import com.gameplat.admin.model.vo.SysSmsConfigVO;
@@ -28,16 +33,13 @@ import com.gameplat.admin.service.SystemConfigService;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.BeanUtils;
 import com.gameplat.base.common.util.StringUtils;
-import com.gameplat.security.SecurityUserHolder;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
 
 @Slf4j
 @Service
@@ -120,7 +122,7 @@ public class SystemConfigServiceImpl implements SystemConfigService {
           }
         }
         if (flag) {
-          // TODO: 2021/11/3 默认状态设置为 正常可用
+          sysSmsConfig.setEnable(TrueFalse.TRUE.getValue());
           sysSmsConfigList.add(sysSmsConfig);
         }
       } else {
@@ -129,8 +131,6 @@ public class SystemConfigServiceImpl implements SystemConfigService {
       }
       // 将list数据set进短信值，修改短信配置
       sysDictData.setDictValue(JSON.toJSONString(sysSmsConfigList));
-      sysDictData.setUpdateBy(SecurityUserHolder.getUsername());
-      sysDictData.setUpdateTime(new Date());
       if (!sysDictDataService.updateById(sysDictData)) {
         throw new ServiceException("新增短信配置失败!");
       }
@@ -155,8 +155,6 @@ public class SystemConfigServiceImpl implements SystemConfigService {
       sysDictData.setDictType(ConfigConstant.FILE_CONFIG);
       sysDictData.setDictName(ConfigConstant.FILE);
       sysDictData.setDictValue(JSONUtil.toJsonStr(sysFileConfigList));
-      sysDictData.setCreateBy(SecurityUserHolder.getUsername());
-      sysDictData.setCreateTime(new Date());
       if (!sysDictDataService.save(sysDictData)) {
         throw new ServiceException("新增文件配置失败!");
       }
@@ -175,7 +173,7 @@ public class SystemConfigServiceImpl implements SystemConfigService {
           }
         }
         if (flag) {
-          // TODO: 2021/11/3 默认状态设置为 正常可用
+          sysFileConfig.setEnable(TrueFalse.TRUE.getValue());
           sysFileConfigList.add(sysFileConfig);
         }
       } else {
@@ -184,8 +182,6 @@ public class SystemConfigServiceImpl implements SystemConfigService {
       }
       // 将list数据set进短信值，修改短信配置
       sysDictData.setDictValue(JSON.toJSONString(sysFileConfigList));
-      sysDictData.setUpdateBy(SecurityUserHolder.getUsername());
-      sysDictData.setUpdateTime(new Date());
       if (!sysDictDataService.updateById(sysDictData)) {
         throw new ServiceException("更新文件配置失败!");
       }
@@ -201,8 +197,6 @@ public class SystemConfigServiceImpl implements SystemConfigService {
       sysDictData.setDictType(dto.getDictType());
       sysDictData.setDictLabel(entry.getKey());
       sysDictData.setDictValue(entry.getValue().toString());
-      sysDictData.setUpdateBy(SecurityUserHolder.getUsername());
-      sysDictData.setUpdateTime(new Date());
 
       LambdaQueryWrapper<SysDictData> queryWrapper = Wrappers.lambdaQuery();
       queryWrapper
@@ -227,17 +221,14 @@ public class SystemConfigServiceImpl implements SystemConfigService {
   public void smsAreaEdit(OperSysSmsAreaDTO dto) {
     SysSmsArea sysSmsArea = sysSmsAreaConvert.toEntity(dto);
     if (sysSmsArea.getId() != null && sysSmsArea.getId() > 0) {
-      sysSmsArea.setUpdateBy(SecurityUserHolder.getUsername());
-      sysSmsArea.setUpdateTime(new Date());
       if (!sysSmsAreaService.updateById(sysSmsArea)) {
         throw new ServiceException("更新区号配置失败!");
       }
-    }
-    sysSmsArea.setCreateBy(SecurityUserHolder.getUsername());
-    sysSmsArea.setCreateTime(new Date());
-    sysSmsArea.setStatus("1");
-    if (!sysSmsAreaService.save(sysSmsArea)) {
-      throw new ServiceException("新增区号配置失败");
+    }else {
+      sysSmsArea.setStatus(TrueFalse.TRUE.getValue());
+      if (!sysSmsAreaService.save(sysSmsArea)) {
+        throw new ServiceException("新增区号配置失败");
+      }
     }
   }
 

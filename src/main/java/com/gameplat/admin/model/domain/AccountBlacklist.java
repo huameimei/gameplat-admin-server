@@ -1,11 +1,14 @@
 package com.gameplat.admin.model.domain;
 
-import com.baomidou.mybatisplus.annotation.*;
-import lombok.Data;
-
-import javax.validation.constraints.NotNull;
+import com.baomidou.mybatisplus.annotation.FieldFill;
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
 import java.util.Date;
+import javax.validation.constraints.NotNull;
+import lombok.Data;
 
 @Data
 @TableName("account_blacklist")

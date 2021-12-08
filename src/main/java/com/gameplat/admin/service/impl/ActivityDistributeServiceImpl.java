@@ -12,20 +12,25 @@ import com.gameplat.admin.enums.FinancialModeEnum;
 import com.gameplat.admin.enums.MemberWealRewordEnums;
 import com.gameplat.admin.enums.PushMessageEnum;
 import com.gameplat.admin.mapper.ActivityDistributeMapper;
-import com.gameplat.admin.model.domain.*;
+import com.gameplat.admin.model.domain.ActivityDistribute;
+import com.gameplat.admin.model.domain.ActivityQualification;
+import com.gameplat.admin.model.domain.Financial;
+import com.gameplat.admin.model.domain.MemberWealReword;
+import com.gameplat.admin.model.domain.ValidWithdraw;
 import com.gameplat.admin.model.dto.ActivityDistributeDTO;
 import com.gameplat.admin.model.dto.PushMessageAddDTO;
 import com.gameplat.admin.model.vo.ActivityDistributeVO;
-import com.gameplat.admin.service.*;
+import com.gameplat.admin.service.ActivityDistributeService;
+import com.gameplat.admin.service.ActivityQualificationService;
+import com.gameplat.admin.service.FinancialService;
+import com.gameplat.admin.service.MemberInfoService;
+import com.gameplat.admin.service.MemberWealRewordService;
+import com.gameplat.admin.service.PushMessageService;
+import com.gameplat.admin.service.ValidWithdrawService;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.IPUtils;
 import com.gameplat.base.common.util.StringUtils;
 import com.gameplat.redis.redisson.DistributedLocker;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections.CollectionUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.MessageFormat;
@@ -33,6 +38,10 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections.CollectionUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 /**
  * 活动分发类

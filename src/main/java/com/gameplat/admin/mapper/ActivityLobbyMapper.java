@@ -2,7 +2,6 @@ package com.gameplat.admin.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.gameplat.admin.model.domain.ActivityLobby;
-import org.apache.ibatis.annotations.Mapper;
 
 /**
  * @author lyq

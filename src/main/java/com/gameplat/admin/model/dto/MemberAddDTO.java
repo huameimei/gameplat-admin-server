@@ -1,14 +1,13 @@
 package com.gameplat.admin.model.dto;
 
-import lombok.Data;
-import org.hibernate.validator.constraints.Length;
-import org.hibernate.validator.constraints.Range;
-
+import java.io.Serializable;
+import java.util.Date;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-import java.io.Serializable;
-import java.util.Date;
+import lombok.Data;
+import org.hibernate.validator.constraints.Length;
+import org.hibernate.validator.constraints.Range;
 
 @Data
 public class MemberAddDTO implements Serializable {

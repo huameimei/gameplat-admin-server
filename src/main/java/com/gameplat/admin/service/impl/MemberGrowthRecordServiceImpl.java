@@ -11,11 +11,10 @@ import com.gameplat.admin.model.domain.MemberGrowthRecord;
 import com.gameplat.admin.model.dto.MemberGrowthRecordDTO;
 import com.gameplat.admin.model.vo.MemberGrowthRecordVO;
 import com.gameplat.admin.service.MemberGrowthRecordService;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 /**
  * @author lily

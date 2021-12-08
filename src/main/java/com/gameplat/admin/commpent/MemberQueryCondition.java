@@ -6,9 +6,8 @@ import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.gameplat.admin.model.domain.Member;
 import com.gameplat.admin.model.dto.MemberQueryDTO;
-import org.springframework.stereotype.Component;
-
 import java.util.Date;
+import org.springframework.stereotype.Component;
 
 /**
  * 会员查询搜索条件构造

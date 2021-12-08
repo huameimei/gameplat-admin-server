@@ -8,7 +8,6 @@ import com.gameplat.admin.model.domain.Member;
 import com.gameplat.admin.model.dto.BizBlacklistQueryDTO;
 import com.gameplat.admin.model.dto.OperBizBlacklistDTO;
 import com.gameplat.base.common.exception.ServiceException;
-
 import java.util.Set;
 
 public interface BizBlacklistService extends IService<BizBlacklist> {

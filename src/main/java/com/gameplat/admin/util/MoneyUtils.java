@@ -1,9 +1,8 @@
 package com.gameplat.admin.util;
 
-import org.apache.commons.lang3.math.NumberUtils;
-
 import java.math.BigDecimal;
 import java.text.NumberFormat;
+import org.apache.commons.lang3.math.NumberUtils;
 
 
 public class MoneyUtils {

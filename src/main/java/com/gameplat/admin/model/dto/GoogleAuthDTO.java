@@ -1,8 +1,7 @@
 package com.gameplat.admin.model.dto;
 
-import lombok.Data;
-
 import javax.validation.constraints.NotEmpty;
+import lombok.Data;
 
 /**
  * 谷歌验证DTO

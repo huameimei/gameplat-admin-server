@@ -1,9 +1,8 @@
 package com.gameplat.admin.model.bean;
 
 import com.gameplat.base.common.json.JsonUtils;
-import lombok.Data;
-
 import java.math.BigDecimal;
+import lombok.Data;
 
 /** 转换类 */
 @Data

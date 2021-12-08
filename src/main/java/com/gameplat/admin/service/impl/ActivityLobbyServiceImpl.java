@@ -61,10 +61,10 @@ public class ActivityLobbyServiceImpl extends ServiceImpl<ActivityLobbyMapper, A
 
 
     @Override
-    public IPage<ActivityLobbyVO> findActivityLobbyList(PageDTO<ActivityLobby> page, ActivityLobbyDTO activityLobbyDTO) {
+    public IPage<ActivityLobbyVO> findActivityLobbyList(PageDTO<ActivityLobby> page, ActivityLobbyQueryDTO activityLobbyQueryDTO) {
         LambdaQueryChainWrapper<ActivityLobby> queryWrapper = this.lambdaQuery();
-        queryWrapper.like(StringUtils.isNotBlank(activityLobbyDTO.getTitle()), ActivityLobby::getTitle, activityLobbyDTO.getTitle())
-                .eq(activityLobbyDTO.getStatus() != null, ActivityLobby::getStatus, activityLobbyDTO.getStatus());
+        queryWrapper.like(StringUtils.isNotBlank(activityLobbyQueryDTO.getTitle()), ActivityLobby::getTitle, activityLobbyQueryDTO.getTitle())
+                .eq(activityLobbyQueryDTO.getStatus() != null, ActivityLobby::getStatus, activityLobbyQueryDTO.getStatus());
 
         IPage<ActivityLobbyVO> activityLobbyVOIPage = queryWrapper.page(page).convert(activityLobbyConvert::toVo);
         if (CollectionUtils.isNotEmpty(activityLobbyVOIPage.getRecords())) {

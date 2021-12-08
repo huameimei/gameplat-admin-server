@@ -2,6 +2,7 @@ package com.gameplat.admin.model.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.gameplat.base.common.util.DateUtil;
+import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -13,11 +14,13 @@ import java.util.Date;
 import java.util.List;
 
 /**
+ * 活动大厅更新DTO
  * @Author: kenvin
  * @Description:
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
+@ApiModel(value = "ActivityLobbyUpdateDTO", description = "活动大厅更新DTO")
 public class ActivityLobbyUpdateDTO implements Serializable {
 
     private static final long serialVersionUID = 6060013282905693277L;
@@ -56,7 +59,7 @@ public class ActivityLobbyUpdateDTO implements Serializable {
     private Integer statisItem;
 
     @ApiModelProperty(value = "充值类型（1 转账汇款，2 在线支付，3 人工入款）")
-    private Integer payType;
+    private String payType;
 
     @ApiModelProperty(value = "统计日期（1 每日，2 每周，3 每月，4 每周X，5 每月X日）")
     private Integer statisDate;

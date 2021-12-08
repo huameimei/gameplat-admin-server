@@ -3,10 +3,7 @@ package com.gameplat.admin.service;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.gameplat.admin.model.domain.ActivityLobby;
-import com.gameplat.admin.model.dto.ActivityLobbyAddDTO;
-import com.gameplat.admin.model.dto.ActivityLobbyDTO;
-import com.gameplat.admin.model.dto.ActivityLobbyUpdateDTO;
-import com.gameplat.admin.model.dto.ActivityLobbyUpdateStatusDTO;
+import com.gameplat.admin.model.dto.*;
 import com.gameplat.admin.model.vo.ActivityLobbyVO;
 
 import java.util.List;
@@ -21,10 +18,10 @@ public interface ActivityLobbyService {
      * 查询活动大厅列表
      *
      * @param page
-     * @param activityLobbyDTO
+     * @param activityLobbyQueryDTO
      * @return
      */
-    IPage<ActivityLobbyVO> findActivityLobbyList(PageDTO<ActivityLobby> page, ActivityLobbyDTO activityLobbyDTO);
+    IPage<ActivityLobbyVO> findActivityLobbyList(PageDTO<ActivityLobby> page, ActivityLobbyQueryDTO activityLobbyQueryDTO);
 
     /**
      * 新增活动大厅

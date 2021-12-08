@@ -16,61 +16,85 @@ import java.util.Date;
 /**
  * 活动类型
  *
- * @author aguai
- * @since 2020-08-14
+ * @author kenvin
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
 @TableName("activity_type")
-@ApiModel(value = "ActivityType", description = "活动类型")
 public class ActivityType implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @ApiModelProperty(value = "编号")
+    /**
+     * 编号
+     */
+    @TableId("id")
     private Long id;
 
-    @ApiModelProperty(value = "活动类型")
+    /**
+     * 活动类型
+     */
     private String typeCode;
 
-    @ApiModelProperty(value = "活动类型名称")
+    /**
+     * 活动类型名称
+     */
     private String typeName;
 
+    /**
+     * 创建时间
+     */
     @TableField(fill = FieldFill.INSERT)
-    @DateTimeFormat(pattern = "yyyy-MM-dd hh:mm:ss")
-    @ApiModelProperty(value = "创建时间")
     private Date createTime;
 
+    /**
+     * 更新时间
+     */
     @TableField(fill = FieldFill.INSERT_UPDATE)
-    @DateTimeFormat(pattern = "yyyy-MM-dd hh:mm:ss")
-    @ApiModelProperty(value = "更新时间")
     private Date updateTime;
 
+    /**
+     * 创建人
+     */
     @TableField(fill = FieldFill.INSERT)
-    @ApiModelProperty(value = "创建人")
     private String createBy;
 
+    /**
+     * 更新人
+     */
     @TableField(fill = FieldFill.INSERT_UPDATE)
-    @ApiModelProperty(value = "更新人")
     private String updateBy;
 
-    @ApiModelProperty(value = "备注")
+    /**
+     * 备注
+     */
     private String remark;
 
-    @ApiModelProperty(value = "排序")
+    /**
+     * 排序
+     */
     private Integer sort;
 
-    @ApiModelProperty(value = "状态")
+    /**
+     * 状态
+     */
     private Integer typeStatus;
 
-    @ApiModelProperty(value = "浮窗状态")
+    /**
+     * 浮窗状态
+     */
     private Integer floatStatus;
 
-    @ApiModelProperty(value = "浮窗logo")
+    /**
+     * 浮窗logo
+     */
     private String floatLogo;
 
-    @ApiModelProperty(value = "浮窗url")
+    /**
+     * 浮窗url
+     */
     private String floatUrl;
+
     /**
      * 语言
      */

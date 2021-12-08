@@ -2,6 +2,7 @@ package com.gameplat.admin.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
+import com.gameplat.admin.model.domain.SysDictData;
 import com.gameplat.admin.model.domain.SysSmsArea;
 import com.gameplat.admin.model.dto.*;
 import com.gameplat.admin.model.vo.SysFileConfigVO;
@@ -27,4 +28,6 @@ public interface SystemConfigService {
   void smsAreaEdit(OperSysSmsAreaDTO dto);
 
   void smsAreaDelete(Long id);
+
+  SysDictData findActivityTypeCodeList(String language);
 }

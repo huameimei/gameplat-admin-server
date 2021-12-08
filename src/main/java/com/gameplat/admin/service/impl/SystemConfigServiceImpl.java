@@ -247,4 +247,13 @@ public class SystemConfigServiceImpl implements SystemConfigService {
       throw new ServiceException("删除区号配置失败!");
     }
   }
+
+  @Override
+  public SysDictData findActivityTypeCodeList(String language) {
+    LambdaQueryWrapper<SysDictData> query = Wrappers.lambdaQuery();
+    query
+            .eq(SysDictData::getDictType, ConfigConstant.ACTIVITY_TYPE_CONFIG)
+            .eq(SysDictData::getDictLabel, ConfigConstant.ACTIVITY_TYPE_CONFIG);
+    return sysDictDataService.getOne(query);
+  }
 }

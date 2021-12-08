@@ -2,6 +2,7 @@ package com.gameplat.admin.model.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.gameplat.base.common.util.DateUtil;
+import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -13,11 +14,14 @@ import java.util.Date;
 import java.util.List;
 
 /**
+ * 活动大厅新增DTO
+ *
  * @Author: kenvin
  * @Description:
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
+@ApiModel(value = "ActivityLobbyAddDTO", description = "活动大厅新增DTO")
 public class ActivityLobbyAddDTO implements Serializable {
 
     private static final long serialVersionUID = 6060013282905693277L;
@@ -53,12 +57,12 @@ public class ActivityLobbyAddDTO implements Serializable {
     private Integer statisItem;
 
     @ApiModelProperty(value = "充值类型（1 转账汇款，2 在线支付，3 人工入款）")
-    private Integer payType;
+    private String payType;
 
     @ApiModelProperty(value = "统计日期（1 每日，2 每周，3 每月，4 每周X，5 每月X日）")
     private Integer statisDate;
 
-    @ApiModelProperty(value = "详细日期（日）")
+    @ApiModelProperty(value = "详细日期（日），周日为每周开始的第一天，下标为1")
     private Integer detailDate;
 
     @ApiModelProperty(value = "参与层级")
@@ -87,9 +91,6 @@ public class ActivityLobbyAddDTO implements Serializable {
 
     @ApiModelProperty(value = "活动大厅优惠")
     private List<ActivityLobbyDiscountDTO> lobbyDiscountList;
-
-    @ApiModelProperty(value = "删除活动大厅优惠id")
-    private List<Long> delDiscountIdList;
 
     @ApiModelProperty(value = "失效活動")
     private Integer failure;
@@ -137,8 +138,7 @@ public class ActivityLobbyAddDTO implements Serializable {
     @ApiModelProperty(value = "创建人")
     private String createBy;
 
-    @ApiModelProperty(value = "创建人")
+    @ApiModelProperty(value = "目标值")
     private String targetValue;
-
 
 }

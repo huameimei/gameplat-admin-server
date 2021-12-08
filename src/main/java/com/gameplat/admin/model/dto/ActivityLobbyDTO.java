@@ -2,6 +2,7 @@ package com.gameplat.admin.model.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.gameplat.base.common.util.DateUtil;
+import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -12,12 +13,14 @@ import java.util.Date;
 import java.util.List;
 
 /**
+ * 活动大厅DTO
  * @Author: lyq
  * @Date: 2020/8/14 15:15
  * @Description:
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
+@ApiModel(value = "ActivityLobbyDTO", description = "活动大厅DTO")
 public class ActivityLobbyDTO implements Serializable {
 
     private static final long serialVersionUID = 6060013282905693277L;

@@ -1,5 +1,6 @@
 package com.gameplat.admin.model.dto;
 
+import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -8,12 +9,14 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 
 /**
+ * 活动大厅打折信息
  * @Author: lyq
  * @Date: 2020/8/20 14:28
  * @Description:
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
+@ApiModel(value = "ActivityLobbyDiscountDTO", description = "活动大厅打折信息")
 public class ActivityLobbyDiscountDTO implements Serializable {
 
     private static final long serialVersionUID = 2027127567683724890L;

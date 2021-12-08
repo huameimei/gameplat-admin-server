@@ -10,6 +10,7 @@ import com.gameplat.admin.model.domain.ActivityInfo;
 import com.gameplat.admin.model.domain.ActivityType;
 import com.gameplat.admin.model.dto.ActivityTypeAddDTO;
 import com.gameplat.admin.model.dto.ActivityTypeDTO;
+import com.gameplat.admin.model.dto.ActivityTypeQueryDTO;
 import com.gameplat.admin.model.dto.ActivityTypeUpdateDTO;
 import com.gameplat.admin.model.vo.ActivityTypeVO;
 import com.gameplat.admin.service.ActivityInfoService;
@@ -42,10 +43,13 @@ public class ActivityTypeServiceImpl extends ServiceImpl<ActivityTypeMapper, Act
     }
 
     @Override
-    public IPage<ActivityTypeVO> list(PageDTO<ActivityType> page, ActivityTypeDTO activityTypeDTO) {
+    public IPage<ActivityTypeVO> list(PageDTO<ActivityType> page, ActivityTypeQueryDTO activityTypeQueryDTO) {
         LambdaQueryChainWrapper<ActivityType> queryChainWrapper = this.lambdaQuery();
-        queryChainWrapper.eq(ActivityType::getLanguage, activityTypeDTO.getLanguage())
-                .eq(ActivityType::getTypeStatus, activityTypeDTO.getTypeStatus());
+        if (activityTypeQueryDTO.getTypeStatus() == null) {
+            activityTypeQueryDTO.setTypeStatus(1);
+        }
+        queryChainWrapper.eq(ActivityType::getLanguage, activityTypeQueryDTO.getLanguage())
+                .eq(ActivityType::getTypeStatus, activityTypeQueryDTO.getTypeStatus());
 
         return queryChainWrapper.page(page).convert(activityTypeConvert::toVo);
     }

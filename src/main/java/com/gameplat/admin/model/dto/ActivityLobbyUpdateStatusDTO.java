@@ -1,5 +1,6 @@
 package com.gameplat.admin.model.dto;
 
+import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -11,11 +12,13 @@ import java.util.Date;
 import java.util.List;
 
 /**
+ * 活动大厅更新状态DTO
  * @Author: kenvin
  * @Description:
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
+@ApiModel(value = "ActivityLobbyUpdateStatusDTO", description = "活动大厅更新状态DTO")
 public class ActivityLobbyUpdateStatusDTO implements Serializable {
 
     private static final long serialVersionUID = 6060013282905693277L;

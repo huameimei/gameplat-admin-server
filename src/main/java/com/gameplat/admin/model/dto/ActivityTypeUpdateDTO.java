@@ -12,12 +12,11 @@ import java.util.Date;
 /**
  * 活动类型更新DTO
  *
- * @author aguai
- * @since 2020-08-14
+ * @author kenvin
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
-@ApiModel(value = "ActivityTypeUpdateDTO", description = "活动类型DTO")
+@ApiModel(value = "ActivityTypeUpdateDTO", description = "活动类型更新DTO")
 public class ActivityTypeUpdateDTO implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -37,10 +36,10 @@ public class ActivityTypeUpdateDTO implements Serializable {
     @ApiModelProperty(value = "排序")
     private Integer sort;
 
-    @ApiModelProperty(value = "状态")
+    @ApiModelProperty(value = "状态,0 无效,1 有效")
     private Integer typeStatus;
 
-    @ApiModelProperty(value = "浮窗状态")
+    @ApiModelProperty(value = "浮窗状态,0 无效,1 有效")
     private Integer floatStatus;
 
     @ApiModelProperty(value = "浮窗logo")

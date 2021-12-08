@@ -5,7 +5,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.gameplat.admin.model.domain.ActivityLobby;
 import com.gameplat.admin.model.dto.ActivityLobbyAddDTO;
-import com.gameplat.admin.model.dto.ActivityLobbyDTO;
+import com.gameplat.admin.model.dto.ActivityLobbyQueryDTO;
 import com.gameplat.admin.model.dto.ActivityLobbyUpdateDTO;
 import com.gameplat.admin.model.dto.ActivityLobbyUpdateStatusDTO;
 import com.gameplat.admin.model.vo.ActivityLobbyVO;
@@ -13,11 +13,14 @@ import com.gameplat.admin.service.ActivityLobbyService;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.StringUtils;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.List;
 
@@ -41,8 +44,12 @@ public class ActivityLobbyController {
     @ApiOperation(value = "活动大厅列表")
     @GetMapping("/list")
     @PreAuthorize("hasAuthority('activity:lobby:list')")
-    public IPage<ActivityLobbyVO> list(PageDTO<ActivityLobby> page, ActivityLobbyDTO activityLobbyDTO) {
-        return activityLobbyService.findActivityLobbyList(page, activityLobbyDTO);
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "current", value = "分页参数：当前页", defaultValue = "1", required = false),
+            @ApiImplicitParam(name = "size", value = "每页条数", required = false),
+    })
+    public IPage<ActivityLobbyVO> list(@ApiIgnore PageDTO<ActivityLobby> page, ActivityLobbyQueryDTO activityLobbyQueryDTO) {
+        return activityLobbyService.findActivityLobbyList(page, activityLobbyQueryDTO);
     }
 
     /**

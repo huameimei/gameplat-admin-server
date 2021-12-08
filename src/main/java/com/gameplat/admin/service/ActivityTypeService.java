@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.gameplat.admin.model.domain.ActivityType;
 import com.gameplat.admin.model.dto.ActivityTypeAddDTO;
 import com.gameplat.admin.model.dto.ActivityTypeDTO;
+import com.gameplat.admin.model.dto.ActivityTypeQueryDTO;
 import com.gameplat.admin.model.dto.ActivityTypeUpdateDTO;
 import com.gameplat.admin.model.vo.ActivityTypeVO;
 
@@ -27,10 +28,10 @@ public interface ActivityTypeService {
      * 分页查询活动类型
      *
      * @param page
-     * @param activityTypeDTO
+     * @param activityTypeQueryDTO
      * @return
      */
-    IPage<ActivityTypeVO> list(PageDTO<ActivityType> page, ActivityTypeDTO activityTypeDTO);
+    IPage<ActivityTypeVO> list(PageDTO<ActivityType> page, ActivityTypeQueryDTO activityTypeQueryDTO);
 
     /**
      * 新增活动类型

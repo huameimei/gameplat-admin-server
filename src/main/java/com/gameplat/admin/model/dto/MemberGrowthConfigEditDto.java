@@ -7,6 +7,7 @@ import lombok.Data;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.Date;
 
 /**
  * @author lily
@@ -58,6 +59,9 @@ public class MemberGrowthConfigEditDto implements Serializable {
     @ApiModelProperty(value = "每日签到奖励成长值", name = "signEveryDayGrowth", required = false)
     private Integer signEveryDayGrowth;
 
+    @ApiModelProperty(value = "每日签到奖励成长值", name = "signEveryDayGrowth", required = false)
+    private Integer bindBankGrowth;
+
     @ApiModelProperty(value = "每日签到最少充值金额", name = "signDayMinRechargeAmount", required = false)
     private BigDecimal signDayMinRechargeAmount;
 
@@ -78,4 +82,55 @@ public class MemberGrowthConfigEditDto implements Serializable {
 
     @ApiModelProperty(value = "语言", hidden = true)
     private String language;
+
+    @ApiModelProperty("完善用户资料奖励成长值")
+    private Integer perfectUserInfoGrowth;
+
+    @ApiModelProperty("所需完善用户的资料列")
+    private String perfectUserInfoField;
+
+    @ApiModelProperty("VIP经验值描述")
+    private String growthDesc;
+
+    @ApiModelProperty("其它提示")
+    private String otherDesc;
+
+    @ApiModelProperty("轮播图  多张用,分割")
+    private String carousel;
+
+    @ApiModelProperty(value = "创建人")
+    private String createBy;
+
+    @ApiModelProperty(value = "创建时间")
+    private Date createTime;
+
+    @ApiModelProperty(value = "更新时间")
+    private Date updateTime;
+
+    @ApiModelProperty(value = "备注")
+    private String remark;
+
+    @ApiModelProperty("VIP经验值描述 en-US")
+    private String growthDescEn;
+
+    @ApiModelProperty("VIP经验值描述 th-TH")
+    private String growthDescTh;
+
+    @ApiModelProperty("VIP经验值描述 in-ID")
+    private String growthDescIn;
+
+    @ApiModelProperty("VIP经验值描述 vi-VN")
+    private String growthDescVi;
+
+    @ApiModelProperty("其它提示 en-US")
+    private String otherDescEn;
+
+    @ApiModelProperty("其它提示 th-TH")
+    private String otherDescTh;
+
+    @ApiModelProperty("其它提示 in-ID")
+    private String otherDescIn;
+
+    @ApiModelProperty("其它提示 vi-VN")
+    private String otherDescVi;
 }

@@ -14,7 +14,6 @@ import com.gameplat.admin.model.domain.MemberWealDetail;
 import com.gameplat.admin.model.dto.MemberWealDetailDTO;
 import com.gameplat.admin.model.vo.MemberWealDetailVO;
 import com.gameplat.admin.service.MemberWealDetailService;
-import com.gameplat.admin.service.MemberWealService;
 import com.gameplat.base.common.exception.ServiceException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -55,9 +54,7 @@ public class MemberWealDetailServiceImpl extends ServiceImpl<MemberWealDetailMap
         }
         LambdaQueryWrapper<MemberWealDetail> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(MemberWealDetail::getWealId, wealId);
-        if (!this.remove(wrapper)){
-            throw new ServiceException("删除失败！");
-        }
+        this.remove(wrapper);
     }
 
     @Override
@@ -81,11 +78,9 @@ public class MemberWealDetailServiceImpl extends ServiceImpl<MemberWealDetailMap
             throw new ServiceException("福利编号不能为空!");
         }
 
-        if (!this.update(new LambdaUpdateWrapper<MemberWealDetail>()
+        this.update(new LambdaUpdateWrapper<MemberWealDetail>()
                 .eq(ObjectUtils.isNotEmpty(id), MemberWealDetail::getWealId, id)
-                .set( MemberWealDetail::getStatus, status))){
-            throw new ServiceException("更新福利记录状态失败:");
-        }
+                .set( MemberWealDetail::getStatus, status));
     }
 
     @Override

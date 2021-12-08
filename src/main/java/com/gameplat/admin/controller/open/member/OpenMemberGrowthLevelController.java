@@ -5,7 +5,6 @@ import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
-import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.gameplat.admin.enums.LanguageEnum;
 import com.gameplat.admin.model.dto.MemberGrowthConfigEditDto;
 import com.gameplat.admin.model.dto.MemberGrowthLevelEditDto;
@@ -88,7 +87,7 @@ public class OpenMemberGrowthLevelController {
 
     @ApiOperation(value = "后台批量修改VIP等级")
     @PreAuthorize("hasAuthority('member:growthLevel:updateLevel')")
-    @PutMapping("/updateLevel.json")
+    @PutMapping("/updateLevel")
     public void batchUpdateLevel(@RequestBody JSONObject obj) {
         String language = obj.get("language").toString();
         language = StrUtil.isBlank(language) ? "zh-CN" : language;

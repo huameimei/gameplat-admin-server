@@ -246,7 +246,11 @@ public class MemberWealServiceImpl extends ServiceImpl<MemberWealMapper, MemberW
             memberWeal.setTotalUserCount(totalUserCount);
             memberWeal.setTotalPayMoney(totalPayMoney);
         }
-        //先删除福利，后保存
+        List<MemberWealDetail> memberWealDetailList = wealDetailService.findSatisfyMember(new MemberWealDetail() {{
+            setWealId(id);
+        }});
+
+        //修改了福利信息时，要重新结算，所以应该先删除
         wealDetailService.removeWealDetail(id);
         if (list != null && list.size() > 0){
             wealDetailService.batchSave(list);
@@ -432,7 +436,7 @@ public class MemberWealServiceImpl extends ServiceImpl<MemberWealMapper, MemberW
                                 //添加奖励记录
                                 wealRewordService.insert(memberWealReword);
                                 //修改福利详情状态 为已完成
-                                wealDetailService.updateByWealStatus(item.getId(),2);
+                                wealDetailService.updateByWealStatus(item.getWealId(),2);
                             } catch (Exception e){
                                 continue;
                             } finally {
@@ -465,7 +469,6 @@ public class MemberWealServiceImpl extends ServiceImpl<MemberWealMapper, MemberW
         }finally {
             distributedLocker.unlock(key);
         }
-
     }
 
     /**

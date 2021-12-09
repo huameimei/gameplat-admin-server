@@ -3,7 +3,6 @@ package com.gameplat.admin.service.impl;
 import com.alicp.jetcache.anno.CacheInvalidate;
 import com.alicp.jetcache.anno.Cached;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.gameplat.admin.constant.CachedKeys;
 import com.gameplat.admin.convert.MemberRemarkConvert;
 import com.gameplat.admin.mapper.MemberRemarkMapper;
 import com.gameplat.admin.model.domain.Member;
@@ -15,6 +14,8 @@ import com.gameplat.admin.service.MemberService;
 import com.gameplat.base.common.exception.ServiceException;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import com.gameplat.common.constant.CachedKeys;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;

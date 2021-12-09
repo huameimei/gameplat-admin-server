@@ -18,6 +18,7 @@ import com.gameplat.admin.model.domain.ActivityQualification;
 import com.gameplat.admin.model.dto.ActivityLobbyAddDTO;
 import com.gameplat.admin.model.dto.ActivityLobbyDTO;
 import com.gameplat.admin.model.dto.ActivityLobbyDiscountDTO;
+import com.gameplat.admin.model.dto.ActivityLobbyQueryDTO;
 import com.gameplat.admin.model.dto.ActivityLobbyUpdateDTO;
 import com.gameplat.admin.model.dto.ActivityLobbyUpdateStatusDTO;
 import com.gameplat.admin.model.vo.ActivityLobbyDiscountVO;

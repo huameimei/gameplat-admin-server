@@ -5,7 +5,6 @@ import cn.hutool.core.map.MapUtil;
 import com.alicp.jetcache.anno.CacheInvalidate;
 import com.alicp.jetcache.anno.Cached;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.gameplat.admin.constant.CachedKeys;
 import com.gameplat.admin.convert.MemberLevelConvert;
 import com.gameplat.admin.enums.MemberLevelEnums;
 import com.gameplat.admin.mapper.MemberLevelMapper;
@@ -25,6 +24,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import com.gameplat.common.constant.CachedKeys;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

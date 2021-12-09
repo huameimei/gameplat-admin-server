@@ -10,6 +10,7 @@ import com.gameplat.admin.model.dto.ActivityTypeAddDTO;
 import com.gameplat.admin.model.dto.ActivityTypeQueryDTO;
 import com.gameplat.admin.model.dto.ActivityTypeUpdateDTO;
 import com.gameplat.admin.model.vo.ActivityTypeVO;
+import com.gameplat.admin.model.vo.CodeDataVO;
 import com.gameplat.admin.service.ActivityTypeService;
 import com.gameplat.admin.service.SystemConfigService;
 import com.gameplat.base.common.exception.ServiceException;
@@ -20,6 +21,7 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -32,6 +34,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 活动板块、管理
@@ -167,7 +172,7 @@ public class ActivityTypeController {
     @GetMapping("/typeCodeList")
     @PreAuthorize("hasAuthority('activity:type:list')")
     @ApiImplicitParams({@ApiImplicitParam(name = "language", value = "语言", required = true)})
-    public JSONArray typeCodeList(String language, @RequestHeader(value = "country", defaultValue = "zh-CN", required = false) String country) {
+    public List<CodeDataVO> typeCodeList(String language, @RequestHeader(value = "country", defaultValue = "zh-CN", required = false) String country) {
         if (StringUtils.isBlank(language)) {
             language = country;
         }
@@ -175,10 +180,21 @@ public class ActivityTypeController {
             throw new ServiceException("语言language参数不能为空");
         }
         SysDictData sysDictData = systemConfigService.findActivityTypeCodeList(language);
-        //mock数据
-        String jsonStr = "{\"zh-CN\":[{\"sport\":\"体育\"},{\"lottery\":\"彩票\"},{\"chess\":\"棋牌\"},{\"real\":\"真人\"},{\"egame\":\"电子\"},{\"esport\":\"电竞\"},{\"hunter\":\"捕鱼\"},{\"asport\":\"动物竞技\"},{\"other\":\"其它\"}],\"en-US\":[{\"sport\":\"Sports\"},{\"lottery\":\"Lottery\"},{\"chess\":\"Cards\"},{\"real\":\"Live\"},{\"egame\":\"Slot\"},{\"esport\":\"Esports\"},{\"hunter\":\"Animal\"},{\"asport\":\"Fishing\"},{\"other\":\"Other\"}]}";
-        JSONObject jsonObject = JSONObject.parseObject(jsonStr);
-        return jsonObject.getJSONArray(language);
+        if (sysDictData == null) {
+            throw new ServiceException("活动板块类型配置信息不存在");
+        }
+        JSONObject jsonObject = JSONObject.parseObject(sysDictData.getDictValue());
+
+        JSONArray jsonArray = jsonObject.getJSONArray(language);
+        if (CollectionUtils.isEmpty(jsonArray)) {
+            throw new ServiceException("语言【" + language + "】活动板块类型配置信息不存在");
+        }
+        List<CodeDataVO> codeDataVOList = new ArrayList<>();
+        for (int i = 0; i < jsonArray.size(); i++) {
+            CodeDataVO codeDataVO = jsonArray.getObject(i, CodeDataVO.class);
+            codeDataVOList.add(codeDataVO);
+        }
+        return codeDataVOList;
     }
 
 }

@@ -14,4 +14,9 @@ public class ConfigConstant {
 	 * 活动类型配置
 	 */
 	public static final String ACTIVITY_TYPE_CONFIG = "ACTIVITY_TYPE_CONFIG";
+
+	/**
+	 * 真人游戏类型
+	 */
+	public static final String LIVE_GAME_TYPE = "LIVE_GAME_TYPE";
 }

@@ -10,39 +10,57 @@ import com.gameplat.admin.mapper.GameMapper;
 import com.gameplat.admin.model.domain.Game;
 import com.gameplat.admin.model.dto.GameQueryDTO;
 import com.gameplat.admin.model.dto.OperGameDTO;
+import com.gameplat.admin.model.vo.GameVO;
 import com.gameplat.admin.service.GameService;
 import com.gameplat.base.common.exception.ServiceException;
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Service
 @Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)
 public class GameServiceImpl extends ServiceImpl<GameMapper, Game> implements GameService {
 
-  @Autowired private GameConvert gameConvert;
+    @Autowired
+    private GameConvert gameConvert;
 
-  @Override
-  @SentinelResource(value = "selectGameList")
-  public IPage<Game> selectGameList(PageDTO<Game> page, GameQueryDTO dto) {
-    return this.lambdaQuery()
-        .like(ObjectUtils.isNotEmpty(dto.getGameName()), Game::getChineseName, dto.getGameName())
-        .eq(
-            ObjectUtils.isNotEmpty(dto.getPlatformCode()),
-            Game::getPlatformCode,
-            dto.getPlatformCode())
-        .eq(ObjectUtils.isNotEmpty(dto.getGameType()), Game::getGameType, dto.getGameType())
-        .eq(ObjectUtils.isNotEmpty(dto.getIsH5()), Game::getIsH5, dto.getIsH5())
-        .eq(ObjectUtils.isNotEmpty(dto.getIsFlash()), Game::getIsFlash, dto.getIsFlash())
-        .page(page);
-  }
-
-  @Override
-  public void updateGame(OperGameDTO operGameDTO) {
-    Game game = gameConvert.toEntity(operGameDTO);
-    if (this.updateById(game)) {
-      throw new ServiceException("更新游戏信息失败!");
+    @Override
+    @SentinelResource(value = "selectGameList")
+    public IPage<Game> selectGameList(PageDTO<Game> page, GameQueryDTO dto) {
+        return this.lambdaQuery()
+                .like(ObjectUtils.isNotEmpty(dto.getGameName()), Game::getChineseName, dto.getGameName())
+                .eq(
+                        ObjectUtils.isNotEmpty(dto.getPlatformCode()),
+                        Game::getPlatformCode,
+                        dto.getPlatformCode())
+                .eq(ObjectUtils.isNotEmpty(dto.getGameType()), Game::getGameType, dto.getGameType())
+                .eq(ObjectUtils.isNotEmpty(dto.getIsH5()), Game::getIsH5, dto.getIsH5())
+                .eq(ObjectUtils.isNotEmpty(dto.getIsFlash()), Game::getIsFlash, dto.getIsFlash())
+                .page(page);
     }
-  }
+
+    @Override
+    public void updateGame(OperGameDTO operGameDTO) {
+        Game game = gameConvert.toEntity(operGameDTO);
+        if (this.updateById(game)) {
+            throw new ServiceException("更新游戏信息失败!");
+        }
+    }
+
+    @Override
+    public List<GameVO> findByGameTypeCode(String gameTypeCode) {
+        List<Game> list = this.lambdaQuery().eq(Game::getGameType, gameTypeCode).list();
+        List<GameVO> gameVOList = new ArrayList<>();
+        if(CollectionUtils.isNotEmpty(list)){
+            for(Game game : list){
+                gameVOList.add(gameConvert.toVo(game));
+            }
+        }
+        return gameVOList;
+    }
 }

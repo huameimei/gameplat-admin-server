@@ -3,27 +3,40 @@ package com.gameplat.admin.controller.open.activity;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
+import com.gameplat.admin.constant.ConfigConstant;
 import com.gameplat.admin.model.domain.ActivityLobby;
+import com.gameplat.admin.model.domain.Game;
+import com.gameplat.admin.model.domain.SysDictData;
 import com.gameplat.admin.model.dto.ActivityLobbyAddDTO;
 import com.gameplat.admin.model.dto.ActivityLobbyQueryDTO;
 import com.gameplat.admin.model.dto.ActivityLobbyUpdateDTO;
 import com.gameplat.admin.model.dto.ActivityLobbyUpdateStatusDTO;
 import com.gameplat.admin.model.vo.ActivityLobbyVO;
+import com.gameplat.admin.model.vo.CodeDataVO;
+import com.gameplat.admin.model.vo.GameVO;
 import com.gameplat.admin.service.ActivityLobbyService;
+import com.gameplat.admin.service.GameService;
+import com.gameplat.admin.service.SysDictDataService;
+import com.gameplat.admin.service.SystemConfigService;
+import com.gameplat.base.common.enums.SystemCodeType;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.StringUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
-import java.util.List;
+
+import java.util.*;
+
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.List;
+
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -46,6 +59,12 @@ public class ActivityLobbyController {
     @Autowired
     private ActivityLobbyService activityLobbyService;
 
+    @Autowired
+    private SysDictDataService sysDictDataService;
+
+    @Autowired
+    private GameService gameService;
+
     /**
      * 活动大厅列表
      */
@@ -53,8 +72,8 @@ public class ActivityLobbyController {
     @GetMapping("/list")
     @PreAuthorize("hasAuthority('activity:lobby:list')")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "current", value = "分页参数：当前页", defaultValue = "1", required = false),
-            @ApiImplicitParam(name = "size", value = "每页条数", required = false),
+            @ApiImplicitParam(name = "current", value = "分页参数：当前页", defaultValue = "1"),
+            @ApiImplicitParam(name = "size", value = "每页条数"),
     })
     public IPage<ActivityLobbyVO> list(@ApiIgnore PageDTO<ActivityLobby> page, ActivityLobbyQueryDTO activityLobbyQueryDTO) {
         return activityLobbyService.findActivityLobbyList(page, activityLobbyQueryDTO);
@@ -139,5 +158,46 @@ public class ActivityLobbyController {
     public List<ActivityLobbyVO> findUnboundLobbyList() {
         return activityLobbyService.findUnboundLobbyList();
     }
+
+    /**
+     * 游戏类型列表
+     */
+    @ApiOperation(value = "游戏类型列表")
+    @GetMapping("/gameTypeList")
+    @PreAuthorize("hasAuthority('activity:lobby:list')")
+    public List<CodeDataVO> gameTypeList() {
+        SysDictData dictData = new SysDictData();
+        dictData.setDictType(ConfigConstant.LIVE_GAME_TYPE);
+        dictData.setStatus(SystemCodeType.ENABLE.getCode());
+        List<SysDictData> dictList = sysDictDataService.getDictList(dictData);
+        if (CollectionUtils.isEmpty(dictList)) {
+            throw new ServiceException("游戏类型列表没有配置");
+        }
+
+        List<CodeDataVO> list = new ArrayList<>();
+        CodeDataVO codeDataVO = null;
+        for (SysDictData data : dictList) {
+            codeDataVO = new CodeDataVO();
+            codeDataVO.setCode(data.getDictValue());
+            codeDataVO.setName(data.getDictLabel());
+            list.add(codeDataVO);
+        }
+        return list;
+    }
+
+    /**
+     * 游戏类型列表
+     */
+    @ApiOperation(value = "游戏列表")
+    @GetMapping("/gameList")
+    @PreAuthorize("hasAuthority('activity:lobby:list')")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "gameTypeCode", value = "游戏类型", required = true),
+    })
+    public List<GameVO> gameList(String gameTypeCode) {
+        List<GameVO> gameList = gameService.findByGameTypeCode(gameTypeCode);
+        return gameList;
+    }
+
 
 }

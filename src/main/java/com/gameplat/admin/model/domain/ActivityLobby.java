@@ -50,6 +50,11 @@ public class ActivityLobby implements Serializable {
     private Integer type;
 
     /**
+     * 活动类型（1 充值活动，2 游戏活动
+     */
+    private Integer activityType;
+
+    /**
      * 描述
      */
     private String description;

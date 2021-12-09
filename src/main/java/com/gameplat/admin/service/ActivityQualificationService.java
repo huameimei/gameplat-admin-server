@@ -8,8 +8,6 @@ import com.gameplat.admin.model.dto.ActivityQualificationDTO;
 import com.gameplat.admin.model.dto.ActivityQualificationUpdateDTO;
 import com.gameplat.admin.model.dto.ActivityQualificationUpdateStatusDTO;
 import com.gameplat.admin.model.vo.ActivityQualificationVO;
-import org.springframework.stereotype.Service;
-
 import java.util.List;
 
 

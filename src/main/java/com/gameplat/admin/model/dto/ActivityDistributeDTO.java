@@ -2,12 +2,11 @@ package com.gameplat.admin.model.dto;
 
 import com.baomidou.mybatisplus.annotation.TableName;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /**
  * 活动分发

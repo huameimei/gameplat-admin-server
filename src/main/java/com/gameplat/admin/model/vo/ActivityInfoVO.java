@@ -2,13 +2,12 @@ package com.gameplat.admin.model.vo;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import java.io.Serializable;
+import java.util.Date;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.dozer.Mapping;
 import org.springframework.format.annotation.DateTimeFormat;
-
-import java.io.Serializable;
-import java.util.Date;
 
 /**
  * 活动类

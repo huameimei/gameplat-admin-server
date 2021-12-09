@@ -1,8 +1,7 @@
 package com.gameplat.admin.model.dto;
 
-import lombok.Data;
-
 import java.util.Date;
+import lombok.Data;
 
 /**
  * ip白名单操作类

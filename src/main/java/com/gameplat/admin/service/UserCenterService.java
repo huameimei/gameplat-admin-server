@@ -17,13 +17,12 @@ import com.gameplat.base.common.util.RSAUtils;
 import com.gameplat.base.common.util.StringUtils;
 import com.gameplat.security.SecurityUserHolder;
 import com.gameplat.security.service.JwtTokenService;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * 个人中心服务

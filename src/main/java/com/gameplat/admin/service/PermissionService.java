@@ -10,22 +10,21 @@ import com.gameplat.admin.model.bean.router.VueRouter;
 import com.gameplat.admin.model.domain.SysMenu;
 import com.gameplat.admin.model.domain.SysUser;
 import com.gameplat.base.common.constant.ContextConstant;
-import com.gameplat.common.enums.SubjectEnum;
 import com.gameplat.base.common.enums.SystemCodeType;
-import com.gameplat.common.enums.UserTypes;
 import com.gameplat.base.common.util.JwtUtils;
 import com.gameplat.base.common.util.StringUtils;
+import com.gameplat.common.enums.SubjectEnum;
+import com.gameplat.common.enums.UserTypes;
 import com.gameplat.security.SecurityUserHolder;
 import com.google.common.collect.Lists;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 
 /**
  * 系统权限业务层处理

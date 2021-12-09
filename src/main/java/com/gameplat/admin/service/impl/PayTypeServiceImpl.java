@@ -13,12 +13,10 @@ import com.gameplat.admin.model.dto.PayTypeAddDTO;
 import com.gameplat.admin.model.dto.PayTypeEditDTO;
 import com.gameplat.admin.model.vo.PayTypeVO;
 import com.gameplat.admin.service.PayTypeService;
-
+import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.common.enums.SwitchStatusEnum;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import com.gameplat.base.common.exception.ServiceException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;

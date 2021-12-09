@@ -12,14 +12,13 @@ import com.gameplat.admin.model.dto.GoogleAuthDTO;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.GoogleAuthenticator;
 import com.gameplat.base.common.util.StringUtils;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 /**
  * 公共服务功能服务

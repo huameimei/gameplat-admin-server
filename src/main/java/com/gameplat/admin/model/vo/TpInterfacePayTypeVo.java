@@ -2,9 +2,8 @@ package com.gameplat.admin.model.vo;
 
 import com.baomidou.mybatisplus.extension.activerecord.Model;
 import com.gameplat.admin.model.domain.TpPayType;
-import lombok.Data;
-
 import java.util.List;
+import lombok.Data;
 
 @Data
 public class TpInterfacePayTypeVo extends Model<TpInterfacePayTypeVo> {

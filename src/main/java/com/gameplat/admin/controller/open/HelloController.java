@@ -1,12 +1,12 @@
 package com.gameplat.admin.controller.open;
 
+import static com.gameplat.common.constant.ServiceName.ADMIN_SERVICE;
+
 import com.gameplat.common.constant.ServiceApi;
 import com.gameplat.log.annotation.Log;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import static com.gameplat.common.constant.ServiceName.ADMIN_SERVICE;
 
 /**
  * @Description:

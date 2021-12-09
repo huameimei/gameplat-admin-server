@@ -3,11 +3,10 @@ package com.gameplat.admin.model.bean;
 import com.gameplat.admin.enums.RiskControllerTypeEnum;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.json.JsonUtils;
-import org.apache.commons.lang3.StringUtils;
-
 import java.math.BigDecimal;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.apache.commons.lang3.StringUtils;
 
 /** 转换类 */
 public class ChannelLimitsBean {

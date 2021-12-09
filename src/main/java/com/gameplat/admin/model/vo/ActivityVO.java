@@ -4,12 +4,11 @@ package com.gameplat.admin.model.vo;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import io.swagger.annotations.ApiModelProperty;
+import java.io.Serializable;
+import java.util.Date;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.dozer.Mapping;
-
-import java.io.Serializable;
-import java.util.Date;
 
 /**
  * <p>

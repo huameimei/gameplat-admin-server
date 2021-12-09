@@ -7,15 +7,14 @@ import com.gameplat.admin.service.SysRoleService;
 import com.gameplat.admin.service.SysUserService;
 import com.gameplat.security.context.UserCredential;
 import com.gameplat.security.util.SecurityUtil;
+import java.util.Collection;
+import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-
-import java.util.Collection;
-import java.util.Set;
 
 @Service
 public class JwtUserDetailsServiceImpl implements UserDetailsService {

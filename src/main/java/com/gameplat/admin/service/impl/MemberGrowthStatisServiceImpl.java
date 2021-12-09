@@ -7,7 +7,6 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.convert.MemberGrowthStatisConvert;
 import com.gameplat.admin.enums.LanguageEnum;
 import com.gameplat.admin.mapper.MemberGrowthStatisMapper;
-import com.gameplat.admin.model.domain.MemberGrowthLevel;
 import com.gameplat.admin.model.domain.MemberGrowthStatis;
 import com.gameplat.admin.model.dto.MemberGrowthStatisDTO;
 import com.gameplat.admin.model.vo.MemberGrowthConfigVO;
@@ -16,11 +15,10 @@ import com.gameplat.admin.model.vo.MemberGrowthStatisVO;
 import com.gameplat.admin.service.MemberGrowthLevelService;
 import com.gameplat.admin.service.MemberGrowthStatisService;
 import com.gameplat.base.common.exception.ServiceException;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 /**
  * @author lily

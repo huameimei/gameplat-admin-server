@@ -13,20 +13,25 @@ import com.gameplat.admin.model.vo.OnlineUserVo;
 import com.gameplat.admin.service.OnlineUserService;
 import com.gameplat.admin.service.SysDictDataService;
 import com.gameplat.admin.service.SysUserService;
-import com.gameplat.common.enums.UserTypes;
 import com.gameplat.base.common.util.CollectorUtils;
 import com.gameplat.base.common.util.StringUtils;
+import com.gameplat.common.enums.UserTypes;
 import com.gameplat.security.SecurityUserHolder;
 import com.gameplat.security.context.UserCredential;
 import com.gameplat.security.service.JwtTokenService;
 import eu.bitwalker.useragentutils.OperatingSystem;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
-
-import java.util.*;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service

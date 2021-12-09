@@ -1,7 +1,6 @@
 package com.gameplat.admin.mapper;
 
 import com.gameplat.admin.model.domain.SysRoleMenu;
-
 import java.util.List;
 
 /**

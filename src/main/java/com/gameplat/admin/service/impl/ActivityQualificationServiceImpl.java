@@ -16,7 +16,12 @@ import com.gameplat.admin.convert.ActivityQualificationConvert;
 import com.gameplat.admin.mapper.ActivityQualificationMapper;
 import com.gameplat.admin.model.domain.ActivityDistribute;
 import com.gameplat.admin.model.domain.ActivityQualification;
-import com.gameplat.admin.model.dto.*;
+import com.gameplat.admin.model.dto.ActivityLobbyDTO;
+import com.gameplat.admin.model.dto.ActivityLobbyDiscountDTO;
+import com.gameplat.admin.model.dto.ActivityQualificationAddDTO;
+import com.gameplat.admin.model.dto.ActivityQualificationDTO;
+import com.gameplat.admin.model.dto.ActivityQualificationUpdateDTO;
+import com.gameplat.admin.model.dto.ActivityQualificationUpdateStatusDTO;
 import com.gameplat.admin.model.vo.ActivityQualificationVO;
 import com.gameplat.admin.model.vo.MemberInfoVO;
 import com.gameplat.admin.service.ActivityCommonService;
@@ -27,15 +32,14 @@ import com.gameplat.base.common.context.GlobalContextHolder;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.RandomUtil;
 import com.gameplat.base.common.util.StringUtils;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections.CollectionUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections.CollectionUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service

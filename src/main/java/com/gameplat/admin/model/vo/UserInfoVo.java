@@ -1,9 +1,8 @@
 package com.gameplat.admin.model.vo;
 
+import java.util.Date;
 import lombok.Data;
 import org.dozer.Mapping;
-
-import java.util.Date;
 
 /**
  * 用户信息

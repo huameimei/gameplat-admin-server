@@ -3,7 +3,6 @@ package com.gameplat.admin.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.gameplat.admin.model.domain.MemberGrowthStatis;
 import com.gameplat.admin.model.domain.MemberWealDetail;
-
 import java.util.List;
 
 public interface MemberGrowthStatisMapper extends BaseMapper<MemberGrowthStatis> {

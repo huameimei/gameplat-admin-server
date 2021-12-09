@@ -4,13 +4,12 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.gameplat.base.common.util.DateUtil;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /**
  * 活动大厅DTO

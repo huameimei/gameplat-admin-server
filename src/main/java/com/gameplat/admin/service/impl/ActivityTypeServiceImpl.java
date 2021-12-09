@@ -16,12 +16,11 @@ import com.gameplat.admin.model.vo.ActivityTypeVO;
 import com.gameplat.admin.service.ActivityInfoService;
 import com.gameplat.admin.service.ActivityTypeService;
 import com.gameplat.base.common.exception.ServiceException;
+import java.util.ArrayList;
+import java.util.List;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Service
 public class ActivityTypeServiceImpl extends ServiceImpl<ActivityTypeMapper, ActivityType>

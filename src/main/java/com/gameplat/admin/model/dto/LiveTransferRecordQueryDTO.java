@@ -1,8 +1,6 @@
 package com.gameplat.admin.model.dto;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import java.io.Serializable;
-import java.util.Date;
 import lombok.Data;
 
 @Data

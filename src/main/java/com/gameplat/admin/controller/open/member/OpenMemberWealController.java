@@ -6,20 +6,32 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.gameplat.admin.enums.LanguageEnum;
 import com.gameplat.admin.model.domain.MemberWeal;
 import com.gameplat.admin.model.domain.MemberWealDetail;
-import com.gameplat.admin.model.dto.*;
+import com.gameplat.admin.model.dto.MemberWealAddDTO;
+import com.gameplat.admin.model.dto.MemberWealDTO;
+import com.gameplat.admin.model.dto.MemberWealDetailDTO;
+import com.gameplat.admin.model.dto.MemberWealDetailEditDTO;
+import com.gameplat.admin.model.dto.MemberWealEditDTO;
+import com.gameplat.admin.model.dto.MemberWealSettleDTO;
 import com.gameplat.admin.model.vo.MemberGrowthConfigVO;
 import com.gameplat.admin.model.vo.MemberWealDetailVO;
 import com.gameplat.admin.model.vo.MemberWealVO;
-import com.gameplat.admin.service.*;
+import com.gameplat.admin.service.MemberGrowthConfigService;
+import com.gameplat.admin.service.MemberWealDetailService;
+import com.gameplat.admin.service.MemberWealService;
 import com.gameplat.base.common.exception.ServiceException;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import javax.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
-
-import javax.servlet.http.HttpServletRequest;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 
 /**
@@ -149,9 +161,14 @@ public class OpenMemberWealController {
      *删除详情中的用户
      */
     @DeleteMapping("/delete")
-    @ApiOperation(value = "删除详情中的用户")
+    @ApiOperation(value = "删除会员俸禄")
     @PreAuthorize("hasAuthority('member:weal:remove')")
     public void deleteByUserId(Long id){
+        //判断是否开启了VIP
+        MemberGrowthConfigVO isVip = configService.findOneConfig(LanguageEnum.app_zh_CN.getCode());
+        if (isVip.getIsEnableVip() == 0) {
+            throw new ServiceException("未开启VIP功能");
+        }
         memberWealDetailService.deleteById(id);
     }
 
@@ -159,10 +176,15 @@ public class OpenMemberWealController {
      *删除详情中的用户
      */
     @PutMapping("/updateRewordAmount")
-    @ApiOperation(value = "编辑详情中的用户信息")
+    @ApiOperation(value = "修改会员俸禄")
     @PreAuthorize("hasAuthority('member:weal:edit')")
     public void editRewordAmount(@RequestBody MemberWealDetailEditDTO dto) {
-        memberWealDetailService.editRewordAmount(dto);
+        //判断是否开启了VIP
+        MemberGrowthConfigVO isVip = configService.findOneConfig(LanguageEnum.app_zh_CN.getCode());
+        if (isVip.getIsEnableVip() == 0) {
+            throw new ServiceException("未开启VIP功能");
+        }
+        memberWealDetailService.editRewordAmount(dto.getId(), dto.getRewordAmount());
     }
 
 }

@@ -6,10 +6,15 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.gameplat.admin.model.domain.GameKind;
 import com.gameplat.admin.model.dto.GameKindQueryDTO;
 import com.gameplat.admin.model.dto.OperGameKindDTO;
+import com.gameplat.admin.model.vo.GameKindVO;
 
 public interface GameKindService extends IService<GameKind> {
 
-  IPage<GameKind> selectGameKindList(PageDTO<GameKind> page, GameKindQueryDTO dto);
+  IPage<GameKindVO> selectGameKindList(PageDTO<GameKind> page, GameKindQueryDTO dto);
 
   void updateGameKind(OperGameKindDTO operGameKindDTO);
+
+  void updateEnable(OperGameKindDTO operGameKindDTO);
+
+  void updateDemoEnable(OperGameKindDTO operGameKindDTO);
 }

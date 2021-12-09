@@ -5,7 +5,6 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.gameplat.admin.model.domain.MemberBackup;
 import com.gameplat.admin.model.vo.MemberBackupVO;
-
 import java.util.List;
 
 public interface MemberBackupService extends IService<MemberBackup> {

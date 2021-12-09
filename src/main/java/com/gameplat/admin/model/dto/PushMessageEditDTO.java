@@ -1,9 +1,8 @@
 package com.gameplat.admin.model.dto;
 
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
-
 import java.util.Date;
+import lombok.Data;
 
 /**
  * 个人消息编辑DTO

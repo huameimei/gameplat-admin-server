@@ -4,11 +4,10 @@ import cn.afterturn.easypoi.excel.annotation.Excel;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.gameplat.admin.util.Date2LongSerializerUtils;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
-
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
+import lombok.Data;
 
 /**
  * @author lily

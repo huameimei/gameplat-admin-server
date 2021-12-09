@@ -1,9 +1,7 @@
 package com.gameplat.admin.convert;
 
 import com.gameplat.admin.model.domain.MemberGrowthConfig;
-import com.gameplat.admin.model.domain.MemberGrowthLevel;
 import com.gameplat.admin.model.vo.MemberGrowthConfigVO;
-import com.gameplat.admin.model.vo.MemberGrowthLevelVO;
 import org.mapstruct.Mapper;
 
 /**

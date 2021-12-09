@@ -8,9 +8,8 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.gameplat.admin.model.domain.Member;
 import com.gameplat.admin.model.vo.MemberInfoVO;
 import com.gameplat.admin.model.vo.MemberVO;
-import org.apache.ibatis.annotations.Param;
-
 import java.util.List;
+import org.apache.ibatis.annotations.Param;
 
 public interface MemberMapper extends BaseMapper<Member> {
 

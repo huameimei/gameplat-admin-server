@@ -11,6 +11,10 @@ import com.gameplat.admin.model.dto.GamePlatformQueryDTO;
 import com.gameplat.admin.model.dto.OperGamePlatformDTO;
 import com.gameplat.admin.service.GamePlatformService;
 import com.gameplat.base.common.exception.ServiceException;
+import com.gameplat.common.enums.TrueFalse;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -43,5 +47,12 @@ public class GamePlatformServiceImpl extends ServiceImpl<GamePlatformMapper, Gam
     if (!this.updateById(gamePlatform)) {
       throw new ServiceException("更新游戏平台信息失败!");
     }
+  }
+
+  @Override
+  public List<GamePlatform> queryByTransfer() {
+    return Optional.ofNullable(this.query()
+        .eq("transfer", TrueFalse.TRUE.getValue()).list())
+        .orElse(Collections.emptyList());
   }
 }

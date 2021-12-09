@@ -2,6 +2,7 @@ package com.gameplat.admin.service.impl;
 
 import cn.hutool.core.date.DateUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -11,9 +12,11 @@ import com.gameplat.admin.convert.LiveTransferRecordConvert;
 import com.gameplat.admin.mapper.LiveTransferRecordMapper;
 import com.gameplat.admin.model.domain.LiveTransferRecord;
 import com.gameplat.admin.model.dto.LiveTransferRecordQueryDTO;
+import com.gameplat.admin.model.dto.OperLiveTransferRecordDTO;
 import com.gameplat.admin.model.vo.PageDtoVO;
 import com.gameplat.admin.service.LiveTransferRecordService;
 import com.gameplat.admin.service.MemberService;
+import com.gameplat.base.common.exception.ServiceException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -75,4 +78,15 @@ public class LiveTransferRecordServiceImpl extends
     return pageDtoVO;
   }
 
+  @Override
+  public void fillOrders(OperLiveTransferRecordDTO liveTransferRecord) {
+    UpdateWrapper<LiveTransferRecord> updateWrapper = new UpdateWrapper();
+    updateWrapper.set(ObjectUtils.isNotNull(liveTransferRecord.getStatus()),"status",liveTransferRecord.getStatus());
+    updateWrapper.set(StringUtils.isNotBlank(liveTransferRecord.getRemark()),"remark",liveTransferRecord.getRemark());
+    updateWrapper.in("status","1,2,5");
+    updateWrapper.eq("id",liveTransferRecord.getId());
+    if(liveTransferRecordMapper.update(null,updateWrapper) < 0){
+      throw new ServiceException("额度转换记录更新失败");
+    }
+  }
 }

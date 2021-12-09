@@ -1,7 +1,9 @@
 package com.gameplat.admin.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.convert.GameKindConvert;
@@ -9,8 +11,13 @@ import com.gameplat.admin.mapper.GameKindMapper;
 import com.gameplat.admin.model.domain.GameKind;
 import com.gameplat.admin.model.dto.GameKindQueryDTO;
 import com.gameplat.admin.model.dto.OperGameKindDTO;
+import com.gameplat.admin.model.vo.GameKindVO;
 import com.gameplat.admin.service.GameKindService;
 import com.gameplat.base.common.exception.ServiceException;
+import com.gameplat.common.enums.LiveDemoEnableEnum;
+import com.google.common.collect.Lists;
+import java.util.Date;
+import javax.annotation.Resource;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -25,15 +32,19 @@ public class GameKindServiceImpl extends ServiceImpl<GameKindMapper, GameKind>
 
   @Autowired private GameKindConvert gameKindConvert;
 
+  @Resource
+  private GameKindMapper gameKindMapper;
+
   @Override
-  public IPage<GameKind> selectGameKindList(PageDTO<GameKind> page, GameKindQueryDTO dto) {
+  public IPage<GameKindVO> selectGameKindList(PageDTO<GameKind> page, GameKindQueryDTO dto) {
     return this.lambdaQuery()
         .eq(ObjectUtils.isNotEmpty(dto.getGameType()), GameKind::getGameType, dto.getGameType())
         .eq(
             ObjectUtils.isNotEmpty(dto.getPlatformCode()),
             GameKind::getPlatformCode,
             dto.getPlatformCode())
-        .page(page);
+        .orderByAsc(Lists.newArrayList(GameKind::getPlatformCode,GameKind::getSort))
+        .page(page).convert(gameKindConvert::toVo);
   }
 
   @Override
@@ -42,5 +53,24 @@ public class GameKindServiceImpl extends ServiceImpl<GameKindMapper, GameKind>
     if (!this.updateById(gameKind)) {
       throw new ServiceException("更新游戏分类信息失败!");
     }
+  }
+
+  @Override
+  public void updateEnable(OperGameKindDTO operGameKindDTO) {
+    LambdaUpdateWrapper<GameKind> update = Wrappers.lambdaUpdate();
+    update.set(ObjectUtils.isNotNull(operGameKindDTO.getEnable()),GameKind::getEnable,operGameKindDTO.getEnable());
+    update.set(GameKind::getUpdateTime,new Date());
+    update.ne(GameKind::getEnable,operGameKindDTO.getEnable());
+    gameKindMapper.update(null,update);
+  }
+
+  @Override
+  public void updateDemoEnable(OperGameKindDTO operGameKindDTO) {
+    LambdaUpdateWrapper<GameKind> update = Wrappers.lambdaUpdate();
+    update.set(ObjectUtils.isNotNull(operGameKindDTO.getDemoEnable()),GameKind::getDemoEnable,operGameKindDTO.getDemoEnable());
+    update.set(GameKind::getUpdateTime,new Date());
+    //仅修改支持试玩的
+    update.ne(GameKind::getDemoEnable,LiveDemoEnableEnum.NOT_SUPPORT.getCode());
+    gameKindMapper.update(null,update);
   }
 }

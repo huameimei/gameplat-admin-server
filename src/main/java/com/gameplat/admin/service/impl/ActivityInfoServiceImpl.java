@@ -17,14 +17,13 @@ import com.gameplat.admin.service.ActivityInfoService;
 import com.gameplat.admin.service.ActivityTypeService;
 import com.gameplat.admin.service.SysBannerInfoService;
 import com.gameplat.base.common.exception.ServiceException;
-import org.apache.commons.collections.CollectionUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.apache.commons.collections.CollectionUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 /**
  * @author admin

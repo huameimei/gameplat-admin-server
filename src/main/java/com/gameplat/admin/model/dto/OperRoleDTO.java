@@ -2,11 +2,9 @@ package com.gameplat.admin.model.dto;
 
 import com.gameplat.common.group.Groups;
 import com.gameplat.common.model.dto.BaseDTO;
+import javax.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.hibernate.validator.internal.engine.groups.Group;
-
-import javax.validation.constraints.NotNull;
 
 /**
  * 操作角色信息DTO

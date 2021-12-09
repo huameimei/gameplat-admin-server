@@ -1,11 +1,8 @@
 package com.gameplat.admin.model.dto;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
-
 import java.io.Serializable;
-import java.util.Date;
+import lombok.Data;
 
 /**
  * @Description : VIP福利记录入参

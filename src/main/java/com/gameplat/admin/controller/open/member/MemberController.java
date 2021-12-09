@@ -6,7 +6,12 @@ import cn.hutool.http.useragent.UserAgentUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.gameplat.admin.model.domain.Member;
-import com.gameplat.admin.model.dto.*;
+import com.gameplat.admin.model.dto.MemberAddDTO;
+import com.gameplat.admin.model.dto.MemberContactCleanDTO;
+import com.gameplat.admin.model.dto.MemberContactUpdateDTO;
+import com.gameplat.admin.model.dto.MemberEditDTO;
+import com.gameplat.admin.model.dto.MemberQueryDTO;
+import com.gameplat.admin.model.dto.MemberTransformDTO;
 import com.gameplat.admin.model.vo.MemberInfoVO;
 import com.gameplat.admin.model.vo.MemberVO;
 import com.gameplat.admin.service.MemberService;
@@ -14,12 +19,18 @@ import com.gameplat.admin.service.MemberTransformService;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.ip.IpAddressParser;
 import com.gameplat.base.common.util.ServletUtils;
+import java.util.List;
+import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
-
-import javax.servlet.http.HttpServletRequest;
-import java.util.List;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/admin/member/")

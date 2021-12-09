@@ -2,9 +2,8 @@ package com.gameplat.admin.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.gameplat.admin.model.domain.SysDictData;
-import org.apache.ibatis.annotations.Param;
-
 import java.util.List;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * 系统字典数据Mapper

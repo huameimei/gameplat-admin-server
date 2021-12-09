@@ -1,10 +1,9 @@
 package com.gameplat.admin.model.dto;
 
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
-
 import java.io.Serializable;
 import java.math.BigDecimal;
+import lombok.Data;
 
 @Data
 public class PayAccountEditDTO implements Serializable {

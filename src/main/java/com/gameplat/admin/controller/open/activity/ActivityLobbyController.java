@@ -5,7 +5,6 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.gameplat.admin.constant.ConfigConstant;
 import com.gameplat.admin.model.domain.ActivityLobby;
-import com.gameplat.admin.model.domain.Game;
 import com.gameplat.admin.model.domain.SysDictData;
 import com.gameplat.admin.model.dto.ActivityLobbyAddDTO;
 import com.gameplat.admin.model.dto.ActivityLobbyQueryDTO;
@@ -17,7 +16,6 @@ import com.gameplat.admin.model.vo.GameVO;
 import com.gameplat.admin.service.ActivityLobbyService;
 import com.gameplat.admin.service.GameService;
 import com.gameplat.admin.service.SysDictDataService;
-import com.gameplat.admin.service.SystemConfigService;
 import com.gameplat.base.common.enums.SystemCodeType;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.StringUtils;
@@ -25,9 +23,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
-
-import java.util.*;
-
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,15 +30,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
+import java.util.ArrayList;
 import java.util.List;
-
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 
 /**
  * 用户活动大厅

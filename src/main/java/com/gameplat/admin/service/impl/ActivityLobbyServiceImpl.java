@@ -16,12 +16,6 @@ import com.gameplat.admin.model.domain.ActivityLobby;
 import com.gameplat.admin.model.domain.ActivityLobbyDiscount;
 import com.gameplat.admin.model.domain.ActivityQualification;
 import com.gameplat.admin.model.dto.*;
-import com.gameplat.admin.model.dto.ActivityLobbyAddDTO;
-import com.gameplat.admin.model.dto.ActivityLobbyDTO;
-import com.gameplat.admin.model.dto.ActivityLobbyDiscountDTO;
-import com.gameplat.admin.model.dto.ActivityLobbyQueryDTO;
-import com.gameplat.admin.model.dto.ActivityLobbyUpdateDTO;
-import com.gameplat.admin.model.dto.ActivityLobbyUpdateStatusDTO;
 import com.gameplat.admin.model.vo.ActivityLobbyDiscountVO;
 import com.gameplat.admin.model.vo.ActivityLobbyVO;
 import com.gameplat.admin.service.ActivityDistributeService;
@@ -33,17 +27,14 @@ import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.BeanUtils;
 import com.gameplat.base.common.util.DateUtil;
 import com.gameplat.base.common.util.StringUtils;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 活动大厅业务

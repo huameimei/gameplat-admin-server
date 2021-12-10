@@ -2,6 +2,7 @@ package com.gameplat.admin.model.vo;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+import com.gameplat.admin.util.Date2LongSerializerUtils;
 import io.swagger.annotations.ApiModelProperty;
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -30,9 +31,11 @@ public class ActivityLobbyVO implements Serializable {
     @ApiModelProperty(value = "标题")
     private String title;
 
+    @JsonSerialize(using = Date2LongSerializerUtils.class)
     @ApiModelProperty(value = "开始时间")
     private Date startTime;
 
+    @JsonSerialize(using = Date2LongSerializerUtils.class)
     @ApiModelProperty(value = "结束时间")
     private Date endTime;
 
@@ -84,12 +87,14 @@ public class ActivityLobbyVO implements Serializable {
     @ApiModelProperty(value = "创建人")
     private String createBy;
 
+    @JsonSerialize(using = Date2LongSerializerUtils.class)
     @ApiModelProperty(value = "创建时间")
     private Date createTime;
 
     @ApiModelProperty(value = "更新人")
     private String updateBy;
 
+    @JsonSerialize(using = Date2LongSerializerUtils.class)
     @ApiModelProperty(value = "更新时间")
     private Date updateTime;
 

@@ -92,10 +92,10 @@ public class ActivityDistribute implements Serializable {
     @ApiModelProperty(value = "唯一标识")
     private String soleIdentifier;
 
-    private String expired;
+//    private String expired;
 
-    @ApiModelProperty(value = "状态（1 结算中，2 已结算, 3過期） ")
-    private List<String> statusList;
+//    @ApiModelProperty(value = "状态（1 结算中，2 已结算, 3過期） ")
+//    private List<String> statusList;
 
     @ApiModelProperty(value = "统计项目（1 累计充值金额，2 累计充值天数，3 连续充值天数，4 单日首充金额，5 首充金额）")
     private Integer statisItem;

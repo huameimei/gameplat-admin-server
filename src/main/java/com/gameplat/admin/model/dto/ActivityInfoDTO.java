@@ -80,7 +80,7 @@ public class ActivityInfoDTO implements Serializable {
     @ApiModelProperty(value = "活动有效期")
     private String validPeriod;
 
-    @ApiModelProperty(value = "活动状态")
+    @ApiModelProperty(value = "活动状态,1 有效,0 无效")
     private Integer status;
 
     @ApiModelProperty(value = "排序")

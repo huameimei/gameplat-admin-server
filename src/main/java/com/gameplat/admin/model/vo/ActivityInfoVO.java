@@ -10,10 +10,9 @@ import org.dozer.Mapping;
 import org.springframework.format.annotation.DateTimeFormat;
 
 /**
- * 活动类
+ * 活动VO
  *
- * @author admin
- * @since 2020-08-14
+ * @author kenvin
  */
 @Data
 @EqualsAndHashCode(callSuper = false)

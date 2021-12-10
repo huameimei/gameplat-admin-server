@@ -12,6 +12,7 @@ import com.gameplat.admin.model.domain.ActivityType;
 import com.gameplat.admin.model.domain.SysBannerInfo;
 import com.gameplat.admin.model.dto.ActivityInfoAddDTO;
 import com.gameplat.admin.model.dto.ActivityInfoDTO;
+import com.gameplat.admin.model.dto.ActivityInfoQueryDTO;
 import com.gameplat.admin.model.vo.ActivityInfoVO;
 import com.gameplat.admin.service.ActivityInfoService;
 import com.gameplat.admin.service.ActivityTypeService;
@@ -45,22 +46,22 @@ public class ActivityInfoServiceImpl
      * 列表查询
      *
      * @param page
-     * @param activityInfoDTO
+     * @param activityInfoQueryDTO
      * @return
      */
     @Override
-    public IPage<ActivityInfoVO> list(PageDTO<ActivityInfo> page, ActivityInfoDTO activityInfoDTO) {
+    public IPage<ActivityInfoVO> list(PageDTO<ActivityInfo> page, ActivityInfoQueryDTO activityInfoQueryDTO) {
         LambdaQueryChainWrapper<ActivityInfo> queryWrapper = this.lambdaQuery();
-        queryWrapper.eq(activityInfoDTO.getType() == null && activityInfoDTO.getType() == 0
-                , ActivityInfo::getType, activityInfoDTO.getType())
-                .eq(activityInfoDTO.getApplyType() == null && activityInfoDTO.getApplyType() == 0
-                        , ActivityInfo::getApplyType, activityInfoDTO.getApplyType())
-                .eq(activityInfoDTO.getValidStatus() == null && activityInfoDTO.getValidStatus() == 0
-                        , ActivityInfo::getValidStatus, activityInfoDTO.getValidStatus())
-                .eq(activityInfoDTO.getStatus() == null && activityInfoDTO.getStatus() == 0
-                        , ActivityInfo::getStatus, activityInfoDTO.getStatus())
-                .eq(activityInfoDTO.getActivityLobbyId() == null && activityInfoDTO.getActivityLobbyId() == 0
-                        , ActivityInfo::getActivityLobbyId, activityInfoDTO.getActivityLobbyId());
+        queryWrapper.eq(activityInfoQueryDTO.getType() != null && activityInfoQueryDTO.getType() != 0
+                , ActivityInfo::getType, activityInfoQueryDTO.getType())
+                .eq(activityInfoQueryDTO.getApplyType() != null && activityInfoQueryDTO.getApplyType() != 0
+                        , ActivityInfo::getApplyType, activityInfoQueryDTO.getApplyType())
+                .eq(activityInfoQueryDTO.getValidStatus() != null && activityInfoQueryDTO.getValidStatus() != 0
+                        , ActivityInfo::getValidStatus, activityInfoQueryDTO.getValidStatus())
+                .eq(activityInfoQueryDTO.getStatus() != null
+                        , ActivityInfo::getStatus, activityInfoQueryDTO.getStatus())
+                .eq(activityInfoQueryDTO.getActivityLobbyId() != null && activityInfoQueryDTO.getActivityLobbyId() != 0
+                        , ActivityInfo::getActivityLobbyId, activityInfoQueryDTO.getActivityLobbyId());
 
         return queryWrapper.page(page).convert(activityInfoConvert::toVo);
     }

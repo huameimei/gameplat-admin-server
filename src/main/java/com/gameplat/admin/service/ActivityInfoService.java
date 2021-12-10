@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.gameplat.admin.model.domain.ActivityInfo;
 import com.gameplat.admin.model.dto.ActivityInfoAddDTO;
 import com.gameplat.admin.model.dto.ActivityInfoDTO;
+import com.gameplat.admin.model.dto.ActivityInfoQueryDTO;
 import com.gameplat.admin.model.vo.ActivityInfoVO;
 import java.util.List;
 
@@ -18,10 +19,10 @@ public interface ActivityInfoService {
      * 列表查询
      *
      * @param page
-     * @param activityInfoDTO
+     * @param activityInfoQueryDTO
      * @return
      */
-    IPage<ActivityInfoVO> list(PageDTO<ActivityInfo> page, ActivityInfoDTO activityInfoDTO);
+    IPage<ActivityInfoVO> list(PageDTO<ActivityInfo> page, ActivityInfoQueryDTO activityInfoQueryDTO);
 
     /**
      * 查询活动详情

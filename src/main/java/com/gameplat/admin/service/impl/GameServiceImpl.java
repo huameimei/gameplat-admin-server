@@ -13,6 +13,7 @@ import com.gameplat.admin.model.dto.OperGameDTO;
 import com.gameplat.admin.model.vo.GameVO;
 import com.gameplat.admin.service.GameService;
 import com.gameplat.base.common.exception.ServiceException;
+import com.gameplat.base.common.util.StringUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -54,7 +55,7 @@ public class GameServiceImpl extends ServiceImpl<GameMapper, Game> implements Ga
 
     @Override
     public List<GameVO> findByGameTypeCode(String gameTypeCode) {
-        List<Game> list = this.lambdaQuery().eq(Game::getGameType, gameTypeCode).list();
+        List<Game> list = this.lambdaQuery().eq(StringUtils.isNotBlank(gameTypeCode), Game::getGameType, gameTypeCode).list();
         List<GameVO> gameVOList = new ArrayList<>();
         if(CollectionUtils.isNotEmpty(list)){
             for(Game game : list){

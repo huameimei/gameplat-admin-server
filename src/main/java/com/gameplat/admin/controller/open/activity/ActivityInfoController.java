@@ -5,10 +5,13 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.gameplat.admin.model.domain.ActivityInfo;
 import com.gameplat.admin.model.dto.ActivityInfoAddDTO;
 import com.gameplat.admin.model.dto.ActivityInfoDTO;
+import com.gameplat.admin.model.dto.ActivityInfoQueryDTO;
 import com.gameplat.admin.model.vo.ActivityInfoVO;
 import com.gameplat.admin.service.ActivityInfoService;
 import com.gameplat.base.common.util.StringUtils;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -24,6 +27,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import springfox.documentation.annotations.ApiIgnore;
 
 /**
  * 活动管理
@@ -33,7 +37,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 @RestController
 @RequestMapping("/api/admin/activity/info")
-@Api(tags = "活动管理")
+@Api(tags = "活动发布管理")
 public class ActivityInfoController {
 
     @Autowired
@@ -43,14 +47,18 @@ public class ActivityInfoController {
      * 活动列表
      *
      * @param page
-     * @param activityInfoDTO
+     * @param activityInfoQueryDTO
      * @return
      */
     @ApiOperation(value = "活动列表")
     @GetMapping("/list")
     @PreAuthorize("hasAuthority('activity:info:list')")
-    public IPage<ActivityInfoVO> list(PageDTO<ActivityInfo> page, ActivityInfoDTO activityInfoDTO) {
-        return activityInfoService.list(page, activityInfoDTO);
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "current", value = "分页参数：当前页", defaultValue = "1"),
+            @ApiImplicitParam(name = "size", value = "每页条数"),
+    })
+    public IPage<ActivityInfoVO> list(@ApiIgnore PageDTO<ActivityInfo> page, ActivityInfoQueryDTO activityInfoQueryDTO) {
+        return activityInfoService.list(page, activityInfoQueryDTO);
     }
 
     /**

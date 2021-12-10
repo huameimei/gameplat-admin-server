@@ -3,10 +3,7 @@ package com.gameplat.admin.service;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.gameplat.admin.model.domain.ActivityQualification;
-import com.gameplat.admin.model.dto.ActivityQualificationAddDTO;
-import com.gameplat.admin.model.dto.ActivityQualificationDTO;
-import com.gameplat.admin.model.dto.ActivityQualificationUpdateDTO;
-import com.gameplat.admin.model.dto.ActivityQualificationUpdateStatusDTO;
+import com.gameplat.admin.model.dto.*;
 import com.gameplat.admin.model.vo.ActivityQualificationVO;
 import java.util.List;
 
@@ -32,10 +29,10 @@ public interface ActivityQualificationService {
      * 查询活动资格列表
      *
      * @param page
-     * @param activityQualificationDTO
+     * @param activityQualificationQueryDTO
      * @return
      */
-    IPage<ActivityQualificationVO> list(PageDTO<ActivityQualification> page, ActivityQualificationDTO activityQualificationDTO);
+    IPage<ActivityQualificationVO> list(PageDTO<ActivityQualification> page, ActivityQualificationQueryDTO activityQualificationQueryDTO);
 
     /**
      * 新增活动资格
@@ -52,11 +49,11 @@ public interface ActivityQualificationService {
     void update(ActivityQualificationUpdateDTO activityQualificationUpdateDTO);
 
     /**
-     * 更新活动资格状态
+     * 审核活动资格
      *
-     * @param activityQualificationUpdateStatusDTO
+     * @param activityQualificationAuditStatusDTO
      */
-    void updateStatus(ActivityQualificationUpdateStatusDTO activityQualificationUpdateStatusDTO);
+    void auditStatus(ActivityQualificationAuditStatusDTO activityQualificationAuditStatusDTO);
 
     /**
      * 更新状态

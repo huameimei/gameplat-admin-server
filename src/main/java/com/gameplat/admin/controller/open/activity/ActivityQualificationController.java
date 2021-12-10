@@ -4,14 +4,13 @@ package com.gameplat.admin.controller.open.activity;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.gameplat.admin.model.domain.ActivityQualification;
-import com.gameplat.admin.model.dto.ActivityQualificationAddDTO;
-import com.gameplat.admin.model.dto.ActivityQualificationDTO;
-import com.gameplat.admin.model.dto.ActivityQualificationUpdateDTO;
-import com.gameplat.admin.model.dto.ActivityQualificationUpdateStatusDTO;
+import com.gameplat.admin.model.dto.*;
 import com.gameplat.admin.model.vo.ActivityQualificationVO;
 import com.gameplat.admin.service.ActivityQualificationService;
 import com.gameplat.base.common.exception.ServiceException;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
@@ -24,6 +23,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import springfox.documentation.annotations.ApiIgnore;
 
 /**
  * 活动资格管理
@@ -43,14 +43,19 @@ public class ActivityQualificationController {
      * 活动资格列表
      *
      * @param page
-     * @param activityQualificationDTO
+     * @param activityQualificationQueryDTO
      * @return
      */
     @ApiOperation(value = "活动资格列表")
     @GetMapping("/list")
     @PreAuthorize("hasAuthority('activity:qualification:list')")
-    public IPage<ActivityQualificationVO> list(PageDTO<ActivityQualification> page, ActivityQualificationDTO activityQualificationDTO) {
-        return activityQualificationService.list(page, activityQualificationDTO);
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "current", value = "分页参数：当前页", defaultValue = "1"),
+            @ApiImplicitParam(name = "size", value = "每页条数"),
+    })
+    public IPage<ActivityQualificationVO> list(@ApiIgnore PageDTO<ActivityQualification> page,
+                                               ActivityQualificationQueryDTO activityQualificationQueryDTO) {
+        return activityQualificationService.list(page, activityQualificationQueryDTO);
     }
 
     /**
@@ -81,18 +86,18 @@ public class ActivityQualificationController {
     }
 
     /**
-     * 更新活动资格状态
+     * 审核活动资格
      *
-     * @param activityQualificationUpdateStatusDTO
+     * @param activityQualificationAuditStatusDTO
      */
-    @ApiOperation(value = "更新活动资格状态")
-    @PutMapping("/updateStatus")
+    @ApiOperation(value = "审核活动资格")
+    @PutMapping("/auditStatus")
     @PreAuthorize("hasAuthority('activity:qualification:edit')")
-    public void updateStatus(@RequestBody ActivityQualificationUpdateStatusDTO activityQualificationUpdateStatusDTO) {
-        if (CollectionUtils.isEmpty(activityQualificationUpdateStatusDTO.getQualificationIds())) {
-            throw new ServiceException("qualificationIds不能为空");
+    public void auditStatus(@RequestBody ActivityQualificationAuditStatusDTO activityQualificationAuditStatusDTO) {
+        if (CollectionUtils.isEmpty(activityQualificationAuditStatusDTO.getIdList())) {
+            throw new ServiceException("id不能为空");
         }
-        activityQualificationService.updateStatus(activityQualificationUpdateStatusDTO);
+        activityQualificationService.auditStatus(activityQualificationAuditStatusDTO);
     }
 
     /**

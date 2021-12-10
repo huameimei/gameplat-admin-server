@@ -23,7 +23,7 @@ public class ActivityQualificationAddDTO implements Serializable {
     /**
      * 1 活动大厅  2 红包雨
      */
-    @ApiModelProperty(value = "活动类型，1 活动大厅  2 红包雨")
+    @ApiModelProperty(value = "活动类型，1 活动大厅")
     private Integer type;
 
     /**

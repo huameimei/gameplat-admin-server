@@ -6,17 +6,21 @@ import com.gameplat.admin.model.domain.ActivityInfo;
 import com.gameplat.admin.model.dto.ActivityInfoAddDTO;
 import com.gameplat.admin.model.dto.ActivityInfoDTO;
 import com.gameplat.admin.model.dto.ActivityInfoQueryDTO;
+import com.gameplat.admin.model.dto.ActivityInfoUpdateDTO;
 import com.gameplat.admin.model.vo.ActivityInfoVO;
 import com.gameplat.admin.service.ActivityInfoService;
+import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.StringUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -63,6 +67,7 @@ public class ActivityInfoController {
 
     /**
      * 活动详情
+     *
      * @param id
      * @return
      */
@@ -75,6 +80,7 @@ public class ActivityInfoController {
 
     /**
      * 新增活动
+     *
      * @param activityInfoAddDTO
      * @param country
      */
@@ -90,7 +96,37 @@ public class ActivityInfoController {
     }
 
     /**
+     * 编辑活动
+     *
+     * @param activityInfoUpdateDTO
+     * @param country
+     */
+    @ApiOperation(value = "编辑活动")
+    @PostMapping("/update")
+    @PreAuthorize("hasAuthority('activity:info:edit')")
+    public void update(@RequestBody ActivityInfoUpdateDTO activityInfoUpdateDTO,
+                       @RequestHeader(value = "country", required = false, defaultValue = "zh-CN") String country) {
+        activityInfoService.update(activityInfoUpdateDTO, country);
+    }
+
+    /**
+     * 删除活动
+     *
+     * @param ids
+     */
+    @ApiOperation(value = "删除活动")
+    @PostMapping("/delete")
+    @PreAuthorize("hasAuthority('activity:info:remove')")
+    public void delete(@RequestBody String ids) {
+        if (StringUtils.isBlank(ids)) {
+            throw new ServiceException("ids不能为空");
+        }
+        activityInfoService.delete(ids);
+    }
+
+    /**
      * 获取关联活动规则的全部活动
+     *
      * @return
      */
     @ApiOperation(value = "获取关联活动规则的全部活动")

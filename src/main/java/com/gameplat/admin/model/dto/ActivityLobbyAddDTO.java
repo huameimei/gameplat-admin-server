@@ -39,14 +39,13 @@ public class ActivityLobbyAddDTO implements Serializable {
     @JsonFormat(pattern = DateUtil.YYYY_MM_DD_HH_MM_SS)
     private Date endTime;
 
-    @ApiModelProperty(value = "活动板块（1 活动大厅，2 红包雨，3 转盘）")
+    @ApiModelProperty(value = "活动板块")
     private Integer type;
 
     @NotBlank(message = "活动类型必选")
     @ApiModelProperty(value = "活动类型（1 充值活动(统计项目(statisItem)选项中的1,2,3,4,5项可选)，2 游戏活动(统计项目(statisItem)选项中的6,7,8,9,10,11,12项可选)")
     private Integer activityType;
 
-    @NotBlank(message = "活动状态必选")
     @ApiModelProperty(value = "描述")
     private String description;
 

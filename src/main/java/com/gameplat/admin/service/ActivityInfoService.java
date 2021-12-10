@@ -6,7 +6,9 @@ import com.gameplat.admin.model.domain.ActivityInfo;
 import com.gameplat.admin.model.dto.ActivityInfoAddDTO;
 import com.gameplat.admin.model.dto.ActivityInfoDTO;
 import com.gameplat.admin.model.dto.ActivityInfoQueryDTO;
+import com.gameplat.admin.model.dto.ActivityInfoUpdateDTO;
 import com.gameplat.admin.model.vo.ActivityInfoVO;
+
 import java.util.List;
 
 /**
@@ -47,7 +49,7 @@ public interface ActivityInfoService {
      * @param activityLobbyId
      * @param id
      */
-    void checkActivityLobbyId(Long activityLobbyId, Integer id);
+    void checkActivityLobbyId(Long activityLobbyId, Long id);
 
     /**
      * 保存活动信息
@@ -79,4 +81,19 @@ public interface ActivityInfoService {
      * @return
      */
     List<ActivityInfo> findByTypeId(Long id);
+
+    /**
+     * 修改活动
+     *
+     * @param activityInfoUpdateDTO
+     * @param country
+     */
+    void update(ActivityInfoUpdateDTO activityInfoUpdateDTO, String country);
+
+    /**
+     * 删除活动
+     *
+     * @param ids
+     */
+    void delete(String ids);
 }

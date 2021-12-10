@@ -39,16 +39,17 @@ public class ActivityLobbyVO implements Serializable {
     @ApiModelProperty(value = "结束时间")
     private Date endTime;
 
-    @ApiModelProperty(value = "活动大类（1 活动大厅，2 红包雨，3 转盘）")
+    @ApiModelProperty(value = "活动大类")
     private Integer type;
 
-    @ApiModelProperty(value = "活动类型（1 充值活动，2 游戏活动")
+    @ApiModelProperty(value = "活动类型（1 充值活动(统计项目(statisItem)选项中的1,2,3,4,5项可选)；2 游戏活动(统计项目(statisItem)选项中的6,7,8,9,10,11,12项可选)")
     private Integer activityType;
 
     @ApiModelProperty(value = "描述")
     private String description;
 
-    @ApiModelProperty(value = "统计项目（1 累计充值金额，2 累计充值天数，3 连续充值天数，4 单日首充金额，5 首充金额）")
+    @ApiModelProperty(value = "统计项目（1 累计充值金额，2 累计充值天数，3 连续充值天数，4 单日首充金额，5 首充金额，6 累计彩票打码金额，7 累计彩票打码天数，" +
+            "8 连续彩票打码天数，9 单日彩票亏损金额，10 累计体育打码金额，11累计体育打码天数，11 连续体育打码天数，12 单日体育亏损金额）")
     private Integer statisItem;
 
     @ApiModelProperty(value = "充值类型（1 转账汇款，2 在线支付，3 人工入款）")

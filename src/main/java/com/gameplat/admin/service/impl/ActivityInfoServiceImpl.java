@@ -11,23 +11,24 @@ import com.gameplat.admin.model.domain.ActivityInfo;
 import com.gameplat.admin.model.domain.ActivityType;
 import com.gameplat.admin.model.domain.SysBannerInfo;
 import com.gameplat.admin.model.dto.ActivityInfoAddDTO;
-import com.gameplat.admin.model.dto.ActivityInfoDTO;
 import com.gameplat.admin.model.dto.ActivityInfoQueryDTO;
+import com.gameplat.admin.model.dto.ActivityInfoUpdateDTO;
 import com.gameplat.admin.model.vo.ActivityInfoVO;
 import com.gameplat.admin.service.ActivityInfoService;
 import com.gameplat.admin.service.ActivityTypeService;
 import com.gameplat.admin.service.SysBannerInfoService;
 import com.gameplat.base.common.exception.ServiceException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 /**
- * @author admin
+ * @author kenvin
  */
 @Service
 public class ActivityInfoServiceImpl
@@ -98,7 +99,7 @@ public class ActivityInfoServiceImpl
     }
 
     @Override
-    public void checkActivityLobbyId(Long activityLobbyId, Integer id) {
+    public void checkActivityLobbyId(Long activityLobbyId, Long id) {
         LambdaQueryChainWrapper<ActivityInfo> queryWrapper = this.lambdaQuery();
         queryWrapper.eq(ActivityInfo::getActivityLobbyId, activityLobbyId)
                 .eq(ActivityInfo::getId, id);
@@ -118,11 +119,8 @@ public class ActivityInfoServiceImpl
 
     @Override
     public List<ActivityInfoVO> getAllSysActivityWithRule() {
-        ActivityInfo activityInfo = new ActivityInfo();
         LambdaQueryChainWrapper<ActivityInfo> queryWrapper = this.lambdaQuery();
-        queryWrapper.eq(activityInfo.getStatus() != null && activityInfo.getStatus() != 0, ActivityInfo::getStatus, 1)
-                .ne(ActivityInfo::getActivityRuleId, null)
-                .gt(ActivityInfo::getActivityRuleId, 0);
+        queryWrapper.eq(ActivityInfo::getStatus, 1);
         List<ActivityInfo> activityInfoList = queryWrapper.list();
         //查询关联数据
         List<Long> activityTypeIdList = new ArrayList<>();
@@ -160,7 +158,6 @@ public class ActivityInfoServiceImpl
         LambdaQueryChainWrapper<ActivityInfo> queryWrapper = this.lambdaQuery();
         queryWrapper.eq(activityInfo.getStatus() != null && activityInfo.getStatus() != 0
                 , ActivityInfo::getStatus, activityInfo.getStatus())
-//                .eq()
         ;
         return queryWrapper.list();
     }
@@ -168,6 +165,24 @@ public class ActivityInfoServiceImpl
     @Override
     public List<ActivityInfo> findByTypeId(Long typeId) {
         return this.lambdaQuery().eq(ActivityInfo::getType, typeId).list();
+    }
+
+    @Override
+    public void update(ActivityInfoUpdateDTO activityInfoUpdateDTO, String country) {
+        ActivityInfo activityInfo = activityInfoConvert.toEntity(activityInfoUpdateDTO);
+        if (!this.saveActivityInfo(activityInfo)) {
+            throw new ServiceException("修改组合活动失败！");
+        }
+    }
+
+    @Override
+    public void delete(String ids) {
+        String[] idArr = ids.split(",");
+        List<Long> idList = new ArrayList<>();
+        for (String idStr : idArr) {
+            idList.add(Long.parseLong(idStr));
+        }
+        this.removeByIds(idList);
     }
 
 

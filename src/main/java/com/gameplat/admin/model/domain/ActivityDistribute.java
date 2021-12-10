@@ -77,7 +77,7 @@ public class ActivityDistribute implements Serializable {
     @ApiModelProperty(value = "目标金额")
     private Integer targetMoney;
 
-    @ApiModelProperty(value = "是否失效（0 失效，1 未失效）")
+    @ApiModelProperty(value = "是否失效（1 失效，0 未失效）")
     private Integer disabled;
 
     @ApiModelProperty(value = "删除（0 已删除，1 未删除）")

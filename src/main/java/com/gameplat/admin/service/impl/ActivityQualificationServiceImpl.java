@@ -16,12 +16,7 @@ import com.gameplat.admin.convert.ActivityQualificationConvert;
 import com.gameplat.admin.mapper.ActivityQualificationMapper;
 import com.gameplat.admin.model.domain.ActivityDistribute;
 import com.gameplat.admin.model.domain.ActivityQualification;
-import com.gameplat.admin.model.dto.ActivityLobbyDTO;
-import com.gameplat.admin.model.dto.ActivityLobbyDiscountDTO;
-import com.gameplat.admin.model.dto.ActivityQualificationAddDTO;
-import com.gameplat.admin.model.dto.ActivityQualificationDTO;
-import com.gameplat.admin.model.dto.ActivityQualificationUpdateDTO;
-import com.gameplat.admin.model.dto.ActivityQualificationUpdateStatusDTO;
+import com.gameplat.admin.model.dto.*;
 import com.gameplat.admin.model.vo.ActivityQualificationVO;
 import com.gameplat.admin.model.vo.MemberInfoVO;
 import com.gameplat.admin.service.ActivityCommonService;
@@ -32,15 +27,20 @@ import com.gameplat.base.common.context.GlobalContextHolder;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.RandomUtil;
 import com.gameplat.base.common.util.StringUtils;
+
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+/**
+ * @author admin
+ */
 @Slf4j
 @Service
 public class ActivityQualificationServiceImpl extends
@@ -76,42 +76,16 @@ public class ActivityQualificationServiceImpl extends
     }
 
     @Override
-    public IPage<ActivityQualificationVO> list(PageDTO<ActivityQualification> page, ActivityQualificationDTO activityQualificationDTO) {
+    public IPage<ActivityQualificationVO> list(PageDTO<ActivityQualification> page, ActivityQualificationQueryDTO activityQualificationQueryDTO) {
         LambdaQueryChainWrapper<ActivityQualification> queryChainWrapper = this.lambdaQuery();
-        queryChainWrapper.like(StringUtils.isNotBlank(activityQualificationDTO.getActivityName())
-                , ActivityQualification::getActivityName, activityQualificationDTO.getActivityName())
-                .eq(activityQualificationDTO.getActivityType() != null
-                        , ActivityQualification::getActivityType, activityQualificationDTO.getActivityType())
-                .eq(activityQualificationDTO.getActivityId() != null && activityQualificationDTO.getActivityId() != 0
-                        , ActivityQualification::getActivityId, activityQualificationDTO.getActivityId())
-                .eq(activityQualificationDTO.getUserId() != null && activityQualificationDTO.getUserId() != 0
-                        , ActivityQualification::getUserId, activityQualificationDTO.getUserId())
-                .like(StringUtils.isNotBlank(activityQualificationDTO.getUsername())
-                        , ActivityQualification::getUsername, activityQualificationDTO.getUsername())
-                .ge(StringUtils.isNotBlank(activityQualificationDTO.getApplyStartTime())
-                        , ActivityQualification::getApplyTime, activityQualificationDTO.getApplyStartTime())
-                .le(StringUtils.isNotBlank(activityQualificationDTO.getApplyEndTime())
-                        , ActivityQualification::getApplyTime, activityQualificationDTO.getApplyEndTime())
-                .eq(StringUtils.isNotBlank(activityQualificationDTO.getAuditPerson())
-                        , ActivityQualification::getAuditPerson, activityQualificationDTO.getAuditPerson())
-                .eq(activityQualificationDTO.getAuditTime() != null, ActivityQualification::getAuditTime, activityQualificationDTO.getAuditTime())
-                .like(StringUtils.isNotBlank(activityQualificationDTO.getAuditRemark())
-                        , ActivityQualification::getAuditRemark, activityQualificationDTO.getAuditRemark())
-                .eq(activityQualificationDTO.getStatus() != null, ActivityQualification::getStatus, activityQualificationDTO.getStatus())
-                .ge(activityQualificationDTO.getActivityStartTime() != null
-                        , ActivityQualification::getActivityStartTime, activityQualificationDTO.getActivityStartTime())
-                .eq(activityQualificationDTO.getActivityEndTime() != null
-                        , ActivityQualification::getActivityEndTime, activityQualificationDTO.getActivityEndTime())
-                .lt(activityQualificationDTO.getAbortTime() != null
-                        , ActivityQualification::getActivityStartTime, activityQualificationDTO.getAbortTime())
-                .eq(activityQualificationDTO.getQualificationStatus() != null
-                        , ActivityQualification::getQualificationStatus, activityQualificationDTO.getQualificationStatus())
-                .eq(activityQualificationDTO.getDrawNum() != null
-                        , ActivityQualification::getDrawNum, activityQualificationDTO.getDrawNum())
-                .eq(activityQualificationDTO.getDeleteFlag() != null
-                        , ActivityQualification::getDeleteFlag, activityQualificationDTO.getDeleteFlag())
-                .eq(activityQualificationDTO.getStatisItem() != null && activityQualificationDTO.getStatisItem() != 0
-                        , ActivityQualification::getStatisItem, activityQualificationDTO.getStatisItem())
+        queryChainWrapper
+                .eq(activityQualificationQueryDTO.getActivityId() != null && activityQualificationQueryDTO.getActivityId() != 0
+                        , ActivityQualification::getActivityId, activityQualificationQueryDTO.getActivityId())
+                .like(StringUtils.isNotBlank(activityQualificationQueryDTO.getUsername())
+                        , ActivityQualification::getUsername, activityQualificationQueryDTO.getUsername())
+                .eq(activityQualificationQueryDTO.getStatus() != null, ActivityQualification::getStatus, activityQualificationQueryDTO.getStatus())
+                .eq(activityQualificationQueryDTO.getQualificationStatus() != null
+                        , ActivityQualification::getQualificationStatus, activityQualificationQueryDTO.getQualificationStatus())
         ;
         return queryChainWrapper.page(page).convert(activityQualificationConvert::toVo);
     }
@@ -178,10 +152,9 @@ public class ActivityQualificationServiceImpl extends
     }
 
     @Override
-    public void updateStatus(ActivityQualificationUpdateStatusDTO activityQualificationUpdateStatusDTO) {
+    public void auditStatus(ActivityQualificationAuditStatusDTO activityQualificationAuditStatusDTO) {
         List<ActivityQualification> qualificationManageStatusList =
-                this.lambdaQuery().in(ActivityQualification::getId
-                        , activityQualificationUpdateStatusDTO.getQualificationIds()).list();
+                this.lambdaQuery().in(ActivityQualification::getId, activityQualificationAuditStatusDTO.getIdList()).list();
         for (ActivityQualification qualification : qualificationManageStatusList) {
             if (qualification.getStatus() == ActivityConst.QUALIFICATION_STATUS_INVALID) {
                 throw new ServiceException("您选择的数据有无效数据，无效数据不能审核！");
@@ -199,11 +172,10 @@ public class ActivityQualificationServiceImpl extends
         }
         //批量更新数据
         if (!this.updateBatchById(qualificationManageStatusList)) {
-            throw new ServiceException("修改失败！");
+            throw new ServiceException("审核失败！");
         }
-
         //审核成功，添加派发记录
-        List<Long> distributeIds = activityQualificationUpdateStatusDTO.getQualificationIds();
+        List<Long> distributeIds = activityQualificationAuditStatusDTO.getIdList();
         List<ActivityQualification> activityQualificationList = this.lambdaQuery().in(ActivityQualification::getActivityId, distributeIds).list();
 
         List<ActivityDistribute> activityDistributeList = new ArrayList<>();
@@ -248,12 +220,18 @@ public class ActivityQualificationServiceImpl extends
         if (activityQualificationUpdateStatusDTO.getId() == null || activityQualificationUpdateStatusDTO.getId() == 0) {
             throw new ServiceException("资格id不能为空");
         }
-        if (activityQualificationUpdateStatusDTO.getStatus() == 2) {
-            throw new ServiceException("审核通过的记录不能修改资格状态");
+        ActivityQualification activityQualification = this.getById(activityQualificationUpdateStatusDTO.getId());
+        if (activityQualification == null) {
+            throw new ServiceException("该活动资格不存在");
         }
-        ActivityQualification activityQualification = activityQualificationConvert.toEntity(activityQualificationUpdateStatusDTO);
+        if (activityQualification.getStatus() == 2) {
+            throw new ServiceException("审核通过的记录不能修改活动资格状态");
+        }
+        if (activityQualificationUpdateStatusDTO.getQualificationStatus() != null) {
+            activityQualification.setQualificationStatus(activityQualificationUpdateStatusDTO.getQualificationStatus());
+        }
         if (!this.updateById(activityQualification)) {
-            throw new ServiceException("修改失败！");
+            throw new ServiceException("修改活动资格状态失败！");
         }
     }
 

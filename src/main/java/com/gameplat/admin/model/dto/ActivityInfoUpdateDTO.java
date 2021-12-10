@@ -3,11 +3,12 @@ package com.gameplat.admin.model.dto;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import io.swagger.annotations.ApiModelProperty;
-import java.io.Serializable;
-import java.util.Date;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.springframework.format.annotation.DateTimeFormat;
+
+import java.io.Serializable;
+import java.util.Date;
 
 /**
  * 新增活动DTO
@@ -17,7 +18,7 @@ import org.springframework.format.annotation.DateTimeFormat;
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class ActivityInfoAddDTO implements Serializable {
+public class ActivityInfoUpdateDTO implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -30,7 +31,7 @@ public class ActivityInfoAddDTO implements Serializable {
     @ApiModelProperty(value = "活动标题")
     private String title;
 
-    @ApiModelProperty(value = "活动类型")//体育1、彩票2、真人3、棋牌4、电竞5、电游6、捕鱼7、动物竞技8
+    @ApiModelProperty(value = "活动类型")
     private Integer type;
 
     @ApiModelProperty(value = "活动类型名称")

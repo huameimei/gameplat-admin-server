@@ -48,11 +48,8 @@ public class ActivityTypeServiceImpl extends ServiceImpl<ActivityTypeMapper, Act
     @Override
     public IPage<ActivityTypeVO> list(PageDTO<ActivityType> page, ActivityTypeQueryDTO activityTypeQueryDTO) {
         LambdaQueryChainWrapper<ActivityType> queryChainWrapper = this.lambdaQuery();
-        if (activityTypeQueryDTO.getTypeStatus() == null) {
-            activityTypeQueryDTO.setTypeStatus(1);
-        }
         queryChainWrapper.eq(ActivityType::getLanguage, activityTypeQueryDTO.getLanguage())
-                .eq(ActivityType::getTypeStatus, activityTypeQueryDTO.getTypeStatus());
+                .eq(activityTypeQueryDTO.getTypeStatus() != null, ActivityType::getTypeStatus, activityTypeQueryDTO.getTypeStatus());
 
         return queryChainWrapper.page(page).convert(activityTypeConvert::toVo);
     }

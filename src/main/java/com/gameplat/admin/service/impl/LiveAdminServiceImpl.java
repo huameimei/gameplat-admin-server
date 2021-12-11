@@ -36,7 +36,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
-@Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)
 public class LiveAdminServiceImpl implements LiveAdminService {
 
   @Resource
@@ -279,8 +278,10 @@ public class LiveAdminServiceImpl implements LiveAdminService {
           + "，转出前系统余额：" + CNYUtils.formatYuanAsYuan(memberInfo.getBalance()) + ","
           + TransferTypesEnum.get(transferIn).getName() + ":" +  CNYUtils.formatYuanAsYuan(balance);
       status = LiveTransferStatus.SUCCESS.getValue();
-      //7. 添加额度转换记录
-      this.liveTransferInfoService.update(memberInfo.getMemberId(), transferIn, orderNo);
+      //7. 添加额度转换记录  自动转换才需要更新
+      if(!transferType) {
+        liveTransferInfoService.update(memberInfo.getMemberId(), transferIn, orderNo);
+      }
     }catch (LiveException | LiveRollbackException ex) {
       boolean bool = gameApi.queryOrderStatus(orderNo, member.getAccount(), amount);
       if(bool){

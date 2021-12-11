@@ -32,5 +32,12 @@ public class AeConfig extends Properties {
     return "CNY";
   }
 
+  public String getPrefix() {
+//    return EnvContextManager.getProsByName("fg.prefix");
+    return "kgsit";
+  }
 
+  public String getAccount(String account){
+    return  account;
+  }
 }

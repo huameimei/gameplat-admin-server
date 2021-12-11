@@ -9,7 +9,7 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public class AeDepositReq extends AeRequest {
+public class AeWithdrawReq extends AeRequest {
 
   private String userId;
 
@@ -17,4 +17,5 @@ public class AeDepositReq extends AeRequest {
 
   private String txCode;
 
+  private String withdrawType;
 }

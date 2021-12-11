@@ -4,7 +4,6 @@ import com.gameplat.admin.cache.AdminCache;
 import com.gameplat.admin.constant.RsaConstant;
 import com.gameplat.admin.enums.DictTypeEnum;
 import com.gameplat.admin.enums.ErrorPasswordLimit;
-import com.gameplat.admin.model.bean.AdminLoginLimit;
 import com.gameplat.admin.model.domain.SysUser;
 import com.gameplat.admin.model.dto.AdminLoginDTO;
 import com.gameplat.admin.model.vo.RefreshToken;
@@ -19,6 +18,7 @@ import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.GoogleAuthenticator;
 import com.gameplat.base.common.util.IPUtils;
 import com.gameplat.base.common.util.StringUtils;
+import com.gameplat.common.model.bean.limit.AdminLoginLimit;
 import com.gameplat.redis.captcha.CaptchaProducer;
 import com.gameplat.security.context.UserCredential;
 import com.gameplat.security.service.JwtTokenService;
@@ -63,14 +63,14 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     // 是否开启后台白名单
     String requestIp = IPUtils.getIpAddress(request);
-    if (SystemCodeType.YES.match(limit.getOpenIpWhiteList())) {
+    if (SystemCodeType.YES.match(limit.getIpWhiteListSwitch())) {
       if (!authIpService.isPermitted(requestIp)) {
         throw new ServiceException("当前IP不允许登录：" + requestIp);
       }
     }
 
     // 是否开启验证码
-    if (SystemCodeType.YES.match(limit.getVCode())) {
+    if (SystemCodeType.YES.match(limit.getLoginCaptchaSwitch())) {
       captchaProducer.validate(dto.getDeviceId(), request);
     }
 
@@ -84,7 +84,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
       throw new UsernameNotFoundException("用户不存在或密码不正确！");
     }
 
-    if (SystemCodeType.YES.match(limit.getOpenGoogleAuth())) {
+    if (SystemCodeType.YES.match(limit.getGoogleAuthSwitch())) {
       this.checkGoogleAuthCode(user.getSafeCode(), dto.getGoogleCode());
     }
 
@@ -130,9 +130,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
   private void checkPasswordErrorCount(AdminLoginLimit limit, int errorPasswordCount) {
     boolean checkErrorCount =
-        ErrorPasswordLimit.ADMIN_RELIEVE.match(limit.getErrorPwdLimit())
-            || (ErrorPasswordLimit.DEFAULT.getKey().equals(limit.getErrorPwdLimit())
-                && errorPasswordCount >= limit.getErrorPwdLimit());
+        ErrorPasswordLimit.ADMIN_RELIEVE.match(limit.getPwdErrorCount())
+            || (ErrorPasswordLimit.DEFAULT.getKey().equals(limit.getPwdErrorCount())
+                && errorPasswordCount >= limit.getPwdErrorCount());
     if (checkErrorCount) {
       throw new ServiceException("密码错误次数超限!");
     }

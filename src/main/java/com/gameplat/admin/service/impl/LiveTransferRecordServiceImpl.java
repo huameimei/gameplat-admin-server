@@ -17,6 +17,7 @@ import com.gameplat.admin.model.vo.PageDtoVO;
 import com.gameplat.admin.service.LiveTransferRecordService;
 import com.gameplat.admin.service.MemberService;
 import com.gameplat.base.common.exception.ServiceException;
+import com.google.common.collect.Lists;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -30,7 +31,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-@Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)
 public class LiveTransferRecordServiceImpl extends
     ServiceImpl<LiveTransferRecordMapper, LiveTransferRecord> implements LiveTransferRecordService {
 
@@ -83,7 +83,7 @@ public class LiveTransferRecordServiceImpl extends
     UpdateWrapper<LiveTransferRecord> updateWrapper = new UpdateWrapper();
     updateWrapper.set(ObjectUtils.isNotNull(liveTransferRecord.getStatus()),"status",liveTransferRecord.getStatus());
     updateWrapper.set(StringUtils.isNotBlank(liveTransferRecord.getRemark()),"remark",liveTransferRecord.getRemark());
-    updateWrapper.in("status","1,2,5");
+    updateWrapper.in("status", Lists.newArrayList(1,2,5));
     updateWrapper.eq("id",liveTransferRecord.getId());
     if(liveTransferRecordMapper.update(null,updateWrapper) < 0){
       throw new ServiceException("额度转换记录更新失败");

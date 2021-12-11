@@ -12,7 +12,6 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)
 public class LiveTransferInfoServiceImpl extends
     ServiceImpl<LiveTransferInfoMapper, LiveTransferInfo> implements LiveTransferInfoService {
 

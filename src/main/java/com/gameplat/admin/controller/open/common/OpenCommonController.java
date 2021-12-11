@@ -1,13 +1,13 @@
 package com.gameplat.admin.controller.open.common;
 
 import com.alibaba.fastjson.JSONObject;
-import com.gameplat.admin.model.bean.AdminLoginLimit;
 import com.gameplat.admin.model.bean.Language;
 import com.gameplat.admin.model.bean.router.VueRouter;
 import com.gameplat.admin.model.domain.SysMenu;
 import com.gameplat.admin.service.PermissionService;
 import com.gameplat.admin.service.SysCommonService;
 import com.gameplat.base.common.util.StringUtils;
+import com.gameplat.common.model.bean.limit.AdminLoginLimit;
 import com.gameplat.redis.captcha.CaptchaImage;
 import com.gameplat.redis.captcha.CaptchaProducer;
 import com.gameplat.redis.idempoten.AutoIdempotent;

@@ -1,10 +1,16 @@
 package com.gameplat.admin.service.live.api.ae.bean;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 /** 检查交易状态响应 */
 @Data
-public class CheckTransferOperationResp extends AeResponse<CheckTransferOperationResp> {
+@SuperBuilder
+@NoArgsConstructor
+@AllArgsConstructor
+public class AeCheckTransferOperationResp extends AeResponse<AeCheckTransferOperationResp> {
 
   private String txCode;
 

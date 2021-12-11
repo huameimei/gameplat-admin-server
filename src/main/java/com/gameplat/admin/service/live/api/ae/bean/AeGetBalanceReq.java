@@ -1,6 +1,7 @@
 package com.gameplat.admin.service.live.api.ae.bean;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
@@ -9,12 +10,14 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public class AeDepositReq extends AeRequest {
+public class AeGetBalanceReq extends AeRequest {
 
-  private String userId;
+  private String userIds;
 
-  private String transferAmount;
+  private String isOffline;
 
-  private String txCode;
+  private String isFilterBalance;
+
+  private String alluser;
 
 }

@@ -13,7 +13,6 @@ import com.gameplat.admin.convert.UserConvert;
 import com.gameplat.admin.mapper.SysRoleMapper;
 import com.gameplat.admin.mapper.SysUserMapper;
 import com.gameplat.admin.mapper.SysUserRoleMapper;
-import com.gameplat.admin.model.bean.AdminLoginLimit;
 import com.gameplat.admin.model.bean.UserSetting;
 import com.gameplat.admin.model.domain.SysRole;
 import com.gameplat.admin.model.domain.SysUser;
@@ -32,7 +31,9 @@ import com.gameplat.base.common.json.JsonUtils;
 import com.gameplat.base.common.util.GoogleAuthenticator;
 import com.gameplat.base.common.util.RSAUtils;
 import com.gameplat.base.common.util.StringUtils;
+import com.gameplat.common.enums.TrueFalse;
 import com.gameplat.common.enums.UserTypes;
+import com.gameplat.common.model.bean.limit.AdminLoginLimit;
 import com.gameplat.security.SecurityUserHolder;
 import java.util.ArrayList;
 import java.util.List;
@@ -121,7 +122,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
     // 生成密码
     String rsaPassword = RSAUtils.decrypt(dto.getPassword(), RsaConstant.PRIVATE_KEY);
     user.setPassword(passwordEncoder.encode(rsaPassword));
-    user.setChangeFlag(limit.getChangeFlag() == 1 ? 0 : 1);
+    user.setChangeFlag(limit.getResetPwdSwitch() == 1 ? 0 : 1);
 
     if (this.save(user)) {
       // 删除用户角色表
@@ -191,7 +192,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
     // RSA私钥解密
     String newPassword = RSAUtils.decrypt(dto.getPassword(), RsaConstant.PRIVATE_KEY);
     user.setPassword(passwordEncoder.encode(newPassword));
-    user.setChangeFlag(loginLimit.getChangeFlag() == 1 ? 0 : 1);
+    user.setChangeFlag(loginLimit.getResetPwdSwitch() == TrueFalse.TRUE.getValue() ? TrueFalse.TRUE.getValue() : TrueFalse.FALSE.getValue());
 
     if (this.updateById(user)) {
       // 重置用户密码错误次数

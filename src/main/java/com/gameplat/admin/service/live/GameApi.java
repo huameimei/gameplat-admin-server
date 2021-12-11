@@ -8,6 +8,8 @@ import java.math.BigDecimal;
 
 public interface GameApi {
     String Suffix = "Api";
+    int SLEEP_TIME = 5000;
+    int WHILE_COUNT = 3;
 
     BigDecimal getBalance(String account) throws Exception;
 
@@ -15,7 +17,7 @@ public interface GameApi {
 
     String free(String gameType, String ip, Boolean isMobile, String url) throws Exception;
 
-    String play(String account, String gameType, String ip, Boolean isMobile, String url) throws Exception;
+    String play(String account, String gameCode, String ip, Boolean isMobile, String url) throws Exception;
 
     void isOpen() throws Exception;
 

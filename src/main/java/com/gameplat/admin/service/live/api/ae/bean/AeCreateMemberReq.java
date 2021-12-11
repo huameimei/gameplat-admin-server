@@ -9,12 +9,13 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public class AeDepositReq extends AeRequest {
+public class AeCreateMemberReq extends AeRequest {
 
   private String userId;
 
-  private String transferAmount;
+  private String language;
 
-  private String txCode;
+  private String currency;
 
+  private String betLimit;
 }

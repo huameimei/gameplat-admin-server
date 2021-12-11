@@ -3,6 +3,7 @@ package com.gameplat.admin.service;
 import com.alibaba.csp.sentinel.annotation.SentinelResource;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.enums.SysUserEnums;
+import com.gameplat.admin.handler.AdminLogBuilder;
 import com.gameplat.admin.mapper.SysMenuMapper;
 import com.gameplat.admin.mapper.SysUserMapper;
 import com.gameplat.admin.model.bean.router.RouterMeta;
@@ -38,6 +39,7 @@ public class PermissionService extends ServiceImpl<SysMenuMapper, SysMenu> {
 
   private final SysMenuMapper menuMapper;
   private final SysUserMapper userMapper;
+  private final AdminLogBuilder adminLogBuilder;
 
   /**
    * 取系统授权菜单
@@ -92,6 +94,7 @@ public class PermissionService extends ServiceImpl<SysMenuMapper, SysMenu> {
       }else{
           type = UserTypes.SUBUSER;
       }
+      map.put(ContextConstant.TENANT,adminLogBuilder.getDbSuffix());
       map.put(ContextConstant.USERNAME,username);
       map.put(ContextConstant.USER_TYPE,type.key());
       map.put(ContextConstant.SUBJECT, SubjectEnum.ADMIN.getKey());

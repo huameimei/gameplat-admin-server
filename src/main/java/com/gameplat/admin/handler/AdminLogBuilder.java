@@ -38,4 +38,12 @@ public class AdminLogBuilder implements LogBuilder {
                 .subject(SubjectEnum.ADMIN.getKey())
                 .build();
     }
+
+    /**
+     * 获取租户标识
+     * @return
+     */
+    public String getDbSuffix(){
+        return dbSuffix;
+    }
 }

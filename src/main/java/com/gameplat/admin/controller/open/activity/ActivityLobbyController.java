@@ -82,6 +82,9 @@ public class ActivityLobbyController {
         if (activityLobbyAddDTO.getApplyWay() == 2 && activityLobbyAddDTO.getNextDayApply() == 0) {
             throw new ServiceException("自动申请的活动必须勾选隔天申请");
         }
+        if (activityLobbyAddDTO.getEndTime().before(activityLobbyAddDTO.getStartTime())) {
+            throw new ServiceException("活动结束时间不能小于活动开始时间");
+        }
         activityLobbyService.add(activityLobbyAddDTO);
     }
 
@@ -102,6 +105,9 @@ public class ActivityLobbyController {
         }
         if (activityLobbyUpdateDTO.getApplyWay() == 2 && activityLobbyUpdateDTO.getNextDayApply() == 0) {
             throw new ServiceException("自动申请的活动必须勾选隔天申请");
+        }
+        if (activityLobbyUpdateDTO.getEndTime().before(activityLobbyUpdateDTO.getStartTime())) {
+            throw new ServiceException("活动结束时间不能小于活动开始时间");
         }
         activityLobbyService.update(activityLobbyUpdateDTO);
     }

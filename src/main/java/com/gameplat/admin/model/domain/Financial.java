@@ -59,7 +59,13 @@ public class Financial implements Serializable {
     private Integer currencyType;
 
     @ApiModelProperty(value = "金额")
+    private BigDecimal BeforeBalance;
+
+    @ApiModelProperty(value = "金额")
     private BigDecimal amount;
+
+    @ApiModelProperty(value = "金额")
+    private BigDecimal afterBalance;
 
     @ApiModelProperty(value = "优惠金额")
     private BigDecimal disAmount;

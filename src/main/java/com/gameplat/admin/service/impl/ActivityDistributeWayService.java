@@ -114,9 +114,9 @@ public class ActivityDistributeWayService extends ServiceImpl<ActivityDistribute
             // 新增现金流水
             Financial financial = new Financial();
             financial.setUsername(activityDistribute.getUsername());
-//                    financialParam.setBeforeBalance(BigDecimal.valueOf(amount).setScale(2, RoundingMode.HALF_UP));
+            financial.setBeforeBalance(BigDecimal.valueOf(amount).setScale(2, RoundingMode.HALF_UP));
             financial.setAmount(activityDistribute.getDiscountsMoney().setScale(2, RoundingMode.HALF_UP));
-//                    financialParam.setAfterBalance(status == 0 ? BigDecimal.valueOf(amount).setScale(2, RoundingMode.HALF_UP) : BigDecimal.valueOf(amount).add(activityDistribute.getDiscountsMoney()).setScale(2, RoundingMode.HALF_UP));
+            financial.setAfterBalance(status == 0 ? BigDecimal.valueOf(amount).setScale(2, RoundingMode.HALF_UP) : BigDecimal.valueOf(amount).add(activityDistribute.getDiscountsMoney()).setScale(2, RoundingMode.HALF_UP));
             financial.setSourceType(50);
             financial.setSourceId(String.valueOf(sourceId));
             financial.setState(status);

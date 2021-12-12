@@ -9,7 +9,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 /**
- * 活动分发
+ * 活动派发DTO
  *
  * @Author: lyq
  * @Date: 2020/8/20 11:45

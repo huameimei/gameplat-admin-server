@@ -32,7 +32,7 @@ public enum GameTypeEnum {
         return null;
     }
 
-    public static String getName(Integer type) {
+    public static String getName(String type) {
         GameTypeEnum[] gameTypeEnums = values();
         for (GameTypeEnum gameTypeEnum : gameTypeEnums) {
             if (gameTypeEnum.gameType().equals(type)) {

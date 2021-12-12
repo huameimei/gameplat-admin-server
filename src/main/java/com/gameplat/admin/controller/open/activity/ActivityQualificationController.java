@@ -4,10 +4,7 @@ package com.gameplat.admin.controller.open.activity;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.gameplat.admin.model.domain.ActivityQualification;
-import com.gameplat.admin.model.dto.ActivityQualificationAddDTO;
-import com.gameplat.admin.model.dto.ActivityQualificationAuditStatusDTO;
-import com.gameplat.admin.model.dto.ActivityQualificationQueryDTO;
-import com.gameplat.admin.model.dto.ActivityQualificationUpdateStatusDTO;
+import com.gameplat.admin.model.dto.*;
 import com.gameplat.admin.model.vo.ActivityQualificationVO;
 import com.gameplat.admin.service.ActivityQualificationService;
 import com.gameplat.base.common.exception.ServiceException;
@@ -106,5 +103,16 @@ public class ActivityQualificationController {
         activityQualificationService.delete(ids);
     }
 
+    /**
+     * 资格检测
+     *
+     * @param activityQualificationCheckDTO
+     */
+    @ApiOperation(value = "资格检测")
+    @PutMapping("/checkQualification")
+    @PreAuthorize("hasAuthority('activity:qualification:check')")
+    public void checkQualification(@RequestBody ActivityQualificationCheckDTO activityQualificationCheckDTO) {
+        activityQualificationService.checkQualification(activityQualificationCheckDTO);
+    }
 
 }

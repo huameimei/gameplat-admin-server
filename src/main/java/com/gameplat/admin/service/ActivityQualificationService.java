@@ -69,4 +69,11 @@ public interface ActivityQualificationService {
      * @param ids
      */
     void delete(String ids);
+
+    /**
+     * 资格检测
+     *
+     * @param activityQualificationCheckDTO
+     */
+    void checkQualification(ActivityQualificationCheckDTO activityQualificationCheckDTO);
 }

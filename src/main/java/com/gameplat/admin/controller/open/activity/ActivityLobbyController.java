@@ -180,7 +180,7 @@ public class ActivityLobbyController {
     @GetMapping("/gameList")
     @PreAuthorize("hasAuthority('activity:lobby:list')")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "gameTypeCode", value = "游戏类型", required = true),
+            @ApiImplicitParam(name = "gameTypeCode", value = "游戏类型"),
     })
     public List<GameVO> gameList(String gameTypeCode) {
         List<GameVO> gameList = gameService.findByGameTypeCode(gameTypeCode);

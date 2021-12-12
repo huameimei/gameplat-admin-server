@@ -106,7 +106,7 @@ public class ActivityLobbyDTO implements Serializable {
     private Integer status;
 
     @ApiModelProperty(value = "游戏类型（1体育 2真人 3棋牌 4彩票 5电子 6电竞 7动物竞技 8捕鱼）")
-    private Integer gameType;
+    private String gameType;
 
     @ApiModelProperty(value = "游戏列表")
     private String gameList;

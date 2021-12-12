@@ -22,7 +22,7 @@ public class ActivityCommonServiceImpl implements ActivityCommonService {
     @Override
     public String getAuditRemark(ActivityLobbyDTO activityLobby, String statisticValue, String validAmount, String startTime, String endTime) {
         Integer targetType = activityLobby.getStatisItem();
-        Integer gameType = activityLobby.getGameType();
+        String gameType = activityLobby.getGameType();
         StringBuilder sb = new StringBuilder();
         Integer applyWay = activityLobby.getApplyWay();
         if (applyWay == 1) {

@@ -161,6 +161,10 @@ public class ActivityLobby implements Serializable {
     private Integer status;
 
     /**
+     * 游戏类型
+     */
+    private String gameType;
+    /**
      * 游戏列表
      */
     private String gameList;

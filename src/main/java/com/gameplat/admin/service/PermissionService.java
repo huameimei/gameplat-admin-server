@@ -94,7 +94,7 @@ public class PermissionService extends ServiceImpl<SysMenuMapper, SysMenu> {
       }else{
           type = UserTypes.SUBUSER;
       }
-      map.put(ContextConstant.TENANT,adminLogBuilder.getDbSuffix());
+//      map.put(ContextConstant.TENANT,adminLogBuilder.getDbSuffix());
       map.put(ContextConstant.USERNAME,username);
       map.put(ContextConstant.USER_TYPE,type.key());
       map.put(ContextConstant.SUBJECT, SubjectEnum.ADMIN.getKey());

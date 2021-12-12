@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import springfox.documentation.annotations.ApiIgnore;
 
 /**
  * 活动分发管理
@@ -42,7 +43,7 @@ public class ActivityDistributeController {
     @ApiOperation(value = "活动分发列表")
     @GetMapping("/list")
     @PreAuthorize("hasAuthority('activity:distribute:list')")
-    public IPage<ActivityDistributeVO> list(PageDTO<ActivityDistribute> page, ActivityDistributeDTO activityDistributeDTO) {
+    public IPage<ActivityDistributeVO> list(@ApiIgnore PageDTO<ActivityDistribute> page, ActivityDistributeDTO activityDistributeDTO) {
         return activityDistributeService.list(page, activityDistributeDTO);
     }
 

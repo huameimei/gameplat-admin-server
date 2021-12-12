@@ -4,7 +4,10 @@ package com.gameplat.admin.controller.open.activity;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.gameplat.admin.model.domain.ActivityQualification;
-import com.gameplat.admin.model.dto.*;
+import com.gameplat.admin.model.dto.ActivityQualificationAddDTO;
+import com.gameplat.admin.model.dto.ActivityQualificationAuditStatusDTO;
+import com.gameplat.admin.model.dto.ActivityQualificationQueryDTO;
+import com.gameplat.admin.model.dto.ActivityQualificationUpdateStatusDTO;
 import com.gameplat.admin.model.vo.ActivityQualificationVO;
 import com.gameplat.admin.service.ActivityQualificationService;
 import com.gameplat.base.common.exception.ServiceException;
@@ -16,13 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
 /**
@@ -71,26 +68,11 @@ public class ActivityQualificationController {
     }
 
     /**
-     * 修改活动资格
-     *
-     * @param activityQualificationUpdateDTO
-     */
-    @ApiOperation(value = "修改活动资格")
-    @PutMapping("/update")
-    @PreAuthorize("hasAuthority('activity:qualification:edit')")
-    public void update(@RequestBody ActivityQualificationUpdateDTO activityQualificationUpdateDTO) {
-        if (activityQualificationUpdateDTO.getId() == null || activityQualificationUpdateDTO.getId() == 0) {
-            throw new ServiceException("id不能为空");
-        }
-        activityQualificationService.update(activityQualificationUpdateDTO);
-    }
-
-    /**
-     * 审核活动资格
+     * 批量审核活动资格
      *
      * @param activityQualificationAuditStatusDTO
      */
-    @ApiOperation(value = "审核活动资格")
+    @ApiOperation(value = "批量审核活动资格")
     @PutMapping("/auditStatus")
     @PreAuthorize("hasAuthority('activity:qualification:edit')")
     public void auditStatus(@RequestBody ActivityQualificationAuditStatusDTO activityQualificationAuditStatusDTO) {

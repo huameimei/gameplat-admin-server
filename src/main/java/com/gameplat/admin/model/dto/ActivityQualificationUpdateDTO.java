@@ -1,16 +1,17 @@
 package com.gameplat.admin.model.dto;
 
 import io.swagger.annotations.ApiModelProperty;
+
 import java.io.Serializable;
 import java.util.Date;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 /**
  * 活动资格更新DTO
  *
- * @Author: lyq
- * @Date: 2020/8/20 11:50
+ * @Author: kenvin
  * @Description:
  */
 @Data
@@ -24,6 +25,12 @@ public class ActivityQualificationUpdateDTO implements Serializable {
 
     @ApiModelProperty(value = "资格id")
     private Long id;
+
+    /**
+     * 1 活动大厅  2 红包雨
+     */
+    @ApiModelProperty(value = "活动类型，1 活动大厅")
+    private Integer type;
 
     @ApiModelProperty(value = "活动名称")
     private String activityName;
@@ -91,7 +98,7 @@ public class ActivityQualificationUpdateDTO implements Serializable {
     @ApiModelProperty(value = "使用时间")
     private Date employTime;
 
-    @ApiModelProperty(value = "统计项目（1 累计充值金额，2 累计充值天数，3 连续充值天数，4 单日首充金额，5 首充金额）")
+    @ApiModelProperty(value = "统计项目")
     private Integer statisItem;
 
     @ApiModelProperty(value = "提现打码量")

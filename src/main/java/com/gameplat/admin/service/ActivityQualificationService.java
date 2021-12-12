@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.gameplat.admin.model.domain.ActivityQualification;
 import com.gameplat.admin.model.dto.*;
 import com.gameplat.admin.model.vo.ActivityQualificationVO;
+
 import java.util.List;
 
 
@@ -40,13 +41,6 @@ public interface ActivityQualificationService {
      * @param activityQualificationAddDTO
      */
     void add(ActivityQualificationAddDTO activityQualificationAddDTO);
-
-    /**
-     * 更新活动资格
-     *
-     * @param activityQualificationUpdateDTO
-     */
-    void update(ActivityQualificationUpdateDTO activityQualificationUpdateDTO);
 
     /**
      * 审核活动资格

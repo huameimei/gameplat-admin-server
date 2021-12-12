@@ -27,22 +27,25 @@ import com.gameplat.base.common.context.GlobalContextHolder;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.RandomUtil;
 import com.gameplat.base.common.util.StringUtils;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections.CollectionUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections.CollectionUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 /**
- * @author admin
+ * 活动资格管理
+ *
+ * @author kenvin
  */
 @Slf4j
 @Service
+@Transactional(rollbackFor = Throwable.class)
 public class ActivityQualificationServiceImpl extends
         ServiceImpl<ActivityQualificationMapper, ActivityQualification>
         implements ActivityQualificationService {
@@ -72,6 +75,7 @@ public class ActivityQualificationServiceImpl extends
                         , ActivityQualification::getDeleteFlag, activityQualification.getDeleteFlag())
                 .eq(activityQualification.getStatus() != null && activityQualification.getStatus() != 0
                         , ActivityQualification::getStatus, activityQualification.getStatus())
+                .eq(ActivityQualification::getDeleteFlag, 1)//是否逻辑删除
                 .list();
     }
 
@@ -144,14 +148,6 @@ public class ActivityQualificationServiceImpl extends
     }
 
     @Override
-    public void update(ActivityQualificationUpdateDTO activityQualificationUpdateDTO) {
-        ActivityQualification activityQualification = activityQualificationConvert.toEntity(activityQualificationUpdateDTO);
-        if (!this.save(activityQualification)) {
-            throw new ServiceException("更新失败");
-        }
-    }
-
-    @Override
     public void auditStatus(ActivityQualificationAuditStatusDTO activityQualificationAuditStatusDTO) {
         List<ActivityQualification> qualificationManageStatusList =
                 this.lambdaQuery().in(ActivityQualification::getId, activityQualificationAuditStatusDTO.getIdList()).list();
@@ -160,7 +156,7 @@ public class ActivityQualificationServiceImpl extends
                 throw new ServiceException("您选择的数据有无效数据，无效数据不能审核！");
             }
             if (qualification.getStatus() == ActivityConst.QUALIFICATION_STATUS_AUDIT) {
-                throw new ServiceException("您选择的数据有已审核的数据，请勿重复审核！");
+                throw new ServiceException("您选择的数据有【" + qualification.getActivityName() + "】已审核的数据，请勿重复审核！");
             }
             if (qualification.getQualificationStatus() == ActivityConst.QUALIFICATION_STATUS_INVALID) {
                 throw new ServiceException("您选择的数据有资格状态被禁用的数据，禁用状态不能审核！");
@@ -254,7 +250,7 @@ public class ActivityQualificationServiceImpl extends
         for (String idStr : idArr) {
             idList.add(Long.parseLong(idStr));
         }
-        List<ActivityQualification> qualificationList = this.lambdaQuery().in(ActivityQualification::getId).list();
+        List<ActivityQualification> qualificationList = this.lambdaQuery().in(ActivityQualification::getId, idList).list();
         if (CollectionUtils.isNotEmpty(qualificationList)) {
             for (ActivityQualification activityQualification : qualificationList) {
                 activityQualification.setDeleteFlag(0);

@@ -77,6 +77,7 @@ public class ActivityLobbyServiceImpl extends ServiceImpl<ActivityLobbyMapper, A
     }
 
     @Override
+    @Transactional
     public void add(ActivityLobbyAddDTO activityLobbyAddDTO) {
         ActivityLobby activityLobby = activityLobbyConvert.toEntity(activityLobbyAddDTO);
         //优惠打折列表
@@ -195,8 +196,8 @@ public class ActivityLobbyServiceImpl extends ServiceImpl<ActivityLobbyMapper, A
 
         if (activityLobbyAddDTO.getStatisItem() == ActivityLobbyEnum.StatisItem.CUMULATIVE_RECHARGE_DAYS.getValue()
                 || activityLobbyAddDTO.getStatisItem() == ActivityLobbyEnum.StatisItem.CONTINUOUS_RECHARGE_DAYS.getValue()
-                || activityLobbyAddDTO.getStatisItem() == ActivityLobbyEnum.StatisItem.ACCUMULATED_LOTTERY_CODING_DAYS.getValue()
-                || activityLobbyAddDTO.getStatisItem() == ActivityLobbyEnum.StatisItem.NUMBER_OF_CONSECUTIVE_LOTTERY_RECHARGE_DAYS.getValue()) {
+                || activityLobbyAddDTO.getStatisItem() == ActivityLobbyEnum.StatisItem.CUMULATIVE_GAME_DML_DAYS.getValue()
+                || activityLobbyAddDTO.getStatisItem() == ActivityLobbyEnum.StatisItem.CONSECUTIVE_GAME_DML_DAYS.getValue()) {
             for (ActivityLobbyDiscount activityLobbyDiscount : activityLobbyDiscounts) {
                 if (activityLobbyDiscount.getTargetValue() < 2) {
                     throw new ServiceException("奖励赠送列表中,设定的目标天数最小值为2");
@@ -220,6 +221,7 @@ public class ActivityLobbyServiceImpl extends ServiceImpl<ActivityLobbyMapper, A
     }
 
     @Override
+    @Transactional
     public void update(ActivityLobbyUpdateDTO activityLobbyUpdateDTO) {
         //根据id查询活动大厅
         ActivityLobby activityLobbyOrigin = this.getById(activityLobbyUpdateDTO.getId());
@@ -393,8 +395,8 @@ public class ActivityLobbyServiceImpl extends ServiceImpl<ActivityLobbyMapper, A
 
         if (activityLobbyUpdateDTO.getStatisItem() == ActivityLobbyEnum.StatisItem.CUMULATIVE_RECHARGE_DAYS.getValue()
                 || activityLobbyUpdateDTO.getStatisItem() == ActivityLobbyEnum.StatisItem.CONTINUOUS_RECHARGE_DAYS.getValue()
-                || activityLobbyUpdateDTO.getStatisItem() == ActivityLobbyEnum.StatisItem.ACCUMULATED_LOTTERY_CODING_DAYS.getValue()
-                || activityLobbyUpdateDTO.getStatisItem() == ActivityLobbyEnum.StatisItem.NUMBER_OF_CONSECUTIVE_LOTTERY_RECHARGE_DAYS.getValue()) {
+                || activityLobbyUpdateDTO.getStatisItem() == ActivityLobbyEnum.StatisItem.CUMULATIVE_GAME_DML_DAYS.getValue()
+                || activityLobbyUpdateDTO.getStatisItem() == ActivityLobbyEnum.StatisItem.CONSECUTIVE_GAME_DML_DAYS.getValue()) {
             for (ActivityLobbyDiscountDTO activityLobbyDiscountDTO : lobbyDiscountList) {
                 if (activityLobbyDiscountDTO.getTargetValue() < 2) {
                     throw new ServiceException("奖励赠送列表中,设定的目标天数最小值为2");

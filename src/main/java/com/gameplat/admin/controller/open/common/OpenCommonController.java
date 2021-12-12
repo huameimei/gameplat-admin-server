@@ -8,8 +8,8 @@ import com.gameplat.admin.service.PermissionService;
 import com.gameplat.admin.service.SysCommonService;
 import com.gameplat.base.common.util.StringUtils;
 import com.gameplat.common.model.bean.limit.AdminLoginLimit;
-import com.gameplat.redis.captcha.CaptchaImage;
 import com.gameplat.redis.captcha.CaptchaProducer;
+import com.gameplat.redis.captcha.Kaptcha;
 import com.gameplat.redis.idempoten.AutoIdempotent;
 import com.gameplat.security.SecurityUserHolder;
 import java.io.IOException;
@@ -48,7 +48,7 @@ public class OpenCommonController {
    * @throws IOException IOException
    */
   @GetMapping("/captcha/{deviceId}")
-  public CaptchaImage createCode(@PathVariable String deviceId, HttpServletResponse response)
+  public Kaptcha createCode(@PathVariable String deviceId, HttpServletResponse response)
       throws IOException {
     Assert.notNull(deviceId, "机器码不能为空");
     response.setHeader("param", "no-cache");

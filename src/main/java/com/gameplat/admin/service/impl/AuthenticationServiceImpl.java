@@ -71,7 +71,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     // 是否开启验证码
     if (SystemCodeType.YES.match(limit.getLoginCaptchaSwitch())) {
-      captchaProducer.validate(dto.getDeviceId(), request);
+      captchaProducer.validate(dto.getDeviceId(), dto.getValiCode());
     }
 
     // 判断密码错误次数

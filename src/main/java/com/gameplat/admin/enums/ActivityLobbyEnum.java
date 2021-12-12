@@ -16,13 +16,11 @@ public class ActivityLobbyEnum {
         CONTINUOUS_RECHARGE_DAYS(3, "连续充值天数"),
         SINGLE_DAY_DEPOSIT_AMOUNT(4, "单日首充金额"),
         FIRST_DEPOSIT_AMOUNT(5, "首充金额"),
-        CUMULATIVE_LOTTERY_RECHARGE_AMOUNT(6, "累计彩票打码金额"),
-        ACCUMULATED_LOTTERY_CODING_DAYS(7, "累计彩票打码天数"),
-        NUMBER_OF_CONSECUTIVE_LOTTERY_RECHARGE_DAYS(8, ""),
-        SINGLE_DAY_LOTTERY_LOSS(9, "单日彩票亏损金额"),
-        CUMULATIVE_SPORTS_RECHARGE_AMOUNT(10, "累计体育打码金额"),
-        CONSECUTIVE_SPORTS_YARDING_DAYS(11, "连续体育打码天数"),
-        AMOUNT_OF_SPORTS_LOSS_PER_DAY(12, "单日体育亏损金额");
+        CUMULATIVE_GAME_DML_AMOUNT(6, "累计游戏打码金额"),
+        CUMULATIVE_GAME_DML_DAYS(7, "累计游戏打码天数"),
+        CONSECUTIVE_GAME_DML_DAYS(8, "连续游戏打码天数"),
+        SINGLE_DAY_GAME_LOSS(9, "单日游戏亏损金额"),
+        CUMULATIVE_SPORTS_RECHARGE_AMOUNT(10, "指定比赛");
 
 
         private int value;

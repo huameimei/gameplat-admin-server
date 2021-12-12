@@ -8,8 +8,6 @@ import com.gameplat.admin.service.PermissionService;
 import com.gameplat.admin.service.SysCommonService;
 import com.gameplat.base.common.util.StringUtils;
 import com.gameplat.common.model.bean.limit.AdminLoginLimit;
-import com.gameplat.redis.captcha.CaptchaProducer;
-import com.gameplat.redis.captcha.Kaptcha;
 import com.gameplat.redis.idempoten.AutoIdempotent;
 import com.gameplat.security.SecurityUserHolder;
 import java.io.IOException;
@@ -17,6 +15,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import javax.servlet.http.HttpServletResponse;
+
+import com.gameplat.web.captcha.CaptchaProducer;
+import com.gameplat.web.captcha.Kaptcha;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;

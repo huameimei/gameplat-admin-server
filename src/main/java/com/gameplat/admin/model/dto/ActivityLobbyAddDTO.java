@@ -43,7 +43,7 @@ public class ActivityLobbyAddDTO implements Serializable {
     private Integer type;
 
     @NotBlank(message = "活动类型必选")
-    @ApiModelProperty(value = "活动类型（1 充值活动(统计项目(statisItem)选项中的1,2,3,4,5项可选)，2 游戏活动(统计项目(statisItem)选项中的6,7,8,9,10,11,12项可选)")
+    @ApiModelProperty(value = "活动类型（1 充值活动(统计项目(statisItem)选项中的1,2,3,4,5项可选)，2 游戏活动(统计项目(statisItem)选项中的6,7,8,9,10项可选)")
     private Integer activityType;
 
     @ApiModelProperty(value = "描述")

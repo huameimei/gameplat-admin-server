@@ -10,6 +10,7 @@ import com.gameplat.admin.model.dto.ActivityInfoUpdateDTO;
 import com.gameplat.admin.model.vo.ActivityInfoVO;
 import com.gameplat.admin.service.ActivityInfoService;
 import com.gameplat.base.common.exception.ServiceException;
+import com.gameplat.base.common.util.DateUtil;
 import com.gameplat.base.common.util.StringUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -89,6 +90,11 @@ public class ActivityInfoController {
     @PreAuthorize("hasAuthority('activity:info:add')")
     public void add(@RequestBody ActivityInfoAddDTO activityInfoAddDTO,
                     @RequestHeader(value = "country", required = false, defaultValue = "zh-CN") String country) {
+        if (activityInfoAddDTO.getValidStatus() == 2) {
+            if (DateUtil.strToDate(activityInfoAddDTO.getEndTime(), "yyyy-MM-dd").before(DateUtil.strToDate(activityInfoAddDTO.getBeginTime(), "yyyy-MM-dd"))) {
+                throw new ServiceException("活动结束时间不能小于活动开始时间");
+            }
+        }
         if (StringUtils.isNotNull(activityInfoAddDTO.getActivityLobbyId())) {
             activityInfoService.checkActivityLobbyId(activityInfoAddDTO.getActivityLobbyId(), activityInfoAddDTO.getId());
         }
@@ -106,6 +112,14 @@ public class ActivityInfoController {
     @PreAuthorize("hasAuthority('activity:info:edit')")
     public void update(@RequestBody ActivityInfoUpdateDTO activityInfoUpdateDTO,
                        @RequestHeader(value = "country", required = false, defaultValue = "zh-CN") String country) {
+        if (activityInfoUpdateDTO.getValidStatus() == 2) {
+            if (DateUtil.strToDate(activityInfoUpdateDTO.getEndTime(), "yyyy-MM-dd").before(DateUtil.strToDate(activityInfoUpdateDTO.getBeginTime(), "yyyy-MM-dd"))) {
+                throw new ServiceException("活动结束时间不能小于活动开始时间");
+            }
+        }
+        if (StringUtils.isNotNull(activityInfoUpdateDTO.getActivityLobbyId())) {
+            activityInfoService.checkActivityLobbyId(activityInfoUpdateDTO.getActivityLobbyId(), activityInfoUpdateDTO.getId());
+        }
         activityInfoService.update(activityInfoUpdateDTO, country);
     }
 

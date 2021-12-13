@@ -69,7 +69,7 @@ public class ActivityDistributeWayService extends ServiceImpl<ActivityDistribute
                 throw new ServiceException("该记录状态不是未结算状态");
             }
             // 初始化参数
-            Long sourceId = activityDistribute.getQualificationActivityId();
+            String sourceId = activityDistribute.getQualificationActivityId().toString();
             Integer status = null;
             String remark = null;
             Double amount = null;

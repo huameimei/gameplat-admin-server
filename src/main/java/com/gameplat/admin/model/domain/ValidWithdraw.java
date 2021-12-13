@@ -30,7 +30,7 @@ public class ValidWithdraw implements Serializable {
   /**
    * 对应充值记录ID
    */
-  private Long rechId;
+  private String rechId;
   private BigDecimal rechMoney;
   private BigDecimal discountMoney;
   /**

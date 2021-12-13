@@ -8,7 +8,7 @@ public interface WithdrawTypeConstant {
    */
   String BANK = "B";
 
-  String BANK_SUB_TYPE = "BANK";
+  String BANK_CURRENCY = "CNY";
 
   /**
    * 虚拟币
@@ -40,6 +40,6 @@ public interface WithdrawTypeConstant {
    */
   String DIRECT = "D";
 
-  String DIRECT_SUB_TYPE = "DIRECT";
+  String DIRECT_CURRENCY = "DIRECT";
 
 }

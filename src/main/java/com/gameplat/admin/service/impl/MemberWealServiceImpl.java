@@ -468,13 +468,13 @@ public class MemberWealServiceImpl extends ServiceImpl<MemberWealMapper, MemberW
                             }
                         }
                         //本批次执行完 睡眠下
-                        try {
-                            log.info("开始分批睡眠执行派发");
-                            Thread.sleep(10000);
-                        } catch (InterruptedException e) {
-                            log.info("睡眠时发生错误了!");
-                            e.printStackTrace();
-                        }
+//                        try {
+//                            log.info("开始分批睡眠执行派发");
+//                            Thread.sleep(10000);
+//                        } catch (InterruptedException e) {
+//                            log.info("睡眠时发生错误了!");
+//                            e.printStackTrace();
+//                        }
                     }
                 }
             }
@@ -591,14 +591,14 @@ public class MemberWealServiceImpl extends ServiceImpl<MemberWealMapper, MemberW
                         }
                     }
                     //本批次执行完 睡眠下
-                    try {
-                        log.info("开始分批睡眠执行派发");
-                        //睡眠5s
-                        Thread.sleep(5000);
-                    } catch (InterruptedException e) {
-                        log.info("睡眠时发生错误了!");
-                        e.printStackTrace();
-                    }
+//                    try {
+//                        log.info("开始分批睡眠执行派发");
+//                        //睡眠5s
+//                        Thread.sleep(5000);
+//                    } catch (InterruptedException e) {
+//                        log.info("睡眠时发生错误了!");
+//                        e.printStackTrace();
+//                    }
                 }
             }
         }

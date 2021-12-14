@@ -211,8 +211,8 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
     BigDecimal approveMoney = memberWithdraw.getCashMoney().subtract(afterCounterFee);
     BigDecimal approveCurrencyCount = BigDecimal.ZERO;
     if (Objects.nonNull(memberWithdraw.getWithdrawType())
-        && !memberWithdraw.getWithdrawType().equals(WithdrawTypeConstant.BANK_SUB_TYPE)
-        && !memberWithdraw.getWithdrawType().equals(WithdrawTypeConstant.DIRECT_SUB_TYPE)) {
+        && !memberWithdraw.getWithdrawType().equals(WithdrawTypeConstant.BANK_CURRENCY)
+        && !memberWithdraw.getWithdrawType().equals(WithdrawTypeConstant.DIRECT_CURRENCY)) {
       approveCurrencyCount = approveMoney.divide(memberWithdraw.getCurrencyRate());
     }
     LambdaUpdateWrapper<MemberWithdraw> update = Wrappers.lambdaUpdate();

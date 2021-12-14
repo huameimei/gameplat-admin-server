@@ -1,5 +1,6 @@
 package com.gameplat.admin.model.bean;
 
+import java.math.BigDecimal;
 import lombok.Data;
 
 /**
@@ -15,13 +16,13 @@ public class UserWithdrawLimitInfo {
   /**
    * 单笔提现最低金额
    */
-  private Long minAmountPerOrder;
+  private BigDecimal minAmountPerOrder;
   /**
    * 单笔提现最高金额
    */
-  private Long maxAmountPerOrder;
+  private BigDecimal maxAmountPerOrder;
   /**
    * 单日提现最高金额上限
    */
-  private Long dayMaxAmount;
+  private BigDecimal dayMaxAmount;
 }

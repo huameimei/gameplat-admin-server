@@ -391,7 +391,7 @@ public class MemberWealServiceImpl extends ServiceImpl<MemberWealMapper, MemberW
                                 if (growthConfig.getIsAutoPayReword() == YseOrNoEnum.YES.getCode()) {
                                     //将通知消息去掉请领取
                                     content = content.replaceAll("，请领取","");
-                                    Long sourceId = IdWorker.getId();
+                                    String sourceId = String.valueOf(IdWorker.getId());
                                     // 新增打码量记录
                                     ValidWithdraw validWithdraw = new ValidWithdraw();
                                     validWithdraw.setAccount(member.getAccount());
@@ -420,7 +420,7 @@ public class MemberWealServiceImpl extends ServiceImpl<MemberWealMapper, MemberW
                                         financial.setCurrencyName(CurrencyTypeEnum.REAL.getDetail());
                                         financial.setCurrencyType(CurrencyTypeEnum.REAL.getCode());
                                         financial.setIpAddress(IPUtils.getIpAddress(request));
-                                        financial.setSourceId(sourceId.toString());
+                                        financial.setSourceId(sourceId);
                                         financial.setIsLess(0);
                                         financial.setState(3);
                                         financial.setMode(3);

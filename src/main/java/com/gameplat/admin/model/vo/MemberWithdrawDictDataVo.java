@@ -1,5 +1,6 @@
 package com.gameplat.admin.model.vo;
 
+import java.math.BigDecimal;
 import lombok.Data;
 
 /**
@@ -15,7 +16,7 @@ public class MemberWithdrawDictDataVo {
     /**
      * 单笔提现最低金额
      */
-    private Long minAmountPerOrder;
+    private BigDecimal minAmountPerOrder;
     /**
      * 单笔提现最高金额
      */
@@ -23,5 +24,5 @@ public class MemberWithdrawDictDataVo {
     /**
      * 单日提现最高金额上限
      */
-    private Long dayMaxAmount;
+    private BigDecimal dayMaxAmount;
 }

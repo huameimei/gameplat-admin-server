@@ -14,15 +14,14 @@ import com.gameplat.admin.constant.ActivityConst;
 import com.gameplat.admin.convert.ActivityLobbyConvert;
 import com.gameplat.admin.convert.ActivityQualificationConvert;
 import com.gameplat.admin.mapper.ActivityQualificationMapper;
+import com.gameplat.admin.model.bean.ActivityMemberInfo;
 import com.gameplat.admin.model.domain.ActivityDistribute;
+import com.gameplat.admin.model.domain.ActivityLobby;
 import com.gameplat.admin.model.domain.ActivityQualification;
 import com.gameplat.admin.model.dto.*;
 import com.gameplat.admin.model.vo.ActivityQualificationVO;
 import com.gameplat.admin.model.vo.MemberInfoVO;
-import com.gameplat.admin.service.ActivityCommonService;
-import com.gameplat.admin.service.ActivityDistributeService;
-import com.gameplat.admin.service.ActivityQualificationService;
-import com.gameplat.admin.service.MemberService;
+import com.gameplat.admin.service.*;
 import com.gameplat.base.common.context.GlobalContextHolder;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.DateUtil;
@@ -62,6 +61,9 @@ public class ActivityQualificationServiceImpl extends
 
     @Autowired
     private ActivityCommonService activityCommonService;
+
+    @Autowired
+    private MemberGrowthStatisService memberGrowthStatisService;
 
 
     @Override
@@ -114,7 +116,8 @@ public class ActivityQualificationServiceImpl extends
                     throw new ServiceException("【" + activityLobbyDTO.getTitle() + "】，没有开启多重彩金");
                 }
                 qm = new ActivityQualification();
-                String auditRemark = activityCommonService.getAuditRemark(activityLobbyDTO, "", "", null, null);
+                ActivityLobby activityLobby = activityLobbyConvert.toEntity(activityLobbyDTO);
+                String auditRemark = activityCommonService.getAuditRemark(activityLobby, "", "", null, null);
                 qm.setAuditRemark(auditRemark);
                 qm.setActivityId(activityLobbyDTO.getId());
                 qm.setActivityName(activityLobbyDTO.getTitle());
@@ -261,67 +264,73 @@ public class ActivityQualificationServiceImpl extends
     }
 
     @Override
-    public void checkQualification(ActivityQualificationCheckDTO activityQualificationCheckDTO) {
-//        List<ActivityUserInfoVO> activityUserInfoList;
-//        Map<String, Object> retMap = new HashMap<String, Object>();
-//        try {
-//            List<String> userNameList = new ArrayList<>();
-//            userNameList.add(activityQualificationCheckDTO.getUsername());
-//            //查询用户参加活动需要的用户基本信息
-//            Map map = new HashMap();
-//            map.put("userNameList", userNameList);
-//            activityUserInfoList = userActivityFeignService.findActivityUserInfo(map);
-//            if (StringUtils.isEmpty(activityUserInfoList)) {
-//                throw new ServiceException("账号不存在,请输入真实有效的账号");
-//            }
-//            activityComponent.userDetection(activityUserInfoList.get(0), 3);
-//        } catch (ServiceException e) {
-//            retMap.put("step", 1);
-//            retMap.put("success", false);
-//            return RetUtils.makeRetJsonData(200, ActivityErrorMessageEnum.getMessage(e.getMessage()), retMap);
-//        }
-//        Date countDate = DateUtil.StringToDate(checkDate, "yyyy-MM-dd HH:mm:ss");
-//        MemberActivityLobby activityLobby = null;
-//        List<QualificationManage> manageList;
-//        try {
-//            //活动检测
-//            activityLobby = activityComponent.activityDetection(activityId, countDate, 3);
-//        } catch (ServiceException e) {
-//            retMap.put("step", 2);
-//            retMap.put("success", false);
-//            return RetUtils.makeRetJsonData(200, ActivityErrorMessageEnum.getMessage(e.getMessage()), retMap);
-//        }
-//
-//        try {
-//            //黑名单检测
-//            activityComponent.blacklistDetection(activityLobby, activityUserInfoList.get(0), 3);
-//        } catch (ServiceException e) {
-//            retMap.put("step", 3);
-//            retMap.put("success", false);
-//            return RetUtils.makeRetJsonData(200, ActivityErrorMessageEnum.getMessage(e.getMessage()), retMap);
-//        }
-//
-//        try {
-//            //资格检测
-//            activityComponent.qualificationDetection(activityLobby, activityUserInfoList.get(0), countDate, 3);
-//        } catch (ServiceException e) {
-//            retMap.put("step", 4);
-//            retMap.put("success", false);
-//            return RetUtils.makeRetJsonData(200, ActivityErrorMessageEnum.getMessage(e.getMessage()), retMap);
-//        }
-//
-//        try {
-//            //规则检测
-//            manageList = activityComponent.activityRuleDetection(activityLobby, countDate, activityUserInfoList, 3);
-//        } catch (ServiceException e) {
-//            retMap.put("step", 5);
-//            retMap.put("success", false);
-//            return RetUtils.makeRetJsonData(200, ActivityErrorMessageEnum.getMessage(e.getMessage()), retMap);
-//        }
-//
-//        retMap.put("step", 0);
-//        retMap.put("success", true);
-//        return RetUtils.makeRetJsonData(200, "检测完毕,目前会员可领取的优惠金额:" + manageList.get(0).getMaxMoney(), retMap);
+    public Map<String, Object> checkQualification(ActivityQualificationCheckDTO activityQualificationCheckDTO) {
+        List<ActivityMemberInfo> activityUserInfoList;
+        Map<String, Object> retMap = new HashMap<>(3);
+        try {
+            List<String> userNameList = new ArrayList<>();
+            userNameList.add(activityQualificationCheckDTO.getUsername());
+            //查询用户参加活动需要的用户基本信息
+            Map map = new HashMap();
+            map.put("userNameList", userNameList);
+            activityUserInfoList = memberGrowthStatisService.findActivityMemberInfo(map);
+            if (StringUtils.isEmpty(activityUserInfoList)) {
+                throw new ServiceException("账号不存在,请输入真实有效的账号");
+            }
+            activityCommonService.userDetection(activityUserInfoList.get(0), 3);
+        } catch (ServiceException e) {
+            retMap.put("step", 1);
+            retMap.put("success", false);
+            retMap.put("message", e.getMessage());
+            return retMap;
+        }
+        Date countDate = DateUtil.strToDate(activityQualificationCheckDTO.getCountDate(), "yyyy-MM-dd HH:mm:ss");
+        ActivityLobby activityLobby = null;
+        List<ActivityQualification> manageList;
+        try {
+            //活动检测
+            activityLobby = activityCommonService.activityDetection(activityQualificationCheckDTO.getActivityId(), countDate, 3);
+        } catch (ServiceException e) {
+            retMap.put("step", 2);
+            retMap.put("success", false);
+            retMap.put("message", e.getMessage());
+            return retMap;
+        }
+
+        try {
+            //黑名单检测
+            activityCommonService.blacklistDetection(activityLobby, activityUserInfoList.get(0), 3);
+        } catch (ServiceException e) {
+            retMap.put("step", 3);
+            retMap.put("success", false);
+            retMap.put("message", e.getMessage());
+            return retMap;
+        }
+
+        try {
+            //资格检测
+            activityCommonService.qualificationDetection(activityLobby, activityUserInfoList.get(0), countDate, 3);
+        } catch (ServiceException e) {
+            retMap.put("step", 4);
+            retMap.put("success", false);
+            retMap.put("message", e.getMessage());
+            return retMap;
+        }
+
+        try {
+            //规则检测
+            manageList = activityCommonService.activityRuleDetection(activityLobby, countDate, activityUserInfoList, 3);
+        } catch (ServiceException e) {
+            retMap.put("step", 5);
+            retMap.put("success", false);
+            retMap.put("message", e.getMessage());
+            return retMap;
+        }
+
+        retMap.put("step", 0);
+        retMap.put("success", true);
+        retMap.put("message", "检测完毕,目前会员可领取的优惠金额:" + manageList.get(0).getMaxMoney());
+        return retMap;
     }
 
 

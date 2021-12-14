@@ -4,7 +4,7 @@ import cn.hutool.core.collection.CollectionUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.gameplat.admin.commpent.MemberQueryCondition;
+import com.gameplat.admin.component.MemberQueryCondition;
 import com.gameplat.admin.constant.SystemConstant;
 import com.gameplat.admin.convert.MemberConvert;
 import com.gameplat.admin.enums.MemberEnums;

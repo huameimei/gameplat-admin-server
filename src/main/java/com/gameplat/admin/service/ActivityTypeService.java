@@ -2,6 +2,7 @@ package com.gameplat.admin.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
+import com.baomidou.mybatisplus.extension.service.IService;
 import com.gameplat.admin.model.domain.ActivityType;
 import com.gameplat.admin.model.dto.ActivityTypeAddDTO;
 import com.gameplat.admin.model.dto.ActivityTypeDTO;
@@ -13,7 +14,7 @@ import java.util.List;
 /**
  * 活动类型
  */
-public interface ActivityTypeService {
+public interface ActivityTypeService extends IService<ActivityType> {
 
     /**
      * 通过id列表查询活动类型
@@ -52,4 +53,11 @@ public interface ActivityTypeService {
      * @param ids
      */
     void remove(String ids);
+
+    /**
+     * 查询所有的活动列表
+     * @param language
+     * @return
+     */
+    List<ActivityTypeVO> listAll(String language);
 }

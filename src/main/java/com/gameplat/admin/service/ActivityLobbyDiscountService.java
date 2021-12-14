@@ -1,5 +1,6 @@
 package com.gameplat.admin.service;
 
+import com.baomidou.mybatisplus.extension.service.IService;
 import com.gameplat.admin.model.domain.ActivityLobbyDiscount;
 import com.gameplat.admin.model.vo.ActivityLobbyDiscountVO;
 import java.util.List;
@@ -7,7 +8,7 @@ import java.util.List;
 /**
  * 活动大厅业务查询
  */
-public interface ActivityLobbyDiscountService {
+public interface ActivityLobbyDiscountService extends IService<ActivityLobbyDiscount> {
 
 
     /**

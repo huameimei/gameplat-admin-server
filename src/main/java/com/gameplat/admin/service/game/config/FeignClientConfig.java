@@ -1,4 +1,4 @@
-package com.gameplat.admin.service.live.config;
+package com.gameplat.admin.service.game.config;
 
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;

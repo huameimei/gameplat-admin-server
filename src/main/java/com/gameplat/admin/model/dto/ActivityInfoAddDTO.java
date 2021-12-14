@@ -212,4 +212,5 @@ public class ActivityInfoAddDTO implements Serializable {
 
     @ApiModelProperty(value = "h5活动说明html")
     private String h5ExplainHtml;
+
 }

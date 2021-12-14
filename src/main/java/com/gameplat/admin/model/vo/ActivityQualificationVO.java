@@ -3,7 +3,9 @@ package com.gameplat.admin.model.vo;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import io.swagger.annotations.ApiModelProperty;
+
 import java.util.Date;
+
 import lombok.Data;
 
 /**
@@ -19,6 +21,15 @@ public class ActivityQualificationVO {
     @JsonSerialize(using = ToStringSerializer.class)
     @ApiModelProperty(value = "用户id")
     private Long userId;
+
+    @ApiModelProperty(value = "活动名称")
+    private String activityName;
+
+    @ApiModelProperty(value = "活动类型（1 活动大厅，2 红包雨，3 转盘）")
+    private Integer activityType;
+
+    @ApiModelProperty(value = "活动ID")
+    private Long activityId;
 
     @ApiModelProperty(value = "会员账号")
     private String username;
@@ -70,5 +81,41 @@ public class ActivityQualificationVO {
 
     @ApiModelProperty(value = "统计结束时间")
     private Date statisEndTime;
+
+    @ApiModelProperty(value = "审核时间")
+    private Date auditTime;
+
+    @ApiModelProperty(value = "活动开始时间")
+    private Date activityStartTime;
+
+    @ApiModelProperty(value = "活动结束时间")
+    private Date activityEndTime;
+
+    @ApiModelProperty(value = "更新时间")
+    private Date updateTime;
+
+    @ApiModelProperty(value = "截止时间")
+    private Date abortTime;
+
+    @ApiModelProperty(value = "使用次数")
+    private Integer employNum;
+
+    @ApiModelProperty(value = "最小金额")
+    private Integer minMoney;
+
+    @ApiModelProperty(value = "最大金额")
+    private Integer maxMoney;
+
+    @ApiModelProperty(value = "删除（0 已删除，1 未删除）")
+    private Integer deleteFlag;
+
+    @ApiModelProperty(value = "使用时间")
+    private Date employTime;
+
+    @ApiModelProperty(value = "与活动派发关联id")
+    private String qualificationActivityId;
+
+    @ApiModelProperty(value = "唯一标识")
+    private String soleIdentifier;
 
 }

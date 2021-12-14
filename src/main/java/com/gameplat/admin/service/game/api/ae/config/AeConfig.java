@@ -1,6 +1,8 @@
-package com.gameplat.admin.service.live.api.ae.bean;
+package com.gameplat.admin.service.game.api.ae.config;
 
+import com.gameplat.admin.component.LiveConfigEnvCache;
 import java.util.Properties;
+import javax.annotation.Resource;
 import org.springframework.stereotype.Component;
 
 @Component

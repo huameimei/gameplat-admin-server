@@ -2,6 +2,7 @@ package com.gameplat.admin.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
+import com.baomidou.mybatisplus.extension.service.IService;
 import com.gameplat.admin.model.domain.ActivityInfo;
 import com.gameplat.admin.model.dto.ActivityInfoAddDTO;
 import com.gameplat.admin.model.dto.ActivityInfoDTO;
@@ -13,8 +14,9 @@ import java.util.List;
 
 /**
  * 活动业务类
+ * @author admin
  */
-public interface ActivityInfoService {
+public interface ActivityInfoService extends IService<ActivityInfo> {
 
 
     /**

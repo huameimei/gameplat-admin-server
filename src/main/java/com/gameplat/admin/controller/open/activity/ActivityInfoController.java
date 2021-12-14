@@ -1,13 +1,14 @@
 package com.gameplat.admin.controller.open.activity;
 
+import com.alibaba.fastjson.JSONArray;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.gameplat.admin.model.domain.ActivityInfo;
 import com.gameplat.admin.model.dto.ActivityInfoAddDTO;
-import com.gameplat.admin.model.dto.ActivityInfoDTO;
 import com.gameplat.admin.model.dto.ActivityInfoQueryDTO;
 import com.gameplat.admin.model.dto.ActivityInfoUpdateDTO;
 import com.gameplat.admin.model.vo.ActivityInfoVO;
+import com.gameplat.admin.model.vo.ValueDataVO;
 import com.gameplat.admin.service.ActivityInfoService;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.DateUtil;
@@ -16,23 +17,17 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.util.CollectionUtils;
+import org.springframework.web.bind.annotation.*;
+import springfox.documentation.annotations.ApiIgnore;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
-
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.util.CollectionUtils;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import springfox.documentation.annotations.ApiIgnore;
 
 /**
  * 活动管理
@@ -76,6 +71,9 @@ public class ActivityInfoController {
     @GetMapping("/detail")
     @PreAuthorize("hasAuthority('activity:info:view')")
     public ActivityInfoVO detail(Long id) {
+        if (id == null || id == 0) {
+            throw new ServiceException("活动id不能为空");
+        }
         return activityInfoService.detail(id);
     }
 
@@ -170,6 +168,20 @@ public class ActivityInfoController {
             }
         });
         return result;
+    }
+
+    /**
+     * 活动排序值列表
+     *
+     * @return
+     */
+    @ApiOperation(value = "活动排序值列表")
+    @GetMapping("/sortList")
+    @PreAuthorize("hasAuthority('activity:info:list')")
+    public List<ValueDataVO> sortList() {
+        String jsonStr = "[{\"name\":\"活动1\",\"value\":1},{\"name\":\"活动2\",\"value\":2},{\"name\":\"活动3\",\"value\":3},{\"name\":\"活动4\",\"value\":4},{\"name\":\"活动5\",\"value\":5},{\"name\":\"活动6\",\"value\":6},{\"name\":\"活动7\",\"value\":7},{\"name\":\"活动8\",\"value\":8},{\"name\":\"活动9\",\"value\":9},{\"name\":\"活动10\",\"value\":10}]";
+        List<ValueDataVO> valueDataVOS = JSONArray.parseArray(jsonStr, ValueDataVO.class);
+        return valueDataVOS;
     }
 
 }

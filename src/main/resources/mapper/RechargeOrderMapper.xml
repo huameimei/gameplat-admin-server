@@ -24,4 +24,63 @@
         GROUP BY member_id, account ) t
         WHERE rechargeMoney >= #{minRechargeAmount}
     </select>
+
+    <select id="findRechargeInfo" resultType="com.gameplat.admin.model.bean.ActivityStatisticItem">
+        SELECT
+        a.user_id as userId,
+        a.user_account as userName,
+        a.accumulativeRechargeAmount
+        <if test="rechargeValidAmount != null">
+            ,sum(ifnull( b.num, 0 )) AS accumulativeRechargeNum
+        </if>
+        FROM(
+        SELECT user_id, user_account, SUM( amount ) accumulativeRechargeAmount
+        FROM
+        recharge_order
+        <where>
+            <if test="payType != null and payType != ''">
+                and mode in (${payType})
+            </if>
+            <if test="startTime != null and startTime != ''">
+                AND add_time <![CDATA[>= ]]> #{startTime}
+            </if>
+            <if test="endTime != null and endTime != ''">
+                AND add_time <![CDATA[<= ]]> #{endTime}
+            </if>
+            and status = 3
+        </where>
+        GROUP BY user_id ) a
+        <if test="rechargeValidAmount != null">
+            LEFT JOIN ( SELECT user_id, CASE WHEN sum( amount ) >= #{rechargeValidAmount} THEN 1 ELSE 0 END num
+            FROM recharge_order
+            <where>
+                <if test="payType != null and payType != ''">
+                    and mode in (${payType})
+                </if>
+                <if test="startTime != null and startTime != ''">
+                    AND add_time <![CDATA[>= ]]> #{startTime}
+                </if>
+                <if test="endTime != null and endTime != ''">
+                    AND add_time <![CDATA[<= ]]> #{endTime}
+                </if>
+                and status = 3
+            </where>
+            GROUP BY user_id, date_format( add_time, '%Y-%m-%d' )) b ON a.user_id = b.user_id
+        </if>
+        <where>
+            <if test="userIdList != null and userIdList.size > 0">
+                and a.user_id in
+                <foreach collection="userIdList" index="index" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="userNameList != null and userNameList.size > 0">
+                and a.user_account in
+                <foreach collection="userNameList" index="index" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+        GROUP BY a.user_id
+    </select>
 </mapper>

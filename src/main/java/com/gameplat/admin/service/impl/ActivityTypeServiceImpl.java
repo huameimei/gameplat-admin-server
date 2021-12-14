@@ -116,6 +116,21 @@ public class ActivityTypeServiceImpl extends ServiceImpl<ActivityTypeMapper, Act
         }
     }
 
+    @Override
+    public List<ActivityTypeVO> listAll(String language) {
+        if (StringUtils.isBlank(language)) {
+            throw new ServiceException("语言不能为空");
+        }
+        List<ActivityType> list = this.lambdaQuery().eq(ActivityType::getLanguage, language).list();
+        List<ActivityTypeVO> activityTypeVOList = new ArrayList<>();
+        if (CollectionUtils.isNotEmpty(list)) {
+            for (ActivityType type : list) {
+                activityTypeVOList.add(activityTypeConvert.toVo(type));
+            }
+        }
+        return activityTypeVOList;
+    }
+
     /**
      * 查询是否已经存在
      *

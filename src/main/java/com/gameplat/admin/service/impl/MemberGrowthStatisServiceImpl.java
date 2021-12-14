@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.convert.MemberGrowthStatisConvert;
 import com.gameplat.admin.enums.LanguageEnum;
 import com.gameplat.admin.mapper.MemberGrowthStatisMapper;
+import com.gameplat.admin.model.bean.ActivityMemberInfo;
 import com.gameplat.admin.model.domain.MemberGrowthStatis;
 import com.gameplat.admin.model.dto.MemberGrowthStatisDTO;
 import com.gameplat.admin.model.vo.MemberGrowthConfigVO;
@@ -16,6 +17,8 @@ import com.gameplat.admin.service.MemberGrowthLevelService;
 import com.gameplat.admin.service.MemberGrowthStatisService;
 import com.gameplat.base.common.exception.ServiceException;
 import java.util.List;
+import java.util.Map;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -89,5 +92,10 @@ public class MemberGrowthStatisServiceImpl extends ServiceImpl<MemberGrowthStati
         if(growthStatisMapper.insertOrUpdate(userGrowthStatis) <= 0){
             throw new ServiceException("操作失败");
         }
+    }
+
+    @Override
+    public List<ActivityMemberInfo> findActivityMemberInfo(Map map) {
+        return growthStatisMapper.findActivityMemberInfo(map);
     }
 }

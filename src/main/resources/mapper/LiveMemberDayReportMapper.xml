@@ -99,6 +99,93 @@
     GROUP BY t.`member_id`, t.`game_code`, t.`game_kind`
   </select>
 
+    <select id="getGameReportInfo" resultType="com.gameplat.admin.model.bean.ActivityStatisticItem">
+      SELECT
+      a.user_name userName,
+      a.cumulativeGameDml,
+      a.gameWinAmount
+      <if test="sportValidAmount != null">
+        ,sum(ifnull( b.num, 0 )) AS cumulativeGameDmDays
+      </if>
+      FROM(
+      SELECT user_name, SUM( valid_amount ) cumulativeGameDml, SUM( win_amount ) gameWinAmount
+      FROM
+      member_game_day_report
+      <where>
+        <if test="startTime != null">
+          and count_date <![CDATA[ >= ]]> date_format(#{startTime}, '%Y-%m-%d')
+        </if>
+        <if test="endTime != null">
+          and count_date <![CDATA[ <= ]]> date_format(#{endTime}, '%Y-%m-%d')
+        </if>
+        <if test="sportGameList != null and sportGameList != ''">
+          and find_in_set(first_kind, #{sportGameList})
+        </if>
+      </where>
+      GROUP BY user_name ) a
+      <if test="sportValidAmount != null">
+        LEFT JOIN ( SELECT user_name, CASE WHEN sum( valid_amount ) >= #{sportValidAmount} THEN
+        1 ELSE 0
+        END num
+        FROM member_game_day_report
+        <where>
+          <if test="startTime != null">
+            and count_date <![CDATA[ >= ]]> date_format(#{startTime}, '%Y-%m-%d')
+          </if>
+          <if test="endTime != null">
+            and count_date <![CDATA[ <= ]]> date_format(#{endTime}, '%Y-%m-%d')
+          </if>
+          <if test="sportGameList != null and sportGameList != ''">
+            and find_in_set(first_kind, #{sportGameList})
+          </if>
+        </where>
+        GROUP BY user_name,count_date ) b ON a.user_name = b.user_name
+      </if>
+      <where>
+        <if test="userNameList != null and userNameList.size > 0">
+          AND a.user_name in
+          <foreach collection="userNameList" index="index" item="item" open="(" close=")" separator=",">
+            #{item}
+          </foreach>
+        </if>
+      </where>
+      GROUP BY a.user_name
+    </select>
+
+  <select id="findGameDmlDateList" resultType="com.gameplat.admin.model.bean.ActivityStatisticItem">
+    SELECT
+    user_name userName,
+    GROUP_CONCAT(DISTINCT(count_date)) AS gameCountDates
+    FROM
+    ( SELECT user_name, count_date, sum( valid_amount ) AS totalAmount
+    FROM
+    member_game_day_report
+    <where>
+      <if test="userNameList != null and userNameList.size > 0">
+        and user_name in
+        <foreach collection="userNameList" index="index" item="item" open="(" close=")" separator=",">
+          #{item}
+        </foreach>
+      </if>
+      <if test="startTime != null">
+        and count_date <![CDATA[ >= ]]> date_format(#{startTime}, '%Y-%m-%d')
+      </if>
+      <if test="endTime != null">
+        and count_date <![CDATA[ <= ]]> date_format(#{endTime}, '%Y-%m-%d')
+      </if>
+      <if test="sportGameList != null and sportGameList != ''">
+        and find_in_set(first_kind, #{sportGameList})
+      </if>
+    </where>
+    GROUP BY user_name, count_date ) AS a
+    <where>
+      <if test="sportValidAmount != null">
+        and totalAmount >= #{sportValidAmount}
+      </if>
+    </where>
+    GROUP BY a.user_name
+  </select>
+
 
   <insert id="saveMemberDayReport">
     INSERT INTO live_member_day_report (account, bet_amount, valid_amount, win_amount, stat_time,

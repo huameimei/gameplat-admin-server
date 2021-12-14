@@ -8,6 +8,7 @@ import com.gameplat.admin.convert.ActivityInfoConvert;
 import com.gameplat.admin.enums.SysBannerInfoEnum;
 import com.gameplat.admin.mapper.ActivityInfoMapper;
 import com.gameplat.admin.model.domain.ActivityInfo;
+import com.gameplat.admin.model.domain.ActivityLobby;
 import com.gameplat.admin.model.domain.ActivityType;
 import com.gameplat.admin.model.domain.SysBannerInfo;
 import com.gameplat.admin.model.dto.ActivityInfoAddDTO;
@@ -15,6 +16,7 @@ import com.gameplat.admin.model.dto.ActivityInfoQueryDTO;
 import com.gameplat.admin.model.dto.ActivityInfoUpdateDTO;
 import com.gameplat.admin.model.vo.ActivityInfoVO;
 import com.gameplat.admin.service.ActivityInfoService;
+import com.gameplat.admin.service.ActivityLobbyService;
 import com.gameplat.admin.service.ActivityTypeService;
 import com.gameplat.admin.service.SysBannerInfoService;
 import com.gameplat.base.common.exception.ServiceException;
@@ -43,6 +45,9 @@ public class ActivityInfoServiceImpl
     @Autowired
     private ActivityTypeService activityTypeService;
 
+    @Autowired
+    private ActivityLobbyService activityLobbyService;
+
     /**
      * 列表查询
      *
@@ -63,13 +68,31 @@ public class ActivityInfoServiceImpl
                         , ActivityInfo::getStatus, activityInfoQueryDTO.getStatus())
                 .eq(activityInfoQueryDTO.getActivityLobbyId() != null && activityInfoQueryDTO.getActivityLobbyId() != 0
                         , ActivityInfo::getActivityLobbyId, activityInfoQueryDTO.getActivityLobbyId());
-
-        return queryWrapper.page(page).convert(activityInfoConvert::toVo);
+        IPage<ActivityInfoVO> page1 = queryWrapper.page(page).convert(activityInfoConvert::toVo);
+        if (CollectionUtils.isNotEmpty(page1.getRecords())) {
+            for (ActivityInfoVO activityInfoVO : page1.getRecords()) {
+                //查询类型
+                ActivityType activityType = activityTypeService.getById(activityInfoVO.getType());
+                if (activityType != null) {
+                    activityInfoVO.setTypeCode(activityType.getTypeCode());
+                    activityInfoVO.setTypeName(activityType.getTypeName());
+                }
+                //活动大厅名称
+                ActivityLobby activityLobby = activityLobbyService.getById(activityInfoVO.getActivityLobbyId());
+                if (activityLobby != null) {
+                    activityInfoVO.setActivityLobbyName(activityLobby.getTitle());
+                }
+            }
+        }
+        return page1;
     }
 
     @Override
     public ActivityInfoVO detail(Long id) {
         ActivityInfo activityInfo = this.getById(id);
+        if (activityInfo == null) {
+            throw new ServiceException("该活动不存在");
+        }
         ActivityInfoVO activityInfoVO = activityInfoConvert.toVo(activityInfo);
         return activityInfoVO;
     }

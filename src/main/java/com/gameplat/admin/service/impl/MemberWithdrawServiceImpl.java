@@ -16,7 +16,6 @@ import com.gameplat.admin.enums.BlacklistConstant.BizBlacklistType;
 import com.gameplat.admin.enums.CashEnum;
 import com.gameplat.admin.enums.ProxyPayStatusEnum;
 import com.gameplat.admin.enums.TranTypes;
-import com.gameplat.admin.enums.UserStates;
 import com.gameplat.admin.enums.WithdrawStatus;
 import com.gameplat.admin.mapper.MemberWithdrawMapper;
 import com.gameplat.admin.model.bean.AdminLimitInfo;
@@ -55,6 +54,7 @@ import com.gameplat.base.common.snowflake.IdGeneratorSnowflake;
 import com.gameplat.base.common.util.DateUtil;
 import com.gameplat.base.common.util.StringUtils;
 import com.gameplat.common.enums.LimitEnums;
+import com.gameplat.common.enums.MemberEnums;
 import com.gameplat.common.enums.UserTypes;
 import com.gameplat.common.model.bean.Builder;
 import com.gameplat.common.model.bean.limit.MemberRechargeLimit;
@@ -643,7 +643,7 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
     }
     if (checkUserState) {
       // 查询用户是否正常
-      if (!UserStates.isMoneyDeal(member.getStatus())) {
+      if (!MemberEnums.Status.ENABlED.match(member.getStatus())) {
         throw new ServiceException("用户已经被冻结");
       }
     }

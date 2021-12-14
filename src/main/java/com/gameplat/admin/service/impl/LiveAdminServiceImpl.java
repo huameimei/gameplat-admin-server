@@ -11,17 +11,17 @@ import com.gameplat.admin.service.LiveTransferRecordService;
 import com.gameplat.admin.service.MemberBillService;
 import com.gameplat.admin.service.MemberInfoService;
 import com.gameplat.admin.service.MemberService;
-import com.gameplat.admin.service.live.GameApi;
+import com.gameplat.admin.service.game.GameApi;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.DateUtil;
 import com.gameplat.common.enums.GamePlatformEnum;
 import com.gameplat.common.enums.LiveTransferStatus;
 import com.gameplat.common.enums.TranTypes;
 import com.gameplat.common.enums.TransferTypesEnum;
-import com.gameplat.common.live.TransferResource;
-import com.gameplat.common.live.exception.LiveException;
-import com.gameplat.common.live.exception.LiveNoRollbackTransferException;
-import com.gameplat.common.live.exception.LiveRollbackException;
+import com.gameplat.common.game.TransferResource;
+import com.gameplat.common.game.exception.LiveException;
+import com.gameplat.common.game.exception.LiveNoRollbackTransferException;
+import com.gameplat.common.game.exception.LiveRollbackException;
 import com.gameplat.common.util.CNYUtils;
 import java.math.BigDecimal;
 import java.util.Date;
@@ -30,7 +30,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationContext;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -333,11 +332,14 @@ public class LiveAdminServiceImpl implements LiveAdminService {
     gameApi.isOpen();
     //2.获取会员在游戏平台的余额
     BigDecimal balance = gameApi.getBalance(account);
-    if (!transferType && balance.compareTo(BigDecimal.ONE) < 0){
-      log.info(transferIn+"真人余额不足,不能转出"+balance);
-      return;
+    //自动转动实际上回收的是在第三方游戏的所有余额
+    if (!transferType){
+      amount = balance;
+      if(balance.compareTo(BigDecimal.ONE) < 0) {
+        log.info(transferIn + "真人余额不足,不能转出" + balance);
+        return;
+      }
     }
-
     MemberInfo memberInfo = memberInfoService.getById(member.getId());
     Object[] params = null;
     String orderNo = gameApi.generateOrderNo(params);

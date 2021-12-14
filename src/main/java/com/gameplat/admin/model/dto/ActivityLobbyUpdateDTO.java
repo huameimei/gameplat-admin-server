@@ -4,16 +4,19 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.gameplat.base.common.util.DateUtil;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 import javax.validation.constraints.NotBlank;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 /**
  * 活动大厅更新DTO
+ *
  * @Author: kenvin
  * @Description:
  */
@@ -33,12 +36,12 @@ public class ActivityLobbyUpdateDTO implements Serializable {
 
     @NotBlank(message = "开始时间不能为空")
     @ApiModelProperty(value = "开始时间")
-    @JsonFormat(pattern= DateUtil.YYYY_MM_DD_HH_MM_SS)
+    @JsonFormat(pattern = DateUtil.YYYY_MM_DD_HH_MM_SS)
     private Date startTime;
 
     @NotBlank(message = "结束时间不能为空")
     @ApiModelProperty(value = "结束时间")
-    @JsonFormat(pattern= DateUtil.YYYY_MM_DD_HH_MM_SS)
+    @JsonFormat(pattern = DateUtil.YYYY_MM_DD_HH_MM_SS)
     private Date endTime;
 
     @ApiModelProperty(value = "活动大类")
@@ -86,9 +89,6 @@ public class ActivityLobbyUpdateDTO implements Serializable {
 
     @ApiModelProperty(value = "ip黑名单")
     private String ipBlacklist;
-
-    @ApiModelProperty(value = "申请路径")
-    private String applyUrl;
 
     @ApiModelProperty(value = "活动大厅优惠")
     private List<ActivityLobbyDiscountDTO> lobbyDiscountList;

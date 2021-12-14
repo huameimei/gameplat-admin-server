@@ -1,22 +1,21 @@
-package com.gameplat.admin.service.live.api.ae.feign;
+package com.gameplat.admin.service.game.api.ae.feign;
 
 
-import com.gameplat.admin.service.live.api.ae.bean.AeCheckTransferOperationReq;
-import com.gameplat.admin.service.live.api.ae.bean.AeCheckTransferOperationResp;
-import com.gameplat.admin.service.live.api.ae.bean.AeCreateMemberReq;
-import com.gameplat.admin.service.live.api.ae.bean.AeDepositReq;
-import com.gameplat.admin.service.live.api.ae.bean.AeDepositResp;
-import com.gameplat.admin.service.live.api.ae.bean.AeLoginAndLaunchRep;
-import com.gameplat.admin.service.live.api.ae.bean.AeLoginAndLaunchReq;
-import com.gameplat.admin.service.live.api.ae.bean.AeResponse;
-import com.gameplat.admin.service.live.api.ae.bean.AeGetBalanceRep;
-import com.gameplat.admin.service.live.api.ae.bean.AeGetBalanceReq;
-import com.gameplat.admin.service.live.api.ae.bean.AeWithdrawReq;
-import com.gameplat.admin.service.live.api.ae.bean.AeWithdrawResp;
-import com.gameplat.admin.service.live.config.FeignFormConfig;
+import com.gameplat.admin.service.game.config.FeignFormConfig;
+import com.gameplat.common.game.api.ae.bean.AeCheckTransferOperationReq;
+import com.gameplat.common.game.api.ae.bean.AeCheckTransferOperationResp;
+import com.gameplat.common.game.api.ae.bean.AeCreateMemberReq;
+import com.gameplat.common.game.api.ae.bean.AeDepositReq;
+import com.gameplat.common.game.api.ae.bean.AeDepositResp;
+import com.gameplat.common.game.api.ae.bean.AeGetBalanceRep;
+import com.gameplat.common.game.api.ae.bean.AeGetBalanceReq;
+import com.gameplat.common.game.api.ae.bean.AeLoginAndLaunchRep;
+import com.gameplat.common.game.api.ae.bean.AeLoginAndLaunchReq;
+import com.gameplat.common.game.api.ae.bean.AeResponse;
+import com.gameplat.common.game.api.ae.bean.AeWithdrawReq;
+import com.gameplat.common.game.api.ae.bean.AeWithdrawResp;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.cloud.openfeign.SpringQueryMap;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PostMapping;
 
@@ -26,10 +25,7 @@ import org.springframework.web.bind.annotation.PostMapping;
     configuration = FeignFormConfig.class)
 public interface AeFeignClient {
 
-  @PostMapping(value = "/wallet/getBalance",
-      headers = HttpHeaders.ACCEPT+"="+MediaType.APPLICATION_FORM_URLENCODED_VALUE,
-      consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE ,
-      produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+  @PostMapping(value = "/wallet/getBalance", produces = MediaType.APPLICATION_JSON_VALUE)
   AeGetBalanceRep getBalance(@SpringQueryMap AeGetBalanceReq req);
 
 

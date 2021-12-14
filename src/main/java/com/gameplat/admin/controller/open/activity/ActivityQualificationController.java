@@ -19,6 +19,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
+import java.util.Map;
+
 /**
  * 活动资格管理
  *
@@ -111,8 +113,8 @@ public class ActivityQualificationController {
     @ApiOperation(value = "资格检测")
     @PutMapping("/checkQualification")
     @PreAuthorize("hasAuthority('activity:qualification:check')")
-    public void checkQualification(@RequestBody ActivityQualificationCheckDTO activityQualificationCheckDTO) {
-        activityQualificationService.checkQualification(activityQualificationCheckDTO);
+    public Map<String, Object> checkQualification(@RequestBody ActivityQualificationCheckDTO activityQualificationCheckDTO) {
+        return activityQualificationService.checkQualification(activityQualificationCheckDTO);
     }
 
 }

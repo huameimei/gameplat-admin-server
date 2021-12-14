@@ -2,21 +2,22 @@ package com.gameplat.admin.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
+import com.baomidou.mybatisplus.extension.service.IService;
 import com.gameplat.admin.model.domain.ActivityQualification;
 import com.gameplat.admin.model.dto.*;
 import com.gameplat.admin.model.vo.ActivityQualificationVO;
 
 import java.util.List;
+import java.util.Map;
 
 
 /**
  * 参加活动资格查询
  *
- * @author lyq
+ * @author kenvin
  * @Description 业务实现层
- * @date 2020-08-20 11:32:32
  */
-public interface ActivityQualificationService {
+public interface ActivityQualificationService extends IService<ActivityQualification> {
 
     /**
      * 根据条件查询资格列表
@@ -75,5 +76,5 @@ public interface ActivityQualificationService {
      *
      * @param activityQualificationCheckDTO
      */
-    void checkQualification(ActivityQualificationCheckDTO activityQualificationCheckDTO);
+    Map<String, Object> checkQualification(ActivityQualificationCheckDTO activityQualificationCheckDTO);
 }

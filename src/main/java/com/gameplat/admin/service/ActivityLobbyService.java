@@ -2,15 +2,20 @@ package com.gameplat.admin.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
+import com.baomidou.mybatisplus.extension.service.IService;
 import com.gameplat.admin.model.domain.ActivityLobby;
+import com.gameplat.admin.model.domain.MemberInfo;
 import com.gameplat.admin.model.dto.*;
 import com.gameplat.admin.model.vo.ActivityLobbyVO;
+
 import java.util.List;
 
 /**
  * 活动大厅业务查询
+ *
+ * @author kenvin
  */
-public interface ActivityLobbyService {
+public interface ActivityLobbyService extends IService<ActivityLobby> {
 
 
     /**

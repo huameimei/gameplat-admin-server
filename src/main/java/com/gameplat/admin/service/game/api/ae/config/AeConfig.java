@@ -8,12 +8,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class AeConfig extends Properties {
 
-  @Resource
-  private LiveConfigEnvCache liveConfigEnvCache;
-
   public String getHost() {
 //    return this.getProperty("ae.host");
-    liveConfigEnvCache.
     return "https://tttint.onlinegames22.com";
   }
 

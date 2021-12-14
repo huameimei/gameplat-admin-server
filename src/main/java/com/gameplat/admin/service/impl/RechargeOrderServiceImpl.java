@@ -15,7 +15,6 @@ import com.gameplat.admin.enums.AllowOthersOperateEnums;
 import com.gameplat.admin.enums.BlacklistConstant.BizBlacklistType;
 import com.gameplat.admin.enums.MemberEnums.Type;
 import com.gameplat.admin.enums.RechargeStatus;
-import com.gameplat.admin.enums.UserStates;
 import com.gameplat.admin.mapper.RechargeOrderHistoryMapper;
 import com.gameplat.admin.mapper.RechargeOrderMapper;
 import com.gameplat.admin.model.bean.AdminLimitInfo;
@@ -53,6 +52,7 @@ import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.json.JsonUtils;
 import com.gameplat.base.common.snowflake.IdGeneratorSnowflake;
 import com.gameplat.common.enums.LimitEnums;
+import com.gameplat.common.enums.MemberEnums;
 import com.gameplat.common.enums.SwitchStatusEnum;
 import com.gameplat.common.enums.UserTypes;
 import com.gameplat.common.model.bean.limit.MemberRechargeLimit;
@@ -403,7 +403,7 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
     if (memberInfo == null) {
       throw new ServiceException("user_not_exist");
     }
-    if (!UserStates.DEFAULT.getValue().equals(member.getStatus())) {
+    if (!MemberEnums.Status.ENABlED.match(member.getStatus())) {
       log.error("--account:{},userId:{},state:{}--", member.getAccount(), member.getId(),
           member.getStatus());
       throw new ServiceException(String.format("会员账号已冻结:%s", member.getAccount()));

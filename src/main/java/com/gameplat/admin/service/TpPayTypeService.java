@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface TpPayTypeService extends IService<TpPayType> {
 
-  List<TpPayTypeVO> queryTpPayTypes(String interfaceCode);
+  List<TpPayTypeVO> queryTpPayTypes(String tpInterfaceCode);
 
   void deleteBatchIds(List<Long> ids);
 }

@@ -10,7 +10,7 @@ public class TpPayTypeVO extends Model<TpInterfaceVO> {
 
   private String payType;
 
-  private String interfaceCode;
+  private String tpInterfaceCode;
 
   private String name;
 

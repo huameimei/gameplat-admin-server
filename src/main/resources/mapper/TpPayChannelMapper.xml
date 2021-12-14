@@ -63,7 +63,7 @@
     FROM tp_pay_channel c
     LEFT JOIN tp_merchant m ON m.id = c.merchant_id
     LEFT JOIN tp_interface i ON i.code = m.tp_interface_code
-    LEFT JOIN tp_pay_type t ON t.interface_code = i.code AND t.code = c.tp_pay_type
+    LEFT JOIN tp_pay_type t ON t.tp_interface_code = i.code AND t.code = c.tp_pay_type
     LEFT JOIN pay_type p ON t.pay_type = p.code
     <include refid="where"/>
     ORDER BY c.sort ASC

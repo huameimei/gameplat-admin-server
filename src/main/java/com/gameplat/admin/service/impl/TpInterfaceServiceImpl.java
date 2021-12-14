@@ -57,7 +57,7 @@ public class TpInterfaceServiceImpl extends ServiceImpl<TpInterfaceMapper, TpInt
       throw new ServiceException("第三方接口不存在!");
     }
     LambdaQueryWrapper<TpPayType> query = Wrappers.lambdaQuery();
-    query.eq(TpPayType::getInterfaceCode, tpInterfacePayTypeVo.getCode());
+    query.eq(TpPayType::getTpInterfaceCode, tpInterfacePayTypeVo.getCode());
     tpInterfacePayTypeVo.setTpPayTypeList(tpPayTypeMapper.selectList(query));
     return tpInterfacePayTypeVo;
   }
@@ -68,7 +68,7 @@ public class TpInterfaceServiceImpl extends ServiceImpl<TpInterfaceMapper, TpInt
       throw new ServiceException("接口更新失败!");
     }
     LambdaQueryWrapper<TpPayType> query = Wrappers.lambdaQuery();
-    query.eq(TpPayType::getInterfaceCode, tpInterface.getCode());
+    query.eq(TpPayType::getTpInterfaceCode, tpInterface.getCode());
     List<TpPayType> tpPayTypeList = tpPayTypeService.list(query);
     // B-A差值
     List<TpPayType> resultList =
@@ -106,7 +106,7 @@ public class TpInterfaceServiceImpl extends ServiceImpl<TpInterfaceMapper, TpInt
     query.eq(TpInterface::getCode, tpInterface.getCode());
     tpInterfaceMapper.delete(query);
     LambdaQueryWrapper<TpPayType> tpPayType = Wrappers.lambdaQuery();
-    tpPayType.eq(TpPayType::getInterfaceCode, tpInterface.getCode());
+    tpPayType.eq(TpPayType::getTpInterfaceCode, tpInterface.getCode());
     tpPayTypeService.remove(tpPayType);
     tpInterfaceMapper.insert(tpInterface);
     tpPayTypeService.saveBatch(tpInterface.getTpPayTypeList());

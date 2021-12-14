@@ -18,7 +18,7 @@ public class TpPayTypeController {
 
   @PostMapping("/queryTpPayTypes")
   @PreAuthorize("hasAuthority('thirdParty:tpPayTypes:queryTpPayTypes')")
-  public List<TpPayTypeVO> getTpPayTypes(String interfaceCode) {
-    return payTypeService.queryTpPayTypes(interfaceCode);
+  public List<TpPayTypeVO> getTpPayTypes(String tpInterfaceCode) {
+    return payTypeService.queryTpPayTypes(tpInterfaceCode);
   }
 }

@@ -5,9 +5,13 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.gameplat.admin.model.domain.ActivityRedPacket;
 import com.gameplat.admin.model.dto.ActivityRedPacketAddDTO;
+import com.gameplat.admin.model.dto.ActivityRedPacketDiscountDTO;
 import com.gameplat.admin.model.dto.ActivityRedPacketQueryDTO;
 import com.gameplat.admin.model.dto.ActivityRedPacketUpdateDTO;
 import com.gameplat.admin.model.vo.ActivityRedPacketVO;
+import com.gameplat.admin.model.vo.MemberActivityPrizeVO;
+
+import java.util.List;
 
 /**
  * 红包雨业务
@@ -50,4 +54,12 @@ public interface ActivityRedPacketService extends IService<ActivityRedPacket> {
      * @param ids
      */
     void delete(String ids);
+
+    /**
+     * 查询优惠列表
+     *
+     * @param activityRedPacketDiscountDTO
+     * @return
+     */
+    Object discountList(ActivityRedPacketDiscountDTO activityRedPacketDiscountDTO);
 }

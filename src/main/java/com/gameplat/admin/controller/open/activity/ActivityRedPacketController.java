@@ -4,9 +4,11 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.gameplat.admin.model.domain.ActivityRedPacket;
 import com.gameplat.admin.model.dto.ActivityRedPacketAddDTO;
+import com.gameplat.admin.model.dto.ActivityRedPacketDiscountDTO;
 import com.gameplat.admin.model.dto.ActivityRedPacketQueryDTO;
 import com.gameplat.admin.model.dto.ActivityRedPacketUpdateDTO;
 import com.gameplat.admin.model.vo.ActivityRedPacketVO;
+import com.gameplat.admin.model.vo.MemberActivityPrizeVO;
 import com.gameplat.admin.service.ActivityRedPacketService;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.StringUtils;
@@ -20,10 +22,12 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
+import java.util.List;
+
 /**
  * 活动红包雨
  *
- * @author admin
+ * @author kenvin
  */
 @Slf4j
 @RestController
@@ -123,6 +127,9 @@ public class ActivityRedPacketController {
     @ApiOperation(value = "更新红包雨状态")
     @PutMapping("/updateStatus")
     @PreAuthorize("hasAuthority('activity:redpacket:edit')")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "packetId", value = "红包ID"),
+    })
     public void updateStatus(@RequestParam Long packetId) {
         activityRedPacketService.updateStatus(packetId);
     }
@@ -137,6 +144,25 @@ public class ActivityRedPacketController {
     @PreAuthorize("hasAuthority('activity:redpacket:remove')")
     public void delete(@RequestBody String ids) {
         activityRedPacketService.delete(ids);
+    }
+
+    /**
+     * 查询红包雨优惠列表
+     *
+     * @param activityRedPacketDiscountDTO
+     * @return
+     */
+    @ApiOperation(value = "查询红包雨优惠列表")
+    @GetMapping("/discountList")
+    @PreAuthorize("hasAuthority('activity:redpacket:list')")
+    public Object discountList(@RequestBody ActivityRedPacketDiscountDTO activityRedPacketDiscountDTO) {
+        if (activityRedPacketDiscountDTO.getId() == null || activityRedPacketDiscountDTO.getId() == 0) {
+            throw new ServiceException("红包雨id不能为空");
+        }
+        if (activityRedPacketDiscountDTO.getType() == null || activityRedPacketDiscountDTO.getType() == 0) {
+            throw new ServiceException("类型不能为空");
+        }
+        return activityRedPacketService.discountList(activityRedPacketDiscountDTO);
     }
 
 

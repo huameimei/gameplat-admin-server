@@ -6,11 +6,17 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.convert.ActivityRedPacketConvert;
 import com.gameplat.admin.mapper.ActivityRedPacketMapper;
+import com.gameplat.admin.model.domain.ActivityRedPacketCondition;
+import com.gameplat.admin.model.vo.MemberActivityPrizeVO;
+import com.gameplat.admin.model.domain.ActivityPrize;
 import com.gameplat.admin.model.domain.ActivityRedPacket;
 import com.gameplat.admin.model.dto.ActivityRedPacketAddDTO;
+import com.gameplat.admin.model.dto.ActivityRedPacketDiscountDTO;
 import com.gameplat.admin.model.dto.ActivityRedPacketQueryDTO;
 import com.gameplat.admin.model.dto.ActivityRedPacketUpdateDTO;
 import com.gameplat.admin.model.vo.ActivityRedPacketVO;
+import com.gameplat.admin.service.ActivityPrizeService;
+import com.gameplat.admin.service.ActivityRedPacketConditionService;
 import com.gameplat.admin.service.ActivityRedPacketService;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.StringUtils;
@@ -31,6 +37,13 @@ public class ActivityRedPacketServiceImpl extends ServiceImpl<ActivityRedPacketM
 
     @Autowired
     private ActivityRedPacketConvert activityRedPacketConvert;
+
+    @Autowired
+    private ActivityPrizeService activityPrizeService;
+
+    @Autowired
+    private ActivityRedPacketConditionService activityRedPacketConditionService;
+
 
     @Override
     public IPage<ActivityRedPacketVO> redPacketList(PageDTO<ActivityRedPacket> page, ActivityRedPacketQueryDTO activityRedPacketQueryDTO) {
@@ -88,6 +101,23 @@ public class ActivityRedPacketServiceImpl extends ServiceImpl<ActivityRedPacketM
             idList.add(Long.parseLong(idStr));
         }
         this.removeByIds(idList);
+    }
+
+    @Override
+    public Object discountList(ActivityRedPacketDiscountDTO activityRedPacketDiscountDTO) {
+        if (activityRedPacketDiscountDTO.getType() == 1) {
+            MemberActivityPrizeVO memberActivityPrizeBean = new MemberActivityPrizeVO();
+            memberActivityPrizeBean.setActivityId(activityRedPacketDiscountDTO.getId());
+            memberActivityPrizeBean.setType(1);
+            List<MemberActivityPrizeVO> prizeBeanList =
+                    activityPrizeService.findActivityPrizeList(memberActivityPrizeBean);
+            return prizeBeanList;
+        } else if (activityRedPacketDiscountDTO.getType() == 2) {
+            return activityRedPacketConditionService.lambdaQuery()
+                    .eq(ActivityRedPacketCondition::getRedPacketId, activityRedPacketDiscountDTO.getId())
+                    .list();
+        }
+        return new ArrayList<>();
     }
 
 

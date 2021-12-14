@@ -1,4 +1,4 @@
-package com.gameplat.admin.model.dto;
+package com.gameplat.admin.model.domain;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -13,15 +13,16 @@ import java.util.Date;
 
 /**
  * <p>
- * 活动奖品DTO
+ * 活动奖品表
  * </p>
  *
  * @since 2020-06-05
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
+@TableName("activity_prize")
 @ApiModel(value = "ActivityPrize对象", description = "活动奖品表")
-public class ActivityPrizeDTO implements Serializable {
+public class ActivityPrize implements Serializable {
 
     private static final long serialVersionUID = 1L;
 

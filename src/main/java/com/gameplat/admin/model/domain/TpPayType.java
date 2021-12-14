@@ -7,6 +7,8 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModelProperty;
+
+import java.math.BigDecimal;
 import java.util.Date;
 import lombok.Data;
 
@@ -21,7 +23,10 @@ public class TpPayType {
   private String payType;
 
   @ApiModelProperty(value = "第三方入款接口编码")
-  private String interfaceCode;
+  private String tpInterfaceCode;
+
+  @ApiModelProperty(value = "金额范围")
+  private BigDecimal amountDeviation;
 
   @ApiModelProperty(value = "版本号")
   private String version;

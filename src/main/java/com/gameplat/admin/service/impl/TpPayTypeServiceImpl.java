@@ -28,7 +28,7 @@ public class TpPayTypeServiceImpl extends ServiceImpl<TpPayTypeMapper, TpPayType
   @Override
   public List<TpPayTypeVO> queryTpPayTypes(String interfaceCode) {
     LambdaQueryWrapper<TpPayType> query = Wrappers.lambdaQuery();
-    query.eq(TpPayType::getInterfaceCode, interfaceCode);
+    query.eq(TpPayType::getTpInterfaceCode, interfaceCode);
     return this.list(query).stream()
         .map(e -> tpPayTypeConvert.toVo(e))
         .collect(Collectors.toList());

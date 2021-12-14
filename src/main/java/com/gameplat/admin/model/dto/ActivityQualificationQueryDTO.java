@@ -27,7 +27,13 @@ public class ActivityQualificationQueryDTO implements Serializable {
     @ApiModelProperty(value = "资格状态（0 禁用，1 启用）")
     private Integer qualificationStatus;
 
-    @ApiModelProperty(value = "状态（0 无效，1 申请中，2 已审核）")
+    @ApiModelProperty(value = "审核状态（0 无效，1 申请中，2 已审核）")
     private Integer status;
+
+    @ApiModelProperty(value = "申请开始时间")
+    private String applyStartTime;
+
+    @ApiModelProperty(value = "申请结束时间")
+    private String applyEndTime;
 
 }

@@ -4,15 +4,18 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.gameplat.base.common.util.DateUtil;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 /**
  * 活动大厅DTO
+ *
  * @Author: lyq
  * @Date: 2020/8/14 15:15
  * @Description:
@@ -83,9 +86,6 @@ public class ActivityLobbyDTO implements Serializable {
 
     @ApiModelProperty(value = "ip黑名单")
     private String ipBlacklist;
-
-    @ApiModelProperty(value = "申请路径")
-    private String applyUrl;
 
     @ApiModelProperty(value = "活动大厅优惠")
     private List<ActivityLobbyDiscountDTO> lobbyDiscountList;

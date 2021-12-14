@@ -99,9 +99,6 @@ public class ActivityLobbyVO implements Serializable {
     @ApiModelProperty(value = "更新时间")
     private Date updateTime;
 
-    @ApiModelProperty(value = "申请路径")
-    private String applyUrl;
-
     @ApiModelProperty(value = "领取方式（1 红包，2 通知）")
     private Integer getWay;
 

@@ -1,9 +1,11 @@
 package com.gameplat.admin.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.gameplat.admin.model.bean.ActivityMemberInfo;
 import com.gameplat.admin.model.domain.MemberGrowthStatis;
 import com.gameplat.admin.model.domain.MemberWealDetail;
 import java.util.List;
+import java.util.Map;
 
 public interface MemberGrowthStatisMapper extends BaseMapper<MemberGrowthStatis> {
 
@@ -14,4 +16,6 @@ public interface MemberGrowthStatisMapper extends BaseMapper<MemberGrowthStatis>
 
 
     int insertOrUpdate(MemberGrowthStatis memberGrowthStatis);
+
+    List<ActivityMemberInfo> findActivityMemberInfo(Map map);
 }

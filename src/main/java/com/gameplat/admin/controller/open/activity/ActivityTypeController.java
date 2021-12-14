@@ -197,4 +197,30 @@ public class ActivityTypeController {
         return codeDataVOList;
     }
 
+    /**
+     * 活动板块查询所有列表
+     *
+     * @param language
+     * @param country
+     * @return
+     */
+    @ApiOperation(value = "活动板块查询所有列表")
+    @GetMapping("/listAll")
+    @PreAuthorize("hasAuthority('activity:type:list')")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "language", value = "语言"),
+            @ApiImplicitParam(name = "country", value = "国家"),
+
+    })
+    public List<ActivityTypeVO> listAll(@RequestParam(value = "language", required = false) String language,
+                                        @RequestHeader(value = "country", defaultValue = "zh-CN", required = false) String country) {
+        if (StringUtils.isBlank(language)) {
+            language = country;
+        }
+        if (StringUtils.isBlank(language)) {
+            throw new ServiceException("语言language参数必传");
+        }
+        return activityTypeService.listAll(language);
+    }
+
 }

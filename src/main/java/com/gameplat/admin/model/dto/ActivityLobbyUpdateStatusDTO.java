@@ -2,13 +2,16 @@ package com.gameplat.admin.model.dto;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+
 import java.io.Serializable;
 import javax.validation.constraints.NotBlank;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 /**
  * 活动大厅更新状态DTO
+ *
  * @Author: kenvin
  * @Description:
  */
@@ -32,9 +35,6 @@ public class ActivityLobbyUpdateStatusDTO implements Serializable {
 
     @ApiModelProperty(value = "ip黑名单")
     private String ipBlacklist;
-
-    @ApiModelProperty(value = "申请路径")
-    private String applyUrl;
 
     @NotBlank(message = "活动状态必选")
     @ApiModelProperty(value = "活动状态（0 关闭，1 开启，2 失效）")

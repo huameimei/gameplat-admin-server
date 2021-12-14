@@ -1,4 +1,4 @@
-package com.gameplat.admin.service.live;
+package com.gameplat.admin.service.game;
 
 import java.io.Serializable;
 import lombok.Data;

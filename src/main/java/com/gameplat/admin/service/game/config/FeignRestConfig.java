@@ -1,4 +1,4 @@
-package com.gameplat.admin.service.live.config;
+package com.gameplat.admin.service.game.config;
 
 import feign.Logger;
 import java.util.concurrent.TimeUnit;

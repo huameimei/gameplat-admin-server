@@ -1,11 +1,10 @@
-package com.gameplat.admin.consumer.ae;
+package com.gameplat.admin.consumer;
 
 import org.springframework.cloud.stream.annotation.Input;
 import org.springframework.messaging.MessageChannel;
 
-public interface AeSink {
-
-  String INPUT = "aeInput";
+public interface LiveConfigSink {
+  String INPUT = "liveConfigInput";
 
   @Input(INPUT)
   MessageChannel input();

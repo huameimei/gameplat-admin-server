@@ -1,9 +1,9 @@
-package com.gameplat.admin.service.live;
+package com.gameplat.admin.service.game;
 
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.RandomUtil;
-import com.gameplat.common.live.LiveGameResult;
-import com.gameplat.common.live.TransferResource;
+import com.gameplat.common.game.LiveGameResult;
+import com.gameplat.common.game.TransferResource;
 import java.math.BigDecimal;
 
 public interface GameApi {

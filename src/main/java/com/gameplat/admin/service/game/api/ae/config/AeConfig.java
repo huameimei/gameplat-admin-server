@@ -1,13 +1,19 @@
-package com.gameplat.admin.service.live.api.ae.bean;
+package com.gameplat.admin.service.game.api.ae.config;
 
+import com.gameplat.admin.component.LiveConfigEnvCache;
 import java.util.Properties;
+import javax.annotation.Resource;
 import org.springframework.stereotype.Component;
 
 @Component
 public class AeConfig extends Properties {
 
+  @Resource
+  private LiveConfigEnvCache liveConfigEnvCache;
+
   public String getHost() {
 //    return this.getProperty("ae.host");
+    liveConfigEnvCache.
     return "https://tttint.onlinegames22.com";
   }
 

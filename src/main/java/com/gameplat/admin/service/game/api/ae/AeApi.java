@@ -1,31 +1,31 @@
-package com.gameplat.admin.service.live.api.ae;
+package com.gameplat.admin.service.game.api.ae;
 
 
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.json.JSONUtil;
-import com.gameplat.admin.service.live.GameApi;
-import com.gameplat.admin.service.live.api.ae.bean.AeCheckTransferOperationReq;
-import com.gameplat.admin.service.live.api.ae.bean.AeCheckTransferOperationResp;
-import com.gameplat.admin.service.live.api.ae.bean.AeConfig;
-import com.gameplat.admin.service.live.api.ae.bean.AeCreateMemberReq;
-import com.gameplat.admin.service.live.api.ae.bean.AeDepositReq;
-import com.gameplat.admin.service.live.api.ae.bean.AeDepositResp;
-import com.gameplat.admin.service.live.api.ae.bean.AeLoginAndLaunchRep;
-import com.gameplat.admin.service.live.api.ae.bean.AeLoginAndLaunchReq;
-import com.gameplat.admin.service.live.api.ae.bean.AeResponse;
-import com.gameplat.admin.service.live.api.ae.bean.AeGetBalanceRep;
-import com.gameplat.admin.service.live.api.ae.bean.AeGetBalanceReq;
-import com.gameplat.admin.service.live.api.ae.bean.AeWithdrawReq;
-import com.gameplat.admin.service.live.api.ae.bean.AeWithdrawResp;
-import com.gameplat.admin.service.live.api.ae.enums.API;
-import com.gameplat.admin.service.live.api.ae.enums.AeStatus;
-import com.gameplat.admin.service.live.api.ae.enums.WithdrawType;
-import com.gameplat.admin.service.live.api.ae.feign.AeFeignClient;
+import com.gameplat.admin.service.game.GameApi;
+import com.gameplat.admin.service.game.api.ae.config.AeConfig;
+import com.gameplat.admin.service.game.api.ae.feign.AeFeignClient;
 import com.gameplat.base.common.exception.ServiceException;
-import com.gameplat.common.live.TransferResource;
-import com.gameplat.common.live.exception.LiveException;
-import com.gameplat.common.live.exception.LiveNoRollbackTransferException;
-import com.gameplat.common.live.exception.LiveTimeOutException;
+import com.gameplat.common.game.TransferResource;
+import com.gameplat.common.game.api.ae.bean.AeCheckTransferOperationReq;
+import com.gameplat.common.game.api.ae.bean.AeCheckTransferOperationResp;
+import com.gameplat.common.game.api.ae.bean.AeCreateMemberReq;
+import com.gameplat.common.game.api.ae.bean.AeDepositReq;
+import com.gameplat.common.game.api.ae.bean.AeDepositResp;
+import com.gameplat.common.game.api.ae.bean.AeGetBalanceRep;
+import com.gameplat.common.game.api.ae.bean.AeGetBalanceReq;
+import com.gameplat.common.game.api.ae.bean.AeLoginAndLaunchRep;
+import com.gameplat.common.game.api.ae.bean.AeLoginAndLaunchReq;
+import com.gameplat.common.game.api.ae.bean.AeResponse;
+import com.gameplat.common.game.api.ae.bean.AeWithdrawReq;
+import com.gameplat.common.game.api.ae.bean.AeWithdrawResp;
+import com.gameplat.common.game.api.ae.enums.API;
+import com.gameplat.common.game.api.ae.enums.AeStatus;
+import com.gameplat.common.game.api.ae.enums.WithdrawType;
+import com.gameplat.common.game.exception.LiveException;
+import com.gameplat.common.game.exception.LiveNoRollbackTransferException;
+import com.gameplat.common.game.exception.LiveTimeOutException;
 import java.math.BigDecimal;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -81,7 +81,7 @@ public class AeApi implements GameApi {
           .map(NumberUtil::toBigDecimal)
           .orElse(BigDecimal.ZERO);
     } else {
-      throw new LiveException(aeGetBalanceRep.getStatus(), "", API.GET_BALANCE.getUrl(),
+      throw new LiveException(aeGetBalanceRep.getStatus(), aeGetBalanceRep.getDesc(), API.GET_BALANCE.getUrl(),
           JSONUtil.toJsonStr(aeGetBalanceReq), aeGetBalanceRep);
     }
   }
@@ -122,7 +122,7 @@ public class AeApi implements GameApi {
       if (AeStatus.SUCCESS.getValue().equals(aeLoginAndLaunchRep.getStatus())) {
         return aeLoginAndLaunchRep.getUrl();
       } else {
-        throw new LiveException(aeLoginAndLaunchRep.getStatus(), "", API.LOGIN_AND_LAUNCH.getUrl(),
+        throw new LiveException(aeLoginAndLaunchRep.getStatus(),aeLoginAndLaunchRep.getDesc(), API.LOGIN_AND_LAUNCH.getUrl(),
             JSONUtil.toJsonStr(params), aeLoginAndLaunchRep);
       }
     } catch (LiveException e) {
@@ -216,7 +216,7 @@ public class AeApi implements GameApi {
         result.setOrderNo(orderNum);
         return result;
       } else {
-        throw new LiveException(aeWithdrawResp.getStatus(), "",
+        throw new LiveException(aeWithdrawResp.getStatus(),aeWithdrawResp.getDesc(),
             API.TRANSER_OUT.getUrl(),
             JSONUtil.toJsonStr(aeWithdrawReq), aeWithdrawResp);
       }
@@ -272,7 +272,7 @@ public class AeApi implements GameApi {
           log.info("AE请求创建会员，账号已经存在");
           return;
         } else {
-          throw new LiveException(aeResponse.getStatus(), aeResponse.getDesc(), "",
+          throw new LiveException(aeResponse.getStatus(), aeResponse.getDesc(), API.CREATE_MEMBER.getUrl(),
               JSONUtil.toJsonStr(aeCreateMemberReq), aeResponse);
         }
       } catch (Exception e) {

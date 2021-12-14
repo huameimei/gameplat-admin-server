@@ -1,4 +1,4 @@
-package com.gameplat.admin.commpent;
+package com.gameplat.admin.component;
 
 import cn.hutool.core.date.DateUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;

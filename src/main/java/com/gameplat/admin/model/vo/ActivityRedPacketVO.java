@@ -3,6 +3,8 @@ package com.gameplat.admin.model.vo;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.gameplat.admin.util.Date2LongSerializerUtils;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -33,9 +35,11 @@ public class ActivityRedPacketVO implements Serializable {
     private String weekTime;
 
     @ApiModelProperty(value = "开始时间")
+    @JsonSerialize(using = Date2LongSerializerUtils.class)
     private Date beginTime;
 
     @ApiModelProperty(value = "结束时间")
+    @JsonSerialize(using = Date2LongSerializerUtils.class)
     private Date endTime;
 
     @ApiModelProperty(value = "状态 0下线 1上线")
@@ -45,12 +49,14 @@ public class ActivityRedPacketVO implements Serializable {
     private String createBy;
 
     @ApiModelProperty(value = "创建时间")
+    @JsonSerialize(using = Date2LongSerializerUtils.class)
     private Date createTime;
 
     @ApiModelProperty(value = "更新人")
     private String updateBy;
 
     @ApiModelProperty(value = "更新时间")
+    @JsonSerialize(using = Date2LongSerializerUtils.class)
     private Date updateTime;
 
     @ApiModelProperty(value = "备注")

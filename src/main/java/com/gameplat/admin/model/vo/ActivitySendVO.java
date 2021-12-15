@@ -2,6 +2,7 @@ package com.gameplat.admin.model.vo;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+import com.gameplat.admin.util.Date2LongSerializerUtils;
 import io.swagger.annotations.ApiModelProperty;
 import java.util.Date;
 import lombok.Data;
@@ -18,9 +19,11 @@ public class ActivitySendVO {
     private String activityId;
 
     @ApiModelProperty(value = "开始时间")
+    @JsonSerialize(using = Date2LongSerializerUtils.class)
     private Date startDate;
 
     @ApiModelProperty(value = "结束时间")
+    @JsonSerialize(using = Date2LongSerializerUtils.class)
     private Date endDate;
 
     @JsonSerialize(using= ToStringSerializer.class)
@@ -40,5 +43,6 @@ public class ActivitySendVO {
     private Double cumulativeAmount;
 
     @ApiModelProperty(value = "充值时间")
+    @JsonSerialize(using = Date2LongSerializerUtils.class)
     private Date payTime;
 }

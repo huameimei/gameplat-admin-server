@@ -9,20 +9,19 @@ import com.gameplat.admin.enums.ActivityDistributeEnum;
 import com.gameplat.admin.mapper.ActivityDistributeMapper;
 import com.gameplat.admin.model.domain.ActivityDistribute;
 import com.gameplat.admin.model.domain.MemberWealReword;
-import com.gameplat.admin.model.dto.ActivityDistributeDTO;
+import com.gameplat.admin.model.dto.ActivityDistributeQueryDTO;
 import com.gameplat.admin.model.vo.ActivityDistributeVO;
 import com.gameplat.admin.service.ActivityDistributeService;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.StringUtils;
-
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
-
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 活动分发类
@@ -73,21 +72,21 @@ public class ActivityDistributeServiceImpl
     }
 
     @Override
-    public IPage<ActivityDistributeVO> list(PageDTO<ActivityDistribute> page, ActivityDistributeDTO activityDistributeDTO) {
+    public IPage<ActivityDistributeVO> list(PageDTO<ActivityDistribute> page, ActivityDistributeQueryDTO activityDistributeQueryDTO) {
         LambdaQueryChainWrapper<ActivityDistribute> lambdaQuery = this.lambdaQuery();
         lambdaQuery.eq(ActivityDistribute::getDeleteFlag, 1)
-                .like(StringUtils.isNotBlank(activityDistributeDTO.getUsername())
-                        , ActivityDistribute::getUsername, activityDistributeDTO.getUsername())
-                .eq(activityDistributeDTO.getActivityId() != null && activityDistributeDTO.getActivityId() != 0
-                        , ActivityDistribute::getActivityId, activityDistributeDTO.getActivityId())
-                .eq(activityDistributeDTO.getStatus() != null
-                        , ActivityDistribute::getStatus, activityDistributeDTO.getStatus())
-                .eq(activityDistributeDTO.getGetWay() != null && activityDistributeDTO.getGetWay() != 0
-                        , ActivityDistribute::getGetWay, activityDistributeDTO.getGetWay())
-                .ge(StringUtils.isNotBlank(activityDistributeDTO.getApplyStartTime())
-                        , ActivityDistribute::getApplyTime, activityDistributeDTO.getApplyStartTime())
-                .le(StringUtils.isNotBlank(activityDistributeDTO.getApplyEndTime())
-                        , ActivityDistribute::getApplyTime, activityDistributeDTO.getApplyEndTime())
+                .like(StringUtils.isNotBlank(activityDistributeQueryDTO.getUsername())
+                        , ActivityDistribute::getUsername, activityDistributeQueryDTO.getUsername())
+                .eq(activityDistributeQueryDTO.getActivityId() != null && activityDistributeQueryDTO.getActivityId() != 0
+                        , ActivityDistribute::getActivityId, activityDistributeQueryDTO.getActivityId())
+                .eq(activityDistributeQueryDTO.getStatus() != null
+                        , ActivityDistribute::getStatus, activityDistributeQueryDTO.getStatus())
+                .eq(activityDistributeQueryDTO.getGetWay() != null && activityDistributeQueryDTO.getGetWay() != 0
+                        , ActivityDistribute::getGetWay, activityDistributeQueryDTO.getGetWay())
+                .ge(StringUtils.isNotBlank(activityDistributeQueryDTO.getApplyStartTime())
+                        , ActivityDistribute::getApplyTime, activityDistributeQueryDTO.getApplyStartTime())
+                .le(StringUtils.isNotBlank(activityDistributeQueryDTO.getApplyEndTime())
+                        , ActivityDistribute::getApplyTime, activityDistributeQueryDTO.getApplyEndTime())
         ;
         return lambdaQuery.page(page).convert(activityDistributeConvert::toVo);
     }

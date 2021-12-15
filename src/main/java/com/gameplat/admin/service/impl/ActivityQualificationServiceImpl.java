@@ -130,7 +130,7 @@ public class ActivityQualificationServiceImpl extends
                 qm.setDeleteFlag(1);
                 qm.setDrawNum(1);
                 qm.setEmployNum(0);
-                qm.setQualificationActivityId(IdWorker.getId());
+                qm.setQualificationActivityId(IdWorker.getIdStr());
                 qm.setQualificationStatus(1);
                 qm.setStatisItem(activityLobbyDTO.getStatisItem());
                 qm.setMaxMoney(lobbyDiscount.stream().mapToInt(ActivityLobbyDiscountDTO::getPresenterValue).sum());

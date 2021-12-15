@@ -87,7 +87,7 @@ public class ActivityDistribute implements Serializable {
     private Integer memberPayLevel;
 
     @ApiModelProperty(value = "与资格管理关联id")
-    private Long qualificationActivityId;
+    private String qualificationActivityId;
 
     @ApiModelProperty(value = "唯一标识")
     private String soleIdentifier;

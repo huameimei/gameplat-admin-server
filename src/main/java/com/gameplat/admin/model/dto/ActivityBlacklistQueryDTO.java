@@ -7,14 +7,14 @@ import java.io.Serializable;
 
 
 /**
- * 新增活动黑名单DTO
+ * 活动黑名单查询DTO
  *
  * @author aBen
  * @Description 实体层
  * @date 2020-08-20 11:30:39
  */
 @Data
-public class ActivityBlacklistAddDTO implements Serializable {
+public class ActivityBlacklistQueryDTO implements Serializable {
 
     private static final long serialVersionUID = -1005615158531421103L;
 

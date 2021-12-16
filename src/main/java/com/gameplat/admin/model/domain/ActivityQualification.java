@@ -5,8 +5,10 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import io.swagger.annotations.ApiModelProperty;
+
 import java.io.Serializable;
 import java.util.Date;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -119,7 +121,7 @@ public class ActivityQualification implements Serializable {
     private Date employTime;
 
     @ApiModelProperty(value = "与活动派发关联id")
-    private Long qualificationActivityId;
+    private String qualificationActivityId;
 
     @ApiModelProperty(value = "唯一标识")
     private String soleIdentifier;

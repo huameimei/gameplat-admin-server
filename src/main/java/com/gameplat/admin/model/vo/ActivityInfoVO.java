@@ -4,6 +4,8 @@ import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.gameplat.admin.util.Date2LongSerializerUtils;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -157,12 +159,14 @@ public class ActivityInfoVO implements Serializable {
     /**
      * 创建时间
      */
+    @JsonSerialize(using = Date2LongSerializerUtils.class)
     @ApiModelProperty("创建时间")
     private Date createTime;
 
     /**
      * 更新时间
      */
+    @JsonSerialize(using = Date2LongSerializerUtils.class)
     @ApiModelProperty("更新时间")
     private Date updateTime;
 

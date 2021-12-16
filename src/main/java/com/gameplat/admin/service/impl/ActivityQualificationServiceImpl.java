@@ -10,7 +10,6 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.gameplat.admin.constant.ActivityConst;
 import com.gameplat.admin.convert.ActivityLobbyConvert;
 import com.gameplat.admin.convert.ActivityQualificationConvert;
 import com.gameplat.admin.mapper.ActivityQualificationMapper;
@@ -131,7 +130,7 @@ public class ActivityQualificationServiceImpl extends
                 qm.setDeleteFlag(1);
                 qm.setDrawNum(1);
                 qm.setEmployNum(0);
-                qm.setQualificationActivityId(IdWorker.getId());
+                qm.setQualificationActivityId(IdWorker.getIdStr());
                 qm.setQualificationStatus(1);
                 qm.setStatisItem(activityLobbyDTO.getStatisItem());
                 qm.setMaxMoney(lobbyDiscount.stream().mapToInt(ActivityLobbyDiscountDTO::getPresenterValue).sum());
@@ -153,17 +152,17 @@ public class ActivityQualificationServiceImpl extends
         List<ActivityQualification> qualificationManageStatusList =
                 this.lambdaQuery().in(ActivityQualification::getId, activityQualificationAuditStatusDTO.getIdList()).list();
         for (ActivityQualification qualification : qualificationManageStatusList) {
-            if (qualification.getStatus() == ActivityConst.QUALIFICATION_STATUS_INVALID) {
+            if (qualification.getStatus() == 0) {
                 throw new ServiceException("您选择的数据有无效数据，无效数据不能审核！");
             }
-            if (qualification.getStatus() == ActivityConst.QUALIFICATION_STATUS_AUDIT) {
+            if (qualification.getStatus() == 2) {
                 throw new ServiceException("您选择的数据有【" + qualification.getActivityName() + "】已审核的数据，请勿重复审核！");
             }
-            if (qualification.getQualificationStatus() == ActivityConst.QUALIFICATION_STATUS_INVALID) {
+            if (qualification.getQualificationStatus() == 0) {
                 throw new ServiceException("您选择的数据有资格状态被禁用的数据，禁用状态不能审核！");
             }
             //更新数据
-            qualification.setStatus(ActivityConst.QUALIFICATION_STATUS_AUDIT);
+            qualification.setStatus(2);
             qualification.setAuditPerson(GlobalContextHolder.getContext().getUsername());
             qualification.setAuditTime(new Date());
         }

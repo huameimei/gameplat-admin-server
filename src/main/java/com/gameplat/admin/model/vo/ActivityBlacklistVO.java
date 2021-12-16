@@ -1,7 +1,11 @@
 package com.gameplat.admin.model.vo;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.gameplat.admin.util.Date2LongSerializerUtils;
 import io.swagger.annotations.ApiModelProperty;
 import java.io.Serializable;
+import java.util.Date;
+
 import lombok.Data;
 
 
@@ -32,7 +36,8 @@ public class ActivityBlacklistVO implements Serializable {
     private String createBy;
 
     @ApiModelProperty(value = "创建时间")
-    private String createTime;
+    @JsonSerialize(using = Date2LongSerializerUtils.class)
+    private Date createTime;
 
 
 }

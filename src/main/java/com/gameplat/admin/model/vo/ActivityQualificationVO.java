@@ -2,6 +2,7 @@ package com.gameplat.admin.model.vo;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+import com.gameplat.admin.util.Date2LongSerializerUtils;
 import io.swagger.annotations.ApiModelProperty;
 
 import java.util.Date;
@@ -35,6 +36,7 @@ public class ActivityQualificationVO {
     private String username;
 
     @ApiModelProperty(value = "申请时间")
+    @JsonSerialize(using = Date2LongSerializerUtils.class)
     private Date applyTime;
 
     @ApiModelProperty(value = "审核人")
@@ -77,24 +79,31 @@ public class ActivityQualificationVO {
     private Integer getWay;
 
     @ApiModelProperty(value = "统计开始时间")
+    @JsonSerialize(using = Date2LongSerializerUtils.class)
     private Date statisStartTime;
 
     @ApiModelProperty(value = "统计结束时间")
+    @JsonSerialize(using = Date2LongSerializerUtils.class)
     private Date statisEndTime;
 
     @ApiModelProperty(value = "审核时间")
+    @JsonSerialize(using = Date2LongSerializerUtils.class)
     private Date auditTime;
 
     @ApiModelProperty(value = "活动开始时间")
+    @JsonSerialize(using = Date2LongSerializerUtils.class)
     private Date activityStartTime;
 
     @ApiModelProperty(value = "活动结束时间")
+    @JsonSerialize(using = Date2LongSerializerUtils.class)
     private Date activityEndTime;
 
     @ApiModelProperty(value = "更新时间")
+    @JsonSerialize(using = Date2LongSerializerUtils.class)
     private Date updateTime;
 
     @ApiModelProperty(value = "截止时间")
+    @JsonSerialize(using = Date2LongSerializerUtils.class)
     private Date abortTime;
 
     @ApiModelProperty(value = "使用次数")
@@ -110,6 +119,7 @@ public class ActivityQualificationVO {
     private Integer deleteFlag;
 
     @ApiModelProperty(value = "使用时间")
+    @JsonSerialize(using = Date2LongSerializerUtils.class)
     private Date employTime;
 
     @ApiModelProperty(value = "与活动派发关联id")

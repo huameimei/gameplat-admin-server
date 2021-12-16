@@ -2,6 +2,7 @@ package com.gameplat.admin.model.vo;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+import com.gameplat.admin.util.Date2LongSerializerUtils;
 import io.swagger.annotations.ApiModelProperty;
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -44,6 +45,7 @@ public class ActivityDistributeVO implements Serializable {
     private String username;
 
     @ApiModelProperty(value = "申请时间")
+    @JsonSerialize(using = Date2LongSerializerUtils.class)
     private Date applyTime;
 
     @ApiModelProperty(value = "优惠金额")
@@ -53,6 +55,7 @@ public class ActivityDistributeVO implements Serializable {
     private String discountsPrize;
 
     @ApiModelProperty(value = "结算时间")
+    @JsonSerialize(using = Date2LongSerializerUtils.class)
     private Date settlementTime;
 
     @ApiModelProperty(value = "状态（1 结算中，2 已结算） ")
@@ -65,12 +68,14 @@ public class ActivityDistributeVO implements Serializable {
     private String createBy;
 
     @ApiModelProperty(value = "创建时间")
+    @JsonSerialize(using = Date2LongSerializerUtils.class)
     private Date createTime;
 
     @ApiModelProperty(value = "更新人")
     private String updateBy;
 
     @ApiModelProperty(value = "更新时间")
+    @JsonSerialize(using = Date2LongSerializerUtils.class)
     private Date updateTime;
 
     @ApiModelProperty(value = "是否失效（0 失效，1 未失效）")
@@ -92,9 +97,11 @@ public class ActivityDistributeVO implements Serializable {
     private String soleIdentifier;
 
     @ApiModelProperty(value = "统计开始时间")
+    @JsonSerialize(using = Date2LongSerializerUtils.class)
     private Date statisStartTime;
 
     @ApiModelProperty(value = "统计结束时间")
+    @JsonSerialize(using = Date2LongSerializerUtils.class)
     private Date statisEndTime;
 
     @ApiModelProperty(value = "领取方式（1 直接发放，2 福利中心）")

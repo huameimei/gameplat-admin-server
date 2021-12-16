@@ -636,7 +636,7 @@ public class ActivityCommonServiceImpl implements ActivityCommonService {
         manage.setStatisItem(activityLobby.getStatisItem());
         manage.setMaxMoney(satisfyDiscounts.stream().mapToInt(ActivityLobbyDiscount::getPresenterValue).sum());
         manage.setWithdrawDml(satisfyDiscounts.stream().mapToInt(ActivityLobbyDiscount::getWithdrawDml).sum());
-        manage.setQualificationActivityId(Long.parseLong(RandomUtil.generateOrderCode()));
+        manage.setQualificationActivityId(RandomUtil.generateOrderCode());
         manage.setSoleIdentifier(IdempotentKeyUtils.md5(DateUtil.formatDate(countDate)));
         manage.setStatisStartTime(DateUtil.parse(startTime, "yyyy-MM-dd HH:mm:ss"));
         manage.setStatisEndTime(DateUtil.parse(endTime, "yyyy-MM-dd HH:mm:ss"));

@@ -1,19 +1,21 @@
 package com.gameplat.admin.model.vo;
 
-
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import com.gameplat.admin.util.Date2LongSerializerUtils;
+import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import java.io.Serializable;
-import java.util.Date;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.dozer.Mapping;
+
+import java.io.Serializable;
+import java.util.Date;
 
 /**
  * <p>
- * 活动VO
+ * 红包雨VO
  * </p>
  *
  * @author 沙漠
@@ -21,26 +23,16 @@ import org.dozer.Mapping;
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class ActivityVO implements Serializable {
+@ApiModel(value = "ActivityRedPacketVO对象", description = "红包雨")
+public class ActivityRedPacketVO implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @JsonSerialize(using = ToStringSerializer.class)
     @ApiModelProperty(value = "主键")
-    @Mapping(value = "activityId")
-    private Long id;
+    private Long packetId;
 
-    @ApiModelProperty(value = "活动名称")
-    private String activityName;
-
-    @ApiModelProperty(value = "是否参与红包雨 0否 1是")
-    private Integer isPackage;
-
-    @ApiModelProperty(value = "是否参与每日首充 0否 1是")
-    private Integer isCharge;
-
-    @ApiModelProperty(value = "是否参与转盘 0否 1是")
-    private Integer isTurntable;
+    @ApiModelProperty(value = "红包时间(周一到周日)")
+    private String weekTime;
 
     @ApiModelProperty(value = "开始时间")
     @JsonSerialize(using = Date2LongSerializerUtils.class)
@@ -69,5 +61,32 @@ public class ActivityVO implements Serializable {
 
     @ApiModelProperty(value = "备注")
     private String remark;
+
+    @ApiModelProperty(value = "红包雨标题")
+    private String realTitle;
+
+    @ApiModelProperty(value = "红包雨位置")
+    private String realLocation;
+
+    @ApiModelProperty(value = "频率")
+    private String frequency;
+
+    @ApiModelProperty(value = "持续时长")
+    private String duration;
+
+    @ApiModelProperty(value = "红包类型（1红包雨，2运营红包）")
+    private Integer packetType;
+
+    @ApiModelProperty(value = "红包总个数")
+    private Integer packetTotalNum;
+
+    @ApiModelProperty(value = "用户抽红包总次数限制")
+    private Integer packetDrawLimit;
+
+    @ApiModelProperty(value = "启动时间(时分秒)")
+    private String startTime;
+
+    @ApiModelProperty(value = "终止时间(时分秒)")
+    private String stopTime;
 
 }

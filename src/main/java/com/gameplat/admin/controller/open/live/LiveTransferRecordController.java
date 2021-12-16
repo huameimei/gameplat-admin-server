@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/live/liveTransferRecord")
+@RequestMapping("/api/admin/live/liveTransferRecord")
 public class LiveTransferRecordController {
 
   @Autowired

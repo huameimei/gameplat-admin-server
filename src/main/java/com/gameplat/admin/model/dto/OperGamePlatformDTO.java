@@ -12,4 +12,6 @@ public class OperGamePlatformDTO implements Serializable {
   private String name;
 
   private Integer transfer;
+
+  private Integer sort;
 }

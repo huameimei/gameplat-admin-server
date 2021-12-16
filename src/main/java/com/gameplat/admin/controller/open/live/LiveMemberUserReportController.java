@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/live/liveMemberDayReport")
+@RequestMapping("/api/admin/live/liveMemberDayReport")
 public class LiveMemberUserReportController {
 
   @Autowired

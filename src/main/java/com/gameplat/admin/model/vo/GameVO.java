@@ -23,25 +23,28 @@ public class GameVO implements Serializable {
     @ApiModelProperty(value = "游戏中文名")
     private String chineseName;
 
-    @ApiModelProperty(value = "游戏排序")
+    @ApiModelProperty(value = "游戏英文名")
     private String englishName;
 
-    @ApiModelProperty(value = "游戏排序")
+    @ApiModelProperty(value = "图片名称")
     private String imageName;
 
-    @ApiModelProperty(value = "游戏排序")
+    @ApiModelProperty(value = "游戏平台")
     private String platformCode;
 
-    @ApiModelProperty(value = "游戏排序")
+    @ApiModelProperty(value = "游戏类型")
     private String gameType;
 
-    @ApiModelProperty(value = "游戏排序")
+    @ApiModelProperty(value = "游戏类别")
+    private String gameKind;
+
+    @ApiModelProperty(value = "是否支持H5")
     private Integer isH5;
 
-    @ApiModelProperty(value = "游戏排序")
+    @ApiModelProperty(value = "是否支持电脑端")
     private Integer isFlash;
 
-    @ApiModelProperty(value = "游戏排序")
+    @ApiModelProperty(value = "H5图片")
     private String h5ImageName;
 
     @ApiModelProperty(value = "游戏排序")

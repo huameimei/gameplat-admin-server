@@ -22,6 +22,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 @FeignClient(
     name = "aeFeignClient",
     url = "https://tttint.onlinegames22.com",
+//    url = "${public.proxy.host}",
+//    path ="/ae/",
     configuration = FeignFormConfig.class)
 public interface AeFeignClient {
 

@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/live/liveRebateConfig/")
+@RequestMapping("/api/admin/live/liveRebateConfig/")
 public class LiveRebateConfigController {
 
   @Autowired

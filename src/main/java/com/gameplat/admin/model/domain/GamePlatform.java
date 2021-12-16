@@ -24,7 +24,7 @@ public class GamePlatform implements Serializable {
 
   private Integer transfer;
 
-  private String sort;
+  private Integer sort;
 
   @TableField(fill = FieldFill.INSERT)
   @ApiModelProperty(value = "创建时间")

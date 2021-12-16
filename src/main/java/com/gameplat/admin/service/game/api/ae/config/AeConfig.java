@@ -1,42 +1,45 @@
 package com.gameplat.admin.service.game.api.ae.config;
 
-import com.gameplat.admin.component.LiveConfigEnvCache;
-import java.util.Properties;
+import com.gameplat.admin.service.GameConfigService;
+import com.gameplat.common.enums.GameCodeEnum;
+import java.util.Map;
 import javax.annotation.Resource;
 import org.springframework.stereotype.Component;
 
 @Component
-public class AeConfig extends Properties {
+public class AeConfig {
 
-  public String getHost() {
-//    return this.getProperty("ae.host");
-    return "https://tttint.onlinegames22.com";
-  }
-
+  @Resource
+  private GameConfigService gameConfigService;
 
   public String getCert() {
-//    return this.getProperty("ae.cert");
-    return "VFd520gJgUT6oV21WCk";
+    Map<String, String> configMap = gameConfigService
+        .queryGameConfigInfoByPlatCode(GameCodeEnum.AE_LIVE.code());
+    return configMap.getOrDefault("cert","VFd520gJgUT6oV21WCk");
   }
 
   public String getAgentId() {
-//    return this.getProperty("ae.agent-id");
-    return "kgsporta2";
+    Map<String, String> configMap = gameConfigService
+        .queryGameConfigInfoByPlatCode(GameCodeEnum.AE_LIVE.code());
+    return configMap.getOrDefault("agent-id","kgsporta2");
   }
 
   public boolean isOpen() {
-//    return Boolean.parseBoolean(this.getProperty("ae.open"));
-    return true;
+    Map<String, String> configMap = gameConfigService
+        .queryGameConfigInfoByPlatCode(GameCodeEnum.AE_LIVE.code());
+    return Boolean.parseBoolean(configMap.getOrDefault("open","true"));
   }
 
   public String getCurrency() {
-//    return this.getProperty("ae.currency");
-    return "CNY";
+    Map<String, String> configMap = gameConfigService
+        .queryGameConfigInfoByPlatCode(GameCodeEnum.AE_LIVE.code());
+    return configMap.getOrDefault("currency","CNY");
   }
 
   public String getPrefix() {
-//    return EnvContextManager.getProsByName("fg.prefix");
-    return "kgsit";
+    Map<String, String> configMap = gameConfigService
+        .queryGameConfigInfoByPlatCode(GameCodeEnum.AE_LIVE.code());
+    return configMap.getOrDefault("prefix","kgsit");
   }
 
   public String getAccount(String account){

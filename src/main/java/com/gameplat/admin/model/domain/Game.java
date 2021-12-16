@@ -44,6 +44,11 @@ public class Game implements Serializable {
   private String gameType;
 
   /**
+   * 游戏类别
+   */
+  private String gameKind;
+
+  /**
    * 支持手机端（0：支持，1：不支持）
    */
   private Integer isH5;

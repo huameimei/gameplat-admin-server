@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/live/liveRebateReport")
+@RequestMapping("/api/admin/live/liveRebateReport")
 public class LiveRebateReportController {
 
   @Autowired

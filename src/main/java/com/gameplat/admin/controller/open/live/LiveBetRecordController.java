@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/live/liveBetRecord")
+@RequestMapping("/api/admin/live/liveBetRecord")
 public class LiveBetRecordController {
 
   @Resource

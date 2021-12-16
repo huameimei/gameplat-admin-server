@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.gameplat.admin.model.domain.ActivityBlacklist;
 import com.gameplat.admin.model.dto.ActivityBlacklistAddDTO;
-import com.gameplat.admin.model.dto.ActivityBlacklistDTO;
+import com.gameplat.admin.model.dto.ActivityBlacklistQueryDTO;
 import com.gameplat.admin.model.vo.ActivityBlacklistVO;
 import com.gameplat.admin.service.ActivityBlacklistService;
 import com.gameplat.base.common.exception.ServiceException;
@@ -14,12 +14,8 @@ import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import springfox.documentation.annotations.ApiIgnore;
 
 /**
  * 活动黑名单管理
@@ -38,14 +34,14 @@ public class ActivityBlacklistController {
     /**
      * 活动黑名单列表
      * @param page
-     * @param activityBlacklistDTO
+     * @param activityBlacklistQueryDTO
      * @return
      */
     @ApiOperation(value = "活动黑名单列表")
     @GetMapping("/list")
     @PreAuthorize("hasAuthority('activity:blacklist:list')")
-    public IPage<ActivityBlacklistVO> list(PageDTO<ActivityBlacklist> page, ActivityBlacklistDTO activityBlacklistDTO) {
-        return activityBlacklistService.list(page, activityBlacklistDTO);
+    public IPage<ActivityBlacklistVO> list(@ApiIgnore PageDTO<ActivityBlacklist> page, ActivityBlacklistQueryDTO activityBlacklistQueryDTO) {
+        return activityBlacklistService.list(page, activityBlacklistQueryDTO);
     }
 
     /**

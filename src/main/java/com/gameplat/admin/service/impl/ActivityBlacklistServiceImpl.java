@@ -8,17 +8,18 @@ import com.gameplat.admin.enums.ActivityBlacklistEnum;
 import com.gameplat.admin.mapper.ActivityBlacklistMapper;
 import com.gameplat.admin.model.domain.ActivityBlacklist;
 import com.gameplat.admin.model.dto.ActivityBlacklistAddDTO;
-import com.gameplat.admin.model.dto.ActivityBlacklistDTO;
+import com.gameplat.admin.model.dto.ActivityBlacklistQueryDTO;
 import com.gameplat.admin.model.vo.ActivityBlacklistVO;
 import com.gameplat.admin.model.vo.MemberInfoVO;
 import com.gameplat.admin.service.ActivityBlacklistService;
 import com.gameplat.admin.service.MemberService;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.StringUtils;
-import java.util.ArrayList;
-import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 活动黑名单业务处理
@@ -36,14 +37,14 @@ public class ActivityBlacklistServiceImpl extends ServiceImpl<ActivityBlacklistM
     private MemberService memberService;
 
     @Override
-    public IPage<ActivityBlacklistVO> list(PageDTO<ActivityBlacklist> page, ActivityBlacklistDTO activityBlacklistDTO) {
+    public IPage<ActivityBlacklistVO> list(PageDTO<ActivityBlacklist> page, ActivityBlacklistQueryDTO activityBlacklistQueryDTO) {
         return this.lambdaQuery()
-                .like(StringUtils.isNotBlank(activityBlacklistDTO.getLimitedContent())
-                        , ActivityBlacklist::getLimitedContent, activityBlacklistDTO.getLimitedContent())
-                .eq(activityBlacklistDTO.getLimitedType() != null && activityBlacklistDTO.getLimitedType() != 0
-                        , ActivityBlacklist::getLimitedType, activityBlacklistDTO.getLimitedType())
-                .eq(activityBlacklistDTO.getActivityId() != null && activityBlacklistDTO.getActivityId() != 0
-                        , ActivityBlacklist::getActivityId, activityBlacklistDTO.getActivityId())
+                .like(StringUtils.isNotBlank(activityBlacklistQueryDTO.getLimitedContent())
+                        , ActivityBlacklist::getLimitedContent, activityBlacklistQueryDTO.getLimitedContent())
+                .eq(activityBlacklistQueryDTO.getLimitedType() != null && activityBlacklistQueryDTO.getLimitedType() != 0
+                        , ActivityBlacklist::getLimitedType, activityBlacklistQueryDTO.getLimitedType())
+                .eq(activityBlacklistQueryDTO.getActivityId() != null && activityBlacklistQueryDTO.getActivityId() != 0
+                        , ActivityBlacklist::getActivityId, activityBlacklistQueryDTO.getActivityId())
                 .page(page).convert(activityBlacklistConvert::toVo);
     }
 

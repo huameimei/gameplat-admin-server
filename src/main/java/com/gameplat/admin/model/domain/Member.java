@@ -140,4 +140,7 @@ public class Member extends Model<Member> {
   private Integer superAgentLevel;
 
   private Integer tableIndex;
+
+  @ApiModelProperty(value = "当前会员等级")
+  private Integer level;
 }

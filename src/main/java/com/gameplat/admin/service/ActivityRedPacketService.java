@@ -7,7 +7,7 @@ import com.gameplat.admin.model.domain.ActivityRedPacket;
 import com.gameplat.admin.model.dto.*;
 import com.gameplat.admin.model.vo.ActivityRedPacketConfigVO;
 import com.gameplat.admin.model.vo.ActivityRedPacketVO;
-import com.gameplat.admin.model.vo.MemberActivityPrizeVO;
+import com.gameplat.admin.model.vo.ActivityTurntablePrizeConfigVO;
 
 import java.util.List;
 
@@ -74,4 +74,18 @@ public interface ActivityRedPacketService extends IService<ActivityRedPacket> {
      * @param activityRedPacketConfigDTO
      */
     void updateConfig(ActivityRedPacketConfigDTO activityRedPacketConfigDTO);
+
+    /**
+     * 获取转盘奖品配置
+     *
+     * @return
+     */
+    List<ActivityTurntablePrizeConfigVO> getTurntablePrizeConfig();
+
+    /**
+     * 更新转盘奖品配置
+     *
+     * @param activityTurntablePrizeConfigDTO
+     */
+    void updateTurntablePrizeConfig(ActivityTurntablePrizeConfigDTO activityTurntablePrizeConfigDTO);
 }

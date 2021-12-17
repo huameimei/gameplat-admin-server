@@ -14,6 +14,7 @@ import com.gameplat.admin.model.domain.SysDictData;
 import com.gameplat.admin.model.dto.*;
 import com.gameplat.admin.model.vo.ActivityRedPacketConfigVO;
 import com.gameplat.admin.model.vo.ActivityRedPacketVO;
+import com.gameplat.admin.model.vo.ActivityTurntablePrizeConfigVO;
 import com.gameplat.admin.model.vo.MemberActivityPrizeVO;
 import com.gameplat.admin.service.ActivityPrizeService;
 import com.gameplat.admin.service.ActivityRedPacketConditionService;
@@ -21,6 +22,7 @@ import com.gameplat.admin.service.ActivityRedPacketService;
 import com.gameplat.admin.service.SysDictDataService;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.StringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -149,6 +151,32 @@ public class ActivityRedPacketServiceImpl extends ServiceImpl<ActivityRedPacketM
         boolean result = sysDictDataService.updateById(sysDictData);
         if (!result) {
             throw new ServiceException("更新红包配置失败");
+        }
+    }
+
+    @Override
+    public List<ActivityTurntablePrizeConfigVO> getTurntablePrizeConfig() {
+        SysDictData sysDictData = sysDictDataService.getDictList(ConfigConstant.ACTIVITY_REDPACKET_CONFIG, ConfigConstant.ACTIVITY_REDPACKET_CONFIG_TURNTABLE_PRIZE);
+        if (sysDictData == null || StringUtils.isBlank(sysDictData.getDictValue())) {
+            throw new ServiceException("活动红包配置没有配置，请先配置红包数据");
+        }
+        List<ActivityTurntablePrizeConfigVO> list = JSON.parseArray(sysDictData.getDictValue(), ActivityTurntablePrizeConfigVO.class);
+        return list;
+    }
+
+    @Override
+    public void updateTurntablePrizeConfig(ActivityTurntablePrizeConfigDTO activityTurntablePrizeConfigDTO) {
+        List<ActivityTurntablePrizeConfigVO> list = getTurntablePrizeConfig();
+        for (ActivityTurntablePrizeConfigVO vo : list) {
+            if (vo.getPrizeId().equals(activityTurntablePrizeConfigDTO.getPrizeId())) {
+                BeanUtils.copyProperties(activityTurntablePrizeConfigDTO, vo);
+            }
+        }
+        SysDictData sysDictData = sysDictDataService.getDictList(ConfigConstant.ACTIVITY_REDPACKET_CONFIG, ConfigConstant.ACTIVITY_REDPACKET_CONFIG_TURNTABLE_PRIZE);
+        sysDictData.setDictValue(JSON.toJSONString(list));
+        boolean result = sysDictDataService.updateById(sysDictData);
+        if (!result) {
+            throw new ServiceException("更新转盘奖品配置失败");
         }
     }
 

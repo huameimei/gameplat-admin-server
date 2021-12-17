@@ -29,4 +29,9 @@ public class ConfigConstant {
      * 活动红包配置--红包类型配置
      */
     public static final String ACTIVITY_REDPACKET_CONFIG_REDPACKET = "REDPACKET";
+
+    /**
+     * 活动红包配置--转盘配置
+     */
+    public static final String ACTIVITY_REDPACKET_CONFIG_TURNTABLE_PRIZE = "TURNTABLE_PRIZE";
 }

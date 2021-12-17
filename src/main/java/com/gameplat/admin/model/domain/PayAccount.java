@@ -56,6 +56,8 @@ public class PayAccount {
 
   private String emailAddress;
 
+  private Integer typeSubscript;
+
   /**
    * 创建者
    */

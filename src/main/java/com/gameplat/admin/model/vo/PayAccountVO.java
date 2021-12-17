@@ -50,6 +50,8 @@ public class PayAccountVO extends Model<PayAccountVO> {
 
   private String emailAddress;
 
+  private Integer typeSubscript;
+
   /** 通道金额设置标识，0位禁用 */
   private Integer limitStatus;
 

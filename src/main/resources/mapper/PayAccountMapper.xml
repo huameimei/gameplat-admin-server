@@ -27,6 +27,7 @@
     <result property="updateBy" column="update_by"/>
     <result property="updateTime" column="update_time"/>
     <result property="emailAddress" column="email_address"/>
+    <result property="typeSubscript" column="type_subscript"/>
   </resultMap>
 
   <resultMap type="PayAccountVO" id="PayAccountVOMap" extends="PayAccountMap">
@@ -56,7 +57,7 @@
   <select id="findPayAccountPage" resultMap="PayAccountVOMap">
     SELECT id,name,account,owner,pay_type,bank_name,bank_address,qr_code,member_levels,remarks,
     sort,status,recharge_times,recharge_amount,order_remark,order_remark_status,limit_info,
-    handle_tip,create_by,create_time,update_by,update_time,email_address
+    handle_tip,create_by,create_time,update_by,update_time,email_address,type_subscript
     FROM pay_account
     <include refid="where"/>
     ORDER BY sort ASC

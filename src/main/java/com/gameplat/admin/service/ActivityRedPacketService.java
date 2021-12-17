@@ -4,10 +4,8 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.gameplat.admin.model.domain.ActivityRedPacket;
-import com.gameplat.admin.model.dto.ActivityRedPacketAddDTO;
-import com.gameplat.admin.model.dto.ActivityRedPacketDiscountDTO;
-import com.gameplat.admin.model.dto.ActivityRedPacketQueryDTO;
-import com.gameplat.admin.model.dto.ActivityRedPacketUpdateDTO;
+import com.gameplat.admin.model.dto.*;
+import com.gameplat.admin.model.vo.ActivityRedPacketConfigVO;
 import com.gameplat.admin.model.vo.ActivityRedPacketVO;
 import com.gameplat.admin.model.vo.MemberActivityPrizeVO;
 
@@ -62,4 +60,18 @@ public interface ActivityRedPacketService extends IService<ActivityRedPacket> {
      * @return
      */
     Object discountList(ActivityRedPacketDiscountDTO activityRedPacketDiscountDTO);
+
+    /**
+     * 获取红包配置
+     *
+     * @return
+     */
+    ActivityRedPacketConfigVO getConfig();
+
+    /**
+     * 更新活动配置
+     *
+     * @param activityRedPacketConfigDTO
+     */
+    void updateConfig(ActivityRedPacketConfigDTO activityRedPacketConfigDTO);
 }

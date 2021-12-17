@@ -1,27 +1,29 @@
 package com.gameplat.admin.service.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.conditions.update.LambdaUpdateChainWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.gameplat.admin.constant.ConfigConstant;
 import com.gameplat.admin.convert.ActivityRedPacketConvert;
 import com.gameplat.admin.mapper.ActivityRedPacketMapper;
-import com.gameplat.admin.model.domain.ActivityRedPacketCondition;
-import com.gameplat.admin.model.vo.MemberActivityPrizeVO;
-import com.gameplat.admin.model.domain.ActivityPrize;
 import com.gameplat.admin.model.domain.ActivityRedPacket;
-import com.gameplat.admin.model.dto.ActivityRedPacketAddDTO;
-import com.gameplat.admin.model.dto.ActivityRedPacketDiscountDTO;
-import com.gameplat.admin.model.dto.ActivityRedPacketQueryDTO;
-import com.gameplat.admin.model.dto.ActivityRedPacketUpdateDTO;
+import com.gameplat.admin.model.domain.ActivityRedPacketCondition;
+import com.gameplat.admin.model.domain.SysDictData;
+import com.gameplat.admin.model.dto.*;
+import com.gameplat.admin.model.vo.ActivityRedPacketConfigVO;
 import com.gameplat.admin.model.vo.ActivityRedPacketVO;
+import com.gameplat.admin.model.vo.MemberActivityPrizeVO;
 import com.gameplat.admin.service.ActivityPrizeService;
 import com.gameplat.admin.service.ActivityRedPacketConditionService;
 import com.gameplat.admin.service.ActivityRedPacketService;
+import com.gameplat.admin.service.SysDictDataService;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,7 +31,7 @@ import java.util.List;
 /**
  * 活动红包雨业务处理
  *
- * @author admin
+ * @author kenvin
  */
 @Service
 public class ActivityRedPacketServiceImpl extends ServiceImpl<ActivityRedPacketMapper, ActivityRedPacket>
@@ -44,6 +46,8 @@ public class ActivityRedPacketServiceImpl extends ServiceImpl<ActivityRedPacketM
     @Autowired
     private ActivityRedPacketConditionService activityRedPacketConditionService;
 
+    @Autowired
+    private SysDictDataService sysDictDataService;
 
     @Override
     public IPage<ActivityRedPacketVO> redPacketList(PageDTO<ActivityRedPacket> page, ActivityRedPacketQueryDTO activityRedPacketQueryDTO) {
@@ -118,6 +122,34 @@ public class ActivityRedPacketServiceImpl extends ServiceImpl<ActivityRedPacketM
                     .list();
         }
         return new ArrayList<>();
+    }
+
+    @Override
+    public ActivityRedPacketConfigVO getConfig() {
+        SysDictData sysDictData = sysDictDataService.getDictList(ConfigConstant.ACTIVITY_REDPACKET_CONFIG, ConfigConstant.ACTIVITY_REDPACKET_CONFIG_REDPACKET);
+        if (sysDictData == null || StringUtils.isBlank(sysDictData.getDictValue())) {
+            throw new ServiceException("活动红包配置没有配置，请先配置红包数据");
+        }
+        ActivityRedPacketConfigVO configVO = JSON.parseObject(sysDictData.getDictValue(), ActivityRedPacketConfigVO.class);
+        if (configVO == null) {
+            throw new ServiceException("活动红包配置没有配置，请先配置红包数据");
+        }
+        return configVO;
+    }
+
+    @Override
+    @Transactional(rollbackFor = Throwable.class)
+    public void updateConfig(ActivityRedPacketConfigDTO configDTO) {
+        SysDictData sysDictData = sysDictDataService.getDictList(ConfigConstant.ACTIVITY_REDPACKET_CONFIG, ConfigConstant.ACTIVITY_REDPACKET_CONFIG_REDPACKET);
+        if (sysDictData == null || StringUtils.isBlank(sysDictData.getDictValue())) {
+            throw new ServiceException("活动红包配置没有配置，请先配置红包数据");
+        }
+        //更新配置信息
+        sysDictData.setDictValue(JSON.toJSONString(configDTO));
+        boolean result = sysDictDataService.updateById(sysDictData);
+        if (!result) {
+            throw new ServiceException("更新红包配置失败");
+        }
     }
 
 

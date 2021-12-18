@@ -9,16 +9,20 @@ import com.gameplat.admin.convert.MemberGrowthLevelConvert;
 import com.gameplat.admin.enums.LanguageEnum;
 import com.gameplat.admin.mapper.MemberGrowthLevelMapper;
 import com.gameplat.admin.model.domain.MemberGrowthLevel;
-import com.gameplat.admin.model.domain.MemberGrowthStatis;
+import com.gameplat.admin.model.domain.MemberGrowthRecord;
 import com.gameplat.admin.model.dto.MemberGrowthLevelEditDto;
-import com.gameplat.admin.model.dto.MemberGrowthStatisDTO;
 import com.gameplat.admin.model.vo.MemberGrowthConfigVO;
 import com.gameplat.admin.model.vo.MemberGrowthLevelVO;
 import com.gameplat.admin.service.MemberGrowthConfigService;
 import com.gameplat.admin.service.MemberGrowthLevelService;
-import com.gameplat.admin.service.MemberGrowthStatisService;
+import com.gameplat.admin.service.MemberGrowthRecordService;
+
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+
+import com.gameplat.base.common.context.GlobalContextHolder;
+import com.gameplat.base.common.exception.ServiceException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -37,9 +41,11 @@ public class MemberGrowthLevelServiceImpl extends ServiceImpl<MemberGrowthLevelM
 
     @Autowired private MemberGrowthLevelMapper levelMapper;
 
-    @Autowired private MemberGrowthStatisService growthStatisService;
-
     @Autowired private MemberGrowthConfigService growthConfigService;
+
+    @Autowired private MemberGrowthRecordService memberGrowthRecordService;
+
+    public static final String kindName = "{\"en-US\": \"platform\", \"in-ID\": \"peron\", \"th-TH\": \"แพลตฟอร์ม\", \"vi-VN\": \"nền tảng\", \"zh-CN\": \"平台\"}";
 
     /**
      * 查询所有等级
@@ -74,13 +80,39 @@ public class MemberGrowthLevelServiceImpl extends ServiceImpl<MemberGrowthLevelM
         //重新计算会员的等级
         if(count > 0) {
             //获取到所有VIP汇总数据
-            List<MemberGrowthStatis> staticList = growthStatisService.findList(new MemberGrowthStatisDTO());
+            List<MemberGrowthRecord> recordList = memberGrowthRecordService.findRecordGroupBy(new MemberGrowthRecord());
             MemberGrowthConfigVO growthConfig = growthConfigService.findOneConfig(LanguageEnum.app_zh_CN.getCode());
-            for (MemberGrowthStatis userStatis : staticList) {
+            for (MemberGrowthRecord userRecord : recordList) {
                 //得到重新计算后的等级
-                Integer newLevel = growthStatisService.dealUpLevel(userStatis.getGrowth(), growthConfig);
-                userStatis.setLevel(newLevel);
-                growthStatisService.insertOrUpdate(userStatis);
+                Integer newLevel = memberGrowthRecordService.dealUpLevel(userRecord.getCurrentGrowth(), growthConfig);
+                //如果等级有所变化，就添加一条变动记录
+                if(!newLevel.equals(userRecord.getCurrentLevel())){
+                    MemberGrowthRecord record = new MemberGrowthRecord();
+                    record.setUserId(userRecord.getUserId());
+                    record.setUserName(userRecord.getUserName());
+                    record.setKindCode("plat");
+                    record.setKindName(kindName);
+                    record.setType(3);
+                    record.setOldLevel(userRecord.getCurrentLevel());
+                    record.setCurrentLevel(newLevel);
+                    record.setChangeMult(1.0);
+                    record.setOldGrowth(userRecord.getCurrentGrowth());
+
+                    if (newLevel < userRecord.getCurrentLevel()){
+                        Integer currentGrowth = this.lambdaQuery().eq(MemberGrowthLevel::getLevel, newLevel - 1).one().getGrowth();
+                        record.setCurrentGrowth(currentGrowth);
+                        record.setChangeGrowth(currentGrowth - userRecord.getCurrentGrowth());
+                    }else if ((newLevel > userRecord.getCurrentLevel())){
+                        record.setCurrentGrowth(userRecord.getCurrentGrowth());
+                        record.setChangeGrowth(0);
+                    }
+                    record.setCreateBy(GlobalContextHolder.getContext().getUsername());
+                    record.setCreateTime(new Date());
+                    record.setRemark("VIP等级晋级下级所需成长值变动");
+                    if (! memberGrowthRecordService.save(record)){
+                        throw new ServiceException("操作失败！");
+                    };
+                }
             }
         }
     }

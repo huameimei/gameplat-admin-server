@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gameplat.admin.mapper.MemberGrowthRecordMapper">
+
+<!-- 获取达到有效投注金额的会员账号 -->
+    <select id="findRecordGroupBy" resultType="com.gameplat.admin.model.domain.MemberGrowthRecord">
+        select a.* from member_growth_record a,
+        (select user_id, max(create_time) create_time from member_growth_record GROUP BY user_id) b
+        <where>
+            a.user_id = b.user_id
+            and a.create_time = b.create_time
+            <if test="user_id != null and user_id ！= ''">
+            and a.user_id = #{userId}
+            </if>
+        </where>
+    </select>
+
+</mapper>

@@ -8,6 +8,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.convert.MemberGrowthLevelConvert;
 import com.gameplat.admin.enums.LanguageEnum;
 import com.gameplat.admin.mapper.MemberGrowthLevelMapper;
+import com.gameplat.admin.model.domain.Member;
 import com.gameplat.admin.model.domain.MemberGrowthLevel;
 import com.gameplat.admin.model.domain.MemberGrowthRecord;
 import com.gameplat.admin.model.dto.MemberGrowthLevelEditDto;
@@ -21,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import com.gameplat.admin.service.MemberService;
 import com.gameplat.base.common.context.GlobalContextHolder;
 import com.gameplat.base.common.exception.ServiceException;
 import lombok.RequiredArgsConstructor;
@@ -44,6 +46,8 @@ public class MemberGrowthLevelServiceImpl extends ServiceImpl<MemberGrowthLevelM
     @Autowired private MemberGrowthConfigService growthConfigService;
 
     @Autowired private MemberGrowthRecordService memberGrowthRecordService;
+
+    @Autowired private MemberService memberService;
 
     public static final String kindName = "{\"en-US\": \"platform\", \"in-ID\": \"peron\", \"th-TH\": \"แพลตฟอร์ม\", \"vi-VN\": \"nền tảng\", \"zh-CN\": \"平台\"}";
 
@@ -112,6 +116,10 @@ public class MemberGrowthLevelServiceImpl extends ServiceImpl<MemberGrowthLevelM
                     if (! memberGrowthRecordService.save(record)){
                         throw new ServiceException("操作失败！");
                     };
+                    Member member = new Member();
+                    member.setId(userRecord.getUserId());
+                    member.setLevel(newLevel);
+                    memberService.updateById(member);
                 }
             }
         }

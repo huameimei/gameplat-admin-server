@@ -21,6 +21,9 @@ public class MemberVipSignStatisVO implements Serializable {
     @ApiModelProperty("主键")
     private Long id;
 
+    @ApiModelProperty("主键")
+    private Long userId;
+
     @ApiModelProperty("会员账号")
     private String userName;
 

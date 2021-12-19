@@ -12,7 +12,7 @@ import java.math.BigDecimal;
  */
 @Data
 public class MemberGrowthChangeDto {
-    @ApiModelProperty("会员id")
+    @ApiModelProperty(required = true, value = "会员id")
     private Long userId;
 
     @ApiModelProperty("会员账号")
@@ -21,7 +21,7 @@ public class MemberGrowthChangeDto {
     @ApiModelProperty("此次变动金额")
     private Integer changeGrowth;
 
-    @ApiModelProperty("类型：0:充值  1:签到 2:投注打码量 3:后台修改 4:完善资料 5：绑定银行卡")
+    @ApiModelProperty(required = true, value = "类型：0:充值  1:签到 2:投注打码量 3:后台修改 4:完善资料 5：绑定银行卡")
     private Integer type;
 
     @ApiModelProperty("变动原因")

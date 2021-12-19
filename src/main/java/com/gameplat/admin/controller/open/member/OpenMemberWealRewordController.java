@@ -27,7 +27,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class OpenMemberWealRewordController {
 
     @Autowired private MemberWealRewordService rewordService;
-    @Autowired private MemberGrowthConfigService configService;
 
     @GetMapping("/list")
     @ApiOperation(value = "vip福利记录列表")

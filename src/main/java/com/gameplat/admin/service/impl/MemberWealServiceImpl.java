@@ -15,13 +15,7 @@ import com.gameplat.admin.convert.MemberWealConvert;
 import com.gameplat.admin.enums.CurrencyTypeEnum;
 import com.gameplat.admin.enums.FinancialSourceTypeEnum;
 import com.gameplat.admin.enums.LanguageEnum;
-import com.gameplat.admin.mapper.MemberDayReportMapper;
-import com.gameplat.admin.mapper.MemberGrowthConfigMapper;
-import com.gameplat.admin.mapper.MemberGrowthLevelMapper;
-import com.gameplat.admin.mapper.MemberGrowthStatisMapper;
-import com.gameplat.admin.mapper.MemberMapper;
-import com.gameplat.admin.mapper.MemberWealMapper;
-import com.gameplat.admin.mapper.RechargeOrderMapper;
+import com.gameplat.admin.mapper.*;
 import com.gameplat.admin.model.domain.Financial;
 import com.gameplat.admin.model.domain.Member;
 import com.gameplat.admin.model.domain.MemberBlackList;
@@ -85,7 +79,7 @@ public class MemberWealServiceImpl extends ServiceImpl<MemberWealMapper, MemberW
 
     @Autowired private MemberWealConvert wealConvert;
     @Autowired private MemberWealMapper mapper;
-    @Autowired private MemberGrowthStatisMapper statisMapper;
+    @Autowired private MemberGrowthRecordMapper memberGrowthRecordMapper;
     @Autowired private RechargeOrderMapper rechargeOrderMapper;
     @Autowired private MemberDayReportMapper dayReportMapper;
     @Autowired private MemberMapper memberMapper;
@@ -192,7 +186,7 @@ public class MemberWealServiceImpl extends ServiceImpl<MemberWealMapper, MemberW
             throw new IllegalArgumentException("福利状态异常,不能结算！");
         }
         //获取会员对应等级的福利金额
-        List<MemberWealDetail> memberSalaryInfoList = statisMapper.getMemberSalaryInfo(type);
+        List<MemberWealDetail> memberSalaryInfoList = memberGrowthRecordMapper.getMemberSalaryInfo(type);
 
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         //查找符合充值金额和打码量资格的会员

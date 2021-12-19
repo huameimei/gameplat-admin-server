@@ -36,7 +36,7 @@ public class MemberWealDetail implements Serializable {
     @ApiModelProperty(value = "会员账号")
     private String userName;
 
-    @ApiModelProperty(value = "会员层级")
+    @ApiModelProperty(value = "会员等级")
     private Integer level;
 
     @ApiModelProperty(value = "派发金额")

@@ -3,13 +3,40 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.gameplat.admin.mapper.MemberGrowthRecordMapper">
 
-<!-- 获取达到有效投注金额的会员账号 -->
+<!-- 获取到所有会员VIP汇总数据 -->
     <select id="findRecordGroupBy" resultType="com.gameplat.admin.model.domain.MemberGrowthRecord">
         select a.* from member_growth_record a,
         (select user_id, max(create_time) create_time from member_growth_record GROUP BY user_id) b
         <where>
             a.user_id = b.user_id
             and a.create_time = b.create_time
+        </where>
+    </select>
+
+
+    <!-- 获取达到有效投注金额的会员账号 -->
+    <select id="getMemberSalaryInfo" parameterType="java.lang.Integer" resultType="com.gameplat.admin.model.domain.MemberWealDetail">
+        select
+        c.user_id userId,
+        c.user_name userName,
+        c.current_level level,
+        (
+            case #{type}
+            when 0 then d.week_wage
+            when 1 then d.month_wage
+            when 2 then d.birth_gift_money
+            when 3 then d.red_envelope
+            else 0 end
+        ) rewordAmount
+        from (select user_id, user_name, max(create_time) createTime, current_level  from member_growth_record GROUP BY user_id) c
+        LEFT JOIN member_growth_level d ON c.current_level= d.`level`
+        <where>
+            <if test="type != null and type == 0">
+                AND d.week_wage >0
+            </if>
+            <if test="type != null and type == 1">
+                AND d.month_wage >0
+            </if>
         </where>
     </select>
 

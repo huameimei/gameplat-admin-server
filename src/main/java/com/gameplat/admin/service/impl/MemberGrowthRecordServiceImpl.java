@@ -162,7 +162,6 @@ public class MemberGrowthRecordServiceImpl extends ServiceImpl<MemberGrowthRecor
             if (growthConfig.getIsEnableRecharge() == YseOrNoEnum.YES.getCode()) {
                 //获取充值 成长值 兑换比例
                 changeFinalGrowth = growthConfig.getRechageRate().multiply(BigDecimal.valueOf(changeGrowth)).intValue();
-                memberGrowthRecord.setCurrentGrowth(oldGrowth+ changeFinalGrowth);
                 saveRecord.setKindName(kindName);
                 saveRecord.setKindCode("plat");
                 saveRecord.setChangeMult(growthConfig.getRechageRate().doubleValue());
@@ -182,7 +181,6 @@ public class MemberGrowthRecordServiceImpl extends ServiceImpl<MemberGrowthRecor
                 if (currentSignGrowth > growthConfig.getSignMaxGrowth()) {
                     return;
                 }
-                memberGrowthRecord.setCurrentGrowth(currentSignGrowth);
                 saveRecord.setKindName(kindName);
                 saveRecord.setKindCode("plat");
                 saveRecord.setChangeMult(1.0);
@@ -195,7 +193,6 @@ public class MemberGrowthRecordServiceImpl extends ServiceImpl<MemberGrowthRecor
             //判断是否开启了打码量
             if (growthConfig.getIsEnableDama() == YseOrNoEnum.YES.getCode()) {
                 changeFinalGrowth = growthConfig.getDamaRate().multiply(BigDecimal.valueOf(changeGrowth)).intValue();
-                memberGrowthRecord.setCurrentGrowth(oldGrowth + changeFinalGrowth);
                 saveRecord.setKindName(dto.getKindName());
                 saveRecord.setKindCode(dto.getKindCode());
                 saveRecord.setChangeMult(growthConfig.getDamaRate().multiply(dto.getChangeMult()).setScale(2).doubleValue());
@@ -205,7 +202,6 @@ public class MemberGrowthRecordServiceImpl extends ServiceImpl<MemberGrowthRecor
         } else if(type == GrowthChangeEnum.backEdit.getCode()){
             //后台修改
             changeFinalGrowth = changeGrowth;
-            memberGrowthRecord.setCurrentGrowth(oldGrowth+ changeFinalGrowth);
             saveRecord.setKindName(kindName);
             saveRecord.setKindCode("plat");
             saveRecord.setChangeMult(new BigDecimal("1").doubleValue());
@@ -224,7 +220,6 @@ public class MemberGrowthRecordServiceImpl extends ServiceImpl<MemberGrowthRecor
                     .list()
                     .size() == 0){
                 changeFinalGrowth = growthConfig.getBindBankGrowth();
-                memberGrowthRecord.setCurrentGrowth(changeFinalGrowth);
             }
         }
         //设置最新总成长值

@@ -1,7 +1,7 @@
 package com.gameplat.admin.service.game.api.ae.config;
 
 import com.gameplat.admin.service.GameConfigService;
-import com.gameplat.common.enums.GameCodeEnum;
+import com.gameplat.common.enums.GamePlatformEnum;
 import java.util.Map;
 import javax.annotation.Resource;
 import org.springframework.stereotype.Component;
@@ -14,31 +14,31 @@ public class AeConfig {
 
   public String getCert() {
     Map<String, String> configMap = gameConfigService
-        .queryGameConfigInfoByPlatCode(GameCodeEnum.AE_LIVE.code());
+        .queryGameConfigInfoByPlatCode(GamePlatformEnum.AE.getCode());
     return configMap.getOrDefault("cert","VFd520gJgUT6oV21WCk");
   }
 
   public String getAgentId() {
     Map<String, String> configMap = gameConfigService
-        .queryGameConfigInfoByPlatCode(GameCodeEnum.AE_LIVE.code());
+        .queryGameConfigInfoByPlatCode(GamePlatformEnum.AE.getCode());
     return configMap.getOrDefault("agent-id","kgsporta2");
   }
 
   public boolean isOpen() {
     Map<String, String> configMap = gameConfigService
-        .queryGameConfigInfoByPlatCode(GameCodeEnum.AE_LIVE.code());
+        .queryGameConfigInfoByPlatCode(GamePlatformEnum.AE.getCode());
     return Boolean.parseBoolean(configMap.getOrDefault("open","true"));
   }
 
   public String getCurrency() {
     Map<String, String> configMap = gameConfigService
-        .queryGameConfigInfoByPlatCode(GameCodeEnum.AE_LIVE.code());
+        .queryGameConfigInfoByPlatCode(GamePlatformEnum.AE.getCode());
     return configMap.getOrDefault("currency","CNY");
   }
 
   public String getPrefix() {
     Map<String, String> configMap = gameConfigService
-        .queryGameConfigInfoByPlatCode(GameCodeEnum.AE_LIVE.code());
+        .queryGameConfigInfoByPlatCode(GamePlatformEnum.AE.getCode());
     return configMap.getOrDefault("prefix","kgsit");
   }
 

@@ -89,4 +89,12 @@ public class LiveTransferRecordServiceImpl extends
       throw new ServiceException("额度转换记录更新失败");
     }
   }
+
+  @Override
+  public boolean findTransferRecordCount(LiveTransferRecord dto) {
+    QueryWrapper<LiveTransferRecord> queryWrapper = Wrappers.query();
+    queryWrapper.eq(StringUtils.isNotBlank(dto.getLiveCode()),"live_code",dto.getLiveCode());
+    queryWrapper.eq(StringUtils.isNotBlank(dto.getAccount()),"account",dto.getAccount());
+    return liveTransferRecordMapper.selectCount(queryWrapper) > 0;
+  }
 }

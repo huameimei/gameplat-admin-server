@@ -14,10 +14,12 @@ import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.GoogleAuthenticator;
 import com.gameplat.base.common.util.IPUtils;
 import com.gameplat.base.common.util.StringUtils;
+import com.gameplat.common.enums.LimitEnums;
 import com.gameplat.common.model.bean.limit.AdminLoginLimit;
 import com.gameplat.security.context.UserCredential;
 import com.gameplat.security.service.JwtTokenService;
 import com.gameplat.web.captcha.CaptchaProducer;
+import javax.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -57,11 +59,14 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Autowired
     private PasswordService passwordService;
 
+    @Resource
+    private  LimitInfoService limitInfoService;
+
     @Override
     public UserToken login(AdminLoginDTO dto, HttpServletRequest request) {
         // 获取管理员登录限制信息
         AdminLoginLimit limit =
-                dictDataService.getDictData(DictTypeEnum.ADMIN_LOGIN_CONFIG, AdminLoginLimit.class);
+            limitInfoService.getLimitInfo(LimitEnums.ADMIN_LOGIN_CONFIG, AdminLoginLimit.class);
         if (null == limit) {
             throw new ServiceException("登录配置信息未配置");
         }

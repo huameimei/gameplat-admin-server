@@ -3,10 +3,14 @@ package com.gameplat.admin.service.game.api.ae;
 
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.json.JSONUtil;
+import com.gameplat.admin.model.domain.LiveTransferRecord;
+import com.gameplat.admin.model.dto.LiveTransferRecordQueryDTO;
+import com.gameplat.admin.service.LiveTransferRecordService;
 import com.gameplat.admin.service.game.GameApi;
 import com.gameplat.admin.service.game.api.ae.config.AeConfig;
 import com.gameplat.admin.service.game.api.ae.feign.AeFeignClient;
 import com.gameplat.base.common.exception.ServiceException;
+import com.gameplat.common.enums.GamePlatformEnum;
 import com.gameplat.common.game.TransferResource;
 import com.gameplat.common.game.api.ae.bean.AeCheckTransferOperationReq;
 import com.gameplat.common.game.api.ae.bean.AeCheckTransferOperationResp;
@@ -62,6 +66,9 @@ public class AeApi implements GameApi {
 
   @Autowired
   private AeFeignClient aeFeignClient;
+
+  @Autowired
+  private LiveTransferRecordService liveTransferRecordService;
 
   @Override
   @Retryable(value = Exception.class, backoff = @Backoff(delay = RETRY_DELAY))
@@ -242,6 +249,13 @@ public class AeApi implements GameApi {
    */
 
   public void createMember(String account) throws Exception {
+    LiveTransferRecord dto = new LiveTransferRecord();
+    dto.setAccount(account);
+    dto.setLiveCode(GamePlatformEnum.AE.getCode());
+    if(liveTransferRecordService.findTransferRecordCount(dto)){
+      log.info("用户{}在真人游戏平台{}已有账号",account,GamePlatformEnum.AE.getName());
+      return;
+    }
     Map<String, Object> limitId = new LinkedHashMap<>();
     limitId.put(BET_LIMIT_ID, DEFAULT_BET_LIMIT_IDS);
 

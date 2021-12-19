@@ -12,4 +12,6 @@ public interface LiveTransferRecordService extends IService<LiveTransferRecord> 
   PageDtoVO<LiveTransferRecord> queryLiveTransferRecord(Page<LiveTransferRecord> page, LiveTransferRecordQueryDTO dto);
 
   void fillOrders(OperLiveTransferRecordDTO liveTransferRecord);
+
+  boolean findTransferRecordCount(LiveTransferRecord dto);
 }

@@ -60,28 +60,28 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Override
     public UserToken login(AdminLoginDTO dto, HttpServletRequest request) {
         // 获取管理员登录限制信息
-//        AdminLoginLimit limit =
-//                dictDataService.getDictData(DictTypeEnum.ADMIN_LOGIN_CONFIG, AdminLoginLimit.class);
-//        if (null == limit) {
-//            throw new ServiceException("登录配置信息未配置");
-//        }
+        AdminLoginLimit limit =
+                dictDataService.getDictData(DictTypeEnum.ADMIN_LOGIN_CONFIG, AdminLoginLimit.class);
+        if (null == limit) {
+            throw new ServiceException("登录配置信息未配置");
+        }
 
         // 是否开启后台白名单
-//        String requestIp = IPUtils.getIpAddress(request);
-//        if (SystemCodeType.YES.match(limit.getIpWhiteListSwitch())) {
-//            if (!authIpService.isPermitted(requestIp)) {
-//                throw new ServiceException("当前IP不允许登录：" + requestIp);
-//            }
-//        }
+        String requestIp = IPUtils.getIpAddress(request);
+        if (SystemCodeType.YES.match(limit.getIpWhiteListSwitch())) {
+            if (!authIpService.isPermitted(requestIp)) {
+                throw new ServiceException("当前IP不允许登录：" + requestIp);
+            }
+        }
 
         // 是否开启验证码
-//        if (SystemCodeType.YES.match(limit.getLoginCaptchaSwitch())) {
-//            captchaProducer.validate(dto.getDeviceId(), dto.getValiCode());
-//        }
-//
-//        // 判断密码错误次数
-//        int errorPasswordCount = adminCache.getErrorPasswordCount(dto.getAccount());
-//        this.checkPasswordErrorCount(limit, errorPasswordCount);
+        if (SystemCodeType.YES.match(limit.getLoginCaptchaSwitch())) {
+            captchaProducer.validate(dto.getDeviceId(), dto.getValiCode());
+        }
+
+        // 判断密码错误次数
+        int errorPasswordCount = adminCache.getErrorPasswordCount(dto.getAccount());
+        this.checkPasswordErrorCount(limit, errorPasswordCount);
 
         // 校验安全码
         SysUser user = userService.getByUsername(dto.getAccount());
@@ -89,9 +89,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             throw new UsernameNotFoundException("用户不存在或密码不正确！");
         }
 
-//        if (SystemCodeType.YES.match(limit.getGoogleAuthSwitch())) {
-//            this.checkGoogleAuthCode(user.getSafeCode(), dto.getGoogleCode());
-//        }
+        if (SystemCodeType.YES.match(limit.getGoogleAuthSwitch())) {
+            this.checkGoogleAuthCode(user.getSafeCode(), dto.getGoogleCode());
+        }
 
         // 解密密码并登陆
         String password = passwordService.decode(dto.getPassword(), RsaConstant.PRIVATE_KEY);
@@ -101,7 +101,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         adminCache.cleanErrorPasswordCount(user.getUserName());
 
         // 更新用户登录信息
-//        user.setLoginIp(requestIp);
+        user.setLoginIp(requestIp);
         user.setLoginDate(new Date());
         userService.updateById(user);
 

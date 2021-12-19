@@ -19,6 +19,7 @@ import com.gameplat.admin.service.MemberGrowthConfigService;
 import com.gameplat.admin.service.MemberGrowthLevelService;
 import com.gameplat.admin.service.MemberGrowthRecordService;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -108,7 +109,7 @@ public class MemberGrowthLevelServiceImpl extends ServiceImpl<MemberGrowthLevelM
                     record.setType(3);
                     record.setOldLevel(userRecord.getCurrentLevel());
                     record.setCurrentLevel(newLevel);
-                    record.setChangeMult(1.0);
+                    record.setChangeMult(new BigDecimal("1"));
                     record.setOldGrowth(userRecord.getCurrentGrowth());
 
                     if (newLevel < userRecord.getCurrentLevel()){

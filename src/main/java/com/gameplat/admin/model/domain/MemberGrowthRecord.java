@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import io.swagger.annotations.ApiModelProperty;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Date;
 import lombok.Data;
 
@@ -46,7 +47,7 @@ public class MemberGrowthRecord implements Serializable {
     private Integer currentLevel;
 
     @ApiModelProperty(value = "变动倍数")
-    private Double changeMult;
+    private BigDecimal changeMult;
 
     @ApiModelProperty(value = "变动的成长值")
     private Integer changeGrowth;

@@ -164,7 +164,7 @@ public class MemberGrowthRecordServiceImpl extends ServiceImpl<MemberGrowthRecor
                 changeFinalGrowth = growthConfig.getRechageRate().multiply(BigDecimal.valueOf(changeGrowth)).intValue();
                 saveRecord.setKindName(kindName);
                 saveRecord.setKindCode("plat");
-                saveRecord.setChangeMult(growthConfig.getRechageRate().doubleValue());
+                saveRecord.setChangeMult(growthConfig.getRechageRate());
             } else {
                 return;
             }
@@ -183,7 +183,7 @@ public class MemberGrowthRecordServiceImpl extends ServiceImpl<MemberGrowthRecor
                 }
                 saveRecord.setKindName(kindName);
                 saveRecord.setKindCode("plat");
-                saveRecord.setChangeMult(1.0);
+                saveRecord.setChangeMult(new BigDecimal("1"));
                 saveRecord.setRemark(dto.getRemark());
             } else {
                 return;
@@ -195,7 +195,7 @@ public class MemberGrowthRecordServiceImpl extends ServiceImpl<MemberGrowthRecor
                 changeFinalGrowth = growthConfig.getDamaRate().multiply(BigDecimal.valueOf(changeGrowth)).intValue();
                 saveRecord.setKindName(dto.getKindName());
                 saveRecord.setKindCode(dto.getKindCode());
-                saveRecord.setChangeMult(growthConfig.getDamaRate().multiply(dto.getChangeMult()).setScale(2).doubleValue());
+                saveRecord.setChangeMult(growthConfig.getDamaRate().multiply(dto.getChangeMult()).setScale(2));
             } else {
                 return;
             }
@@ -204,7 +204,7 @@ public class MemberGrowthRecordServiceImpl extends ServiceImpl<MemberGrowthRecor
             changeFinalGrowth = changeGrowth;
             saveRecord.setKindName(kindName);
             saveRecord.setKindCode("plat");
-            saveRecord.setChangeMult(new BigDecimal("1").doubleValue());
+            saveRecord.setChangeMult(new BigDecimal("1"));
             if (dto.getRemark() != null){
                 saveRecord.setRemark(dto.getRemark());
             }

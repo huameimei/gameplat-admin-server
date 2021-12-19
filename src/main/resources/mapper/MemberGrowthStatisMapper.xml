@@ -56,10 +56,9 @@
         a.account AS username,
         a.user_level AS userRank,
         i.last_login_ip AS lastLoginIp,
-        IFNULL(c.level,0) AS userLevel
+        IFNULL(a.level,0) AS userLevel
         FROM member a
         LEFT JOIN member_info i ON a.id = i.member_id
-        LEFT JOIN member_growth_statis c ON a.id = c.user_id
         <where>
             <if test="userIdList != null and userIdList.size > 0">
                 and a.id in

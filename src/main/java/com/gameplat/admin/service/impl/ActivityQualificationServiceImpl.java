@@ -265,18 +265,22 @@ public class ActivityQualificationServiceImpl extends
     @Override
     public Map<String, Object> checkQualification(ActivityQualificationCheckDTO activityQualificationCheckDTO) {
         List<ActivityMemberInfo> activityUserInfoList;
+        MemberInfoVO memberInfo = null;
         Map<String, Object> retMap = new HashMap<>(3);
         try {
-            List<String> userNameList = new ArrayList<>();
-            userNameList.add(activityQualificationCheckDTO.getUsername());
+//            List<String> userNameList = new ArrayList<>();
+//            userNameList.add(activityQualificationCheckDTO.getUsername());
             //查询用户参加活动需要的用户基本信息
-            Map map = new HashMap();
-            map.put("userNameList", userNameList);
-            activityUserInfoList = memberGrowthStatisService.findActivityMemberInfo(map);
-            if (StringUtils.isEmpty(activityUserInfoList)) {
+//            Map map = new HashMap();
+//            map.put("userNameList", userNameList);
+
+            memberInfo = memberService.getMemberInfo(activityQualificationCheckDTO.getUsername());
+
+//            activityUserInfoList = memberGrowthStatisService.findActivityMemberInfo(map);
+            if (memberInfo == null) {
                 throw new ServiceException("账号不存在,请输入真实有效的账号");
             }
-            activityCommonService.userDetection(activityUserInfoList.get(0), 3);
+            activityCommonService.userDetection(memberInfo, 3);
         } catch (ServiceException e) {
             retMap.put("step", 1);
             retMap.put("success", false);
@@ -298,7 +302,7 @@ public class ActivityQualificationServiceImpl extends
 
         try {
             //黑名单检测
-            activityCommonService.blacklistDetection(activityLobby, activityUserInfoList.get(0), 3);
+            activityCommonService.blacklistDetection(activityLobby, memberInfo, 3);
         } catch (ServiceException e) {
             retMap.put("step", 3);
             retMap.put("success", false);
@@ -308,7 +312,7 @@ public class ActivityQualificationServiceImpl extends
 
         try {
             //资格检测
-            activityCommonService.qualificationDetection(activityLobby, activityUserInfoList.get(0), countDate, 3);
+            activityCommonService.qualificationDetection(activityLobby, memberInfo, countDate, 3);
         } catch (ServiceException e) {
             retMap.put("step", 4);
             retMap.put("success", false);
@@ -318,7 +322,7 @@ public class ActivityQualificationServiceImpl extends
 
         try {
             //规则检测
-            manageList = activityCommonService.activityRuleDetection(activityLobby, countDate, activityUserInfoList, 3);
+            manageList = activityCommonService.activityRuleDetection(activityLobby, countDate, memberInfo, 3);
         } catch (ServiceException e) {
             retMap.put("step", 5);
             retMap.put("success", false);

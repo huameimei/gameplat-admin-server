@@ -25,7 +25,7 @@ public class MemberInfoVO implements Serializable {
   /** 用户类型 */
   private String userType;
 
-  /** 会员状态 */
+  /** 会员状态 禁用：-1；停用：0；正常：1*/
   private Integer status;
 
   private String withdrawFlag;
@@ -95,4 +95,7 @@ public class MemberInfoVO implements Serializable {
 
   /** 会员备注 */
   private String remark;
+
+  /** 会员VIP等级 */
+  private Integer level;
 }

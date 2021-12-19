@@ -14,6 +14,7 @@ import com.gameplat.admin.model.bean.ActivityMemberInfo;
 import com.gameplat.admin.model.bean.ActivityStatisticItem;
 import com.gameplat.admin.model.domain.*;
 import com.gameplat.admin.model.dto.ActivityLobbyDTO;
+import com.gameplat.admin.model.vo.MemberInfoVO;
 import com.gameplat.admin.service.*;
 import com.gameplat.admin.util.IdempotentKeyUtils;
 import com.gameplat.base.common.exception.ServiceException;
@@ -135,8 +136,8 @@ public class ActivityCommonServiceImpl implements ActivityCommonService {
     }
 
     @Override
-    public void userDetection(ActivityMemberInfo activityMemberInfo, int flagCheck) {
-        if (activityMemberInfo.getStatus() == 0) {
+    public void userDetection(MemberInfoVO memberInfo, int flagCheck) {
+        if (memberInfo.getStatus() == 0) {
             //账号状态异常
             throw new ServiceException("账号状态异常");
         }
@@ -232,16 +233,16 @@ public class ActivityCommonServiceImpl implements ActivityCommonService {
     }
 
     @Override
-    public void blacklistDetection(ActivityLobby activityLobby, ActivityMemberInfo activityMemberInfo, int i) {
+    public void blacklistDetection(ActivityLobby activityLobby, MemberInfoVO memberInfo, int i) {
         //查询该活动黑名单
         LambdaQueryChainWrapper<ActivityBlacklist> activityBlacklistLambdaQueryChainWrapper = activityBlacklistService.lambdaQuery();
         activityBlacklistLambdaQueryChainWrapper
                 .eq(ActivityBlacklist::getActivityId, activityLobby.getId());
 
-        if (StringUtils.isNotBlank(activityMemberInfo.getUsername()) && StringUtils.isNotBlank(activityMemberInfo.getLastLoginIp())) {
+        if (StringUtils.isNotBlank(memberInfo.getAccount()) && StringUtils.isNotBlank(memberInfo.getLastLoginIp())) {
             activityBlacklistLambdaQueryChainWrapper
-                    .and(wrapper -> wrapper.eq(ActivityBlacklist::getLimitedContent, activityMemberInfo.getUsername()
-                            ).or().eq(ActivityBlacklist::getLimitedContent, activityMemberInfo.getLastLoginIp())
+                    .and(wrapper -> wrapper.eq(ActivityBlacklist::getLimitedContent, memberInfo.getAccount()
+                            ).or().eq(ActivityBlacklist::getLimitedContent, memberInfo.getLastLoginIp())
                     );
         }
 
@@ -253,19 +254,19 @@ public class ActivityCommonServiceImpl implements ActivityCommonService {
     }
 
     @Override
-    public void qualificationDetection(ActivityLobby activityLobby, ActivityMemberInfo activityMemberInfo, Date countDate, int i) {
+    public void qualificationDetection(ActivityLobby activityLobby, MemberInfoVO memberInfo, Date countDate, int i) {
         //判断该用户是否重复参加该活动
         ActivityQualification query = new ActivityQualification();
         query.setActivityId(activityLobby.getId());
         query.setActivityType(activityLobby.getType());
-        query.setUserId(activityMemberInfo.getUserId());
+        query.setUserId(memberInfo.getId());
         if (activityLobby.getIsRepeat() == 1) {
             query.setSoleIdentifier(IdempotentKeyUtils.md5(DateUtil.formatDate(countDate)));
         }
 
         Integer count = activityQualificationService.lambdaQuery().eq(ActivityQualification::getActivityId, activityLobby.getId())
                 .eq(ActivityQualification::getActivityType, activityLobby.getType())
-                .eq(ActivityQualification::getUserId, activityMemberInfo.getUserId())
+                .eq(ActivityQualification::getUserId, memberInfo.getId())
                 .eq(activityLobby.getIsRepeat() == 1
                         , ActivityQualification::getSoleIdentifier, IdempotentKeyUtils.md5(DateUtil.formatDate(countDate)))
                 .count();
@@ -281,12 +282,12 @@ public class ActivityCommonServiceImpl implements ActivityCommonService {
 
         // 判断用户充值层级是否满足活动要求
         String gradedRequire = activityLobby.getGraded();
-        String rank = activityMemberInfo.getUserRank() != null ? activityMemberInfo.getUserRank() : "0";
+        String rank = memberInfo.getUserLevel() != null ? String.valueOf(memberInfo.getUserLevel()) : "0";
         if (StringUtils.isNotEmpty(gradedRequire)) {
             String[] graders = gradedRequire.split(",");
             List<String> graderList = Lists.newArrayList(graders);
             if (!graderList.contains(rank)) {
-                log.info("活动:{},限制此用户充值层级:{}", activityLobby.getTitle(), activityMemberInfo.getUserId());
+                log.info("活动:{},限制此用户充值层级:{}", activityLobby.getTitle(), memberInfo.getId());
                 //你的条件不符合该活动要求
                 throw new ServiceException("E016");
             }
@@ -294,12 +295,12 @@ public class ActivityCommonServiceImpl implements ActivityCommonService {
 
         //判断用户VIP等级是否满足活动要求
         String userLevelRequire = activityLobby.getUserLevel();
-        String userLevel = activityMemberInfo.getUserLevel() != null ? String.valueOf(activityMemberInfo.getUserLevel()) : "0";
+        String userLevel = memberInfo.getLevel() != null ? String.valueOf(memberInfo.getLevel()) : "0";
         if (StringUtils.isNotEmpty(userLevelRequire)) {
             String[] userLevels = userLevelRequire.split(",");
             List<String> userLevelList = Lists.newArrayList(userLevels);
             if (!userLevelList.contains(userLevel)) {
-                log.info("活动:{},限制此用户VIP等级:{}", activityLobby.getTitle(), activityMemberInfo.getUserId());
+                log.info("活动:{},限制此用户VIP等级:{}", activityLobby.getTitle(), memberInfo.getId());
                 //你的VIP等级不符合该活动要求
                 throw new ServiceException("E017");
             }
@@ -307,7 +308,7 @@ public class ActivityCommonServiceImpl implements ActivityCommonService {
     }
 
     @Override
-    public List<ActivityQualification> activityRuleDetection(ActivityLobby activityLobby, Date countDate, List<ActivityMemberInfo> activityUserInfoList, int flagCheck) {
+    public List<ActivityQualification> activityRuleDetection(ActivityLobby activityLobby, Date countDate, MemberInfoVO memberInfo, int flagCheck) {
         // 根据活动id查询对应的优惠列表
         List<ActivityLobbyDiscount> lobbyDiscounts =
                 activityLobbyDiscountService.lambdaQuery()
@@ -327,11 +328,11 @@ public class ActivityCommonServiceImpl implements ActivityCommonService {
         switch (statisItem) {
             case 1:
                 // 累计充值金额
-                manageList = dealCumulativeRecharge(activityLobby, lobbyDiscounts, activityUserInfoList, statisticalStartTime, statisticalEndTime, flagCheck, countDate);
+                manageList = dealCumulativeRecharge(activityLobby, lobbyDiscounts, memberInfo, statisticalStartTime, statisticalEndTime, flagCheck, countDate);
                 break;
             case 2:
                 // 累计充值天数
-                manageList = dealCumulativeRechargeDays(activityLobby, lobbyDiscounts, activityUserInfoList, statisticalStartTime, statisticalEndTime, flagCheck, countDate);
+                manageList = dealCumulativeRechargeDays(activityLobby, lobbyDiscounts, memberInfo, statisticalStartTime, statisticalEndTime, flagCheck, countDate);
                 break;
             case 3:
                 // 连续充值天数
@@ -376,12 +377,16 @@ public class ActivityCommonServiceImpl implements ActivityCommonService {
      * @param memberActivityLobby 活动
      * @param discounts           活动 所有优惠
      */
-    public List<ActivityQualification> dealCumulativeRechargeDays(ActivityLobby memberActivityLobby, List<ActivityLobbyDiscount> discounts
-            , List<ActivityMemberInfo> activityUserInfoList, String startTime, String endTime, Integer flagCheck, Date countDate) {
+    public List<ActivityQualification> dealCumulativeRechargeDays(ActivityLobby memberActivityLobby,
+                                                                  List<ActivityLobbyDiscount> discounts,
+                                                                  MemberInfoVO memberInfo,
+                                                                  String startTime, String endTime, Integer flagCheck, Date countDate) {
         //查询统计周期内的会员游戏日报表汇总数据(打码量)
-        Map map = new HashMap<>();
-        if (StringUtils.isNotEmpty(activityUserInfoList)) {
-            map.put("userNameList", activityUserInfoList.stream().map(ActivityMemberInfo::getUsername).collect(Collectors.toList()));
+        Map map = new HashMap<>(1);
+        if (memberInfo != null) {
+            List<String> accountList = new ArrayList<>();
+            accountList.add(memberInfo.getAccount());
+            map.put("userNameList", accountList);
         }
         map.put("startTime", startTime);
         map.put("endTime", endTime);
@@ -441,12 +446,17 @@ public class ActivityCommonServiceImpl implements ActivityCommonService {
      * @param memberActivityLobby 活动
      * @param discounts           活动 所有优惠
      */
-    public List<ActivityQualification> dealCumulativeRecharge(ActivityLobby memberActivityLobby, List<ActivityLobbyDiscount> discounts, List<ActivityMemberInfo> activityUserInfoList,
-                                                              String startTime, String endTime, Integer flagCheck, Date countDate) {
+    public List<ActivityQualification> dealCumulativeRecharge(ActivityLobby memberActivityLobby,
+                                                              List<ActivityLobbyDiscount> discounts,
+                                                              MemberInfoVO memberInfo,
+                                                              String startTime, String endTime,
+                                                              Integer flagCheck, Date countDate) {
         //查询统计周期内的会员游戏日报表汇总数据(打码量)
         Map map = new HashMap<>();
-        if (StringUtils.isNotEmpty(activityUserInfoList)) {
-            map.put("userNameList", activityUserInfoList.stream().map(ActivityMemberInfo::getUsername).collect(Collectors.toList()));
+        if (memberInfo != null) {
+            List<String> accountList = new ArrayList<>();
+            accountList.add(memberInfo.getAccount());
+            map.put("userNameList", accountList);
         }
         map.put("startTime", startTime);
         map.put("endTime", endTime);

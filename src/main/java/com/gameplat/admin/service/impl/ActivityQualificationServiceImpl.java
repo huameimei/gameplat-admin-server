@@ -20,7 +20,10 @@ import com.gameplat.admin.model.domain.ActivityQualification;
 import com.gameplat.admin.model.dto.*;
 import com.gameplat.admin.model.vo.ActivityQualificationVO;
 import com.gameplat.admin.model.vo.MemberInfoVO;
-import com.gameplat.admin.service.*;
+import com.gameplat.admin.service.ActivityCommonService;
+import com.gameplat.admin.service.ActivityDistributeService;
+import com.gameplat.admin.service.ActivityQualificationService;
+import com.gameplat.admin.service.MemberService;
 import com.gameplat.base.common.context.GlobalContextHolder;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.DateUtil;
@@ -60,10 +63,6 @@ public class ActivityQualificationServiceImpl extends
 
     @Autowired
     private ActivityCommonService activityCommonService;
-
-    @Autowired
-    private MemberGrowthStatisService memberGrowthStatisService;
-
 
     @Override
     public List<ActivityQualification> findQualificationList(ActivityQualification activityQualification) {

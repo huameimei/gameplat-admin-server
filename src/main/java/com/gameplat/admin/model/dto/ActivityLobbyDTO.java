@@ -45,7 +45,7 @@ public class ActivityLobbyDTO implements Serializable {
     private Date endTime;
 
     @ApiModelProperty(value = "活动大类")
-    private Long type;
+    private Integer type;
 
     @ApiModelProperty(value = "活动类型（1 充值活动(统计项目(statisItem)选项中的1,2,3,4,5项可选)；2 游戏活动(统计项目(statisItem)选项中的6,7,8,9,10,11,12项可选)")
     private Integer activityType;

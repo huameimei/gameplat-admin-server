@@ -7,7 +7,6 @@ import lombok.Data;
 
 import java.io.Serializable;
 import java.util.List;
-import lombok.Data;
 
 /**
  * 活动资格新增DTO
@@ -23,7 +22,7 @@ public class ActivityQualificationAddDTO implements Serializable {
     /**
      * 1 活动大厅  2 红包雨
      */
-    @ApiModelProperty(value = "活动类型，1 活动大厅")
+    @ApiModelProperty(value = "活动类型，1 活动大厅，2 红包雨")
     private Integer type;
 
     /**

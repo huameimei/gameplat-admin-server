@@ -11,10 +11,8 @@ import com.gameplat.admin.model.domain.MemberWealReword;
 import com.gameplat.admin.model.dto.MemberWealRewordAddDTO;
 import com.gameplat.admin.model.dto.MemberWealRewordDTO;
 import com.gameplat.admin.model.vo.MemberWealRewordVO;
-import com.gameplat.admin.service.MemberService;
 import com.gameplat.admin.service.MemberWealRewordService;
 import com.gameplat.base.common.exception.ServiceException;
-import com.gameplat.redis.redisson.DistributedLocker;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.List;
@@ -36,13 +34,6 @@ import org.springframework.stereotype.Service;
 public class MemberWealRewordServiceImpl extends ServiceImpl<MemberWealRewordMapper, MemberWealReword> implements MemberWealRewordService {
 
     @Autowired private MemberWealRewordConvert rewordConvert;
-
-    @Autowired private MemberWealRewordMapper rewordMapper;
-
-    @Autowired private MemberService memberService;
-
-    @Autowired
-    private DistributedLocker distributedLocker;
 
     /**
      * 分页获取VIP福利记录列表
@@ -115,7 +106,7 @@ public class MemberWealRewordServiceImpl extends ServiceImpl<MemberWealRewordMap
     }
 
     @Override
-    public void insert(MemberWealRewordAddDTO dto) {
+    public void insertMemberWealReword(MemberWealRewordAddDTO dto) {
         MemberWealReword memberWealReword = rewordConvert.toEntity(dto);
         if (!this.save(memberWealReword)){
             throw new ServiceException("新增福利记录失败！");
@@ -132,6 +123,4 @@ public class MemberWealRewordServiceImpl extends ServiceImpl<MemberWealRewordMap
                 .ge(MemberWealReword::getCurrentLevel, dto.getVipLevel())
                 .count();
     }
-
-
 }

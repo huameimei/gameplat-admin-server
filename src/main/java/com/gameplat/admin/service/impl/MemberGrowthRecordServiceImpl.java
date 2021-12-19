@@ -89,6 +89,7 @@ public class MemberGrowthRecordServiceImpl extends ServiceImpl<MemberGrowthRecor
         return result;
     }
 
+    /** 成长值变动后重新计算新的等级 */
     @Override
     public Integer dealUpLevel(Integer afterGrowth, MemberGrowthConfig memberGrowthConfig) {
         //todo 1.先获取所有成长值等级
@@ -234,7 +235,7 @@ public class MemberGrowthRecordServiceImpl extends ServiceImpl<MemberGrowthRecor
         if(memberGrowthRecord.getCurrentGrowth() < 0) {
             memberGrowthRecord.setCurrentGrowth(0);
         }
-
+        //成长值变动后重新计算新的等级
         Integer afterLevel = this.dealUpLevel(memberGrowthRecord.getCurrentGrowth(),growthConfig);
         memberGrowthRecord.setCurrentLevel(afterLevel);
         //todo 5.记录成长值变动记录  重新更新 会员成长值汇总

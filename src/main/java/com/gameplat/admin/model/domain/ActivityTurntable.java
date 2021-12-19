@@ -22,7 +22,6 @@ import java.util.Date;
 @Data
 @TableName("activity_turntable")
 @EqualsAndHashCode(callSuper = false)
-@ApiModel(value = "ActivityTurntable对象", description = "转盘表")
 public class ActivityTurntable implements Serializable {
 
     private static final long serialVersionUID = 1L;

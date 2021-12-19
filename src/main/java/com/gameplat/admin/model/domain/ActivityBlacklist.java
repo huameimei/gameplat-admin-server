@@ -1,9 +1,9 @@
 package com.gameplat.admin.model.domain;
 
-import com.baomidou.mybatisplus.annotation.TableName;
-import io.swagger.annotations.ApiModelProperty;
-import java.io.Serializable;
+import com.baomidou.mybatisplus.annotation.*;
 import lombok.Data;
+
+import java.io.Serializable;
 
 
 /**
@@ -18,23 +18,37 @@ import lombok.Data;
 public class ActivityBlacklist implements Serializable {
 
     private static final long serialVersionUID = 8368306176937351503L;
-    @ApiModelProperty(value = "主键ID")
+    /**
+     * 主键ID
+     */
+    @TableId(value = "id", type = IdType.AUTO)
     private Long id;
 
-    @ApiModelProperty(value = "活动ID")
+    /**
+     * 活动ID
+     */
     private Long activityId;
 
-    @ApiModelProperty(value = "限制内容")
+    /**
+     * 限制内容
+     */
     private String limitedContent;
 
-    @ApiModelProperty(value = "限制类型 1会员账号  2 ip地址")
+    /**
+     * 限制类型 1会员账号  2 ip地址
+     */
     private Integer limitedType;
 
-    @ApiModelProperty(value = "创建人")
+    /**
+     * 创建人
+     */
+    @TableField(fill = FieldFill.INSERT)
     private String createBy;
 
-    @ApiModelProperty(value = "创建时间")
+    /**
+     * 创建时间
+     */
+    @TableField(fill = FieldFill.INSERT)
     private String createTime;
-
 
 }

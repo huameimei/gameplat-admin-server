@@ -55,7 +55,7 @@ public class ActivityRedPacketConfigVO implements Serializable {
     private Long weekendRedenvelopeId;
 
     @ApiModelProperty("是否启用ip限制")
-    private String redenvelopeIsIpLimit;
+    private Boolean redenvelopeIsIpLimit;
 
     @ApiModelProperty("聊天室红包配置")
     private String redenvelopeChat;

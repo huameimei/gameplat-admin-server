@@ -141,7 +141,7 @@ public class ActivityInfoServiceImpl
     }
 
     @Override
-    public List<ActivityInfoVO> getAllSysActivityWithRule() {
+    public List<ActivityInfoVO> getAllActivity() {
         LambdaQueryChainWrapper<ActivityInfo> queryWrapper = this.lambdaQuery();
         queryWrapper.eq(ActivityInfo::getStatus, 1);
         List<ActivityInfo> activityInfoList = queryWrapper.list();

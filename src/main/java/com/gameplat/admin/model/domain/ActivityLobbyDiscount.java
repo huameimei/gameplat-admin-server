@@ -1,18 +1,17 @@
 package com.gameplat.admin.model.domain;
 
-import com.baomidou.mybatisplus.annotation.FieldFill;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
 import io.swagger.annotations.ApiModelProperty;
+
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
+
 import lombok.Data;
 
 
 /**
- * @author lyq
+ * @author kenvin
  * @Description 实体层
  * @date 2020-08-20 11:27:34
  */
@@ -21,45 +20,69 @@ import lombok.Data;
 public class ActivityLobbyDiscount implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    @ApiModelProperty(value = "大厅优惠id")
-    @TableId("lobby_discount_id")
+    /**
+     * 大厅优惠id
+     */
+    @TableId(value = "lobby_discount_id", type = IdType.AUTO)
     private Long lobbyDiscountId;
 
-    @ApiModelProperty(value = "活动大厅id")
+    /**
+     * 活动大厅id
+     */
     private Long lobbyId;
 
-    @ApiModelProperty(value = "优惠url")
+    /**
+     * 优惠url
+     */
     private String discountUrl;
 
-    @ApiModelProperty(value = "目标值")
+    /**
+     * 目标值
+     */
     private Integer targetValue;
 
-    @ApiModelProperty(value = "赠送值")
+    /**
+     * 赠送值
+     */
     private Integer presenterValue;
 
-    @ApiModelProperty(value = "赠送打码")
+    /**
+     * 赠送打码
+     */
     private BigDecimal presenterDml;
 
-    @ApiModelProperty(value = "提现打码")
+    /**
+     * 提现打码
+     */
     private Integer withdrawDml;
 
-    @ApiModelProperty(value = "备注")
+    /**
+     * 备注
+     */
     private String remark;
 
+    /**
+     * 创建人
+     */
     @TableField(fill = FieldFill.INSERT)
-    @ApiModelProperty(value = "创建人")
     private String createBy;
 
+    /**
+     * 创建时间
+     */
     @TableField(fill = FieldFill.INSERT)
-    @ApiModelProperty(value = "创建时间")
     private Date createTime;
 
+    /**
+     * 更新人
+     */
     @TableField(fill = FieldFill.INSERT_UPDATE)
-    @ApiModelProperty(value = "更新人")
     private String updateBy;
 
+    /**
+     * 更新时间
+     */
     @TableField(fill = FieldFill.INSERT_UPDATE)
-    @ApiModelProperty(value = "更新时间")
     private Date updateTime;
 
 }

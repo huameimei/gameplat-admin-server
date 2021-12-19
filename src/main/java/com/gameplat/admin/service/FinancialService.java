@@ -6,7 +6,7 @@ import java.util.Map;
 
 public interface FinancialService extends IService<Financial> {
 
-    int insert(Financial financial);
+    int insertFinancial(Financial financial);
 
     // 参数校验
     void checkFinancialParam(Financial financial);

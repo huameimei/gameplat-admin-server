@@ -122,36 +122,16 @@ public class MemberWealRewordServiceImpl extends ServiceImpl<MemberWealRewordMap
         }
     }
 
-//    @Override
-//    public void check(MemberWealRewordCheckDTO dto, HttpServletRequest request) {
-//        //获取奖励记录
-//        MemberWealReword wealReword = rewordMapper.selectById(dto.getId());
-//        if (wealReword.getStatus() != 0){
-//            throw new ServiceException("已审核过!");
-//        }
-//
-//        //获取奖励用户
-//        MemberInfoVO member = memberService.getInfo(wealReword.getUserId());
-//        //福利状态
-//        Integer status = dto.getStatus();
-//        //'已完成' 状态  表示审核通过
-//        if (status == 2) {
-//            // 账户资金锁
-//            String lockKey = MessageFormat.format(MemberServiceKeyConstant.MEMBER_FINANCIAL_LOCK, member.getAccount());
-//            try {
-//                // 获取资金锁（等待8秒，租期120秒）
-//                boolean flag = distributedLocker.tryLock(lockKey, TimeUnit.SECONDS, 8, 120);
-//                if (!flag) {
-//                    throw new ServiceException("资金锁未释放！");
-//                }
-//                // 给用户增加真币资产
-//
-//                //通知 发个人消息
-//
-//        } else if (status == 3) {//'已失效' 状态 表示审核不通过
-//                wealReword.setRemark(dto.getRemark());
-//        }
-//    }
+
+    @Override
+    public Integer findCountReword(MemberWealRewordDTO dto) {
+        return this.lambdaQuery()
+                .eq(MemberWealReword::getType, 0)
+                .eq(MemberWealReword::getUserId, dto.getUserId())
+                .lt(MemberWealReword::getOldLevel, dto.getVipLevel())
+                .ge(MemberWealReword::getCurrentLevel, dto.getVipLevel())
+                .count();
+    }
 
 
 }

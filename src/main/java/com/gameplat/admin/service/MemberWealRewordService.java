@@ -21,15 +21,12 @@ public interface MemberWealRewordService extends IService<MemberWealReword> {
      */
     void exportWealReword(MemberWealRewordDTO queryDTO, HttpServletResponse response);
 
-    /**
-     * 审核  当会员领取了奖励之后  需要审核 审核通过之后
-     */
-//    void check(MemberWealRewordCheckDTO dto, HttpServletRequest request);
-
+    Integer findCountReword(MemberWealRewordDTO dto);
     /**
      * 新增福利记录
      */
-    void insert(MemberWealRewordAddDTO dto);
+    void insertMemberWealReword(MemberWealRewordAddDTO dto);
+
 
     /**
      * 获取VIP福利记录列表 不分页

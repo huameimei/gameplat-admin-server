@@ -35,6 +35,18 @@ public class MemberGrowthConfigServiceImpl extends ServiceImpl<MemberGrowthConfi
     }
 
     /**
+     * 只查询一条
+     */
+    @Override
+    public MemberGrowthConfig getOneConfig(String language) {
+
+        if(StrUtil.isBlank(language)) {
+            language = LanguageEnum.app_zh_CN.getCode();
+        }
+        return configMapper.findOneConfig(language);
+    }
+
+    /**
      * 修改成长值配置
      * */
     @Override

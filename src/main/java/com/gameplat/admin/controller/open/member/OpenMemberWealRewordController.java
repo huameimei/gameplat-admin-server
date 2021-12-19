@@ -43,23 +43,5 @@ public class OpenMemberWealRewordController {
         rewordService.exportWealReword(queryDTO, response);
     }
 
-//    @PutMapping("/check")
-//    @ApiOperation(value = "审核升级奖励")
-//    @PreAuthorize("hasAuthority('member:wealReword:check')")
-//    public void check(@RequestBody MemberWealRewordCheckDTO dto, HttpServletRequest request){
-//
-//        MemberGrowthConfigVO config = configService.findOneConfig(LanguageEnum.app_zh_CN.getCode());
-//
-//        if (config.getIsEnableVip() == 0) {
-//            throw new ServiceException("未开启VIP功能");
-//        }
-//        if (dto.getId() == null) {
-//            throw new ServiceException("参数不全");
-//        }
-//        if (dto.getStatus() == 3 && StrUtil.isBlank(dto.getRemark())) {
-//            throw new ServiceException("参数不全");
-//        }
-//        rewordService.check(dto, request);
-//    }
 
 }

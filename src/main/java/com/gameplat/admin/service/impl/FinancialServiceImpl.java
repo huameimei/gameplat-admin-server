@@ -38,7 +38,7 @@ public class FinancialServiceImpl extends ServiceImpl<FinancialMapper, Financial
      * 添加流水
      */
     @Override
-    public int insert(Financial financial) {
+    public int insertFinancial(Financial financial) {
         // 参数校验
         checkFinancialParam(financial);
         financial.setCreateBy("system");

@@ -9,6 +9,7 @@ import com.gameplat.admin.convert.MemberGrowthLevelConvert;
 import com.gameplat.admin.enums.LanguageEnum;
 import com.gameplat.admin.mapper.MemberGrowthLevelMapper;
 import com.gameplat.admin.model.domain.Member;
+import com.gameplat.admin.model.domain.MemberGrowthConfig;
 import com.gameplat.admin.model.domain.MemberGrowthLevel;
 import com.gameplat.admin.model.domain.MemberGrowthRecord;
 import com.gameplat.admin.model.dto.MemberGrowthLevelEditDto;
@@ -69,6 +70,14 @@ public class MemberGrowthLevelServiceImpl extends ServiceImpl<MemberGrowthLevelM
         return voList;
     }
 
+    @Override
+    public List<MemberGrowthLevel> getList(Integer limitLevel, String language) {
+        if (StrUtil.isBlank(language)) {
+            language = LanguageEnum.app_zh_CN.getCode();
+        }
+        return levelMapper.findList(limitLevel+1, language);
+    }
+
     /**
      * 批量修改VIP等级
      */
@@ -85,7 +94,7 @@ public class MemberGrowthLevelServiceImpl extends ServiceImpl<MemberGrowthLevelM
         if(count > 0) {
             //获取到所有VIP汇总数据
             List<MemberGrowthRecord> recordList = memberGrowthRecordService.findRecordGroupBy(new MemberGrowthRecord());
-            MemberGrowthConfigVO growthConfig = growthConfigService.findOneConfig(LanguageEnum.app_zh_CN.getCode());
+            MemberGrowthConfig growthConfig = growthConfigService.getOneConfig(LanguageEnum.app_zh_CN.getCode());
             for (MemberGrowthRecord userRecord : recordList) {
                 //得到重新计算后的等级
                 Integer newLevel = memberGrowthRecordService.dealUpLevel(userRecord.getCurrentGrowth(), growthConfig);

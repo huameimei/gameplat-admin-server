@@ -18,6 +18,11 @@ public interface MemberGrowthLevelService extends IService<MemberGrowthLevel> {
     List<MemberGrowthLevelVO> findList(Integer limitLevel, String language);
 
     /**
+     * 查询所有等级
+     */
+    List<MemberGrowthLevel> getList(Integer limitLevel, String language);
+
+    /**
      * 批量修改VIP等级
      */
     void batchUpdateLevel(List<MemberGrowthLevelEditDto> list,  String language);

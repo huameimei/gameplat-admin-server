@@ -429,7 +429,7 @@ public class MemberWealServiceImpl extends ServiceImpl<MemberWealMapper, MemberW
                                         financial.setSourceType(sourceType);
                                         financial.setRemark(content);
                                         //添加流水数据
-                                        financialService.insert(financial);
+                                        financialService.insertFinancial(financial);
                                         //已完成
                                         memberWealReword.setStatus(2);
                                         //默认当前时间为领取时间  实际上不需要领取
@@ -458,7 +458,7 @@ public class MemberWealServiceImpl extends ServiceImpl<MemberWealMapper, MemberW
                                 //新增系统回复用户消息
                                 sysInformationService.createSysInformation(sysInformationAddDTO);
                                 //添加奖励记录
-                                wealRewordService.insert(memberWealReword);
+                                wealRewordService.insertMemberWealReword(memberWealReword);
                                 //修改福利详情状态 为已完成
                                 wealDetailService.updateByWealStatus(item.getWealId(),2);
                             } catch (Exception e){
@@ -568,7 +568,7 @@ public class MemberWealServiceImpl extends ServiceImpl<MemberWealMapper, MemberW
                                     financial.setSourceType(sourceType);
                                     financial.setRemark(remark);
                                     //添加流水（VIP资金变动流水）
-                                    financialService.insert(financial);
+                                    financialService.insertFinancial(financial);
                                 } catch (Exception e) {
                                     log.error(MessageFormat.format("会员：{0}，VIP资金变动, 失败原因：{2}", member.getAccount(), e));
                                     // 释放资金锁

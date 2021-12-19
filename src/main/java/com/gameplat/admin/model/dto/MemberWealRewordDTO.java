@@ -35,4 +35,7 @@ public class MemberWealRewordDTO implements Serializable {
 
     @ApiModelProperty("结束时间")
     private String endTime;
+
+    @ApiModelProperty("vip等级")
+    private Integer vipLevel;
 }

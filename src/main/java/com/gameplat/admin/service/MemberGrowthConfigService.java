@@ -12,6 +12,8 @@ public interface MemberGrowthConfigService extends IService<MemberGrowthConfig> 
      */
     MemberGrowthConfigVO findOneConfig(String language);
 
+    MemberGrowthConfig getOneConfig(String language);
+
     /**
      * 修改成长值配置
      * */

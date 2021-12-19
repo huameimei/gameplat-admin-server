@@ -129,7 +129,7 @@ public class ActivityDistributeWayService extends ServiceImpl<ActivityDistribute
             financial.setIpAddress(IPUtils.getHostIp());
             financial.setIsLess(0);
             //记录现金流水
-            financialService.insert(financial);
+            financialService.insertFinancial(financial);
 
             //插入福利中心记录(已领取)
             wealReword.setStatus(MemberWealRewordEnums.MemberWealRewordStatus.COMPLETED.getValue());

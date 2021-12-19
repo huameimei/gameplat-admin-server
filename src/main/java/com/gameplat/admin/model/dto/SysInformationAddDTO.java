@@ -82,4 +82,8 @@ public class SysInformationAddDTO implements Serializable {
      */
     @ApiModelProperty(value = "用户反馈记录id")
     private Long userFeedbackId;
+
+    /** 创建人 */
+    @ApiModelProperty(value = "用户反馈记录id")
+    private String  createBy;
 }

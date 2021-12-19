@@ -4,12 +4,13 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import com.gameplat.admin.util.Date2LongSerializerUtils;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
 
 /**
  * 活动大厅VO
@@ -40,7 +41,8 @@ public class ActivityLobbyVO implements Serializable {
     private Date endTime;
 
     @ApiModelProperty(value = "活动大类")
-    private Integer type;
+    @JsonSerialize(using = ToStringSerializer.class)
+    private Long type;
 
     @ApiModelProperty(value = "活动类型（1 充值活动(统计项目(statisItem)选项中的1,2,3,4,5项可选)；2 游戏活动(统计项目(statisItem)选项中的6,7,8,9,10,11,12项可选)")
     private Integer activityType;
@@ -124,6 +126,7 @@ public class ActivityLobbyVO implements Serializable {
     private BigDecimal sportValidAmount;
 
     @ApiModelProperty(value = "指定比赛ID")
+    @JsonSerialize(using = ToStringSerializer.class)
     private Long matchId;
 
     @ApiModelProperty(value = "指定比赛类型")

@@ -169,7 +169,10 @@ public class ActivityRedPacketServiceImpl extends ServiceImpl<ActivityRedPacketM
         List<ActivityTurntablePrizeConfigVO> list = getTurntablePrizeConfig();
         for (ActivityTurntablePrizeConfigVO vo : list) {
             if (vo.getPrizeId().equals(activityTurntablePrizeConfigDTO.getPrizeId())) {
+                //中将概率不能修改
+                Double probability = vo.getProbability();
                 BeanUtils.copyProperties(activityTurntablePrizeConfigDTO, vo);
+                vo.setProbability(probability);
             }
         }
         SysDictData sysDictData = sysDictDataService.getDictList(ConfigConstant.ACTIVITY_CONFIG, ConfigConstant.ACTIVITY_REDPACKET_CONFIG_TURNTABLE_PRIZE);

@@ -1,9 +1,6 @@
 package com.gameplat.admin.model.domain;
 
-import com.baomidou.mybatisplus.annotation.FieldFill;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
 import io.swagger.annotations.ApiModelProperty;
 
 import java.io.Serializable;
@@ -28,56 +25,87 @@ public class ActivityQualification implements Serializable {
     /**
      * 资格id
      */
-    @TableId(value = "id")
-    @ApiModelProperty(value = "")
+    @TableId(value = "id", type = IdType.AUTO)
     private Long id;
 
-    @ApiModelProperty(value = "活动名称")
+    /**
+     * 活动名称
+     */
     private String activityName;
 
-    @ApiModelProperty(value = "活动类型（1 活动大厅，2 红包雨，3 转盘）")
+    /**
+     * 活动类型（1 活动大厅，2 红包雨，3 转盘）
+     */
     private Integer activityType;
 
-    @ApiModelProperty(value = "活动ID")
+    /**
+     * 活动ID
+     */
     private Long activityId;
 
-    @ApiModelProperty(value = "用户id")
+    /**
+     * 用户id
+     */
     private Long userId;
 
-    @ApiModelProperty(value = "会员账号")
+    /**
+     * 会员账号
+     */
     private String username;
 
-    @ApiModelProperty(value = "申请时间")
+    /**
+     * 申请时间
+     */
     private Date applyTime;
 
-    @ApiModelProperty(value = "审核人")
+    /**
+     * 审核人
+     */
     private String auditPerson;
 
-    @ApiModelProperty(value = "审核时间")
+    /**
+     * 审核时间
+     */
     private Date auditTime;
 
-    @ApiModelProperty(value = "审核备注")
+    /**
+     * 审核备注
+     */
     private String auditRemark;
 
-    @ApiModelProperty(value = "状态（0 无效，1 申请中，2 已审核）")
+    /**
+     * 状态（0 无效，1 申请中，2 已审核）
+     */
     private Integer status;
 
-    @ApiModelProperty(value = "活动开始时间")
+    /**
+     * 活动开始时间
+     */
     private Date activityStartTime;
 
-    @ApiModelProperty(value = "活动结束时间")
+    /**
+     * 活动结束时间
+     */
     private Date activityEndTime;
 
-    @ApiModelProperty(value = "统计开始时间")
+    /**
+     * 统计开始时间
+     */
     private Date statisStartTime;
 
-    @ApiModelProperty(value = "统计结束时间")
+    /**
+     * 统计结束时间
+     */
     private Date statisEndTime;
 
-    @ApiModelProperty(value = "删除（0 已删除，1 未删除）")
+    /**
+     * 删除（0 已删除，1 未删除）
+     */
     private Integer deleteFlag;
 
-    @ApiModelProperty(value = "备注")
+    /**
+     * 备注
+     */
     private String remark;
 
     /**
@@ -142,7 +170,6 @@ public class ActivityQualification implements Serializable {
     /**
      * 唯一标识
      */
-    @ApiModelProperty(value = "")
     private String soleIdentifier;
 
     /**

@@ -1,21 +1,15 @@
 package com.gameplat.admin.model.vo;
 
-import com.baomidou.mybatisplus.annotation.FieldFill;
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import com.gameplat.admin.util.Date2LongSerializerUtils;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.io.Serializable;
 import java.util.Date;
-
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import org.dozer.Mapping;
-import org.springframework.format.annotation.DateTimeFormat;
 
 /**
  * 活动VO
@@ -33,7 +27,7 @@ public class ActivityInfoVO implements Serializable {
      * 编号
      */
     @ApiModelProperty("编号ID")
-    @TableId(type = IdType.AUTO, value = "id")
+    @JsonSerialize(using = ToStringSerializer.class)
     private Long id;
 
     /**
@@ -47,6 +41,7 @@ public class ActivityInfoVO implements Serializable {
      * 体育1、彩票2、真人3、棋牌4、电竞5、电游6、捕鱼7、动物竞技8
      */
     @ApiModelProperty("活动版块，活动类型")
+    @JsonSerialize(using = ToStringSerializer.class)
     private Long type;
 
     /**
@@ -140,11 +135,6 @@ public class ActivityInfoVO implements Serializable {
     private String endTime;
 
     /**
-     * 活动有效期
-     */
-//    private String validPeriod;
-
-    /**
      * 活动状态
      */
     @ApiModelProperty("活动状态（0关闭 1开启）")
@@ -191,7 +181,6 @@ public class ActivityInfoVO implements Serializable {
     /**
      * 是否弹窗默认0 不弹 1弹窗
      */
-    //2.13点击2.1开启弹窗，页面新增弹窗图片设置，点击上传按钮，分别添加移动端和Web对应的弹窗图片。
     @ApiModelProperty("是否弹窗默认0 不弹 1弹窗")
     private String isPopup;
 

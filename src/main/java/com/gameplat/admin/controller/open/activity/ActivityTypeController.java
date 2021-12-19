@@ -69,8 +69,8 @@ public class ActivityTypeController {
     @GetMapping("/list")
     @PreAuthorize("hasAuthority('activity:type:list')")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "current", value = "分页参数：当前页", defaultValue = "1", required = false),
-            @ApiImplicitParam(name = "size", value = "每页条数", required = false),
+            @ApiImplicitParam(name = "current", value = "分页参数：当前页", defaultValue = "1"),
+            @ApiImplicitParam(name = "size", value = "每页条数"),
     })
     public IPage<ActivityTypeVO> list(@ApiIgnore PageDTO<ActivityType> page, ActivityTypeQueryDTO activityTypeQueryDTO,
                                       @RequestHeader(value = "country", defaultValue = "zh-CN", required = false) String country) {

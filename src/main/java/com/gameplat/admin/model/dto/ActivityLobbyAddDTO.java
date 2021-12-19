@@ -42,7 +42,7 @@ public class ActivityLobbyAddDTO implements Serializable {
     private Date endTime;
 
     @ApiModelProperty(value = "活动板块")
-    private Integer type;
+    private Long type;
 
     @NotBlank(message = "活动类型必选")
     @ApiModelProperty(value = "活动类型（1 充值活动(统计项目(statisItem)选项中的1,2,3,4,5项可选)，2 游戏活动(统计项目(statisItem)选项中的6,7,8,9,10项可选)")
@@ -102,7 +102,7 @@ public class ActivityLobbyAddDTO implements Serializable {
     @ApiModelProperty(value = "活动状态（0 关闭，1 开启，2 失效）")
     private Integer status;
 
-    @ApiModelProperty(value = "游戏类型（1体育 2真人 3棋牌 4彩票 5电子 6电竞 7动物竞技 8捕鱼）")
+    @ApiModelProperty(value = "游戏类型")
     private String gameType;
 
     @ApiModelProperty(value = "游戏列表")

@@ -4,10 +4,9 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import com.gameplat.admin.util.Date2LongSerializerUtils;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
 
 import java.util.Date;
-
-import lombok.Data;
 
 /**
  * 活动资格VO
@@ -30,6 +29,7 @@ public class ActivityQualificationVO {
     private Integer activityType;
 
     @ApiModelProperty(value = "活动ID")
+    @JsonSerialize(using = ToStringSerializer.class)
     private Long activityId;
 
     @ApiModelProperty(value = "会员账号")

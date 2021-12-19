@@ -1,14 +1,15 @@
 package com.gameplat.admin.model.vo;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import com.gameplat.admin.util.Date2LongSerializerUtils;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import java.io.Serializable;
-import java.util.Date;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.springframework.format.annotation.DateTimeFormat;
+
+import java.io.Serializable;
+import java.util.Date;
 
 /**
  * 活动类型VO
@@ -24,6 +25,7 @@ public class ActivityTypeVO implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @ApiModelProperty(value = "编号")
+    @JsonSerialize(using = ToStringSerializer.class)
     private Long id;
 
     @ApiModelProperty(value = "活动类型")
@@ -32,12 +34,10 @@ public class ActivityTypeVO implements Serializable {
     @ApiModelProperty(value = "活动类型名称")
     private String typeName;
 
-    @DateTimeFormat(pattern = "yyyy-MM-dd hh:mm:ss")
     @ApiModelProperty(value = "创建时间")
     @JsonSerialize(using = Date2LongSerializerUtils.class)
     private Date createTime;
 
-    @DateTimeFormat(pattern = "yyyy-MM-dd hh:mm:ss")
     @ApiModelProperty(value = "更新时间")
     @JsonSerialize(using = Date2LongSerializerUtils.class)
     private Date updateTime;

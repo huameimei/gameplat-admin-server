@@ -1,12 +1,13 @@
 package com.gameplat.admin.model.vo;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import com.gameplat.admin.util.Date2LongSerializerUtils;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
+
 import java.io.Serializable;
 import java.util.Date;
-
-import lombok.Data;
 
 
 /**
@@ -20,10 +21,13 @@ public class ActivityBlacklistVO implements Serializable {
 
 
     private static final long serialVersionUID = 7535872776555957753L;
+
     @ApiModelProperty(value = "主键ID")
+    @JsonSerialize(using = ToStringSerializer.class)
 	private Long id;
 
     @ApiModelProperty(value = "活动ID")
+    @JsonSerialize(using = ToStringSerializer.class)
     private Long activityId;
 
     @ApiModelProperty(value =   "限制内容")
@@ -38,6 +42,5 @@ public class ActivityBlacklistVO implements Serializable {
     @ApiModelProperty(value = "创建时间")
     @JsonSerialize(using = Date2LongSerializerUtils.class)
     private Date createTime;
-
 
 }

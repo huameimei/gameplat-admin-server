@@ -10,9 +10,6 @@
         <where>
             a.user_id = b.user_id
             and a.create_time = b.create_time
-            <if test="user_id != null and user_id ！= ''">
-            and a.user_id = #{userId}
-            </if>
         </where>
     </select>
 

@@ -75,7 +75,7 @@ public class ActivityRedPacketController {
     @PutMapping("/updateTurntablePrizeConfig")
     @PreAuthorize("hasAuthority('activity:redpacket:view')")
     public void updateTurntablePrizeConfig(@RequestBody ActivityTurntablePrizeConfigDTO activityTurntablePrizeConfigDTO) {
-        if (activityTurntablePrizeConfigDTO.getPrizeId() == null || activityTurntablePrizeConfigDTO.getPrizeId() == 0) {
+        if (activityTurntablePrizeConfigDTO.getPrizeId() == null) {
             throw new ServiceException("奖品ID不能为空");
         }
         activityRedPacketService.updateTurntablePrizeConfig(activityTurntablePrizeConfigDTO);

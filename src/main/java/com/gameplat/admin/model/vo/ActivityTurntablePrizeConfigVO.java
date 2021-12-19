@@ -25,13 +25,13 @@ public class ActivityTurntablePrizeConfigVO implements Serializable {
     private Integer prizeId;
 
     @ApiModelProperty("转盘角度最小值")
-    private Integer min;
+    private String min;
 
     @ApiModelProperty("转盘角度最大值")
-    private Integer max;
+    private String max;
 
     @ApiModelProperty("奖项名称")
-    private Integer prizeName;
+    private String prizeName;
 
     @ApiModelProperty("奖金")
     private Double prizeMoney;

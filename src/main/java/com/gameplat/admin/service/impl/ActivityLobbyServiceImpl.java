@@ -77,7 +77,7 @@ public class ActivityLobbyServiceImpl extends ServiceImpl<ActivityLobbyMapper, A
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Throwable.class)
     public void add(ActivityLobbyAddDTO activityLobbyAddDTO) {
         ActivityLobby activityLobby = activityLobbyConvert.toEntity(activityLobbyAddDTO);
         //优惠打折列表
@@ -114,19 +114,18 @@ public class ActivityLobbyServiceImpl extends ServiceImpl<ActivityLobbyMapper, A
             endTime = DateUtil.dateToStr(activityLobbyAddDTO.getEndTime(), DateUtil.YYYY_MM_DD);
         }
 
-        if (activityLobbyAddDTO.getStatisDate() == 1) {
+        if (activityLobbyAddDTO.getStatisDate() == 1) {//1 每日
             applyDateList.add("每天");
         }
-
         //如果统计周期是每周，需要判断活动的结束时间是不是周日
-        if (activityLobbyAddDTO.getStatisDate() == 2) {
+        else if (activityLobbyAddDTO.getStatisDate() == 2) {//2 每周
             if (DateUtil2.getWeekNumOfDate(activityLobbyAddDTO.getEndTime()) != 7) {
                 throw new ServiceException("统计日期选择每周，活动的结束日期应该为某周的星期天");
             }
             applyDateList = DateUtil2.getDayOfWeekWithinDateInterval(startTime, endTime, detailDate);
         }
         //如果统计周期是每月，需要判断活动的结束时间是不是某月的最后一天
-        if (activityLobbyAddDTO.getStatisDate() == 3) {
+        else if (activityLobbyAddDTO.getStatisDate() == 3) {//3 每月
             if (!DateUtil2.isSameDate(cn.hutool.core.date.DateUtil.endOfMonth(activityLobbyAddDTO.getEndTime()),
                     activityLobbyAddDTO.getEndTime())) {
                 throw new ServiceException("统计日期选择每月，活动的结束日期应该为某月的最后一天");
@@ -143,16 +142,15 @@ public class ActivityLobbyServiceImpl extends ServiceImpl<ActivityLobbyMapper, A
             }
         }
         //如果统计周期是每周X，需要判断活动的结束时间是不是每周X
-        if (activityLobbyAddDTO.getStatisDate() == 4) {
+        else if (activityLobbyAddDTO.getStatisDate() == 4) {//4 每周X
             if (DateTime.of(activityLobbyAddDTO.getEndTime()).dayOfWeek() != activityLobbyAddDTO.getDetailDate()) {
                 throw new ServiceException("统计日期选择" + DetailDateEnum.getWeek(activityLobbyAddDTO.getDetailDate())
                         + ",活动的结束日期应该为" + DetailDateEnum.getWeek(activityLobbyAddDTO.getDetailDate()));
             }
             applyDateList = DateUtil2.getDayOfWeekWithinDateInterval(startTime, endTime, detailDate);
         }
-
         //如果统计周期是每月X，需要判断活动的结束时间是不是每月X
-        if (activityLobbyAddDTO.getStatisDate() == 5) {
+        else if (activityLobbyAddDTO.getStatisDate() == 5) {//5 每月X日
             if (Integer.parseInt(String.format("%td", activityLobbyAddDTO.getEndTime())) != activityLobbyAddDTO.getDetailDate()) {
                 throw new ServiceException("统计日期选择每月" + activityLobbyAddDTO.getDetailDate() + "号" + ",活动的结束日期那天应该为" + activityLobbyAddDTO.getDetailDate() + "号");
             }

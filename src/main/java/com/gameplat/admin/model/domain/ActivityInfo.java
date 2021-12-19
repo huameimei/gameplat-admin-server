@@ -26,10 +26,6 @@ public class ActivityInfo implements Serializable {
      */
     @TableId(type = IdType.AUTO, value = "id")
     private Long id;
-    /**
-     * 类型
-     */
-//    private Long activityType;
 
     /**
      * 活动标题
@@ -38,19 +34,8 @@ public class ActivityInfo implements Serializable {
 
     /**
      * 活动版块，活动类型
-     * 体育1、彩票2、真人3、棋牌4、电竞5、电游6、捕鱼7、动物竞技8
      */
     private Long type;
-
-    /**
-     * 活动类型名称
-     */
-//    private String typeName;
-
-    /**
-     * 活动类型编码
-     */
-//    private String typeCode;
 
     /**
      * 主图片名称
@@ -116,11 +101,6 @@ public class ActivityInfo implements Serializable {
      * 活动结束时间
      */
     private String endTime;
-
-    /**
-     * 活动有效期
-     */
-//    private String validPeriod;
 
     /**
      * 活动状态

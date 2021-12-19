@@ -16,9 +16,8 @@ import lombok.EqualsAndHashCode;
 /**
  * 活动资格管理
  *
- * @author lyq
+ * @author kenvin
  * @Description 实体层
- * @date 2020-08-20 11:32:32
  */
 @TableName("activity_qualification")
 @Data
@@ -26,8 +25,11 @@ import lombok.EqualsAndHashCode;
 public class ActivityQualification implements Serializable {
     private static final long serialVersionUID = 1L;
 
+    /**
+     * 资格id
+     */
     @TableId(value = "id")
-    @ApiModelProperty(value = "资格id")
+    @ApiModelProperty(value = "")
     private Long id;
 
     @ApiModelProperty(value = "活动名称")
@@ -102,31 +104,50 @@ public class ActivityQualification implements Serializable {
     @TableField(fill = FieldFill.INSERT_UPDATE)
     private Date updateTime;
 
-    @ApiModelProperty(value = "总抽奖次数")
+    /**
+     * 总抽奖次数
+     */
     private Integer drawNum;
 
-    @ApiModelProperty(value = "使用次数")
+    /**
+     * 使用次数
+     */
     private Integer employNum;
 
-    @ApiModelProperty(value = "最小金额")
+    /**
+     * 最小金额
+     */
     private Integer minMoney;
 
-    @ApiModelProperty(value = "最大金额")
+    /**
+     * 最大金额
+     */
     private Integer maxMoney;
 
-    @ApiModelProperty(value = "资格状态（0 禁用，1 启用）")
+    /**
+     * 资格状态（0 禁用，1 启用）
+     */
     private Integer qualificationStatus;
 
-    @ApiModelProperty(value = "使用时间")
+    /**
+     * 使用时间
+     */
     private Date employTime;
 
-    @ApiModelProperty(value = "与活动派发关联id")
+    /**
+     * 与活动派发关联id
+     */
     private String qualificationActivityId;
 
-    @ApiModelProperty(value = "唯一标识")
+    /**
+     * 唯一标识
+     */
+    @ApiModelProperty(value = "")
     private String soleIdentifier;
 
-    @ApiModelProperty(value = "是否禁用，1:启用，0:禁用")
+    /**
+     * 是否禁用，1:启用，0:禁用
+     */
     private Integer disable;
 
     /**

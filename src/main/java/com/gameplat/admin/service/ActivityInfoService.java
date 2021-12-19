@@ -66,7 +66,7 @@ public interface ActivityInfoService extends IService<ActivityInfo> {
      *
      * @return
      */
-    List<ActivityInfoVO> getAllSysActivityWithRule();
+    List<ActivityInfoVO> getAllActivity();
 
     /**
      * 通过条件查询列表数据

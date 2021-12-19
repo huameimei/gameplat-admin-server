@@ -128,7 +128,7 @@ public class ActivityRedPacketServiceImpl extends ServiceImpl<ActivityRedPacketM
 
     @Override
     public ActivityRedPacketConfigVO getConfig() {
-        SysDictData sysDictData = sysDictDataService.getDictList(ConfigConstant.ACTIVITY_REDPACKET_CONFIG, ConfigConstant.ACTIVITY_REDPACKET_CONFIG_REDPACKET);
+        SysDictData sysDictData = sysDictDataService.getDictList(ConfigConstant.ACTIVITY_CONFIG, ConfigConstant.ACTIVITY_REDPACKET_CONFIG_REDPACKET);
         if (sysDictData == null || StringUtils.isBlank(sysDictData.getDictValue())) {
             throw new ServiceException("活动红包配置没有配置，请先配置红包数据");
         }
@@ -142,7 +142,7 @@ public class ActivityRedPacketServiceImpl extends ServiceImpl<ActivityRedPacketM
     @Override
     @Transactional(rollbackFor = Throwable.class)
     public void updateConfig(ActivityRedPacketConfigDTO configDTO) {
-        SysDictData sysDictData = sysDictDataService.getDictList(ConfigConstant.ACTIVITY_REDPACKET_CONFIG, ConfigConstant.ACTIVITY_REDPACKET_CONFIG_REDPACKET);
+        SysDictData sysDictData = sysDictDataService.getDictList(ConfigConstant.ACTIVITY_CONFIG, ConfigConstant.ACTIVITY_REDPACKET_CONFIG_REDPACKET);
         if (sysDictData == null || StringUtils.isBlank(sysDictData.getDictValue())) {
             throw new ServiceException("活动红包配置没有配置，请先配置红包数据");
         }
@@ -156,7 +156,7 @@ public class ActivityRedPacketServiceImpl extends ServiceImpl<ActivityRedPacketM
 
     @Override
     public List<ActivityTurntablePrizeConfigVO> getTurntablePrizeConfig() {
-        SysDictData sysDictData = sysDictDataService.getDictList(ConfigConstant.ACTIVITY_REDPACKET_CONFIG, ConfigConstant.ACTIVITY_REDPACKET_CONFIG_TURNTABLE_PRIZE);
+        SysDictData sysDictData = sysDictDataService.getDictList(ConfigConstant.ACTIVITY_CONFIG, ConfigConstant.ACTIVITY_REDPACKET_CONFIG_TURNTABLE_PRIZE);
         if (sysDictData == null || StringUtils.isBlank(sysDictData.getDictValue())) {
             throw new ServiceException("活动红包配置没有配置，请先配置红包数据");
         }
@@ -172,7 +172,7 @@ public class ActivityRedPacketServiceImpl extends ServiceImpl<ActivityRedPacketM
                 BeanUtils.copyProperties(activityTurntablePrizeConfigDTO, vo);
             }
         }
-        SysDictData sysDictData = sysDictDataService.getDictList(ConfigConstant.ACTIVITY_REDPACKET_CONFIG, ConfigConstant.ACTIVITY_REDPACKET_CONFIG_TURNTABLE_PRIZE);
+        SysDictData sysDictData = sysDictDataService.getDictList(ConfigConstant.ACTIVITY_CONFIG, ConfigConstant.ACTIVITY_REDPACKET_CONFIG_TURNTABLE_PRIZE);
         sysDictData.setDictValue(JSON.toJSONString(list));
         boolean result = sysDictDataService.updateById(sysDictData);
         if (!result) {

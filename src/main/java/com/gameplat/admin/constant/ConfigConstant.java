@@ -21,6 +21,11 @@ public class ConfigConstant {
     public static final String LIVE_GAME_TYPE = "LIVE_GAME_TYPE";
 
     /**
+     * 活动配置
+     */
+    public static final String ACTIVITY_CONFIG = "ACTIVITY_CONFIG";
+
+    /**
      * 活动红包配置
      */
     public static final String ACTIVITY_REDPACKET_CONFIG = "ACTIVITY_REDPACKET_CONFIG";
@@ -28,10 +33,16 @@ public class ConfigConstant {
     /**
      * 活动红包配置--红包类型配置
      */
-    public static final String ACTIVITY_REDPACKET_CONFIG_REDPACKET = "REDPACKET";
+    public static final String ACTIVITY_REDPACKET_CONFIG_REDPACKET = "RED_PACKET";
 
     /**
      * 活动红包配置--转盘配置
      */
     public static final String ACTIVITY_REDPACKET_CONFIG_TURNTABLE_PRIZE = "TURNTABLE_PRIZE";
+
+    /**
+     * 活动配置--活动排序
+     */
+    public static final String ACTIVITY_SORT_CONFIG = "ACTIVITY_SORT_CONFIG";
+
 }

@@ -1,9 +1,6 @@
 package com.gameplat.admin.model.domain;
 
-import com.baomidou.mybatisplus.annotation.FieldFill;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -25,7 +22,7 @@ public class ActivityType implements Serializable {
     /**
      * 编号
      */
-    @TableId("id")
+    @TableId(value = "id",type= IdType.AUTO)
     private Long id;
 
     /**

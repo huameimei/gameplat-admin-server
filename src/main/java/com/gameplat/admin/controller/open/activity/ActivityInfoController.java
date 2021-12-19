@@ -3,13 +3,16 @@ package com.gameplat.admin.controller.open.activity;
 import com.alibaba.fastjson.JSONArray;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
+import com.gameplat.admin.constant.ConfigConstant;
 import com.gameplat.admin.model.domain.ActivityInfo;
+import com.gameplat.admin.model.domain.SysDictData;
 import com.gameplat.admin.model.dto.ActivityInfoAddDTO;
 import com.gameplat.admin.model.dto.ActivityInfoQueryDTO;
 import com.gameplat.admin.model.dto.ActivityInfoUpdateDTO;
 import com.gameplat.admin.model.vo.ActivityInfoVO;
 import com.gameplat.admin.model.vo.ValueDataVO;
 import com.gameplat.admin.service.ActivityInfoService;
+import com.gameplat.admin.service.SysDictDataService;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.DateUtil;
 import com.gameplat.base.common.util.StringUtils;
@@ -42,6 +45,9 @@ public class ActivityInfoController {
 
     @Autowired
     private ActivityInfoService activityInfoService;
+
+    @Autowired
+    private SysDictDataService sysDictDataService;
 
     /**
      * 活动列表
@@ -137,15 +143,15 @@ public class ActivityInfoController {
     }
 
     /**
-     * 获取关联活动规则的全部活动
+     * 获取全部活动
      *
      * @return
      */
-    @ApiOperation(value = "获取关联活动规则的全部活动")
-    @GetMapping("/getAllSysActivityWithRule")
+    @ApiOperation(value = "获取全部活动")
+    @GetMapping("/getAllActivity")
     @PreAuthorize("hasAuthority('activity:info:list')")
-    public List<ActivityInfoVO> getAllSysActivityWithRule() {
-        List<ActivityInfoVO> activityList = activityInfoService.getAllSysActivityWithRule();
+    public List<ActivityInfoVO> getAllActivity() {
+        List<ActivityInfoVO> activityList = activityInfoService.getAllActivity();
         if (CollectionUtils.isEmpty(activityList)) {
             return new ArrayList<>();
         }
@@ -179,8 +185,11 @@ public class ActivityInfoController {
     @GetMapping("/sortList")
     @PreAuthorize("hasAuthority('activity:info:list')")
     public List<ValueDataVO> sortList() {
-        String jsonStr = "[{\"name\":\"活动1\",\"value\":1},{\"name\":\"活动2\",\"value\":2},{\"name\":\"活动3\",\"value\":3},{\"name\":\"活动4\",\"value\":4},{\"name\":\"活动5\",\"value\":5},{\"name\":\"活动6\",\"value\":6},{\"name\":\"活动7\",\"value\":7},{\"name\":\"活动8\",\"value\":8},{\"name\":\"活动9\",\"value\":9},{\"name\":\"活动10\",\"value\":10}]";
-        List<ValueDataVO> valueDataVOS = JSONArray.parseArray(jsonStr, ValueDataVO.class);
+        SysDictData dictData = sysDictDataService.getDictList(ConfigConstant.ACTIVITY_CONFIG, ConfigConstant.ACTIVITY_SORT_CONFIG);
+        if (dictData == null || StringUtils.isBlank(dictData.getDictValue())) {
+            throw new ServiceException("活动排序值没有配置");
+        }
+        List<ValueDataVO> valueDataVOS = JSONArray.parseArray(dictData.getDictValue(), ValueDataVO.class);
         return valueDataVOS;
     }
 

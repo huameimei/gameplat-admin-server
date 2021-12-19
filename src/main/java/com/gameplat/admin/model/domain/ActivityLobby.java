@@ -11,7 +11,7 @@ import java.util.Date;
 /**
  * 活动大厅
  *
- * @author lyq
+ * @author kenvin
  * @Description 实体层
  * @date 2020-08-14 14:50:01
  */
@@ -23,7 +23,7 @@ public class ActivityLobby implements Serializable {
     /**
      * 主键
      */
-    @TableId(type = IdType.AUTO)
+    @TableId(value = "id", type = IdType.AUTO)
     private Long id;
 
     /**

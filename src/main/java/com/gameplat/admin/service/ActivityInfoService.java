@@ -4,16 +4,14 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.gameplat.admin.model.domain.ActivityInfo;
-import com.gameplat.admin.model.dto.ActivityInfoAddDTO;
-import com.gameplat.admin.model.dto.ActivityInfoDTO;
-import com.gameplat.admin.model.dto.ActivityInfoQueryDTO;
-import com.gameplat.admin.model.dto.ActivityInfoUpdateDTO;
+import com.gameplat.admin.model.dto.*;
 import com.gameplat.admin.model.vo.ActivityInfoVO;
 
 import java.util.List;
 
 /**
  * 活动业务类
+ *
  * @author admin
  */
 public interface ActivityInfoService extends IService<ActivityInfo> {
@@ -98,4 +96,11 @@ public interface ActivityInfoService extends IService<ActivityInfo> {
      * @param ids
      */
     void delete(String ids);
+
+    /**
+     * 更新活动排序
+     *
+     * @param activityInfoUpdateSortDTO
+     */
+    void updateSort(ActivityInfoUpdateSortDTO activityInfoUpdateSortDTO);
 }

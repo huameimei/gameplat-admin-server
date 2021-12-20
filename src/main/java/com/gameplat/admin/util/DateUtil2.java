@@ -148,7 +148,6 @@ public class DateUtil2 extends com.gameplat.base.common.util.DateUtil {
         Date now = new Date();
         boolean greaterThan = true;
         if (now.getTime() >= compareDate.getTime()) {
-            System.out.println("小于当前时间");
             greaterThan = false;
         }
         return greaterThan;
@@ -165,7 +164,6 @@ public class DateUtil2 extends com.gameplat.base.common.util.DateUtil {
         Date now = new Date();
         boolean greaterThan = true;
         if (now.getTime() <= compareDate.getTime()) {
-            System.out.println("小于当前时间");
             greaterThan = false;
         }
         return greaterThan;

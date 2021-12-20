@@ -1,7 +1,9 @@
 package com.gameplat.admin.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
+import com.baomidou.mybatisplus.extension.conditions.update.LambdaUpdateChainWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.convert.ActivityInfoConvert;
@@ -14,6 +16,7 @@ import com.gameplat.admin.model.domain.SysBannerInfo;
 import com.gameplat.admin.model.dto.ActivityInfoAddDTO;
 import com.gameplat.admin.model.dto.ActivityInfoQueryDTO;
 import com.gameplat.admin.model.dto.ActivityInfoUpdateDTO;
+import com.gameplat.admin.model.dto.ActivityInfoUpdateSortDTO;
 import com.gameplat.admin.model.vo.ActivityInfoVO;
 import com.gameplat.admin.service.ActivityInfoService;
 import com.gameplat.admin.service.ActivityLobbyService;
@@ -206,6 +209,22 @@ public class ActivityInfoServiceImpl
             idList.add(Long.parseLong(idStr));
         }
         this.removeByIds(idList);
+    }
+
+    @Override
+    public void updateSort(ActivityInfoUpdateSortDTO activityInfoUpdateSortDTO) {
+        ActivityInfo activityInfo = this.getById(activityInfoUpdateSortDTO.getId());
+        if (activityInfo == null) {
+            throw new ServiceException("该活动不存在");
+        }
+        LambdaUpdateWrapper<ActivityInfo> activityInfoLambdaUpdateWrapper = new LambdaUpdateWrapper<>();
+        activityInfoLambdaUpdateWrapper
+                .eq(ActivityInfo::getId, activityInfoUpdateSortDTO.getId())
+                .set(ActivityInfo::getSort, activityInfoUpdateSortDTO.getSort());
+        boolean result = this.update(activityInfoLambdaUpdateWrapper);
+        if (!result) {
+            throw new ServiceException("更新活动失败");
+        }
     }
 
 

@@ -82,6 +82,7 @@ public class ActivityLobbyServiceImpl extends ServiceImpl<ActivityLobbyMapper, A
         ActivityLobby activityLobby = activityLobbyConvert.toEntity(activityLobbyAddDTO);
         //优惠打折列表
         List<ActivityLobbyDiscount> activityLobbyDiscounts = BeanUtils.mapList(activityLobbyAddDTO.getLobbyDiscountList(), ActivityLobbyDiscount.class);
+        //指定比赛
         if (activityLobbyAddDTO.getStatisItem() == ActivityLobbyEnum.StatisItem.CUMULATIVE_SPORTS_RECHARGE_AMOUNT.getValue()) {
             if (StringUtils.isNull(activityLobbyAddDTO.getMatchId())) {
                 throw new ServiceException("指定比赛不能为空");
@@ -102,6 +103,7 @@ public class ActivityLobbyServiceImpl extends ServiceImpl<ActivityLobbyMapper, A
         Integer detailDate = activityLobbyAddDTO.getDetailDate();
         String startTime;
         String endTime;
+        //隔天申请（0 否，1 是）
         if (activityLobbyAddDTO.getNextDayApply() == 1) {
             detailDate = detailDate + 1;
             if (detailDate == 7) {
@@ -219,7 +221,7 @@ public class ActivityLobbyServiceImpl extends ServiceImpl<ActivityLobbyMapper, A
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Throwable.class)
     public void update(ActivityLobbyUpdateDTO activityLobbyUpdateDTO) {
         //根据id查询活动大厅
         ActivityLobby activityLobbyOrigin = this.getById(activityLobbyUpdateDTO.getId());
@@ -239,6 +241,7 @@ public class ActivityLobbyServiceImpl extends ServiceImpl<ActivityLobbyMapper, A
             throw new ServiceException("该活动已过期，如要创建一个新的活动，请点击新增添加");
         }
 
+        //指定比赛
         if (activityLobbyUpdateDTO.getStatisItem() == ActivityLobbyEnum.StatisItem.CUMULATIVE_SPORTS_RECHARGE_AMOUNT.getValue()) {
             if (StringUtils.isNull(activityLobbyUpdateDTO.getMatchId())) {
                 throw new ServiceException("指定比赛不能为空");
@@ -273,9 +276,8 @@ public class ActivityLobbyServiceImpl extends ServiceImpl<ActivityLobbyMapper, A
         if (activityLobbyUpdateDTO.getStatisDate() == 1) {
             applyDateList.add("每天");
         }
-
         //如果统计周期是每周，需要判断活动的结束时间是不是周日
-        if (activityLobbyUpdateDTO.getStatisDate() == 2) {
+        else if (activityLobbyUpdateDTO.getStatisDate() == 2) {
             if (DateUtil2.getWeekNumOfDate(activityLobbyUpdateDTO.getEndTime()) != 7) {
                 throw new ServiceException("统计日期选择每周，活动的结束日期应该为某周的星期天");
             }
@@ -283,7 +285,7 @@ public class ActivityLobbyServiceImpl extends ServiceImpl<ActivityLobbyMapper, A
             applyDateList = DateUtil2.getDayOfWeekWithinDateInterval(startTime, endTime, detailDate);
         }
         //如果统计周期是每月，需要判断活动的结束时间是不是某月的最后一天
-        if (activityLobbyUpdateDTO.getStatisDate() == 3) {
+        else if (activityLobbyUpdateDTO.getStatisDate() == 3) {
             if (!DateUtil2.isSameDate(cn.hutool.core.date.DateUtil.endOfMonth(activityLobbyUpdateDTO.getEndTime()), activityLobbyUpdateDTO.getEndTime())) {
                 throw new ServiceException("统计日期选择每月，活动的结束日期应该为某月的最后一天");
             }
@@ -299,16 +301,15 @@ public class ActivityLobbyServiceImpl extends ServiceImpl<ActivityLobbyMapper, A
             }
         }
         //如果统计周期是每周X，需要判断活动的结束时间是不是每周X
-        if (activityLobbyUpdateDTO.getStatisDate() == 4) {
+        else if (activityLobbyUpdateDTO.getStatisDate() == 4) {
             if (DateTime.of(activityLobbyUpdateDTO.getEndTime()).dayOfWeek() == activityLobbyUpdateDTO.getDetailDate().intValue()) {
                 throw new ServiceException("统计日期选择" + DetailDateEnum.getWeek(activityLobbyUpdateDTO.getDetailDate())
                         + ",活动的结束日期应该为" + DetailDateEnum.getWeek(activityLobbyUpdateDTO.getDetailDate()));
             }
             applyDateList = DateUtil2.getDayOfWeekWithinDateInterval(startTime, endTime, detailDate);
         }
-
         //如果统计周期是每月X，需要判断活动的结束时间是不是每月X
-        if (activityLobbyUpdateDTO.getStatisDate() == 5) {
+        else if (activityLobbyUpdateDTO.getStatisDate() == 5) {
             if (Integer.parseInt(String.format("%td", activityLobbyUpdateDTO.getEndTime())) != activityLobbyUpdateDTO.getDetailDate()) {
                 throw new ServiceException("统计日期选择每月" + activityLobbyUpdateDTO.getDetailDate() + "号" + ",活动的结束日期那天应该为" + activityLobbyUpdateDTO.getDetailDate() + "号");
             }

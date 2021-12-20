@@ -9,6 +9,7 @@ import com.gameplat.admin.model.domain.SysDictData;
 import com.gameplat.admin.model.dto.ActivityInfoAddDTO;
 import com.gameplat.admin.model.dto.ActivityInfoQueryDTO;
 import com.gameplat.admin.model.dto.ActivityInfoUpdateDTO;
+import com.gameplat.admin.model.dto.ActivityInfoUpdateSortDTO;
 import com.gameplat.admin.model.vo.ActivityInfoVO;
 import com.gameplat.admin.model.vo.ValueDataVO;
 import com.gameplat.admin.service.ActivityInfoService;
@@ -125,6 +126,24 @@ public class ActivityInfoController {
             activityInfoService.checkActivityLobbyId(activityInfoUpdateDTO.getActivityLobbyId(), activityInfoUpdateDTO.getId());
         }
         activityInfoService.update(activityInfoUpdateDTO, country);
+    }
+
+    /**
+     * 修改活动排序
+     *
+     * @param activityInfoUpdateSortDTO
+     */
+    @ApiOperation(value = "修改活动排序")
+    @PostMapping("/updateSort")
+    @PreAuthorize("hasAuthority('activity:info:edit')")
+    public void updateSort(@RequestBody ActivityInfoUpdateSortDTO activityInfoUpdateSortDTO) {
+        if (activityInfoUpdateSortDTO.getId() == null || activityInfoUpdateSortDTO.getId() == 0) {
+            throw new ServiceException("活动id不能为空");
+        }
+        if (activityInfoUpdateSortDTO.getSort() == null) {
+            throw new ServiceException("活动排序sort不能为空");
+        }
+        activityInfoService.updateSort(activityInfoUpdateSortDTO);
     }
 
     /**

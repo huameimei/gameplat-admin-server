@@ -74,22 +74,21 @@ public class ActivityBlacklistServiceImpl extends ServiceImpl<ActivityBlacklistM
         this.removeByIds(idList);
     }
 
+
     public boolean isIp(String ip) {//判断是否是一个IP
-        boolean b = false;
-        ip = this.removeBlankSpace(ip);
-        if (ip.matches("\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}")) {
-            String s[] = ip.split("\\.");
-            if (Integer.parseInt(s[0]) < 255) {
-                if (Integer.parseInt(s[1]) < 255) {
-                    if (Integer.parseInt(s[2]) < 255) {
-                        if (Integer.parseInt(s[3]) < 255) {
-                            b = true;
-                        }
-                    }
+        String ipRegex = "\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}";
+        if (ip.matches(ipRegex)) {
+            String[] ipArray = ip.split("\\.");
+            for (int i = 0; i < ipArray.length; i++) {
+                int number = Integer.parseInt(ipArray[i]);
+                if (number < 0 || number > 255) {
+                    return false;
                 }
             }
+            return true;
+        } else {
+            return false;
         }
-        return b;
     }
 
     public String removeBlankSpace(String ip) {//去掉IP字符串前后所有的空格

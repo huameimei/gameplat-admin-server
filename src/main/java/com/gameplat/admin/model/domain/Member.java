@@ -143,4 +143,7 @@ public class Member extends Model<Member> {
 
   @ApiModelProperty(value = "当前会员等级")
   private Integer level;
+
+  @ApiModelProperty(value = "当前会员成长值")
+  private Integer growth;
 }

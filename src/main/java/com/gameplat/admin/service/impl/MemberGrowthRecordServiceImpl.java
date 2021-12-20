@@ -287,14 +287,19 @@ public class MemberGrowthRecordServiceImpl extends ServiceImpl<MemberGrowthRecor
         }
         //晋级到下级所需的成长值
         Integer growth = growthLevel.getGrowth();
+        Integer currentGrowth = 0;
         //当前成长值
-        Integer currentGrowth = this.getOne(new QueryWrapper<MemberGrowthRecord>()
+        MemberGrowthRecord growthRecord = this.getOne(new QueryWrapper<MemberGrowthRecord>()
                 .select("user_id userId", "current_growth currentGrowth", "max(create_time) createTime")
-                .eq("user_id", memberId)).getCurrentGrowth();
+                .eq("user_id", memberId));
+        if (!BeanUtil.isEmpty(growthRecord)){
+            currentGrowth = growthRecord.getCurrentGrowth();
+        }
 
+        Integer finalCurrentGrowth = currentGrowth;
         return new GrowthScaleVO(){{
             setLowerGrowth(growth);
-            setCurrentGrowth(currentGrowth);
+            setCurrentGrowth(finalCurrentGrowth);
         }};
     }
 

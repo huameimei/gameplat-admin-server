@@ -3,7 +3,6 @@ package com.gameplat.admin.service.impl;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
-import com.baomidou.mybatisplus.extension.conditions.update.LambdaUpdateChainWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.convert.ActivityInfoConvert;
@@ -34,6 +33,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * 活动业务类
+ *
  * @author kenvin
  */
 @Service
@@ -72,6 +73,9 @@ public class ActivityInfoServiceImpl
                         , ActivityInfo::getStatus, activityInfoQueryDTO.getStatus())
                 .eq(activityInfoQueryDTO.getActivityLobbyId() != null && activityInfoQueryDTO.getActivityLobbyId() != 0
                         , ActivityInfo::getActivityLobbyId, activityInfoQueryDTO.getActivityLobbyId())
+                //按排序sort正序排列
+                .orderByAsc(Lists.newArrayList(ActivityInfo::getSort))
+                //按照时间倒序排列
                 .orderByDesc(Lists.newArrayList(ActivityInfo::getCreateTime, ActivityInfo::getId));
         IPage<ActivityInfoVO> page1 = queryWrapper.page(page).convert(activityInfoConvert::toVo);
         if (CollectionUtils.isNotEmpty(page1.getRecords())) {

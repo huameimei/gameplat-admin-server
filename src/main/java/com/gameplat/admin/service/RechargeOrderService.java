@@ -2,6 +2,7 @@ package com.gameplat.admin.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.gameplat.admin.model.bean.ActivityStatisticItem;
 import com.gameplat.admin.model.bean.ManualRechargeOrderBo;
 import com.gameplat.admin.model.bean.PageExt;
 import com.gameplat.admin.model.domain.RechargeOrder;
@@ -9,27 +10,46 @@ import com.gameplat.admin.model.dto.RechargeOrderQueryDTO;
 import com.gameplat.admin.model.vo.RechargeOrderVO;
 import com.gameplat.admin.model.vo.SummaryVO;
 import com.gameplat.security.context.UserCredential;
+
 import java.math.BigDecimal;
+import java.util.List;
+import java.util.Map;
 
 public interface RechargeOrderService extends IService<RechargeOrder> {
 
-  PageExt<RechargeOrderVO, SummaryVO> findPage(Page<RechargeOrder> page, RechargeOrderQueryDTO dto);
+    PageExt<RechargeOrderVO, SummaryVO> findPage(Page<RechargeOrder> page, RechargeOrderQueryDTO dto);
 
-  void updateDiscount(Long id, Integer discountType, BigDecimal discountAmount,
-      BigDecimal discountDml);
+    void updateDiscount(Long id, Integer discountType, BigDecimal discountAmount,
+                        BigDecimal discountDml);
 
-  void updateRemarks(Long id, String auditRemarks);
+    void updateRemarks(Long id, String auditRemarks);
 
-  void handle(Long id, UserCredential userCredential);
+    void handle(Long id, UserCredential userCredential);
 
-  void unHandle(Long id, UserCredential userCredential);
+    void unHandle(Long id, UserCredential userCredential);
 
-  void accept(Long id, UserCredential userCredential) throws Exception;
+    void accept(Long id, UserCredential userCredential) throws Exception;
 
-  void cancel(Long id, UserCredential userCredential);
+    void cancel(Long id, UserCredential userCredential);
 
-  void updateStatus(Long id, Integer curStatus, Integer newStatus, String auditorAccount);
+    void updateStatus(Long id, Integer curStatus, Integer newStatus, String auditorAccount);
 
-  void manual(ManualRechargeOrderBo manualRechargeOrderBo, UserCredential userCredential)
-      throws Exception;
+    void manual(ManualRechargeOrderBo manualRechargeOrderBo, UserCredential userCredential)
+            throws Exception;
+
+    /**
+     * 查询每天充值的金额
+     *
+     * @param map
+     * @return
+     */
+    List<ActivityStatisticItem> findRechargeDateList(Map map);
+
+    /**
+     * 查询所有首次充值的金额
+     *
+     * @param map
+     * @return
+     */
+    List<ActivityStatisticItem> findAllFirstRechargeAmount(Map map);
 }

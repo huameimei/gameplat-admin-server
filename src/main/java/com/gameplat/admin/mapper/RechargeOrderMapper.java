@@ -38,4 +38,20 @@ public interface RechargeOrderMapper extends BaseMapper<RechargeOrder> {
      * @return
      */
     List<ActivityStatisticItem> findRechargeInfo(Map map);
+
+    /**
+     * 统计用户充值记录
+     *
+     * @param map
+     * @return
+     */
+    List<ActivityStatisticItem> findRechargeDateList(Map map);
+
+    /**
+     * 统计首充金额
+     *
+     * @param map
+     * @return
+     */
+    List<ActivityStatisticItem> findFirstRechargeAmount(Map map);
 }

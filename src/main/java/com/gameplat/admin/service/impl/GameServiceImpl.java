@@ -57,8 +57,8 @@ public class GameServiceImpl extends ServiceImpl<GameMapper, Game> implements Ga
     public List<GameVO> findByGameTypeCode(String gameTypeCode) {
         List<Game> list = this.lambdaQuery().eq(StringUtils.isNotBlank(gameTypeCode), Game::getGameType, gameTypeCode).list();
         List<GameVO> gameVOList = new ArrayList<>();
-        if(CollectionUtils.isNotEmpty(list)){
-            for(Game game : list){
+        if (CollectionUtils.isNotEmpty(list)) {
+            for (Game game : list) {
                 gameVOList.add(gameConvert.toVo(game));
             }
         }

@@ -1,12 +1,15 @@
-package com.gameplat.admin.model.vo;
+package com.gameplat.admin.model.domain;
+
+import lombok.Data;
 
 import java.io.Serializable;
 import java.util.Date;
 
-import lombok.Data;
-
+/**
+ * 游戏注单
+ */
 @Data
-public class LiveBetRecordVO implements Serializable {
+public class LiveBetRecord implements Serializable {
     /**
      * 订单号
      */

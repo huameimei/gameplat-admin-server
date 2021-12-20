@@ -57,17 +57,28 @@ import javax.servlet.http.HttpServletRequest;
 @Transactional
 public class MemberGrowthRecordServiceImpl extends ServiceImpl<MemberGrowthRecordMapper, MemberGrowthRecord> implements MemberGrowthRecordService {
 
-    @Autowired private MemberGrowthRecordConvert recordConvert;
-    @Autowired private MemberGrowthRecordMapper memberGrowthRecordMapper;
-    @Autowired private MemberGrowthLevelService growthLevelService;
-    @Autowired private MemberGrowthConfigService memberGrowthConfigService;
-    @Autowired private MemberService memberService;
-    @Autowired private MemberBlackListService memberBlackListService;
-    @Autowired private DistributedLocker distributedLocker;
-    @Autowired private MemberWealRewordService memberWealRewordService;
-    @Autowired private FinancialService financialService;
-    @Autowired private SysInformationService sysInformationService;
-    @Autowired private ValidWithdrawService validWithdrawService;
+    @Autowired
+    private MemberGrowthRecordConvert recordConvert;
+    @Autowired
+    private MemberGrowthRecordMapper memberGrowthRecordMapper;
+    @Autowired
+    private MemberGrowthLevelService growthLevelService;
+    @Autowired
+    private MemberGrowthConfigService memberGrowthConfigService;
+    @Autowired
+    private MemberService memberService;
+    @Autowired
+    private MemberBlackListService memberBlackListService;
+    @Autowired
+    private DistributedLocker distributedLocker;
+    @Autowired
+    private MemberWealRewordService memberWealRewordService;
+    @Autowired
+    private FinancialService financialService;
+    @Autowired
+    private SysInformationService sysInformationService;
+    @Autowired
+    private ValidWithdrawService validWithdrawService;
 
     public static final String kindName = "{\"en-US\": \"platform\", \"in-ID\": \"peron\", \"th-TH\": \"แพลตฟอร์ม\", \"vi-VN\": \"nền tảng\", \"zh-CN\": \"平台\"}";
 
@@ -93,12 +104,14 @@ public class MemberGrowthRecordServiceImpl extends ServiceImpl<MemberGrowthRecor
         return result;
     }
 
-    /** 成长值变动后重新计算新的等级 */
+    /**
+     * 成长值变动后重新计算新的等级
+     */
     @Override
     public Integer dealUpLevel(Integer afterGrowth, MemberGrowthConfig memberGrowthConfig) {
         //todo 1.先获取所有成长值等级
         Integer limitLevel = memberGrowthConfig.getLimitLevel();
-        if (limitLevel == null){
+        if (limitLevel == null) {
             limitLevel = 50;
         }
         List<MemberGrowthLevelVO> levels = growthLevelService.findList(limitLevel + 1, LanguageEnum.app_zh_CN.getCode());
@@ -120,7 +133,9 @@ public class MemberGrowthRecordServiceImpl extends ServiceImpl<MemberGrowthRecor
         return memberGrowthRecordMapper.findRecordGroupBy(entity);
     }
 
-    /** 修改单个会员成长值   成成长值变动*/
+    /**
+     * 修改单个会员成长值   成成长值变动
+     */
     @Override
     public void editMemberGrowth(MemberGrowthChangeDto dto, HttpServletRequest request) {
         //判断是否开启了VIP
@@ -138,17 +153,17 @@ public class MemberGrowthRecordServiceImpl extends ServiceImpl<MemberGrowthRecor
         }
         //变动的类型
         Integer type = dto.getType();
-        if (dto.getChangeGrowth() == null){
+        if (dto.getChangeGrowth() == null) {
             throw new ServiceException("此次变动金额参数不存在");
         }
         //变动的成长值
-        Integer changeGrowth =  dto.getChangeGrowth();
+        Integer changeGrowth = dto.getChangeGrowth();
         //todo 1.获取用户成长值汇总数据
         List<MemberGrowthRecord> memberGrowthRecords = this.findOne(dto);
         MemberGrowthRecord memberGrowthRecord = new MemberGrowthRecord();
-        if(ObjectUtils.isNotEmpty(memberGrowthRecords)){
+        if (ObjectUtils.isNotEmpty(memberGrowthRecords)) {
             memberGrowthRecord = memberGrowthRecords.get(0);
-        } else{
+        } else {
             memberGrowthRecord.setOldGrowth(0);
             memberGrowthRecord.setCurrentGrowth(0);
             memberGrowthRecord.setOldLevel(0);
@@ -172,7 +187,7 @@ public class MemberGrowthRecordServiceImpl extends ServiceImpl<MemberGrowthRecor
             } else {
                 return;
             }
-        } else if(type == GrowthChangeEnum.sign.getCode()){
+        } else if (type == GrowthChangeEnum.sign.getCode()) {
             //签到
             //判断是否开启了签到
             if (growthConfig.getIsEnableSign() == YseOrNoEnum.YES.getCode()) {
@@ -193,7 +208,7 @@ public class MemberGrowthRecordServiceImpl extends ServiceImpl<MemberGrowthRecor
                 return;
             }
 
-        } else if(type == GrowthChangeEnum.dama.getCode()){
+        } else if (type == GrowthChangeEnum.dama.getCode()) {
             //判断是否开启了打码量
             if (growthConfig.getIsEnableDama() == YseOrNoEnum.YES.getCode()) {
                 changeFinalGrowth = growthConfig.getDamaRate().multiply(BigDecimal.valueOf(changeGrowth)).intValue();
@@ -203,26 +218,26 @@ public class MemberGrowthRecordServiceImpl extends ServiceImpl<MemberGrowthRecor
             } else {
                 return;
             }
-        } else if(type == GrowthChangeEnum.backEdit.getCode()){
+        } else if (type == GrowthChangeEnum.backEdit.getCode()) {
             //后台修改
             changeFinalGrowth = changeGrowth;
             saveRecord.setKindName(kindName);
             saveRecord.setKindCode("plat");
             saveRecord.setChangeMult(new BigDecimal("1"));
-            if (dto.getRemark() != null){
+            if (dto.getRemark() != null) {
                 saveRecord.setRemark(dto.getRemark());
             }
 
-        } else if(type == GrowthChangeEnum.finishInfo.getCode()){
+        } else if (type == GrowthChangeEnum.finishInfo.getCode()) {
             //完善资料
-        } else if(type == GrowthChangeEnum.bindBankCard.getCode()){
+        } else if (type == GrowthChangeEnum.bindBankCard.getCode()) {
             //绑定银行卡
             //判断是否已经绑定过银行卡加过成长值
             if (this.lambdaQuery()
                     .eq(MemberGrowthRecord::getUserId, dto.getUserId())
                     .eq(MemberGrowthRecord::getType, GrowthChangeEnum.bindBankCard.getCode())
                     .list()
-                    .size() == 0){
+                    .size() == 0) {
                 changeFinalGrowth = growthConfig.getBindBankGrowth();
             }
         }
@@ -231,11 +246,11 @@ public class MemberGrowthRecordServiceImpl extends ServiceImpl<MemberGrowthRecor
         //当前的会员等级
         Integer beforeLevel = memberGrowthRecord.getCurrentLevel();
         //todo 4.通过变动后的最新成长值 执行 增加成长值升级
-        if(memberGrowthRecord.getCurrentGrowth() < 0) {
+        if (memberGrowthRecord.getCurrentGrowth() < 0) {
             memberGrowthRecord.setCurrentGrowth(0);
         }
         //成长值变动后重新计算新的等级
-        Integer afterLevel = this.dealUpLevel(memberGrowthRecord.getCurrentGrowth(),growthConfig);
+        Integer afterLevel = this.dealUpLevel(memberGrowthRecord.getCurrentGrowth(), growthConfig);
         memberGrowthRecord.setCurrentLevel(afterLevel);
         //todo 5.记录成长值变动记录  重新更新 会员成长值汇总
         Integer tempGrowth = changeFinalGrowth;
@@ -249,12 +264,12 @@ public class MemberGrowthRecordServiceImpl extends ServiceImpl<MemberGrowthRecor
         saveRecord.setOldGrowth(oldGrowth);
         saveRecord.setCurrentGrowth(memberGrowthRecord.getCurrentGrowth());
         Boolean save = this.insertMemberGrowthRecord(saveRecord);
-        if(!save){
+        if (!save) {
             throw new ServiceException("服务器繁忙，请稍后再试");
         }
         //todo 6.传入变动前和变动后的等级 处理发放升级奖励
         if (beforeLevel.compareTo(afterLevel) < 0) {
-            this.dealPayUpReword(beforeLevel,afterLevel,growthConfig,member,request);
+            this.dealPayUpReword(beforeLevel, afterLevel, growthConfig, member, request);
             //VIP变动更新会员vip
             Member sysUser = new Member();
             sysUser.setId(memberId);
@@ -274,15 +289,17 @@ public class MemberGrowthRecordServiceImpl extends ServiceImpl<MemberGrowthRecor
         return this.save(userGrowthRecord);
     }
 
-    /** 进度条 */
+    /**
+     * 进度条
+     */
     @Override
     public GrowthScaleVO progressBar(Integer level, Long memberId) {
 
-        if(BeanUtil.isEmpty(memberService.getById(memberId))){
-           throw new ServiceException("该会员不存在");
+        if (BeanUtil.isEmpty(memberService.getById(memberId))) {
+            throw new ServiceException("该会员不存在");
         }
         MemberGrowthLevel growthLevel = growthLevelService.getLevel(level);
-        if (BeanUtil.isEmpty(growthLevel)){
+        if (BeanUtil.isEmpty(growthLevel)) {
             throw new ServiceException("无此等级配置信息");
         }
         //晋级到下级所需的成长值
@@ -292,18 +309,20 @@ public class MemberGrowthRecordServiceImpl extends ServiceImpl<MemberGrowthRecor
         MemberGrowthRecord growthRecord = this.getOne(new QueryWrapper<MemberGrowthRecord>()
                 .select("user_id userId", "current_growth currentGrowth", "max(create_time) createTime")
                 .eq("user_id", memberId));
-        if (!BeanUtil.isEmpty(growthRecord)){
+        if (!BeanUtil.isEmpty(growthRecord)) {
             currentGrowth = growthRecord.getCurrentGrowth();
         }
 
         Integer finalCurrentGrowth = currentGrowth;
-        return new GrowthScaleVO(){{
+        return new GrowthScaleVO() {{
             setLowerGrowth(growth);
             setCurrentGrowth(finalCurrentGrowth);
         }};
     }
 
-    /** 处理升级 */
+    /**
+     * 处理升级
+     */
     @Override
     public void dealPayUpReword(Integer beforeLevel, Integer afterLevel, MemberGrowthConfig growthConfig, Member member, HttpServletRequest request) {
         //查询用户是否在黑名单中
@@ -319,7 +338,7 @@ public class MemberGrowthRecordServiceImpl extends ServiceImpl<MemberGrowthRecor
             if (limitLevel == null) {
                 limitLevel = 50;
             }
-            List<MemberGrowthLevel> levels = growthLevelService.getList(limitLevel + 1,LanguageEnum.app_zh_CN.getCode());
+            List<MemberGrowthLevel> levels = growthLevelService.getList(limitLevel + 1, LanguageEnum.app_zh_CN.getCode());
             Map<Integer, MemberGrowthLevel> levelMap = levels.stream().collect(Collectors.toMap(MemberGrowthLevel::getLevel, UserGrowthLevel -> UserGrowthLevel));
             //获取是否重复派发升级奖励 0 不允许重复派发   1 允许重复派发
             Integer isRepeatPayUpReword = growthConfig.getIsRepeatPayUpReword() == null ? 0 : growthConfig.getIsRepeatPayUpReword();
@@ -333,14 +352,14 @@ public class MemberGrowthRecordServiceImpl extends ServiceImpl<MemberGrowthRecor
                     queryDto.setVipLevel(i);
                     int isPayCount = memberWealRewordService.findCountReword(queryDto);
                     log.info("不允许重复派发升级奖励:用户({0}),当前判断等级:VIP{1},是否发放:{2}", member.getId(), i, isPayCount);
-                    if (isPayCount > 0){
+                    if (isPayCount > 0) {
                         continue;
                     }
                 }
                 rewordAmount = rewordAmount.add(levelMap.get(i).getUpReward());
             }
             //判断升级奖励金额是否大于0
-            if (rewordAmount.compareTo(new BigDecimal("0")) > 0){
+            if (rewordAmount.compareTo(new BigDecimal("0")) > 0) {
                 MemberWealRewordAddDTO saveRewordObj = new MemberWealRewordAddDTO();
                 saveRewordObj.setUserId(member.getId());
                 saveRewordObj.setUserName(member.getAccount());
@@ -362,7 +381,7 @@ public class MemberGrowthRecordServiceImpl extends ServiceImpl<MemberGrowthRecor
                     validWithdraw.setType(0);
                     validWithdraw.setStatus(0);
                     validWithdraw.setDiscountMoney(BigDecimal.ZERO);
-                    validWithdraw.setRemark(member.getAccount()+ "从VIP" + beforeLevel + "升至VIP" + afterLevel + "奖励金额增加打码量");
+                    validWithdraw.setRemark(member.getAccount() + "从VIP" + beforeLevel + "升至VIP" + afterLevel + "奖励金额增加打码量");
                     validWithdrawService.saveValidWithdraw(validWithdraw);
                     // 账户资金锁
                     String lockKey = MessageFormat.format(MemberServiceKeyConstant.MEMBER_FINANCIAL_LOCK, member.getAccount());
@@ -409,7 +428,7 @@ public class MemberGrowthRecordServiceImpl extends ServiceImpl<MemberGrowthRecor
         sysInformationDto.setContent(content);
         sysInformationDto.setTitle("VIP等级升级");
         sysInformationDto.setType((byte) 3);
-        sysInformationDto.setLetterType((byte)9);
+        sysInformationDto.setLetterType((byte) 9);
         sysInformationDto.setUserName(member.getAccount());
         sysInformationDto.setUserId(member.getId());
         sysInformationDto.setCreateBy(member.getAccount());

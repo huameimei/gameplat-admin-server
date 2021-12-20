@@ -263,19 +263,10 @@ public class ActivityQualificationServiceImpl extends
 
     @Override
     public Map<String, Object> checkQualification(ActivityQualificationCheckDTO activityQualificationCheckDTO) {
-        List<ActivityMemberInfo> activityUserInfoList;
         MemberInfoVO memberInfo = null;
         Map<String, Object> retMap = new HashMap<>(3);
         try {
-//            List<String> userNameList = new ArrayList<>();
-//            userNameList.add(activityQualificationCheckDTO.getUsername());
-            //查询用户参加活动需要的用户基本信息
-//            Map map = new HashMap();
-//            map.put("userNameList", userNameList);
-
             memberInfo = memberService.getMemberInfo(activityQualificationCheckDTO.getUsername());
-
-//            activityUserInfoList = memberGrowthStatisService.findActivityMemberInfo(map);
             if (memberInfo == null) {
                 throw new ServiceException("账号不存在,请输入真实有效的账号");
             }

@@ -21,6 +21,10 @@ import com.gameplat.base.common.ip.IpAddressParser;
 import com.gameplat.base.common.util.ServletUtils;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
+
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -32,6 +36,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+@Api(tags = "会员管理")
 @RestController
 @RequestMapping("/api/admin/member/")
 public class MemberController {
@@ -40,21 +45,25 @@ public class MemberController {
 
   @Autowired private MemberTransformService memberTransformService;
 
+  @ApiOperation(value = "会员列表")
   @GetMapping("/list")
   public IPage<MemberVO> list(PageDTO<Member> page, MemberQueryDTO dto) {
     return memberService.queryPage(page, dto);
   }
 
+  @ApiOperation(value = "会员详情")
   @GetMapping("/info/{id}")
   public MemberInfoVO info(@PathVariable Long id) {
     return memberService.getInfo(id);
   }
 
+  @ApiOperation(value = "会员详情")
   @GetMapping("/getAccount")
   public MemberInfoVO memberInfo(@RequestParam String account) {
     return memberService.getMemberInfo(account);
   }
 
+  @ApiOperation(value = "添加会员")
   @PostMapping("/add")
   public void add(@Validated @RequestBody MemberAddDTO dto, HttpServletRequest request) {
     String userAgentHeader = request.getHeader(Header.USER_AGENT.getValue());
@@ -70,16 +79,19 @@ public class MemberController {
     memberService.add(dto);
   }
 
+  @ApiOperation(value = "编辑会员")
   @PutMapping("/edit")
   public void update(@Validated @RequestBody MemberEditDTO dto) {
     memberService.update(dto);
   }
 
+  @ApiOperation(value = "启用会员")
   @PutMapping("/enable")
   public void enable(@RequestBody List<Long> ids) {
     memberService.enable(ids);
   }
 
+  @ApiOperation(value = "禁用会员")
   @PutMapping("/disable")
   public void disable(@RequestBody List<Long> ids) {
     memberService.disable(ids);

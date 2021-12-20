@@ -27,6 +27,7 @@ import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.BeanUtils;
 import com.gameplat.base.common.util.DateUtil;
 import com.gameplat.base.common.util.StringUtils;
+import com.google.common.collect.Lists;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -64,7 +65,8 @@ public class ActivityLobbyServiceImpl extends ServiceImpl<ActivityLobbyMapper, A
     public IPage<ActivityLobbyVO> findActivityLobbyList(PageDTO<ActivityLobby> page, ActivityLobbyQueryDTO activityLobbyQueryDTO) {
         LambdaQueryChainWrapper<ActivityLobby> queryWrapper = this.lambdaQuery();
         queryWrapper.like(StringUtils.isNotBlank(activityLobbyQueryDTO.getTitle()), ActivityLobby::getTitle, activityLobbyQueryDTO.getTitle())
-                .eq(activityLobbyQueryDTO.getStatus() != null, ActivityLobby::getStatus, activityLobbyQueryDTO.getStatus());
+                .eq(activityLobbyQueryDTO.getStatus() != null, ActivityLobby::getStatus, activityLobbyQueryDTO.getStatus())
+                .orderByDesc(Lists.newArrayList(ActivityLobby::getCreateTime, ActivityLobby::getId));
 
         IPage<ActivityLobbyVO> activityLobbyVOIPage = queryWrapper.page(page).convert(activityLobbyConvert::toVo);
         if (CollectionUtils.isNotEmpty(activityLobbyVOIPage.getRecords())) {

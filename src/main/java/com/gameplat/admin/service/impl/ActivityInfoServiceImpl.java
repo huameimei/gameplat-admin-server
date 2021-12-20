@@ -23,6 +23,7 @@ import com.gameplat.admin.service.ActivityLobbyService;
 import com.gameplat.admin.service.ActivityTypeService;
 import com.gameplat.admin.service.SysBannerInfoService;
 import com.gameplat.base.common.exception.ServiceException;
+import com.google.common.collect.Lists;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -70,7 +71,8 @@ public class ActivityInfoServiceImpl
                 .eq(activityInfoQueryDTO.getStatus() != null
                         , ActivityInfo::getStatus, activityInfoQueryDTO.getStatus())
                 .eq(activityInfoQueryDTO.getActivityLobbyId() != null && activityInfoQueryDTO.getActivityLobbyId() != 0
-                        , ActivityInfo::getActivityLobbyId, activityInfoQueryDTO.getActivityLobbyId());
+                        , ActivityInfo::getActivityLobbyId, activityInfoQueryDTO.getActivityLobbyId())
+                .orderByDesc(Lists.newArrayList(ActivityInfo::getCreateTime, ActivityInfo::getId));
         IPage<ActivityInfoVO> page1 = queryWrapper.page(page).convert(activityInfoConvert::toVo);
         if (CollectionUtils.isNotEmpty(page1.getRecords())) {
             for (ActivityInfoVO activityInfoVO : page1.getRecords()) {

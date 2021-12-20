@@ -48,7 +48,7 @@ public class ActivityQualificationVO {
     @ApiModelProperty(value = "状态（0 无效，1 申请中，2 已审核）")
     private Integer status;
 
-    @ApiModelProperty(value = "资格状态（1 已使用，2 全部）")
+    @ApiModelProperty(value = "资格状态（0 禁用，1 启用）")
     private Integer qualificationStatus;
 
     @ApiModelProperty(value = "用户状态 0:非正常 1:正常")

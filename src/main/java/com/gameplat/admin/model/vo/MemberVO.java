@@ -3,6 +3,8 @@ package com.gameplat.admin.model.vo;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
+
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 @Data
@@ -98,4 +100,11 @@ public class MemberVO implements Serializable {
 
   /** 会员备注 */
   private String remark;
+
+  @ApiModelProperty(value = "当前会员等级")
+  private Integer level;
+
+  @ApiModelProperty(value = "当前会员成长值")
+  private Integer growth;
+
 }

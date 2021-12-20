@@ -1,8 +1,10 @@
 package com.gameplat.admin.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.date.DateTime;
 import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
@@ -16,8 +18,10 @@ import com.gameplat.admin.enums.LanguageEnum;
 import com.gameplat.admin.mapper.MemberGrowthRecordMapper;
 import com.gameplat.admin.model.domain.*;
 import com.gameplat.admin.model.dto.*;
+import com.gameplat.admin.model.vo.GrowthScaleVO;
 import com.gameplat.admin.model.vo.MemberGrowthLevelVO;
 import com.gameplat.admin.model.vo.MemberGrowthRecordVO;
+import com.gameplat.admin.model.vo.MemberInfoVO;
 import com.gameplat.admin.service.*;
 
 import java.math.BigDecimal;
@@ -268,6 +272,30 @@ public class MemberGrowthRecordServiceImpl extends ServiceImpl<MemberGrowthRecor
     @Override
     public Boolean insertMemberGrowthRecord(MemberGrowthRecord userGrowthRecord) {
         return this.save(userGrowthRecord);
+    }
+
+    /** 进度条 */
+    @Override
+    public GrowthScaleVO progressBar(Integer level, Long memberId) {
+
+        if(BeanUtil.isEmpty(memberService.getById(memberId))){
+           throw new ServiceException("该会员不存在");
+        }
+        MemberGrowthLevel growthLevel = growthLevelService.getLevel(level);
+        if (BeanUtil.isEmpty(growthLevel)){
+            throw new ServiceException("无此等级配置信息");
+        }
+        //晋级到下级所需的成长值
+        Integer growth = growthLevel.getGrowth();
+        //当前成长值
+        Integer currentGrowth = this.getOne(new QueryWrapper<MemberGrowthRecord>()
+                .select("user_id userId", "current_growth currentGrowth", "max(create_time) createTime")
+                .eq("user_id", memberId)).getCurrentGrowth();
+
+        return new GrowthScaleVO(){{
+            setLowerGrowth(growth);
+            setCurrentGrowth(currentGrowth);
+        }};
     }
 
     /** 处理升级 */

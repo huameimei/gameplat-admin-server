@@ -1,10 +1,12 @@
 package com.gameplat.admin.controller.open.member;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.gameplat.admin.model.domain.MemberGrowthRecord;
 import com.gameplat.admin.model.dto.MemberGrowthChangeDto;
 import com.gameplat.admin.model.dto.MemberGrowthRecordDTO;
+import com.gameplat.admin.model.vo.GrowthScaleVO;
 import com.gameplat.admin.model.vo.MemberGrowthRecordVO;
 import com.gameplat.admin.service.MemberGrowthRecordService;
 import com.gameplat.base.common.exception.ServiceException;
@@ -57,5 +59,15 @@ public class OpenMemberGrowthRecordController {
             log.info("异常原因:", e);
             throw new ServiceException("成长值变动失败！");
         }
+    }
+
+    @GetMapping("/getBar")
+    @ApiOperation(value = "进度条")
+    @PreAuthorize("hasAuthority('member:growthRecord:getBar')")
+    public GrowthScaleVO progressBar(Integer level, Long memberId) {
+            if (ObjectUtils.isNull(level) || ObjectUtils.isNull(memberId)) {
+                throw new ServiceException("参数不全！");
+            }
+            return memberGrowthRecordService.progressBar(level, memberId);
     }
 }

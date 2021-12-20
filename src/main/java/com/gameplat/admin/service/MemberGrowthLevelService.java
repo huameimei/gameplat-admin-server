@@ -22,6 +22,8 @@ public interface MemberGrowthLevelService extends IService<MemberGrowthLevel> {
      */
     List<MemberGrowthLevel> getList(Integer limitLevel, String language);
 
+    MemberGrowthLevel getLevel(Integer level);
+
     /**
      * 批量修改VIP等级
      */

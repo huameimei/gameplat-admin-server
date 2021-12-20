@@ -79,6 +79,13 @@ public class MemberGrowthLevelServiceImpl extends ServiceImpl<MemberGrowthLevelM
         return levelMapper.findList(limitLevel+1, language);
     }
 
+    @Override
+    public MemberGrowthLevel getLevel(Integer level) {
+        return this.lambdaQuery()
+                .eq(MemberGrowthLevel::getLevel, level)
+                .one();
+    }
+
     /**
      * 批量修改VIP等级
      */
@@ -112,8 +119,9 @@ public class MemberGrowthLevelServiceImpl extends ServiceImpl<MemberGrowthLevelM
                     record.setChangeMult(new BigDecimal("1"));
                     record.setOldGrowth(userRecord.getCurrentGrowth());
 
+                    Integer currentGrowth = userRecord.getCurrentGrowth();
                     if (newLevel < userRecord.getCurrentLevel()){
-                        Integer currentGrowth = this.lambdaQuery().eq(MemberGrowthLevel::getLevel, newLevel - 1).one().getGrowth();
+                        currentGrowth = this.lambdaQuery().eq(MemberGrowthLevel::getLevel, newLevel - 1).one().getGrowth();
                         record.setCurrentGrowth(currentGrowth);
                         record.setChangeGrowth(currentGrowth - userRecord.getCurrentGrowth());
                     }else if ((newLevel > userRecord.getCurrentLevel())){
@@ -129,6 +137,7 @@ public class MemberGrowthLevelServiceImpl extends ServiceImpl<MemberGrowthLevelM
                     Member member = new Member();
                     member.setId(userRecord.getUserId());
                     member.setLevel(newLevel);
+                    member.setGrowth(currentGrowth);
                     memberService.updateById(member);
                 }
             }

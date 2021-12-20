@@ -11,6 +11,7 @@ import com.gameplat.admin.model.domain.MemberGrowthStatis;
 import com.gameplat.admin.model.dto.MemberGrowthChangeDto;
 import com.gameplat.admin.model.dto.MemberGrowthRecordDTO;
 import com.gameplat.admin.model.dto.MemberGrowthStatisDTO;
+import com.gameplat.admin.model.vo.GrowthScaleVO;
 import com.gameplat.admin.model.vo.MemberGrowthConfigVO;
 import com.gameplat.admin.model.vo.MemberGrowthRecordVO;
 
@@ -32,6 +33,7 @@ public interface MemberGrowthRecordService extends IService<MemberGrowthRecord> 
 
     Boolean insertMemberGrowthRecord(MemberGrowthRecord userGrowthRecord);
 
+    GrowthScaleVO progressBar(Integer level, Long memberId);
     /** 处理升级 */
     void dealPayUpReword(Integer beforeLevel, Integer afterLevel, MemberGrowthConfig growthConfig, Member member, HttpServletRequest request);
 }

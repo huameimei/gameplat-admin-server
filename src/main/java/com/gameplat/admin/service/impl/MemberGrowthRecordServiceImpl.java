@@ -97,8 +97,10 @@ public class MemberGrowthRecordServiceImpl extends ServiceImpl<MemberGrowthRecor
 
         List<MemberGrowthRecordVO> list = result.getRecords();
         for (MemberGrowthRecordVO vo : list) {
-            JSONObject jsonKindName = JSONObject.parseObject(vo.getKindName());
-            vo.setKindName(jsonKindName.getString(dto.getLanguage()));
+            if(ObjectUtils.isNotNull(vo.getKindName())){
+                JSONObject jsonKindName = JSONObject.parseObject(vo.getKindName());
+                vo.setKindName(jsonKindName.getString(dto.getLanguage()));
+            }
         }
 
         return result;

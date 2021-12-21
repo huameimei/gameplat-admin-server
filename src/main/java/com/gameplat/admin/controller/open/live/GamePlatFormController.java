@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/admin/live/gamePlatform/")
+@RequestMapping("/api/admin/live/gamePlatform")
 public class GamePlatFormController {
 
   @Autowired private GamePlatformService gamePlatformService;

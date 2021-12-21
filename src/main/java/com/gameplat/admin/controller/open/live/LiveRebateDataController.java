@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/admin/live/liveRebateData")
+@RequestMapping("/api/admin/live/liveRebateData/")
 public class LiveRebateDataController {
 
   @Resource

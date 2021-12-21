@@ -145,7 +145,7 @@ public class ActivityInfo implements Serializable {
      * 是否弹窗默认0 不弹 1弹窗
      */
     //2.13点击2.1开启弹窗，页面新增弹窗图片设置，点击上传按钮，分别添加移动端和Web对应的弹窗图片。
-    private String isPopup;
+    private Boolean isPopup;
 
     /**
      * 移动端弹窗图片

@@ -91,13 +91,4 @@ public class ActivityBlacklistServiceImpl extends ServiceImpl<ActivityBlacklistM
         }
     }
 
-    public String removeBlankSpace(String ip) {//去掉IP字符串前后所有的空格
-        while (ip.startsWith(" ")) {
-            ip = ip.substring(1, ip.length()).trim();
-        }
-        while (ip.endsWith(" ")) {
-            ip = ip.substring(0, ip.length() - 1).trim();
-        }
-        return ip;
-    }
 }

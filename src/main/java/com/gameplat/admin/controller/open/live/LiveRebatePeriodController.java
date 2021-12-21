@@ -35,7 +35,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/admin/live/liveRebatePeriod")
+@RequestMapping("/api/admin/live/liveRebatePeriod/")
 public class LiveRebatePeriodController {
 
   private static final String LIVE_REBATE_PAY_REDIS_LOCK = "live_rebate_pay_redis_lock";

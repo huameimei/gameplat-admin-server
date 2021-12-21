@@ -23,4 +23,8 @@ public interface MemberBillMapper extends BaseMapper<MemberBill> {
                                           String endTime,
                                           Integer tableIndex);
 
+    MemberBill findBillByTableIndex(String orderNo,
+        int tranTypes,
+        Integer tableIndex);
+
 }

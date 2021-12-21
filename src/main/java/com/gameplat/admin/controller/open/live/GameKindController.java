@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/admin/live/gameKind/")
+@RequestMapping("/api/admin/live/gameKind")
 public class GameKindController {
 
   @Autowired private GameKindService gameKindService;

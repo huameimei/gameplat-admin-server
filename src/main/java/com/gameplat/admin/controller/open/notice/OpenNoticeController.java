@@ -30,7 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/notice/official-news")
+@RequestMapping("/api/admin/notice/official-news")
 public class OpenNoticeController {
 
     @Autowired private NoticeService noticeService;

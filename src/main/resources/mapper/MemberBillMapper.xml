@@ -47,4 +47,21 @@
         ORDER BY create_time DESC,id DESC
     </select>
 
+
+    <select id="findBillByTableIndex" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from member_bill_${tableIndex}
+        <where>
+            <if test="orderNo != null and orderNo != ''">
+                and order_no = #{orderNo}
+            </if>
+            <if test="tranType != null and tranType != ''">
+                and tran_type = #{tranType}
+            </if>
+        </where>
+    </select>
+
+
+
 </mapper>

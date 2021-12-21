@@ -13,6 +13,7 @@ import com.gameplat.admin.model.domain.MemberBill;
 import com.gameplat.admin.model.dto.MemberBillDTO;
 import com.gameplat.admin.model.vo.MemberBillVO;
 import com.gameplat.admin.service.MemberBillService;
+import com.gameplat.admin.service.MemberService;
 import com.gameplat.base.common.exception.ServiceException;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -34,6 +35,9 @@ public class MemberBillServiceImpl extends ServiceImpl<MemberBillMapper, MemberB
   private MemberBillMapper memberBillMapper;
   @Autowired
   private MemberBillConvert memberBillConvert;
+  @Autowired
+  private MemberService memberService;
+
 
   @Override
   public void save(Member member, MemberBill memberBill) throws Exception {
@@ -114,12 +118,22 @@ public class MemberBillServiceImpl extends ServiceImpl<MemberBillMapper, MemberB
   }
 
   @Override
-  public MemberBill queryLiveBill(Long id, String orderNo, int transType) {
+  public MemberBill queryLiveBill(Long id, String orderNo, int tranType) {
     //TODO 获取额度转换流水记录
     // 1. 现在在主表查询，接口为空就根据会员ID取模 到对应的历史表中获取数据
-
-
-    return null;
+    MemberBill memberBill = this.lambdaQuery()
+        .eq(ObjectUtils.isNotEmpty(id), MemberBill::getMemberId, id)
+        .eq(ObjectUtils.isNotEmpty(orderNo), MemberBill::getOrderNo, orderNo)
+        .eq(ObjectUtils.isNotEmpty(tranType), MemberBill::getTranType, tranType).one();
+    if (memberBill == null){
+      Member member = memberService.getById(id);
+      if (member == null){
+        throw new ServiceException("用户不存在");
+      }
+      int tableIndex = member.getTableIndex();
+      memberBill = memberBillMapper.findBillByTableIndex(orderNo,tranType,tableIndex);
+    }
+    return memberBill;
   }
 
   public List<MemberBillVO> getList(MemberBillDTO dto) {

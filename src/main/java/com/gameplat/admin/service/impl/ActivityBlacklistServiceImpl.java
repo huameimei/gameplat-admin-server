@@ -14,6 +14,7 @@ import com.gameplat.admin.model.vo.MemberInfoVO;
 import com.gameplat.admin.service.ActivityBlacklistService;
 import com.gameplat.admin.service.MemberService;
 import com.gameplat.base.common.exception.ServiceException;
+import com.gameplat.base.common.util.IpAddressUtils;
 import com.gameplat.base.common.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -56,7 +57,7 @@ public class ActivityBlacklistServiceImpl extends ServiceImpl<ActivityBlacklistM
                 throw new ServiceException("限制内容框中输入的会员账号不存在");
             }
         } else if (activityBlacklistAddDTO.getLimitedType() == ActivityBlacklistEnum.IP.getValue()) {
-            if (!isIp(activityBlacklistAddDTO.getLimitedContent())) {
+            if (!IpAddressUtils.inputIsIpAddress(activityBlacklistAddDTO.getLimitedContent())) {
                 throw new ServiceException("限制内容框中输入的IP地址不是一个有效的IP地址");
             }
         }
@@ -75,29 +76,4 @@ public class ActivityBlacklistServiceImpl extends ServiceImpl<ActivityBlacklistM
     }
 
 
-    public boolean isIp(String ip) {//判断是否是一个IP
-        String ipRegex = "\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}";
-        if (ip.matches(ipRegex)) {
-            String[] ipArray = ip.split("\\.");
-            for (int i = 0; i < ipArray.length; i++) {
-                int number = Integer.parseInt(ipArray[i]);
-                if (number < 0 || number > 255) {
-                    return false;
-                }
-            }
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    public String removeBlankSpace(String ip) {//去掉IP字符串前后所有的空格
-        while (ip.startsWith(" ")) {
-            ip = ip.substring(1, ip.length()).trim();
-        }
-        while (ip.endsWith(" ")) {
-            ip = ip.substring(0, ip.length() - 1).trim();
-        }
-        return ip;
-    }
 }

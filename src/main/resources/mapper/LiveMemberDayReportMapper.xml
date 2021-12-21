@@ -101,45 +101,44 @@
 
     <select id="getGameReportInfo" resultType="com.gameplat.admin.model.bean.ActivityStatisticItem">
       SELECT
-      a.user_name userName,
+      a.account userName,
       a.cumulativeGameDml,
       a.gameWinAmount
       <if test="sportValidAmount != null">
-        ,sum(ifnull( b.num, 0 )) AS cumulativeGameDmDays
+        ,SUM(IFNULL( b.num, 0 )) AS cumulativeGameDmDays
       </if>
       FROM(
-      SELECT user_name, SUM( valid_amount ) cumulativeGameDml, SUM( win_amount ) gameWinAmount
-      FROM
-      member_game_day_report
+      SELECT account, SUM( valid_amount ) cumulativeGameDml, SUM( win_amount ) gameWinAmount
+      FROM live_member_day_report
       <where>
         <if test="startTime != null">
-          and count_date <![CDATA[ >= ]]> date_format(#{startTime}, '%Y-%m-%d')
+          AND stat_time <![CDATA[ >= ]]> date_format(#{startTime}, '%Y-%m-%d')
         </if>
         <if test="endTime != null">
-          and count_date <![CDATA[ <= ]]> date_format(#{endTime}, '%Y-%m-%d')
+          AND stat_time <![CDATA[ <= ]]> date_format(#{endTime}, '%Y-%m-%d')
         </if>
         <if test="sportGameList != null and sportGameList != ''">
-          and find_in_set(first_kind, #{sportGameList})
+          AND FIND_IN_SET(first_kind, #{sportGameList})
         </if>
       </where>
-      GROUP BY user_name ) a
+      GROUP BY account ) a
       <if test="sportValidAmount != null">
-        LEFT JOIN ( SELECT user_name, CASE WHEN sum( valid_amount ) >= #{sportValidAmount} THEN
-        1 ELSE 0
-        END num
-        FROM member_game_day_report
+        LEFT JOIN ( SELECT account,
+                           CASE WHEN SUM( valid_amount ) >= #{sportValidAmount} THEN
+                               1 ELSE 0 END num
+        FROM live_member_day_report
         <where>
           <if test="startTime != null">
-            and count_date <![CDATA[ >= ]]> date_format(#{startTime}, '%Y-%m-%d')
+            AND stat_time <![CDATA[ >= ]]> date_format(#{startTime}, '%Y-%m-%d')
           </if>
           <if test="endTime != null">
-            and count_date <![CDATA[ <= ]]> date_format(#{endTime}, '%Y-%m-%d')
+            AND stat_time <![CDATA[ <= ]]> date_format(#{endTime}, '%Y-%m-%d')
           </if>
           <if test="sportGameList != null and sportGameList != ''">
-            and find_in_set(first_kind, #{sportGameList})
+            AND FIND_IN_SET(first_kind, #{sportGameList})
           </if>
         </where>
-        GROUP BY user_name,count_date ) b ON a.user_name = b.user_name
+        GROUP BY account,stat_time ) b ON a.account = b.account
       </if>
       <where>
         <if test="userNameList != null and userNameList.size > 0">

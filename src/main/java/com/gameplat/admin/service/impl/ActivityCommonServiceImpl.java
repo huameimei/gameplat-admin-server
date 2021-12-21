@@ -10,10 +10,8 @@ import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
 import com.gameplat.admin.enums.GameTypeEnum;
 import com.gameplat.admin.mapper.RechargeOrderMapper;
-import com.gameplat.admin.model.bean.ActivityMemberInfo;
 import com.gameplat.admin.model.bean.ActivityStatisticItem;
 import com.gameplat.admin.model.domain.*;
-import com.gameplat.admin.model.dto.ActivityLobbyDTO;
 import com.gameplat.admin.model.vo.MemberInfoVO;
 import com.gameplat.admin.service.*;
 import com.gameplat.admin.util.IdempotentKeyUtils;
@@ -26,7 +24,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -59,6 +60,12 @@ public class ActivityCommonServiceImpl implements ActivityCommonService {
 
     @Autowired
     private LiveMemberDayReportService liveMemberDayReportService;
+
+    @Autowired
+    private RechargeOrderService rechargeOrderService;
+
+    @Resource
+    private LiveBetRecordService liveBetRecordService;
 
 
     /**
@@ -273,10 +280,10 @@ public class ActivityCommonServiceImpl implements ActivityCommonService {
         if (count > 0) {
             if (activityLobby.getIsRepeat() == 1) {
                 //活动的每个统计周期内,只能参与一次
-                throw new ServiceException("E014");
+                throw new ServiceException("活动的每个统计周期内,只能参与一次");
             } else if (activityLobby.getIsRepeat() == 0) {
                 //该活动不可重复参加
-                throw new ServiceException("E015");
+                throw new ServiceException("该活动不可重复参加");
             }
         }
 
@@ -289,7 +296,7 @@ public class ActivityCommonServiceImpl implements ActivityCommonService {
             if (!graderList.contains(rank)) {
                 log.info("活动:{},限制此用户充值层级:{}", activityLobby.getTitle(), memberInfo.getId());
                 //你的条件不符合该活动要求
-                throw new ServiceException("E016");
+                throw new ServiceException("你的条件不符合该活动要求");
             }
         }
 
@@ -302,7 +309,7 @@ public class ActivityCommonServiceImpl implements ActivityCommonService {
             if (!userLevelList.contains(userLevel)) {
                 log.info("活动:{},限制此用户VIP等级:{}", activityLobby.getTitle(), memberInfo.getId());
                 //你的VIP等级不符合该活动要求
-                throw new ServiceException("E017");
+                throw new ServiceException("你的VIP等级不符合该活动要求");
             }
         }
     }
@@ -336,35 +343,35 @@ public class ActivityCommonServiceImpl implements ActivityCommonService {
                 break;
             case 3:
                 // 连续充值天数
-//                manageList = dealContinuousDays(activityLobby, lobbyDiscounts, activityUserInfoList, statisticalStartTime, statisticalEndTime, flagCheck, countDate);
+                manageList = dealContinuousDays(activityLobby, lobbyDiscounts, memberInfo, statisticalStartTime, statisticalEndTime, flagCheck, countDate);
                 break;
             case 4:
                 // 单日首充金额
-//                manageList = dealFirstPayDay(activityLobby, lobbyDiscounts, activityUserInfoList, statisticalStartTime, statisticalEndTime, flagCheck, countDate);
+                manageList = dealFirstPayDay(activityLobby, lobbyDiscounts, memberInfo, statisticalStartTime, statisticalEndTime, flagCheck, countDate);
                 break;
             case 5:
                 // 首充金额
-//                manageList = dealFirstPay(activityLobby, lobbyDiscounts, activityUserInfoList, statisticalStartTime, statisticalEndTime, flagCheck, countDate);
+                manageList = dealFirstPay(activityLobby, lobbyDiscounts, memberInfo, statisticalStartTime, statisticalEndTime, flagCheck, countDate);
                 break;
             case 6:
                 // 累计游戏打码金额
-//                manageList = dealCumulativeGameDml(activityLobby, lobbyDiscounts, activityUserInfoList, statisticalStartTime, statisticalEndTime, flagCheck, countDate);
+                manageList = dealCumulativeGameDml(activityLobby, lobbyDiscounts, memberInfo, statisticalStartTime, statisticalEndTime, flagCheck, countDate);
                 break;
             case 7:
                 // 累计游戏打码天数
-//                manageList = dealCumulativeGameDmDays(activityLobby, lobbyDiscounts, activityUserInfoList, statisticalStartTime, statisticalEndTime, flagCheck, countDate);
+                manageList = dealCumulativeGameDmDays(activityLobby, lobbyDiscounts, memberInfo, statisticalStartTime, statisticalEndTime, flagCheck, countDate);
                 break;
             case 8:
                 // 连续游戏打码天数
-//                manageList = dealContinuousGameDmDays(activityLobby, lobbyDiscounts, activityUserInfoList, statisticalStartTime, statisticalEndTime, flagCheck, countDate);
+                manageList = dealContinuousGameDmDays(activityLobby, lobbyDiscounts, memberInfo, statisticalStartTime, statisticalEndTime, flagCheck, countDate);
                 break;
             case 9:
                 // 单日游戏亏损金额
-//                manageList = dealGameWinAmount(activityLobby, lobbyDiscounts, activityUserInfoList, statisticalStartTime, statisticalEndTime, flagCheck, countDate);
+                manageList = dealGameWinAmount(activityLobby, lobbyDiscounts, memberInfo, statisticalStartTime, statisticalEndTime, flagCheck, countDate);
                 break;
             case 10:
                 // 指定比赛打码量
-//                manageList = dealAssignMatch(activityLobby, lobbyDiscounts, activityUserInfoList, statisticalStartTime, statisticalEndTime, flagCheck, countDate);
+                manageList = dealAssignMatch(activityLobby, lobbyDiscounts, memberInfo, statisticalStartTime, statisticalEndTime, flagCheck, countDate);
                 break;
         }
 
@@ -372,30 +379,465 @@ public class ActivityCommonServiceImpl implements ActivityCommonService {
     }
 
     /**
-     * 累计充值天数
-     *
-     * @param memberActivityLobby 活动
-     * @param discounts           活动 所有优惠
+     * 指定比赛
      */
-    public List<ActivityQualification> dealCumulativeRechargeDays(ActivityLobby memberActivityLobby,
-                                                                  List<ActivityLobbyDiscount> discounts,
-                                                                  MemberInfoVO memberInfo,
-                                                                  String startTime, String endTime, Integer flagCheck, Date countDate) {
-        //查询统计周期内的会员游戏日报表汇总数据(打码量)
-        Map map = new HashMap<>(1);
+    public List<ActivityQualification> dealAssignMatch(ActivityLobby memberActivityLobby, List<ActivityLobbyDiscount> discounts,
+                                                       MemberInfoVO memberInfo, String startTime,
+                                                       String endTime, Integer flagCheck, Date countDate) {
+        String errorMsg = null;
+        Map map = new HashMap();
         if (memberInfo != null) {
-            List<String> accountList = new ArrayList<>();
-            accountList.add(memberInfo.getAccount());
-            map.put("userNameList", accountList);
+            map.put("userNameList", Lists.newArrayList(memberInfo.getAccount()));
+        }
+        map.put("gameCode", "xj");
+        map.put("bonusDate", startTime.substring(0, 10));
+        map.put("matchId", memberActivityLobby.getMatchId());
+        List<ActivityStatisticItem> userAssignMatchDmlList = liveBetRecordService.xjAssignMatchDml(map);
+        if (StringUtils.isEmpty(userAssignMatchDmlList)) {
+            //您没有该场比赛的投注记录
+            throw new ServiceException("E035");
+        }
+
+        //根据目标值对活动优惠列表倒叙排列
+        discounts.sort(Comparator.comparingInt(ActivityLobbyDiscount::getTargetValue).reversed());
+
+        List<ActivityQualification> qualificationManageList = new ArrayList<>();
+        for (ActivityStatisticItem userAssignMatchDml : userAssignMatchDmlList) {
+            //组装会员信息
+            if (userAssignMatchDml.getUserName().equals(memberInfo.getAccount())) {
+                userAssignMatchDml.setUserId(memberInfo.getId());
+            }
+
+            //深拷贝一份活动优惠列表,用于活动自动申请计算多重彩金的最终金额
+            List<ActivityLobbyDiscount> copyDiscounts = BeanUtils.mapList(discounts, ActivityLobbyDiscount.class);
+            ActivityQualification qualificationManage = judgeValidAmount(userAssignMatchDml.getCumulativeGameDml(), copyDiscounts, new ArrayList<>(),
+                    memberActivityLobby, userAssignMatchDml, startTime, endTime, countDate);
+            if (StringUtils.isNull(qualificationManage)) {
+                if (flagCheck == 3) {
+                    errorMsg = "该场比赛的打码量未达到活动最低标准,目前打码量:" + userAssignMatchDml.getValidAmount();
+                } else {
+                    if (memberActivityLobby.getApplyWay() == 1) {
+                        //您在该场比赛的打码量未达到活动最低标准
+                        errorMsg = "您在该场比赛的打码量未达到活动最低标准";
+                    } else if (memberActivityLobby.getApplyWay() == 2) {
+                        continue;
+                    }
+                }
+                throw new ServiceException(errorMsg);
+            }
+            qualificationManageList.add(qualificationManage);
+        }
+
+        return qualificationManageList;
+    }
+
+    /**
+     * 单日游戏亏损金额
+     *
+     * @param memberActivityLobby
+     * @param discounts
+     * @param memberInfo
+     * @param startTime
+     * @param endTime
+     * @param flagCheck
+     * @param countDate
+     * @return
+     */
+    public List<ActivityQualification> dealGameWinAmount(ActivityLobby memberActivityLobby, List<ActivityLobbyDiscount> discounts,
+                                                         MemberInfoVO memberInfo, String startTime,
+                                                         String endTime, Integer flagCheck, Date countDate) {
+        String errorMsg = null;
+        Map map = new HashMap<>();
+        if (memberInfo == null) {
+            map.put("userNameList", Lists.newArrayList(memberInfo.getAccount()));
         }
         map.put("startTime", startTime);
         map.put("endTime", endTime);
+        map.put("sportGameList", memberActivityLobby.getGameList());
+        List<ActivityStatisticItem> memberGameReportInfoList = liveMemberDayReportService.getGameReportInfo(map);
+        if (StringUtils.isEmpty(memberGameReportInfoList)) {
+            throw new ServiceException("您在活动统计期间,对于指定的游戏,没有有效的投注金额");
+        }
 
+        //根据目标值对活动优惠列表倒叙排列
+        discounts.sort(Comparator.comparingInt(ActivityLobbyDiscount::getTargetValue).reversed());
+
+        List<ActivityQualification> qualificationManageList = new ArrayList<>();
+        for (ActivityStatisticItem memberGameReportInfo : memberGameReportInfoList) {
+            //组装会员信息
+            if (memberGameReportInfo.getUserName().equals(memberInfo.getAccount())) {
+                memberGameReportInfo.setUserId(memberInfo.getId());
+            }
+
+            //先判断输赢金额是否大于等于0
+            if (NumberUtil.isGreaterOrEqual(memberGameReportInfo.getGameWinAmount(), BigDecimal.ZERO)) {
+                if (memberActivityLobby.getApplyWay() == 1) {
+                    //您在活动统计期间,对于指定的游戏,单日亏损金额和总打码量未达到活动最低标准
+                    throw new ServiceException("您在活动统计期间,对于指定的游戏,单日亏损金额和总打码量未达到活动最低标准");
+                } else if (memberActivityLobby.getApplyWay() == 2) {
+                    continue;
+                }
+            }
+
+            //深拷贝一份活动优惠列表,用于活动自动申请计算多重彩金的最终金额
+            List<ActivityLobbyDiscount> copyDiscounts = BeanUtils.mapList(discounts, ActivityLobbyDiscount.class);
+            ActivityQualification qualificationManage = judgeMoney(memberGameReportInfo.getGameWinAmount().negate(), memberGameReportInfo.getCumulativeGameDml(), copyDiscounts, new ArrayList<>(),
+                    memberActivityLobby, memberGameReportInfo, startTime, endTime, countDate);
+            if (StringUtils.isNull(qualificationManage)) {
+                if (flagCheck == 3) {
+                    errorMsg = "活动统计期间,对于指定的游戏,单日亏损金额和总打码量未达到活动最低标准,目前亏损金额:" + memberGameReportInfo.getGameWinAmount() + ",打码量:" + memberGameReportInfo.getCumulativeGameDml();
+                } else {
+                    if (memberActivityLobby.getApplyWay() == 1) {
+                        //您在活动统计期间,对于指定的游戏,单日亏损金额和总打码量未达到活动最低标准
+                        errorMsg = "您在活动统计期间,对于指定的游戏,单日亏损金额和总打码量未达到活动最低标准";
+                    } else if (memberActivityLobby.getApplyWay() == 2) {
+                        continue;
+                    }
+                }
+                throw new ServiceException(errorMsg);
+            }
+            qualificationManageList.add(qualificationManage);
+        }
+        return qualificationManageList;
+    }
+
+    /**
+     * 连续游戏打码天数
+     *
+     * @param memberActivityLobby
+     * @param discounts
+     * @param memberInfo
+     * @param startTime
+     * @param endTime
+     * @param flagCheck
+     * @param countDate
+     * @return
+     */
+    public List<ActivityQualification> dealContinuousGameDmDays(ActivityLobby memberActivityLobby, List<ActivityLobbyDiscount> discounts,
+                                                                MemberInfoVO memberInfo, String startTime,
+                                                                String endTime, Integer flagCheck, Date countDate) {
+        String errorMsg = null;
+        Map map = new HashMap<>();
+        if (memberInfo != null) {
+            map.put("userNameList", Lists.newArrayList(memberInfo.getAccount()));
+        }
+        map.put("startTime", startTime);
+        map.put("endTime", endTime);
+        map.put("sportGameList", memberActivityLobby.getGameList());
+        map.put("sportValidAmount", memberActivityLobby.getSportValidAmount());
+        map.put("statisItem", memberActivityLobby.getStatisItem());
+        List<ActivityStatisticItem> memberGameReportInfoList = liveMemberDayReportService.getGameReportInfo(map);
+        if (StringUtils.isEmpty(memberGameReportInfoList)) {
+            throw new ServiceException("您在活动统计期间,对于指定的游戏,没有有效的投注金额");
+        }
+
+        //根据目标值对活动优惠列表倒叙排列
+        discounts.sort(Comparator.comparingInt(ActivityLobbyDiscount::getTargetValue).reversed());
+
+        List<ActivityQualification> qualificationManageList = new ArrayList<>();
+        for (ActivityStatisticItem memberGameReportInfo : memberGameReportInfoList) {
+            //组装会员信息
+            if (memberGameReportInfo.getUserName().equals(memberInfo.getAccount())) {
+                memberGameReportInfo.setUserId(memberInfo.getId());
+            }
+            //最大连续游戏打码天数
+            int maxCumulativeGameDmDays = getMaxPayDay(memberGameReportInfo.getGameCountDateList());
+
+            //深拷贝一份活动优惠列表,用于活动自动申请计算多重彩金的最终金额
+            List<ActivityLobbyDiscount> copyDiscounts = BeanUtils.mapList(discounts, ActivityLobbyDiscount.class);
+            ActivityQualification qualificationManage = judgeDays(maxCumulativeGameDmDays, memberGameReportInfo.getCumulativeGameDml(), copyDiscounts, new ArrayList<>(),
+                    memberActivityLobby, memberGameReportInfo, startTime, endTime, countDate);
+            if (StringUtils.isNull(qualificationManage)) {
+                if (flagCheck == 3) {
+                    errorMsg = "活动统计期间,对于指定的游戏,最大连续打码天数和总打码量未达到活动最低标准,目前最大连续打码天数:" + maxCumulativeGameDmDays + ",打码量:" + memberGameReportInfo.getCumulativeGameDml();
+                } else {
+                    if (memberActivityLobby.getApplyWay() == 1) {
+                        //您在活动统计期间,对于指定的游戏,最大连续打码天数和总打码量未达到活动最低标准
+                        errorMsg = "您在活动统计期间,对于指定的游戏,最大连续打码天数和总打码量未达到活动最低标准";
+                    } else if (memberActivityLobby.getApplyWay() == 2) {
+                        continue;
+                    }
+                }
+                throw new ServiceException(errorMsg);
+            }
+            qualificationManageList.add(qualificationManage);
+        }
+        return qualificationManageList;
+    }
+
+
+    /**
+     * 累计游戏打码天数
+     *
+     * @param memberActivityLobby 活动
+     * @param discounts           优惠
+     * @param memberInfo
+     * @param startTime
+     * @param endTime
+     * @param flagCheck
+     * @param countDate
+     * @return
+     */
+    public List<ActivityQualification> dealCumulativeGameDmDays(ActivityLobby memberActivityLobby, List<ActivityLobbyDiscount> discounts,
+                                                                MemberInfoVO memberInfo, String startTime,
+                                                                String endTime, Integer flagCheck, Date countDate) {
+        String errorMsg = null;
+        Map map = new HashMap<>();
+        if (memberInfo != null) {
+            map.put("userNameList", Lists.newArrayList(memberInfo.getAccount()));
+        }
+        map.put("startTime", startTime);
+        map.put("endTime", endTime);
+        map.put("sportGameList", memberActivityLobby.getGameList());
+        map.put("sportValidAmount", memberActivityLobby.getSportValidAmount());
+        List<ActivityStatisticItem> memberGameReportInfoList = liveMemberDayReportService.getGameReportInfo(map);
+        if (StringUtils.isEmpty(memberGameReportInfoList)) {
+            throw new ServiceException("您在活动统计期间,对于指定的游戏,累计打码金额未达到活动最低标准");
+        }
+
+        //根据目标值对活动优惠列表倒叙排列
+        discounts.sort(Comparator.comparingInt(ActivityLobbyDiscount::getTargetValue).reversed());
+
+        List<ActivityQualification> qualificationManageList = new ArrayList<>();
+        for (ActivityStatisticItem memberGameReportInfo : memberGameReportInfoList) {
+            //组装会员信息
+            if (memberGameReportInfo.getUserName().equals(memberInfo.getAccount())) {
+                memberGameReportInfo.setUserId(memberInfo.getId());
+            }
+
+            //深拷贝一份活动优惠列表,用于活动自动申请计算多重彩金的最终金额
+            List<ActivityLobbyDiscount> copyDiscounts = BeanUtils.mapList(discounts, ActivityLobbyDiscount.class);
+            ActivityQualification qualificationManage = judgeDays(memberGameReportInfo.getCumulativeGameDmDays(), memberGameReportInfo.getCumulativeGameDml(), copyDiscounts, new ArrayList<>(),
+                    memberActivityLobby, memberGameReportInfo, startTime, endTime, countDate);
+            if (StringUtils.isNull(qualificationManage)) {
+                if (flagCheck == 3) {
+                    errorMsg = "活动统计期间,对于指定的游戏,累计打码天数和总打码量未达到活动最低标准,目前累计打码天数:" + memberGameReportInfo.getCumulativeGameDmDays() + ",打码量:" + memberGameReportInfo.getCumulativeGameDml();
+                } else {
+                    if (memberActivityLobby.getApplyWay() == 1) {
+                        //您在活动统计期间,对于指定的游戏,累计打码天数和总打码量未达到活动最低标准
+                        errorMsg = "您在活动统计期间,对于指定的游戏,累计打码天数和总打码量未达到活动最低标准";
+                    } else if (memberActivityLobby.getApplyWay() == 2) {
+                        continue;
+                    }
+                }
+                throw new ServiceException(errorMsg);
+            }
+            qualificationManageList.add(qualificationManage);
+        }
+        return qualificationManageList;
+    }
+
+    /**
+     * 累计游戏打码金额
+     *
+     * @param memberActivityLobby 活动
+     * @param discounts           优惠
+     * @param memberInfo
+     * @param startTime
+     * @param endTime
+     * @param flagCheck
+     * @param countDate
+     * @return
+     */
+    public List<ActivityQualification> dealCumulativeGameDml(ActivityLobby memberActivityLobby, List<ActivityLobbyDiscount> discounts,
+                                                             MemberInfoVO memberInfo, String startTime,
+                                                             String endTime, Integer flagCheck, Date countDate) {
+        String errorMsg = null;
+        Map map = new HashMap<>();
+        if (memberInfo != null) {
+            map.put("userNameList", Lists.newArrayList(memberInfo.getAccount()));
+        }
+        map.put("startTime", startTime);
+        map.put("endTime", endTime);
+        map.put("sportGameList", memberActivityLobby.getGameList());
+        List<ActivityStatisticItem> memberGameReportInfoList = liveMemberDayReportService.getGameReportInfo(map);
+        if (StringUtils.isEmpty(memberGameReportInfoList)) {
+            //您在活动统计期间,对于指定的游戏,没有有效的投注金额
+            throw new ServiceException("您在活动统计期间,对于指定的游戏,没有有效的投注金额");
+        }
+        //根据目标值对活动优惠列表倒叙排列
+        discounts.sort(Comparator.comparingInt(ActivityLobbyDiscount::getTargetValue).reversed());
+
+        List<ActivityQualification> qualificationManageList = new ArrayList<>();
+        for (ActivityStatisticItem memberGameReportInfo : memberGameReportInfoList) {
+            //组装会员信息
+            if (memberGameReportInfo.getUserName().equals(memberInfo.getAccount())) {
+                memberGameReportInfo.setUserId(memberInfo.getId());
+            }
+
+            //深拷贝一份活动优惠列表,用于活动自动申请计算多重彩金的最终金额
+            List<ActivityLobbyDiscount> copyDiscounts = BeanUtils.mapList(discounts, ActivityLobbyDiscount.class);
+            ActivityQualification qualificationManage = judgeValidAmount(memberGameReportInfo.getCumulativeGameDml(), copyDiscounts, new ArrayList<>(),
+                    memberActivityLobby, memberGameReportInfo, startTime, endTime, countDate);
+            if (StringUtils.isNull(qualificationManage)) {
+                if (flagCheck == 3) {
+                    errorMsg = "活动统计期间,对于指定的游戏,累计打码金额未达到活动最低标准,目前累计打码金额:" + memberGameReportInfo.getCumulativeGameDml();
+                } else {
+                    if (memberActivityLobby.getApplyWay() == 1) {
+                        //您在活动统计期间,对于指定的游戏,累计打码金额未达到活动最低标准
+                        errorMsg = "您在活动统计期间,对于指定的游戏,累计打码金额未达到活动最低标准";
+                    } else if (memberActivityLobby.getApplyWay() == 2) {
+                        continue;
+                    }
+                }
+                throw new ServiceException(errorMsg);
+            }
+            qualificationManageList.add(qualificationManage);
+        }
+
+        return qualificationManageList;
+    }
+
+    /**
+     * 检查有效金额
+     *
+     * @param validAmount
+     * @param discounts
+     * @param satisfyDiscounts
+     * @param memberActivityLobby
+     * @param statisticUserInfo
+     * @param startTime
+     * @param endTime
+     * @param countDate
+     * @return
+     */
+    public ActivityQualification judgeValidAmount(BigDecimal validAmount, List<ActivityLobbyDiscount> discounts,
+                                                  List<ActivityLobbyDiscount> satisfyDiscounts, ActivityLobby memberActivityLobby,
+                                                  ActivityStatisticItem statisticUserInfo, String startTime, String endTime, Date countDate) {
+        //通过目标值和赠送打码量筛选，因为活动优惠列表集合是倒序，所以找到的第一个为目标满足的最大条件
+        ActivityLobbyDiscount lobbyDiscount = discounts.stream().filter(discount ->
+                NumberUtil.isGreaterOrEqual(validAmount, Convert.toBigDecimal(discount.getTargetValue())))
+                .findFirst().orElse(null);
+        if (StringUtils.isNotNull(lobbyDiscount)) {
+            String auditRemark = getAuditRemark(memberActivityLobby, validAmount.toString(), null, startTime, endTime);
+            satisfyDiscounts.add(lobbyDiscount);
+            //如果活动选择了多重彩金，则递归调用此方法
+            if (memberActivityLobby.getMultipleHandsel() == 1) {
+                discounts.remove(lobbyDiscount);
+                //如果活动优惠列表的长度为0，则停止递归
+                if (discounts.size() > 0) {
+                    judgeValidAmount(validAmount, discounts, satisfyDiscounts, memberActivityLobby, statisticUserInfo, startTime, endTime, countDate);
+                }
+            }
+            ActivityQualification manage = assembleQualificationManage(memberActivityLobby, statisticUserInfo, satisfyDiscounts, auditRemark, countDate, startTime, endTime);
+            return manage;
+        }
+        return null;
+    }
+
+    /**
+     * 首充金额
+     *
+     * @param memberActivityLobby 活动
+     * @param discounts           优惠
+     * @param memberInfo
+     * @param startTime
+     * @param endTime
+     * @param flagCheck
+     * @param countDate
+     * @return
+     */
+    public List<ActivityQualification> dealFirstPay(ActivityLobby memberActivityLobby, List<ActivityLobbyDiscount> discounts,
+                                                    MemberInfoVO memberInfo, String startTime,
+                                                    String endTime, Integer flagCheck, Date countDate) {
+        String errorMsg = null;
+        //查询统计周期内的会员游戏日报表汇总数据(打码量)
+        Map map = new HashMap<>();
+        if (memberInfo != null) {
+            map.put("userNameList", Lists.newArrayList(memberInfo.getAccount()));
+        }
         map.put("payType", memberActivityLobby.getPayType());
-        map.put("rechargeValidAmount", memberActivityLobby.getRechargeValidAmount());
-        List<ActivityStatisticItem> statisticUserInfoList = rechargeOrderMapper.findRechargeInfo(map);
+        map.put("startTime", DateUtil.format(memberActivityLobby.getStartTime(), DatePattern.NORM_DATE_PATTERN));
+        map.put("endTime", DateUtil.format(memberActivityLobby.getEndTime(), DatePattern.NORM_DATE_PATTERN));
+        List<ActivityStatisticItem> statisticUserInfoList = rechargeOrderService.findAllFirstRechargeAmount(map);
         if (StringUtils.isEmpty(statisticUserInfoList)) {
-            throw new ServiceException("E020");
+            throw new ServiceException("您在活动统计期间没有有效的充值金额");
+        }
+
+        map.put("userNameList", statisticUserInfoList.stream().map(ActivityStatisticItem::getUserName).collect(Collectors.toList()));
+        map.put("startTime", startTime);
+        map.put("endTime", endTime);
+        List<ActivityStatisticItem> memberGameReportInfoList = liveMemberDayReportService.getGameReportInfo(map);
+
+        //根据目标值对活动优惠列表倒叙排列
+        discounts.sort(Comparator.comparingInt(ActivityLobbyDiscount::getTargetValue).reversed());
+
+        List<ActivityQualification> qualificationManageList = new ArrayList<>();
+        for (ActivityStatisticItem statisticUserInfo : statisticUserInfoList) {
+            if (statisticUserInfo.getIsNewUser() == 2) {
+                if (flagCheck == 3) {
+                    //该活动只针对新用户有效
+                    throw new ServiceException("该活动只针对新用户有效");
+                } else {
+                    if (memberActivityLobby.getApplyWay() == 1) {
+                        //您账号的第一笔首充订单并不在活动时间内
+                        throw new ServiceException("您账号的第一笔首充订单并不在活动时间内");
+                    } else if (memberActivityLobby.getApplyWay() == 2) {
+                        continue;
+                    }
+                }
+            }
+            //先将所有会员打码量都赋值为0
+            statisticUserInfo.setValidAmount(BigDecimal.ZERO);
+            //如果部分会员有打码量金额,则赋值实际的打码量金额
+            if (StringUtils.isNotEmpty(memberGameReportInfoList)) {
+                //组装会员信息
+                for (ActivityStatisticItem memberDayReportVO : memberGameReportInfoList) {
+                    if (statisticUserInfo.getUserName().equals(memberDayReportVO.getUserName())) {
+                        statisticUserInfo.setValidAmount(memberDayReportVO.getCumulativeGameDml());
+                    }
+                }
+            }
+
+            //深拷贝一份活动优惠列表,用于活动自动申请计算多重彩金的最终金额
+            List<ActivityLobbyDiscount> copyDiscounts = BeanUtils.mapList(discounts, ActivityLobbyDiscount.class);
+            ActivityQualification qualificationManage = judgeMoney(statisticUserInfo.getFirstRechargeAmount(), statisticUserInfo.getValidAmount(), copyDiscounts, new ArrayList<>(),
+                    memberActivityLobby, statisticUserInfo, startTime, endTime, countDate);
+            if (StringUtils.isNull(qualificationManage)) {
+                if (flagCheck == 3) {
+                    errorMsg = "活动统计期间,首充金额和打码量未达到活动最低标准,目前首充金额:" + statisticUserInfo.getFirstRechargeAmount() + ",打码量:" + statisticUserInfo.getValidAmount();
+                } else {
+                    if (memberActivityLobby.getApplyWay() == 1) {
+                        //您在活动统计期间的首充金额和打码量未达到活动最低标准
+                        errorMsg = "您在活动统计期间的首充金额和打码量未达到活动最低标准";
+                    } else if (memberActivityLobby.getApplyWay() == 2) {
+                        continue;
+                    }
+                }
+                throw new ServiceException(errorMsg);
+            }
+            qualificationManageList.add(qualificationManage);
+        }
+        return qualificationManageList;
+    }
+
+    /**
+     * 单日首充金额
+     *
+     * @param memberActivityLobby
+     * @param discounts
+     * @param memberInfo
+     * @param startTime
+     * @param endTime
+     * @param flagCheck
+     * @param countDate
+     * @return
+     */
+    public List<ActivityQualification> dealFirstPayDay(ActivityLobby memberActivityLobby, List<ActivityLobbyDiscount> discounts,
+                                                       MemberInfoVO memberInfo, String startTime,
+                                                       String endTime, Integer flagCheck, Date countDate) {
+        String errorMsg = null;
+        //查询统计周期内的会员游戏日报表汇总数据(打码量)
+        Map map = new HashMap<>();
+        if (memberInfo != null) {
+            map.put("userNameList", Lists.newArrayList(memberInfo.getAccount()));
+        }
+        map.put("startTime", startTime);
+        map.put("endTime", endTime);
+        map.put("payType", memberActivityLobby.getPayType());
+        List<ActivityStatisticItem> statisticUserInfoList = rechargeOrderMapper.findFirstRechargeAmount(map);
+        if (StringUtils.isEmpty(statisticUserInfoList)) {
+            throw new ServiceException("您在活动统计期间没有有效的充值金额");
         }
 
         map.put("userNameList", statisticUserInfoList.stream().map(ActivityStatisticItem::getUserName).collect(Collectors.toList()));
@@ -420,24 +862,233 @@ public class ActivityCommonServiceImpl implements ActivityCommonService {
 
             //深拷贝一份活动优惠列表,用于活动自动申请计算多重彩金的最终金额
             List<ActivityLobbyDiscount> copyDiscounts = BeanUtils.mapList(discounts, ActivityLobbyDiscount.class);
-//            ActivityQualification qualificationManage = judgeDays(statisticUserInfo.getAccumulativeRechargeNum(), statisticUserInfo.getValidAmount(), copyDiscounts, new ArrayList<>(),
-//                    memberActivityLobby, statisticUserInfo, startTime, endTime, countDate);
-//            if (StringUtils.isNull(qualificationManage)) {
-//                if (flagCheck == 3) {
-//                    errorMsg = "活动统计期间,累计充值天数和打码量未达到活动最低标准,目前累计充值天数:" + statisticUserInfo.getAccumulativeRechargeNum() + ",打码量:" + statisticUserInfo.getValidAmount();
-//                } else {
-//                    if (memberActivityLobby.getApplyWay() == 1) {
-//                        //您在活动统计期间的累计充值天数和打码量未达到活动最低标准
-//                        errorMsg = "E022";
-//                    } else if (memberActivityLobby.getApplyWay() == 2) {
-//                        continue;
-//                    }
-//                }
-//                throw new ServiceException(errorMsg);
-//            }
-//            qualificationManageList.add(qualificationManage);
+            ActivityQualification qualificationManage = judgeMoney(statisticUserInfo.getFirstRechargeAmount(), statisticUserInfo.getValidAmount(), copyDiscounts, new ArrayList<>(),
+                    memberActivityLobby, statisticUserInfo, startTime, endTime, countDate);
+            if (StringUtils.isNull(qualificationManage)) {
+                if (flagCheck == 3) {
+                    errorMsg = "活动统计期间,单日首充金额和打码量未达到活动最低标准,目前单日首充金额:" + statisticUserInfo.getFirstRechargeAmount() + ",打码量:" + statisticUserInfo.getValidAmount();
+                } else {
+                    if (memberActivityLobby.getApplyWay() == 1) {
+                        //您在活动统计期间的单日首充金额和打码量未达到活动最低标准
+                        errorMsg = "您在活动统计期间的单日首充金额和打码量未达到活动最低标准";
+                    } else if (memberActivityLobby.getApplyWay() == 2) {
+                        continue;
+                    }
+                }
+                throw new ServiceException(errorMsg);
+            }
+            qualificationManageList.add(qualificationManage);
         }
         return qualificationManageList;
+    }
+
+    /**
+     * 连续充值天数
+     *
+     * @param memberActivityLobby
+     * @param discounts
+     * @param memberInfo
+     * @param startTime
+     * @param endTime
+     * @param flagCheck
+     * @param countDate
+     * @return
+     */
+    public List<ActivityQualification> dealContinuousDays(ActivityLobby memberActivityLobby,
+                                                          List<ActivityLobbyDiscount> discounts, MemberInfoVO memberInfo,
+                                                          String startTime, String endTime, Integer flagCheck, Date countDate) {
+        String errorMsg = null;
+        //查询统计周期内的会员游戏日报表汇总数据(打码量)
+        Map map = new HashMap<>(1);
+        if (memberInfo != null) {
+            map.put("userNameList", Lists.newArrayList(memberInfo.getAccount()));
+        }
+        map.put("startTime", startTime);
+        map.put("endTime", endTime);
+        map.put("payType", memberActivityLobby.getPayType());
+        map.put("rechargeValidAmount", memberActivityLobby.getRechargeValidAmount());
+        List<ActivityStatisticItem> statisticUserInfoList = rechargeOrderService.findRechargeDateList(map);
+        if (StringUtils.isEmpty(statisticUserInfoList)) {
+            throw new ServiceException("您在活动统计期间没有有效的充值金额");
+        }
+
+        map.put("userNameList", statisticUserInfoList.stream().map(ActivityStatisticItem::getUserName).collect(Collectors.toList()));
+        List<ActivityStatisticItem> memberGameReportInfoList = liveMemberDayReportService.getGameReportInfo(map);
+
+        //根据目标值对活动优惠列表倒叙排列
+        discounts.sort(Comparator.comparingInt(ActivityLobbyDiscount::getTargetValue).reversed());
+
+        List<ActivityQualification> qualificationManageList = new ArrayList<>();
+        for (ActivityStatisticItem statisticUserInfo : statisticUserInfoList) {
+            //先将所有会员打码量都赋值为0
+            statisticUserInfo.setValidAmount(BigDecimal.ZERO);
+            //如果部分会员有打码量金额,则赋值实际的打码量金额
+            if (StringUtils.isNotEmpty(memberGameReportInfoList)) {
+                //组装会员信息
+                for (ActivityStatisticItem memberDayReportVO : memberGameReportInfoList) {
+                    if (statisticUserInfo.getUserName().equals(memberDayReportVO.getUserName())) {
+                        statisticUserInfo.setValidAmount(memberDayReportVO.getCumulativeGameDml());
+                    }
+                }
+            }
+            //最大连续充值天数
+            int maxRechargeDay = getMaxPayDay(statisticUserInfo.getRechargeTimeList());
+
+            //深拷贝一份活动优惠列表,用于活动自动申请计算多重彩金的最终金额
+            List<ActivityLobbyDiscount> copyDiscounts = BeanUtils.mapList(discounts, ActivityLobbyDiscount.class);
+            ActivityQualification qualificationManage = judgeDays(maxRechargeDay, statisticUserInfo.getValidAmount(), copyDiscounts, new ArrayList<>(),
+                    memberActivityLobby, statisticUserInfo, startTime, endTime, countDate);
+            if (StringUtils.isNull(qualificationManage)) {
+                if (flagCheck == 3) {
+                    errorMsg = "活动统计期间,最大连续充值天数和打码量未达到活动最低标准,目前最大连续充值天数:" + maxRechargeDay + ",打码量:" + statisticUserInfo.getValidAmount();
+                } else {
+                    //您在活动统计期间的最大连续充值天数和打码量未达到活动最低标准
+                    if (memberActivityLobby.getApplyWay() == 1) {
+                        errorMsg = "您在活动统计期间的最大连续充值天数和打码量未达到活动最低标准";
+                    } else if (memberActivityLobby.getApplyWay() == 2) {
+                        continue;
+                    }
+                }
+                throw new ServiceException(errorMsg);
+            }
+            qualificationManageList.add(qualificationManage);
+        }
+        return qualificationManageList;
+    }
+
+    /**
+     * 获取最大连续时间天数
+     *
+     * @param vos
+     * @return
+     */
+    public int getMaxPayDay(List<Date> vos) {
+        int count = 1;
+        int resultCount = 0;
+        for (int i = 0; i < vos.size(); i++) {
+            LocalDate start = vos.get(i).toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+            if (i >= vos.size() - 1) {
+                break;
+            }
+            LocalDate end = vos.get(i + 1).toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+            if (end.minusDays(1).equals(start)) {
+                count++;
+            } else {
+                resultCount = Math.max(resultCount, count);
+                count = 1;
+            }
+        }
+        return Math.max(resultCount, count);
+    }
+
+    /**
+     * 累计充值天数
+     *
+     * @param memberActivityLobby 活动
+     * @param discounts           活动 所有优惠
+     */
+    public List<ActivityQualification> dealCumulativeRechargeDays(ActivityLobby memberActivityLobby,
+                                                                  List<ActivityLobbyDiscount> discounts,
+                                                                  MemberInfoVO memberInfo,
+                                                                  String startTime, String endTime, Integer flagCheck, Date countDate) {
+        String errorMsg = null;
+        //查询统计周期内的会员游戏日报表汇总数据(打码量)
+        Map map = new HashMap<>(1);
+        if (memberInfo != null) {
+            List<String> accountList = new ArrayList<>();
+            accountList.add(memberInfo.getAccount());
+            map.put("userNameList", accountList);
+        }
+        map.put("startTime", startTime);
+        map.put("endTime", endTime);
+
+        map.put("payType", memberActivityLobby.getPayType());
+        map.put("rechargeValidAmount", memberActivityLobby.getRechargeValidAmount());
+        List<ActivityStatisticItem> statisticUserInfoList = rechargeOrderMapper.findRechargeInfo(map);
+        if (StringUtils.isEmpty(statisticUserInfoList)) {
+            throw new ServiceException("您在活动统计期间没有有效的充值金额");
+        }
+
+        map.put("userNameList", statisticUserInfoList.stream().map(ActivityStatisticItem::getUserName).collect(Collectors.toList()));
+        List<ActivityStatisticItem> memberGameReportInfoList = liveMemberDayReportService.getGameReportInfo(map);
+
+        //根据目标值对活动优惠列表倒叙排列
+        discounts.sort(Comparator.comparingInt(ActivityLobbyDiscount::getTargetValue).reversed());
+
+        List<ActivityQualification> qualificationManageList = new ArrayList<>();
+        for (ActivityStatisticItem statisticUserInfo : statisticUserInfoList) {
+            //先将所有会员打码量都赋值为0
+            statisticUserInfo.setValidAmount(BigDecimal.ZERO);
+            //如果部分会员有打码量金额,则赋值实际的打码量金额
+            if (StringUtils.isNotEmpty(memberGameReportInfoList)) {
+                //组装会员信息
+                for (ActivityStatisticItem memberDayReportVO : memberGameReportInfoList) {
+                    if (statisticUserInfo.getUserName().equals(memberDayReportVO.getUserName())) {
+                        statisticUserInfo.setValidAmount(memberDayReportVO.getCumulativeGameDml());
+                    }
+                }
+            }
+
+            //深拷贝一份活动优惠列表,用于活动自动申请计算多重彩金的最终金额
+            List<ActivityLobbyDiscount> copyDiscounts = BeanUtils.mapList(discounts, ActivityLobbyDiscount.class);
+            ActivityQualification qualificationManage = judgeDays(statisticUserInfo.getAccumulativeRechargeNum(), statisticUserInfo.getValidAmount(), copyDiscounts, new ArrayList<>(),
+                    memberActivityLobby, statisticUserInfo, startTime, endTime, countDate);
+            if (StringUtils.isNull(qualificationManage)) {
+                if (flagCheck == 3) {
+                    errorMsg = "活动统计期间,累计充值天数和打码量未达到活动最低标准,目前累计充值天数:" + statisticUserInfo.getAccumulativeRechargeNum() + ",打码量:" + statisticUserInfo.getValidAmount();
+                } else {
+                    if (memberActivityLobby.getApplyWay() == 1) {
+                        //您在活动统计期间的累计充值天数和打码量未达到活动最低标准
+                        errorMsg = "您在活动统计期间的累计充值天数和打码量未达到活动最低标准";
+                    } else if (memberActivityLobby.getApplyWay() == 2) {
+                        continue;
+                    }
+                }
+                throw new ServiceException(errorMsg);
+            }
+            qualificationManageList.add(qualificationManage);
+        }
+        return qualificationManageList;
+    }
+
+    /**
+     * 判断天数
+     *
+     * @param days
+     * @param validAmount
+     * @param discounts
+     * @param satisfyDiscounts
+     * @param memberActivityLobby
+     * @param statisticUserInfo
+     * @param startTime
+     * @param endTime
+     * @param countDate
+     * @return
+     */
+    public ActivityQualification judgeDays(Integer days, BigDecimal validAmount, List<ActivityLobbyDiscount> discounts,
+                                           List<ActivityLobbyDiscount> satisfyDiscounts,
+                                           ActivityLobby memberActivityLobby, ActivityStatisticItem statisticUserInfo,
+                                           String startTime, String endTime, Date countDate) {
+        //通过目标值和赠送打码量筛选，因为活动优惠列表集合是倒序，所以找到的第一个为目标满足的最大条件
+        ActivityLobbyDiscount lobbyDiscount = discounts.stream().filter(discount ->
+                days >= discount.getTargetValue() &&
+                        NumberUtil.isGreaterOrEqual(validAmount, discount.getPresenterDml()))
+                .findFirst().orElse(null);
+        if (StringUtils.isNotNull(lobbyDiscount)) {
+            String auditRemark = getAuditRemark(memberActivityLobby, days.toString(), validAmount.toString(), startTime, endTime);
+            satisfyDiscounts.add(lobbyDiscount);
+            //如果活动选择了多重彩金，则递归调用此方法
+            if (memberActivityLobby.getMultipleHandsel() == 1) {
+                discounts.remove(lobbyDiscount);
+                //如果活动优惠列表的长度为0，则停止递归
+                if (discounts.size() > 0) {
+                    judgeDays(days, validAmount, discounts, satisfyDiscounts, memberActivityLobby, statisticUserInfo, startTime, endTime, countDate);
+                }
+            }
+            ActivityQualification manage = assembleQualificationManage(memberActivityLobby, statisticUserInfo, satisfyDiscounts, auditRemark, countDate, startTime, endTime);
+            return manage;
+        }
+        return null;
     }
 
     /**
@@ -498,7 +1149,7 @@ public class ActivityCommonServiceImpl implements ActivityCommonService {
                 } else {
                     if (memberActivityLobby.getApplyWay() == 1) {
                         //您在活动统计期间的累计充值金额和打码量未达到活动最低标准
-                        errorMsg = "E021";
+                        errorMsg = "您在活动统计期间的累计充值金额和打码量未达到活动最低标准";
                     } else if (memberActivityLobby.getApplyWay() == 2) {
                         continue;
                     }
@@ -616,6 +1267,15 @@ public class ActivityCommonServiceImpl implements ActivityCommonService {
 
     /**
      * 组装优惠数据
+     *
+     * @param activityLobby
+     * @param userInfo
+     * @param satisfyDiscounts
+     * @param auditRemark
+     * @param countDate
+     * @param startTime
+     * @param endTime
+     * @return
      */
     private ActivityQualification assembleQualificationManage(ActivityLobby activityLobby,
                                                               ActivityStatisticItem userInfo, List<ActivityLobbyDiscount> satisfyDiscounts,
@@ -656,29 +1316,5 @@ public class ActivityCommonServiceImpl implements ActivityCommonService {
         manage.setGetWay(activityLobby.getGetWay());
         return manage;
     }
-
-//    public QualificationManage judgeDays(Integer days, BigDecimal validAmount, List<MemberLobbyDiscount> discounts, List<MemberLobbyDiscount> satisfyDiscounts,
-//                                         MemberActivityLobby memberActivityLobby, ActivityStatisticItemVO statisticUserInfo, String startTime, String endTime, Date countDate) {
-//        //通过目标值和赠送打码量筛选，因为活动优惠列表集合是倒序，所以找到的第一个为目标满足的最大条件
-//        MemberLobbyDiscount lobbyDiscount = discounts.stream().filter(discount ->
-//                days >= discount.getTargetValue() &&
-//                        NumberUtil.isGreaterOrEqual(validAmount, discount.getPresenterDml()))
-//                .findFirst().orElse(null);
-//        if (StringUtils.isNotNull(lobbyDiscount)) {
-//            String auditRemark = getAuditRemark(memberActivityLobby, days.toString(), validAmount.toString(), startTime, endTime);
-//            satisfyDiscounts.add(lobbyDiscount);
-//            //如果活动选择了多重彩金，则递归调用此方法
-//            if (memberActivityLobby.getMultipleHandsel() == 1) {
-//                discounts.remove(lobbyDiscount);
-//                //如果活动优惠列表的长度为0，则停止递归
-//                if (discounts.size() > 0) {
-//                    judgeDays(days, validAmount, discounts, satisfyDiscounts, memberActivityLobby, statisticUserInfo, startTime, endTime, countDate);
-//                }
-//            }
-//            QualificationManage manage = assembleQualificationManage(memberActivityLobby, statisticUserInfo, satisfyDiscounts, auditRemark, countDate, startTime, endTime);
-//            return manage;
-//        }
-//        return null;
-//    }
 
 }

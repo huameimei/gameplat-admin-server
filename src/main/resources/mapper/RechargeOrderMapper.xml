@@ -27,19 +27,18 @@
 
     <select id="findRechargeInfo" resultType="com.gameplat.admin.model.bean.ActivityStatisticItem">
         SELECT
-        a.user_id as userId,
-        a.user_account as userName,
+        a.member_id as userId,
+        a.account as userName,
         a.accumulativeRechargeAmount
         <if test="rechargeValidAmount != null">
-            ,sum(ifnull( b.num, 0 )) AS accumulativeRechargeNum
+            ,SUM(IFNULL( b.num, 0 )) AS accumulativeRechargeNum
         </if>
         FROM(
-        SELECT user_id, user_account, SUM( amount ) accumulativeRechargeAmount
-        FROM
-        recharge_order
+        SELECT member_id, account, SUM(amount) accumulativeRechargeAmount
+        FROM recharge_order
         <where>
             <if test="payType != null and payType != ''">
-                and mode in (${payType})
+                AND mode IN (${payType})
             </if>
             <if test="startTime != null and startTime != ''">
                 AND add_time <![CDATA[>= ]]> #{startTime}
@@ -47,40 +46,116 @@
             <if test="endTime != null and endTime != ''">
                 AND add_time <![CDATA[<= ]]> #{endTime}
             </if>
-            and status = 3
+            AND status = 3
         </where>
-        GROUP BY user_id ) a
+        GROUP BY member_id ) a
         <if test="rechargeValidAmount != null">
-            LEFT JOIN ( SELECT user_id, CASE WHEN sum( amount ) >= #{rechargeValidAmount} THEN 1 ELSE 0 END num
+            LEFT JOIN ( SELECT member_id, CASE WHEN SUM( amount ) >= #{rechargeValidAmount} THEN 1 ELSE 0 END num
             FROM recharge_order
             <where>
                 <if test="payType != null and payType != ''">
-                    and mode in (${payType})
+                    AND mode IN (${payType})
                 </if>
                 <if test="startTime != null and startTime != ''">
-                    AND add_time <![CDATA[>= ]]> #{startTime}
+                    AND recharge_time <![CDATA[>= ]]> #{startTime}
                 </if>
                 <if test="endTime != null and endTime != ''">
-                    AND add_time <![CDATA[<= ]]> #{endTime}
+                    AND recharge_time <![CDATA[<= ]]> #{endTime}
                 </if>
-                and status = 3
+                AND status = 3
             </where>
-            GROUP BY user_id, date_format( add_time, '%Y-%m-%d' )) b ON a.user_id = b.user_id
+            GROUP BY member_id, date_format( recharge_time, '%Y-%m-%d' )) b ON a.member_id = b.member_id
         </if>
         <where>
             <if test="userIdList != null and userIdList.size > 0">
-                and a.user_id in
+                AND a.member_id IN
                 <foreach collection="userIdList" index="index" item="item" open="(" close=")" separator=",">
                     #{item}
                 </foreach>
             </if>
             <if test="userNameList != null and userNameList.size > 0">
-                and a.user_account in
+                AND a.account IN
                 <foreach collection="userNameList" index="index" item="item" open="(" close=")" separator=",">
                     #{item}
                 </foreach>
             </if>
         </where>
-        GROUP BY a.user_id
+        GROUP BY a.member_id
+    </select>
+
+    <select id="findRechargeDateList" resultType="com.gameplat.admin.model.bean.ActivityStatisticItem">
+        SELECT
+        member_id userId,
+        account userName,
+        GROUP_CONCAT(DISTINCT(recharge_time)) AS rechargeTimes
+        FROM (SELECT
+        member_id,
+        account,
+        date_format( recharge_time, '%Y-%m-%d') AS recharge_time,
+        SUM(amount) AS totalAmount
+        FROM recharge_order
+        <where>
+            AND status = 3
+            <if test="userIdList != null and userIdList.size > 0">
+                AND member_id IN
+                <foreach collection="userIdList" index="index" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="userNameList != null and userNameList.size > 0">
+                AND account IN
+                <foreach collection="userNameList" index="index" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="payType != null and payType != ''">
+                AND mode IN (${payType})
+            </if>
+            <if test="startTime != null and startTime != ''">
+                AND recharge_time <![CDATA[>= ]]> #{startTime}
+            </if>
+            <if test="endTime != null and endTime != ''">
+                AND recharge_time <![CDATA[<= ]]> #{endTime}
+            </if>
+        </where>
+        GROUP BY member_id, recharge_time) AS a
+        WHERE
+        totalAmount >= #{rechargeValidAmount}
+        GROUP BY a.member_id
+    </select>
+
+    <select id="findFirstRechargeAmount" resultType="com.gameplat.admin.model.bean.ActivityStatisticItem">
+        SELECT
+        member_id userId,
+        account userName,
+        DATE_FORMAT(recharge_time,'%Y-%m-%d') AS rechargeTime,
+        amount AS firstRechargeAmount
+        FROM recharge_order
+        <where>
+            AND status = 3
+            <if test="userIdList != null and userIdList.size > 0">
+                AND member_id IN
+                <foreach collection="userIdList" index="index" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="userNameList != null and userNameList.size > 0">
+                AND account IN
+                <foreach collection="userNameList" index="index" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="payType != null and payType != ''">
+                AND mode IN (${payType})
+            </if>
+            <if test="startTime != null and startTime != ''">
+                AND recharge_time <![CDATA[>= ]]> #{startTime}
+            </if>
+            <if test="endTime != null and endTime != ''">
+                AND recharge_time <![CDATA[<= ]]> #{endTime}
+            </if>
+        </where>
+        GROUP BY member_id
+        ORDER BY recharge_time,id
     </select>
 </mapper>

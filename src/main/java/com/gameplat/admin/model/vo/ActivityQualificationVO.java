@@ -19,6 +19,10 @@ import java.util.Date;
 public class ActivityQualificationVO {
 
     @JsonSerialize(using = ToStringSerializer.class)
+    @ApiModelProperty(value = "主键ID")
+    private Long id;
+
+    @JsonSerialize(using = ToStringSerializer.class)
     @ApiModelProperty(value = "用户id")
     private Long userId;
 

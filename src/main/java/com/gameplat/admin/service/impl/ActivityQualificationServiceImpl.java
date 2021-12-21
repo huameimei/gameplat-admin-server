@@ -13,7 +13,6 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.convert.ActivityLobbyConvert;
 import com.gameplat.admin.convert.ActivityQualificationConvert;
 import com.gameplat.admin.mapper.ActivityQualificationMapper;
-import com.gameplat.admin.model.bean.ActivityMemberInfo;
 import com.gameplat.admin.model.domain.ActivityDistribute;
 import com.gameplat.admin.model.domain.ActivityLobby;
 import com.gameplat.admin.model.domain.ActivityQualification;
@@ -29,6 +28,7 @@ import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.DateUtil;
 import com.gameplat.base.common.util.RandomUtil;
 import com.gameplat.base.common.util.StringUtils;
+import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -96,52 +96,67 @@ public class ActivityQualificationServiceImpl extends
     public void add(ActivityQualificationAddDTO activityQualificationAddDTO) {
         Integer type = activityQualificationAddDTO.getType();
         String username = activityQualificationAddDTO.getUsername();
-        MemberInfoVO memberInfo = memberService.getMemberInfo(username);
-        if (StringUtils.isNull(memberInfo)) {
-            throw new ServiceException("用户不存在");
+        if (type == null) {
+            throw new ServiceException("活动类型不能为空");
         }
-        // 1 活动大厅  2 红包雨
-        if (type == 1) {
-            List<ActivityLobbyDTO> activityLobbyList = activityQualificationAddDTO.getActivityLobbyList();
-            if (CollectionUtils.isEmpty(activityLobbyList)) {
-                throw new ServiceException("活动大厅数据不能为空");
+        if (StringUtils.isBlank(username)) {
+            throw new ServiceException("用户名不能为空");
+        }
+        List<String> usernameList = new ArrayList<>();
+        if (username.contains(",")) {
+            usernameList.addAll(Lists.newArrayList(username.split(",")));
+        } else {
+            usernameList.add(username);
+        }
+
+        for (String username1 : usernameList) {
+            MemberInfoVO memberInfo = memberService.getMemberInfo(username1);
+            if (StringUtils.isNull(memberInfo)) {
+                throw new ServiceException("用户【" + username1 + "】不存在,请检查");
             }
-            List<ActivityQualification> manageList = new ArrayList<>();
-            ActivityQualification qm;
-            for (ActivityLobbyDTO activityLobbyDTO : activityLobbyList) {
-                List<ActivityLobbyDiscountDTO> lobbyDiscount = activityLobbyDTO.getLobbyDiscountList();
-                if (activityLobbyDTO.getMultipleHandsel() == 0 && lobbyDiscount.size() > 1) {
-                    throw new ServiceException("【" + activityLobbyDTO.getTitle() + "】，没有开启多重彩金");
+            // 1 活动大厅  2 红包雨
+            if (type == 1) {
+                List<ActivityLobbyDTO> activityLobbyList = activityQualificationAddDTO.getActivityLobbyList();
+                if (CollectionUtils.isEmpty(activityLobbyList)) {
+                    throw new ServiceException("活动大厅数据不能为空");
                 }
-                qm = new ActivityQualification();
-                ActivityLobby activityLobby = activityLobbyConvert.toEntity(activityLobbyDTO);
-                String auditRemark = activityCommonService.getAuditRemark(activityLobby, "", "", null, null);
-                qm.setAuditRemark(auditRemark);
-                qm.setActivityId(activityLobbyDTO.getId());
-                qm.setActivityName(activityLobbyDTO.getTitle());
-                qm.setActivityType(activityLobbyDTO.getType());
-                qm.setUserId(memberInfo.getId());
-                qm.setUsername(username);
-                qm.setApplyTime(new Date());
-                qm.setStatus(1);
-                qm.setActivityStartTime(activityLobbyDTO.getStartTime());
-                qm.setActivityEndTime(activityLobbyDTO.getEndTime());
-                qm.setDeleteFlag(1);
-                qm.setDrawNum(1);
-                qm.setEmployNum(0);
-                qm.setQualificationActivityId(IdWorker.getIdStr());
-                qm.setQualificationStatus(1);
-                qm.setStatisItem(activityLobbyDTO.getStatisItem());
-                qm.setMaxMoney(lobbyDiscount.stream().mapToInt(ActivityLobbyDiscountDTO::getPresenterValue).sum());
-                qm.setWithdrawDml(lobbyDiscount.stream().mapToInt(ActivityLobbyDiscountDTO::getWithdrawDml).sum());
-                qm.setSoleIdentifier(RandomUtil.generateOrderCode());
-                lobbyDiscount.sort(Comparator.comparingInt(ActivityLobbyDiscountDTO::getTargetValue));
-                qm.setAwardDetail(JSON.parseArray(JSONObject.toJSONString(lobbyDiscount)).toJSONString());
-                qm.setGetWay(activityLobbyDTO.getGetWay());
-                manageList.add(qm);
-            }
-            if (CollectionUtils.isNotEmpty(manageList)) {
-                this.saveBatch(manageList);
+                List<ActivityQualification> manageList = new ArrayList<>();
+                ActivityQualification qm;
+                for (ActivityLobbyDTO activityLobbyDTO : activityLobbyList) {
+                    List<ActivityLobbyDiscountDTO> lobbyDiscount = activityLobbyDTO.getLobbyDiscountList();
+                    if (activityLobbyDTO.getMultipleHandsel() == 0 && lobbyDiscount.size() > 1) {
+                        throw new ServiceException("【" + activityLobbyDTO.getTitle() + "】，没有开启多重彩金");
+                    }
+                    qm = new ActivityQualification();
+                    ActivityLobby activityLobby = activityLobbyConvert.toEntity(activityLobbyDTO);
+                    String auditRemark = activityCommonService.getAuditRemark(activityLobby, "", "", null, null);
+                    qm.setAuditRemark(auditRemark);
+                    qm.setActivityId(activityLobbyDTO.getId());
+                    qm.setActivityName(activityLobbyDTO.getTitle());
+                    qm.setActivityType(activityLobbyDTO.getType());
+                    qm.setUserId(memberInfo.getId());
+                    qm.setUsername(username1);
+                    qm.setApplyTime(new Date());
+                    qm.setStatus(1);
+                    qm.setActivityStartTime(activityLobbyDTO.getStartTime());
+                    qm.setActivityEndTime(activityLobbyDTO.getEndTime());
+                    qm.setDeleteFlag(1);
+                    qm.setDrawNum(1);
+                    qm.setEmployNum(0);
+                    qm.setQualificationActivityId(IdWorker.getIdStr());
+                    qm.setQualificationStatus(1);
+                    qm.setStatisItem(activityLobbyDTO.getStatisItem());
+                    qm.setMaxMoney(lobbyDiscount.stream().mapToInt(ActivityLobbyDiscountDTO::getPresenterValue).sum());
+                    qm.setWithdrawDml(lobbyDiscount.stream().mapToInt(ActivityLobbyDiscountDTO::getWithdrawDml).sum());
+                    qm.setSoleIdentifier(RandomUtil.generateOrderCode());
+                    lobbyDiscount.sort(Comparator.comparingInt(ActivityLobbyDiscountDTO::getTargetValue));
+                    qm.setAwardDetail(JSON.parseArray(JSONObject.toJSONString(lobbyDiscount)).toJSONString());
+                    qm.setGetWay(activityLobbyDTO.getGetWay());
+                    manageList.add(qm);
+                }
+                if (CollectionUtils.isNotEmpty(manageList)) {
+                    this.saveBatch(manageList);
+                }
             }
         }
     }
@@ -203,7 +218,7 @@ public class ActivityQualificationServiceImpl extends
             }
         }
         if (CollectionUtils.isNotEmpty(activityDistributeList)) {
-            boolean result = activityDistributeService.saveBatch(activityDistributeList);
+            boolean result = activityDistributeService.saveDistributeBatch(activityDistributeList);
             if (result) {
                 log.info("插入活动派发成功");
             }

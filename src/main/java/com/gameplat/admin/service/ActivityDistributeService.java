@@ -36,7 +36,7 @@ public interface ActivityDistributeService {
      * @param activityDistributeList
      * @return
      */
-    boolean saveBatch(List<ActivityDistribute> activityDistributeList);
+    boolean saveDistributeBatch(List<ActivityDistribute> activityDistributeList);
 
     /**
      * 分页查询

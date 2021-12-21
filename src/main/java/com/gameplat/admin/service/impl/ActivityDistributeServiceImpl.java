@@ -67,7 +67,7 @@ public class ActivityDistributeServiceImpl
     }
 
     @Override
-    public boolean saveBatch(List<ActivityDistribute> activityDistributeList) {
+    public boolean saveDistributeBatch(List<ActivityDistribute> activityDistributeList) {
         return this.saveBatch(activityDistributeList);
     }
 

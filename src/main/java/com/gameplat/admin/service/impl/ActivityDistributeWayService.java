@@ -10,6 +10,7 @@ import com.gameplat.admin.enums.PushMessageEnum;
 import com.gameplat.admin.mapper.ActivityDistributeMapper;
 import com.gameplat.admin.model.domain.*;
 import com.gameplat.admin.model.dto.PushMessageAddDTO;
+import com.gameplat.admin.model.vo.MemberInfoVO;
 import com.gameplat.admin.service.*;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.IPUtils;
@@ -53,7 +54,10 @@ public class ActivityDistributeWayService extends ServiceImpl<ActivityDistribute
     @Autowired
     private PushMessageService pushMessageService;
 
-    @Transactional
+    @Autowired
+    private MemberService memberService;
+
+    @Transactional(rollbackFor = Throwable.class)
     public void directRelease(ActivityDistribute activityDistribute, MemberWealReword wealReword) {
         // 账户资金锁
         String lockKey = MessageFormat.format(MemberServiceKeyConstant.MEMBER_FINANCIAL_LOCK, activityDistribute.getUsername());
@@ -72,7 +76,10 @@ public class ActivityDistributeWayService extends ServiceImpl<ActivityDistribute
             String sourceId = activityDistribute.getQualificationActivityId().toString();
             Integer status = null;
             String remark = null;
-            Double amount = null;
+            BigDecimal amount = null;
+            //获取会员信息
+            MemberInfoVO memberInfoVO = memberService.getMemberInfo(wealReword.getUserName());
+            amount = memberInfoVO.getBalance() == null ? BigDecimal.ZERO : memberInfoVO.getBalance();
             //更新用户的金额
             memberInfoService.updateBalance(activityDistribute.getUserId(), activityDistribute.getDiscountsMoney());
 
@@ -101,8 +108,7 @@ public class ActivityDistributeWayService extends ServiceImpl<ActivityDistribute
                 validWithdraw.setMemberId(activityDistribute.getUserId());
                 validWithdraw.setRechId(sourceId);
                 validWithdraw.setRechMoney(activityDistribute.getDiscountsMoney().setScale(2, RoundingMode.HALF_UP));
-
-//                        validWithdraw.setDmlClaim(new BigDecimal(activityDistribute.getWithdrawDml()).setScale(2, RoundingMode.HALF_UP));
+                validWithdraw.setMormDml(new BigDecimal(activityDistribute.getWithdrawDml()).setScale(2, RoundingMode.HALF_UP));
 
                 validWithdraw.setType(0);
                 validWithdraw.setStatus(0);
@@ -114,9 +120,9 @@ public class ActivityDistributeWayService extends ServiceImpl<ActivityDistribute
             // 新增现金流水
             Financial financial = new Financial();
             financial.setUsername(activityDistribute.getUsername());
-            financial.setBeforeBalance(BigDecimal.valueOf(amount).setScale(2, RoundingMode.HALF_UP));
+            financial.setBeforeBalance(amount.setScale(2, RoundingMode.HALF_UP));
             financial.setAmount(activityDistribute.getDiscountsMoney().setScale(2, RoundingMode.HALF_UP));
-            financial.setAfterBalance(status == 0 ? BigDecimal.valueOf(amount).setScale(2, RoundingMode.HALF_UP) : BigDecimal.valueOf(amount).add(activityDistribute.getDiscountsMoney()).setScale(2, RoundingMode.HALF_UP));
+            financial.setAfterBalance(status == 0 ? amount.setScale(2, RoundingMode.HALF_UP) : amount.add(activityDistribute.getDiscountsMoney()).setScale(2, RoundingMode.HALF_UP));
             financial.setSourceType(50);
             financial.setSourceId(String.valueOf(sourceId));
             financial.setState(status);

@@ -130,6 +130,8 @@ public class ActivityDistributeServiceImpl
                     throw new ServiceException("已结算的不能重复结算！");
                 }
             }
+        } else {
+            throw new ServiceException("派发活动信息不存在，请重试！");
         }
 
         log.info("开始派发活动奖励,{}", System.currentTimeMillis());

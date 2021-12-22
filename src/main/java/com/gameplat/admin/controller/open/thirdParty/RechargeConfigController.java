@@ -27,7 +27,7 @@ public class RechargeConfigController {
 
   @PostMapping("/add")
   @PreAuthorize("hasAuthority('thirdParty:rechargeConfig:add')")
-  public void add(@RequestBody RechargeConfig rechargeConfig) {
+  public void add(RechargeConfig rechargeConfig) {
     rechargeConfigService.add(rechargeConfig);
   }
 

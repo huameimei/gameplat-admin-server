@@ -2,8 +2,10 @@ package com.gameplat.admin.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
+import com.gameplat.admin.model.bean.PageExt;
 import com.gameplat.admin.model.domain.ActivityDistribute;
 import com.gameplat.admin.model.dto.ActivityDistributeQueryDTO;
+import com.gameplat.admin.model.vo.ActivityDistributeStatisticsVO;
 import com.gameplat.admin.model.vo.ActivityDistributeVO;
 
 import java.util.List;
@@ -45,7 +47,7 @@ public interface ActivityDistributeService {
      * @param activityDistributeQueryDTO
      * @return
      */
-    IPage<ActivityDistributeVO> list(PageDTO<ActivityDistribute> page, ActivityDistributeQueryDTO activityDistributeQueryDTO);
+    PageExt<IPage<ActivityDistributeVO>, ActivityDistributeStatisticsVO> list(PageDTO<ActivityDistribute> page, ActivityDistributeQueryDTO activityDistributeQueryDTO);
 
     /**
      * 更新分发状态

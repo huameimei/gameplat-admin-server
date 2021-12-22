@@ -44,7 +44,8 @@ public class ActivityLobbyVO implements Serializable {
     @JsonSerialize(using = ToStringSerializer.class)
     private Long type;
 
-    @ApiModelProperty(value = "活动类型（1 充值活动(统计项目(statisItem)选项中的1,2,3,4,5项可选)；2 游戏活动(统计项目(statisItem)选项中的6,7,8,9,10,11,12项可选)")
+    @ApiModelProperty(value = "活动类型（1 充值活动(统计项目(statisItem)选项中的1,2,3,4,5项可选)；" +
+            "2 游戏活动(统计项目(statisItem)选项中的6,7,8,9,10,11,12项可选)")
     private Integer activityType;
 
     @ApiModelProperty(value = "描述")
@@ -107,7 +108,7 @@ public class ActivityLobbyVO implements Serializable {
     @ApiModelProperty(value = "活动大厅优惠")
     private List<ActivityLobbyDiscountVO> lobbyDiscountList;
 
-    @ApiModelProperty(value = "用户等级")
+    @ApiModelProperty(value = "用户VIP等级")
     private String userLevel;
 
     @ApiModelProperty(value = "活动状态（0 关闭，1 开启，2 失效）")

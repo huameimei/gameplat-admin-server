@@ -2,8 +2,10 @@ package com.gameplat.admin.controller.open.activity;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
+import com.gameplat.admin.model.bean.PageExt;
 import com.gameplat.admin.model.domain.ActivityDistribute;
 import com.gameplat.admin.model.dto.ActivityDistributeQueryDTO;
+import com.gameplat.admin.model.vo.ActivityDistributeStatisticsVO;
 import com.gameplat.admin.model.vo.ActivityDistributeVO;
 import com.gameplat.admin.service.ActivityDistributeService;
 import com.gameplat.base.common.exception.ServiceException;
@@ -40,7 +42,7 @@ public class ActivityDistributeController {
     @ApiOperation(value = "活动分发列表")
     @GetMapping("/list")
     @PreAuthorize("hasAuthority('activity:distribute:list')")
-    public IPage<ActivityDistributeVO> list(@ApiIgnore PageDTO<ActivityDistribute> page, ActivityDistributeQueryDTO activityDistributeQueryDTO) {
+    public PageExt<IPage<ActivityDistributeVO>, ActivityDistributeStatisticsVO> list(@ApiIgnore PageDTO<ActivityDistribute> page, ActivityDistributeQueryDTO activityDistributeQueryDTO) {
         return activityDistributeService.list(page, activityDistributeQueryDTO);
     }
 

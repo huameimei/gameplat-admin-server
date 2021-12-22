@@ -1,5 +1,6 @@
 package com.gameplat.admin.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
@@ -7,26 +8,30 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.convert.ActivityDistributeConvert;
 import com.gameplat.admin.enums.ActivityDistributeEnum;
 import com.gameplat.admin.mapper.ActivityDistributeMapper;
+import com.gameplat.admin.model.bean.PageExt;
 import com.gameplat.admin.model.domain.ActivityDistribute;
 import com.gameplat.admin.model.domain.MemberWealReword;
 import com.gameplat.admin.model.dto.ActivityDistributeQueryDTO;
+import com.gameplat.admin.model.vo.ActivityDistributeStatisticsVO;
 import com.gameplat.admin.model.vo.ActivityDistributeVO;
 import com.gameplat.admin.service.ActivityDistributeService;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.StringUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.MapUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 活动分发类
  *
- * @author admin
+ * @author kenvin
  */
 @Slf4j
 @Service
@@ -72,7 +77,7 @@ public class ActivityDistributeServiceImpl
     }
 
     @Override
-    public IPage<ActivityDistributeVO> list(PageDTO<ActivityDistribute> page, ActivityDistributeQueryDTO activityDistributeQueryDTO) {
+    public PageExt<IPage<ActivityDistributeVO>, ActivityDistributeStatisticsVO> list(PageDTO<ActivityDistribute> page, ActivityDistributeQueryDTO activityDistributeQueryDTO) {
         LambdaQueryChainWrapper<ActivityDistribute> lambdaQuery = this.lambdaQuery();
         lambdaQuery.eq(ActivityDistribute::getDeleteFlag, 1)
                 .like(StringUtils.isNotBlank(activityDistributeQueryDTO.getUsername())
@@ -88,7 +93,25 @@ public class ActivityDistributeServiceImpl
                 .le(StringUtils.isNotBlank(activityDistributeQueryDTO.getApplyEndTime())
                         , ActivityDistribute::getApplyTime, activityDistributeQueryDTO.getApplyEndTime())
         ;
-        return lambdaQuery.page(page).convert(activityDistributeConvert::toVo);
+
+        IPage<ActivityDistributeVO> iPage = lambdaQuery.page(page).convert(activityDistributeConvert::toVo);
+        BigDecimal subtotalMoney = BigDecimal.ZERO;
+        if (CollectionUtils.isNotEmpty(iPage.getRecords())) {
+            for (ActivityDistributeVO vo : iPage.getRecords()) {
+                subtotalMoney = subtotalMoney.add(vo.getDiscountsMoney());
+            }
+        }
+
+        ActivityDistributeStatisticsVO activityDistributeStatisticsVO = new ActivityDistributeStatisticsVO();
+        QueryWrapper<ActivityDistribute> queryWrapper = new QueryWrapper<>();
+        queryWrapper.select("SUM(discounts_money) aggregate");
+        Map<String, Object> map = this.getMap(queryWrapper);
+        if (MapUtils.isNotEmpty(map) && map.get("aggregate") != null) {
+            BigDecimal aggregate = new BigDecimal(map.get("aggregate").toString());
+            activityDistributeStatisticsVO.setAllMoney(aggregate.setScale(2, BigDecimal.ROUND_UP).doubleValue());
+        }
+        activityDistributeStatisticsVO.setSubtotalMoney(subtotalMoney.setScale(2, BigDecimal.ROUND_UP).doubleValue());
+        return new PageExt(iPage, activityDistributeStatisticsVO);
     }
 
     @Override
@@ -133,7 +156,7 @@ public class ActivityDistributeServiceImpl
                     throw new ServiceException("无效的领取方式参数");
                 }
             } catch (Exception e) {
-                log.info("活动派发异常,派发ID:{},异常原因:{}", activityDistribute.getActivityId(), e);
+                log.error("活动派发异常,派发ID:{},异常原因:{}", activityDistribute.getActivityId(), e);
                 continue;
             }
         }

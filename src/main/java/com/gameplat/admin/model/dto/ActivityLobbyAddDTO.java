@@ -4,15 +4,14 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.gameplat.base.common.util.DateUtil;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
+import javax.validation.constraints.NotBlank;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
-import javax.validation.constraints.NotBlank;
-
-import lombok.Data;
-import lombok.EqualsAndHashCode;
 
 /**
  * 活动大厅新增DTO
@@ -95,7 +94,7 @@ public class ActivityLobbyAddDTO implements Serializable {
     @ApiModelProperty(value = "领取方式（1 红包，2 通知）")
     private Integer getWay;
 
-    @ApiModelProperty(value = "用户等级")
+    @ApiModelProperty(value = "用户VIP等级")
     private String userLevel;
 
     @NotBlank(message = "活动状态必选")

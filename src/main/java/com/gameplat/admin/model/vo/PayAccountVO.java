@@ -32,6 +32,8 @@ public class PayAccountVO extends Model<PayAccountVO> {
 
   private Integer sort;
 
+  private String url;
+
   @ApiModelProperty(value = "状态: [0 - 启用, 1 - 禁用]")
   private Integer status;
 

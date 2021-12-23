@@ -62,6 +62,8 @@ public class TpPayChannelAddDTO implements Serializable {
   /** 风控值 */
   private String riskControlValue;
 
+  private Integer typeSubscript;
+
   @Override
   public String toString() {
     return JSON.toJSONString(this);

@@ -45,6 +45,8 @@ public class TpPayChannelVO extends Model<TpPayChannelVO> {
 
   private String payType;
 
+  private Integer typeSubscript;
+
   /** 通道金额设置标识，0位禁用 */
   private Integer limitStatus;
 

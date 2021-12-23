@@ -55,6 +55,8 @@ public class TpPayChannel {
   @ApiModelProperty(value = "通道提示")
   private String payChannelTip;
 
+  private Integer typeSubscript;
+
   /**
    * 创建者
    */

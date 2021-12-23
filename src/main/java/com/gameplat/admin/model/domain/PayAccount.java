@@ -58,6 +58,8 @@ public class PayAccount {
 
   private Integer typeSubscript;
 
+  private String url;
+
   /**
    * 创建者
    */

@@ -33,6 +33,7 @@ public class MemberQueryCondition {
         .eq(ObjectUtils.isNotEmpty(dto.getQq()), "t1.qq", dto.getQq())
         .eq(ObjectUtils.isNotEmpty(dto.getUserLevel()), "t1.user_level", dto.getUserLevel())
         .eq(ObjectUtils.isNotEmpty(dto.getAgentLevel()), "t1.agent_level", dto.getAgentLevel())
+        .eq(ObjectUtils.isNotEmpty(dto.getLevel()), "t1.level", dto.getLevel())
         .eq(
             ObjectUtils.isNotEmpty(dto.getInvitationCode()),
             "t2.invitation_code",
@@ -87,10 +88,7 @@ public class MemberQueryCondition {
             dto.getRechTimesTo())
         // 最近充值时间
         .between(
-            ObjectUtils.isNotEmpty(dto.getLastRechTimeFrom()),
-            "t2.last_rech_time",
-            dto.getLastRechTimeFrom(),
-            dto.getLastRechTimeTo())
+            ObjectUtils.isNotEmpty(dto.getLastRechTimeFrom() ), "t2.last_rech_time", dto.getLastRechTimeFrom(),dto.getLastRechTimeTo())
         // 充值金额范围
         .ge(
             ObjectUtils.isNotEmpty(dto.getRechAmountFrom()),

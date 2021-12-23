@@ -44,10 +44,10 @@ public class MemberQueryDTO implements Serializable {
   /** 权限控制 账号可以查看的会员层级 */
   private List<String> levelList;
 
-  /** 代理等级 */
+  /** 会员层级 */
   private Integer userLevel;
 
-  /** 代理等级 */
+  /** 代理层级 */
   private Integer agentLevel;
 
   private Integer maxUserLevel;
@@ -93,15 +93,15 @@ public class MemberQueryDTO implements Serializable {
   private Long balanceTo;
 
   /** 注册时间范围 */
-  private Date registerTimeFrom;
+  private String registerTimeFrom;
 
-  private Date registerTimeTo;
+  private String registerTimeTo;
 
   /** 登录时间开始 */
-  private Date lastLoginTimeFrom;
+  private String lastLoginTimeFrom;
 
   /** 登录时间结束 */
-  private Date lastLoginTimeTo;
+  private String lastLoginTimeTo;
 
   /** 多少天内登陆过 */
   private Integer dayOfLogin;
@@ -124,9 +124,9 @@ public class MemberQueryDTO implements Serializable {
   private Long rechAmountTo;
 
   /** 最近提现时间 */
-  private Date lastWithdrawTimeFrom;
+  private String lastWithdrawTimeFrom;
 
-  private Date lastWithdrawTimeTo;
+  private String lastWithdrawTimeTo;
 
   /** 累计提现次数 */
   private Integer withdrawTimesFrom;
@@ -147,4 +147,7 @@ public class MemberQueryDTO implements Serializable {
 
   /** 未二次充值 */
   private Boolean notTwiceRech;
+
+  /** 会员当前等级 */
+  private Integer level;
 }

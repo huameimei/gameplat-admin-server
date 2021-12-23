@@ -55,6 +55,7 @@ import com.gameplat.base.common.util.DateUtil;
 import com.gameplat.base.common.util.StringUtils;
 import com.gameplat.common.enums.LimitEnums;
 import com.gameplat.common.enums.MemberEnums;
+import com.gameplat.common.enums.SwitchStatusEnum;
 import com.gameplat.common.enums.UserTypes;
 import com.gameplat.common.model.bean.Builder;
 import com.gameplat.common.model.bean.limit.MemberRechargeLimit;
@@ -391,7 +392,7 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
     }
 
     // 获取所有的可用代付商户
-    List<PpMerchant> merchantList = ppMerchantService.queryAllMerchant(0);
+    List<PpMerchant> merchantList = ppMerchantService.queryAllMerchant(SwitchStatusEnum.ENABLED.getValue());
     if (CollectionUtils.isEmpty(merchantList)) {
       throw new ServiceException("没有可用的代付商户");
     }

@@ -33,11 +33,13 @@ public class PayType {
   @ApiModelProperty(value = "是否支持在线支付: [0 - 否, 1 - 是]")
   private Integer onlinePayEnabled;
 
-  @ApiModelProperty(value = "状态: [0 - 启用, 1 - 禁用]")
+  @ApiModelProperty(value = "状态: [1 - 启用, 0 - 禁用]")
   private Integer status;
 
   @ApiModelProperty(value = "是否系统支付编码: [0 - 否, 1 - 是]")
   private Integer isSysCode;
+
+  private String url;
 
   /**
    * 创建者

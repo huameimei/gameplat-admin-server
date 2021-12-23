@@ -40,7 +40,7 @@ public class TpPayChannel {
   @ApiModelProperty(value = "排序值")
   private Integer sort;
 
-  @ApiModelProperty(value = "状态: [0 - 启用, 1 - 禁用]")
+  @ApiModelProperty(value = "状态: [1 - 启用, 0 - 禁用]")
   private Integer status;
 
   @ApiModelProperty(value = "充值次数")

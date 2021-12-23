@@ -22,4 +22,6 @@ public class PayTypeAddDTO implements Serializable {
   private Integer sort;
 
   private String rechargeDesc;
+
+  private String url;
 }

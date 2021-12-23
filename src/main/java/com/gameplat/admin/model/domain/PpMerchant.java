@@ -24,7 +24,7 @@ public class PpMerchant {
   @ApiModelProperty(value = "第三方代付接口编码")
   private String ppInterfaceCode;
 
-  @ApiModelProperty(value = "状态: [0 - 启用, 1 - 禁用]")
+  @ApiModelProperty(value = "状态: [1 - 启用, 0 - 禁用]")
   private Integer status;
 
   @ApiModelProperty(value = "代付累计次数")

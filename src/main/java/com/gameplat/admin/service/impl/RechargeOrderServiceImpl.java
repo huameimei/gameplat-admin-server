@@ -536,7 +536,7 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
              */
             if (validateLimitAmount(payAccount.getLimitInfo(), payAccount.getRechargeAmount())) {
                 LambdaUpdateWrapper<PayAccount> update = Wrappers.lambdaUpdate();
-                update.set(PayAccount::getStatus, 1)
+                update.set(PayAccount::getStatus, SwitchStatusEnum.DISABLED.getValue())
                         .eq(PayAccount::getId, payAccount.getId());
                 payAccountService.update(new PayAccount(), update);
             }

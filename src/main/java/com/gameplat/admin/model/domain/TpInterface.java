@@ -39,7 +39,7 @@ public class TpInterface {
   @ApiModelProperty(value = "调度地址")
   private String dispatchUrl;
 
-  @ApiModelProperty(value = "状态: [0 - 启用, 1 - 禁用]")
+  @ApiModelProperty(value = "状态: [1 - 启用, 0 - 禁用]")
   private Integer status;
 
   @ApiModelProperty(value = "接口参数JSON")

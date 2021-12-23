@@ -1,5 +1,7 @@
 package com.gameplat.admin.controller.open.member;
 
+import cn.afterturn.easypoi.excel.ExcelExportUtil;
+import cn.afterturn.easypoi.excel.entity.ExportParams;
 import cn.hutool.http.Header;
 import cn.hutool.http.useragent.UserAgent;
 import cn.hutool.http.useragent.UserAgentUtil;
@@ -19,12 +21,19 @@ import com.gameplat.admin.service.MemberTransformService;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.ip.IpAddressParser;
 import com.gameplat.base.common.util.ServletUtils;
+
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.List;
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiOperation;
+import lombok.Cleanup;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -120,5 +129,21 @@ public class MemberController {
   @PutMapping("/updateContact")
   public void updateContact(@Validated @RequestBody MemberContactUpdateDTO dto) {
     memberService.updateContact(dto);
+  }
+
+  @ApiOperation(value = "导出会员列表")
+  @GetMapping("/exportList")
+  public void exportList(MemberQueryDTO dto, HttpServletResponse response) {
+    List<MemberVO> member = memberService.queryList(dto);
+    try {
+      response.setContentType("application/vnd.ms-excel");
+      response.setHeader("Content-disposition", "attachment;filename = myExcel.xls");
+      @Cleanup OutputStream outputStream = null;
+      Workbook workbook = ExcelExportUtil.exportExcel(new ExportParams("会员账号列表导出", "会员账号列表"), MemberVO.class, member);
+      outputStream = response.getOutputStream();
+      workbook.write(outputStream);
+    } catch (IOException e) {
+      throw new ServiceException("导出失败");
+    }
   }
 }

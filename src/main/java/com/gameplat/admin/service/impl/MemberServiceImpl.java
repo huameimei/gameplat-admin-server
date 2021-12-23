@@ -47,6 +47,11 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
   }
 
   @Override
+  public List<MemberVO> queryList(MemberQueryDTO dto) {
+    return memberMapper.queryList(memberQueryCondition.builderQueryWrapper(dto));
+  }
+
+  @Override
   public MemberInfoVO getInfo(Long id) {
     return memberMapper.getMemberInfo(id);
   }

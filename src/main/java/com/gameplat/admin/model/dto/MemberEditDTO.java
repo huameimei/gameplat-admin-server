@@ -1,6 +1,7 @@
 package com.gameplat.admin.model.dto;
 
 import java.io.Serializable;
+import java.util.Date;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
 import lombok.Data;
@@ -53,7 +54,7 @@ public class MemberEditDTO implements Serializable {
   @Length(max = 50, message = "电子邮箱不能超过50个字符")
   private String email;
 
-  private String birthday;
+  private Date birthday;
 
   @Length(max = 255, message = "会员备注不能超过255个字符")
   private String remark;

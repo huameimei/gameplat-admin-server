@@ -23,6 +23,8 @@ public interface MemberService extends IService<Member> {
 
   IPage<MemberVO> queryPage(Page<Member> page, MemberQueryDTO dto);
 
+  List<MemberVO> queryList(MemberQueryDTO dto);
+
   MemberInfoVO getInfo(Long id);
 
   Optional<Member> getByAccount(String account);

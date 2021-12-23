@@ -109,9 +109,9 @@ public class MemberQueryDTO implements Serializable {
   /** 多少天内未登陆 */
   private Integer dayOfNotLogin;
 
-  private Date lastRechTimeFrom;
+  private String lastRechTimeFrom;
 
-  private Date lastRechTimeTo;
+  private String lastRechTimeTo;
 
   /** 充值次数范围 */
   private Integer rechTimesFrom;

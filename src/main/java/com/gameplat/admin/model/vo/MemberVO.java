@@ -4,8 +4,13 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 
+import cn.afterturn.easypoi.excel.annotation.Excel;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.gameplat.admin.util.Date2LongSerializerUtils;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import org.springframework.format.annotation.DateTimeFormat;
 
 @Data
 public class MemberVO implements Serializable {
@@ -13,30 +18,105 @@ public class MemberVO implements Serializable {
   private Long id;
 
   /** 会员账号 */
+  @Excel(name = "会员账号", width = 30, isImportField = "true_st")
   private String account;
 
   /** 会员昵称 */
+  @Excel(name = "会员昵称", width = 30, isImportField = "true_st")
   private String nickname;
 
   /** 真实姓名 */
+  @Excel(name = "真实姓名", width = 30, isImportField = "true_st")
   private String realName;
 
+  @Excel(name = "VIP等级", width = 30, isImportField = "true_st")
+  @ApiModelProperty(value = "VIP等级")
+  private Integer level;
+
+  /** 会员备注 */
+  @Excel(name = "会员备注", width = 30, isImportField = "true_st")
+  private String remark;
+
+  /** 上级代理 */
+  @Excel(name = "上级代理", width = 30, isImportField = "true_st")
+  private String parentName;
+
+  /** 用户类型 */
+  @Excel(name = "会员类型", replace = {"会员_M", "代理_A", "推广_P", "试玩_T"}, width = 30, isImportField = "true_st")
+  private String userType;
+
   /** 会员层级 */
+  @Excel(name = "会员层级", width = 30, isImportField = "true_st")
   private Integer userLevel;
 
-  /** 代理等级 */
-  private String agentLevel;
+  /** 下级人数 */
+  @Excel(name = "下级人数", width = 30, isImportField = "true_st")
+  private String lowerNum;
+
+  @Excel(name = "提现状态", replace = {"启用_Y", "禁用_N"}, width = 30, isImportField = "true_st")
+  private String withdrawFlag;
+
+  /** 账户余额 单位分 */
+  @Excel(name = "账户余额", width = 30, isImportField = "true_st")
+  private BigDecimal balance;
+
+  /** 余宝金额 */
+  @Excel(name = "提现冻结", width = 30, isImportField = "true_st")
+  private BigDecimal freeze;
+
+  /** 累计充值金额 */
+  @Excel(name = "充值金额", width = 30, isImportField = "true_st")
+  private BigDecimal totalRechAmount;
+
+  /** 累计充值次数 */
+  @Excel(name = "充值次数", width = 30, isImportField = "true_st")
+  private Integer totalRechTimes;
+
+  /** 累计出款金额 */
+  @Excel(name = "提现金额", width = 30, isImportField = "true_st")
+  private BigDecimal totalWithdrawAmount;
+
+  /** 累计出款次数 */
+  @Excel(name = "提现次数", width = 30, isImportField = "true_st")
+  private Integer totalWithdrawTimes;
+
+  @Excel(name = "注册IP", width = 30, isImportField = "true_st")
+  private String registerIp;
+
+  /** 注册时间 */
+  @Excel(name = "注册时间", width = 30, isImportField = "true_st")
+  private Date createTime;
+
+  private String dialCode;
+
+  /** 邀请码 */
+  @Excel(name = "推广码", width = 30, isImportField = "true_st")
+  private String invitationCode;
+
+  @Excel(name = "注册域名", width = 30, isImportField = "true_st")
+  private String registerHost;
+
+  /** 会员状态 */
+  @Excel(name = "账户状态", replace = {"禁用_-1", "停用_0", "正常_1"}, width = 30, isImportField = "true_st")
+  private Integer status;
+
+  /** 是否在线 */
+  private Integer online;
+
+  /** 最近登录IP */
+  @Excel(name = "最后登录IP", width = 30, isImportField = "true_st")
+  private String lastLoginIp;
+
+  /** 最近登录时间 */
+  @Excel(name = "最后登录时间", width = 30, isImportField = "true_st")
+  @JsonSerialize(using = Date2LongSerializerUtils.class)
+  private Date lastLoginTime;
 
   /** 代理路径 */
   private String superPath;
 
-  /** 用户类型 */
-  private String userType;
-
-  /** 上级代理 */
-  private String parentName;
-
-  private String dialCode;
+  /** 代理等级 */
+  private String agentLevel;
 
   private String phone;
 
@@ -46,63 +126,12 @@ public class MemberVO implements Serializable {
 
   private String qq;
 
-  private String withdrawFlag;
-
-  /** 邀请码 */
-  private String invitationCode;
-
-  /** 下级人数 */
-  private String lowerNum;
-
-  /** 账户余额 单位分 */
-  private BigDecimal balance;
-
-  /** 余宝金额 */
-  private BigDecimal freeze;
-
-  /** 累计充值金额 */
-  private BigDecimal totalRechAmount;
-
-  /** 累计充值次数 */
-  private Integer totalRechTimes;
-
-  /** 累计出款金额 */
-  private BigDecimal totalWithdrawAmount;
-
-  /** 累计出款次数 */
-  private Integer totalWithdrawTimes;
-
-  /** 注册时间 */
-  private Date createTime;
-
-  private String registerIp;
-
-  private String registerHost;
-
   /** 注册来源 */
   private Integer registerSource;
 
   private String registerBrowser;
 
   private String registerOs;
-
-  /** 会员状态 */
-  private Integer status;
-
-  /** 是否在线 */
-  private Integer online;
-
-  /** 最近登录时间 */
-  private Date lastLoginTime;
-
-  /** 最近登录IP */
-  private String lastLoginIp;
-
-  /** 会员备注 */
-  private String remark;
-
-  @ApiModelProperty(value = "当前会员等级")
-  private Integer level;
 
   @ApiModelProperty(value = "当前会员成长值")
   private Integer growth;

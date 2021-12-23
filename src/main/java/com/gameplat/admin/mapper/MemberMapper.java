@@ -15,6 +15,8 @@ public interface MemberMapper extends BaseMapper<Member> {
 
   IPage<MemberVO> queryPage(Page<Member> page, @Param(Constants.WRAPPER) Wrapper<Member> wrapper);
 
+  List<MemberVO> queryList(@Param(Constants.WRAPPER) Wrapper<Member> wrapper);
+
   MemberInfoVO getMemberInfo(Long id);
 
   /**

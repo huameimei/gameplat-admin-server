@@ -64,7 +64,7 @@ public class TpMerchantController {
   @GetMapping("/queryAllMerchant")
   @PreAuthorize("hasAuthority('thirdParty:tpMerchants:queryAllMerchant')")
   public List<TpMerchantVO> getAllMerchant() {
-    Integer status = 0; // 获取可用商户
+    Integer status = 1; // 获取可用商户
     return tpMerchantService.queryAllMerchant(status);
   }
 }

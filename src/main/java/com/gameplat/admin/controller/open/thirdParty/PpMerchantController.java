@@ -64,7 +64,7 @@ public class PpMerchantController {
   @GetMapping("/queryAllMerchant")
   @PreAuthorize("hasAuthority('thirdParty:ppMerchants:queryAllMerchant')")
   public List<PpMerchant> getAllMerchant() {
-    Integer status = 0; // 获取可用商户
+    Integer status = 1; // 获取可用商户
     return ppMerchantService.queryAllMerchant(status);
   }
 }

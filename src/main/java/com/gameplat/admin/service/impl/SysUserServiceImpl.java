@@ -80,6 +80,9 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
             ObjectUtils.isNotEmpty(userDTO.getNickName()),
             SysUser::getNickName,
             userDTO.getNickName())
+        .like(ObjectUtils.isNotEmpty(userDTO.getLoginIp()),
+            SysUser::getLoginIp,
+            userDTO.getLoginIp())
         .eq(
             ObjectUtils.isNotNull(userDTO.getUserType()),
             SysUser::getUserType,

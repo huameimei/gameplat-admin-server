@@ -47,4 +47,7 @@ public class OperUserDTO implements Serializable {
   private String limitInfo;
 
   private Long roleId;
+
+  /** 用户层级 */
+  private String userLevel;
 }

@@ -38,7 +38,7 @@ public class BankBlacklistServiceImpl extends ServiceImpl<BankBlacklistMapper, B
   public IPage<BankBlacklist> queryBankBlacklistList(
       PageDTO<BankBlacklist> page, BankBlacklistQueryDTO dto) {
     QueryWrapper<BankBlacklist> queryWrapper = Wrappers.query();
-    queryWrapper.eq(ObjectUtils.isNotEmpty(dto.getCardNo()), "", dto.getCardNo());
+    queryWrapper.eq(ObjectUtils.isNotEmpty(dto.getCardNo()), "card_no", dto.getCardNo());
     if (StringUtils.isNotBlank(dto.getStartTime())) {
       queryWrapper.apply("create_time >= STR_TO_DATE({0}, '%Y-%m-%d %H:%i:%s')",
           DateUtil.beginOfDay(DateUtils.parseDate(dto.getStartTime(), DateUtils.DATE_PATTERN)));

@@ -20,14 +20,14 @@ public class DirectChargeController {
 
   @GetMapping("/get")
   public DirectCharge get() {
-    SysDictData sysDictData = dictDataService.getDictList("system_config", "direct-charge");
+    SysDictData sysDictData = dictDataService.getDictData("system_config", "direct-charge");
     return JSON.parseObject(sysDictData.getDictValue(), DirectCharge.class);
   }
 
   @PutMapping("/edit")
   @PreAuthorize("hasAuthority('finance:directCharge:edit')")
   public void update(@RequestBody DirectCharge directCharge) {
-    SysDictData sysDictData = dictDataService.getDictList("system_config", "direct-charge");
+    SysDictData sysDictData = dictDataService.getDictData("system_config", "direct-charge");
     sysDictData.setDictValue(JSON.toJSONString(directCharge));
     dictDataService.updateById(sysDictData);
   }

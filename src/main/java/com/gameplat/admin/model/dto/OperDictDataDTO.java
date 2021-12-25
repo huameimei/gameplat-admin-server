@@ -4,7 +4,11 @@ import com.gameplat.common.group.Groups;
 import java.io.Serializable;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * 字典数据操作DTO
@@ -12,6 +16,9 @@ import lombok.Data;
  * @author three
  */
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class OperDictDataDTO implements Serializable {
 
   @NotNull(groups = Groups.UPDATE.class, message = "字典ID不能为空")

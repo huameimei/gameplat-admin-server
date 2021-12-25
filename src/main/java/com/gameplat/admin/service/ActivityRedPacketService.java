@@ -87,5 +87,5 @@ public interface ActivityRedPacketService extends IService<ActivityRedPacket> {
      *
      * @param activityTurntablePrizeConfigDTO
      */
-    void updateTurntablePrizeConfig(ActivityTurntablePrizeConfigDTO activityTurntablePrizeConfigDTO);
+    void updateTurntablePrizeConfig(ActivityTurntablePrizeConfigDTO e);
 }

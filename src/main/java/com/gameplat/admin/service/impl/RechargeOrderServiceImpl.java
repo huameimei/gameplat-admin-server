@@ -32,22 +32,12 @@ import com.gameplat.admin.model.domain.TpPayChannel;
 import com.gameplat.admin.model.dto.RechargeOrderQueryDTO;
 import com.gameplat.admin.model.vo.RechargeOrderVO;
 import com.gameplat.admin.model.vo.SummaryVO;
-import com.gameplat.admin.service.DiscountTypeService;
-import com.gameplat.admin.service.LimitInfoService;
-import com.gameplat.admin.service.MemberBillService;
-import com.gameplat.admin.service.MemberInfoService;
-import com.gameplat.admin.service.MemberService;
-import com.gameplat.admin.service.PayAccountService;
-import com.gameplat.admin.service.RechargeOrderService;
-import com.gameplat.admin.service.SysDictDataService;
-import com.gameplat.admin.service.SysUserService;
-import com.gameplat.admin.service.TpMerchantService;
-import com.gameplat.admin.service.TpPayChannelService;
-import com.gameplat.admin.service.ValidWithdrawService;
+import com.gameplat.admin.service.*;
 import com.gameplat.admin.util.MoneyUtils;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.json.JsonUtils;
 import com.gameplat.base.common.snowflake.IdGeneratorSnowflake;
+import com.gameplat.common.enums.*;
 import com.gameplat.base.common.util.DateUtil;
 import com.gameplat.common.enums.LimitEnums;
 import com.gameplat.common.enums.MemberEnums;
@@ -69,6 +59,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
+
+import static com.gameplat.common.enums.DictDataEnum.MAX_DISCOUNT_MONEY;
+import static com.gameplat.common.enums.DictDataEnum.MAX_RECHARGE_MONEY;
 
 @Slf4j
 @Service
@@ -106,8 +99,8 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
     @Autowired
     private TpPayChannelService tpPayChannelService;
 
-    @Autowired
-    private SysDictDataService sysDictDataService;
+  @Autowired
+  private ConfigService configService;
 
     @Autowired
     private BizBlacklistFacade bizBlacklistFacade;
@@ -690,29 +683,28 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
         rechargeOrder.setMemberType(member.getUserType());
     }
 
-    private void verifyAmount(BigDecimal amount, BigDecimal discountAmount)
-            throws Exception {
-        if (amount == null || amount.compareTo(BigDecimal.ZERO) < 0) {
-            throw new ServiceException("无效的充值金额。");
-        }
-        if (amount.compareTo(BigDecimal.ZERO) == 0 && (discountAmount == null
-                || discountAmount.compareTo(BigDecimal.ZERO) <= 0)) {
-            throw new ServiceException("无效的充值金额。");
-        }
-        //系统最高配置金额
-        SysDictData maxAmount = sysDictDataService
-                .getDictList("SYSTEM_PARAMETER_CONFIG", "maxRechargeMoney");
-        if (amount.compareTo(new BigDecimal(maxAmount.getDictValue())) > 0) {
-            throw new ServiceException("人工充值金额不能大于系统配置的最高金额：" + maxAmount.getDictValue());
-        }
-        SysDictData maxDiscount = sysDictDataService
-                .getDictList("SYSTEM_PARAMETER_CONFIG", "maxDiscountMoney");
-        if (discountAmount != null) {
-            if (discountAmount.compareTo(new BigDecimal(maxDiscount.getDictValue())) > 0) {
-                throw new ServiceException("人工充值优惠金额不能大于系统配置的最高金额：" + maxDiscount.getDictValue());
-            }
-        }
+  private void verifyAmount(BigDecimal amount, BigDecimal discountAmount)
+      throws Exception {
+    if (amount == null || amount.compareTo(BigDecimal.ZERO) < 0) {
+      throw new ServiceException("无效的充值金额。");
     }
+    if (amount.compareTo(BigDecimal.ZERO) == 0 && (discountAmount == null
+        || discountAmount.compareTo(BigDecimal.ZERO) <= 0)) {
+      throw new ServiceException("无效的充值金额。");
+    }
+    // 系统最高配置金额
+    String maxAmount = configService.getValue(MAX_RECHARGE_MONEY);
+    if (amount.compareTo(new BigDecimal(maxAmount)) > 0) {
+      throw new ServiceException("人工充值金额不能大于系统配置的最高金额：" + maxAmount);
+    }
+
+    String maxDiscount = configService.getValue(MAX_DISCOUNT_MONEY);
+    if (discountAmount != null) {
+      if (discountAmount.compareTo(new BigDecimal(maxDiscount)) > 0) {
+        throw new ServiceException("人工充值优惠金额不能大于系统配置的最高金额：" + maxDiscount);
+      }
+    }
+  }
 
     private void verifyDiscountType(DiscountType discountType) throws Exception {
         if (discountType == null) {

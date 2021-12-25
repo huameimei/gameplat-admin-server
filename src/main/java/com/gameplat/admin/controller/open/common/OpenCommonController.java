@@ -7,6 +7,8 @@ import com.gameplat.admin.model.domain.SysMenu;
 import com.gameplat.admin.service.PermissionService;
 import com.gameplat.admin.service.SysCommonService;
 import com.gameplat.base.common.util.StringUtils;
+import com.gameplat.common.compent.kaptcha.Kaptcha;
+import com.gameplat.common.compent.kaptcha.KaptchaProducer;
 import com.gameplat.common.model.bean.limit.AdminLoginLimit;
 import com.gameplat.redis.idempoten.AutoIdempotent;
 import com.gameplat.security.SecurityUserHolder;
@@ -16,8 +18,6 @@ import java.util.List;
 import java.util.Map;
 import javax.servlet.http.HttpServletResponse;
 
-import com.gameplat.web.captcha.CaptchaProducer;
-import com.gameplat.web.captcha.Kaptcha;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -41,16 +41,14 @@ public class OpenCommonController {
 
   @Autowired private PermissionService permissionService;
 
-  @Autowired private CaptchaProducer producer;
+  @Autowired private KaptchaProducer producer;
 
   /**
    * 获取验证码
    *
-   * @throws IOException IOException
    */
   @GetMapping("/captcha/{deviceId}")
-  public Kaptcha createCode(@PathVariable String deviceId, HttpServletResponse response)
-      throws IOException {
+  public Kaptcha createCode(@PathVariable String deviceId, HttpServletResponse response) {
     Assert.notNull(deviceId, "机器码不能为空");
     response.setHeader("param", "no-cache");
     response.setHeader("cache-control", "no-cache");

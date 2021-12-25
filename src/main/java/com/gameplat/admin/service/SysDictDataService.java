@@ -4,14 +4,13 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.gameplat.admin.enums.DictTypeEnum;
 import com.gameplat.admin.model.bean.UserWithdrawLimitInfo;
 import com.gameplat.admin.model.domain.SysDictData;
 import com.gameplat.admin.model.dto.OperDictDataDTO;
 import com.gameplat.admin.model.dto.SysDictDataDTO;
 import com.gameplat.admin.model.vo.DictDataVo;
 import com.gameplat.admin.model.vo.MemberWithdrawDictDataVo;
+
 import java.util.List;
 
 /**
@@ -29,15 +28,7 @@ public interface SysDictDataService extends IService<SysDictData> {
 
   List<SysDictData> getDictDataByTypes(List<String> dictTypes);
 
-  <T> T getDictData(DictTypeEnum dictType, Class<T> t);
-
-  <T> T getDictData(DictTypeEnum dictType, TypeReference<T> t);
-
-  String getDictData(DictTypeEnum dictType);
-
-  List<String> getDictData(DictTypeEnum dictType, String separatorChar);
-
-  DictDataVo selectDictData(SysDictDataDTO dictData);
+  SysDictData getDictData(String dictType, String dictLabel);
 
   void insertDictData(OperDictDataDTO operDictDataDTO);
 
@@ -49,11 +40,9 @@ public interface SysDictDataService extends IService<SysDictData> {
 
   IPage<MemberWithdrawDictDataVo> queryWithdrawPage(Page<SysDictData> page);
 
-  void insertOrUpdate(UserWithdrawLimitInfo userWithdrawLimitInfo);
+  void addOrUpdateUserWithdrawLimit(UserWithdrawLimitInfo userWithdrawLimitInfo);
 
-  void deleteByDictLabel(String dictLabel);
-
-  SysDictData getDictList(String dictType, String dictLabel);
+  void delete(String dictType, String dictLabel);
 
   List<SysDictData> getDictListAll(SysDictDataDTO dictData);
 }

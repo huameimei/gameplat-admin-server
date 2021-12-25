@@ -3,9 +3,7 @@ package com.gameplat.admin.controller.open.activity;
 import com.alibaba.fastjson.JSONArray;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
-import com.gameplat.admin.constant.ConfigConstant;
 import com.gameplat.admin.model.domain.ActivityInfo;
-import com.gameplat.admin.model.domain.SysDictData;
 import com.gameplat.admin.model.dto.ActivityInfoAddDTO;
 import com.gameplat.admin.model.dto.ActivityInfoQueryDTO;
 import com.gameplat.admin.model.dto.ActivityInfoUpdateDTO;
@@ -13,10 +11,11 @@ import com.gameplat.admin.model.dto.ActivityInfoUpdateSortDTO;
 import com.gameplat.admin.model.vo.ActivityInfoVO;
 import com.gameplat.admin.model.vo.ValueDataVO;
 import com.gameplat.admin.service.ActivityInfoService;
-import com.gameplat.admin.service.SysDictDataService;
+import com.gameplat.admin.service.ConfigService;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.DateUtil;
 import com.gameplat.base.common.util.StringUtils;
+import com.gameplat.common.enums.DictDataEnum;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -48,7 +47,7 @@ public class ActivityInfoController {
     private ActivityInfoService activityInfoService;
 
     @Autowired
-    private SysDictDataService sysDictDataService;
+    private ConfigService configService;
 
     /**
      * 活动列表
@@ -204,12 +203,11 @@ public class ActivityInfoController {
     @GetMapping("/sortList")
     @PreAuthorize("hasAuthority('activity:info:list')")
     public List<ValueDataVO> sortList() {
-        SysDictData dictData = sysDictDataService.getDictList(ConfigConstant.ACTIVITY_CONFIG, ConfigConstant.ACTIVITY_SORT_CONFIG);
-        if (dictData == null || StringUtils.isBlank(dictData.getDictValue())) {
+        String activitySortConfig = configService.getValue(DictDataEnum.ACTIVITY_SORT_CONFIG);
+        if (StringUtils.isBlank(activitySortConfig)) {
             throw new ServiceException("活动排序值没有配置");
         }
-        List<ValueDataVO> valueDataVOS = JSONArray.parseArray(dictData.getDictValue(), ValueDataVO.class);
-        return valueDataVOS;
+        return JSONArray.parseArray(activitySortConfig, ValueDataVO.class);
     }
 
 }

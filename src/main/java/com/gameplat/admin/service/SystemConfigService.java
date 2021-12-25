@@ -2,7 +2,6 @@ package com.gameplat.admin.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
-import com.gameplat.admin.model.domain.SysDictData;
 import com.gameplat.admin.model.domain.SysSmsArea;
 import com.gameplat.admin.model.dto.OperSysSmsAreaDTO;
 import com.gameplat.admin.model.dto.OperSystemConfigDTO;
@@ -12,6 +11,8 @@ import com.gameplat.admin.model.dto.SysSmsConfigDTO;
 import com.gameplat.admin.model.vo.SysFileConfigVO;
 import com.gameplat.admin.model.vo.SysSmsAreaVO;
 import com.gameplat.admin.model.vo.SysSmsConfigVO;
+import com.gameplat.common.model.bean.EmailConfig;
+
 import java.util.List;
 
 public interface SystemConfigService {
@@ -32,5 +33,7 @@ public interface SystemConfigService {
 
   void smsAreaDelete(Long id);
 
-  SysDictData findActivityTypeCodeList(String language);
+  EmailConfig findEmailConfig();
+
+  void updateEmail(EmailConfig emailConfig);
 }

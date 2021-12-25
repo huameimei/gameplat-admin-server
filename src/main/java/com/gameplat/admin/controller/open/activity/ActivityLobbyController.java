@@ -3,7 +3,6 @@ package com.gameplat.admin.controller.open.activity;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
-import com.gameplat.admin.constant.ConfigConstant;
 import com.gameplat.admin.model.domain.ActivityLobby;
 import com.gameplat.admin.model.domain.SysDictData;
 import com.gameplat.admin.model.dto.ActivityLobbyAddDTO;
@@ -19,6 +18,7 @@ import com.gameplat.admin.service.SysDictDataService;
 import com.gameplat.base.common.enums.SystemCodeType;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.StringUtils;
+import com.gameplat.common.enums.DictTypeEnum;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -161,7 +161,7 @@ public class ActivityLobbyController {
     @PreAuthorize("hasAuthority('activity:lobby:list')")
     public List<CodeDataVO> gameTypeList() {
         SysDictData dictData = new SysDictData();
-        dictData.setDictType(ConfigConstant.LIVE_GAME_TYPE);
+        dictData.setDictType(DictTypeEnum.LIVE_GAME_TYPE.getValue());
         dictData.setStatus(SystemCodeType.ENABLE.getCode());
         List<SysDictData> dictList = sysDictDataService.getDictList(dictData);
         if (CollectionUtils.isEmpty(dictList)) {

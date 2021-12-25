@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.gameplat.admin.convert.DictDataConvert;
 import com.gameplat.admin.model.domain.SysDictData;
+import com.gameplat.admin.model.domain.SysEmail;
 import com.gameplat.admin.model.domain.SysSmsArea;
 import com.gameplat.admin.model.dto.OperSysSmsAreaDTO;
 import com.gameplat.admin.model.dto.OperSystemConfigDTO;
@@ -18,6 +19,8 @@ import com.gameplat.admin.model.vo.SysSmsConfigVO;
 import com.gameplat.admin.service.SysDictDataService;
 import com.gameplat.admin.service.SystemConfigService;
 import java.util.List;
+
+import com.gameplat.common.model.bean.EmailConfig;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -92,5 +95,15 @@ public class OpenSystemConfigController {
   @DeleteMapping("/smsArea/del/{id}")
   public void smsAreaEdit(@PathVariable("id") Long id) {
     systemConfigService.smsAreaDelete(id);
+  }
+
+  @GetMapping("/email/list")
+  public EmailConfig findEmailList() {
+    return systemConfigService.findEmailConfig();
+  }
+
+  @PutMapping("/email/update")
+  public void updateEmail(@RequestBody EmailConfig emailConfig) {
+    systemConfigService.updateEmail(emailConfig);
   }
 }

@@ -5,7 +5,6 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.conditions.update.LambdaUpdateChainWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.gameplat.admin.constant.ConfigConstant;
 import com.gameplat.admin.convert.ActivityRedPacketConvert;
 import com.gameplat.admin.mapper.ActivityRedPacketMapper;
 import com.gameplat.admin.model.domain.ActivityRedPacket;
@@ -16,12 +15,10 @@ import com.gameplat.admin.model.vo.ActivityRedPacketConfigVO;
 import com.gameplat.admin.model.vo.ActivityRedPacketVO;
 import com.gameplat.admin.model.vo.ActivityTurntablePrizeConfigVO;
 import com.gameplat.admin.model.vo.MemberActivityPrizeVO;
-import com.gameplat.admin.service.ActivityPrizeService;
-import com.gameplat.admin.service.ActivityRedPacketConditionService;
-import com.gameplat.admin.service.ActivityRedPacketService;
-import com.gameplat.admin.service.SysDictDataService;
+import com.gameplat.admin.service.*;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.StringUtils;
+import com.gameplat.common.enums.DictDataEnum;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -50,6 +47,8 @@ public class ActivityRedPacketServiceImpl extends ServiceImpl<ActivityRedPacketM
 
     @Autowired
     private SysDictDataService sysDictDataService;
+
+    @Autowired private ConfigService configService;
 
     @Override
     public IPage<ActivityRedPacketVO> redPacketList(PageDTO<ActivityRedPacket> page, ActivityRedPacketQueryDTO activityRedPacketQueryDTO) {
@@ -115,9 +114,7 @@ public class ActivityRedPacketServiceImpl extends ServiceImpl<ActivityRedPacketM
             MemberActivityPrizeVO memberActivityPrizeBean = new MemberActivityPrizeVO();
             memberActivityPrizeBean.setActivityId(activityRedPacketDiscountDTO.getId());
             memberActivityPrizeBean.setType(1);
-            List<MemberActivityPrizeVO> prizeBeanList =
-                    activityPrizeService.findActivityPrizeList(memberActivityPrizeBean);
-            return prizeBeanList;
+            return activityPrizeService.findActivityPrizeList(memberActivityPrizeBean);
         } else if (activityRedPacketDiscountDTO.getType() == 2) {
             return activityRedPacketConditionService.lambdaQuery()
                     .eq(ActivityRedPacketCondition::getRedPacketId, activityRedPacketDiscountDTO.getId())
@@ -128,11 +125,11 @@ public class ActivityRedPacketServiceImpl extends ServiceImpl<ActivityRedPacketM
 
     @Override
     public ActivityRedPacketConfigVO getConfig() {
-        SysDictData sysDictData = sysDictDataService.getDictList(ConfigConstant.ACTIVITY_CONFIG, ConfigConstant.ACTIVITY_REDPACKET_CONFIG_REDPACKET);
-        if (sysDictData == null || StringUtils.isBlank(sysDictData.getDictValue())) {
+        String redPacketConfig = configService.getValue(DictDataEnum.REDPACKET);
+        if (StringUtils.isBlank(redPacketConfig)) {
             throw new ServiceException("活动红包配置没有配置，请先配置红包数据");
         }
-        ActivityRedPacketConfigVO configVO = JSON.parseObject(sysDictData.getDictValue(), ActivityRedPacketConfigVO.class);
+        ActivityRedPacketConfigVO configVO = JSON.parseObject(redPacketConfig, ActivityRedPacketConfigVO.class);
         if (configVO == null) {
             throw new ServiceException("活动红包配置没有配置，请先配置红包数据");
         }
@@ -142,7 +139,9 @@ public class ActivityRedPacketServiceImpl extends ServiceImpl<ActivityRedPacketM
     @Override
     @Transactional(rollbackFor = Throwable.class)
     public void updateConfig(ActivityRedPacketConfigDTO configDTO) {
-        SysDictData sysDictData = sysDictDataService.getDictList(ConfigConstant.ACTIVITY_CONFIG, ConfigConstant.ACTIVITY_REDPACKET_CONFIG_REDPACKET);
+        SysDictData sysDictData =
+            sysDictDataService.getDictData(
+                DictDataEnum.REDPACKET.getType().getValue(), DictDataEnum.REDPACKET.getLabel());
         if (sysDictData == null || StringUtils.isBlank(sysDictData.getDictValue())) {
             throw new ServiceException("活动红包配置没有配置，请先配置红包数据");
         }
@@ -156,26 +155,28 @@ public class ActivityRedPacketServiceImpl extends ServiceImpl<ActivityRedPacketM
 
     @Override
     public List<ActivityTurntablePrizeConfigVO> getTurntablePrizeConfig() {
-        SysDictData sysDictData = sysDictDataService.getDictList(ConfigConstant.ACTIVITY_CONFIG, ConfigConstant.ACTIVITY_REDPACKET_CONFIG_TURNTABLE_PRIZE);
-        if (sysDictData == null || StringUtils.isBlank(sysDictData.getDictValue())) {
-            throw new ServiceException("活动红包配置没有配置，请先配置红包数据");
+        String configValue = configService.getValue(DictDataEnum.TURNTABLE_PRIZE);
+        if (StringUtils.isBlank(configValue)) {
+          throw new ServiceException("活动红包配置没有配置，请先配置红包数据");
         }
-        List<ActivityTurntablePrizeConfigVO> list = JSON.parseArray(sysDictData.getDictValue(), ActivityTurntablePrizeConfigVO.class);
-        return list;
+        return JSON.parseArray(configValue, ActivityTurntablePrizeConfigVO.class);
     }
 
     @Override
-    public void updateTurntablePrizeConfig(ActivityTurntablePrizeConfigDTO activityTurntablePrizeConfigDTO) {
+    public void updateTurntablePrizeConfig(ActivityTurntablePrizeConfigDTO dto) {
         List<ActivityTurntablePrizeConfigVO> list = getTurntablePrizeConfig();
         for (ActivityTurntablePrizeConfigVO vo : list) {
-            if (vo.getPrizeId().equals(activityTurntablePrizeConfigDTO.getPrizeId())) {
+            if (vo.getPrizeId().equals(dto.getPrizeId())) {
                 //中将概率不能修改
                 Double probability = vo.getProbability();
-                BeanUtils.copyProperties(activityTurntablePrizeConfigDTO, vo);
+                BeanUtils.copyProperties(dto, vo);
                 vo.setProbability(probability);
             }
         }
-        SysDictData sysDictData = sysDictDataService.getDictList(ConfigConstant.ACTIVITY_CONFIG, ConfigConstant.ACTIVITY_REDPACKET_CONFIG_TURNTABLE_PRIZE);
+        SysDictData sysDictData =
+            sysDictDataService.getDictData(
+                DictDataEnum.TURNTABLE_PRIZE.getType().getValue(),
+                DictDataEnum.TURNTABLE_PRIZE.getLabel());
         sysDictData.setDictValue(JSON.toJSONString(list));
         boolean result = sysDictDataService.updateById(sysDictData);
         if (!result) {

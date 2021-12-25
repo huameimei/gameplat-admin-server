@@ -3,7 +3,6 @@ package com.gameplat.admin.controller.open.thirdParty;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
-import com.gameplat.admin.enums.DictTypeEnum;
 import com.gameplat.admin.model.domain.SysDictData;
 import com.gameplat.admin.model.dto.OperDictDataDTO;
 import com.gameplat.admin.model.dto.SysDictDataDTO;
@@ -11,6 +10,7 @@ import com.gameplat.admin.model.vo.DictDataVo;
 import com.gameplat.admin.service.SysDictDataService;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.StringUtils;
+import com.gameplat.common.enums.DictTypeEnum;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,7 +28,7 @@ public class RechVirtualController {
   @GetMapping("/list")
   @PreAuthorize("hasAuthority('thirdParty:rechVirtual:list')")
   public IPage<DictDataVo> list(PageDTO<SysDictData> page, SysDictDataDTO dictData) {
-    dictData.setDictType(DictTypeEnum.RECH_VIRTUAL.getKey());
+    dictData.setDictType(DictTypeEnum.RECH_VIRTUAL.getValue());
     return dictDataService.selectDictDataList(page, dictData);
   }
 
@@ -42,7 +42,7 @@ public class RechVirtualController {
       throw new ServiceException("值不能为空");
     }
     dictData.setDictLabel(JSONObject.parseObject(dictData.getDictValue()).getString("configKey"));
-    dictData.setDictType(DictTypeEnum.RECH_VIRTUAL.getKey());
+    dictData.setDictType(DictTypeEnum.RECH_VIRTUAL.getValue());
     dictDataService.updateDictData(dictData);
   }
 }

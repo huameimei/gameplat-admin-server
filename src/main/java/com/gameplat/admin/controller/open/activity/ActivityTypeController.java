@@ -12,9 +12,11 @@ import com.gameplat.admin.model.dto.ActivityTypeUpdateDTO;
 import com.gameplat.admin.model.vo.ActivityTypeVO;
 import com.gameplat.admin.model.vo.CodeDataVO;
 import com.gameplat.admin.service.ActivityTypeService;
+import com.gameplat.admin.service.ConfigService;
 import com.gameplat.admin.service.SystemConfigService;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.StringUtils;
+import com.gameplat.common.enums.DictDataEnum;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -55,7 +57,7 @@ public class ActivityTypeController {
     private ActivityTypeService activityTypeService;
 
     @Autowired
-    private SystemConfigService systemConfigService;
+    private ConfigService configService;
 
     /**
      * 活动板块列表
@@ -179,12 +181,12 @@ public class ActivityTypeController {
         if (StringUtils.isBlank(language)) {
             throw new ServiceException("语言language参数不能为空");
         }
-        SysDictData sysDictData = systemConfigService.findActivityTypeCodeList(language);
-        if (sysDictData == null) {
+        String activityTypeConfig = configService.getValue(DictDataEnum.ACTIVITY_TYPE_CONFIG);
+        if (StringUtils.isNotEmpty(activityTypeConfig)) {
             throw new ServiceException("活动板块类型配置信息不存在");
         }
-        JSONObject jsonObject = JSONObject.parseObject(sysDictData.getDictValue());
 
+        JSONObject jsonObject = JSONObject.parseObject(activityTypeConfig);
         JSONArray jsonArray = jsonObject.getJSONArray(language);
         if (CollectionUtils.isEmpty(jsonArray)) {
             throw new ServiceException("语言【" + language + "】活动板块类型配置信息不存在");

@@ -4,12 +4,13 @@ import cn.hutool.core.collection.CollectionUtil;
 import com.alibaba.csp.sentinel.annotation.SentinelResource;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
-import com.gameplat.admin.enums.DictTypeEnum;
 import com.gameplat.admin.model.bean.OnlineCount;
 import com.gameplat.admin.model.bean.PageExt;
+import com.gameplat.admin.model.domain.SysDictData;
 import com.gameplat.admin.model.domain.SysUser;
 import com.gameplat.admin.model.dto.OnlineUserDTO;
 import com.gameplat.admin.model.vo.OnlineUserVo;
+import com.gameplat.admin.service.ConfigService;
 import com.gameplat.admin.service.OnlineUserService;
 import com.gameplat.admin.service.SysDictDataService;
 import com.gameplat.admin.service.SysUserService;
@@ -20,18 +21,15 @@ import com.gameplat.security.SecurityUserHolder;
 import com.gameplat.security.context.UserCredential;
 import com.gameplat.security.service.JwtTokenService;
 import eu.bitwalker.useragentutils.OperatingSystem;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
+
+import java.util.*;
+import java.util.stream.Collectors;
+
+import static com.gameplat.common.enums.DictDataEnum.PUBLIC_WARNING_ACCOUNT;
 
 @Slf4j
 @Service
@@ -41,7 +39,7 @@ public class OnlineUserServiceImpl implements OnlineUserService {
 
   @Autowired private SysUserService userService;
 
-  @Autowired private SysDictDataService dictDataService;
+  @Autowired private ConfigService configService;
 
   @Autowired private JwtTokenService jwtTokenService;
 
@@ -67,9 +65,7 @@ public class OnlineUserServiceImpl implements OnlineUserService {
             .orElse(Collections.emptyList());
 
     // 合并公共告警会员和自定义告警会员
-    List<String> specialAccounts =
-        dictDataService.getDictData(DictTypeEnum.PUBLIC_WARNING_ACCOUNT, ",");
-
+    List<String> specialAccounts = this.getPublicWarningAccounts();
     Set<String> warningAccounts = new HashSet<>(warningUsers);
     warningAccounts.addAll(specialAccounts);
 
@@ -188,5 +184,13 @@ public class OnlineUserServiceImpl implements OnlineUserService {
         credentials.removeIf(e -> !userType.equals(e.getUserType()));
       }
     }
+  }
+
+  private List<String> getPublicWarningAccounts() {
+    String dictDataList = configService.getValue(PUBLIC_WARNING_ACCOUNT);
+    return Optional.ofNullable(dictDataList)
+        .map(c -> StringUtils.split(c, ","))
+        .map(Arrays::asList)
+        .orElseGet(Collections::emptyList);
   }
 }

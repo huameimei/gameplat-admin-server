@@ -11,48 +11,22 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.constant.WithdrawTypeConstant;
 import com.gameplat.admin.convert.MemberWithdrawConvert;
-import com.gameplat.admin.enums.AllowOthersOperateEnums;
+import com.gameplat.admin.enums.*;
 import com.gameplat.admin.enums.BlacklistConstant.BizBlacklistType;
-import com.gameplat.admin.enums.CashEnum;
-import com.gameplat.admin.enums.ProxyPayStatusEnum;
-import com.gameplat.admin.enums.TranTypes;
-import com.gameplat.admin.enums.WithdrawStatus;
 import com.gameplat.admin.mapper.MemberWithdrawMapper;
-import com.gameplat.admin.model.bean.AdminLimitInfo;
-import com.gameplat.admin.model.bean.DirectCharge;
-import com.gameplat.admin.model.bean.ManualRechargeOrderBo;
-import com.gameplat.admin.model.bean.PageExt;
-import com.gameplat.admin.model.bean.ProxyPayMerBean;
-import com.gameplat.admin.model.domain.Member;
-import com.gameplat.admin.model.domain.MemberBill;
-import com.gameplat.admin.model.domain.MemberInfo;
-import com.gameplat.admin.model.domain.MemberWithdraw;
-import com.gameplat.admin.model.domain.MemberWithdrawHistory;
-import com.gameplat.admin.model.domain.PpInterface;
-import com.gameplat.admin.model.domain.PpMerchant;
-import com.gameplat.admin.model.domain.SysDictData;
-import com.gameplat.admin.model.domain.SysUser;
+import com.gameplat.admin.model.bean.*;
+import com.gameplat.admin.model.domain.*;
 import com.gameplat.admin.model.dto.MemberWithdrawQueryDTO;
 import com.gameplat.admin.model.vo.MemberWithdrawVO;
 import com.gameplat.admin.model.vo.SummaryVO;
-import com.gameplat.admin.service.LimitInfoService;
-import com.gameplat.admin.service.MemberBillService;
-import com.gameplat.admin.service.MemberInfoService;
-import com.gameplat.admin.service.MemberService;
-import com.gameplat.admin.service.MemberWithdrawHistoryService;
-import com.gameplat.admin.service.MemberWithdrawService;
-import com.gameplat.admin.service.PpInterfaceService;
-import com.gameplat.admin.service.PpMerchantService;
-import com.gameplat.admin.service.RechargeOrderService;
-import com.gameplat.admin.service.SysDictDataService;
-import com.gameplat.admin.service.SysUserService;
-import com.gameplat.admin.service.ValidWithdrawService;
+import com.gameplat.admin.service.*;
 import com.gameplat.admin.util.MoneyUtils;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.json.JsonUtils;
 import com.gameplat.base.common.snowflake.IdGeneratorSnowflake;
 import com.gameplat.base.common.util.DateUtil;
 import com.gameplat.base.common.util.StringUtils;
+import com.gameplat.common.enums.DictDataEnum;
 import com.gameplat.common.enums.LimitEnums;
 import com.gameplat.common.enums.MemberEnums;
 import com.gameplat.common.enums.SwitchStatusEnum;
@@ -60,14 +34,6 @@ import com.gameplat.common.enums.UserTypes;
 import com.gameplat.common.model.bean.Builder;
 import com.gameplat.common.model.bean.limit.MemberRechargeLimit;
 import com.gameplat.security.context.UserCredential;
-import java.math.BigDecimal;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
 import jodd.util.StringUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
@@ -76,6 +42,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.math.BigDecimal;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -123,7 +92,7 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
   private BizBlacklistFacade bizBlacklistFacade;
 
   @Autowired
-  private SysDictDataService sysDictDataService;
+  private ConfigService configService;
 
   @Override
   public PageExt<MemberWithdrawVO, SummaryVO> findPage(
@@ -672,12 +641,10 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
    * @param userCredential
    * @throws Exception
    */
-  public void directCharge(MemberWithdraw memberWithdraw, UserCredential userCredential)
-      throws Exception {
-    SysDictData sysDictData = sysDictDataService.getDictList("system_config", "direct-charge");
-    Optional.ofNullable(sysDictData).orElseThrow(() -> new ServiceException("免提直充配置异常，请检查配置是否正确。"));
-
-    DirectCharge directCharge = JSON.parseObject(sysDictData.getDictValue(), DirectCharge.class);
+  public void directCharge(MemberWithdraw memberWithdraw, UserCredential userCredential) throws Exception {
+    String configValue = configService.getValue(DictDataEnum.DIRECT_CHARGE);
+    Optional.ofNullable(configValue).orElseThrow(() -> new ServiceException("免提直充配置异常，请检查配置是否正确。"));
+    DirectCharge directCharge = JSON.parseObject(configValue, DirectCharge.class);
     String levels = directCharge.getLevels(); //层级
     int pointFlag = directCharge.getPointFlag(); //是否计算积分
     int dmlFlag = directCharge.getDmlFlag(); //是否稽查打码量

@@ -2,7 +2,6 @@ package com.gameplat.admin.service;
 
 import com.alibaba.csp.sentinel.annotation.SentinelResource;
 import com.alibaba.fastjson.JSONObject;
-import com.gameplat.admin.enums.DictTypeEnum;
 import com.gameplat.admin.mapper.SysUserMapper;
 import com.gameplat.admin.model.bean.Language;
 import com.gameplat.admin.model.domain.SysDictData;
@@ -11,6 +10,7 @@ import com.gameplat.admin.model.dto.GoogleAuthDTO;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.GoogleAuthenticator;
 import com.gameplat.base.common.util.StringUtils;
+import com.gameplat.common.enums.DictTypeEnum;
 import com.gameplat.common.enums.LimitEnums;
 import com.gameplat.common.model.bean.limit.AdminLoginLimit;
 import java.util.Arrays;
@@ -78,7 +78,7 @@ public class SysCommonService {
    */
   @SentinelResource(value = "language")
   public List<Language> language() {
-    SysDictData dictData = dictDataService.getDictDataByType(DictTypeEnum.LANGUAGE_CONFIG.getKey());
+    SysDictData dictData = dictDataService.getDictDataByType(DictTypeEnum.LANGUAGE_CONFIG.getValue());
     if (StringUtils.isNotNull(dictData)) {
       return JSONObject.parseArray(dictData.getDictValue(), Language.class);
     }

@@ -1,8 +1,6 @@
 package com.gameplat.admin.service.impl;
 
 import cn.hutool.json.JSONObject;
-import cn.hutool.json.JSONUtil;
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -10,7 +8,7 @@ import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
-import com.gameplat.admin.constant.ConfigConstant;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.gameplat.admin.constant.TrueFalse;
 import com.gameplat.admin.convert.SysFileConfigConvert;
 import com.gameplat.admin.convert.SysSmsAreaConvert;
@@ -19,34 +17,40 @@ import com.gameplat.admin.model.domain.SysDictData;
 import com.gameplat.admin.model.domain.SysFileConfig;
 import com.gameplat.admin.model.domain.SysSmsArea;
 import com.gameplat.admin.model.domain.SysSmsConfig;
-import com.gameplat.admin.model.dto.OperSysSmsAreaDTO;
-import com.gameplat.admin.model.dto.OperSystemConfigDTO;
-import com.gameplat.admin.model.dto.SysFileConfigDTO;
-import com.gameplat.admin.model.dto.SysSmsAreaQueryDTO;
-import com.gameplat.admin.model.dto.SysSmsConfigDTO;
+import com.gameplat.admin.model.dto.*;
 import com.gameplat.admin.model.vo.SysFileConfigVO;
 import com.gameplat.admin.model.vo.SysSmsAreaVO;
 import com.gameplat.admin.model.vo.SysSmsConfigVO;
+import com.gameplat.admin.service.ConfigService;
 import com.gameplat.admin.service.SysDictDataService;
 import com.gameplat.admin.service.SysSmsAreaService;
 import com.gameplat.admin.service.SystemConfigService;
 import com.gameplat.base.common.exception.ServiceException;
-import com.gameplat.base.common.util.BeanUtils;
+import com.gameplat.base.common.json.JsonUtils;
 import com.gameplat.base.common.util.StringUtils;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import com.gameplat.common.enums.DictDataEnum;
+import com.gameplat.common.enums.DictTypeEnum;
+import com.gameplat.common.model.bean.EmailConfig;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 @Slf4j
 @Service
-@RequiredArgsConstructor
+@Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)
 public class SystemConfigServiceImpl implements SystemConfigService {
 
-  @Autowired private SysDictDataService sysDictDataService;
+  @Autowired private SysDictDataService dictDataService;
+
+  @Autowired private ConfigService configService;
 
   @Autowired private SysSmsConfigConvert sysSmsConfigConvert;
 
@@ -58,133 +62,78 @@ public class SystemConfigServiceImpl implements SystemConfigService {
 
   @Override
   public List<SysSmsConfigVO> findSmsList() {
-    List<SysSmsConfigVO> list = new ArrayList<>();
-    LambdaQueryWrapper<SysDictData> query = Wrappers.lambdaQuery();
-    query
-        .eq(SysDictData::getDictType, ConfigConstant.SMS_CONFIG)
-        .eq(SysDictData::getDictLabel, ConfigConstant.SMS);
-    SysDictData sysDictData = sysDictDataService.getOne(query);
-    if (sysDictData != null && StringUtils.isNotBlank(sysDictData.getDictValue())) {
-      // 得到本地短信运营商
-      list = JSONArray.parseArray(sysDictData.getDictValue(), SysSmsConfigVO.class);
+    String dictData = configService.getValue(DictDataEnum.SMS);
+    if (StringUtils.isNotBlank(dictData)) {
+      return JSONArray.parseArray(dictData, SysSmsConfigVO.class);
     }
-    return list;
+
+    return Collections.emptyList();
   }
 
   @Override
   public List<SysFileConfigVO> findFileList() {
-    List<SysFileConfigVO> list = new ArrayList<>();
-    LambdaQueryWrapper<SysDictData> query = Wrappers.lambdaQuery();
-    query
-        .eq(SysDictData::getDictType, ConfigConstant.FILE_CONFIG)
-        .eq(SysDictData::getDictLabel, ConfigConstant.FILE);
-    SysDictData sysDictData = sysDictDataService.getOne(query);
-    if (sysDictData != null && StringUtils.isNotBlank(sysDictData.getDictValue())) {
-      // 得到本地短信运营商
-      list = JSONArray.parseArray(sysDictData.getDictValue(), SysFileConfigVO.class);
+    String dictData = configService.getValue(DictDataEnum.FILE);
+    if (StringUtils.isNotBlank(dictData)) {
+      return JSONArray.parseArray(dictData, SysFileConfigVO.class);
     }
-    return list;
+    return Collections.emptyList();
   }
 
   @Override
-  public void updateSmsConfig(SysSmsConfigDTO sysSmsConfigDTO) {
+  public void updateSmsConfig(SysSmsConfigDTO dto) {
     // 查询短信配置
-    LambdaQueryWrapper<SysDictData> query = Wrappers.lambdaQuery();
-    query
-        .eq(SysDictData::getDictType, ConfigConstant.SMS_CONFIG)
-        .eq(SysDictData::getDictLabel, ConfigConstant.SMS);
-    SysDictData sysDictData = sysDictDataService.getOne(query);
-    List<SysSmsConfig> sysSmsConfigList = new ArrayList<>();
+    SysDictData dictData =
+        dictDataService.getDictData(
+            DictTypeEnum.SMS_CONFIG.getValue(), DictDataEnum.SMS.getLabel());
 
-    SysSmsConfig sysSmsConfig = sysSmsConfigConvert.toEntity(sysSmsConfigDTO);
-    // 如果查询短信配置为空，则新增一条短信记录
-    if (sysDictData == null) {
-      sysSmsConfigList.add(sysSmsConfig);
-      sysDictData = new SysDictData();
-      sysDictData.setDictType(ConfigConstant.SMS_CONFIG);
-      sysDictData.setDictName(ConfigConstant.SMS);
-      sysDictData.setDictValue(JSONUtil.toJsonStr(sysSmsConfigList));
-      if (!sysDictDataService.save(sysDictData)) {
-        throw new ServiceException("新增短信配置失败!");
-      }
-    } else {
-      // 查询短信配置不为空，但值为空，加入[]
-      if (StringUtils.isBlank(sysDictData.getDictValue())) {
-        sysDictData.setDictValue("[]");
-      }
-      sysSmsConfigList = JSONArray.parseArray(sysDictData.getDictValue(), SysSmsConfig.class);
-      if (!CollectionUtils.isEmpty(sysSmsConfigList)) {
-        boolean flag = true;
-        for (SysSmsConfig item : sysSmsConfigList) {
-          if (sysSmsConfig.getOperator().equals(item.getOperator())) {
-            flag = false;
-            BeanUtils.copyBeanProp(item, sysSmsConfig);
-          }
-        }
-        if (flag) {
-          sysSmsConfig.setEnable(TrueFalse.TRUE.getValue());
-          sysSmsConfigList.add(sysSmsConfig);
-        }
-      } else {
-        // 2.短信配置值为空,将传入值放入list
-        sysSmsConfigList.add(sysSmsConfig);
-      }
-      // 将list数据set进短信值，修改短信配置
-      sysDictData.setDictValue(JSON.toJSONString(sysSmsConfigList));
-      if (!sysDictDataService.updateById(sysDictData)) {
-        throw new ServiceException("新增短信配置失败!");
-      }
+    List<SysSmsConfig> smsConfigList =
+        Optional.of(dictData)
+            .map(SysDictData::getDictValue)
+            .map(c -> JsonUtils.parse(c, new TypeReference<List<SysSmsConfig>>() {}))
+            .orElse(Collections.emptyList());
+
+    SysSmsConfig smsConfig = sysSmsConfigConvert.toEntity(dto);
+    if (CollectionUtils.isNotEmpty(smsConfigList)) {
+      // 替换旧数据
+      smsConfigList.replaceAll(
+          c -> c.getOperator().equals(smsConfig.getOperator()) ? smsConfig : c);
+
+      // 修改
+      dictDataService.updateDictData(
+          OperDictDataDTO.builder()
+              .id(dictData.getId())
+              .dictLabel(dictData.getDictLabel())
+              .dictType(dictData.getDictType())
+              .dictValue(JsonUtils.toJson(smsConfigList))
+              .build());
     }
   }
 
   @Override
-  public void updateFileConfig(SysFileConfigDTO sysFileConfigDTO) {
-    // 查询短信配置
-    LambdaQueryWrapper<SysDictData> query = Wrappers.lambdaQuery();
-    query
-        .eq(SysDictData::getDictType, ConfigConstant.FILE_CONFIG)
-        .eq(SysDictData::getDictLabel, ConfigConstant.FILE);
-    SysDictData sysDictData = sysDictDataService.getOne(query);
-    List<SysFileConfig> sysFileConfigList = new ArrayList<>();
+  public void updateFileConfig(SysFileConfigDTO dto) {
+    SysDictData dictData =
+        dictDataService.getDictData(
+            DictTypeEnum.FILE_CONFIG.getValue(), DictDataEnum.FILE.getLabel());
 
-    SysFileConfig sysFileConfig = sysFileConfigConvert.toEntity(sysFileConfigDTO);
-    // 如果查询短信配置为空，则新增一条短信记录
-    if (sysDictData == null) {
-      sysFileConfigList.add(sysFileConfig);
-      sysDictData = new SysDictData();
-      sysDictData.setDictType(ConfigConstant.FILE_CONFIG);
-      sysDictData.setDictName(ConfigConstant.FILE);
-      sysDictData.setDictValue(JSONUtil.toJsonStr(sysFileConfigList));
-      if (!sysDictDataService.save(sysDictData)) {
-        throw new ServiceException("新增文件配置失败!");
-      }
-    } else {
-      // 查询短信配置不为空，但值为空，加入[]
-      if (StringUtils.isBlank(sysDictData.getDictValue())) {
-        sysDictData.setDictValue("[]");
-      }
-      sysFileConfigList = JSONArray.parseArray(sysDictData.getDictValue(), SysFileConfig.class);
-      if (!CollectionUtils.isEmpty(sysFileConfigList)) {
-        boolean flag = true;
-        for (SysFileConfig item : sysFileConfigList) {
-          if (sysFileConfig.getServiceProvider().equals(item.getServiceProvider())) {
-            flag = false;
-            BeanUtils.copyBeanProp(item, sysFileConfig);
-          }
-        }
-        if (flag) {
-          sysFileConfig.setEnable(TrueFalse.TRUE.getValue());
-          sysFileConfigList.add(sysFileConfig);
-        }
-      } else {
-        // 2.短信配置值为空,将传入值放入list
-        sysFileConfigList.add(sysFileConfig);
-      }
-      // 将list数据set进短信值，修改短信配置
-      sysDictData.setDictValue(JSON.toJSONString(sysFileConfigList));
-      if (!sysDictDataService.updateById(sysDictData)) {
-        throw new ServiceException("更新文件配置失败!");
-      }
+    List<SysFileConfig> fileConfigList =
+        Optional.of(dictData)
+            .map(SysDictData::getDictValue)
+            .map(c -> JsonUtils.parse(c, new TypeReference<List<SysFileConfig>>() {}))
+            .orElse(Collections.emptyList());
+
+    SysFileConfig config = sysFileConfigConvert.toEntity(dto);
+    if (CollectionUtils.isNotEmpty(fileConfigList)) {
+      // 替换旧数据
+      fileConfigList.replaceAll(
+          c -> c.getServiceProvider().equals(config.getServiceProvider()) ? config : c);
+
+      dictDataService.updateDictData(
+          OperDictDataDTO.builder()
+              .id(dictData.getId())
+              .dictLabel(dictData.getDictLabel())
+              .dictType(dictData.getDictType())
+              .dictValue(JsonUtils.toJson(fileConfigList))
+              .build());
     }
   }
 
@@ -202,7 +151,7 @@ public class SystemConfigServiceImpl implements SystemConfigService {
       queryWrapper
           .eq(SysDictData::getDictType, dto.getDictType())
           .eq(SysDictData::getDictLabel, entry.getKey());
-      if (!sysDictDataService.update(sysDictData, queryWrapper)) {
+      if (!dictDataService.update(sysDictData, queryWrapper)) {
         throw new ServiceException("更新配置失败!");
       }
     }
@@ -224,7 +173,7 @@ public class SystemConfigServiceImpl implements SystemConfigService {
       if (!sysSmsAreaService.updateById(sysSmsArea)) {
         throw new ServiceException("更新区号配置失败!");
       }
-    }else {
+    } else {
       sysSmsArea.setStatus(TrueFalse.TRUE.getValue());
       if (!sysSmsAreaService.save(sysSmsArea)) {
         throw new ServiceException("新增区号配置失败");
@@ -240,11 +189,26 @@ public class SystemConfigServiceImpl implements SystemConfigService {
   }
 
   @Override
-  public SysDictData findActivityTypeCodeList(String language) {
-    LambdaQueryWrapper<SysDictData> query = Wrappers.lambdaQuery();
-    query
-            .eq(SysDictData::getDictType, ConfigConstant.ACTIVITY_CONFIG)
-            .eq(SysDictData::getDictLabel, ConfigConstant.ACTIVITY_TYPE_CONFIG);
-    return sysDictDataService.getOne(query);
+  public EmailConfig findEmailConfig() {
+    return configService.get(DictDataEnum.EMAIL, EmailConfig.class);
+  }
+
+  @Override
+  public void updateEmail(EmailConfig config) {
+    SysDictData dictData =
+        dictDataService.getDictData(
+            DictTypeEnum.EMAIL_CONFIG.getValue(), DictDataEnum.EMAIL.getLabel());
+
+    if (null == dictData) {
+      throw new ServiceException("邮箱配置不存在!");
+    }
+
+    dictDataService.updateDictData(
+        OperDictDataDTO.builder()
+            .id(dictData.getId())
+            .dictLabel(dictData.getDictLabel())
+            .dictType(dictData.getDictType())
+            .dictValue(JsonUtils.toJson(config))
+            .build());
   }
 }

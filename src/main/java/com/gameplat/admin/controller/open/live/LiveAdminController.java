@@ -1,7 +1,5 @@
 package com.gameplat.admin.controller.open.live;
 
-import cn.hutool.http.HttpUtil;
-import cn.hutool.system.UserInfo;
 import com.gameplat.admin.model.domain.GamePlatform;
 import com.gameplat.admin.model.domain.Member;
 import com.gameplat.admin.model.domain.MemberInfo;
@@ -14,7 +12,6 @@ import com.gameplat.admin.service.MemberService;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.StringUtils;
 import com.gameplat.common.enums.TransferTypesEnum;
-import com.gameplat.log.enums.LogType;
 import com.gameplat.redis.api.RedisService;
 import java.math.BigDecimal;
 import java.util.HashMap;
@@ -22,7 +19,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.CollectionUtils;

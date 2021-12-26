@@ -38,6 +38,11 @@ public class GameKind implements Serializable {
   private Integer enable;
 
   /**
+   * 是否热门(0：否；1:是)
+   */
+  private Integer hot;
+
+  /**
    * 排序
    */
   private Integer sort;

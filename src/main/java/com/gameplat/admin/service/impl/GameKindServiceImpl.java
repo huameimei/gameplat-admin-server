@@ -43,6 +43,7 @@ public class GameKindServiceImpl extends ServiceImpl<GameKindMapper, GameKind>
             ObjectUtils.isNotEmpty(dto.getPlatformCode()),
             GameKind::getPlatformCode,
             dto.getPlatformCode())
+        .eq(ObjectUtils.isNotEmpty(dto.getHot()),GameKind::getHot,dto.getHot())
         .orderByAsc(Lists.newArrayList(GameKind::getPlatformCode,GameKind::getSort))
         .page(page).convert(gameKindConvert::toVo);
   }

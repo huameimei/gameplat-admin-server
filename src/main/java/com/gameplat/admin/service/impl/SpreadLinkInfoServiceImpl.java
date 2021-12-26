@@ -52,6 +52,7 @@ public class SpreadLinkInfoServiceImpl extends ServiceImpl<SpreadLinkInfoMapper,
             SpreadLinkInfo::getUserType,
             dto.getUserType())
         .eq(ObjectUtils.isNotNull(dto.getStatus()), SpreadLinkInfo::getStatus, dto.getStatus())
+        .eq(ObjectUtils.isNotEmpty(dto.getCode()), SpreadLinkInfo::getCode, dto.getCode())
         .orderBy(
             StringUtils.equals(dto.getOrderByColumn(), "createTime"),
             ValidatorUtil.isAsc(dto.getSortBy()),

@@ -90,9 +90,14 @@ public class SpreadUnionServiceImpl extends ServiceImpl<SpreadUnionMapper, Sprea
      */
     @Override
     public void insertUnionPackage(SpreadUnionPackageDTO spreadUnionPackageDTO) {
-//        this.lambdaUpdate().eq(SpreadUnion::getUnionName,spreadUnionPackageDTO.getUnionName())
-//                .set(spreadUnionPackageDTO.getUnionPackageId() != null,SpreadUnion::getUnionPackageId,spreadUnionPackageDTO.getUnionPackageId())
-//                .set(spreadUnionPackageDTO)
+        this.lambdaUpdate().eq(SpreadUnion::getUnionName,spreadUnionPackageDTO.getUnionName())
+                .set(spreadUnionPackageDTO.getUnionPackageId() != null, SpreadUnion::getUnionPackageId, spreadUnionPackageDTO.getUnionPackageId())
+                .set(spreadUnionPackageDTO.getUnionPackageName() != null, SpreadUnion::getUnionPackageName, spreadUnionPackageDTO.getUnionPackageName())
+                .set(spreadUnionPackageDTO.getUnionPlatform() != null, SpreadUnion::getUnionPlatform, spreadUnionPackageDTO.getUnionPlatform())
+                .set(spreadUnionPackageDTO.getPromotionDomain() != null, SpreadUnion::getPromotionDomain, spreadUnionPackageDTO.getPromotionDomain())
+                .set(spreadUnionPackageDTO.getUnionStatus() != null, SpreadUnion::getUnionStatus , spreadUnionPackageDTO.getUnionStatus())
+                .set(spreadUnionPackageDTO.getIosDownloadUrl() != null, SpreadUnion::getIosDownloadUrl , spreadUnionPackageDTO.getIosDownloadUrl())
+                .set(spreadUnionPackageDTO.getAppDownloadUrl() != null ,SpreadUnion::getAppDownloadUrl ,spreadUnionPackageDTO.getAppDownloadUrl());
     }
 
     /**
@@ -109,6 +114,6 @@ public class SpreadUnionServiceImpl extends ServiceImpl<SpreadUnionMapper, Sprea
      */
     @Override
     public void removeUnionPackage(List<Long> id) {
-
+        this.removeByIds(id);
     }
 }

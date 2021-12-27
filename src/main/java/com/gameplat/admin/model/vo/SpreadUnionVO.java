@@ -9,7 +9,7 @@ import java.util.Date;
 @Data
 public class SpreadUnionVO implements Serializable {
 
-    private static final long serialVersionUID = 1L;
+
 
     @ApiModelProperty(value = "主键")
     private Long id;
@@ -18,31 +18,31 @@ public class SpreadUnionVO implements Serializable {
     private String unionName;
 
     @ApiModelProperty(value = "代理账号")
-    private Integer agentAccount;
+    private String agentAccount;
 
     @ApiModelProperty(value = "渠道类型")
-    private Integer channel;
+    private String channel;
 
     @ApiModelProperty(value = "联盟包id")
     private Integer unionPackageId;
 
     @ApiModelProperty(value = "联盟包名称")
-    private Date unionPackageName;
+    private String unionPackageName;
 
     @ApiModelProperty(value = "联运平台")
-    private Date unionPlatform;
+    private String unionPlatform;
 
     @ApiModelProperty(value = "推广域名")
-    private Integer promotionDomain;
+    private String promotionDomain;
 
-    @ApiModelProperty(value = "联运专用IOS包")
+    @ApiModelProperty(value = "联运专用IOS包下载地址")
     private String iosDownloadUrl;
 
-    @ApiModelProperty(value = "联运专用安卓包")
-    private Date appDownloadUrl;
+    @ApiModelProperty(value = "联运专用安卓包下载地址")
+    private String appDownloadUrl;
 
     @ApiModelProperty(value = "联运状态")
-    private String unionStatus;
+    private Integer unionStatus;
 
     @ApiModelProperty(value = "创建时间")
     private Date createTime;
@@ -55,6 +55,5 @@ public class SpreadUnionVO implements Serializable {
 
     @ApiModelProperty(value = "更新人")
     private String updateBy;
-
 
 }

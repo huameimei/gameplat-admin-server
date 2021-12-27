@@ -3,6 +3,8 @@ package com.gameplat.admin.model.dto;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import java.io.Serializable;
 import java.util.Date;
+
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 /**
@@ -19,38 +21,53 @@ public class NoticeEditDTO implements Serializable {
     /**
      * 类型 (1滚动公告、2登录公告、3推广公告、4注册公告、5彩票公告、6体育公告)
      */
+    @ApiModelProperty(value = "类型 (1滚动公告、2登录公告、3推广公告、4注册公告、5彩票公告、6体育公告)")
     private Integer noticeType;
 
     /**
      * 公告标题
      */
+    @ApiModelProperty(value = "公告标题")
     private String noticeTitle;
 
     /**
      * 内容
      */
+    @ApiModelProperty(value = "内容")
     private String noticeContent;
 
     /**
      * 公告的开始日期
      */
+    @ApiModelProperty(value = "公告的开始日期")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date beginDate;
 
     /**
      * 公告的结束日期
      */
+    @ApiModelProperty(value = "公告的结束日期")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date endDate;
 
     /**
      * 排序
      */
+    @ApiModelProperty(value = "排序")
     private Integer sort;
 
     /**
      * 操作人的账号
      */
+    @ApiModelProperty(value = "操作人的账号")
     private String operator;
+
+    /** 总类别 */
+    @ApiModelProperty(value = "总类别")
+    private String totalCategory;
+
+    /** 位置 */
+    @ApiModelProperty(value = "位置")
+    private String category;
 
 }

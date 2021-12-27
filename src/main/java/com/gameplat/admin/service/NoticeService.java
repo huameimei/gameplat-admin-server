@@ -7,7 +7,11 @@ import com.gameplat.admin.model.dto.NoticeAddDTO;
 import com.gameplat.admin.model.dto.NoticeEditDTO;
 import com.gameplat.admin.model.dto.NoticeQueryDTO;
 import com.gameplat.admin.model.dto.NoticeUpdateStatusDTO;
+import com.gameplat.admin.model.vo.NoticeDictDataVO;
 import com.gameplat.admin.model.vo.NoticeVO;
+import com.gameplat.admin.model.vo.ValueDataVO;
+
+import java.util.List;
 
 public interface NoticeService extends IService<Notice> {
 
@@ -22,4 +26,6 @@ public interface NoticeService extends IService<Notice> {
     void disableStatus(NoticeUpdateStatusDTO noticeUpdateStatusDTO);
 
     void enableStatus(NoticeUpdateStatusDTO noticeUpdateStatusDTO);
+
+    NoticeDictDataVO getDictData();
 }

@@ -1,5 +1,6 @@
 package com.gameplat.admin.service.impl;
 
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
@@ -7,16 +8,24 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.convert.NoticeConvert;
 import com.gameplat.admin.mapper.NoticeMapper;
 import com.gameplat.admin.model.domain.Notice;
+import com.gameplat.admin.model.domain.SysDictData;
 import com.gameplat.admin.model.dto.NoticeAddDTO;
 import com.gameplat.admin.model.dto.NoticeEditDTO;
 import com.gameplat.admin.model.dto.NoticeQueryDTO;
 import com.gameplat.admin.model.dto.NoticeUpdateStatusDTO;
+import com.gameplat.admin.model.vo.NoticeDictDataVO;
 import com.gameplat.admin.model.vo.NoticeVO;
+import com.gameplat.admin.model.vo.ValueDataVO;
 import com.gameplat.admin.service.NoticeService;
+import com.gameplat.admin.service.SysDictDataService;
 import com.gameplat.base.common.exception.ServiceException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * @author lily
@@ -29,6 +38,7 @@ import org.springframework.stereotype.Service;
 public class NoticeServiceImpl extends ServiceImpl<NoticeMapper, Notice> implements NoticeService {
 
     @Autowired private NoticeConvert noticeConvert;
+    @Autowired private SysDictDataService sysDictDataService;
 
     @Override
     public IPage<NoticeVO> selectNoticeList(IPage<Notice> page, NoticeQueryDTO noticeQueryDTO) {
@@ -83,6 +93,34 @@ public class NoticeServiceImpl extends ServiceImpl<NoticeMapper, Notice> impleme
         if (!this.updateById(notice)){
             throw new ServiceException("启用失败！");
         }
+    }
+
+    @Override
+    public NoticeDictDataVO getDictData() {
+        SysDictData notice_category = sysDictDataService.getDictDataByType("NOTICE_CATEGORY");
+        List<String> types = new ArrayList<>();
+        types.add("NOTICE_CATEGORY");
+        types.add("NOTICE_TOTAL_CATEGORY");
+        types.add("NOTICE_TYPE");
+        types.add("PUSH_MESSAGE_TYPE");
+        List<SysDictData> dictDataByTypes = sysDictDataService.getDictDataByTypes(types);
+
+        NoticeDictDataVO vo = new NoticeDictDataVO();
+        for (SysDictData dictDataByType : dictDataByTypes) {
+            if(dictDataByType.getDictType().equals("NOTICE_TYPE")){
+                vo.setNoticeType(JSONObject.parseArray(dictDataByType.getDictValue()));
+            }
+            if(dictDataByType.getDictType().equals("NOTICE_CATEGORY")){
+                vo.setNoticeCategory(JSONObject.parseArray(dictDataByType.getDictValue()));
+            }
+            if(dictDataByType.getDictType().equals("NOTICE_TOTAL_CATEGORY")){
+                vo.setNoticeTotalCategory(JSONObject.parseArray(dictDataByType.getDictValue()));
+            }
+            if(dictDataByType.getDictType().equals("PUSH_MESSAGE_TYPE")){
+                vo.setPushMessageType(JSONObject.parseArray(dictDataByType.getDictValue()));
+            }
+        }
+        return vo;
     }
 
     @Override

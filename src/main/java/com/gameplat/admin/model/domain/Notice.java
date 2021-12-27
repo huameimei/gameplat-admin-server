@@ -72,4 +72,10 @@ public class Notice implements Serializable {
      */
     @TableField(fill = FieldFill.INSERT)
     private Date createTime;
+
+    /** 总类别 */
+    private String totalCategory;
+
+    /** 位置 */
+    private String category;
 }

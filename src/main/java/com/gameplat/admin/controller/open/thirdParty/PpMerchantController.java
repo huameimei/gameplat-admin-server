@@ -7,6 +7,7 @@ import com.gameplat.admin.model.dto.PpMerchantAddDTO;
 import com.gameplat.admin.model.dto.PpMerchantEditDTO;
 import com.gameplat.admin.model.vo.PpMerchantVO;
 import com.gameplat.admin.service.PpMerchantService;
+import com.gameplat.common.enums.SwitchStatusEnum;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -64,7 +65,6 @@ public class PpMerchantController {
   @GetMapping("/queryAllMerchant")
   @PreAuthorize("hasAuthority('thirdParty:ppMerchants:queryAllMerchant')")
   public List<PpMerchant> getAllMerchant() {
-    Integer status = 1; // 获取可用商户
-    return ppMerchantService.queryAllMerchant(status);
+    return ppMerchantService.queryAllMerchant(SwitchStatusEnum.ENABLED.getValue());
   }
 }

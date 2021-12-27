@@ -24,6 +24,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletResponse;
+
 /**
  * 代理推广管理
  *
@@ -41,6 +43,12 @@ public class OpenSpreadLinkInfoController {
   @PreAuthorize("hasAuthority('diffusion:spreadConfig:view')")
   public IPage<SpreadConfigVO> list(PageDTO<SpreadLinkInfo> page, SpreadLinkInfoDTO configDTO) {
     return configService.page(page, configDTO);
+  }
+
+  @GetMapping("/exportList")
+  @PreAuthorize("hasAuthority('diffusion:spreadConfig:view')")
+  public void exportList(SpreadLinkInfoDTO configDTO, HttpServletResponse response) {
+    configService.exportList(configDTO, response);
   }
 
   @PostMapping("/add")

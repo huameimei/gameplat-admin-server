@@ -1,5 +1,7 @@
 package com.gameplat.admin.service.impl;
 
+import cn.afterturn.easypoi.excel.ExcelExportUtil;
+import cn.afterturn.easypoi.excel.entity.ExportParams;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
@@ -16,12 +18,20 @@ import com.gameplat.base.common.enums.SystemCodeType;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.StringUtils;
 import com.gameplat.base.common.validator.ValidatorUtil;
+
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.Date;
 import java.util.List;
+
+import lombok.Cleanup;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
+
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * 域名推广配置 服务实现层
@@ -67,6 +77,50 @@ public class SpreadLinkInfoServiceImpl extends ServiceImpl<SpreadLinkInfoMapper,
             SpreadLinkInfo::getRegistCount)
         .page(page)
         .convert(spreadLinkInfoConvert::toVo);
+  }
+
+  @Override
+  public void exportList(SpreadLinkInfoDTO dto, HttpServletResponse response) {
+    try{
+      List<SpreadLinkInfo> list = this.lambdaQuery()
+              .eq(ObjectUtils.isNotNull(dto.getId()), SpreadLinkInfo::getId, dto.getId())
+              .eq(
+                      ObjectUtils.isNotEmpty(dto.getAgentAccount()),
+                      SpreadLinkInfo::getAgentAccount,
+                      dto.getAgentAccount())
+              .eq(
+                      ObjectUtils.isNotEmpty(dto.getSpreadType()),
+                      SpreadLinkInfo::getSpreadType,
+                      dto.getSpreadType())
+              .eq(
+                      ObjectUtils.isNotNull(dto.getUserType()),
+                      SpreadLinkInfo::getUserType,
+                      dto.getUserType())
+              .eq(ObjectUtils.isNotNull(dto.getStatus()), SpreadLinkInfo::getStatus, dto.getStatus())
+              .eq(ObjectUtils.isNotEmpty(dto.getCode()), SpreadLinkInfo::getCode, dto.getCode())
+              .orderBy(
+                      StringUtils.equals(dto.getOrderByColumn(), "createTime"),
+                      ValidatorUtil.isAsc(dto.getSortBy()),
+                      SpreadLinkInfo::getCreateTime)
+              .orderBy(
+                      StringUtils.equals(dto.getOrderByColumn(), "visitCount"),
+                      ValidatorUtil.isAsc(dto.getSortBy()),
+                      SpreadLinkInfo::getVisitCount)
+              .orderBy(
+                      StringUtils.equals(dto.getOrderByColumn(), "registCount"),
+                      ValidatorUtil.isAsc(dto.getSortBy()),
+                      SpreadLinkInfo::getRegistCount)
+              .list();
+      response.setContentType("application/vnd.ms-excel");
+      response.setHeader("Content-disposition", "attachment;filename = myExcel.xls");
+      @Cleanup OutputStream outputStream = null;
+      Workbook workbook = ExcelExportUtil.exportExcel(new ExportParams("域名推广列表导出", "域名推广列表"), SpreadLinkInfo.class, list);
+      outputStream = response.getOutputStream();
+      workbook.write(outputStream);
+    }catch (IOException e) {
+      throw new ServiceException("导出失败:"+e);
+    }
+
   }
 
   /**

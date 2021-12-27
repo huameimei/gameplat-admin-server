@@ -44,4 +44,9 @@ public interface SpreadLinkInfoService extends IService<SpreadLinkInfo> {
    * @param ids
    */
   void batchDeleteByIds(List<Long> ids);
+
+  /**
+   * 根据代理账号获取代理信息
+   */
+  List<SpreadLinkInfo> getSpreadList(String agentAccount);
 }

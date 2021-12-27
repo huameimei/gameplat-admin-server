@@ -191,4 +191,10 @@ public class SpreadLinkInfoServiceImpl extends ServiceImpl<SpreadLinkInfoMapper,
       throw new ServiceException("批量删除失败");
     }
   }
+
+  @Override
+  public List<SpreadLinkInfo> getSpreadList(String agentAccount) {
+    List<SpreadLinkInfo> list = this.lambdaQuery().eq(SpreadLinkInfo::getAgentAccount, agentAccount).list();
+    return list;
+  }
 }

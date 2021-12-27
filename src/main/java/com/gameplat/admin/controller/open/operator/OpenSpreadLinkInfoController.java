@@ -9,20 +9,15 @@ import com.gameplat.admin.model.dto.SpreadLinkInfoDTO;
 import com.gameplat.admin.model.dto.SpreadLinkInfoEditDTO;
 import com.gameplat.admin.model.vo.SpreadConfigVO;
 import com.gameplat.admin.service.SpreadLinkInfoService;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * 代理推广管理
@@ -94,5 +89,15 @@ public class OpenSpreadLinkInfoController {
   @GetMapping("/spreadTypeList")
   public List<Map<String, Object>> getSpreadTypesList() {
     return SpreadTypes.getAllList();
+  }
+
+  @GetMapping("/getAgentDomain")
+  public List<String> getAgentDomain(@RequestParam String agentAccount){
+    List<SpreadLinkInfo> spreadList = configService.getSpreadList(agentAccount);
+    List<String>  listStr = new ArrayList<>();
+    spreadList.forEach(x->{
+      listStr.add(x.getExternalUrl());
+    });
+    return listStr;
   }
 }

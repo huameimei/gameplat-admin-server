@@ -1,5 +1,7 @@
 package com.gameplat.admin.model.domain;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -19,6 +21,7 @@ public class SpreadUnion implements Serializable {
 
 
     @ApiModelProperty(value = "主键")
+    @TableId(type = IdType.AUTO)
     private Long id;
 
     @ApiModelProperty(value = "联盟名称")

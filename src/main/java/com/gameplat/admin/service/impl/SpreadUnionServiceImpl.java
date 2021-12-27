@@ -2,18 +2,26 @@ package com.gameplat.admin.service.impl;
 
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.convert.SpreadUnionConvert;
 import com.gameplat.admin.mapper.SpreadUnionMapper;
+import com.gameplat.admin.model.domain.ActivityType;
+import com.gameplat.admin.model.domain.MemberBill;
+import com.gameplat.admin.model.domain.SpreadLinkInfo;
 import com.gameplat.admin.model.domain.SpreadUnion;
 import com.gameplat.admin.model.dto.SpreadUnionDTO;
 import com.gameplat.admin.model.dto.SpreadUnionPackageDTO;
 import com.gameplat.admin.model.vo.SpreadUnionVO;
+import com.gameplat.admin.service.SpreadLinkInfoService;
 import com.gameplat.admin.service.SpreadUnionService;
+import com.gameplat.base.common.exception.ServiceException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.List;
 
@@ -28,13 +36,22 @@ public class SpreadUnionServiceImpl extends ServiceImpl<SpreadUnionMapper, Sprea
     @Autowired
     private SpreadUnionConvert spreadUnionConvert;
 
+    @Autowired
+    private SpreadLinkInfoService spreadLinkInfoService;
+
 
     /**
      * 创建联运设置
      */
     @Override
     public void creatUnion(SpreadUnionDTO spreadUnionDTO) {
-        this.save(spreadUnionConvert.toSpreadUnionDTO(spreadUnionDTO));
+        List<SpreadLinkInfo> spreadList = spreadLinkInfoService.getSpreadList(spreadUnionDTO.getAgentAccount());
+        if (spreadList.size() == 0){
+            throw new ServiceException("未获取道相关设置的代理，请先进行代理设置");
+        }
+        if(!this.save(spreadUnionConvert.toSpreadUnionDTO(spreadUnionDTO))) {
+            throw new ServiceException("联盟名称重复");
+        }
     }
 
     /**
@@ -43,12 +60,16 @@ public class SpreadUnionServiceImpl extends ServiceImpl<SpreadUnionMapper, Sprea
      *  联盟名称，代理账号，渠道类型
      */
     @Override
-    public List<SpreadUnion> getUnion(SpreadUnionDTO spreadUnionDTO) {
-        List<SpreadUnion> list = this.lambdaQuery()
+    public IPage<SpreadUnionVO> getUnion(PageDTO<SpreadUnion> page ,SpreadUnionDTO spreadUnionDTO) {
+        LambdaQueryChainWrapper<SpreadUnion> queryChainWrapper = this.lambdaQuery();
+        IPage<SpreadUnionVO> convert = queryChainWrapper
                 .eq(spreadUnionDTO.getUnionName() != null, SpreadUnion::getUnionName, spreadUnionDTO.getUnionName())
-                .eq(spreadUnionDTO.getAgentAccount() != null,SpreadUnion::getAgentAccount,spreadUnionDTO.getAgentAccount())
-                .eq(spreadUnionDTO.getChannel() != null, SpreadUnion::getChannel, spreadUnionDTO.getChannel()).list();
-        return list;
+                .eq(spreadUnionDTO.getAgentAccount() != null, SpreadUnion::getAgentAccount, spreadUnionDTO.getAgentAccount())
+                .eq(spreadUnionDTO.getChannel() != null, SpreadUnion::getChannel, spreadUnionDTO.getChannel())
+                .orderByDesc(SpreadUnion::getId).page(page).convert(spreadUnionConvert::toSpreadUnionVO);
+
+
+        return convert;
     }
 
     /**
@@ -57,7 +78,7 @@ public class SpreadUnionServiceImpl extends ServiceImpl<SpreadUnionMapper, Sprea
     @Override
     public void editUnion(SpreadUnionDTO spreadUnionDTO) {
         this.lambdaUpdate()
-                .eq(SpreadUnion::getId,spreadUnionDTO)
+                .eq(SpreadUnion::getId,spreadUnionDTO.getId())
                 .set(SpreadUnion::getUnionName,spreadUnionDTO.getUnionName())
                 .set(SpreadUnion::getAgentAccount,spreadUnionDTO.getAgentAccount())
                 .set(SpreadUnion::getChannel,spreadUnionDTO.getChannel());

@@ -12,4 +12,5 @@ public interface SpreadUnionConvert {
 
     SpreadUnion toSpreadUnionDTO(SpreadUnionDTO spreadUnion);
 
+
 }

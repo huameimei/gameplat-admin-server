@@ -1,9 +1,12 @@
 package com.gameplat.admin.service;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.gameplat.admin.model.domain.SpreadUnion;
 import com.gameplat.admin.model.dto.SpreadUnionDTO;
 import com.gameplat.admin.model.dto.SpreadUnionPackageDTO;
+import com.gameplat.admin.model.vo.SpreadUnionVO;
 
 import java.util.List;
 
@@ -20,7 +23,7 @@ public interface SpreadUnionService extends IService<SpreadUnion> {
     /**
      * 联盟查询
      */
-    List<SpreadUnion> getUnion(SpreadUnionDTO spreadUnionDTO);
+    IPage<SpreadUnionVO> getUnion(PageDTO<SpreadUnion> page  ,SpreadUnionDTO spreadUnionDTO);
 
     /**
      * 联盟修改

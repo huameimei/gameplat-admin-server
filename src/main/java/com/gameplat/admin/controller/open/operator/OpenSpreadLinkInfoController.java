@@ -19,6 +19,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletResponse;
+
 /**
  * 代理推广管理
  *
@@ -36,6 +38,12 @@ public class OpenSpreadLinkInfoController {
   @PreAuthorize("hasAuthority('diffusion:spreadConfig:view')")
   public IPage<SpreadConfigVO> list(PageDTO<SpreadLinkInfo> page, SpreadLinkInfoDTO configDTO) {
     return configService.page(page, configDTO);
+  }
+
+  @GetMapping("/exportList")
+  @PreAuthorize("hasAuthority('diffusion:spreadConfig:view')")
+  public void exportList(SpreadLinkInfoDTO configDTO, HttpServletResponse response) {
+    configService.exportList(configDTO, response);
   }
 
   @PostMapping("/add")

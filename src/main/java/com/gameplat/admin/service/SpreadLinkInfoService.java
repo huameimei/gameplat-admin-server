@@ -8,11 +8,15 @@ import com.gameplat.admin.model.dto.SpreadLinkInfoAddDTO;
 import com.gameplat.admin.model.dto.SpreadLinkInfoDTO;
 import com.gameplat.admin.model.dto.SpreadLinkInfoEditDTO;
 import com.gameplat.admin.model.vo.SpreadConfigVO;
+
+import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
 public interface SpreadLinkInfoService extends IService<SpreadLinkInfo> {
 
   IPage<SpreadConfigVO> page(PageDTO<SpreadLinkInfo> page, SpreadLinkInfoDTO dto);
+
+  void exportList(SpreadLinkInfoDTO dto, HttpServletResponse response);
 
   void add(SpreadLinkInfoAddDTO configAddDTO);
 

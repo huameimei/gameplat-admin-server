@@ -19,6 +19,7 @@ import com.gameplat.admin.service.SpreadLinkInfoService;
 import com.gameplat.admin.service.SpreadUnionService;
 import com.gameplat.base.common.exception.ServiceException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import springfox.documentation.annotations.ApiIgnore;
@@ -30,6 +31,7 @@ import java.util.List;
  * 联运设置实现
  */
 @Service
+@Slf4j
 public class SpreadUnionServiceImpl extends ServiceImpl<SpreadUnionMapper, SpreadUnion>
         implements SpreadUnionService {
 
@@ -50,7 +52,8 @@ public class SpreadUnionServiceImpl extends ServiceImpl<SpreadUnionMapper, Sprea
             throw new ServiceException("未获取道相关设置的代理，请先进行代理设置");
         }
         if(!this.save(spreadUnionConvert.toSpreadUnionDTO(spreadUnionDTO))) {
-            throw new ServiceException("联盟名称重复");
+            log.error("新建联运设置参数信息  spreadUnionDTO：{}",spreadUnionDTO);
+            throw new ServiceException("插入失败,请联系管理员");
         }
     }
 
@@ -67,8 +70,6 @@ public class SpreadUnionServiceImpl extends ServiceImpl<SpreadUnionMapper, Sprea
                 .eq(spreadUnionDTO.getAgentAccount() != null, SpreadUnion::getAgentAccount, spreadUnionDTO.getAgentAccount())
                 .eq(spreadUnionDTO.getChannel() != null, SpreadUnion::getChannel, spreadUnionDTO.getChannel())
                 .orderByDesc(SpreadUnion::getId).page(page).convert(spreadUnionConvert::toSpreadUnionVO);
-
-
         return convert;
     }
 
@@ -77,11 +78,20 @@ public class SpreadUnionServiceImpl extends ServiceImpl<SpreadUnionMapper, Sprea
      */
     @Override
     public void editUnion(SpreadUnionDTO spreadUnionDTO) {
-        this.lambdaUpdate()
-                .eq(SpreadUnion::getId,spreadUnionDTO.getId())
+        List<SpreadLinkInfo> spreadList = spreadLinkInfoService.getSpreadList(spreadUnionDTO.getAgentAccount());
+        if (spreadList.size() == 0){
+            log.info("查询代理相关信息 参数 {}，返回结果：{}",spreadUnionDTO.getAgentAccount() , spreadList);
+            throw new ServiceException("未获取道相关设置的代理，请先进行代理设置");
+        }
+
+        if(!this.lambdaUpdate()
                 .set(SpreadUnion::getUnionName,spreadUnionDTO.getUnionName())
                 .set(SpreadUnion::getAgentAccount,spreadUnionDTO.getAgentAccount())
-                .set(SpreadUnion::getChannel,spreadUnionDTO.getChannel());
+                .set(SpreadUnion::getChannel,spreadUnionDTO.getChannel())
+                .eq(SpreadUnion::getId,spreadUnionDTO.getId()).update()){
+            log.error("修改联盟设置失败,传入的参数  spreadUnionDTO：{}",spreadUnionDTO);
+            throw new ServiceException("修改失败,请联系管理员");
+        }
     }
 
     /**

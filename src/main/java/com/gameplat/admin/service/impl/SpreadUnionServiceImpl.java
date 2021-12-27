@@ -14,6 +14,7 @@ import com.gameplat.admin.model.domain.SpreadLinkInfo;
 import com.gameplat.admin.model.domain.SpreadUnion;
 import com.gameplat.admin.model.dto.SpreadUnionDTO;
 import com.gameplat.admin.model.dto.SpreadUnionPackageDTO;
+import com.gameplat.admin.model.vo.SpreadUnionPackageVO;
 import com.gameplat.admin.model.vo.SpreadUnionVO;
 import com.gameplat.admin.service.SpreadLinkInfoService;
 import com.gameplat.admin.service.SpreadUnionService;
@@ -22,6 +23,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.List;
@@ -64,8 +66,7 @@ public class SpreadUnionServiceImpl extends ServiceImpl<SpreadUnionMapper, Sprea
      */
     @Override
     public IPage<SpreadUnionVO> getUnion(PageDTO<SpreadUnion> page ,SpreadUnionDTO spreadUnionDTO) {
-        LambdaQueryChainWrapper<SpreadUnion> queryChainWrapper = this.lambdaQuery();
-        IPage<SpreadUnionVO> convert = queryChainWrapper
+        IPage<SpreadUnionVO> convert = this.lambdaQuery()
                 .eq(spreadUnionDTO.getUnionName() != null, SpreadUnion::getUnionName, spreadUnionDTO.getUnionName())
                 .eq(spreadUnionDTO.getAgentAccount() != null, SpreadUnion::getAgentAccount, spreadUnionDTO.getAgentAccount())
                 .eq(spreadUnionDTO.getChannel() != null, SpreadUnion::getChannel, spreadUnionDTO.getChannel())
@@ -98,53 +99,11 @@ public class SpreadUnionServiceImpl extends ServiceImpl<SpreadUnionMapper, Sprea
      * 删除联盟设置
      */
     @Override
+    @Transactional
     public void removeUnion(List<Long> id) {
-        this.removeByIds(id);
+        if (!this.removeByIds(id)){
+            throw new ServiceException("删除联盟设置异常");
+        }
     }
 
-    /**
-     * 联盟包设置列表
-     *  检索条件
-     *  代理账号，联盟名称，联运类型
-     */
-    @Override
-    public List<SpreadUnion> getUnionPackage(SpreadUnionPackageDTO spreadUnionPackageDTO) {
-        List<SpreadUnion> list = this.lambdaQuery()
-                .eq(spreadUnionPackageDTO.getAgentAccount() != null, SpreadUnion::getAgentAccount, spreadUnionPackageDTO.getAgentAccount())
-                .eq(spreadUnionPackageDTO.getUnionName() != null, SpreadUnion::getUnionName, spreadUnionPackageDTO.getUnionName())
-                .eq(spreadUnionPackageDTO.getChannel() != null, SpreadUnion::getChannel, spreadUnionPackageDTO.getChannel()).list();
-        return list;
-    }
-
-    /**
-     * 联盟包设置增加
-     */
-    @Override
-    public void insertUnionPackage(SpreadUnionPackageDTO spreadUnionPackageDTO) {
-        this.lambdaUpdate().eq(SpreadUnion::getUnionName,spreadUnionPackageDTO.getUnionName())
-                .set(spreadUnionPackageDTO.getUnionPackageId() != null, SpreadUnion::getUnionPackageId, spreadUnionPackageDTO.getUnionPackageId())
-                .set(spreadUnionPackageDTO.getUnionPackageName() != null, SpreadUnion::getUnionPackageName, spreadUnionPackageDTO.getUnionPackageName())
-                .set(spreadUnionPackageDTO.getUnionPlatform() != null, SpreadUnion::getUnionPlatform, spreadUnionPackageDTO.getUnionPlatform())
-                .set(spreadUnionPackageDTO.getPromotionDomain() != null, SpreadUnion::getPromotionDomain, spreadUnionPackageDTO.getPromotionDomain())
-                .set(spreadUnionPackageDTO.getUnionStatus() != null, SpreadUnion::getUnionStatus , spreadUnionPackageDTO.getUnionStatus())
-                .set(spreadUnionPackageDTO.getIosDownloadUrl() != null, SpreadUnion::getIosDownloadUrl , spreadUnionPackageDTO.getIosDownloadUrl())
-                .set(spreadUnionPackageDTO.getAppDownloadUrl() != null ,SpreadUnion::getAppDownloadUrl ,spreadUnionPackageDTO.getAppDownloadUrl());
-    }
-
-    /**
-     * 联盟包设置修改
-     */
-    @Override
-    public void editUnionPackage(SpreadUnionPackageDTO spreadUnionPackageDTO) {
-
-    }
-
-    /**
-     * 联盟包删除
-     * @param id 编号Id
-     */
-    @Override
-    public void removeUnionPackage(List<Long> id) {
-        this.removeByIds(id);
-    }
 }

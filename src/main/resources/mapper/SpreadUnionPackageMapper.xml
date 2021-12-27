@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gameplat.admin.mapper.SpreadUnionPackageMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.gameplat.admin.model.domain.SpreadUnionPackage">
+        <id column="id" property="id"/>
+        <result column="union_id" property="unionId"/>
+        <result column="union_packageId" property="unionPackageId"/>
+        <result column="union_package_name" property="unionPackageName"/>
+        <result column="union_platform" property="unionPlatform"/>
+        <result column="promotion_domain" property="promotionDomain"/>
+        <result column="ios_download_url" property="iosDownloadUrl"/>
+        <result column="app_download_url" property="appDownloadUrl"/>
+        <result column="union_status" property="unionStatus"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="create_by" property="createBy"/>
+        <result column="update_by" property="updateBy"/>
+    </resultMap>
+
+
+</mapper>

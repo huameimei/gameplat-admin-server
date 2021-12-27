@@ -2,6 +2,7 @@ package com.gameplat.admin.convert;
 
 import com.gameplat.admin.model.domain.SpreadUnion;
 import com.gameplat.admin.model.dto.SpreadUnionDTO;
+import com.gameplat.admin.model.vo.SpreadUnionPackageVO;
 import com.gameplat.admin.model.vo.SpreadUnionVO;
 import org.mapstruct.Mapper;
 
@@ -12,5 +13,8 @@ public interface SpreadUnionConvert {
 
     SpreadUnion toSpreadUnionDTO(SpreadUnionDTO spreadUnion);
 
+
+    // 联运
+    SpreadUnionPackageVO toSpreadUnionPackageVO(SpreadUnion spreadUnion);
 
 }

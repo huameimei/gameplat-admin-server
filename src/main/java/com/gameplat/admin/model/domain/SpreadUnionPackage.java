@@ -11,11 +11,11 @@ import lombok.EqualsAndHashCode;
 import java.io.Serializable;
 import java.util.Date;
 
-@TableName("spread_union")
+@TableName("spread_union_package")
 @Data
 @EqualsAndHashCode(callSuper = false)
-@ApiModel(value = "联运对象", description = "联运设置表")
-public class SpreadUnion implements Serializable {
+@ApiModel(value = "联运包设置", description = "活动表")
+public class SpreadUnionPackage implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -24,14 +24,29 @@ public class SpreadUnion implements Serializable {
     @TableId(type = IdType.AUTO)
     private Long id;
 
-    @ApiModelProperty(value = "联盟名称")
-    private String unionName;
+    @ApiModelProperty(value = "联盟设置编号")
+    private Long unionId;
 
-    @ApiModelProperty(value = "代理账号")
-    private String agentAccount;
+    @ApiModelProperty(value = "联盟包id")
+    private Integer unionPackageId;
 
-    @ApiModelProperty(value = "渠道类型")
-    private String channel;
+    @ApiModelProperty(value = "联盟包名称")
+    private String unionPackageName;
+
+    @ApiModelProperty(value = "联运平台")
+    private String unionPlatform;
+
+    @ApiModelProperty(value = "推广域名")
+    private String promotionDomain;
+
+    @ApiModelProperty(value = "联运专用IOS包下载地址")
+    private String iosDownloadUrl;
+
+    @ApiModelProperty(value = "联运专用安卓包下载地址")
+    private String appDownloadUrl;
+
+    @ApiModelProperty(value = "联运状态")
+    private Integer unionStatus;
 
     @ApiModelProperty(value = "创建时间")
     private Date createTime;

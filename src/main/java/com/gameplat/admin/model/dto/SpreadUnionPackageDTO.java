@@ -13,14 +13,8 @@ public class SpreadUnionPackageDTO implements Serializable {
     @ApiModelProperty(value = "主键")
     private Long id;
 
-    @ApiModelProperty(value = "联盟名称")
-    private String unionName;
-
-    @ApiModelProperty(value = "代理账号")
-    private String agentAccount;
-
-    @ApiModelProperty(value = "渠道类型")
-    private String channel;
+    @ApiModelProperty(value = "联盟设置编号")
+    private Long unionId;
 
     @ApiModelProperty(value = "联盟包id")
     private Integer unionPackageId;
@@ -39,21 +33,6 @@ public class SpreadUnionPackageDTO implements Serializable {
 
     @ApiModelProperty(value = "联运专用安卓包下载地址")
     private String appDownloadUrl;
-
-    @ApiModelProperty(value = "联运状态")
-    private Integer unionStatus;
-
-    @ApiModelProperty(value = "创建时间")
-    private Date createTime;
-
-    @ApiModelProperty(value = "更新时间")
-    private Date updateTime;
-
-    @ApiModelProperty(value = "创建人")
-    private String createBy;
-
-    @ApiModelProperty(value = "更新人")
-    private String updateBy;
 
 
 }

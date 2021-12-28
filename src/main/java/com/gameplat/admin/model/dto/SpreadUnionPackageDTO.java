@@ -9,6 +9,14 @@ import java.util.Date;
 @Data
 public class SpreadUnionPackageDTO implements Serializable {
 
+    @ApiModelProperty(value = "联运名称")
+    private String unionName;
+
+    @ApiModelProperty(value = "渠道类型")
+    private String channel;
+
+    @ApiModelProperty(value = "代理账号")
+    private String agentAccount;
 
     @ApiModelProperty(value = "主键")
     private Long id;
@@ -33,6 +41,9 @@ public class SpreadUnionPackageDTO implements Serializable {
 
     @ApiModelProperty(value = "联运专用安卓包下载地址")
     private String appDownloadUrl;
+
+    @ApiModelProperty(value = "联运状态")
+    private Integer unionStatus;
 
 
 }

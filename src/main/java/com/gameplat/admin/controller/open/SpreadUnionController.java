@@ -87,7 +87,7 @@ public class SpreadUnionController {
     @ApiOperation(value = "联盟包设置删除")
     @PostMapping("/removeUnionPackage")
 //    @PreAuthorize("hasAuthority('spreadUnion:unionpackage:remove')")
-    public void removeUnionPackage(List<Long> id){
-        spreadUnionPackageService.removeUnionPackage(id);
+    public void removeUnionPackage(@RequestParam List<Long> idList){
+        spreadUnionPackageService.removeUnionPackage(idList);
     }
 }

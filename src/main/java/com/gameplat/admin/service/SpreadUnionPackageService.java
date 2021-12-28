@@ -1,14 +1,10 @@
 package com.gameplat.admin.service;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.gameplat.admin.model.domain.SpreadUnion;
 import com.gameplat.admin.model.domain.SpreadUnionPackage;
-import com.gameplat.admin.model.dto.SpreadUnionDTO;
 import com.gameplat.admin.model.dto.SpreadUnionPackageDTO;
 import com.gameplat.admin.model.vo.SpreadUnionPackageVO;
-import com.gameplat.admin.model.vo.SpreadUnionVO;
 
 import java.util.List;
 

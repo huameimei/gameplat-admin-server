@@ -9,14 +9,17 @@ import java.util.Date;
 @Data
 public class SpreadUnionPackageVO implements Serializable {
 
+    @ApiModelProperty(value = "联盟名称")
+    private String unionName;
 
-    private static final long serialVersionUID = 1L;
+    @ApiModelProperty(value = "代理账号")
+    private String agentAccount;
+
+    @ApiModelProperty(value = "渠道类型")
+    private String channel;
 
     @ApiModelProperty(value = "主键")
     private Long id;
-
-    @ApiModelProperty(value = "联盟设置编号")
-    private Long unionId;
 
     @ApiModelProperty(value = "联盟包id")
     private Integer unionPackageId;

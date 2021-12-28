@@ -53,7 +53,8 @@ public class SpreadUnionPackageServiceImpl extends ServiceImpl<SpreadUnionPackag
      */
     @Override
     public List<SpreadUnionPackageVO> getUnionPackage(PageDTO<SpreadUnionPackage> page ,SpreadUnionPackageDTO spreadUnionPackageDTO) {
-        return null;
+        List<SpreadUnionPackageVO> unionPackage = spreadUnionPackageMapper.getUnionPackage(spreadUnionPackageDTO);
+        return unionPackage;
     }
 
     /**
@@ -61,6 +62,10 @@ public class SpreadUnionPackageServiceImpl extends ServiceImpl<SpreadUnionPackag
      */
     @Override
     public void insertUnionPackage(SpreadUnionPackageDTO spreadUnionPackageDTO) {
+        if (!this.save(spreadUnionConvert.toSpreadUnionPackageDTO(spreadUnionPackageDTO))){
+            log.error("增加联盟包设置失败,传入的参数 {}",spreadUnionPackageDTO);
+            throw new ServiceException("增加联盟包设置失败");
+        }
     }
 
     /**
@@ -68,7 +73,19 @@ public class SpreadUnionPackageServiceImpl extends ServiceImpl<SpreadUnionPackag
      */
     @Override
     public void editUnionPackage(SpreadUnionPackageDTO spreadUnionPackageDTO) {
-
+        if (!this.lambdaUpdate()
+                .set(spreadUnionPackageDTO.getUnionId() != null, SpreadUnionPackage::getUnionId, spreadUnionPackageDTO.getUnionId())
+                .set(spreadUnionPackageDTO.getUnionPackageId() != null, SpreadUnionPackage::getUnionPackageId, spreadUnionPackageDTO.getUnionPackageId())
+                .set(spreadUnionPackageDTO.getUnionPackageName() != null, SpreadUnionPackage::getUnionPackageName, spreadUnionPackageDTO.getUnionPackageName())
+                .set(spreadUnionPackageDTO.getUnionPlatform() != null, SpreadUnionPackage::getUnionPlatform, spreadUnionPackageDTO.getUnionPlatform())
+                .set(spreadUnionPackageDTO.getUnionStatus() != null, SpreadUnionPackage::getUnionStatus, spreadUnionPackageDTO.getUnionStatus())
+                .set(spreadUnionPackageDTO.getIosDownloadUrl() != null, SpreadUnionPackage::getIosDownloadUrl, spreadUnionPackageDTO.getIosDownloadUrl())
+                .set(spreadUnionPackageDTO.getAppDownloadUrl() != null, SpreadUnionPackage::getAppDownloadUrl, spreadUnionPackageDTO.getAppDownloadUrl())
+                .eq(SpreadUnionPackage::getId,spreadUnionPackageDTO.getId())
+                .update()){
+            log.error("联盟包设置修改失败 ，传入的参数 {}",spreadUnionPackageDTO);
+            throw new ServiceException("联盟包设置修改失败，请联系管理员");
+        }
     }
 
     /**
@@ -77,7 +94,10 @@ public class SpreadUnionPackageServiceImpl extends ServiceImpl<SpreadUnionPackag
      */
     @Override
     public void removeUnionPackage(List<Long> id) {
-        this.removeByIds(id);
+        if (!this.removeByIds(id)){
+            log.error("联盟包删除失败,传入的id集合是  {} ",id);
+            throw  new ServiceException("联盟包设置删除失败，请联系管理员");
+        }
     }
 
 

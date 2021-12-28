@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gameplat.admin.mapper.MemberStatusMapper">
+
+    <select id="findStatisticsList" resultType="com.gameplat.admin.model.vo.IpStatisticsVO">
+        SELECT
+        t.login_ip loginIp,
+        t.frequency frequency
+        FROM
+        ( SELECT
+            login_ip,
+            count( * ) frequency,
+            ms.create_time,
+            ms.`type`
+            FROM member_status as ms
+            left join member as m on ms.member_id = m.id
+        <where>
+            m.user_type in ('M','A')
+            <if test="beginTime != null and beginTime != ''">
+                and date_format(ms.create_time,'%y%m%d') &gt;= date_format(#{beginTime},'%y%m%d')
+            </if>
+            <if test="endTime != null and endTime != ''">
+                and date_format(ms.create_time,'%y%m%d') &lt;= date_format(#{endTime},'%y%m%d')
+            </if>
+        </where>
+        GROUP BY login_ip,`type`) t
+        <where>
+            <if test="loginIp != null and loginIp != '' ">
+                and t.login_ip=#{loginIp}
+            </if>
+            <if test="frequency != null and frequency != ''">
+                and t.frequency>=#{frequency}
+            </if>
+            <if test="type != null and type != ''">
+                and t.type=#{type}
+            </if>
+        </where>
+    </select>
+</mapper>

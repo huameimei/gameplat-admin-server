@@ -40,4 +40,10 @@ public class ProFileVo {
    */
   private Date createTime;
 
+  private String userLevel;
+
+  private String limitInfo;
+
+  private String userType;
+
 }

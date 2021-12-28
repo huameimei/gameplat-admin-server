@@ -83,4 +83,7 @@ public class SysUser implements Serializable {
   /** 角色组 */
   @TableField(exist = false)
   private Long[] roleIds;
+
+  /** 用户层级 */
+  private String userLevel;
 }

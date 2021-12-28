@@ -70,6 +70,9 @@ public class UserCenterService {
     userVo.setIsChange(user.getChangeFlag());
     userVo.setPermis(permisList);
     userVo.setSetting(user.getSettings());
+    userVo.setUserLevel(user.getUserLevel());
+    userVo.setLimitInfo(user.getLimitInfo());
+    userVo.setUserType(user.getUserType());
     return userVo;
   }
 

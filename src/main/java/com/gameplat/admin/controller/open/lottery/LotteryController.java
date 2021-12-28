@@ -63,7 +63,7 @@ public class LotteryController {
     if (bodyObject.getInt("code") == HttpStatus.HTTP_OK) {
       return Result.succeedData(bodyObject.getObj("data"));
     }else{
-      return Result.failed();
+      return Result.failed(bodyObject.getStr("msg"));
     }
   }
 }

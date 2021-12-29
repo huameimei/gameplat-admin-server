@@ -25,6 +25,7 @@
       su.union_name unionName,
       su.agent_account agentAccount,
       su.channel,
+      su.id unionId,
       sup.id,
       sup.union_package_id unionPackageId,
       sup.union_package_name unionPackageName,

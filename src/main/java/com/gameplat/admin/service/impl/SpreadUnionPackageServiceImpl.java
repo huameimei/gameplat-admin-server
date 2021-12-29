@@ -84,6 +84,7 @@ public class SpreadUnionPackageServiceImpl extends ServiceImpl<SpreadUnionPackag
                 .set(spreadUnionPackageDTO.getUnionStatus() != null, SpreadUnionPackage::getUnionStatus, spreadUnionPackageDTO.getUnionStatus())
                 .set(spreadUnionPackageDTO.getIosDownloadUrl() != null, SpreadUnionPackage::getIosDownloadUrl, spreadUnionPackageDTO.getIosDownloadUrl())
                 .set(spreadUnionPackageDTO.getAppDownloadUrl() != null, SpreadUnionPackage::getAppDownloadUrl, spreadUnionPackageDTO.getAppDownloadUrl())
+                .set(spreadUnionPackageDTO.getPromotionDomain() != null, SpreadUnionPackage::getPromotionDomain, spreadUnionPackageDTO.getPromotionDomain())
                 .eq(SpreadUnionPackage::getId,spreadUnionPackageDTO.getId())
                 .update()){
             log.error("联盟包设置修改失败 ，传入的参数 {}",spreadUnionPackageDTO);

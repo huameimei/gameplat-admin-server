@@ -18,6 +18,9 @@ public class SpreadUnionPackageVO implements Serializable {
     @ApiModelProperty(value = "渠道类型")
     private String channel;
 
+    @ApiModelProperty(value = "联盟Id")
+    private Long unionId;
+
     @ApiModelProperty(value = "主键")
     private Long id;
 

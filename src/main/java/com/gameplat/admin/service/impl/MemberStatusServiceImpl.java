@@ -34,7 +34,7 @@ public class MemberStatusServiceImpl extends ServiceImpl<MemberStatusMapper, Mem
     }
 
     @Override
-    public List<IpAnalysisVO> findipAnalysisList(IpAnalysisDTO ipAnalysisDTO) {
-        return memberStatusMapper.findipAnalysisList(ipAnalysisDTO);
+    public List<IpAnalysisVO> findIpAnalysisList(IpAnalysisDTO ipAnalysisDTO) {
+        return memberStatusMapper.findIpAnalysisList(ipAnalysisDTO);
     }
 }

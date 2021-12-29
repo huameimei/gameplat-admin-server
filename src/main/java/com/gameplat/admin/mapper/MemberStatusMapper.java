@@ -18,5 +18,5 @@ public interface MemberStatusMapper extends BaseMapper<MemberStatus> {
     List<IpStatisticsVO> findStatisticsList(IpStatisticsDTO ipStatisticsDTO);
 
     /** 会员ip分析 */
-    List<IpAnalysisVO> findipAnalysisList(IpAnalysisDTO ipAnalysisDTO);
+    List<IpAnalysisVO> findIpAnalysisList(IpAnalysisDTO ipAnalysisDTO);
 }

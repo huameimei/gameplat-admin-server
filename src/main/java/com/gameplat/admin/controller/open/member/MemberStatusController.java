@@ -38,7 +38,7 @@ public class MemberStatusController {
 
     @ApiOperation(value = "ip分析列表")
     @GetMapping("/ip_analysis")
-    public List<IpAnalysisVO> findipAnalysisList(IpAnalysisDTO ipAnalysisDTO){
-       return memberStatusService.findipAnalysisList(ipAnalysisDTO);
+    public List<IpAnalysisVO> findIpAnalysisList(IpAnalysisDTO ipAnalysisDTO){
+       return memberStatusService.findIpAnalysisList(ipAnalysisDTO);
     }
 }

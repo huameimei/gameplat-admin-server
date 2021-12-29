@@ -13,5 +13,5 @@ public interface MemberStatusService extends IService<MemberStatus> {
 
     List<IpStatisticsVO> findStatisticsList(IpStatisticsDTO ipStatisticsDTO);
 
-    List<IpAnalysisVO> findipAnalysisList(IpAnalysisDTO ipAnalysisDTO);
+    List<IpAnalysisVO> findIpAnalysisList(IpAnalysisDTO ipAnalysisDTO);
 }

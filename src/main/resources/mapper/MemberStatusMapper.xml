@@ -39,7 +39,7 @@
     </select>
 
     <!--  会员ip分析  -->
-    <select id="findipAnalysisList" resultType="com.gameplat.admin.model.vo.IpAnalysisVO">
+    <select id="findIpAnalysisList" resultType="com.gameplat.admin.model.vo.IpAnalysisVO">
         SELECT
         st.member_id as userId,
         su.account username,

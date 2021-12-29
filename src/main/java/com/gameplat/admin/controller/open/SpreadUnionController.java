@@ -66,7 +66,7 @@ public class SpreadUnionController {
     @ApiOperation(value = "联盟包设置列表")
     @GetMapping("/getUnionPackage")
 //    @PreAuthorize("hasAuthority('spreadUnion:unionpackage:lsit')")
-    public List<SpreadUnionPackageVO> getUnionPackage(@ApiIgnore PageDTO<SpreadUnionPackage> page , @RequestBody SpreadUnionPackageDTO spreadUnionPackageDTO){
+    public List<SpreadUnionPackageVO> getUnionPackage(@ApiIgnore PageDTO<SpreadUnionPackage> page , SpreadUnionPackageDTO spreadUnionPackageDTO){
        return spreadUnionPackageService.getUnionPackage(page, spreadUnionPackageDTO);
     }
 
@@ -87,7 +87,7 @@ public class SpreadUnionController {
     @ApiOperation(value = "联盟包设置删除")
     @DeleteMapping("/removeUnionPackage")
 //    @PreAuthorize("hasAuthority('spreadUnion:unionpackage:remove')")
-    public void removeUnionPackage(List<Long> idList){
+    public void removeUnionPackage(@RequestBody List<Long> idList){
         spreadUnionPackageService.removeUnionPackage(idList);
     }
 }

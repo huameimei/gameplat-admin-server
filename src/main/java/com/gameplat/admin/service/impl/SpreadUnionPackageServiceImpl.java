@@ -113,7 +113,10 @@ public class SpreadUnionPackageServiceImpl extends ServiceImpl<SpreadUnionPackag
     public void removeByUnionId(List<Long> unionId) {
         LambdaQueryWrapper<SpreadUnionPackage> query = Wrappers.lambdaQuery();
         query.in(SpreadUnionPackage::getUnionId,unionId);
-        if (!this.remove(query)){
+        try{
+            this.remove(query);
+        }catch (Exception e){
+            log.error("联盟包删除失败,异常信息 {}",e);
             throw new  ServiceException("删除失败");
         }
     }

@@ -57,7 +57,7 @@ public class SpreadUnionController {
     @ApiOperation(value = "联盟删除")
     @DeleteMapping("/removeUnion")
 //    @PreAuthorize("hasAuthority('spreadUnion:blacklist:remove')")
-    public void removeUnion(@RequestBody List<Long> idList){
+    public void removeUnion(@RequestBody List<Long> idList ){
         spreadUnionPackageService.removeByUnionId(idList);
         spreadUnionService.removeUnion(idList);
     }

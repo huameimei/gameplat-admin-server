@@ -33,7 +33,7 @@ public class SpreadUnionController {
     @ApiOperation(value = "联盟增加")
     @PostMapping("/creatUnion")
 //    @PreAuthorize("hasAuthority('spreadUnion:union:create')")
-    public void creatUnion(SpreadUnionDTO spreadUnionDTO){
+    public void creatUnion(@RequestBody  SpreadUnionDTO spreadUnionDTO){
         spreadUnionService.creatUnion(spreadUnionDTO);
     }
 
@@ -49,15 +49,15 @@ public class SpreadUnionController {
     @ApiOperation(value = "联盟修改")
     @PostMapping("/editUnion")
 //    @PreAuthorize("hasAuthority('spreadUnion:union:edit')")
-    public void editUnion(SpreadUnionDTO spreadUnionDTO){
+    public void editUnion(@RequestBody SpreadUnionDTO spreadUnionDTO){
         spreadUnionService.editUnion(spreadUnionDTO);
     }
 
 
     @ApiOperation(value = "联盟删除")
-    @PostMapping("/removeUnion")
+    @DeleteMapping("/removeUnion")
 //    @PreAuthorize("hasAuthority('spreadUnion:blacklist:remove')")
-    public void removeUnion(@RequestParam List<Long> idList){
+    public void removeUnion(@RequestBody List<Long> idList){
         spreadUnionPackageService.removeByUnionId(idList);
         spreadUnionService.removeUnion(idList);
     }
@@ -66,28 +66,28 @@ public class SpreadUnionController {
     @ApiOperation(value = "联盟包设置列表")
     @GetMapping("/getUnionPackage")
 //    @PreAuthorize("hasAuthority('spreadUnion:unionpackage:lsit')")
-    public List<SpreadUnionPackageVO> getUnionPackage(@ApiIgnore PageDTO<SpreadUnionPackage> page , SpreadUnionPackageDTO spreadUnionPackageDTO){
+    public List<SpreadUnionPackageVO> getUnionPackage(@ApiIgnore PageDTO<SpreadUnionPackage> page , @RequestBody SpreadUnionPackageDTO spreadUnionPackageDTO){
        return spreadUnionPackageService.getUnionPackage(page, spreadUnionPackageDTO);
     }
 
     @ApiOperation(value = "联盟包设置增加")
     @PostMapping("/insertUnionPackage")
 //    @PreAuthorize("hasAuthority('spreadUnion:unionpackage:add')")
-    public void insertUnionPackage(SpreadUnionPackageDTO spreadUnionPackageDTO){
+    public void insertUnionPackage(@RequestBody SpreadUnionPackageDTO spreadUnionPackageDTO){
         spreadUnionPackageService.insertUnionPackage(spreadUnionPackageDTO);
     }
 
     @ApiOperation(value = "联盟包设置修改")
     @PostMapping("/editUnionPackage")
 //    @PreAuthorize("hasAuthority('spreadUnion:unionpackage:edit')")
-    public void editUnionPackage(SpreadUnionPackageDTO spreadUnionPackageDTO){
+    public void editUnionPackage(@RequestBody SpreadUnionPackageDTO spreadUnionPackageDTO){
         spreadUnionPackageService.editUnionPackage(spreadUnionPackageDTO);
     }
 
     @ApiOperation(value = "联盟包设置删除")
-    @PostMapping("/removeUnionPackage")
+    @DeleteMapping("/removeUnionPackage")
 //    @PreAuthorize("hasAuthority('spreadUnion:unionpackage:remove')")
-    public void removeUnionPackage(@RequestParam List<Long> idList){
+    public void removeUnionPackage(List<Long> idList){
         spreadUnionPackageService.removeUnionPackage(idList);
     }
 }

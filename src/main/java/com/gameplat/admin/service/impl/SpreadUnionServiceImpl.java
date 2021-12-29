@@ -51,7 +51,7 @@ public class SpreadUnionServiceImpl extends ServiceImpl<SpreadUnionMapper, Sprea
     public void creatUnion(SpreadUnionDTO spreadUnionDTO) {
         List<SpreadLinkInfo> spreadList = spreadLinkInfoService.getSpreadList(spreadUnionDTO.getAgentAccount());
         if (spreadList.size() == 0){
-            throw new ServiceException("未获取道相关设置的代理，请先进行代理设置");
+            throw new ServiceException("未获取到您需要绑定的代理信息");
         }
         if(!this.save(spreadUnionConvert.toSpreadUnionDTO(spreadUnionDTO))) {
             log.error("新建联运设置参数信息  spreadUnionDTO：{}",spreadUnionDTO);
@@ -82,7 +82,7 @@ public class SpreadUnionServiceImpl extends ServiceImpl<SpreadUnionMapper, Sprea
         List<SpreadLinkInfo> spreadList = spreadLinkInfoService.getSpreadList(spreadUnionDTO.getAgentAccount());
         if (spreadList.size() == 0){
             log.info("查询代理相关信息 参数 {}，返回结果：{}",spreadUnionDTO.getAgentAccount() , spreadList);
-            throw new ServiceException("未获取道相关设置的代理，请先进行代理设置");
+            throw new ServiceException("未获取到您需要绑定的代理信息");
         }
 
         if(!this.lambdaUpdate()

@@ -1,13 +1,16 @@
 package com.gameplat.admin.service.impl;
 
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.convert.SpreadUnionConvert;
 import com.gameplat.admin.mapper.SpreadUnionMapper;
 import com.gameplat.admin.mapper.SpreadUnionPackageMapper;
+import com.gameplat.admin.model.domain.PayAccount;
 import com.gameplat.admin.model.domain.SpreadLinkInfo;
 import com.gameplat.admin.model.domain.SpreadUnion;
 import com.gameplat.admin.model.domain.SpreadUnionPackage;
@@ -108,9 +111,9 @@ public class SpreadUnionPackageServiceImpl extends ServiceImpl<SpreadUnionPackag
     @Override
     @Transactional
     public void removeByUnionId(List<Long> unionId) {
-        LambdaQueryChainWrapper<SpreadUnionPackage> spreadUnionPackageLambdaQueryChainWrapper = this.lambdaQuery();
-        spreadUnionPackageLambdaQueryChainWrapper.in(SpreadUnionPackage::getUnionId,unionId);
-        if (!this.remove(spreadUnionPackageLambdaQueryChainWrapper)){
+        LambdaQueryWrapper<SpreadUnionPackage> query = Wrappers.lambdaQuery();
+        query.in(SpreadUnionPackage::getUnionId,unionId);
+        if (!this.remove(query)){
             throw new  ServiceException("删除失败");
         }
     }

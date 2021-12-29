@@ -1,6 +1,8 @@
 package com.gameplat.admin.controller.open.member;
 
+import com.gameplat.admin.model.dto.IpAnalysisDTO;
 import com.gameplat.admin.model.dto.IpStatisticsDTO;
+import com.gameplat.admin.model.vo.IpAnalysisVO;
 import com.gameplat.admin.model.vo.IpStatisticsVO;
 import com.gameplat.admin.service.MemberStatusService;
 import io.swagger.annotations.ApiOperation;
@@ -32,5 +34,11 @@ public class MemberStatusController {
     @GetMapping("/ip_statistics")
     public List<IpStatisticsVO> findStatisticsList(IpStatisticsDTO ipStatisticsDTO){
         return memberStatusService.findStatisticsList(ipStatisticsDTO);
+    }
+
+    @ApiOperation(value = "ip分析列表")
+    @GetMapping("/ip_analysis")
+    public List<IpAnalysisVO> findipAnalysisList(IpAnalysisDTO ipAnalysisDTO){
+       return memberStatusService.findipAnalysisList(ipAnalysisDTO);
     }
 }

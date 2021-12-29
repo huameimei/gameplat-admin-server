@@ -3,7 +3,9 @@ package com.gameplat.admin.service.impl;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.mapper.MemberStatusMapper;
 import com.gameplat.admin.model.domain.MemberStatus;
+import com.gameplat.admin.model.dto.IpAnalysisDTO;
 import com.gameplat.admin.model.dto.IpStatisticsDTO;
+import com.gameplat.admin.model.vo.IpAnalysisVO;
 import com.gameplat.admin.model.vo.IpStatisticsVO;
 import com.gameplat.admin.service.MemberStatusService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,5 +31,10 @@ public class MemberStatusServiceImpl extends ServiceImpl<MemberStatusMapper, Mem
     @Override
     public List<IpStatisticsVO> findStatisticsList(IpStatisticsDTO ipStatisticsDTO) {
         return memberStatusMapper.findStatisticsList(ipStatisticsDTO);
+    }
+
+    @Override
+    public List<IpAnalysisVO> findipAnalysisList(IpAnalysisDTO ipAnalysisDTO) {
+        return memberStatusMapper.findipAnalysisList(ipAnalysisDTO);
     }
 }

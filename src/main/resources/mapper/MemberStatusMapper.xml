@@ -2,6 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.gameplat.admin.mapper.MemberStatusMapper">
 
+    <!--  会员ip统计  -->
     <select id="findStatisticsList" resultType="com.gameplat.admin.model.vo.IpStatisticsVO">
         SELECT
         t.login_ip loginIp,
@@ -36,4 +37,49 @@
             </if>
         </where>
     </select>
+
+    <!--  会员ip分析  -->
+    <select id="findipAnalysisList" resultType="com.gameplat.admin.model.vo.IpAnalysisVO">
+        SELECT
+        st.member_id as userId,
+        su.account username,
+        st.login_ip as loginIp,
+        st.login_address as loginAddress,
+        count(st.login_ip) as loginTime,
+        (select offline from member_status st_c
+        WHERE st_c.member_id = st.member_id
+        <if test="beginTime != null and beginTime != ''">
+            and st_c.create_time &gt;= #{beginTime}
+        </if>
+        <if test="endTime != null and endTime != ''">
+            and st_c.create_time &lt;= #{endTime}
+        </if>
+        ORDER BY st_c.id desc
+        limit 1
+        ) as offline
+        from member_status st
+        left JOIN member su on st.member_id = su.id
+        where
+        su.user_type IN ( 'M', 'A' )
+        <if test="username != null and username != ''">
+            and su.account=#{username}
+        </if>
+        <if test="loginIp != null and loginIp != '' ">
+            and st.login_ip = #{loginIp}
+        </if>
+        <if test="type != null">
+            and st.type = #{type}
+        </if>
+        <if test="beginTime != null and beginTime != ''">
+            and st.create_time &gt;= #{beginTime}
+        </if>
+        <if test="endTime != null and endTime != ''">
+            and st.create_time &lt;= #{endTime}
+        </if>
+        GROUP BY st.member_id,st.login_ip
+        HAVING loginTime > 0
+        order by st.id desc
+    </select>
+
+
 </mapper>

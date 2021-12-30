@@ -6,6 +6,8 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.gameplat.admin.util.Date2LongSerializerUtils;
 import io.swagger.annotations.ApiModelProperty;
 import java.util.Date;
 import lombok.Data;
@@ -54,6 +56,7 @@ public class PayType {
   @TableField(fill = FieldFill.INSERT)
   @ApiModelProperty(value = "创建时间")
   @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+  @JsonSerialize(using = Date2LongSerializerUtils.class)
   private Date createTime;
 
   /**
@@ -69,5 +72,6 @@ public class PayType {
   @TableField(fill = FieldFill.INSERT_UPDATE)
   @ApiModelProperty(value = "更新时间")
   @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+  @JsonSerialize(using = Date2LongSerializerUtils.class)
   private Date updateTime;
 }

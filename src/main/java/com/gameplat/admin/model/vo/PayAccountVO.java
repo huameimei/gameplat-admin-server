@@ -2,6 +2,8 @@ package com.gameplat.admin.model.vo;
 
 import com.baomidou.mybatisplus.extension.activerecord.Model;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.gameplat.admin.util.Date2LongSerializerUtils;
 import io.swagger.annotations.ApiModelProperty;
 import java.math.BigDecimal;
 import java.util.Date;
@@ -95,6 +97,7 @@ public class PayAccountVO extends Model<PayAccountVO> {
    */
   @ApiModelProperty(value = "创建时间")
   @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+  @JsonSerialize(using = Date2LongSerializerUtils.class)
   private Date createTime;
 
   /**
@@ -108,5 +111,6 @@ public class PayAccountVO extends Model<PayAccountVO> {
    */
   @ApiModelProperty(value = "更新时间")
   @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+  @JsonSerialize(using = Date2LongSerializerUtils.class)
   private Date updateTime;
 }

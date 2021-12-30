@@ -1,6 +1,9 @@
 package com.gameplat.admin.model.vo;
 
 import java.util.Date;
+
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.gameplat.admin.util.Date2LongSerializerUtils;
 import lombok.Data;
 
 /**
@@ -17,6 +20,7 @@ public class DictDataVo {
     private String dictLabel;
     private String dictValue;
     private Integer status;
+    @JsonSerialize(using = Date2LongSerializerUtils.class)
     private Date createTime;
     private String remark;
     private Integer dictSort;

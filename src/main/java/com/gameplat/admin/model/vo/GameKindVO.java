@@ -34,6 +34,11 @@ public class GameKindVO implements Serializable {
   private Integer hot;
 
   /**
+   * 是否有下级游戏(0：否；1:是)
+   */
+  private Integer subLevel;
+
+  /**
    * 排序
    */
   private Integer sort;

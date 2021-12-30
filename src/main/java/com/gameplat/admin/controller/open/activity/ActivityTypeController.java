@@ -182,7 +182,7 @@ public class ActivityTypeController {
             throw new ServiceException("语言language参数不能为空");
         }
         String activityTypeConfig = configService.getValue(DictDataEnum.ACTIVITY_TYPE_CONFIG);
-        if (StringUtils.isNotEmpty(activityTypeConfig)) {
+        if (StringUtils.isEmpty(activityTypeConfig)) {
             throw new ServiceException("活动板块类型配置信息不存在");
         }
 

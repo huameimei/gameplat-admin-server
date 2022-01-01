@@ -7,7 +7,10 @@ import com.gameplat.admin.model.domain.Member;
 import com.gameplat.admin.model.domain.MemberBill;
 import com.gameplat.admin.model.dto.MemberBillDTO;
 import com.gameplat.admin.model.vo.MemberBillVO;
+import com.gameplat.common.model.bean.TranTypeBean;
+
 import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 
 public interface MemberBillService extends IService<MemberBill> {
 
@@ -18,4 +21,6 @@ public interface MemberBillService extends IService<MemberBill> {
   void exportList(MemberBillDTO dto, HttpServletResponse response);
 
   MemberBill queryLiveBill(Long id, String orderNo, int transType);
+
+  List<TranTypeBean> findTranTypes();
 }

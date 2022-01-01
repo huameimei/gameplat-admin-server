@@ -23,6 +23,9 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import javax.servlet.http.HttpServletResponse;
+
+import com.gameplat.common.enums.TranTypes;
+import com.gameplat.common.model.bean.TranTypeBean;
 import lombok.Cleanup;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,6 +51,11 @@ public class MemberBillServiceImpl extends ServiceImpl<MemberBillMapper, MemberB
     this.save(memberBill);
   }
 
+  @Override
+  public List<TranTypeBean> findTranTypes(){
+    List<TranTypeBean> allTranList = TranTypes.getAllTranList();
+    return allTranList;
+  }
   @Override
   public IPage<MemberBillVO> findMemberBilllist(PageDTO<MemberBill> page, MemberBillDTO dto) {
 

@@ -19,4 +19,6 @@ public class PayTypeVO extends Model<PayTypeVO> {
     private String url;
 
     private String onlinePayEnabled;
+
+    private String status;
 }

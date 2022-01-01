@@ -21,7 +21,7 @@ public interface RechargeConfigService extends IService<RechargeConfig> {
    *
    * @return List
    */
-  List<RechargeConfig> queryAll();
+  List<RechargeConfig> queryAll(Integer memberLevel);
 
 
 }

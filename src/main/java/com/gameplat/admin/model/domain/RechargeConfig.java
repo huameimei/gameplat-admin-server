@@ -77,11 +77,6 @@ public class RechargeConfig implements Serializable {
   @NotNull
   private Integer validateCodeEnabled;
 
-  /**
-   * 取消入款后是否限制入款 0 - 否, 1 - 是
-   */
-  private Integer disableAfterCancelled;
-
   // 风控金额
   private String riskMoney;
 
@@ -116,5 +111,9 @@ public class RechargeConfig implements Serializable {
   // 首充充值优惠上限
   @Min(0)
   private BigDecimal firstRechargeDiscountMaxAmount;
+
+  private Integer memberLevel;
+
+  private Integer status;
 
 }

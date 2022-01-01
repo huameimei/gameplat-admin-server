@@ -289,8 +289,6 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
       if (WithdrawStatus.SUCCESS.getValue() == cashStatus) {
         // 扣除会员余额
         memberInfoService.updateBalance(member.getId(), memberWithdraw.getCashMoney().negate());
-        // 更新充提报表,如果是推广账户不进入报表
-        // TODO: 2021/11/2  未完成
         // 删除出款验证打码量记录的数据
         validWithdrawService.remove(memberWithdraw.getMemberId(), memberWithdraw.getCreateTime());
         // 免提直充
@@ -315,16 +313,6 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
         bill.setContent(billContent);
         bill.setOperator(userCredential.getUsername());
         memberBillService.save(member, bill);
-        //        if (isPush) {
-        //          String content = String.format("您于%s提交的取现订单被取消，订单号为%s",
-        //              DateUtil.getDateToString(userWithdraw.getAddTime(),
-        // DateUtil.YYYY_MM_DD_HH_MM_SS),
-        //              userWithdraw.getCashOrderNo());
-        //          if (StringUtil.isNotBlank(userWithdraw.getApproveReason())) {
-        //            content += String.format(",取消原因:%s", userWithdraw.getApproveReason());
-        //          }
-        //          pushMessageService.saveByCashier(userWithdraw.getUserId(), content);
-        //        }
       } else if (WithdrawStatus.REFUSE.getValue() == cashStatus) {
         String content = String.format("您于%s提交的取现订单被没收，订单号为%s，金额：%s",
             DateUtil.getDateToString(memberWithdraw.getCreateTime(),
@@ -339,13 +327,9 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
         bill.setContent(content);
         bill.setOperator(userCredential.getUsername());
         memberBillService.save(member, bill);
-        //        if (isPush) {
-        //          pushMessageService.saveByCashier(userWithdraw.getUserId(), content);
-        //        }
       }
       // 新增出款记录
       insertWithdrawHistory(memberWithdraw);
-      //    }
     }
   }
 
@@ -711,9 +695,6 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
             memberWithdraw.getCashOrderNo(), memberWithdraw.getAccount());
         return;
       }
-
-      // 充值添加成长值
-
     }
   }
 

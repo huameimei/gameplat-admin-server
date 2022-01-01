@@ -40,7 +40,7 @@ public interface PayTypeService extends IService<PayType> {
    *
    * @return List
    */
-  List<PayTypeVO> queryList();
+  List<PayTypeVO> queryList(String name,Integer status);
 
   /**
    * 支付方式列表

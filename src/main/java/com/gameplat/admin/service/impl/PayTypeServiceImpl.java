@@ -3,6 +3,7 @@ package com.gameplat.admin.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -32,8 +33,10 @@ public class PayTypeServiceImpl extends ServiceImpl<PayTypeMapper, PayType>
   @Autowired private PayTypeMapper payTypeMapper;
 
   @Override
-  public List<PayTypeVO> queryList() {
-    return this.list().stream().map(e -> payTypeConvert.toVo(e)).collect(Collectors.toList());
+  public List<PayTypeVO> queryList(String name,Integer status) {
+    return this.lambdaQuery().eq(ObjectUtils.isNotEmpty(status),PayType::getStatus,status)
+        .eq(ObjectUtils.isNotEmpty(name),PayType::getName,name)
+        .list().stream().map(e -> payTypeConvert.toVo(e)).collect(Collectors.toList());
   }
 
   @Override
@@ -85,6 +88,7 @@ public class PayTypeServiceImpl extends ServiceImpl<PayTypeMapper, PayType>
     }
     this.removeById(id);
   }
+
 
   @Override
   public IPage<PayType> queryPage(Page<PayType> page) {

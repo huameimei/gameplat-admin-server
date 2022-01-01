@@ -22,6 +22,7 @@
     <result property="orderRemarkStatus" column="order_remark_status"/>
     <result property="limitInfo" column="limit_info"/>
     <result property="handleTip" column="handle_tip"/>
+    <result property="url" column="url"/>
     <result property="createBy" column="create_by"/>
     <result property="createTime" column="create_time"/>
     <result property="updateBy" column="update_by"/>
@@ -57,7 +58,7 @@
   <select id="findPayAccountPage" resultMap="PayAccountVOMap">
     SELECT id,name,account,owner,pay_type,bank_name,bank_address,qr_code,member_levels,remarks,
     sort,status,recharge_times,recharge_amount,order_remark,order_remark_status,limit_info,
-    handle_tip,create_by,create_time,update_by,update_time,email_address,type_subscript
+    handle_tip,create_by,create_time,update_by,update_time,email_address,type_subscript,url
     FROM pay_account
     <include refid="where"/>
     ORDER BY sort ASC

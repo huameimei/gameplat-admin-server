@@ -23,14 +23,8 @@ public class MemberBankEditDTO implements Serializable {
   @Length(max = 100, message = "银行名称不能超过100个字符")
   private String cardNo;
 
-  @Length(max = 100, message = "银所属省份不能超过100个字符")
-  private String province;
-
-  @Length(max = 100, message = "所属市县不能超过100个字符")
-  private String city;
-
   @Length(max = 100, message = "银行地址不能超过100个字符")
-  private String subAddress;
+  private String address;
 
   @NotEmpty(message = "币种不能为空")
   private String currency;

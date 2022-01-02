@@ -22,13 +22,9 @@ public class MemberBank {
 
   private String bankName;
 
-  private String subAddress;
+  private String address;
 
   private String cardNo;
-
-  private String province;
-
-  private String city;
 
   private String type;
 

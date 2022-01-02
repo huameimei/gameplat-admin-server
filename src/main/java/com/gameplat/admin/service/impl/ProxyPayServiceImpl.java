@@ -211,7 +211,7 @@ public class ProxyPayServiceImpl implements ProxyPayService {
         memberWithdrawService.lambdaQuery().eq(MemberWithdraw::getCashOrderNo, orderNo).one();
     /** 校验体现订单信息 */
     if (memberWithdraw == null) {
-      throw new ServiceException("UW/ORDER_NULL, 充值订单不存在或订单已处理", null);
+      throw new ServiceException("充值订单不存在或订单已处理");
     }
     String beanName = getProxyInterfaceCode(memberWithdraw);
     ProxyCallbackContext proxyCallbackContext = getProxyCallbackContent(memberWithdraw);
@@ -239,7 +239,7 @@ public class ProxyPayServiceImpl implements ProxyPayService {
 
     Member info = memberService.getById(memberWithdraw.getMemberId());
     if (info == null) {
-      throw new ServiceException("UC/EXT_INFO_NULL, 用户不存在", null);
+      throw new ServiceException("用户不存在");
     }
 
     int orignCashStatus = memberWithdraw.getCashStatus();
@@ -475,7 +475,7 @@ public class ProxyPayServiceImpl implements ProxyPayService {
               + memberWithdraw.toString()
               + ",origCashStatus="
               + memberWithdraw.getCashStatus());
-      throw new ServiceException("UW/UPDATE_ERROR, 订单已处理", null);
+      throw new ServiceException("订单已处理");
     }
     // 更新会员信息表
     memberInfoService.updateBalanceWithWithdraw(memberWithdraw.getMemberId(), memberWithdraw.getCashMoney());
@@ -511,7 +511,7 @@ public class ProxyPayServiceImpl implements ProxyPayService {
               + memberWithdraw.toString()
               + ",origCashStatus="
               + withdrawStatus);
-      throw new ServiceException("UW/UPDATE_ERROR, 订单已处理", null);
+      throw new ServiceException("订单已处理");
     }
     /** 历史提现订单记录 */
     boolean updateHistoryStatus =
@@ -533,7 +533,7 @@ public class ProxyPayServiceImpl implements ProxyPayService {
               + memberWithdraw.toString()
               + ",origCashStatus="
               + withdrawStatus);
-      throw new ServiceException("UW/UPDATE_ERROR, 历史订单不存在", null);
+      throw new ServiceException("历史订单不存在");
     }
   }
 
@@ -547,7 +547,7 @@ public class ProxyPayServiceImpl implements ProxyPayService {
             .update();
     if (!updateMerchant) {
       log.error("修改代付商户出款次数和金额异常：ppMerchant=" + ppMerchant.toString());
-      throw new ServiceException("UW/UPDATE_ERROR, 修改代付商户出款次数和金额异常", null);
+      throw new ServiceException("修改代付商户出款次数和金额异常");
     }
   }
 

@@ -193,7 +193,7 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
         .eq(MemberWithdraw::getId, id);
     if (!this.update(new MemberWithdraw(), update)) {
       log.error("更新提现订单手续费：id=" + id + ",调整后手续费afterCounterFee=" + afterCounterFee);
-      throw new ServiceException("UW/UPDATE_ERROR, 订单已处理", null);
+      throw new ServiceException("订单已处理");
     }
   }
 
@@ -221,12 +221,12 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
     MemberWithdraw memberWithdraw = this.getById(id);
 
     if (memberWithdraw == null) {
-      throw new ServiceException("UW/ORDER_NULL,充值订单不存在或订单已处理", null);
+      throw new ServiceException("充值订单不存在或订单已处理");
     }
 
     Integer origCashStatus = memberWithdraw.getCashStatus();
     if (!curStatus.equals(origCashStatus)) {
-      throw new ServiceException("UW/ORDER_PROCESSED,订单状态已变化,请刷新重试.", null);
+      throw new ServiceException("订单状态已变化,请刷新重试.");
     }
 
     boolean isFinishedOrder =
@@ -234,14 +234,14 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
             || WithdrawStatus.CANCELLED.getValue() == curStatus
             || WithdrawStatus.REFUSE.getValue() == curStatus);
     if (isFinishedOrder) {
-      throw new ServiceException("UW/ORDER_NULL,出款订单已完成,请确认再试", null);
+      throw new ServiceException("出款订单已完成,请确认再试");
     }
 
     Member member = memberService.getById(memberWithdraw.getMemberId());
     MemberInfo memberInfo = memberInfoService.getById(memberWithdraw.getMemberId());
     if (member == null || memberInfo == null) {
       log.error("用户ID不存在:" + memberWithdraw.getMemberId());
-      throw new ServiceException("UC/EXT_INFO_NULL,用户不存在", null);
+      throw new ServiceException("用户不存在");
     }
     if (WithdrawStatus.UNHANDLED.getValue() != curStatus) {
       // 验证已受理出款订单是否开启允许其他账户验证
@@ -507,7 +507,7 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
               + memberWithdraw.toString()
               + ",origCashStatus="
               + origCashStatus);
-      throw new ServiceException("UW/UPDATE_ERROR,订单已处理", null);
+      throw new ServiceException("订单已处理");
     }
   }
 
@@ -589,11 +589,11 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
       throws Exception {
     // 查询用户是否存在
     if (member == null) {
-      throw new ServiceException("UC/USER_NOT_EXIST, uc.user_not_exist", null);
+      throw new ServiceException("用户信息不存在！");
     }
     // 查询用户的扩展信息是否为空
     if (memberInfo == null) {
-      throw new ServiceException("UC/USER_NOT_EXIST, uc.user_not_exist", null);
+      throw new ServiceException("用户扩展信息不存在！");
     }
     if (checkUserState) {
       // 查询用户是否正常

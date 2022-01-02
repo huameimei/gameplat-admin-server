@@ -10,12 +10,15 @@ import lombok.Data;
 @Data
 public class OnlineCount {
 
-  private int iphoneCount;
+  private int iosCount;
 
   private int androidCount;
 
   /** win用户合计 */
   private int windowsCount;
+
+  /** H5 */
+  private int h5Count;
 
   /** 会员合计 */
   private int memberCount;
@@ -28,4 +31,7 @@ public class OnlineCount {
 
   /** 告警会员合计 */
   private int warningCount;
+
+  /** 其他 */
+  private int otherCount;
 }

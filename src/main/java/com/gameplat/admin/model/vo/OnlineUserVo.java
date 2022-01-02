@@ -15,6 +15,8 @@ import lombok.Data;
 @Builder
 public class OnlineUserVo implements Serializable {
 
+  private String uuid;
+
   private String username;
 
   private String nickname;

@@ -1,6 +1,5 @@
 package com.gameplat.admin.model.dto;
 
-import java.util.Set;
 import lombok.Data;
 
 /**
@@ -19,7 +18,4 @@ public class OnlineUserDTO {
 
   /** 客户端类型 */
   private Integer clientType;
-
-  /** 告警会员 */
-  private Set<String> waningAccounts;
 }

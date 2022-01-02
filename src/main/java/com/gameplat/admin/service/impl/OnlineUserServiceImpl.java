@@ -1,26 +1,26 @@
 package com.gameplat.admin.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.crypto.digest.MD5;
 import com.alibaba.csp.sentinel.annotation.SentinelResource;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.gameplat.admin.model.bean.OnlineCount;
 import com.gameplat.admin.model.bean.PageExt;
-import com.gameplat.admin.model.domain.SysDictData;
 import com.gameplat.admin.model.domain.SysUser;
 import com.gameplat.admin.model.dto.OnlineUserDTO;
+import com.gameplat.admin.model.vo.MemberInfoVO;
 import com.gameplat.admin.model.vo.OnlineUserVo;
 import com.gameplat.admin.service.ConfigService;
+import com.gameplat.admin.service.MemberService;
 import com.gameplat.admin.service.OnlineUserService;
-import com.gameplat.admin.service.SysDictDataService;
 import com.gameplat.admin.service.SysUserService;
+import com.gameplat.base.common.enums.ClientType;
 import com.gameplat.base.common.util.CollectorUtils;
 import com.gameplat.base.common.util.StringUtils;
 import com.gameplat.common.enums.UserTypes;
 import com.gameplat.security.SecurityUserHolder;
 import com.gameplat.security.context.UserCredential;
-import com.gameplat.security.service.JwtTokenService;
-import eu.bitwalker.useragentutils.OperatingSystem;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -41,33 +41,20 @@ public class OnlineUserServiceImpl implements OnlineUserService {
 
   @Autowired private ConfigService configService;
 
-  @Autowired private JwtTokenService jwtTokenService;
+  @Autowired private MemberService memberService;
 
   @Autowired private RedisTemplate<String, Object> redisTemplate;
 
   @Override
   public List<UserCredential> getOnlineUsers() {
-    return this.getOnlineUsers(this.getOnlineUserKeys(), null);
+    return this.getOnlineUsers(this.getOnlineUserKeys());
   }
 
   @Override
   @SentinelResource(value = "selectOnlineList")
   public PageExt<OnlineUserVo, OnlineCount> selectOnlineList(
       PageDTO<OnlineUserVo> page, OnlineUserDTO dto) {
-    SysUser user = userService.getByUsername(SecurityUserHolder.getUsername());
-    // 获取用户自定义告警会员
-    List<String> warningUsers =
-        Optional.ofNullable(user.getSettings())
-            .map(JSONObject::parseObject)
-            .map(c -> c.getString("specialMemberWarn"))
-            .map(c -> StringUtils.split(c, ","))
-            .map(Arrays::asList)
-            .orElse(Collections.emptyList());
-
-    // 合并公共告警会员和自定义告警会员
-    List<String> specialAccounts = this.getPublicWarningAccounts();
-    Set<String> warningAccounts = new HashSet<>(warningUsers);
-    warningAccounts.addAll(specialAccounts);
+    List<String> warningAccounts = this.getWarningAccounts();
 
     int total = 0;
     int current = (int) page.getCurrent();
@@ -79,10 +66,10 @@ public class OnlineUserServiceImpl implements OnlineUserService {
 
     if (CollectionUtil.isNotEmpty(keys)) {
       total = keys.size();
-      onlineUsers = this.getOnlineUsers(keys, dto);
+      onlineUsers = this.getOnlineUsers(keys);
       // 在线会员统计
       onlineCount = this.countOnline(onlineUsers, warningAccounts);
-      this.filterOnlineUserByCondition(onlineUsers, dto);
+      onlineUsers = this.filterOnlineUserByCondition(onlineUsers, dto, warningAccounts);
     }
 
     // 分页
@@ -96,8 +83,17 @@ public class OnlineUserServiceImpl implements OnlineUserService {
 
   @Override
   @SentinelResource(value = "kick")
-  public void kick(String username) {
-    jwtTokenService.removeToken(username);
+  public void kick(String uuid) {
+    Set<String> keys = this.getOnlineUserKeys();
+    if (CollectionUtil.isNotEmpty(keys)) {
+      MD5 md5 = MD5.create();
+      keys.forEach(
+          key -> {
+            if (md5.digestHex(key).equals(uuid)) {
+              redisTemplate.delete(key);
+            }
+          });
+    }
   }
 
   @Override
@@ -109,35 +105,43 @@ public class OnlineUserServiceImpl implements OnlineUserService {
     }
   }
 
-  private OnlineCount countOnline(List<UserCredential> onlineUsers, Set<String> warningAccounts) {
+  private OnlineCount countOnline(List<UserCredential> onlineUsers, List<String> warningAccounts) {
     OnlineCount onlineCount = new OnlineCount();
     onlineUsers.forEach(
         user -> {
-          String userType = user.getUserType();
-          String clientType = user.getClientType();
-
           // 统计客户端类型
-          if (clientType.contains(OperatingSystem.IOS.getName())) {
-            onlineCount.setIphoneCount(onlineCount.getIphoneCount() + 1);
-          } else if (clientType.contains(OperatingSystem.ANDROID.getName())) {
-            onlineCount.setAndroidCount(onlineCount.getAndroidCount() + 1);
-          } else if (clientType.contains(OperatingSystem.WINDOWS.getName())) {
-            onlineCount.setWindowsCount(onlineCount.getWindowsCount() + 1);
-          } else if (clientType.contains(OperatingSystem.MAC_OS.getName())) {
-            onlineCount.setWindowsCount(onlineCount.getWindowsCount() + 1);
-          }
-
+          this.countClientType(onlineCount, user.getClientType());
           // 统计会员数量
-          if (UserTypes.MEMBER.match(userType)) {
-            onlineCount.setMemberCount(onlineCount.getMemberCount() + 1);
-          } else if (UserTypes.TEST.match(userType)) {
-            onlineCount.setTestUserCount(onlineCount.getTestUserCount() + 1);
-          } else if (warningAccounts.contains(user.getUsername())) {
-            onlineCount.setWarningCount(onlineCount.getWarningCount() + 1);
-          }
+          this.countUserType(onlineCount, warningAccounts, user);
         });
 
     return onlineCount;
+  }
+
+  private void countClientType(OnlineCount onlineCount, String clientType) {
+    if (ClientType.IOS.match(clientType)) {
+      onlineCount.setIosCount(onlineCount.getIosCount() + 1);
+    } else if (ClientType.ANDROID.match(clientType)) {
+      onlineCount.setAndroidCount(onlineCount.getAndroidCount() + 1);
+    } else if (ClientType.H5.match(clientType)) {
+      onlineCount.setH5Count(onlineCount.getH5Count() + 1);
+    } else if (ClientType.WEB.match(clientType)) {
+      onlineCount.setWindowsCount(onlineCount.getWindowsCount() + 1);
+    } else {
+      onlineCount.setOtherCount(onlineCount.getOtherCount() + 1);
+    }
+  }
+
+  private void countUserType(
+      OnlineCount onlineCount, List<String> warningAccounts, UserCredential credential) {
+    String userType = credential.getUserType();
+    if (UserTypes.MEMBER.match(userType)) {
+      onlineCount.setMemberCount(onlineCount.getMemberCount() + 1);
+    } else if (UserTypes.TEST.match(userType)) {
+      onlineCount.setTestUserCount(onlineCount.getTestUserCount() + 1);
+    } else if (warningAccounts.contains(credential.getUsername())) {
+      onlineCount.setWarningCount(onlineCount.getWarningCount() + 1);
+    }
   }
 
   private Set<String> getOnlineUserKeys() {
@@ -145,19 +149,33 @@ public class OnlineUserServiceImpl implements OnlineUserService {
   }
 
   private OnlineUserVo convert(UserCredential credential) {
-    return OnlineUserVo.builder()
-        .username(credential.getUsername())
-        .nickname(credential.getNickname())
-        .realName(credential.getRealName())
-        .userType(credential.getUserType())
-        .loginIp(credential.getLoginIp())
-        .lastLoginDate(credential.getLoginDate())
-        .deviceType(credential.getDeviceType())
-        .clientType(credential.getClientType())
-        .build();
+    OnlineUserVo onlineUser =
+        OnlineUserVo.builder()
+            .uuid(credential.getUuid())
+            .username(credential.getUsername())
+            .userType(credential.getUserType())
+            .loginIp(credential.getLoginIp())
+            .lastLoginDate(credential.getLoginDate())
+            .deviceType(credential.getDeviceType())
+            .clientType(credential.getClientType())
+            .build();
+
+    if (UserTypes.isAdminUser(credential.getUserType())) {
+      SysUser user = userService.getById(credential.getUserId());
+      onlineUser.setNickname(user.getNickName());
+    } else {
+      // 查询会员信息
+      MemberInfoVO memberInfo = memberService.getInfo(credential.getUserId());
+      onlineUser.setParentName(memberInfo.getParentName());
+      onlineUser.setRealName(memberInfo.getRealName());
+      onlineUser.setBalance(memberInfo.getBalance());
+      onlineUser.setNickname(memberInfo.getNickname());
+    }
+
+    return onlineUser;
   }
 
-  private List<UserCredential> getOnlineUsers(Set<String> keys, OnlineUserDTO dto) {
+  private List<UserCredential> getOnlineUsers(Set<String> keys) {
     return Optional.ofNullable(redisTemplate.opsForValue().multiGet(keys))
         .map(e -> e.stream().map(c -> (UserCredential) c).collect(Collectors.toList()))
         .orElseGet(Collections::emptyList);
@@ -169,23 +187,63 @@ public class OnlineUserServiceImpl implements OnlineUserService {
    * @param credentials List
    * @param dto OnlineUserDTO
    */
-  private void filterOnlineUserByCondition(List<UserCredential> credentials, OnlineUserDTO dto) {
-    String username = dto.getUserName();
-    if (StringUtils.isNotEmpty(username)) {
-      credentials.removeIf(e -> !username.equals(e.getUsername()));
+  private List<UserCredential> filterOnlineUserByCondition(
+      List<UserCredential> credentials, OnlineUserDTO dto, List<String> warningAccounts) {
+    return credentials.stream()
+        .filter(e -> this.filterByUsername(e, dto.getUserName()))
+        .filter(e -> this.filterByUserType(e, dto.getUserType(), warningAccounts))
+        .collect(Collectors.toList());
+  }
+
+  private boolean filterByUsername(UserCredential credential, String username) {
+    return StringUtils.isBlank(username) || credential.getUsername().equals(username);
+  }
+
+  private boolean filterByUserType(
+      UserCredential credential, String userType, List<String> warningAccounts) {
+    if (StringUtils.isBlank(userType)) {
+      return true;
     }
 
-    String userType = dto.getUserType();
-    if (StringUtils.isNotEmpty(userType)) {
-      if (UserTypes.WARN.match(userType) && !UserTypes.isAdminUser(userType)) {
-        // 如果是告警会员则匹配用户名
-        credentials.removeIf(e -> !dto.getWaningAccounts().contains(e.getUsername()));
-      } else {
-        credentials.removeIf(e -> !userType.equals(e.getUserType()));
-      }
+    if (UserTypes.WARN.match(userType)) {
+      return warningAccounts.contains(credential.getUsername());
+    } else {
+      return StringUtils.equals(userType, credential.getUserType());
     }
   }
 
+  /**
+   * 获取告警会员，包含自定义和公共告警会员
+   *
+   * @return List<String>
+   */
+  private List<String> getWarningAccounts() {
+    List<String> warningAccounts = new ArrayList<>();
+    warningAccounts.addAll(this.getPublicWarningAccounts());
+    warningAccounts.addAll(this.getCustomerWarningAccounts());
+    return warningAccounts;
+  }
+
+  /**
+   * 获取用户自定义告警会员
+   *
+   * @return List<String>
+   */
+  private List<String> getCustomerWarningAccounts() {
+    SysUser user = userService.getByUsername(SecurityUserHolder.getUsername());
+    return Optional.ofNullable(user.getSettings())
+        .map(JSONObject::parseObject)
+        .map(c -> c.getString("specialMemberWarn"))
+        .map(c -> StringUtils.split(c, ","))
+        .map(Arrays::asList)
+        .orElse(Collections.emptyList());
+  }
+
+  /**
+   * 获取公共告警会员
+   *
+   * @return List<String>
+   */
   private List<String> getPublicWarningAccounts() {
     String dictDataList = configService.getValue(PUBLIC_WARNING_ACCOUNT);
     return Optional.ofNullable(dictDataList)

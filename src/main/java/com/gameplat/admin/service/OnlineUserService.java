@@ -30,9 +30,9 @@ public interface OnlineUserService {
   /**
    * 踢用户下线
    *
-   * @param username String
+   * @param uuid String
    */
-  void kick(String username);
+  void kick(String uuid);
 
   /** 踢出所有用户 */
   void kickAll();

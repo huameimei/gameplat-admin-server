@@ -32,8 +32,8 @@ public class PayTypeController {
 
   @PostMapping("/list")
   @PreAuthorize("hasAuthority('thirdParty:payTypes:list')")
-  public List<PayTypeVO> findPayTypes(String name,Integer status) {
-    return payTypeService.queryList(name,status);
+  public List<PayTypeVO> findPayTypes(String name) {
+    return payTypeService.queryList(name);
   }
 
   @PostMapping("/add")

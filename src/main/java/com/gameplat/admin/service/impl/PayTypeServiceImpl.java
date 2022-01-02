@@ -28,14 +28,16 @@ import org.springframework.transaction.annotation.Transactional;
 public class PayTypeServiceImpl extends ServiceImpl<PayTypeMapper, PayType>
     implements PayTypeService {
 
-  @Autowired private PayTypeConvert payTypeConvert;
+  @Autowired
+  private PayTypeConvert payTypeConvert;
 
-  @Autowired private PayTypeMapper payTypeMapper;
+  @Autowired
+  private PayTypeMapper payTypeMapper;
 
   @Override
-  public List<PayTypeVO> queryList(String name,Integer status) {
-    return this.lambdaQuery().eq(ObjectUtils.isNotEmpty(status),PayType::getStatus,status)
-        .eq(ObjectUtils.isNotEmpty(name),PayType::getName,name)
+  public List<PayTypeVO> queryList(String name) {
+    return this.lambdaQuery()
+        .like(ObjectUtils.isNotEmpty(name), PayType::getName, name)
         .list().stream().map(e -> payTypeConvert.toVo(e)).collect(Collectors.toList());
   }
 
@@ -94,7 +96,7 @@ public class PayTypeServiceImpl extends ServiceImpl<PayTypeMapper, PayType>
   public IPage<PayType> queryPage(Page<PayType> page) {
     LambdaQueryWrapper<PayType> query = Wrappers.lambdaQuery();
     query.orderByAsc(PayType::getSort);
-    return this.page(page,query);
+    return this.page(page, query);
   }
 
   @Override

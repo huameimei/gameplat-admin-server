@@ -141,16 +141,10 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
                 .update(new Member());
     }
 
-    /**
-     * 根据账号获取会员信息
-     *
-     * @param account String
-     * @return Member
-     */
-    @Override
-    public Optional<Member> getByAccount(String account) {
-        return this.lambdaQuery().eq(Member::getAccount, account).oneOpt();
-    }
+  @Override
+  public Optional<Member> getByAccount(String account) {
+    return this.lambdaQuery().eq(Member::getAccount, account).oneOpt();
+  }
 
     @Override
     public Optional<Member> getAgentByAccount(String account) {

@@ -107,9 +107,8 @@ public class SysDictDataServiceImpl extends ServiceImpl<SysDictDataMapper, SysDi
             SysDictData::getDictType,
             dictData.getDictType())
         .eq(
-            ObjectUtils.isNotNull(dictData.getStatus()),
             SysDictData::getStatus,
-            dictData.getStatus())
+            1)
         .list();
   }
 

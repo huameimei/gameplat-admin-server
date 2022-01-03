@@ -1,23 +1,22 @@
 package com.gameplat.admin.controller.open.system;
 
 import cn.hutool.json.JSONObject;
+import com.alibaba.fastjson.JSONArray;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.gameplat.admin.convert.DictDataConvert;
 import com.gameplat.admin.model.domain.SysDictData;
 import com.gameplat.admin.model.domain.SysEmail;
 import com.gameplat.admin.model.domain.SysSmsArea;
-import com.gameplat.admin.model.dto.OperSysSmsAreaDTO;
-import com.gameplat.admin.model.dto.OperSystemConfigDTO;
-import com.gameplat.admin.model.dto.SysDictDataDTO;
-import com.gameplat.admin.model.dto.SysFileConfigDTO;
-import com.gameplat.admin.model.dto.SysSmsAreaQueryDTO;
-import com.gameplat.admin.model.dto.SysSmsConfigDTO;
+import com.gameplat.admin.model.dto.*;
+import com.gameplat.admin.model.vo.AgentContacaVO;
 import com.gameplat.admin.model.vo.SysFileConfigVO;
 import com.gameplat.admin.model.vo.SysSmsAreaVO;
 import com.gameplat.admin.model.vo.SysSmsConfigVO;
 import com.gameplat.admin.service.SysDictDataService;
 import com.gameplat.admin.service.SystemConfigService;
+
+import java.util.ArrayList;
 import java.util.List;
 
 import com.gameplat.common.model.bean.EmailConfig;
@@ -51,10 +50,21 @@ public class OpenSystemConfigController {
     SysDictData sysDictData = dictDataConvert.toEntity(dictDataDTO);
     List<SysDictData> list = dictDataService.getDictList(sysDictData);
     JSONObject json = new JSONObject();
-    for (SysDictData data : list) {
-      json.set(data.getDictLabel(), data.getDictValue());
+    for (SysDictData dictData : list) {
+      JSONArray dictValue= JSONArray.parseArray(dictData.getDictValue());
+      json.set(dictData.getDictLabel(), dictValue);
     }
     return json;
+  }
+
+  @GetMapping("/agent/list")
+  public List<AgentContacaVO> findAgentContacaList() {
+    return systemConfigService.findAgentContacaList();
+  }
+
+  @PutMapping("/agent/update")
+  public void updateAgentContaca(@RequestBody AgentContacaDTO agentContacaDTO) {
+    systemConfigService.updateAgentContaca(agentContacaDTO);
   }
 
   @GetMapping("/sms/list")

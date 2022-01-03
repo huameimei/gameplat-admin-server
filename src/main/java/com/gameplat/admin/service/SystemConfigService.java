@@ -3,19 +3,21 @@ package com.gameplat.admin.service;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.gameplat.admin.model.domain.SysSmsArea;
-import com.gameplat.admin.model.dto.OperSysSmsAreaDTO;
-import com.gameplat.admin.model.dto.OperSystemConfigDTO;
-import com.gameplat.admin.model.dto.SysFileConfigDTO;
-import com.gameplat.admin.model.dto.SysSmsAreaQueryDTO;
-import com.gameplat.admin.model.dto.SysSmsConfigDTO;
+import com.gameplat.admin.model.dto.*;
+import com.gameplat.admin.model.vo.AgentContacaVO;
 import com.gameplat.admin.model.vo.SysFileConfigVO;
 import com.gameplat.admin.model.vo.SysSmsAreaVO;
 import com.gameplat.admin.model.vo.SysSmsConfigVO;
 import com.gameplat.common.model.bean.EmailConfig;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
 
 public interface SystemConfigService {
+
+  List<AgentContacaVO> findAgentContacaList();
+
+  void updateAgentContaca(AgentContacaDTO agentContacaDTO);
 
   List<SysSmsConfigVO> findSmsList();
 

@@ -5,19 +5,19 @@ import com.alibaba.fastjson.JSONArray;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
+import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.gameplat.admin.constant.TrueFalse;
+import com.gameplat.admin.convert.AgentContacaConfigConvert;
 import com.gameplat.admin.convert.SysFileConfigConvert;
 import com.gameplat.admin.convert.SysSmsAreaConvert;
 import com.gameplat.admin.convert.SysSmsConfigConvert;
-import com.gameplat.admin.model.domain.SysDictData;
-import com.gameplat.admin.model.domain.SysFileConfig;
-import com.gameplat.admin.model.domain.SysSmsArea;
-import com.gameplat.admin.model.domain.SysSmsConfig;
+import com.gameplat.admin.model.domain.*;
 import com.gameplat.admin.model.dto.*;
+import com.gameplat.admin.model.vo.AgentContacaVO;
 import com.gameplat.admin.model.vo.SysFileConfigVO;
 import com.gameplat.admin.model.vo.SysSmsAreaVO;
 import com.gameplat.admin.model.vo.SysSmsConfigVO;
@@ -25,23 +25,21 @@ import com.gameplat.admin.service.ConfigService;
 import com.gameplat.admin.service.SysDictDataService;
 import com.gameplat.admin.service.SysSmsAreaService;
 import com.gameplat.admin.service.SystemConfigService;
+import com.gameplat.base.common.context.GlobalContextHolder;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.json.JsonUtils;
+import com.gameplat.base.common.util.DateUtil;
 import com.gameplat.base.common.util.StringUtils;
 import com.gameplat.common.enums.DictDataEnum;
 import com.gameplat.common.enums.DictTypeEnum;
 import com.gameplat.common.model.bean.EmailConfig;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -59,6 +57,67 @@ public class SystemConfigServiceImpl implements SystemConfigService {
   @Autowired private SysSmsAreaService sysSmsAreaService;
 
   @Autowired private SysSmsAreaConvert sysSmsAreaConvert;
+
+  @Autowired private AgentContacaConfigConvert agentContacaConfigConvert;
+
+  @Override
+  public List<AgentContacaVO> findAgentContacaList() {
+    String dictData = configService.getValue(DictDataEnum.AGENT_CONTACT_CONFIG);
+    if (StringUtils.isNotBlank(dictData)) {
+      return JSONArray.parseArray(dictData, AgentContacaVO.class);
+    }
+
+    return Collections.emptyList();
+  }
+
+  @Override
+  public void updateAgentContaca(AgentContacaDTO dto) {
+    SysDictData dictData =
+            dictDataService.getDictData(
+                    DictTypeEnum.AGENT_CONTACT.getValue(), DictDataEnum.AGENT_CONTACT_CONFIG.getLabel());
+
+    List<AgentContacaConfig> agentContacaConfigList =
+            Optional.of(dictData)
+                    .map(SysDictData::getDictValue)
+                    .map(c -> JsonUtils.parse(c, new TypeReference<List<AgentContacaConfig>>() {}))
+                    .orElse(Collections.emptyList());
+
+    AgentContacaConfig agentContacaConfig = agentContacaConfigConvert.toEntity(dto);
+    List<AgentContacaConfig> list = new ArrayList<>();
+
+    Boolean flag = false;
+    if (CollectionUtils.isNotEmpty(agentContacaConfigList)) {
+        for (AgentContacaConfig contacaConfig : agentContacaConfigList) {
+            if(contacaConfig.getId().equals(dto.getId())){
+              flag = true;
+              agentContacaConfig.setUpdateBy(GlobalContextHolder.getContext().getUsername());
+              agentContacaConfig.setUpdateTime(DateUtil.getNowTime());
+              list.add(agentContacaConfig);
+            }else{ //新增
+                list.add(contacaConfig);
+            }
+        }
+        if (!flag){
+          agentContacaConfig.setId(IdWorker.getId());
+          agentContacaConfig.setCreateBy(GlobalContextHolder.getContext().getUsername());
+          agentContacaConfig.setCreateTime(DateUtil.getNowTime());
+          list.add(agentContacaConfig);
+        }
+
+      // 替换旧数据
+//      agentContacaConfigList.replaceAll( c -> c.getId().equals(agentContacaConfig.getId()) ? agentContacaConfig : c);
+
+
+      // 修改
+      dictDataService.updateDictData(
+              OperDictDataDTO.builder()
+                      .id(dictData.getId())
+                      .dictLabel(dictData.getDictLabel())
+                      .dictType(dictData.getDictType())
+                      .dictValue(JsonUtils.toJson(list))
+                      .build());
+    }
+  }
 
   @Override
   public List<SysSmsConfigVO> findSmsList() {

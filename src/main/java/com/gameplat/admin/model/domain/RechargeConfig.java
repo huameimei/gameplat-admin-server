@@ -1,6 +1,7 @@
 package com.gameplat.admin.model.domain;
 
 
+import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
@@ -14,7 +15,7 @@ import lombok.Data;
 @TableName("recharge_config")
 public class RechargeConfig implements Serializable {
 
-  @TableId
+  @TableId(type = IdType.AUTO)
   private Long id;
 
   /**

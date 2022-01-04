@@ -1,6 +1,5 @@
 package com.gameplat.admin.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -241,7 +240,8 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, Message> impl
         messageDistribute.setUserAccount(memberInfoVO.getAccount());
         messageDistribute.setAgentLevel(memberInfoVO.getSuperPath());
         messageDistribute.setReadStatus(0);
-        messageDistribute.setRechargeLevel(memberInfoVO.getUserLevel());//会员层级
+        //会员层级
+        messageDistribute.setRechargeLevel(memberInfoVO.getUserLevel());
         messageDistribute.setVipLevel(memberInfoVO.getLevel());
         messageDistribute.setAcceptRemoveFlag(0);
         messageDistribute.setReadStatus(0);

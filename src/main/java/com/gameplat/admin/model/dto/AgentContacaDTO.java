@@ -23,6 +23,12 @@ public class AgentContacaDTO implements Serializable {
   @ApiModelProperty(value = "联系详情")
   private String contactDetail;
 
+  @ApiModelProperty(value = "创建人")
+  private String createBy;
+
+  @ApiModelProperty(value = "创建时间")
+  private String createTime;
+
   @ApiModelProperty(value = "更新人")
   private String updateBy;
 

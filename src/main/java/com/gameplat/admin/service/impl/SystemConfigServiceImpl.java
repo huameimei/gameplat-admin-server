@@ -91,7 +91,7 @@ public class SystemConfigServiceImpl implements SystemConfigService {
             if(contacaConfig.getId().equals(dto.getId())){
               flag = true;
               agentContacaConfig.setUpdateBy(GlobalContextHolder.getContext().getUsername());
-              agentContacaConfig.setUpdateTime(DateUtil.getNowTime());
+              agentContacaConfig.setUpdateTime(String.valueOf(System.currentTimeMillis()));
               list.add(agentContacaConfig);
             }else{ //新增
                 list.add(contacaConfig);
@@ -100,7 +100,7 @@ public class SystemConfigServiceImpl implements SystemConfigService {
         if (!flag){
           agentContacaConfig.setId(IdWorker.getId());
           agentContacaConfig.setCreateBy(GlobalContextHolder.getContext().getUsername());
-          agentContacaConfig.setCreateTime(DateUtil.getNowTime());
+          agentContacaConfig.setCreateTime(String.valueOf(System.currentTimeMillis()));
           list.add(agentContacaConfig);
         }
 

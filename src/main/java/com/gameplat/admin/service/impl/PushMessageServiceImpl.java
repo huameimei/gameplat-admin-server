@@ -27,9 +27,11 @@ import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.BeanUtils;
 import com.gameplat.base.common.util.DateUtils;
 import com.gameplat.security.context.UserCredential;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -161,7 +163,7 @@ public class PushMessageServiceImpl extends ServiceImpl<PushMessageMapper, PushM
                         .getOnlineUsers()
                         .forEach(user -> buildPushMessage(pushMessageAddDTO, pushMessageList, user));
                 break;
-            case SPECIFY_LEVEL:
+            case USER_LEVEL:
                 //4-指定层级
                 if (ObjectUtils.isNull(pushMessageAddDTO.getUserLevel()) || pushMessageAddDTO.getUserLevel().length < 1) {
                     throw new ServiceException("充值层级不能为空");

@@ -6,11 +6,12 @@ package com.gameplat.admin.enums;
 public class PushMessageEnum {
 
     public enum UserRange {
-        SOME_MEMBERS(1, "部分会员"),
-        ALL_MEMBERS(2, "所有会有"),
+        ALL_MEMBERS(1, "全部会员"),
+        SOME_MEMBERS(2, "部分会员"),
         ONLINE_MEMBER(3, "在线会员"),
-        SPECIFY_LEVEL(4, "指定层级"),
-        AGENT_LINE(5, "代理线");
+        USER_LEVEL(4, "会员层级"),
+        VIP_LEVEL(5, "VIP等级"),
+        AGENT_LINE(6, "代理线");
 
 
         private int value;
@@ -30,7 +31,7 @@ public class PushMessageEnum {
             return null;
         }
 
-        public int getValue(){
+        public int getValue() {
             return this.value;
         }
     }

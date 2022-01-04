@@ -19,6 +19,8 @@ public interface SystemConfigService {
 
   void updateAgentContaca(AgentContacaDTO agentContacaDTO);
 
+  void delAgentContaca(Long id);
+
   List<SysSmsConfigVO> findSmsList();
 
   List<SysFileConfigVO> findFileList();

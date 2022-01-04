@@ -11,6 +11,7 @@ import com.gameplat.admin.model.dto.MemberEditDTO;
 import com.gameplat.admin.model.dto.MemberQueryDTO;
 import com.gameplat.admin.model.vo.MemberInfoVO;
 import com.gameplat.admin.model.vo.MemberVO;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -21,47 +22,55 @@ import java.util.Optional;
  */
 public interface MemberService extends IService<Member> {
 
-  IPage<MemberVO> queryPage(Page<Member> page, MemberQueryDTO dto);
+    IPage<MemberVO> queryPage(Page<Member> page, MemberQueryDTO dto);
 
-  List<MemberVO> queryList(MemberQueryDTO dto);
+    List<MemberVO> queryList(MemberQueryDTO dto);
 
-  MemberInfoVO getInfo(Long id);
+    MemberInfoVO getInfo(Long id);
 
-  Optional<Member> getByAccount(String account);
+    Optional<Member> getByAccount(String account);
 
-  Optional<Member> getAgentByAccount(String account);
+    Optional<Member> getAgentByAccount(String account);
 
-  List<Member> getByParentName(String parentName);
+    List<Member> getByParentName(String parentName);
 
-  MemberInfoVO getMemberInfo(String account);
+    MemberInfoVO getMemberInfo(String account);
 
-  void add(MemberAddDTO dto);
+    void add(MemberAddDTO dto);
 
-  void update(MemberEditDTO dto);
+    void update(MemberEditDTO dto);
 
-  void disable(List<Long> ids);
+    void disable(List<Long> ids);
 
-  void enable(List<Long> ids);
+    void enable(List<Long> ids);
 
-  void clearContact(MemberContactCleanDTO dto);
+    void clearContact(MemberContactCleanDTO dto);
 
-  void updateContact(MemberContactUpdateDTO dto);
+    void updateContact(MemberContactUpdateDTO dto);
 
-  List<String> findAccountByUserLevelIn(List<String> levelsLists);
+    List<String> findAccountByUserLevelIn(List<String> levelsLists);
 
-  /**
-   * 通过用户层级查询用户list
-   *
-   * @param userLevelList List
-   * @return List
-   */
-  List<Member> getListByUserLevel(List<String> userLevelList);
+    /**
+     * 通过用户层级查询用户list
+     *
+     * @param userLevelList List
+     * @return List
+     */
+    List<Member> getListByUserLevel(List<String> userLevelList);
 
-  /**
-   * 查询代理线的会员列表
-   *
-   * @param agentAccount
-   * @return List
-   */
-  List<Member> getListByAgentAccount(String agentAccount);
+    /**
+     * 查询代理线的会员列表
+     *
+     * @param agentAccount
+     * @return List
+     */
+    List<Member> getListByAgentAccount(String agentAccount);
+
+    /**
+     * 查询vip用户
+     *
+     * @param vipLevelList
+     * @return
+     */
+    List<Member> getListByVipLevel(List<String> vipLevelList);
 }

@@ -30,6 +30,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -60,12 +61,21 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, Message> impl
 
     @Override
     public IPage<MessageVO> findMessageList(PageDTO<Message> page, MessageQueryDTO messageQueryDTO) {
-        return this.lambdaQuery()
+        IPage<MessageVO> iPage = this.lambdaQuery()
                 .eq(StringUtils.isNotBlank(messageQueryDTO.getMessageTitle()), Message::getMessageTitle, messageQueryDTO.getMessageTitle())
                 .eq(StringUtils.isNotBlank(messageQueryDTO.getMessageContent()), Message::getMessageContent, messageQueryDTO.getMessageContent())
                 .eq(messageQueryDTO.getStatus() != null, Message::getStatus, messageQueryDTO.getStatus())
                 .eq(StringUtils.isNotBlank(messageQueryDTO.getLanguage()), Message::getLanguage, messageQueryDTO.getLanguage())
                 .page(page).convert(messageConvert::toVo);
+        if (CollectionUtils.isNotEmpty(iPage.getRecords())) {
+            for (MessageVO messageVO : iPage.getRecords()) {
+                //时间超过了后，消息失效
+                if (messageVO.getStatus() == 1 && new Date().after(messageVO.getEndTime())) {
+                    messageVO.setStatus(0);
+                }
+            }
+        }
+        return iPage;
     }
 
     @Override
@@ -73,10 +83,11 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, Message> impl
         validMessageInfo(messageAddDTO);
 
         Message message = messageConvert.toEntity(messageAddDTO);
+        message.setStatus(1);
         this.save(message);
 
         List<MessageDistribute> messageList = new ArrayList<>();
-        buildMemberList(messageAddDTO, messageList, message);
+        buildMembeDistributeList(messageAddDTO, messageList, message);
 
         //批量保存消息
         messageDistributeService.saveBatch(messageList);
@@ -88,7 +99,7 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, Message> impl
      * @param messageAddDTO
      * @param messageList
      */
-    private void buildMemberList(MessageAddDTO messageAddDTO, List<MessageDistribute> messageList, Message message) {
+    private void buildMembeDistributeList(MessageAddDTO messageAddDTO, List<MessageDistribute> messageList, Message message) {
         PushMessageEnum.UserRange userRange = PushMessageEnum.UserRange.get(messageAddDTO.getPushRange());
         switch (userRange) {
             case ALL_MEMBERS:
@@ -273,7 +284,7 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, Message> impl
         this.updateById(message);
 
         List<MessageDistribute> messageList = new ArrayList<>();
-        buildMemberList(messageAddDTO, messageList, message);
+        buildMembeDistributeList(messageAddDTO, messageList, message);
 
         //删除原来会员分发数据，再插入数据
         QueryWrapper<MessageDistribute> wrapper = new QueryWrapper<>();

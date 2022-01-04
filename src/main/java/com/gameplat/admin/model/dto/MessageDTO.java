@@ -51,7 +51,7 @@ public class MessageDTO implements Serializable {
     @ApiModelProperty(value = "是否即时消息: 0 否  1 是")
     private Integer immediateFlag;
 
-    @ApiModelProperty(value = "状态：0 禁用 1 启用")
+    @ApiModelProperty(value = "状态：0 过期,1 有效")
     private Integer status;
 
     @ApiModelProperty(value = "弹窗排序")

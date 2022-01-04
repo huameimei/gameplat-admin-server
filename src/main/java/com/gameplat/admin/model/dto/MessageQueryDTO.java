@@ -19,7 +19,7 @@ public class MessageQueryDTO {
     @ApiModelProperty(value = "消息内容")
     private String messageContent;
 
-    @ApiModelProperty(value = "状态：0 禁用 1 启用")
+    @ApiModelProperty(value = "状态：0 过期,1 有效")
     private Integer status;
 
     @ApiModelProperty(value = "语言种类")

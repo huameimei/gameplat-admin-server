@@ -104,11 +104,36 @@ public class SystemConfigServiceImpl implements SystemConfigService {
           list.add(agentContacaConfig);
         }
 
-      // 替换旧数据
-//      agentContacaConfigList.replaceAll( c -> c.getId().equals(agentContacaConfig.getId()) ? agentContacaConfig : c);
-
-
       // 修改
+      dictDataService.updateDictData(
+              OperDictDataDTO.builder()
+                      .id(dictData.getId())
+                      .dictLabel(dictData.getDictLabel())
+                      .dictType(dictData.getDictType())
+                      .dictValue(JsonUtils.toJson(list))
+                      .build());
+    }
+  }
+
+  @Override
+  public void delAgentContaca(Long id) {
+    List<AgentContacaConfig> list = new ArrayList<>();
+
+    SysDictData dictData =
+            dictDataService.getDictData(
+                    DictTypeEnum.AGENT_CONTACT.getValue(), DictDataEnum.AGENT_CONTACT_CONFIG.getLabel());
+
+    List<AgentContacaConfig> agentContacaConfigList =
+            Optional.of(dictData)
+                    .map(SysDictData::getDictValue)
+                    .map(c -> JsonUtils.parse(c, new TypeReference<List<AgentContacaConfig>>() {}))
+                    .orElse(Collections.emptyList());
+    if (CollectionUtils.isNotEmpty(agentContacaConfigList)){
+      for (AgentContacaConfig agentContacaConfig : agentContacaConfigList) {
+        if(!agentContacaConfig.getId().equals(id)){
+          list.add(agentContacaConfig);
+        }
+      }
       dictDataService.updateDictData(
               OperDictDataDTO.builder()
                       .id(dictData.getId())

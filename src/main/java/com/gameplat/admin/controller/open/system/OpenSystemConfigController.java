@@ -20,6 +20,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.gameplat.common.model.bean.EmailConfig;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,6 +37,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
+@Api(tags = "系统配置API")
 @RequestMapping("/api/admin/system/config")
 public class OpenSystemConfigController {
 
@@ -57,14 +60,22 @@ public class OpenSystemConfigController {
     return json;
   }
 
+  @ApiOperation(value = "代理联系方式地址列表")
   @GetMapping("/agent/list")
   public List<AgentContacaVO> findAgentContacaList() {
     return systemConfigService.findAgentContacaList();
   }
 
-  @PutMapping("/agent/update")
+  @ApiOperation(value = "编辑、新增代理联系方式地址")
+  @PutMapping("/agent/edit")
   public void updateAgentContaca(@RequestBody AgentContacaDTO agentContacaDTO) {
     systemConfigService.updateAgentContaca(agentContacaDTO);
+  }
+
+  @ApiOperation(value = "删除代理联系方式地址")
+  @DeleteMapping("/agent/del/{id}")
+  public void delAgentContaca(@PathVariable("id") Long id) {
+    systemConfigService.delAgentContaca(id);
   }
 
   @GetMapping("/sms/list")

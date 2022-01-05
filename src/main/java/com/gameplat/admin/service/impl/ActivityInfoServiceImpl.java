@@ -114,6 +114,7 @@ public class ActivityInfoServiceImpl
                 //保存活动显示的图片
                 SysBannerInfo banner = new SysBannerInfo();
                 banner.setChildType(activityInfo.getId());
+                banner.setChildName(activityInfo.getTitle());
                 banner.setLanguage(country);
                 banner.setStatus(SysBannerInfoEnum.Status.VALID.getValue());
 

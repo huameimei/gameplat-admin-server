@@ -12,12 +12,8 @@ import com.gameplat.common.compent.kaptcha.KaptchaProducer;
 import com.gameplat.common.model.bean.limit.AdminLoginLimit;
 import com.gameplat.redis.idempoten.AutoIdempotent;
 import com.gameplat.security.SecurityUserHolder;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import javax.servlet.http.HttpServletResponse;
-
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -27,11 +23,17 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 /**
  * 公共控制类
  *
  * @author three
  */
+@Api(tags = "公共控制类")
 @Slf4j
 @Controller
 @RequestMapping("/api/admin/common")
@@ -69,6 +71,7 @@ public class OpenCommonController {
   }
 
   /** 获取字典数据 */
+  @ApiOperation(value = "获取字典数据")
   @ResponseBody
   @GetMapping("/getDictByTypes/{types}")
   @AutoIdempotent(key = "getDictByTypes", expir = 2000L)

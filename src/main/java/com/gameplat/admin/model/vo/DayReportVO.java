@@ -14,9 +14,11 @@ import java.util.Date;
  * @date 2021/12/31
  */
 @Data
-public class MemberDayReportVO implements Serializable {
+public class DayReportVO implements Serializable {
 
-    @ApiModelProperty(value = "日期")
+    private static final long serialVersionUID = -3196207776088644481L;
+
+    @ApiModelProperty(value = "统计日期")
     @JsonSerialize(using = Date2LongSerializerUtils.class)
     private Date statTime;
 

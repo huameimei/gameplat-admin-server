@@ -6,7 +6,6 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.gameplat.admin.convert.DictDataConvert;
 import com.gameplat.admin.model.domain.SysDictData;
-import com.gameplat.admin.model.domain.SysEmail;
 import com.gameplat.admin.model.domain.SysSmsArea;
 import com.gameplat.admin.model.dto.*;
 import com.gameplat.admin.model.vo.AgentContacaVO;
@@ -16,7 +15,6 @@ import com.gameplat.admin.model.vo.SysSmsConfigVO;
 import com.gameplat.admin.service.SysDictDataService;
 import com.gameplat.admin.service.SystemConfigService;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import com.gameplat.common.model.bean.EmailConfig;

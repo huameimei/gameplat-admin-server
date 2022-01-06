@@ -9,6 +9,7 @@ import com.gameplat.admin.model.dto.MessageAddDTO;
 import com.gameplat.admin.model.dto.MessageDistributeQueryDTO;
 import com.gameplat.admin.model.dto.MessageEditDTO;
 import com.gameplat.admin.model.dto.MessageQueryDTO;
+import com.gameplat.admin.model.vo.MessageDictDataVO;
 import com.gameplat.admin.model.vo.MessageDistributeVO;
 import com.gameplat.admin.model.vo.MessageVO;
 import com.gameplat.admin.service.MessageService;
@@ -33,6 +34,13 @@ public class OpenMessageController {
 
     @Autowired
     private MessageService messageService;
+
+    @ApiOperation(value = "公告消息和个人弹窗消息字典数据列表")
+    @GetMapping("/getTypes")
+    public MessageDictDataVO getDictData() {
+        return messageService.getDictData();
+    }
+
 
     /**
      * 分页查询个人消息

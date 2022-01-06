@@ -9,9 +9,9 @@ import com.gameplat.admin.model.dto.MessageAddDTO;
 import com.gameplat.admin.model.dto.MessageDistributeQueryDTO;
 import com.gameplat.admin.model.dto.MessageEditDTO;
 import com.gameplat.admin.model.dto.MessageQueryDTO;
+import com.gameplat.admin.model.vo.MessageDictDataVO;
 import com.gameplat.admin.model.vo.MessageDistributeVO;
 import com.gameplat.admin.model.vo.MessageVO;
-import com.gameplat.admin.model.vo.PushMessageVO;
 
 /**
  * 消息业务处理
@@ -20,6 +20,7 @@ import com.gameplat.admin.model.vo.PushMessageVO;
  */
 public interface MessageService extends IService<Message> {
 
+    MessageDictDataVO getDictData();
 
     /**
      * 分页查询

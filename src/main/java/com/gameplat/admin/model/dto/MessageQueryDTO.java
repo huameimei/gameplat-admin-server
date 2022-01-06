@@ -14,10 +14,10 @@ import java.util.Date;
 public class MessageQueryDTO {
 
     @ApiModelProperty(value = "消息标题")
-    private String messageTitle;
+    private String title;
 
     @ApiModelProperty(value = "消息内容")
-    private String messageContent;
+    private String content;
 
     @ApiModelProperty(value = "状态：0 过期,1 有效")
     private Integer status;

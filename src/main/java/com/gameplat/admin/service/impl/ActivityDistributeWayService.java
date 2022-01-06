@@ -9,7 +9,7 @@ import com.gameplat.admin.enums.MemberWealRewordEnums;
 import com.gameplat.admin.enums.PushMessageEnum;
 import com.gameplat.admin.mapper.ActivityDistributeMapper;
 import com.gameplat.admin.model.domain.*;
-import com.gameplat.admin.model.dto.PushMessageAddDTO;
+import com.gameplat.admin.model.dto.MessageAddDTO;
 import com.gameplat.admin.model.vo.MemberInfoVO;
 import com.gameplat.admin.service.*;
 import com.gameplat.base.common.exception.ServiceException;
@@ -52,7 +52,8 @@ public class ActivityDistributeWayService extends ServiceImpl<ActivityDistribute
     private FinancialService financialService;
 
     @Autowired
-    private PushMessageService pushMessageService;
+    private MessageService messageService;
+
 
     @Autowired
     private MemberService memberService;
@@ -142,12 +143,18 @@ public class ActivityDistributeWayService extends ServiceImpl<ActivityDistribute
             memberWealRewordService.save(wealReword);
 
             //通知 发个人消息
-            PushMessageAddDTO pushMessage = new PushMessageAddDTO();
-            pushMessage.setMessageContent(getInformationContent(activityDistribute));
-            pushMessage.setMessageTitle("活动派发");
-            pushMessage.setUserRange(PushMessageEnum.UserRange.SOME_MEMBERS.getValue());
-            pushMessage.setUserAccount(activityDistribute.getUsername());
-            pushMessageService.insertPushMessage(pushMessage);
+            MessageAddDTO message = new MessageAddDTO();
+            message.setContent(getInformationContent(activityDistribute));
+            message.setTitle("活动派发");
+            message.setPushRange(PushMessageEnum.UserRange.SOME_MEMBERS.getValue());
+            message.setLinkAccount(activityDistribute.getUsername());
+            message.setCategory(4);
+            message.setPosition(0);
+            message.setShowType(0);
+            message.setPopsCount(0);
+            message.setType(1);
+            message.setCreateBy("System");
+            messageService.insertMessage(message);
         } finally {
             // 释放资金锁
             distributedLocker.unlock(lockKey);
@@ -174,12 +181,18 @@ public class ActivityDistributeWayService extends ServiceImpl<ActivityDistribute
         activityQualificationService.updateQualificationStatus(activityQualification);
 
         //通知 发个人消息
-        PushMessageAddDTO pushMessage = new PushMessageAddDTO();
-        pushMessage.setMessageContent(getInformationContent(activityDistribute));
-        pushMessage.setMessageTitle("活动派发");
-        pushMessage.setUserRange(PushMessageEnum.UserRange.SOME_MEMBERS.getValue());
-        pushMessage.setUserAccount(activityDistribute.getUsername());
-        pushMessageService.insertPushMessage(pushMessage);
+        MessageAddDTO message = new MessageAddDTO();
+        message.setContent(getInformationContent(activityDistribute));
+        message.setTitle("活动派发");
+        message.setPushRange(PushMessageEnum.UserRange.SOME_MEMBERS.getValue());
+        message.setLinkAccount(activityDistribute.getUsername());
+        message.setCategory(4);
+        message.setPosition(0);
+        message.setShowType(0);
+        message.setPopsCount(0);
+        message.setType(1);
+        message.setCreateBy("System");
+        messageService.insertMessage(message);
     }
 
     /**

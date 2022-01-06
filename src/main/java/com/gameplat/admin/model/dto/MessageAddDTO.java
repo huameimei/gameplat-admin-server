@@ -1,7 +1,5 @@
 package com.gameplat.admin.model.dto;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.gameplat.base.common.util.DateUtil;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
@@ -20,40 +18,20 @@ public class MessageAddDTO implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @ApiModelProperty(value = "语种")
-    private String language;
-
-    @ApiModelProperty(value = "推送范围,1:全部会员,2:部分会员,3:在线会员,4:会员层级,5:VIP等级,6:代理线")
-    private Integer pushRange;
-
-    @ApiModelProperty(value = "推送目标,用于接收不同推送范围填写的值")
-    private String pushTarget;
-
-    @ApiModelProperty(value = "消息类型,1:文本弹窗,2:图片弹窗")
-    private Integer messageType;
-
-    @ApiModelProperty(value = "弹窗类型")
-    private String popupsType;
-
-    @ApiModelProperty(value = "弹出次数: 1 一次, 2 多次")
-    private Integer popupsFrequency;
-
-    @ApiModelProperty(value = "弹窗排序")
-    private Integer sort;
-
-    @JsonFormat(pattern = DateUtil.YYYY_MM_DD_HH_MM_SS)
-    @ApiModelProperty(value = "开始时间")
-    private Date beginTime;
-
-    @JsonFormat(pattern = DateUtil.YYYY_MM_DD_HH_MM_SS)
-    @ApiModelProperty(value = "结束时间")
-    private Date endTime;
-
     @ApiModelProperty(value = "消息标题")
-    private String messageTitle;
+    private String title;
 
     @ApiModelProperty(value = "消息内容")
-    private String messageContent;
+    private String content;
+
+    @ApiModelProperty(value = "总类别:0.默认(3) 1.游戏(2) 2.足球(2) 3.直播(2) 4.系统(1)")
+    private Integer category;
+
+    @ApiModelProperty(value = "位置: 0.默认(1) 1.推荐(2) 2.首页大厅(2,3) 3.彩票首页(3) 4.体育首页(3) 5.游戏首页(3)")
+    private Integer position;
+
+    @ApiModelProperty(value = "展示类型: 0.默认(1) 1.滚动(2) 2.文本弹窗(3) 3.图片弹窗(3)")
+    private Integer showType;
 
     @ApiModelProperty(value = "PC端图片")
     private String pcImage;
@@ -61,7 +39,40 @@ public class MessageAddDTO implements Serializable {
     @ApiModelProperty(value = "APP端图片")
     private String appImage;
 
+    @ApiModelProperty(value = "弹出次数:0.默认(1,2) 1.只弹一次(3) 2.多次弹出(3)")
+    private Integer popsCount;
+
+    @ApiModelProperty(value = "推送范围:1.全部会员 2.部分会员 3.在线会员 4.充值层级 5.VIP等级 6.代理线")
+    private Integer pushRange;
+
+    @ApiModelProperty(value = "关联账号")
+    private String linkAccount;
+
+    @ApiModelProperty(value = "开始时间")
+    private Date beginTime;
+
+    @ApiModelProperty(value = "结束时间")
+    private Date endTime;
+
+    @ApiModelProperty(value = "升序排序")
+    private Integer sort;
+
+    @ApiModelProperty(value = "消息类型（1.系统消息、2.平台公告、3.个人弹窗消息）")
+    private Integer type;
+
+    @ApiModelProperty(value = "语种")
+    private String language;
+
+    @ApiModelProperty(value = "状态：0 禁用 1 启用")
+    private Integer status;
+
     @ApiModelProperty(value = "是否即时消息: 0 否  1 是")
     private Integer immediateFlag;
+
+    @ApiModelProperty(value = "备注")
+    private String remarks;
+
+    @ApiModelProperty(value = "创建人")
+    private String createBy;
 
 }

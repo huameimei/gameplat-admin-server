@@ -1,6 +1,7 @@
 package com.gameplat.admin.model.domain;
 
 import com.baomidou.mybatisplus.annotation.*;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -13,6 +14,7 @@ import java.util.Date;
  * @date: 2021/4/28 15:53
  * @desc:
  */
+
 @Data
 @TableName("message")
 public class Message implements Serializable {
@@ -25,117 +27,73 @@ public class Message implements Serializable {
     @TableId(value = "id", type = IdType.AUTO)
     private Long id;
 
-    /**
-     * 消息标题
-     */
-    private String messageTitle;
+    @ApiModelProperty(value = "消息标题")
+    private String title;
 
-    /**
-     * 消息内容
-     */
-    private String messageContent;
+    @ApiModelProperty(value = "消息内容")
+    private String content;
 
-    /**
-     * PC端图片
-     */
+    @ApiModelProperty(value = "总类别:0.默认(3) 1.游戏(2) 2.足球(2) 3.直播(2) 4.系统(1)")
+    private Integer category;
+
+    @ApiModelProperty(value = "位置: 0.默认(1) 1.推荐(2) 2.首页大厅(2,3) 3.彩票首页(3) 4.体育首页(3) 5.游戏首页(3)")
+    private Integer position;
+
+    @ApiModelProperty(value = "展示类型: 0.默认(1) 1.滚动(2) 2.文本弹窗(3) 3.图片弹窗(3)")
+    private Integer showType;
+
+    @ApiModelProperty(value = "PC端图片")
     private String pcImage;
 
-    /**
-     * APP端图片
-     */
+    @ApiModelProperty(value = "APP端图片")
     private String appImage;
 
-    /**
-     * 推送范围
-     */
+    @ApiModelProperty(value = "弹出次数:0.默认(1,2) 1.只弹一次(3) 2.多次弹出(3)")
+    private Integer popsCount;
+
+    @ApiModelProperty(value = "推送范围:1.全部会员 2.部分会员 3.在线会员 4.充值层级 5.VIP等级 6.代理线")
     private Integer pushRange;
 
-    /**
-     * 是否弹窗: 0 否  1 是
-     */
-    private Integer popupsFlag;
-
-    /**
-     * 弹出次数: 1 一次  2 多次
-     */
-    private Integer popupsFrequency;
-
-    /**
-     * 消息类型
-     */
-    private Integer messageType;
-
-    /**
-     * 弹窗类型
-     */
-    private String popupsType;
-
-    /**
-     * 是否即时消息: 0 否  1 是
-     */
-    private Integer immediateFlag;
-
-    /**
-     * 状态：0 禁用 1 启用
-     */
-    private Integer status;
-
-    /**
-     * 升序排序
-     */
-    private Integer sort;
-
-    /**
-     * 关联账号
-     */
+    @ApiModelProperty(value = "关联账号")
     private String linkAccount;
 
-    /**
-     * 会员层级
-     */
-    private String level;
-
-    /**
-     * 语种
-     */
-    private String language;
-
-    /**
-     * 备注
-     */
-    private String remarks;
-
-    /**
-     * 开始时间
-     */
+    @ApiModelProperty(value = "开始时间")
     private Date beginTime;
 
-    /**
-     * 结束时间
-     */
+    @ApiModelProperty(value = "结束时间")
     private Date endTime;
 
-    /**
-     * 创建人
-     */
+    @ApiModelProperty(value = "升序排序")
+    private Integer sort;
+
+    @ApiModelProperty(value = "消息类型（1.系统消息、2.平台公告、3.个人弹窗消息）")
+    private Integer type;
+
+    @ApiModelProperty(value = "语种")
+    private String language;
+
+    @ApiModelProperty(value = "状态：0 禁用 1 启用")
+    private Integer status;
+
+    @ApiModelProperty(value = "是否即时消息: 0 否  1 是")
+    private Integer immediateFlag;
+
+    @ApiModelProperty(value = "备注")
+    private String remarks;
+
+    @ApiModelProperty(value = "创建人")
     @TableField(fill = FieldFill.INSERT)
     private String createBy;
 
-    /**
-     * 创建时间
-     */
+    @ApiModelProperty(value = "创建时间")
     @TableField(fill = FieldFill.INSERT)
     private Date createTime;
 
-    /**
-     * 更新人
-     */
+    @ApiModelProperty(value = "更新人")
     @TableField(fill = FieldFill.INSERT_UPDATE)
     private String updateBy;
 
-    /**
-     * 更新时间
-     */
+    @ApiModelProperty(value = "更新时间")
     @TableField(fill = FieldFill.INSERT_UPDATE)
     private Date updateTime;
 }

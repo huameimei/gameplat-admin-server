@@ -12,15 +12,10 @@ import com.gameplat.admin.mapper.MessageMapper;
 import com.gameplat.admin.model.domain.Member;
 import com.gameplat.admin.model.domain.Message;
 import com.gameplat.admin.model.domain.MessageDistribute;
+import com.gameplat.admin.model.domain.SysDictData;
 import com.gameplat.admin.model.dto.*;
-import com.gameplat.admin.model.vo.MemberInfoVO;
-import com.gameplat.admin.model.vo.MemberVO;
-import com.gameplat.admin.model.vo.MessageDistributeVO;
-import com.gameplat.admin.model.vo.MessageVO;
-import com.gameplat.admin.service.MemberService;
-import com.gameplat.admin.service.MessageDistributeService;
-import com.gameplat.admin.service.MessageService;
-import com.gameplat.admin.service.OnlineUserService;
+import com.gameplat.admin.model.vo.*;
+import com.gameplat.admin.service.*;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.BeanUtils;
 import com.gameplat.base.common.util.StringUtils;
@@ -56,14 +51,57 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, Message> impl
     @Autowired
     private OnlineUserService onlineUserService;
 
+    @Autowired
+    private SysDictDataService sysDictDataService;
+
     //分页条数
     private int perSize = 1000;
 
     @Override
+    public MessageDictDataVO getDictData() {
+        List<String> types = new ArrayList<>();
+        types.add("MESSAGE_MEMBER_RANGE");
+        types.add("MESSAGE_LOCATION");
+        types.add("MESSAGE_POP_COUNT");
+        types.add("MESSAGE_CATEGORY");
+        types.add("MESSAGE_SHOW_TYPE");
+        List<SysDictData> dictDataByTypes = sysDictDataService.getDictDataByTypes(types);
+        MessageDictDataVO vo = new MessageDictDataVO();
+        List userRange = new ArrayList();
+        List location = new ArrayList();
+        List popCount = new ArrayList();
+        List messageCate = new ArrayList();
+        List messageShowType = new ArrayList();
+        for (SysDictData dictDataByType : dictDataByTypes) {
+            if(dictDataByType.getDictType().equals("MESSAGE_MEMBER_RANGE")){
+                userRange.add(dictDataByType);
+            }
+            if(dictDataByType.getDictType().equals("MESSAGE_LOCATION")){
+                location.add(dictDataByType);
+            }
+            if(dictDataByType.getDictType().equals("MESSAGE_POP_COUNT")){
+                popCount.add(dictDataByType);
+            }
+            if(dictDataByType.getDictType().equals("MESSAGE_CATEGORY")){
+                messageCate.add(dictDataByType);
+            }
+            if(dictDataByType.getDictType().equals("MESSAGE_SHOW_TYPE")){
+                messageShowType.add(dictDataByType);
+            }
+        }
+        vo.setUserRange(userRange);
+        vo.setLocation(location);
+        vo.setPopCount(popCount);
+        vo.setMessageCate(messageCate);
+        vo.setMessageShowType(messageShowType);
+        return vo;
+    }
+
+    @Override
     public IPage<MessageVO> findMessageList(PageDTO<Message> page, MessageQueryDTO messageQueryDTO) {
         IPage<MessageVO> iPage = this.lambdaQuery()
-                .eq(StringUtils.isNotBlank(messageQueryDTO.getMessageTitle()), Message::getMessageTitle, messageQueryDTO.getMessageTitle())
-                .eq(StringUtils.isNotBlank(messageQueryDTO.getMessageContent()), Message::getMessageContent, messageQueryDTO.getMessageContent())
+                .eq(StringUtils.isNotBlank(messageQueryDTO.getTitle()), Message::getTitle, messageQueryDTO.getTitle())
+                .eq(StringUtils.isNotBlank(messageQueryDTO.getContent()), Message::getContent, messageQueryDTO.getContent())
                 .eq(messageQueryDTO.getStatus() != null, Message::getStatus, messageQueryDTO.getStatus())
                 .eq(StringUtils.isNotBlank(messageQueryDTO.getLanguage()), Message::getLanguage, messageQueryDTO.getLanguage())
                 .page(page).convert(messageConvert::toVo);
@@ -129,15 +167,15 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, Message> impl
                 }
                 break;
             case SOME_MEMBERS:
-                //2-部分会员,获取部分会有账号
-                if (StringUtils.isBlank(messageAddDTO.getPushTarget())) {
+                //2-部分会员,获取部分会员账号
+                if (StringUtils.isBlank(messageAddDTO.getLinkAccount())) {
                     throw new ServiceException("推送范围选择部分会员，会员账号不能为空");
                 }
                 List<String> accountList = new ArrayList<>();
-                if (messageAddDTO.getPushTarget().contains(",")) {
-                    accountList.addAll(Arrays.asList(messageAddDTO.getPushTarget().split(",")));
+                if (messageAddDTO.getLinkAccount().contains(",")) {
+                    accountList.addAll(Arrays.asList(messageAddDTO.getLinkAccount().split(",")));
                 } else {
-                    accountList.add(messageAddDTO.getPushTarget());
+                    accountList.add(messageAddDTO.getLinkAccount());
                 }
                 //验证会员是否存在
                 if (CollectionUtils.isNotEmpty(accountList)) {
@@ -179,10 +217,10 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, Message> impl
                 break;
             case USER_LEVEL:
                 //4-会员层级
-                if (StringUtils.isBlank(messageAddDTO.getPushTarget())) {
+                if (StringUtils.isBlank(messageAddDTO.getLinkAccount())) {
                     throw new ServiceException("充值层级值不能为空");
                 }
-                List<String> userLevelList = Arrays.asList(messageAddDTO.getPushTarget().split(","));
+                List<String> userLevelList = Arrays.asList(messageAddDTO.getLinkAccount().split(","));
                 //查询指定层级的用户
                 List<Member> memberList = memberService.getListByUserLevel(userLevelList);
                 if (CollectionUtils.isNotEmpty(memberList)) {
@@ -195,10 +233,10 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, Message> impl
                 break;
             case VIP_LEVEL:
                 //5-VIP等级
-                if (StringUtils.isBlank(messageAddDTO.getPushTarget())) {
+                if (StringUtils.isBlank(messageAddDTO.getLinkAccount())) {
                     throw new ServiceException("充值层级值不能为空");
                 }
-                List<String> vipLevelList = Arrays.asList(messageAddDTO.getPushTarget().split(","));
+                List<String> vipLevelList = Arrays.asList(messageAddDTO.getLinkAccount().split(","));
                 //查询指定层级的用户
                 List<Member> memberList1 = memberService.getListByVipLevel(vipLevelList);
                 if (CollectionUtils.isNotEmpty(memberList1)) {
@@ -211,10 +249,10 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, Message> impl
                 break;
             case AGENT_LINE:
                 //6-代理线
-                if (StringUtils.isBlank(messageAddDTO.getPushTarget())) {
+                if (StringUtils.isBlank(messageAddDTO.getLinkAccount())) {
                     throw new ServiceException("代理线不能为空");
                 }
-                String agentAccout = messageAddDTO.getPushTarget();
+                String agentAccout = messageAddDTO.getLinkAccount();
                 MemberInfoVO agnetMemberInfo = memberService.getMemberInfo(agentAccout);
                 if (agnetMemberInfo == null || !"A".equals(agnetMemberInfo.getUserType())) {
                     throw new ServiceException("代理帐号不存在");
@@ -304,29 +342,26 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, Message> impl
         if (StringUtils.isBlank(messageAddDTO.getLanguage())) {
             throw new ServiceException("语言不能为空");
         }
-        if (messageAddDTO.getPushRange() == null || messageAddDTO.getPushRange() == 0) {
+        if (messageAddDTO.getPushRange() == null) {
             throw new ServiceException("推送范围不能为空");
         }
-        if (messageAddDTO.getMessageType() == null || messageAddDTO.getMessageType() == 0) {
-            throw new ServiceException("消息类型不能为空");
+        if (messageAddDTO.getShowType() == null) {
+            throw new ServiceException("展示类型不能为空");
         }
-        if (StringUtils.isBlank(messageAddDTO.getPopupsType())) {
-            throw new ServiceException("弹窗类型不能为空");
-        }
-        if (messageAddDTO.getPopupsFrequency() == null || messageAddDTO.getPopupsFrequency() == 0) {
+        if (messageAddDTO.getPopsCount() == null) {
             throw new ServiceException("弹出次数不能为空");
         }
         if (messageAddDTO.getBeginTime() == null || messageAddDTO.getEndTime() == null) {
             throw new ServiceException("时间范围不能为空");
         }
-        if (StringUtils.isBlank(messageAddDTO.getMessageTitle())) {
+        if (StringUtils.isBlank(messageAddDTO.getTitle())) {
             throw new ServiceException("消息标题不能为空");
         }
-        if (StringUtils.isBlank(messageAddDTO.getMessageContent())) {
+        if (StringUtils.isBlank(messageAddDTO.getContent())) {
             throw new ServiceException("消息内容不能为空");
         }
 
-        if (messageAddDTO.getMessageType() == 2
+        if (messageAddDTO.getShowType() == PushMessageEnum.MessageShowType.PIC_POPUP.getValue()
                 && (StringUtils.isBlank(messageAddDTO.getAppImage())
                 || StringUtils.isBlank(messageAddDTO.getPcImage()))) {
             throw new ServiceException("选择消息类型为图片弹窗，web端和移动端图片不能为空");

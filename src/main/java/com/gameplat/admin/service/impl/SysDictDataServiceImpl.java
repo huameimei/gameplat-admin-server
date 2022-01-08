@@ -81,13 +81,25 @@ public class SysDictDataServiceImpl extends ServiceImpl<SysDictDataMapper, SysDi
 
   @Override
   @SentinelResource(value = "getDictData")
-  @Cached(name = CachedKeys.DICT_DATA_CACHE, key = "#dictType + ':' + #dictLabel", expire = 7200)
   public SysDictData getDictData(String dictType, String dictLabel) {
     return this.lambdaQuery()
         .eq(SysDictData::getStatus, SystemCodeType.ENABLE.getCode())
         .eq(SysDictData::getDictType, dictType)
         .eq(SysDictData::getDictLabel, dictLabel)
         .one();
+  }
+
+  @Override
+  @SentinelResource(value = "getDictDataValue")
+  @Cached(name = CachedKeys.DICT_DATA_CACHE, key = "#dictType + ':' + #dictLabel", expire = 7200)
+  public String getDictDataValue(String dictType, String dictLabel) {
+    return this.lambdaQuery()
+        .eq(SysDictData::getStatus, SystemCodeType.ENABLE.getCode())
+        .eq(SysDictData::getDictType, dictType)
+        .eq(SysDictData::getDictLabel, dictLabel)
+        .oneOpt()
+        .map(SysDictData::getDictValue)
+        .orElse(null);
   }
 
   @Override
@@ -209,6 +221,15 @@ public class SysDictDataServiceImpl extends ServiceImpl<SysDictDataMapper, SysDi
       key = "#entity.dictType + ':' + #entity.label")
   public boolean updateById(SysDictData entity) {
     return super.updateById(entity);
+  }
+
+  @Override
+  @SentinelResource(value = "saveOrUpdate")
+  @CacheInvalidate(
+      name = CachedKeys.DICT_DATA_CACHE,
+      key = "#entity.dictType + ':' + #entity.dictLabel")
+  public boolean saveOrUpdate(SysDictData entity) {
+    return super.saveOrUpdate(entity);
   }
 
   private SysDictData getByTypeAndLabel(String type, String label) {

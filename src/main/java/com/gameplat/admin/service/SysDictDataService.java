@@ -30,6 +30,8 @@ public interface SysDictDataService extends IService<SysDictData> {
 
   SysDictData getDictData(String dictType, String dictLabel);
 
+  String getDictDataValue(String dictType, String dictLabel);
+
   void insertDictData(OperDictDataDTO operDictDataDTO);
 
   void updateDictData(OperDictDataDTO operDictDataDTO);

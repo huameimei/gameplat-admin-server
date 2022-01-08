@@ -3,7 +3,6 @@ package com.gameplat.admin.controller.open.common;
 import com.alibaba.fastjson.JSONObject;
 import com.gameplat.admin.model.dto.AdminLoginDTO;
 import com.gameplat.admin.model.dto.GoogleAuthDTO;
-import com.gameplat.admin.model.vo.RefreshToken;
 import com.gameplat.admin.model.vo.UserToken;
 import com.gameplat.admin.service.AuthenticationService;
 import com.gameplat.admin.service.SysUserService;

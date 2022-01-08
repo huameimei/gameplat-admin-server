@@ -1,4 +1,4 @@
-package com.gameplat.admin.service.impl;
+package com.gameplat.admin.service;
 
 import java.security.PrivateKey;
 

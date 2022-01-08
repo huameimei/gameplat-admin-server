@@ -11,12 +11,11 @@ import com.gameplat.admin.model.dto.*;
 import com.gameplat.admin.model.vo.AgentContacaVO;
 import com.gameplat.admin.model.vo.SysFileConfigVO;
 import com.gameplat.admin.model.vo.SysSmsAreaVO;
-import com.gameplat.admin.model.vo.SysSmsConfigVO;
 import com.gameplat.admin.service.SysDictDataService;
 import com.gameplat.admin.service.SystemConfigService;
 
-import java.util.List;
-
+import com.gameplat.common.compent.oss.config.FileConfig;
+import com.gameplat.common.compent.sms.SmsConfig;
 import com.gameplat.common.model.bean.EmailConfig;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -24,13 +23,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -77,23 +72,23 @@ public class OpenSystemConfigController {
   }
 
   @GetMapping("/sms/list")
-  public List<SysSmsConfigVO> findSmsList() {
+  public List<SmsConfig> findSmsList() {
     return systemConfigService.findSmsList();
   }
 
   @GetMapping("/file/list")
-  public List<SysFileConfigVO> findFileList() {
+  public List<FileConfig> findFileList() {
     return systemConfigService.findFileList();
   }
 
   @PutMapping("/sms/update")
-  public void updateSms(@RequestBody SysSmsConfigDTO sysSmsConfigDTO) {
-    systemConfigService.updateSmsConfig(sysSmsConfigDTO);
+  public void updateSms(@RequestBody SmsConfig config) {
+    systemConfigService.updateSmsConfig(config);
   }
 
   @PutMapping("/file/update")
-  public void updateSms(@RequestBody SysFileConfigDTO sysFileConfigDTO) {
-    systemConfigService.updateFileConfig(sysFileConfigDTO);
+  public void updateSms(@RequestBody FileConfig config) {
+    systemConfigService.updateFileConfig(config);
   }
 
   @PutMapping("/update")
@@ -124,5 +119,10 @@ public class OpenSystemConfigController {
   @PutMapping("/email/update")
   public void updateEmail(@RequestBody EmailConfig emailConfig) {
     systemConfigService.updateEmail(emailConfig);
+  }
+
+  @PostMapping("/email/testSend")
+  public void testSendEmail(@RequestBody EmailTestDTO dto) {
+    systemConfigService.testSendEmail(dto);
   }
 }

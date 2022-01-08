@@ -4,6 +4,7 @@ import cn.hutool.crypto.KeyUtil;
 import cn.hutool.crypto.asymmetric.KeyType;
 import cn.hutool.crypto.asymmetric.RSA;
 import cn.hutool.crypto.digest.MD5;
+import com.gameplat.admin.service.PasswordService;
 import com.gameplat.base.common.util.Base64;
 import java.security.PrivateKey;
 import org.springframework.beans.factory.annotation.Autowired;

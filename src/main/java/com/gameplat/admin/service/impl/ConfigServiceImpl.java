@@ -83,8 +83,7 @@ public class ConfigServiceImpl implements ConfigService {
   }
 
   private Optional<String> getDictData(DictDataEnum dataEnum) {
-    String dictType = dataEnum.getType().getValue();
-    return Optional.ofNullable(dictDataService.getDictData(dictType, dataEnum.getLabel()))
-        .map(SysDictData::getDictValue);
+    return Optional.ofNullable(
+        dictDataService.getDictDataValue(dataEnum.getType().getValue(), dataEnum.getLabel()));
   }
 }

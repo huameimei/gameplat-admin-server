@@ -12,8 +12,6 @@ import com.gameplat.common.compent.kaptcha.KaptchaProducer;
 import com.gameplat.common.model.bean.limit.AdminLoginLimit;
 import com.gameplat.redis.idempoten.AutoIdempotent;
 import com.gameplat.security.SecurityUserHolder;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;

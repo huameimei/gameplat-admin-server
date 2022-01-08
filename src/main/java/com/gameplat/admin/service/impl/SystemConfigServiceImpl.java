@@ -1,5 +1,6 @@
 package com.gameplat.admin.service.impl;
 
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.json.JSONObject;
 import com.alibaba.fastjson.JSONArray;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -11,16 +12,11 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.gameplat.admin.constant.TrueFalse;
-import com.gameplat.admin.convert.AgentContacaConfigConvert;
-import com.gameplat.admin.convert.SysFileConfigConvert;
 import com.gameplat.admin.convert.SysSmsAreaConvert;
-import com.gameplat.admin.convert.SysSmsConfigConvert;
-import com.gameplat.admin.model.domain.*;
+import com.gameplat.admin.model.domain.SysDictData;
+import com.gameplat.admin.model.domain.SysSmsArea;
 import com.gameplat.admin.model.dto.*;
-import com.gameplat.admin.model.vo.AgentContacaVO;
-import com.gameplat.admin.model.vo.SysFileConfigVO;
 import com.gameplat.admin.model.vo.SysSmsAreaVO;
-import com.gameplat.admin.model.vo.SysSmsConfigVO;
 import com.gameplat.admin.service.ConfigService;
 import com.gameplat.admin.service.SysDictDataService;
 import com.gameplat.admin.service.SysSmsAreaService;
@@ -30,11 +26,16 @@ import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.json.JsonUtils;
 import com.gameplat.base.common.util.DateUtil;
 import com.gameplat.base.common.util.StringUtils;
+import com.gameplat.common.compent.email.EmailSender;
+import com.gameplat.common.compent.oss.config.FileConfig;
+import com.gameplat.common.compent.sms.SmsConfig;
 import com.gameplat.common.enums.DictDataEnum;
 import com.gameplat.common.enums.DictTypeEnum;
 import com.gameplat.common.model.bean.EmailConfig;
+import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -49,10 +50,6 @@ public class SystemConfigServiceImpl implements SystemConfigService {
   @Autowired private SysDictDataService dictDataService;
 
   @Autowired private ConfigService configService;
-
-  @Autowired private SysSmsConfigConvert sysSmsConfigConvert;
-
-  @Autowired private SysFileConfigConvert sysFileConfigConvert;
 
   @Autowired private SysSmsAreaService sysSmsAreaService;
 
@@ -145,79 +142,78 @@ public class SystemConfigServiceImpl implements SystemConfigService {
   }
 
   @Override
-  public List<SysSmsConfigVO> findSmsList() {
+  public List<SmsConfig> findSmsList() {
     String dictData = configService.getValue(DictDataEnum.SMS);
     if (StringUtils.isNotBlank(dictData)) {
-      return JSONArray.parseArray(dictData, SysSmsConfigVO.class);
+      return JSONArray.parseArray(dictData, SmsConfig.class);
     }
 
     return Collections.emptyList();
   }
 
   @Override
-  public List<SysFileConfigVO> findFileList() {
-    String dictData = configService.getValue(DictDataEnum.FILE);
-    if (StringUtils.isNotBlank(dictData)) {
-      return JSONArray.parseArray(dictData, SysFileConfigVO.class);
-    }
-    return Collections.emptyList();
+  public List<FileConfig> findFileList() {
+    return Optional.ofNullable(configService.getValue(DictDataEnum.FILE))
+        .map(e -> JSONArray.parseArray(e, FileConfig.class))
+        .orElse(null);
   }
 
   @Override
-  public void updateSmsConfig(SysSmsConfigDTO dto) {
-    // 查询短信配置
+  public void updateSmsConfig(SmsConfig config) {
+    config.setEnable(true);
+
     SysDictData dictData =
         dictDataService.getDictData(
-            DictTypeEnum.SMS_CONFIG.getValue(), DictDataEnum.SMS.getLabel());
+            DictDataEnum.SMS.getType().getValue(), DictDataEnum.SMS.getLabel());
 
-    List<SysSmsConfig> smsConfigList =
+    List<SmsConfig> configs =
         Optional.of(dictData)
             .map(SysDictData::getDictValue)
-            .map(c -> JsonUtils.parse(c, new TypeReference<List<SysSmsConfig>>() {}))
-            .orElse(Collections.emptyList());
+            .map(c -> JsonUtils.parse(c, new TypeReference<List<SmsConfig>>() {}))
+            .orElseGet(() -> Lists.newArrayList(config));
 
-    SysSmsConfig smsConfig = sysSmsConfigConvert.toEntity(dto);
-    if (CollectionUtils.isNotEmpty(smsConfigList)) {
+    if (CollectionUtils.isNotEmpty(configs)) {
+      // 禁用全部
+      configs.forEach(e -> e.setEnable(false));
       // 替换旧数据
-      smsConfigList.replaceAll(
-          c -> c.getOperator().equals(smsConfig.getOperator()) ? smsConfig : c);
+      configs.replaceAll(c -> c.getProvider().equals(config.getProvider()) ? config : c);
+    }
 
-      // 修改
-      dictDataService.updateDictData(
-          OperDictDataDTO.builder()
-              .id(dictData.getId())
-              .dictLabel(dictData.getDictLabel())
-              .dictType(dictData.getDictType())
-              .dictValue(JsonUtils.toJson(smsConfigList))
-              .build());
+    // 保存
+    dictData.setDictValue(JsonUtils.toJson(configs));
+    if (!dictDataService.saveOrUpdate(dictData)) {
+      throw new ServiceException("修改失败!");
     }
   }
 
   @Override
-  public void updateFileConfig(SysFileConfigDTO dto) {
+  public void updateFileConfig(FileConfig config) {
+    // 设为启用
+    config.setEnable(true);
+
     SysDictData dictData =
         dictDataService.getDictData(
             DictTypeEnum.FILE_CONFIG.getValue(), DictDataEnum.FILE.getLabel());
 
-    List<SysFileConfig> fileConfigList =
+    List<FileConfig> configs =
         Optional.of(dictData)
             .map(SysDictData::getDictValue)
-            .map(c -> JsonUtils.parse(c, new TypeReference<List<SysFileConfig>>() {}))
-            .orElse(Collections.emptyList());
+            .map(c -> JsonUtils.parse(c, new TypeReference<List<FileConfig>>() {}))
+            .filter(CollectionUtil::isNotEmpty)
+            .orElseGet(() -> Lists.newArrayList(config));
 
-    SysFileConfig config = sysFileConfigConvert.toEntity(dto);
-    if (CollectionUtils.isNotEmpty(fileConfigList)) {
+    if (CollectionUtils.isNotEmpty(configs)) {
+      // 禁用全部
+      configs.forEach(e -> e.setEnable(false));
+
       // 替换旧数据
-      fileConfigList.replaceAll(
-          c -> c.getServiceProvider().equals(config.getServiceProvider()) ? config : c);
+      configs.replaceAll(c -> c.getProvider().equals(config.getProvider()) ? config : c);
+    }
 
-      dictDataService.updateDictData(
-          OperDictDataDTO.builder()
-              .id(dictData.getId())
-              .dictLabel(dictData.getDictLabel())
-              .dictType(dictData.getDictType())
-              .dictValue(JsonUtils.toJson(fileConfigList))
-              .build());
+    // 保存
+    dictData.setDictValue(JsonUtils.toJson(configs));
+    if (!dictDataService.saveOrUpdate(dictData)) {
+      throw new ServiceException("修改失败!");
     }
   }
 
@@ -294,5 +290,12 @@ public class SystemConfigServiceImpl implements SystemConfigService {
             .dictType(dictData.getDictType())
             .dictValue(JsonUtils.toJson(config))
             .build());
+  }
+
+  @Async
+  @Override
+  public void testSendEmail(EmailTestDTO dto) {
+    EmailSender sender = EmailSender.buildWithConfig(this.findEmailConfig());
+    sender.send(dto.getSubject(), dto.getContent(), dto.getTo());
   }
 }

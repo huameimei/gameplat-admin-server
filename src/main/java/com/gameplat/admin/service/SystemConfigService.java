@@ -7,7 +7,8 @@ import com.gameplat.admin.model.dto.*;
 import com.gameplat.admin.model.vo.AgentContacaVO;
 import com.gameplat.admin.model.vo.SysFileConfigVO;
 import com.gameplat.admin.model.vo.SysSmsAreaVO;
-import com.gameplat.admin.model.vo.SysSmsConfigVO;
+import com.gameplat.common.compent.oss.config.FileConfig;
+import com.gameplat.common.compent.sms.SmsConfig;
 import com.gameplat.common.model.bean.EmailConfig;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -21,13 +22,13 @@ public interface SystemConfigService {
 
   void delAgentContaca(Long id);
 
-  List<SysSmsConfigVO> findSmsList();
+  List<SmsConfig> findSmsList();
 
-  List<SysFileConfigVO> findFileList();
+  List<FileConfig> findFileList();
 
-  void updateSmsConfig(SysSmsConfigDTO sysSmsConfigDTO);
+  void updateSmsConfig(SmsConfig config);
 
-  void updateFileConfig(SysFileConfigDTO sysFileConfigDTO);
+  void updateFileConfig(FileConfig config);
 
   void configDataEdit(OperSystemConfigDTO dto);
 
@@ -40,4 +41,6 @@ public interface SystemConfigService {
   EmailConfig findEmailConfig();
 
   void updateEmail(EmailConfig emailConfig);
+
+  void testSendEmail(EmailTestDTO dto);
 }

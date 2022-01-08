@@ -24,8 +24,8 @@ public class MemberQueryCondition {
    * @return QueryWrapper
    */
   public QueryWrapper<Member> builderQueryWrapper(MemberQueryDTO dto) {
-    QueryWrapper<Member> queryWrapper = Wrappers.query();
-    queryWrapper
+    QueryWrapper<Member> query = Wrappers.query();
+    query
         .eq(ObjectUtils.isNotEmpty(dto.getNickname()), "t1.nickname", dto.getNickname())
         .eq(ObjectUtils.isNotNull(dto.getUserType()), "t1.user_type", dto.getUserType())
         .eq(ObjectUtils.isNotNull(dto.getStatus()), "t1.status", dto.getStatus())
@@ -38,21 +38,18 @@ public class MemberQueryCondition {
             ObjectUtils.isNotEmpty(dto.getInvitationCode()),
             "t2.invitation_code",
             dto.getInvitationCode())
-        .func(
-            ObjectUtils.isNotEmpty(dto.getAccount()), query -> this.builderAccountQuery(query, dto))
+        .func(ObjectUtils.isNotEmpty(dto.getAccount()), q -> this.builderAccountQuery(query, dto))
         .func(
             ObjectUtils.isNotEmpty(dto.getAgentAccount()),
-            query -> this.builderAgentAccountQuery(query, dto))
-        .func(
-            ObjectUtils.isNotEmpty(dto.getRealName()),
-            query -> this.builderRealNameQuery(query, dto))
-        .func(ObjectUtils.isNotEmpty(dto.getRemark()), query -> this.builderRemarkQuery(query, dto))
+            q -> this.builderAgentAccountQuery(query, dto))
+        .func(ObjectUtils.isNotEmpty(dto.getRealName()), q -> this.builderRealNameQuery(query, dto))
+        .func(ObjectUtils.isNotEmpty(dto.getRemark()), q -> this.builderRemarkQuery(query, dto))
         .func(
             ObjectUtils.isNotEmpty(dto.getRegisterIp()),
-            query -> this.builderRegisterIpQuery(query, dto))
+            q -> this.builderRegisterIpQuery(query, dto))
         .func(
             ObjectUtils.isNotEmpty(dto.getLastLoginIp()),
-            query -> this.builderLastLoginIpQuery(query, dto))
+            q -> this.builderLastLoginIpQuery(query, dto))
         // 余额范围搜索
         .ge(ObjectUtils.isNotNull(dto.getBalanceFrom()), "t2.balance", dto.getBalanceFrom())
         .le(ObjectUtils.isNotNull(dto.getBalanceTo()), "t2.balance", dto.getBalanceTo())
@@ -76,7 +73,7 @@ public class MemberQueryCondition {
         // 最近多少天未登陆
         .func(
             ObjectUtils.isNotNull(dto.getDayOfNotLogin()),
-            query -> this.builderDayOfNotLoginQuery(query, dto))
+            q -> this.builderDayOfNotLoginQuery(query, dto))
         // 累计充值次数范围
         .ge(
             ObjectUtils.isNotEmpty(dto.getRechTimesFrom()),
@@ -88,7 +85,10 @@ public class MemberQueryCondition {
             dto.getRechTimesTo())
         // 最近充值时间
         .between(
-            ObjectUtils.isNotEmpty(dto.getLastRechTimeFrom() ), "t2.last_rech_time", dto.getLastRechTimeFrom(),dto.getLastRechTimeTo())
+            ObjectUtils.isNotEmpty(dto.getLastRechTimeFrom()),
+            "t2.last_rech_time",
+            dto.getLastRechTimeFrom(),
+            dto.getLastRechTimeTo())
         // 充值金额范围
         .ge(
             ObjectUtils.isNotEmpty(dto.getRechAmountFrom()),
@@ -101,7 +101,7 @@ public class MemberQueryCondition {
         // 超过多少天未充值
         .func(
             ObjectUtils.isNotNull(dto.getDayOfNoRecha()),
-            query -> this.builderDayOfNotRechQuery(query, dto))
+            q -> this.builderDayOfNotRechQuery(query, dto))
         // 累计提现次数范围
         .ge(
             ObjectUtils.isNotEmpty(dto.getWithdrawTimesFrom()),
@@ -129,7 +129,7 @@ public class MemberQueryCondition {
         // 未二次充值
         .lt(Boolean.TRUE.equals(dto.getNotTwiceRech()), "t2.total_rech_times", 2);
 
-    return queryWrapper;
+    return query;
   }
 
   private Date getDateDiff(Integer diff) {

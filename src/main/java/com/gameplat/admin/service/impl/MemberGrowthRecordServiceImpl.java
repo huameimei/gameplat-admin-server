@@ -1,7 +1,6 @@
 package com.gameplat.admin.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.date.DateTime;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -15,13 +14,14 @@ import com.gameplat.admin.convert.MemberGrowthRecordConvert;
 import com.gameplat.admin.enums.FinancialSourceTypeEnum;
 import com.gameplat.admin.enums.GrowthChangeEnum;
 import com.gameplat.admin.enums.LanguageEnum;
+import com.gameplat.admin.enums.PushMessageEnum;
 import com.gameplat.admin.mapper.MemberGrowthRecordMapper;
+import com.gameplat.admin.mapper.MessageMapper;
 import com.gameplat.admin.model.domain.*;
 import com.gameplat.admin.model.dto.*;
 import com.gameplat.admin.model.vo.GrowthScaleVO;
 import com.gameplat.admin.model.vo.MemberGrowthLevelVO;
 import com.gameplat.admin.model.vo.MemberGrowthRecordVO;
-import com.gameplat.admin.model.vo.MemberInfoVO;
 import com.gameplat.admin.service.*;
 
 import java.math.BigDecimal;
@@ -76,9 +76,11 @@ public class MemberGrowthRecordServiceImpl extends ServiceImpl<MemberGrowthRecor
     @Autowired
     private FinancialService financialService;
     @Autowired
-    private SysInformationService sysInformationService;
-    @Autowired
     private ValidWithdrawService validWithdrawService;
+    @Autowired
+    private MessageMapper messageMapper;
+    @Autowired
+    private MessageDistributeService messageDistributeService;
 
     public static final String kindName = "{\"en-US\": \"platform\", \"in-ID\": \"peron\", \"th-TH\": \"แพลตฟอร์ม\", \"vi-VN\": \"nền tảng\", \"zh-CN\": \"平台\"}";
 
@@ -426,16 +428,30 @@ public class MemberGrowthRecordServiceImpl extends ServiceImpl<MemberGrowthRecor
             }
         }
         //通知 发个人消息
-        SysInformationAddDTO sysInformationDto = new SysInformationAddDTO();
-        sysInformationDto.setContent(content);
-        sysInformationDto.setTitle("VIP等级升级");
-        sysInformationDto.setType((byte) 3);
-        sysInformationDto.setLetterType((byte) 9);
-        sysInformationDto.setUserName(member.getAccount());
-        sysInformationDto.setUserId(member.getId());
-        sysInformationDto.setCreateBy(member.getAccount());
         log.info("发送消息");
-        sysInformationService.createSysInformation(sysInformationDto);
+        MessageAddDTO message = new MessageAddDTO();
+        message.setTitle("VIP等级升级");
+        message.setContent(content);
+        message.setCategory(PushMessageEnum.MessageCategory.SYS_SEND.getValue());
+        message.setPosition(PushMessageEnum.MessageCategory.CATE_DEF.getValue());
+        message.setShowType(PushMessageEnum.MessageShowType.SHOW_DEF.getValue());
+        message.setPopsCount(PushMessageEnum.PopCount.POP_COUNT_DEF.getValue());
+        message.setPushRange(PushMessageEnum.UserRange.SOME_MEMBERS.getValue());
+        message.setLinkAccount(member.getAccount());
+        message.setType(1);
+        message.setStatus(1);
+        message.setCreateBy("System");
+        messageMapper.saveReturnId(message);
+
+        MessageDistribute messageDistribute = new MessageDistribute();
+        messageDistribute.setMessageId(message.getId());
+        messageDistribute.setUserId(member.getId());
+        messageDistribute.setUserAccount(member.getAccount());
+        messageDistribute.setRechargeLevel(member.getUserLevel());
+        messageDistribute.setVipLevel(member.getLevel());
+        messageDistribute.setReadStatus(0);
+        messageDistribute.setCreateBy("System");
+        messageDistributeService.save(messageDistribute);
         log.info("发送消息成功");
     }
 

@@ -339,9 +339,6 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, Message> impl
      * @param messageAddDTO
      */
     private void validMessageInfo(MessageAddDTO messageAddDTO) {
-        if (StringUtils.isBlank(messageAddDTO.getLanguage())) {
-            throw new ServiceException("语言不能为空");
-        }
         if (messageAddDTO.getPushRange() == null) {
             throw new ServiceException("推送范围不能为空");
         }

@@ -58,10 +58,10 @@ public class Message implements Serializable {
     private String linkAccount;
 
     @ApiModelProperty(value = "开始时间")
-    private Date beginTime;
+    private String beginTime;
 
     @ApiModelProperty(value = "结束时间")
-    private Date endTime;
+    private String endTime;
 
     @ApiModelProperty(value = "升序排序")
     private Integer sort;

@@ -18,6 +18,9 @@ public class MessageAddDTO implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    @ApiModelProperty(value = "id")
+    private Long id;
+
     @ApiModelProperty(value = "消息标题")
     private String title;
 
@@ -49,10 +52,10 @@ public class MessageAddDTO implements Serializable {
     private String linkAccount;
 
     @ApiModelProperty(value = "开始时间")
-    private Date beginTime;
+    private String beginTime;
 
     @ApiModelProperty(value = "结束时间")
-    private Date endTime;
+    private String endTime;
 
     @ApiModelProperty(value = "升序排序")
     private Integer sort;

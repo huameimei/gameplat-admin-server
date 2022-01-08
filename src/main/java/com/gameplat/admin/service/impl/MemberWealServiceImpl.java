@@ -15,30 +15,12 @@ import com.gameplat.admin.convert.MemberWealConvert;
 import com.gameplat.admin.enums.CurrencyTypeEnum;
 import com.gameplat.admin.enums.FinancialSourceTypeEnum;
 import com.gameplat.admin.enums.LanguageEnum;
+import com.gameplat.admin.enums.PushMessageEnum;
 import com.gameplat.admin.mapper.*;
-import com.gameplat.admin.model.domain.Financial;
-import com.gameplat.admin.model.domain.Member;
-import com.gameplat.admin.model.domain.MemberBlackList;
-import com.gameplat.admin.model.domain.MemberGrowthConfig;
-import com.gameplat.admin.model.domain.MemberGrowthLevel;
-import com.gameplat.admin.model.domain.MemberWeal;
-import com.gameplat.admin.model.domain.MemberWealDetail;
-import com.gameplat.admin.model.domain.MemberWealReword;
-import com.gameplat.admin.model.domain.ValidWithdraw;
-import com.gameplat.admin.model.dto.MemberWealAddDTO;
-import com.gameplat.admin.model.dto.MemberWealDTO;
-import com.gameplat.admin.model.dto.MemberWealEditDTO;
-import com.gameplat.admin.model.dto.MemberWealRewordAddDTO;
-import com.gameplat.admin.model.dto.MemberWealRewordDTO;
-import com.gameplat.admin.model.dto.SysInformationAddDTO;
+import com.gameplat.admin.model.domain.*;
+import com.gameplat.admin.model.dto.*;
 import com.gameplat.admin.model.vo.MemberWealVO;
-import com.gameplat.admin.service.FinancialService;
-import com.gameplat.admin.service.MemberBlackListService;
-import com.gameplat.admin.service.MemberWealDetailService;
-import com.gameplat.admin.service.MemberWealRewordService;
-import com.gameplat.admin.service.MemberWealService;
-import com.gameplat.admin.service.SysInformationService;
-import com.gameplat.admin.service.ValidWithdrawService;
+import com.gameplat.admin.service.*;
 import com.gameplat.base.common.context.GlobalContextHolder;
 import com.gameplat.base.common.enums.YseOrNoEnum;
 import com.gameplat.base.common.exception.ServiceException;
@@ -90,9 +72,10 @@ public class MemberWealServiceImpl extends ServiceImpl<MemberWealMapper, MemberW
     @Autowired private ValidWithdrawService validWithdrawService;
     @Autowired private FinancialService financialService;
     @Autowired private DistributedLocker distributedLocker;
-    @Autowired private SysInformationService sysInformationService;
     @Autowired private MemberWealRewordService wealRewordService;
     @Autowired private RedissonClient redissonClient;
+    @Autowired private MessageMapper messageMapper;
+    @Autowired private MessageDistributeService messageDistributeService;
 
     /**
      * 获取等级俸禄达标会员
@@ -441,21 +424,35 @@ public class MemberWealServiceImpl extends ServiceImpl<MemberWealMapper, MemberW
                                     //不自动派发则 需要领取
                                     memberWealReword.setStatus(1);
                                 }
-                                //6.5 通知 发个人消息s
-                                SysInformationAddDTO sysInformationAddDTO = new SysInformationAddDTO();
-                                sysInformationAddDTO.setContent(content);
-                                sysInformationAddDTO.setTitle("VIP福利奖励");
-                                sysInformationAddDTO.setType((byte) 3);
-                                sysInformationAddDTO.setLetterType((byte) 8);
-                                sysInformationAddDTO.setUserName(member.getAccount());
-                                sysInformationAddDTO.setUserId(member.getId());
-                                //新增系统回复用户消息
-                                sysInformationService.createSysInformation(sysInformationAddDTO);
+                                //6.5 通知 发个人消息
+                                MessageAddDTO message = new MessageAddDTO();
+                                message.setTitle("VIP福利奖励");
+                                message.setContent(content);
+                                message.setCategory(PushMessageEnum.MessageCategory.SYS_SEND.getValue());
+                                message.setPosition(PushMessageEnum.MessageCategory.CATE_DEF.getValue());
+                                message.setShowType(PushMessageEnum.MessageShowType.SHOW_DEF.getValue());
+                                message.setPopsCount(PushMessageEnum.PopCount.POP_COUNT_DEF.getValue());
+                                message.setPushRange(PushMessageEnum.UserRange.SOME_MEMBERS.getValue());
+                                message.setLinkAccount(member.getAccount());
+                                message.setType(1);
+                                message.setStatus(1);
+                                message.setCreateBy("System");
+                                messageMapper.saveReturnId(message);
+
+                                MessageDistribute messageDistribute = new MessageDistribute();
+                                messageDistribute.setMessageId(message.getId());
+                                messageDistribute.setUserId(member.getId());
+                                messageDistribute.setUserAccount(member.getAccount());
+                                messageDistribute.setRechargeLevel(member.getUserLevel());
+                                messageDistribute.setVipLevel(member.getLevel());
+                                messageDistribute.setReadStatus(0);
+                                messageDistribute.setCreateBy("System");
+                                messageDistributeService.save(messageDistribute);
                                 //添加奖励记录
                                 wealRewordService.insertMemberWealReword(memberWealReword);
                                 //修改福利详情状态 为已完成
                                 wealDetailService.updateByWealStatus(item.getWealId(),2);
-                            } catch (Exception e){
+                            } catch (Exception e) {
                                 continue;
                             } finally {
                                 continue;

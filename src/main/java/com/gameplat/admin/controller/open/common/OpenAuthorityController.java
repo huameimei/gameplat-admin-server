@@ -9,6 +9,7 @@ import com.gameplat.admin.service.SysUserService;
 import com.gameplat.base.common.util.GoogleAuthenticator;
 import com.gameplat.base.common.util.ServletUtils;
 import com.gameplat.common.constant.ServiceName;
+import com.gameplat.common.model.bean.RefreshToken;
 import com.gameplat.log.annotation.Log;
 import com.gameplat.log.annotation.LoginLog;
 import com.gameplat.redis.idempoten.AutoIdempotent;

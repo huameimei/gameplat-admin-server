@@ -65,8 +65,11 @@ public class SysDictDataServiceImpl extends ServiceImpl<SysDictDataMapper, SysDi
   @Override
   @SentinelResource(value = "getDictDataByType")
   @Cached(name = CachedKeys.DICT_DATA_CACHE, key = "#dictType", expire = 3600)
-  public SysDictData getDictDataByType(String dictType) {
-    return this.getByTypeAndLabel(dictType, null);
+  public List<SysDictData> getDictDataByType(String dictType) {
+    return this.lambdaQuery()
+        .eq(SysDictData::getStatus, SystemCodeType.ENABLE.getCode())
+        .eq(SysDictData::getDictType, dictType)
+        .list();
   }
 
   @Override
@@ -230,13 +233,5 @@ public class SysDictDataServiceImpl extends ServiceImpl<SysDictDataMapper, SysDi
       key = "#entity.dictType + ':' + #entity.dictLabel")
   public boolean saveOrUpdate(SysDictData entity) {
     return super.saveOrUpdate(entity);
-  }
-
-  private SysDictData getByTypeAndLabel(String type, String label) {
-    return this.lambdaQuery()
-        .eq(SysDictData::getStatus, SystemCodeType.ENABLE.getCode())
-        .eq(SysDictData::getDictType, type)
-        .eq(ObjectUtils.isNotEmpty(label), SysDictData::getDictLabel, label)
-        .one();
   }
 }

@@ -1,7 +1,6 @@
 package com.gameplat.admin.service.impl;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.gameplat.admin.model.domain.SysDictData;
 import com.gameplat.admin.service.ConfigService;
 import com.gameplat.admin.service.SysDictDataService;
 import com.gameplat.base.common.exception.ServiceException;
@@ -10,7 +9,6 @@ import com.gameplat.common.enums.DictDataEnum;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
 import java.util.Optional;
 
 @Service

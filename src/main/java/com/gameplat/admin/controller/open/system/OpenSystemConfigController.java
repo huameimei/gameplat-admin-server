@@ -1,7 +1,7 @@
 package com.gameplat.admin.controller.open.system;
 
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.json.JSONObject;
-import com.alibaba.fastjson.JSONArray;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.gameplat.admin.convert.DictDataConvert;
@@ -12,7 +12,6 @@ import com.gameplat.admin.model.vo.AgentContacaVO;
 import com.gameplat.admin.model.vo.SysSmsAreaVO;
 import com.gameplat.admin.service.SysDictDataService;
 import com.gameplat.admin.service.SystemConfigService;
-
 import com.gameplat.common.compent.oss.config.FileConfig;
 import com.gameplat.common.compent.sms.SmsConfig;
 import com.gameplat.common.model.bean.EmailConfig;
@@ -44,11 +43,12 @@ public class OpenSystemConfigController {
   public JSONObject listAll(SysDictDataDTO dictDataDTO) {
     SysDictData sysDictData = dictDataConvert.toEntity(dictDataDTO);
     List<SysDictData> list = dictDataService.getDictList(sysDictData);
+
     JSONObject json = new JSONObject();
-    for (SysDictData dictData : list) {
-      JSONArray dictValue= JSONArray.parseArray(dictData.getDictValue());
-      json.set(dictData.getDictLabel(), dictValue);
+    if (CollectionUtil.isNotEmpty(list)) {
+      list.forEach(data -> json.set(data.getDictLabel(), data.getDictValue()));
     }
+
     return json;
   }
 
@@ -60,7 +60,7 @@ public class OpenSystemConfigController {
 
   @ApiOperation(value = "编辑、新增代理联系方式地址")
   @PutMapping("/agent/edit")
-  public void updateAgentContaca(@RequestBody AgentContacaDTO agentContacaDTO) {
+  public void updateAgentContact(@RequestBody AgentContacaDTO agentContacaDTO) {
     systemConfigService.updateAgentContaca(agentContacaDTO);
   }
 

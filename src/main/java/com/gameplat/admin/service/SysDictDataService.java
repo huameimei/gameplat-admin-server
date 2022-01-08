@@ -24,7 +24,7 @@ public interface SysDictDataService extends IService<SysDictData> {
 
   List<SysDictData> getDictList(SysDictData dictData);
 
-  SysDictData getDictDataByType(String dictType);
+  List<SysDictData> getDictDataByType(String dictType);
 
   List<SysDictData> getDictDataByTypes(List<String> dictTypes);
 

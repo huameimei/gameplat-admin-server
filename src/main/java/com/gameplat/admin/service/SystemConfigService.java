@@ -9,7 +9,6 @@ import com.gameplat.admin.model.vo.SysSmsAreaVO;
 import com.gameplat.common.compent.oss.config.FileConfig;
 import com.gameplat.common.compent.sms.SmsConfig;
 import com.gameplat.common.model.bean.EmailConfig;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
 

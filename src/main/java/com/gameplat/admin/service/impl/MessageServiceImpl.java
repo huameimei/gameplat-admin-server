@@ -272,6 +272,7 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, Message> impl
                     }
                 }
                 break;
+            default:
         }
     }
 

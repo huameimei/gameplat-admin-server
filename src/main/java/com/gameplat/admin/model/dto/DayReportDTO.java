@@ -26,8 +26,8 @@ public class DayReportDTO implements Serializable {
     private String superPath;
 
     @ApiModelProperty(value = "开始时间")
-    private Date beginDate;
+    private String beginDate;
 
     @ApiModelProperty(value = "结束时间")
-    private Date endDate;
+    private String endDate;
 }

@@ -18,7 +18,7 @@ public class IpStatisticsDTO {
     private String frequency;
 
     @ApiModelProperty(value = "分析类型")
-    private String type;
+    private Integer type;
 
     @ApiModelProperty(value = "开始时间")
     private String beginTime;

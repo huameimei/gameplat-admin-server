@@ -2,4 +2,26 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.gameplat.admin.mapper.MemberInfoMapper">
+
+    <select id="findIp" parameterType="com.gameplat.admin.model.dto.QueryIpStatReportDTO" resultType="com.gameplat.admin.model.vo.IpStatisticsVO">
+        select
+        last_login_ip as loginIp,
+        count(1) as frequency
+        from member_info
+        where 1=1
+        <if test="ip != null">
+            and last_login_ip = #{ip}
+        </if>
+        <if test="beginDate != null and beginDate != ''">
+            and date_format(last_login_time,'%y%m%d') <![CDATA[ >= ]]> date_format(#{beginDate},'%y%m%d')
+        </if>
+        <if test="endDate != null and endDate != ''">
+            and date_format(last_login_time,'%y%m%d') <![CDATA[ <= ]]> date_format(#{endDate},'%y%m%d')
+        </if>
+        group by last_login_ip
+        <if test="count != null and count != ''">
+            having count(1) >= #{count}
+        </if>
+        ORDER BY last_login_time desc
+    </select>
 </mapper>

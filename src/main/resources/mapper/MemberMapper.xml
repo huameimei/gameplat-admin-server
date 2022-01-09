@@ -235,4 +235,27 @@
         </foreach>
 
     </select>
+
+    <select id="findIp" parameterType="com.gameplat.admin.model.dto.QueryIpStatReportDTO" resultType="com.gameplat.admin.model.vo.IpStatisticsVO">
+        select
+        register_ip as loginIp,
+        count(1) as frequency
+        from  member
+        where 1=1
+        and user_type = 'M'
+        <if test="ip != null">
+            and register_ip = #{ip}
+        </if>
+        <if test="beginDate != null and beginDate != ''">
+            and date_format(create_time,'%y%m%d') <![CDATA[ >= ]]> date_format(#{beginDate},'%y%m%d')
+        </if>
+        <if test="endDate != null and endDate != ''">
+            and date_format(create_time,'%y%m%d') <![CDATA[ <= ]]> date_format(#{endDate},'%y%m%d')
+        </if>
+        group by register_ip
+        <if test="count != null and count != ''">
+            having count(1) >= #{count}
+        </if>
+        ORDER BY create_Time desc
+    </select>
 </mapper>

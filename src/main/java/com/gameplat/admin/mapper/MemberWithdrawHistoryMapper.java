@@ -5,9 +5,13 @@ import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.toolkit.Constants;
 import com.gameplat.admin.model.domain.MemberWithdrawHistory;
+import com.gameplat.admin.model.dto.QueryIpStatReportDTO;
+import com.gameplat.admin.model.vo.IpStatisticsVO;
 import com.gameplat.admin.model.vo.MemberWithdrawHistorySummaryVO;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
+
+import java.util.List;
 
 public interface MemberWithdrawHistoryMapper extends BaseMapper<MemberWithdrawHistory> {
 
@@ -19,4 +23,6 @@ public interface MemberWithdrawHistoryMapper extends BaseMapper<MemberWithdrawHi
   MemberWithdrawHistorySummaryVO summaryMemberWithdrawHistory(
       @Param(Constants.WRAPPER) Wrapper<MemberWithdrawHistory> wrapper);
 
+  /** 提现IP统计 */
+  List<IpStatisticsVO> findIp(QueryIpStatReportDTO dto);
 }

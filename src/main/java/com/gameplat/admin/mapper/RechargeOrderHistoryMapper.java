@@ -5,9 +5,13 @@ import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.toolkit.Constants;
 import com.gameplat.admin.model.domain.RechargeOrderHistory;
+import com.gameplat.admin.model.dto.QueryIpStatReportDTO;
+import com.gameplat.admin.model.vo.IpStatisticsVO;
 import com.gameplat.admin.model.vo.RechargeHistorySummaryVO;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
+
+import java.util.List;
 
 public interface RechargeOrderHistoryMapper extends BaseMapper<RechargeOrderHistory> {
 
@@ -19,4 +23,6 @@ public interface RechargeOrderHistoryMapper extends BaseMapper<RechargeOrderHist
   RechargeHistorySummaryVO summaryRechargeOrderHistory(
       @Param(Constants.WRAPPER) Wrapper<RechargeOrderHistory> wrapper);
 
+  /** 充值IP统计 */
+  List<IpStatisticsVO> findIp(QueryIpStatReportDTO dto);
 }

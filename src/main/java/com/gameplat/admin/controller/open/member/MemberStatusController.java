@@ -2,6 +2,7 @@ package com.gameplat.admin.controller.open.member;
 
 import com.gameplat.admin.model.dto.IpAnalysisDTO;
 import com.gameplat.admin.model.dto.IpStatisticsDTO;
+import com.gameplat.admin.model.dto.QueryIpStatReportDTO;
 import com.gameplat.admin.model.vo.IpAnalysisVO;
 import com.gameplat.admin.model.vo.IpStatisticsVO;
 import com.gameplat.admin.service.MemberStatusService;
@@ -32,8 +33,8 @@ public class MemberStatusController {
 
     @ApiOperation(value = "会员ip统计列表")
     @GetMapping("/ip_statistics")
-    public List<IpStatisticsVO> findStatisticsList(IpStatisticsDTO ipStatisticsDTO){
-        return memberStatusService.findStatisticsList(ipStatisticsDTO);
+    public List<IpStatisticsVO> findStatisticsList(QueryIpStatReportDTO dto){
+        return memberStatusService.findStatisticsList(dto);
     }
 
     @ApiOperation(value = "ip分析列表")

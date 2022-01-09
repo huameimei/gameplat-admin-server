@@ -6,6 +6,8 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Constants;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.gameplat.admin.model.domain.Member;
+import com.gameplat.admin.model.dto.QueryIpStatReportDTO;
+import com.gameplat.admin.model.vo.IpStatisticsVO;
 import com.gameplat.admin.model.vo.MemberInfoVO;
 import com.gameplat.admin.model.vo.MemberVO;
 import java.util.List;
@@ -61,5 +63,8 @@ public interface MemberMapper extends BaseMapper<Member> {
    * 根据用户名查生日信息
    * */
   List<Member> findByUserNameList(List<String> userNames);
+
+  /** 注册IP统计 */
+  List<IpStatisticsVO> findIp(QueryIpStatReportDTO dto);
 
 }

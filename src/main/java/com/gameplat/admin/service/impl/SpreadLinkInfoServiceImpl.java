@@ -7,6 +7,8 @@ import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.convert.SpreadLinkInfoConvert;
+import com.gameplat.base.common.enums.EnableEnum;
+import com.gameplat.common.enums.DefaultEnums;
 import com.gameplat.admin.mapper.SpreadLinkInfoMapper;
 import com.gameplat.admin.model.domain.SpreadLinkInfo;
 import com.gameplat.admin.model.dto.SpreadLinkInfoAddDTO;
@@ -14,7 +16,6 @@ import com.gameplat.admin.model.dto.SpreadLinkInfoDTO;
 import com.gameplat.admin.model.dto.SpreadLinkInfoEditDTO;
 import com.gameplat.admin.model.vo.SpreadConfigVO;
 import com.gameplat.admin.service.SpreadLinkInfoService;
-import com.gameplat.base.common.enums.SystemCodeType;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.StringUtils;
 import com.gameplat.base.common.validator.ValidatorUtil;
@@ -126,7 +127,7 @@ public class SpreadLinkInfoServiceImpl extends ServiceImpl<SpreadLinkInfoMapper,
   /**
    * 新增推广信息
    *
-   * @param configAddDTO 需求: 1、代理专属推广地址唯一 2、推广码唯一 3、公共推广地址下允许多个推广码 4、代理专属推广地址允许多个推广码
+   * @param dto 需求: 1、代理专属推广地址唯一 2、推广码唯一 3、公共推广地址下允许多个推广码 4、代理专属推广地址允许多个推广码
    */
   @Override
   public void add(SpreadLinkInfoAddDTO dto) {
@@ -155,11 +156,11 @@ public class SpreadLinkInfoServiceImpl extends ServiceImpl<SpreadLinkInfoMapper,
       throw new ServiceException("推广地址或推广码已被使用！");
     }
 
-    linkInfo.setExclusiveFlag(SystemCodeType.NO.getCode());
+    linkInfo.setExclusiveFlag(DefaultEnums.N.value());
     if (StringUtils.isNotBlank(linkInfo.getExternalUrl())
         && StringUtils.isNotBlank(linkInfo.getAgentAccount())) {
       // 设置专属
-      linkInfo.setExclusiveFlag(SystemCodeType.YES.getCode());
+      linkInfo.setExclusiveFlag(DefaultEnums.Y.value());
     }
 
     if (!this.save(linkInfo)) {
@@ -223,7 +224,7 @@ public class SpreadLinkInfoServiceImpl extends ServiceImpl<SpreadLinkInfoMapper,
   public void batchEnableStatus(List<Long> ids) {
     if (!this.lambdaUpdate()
         .in(SpreadLinkInfo::getId, ids)
-        .set(SpreadLinkInfo::getStatus, SystemCodeType.ENABLE.getCode())
+        .set(SpreadLinkInfo::getStatus, EnableEnum.ENABLED.code())
         .update(new SpreadLinkInfo())) {
       throw new ServiceException("批量修改状态失败!");
     }
@@ -233,7 +234,7 @@ public class SpreadLinkInfoServiceImpl extends ServiceImpl<SpreadLinkInfoMapper,
   public void batchDisableStatus(List<Long> ids) {
     if (!this.lambdaUpdate()
         .in(SpreadLinkInfo::getId, ids)
-        .set(SpreadLinkInfo::getStatus, SystemCodeType.DISABLE.getCode())
+        .set(SpreadLinkInfo::getStatus, EnableEnum.DISABLED.code())
         .update(new SpreadLinkInfo())) {
       throw new ServiceException("批量修改状态失败!");
     }
@@ -248,7 +249,6 @@ public class SpreadLinkInfoServiceImpl extends ServiceImpl<SpreadLinkInfoMapper,
 
   @Override
   public List<SpreadLinkInfo> getSpreadList(String agentAccount) {
-    List<SpreadLinkInfo> list = this.lambdaQuery().eq(SpreadLinkInfo::getAgentAccount, agentAccount).list();
-    return list;
+    return this.lambdaQuery().eq(SpreadLinkInfo::getAgentAccount, agentAccount).list();
   }
 }

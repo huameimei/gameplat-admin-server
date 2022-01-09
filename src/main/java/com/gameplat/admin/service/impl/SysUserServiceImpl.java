@@ -25,7 +25,7 @@ import com.gameplat.admin.model.vo.RoleVo;
 import com.gameplat.admin.model.vo.UserVo;
 import com.gameplat.admin.service.SysCommonService;
 import com.gameplat.admin.service.SysUserService;
-import com.gameplat.base.common.enums.SystemCodeType;
+import com.gameplat.base.common.enums.EnableEnum;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.json.JsonUtils;
 import com.gameplat.base.common.util.GoogleAuthenticator;
@@ -172,7 +172,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
   public List<RoleVo> getRoleList() {
     List<RoleVo> list = new ArrayList<>();
     LambdaQueryWrapper<SysRole> queryWrapper = Wrappers.lambdaQuery();
-    queryWrapper.eq(SysRole::getStatus, SystemCodeType.ENABLE.getCode());
+    queryWrapper.eq(SysRole::getStatus, EnableEnum.ENABLED.code());
     roleMapper
         .selectList(queryWrapper)
         .forEach(

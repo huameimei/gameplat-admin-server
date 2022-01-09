@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.convert.RoleConvert;
+import com.gameplat.common.enums.DefaultEnums;
 import com.gameplat.admin.mapper.SysRoleMapper;
 import com.gameplat.admin.mapper.SysRoleMenuMapper;
 import com.gameplat.admin.model.domain.SysRole;
@@ -16,7 +17,6 @@ import com.gameplat.admin.model.dto.OperRoleDTO;
 import com.gameplat.admin.model.dto.RoleDTO;
 import com.gameplat.admin.model.vo.RoleVo;
 import com.gameplat.admin.service.SysRoleService;
-import com.gameplat.base.common.enums.SystemCodeType;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.StringUtils;
 import java.util.ArrayList;
@@ -69,7 +69,7 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole>
       throw new ServiceException("分组不存在!");
     }
 
-    if (SystemCodeType.YES.getCode().equals(role.getDefaultFlag())) {
+    if (DefaultEnums.Y.match(role.getDefaultFlag())) {
       throw new ServiceException("默认分组不能删除");
     }
 

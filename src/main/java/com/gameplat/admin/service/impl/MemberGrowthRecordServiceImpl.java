@@ -33,9 +33,9 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-import com.gameplat.base.common.enums.YseOrNoEnum;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.IPUtils;
+import com.gameplat.common.enums.BooleanEnum;
 import com.gameplat.redis.redisson.DistributedLocker;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -182,7 +182,7 @@ public class MemberGrowthRecordServiceImpl extends ServiceImpl<MemberGrowthRecor
         if (type == GrowthChangeEnum.recharge.getCode()) {
             //充值
             //判断是否开启了充值
-            if (growthConfig.getIsEnableRecharge() == YseOrNoEnum.YES.getCode()) {
+            if (BooleanEnum.YES.match(growthConfig.getIsEnableRecharge())) {
                 //获取充值 成长值 兑换比例
                 changeFinalGrowth = growthConfig.getRechageRate().multiply(BigDecimal.valueOf(changeGrowth)).intValue();
                 saveRecord.setKindName(kindName);
@@ -194,7 +194,7 @@ public class MemberGrowthRecordServiceImpl extends ServiceImpl<MemberGrowthRecor
         } else if (type == GrowthChangeEnum.sign.getCode()) {
             //签到
             //判断是否开启了签到
-            if (growthConfig.getIsEnableSign() == YseOrNoEnum.YES.getCode()) {
+            if (BooleanEnum.YES.match(growthConfig.getIsEnableSign())) {
                 Integer oldSignGrowth = memberGrowthRecord.getOldGrowth();
                 if (oldSignGrowth >= growthConfig.getSignMaxGrowth()) {
                     return;
@@ -214,7 +214,7 @@ public class MemberGrowthRecordServiceImpl extends ServiceImpl<MemberGrowthRecor
 
         } else if (type == GrowthChangeEnum.dama.getCode()) {
             //判断是否开启了打码量
-            if (growthConfig.getIsEnableDama() == YseOrNoEnum.YES.getCode()) {
+            if (BooleanEnum.YES.match(growthConfig.getIsEnableDama())) {
                 changeFinalGrowth = growthConfig.getDamaRate().multiply(BigDecimal.valueOf(changeGrowth)).intValue();
                 saveRecord.setKindName(dto.getKindName());
                 saveRecord.setKindCode(dto.getKindCode());
@@ -335,7 +335,7 @@ public class MemberGrowthRecordServiceImpl extends ServiceImpl<MemberGrowthRecor
         }});
         String content = "VIP等级升级";
         //判断是否发放奖励 并且是否在黑名单中
-        if (growthConfig.getIsPayUpReword() == YseOrNoEnum.YES.getCode() && memberBlackList.size() <= 0) {
+        if (BooleanEnum.YES.match(growthConfig.getIsPayUpReword()) && memberBlackList.size() <= 0) {
             BigDecimal rewordAmount = new BigDecimal("0");
             //先计算出升级奖励的金额  可能会连升几级
             Integer limitLevel = growthConfig.getLimitLevel();
@@ -373,7 +373,7 @@ public class MemberGrowthRecordServiceImpl extends ServiceImpl<MemberGrowthRecor
                 saveRewordObj.setType(0);
                 saveRewordObj.setSerialNumber(String.valueOf(IdWorker.getId()));
                 //是否自动派发
-                if (growthConfig.getIsAutoPayReword() == YseOrNoEnum.YES.getCode()) {
+                if (BooleanEnum.YES.match(growthConfig.getIsAutoPayReword())) {
                     String sourceId = String.valueOf(IdWorker.getId());
                     // 新增打码量记录
                     ValidWithdraw validWithdraw = new ValidWithdraw();

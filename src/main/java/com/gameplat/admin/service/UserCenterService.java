@@ -10,11 +10,12 @@ import com.gameplat.admin.model.domain.SysUser;
 import com.gameplat.admin.model.dto.ChangePasswordDTO;
 import com.gameplat.admin.model.dto.UserSettingDTO;
 import com.gameplat.admin.model.vo.ProFileVo;
-import com.gameplat.base.common.enums.SystemCodeType;
+import com.gameplat.base.common.enums.EnableEnum;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.json.JsonUtils;
 import com.gameplat.base.common.util.RSAUtils;
 import com.gameplat.base.common.util.StringUtils;
+import com.gameplat.common.enums.BooleanEnum;
 import com.gameplat.security.SecurityUserHolder;
 import com.gameplat.security.service.JwtTokenService;
 import java.util.ArrayList;
@@ -55,7 +56,7 @@ public class UserCenterService {
     }
 
     // 删除用户凭证
-    if (SystemCodeType.DISABLE.match(user.getStatus())) {
+    if (EnableEnum.isEnabled(user.getStatus())) {
       jwtTokenService.removeToken(username);
       throw new ServiceException("账号已停用");
     }
@@ -139,7 +140,7 @@ public class UserCenterService {
       throw new ServiceException("旧密码不正确!");
     }
 
-    user.setChangeFlag(SystemCodeType.YES.getCode());
+    user.setChangeFlag(BooleanEnum.YES.value());
     user.setPassword(passwordEncoder.encode(newPassword));
     if (userMapper.updateById(user) <= 0) {
       throw new ServiceException("密码修改失败!");

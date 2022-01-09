@@ -7,12 +7,12 @@ import com.gameplat.admin.model.domain.SysUser;
 import com.gameplat.admin.model.dto.AdminLoginDTO;
 import com.gameplat.admin.model.vo.UserToken;
 import com.gameplat.admin.service.*;
-import com.gameplat.base.common.enums.SystemCodeType;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.GoogleAuthenticator;
 import com.gameplat.base.common.util.IPUtils;
 import com.gameplat.base.common.util.StringUtils;
 import com.gameplat.common.compent.kaptcha.KaptchaProducer;
+import com.gameplat.common.enums.BooleanEnum;
 import com.gameplat.common.enums.LimitEnums;
 import com.gameplat.common.model.bean.RefreshToken;
 import com.gameplat.common.model.bean.limit.AdminLoginLimit;
@@ -60,14 +60,14 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     // 是否开启后台白名单
     String requestIp = IPUtils.getIpAddress(request);
-    if (SystemCodeType.YES.match(limit.getIpWhiteListSwitch())) {
+    if (BooleanEnum.YES.match(limit.getIpWhiteListSwitch())) {
       if (!authIpService.isPermitted(requestIp)) {
         throw new ServiceException("当前IP不允许登录：" + requestIp);
       }
     }
 
     // 是否开启验证码
-    if (SystemCodeType.YES.match(limit.getLoginCaptchaSwitch())) {
+    if (BooleanEnum.YES.match(limit.getLoginCaptchaSwitch())) {
       kaptchaProducer.validate(dto.getDeviceId(), dto.getValiCode());
     }
 
@@ -81,7 +81,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
       throw new UsernameNotFoundException("用户不存在或密码不正确！");
     }
 
-    if (SystemCodeType.YES.match(limit.getGoogleAuthSwitch())) {
+    if (BooleanEnum.YES.match(limit.getGoogleAuthSwitch())) {
       this.checkGoogleAuthCode(user.getSafeCode(), dto.getGoogleCode());
     }
 

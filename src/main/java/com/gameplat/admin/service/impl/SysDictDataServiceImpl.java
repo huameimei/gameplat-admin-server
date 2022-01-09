@@ -17,7 +17,7 @@ import com.gameplat.admin.model.dto.SysDictDataDTO;
 import com.gameplat.admin.model.vo.DictDataVo;
 import com.gameplat.admin.model.vo.MemberWithdrawDictDataVo;
 import com.gameplat.admin.service.SysDictDataService;
-import com.gameplat.base.common.enums.SystemCodeType;
+import com.gameplat.base.common.enums.EnableEnum;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.json.JsonUtils;
 import com.gameplat.common.constant.CachedKeys;
@@ -67,7 +67,7 @@ public class SysDictDataServiceImpl extends ServiceImpl<SysDictDataMapper, SysDi
   @Cached(name = CachedKeys.DICT_DATA_CACHE, key = "#dictType", expire = 3600)
   public List<SysDictData> getDictDataByType(String dictType) {
     return this.lambdaQuery()
-        .eq(SysDictData::getStatus, SystemCodeType.ENABLE.getCode())
+        .eq(SysDictData::getStatus, EnableEnum.ENABLED.code())
         .eq(SysDictData::getDictType, dictType)
         .list();
   }
@@ -77,7 +77,7 @@ public class SysDictDataServiceImpl extends ServiceImpl<SysDictDataMapper, SysDi
   @Cached(name = CachedKeys.DICT_DATA_CACHE, key = "#dictTypes", expire = 3600)
   public List<SysDictData> getDictDataByTypes(List<String> dictTypes) {
     return this.lambdaQuery()
-        .eq(SysDictData::getStatus, SystemCodeType.ENABLE.getCode())
+        .eq(SysDictData::getStatus, EnableEnum.ENABLED.code())
         .in(SysDictData::getDictType, dictTypes)
         .list();
   }
@@ -86,7 +86,7 @@ public class SysDictDataServiceImpl extends ServiceImpl<SysDictDataMapper, SysDi
   @SentinelResource(value = "getDictData")
   public SysDictData getDictData(String dictType, String dictLabel) {
     return this.lambdaQuery()
-        .eq(SysDictData::getStatus, SystemCodeType.ENABLE.getCode())
+        .eq(SysDictData::getStatus, EnableEnum.ENABLED.code())
         .eq(SysDictData::getDictType, dictType)
         .eq(SysDictData::getDictLabel, dictLabel)
         .one();
@@ -97,7 +97,7 @@ public class SysDictDataServiceImpl extends ServiceImpl<SysDictDataMapper, SysDi
   @Cached(name = CachedKeys.DICT_DATA_CACHE, key = "#dictType + ':' + #dictLabel", expire = 7200)
   public String getDictDataValue(String dictType, String dictLabel) {
     return this.lambdaQuery()
-        .eq(SysDictData::getStatus, SystemCodeType.ENABLE.getCode())
+        .eq(SysDictData::getStatus, EnableEnum.ENABLED.code())
         .eq(SysDictData::getDictType, dictType)
         .eq(SysDictData::getDictLabel, dictLabel)
         .oneOpt()

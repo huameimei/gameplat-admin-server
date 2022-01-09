@@ -8,7 +8,7 @@ import com.gameplat.admin.mapper.SysVersionMapper;
 import com.gameplat.admin.model.domain.SysVersion;
 import com.gameplat.admin.model.dto.VersionDTO;
 import com.gameplat.admin.service.SysVersionService;
-import com.gameplat.base.common.enums.SystemCodeType;
+import com.gameplat.base.common.enums.EnableEnum;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -26,7 +26,7 @@ public class SysVersionServiceImpl extends ServiceImpl<SysVersionMapper, SysVers
   @SentinelResource(value = "selectVersionList")
   public IPage<SysVersion> selectVersionList(IPage<SysVersion> page, VersionDTO versionDTO) {
     return this.lambdaQuery()
-        .eq(SysVersion::getStatus, SystemCodeType.ENABLE.getCode())
+        .eq(SysVersion::getStatus, EnableEnum.ENABLED.code())
         .ge(
             ObjectUtils.isNotEmpty(versionDTO.getBeginTime()),
             SysVersion::getCreateTime,

@@ -22,10 +22,10 @@ import com.gameplat.admin.model.dto.*;
 import com.gameplat.admin.model.vo.MemberWealVO;
 import com.gameplat.admin.service.*;
 import com.gameplat.base.common.context.GlobalContextHolder;
-import com.gameplat.base.common.enums.YseOrNoEnum;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.IPUtils;
 import com.gameplat.base.common.util.RandomUtil;
+import com.gameplat.common.enums.BooleanEnum;
 import com.gameplat.redis.redisson.DistributedLocker;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -365,7 +365,7 @@ public class MemberWealServiceImpl extends ServiceImpl<MemberWealMapper, MemberW
                                 memberWealReword.setType(type+1);
                                 memberWealReword.setSerialNumber(serialNumber);
                                 //自动派发
-                                if (growthConfig.getIsAutoPayReword() == YseOrNoEnum.YES.getCode()) {
+                                if (BooleanEnum.YES.match(growthConfig.getIsAutoPayReword())) {
                                     //将通知消息去掉请领取
                                     content = content.replaceAll("，请领取","");
                                     String sourceId = String.valueOf(IdWorker.getId());

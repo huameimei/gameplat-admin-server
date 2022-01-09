@@ -15,7 +15,7 @@ import com.gameplat.admin.model.vo.GameVO;
 import com.gameplat.admin.service.ActivityLobbyService;
 import com.gameplat.admin.service.GameService;
 import com.gameplat.admin.service.SysDictDataService;
-import com.gameplat.base.common.enums.SystemCodeType;
+import com.gameplat.base.common.enums.EnableEnum;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.StringUtils;
 import com.gameplat.common.enums.DictTypeEnum;
@@ -162,7 +162,7 @@ public class ActivityLobbyController {
     public List<CodeDataVO> gameTypeList() {
         SysDictData dictData = new SysDictData();
         dictData.setDictType(DictTypeEnum.LIVE_GAME_TYPE.getValue());
-        dictData.setStatus(SystemCodeType.ENABLE.getCode());
+        dictData.setStatus(EnableEnum.ENABLED.code());
         List<SysDictData> dictList = sysDictDataService.getDictList(dictData);
         if (CollectionUtils.isEmpty(dictList)) {
             throw new ServiceException("游戏类型列表没有配置");

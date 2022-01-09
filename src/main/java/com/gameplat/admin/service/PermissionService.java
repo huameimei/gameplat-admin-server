@@ -11,9 +11,10 @@ import com.gameplat.admin.model.bean.router.VueRouter;
 import com.gameplat.admin.model.domain.SysMenu;
 import com.gameplat.admin.model.domain.SysUser;
 import com.gameplat.base.common.constant.ContextConstant;
-import com.gameplat.base.common.enums.SystemCodeType;
 import com.gameplat.base.common.util.JwtUtils;
 import com.gameplat.base.common.util.StringUtils;
+import com.gameplat.common.constant.Constant;
+import com.gameplat.common.enums.BooleanEnum;
 import com.gameplat.common.enums.SubjectEnum;
 import com.gameplat.common.enums.UserTypes;
 import com.gameplat.security.SecurityUserHolder;
@@ -65,7 +66,7 @@ public class PermissionService extends ServiceImpl<SysMenuMapper, SysMenu> {
     list.forEach(
         item -> {
           // 隐藏的菜单分配了不能展示出来
-          if (SystemCodeType.NO.getCode().equals(item.getVisible())) {
+          if (BooleanEnum.NO.match(item.getVisible())) {
             VueRouter<SysMenu> router = new VueRouter<>();
             router.setMenuId(item.getMenuId());
             router.setParentId(item.getParentId());

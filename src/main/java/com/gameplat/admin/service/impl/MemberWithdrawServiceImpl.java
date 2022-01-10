@@ -12,7 +12,10 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.constant.WithdrawTypeConstant;
 import com.gameplat.admin.convert.MemberWithdrawConvert;
 import com.gameplat.admin.enums.*;
+import com.gameplat.admin.enums.BlacklistConstant;
 import com.gameplat.admin.enums.BlacklistConstant.BizBlacklistType;
+import com.gameplat.admin.enums.CashEnum;
+import com.gameplat.admin.enums.WithdrawStatus;
 import com.gameplat.admin.mapper.MemberWithdrawMapper;
 import com.gameplat.admin.model.bean.*;
 import com.gameplat.admin.model.domain.*;
@@ -26,11 +29,8 @@ import com.gameplat.base.common.json.JsonUtils;
 import com.gameplat.base.common.snowflake.IdGeneratorSnowflake;
 import com.gameplat.base.common.util.DateUtil;
 import com.gameplat.base.common.util.StringUtils;
-import com.gameplat.common.enums.DictDataEnum;
-import com.gameplat.common.enums.LimitEnums;
+import com.gameplat.common.enums.*;
 import com.gameplat.common.enums.MemberEnums;
-import com.gameplat.common.enums.SwitchStatusEnum;
-import com.gameplat.common.enums.UserTypes;
 import com.gameplat.common.model.bean.Builder;
 import com.gameplat.common.model.bean.limit.MemberRechargeLimit;
 import com.gameplat.security.context.UserCredential;
@@ -525,9 +525,7 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
                   LimitEnums.MEMBER_RECHARGE_LIMIT, MemberRechargeLimit.class))
               .orElseThrow(() -> new ServiceException("加载出入款配置信息失败，请联系客服！"));
       boolean toCheck =
-          (!Objects.equals(
-              AllowOthersOperateEnums.YES.getValue(),
-              limitInfo.getIsHandledAllowOthersOperate()))
+          BooleanEnum.NO.match(limitInfo.getIsHandledAllowOthersOperate())
               && !userCredential.isSuperAdmin();
       if (toCheck) {
         if (!Objects.equals(WithdrawStatus.UNHANDLED.getValue(), memberWithdraw.getCashStatus())

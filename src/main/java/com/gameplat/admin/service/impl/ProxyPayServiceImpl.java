@@ -4,7 +4,6 @@ import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
-import com.gameplat.admin.enums.AllowOthersOperateEnums;
 import com.gameplat.admin.enums.CashEnum;
 import com.gameplat.admin.enums.ProxyPayStatusEnum;
 import com.gameplat.admin.enums.WithdrawStatus;
@@ -35,6 +34,7 @@ import com.gameplat.admin.util.MoneyUtils;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.json.JsonUtils;
 import com.gameplat.base.common.util.StringUtils;
+import com.gameplat.common.enums.BooleanEnum;
 import com.gameplat.common.enums.LimitEnums;
 import com.gameplat.common.enums.SwitchStatusEnum;
 import com.gameplat.common.enums.UserTypes;
@@ -280,9 +280,7 @@ public class ProxyPayServiceImpl implements ProxyPayService {
                       LimitEnums.MEMBER_RECHARGE_LIMIT, MemberRechargeLimit.class))
               .orElseThrow(() -> new ServiceException("加载出入款配置信息失败，请联系客服！"));
       boolean toCheck =
-          (!Objects.equals(
-                  AllowOthersOperateEnums.YES.getValue(),
-                  limitInfo.getIsHandledAllowOthersOperate()))
+          BooleanEnum.NO.match(limitInfo.getIsHandledAllowOthersOperate())
               && !userCredential.isSuperAdmin();
       if (toCheck) {
         if (!Objects.equals(WithdrawStatus.UNHANDLED.getValue(), memberWithdraw.getCashStatus())

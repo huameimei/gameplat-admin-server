@@ -56,7 +56,7 @@ public class UserCenterService {
     }
 
     // 删除用户凭证
-    if (EnableEnum.isEnabled(user.getStatus())) {
+    if (EnableEnum.DISABLED.match(user.getStatus())) {
       jwtTokenService.removeToken(username);
       throw new ServiceException("账号已停用");
     }

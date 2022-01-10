@@ -11,7 +11,6 @@ import com.gameplat.admin.constant.BuildInDiscountType;
 import com.gameplat.admin.constant.RechargeMode;
 import com.gameplat.admin.constant.TrueFalse;
 import com.gameplat.admin.convert.RechargeOrderConvert;
-import com.gameplat.admin.enums.AllowOthersOperateEnums;
 import com.gameplat.admin.enums.BlacklistConstant.BizBlacklistType;
 import com.gameplat.admin.enums.MemberEnums.Type;
 import com.gameplat.admin.enums.RechargeStatus;
@@ -378,11 +377,11 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
    */
   public void crossAccountCheck(UserCredential userCredential, RechargeOrder rechargeOrder)
       throws ServiceException {
-    boolean toCheck = (!Objects.equals(AllowOthersOperateEnums.YES.getValue(),
-        limitInfoService
-            .getLimitInfo(LimitEnums.MEMBER_RECHARGE_LIMIT, MemberRechargeLimit.class)
-            .getIsHandledAllowOthersOperate())
-        && !userCredential.isSuperAdmin());
+    MemberRechargeLimit limit = limitInfoService
+            .getLimitInfo(LimitEnums.MEMBER_RECHARGE_LIMIT, MemberRechargeLimit.class);
+    boolean toCheck =
+        BooleanEnum.NO.match(limit.getIsHandledAllowOthersOperate())
+            && !userCredential.isSuperAdmin();
     if (toCheck) {
       if (RechargeStatus.HANDLED.getValue() != rechargeOrder.getStatus() && !userCredential
           .getUsername().equals(rechargeOrder.getAuditorAccount())) {

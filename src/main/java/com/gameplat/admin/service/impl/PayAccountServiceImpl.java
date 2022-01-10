@@ -72,7 +72,7 @@ public class PayAccountServiceImpl extends ServiceImpl<PayAccountMapper, PayAcco
     }
     LambdaUpdateWrapper<PayAccount> update = Wrappers.lambdaUpdate();
     update.set(PayAccount::getStatus, status).eq(PayAccount::getId, id);
-    this.update(update);
+    this.update(new PayAccount(),update);
   }
 
   @Override

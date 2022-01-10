@@ -41,7 +41,7 @@ public class DiscountTypeServiceImpl extends ServiceImpl<DiscountTypeMapper, Dis
     update
         .set(ObjectUtils.isNotEmpty(status), DiscountType::getStatus, status)
         .eq(DiscountType::getId, id);
-    this.update(update);
+    this.update(new DiscountType(),update);
   }
 
   @Override

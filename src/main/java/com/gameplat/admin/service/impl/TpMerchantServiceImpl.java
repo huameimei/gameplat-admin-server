@@ -137,7 +137,7 @@ public class TpMerchantServiceImpl extends ServiceImpl<TpMerchantMapper, TpMerch
     }
     LambdaUpdateWrapper<TpMerchant> update = Wrappers.lambdaUpdate();
     update.set(TpMerchant::getStatus, status).eq(TpMerchant::getId, id);
-    this.update(update);
+    this.update(new TpMerchant(),update);
   }
 
   @Override

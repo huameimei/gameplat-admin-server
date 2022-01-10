@@ -132,7 +132,7 @@ public class PpMerchantServiceImpl extends ServiceImpl<PpMerchantMapper, PpMerch
     }
     LambdaUpdateWrapper<PpMerchant> update = Wrappers.lambdaUpdate();
     update.set(PpMerchant::getStatus, status).eq(PpMerchant::getId, id);
-    this.update(update);
+    this.update(new PpMerchant(),update);
   }
 
   @Override

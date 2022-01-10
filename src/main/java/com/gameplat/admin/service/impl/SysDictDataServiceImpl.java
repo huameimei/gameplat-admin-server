@@ -164,7 +164,7 @@ public class SysDictDataServiceImpl extends ServiceImpl<SysDictDataMapper, SysDi
     if (null == status) {
       throw new ServiceException("状态不能为空!");
     }
-    this.lambdaUpdate().set(SysDictData::getStatus, status).eq(SysDictData::getId, id).update();
+    this.lambdaUpdate().set(SysDictData::getStatus, status).eq(SysDictData::getId, id).update(new SysDictData());
   }
 
   @Override

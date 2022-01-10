@@ -1,7 +1,10 @@
 package com.gameplat.admin.model.vo;
 
 import com.baomidou.mybatisplus.extension.activerecord.Model;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.gameplat.admin.util.Date2LongSerializerUtils;
 import java.math.BigDecimal;
+import java.util.Date;
 import lombok.Data;
 
 @Data
@@ -76,4 +79,10 @@ public class TpPayChannelVO extends Model<TpPayChannelVO> {
 
   /** 风控值 */
   private String riskControlValue;
+
+  private String updateBy;
+
+  @JsonSerialize(using = Date2LongSerializerUtils.class)
+  private Date updateTime;
+
 }

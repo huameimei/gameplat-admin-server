@@ -79,7 +79,7 @@ public class PayTypeServiceImpl extends ServiceImpl<PayTypeMapper, PayType>
     }
     LambdaUpdateWrapper<PayType> update = Wrappers.lambdaUpdate();
     update.set(PayType::getStatus, status).eq(PayType::getId, id);
-    this.update(update);
+    this.update(new PayType(),update);
   }
 
   @Override

@@ -24,4 +24,7 @@ public class DictDataVo {
     private Date createTime;
     private String remark;
     private Integer dictSort;
+    private String updateBy;
+    @JsonSerialize(using = Date2LongSerializerUtils.class)
+    private Date updateTime;
 }

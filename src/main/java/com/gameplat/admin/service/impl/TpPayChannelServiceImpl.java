@@ -66,7 +66,7 @@ public class TpPayChannelServiceImpl extends ServiceImpl<TpPayChannelMapper, TpP
     }
     LambdaUpdateWrapper<TpPayChannel> update = Wrappers.lambdaUpdate();
     update.set(TpPayChannel::getStatus, status).eq(TpPayChannel::getId, id);
-    this.update(update);
+    this.update(new TpPayChannel(),update);
   }
 
   @Override

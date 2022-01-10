@@ -35,7 +35,7 @@
   </sql>
 
   <select id="findPpMerchantPage" resultMap="ppMerchantVOMap">
-    SELECT m.id,m.name,m.proxy_times,m.proxy_amount,m.status,i.name AS interfaceName,m.sort
+    SELECT m.id,m.name,m.proxy_times,m.proxy_amount,m.status,i.name AS interfaceName,m.sort,m.update_by,m.update_time
     FROM pp_merchant m
     LEFT JOIN pp_interface i ON m.pp_interface_code = i.code
     <include refid="where"/>

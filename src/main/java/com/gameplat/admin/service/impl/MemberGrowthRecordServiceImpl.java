@@ -11,9 +11,9 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.constant.MemberServiceKeyConstant;
 import com.gameplat.admin.convert.MemberGrowthRecordConvert;
-import com.gameplat.admin.enums.FinancialSourceTypeEnum;
 import com.gameplat.admin.enums.GrowthChangeEnum;
 import com.gameplat.admin.enums.LanguageEnum;
+import com.gameplat.admin.enums.MemberBillTransTypeEnum;
 import com.gameplat.admin.enums.PushMessageEnum;
 import com.gameplat.admin.mapper.MemberGrowthRecordMapper;
 import com.gameplat.admin.mapper.MessageMapper;
@@ -34,7 +34,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import com.gameplat.base.common.exception.ServiceException;
-import com.gameplat.base.common.util.IPUtils;
 import com.gameplat.common.enums.BooleanEnum;
 import com.gameplat.redis.redisson.DistributedLocker;
 import lombok.RequiredArgsConstructor;
@@ -74,8 +73,6 @@ public class MemberGrowthRecordServiceImpl extends ServiceImpl<MemberGrowthRecor
     @Autowired
     private MemberWealRewordService memberWealRewordService;
     @Autowired
-    private FinancialService financialService;
-    @Autowired
     private ValidWithdrawService validWithdrawService;
     @Autowired
     private MessageMapper messageMapper;
@@ -83,6 +80,8 @@ public class MemberGrowthRecordServiceImpl extends ServiceImpl<MemberGrowthRecor
     private MessageDistributeService messageDistributeService;
     @Autowired
     private MemberInfoService memberInfoService;
+    @Autowired
+    private MemberBillService memberBillService;
 
     public static final String kindName = "{\"en-US\": \"platform\", \"in-ID\": \"peron\", \"th-TH\": \"แพลตฟอร์ม\", \"vi-VN\": \"nền tảng\", \"zh-CN\": \"平台\"}";
 
@@ -397,19 +396,21 @@ public class MemberGrowthRecordServiceImpl extends ServiceImpl<MemberGrowthRecor
                         if (!flag) {
                             return;
                         }
-                        Financial financialParam = new Financial();
-                        financialParam.setAmount(rewordAmount);
-                        financialParam.setIpAddress(IPUtils.getIpAddress(request));
-                        financialParam.setSourceId(sourceId);
-                        financialParam.setIsLess(0);
-                        financialParam.setState(3);
-                        financialParam.setMode(3);
-                        financialParam.setUserId(member.getId());
-                        financialParam.setUsername(member.getAccount());
-                        financialParam.setSourceType(FinancialSourceTypeEnum.GROWTH_LEVEL_UP_REWORD.getCode());
-                        financialParam.setRemark(member.getNickname() + "从VIP" + beforeLevel + "升至VIP" + afterLevel + "奖励金额");
-                        financialParam.setCreateBy("system");
-                        financialService.insertFinancial(financialParam);
+                        //添加流水记录
+                        MemberBill memberBill = new MemberBill();
+                        memberBill.setMemberId(member.getId());
+                        memberBill.setAccount(member.getAccount());
+                        memberBill.setMemberPath(member.getSuperPath());
+                        memberBill.setTranType(MemberBillTransTypeEnum.UPGRADE_REWARD.getCode());
+                        memberBill.setOrderNo(sourceId);
+                        memberBill.setAmount(rewordAmount);
+                        memberBill.setBalance(memberInfoService.getById(member.getId()).getBalance());
+                        memberBill.setRemark(member.getNickname() + "从VIP" + beforeLevel + "升至VIP" + afterLevel + "奖励金额");
+                        memberBill.setContent(member.getNickname() + "从VIP" + beforeLevel + "升至VIP" + afterLevel + "奖励金额");
+                        memberBill.setOperator("system");
+                        memberBill.setTableIndex(member.getTableIndex());
+                        memberBillService.save(memberBill);
+
                         saveRewordObj.setStatus(2);
                         content = "VIP等级升级奖励已派发 金额:" + rewordAmount;
                         saveRewordObj.setDrawTime(DateTime.now());

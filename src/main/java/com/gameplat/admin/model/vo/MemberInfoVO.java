@@ -44,6 +44,7 @@ public class MemberInfoVO implements Serializable {
 
   private String birthday;
 
+  private Integer parentId;
   /** 上级代理 */
   private String parentName;
 
@@ -99,7 +100,11 @@ public class MemberInfoVO implements Serializable {
   /** 会员VIP等级 */
   private Integer level;
 
+  private Integer growth;
   /** 代理路径 */
   private String superPath;
 
+  private String agentLevel;
+
+  private Integer tableIndex;
 }

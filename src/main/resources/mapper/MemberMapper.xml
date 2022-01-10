@@ -150,15 +150,15 @@
         UPDATE member SET lower_num = lower_num + #{lowerNum} WHERE account = #{account}
     </update>
 
-    <select id="getMemberInfoByAccount" parameterType="java.lang.String" resultType="MemberInfoVO">
+    <select id="getMemberInfoByAccount" parameterType="java.lang.String" resultType="com.gameplat.admin.model.vo.MemberInfoVO">
         SELECT t1.id,
                t1.account,
                t1.nickname,
-               t1.user_level,
-               t1.agent_level,
-               t1.parent_id,
-               t1.user_type,
-               t1.parent_name,
+               t1.user_level as userLevel,
+               t1.agent_level as agentLevel,
+               t1.parent_id as parentId,
+               t1.user_type as userType,
+               t1.parent_name as parentName,
                t1.status,
                t1.remark,
                t1.sex,
@@ -167,23 +167,24 @@
                t1.email,
                t1.phone,
                t1.birthday,
-               t1.register_ip,
-               t1.register_source,
-               t1.create_time,
-               t1.real_name,
-               t1.super_path,
+               t1.register_ip as registerIp,
+               t1.register_source as registerSource,
+               t1.create_time as createTime,
+               t1.real_name as realName,
+               t1.table_index as tableIndex,
                t2.level,
                t2.growth,
-               t2.last_login_ip,
-               t2.last_login_time,
+               t1.super_path as superPath,
+               t2.last_login_ip as lastLoginIp,
+               t2.last_login_time as lastLoginTime,
                t2.balance,
-               t2.invitation_code,
-               t2.last_rech_time,
-               t2.last_withdraw_time,
-               t2.total_rech_amount,
-               t2.total_rech_times,
-               t2.total_withdraw_amount,
-               t2.total_withdraw_times
+               t2.invitation_code as invitationCode,
+               t2.last_rech_time as lastRechTime,
+               t2.last_withdraw_time as lastWithdrawTime,
+               t2.total_rech_amount as totalRechAmount,
+               t2.total_rech_times as totalRechTimes,
+               t2.total_withdraw_amount as totalWithdrawAmount,
+               t2.total_withdraw_times as totalWithdrawTimes
         FROM member t1
                  LEFT JOIN member_info t2 ON t1.id = t2.member_id
         WHERE t1.account = #{account}

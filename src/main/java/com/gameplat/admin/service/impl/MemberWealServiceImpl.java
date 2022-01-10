@@ -12,9 +12,8 @@ import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.constant.MemberServiceKeyConstant;
 import com.gameplat.admin.convert.MemberWealConvert;
-import com.gameplat.admin.enums.CurrencyTypeEnum;
-import com.gameplat.admin.enums.FinancialSourceTypeEnum;
 import com.gameplat.admin.enums.LanguageEnum;
+import com.gameplat.admin.enums.MemberBillTransTypeEnum;
 import com.gameplat.admin.enums.PushMessageEnum;
 import com.gameplat.admin.mapper.*;
 import com.gameplat.admin.model.domain.*;
@@ -70,13 +69,13 @@ public class MemberWealServiceImpl extends ServiceImpl<MemberWealMapper, MemberW
     @Autowired private MemberGrowthConfigMapper growthConfigMapper;
     @Autowired private MemberGrowthLevelMapper growthLevelMapper;
     @Autowired private ValidWithdrawService validWithdrawService;
-    @Autowired private FinancialService financialService;
     @Autowired private DistributedLocker distributedLocker;
     @Autowired private MemberWealRewordService wealRewordService;
     @Autowired private RedissonClient redissonClient;
     @Autowired private MessageMapper messageMapper;
     @Autowired private MessageDistributeService messageDistributeService;
     @Autowired private MemberInfoService memberInfoService;
+    @Autowired private MemberBillService memberBillService;
 
     /**
      * 获取等级俸禄达标会员
@@ -335,19 +334,19 @@ public class MemberWealServiceImpl extends ServiceImpl<MemberWealMapper, MemberW
                                 String content = "";
                                 //周俸禄
                                 if (type == 0){
-                                    sourceType = FinancialSourceTypeEnum.WEEK_WEAL.getCode();
+                                    sourceType = MemberBillTransTypeEnum.WEEK_WEAL.getCode();
                                     content = "本周俸禄奖励已派发 金额:" + item.getRewordAmount() + "，请领取";
                                     //月俸禄
                                 } else if(type == 1){
-                                    sourceType = FinancialSourceTypeEnum.MONTH_WEAL.getCode();
+                                    sourceType = MemberBillTransTypeEnum.MONTH_WEAL.getCode();
                                     content = "本月俸禄奖励已派发 金额:" + item.getRewordAmount() + "，请领取";
                                     //生日礼金
                                 } else if(type == 2){
-                                    sourceType = FinancialSourceTypeEnum.BIRTH_WEAL.getCode();
+                                    sourceType = MemberBillTransTypeEnum.BIRTH_WEAL.getCode();
                                     content = "您的生日礼金奖励已派发 金额:" + item.getRewordAmount() + "，请领取";
                                     //每月红包
                                 } else if(type == 3){
-                                    sourceType = FinancialSourceTypeEnum.RED_ENVELOPE_WEAL.getCode();
+                                    sourceType = MemberBillTransTypeEnum.RED_ENVELOPE_WEAL.getCode();
                                     content = "当月红包奖励已派发 金额:" + item.getRewordAmount() + "，请领取";
                                 }
                                 //查询会员信息
@@ -393,21 +392,21 @@ public class MemberWealServiceImpl extends ServiceImpl<MemberWealMapper, MemberW
                                         if (!flag) {
                                             throw new ServiceException("操作失败");
                                         }
-                                        Financial financial = new Financial();
-                                        financial.setAmount(item.getRewordAmount());
-                                        financial.setCurrencyName(CurrencyTypeEnum.REAL.getDetail());
-                                        financial.setCurrencyType(CurrencyTypeEnum.REAL.getCode());
-                                        financial.setIpAddress(IPUtils.getIpAddress(request));
-                                        financial.setSourceId(sourceId);
-                                        financial.setIsLess(0);
-                                        financial.setState(3);
-                                        financial.setMode(3);
-                                        financial.setUserId(member.getId());
-                                        financial.setUsername(member.getAccount());
-                                        financial.setSourceType(sourceType);
-                                        financial.setRemark(content);
-                                        //添加流水数据
-                                        financialService.insertFinancial(financial);
+                                        //添加流水记录
+                                        MemberBill memberBill = new MemberBill();
+                                        memberBill.setMemberId(member.getId());
+                                        memberBill.setAccount(member.getAccount());
+                                        memberBill.setMemberPath(member.getSuperPath());
+                                        memberBill.setTranType(sourceType);
+                                        memberBill.setOrderNo(sourceId);
+                                        memberBill.setAmount(item.getRewordAmount());
+                                        memberBill.setBalance(memberInfoService.getById(member.getId()).getBalance());
+                                        memberBill.setRemark(content);
+                                        memberBill.setContent(content);
+                                        memberBill.setOperator("system");
+                                        memberBill.setTableIndex(member.getTableIndex());
+                                        memberBillService.save(memberBill);
+
                                         //已完成
                                         memberWealReword.setStatus(2);
                                         //默认当前时间为领取时间  实际上不需要领取
@@ -497,16 +496,16 @@ public class MemberWealServiceImpl extends ServiceImpl<MemberWealMapper, MemberW
         MemberWeal memberWeal = mapper.selectById(wealId);
         //福利类型
         Integer type = memberWeal.getType();
-        Integer sourceType = type == 0 ? FinancialSourceTypeEnum.WEEK_WEAL_RECYCLE.getCode()
-                : type == 1 ? FinancialSourceTypeEnum.MONTH_WEAL_RECYCLE.getCode()
-                : type == 2 ? FinancialSourceTypeEnum.BIRTH_WEAL_RECYCLE.getCode()
-                : type == 3 ? FinancialSourceTypeEnum.RED_ENVELOPE_WEAL_RECYCLE.getCode()
-                : FinancialSourceTypeEnum.WEEK_WEAL_RECYCLE.getCode();
-        String remark = type == 0 ? FinancialSourceTypeEnum.WEEK_WEAL_RECYCLE.getDetail()
-                : type == 1 ? FinancialSourceTypeEnum.MONTH_WEAL_RECYCLE.getDetail()
-                : type == 2 ? FinancialSourceTypeEnum.BIRTH_WEAL_RECYCLE.getDetail()
-                : type == 3 ? FinancialSourceTypeEnum.RED_ENVELOPE_WEAL_RECYCLE.getDetail()
-                : FinancialSourceTypeEnum.WEEK_WEAL_RECYCLE.getDetail();
+        Integer sourceType = type == 0 ? MemberBillTransTypeEnum.WEEK_WEAL_RECYCLE.getCode()
+                : type == 1 ? MemberBillTransTypeEnum.MONTH_WEAL_RECYCLE.getCode()
+                : type == 2 ? MemberBillTransTypeEnum.BIRTH_WEAL_RECYCLE.getCode()
+                : type == 3 ? MemberBillTransTypeEnum.RED_ENVELOPE_WEAL_RECYCLE.getCode()
+                : MemberBillTransTypeEnum.WEEK_WEAL_RECYCLE.getCode();
+        String remark = type == 0 ? MemberBillTransTypeEnum.WEEK_WEAL_RECYCLE.getDetail()
+                : type == 1 ? MemberBillTransTypeEnum.MONTH_WEAL_RECYCLE.getDetail()
+                : type == 2 ? MemberBillTransTypeEnum.BIRTH_WEAL_RECYCLE.getDetail()
+                : type == 3 ? MemberBillTransTypeEnum.RED_ENVELOPE_WEAL_RECYCLE.getDetail()
+                : MemberBillTransTypeEnum.WEEK_WEAL_RECYCLE.getDetail();
         //流水号
         String serialNumber = memberWeal.getSerialNumber();
         List<MemberWealReword> rewordList = wealRewordService.findList(new MemberWealRewordDTO() {{
@@ -546,21 +545,20 @@ public class MemberWealServiceImpl extends ServiceImpl<MemberWealMapper, MemberW
                                     if (!flag) {
                                         return;
                                     }
-                                    Financial financial = new Financial();
-                                    financial.setAmount(negate.negate());
-                                    financial.setCurrencyName(CurrencyTypeEnum.REAL.getDetail());
-                                    financial.setCurrencyType(CurrencyTypeEnum.REAL.getCode());
-                                    financial.setIpAddress(ipAddress);
-                                    financial.setSourceId(RandomUtil.generateNumber(22));
-                                    financial.setIsLess(1);
-                                    financial.setState(3);
-                                    financial.setMode(3);
-                                    financial.setUserId(member.getId());
-                                    financial.setUsername(member.getAccount());
-                                    financial.setSourceType(sourceType);
-                                    financial.setRemark(remark);
-                                    //添加流水（VIP资金变动流水）
-                                    financialService.insertFinancial(financial);
+                                    //添加流水记录
+                                    MemberBill memberBill = new MemberBill();
+                                    memberBill.setMemberId(member.getId());
+                                    memberBill.setAccount(member.getAccount());
+                                    memberBill.setMemberPath(member.getSuperPath());
+                                    memberBill.setTranType(sourceType);
+                                    memberBill.setOrderNo(RandomUtil.generateNumber(22));
+                                    memberBill.setAmount(negate.negate());
+                                    memberBill.setBalance(memberInfoService.getById(member.getId()).getBalance());
+                                    memberBill.setRemark(remark);
+                                    memberBill.setContent(remark);
+                                    memberBill.setOperator("system");
+                                    memberBill.setTableIndex(member.getTableIndex());
+                                    memberBillService.save(memberBill);
                                 } catch (Exception e) {
                                     log.error(MessageFormat.format("会员：{0}，VIP资金变动, 失败原因：{2}", member.getAccount(), e));
                                     // 释放资金锁

@@ -3,10 +3,7 @@ package com.gameplat.admin.service.impl;
 import cn.hutool.core.util.NumberUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.constant.MemberServiceKeyConstant;
-import com.gameplat.admin.enums.ActivityDistributeEnum;
-import com.gameplat.admin.enums.FinancialModeEnum;
-import com.gameplat.admin.enums.MemberWealRewordEnums;
-import com.gameplat.admin.enums.PushMessageEnum;
+import com.gameplat.admin.enums.*;
 import com.gameplat.admin.mapper.ActivityDistributeMapper;
 import com.gameplat.admin.model.domain.*;
 import com.gameplat.admin.model.dto.MessageAddDTO;
@@ -54,6 +51,8 @@ public class ActivityDistributeWayService extends ServiceImpl<ActivityDistribute
     @Autowired
     private MessageService messageService;
 
+    @Autowired
+    private MemberBillService memberBillService;
 
     @Autowired
     private MemberService memberService;
@@ -118,25 +117,21 @@ public class ActivityDistributeWayService extends ServiceImpl<ActivityDistribute
 
                 validWithdrawService.save(validWithdraw);
             }
-            // 新增现金流水
-            Financial financial = new Financial();
-            financial.setUsername(activityDistribute.getUsername());
-            financial.setBeforeBalance(amount.setScale(2, RoundingMode.HALF_UP));
-            financial.setAmount(activityDistribute.getDiscountsMoney().setScale(2, RoundingMode.HALF_UP));
-            financial.setAfterBalance(status == 0 ? amount.setScale(2, RoundingMode.HALF_UP) : amount.add(activityDistribute.getDiscountsMoney()).setScale(2, RoundingMode.HALF_UP));
-            financial.setSourceType(50);
-            financial.setSourceId(String.valueOf(sourceId));
-            financial.setState(status);
-            financial.setMode(FinancialModeEnum.BACKSTAGE_DEPOSIT.getValue());
-            financial.setRemark(remark);
-            financial.setCreateTime(new Date());
-            financial.setUserId(activityDistribute.getUserId());
-            financial.setCurrencyName("真币");
-            financial.setCurrencyType(1);
-            financial.setIpAddress(IPUtils.getHostIp());
-            financial.setIsLess(0);
-            //记录现金流水
-            financialService.insertFinancial(financial);
+
+            //添加流水记录
+            MemberBill memberBill = new MemberBill();
+            memberBill.setMemberId(activityDistribute.getUserId());
+            memberBill.setAccount(memberInfoVO.getAccount());
+            memberBill.setMemberPath(memberInfoVO.getSuperPath());
+            memberBill.setTranType(MemberBillTransTypeEnum.PROMOTION_BONUS.getCode());
+            memberBill.setOrderNo(sourceId);
+            memberBill.setAmount(activityDistribute.getDiscountsMoney().setScale(2, RoundingMode.HALF_UP));
+            memberBill.setBalance(memberInfoService.getById(activityDistribute.getUserId()).getBalance());
+            memberBill.setRemark(remark);
+            memberBill.setContent(remark);
+            memberBill.setOperator("system");
+            memberBill.setTableIndex(memberInfoVO.getTableIndex());
+            memberBillService.save(memberBill);
 
             //插入福利中心记录(已领取)
             wealReword.setStatus(MemberWealRewordEnums.MemberWealRewordStatus.COMPLETED.getValue());

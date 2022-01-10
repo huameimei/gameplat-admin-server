@@ -68,8 +68,8 @@
                t1.create_time,
                t1.real_name,
                t1.lower_num,
-               t1.level,
-               t1.growth,
+               t2.level,
+               t2.growth,
                t2.last_login_ip,
                t2.last_login_time,
                t2.balance,
@@ -257,5 +257,31 @@
             having count(1) >= #{count}
         </if>
         ORDER BY create_Time desc
+    </select>
+
+    <select id="findIpAnalysisList" parameterType="com.gameplat.admin.model.dto.QueryIpStatReportDTO" resultType="com.gameplat.admin.model.vo.IpAnalysisVO">
+        select
+                id as memberId,
+                account,
+                real_name as fullName,
+                register_ip as ipAddress,
+                count(*) as ipCount
+        from member
+        WHERE 1=1
+          AND user_type = 'M'
+        <if test="account != null and account != ''">
+            AND account = #{account}
+        </if>
+        <if test="ip != null and ip != ''">
+            AND register_ip = #{ip}
+        </if>
+        <if test="beginDate != null and beginDate != ''">
+            and date_format(create_time,'%y%m%d') <![CDATA[ >= ]]> date_format(#{beginDate},'%y%m%d')
+        </if>
+        <if test="endDate != null and endDate != ''">
+            and date_format(create_time,'%y%m%d') <![CDATA[ <= ]]> date_format(#{endDate},'%y%m%d')
+        </if>
+        group by register_ip
+        order by id desc, create_time desc
     </select>
 </mapper>

@@ -12,20 +12,20 @@ import java.math.BigDecimal;
 @Data
 public class IpAnalysisVO {
 
-	@ApiModelProperty(value = "用户名")
-	private String username;
+	@ApiModelProperty(value = "会员账号")
+	private String account;
 
-	@ApiModelProperty(value = "真实姓名")
-	private String idName;
+	@ApiModelProperty(value = "会员姓名")
+	private String fullName;
 
-	@ApiModelProperty(value = "用户id")
-	private Long userId;
+	@ApiModelProperty(value = "会员id")
+	private Long memberId;
 
 	@ApiModelProperty(value = "ip地址")
-	private String loginIp;
+	private String ipAddress;
 
 	@ApiModelProperty(value = "ip次数")
-	private Integer loginTime;
+	private Integer ipCount;
 
 	@ApiModelProperty(value = "ip城市")
 	private String loginAddress;
@@ -33,7 +33,7 @@ public class IpAnalysisVO {
 	@ApiModelProperty(value = "在线状态 0不在线 1在线")
 	private Integer offline;
 
-	@ApiModelProperty(value = "余额")
-	private BigDecimal balance;
+	@ApiModelProperty(value = "账户余额")
+	private BigDecimal money;
 
 }

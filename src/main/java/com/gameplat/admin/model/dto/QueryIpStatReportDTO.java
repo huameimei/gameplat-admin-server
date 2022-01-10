@@ -24,4 +24,6 @@ public class QueryIpStatReportDTO implements Serializable {
   private Date beginDate;
   @ApiModelProperty(value = "结束时间")
   private Date endDate;
+  @ApiModelProperty(value = "会员账号")
+  private Date account;
 }

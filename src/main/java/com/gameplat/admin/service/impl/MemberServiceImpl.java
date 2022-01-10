@@ -186,11 +186,6 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
     return memberMapper.getListByAgentAccout(agentAccout);
   }
 
-  @Override
-  public List<Member> getListByVipLevel(List<String> vipLevelList) {
-    return this.lambdaQuery().in(Member::getLevel, vipLevelList).list();
-  }
-
   /**
    * 批量修改会员状态
    *

@@ -76,6 +76,7 @@ public class MemberWealServiceImpl extends ServiceImpl<MemberWealMapper, MemberW
     @Autowired private RedissonClient redissonClient;
     @Autowired private MessageMapper messageMapper;
     @Autowired private MessageDistributeService messageDistributeService;
+    @Autowired private MemberInfoService memberInfoService;
 
     /**
      * 获取等级俸禄达标会员
@@ -444,7 +445,7 @@ public class MemberWealServiceImpl extends ServiceImpl<MemberWealMapper, MemberW
                                 messageDistribute.setUserId(member.getId());
                                 messageDistribute.setUserAccount(member.getAccount());
                                 messageDistribute.setRechargeLevel(member.getUserLevel());
-                                messageDistribute.setVipLevel(member.getLevel());
+                                messageDistribute.setVipLevel(memberInfoService.getById(member.getId()).getLevel());
                                 messageDistribute.setReadStatus(0);
                                 messageDistribute.setCreateBy("System");
                                 messageDistributeService.save(messageDistribute);

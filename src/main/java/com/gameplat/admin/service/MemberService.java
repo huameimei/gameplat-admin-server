@@ -66,11 +66,4 @@ public interface MemberService extends IService<Member> {
      */
     List<Member> getListByAgentAccount(String agentAccount);
 
-    /**
-     * 查询vip用户
-     *
-     * @param vipLevelList
-     * @return
-     */
-    List<Member> getListByVipLevel(List<String> vipLevelList);
 }

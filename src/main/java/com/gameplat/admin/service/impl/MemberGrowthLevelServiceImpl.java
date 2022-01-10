@@ -8,23 +8,16 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.convert.MemberGrowthLevelConvert;
 import com.gameplat.admin.enums.LanguageEnum;
 import com.gameplat.admin.mapper.MemberGrowthLevelMapper;
-import com.gameplat.admin.model.domain.Member;
-import com.gameplat.admin.model.domain.MemberGrowthConfig;
-import com.gameplat.admin.model.domain.MemberGrowthLevel;
-import com.gameplat.admin.model.domain.MemberGrowthRecord;
+import com.gameplat.admin.model.domain.*;
 import com.gameplat.admin.model.dto.MemberGrowthLevelEditDto;
-import com.gameplat.admin.model.vo.MemberGrowthConfigVO;
 import com.gameplat.admin.model.vo.MemberGrowthLevelVO;
-import com.gameplat.admin.service.MemberGrowthConfigService;
-import com.gameplat.admin.service.MemberGrowthLevelService;
-import com.gameplat.admin.service.MemberGrowthRecordService;
+import com.gameplat.admin.service.*;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import com.gameplat.admin.service.MemberService;
 import com.gameplat.base.common.context.GlobalContextHolder;
 import com.gameplat.base.common.exception.ServiceException;
 import lombok.RequiredArgsConstructor;
@@ -50,6 +43,8 @@ public class MemberGrowthLevelServiceImpl extends ServiceImpl<MemberGrowthLevelM
     @Autowired private MemberGrowthRecordService memberGrowthRecordService;
 
     @Autowired private MemberService memberService;
+
+    @Autowired private MemberInfoService memberInfoService;
 
     public static final String kindName = "{\"en-US\": \"platform\", \"in-ID\": \"peron\", \"th-TH\": \"แพลตฟอร์ม\", \"vi-VN\": \"nền tảng\", \"zh-CN\": \"平台\"}";
 
@@ -134,11 +129,11 @@ public class MemberGrowthLevelServiceImpl extends ServiceImpl<MemberGrowthLevelM
                     if (! memberGrowthRecordService.save(record)){
                         throw new ServiceException("操作失败！");
                     };
-                    Member member = new Member();
-                    member.setId(userRecord.getUserId());
+                    MemberInfo member = new MemberInfo();
+                    member.setMemberId(userRecord.getUserId());
                     member.setLevel(newLevel);
                     member.setGrowth(currentGrowth);
-                    memberService.updateById(member);
+                    memberInfoService.updateById(member);
                 }
             }
         }

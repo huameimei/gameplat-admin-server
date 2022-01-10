@@ -81,6 +81,8 @@ public class MemberGrowthRecordServiceImpl extends ServiceImpl<MemberGrowthRecor
     private MessageMapper messageMapper;
     @Autowired
     private MessageDistributeService messageDistributeService;
+    @Autowired
+    private MemberInfoService memberInfoService;
 
     public static final String kindName = "{\"en-US\": \"platform\", \"in-ID\": \"peron\", \"th-TH\": \"แพลตฟอร์ม\", \"vi-VN\": \"nền tảng\", \"zh-CN\": \"平台\"}";
 
@@ -275,16 +277,16 @@ public class MemberGrowthRecordServiceImpl extends ServiceImpl<MemberGrowthRecor
         if (beforeLevel.compareTo(afterLevel) < 0) {
             this.dealPayUpReword(beforeLevel, afterLevel, growthConfig, member, request);
             //VIP变动更新会员vip
-            Member sysUser = new Member();
-            sysUser.setId(memberId);
-            sysUser.setLevel(afterLevel);
-            memberService.updateById(sysUser);
+            MemberInfo memberInfo = new MemberInfo();
+            memberInfo.setMemberId(memberId);
+            memberInfo.setLevel(afterLevel);
+            memberInfoService.updateById(memberInfo);
         } else {
             //VIP变动更新会员vip
-            Member sysUser = new Member();
-            sysUser.setId(memberId);
-            sysUser.setLevel(afterLevel);
-            memberService.updateById(sysUser);
+            MemberInfo memberInfo = new MemberInfo();
+            memberInfo.setMemberId(memberId);
+            memberInfo.setLevel(afterLevel);
+            memberInfoService.updateById(memberInfo);
         }
     }
 
@@ -448,7 +450,7 @@ public class MemberGrowthRecordServiceImpl extends ServiceImpl<MemberGrowthRecor
         messageDistribute.setUserId(member.getId());
         messageDistribute.setUserAccount(member.getAccount());
         messageDistribute.setRechargeLevel(member.getUserLevel());
-        messageDistribute.setVipLevel(member.getLevel());
+        messageDistribute.setVipLevel(memberInfoService.getById(member.getId()).getLevel());
         messageDistribute.setReadStatus(0);
         messageDistribute.setCreateBy("System");
         messageDistributeService.save(messageDistribute);

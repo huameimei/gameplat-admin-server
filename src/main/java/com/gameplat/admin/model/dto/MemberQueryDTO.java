@@ -150,4 +150,6 @@ public class MemberQueryDTO implements Serializable {
 
   /** 会员当前等级 */
   private Integer level;
+
+  private List levels;
 }

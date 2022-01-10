@@ -238,9 +238,9 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, Message> impl
                 }
                 List<String> vipLevelList = Arrays.asList(messageAddDTO.getLinkAccount().split(","));
                 //查询指定层级的用户
-                List<Member> memberList1 = memberService.getListByVipLevel(vipLevelList);
+                List<MemberVO> memberList1 = memberService.queryList(new MemberQueryDTO(){{setLevels(vipLevelList);}});
                 if (CollectionUtils.isNotEmpty(memberList1)) {
-                    for (Member member : memberList1) {
+                    for (MemberVO member : memberList1) {
                         MemberInfoVO memberInfoVO = new MemberInfoVO();
                         BeanUtils.copyBeanProp(memberInfoVO, member);
                         buildMessageDistribute(message, memberInfoVO, messageList);

@@ -6,13 +6,17 @@ import com.gameplat.admin.model.dto.ActivityBlacklistDTO;
 import com.gameplat.admin.model.vo.ActivityBlacklistVO;
 import org.mapstruct.Mapper;
 
+/**
+ * 活动黑名单转换器
+ *
+ * @author kenvin
+ */
 @Mapper(componentModel = "spring")
 public interface ActivityBlacklistConvert {
 
-    ActivityBlacklist toEntity(ActivityBlacklistDTO activityBlacklistDTO);
+  ActivityBlacklist toEntity(ActivityBlacklistDTO activityBlacklistDTO);
 
-    ActivityBlacklistVO toVo(ActivityBlacklist activityBlacklist);
+  ActivityBlacklistVO toVo(ActivityBlacklist activityBlacklist);
 
-    ActivityBlacklist toEntity(ActivityBlacklistAddDTO activityBlacklistAddDTO);
-
+  ActivityBlacklist toEntity(ActivityBlacklistAddDTO activityBlacklistAddDTO);
 }

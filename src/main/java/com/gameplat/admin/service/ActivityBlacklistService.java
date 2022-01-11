@@ -10,29 +10,31 @@ import com.gameplat.admin.model.vo.ActivityBlacklistVO;
 
 /**
  * 活动黑名单业务处理
+ *
  * @author kenvin
  */
 public interface ActivityBlacklistService extends IService<ActivityBlacklist> {
-    /**
-     * 活动黑名单列表
-     *
-     * @param page
-     * @param activityBlacklistQueryDTO
-     * @return
-     */
-    IPage<ActivityBlacklistVO> list(PageDTO<ActivityBlacklist> page, ActivityBlacklistQueryDTO activityBlacklistQueryDTO);
+  /**
+   * 活动黑名单列表
+   *
+   * @param page
+   * @param activityBlacklistQueryDTO
+   * @return
+   */
+  IPage<ActivityBlacklistVO> list(
+      PageDTO<ActivityBlacklist> page, ActivityBlacklistQueryDTO activityBlacklistQueryDTO);
 
-    /**
-     * 新增活动黑名单
-     *
-     * @param activityBlacklistAddDTO
-     */
-    boolean add(ActivityBlacklistAddDTO activityBlacklistAddDTO);
+  /**
+   * 新增活动黑名单
+   *
+   * @param activityBlacklistAddDTO
+   */
+  boolean add(ActivityBlacklistAddDTO activityBlacklistAddDTO);
 
-    /**
-     * 删除活动黑名单
-     *
-     * @param ids
-     */
-    void remove(String ids);
+  /**
+   * 删除活动黑名单
+   *
+   * @param ids
+   */
+  void remove(String ids);
 }

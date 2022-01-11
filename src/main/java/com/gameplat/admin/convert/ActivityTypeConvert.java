@@ -15,24 +15,23 @@ import org.mapstruct.Mapper;
 @Mapper(componentModel = "spring")
 public interface ActivityTypeConvert {
 
-    /**
-     * 将Entity转换成VO
-     *
-     * @param activityType
-     * @return
-     */
-    ActivityTypeVO toVo(ActivityType activityType);
+  /**
+   * 将Entity转换成VO
+   *
+   * @param activityType
+   * @return
+   */
+  ActivityTypeVO toVo(ActivityType activityType);
 
+  /**
+   * DTO转Entity
+   *
+   * @param activityTypeDTO
+   * @return
+   */
+  ActivityType toEntity(ActivityTypeDTO activityTypeDTO);
 
-    /**
-     * DTO转Entity
-     *
-     * @param activityTypeDTO
-     * @return
-     */
-    ActivityType toEntity(ActivityTypeDTO activityTypeDTO);
+  ActivityType toEntity(ActivityTypeAddDTO activityTypeAddDTO);
 
-    ActivityType toEntity(ActivityTypeAddDTO activityTypeAddDTO);
-
-    ActivityType toEntity(ActivityTypeUpdateDTO activityTypeUpdateDTO);
+  ActivityType toEntity(ActivityTypeUpdateDTO activityTypeUpdateDTO);
 }

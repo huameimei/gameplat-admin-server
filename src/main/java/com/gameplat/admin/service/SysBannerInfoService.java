@@ -15,48 +15,48 @@ import java.util.List;
  * @author kenvin
  */
 public interface SysBannerInfoService {
-    /**
-     * 查询banner列表
-     *
-     * @param banner
-     * @return
-     */
-    List<SysBannerInfo> getByBanner(SysBannerInfo banner);
+  /**
+   * 查询banner列表
+   *
+   * @param banner
+   * @return
+   */
+  List<SysBannerInfo> getByBanner(SysBannerInfo banner);
 
-    /**
-     * banner信息保存
-     *
-     * @param sysBannerInfo
-     */
-    boolean save(SysBannerInfo sysBannerInfo);
+  /**
+   * banner信息保存
+   *
+   * @param sysBannerInfo
+   */
+  boolean save(SysBannerInfo sysBannerInfo);
 
-    /**
-     * 分页查询
-     *
-     * @param page
-     * @param language
-     * @return
-     */
-    IPage<SysBannerInfoVO> list(PageDTO<SysBannerInfo> page, String language);
+  /**
+   * 分页查询
+   *
+   * @param page
+   * @param language
+   * @return
+   */
+  IPage<SysBannerInfoVO> list(PageDTO<SysBannerInfo> page, String language);
 
-    /**
-     * 添加
-     *
-     * @param sysBannerInfoAddDTO
-     */
-    void add(SysBannerInfoAddDTO sysBannerInfoAddDTO);
+  /**
+   * 添加
+   *
+   * @param sysBannerInfoAddDTO
+   */
+  void add(SysBannerInfoAddDTO sysBannerInfoAddDTO);
 
-    /**
-     * 编辑
-     *
-     * @param sysBannerInfoEditDTO
-     */
-    void edit(SysBannerInfoEditDTO sysBannerInfoEditDTO);
+  /**
+   * 编辑
+   *
+   * @param sysBannerInfoEditDTO
+   */
+  void edit(SysBannerInfoEditDTO sysBannerInfoEditDTO);
 
-    /**
-     * 删除bannner
-     *
-     * @param ids
-     */
-    void delete(String ids);
+  /**
+   * 删除bannner
+   *
+   * @param ids
+   */
+  void delete(String ids);
 }

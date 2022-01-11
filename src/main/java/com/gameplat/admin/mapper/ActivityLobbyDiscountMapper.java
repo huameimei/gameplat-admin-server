@@ -4,10 +4,8 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.gameplat.admin.model.domain.ActivityLobbyDiscount;
 
 /**
- * @author lyq
- * @Description 数据层
+ * @author lyq<br>
+ *     @Description 数据层
  * @date 2020-08-14 14:50:01
  */
-public interface ActivityLobbyDiscountMapper extends BaseMapper<ActivityLobbyDiscount> {
-
-}
+public interface ActivityLobbyDiscountMapper extends BaseMapper<ActivityLobbyDiscount> {}

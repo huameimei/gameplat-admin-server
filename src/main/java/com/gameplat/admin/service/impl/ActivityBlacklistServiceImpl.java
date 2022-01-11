@@ -28,52 +28,61 @@ import java.util.List;
  * @author kenvin
  */
 @Service
-public class ActivityBlacklistServiceImpl extends ServiceImpl<ActivityBlacklistMapper, ActivityBlacklist>
-        implements ActivityBlacklistService {
+public class ActivityBlacklistServiceImpl
+    extends ServiceImpl<ActivityBlacklistMapper, ActivityBlacklist>
+    implements ActivityBlacklistService {
 
-    @Autowired
-    private ActivityBlacklistConvert activityBlacklistConvert;
+  @Autowired private ActivityBlacklistConvert activityBlacklistConvert;
 
-    @Autowired
-    private MemberService memberService;
+  @Autowired private MemberService memberService;
 
-    @Override
-    public IPage<ActivityBlacklistVO> list(PageDTO<ActivityBlacklist> page, ActivityBlacklistQueryDTO activityBlacklistQueryDTO) {
-        return this.lambdaQuery()
-                .like(StringUtils.isNotBlank(activityBlacklistQueryDTO.getLimitedContent())
-                        , ActivityBlacklist::getLimitedContent, activityBlacklistQueryDTO.getLimitedContent())
-                .eq(activityBlacklistQueryDTO.getLimitedType() != null && activityBlacklistQueryDTO.getLimitedType() != 0
-                        , ActivityBlacklist::getLimitedType, activityBlacklistQueryDTO.getLimitedType())
-                .eq(activityBlacklistQueryDTO.getActivityId() != null && activityBlacklistQueryDTO.getActivityId() != 0
-                        , ActivityBlacklist::getActivityId, activityBlacklistQueryDTO.getActivityId())
-                .page(page).convert(activityBlacklistConvert::toVo);
+  @Override
+  public IPage<ActivityBlacklistVO> list(
+      PageDTO<ActivityBlacklist> page, ActivityBlacklistQueryDTO activityBlacklistQueryDTO) {
+    return this.lambdaQuery()
+        .like(
+            StringUtils.isNotBlank(activityBlacklistQueryDTO.getLimitedContent()),
+            ActivityBlacklist::getLimitedContent,
+            activityBlacklistQueryDTO.getLimitedContent())
+        .eq(
+            activityBlacklistQueryDTO.getLimitedType() != null
+                && activityBlacklistQueryDTO.getLimitedType() != 0,
+            ActivityBlacklist::getLimitedType,
+            activityBlacklistQueryDTO.getLimitedType())
+        .eq(
+            activityBlacklistQueryDTO.getActivityId() != null
+                && activityBlacklistQueryDTO.getActivityId() != 0,
+            ActivityBlacklist::getActivityId,
+            activityBlacklistQueryDTO.getActivityId())
+        .page(page)
+        .convert(activityBlacklistConvert::toVo);
+  }
+
+  @Override
+  public boolean add(ActivityBlacklistAddDTO activityBlacklistAddDTO) {
+    if (activityBlacklistAddDTO.getLimitedType() == ActivityBlacklistEnum.MEMBER.getValue()) {
+      MemberInfoVO memberInfo =
+          memberService.getMemberInfo(activityBlacklistAddDTO.getLimitedContent());
+      if (StringUtils.isNull(memberInfo)) {
+        throw new ServiceException("限制内容框中输入的会员账号不存在");
+      }
+    } else if (activityBlacklistAddDTO.getLimitedType() == ActivityBlacklistEnum.IP.getValue()) {
+      if (!IpAddressUtils.inputIsIpAddress(activityBlacklistAddDTO.getLimitedContent())) {
+        throw new ServiceException("限制内容框中输入的IP地址不是一个有效的IP地址");
+      }
     }
+    ActivityBlacklist activityBlacklist =
+        activityBlacklistConvert.toEntity(activityBlacklistAddDTO);
+    return this.save(activityBlacklist);
+  }
 
-    @Override
-    public boolean add(ActivityBlacklistAddDTO activityBlacklistAddDTO) {
-        if (activityBlacklistAddDTO.getLimitedType() == ActivityBlacklistEnum.MEMBER.getValue()) {
-            MemberInfoVO memberInfo = memberService.getMemberInfo(activityBlacklistAddDTO.getLimitedContent());
-            if (StringUtils.isNull(memberInfo)) {
-                throw new ServiceException("限制内容框中输入的会员账号不存在");
-            }
-        } else if (activityBlacklistAddDTO.getLimitedType() == ActivityBlacklistEnum.IP.getValue()) {
-            if (!IpAddressUtils.inputIsIpAddress(activityBlacklistAddDTO.getLimitedContent())) {
-                throw new ServiceException("限制内容框中输入的IP地址不是一个有效的IP地址");
-            }
-        }
-        ActivityBlacklist activityBlacklist = activityBlacklistConvert.toEntity(activityBlacklistAddDTO);
-        return this.save(activityBlacklist);
+  @Override
+  public void remove(String ids) {
+    String[] idArr = ids.split(",");
+    List<Long> idList = new ArrayList<>();
+    for (String idStr : idArr) {
+      idList.add(Long.parseLong(idStr));
     }
-
-    @Override
-    public void remove(String ids) {
-        String[] idArr = ids.split(",");
-        List<Long> idList = new ArrayList<>();
-        for (String idStr : idArr) {
-            idList.add(Long.parseLong(idStr));
-        }
-        this.removeByIds(idList);
-    }
-
-
+    this.removeByIds(idList);
+  }
 }

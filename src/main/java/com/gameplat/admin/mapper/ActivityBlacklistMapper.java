@@ -5,6 +5,7 @@ import com.gameplat.admin.model.domain.ActivityBlacklist;
 
 /**
  * 活动黑名单mapper
+ *
+ * @author kenvin
  */
-public interface ActivityBlacklistMapper extends BaseMapper<ActivityBlacklist> {
-}
+public interface ActivityBlacklistMapper extends BaseMapper<ActivityBlacklist> {}

@@ -10,6 +10,8 @@ import com.gameplat.admin.service.ActivityBlacklistService;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.StringUtils;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,56 +30,61 @@ import springfox.documentation.annotations.ApiIgnore;
 @Api(tags = "活动黑名单管理")
 public class ActivityBlacklistController {
 
-    @Autowired
-    private ActivityBlacklistService activityBlacklistService;
+  @Autowired private ActivityBlacklistService activityBlacklistService;
 
-    /**
-     * 活动黑名单列表
-     * @param page
-     * @param activityBlacklistQueryDTO
-     * @return
-     */
-    @ApiOperation(value = "活动黑名单列表")
-    @GetMapping("/list")
-    @PreAuthorize("hasAuthority('activity:blacklist:list')")
-    public IPage<ActivityBlacklistVO> list(@ApiIgnore PageDTO<ActivityBlacklist> page, ActivityBlacklistQueryDTO activityBlacklistQueryDTO) {
-        return activityBlacklistService.list(page, activityBlacklistQueryDTO);
+  /**
+   * 活动黑名单列表
+   *
+   * @param page
+   * @param activityBlacklistQueryDTO
+   * @return
+   */
+  @ApiOperation(value = "活动黑名单列表")
+  @GetMapping("/list")
+  @PreAuthorize("hasAuthority('activity:blacklist:list')")
+  @ApiImplicitParams({
+    @ApiImplicitParam(name = "current", value = "分页参数：当前页", defaultValue = "1"),
+    @ApiImplicitParam(name = "size", value = "每页条数"),
+  })
+  public IPage<ActivityBlacklistVO> list(
+      @ApiIgnore PageDTO<ActivityBlacklist> page,
+      ActivityBlacklistQueryDTO activityBlacklistQueryDTO) {
+    return activityBlacklistService.list(page, activityBlacklistQueryDTO);
+  }
+
+  /**
+   * 新增活动黑名单
+   *
+   * @param activityBlacklistAddDTO
+   */
+  @ApiOperation(value = "新增活动黑名单")
+  @PostMapping("/add")
+  @PreAuthorize("hasAuthority('activity:blacklist:add')")
+  public void add(@RequestBody ActivityBlacklistAddDTO activityBlacklistAddDTO) {
+    if (StringUtils.isNull(activityBlacklistAddDTO.getActivityId())) {
+      throw new ServiceException("活动ID不能为空");
     }
-
-    /**
-     * 新增活动黑名单
-     * @param activityBlacklistAddDTO
-     */
-    @ApiOperation(value = "新增活动黑名单")
-    @PostMapping("/add")
-    @PreAuthorize("hasAuthority('activity:blacklist:add')")
-    public void add(@RequestBody ActivityBlacklistAddDTO activityBlacklistAddDTO) {
-        if (StringUtils.isNull(activityBlacklistAddDTO.getActivityId())) {
-            throw new ServiceException("活动ID不能为空");
-        }
-        if (StringUtils.isEmpty(activityBlacklistAddDTO.getLimitedContent())) {
-            throw new ServiceException("限制内容不能为空");
-        }
-        if (StringUtils.isNull(activityBlacklistAddDTO.getLimitedType())) {
-            throw new ServiceException("限制类型不能为空");
-        }
-        activityBlacklistService.add(activityBlacklistAddDTO);
+    if (StringUtils.isEmpty(activityBlacklistAddDTO.getLimitedContent())) {
+      throw new ServiceException("限制内容不能为空");
     }
-
-    /**
-     * 删除活动黑名单
-     *
-     * @param ids
-     */
-    @ApiOperation(value = "删除活动黑名单")
-    @DeleteMapping("/delete")
-    @PreAuthorize("hasAuthority('activity:blacklist:remove')")
-    public void remove(@RequestBody String ids) {
-        if (StringUtils.isBlank(ids)) {
-            throw new ServiceException("ids不能为空");
-        }
-        activityBlacklistService.remove(ids);
+    if (StringUtils.isNull(activityBlacklistAddDTO.getLimitedType())) {
+      throw new ServiceException("限制类型不能为空");
     }
+    activityBlacklistService.add(activityBlacklistAddDTO);
+  }
 
-
+  /**
+   * 删除活动黑名单
+   *
+   * @param ids
+   */
+  @ApiOperation(value = "删除活动黑名单")
+  @DeleteMapping("/delete")
+  @PreAuthorize("hasAuthority('activity:blacklist:remove')")
+  public void remove(@RequestBody String ids) {
+    if (StringUtils.isBlank(ids)) {
+      throw new ServiceException("ids不能为空");
+    }
+    activityBlacklistService.remove(ids);
+  }
 }

@@ -8,16 +8,17 @@ import com.gameplat.admin.model.vo.ActivityVO;
 
 /**
  * 活动业务类
+ *
+ * @author kenvin
  */
 public interface ActivityService {
 
-
-    /**
-     * 活动列表分页
-     *
-     * @param page
-     * @param activityDTO
-     * @return
-     */
-    IPage<ActivityVO> list(PageDTO<Activity> page, ActivityDTO activityDTO);
+  /**
+   * 活动列表分页
+   *
+   * @param page
+   * @param activityDTO
+   * @return
+   */
+  IPage<ActivityVO> list(PageDTO<Activity> page, ActivityDTO activityDTO);
 }

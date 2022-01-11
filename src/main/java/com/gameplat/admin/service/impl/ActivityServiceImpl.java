@@ -20,18 +20,15 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class ActivityServiceImpl extends ServiceImpl<ActivityMapper, Activity>
-        implements ActivityService {
+    implements ActivityService {
 
-    @Autowired
-    private ActivityConvert activityConvert;
+  @Autowired private ActivityConvert activityConvert;
 
+  @Override
+  public IPage<ActivityVO> list(PageDTO<Activity> page, ActivityDTO activityDTO) {
+    LambdaQueryChainWrapper<Activity> queryWrapper = this.lambdaQuery();
+    //        queryWrapper.eq(StringUtils.isNotBlank());
 
-    @Override
-    public IPage<ActivityVO> list(PageDTO<Activity> page, ActivityDTO activityDTO) {
-        LambdaQueryChainWrapper<Activity> queryWrapper = this.lambdaQuery();
-//        queryWrapper.eq(StringUtils.isNotBlank());
-
-
-        return queryWrapper.page(page).convert(activityConvert::toVo);
-    }
+    return queryWrapper.page(page).convert(activityConvert::toVo);
+  }
 }

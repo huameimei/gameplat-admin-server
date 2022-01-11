@@ -3,7 +3,7 @@ package com.gameplat.admin.enums;
 /**
  * 活动黑名单状态
  *
- * @author admin
+ * @author kenvin
  */
 public enum ActivityBlacklistEnum {
 

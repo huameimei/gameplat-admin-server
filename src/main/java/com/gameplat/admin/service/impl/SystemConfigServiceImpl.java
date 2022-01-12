@@ -53,10 +53,6 @@ public class SystemConfigServiceImpl implements SystemConfigService {
 
   @Autowired private ConfigService configService;
 
-  @Autowired private SysSmsAreaService sysSmsAreaService;
-
-  @Autowired private SysSmsAreaConvert sysSmsAreaConvert;
-
   @Autowired private AgentContacaConfigConvert agentContacaConfigConvert;
 
   @Override
@@ -236,37 +232,6 @@ public class SystemConfigServiceImpl implements SystemConfigService {
       if (!dictDataService.update(sysDictData, queryWrapper)) {
         throw new ServiceException("更新配置失败!");
       }
-    }
-  }
-
-  @Override
-  public IPage<SysSmsAreaVO> findSmsAreaList(PageDTO<SysSmsArea> page, SysSmsAreaQueryDTO dto) {
-    LambdaQueryWrapper<SysSmsArea> query = Wrappers.lambdaQuery();
-    query
-        .eq(ObjectUtils.isNotEmpty(dto.getCode()), SysSmsArea::getCode, dto.getCode())
-        .eq(ObjectUtils.isNotEmpty(dto.getName()), SysSmsArea::getName, dto.getName());
-    return sysSmsAreaService.page(page, query).convert(sysSmsAreaConvert::toVo);
-  }
-
-  @Override
-  public void smsAreaEdit(OperSysSmsAreaDTO dto) {
-    SysSmsArea sysSmsArea = sysSmsAreaConvert.toEntity(dto);
-    if (sysSmsArea.getId() != null && sysSmsArea.getId() > 0) {
-      if (!sysSmsAreaService.updateById(sysSmsArea)) {
-        throw new ServiceException("更新区号配置失败!");
-      }
-    } else {
-      sysSmsArea.setStatus(TrueFalse.TRUE.getValue());
-      if (!sysSmsAreaService.save(sysSmsArea)) {
-        throw new ServiceException("新增区号配置失败");
-      }
-    }
-  }
-
-  @Override
-  public void smsAreaDelete(Long id) {
-    if (!sysSmsAreaService.removeById(id)) {
-      throw new ServiceException("删除区号配置失败!");
     }
   }
 

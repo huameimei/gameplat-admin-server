@@ -1,4 +1,4 @@
-package com.gameplat.admin.controller.open.system;
+package com.gameplat.admin.controller.open.operator;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
@@ -28,7 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/admin/system/sms")
+@RequestMapping("/api/admin/operator/logs/sms")
 public class OpenSmsController {
 
   @Autowired private SysSmsService smsService;

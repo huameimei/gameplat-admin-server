@@ -1,4 +1,4 @@
-package com.gameplat.admin.controller.open.system;
+package com.gameplat.admin.controller.open.operator;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
@@ -25,19 +25,19 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/admin/system/email")
+@RequestMapping("/api/admin/operator/logs/email")
 public class OpenEmailController {
 
   @Autowired private SysEmailService emailService;
 
   @GetMapping("/list")
-  @PreAuthorize("hasAuthority('system:email:view')")
+  @PreAuthorize("hasAuthority('logs:email:view')")
   public IPage<EmailVO> list(PageDTO<SysEmail> page, EmailDTO emailDTO) {
     return emailService.selectEmailList(page, emailDTO);
   }
 
   @DeleteMapping("/clean")
-  @PreAuthorize("hasAuthority('system:email:clean')")
+  @PreAuthorize("hasAuthority('logs:email:clean')")
   @Log(module = ServiceName.ADMIN_SERVICE, param = true, desc = "清空邮件记录表")
   public void clean() {
     emailService.cleanEmail();

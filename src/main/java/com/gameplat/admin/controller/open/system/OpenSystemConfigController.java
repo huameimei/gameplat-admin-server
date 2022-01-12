@@ -95,20 +95,7 @@ public class OpenSystemConfigController {
     systemConfigService.configDataEdit(dto);
   }
 
-  @GetMapping("/smsArea/list")
-  public IPage<SysSmsAreaVO> findSmsAreaList(PageDTO<SysSmsArea> page, SysSmsAreaQueryDTO dto) {
-    return systemConfigService.findSmsAreaList(page, dto);
-  }
 
-  @PutMapping("/smsArea/update")
-  public void smsAreaEdit(@RequestBody OperSysSmsAreaDTO dto) {
-    systemConfigService.smsAreaEdit(dto);
-  }
-
-  @DeleteMapping("/smsArea/del/{id}")
-  public void smsAreaEdit(@PathVariable("id") Long id) {
-    systemConfigService.smsAreaDelete(id);
-  }
 
   @GetMapping("/email/list")
   public EmailConfig findEmailList() {

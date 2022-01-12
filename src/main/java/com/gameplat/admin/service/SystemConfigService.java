@@ -30,12 +30,6 @@ public interface SystemConfigService {
 
   void configDataEdit(OperSystemConfigDTO dto);
 
-  IPage<SysSmsAreaVO> findSmsAreaList(PageDTO<SysSmsArea> page, SysSmsAreaQueryDTO dto);
-
-  void smsAreaEdit(OperSysSmsAreaDTO dto);
-
-  void smsAreaDelete(Long id);
-
   EmailConfig findEmailConfig();
 
   void updateEmail(EmailConfig emailConfig);

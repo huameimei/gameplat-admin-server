@@ -1,6 +1,5 @@
-package com.gameplat.admin.model.domain;
+package com.gameplat.admin.model.dto;
 
-import com.baomidou.mybatisplus.annotation.*;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
@@ -8,23 +7,18 @@ import java.io.Serializable;
 import java.util.Date;
 
 /**
- * 站内信
+ * 站内信新增DTO
  *
  * @author: kenvin
  * @date: 2021/4/28 15:53
  * @desc:
  */
-
 @Data
-@TableName("message")
-public class Message implements Serializable {
+public class MessageInfoAddDTO implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    /**
-     * 主键
-     */
-    @TableId(value = "id", type = IdType.AUTO)
+    @ApiModelProperty(value = "id")
     private Long id;
 
     @ApiModelProperty(value = "消息标题")
@@ -58,10 +52,10 @@ public class Message implements Serializable {
     private String linkAccount;
 
     @ApiModelProperty(value = "开始时间")
-    private String beginTime;
+    private Date beginTime;
 
     @ApiModelProperty(value = "结束时间")
-    private String endTime;
+    private Date endTime;
 
     @ApiModelProperty(value = "升序排序")
     private Integer sort;
@@ -82,18 +76,6 @@ public class Message implements Serializable {
     private String remarks;
 
     @ApiModelProperty(value = "创建人")
-    @TableField(fill = FieldFill.INSERT)
     private String createBy;
 
-    @ApiModelProperty(value = "创建时间")
-    @TableField(fill = FieldFill.INSERT)
-    private Date createTime;
-
-    @ApiModelProperty(value = "更新人")
-    @TableField(fill = FieldFill.INSERT_UPDATE)
-    private String updateBy;
-
-    @ApiModelProperty(value = "更新时间")
-    @TableField(fill = FieldFill.INSERT_UPDATE)
-    private Date updateTime;
 }

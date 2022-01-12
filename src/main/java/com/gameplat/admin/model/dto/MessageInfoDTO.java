@@ -14,7 +14,7 @@ import java.util.Date;
  * @desc:
  */
 @Data
-public class MessageDTO implements Serializable {
+public class MessageInfoDTO implements Serializable {
 
     private static final long serialVersionUID = 1L;
 

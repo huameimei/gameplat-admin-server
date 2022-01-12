@@ -1,9 +1,9 @@
 package com.gameplat.admin.convert;
 
-import com.gameplat.admin.model.domain.Message;
-import com.gameplat.admin.model.dto.MessageAddDTO;
-import com.gameplat.admin.model.dto.MessageEditDTO;
-import com.gameplat.admin.model.vo.MessageVO;
+import com.gameplat.admin.model.domain.MessageInfo;
+import com.gameplat.admin.model.dto.MessageInfoAddDTO;
+import com.gameplat.admin.model.dto.MessageInfoEditDTO;
+import com.gameplat.admin.model.vo.MessageInfoVO;
 import org.mapstruct.Mapper;
 
 /**
@@ -14,11 +14,11 @@ import org.mapstruct.Mapper;
 @Mapper(componentModel = "spring")
 public interface MessageConvert {
 
-    Message toEntity(MessageAddDTO messageAddDTO);
+    MessageInfo toEntity(MessageInfoAddDTO messageInfoAddDTO);
 
-    Message toEntity(MessageEditDTO messageEditDTO);
+    MessageInfo toEntity(MessageInfoEditDTO messageInfoEditDTO);
 
-    MessageVO toVo(Message message);
+    MessageInfoVO toVo(MessageInfo messageInfo);
 
 
 }

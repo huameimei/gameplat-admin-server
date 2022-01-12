@@ -432,7 +432,7 @@ public class MemberGrowthRecordServiceImpl extends ServiceImpl<MemberGrowthRecor
         }
         //通知 发个人消息
         log.info("发送消息");
-        MessageAddDTO message = new MessageAddDTO();
+        MessageInfoAddDTO message = new MessageInfoAddDTO();
         message.setTitle("VIP等级升级");
         message.setContent(content);
         message.setCategory(PushMessageEnum.MessageCategory.SYS_SEND.getValue());

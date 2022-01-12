@@ -6,11 +6,10 @@ import com.gameplat.admin.constant.MemberServiceKeyConstant;
 import com.gameplat.admin.enums.*;
 import com.gameplat.admin.mapper.ActivityDistributeMapper;
 import com.gameplat.admin.model.domain.*;
-import com.gameplat.admin.model.dto.MessageAddDTO;
+import com.gameplat.admin.model.dto.MessageInfoAddDTO;
 import com.gameplat.admin.model.vo.MemberInfoVO;
 import com.gameplat.admin.service.*;
 import com.gameplat.base.common.exception.ServiceException;
-import com.gameplat.base.common.util.IPUtils;
 import com.gameplat.redis.redisson.DistributedLocker;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -43,7 +42,7 @@ public class ActivityDistributeWayService
 
   @Autowired private FinancialService financialService;
 
-  @Autowired private MessageService messageService;
+  @Autowired private MessageInfoService messageInfoService;
 
   @Autowired private MemberBillService memberBillService;
 
@@ -141,7 +140,7 @@ public class ActivityDistributeWayService
       memberWealRewordService.save(wealReword);
 
       // 通知 发个人消息
-      MessageAddDTO message = new MessageAddDTO();
+      MessageInfoAddDTO message = new MessageInfoAddDTO();
       message.setContent(getInformationContent(activityDistribute));
       message.setTitle("活动派发");
       message.setPushRange(PushMessageEnum.UserRange.SOME_MEMBERS.getValue());
@@ -152,7 +151,7 @@ public class ActivityDistributeWayService
       message.setPopsCount(0);
       message.setType(1);
       message.setCreateBy("System");
-      messageService.insertMessage(message);
+      messageInfoService.insertMessage(message);
     } finally {
       // 释放资金锁
       distributedLocker.unlock(lockKey);
@@ -180,7 +179,7 @@ public class ActivityDistributeWayService
     activityQualificationService.updateQualificationStatus(activityQualification);
 
     // 通知 发个人消息
-    MessageAddDTO message = new MessageAddDTO();
+    MessageInfoAddDTO message = new MessageInfoAddDTO();
     message.setContent(getInformationContent(activityDistribute));
     message.setTitle("活动派发");
     message.setPushRange(PushMessageEnum.UserRange.SOME_MEMBERS.getValue());
@@ -191,7 +190,7 @@ public class ActivityDistributeWayService
     message.setPopsCount(0);
     message.setType(1);
     message.setCreateBy("System");
-    messageService.insertMessage(message);
+    messageInfoService.insertMessage(message);
   }
 
   /**

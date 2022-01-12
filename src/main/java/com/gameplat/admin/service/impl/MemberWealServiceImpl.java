@@ -425,7 +425,7 @@ public class MemberWealServiceImpl extends ServiceImpl<MemberWealMapper, MemberW
                                     memberWealReword.setStatus(1);
                                 }
                                 //6.5 通知 发个人消息
-                                MessageAddDTO message = new MessageAddDTO();
+                                MessageInfoAddDTO message = new MessageInfoAddDTO();
                                 message.setTitle("VIP福利奖励");
                                 message.setContent(content);
                                 message.setCategory(PushMessageEnum.MessageCategory.SYS_SEND.getValue());

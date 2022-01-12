@@ -11,7 +11,7 @@ import java.util.Date;
  * @author admin
  */
 @Data
-public class MessageQueryDTO {
+public class MessageInfoQueryDTO {
 
     @ApiModelProperty(value = "消息标题")
     private String title;

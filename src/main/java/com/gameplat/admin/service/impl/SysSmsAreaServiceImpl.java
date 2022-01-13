@@ -46,6 +46,10 @@ public class SysSmsAreaServiceImpl extends ServiceImpl<SysSmsAreaMapper, SysSmsA
 
     @Override
     public void editSmsArea(SmsAreaEditDTO editDTO) {
+        SysSmsArea area = this.getById(editDTO.getId());
+        if(ObjectUtils.isNull(area)) {
+            throw new ServiceException("该区号设置不存在");
+        }
         SysSmsArea sysSmsArea = areaConvert.toEntity(editDTO);
         if (areaMapper.updateById(sysSmsArea) == 0) {
             throw new ServiceException("更新区号配置失败!");
@@ -54,6 +58,10 @@ public class SysSmsAreaServiceImpl extends ServiceImpl<SysSmsAreaMapper, SysSmsA
 
     @Override
     public void deleteAreaById(Long id) {
+        SysSmsArea area = this.getById(id);
+        if(ObjectUtils.isNull(area)) {
+            throw new ServiceException("该区号设置不存在");
+        }
         if (areaMapper.deleteById(id) == 0) {
             throw new ServiceException("删除区号配置失败!");
         }
@@ -61,8 +69,7 @@ public class SysSmsAreaServiceImpl extends ServiceImpl<SysSmsAreaMapper, SysSmsA
 
     @Override
     public void changeStatus(Long id, Integer status) {
-        SysSmsArea area = this.lambdaQuery()
-                .eq(SysSmsArea::getId, id).one();
+        SysSmsArea area = this.getById(id);
         if(ObjectUtils.isNull(area)) {
             throw new ServiceException("修改状态失败");
         }

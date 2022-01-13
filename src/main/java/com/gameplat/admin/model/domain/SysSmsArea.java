@@ -1,17 +1,15 @@
 package com.gameplat.admin.model.domain;
 
-import com.baomidou.mybatisplus.annotation.FieldFill;
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.*;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import io.swagger.annotations.ApiModelProperty;
-import java.io.Serializable;
-import java.util.Date;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.io.Serializable;
+import java.util.Date;
+
 @Data
+@TableName("sys_sms_area")
 @EqualsAndHashCode(callSuper = false)
 public class SysSmsArea implements Serializable {
 
@@ -30,14 +28,12 @@ public class SysSmsArea implements Serializable {
    * 创建者
    */
   @TableField(fill = FieldFill.INSERT)
-  @ApiModelProperty(value = "创建者")
   private String createBy;
 
   /**
    * 创建时间
    */
   @TableField(fill = FieldFill.INSERT)
-  @ApiModelProperty(value = "创建时间")
   @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
   private Date createTime;
 
@@ -45,14 +41,12 @@ public class SysSmsArea implements Serializable {
    * 更新人
    */
   @TableField(fill = FieldFill.INSERT_UPDATE)
-  @ApiModelProperty(value = "更新者")
   private String updateBy;
 
   /**
    * 更新时间
    */
   @TableField(fill = FieldFill.INSERT_UPDATE)
-  @ApiModelProperty(value = "更新时间")
   @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
   private Date updateTime;
 

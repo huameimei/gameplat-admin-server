@@ -17,6 +17,7 @@ import com.gameplat.admin.model.vo.ActivityDistributeVO;
 import com.gameplat.admin.service.ActivityDistributeService;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.StringUtils;
+import com.gameplat.common.enums.BooleanEnum;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
@@ -85,7 +86,8 @@ public class ActivityDistributeServiceImpl
       PageDTO<ActivityDistribute> page, ActivityDistributeQueryDTO activityDistributeQueryDTO) {
     LambdaQueryChainWrapper<ActivityDistribute> lambdaQuery = this.lambdaQuery();
     lambdaQuery
-        .eq(ActivityDistribute::getDeleteFlag, 1)
+            //未删除
+        .eq(ActivityDistribute::getDeleteFlag, BooleanEnum.YES.value())
         .like(
             StringUtils.isNotBlank(activityDistributeQueryDTO.getUsername()),
             ActivityDistribute::getUsername,

@@ -23,5 +23,5 @@ public interface MessageFeedbackService extends IService<MessageFeedback> {
     void removeMessage(Long id);
 
     /** 反馈列表 */
-    IPage<MessageFeedbackVO> get(PageDTO<MessageFeedback> page, MessageFeedbackQueryDTO dto);
+    IPage<MessageFeedbackVO> getList(PageDTO<MessageFeedback> page, MessageFeedbackQueryDTO dto);
 }

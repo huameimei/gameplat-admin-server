@@ -24,6 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
@@ -85,16 +86,10 @@ public class ActivityTypeController {
   @PostMapping("/add")
   @PreAuthorize("hasAuthority('activity:type:add')")
   public void add(
-      @RequestBody ActivityTypeAddDTO activityTypeAddDTO,
+      @Validated @RequestBody ActivityTypeAddDTO activityTypeAddDTO,
       @RequestHeader(value = "country", defaultValue = "zh-CN", required = false) String country) {
     if (StringUtils.isBlank(activityTypeAddDTO.getLanguage())) {
       activityTypeAddDTO.setLanguage(country);
-    }
-    if (StringUtils.isBlank(activityTypeAddDTO.getTypeName())) {
-      throw new ServiceException("活动板块名称不能为空");
-    }
-    if (activityTypeAddDTO.getSort() == null || activityTypeAddDTO.getSort() == 0) {
-      throw new ServiceException("排序不能为空");
     }
     if (activityTypeAddDTO.getFloatStatus() != null && activityTypeAddDTO.getFloatStatus() != 0) {
       if (StringUtils.isBlank(activityTypeAddDTO.getFloatLogo())) {
@@ -117,16 +112,10 @@ public class ActivityTypeController {
   @PutMapping("/update")
   @PreAuthorize("hasAuthority('activity:type:edit')")
   public void update(
-      @RequestBody ActivityTypeUpdateDTO activityTypeUpdateDTO,
+      @Validated @RequestBody ActivityTypeUpdateDTO activityTypeUpdateDTO,
       @RequestHeader(value = "country", defaultValue = "zh-CN", required = false) String country) {
-    if (activityTypeUpdateDTO.getId() == null || activityTypeUpdateDTO.getId() == 0) {
-      throw new ServiceException("更新活动板块，ID不能为空");
-    }
     if (StringUtils.isBlank(activityTypeUpdateDTO.getLanguage())) {
       activityTypeUpdateDTO.setLanguage(country);
-    }
-    if (activityTypeUpdateDTO.getSort() == null || activityTypeUpdateDTO.getSort() == 0) {
-      throw new ServiceException("排序不能为空");
     }
     if (activityTypeUpdateDTO.getFloatStatus() != null
         && activityTypeUpdateDTO.getFloatStatus() != 0) {

@@ -16,6 +16,7 @@ import com.gameplat.admin.service.ActivityInfoService;
 import com.gameplat.admin.service.ActivityTypeService;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.StringUtils;
+import com.gameplat.common.enums.BooleanEnum;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -69,7 +70,7 @@ public class ActivityTypeServiceImpl extends ServiceImpl<ActivityTypeMapper, Act
     }
     ActivityType activityType1 = activityTypeConvert.toEntity(activityTypeAddDTO);
     if (activityType1.getTypeStatus() == null) {
-      activityType1.setTypeStatus(1);
+      activityType1.setTypeStatus(BooleanEnum.YES.value());
     }
     this.save(activityType1);
   }
@@ -127,9 +128,6 @@ public class ActivityTypeServiceImpl extends ServiceImpl<ActivityTypeMapper, Act
 
   @Override
   public List<ActivityTypeVO> listAll(String language) {
-    if (StringUtils.isBlank(language)) {
-      throw new ServiceException("语言不能为空");
-    }
     List<ActivityType> list = this.lambdaQuery().eq(ActivityType::getLanguage, language).list();
     List<ActivityTypeVO> activityTypeVOList = new ArrayList<>();
     if (CollectionUtils.isNotEmpty(list)) {

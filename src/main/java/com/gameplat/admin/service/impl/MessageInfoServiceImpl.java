@@ -10,8 +10,8 @@ import com.gameplat.admin.convert.MessageDistributeConvert;
 import com.gameplat.admin.enums.PushMessageEnum;
 import com.gameplat.admin.mapper.MessageMapper;
 import com.gameplat.admin.model.domain.Member;
-import com.gameplat.admin.model.domain.MessageInfo;
 import com.gameplat.admin.model.domain.MessageDistribute;
+import com.gameplat.admin.model.domain.MessageInfo;
 import com.gameplat.admin.model.domain.SysDictData;
 import com.gameplat.admin.model.dto.*;
 import com.gameplat.admin.model.vo.*;
@@ -21,6 +21,7 @@ import com.gameplat.base.common.util.BeanUtils;
 import com.gameplat.base.common.util.StringUtils;
 import com.gameplat.common.enums.BooleanEnum;
 import com.gameplat.common.enums.SwitchStatusEnum;
+import com.gameplat.common.enums.UserTypes;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -278,7 +279,8 @@ public class MessageInfoServiceImpl extends ServiceImpl<MessageMapper, MessageIn
         }
         String agentAccout = messageInfoAddDTO.getLinkAccount();
         MemberInfoVO agnetMemberInfo = memberService.getMemberInfo(agentAccout);
-        if (agnetMemberInfo == null || !"A".equals(agnetMemberInfo.getUserType())) {
+        if (agnetMemberInfo == null
+            || !UserTypes.AGENT.value().equals(agnetMemberInfo.getUserType())) {
           throw new ServiceException("代理帐号不存在");
         }
         // 查询管理的所有代理线的会员信息
@@ -339,9 +341,15 @@ public class MessageInfoServiceImpl extends ServiceImpl<MessageMapper, MessageIn
       throw new ServiceException("id不能为空");
     }
 
+    if (messageInfoEditDTO.getShowType() == PushMessageEnum.MessageShowType.PIC_POPUP.getValue()
+        && (StringUtils.isBlank(messageInfoEditDTO.getAppImage())
+            || StringUtils.isBlank(messageInfoEditDTO.getPcImage()))) {
+      throw new ServiceException("选择消息类型为图片弹窗，web端和移动端图片不能为空");
+    }
+
     MessageInfoAddDTO messageInfoAddDTO = new MessageInfoAddDTO();
     BeanUtils.copyBeanProp(messageInfoAddDTO, messageInfoEditDTO);
-    validMessageInfo(messageInfoAddDTO);
+//    validMessageInfo(messageInfoAddDTO);
 
     MessageInfo messageInfo = messageConvert.toEntity(messageInfoEditDTO);
     this.updateById(messageInfo);
@@ -364,25 +372,6 @@ public class MessageInfoServiceImpl extends ServiceImpl<MessageMapper, MessageIn
    * @param messageInfoAddDTO
    */
   private void validMessageInfo(MessageInfoAddDTO messageInfoAddDTO) {
-    if (messageInfoAddDTO.getPushRange() == null) {
-      throw new ServiceException("推送范围不能为空");
-    }
-    if (messageInfoAddDTO.getShowType() == null) {
-      throw new ServiceException("展示类型不能为空");
-    }
-    if (messageInfoAddDTO.getPopsCount() == null) {
-      throw new ServiceException("弹出次数不能为空");
-    }
-    if (messageInfoAddDTO.getBeginTime() == null || messageInfoAddDTO.getEndTime() == null) {
-      throw new ServiceException("时间范围不能为空");
-    }
-    if (StringUtils.isBlank(messageInfoAddDTO.getTitle())) {
-      throw new ServiceException("消息标题不能为空");
-    }
-    if (StringUtils.isBlank(messageInfoAddDTO.getContent())) {
-      throw new ServiceException("消息内容不能为空");
-    }
-
     if (messageInfoAddDTO.getShowType() == PushMessageEnum.MessageShowType.PIC_POPUP.getValue()
         && (StringUtils.isBlank(messageInfoAddDTO.getAppImage())
             || StringUtils.isBlank(messageInfoAddDTO.getPcImage()))) {

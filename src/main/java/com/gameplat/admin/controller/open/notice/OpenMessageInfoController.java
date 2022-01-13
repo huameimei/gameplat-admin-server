@@ -18,6 +18,7 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
@@ -66,7 +67,7 @@ public class OpenMessageInfoController {
   @ApiOperation(value = "新增个人消息")
   @PostMapping("/add")
   @PreAuthorize("hasAuthority('notice:message:add')")
-  public void add(@RequestBody MessageInfoAddDTO messageInfoAddDTO) {
+  public void add(@Validated @RequestBody MessageInfoAddDTO messageInfoAddDTO) {
     messageInfoService.insertMessage(messageInfoAddDTO);
   }
 
@@ -78,7 +79,7 @@ public class OpenMessageInfoController {
   @ApiOperation(value = "编辑个人消息")
   @PostMapping("/edit")
   @PreAuthorize("hasAuthority('notice:message:edit')")
-  public void edit(@RequestBody MessageInfoEditDTO messageInfoEditDTO) {
+  public void edit(@Validated @RequestBody MessageInfoEditDTO messageInfoEditDTO) {
     messageInfoService.editMessage(messageInfoEditDTO);
   }
 

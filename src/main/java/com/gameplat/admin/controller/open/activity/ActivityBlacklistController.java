@@ -16,6 +16,7 @@ import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
@@ -60,16 +61,7 @@ public class ActivityBlacklistController {
   @ApiOperation(value = "新增活动黑名单")
   @PostMapping("/add")
   @PreAuthorize("hasAuthority('activity:blacklist:add')")
-  public void add(@RequestBody ActivityBlacklistAddDTO activityBlacklistAddDTO) {
-    if (StringUtils.isNull(activityBlacklistAddDTO.getActivityId())) {
-      throw new ServiceException("活动ID不能为空");
-    }
-    if (StringUtils.isEmpty(activityBlacklistAddDTO.getLimitedContent())) {
-      throw new ServiceException("限制内容不能为空");
-    }
-    if (StringUtils.isNull(activityBlacklistAddDTO.getLimitedType())) {
-      throw new ServiceException("限制类型不能为空");
-    }
+  public void add(@Validated @RequestBody ActivityBlacklistAddDTO activityBlacklistAddDTO) {
     activityBlacklistService.add(activityBlacklistAddDTO);
   }
 

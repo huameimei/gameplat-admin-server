@@ -14,6 +14,8 @@ import com.gameplat.admin.model.dto.MessageFeedbackUpdateDTO;
 import com.gameplat.admin.model.vo.MessageFeedbackVO;
 import com.gameplat.admin.service.MessageFeedbackService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
+import org.springframework.data.elasticsearch.repository.ElasticsearchRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -53,7 +55,7 @@ public class MessageFeedbackServiceImpl extends ServiceImpl<MessageFeedbackMappe
 
     /** 反馈列表 */
     @Override
-    public IPage<MessageFeedbackVO> get(PageDTO<MessageFeedback> page, MessageFeedbackQueryDTO dto) {
+    public IPage<MessageFeedbackVO> getList(PageDTO<MessageFeedback> page, MessageFeedbackQueryDTO dto) {
         return this.lambdaQuery()
                 .like(ObjectUtil.isNotEmpty(dto.getTitle()), MessageFeedback::getTitle, dto.getTitle())
                 .eq(ObjectUtil.isNotEmpty(dto.getIsRead()), MessageFeedback::getIsRead, dto.getIsRead())

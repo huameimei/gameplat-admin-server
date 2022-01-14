@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.gameplat.admin.model.domain.SysBannerInfo;
 import com.gameplat.admin.model.dto.SysBannerInfoAddDTO;
 import com.gameplat.admin.model.dto.SysBannerInfoEditDTO;
+import com.gameplat.admin.model.dto.SysBannerInfoUpdateStatusDTO;
 import com.gameplat.admin.model.vo.SysBannerInfoVO;
 
 import java.util.List;
@@ -28,7 +29,7 @@ public interface SysBannerInfoService {
    *
    * @param sysBannerInfo
    */
-  boolean save(SysBannerInfo sysBannerInfo);
+  boolean saveSysBannerInfo(SysBannerInfo sysBannerInfo);
 
   /**
    * 分页查询
@@ -59,4 +60,11 @@ public interface SysBannerInfoService {
    * @param ids
    */
   void delete(String ids);
+
+  /**
+   * 更新banner状态
+   *
+   * @param sysBannerInfoUpdateStatusDTO
+   */
+  void updateStatus(SysBannerInfoUpdateStatusDTO sysBannerInfoUpdateStatusDTO);
 }

@@ -103,7 +103,7 @@ public class LiveRebateDataServiceImpl extends
    */
   @Override
   public void saveRebateReport(String statTime, GamePlatform gamePlatform) {
-    log.info("{}[{}],statTime:[{}]> Start save live_rebate_data", gamePlatform.getName(), gamePlatform.getCode(), statTime);
+    log.info("{}[{}],statTime:[{}]> Start saveSysBannerInfo live_rebate_data", gamePlatform.getName(), gamePlatform.getCode(), statTime);
     // 获取某一游戏平台当天的统计数据
     int count = this.liveRebateDataMapper.getDayCount(statTime, gamePlatform);
     if (count > 0) {
@@ -120,9 +120,9 @@ public class LiveRebateDataServiceImpl extends
 
       log.info("{}[{}],statTime:[{}]> live_rebate_data saved data size:[{}]", gamePlatform.getName(), gamePlatform.getCode(), statTime,generate);
     } else {
-      log.info("{}[{}],statTime:[{}]> no data save to live_rebate_data", gamePlatform.getName(), gamePlatform.getCode(), statTime);
+      log.info("{}[{}],statTime:[{}]> no data saveSysBannerInfo to live_rebate_data", gamePlatform.getName(), gamePlatform.getCode(), statTime);
     }
-    log.info("{}[{}],statTime:[{}]> End  save live_rebate_data", gamePlatform.getName(), gamePlatform.getCode(), statTime);
+    log.info("{}[{}],statTime:[{}]> End  saveSysBannerInfo live_rebate_data", gamePlatform.getName(), gamePlatform.getCode(), statTime);
   }
 
   @Override

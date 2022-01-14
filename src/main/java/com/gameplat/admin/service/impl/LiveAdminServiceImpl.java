@@ -79,7 +79,7 @@ public class LiveAdminServiceImpl implements LiveAdminService {
     /*
      * TODO 推送站内消息
      */
-    //pushMessageService.save(userInfo.getUserId(), String.format("此次操作为,没收玩家在%s真人平台的所有余额,没收金额为%s",transferIn,amount));
+    //pushMessageService.saveSysBannerInfo(userInfo.getUserId(), String.format("此次操作为,没收玩家在%s真人平台的所有余额,没收金额为%s",transferIn,amount));
   }
 
 

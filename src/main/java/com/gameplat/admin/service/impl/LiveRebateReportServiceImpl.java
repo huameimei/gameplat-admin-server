@@ -353,7 +353,7 @@ public class LiveRebateReportServiceImpl extends
     //TODO 批量修改打码量--真人返水优惠打码量设为0
     //validWithdrawService.rollLiveRebateDML(remark);
     // TODO  写账变
-    //userBillService.save(userId, TranTypes.LIVE_ROLLBACK.getValue(), -realRebateMoney, "",
+    //userBillService.saveSysBannerInfo(userId, TranTypes.LIVE_ROLLBACK.getValue(), -realRebateMoney, "",
      //   rollBackUserBillContent(userId, periodName, realRebateMoney), admin.getAccount());
 
     // TODO 修改账户余额

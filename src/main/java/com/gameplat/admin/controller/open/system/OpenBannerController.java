@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.gameplat.admin.model.domain.SysBannerInfo;
 import com.gameplat.admin.model.dto.SysBannerInfoAddDTO;
 import com.gameplat.admin.model.dto.SysBannerInfoEditDTO;
+import com.gameplat.admin.model.dto.SysBannerInfoUpdateStatusDTO;
 import com.gameplat.admin.model.vo.SysBannerInfoVO;
 import com.gameplat.admin.service.SysBannerInfoService;
 import com.gameplat.base.common.exception.ServiceException;
@@ -47,7 +48,9 @@ public class OpenBannerController {
     @ApiImplicitParam(name = "current", value = "分页参数：当前页", defaultValue = "1"),
     @ApiImplicitParam(name = "size", value = "每页条数"),
   })
-  public IPage<SysBannerInfoVO> list(@ApiIgnore PageDTO<SysBannerInfo> page, String language) {
+  public IPage<SysBannerInfoVO> list(
+      @ApiIgnore PageDTO<SysBannerInfo> page,
+      @RequestParam(defaultValue = "zh-CN") String language) {
     return sysBannerInfoService.list(page, language);
   }
 
@@ -69,8 +72,8 @@ public class OpenBannerController {
    * @param sysBannerInfoEditDTO
    */
   @ApiOperation(value = "编辑banner")
-  @PostMapping("/edit")
-  @PreAuthorize("hasAuthority('system:banner:add')")
+  @PutMapping("/edit")
+  @PreAuthorize("hasAuthority('system:banner:edit')")
   public void edit(@Validated @RequestBody SysBannerInfoEditDTO sysBannerInfoEditDTO) {
     sysBannerInfoService.edit(sysBannerInfoEditDTO);
   }
@@ -88,5 +91,17 @@ public class OpenBannerController {
       throw new ServiceException("ids不能为空");
     }
     sysBannerInfoService.delete(ids);
+  }
+
+  /**
+   * 修改banner状态
+   *
+   * @param dto
+   */
+  @ApiOperation(value = "修改banner状态")
+  @PutMapping("/updateStatus")
+  @PreAuthorize("hasAuthority('system:banner:edit')")
+  public void updateStatus(@Validated @RequestBody SysBannerInfoUpdateStatusDTO dto) {
+    sysBannerInfoService.updateStatus(dto);
   }
 }

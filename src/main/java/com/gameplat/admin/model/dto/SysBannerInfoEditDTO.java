@@ -1,14 +1,11 @@
 package com.gameplat.admin.model.dto;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
-import java.util.Date;
 
 /**
  * banner信息DTO
@@ -48,22 +45,6 @@ public class SysBannerInfoEditDTO implements Serializable {
   /** 状态 */
   @ApiModelProperty("状态")
   private Integer status;
-
-  /** 创建时间 */
-  @ApiModelProperty("创建时间")
-  private Date createTime;
-
-  /** 创建人 */
-  @ApiModelProperty("创建人")
-  private String createBy;
-
-  /** 更新时间 */
-  @ApiModelProperty("更新时间")
-  private Date updateTime;
-
-  /** 更新人 */
-  @ApiModelProperty("更新人")
-  private String updateBy;
 
   /** 备注 */
   @ApiModelProperty("备注")

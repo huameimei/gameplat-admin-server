@@ -102,7 +102,7 @@ public class LiveMemberDayReportServiceImpl extends
 
     @Override
     public void saveMemberDayReport(String statTime, GamePlatform gamePlatform) {
-        log.info("{}[{}],statTime:[{}]> Start save live_user_day_report", gamePlatform.getName(), gamePlatform.getCode(), statTime);
+        log.info("{}[{}],statTime:[{}]> Start saveSysBannerInfo live_user_day_report", gamePlatform.getName(), gamePlatform.getCode(), statTime);
         String tableName = String.format("live_%s_bet_record", gamePlatform.getCode());
         int count = this.liveMemberDayReportMapper.getDayCount(statTime, tableName);
         if (count > 0) {
@@ -115,9 +115,9 @@ public class LiveMemberDayReportServiceImpl extends
             int generate = this.liveMemberDayReportMapper.saveMemberDayReport(statTime, gamePlatform, tableName);
             log.info("{}[{}],statTime:[{}] > live_user_day_report generate data size:[{}]", gamePlatform.getName(), gamePlatform.getCode(), statTime, generate);
         } else {
-            log.info("{}[{}],statTime:[{}]> no data save to live_user_day_report", gamePlatform.getName(), gamePlatform.getCode(), statTime);
+            log.info("{}[{}],statTime:[{}]> no data saveSysBannerInfo to live_user_day_report", gamePlatform.getName(), gamePlatform.getCode(), statTime);
         }
-        log.info("{}[{}],statTime:[{}]> End save live_user_day_report", gamePlatform.getName(), gamePlatform.getCode(), statTime);
+        log.info("{}[{}],statTime:[{}]> End saveSysBannerInfo live_user_day_report", gamePlatform.getName(), gamePlatform.getCode(), statTime);
     }
 
     @Override

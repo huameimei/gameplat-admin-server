@@ -48,8 +48,8 @@ public class SysBannerInfoAddDTO implements Serializable {
   private String remark;
 
   /** 语种 */
-  @NotNull(message = "语种不能为空")
-  @ApiModelProperty("语种")
+  @NotBlank(message = "语言不能为空")
+  @ApiModelProperty("语言")
   private String language;
 
   @ApiModelProperty("跳转地址")

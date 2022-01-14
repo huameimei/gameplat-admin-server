@@ -8,6 +8,7 @@ import com.gameplat.admin.mapper.SysBannerInfoMapper;
 import com.gameplat.admin.model.domain.SysBannerInfo;
 import com.gameplat.admin.model.dto.SysBannerInfoAddDTO;
 import com.gameplat.admin.model.dto.SysBannerInfoEditDTO;
+import com.gameplat.admin.model.dto.SysBannerInfoUpdateStatusDTO;
 import com.gameplat.admin.model.vo.SysBannerInfoVO;
 import com.gameplat.admin.service.ConfigService;
 import com.gameplat.admin.service.SysBannerInfoService;
@@ -41,15 +42,13 @@ public class SysBannerInfoServiceImpl extends ServiceImpl<SysBannerInfoMapper, S
   }
 
   @Override
-  public boolean save(SysBannerInfo entity) {
-    return this.save(entity);
+  public boolean saveSysBannerInfo(SysBannerInfo sysBannerInfo) {
+    validBannerInfo(sysBannerInfo);
+    return this.save(sysBannerInfo);
   }
 
   @Override
   public IPage<SysBannerInfoVO> list(PageDTO<SysBannerInfo> page, String language) {
-    if (StringUtils.isBlank(language)) {
-      throw new ServiceException("语言必传");
-    }
     return this.lambdaQuery()
         .eq(SysBannerInfo::getLanguage, language)
         .page(page)
@@ -59,6 +58,18 @@ public class SysBannerInfoServiceImpl extends ServiceImpl<SysBannerInfoMapper, S
   @Override
   public void add(SysBannerInfoAddDTO sysBannerInfoAddDTO) {
     SysBannerInfo sysBannerInfo = sysBannerInfoConvert.toEntity(sysBannerInfoAddDTO);
+    validBannerInfo(sysBannerInfo);
+    if (!this.save(sysBannerInfo)) {
+      throw new ServiceException("banner信息保存异常");
+    }
+  }
+
+  /**
+   * 校验banner信息
+   *
+   * @param sysBannerInfo
+   */
+  private void validBannerInfo(SysBannerInfo sysBannerInfo) {
     // 校验选择不同类型的数据判断
     // 活动优惠
     if (sysBannerInfo
@@ -87,15 +98,16 @@ public class SysBannerInfoServiceImpl extends ServiceImpl<SysBannerInfoMapper, S
         throw new ServiceException("选择游戏分类，关联游戏不能为空");
       }
     }
-
-    if (!this.save(sysBannerInfo)) {
-      throw new ServiceException("banner信息保存异常");
-    }
   }
 
   @Override
   public void edit(SysBannerInfoEditDTO sysBannerInfoEditDTO) {
+    SysBannerInfo sysBannerInfo1 = this.getById(sysBannerInfoEditDTO.getId());
+    if (sysBannerInfo1 == null) {
+      throw new ServiceException("banner信息不存在");
+    }
     SysBannerInfo sysBannerInfo = sysBannerInfoConvert.toEntity(sysBannerInfoEditDTO);
+    validBannerInfo(sysBannerInfo);
     if (!this.updateById(sysBannerInfo)) {
       throw new ServiceException("banner信息更新异常");
     }
@@ -105,7 +117,17 @@ public class SysBannerInfoServiceImpl extends ServiceImpl<SysBannerInfoMapper, S
   public void delete(String ids) {
     boolean flag = this.removeByIds(Arrays.asList(ids.split(",")));
     if (!flag) {
-      throw new ServiceException("删除banner成功");
+      throw new ServiceException("删除banner失败");
     }
+  }
+
+  @Override
+  public void updateStatus(SysBannerInfoUpdateStatusDTO sysBannerInfoUpdateStatusDTO) {
+    SysBannerInfo sysBannerInfo = this.getById(sysBannerInfoUpdateStatusDTO.getId());
+    if (sysBannerInfo == null) {
+      throw new ServiceException("banner信息不存在");
+    }
+    sysBannerInfo.setStatus(sysBannerInfoUpdateStatusDTO.getStatus());
+    this.updateById(sysBannerInfo);
   }
 }

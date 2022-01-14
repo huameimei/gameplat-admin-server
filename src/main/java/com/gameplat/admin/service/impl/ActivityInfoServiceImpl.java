@@ -136,7 +136,7 @@ public class ActivityInfoServiceImpl extends ServiceImpl<ActivityInfoMapper, Act
               if (sysBannerInfo.getStatus() != 0
                   && !activityInfo.getStatus().equals(sysBannerInfo.getStatus())) {
                 sysBannerInfo.setStatus(SysBannerInfoEnum.Status.INVALID.getValue());
-                sysBannerInfoService.save(sysBannerInfo);
+                sysBannerInfoService.saveSysBannerInfo(sysBannerInfo);
               }
             });
       }

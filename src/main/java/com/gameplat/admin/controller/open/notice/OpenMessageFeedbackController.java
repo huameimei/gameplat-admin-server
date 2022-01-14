@@ -8,13 +8,16 @@ import com.gameplat.admin.model.vo.MessageFeedbackVO;
 import com.gameplat.admin.service.MessageFeedbackService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 /**
  * 意见反馈
  * @author lily
  */
+@Slf4j
 @Api(tags = "意见反馈")
 @RestController
 @RequestMapping("/api/admin/message/feeback")
@@ -28,6 +31,12 @@ public class OpenMessageFeedbackController {
     return messageFeedbackService.getList(page, dto);
   }
 
+  @ApiOperation(value = "根据ID查询意见反馈内容")
+  @GetMapping("/getById")
+  public MessageFeedbackVO getById(Long id) {
+    return messageFeedbackService.getById(id);
+  }
+
   @ApiOperation(value = "修改意见反馈")
   @PutMapping("/edit")
   public void updateMessage(@RequestBody MessageFeedbackUpdateDTO dto) {
@@ -36,7 +45,7 @@ public class OpenMessageFeedbackController {
 
   @ApiOperation(value = "新增意见反馈")
   @PostMapping("/add")
-  public void insertMessage(@RequestBody MessageFeedbackAddDTO dto) {
+  public void insertMessage(@Validated @RequestBody MessageFeedbackAddDTO dto) {
     messageFeedbackService.insertMessage(dto);
   }
 
@@ -45,4 +54,6 @@ public class OpenMessageFeedbackController {
   public void removeMessage(Long id) {
     messageFeedbackService.removeMessage(id);
   }
+
+
 }

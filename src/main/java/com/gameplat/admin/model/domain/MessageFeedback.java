@@ -12,7 +12,7 @@ import java.util.Date;
  * @author kenvin
  */
 @Data
-@TableName("message_info")
+@TableName("message_feedback")
 public class MessageFeedback implements Serializable {
 
   /** 主键ID */

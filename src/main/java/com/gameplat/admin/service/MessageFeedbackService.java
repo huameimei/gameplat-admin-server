@@ -24,4 +24,7 @@ public interface MessageFeedbackService extends IService<MessageFeedback> {
 
     /** 反馈列表 */
     IPage<MessageFeedbackVO> getList(PageDTO<MessageFeedback> page, MessageFeedbackQueryDTO dto);
+
+    /** 根据id查询反馈内容 */
+    MessageFeedbackVO getById(Long id);
 }

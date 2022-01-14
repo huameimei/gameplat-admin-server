@@ -6,6 +6,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -19,11 +20,13 @@ import java.util.Date;
 public class MessageFeedbackAddDTO implements Serializable {
 
   /** 反馈标题 */
+  @NotNull(message = "反馈标题不能为空")
   @ApiModelProperty("反馈标题")
   private String title;
 
   /** 反馈内容 */
   @ApiModelProperty("反馈内容")
+  @NotNull(message = "反馈内容不能为空")
   private String content;
 
   /** 反馈意见图片 */
@@ -35,6 +38,7 @@ public class MessageFeedbackAddDTO implements Serializable {
   private Integer isRead;
 
   /** 站内信类型，0:活动建议 1:功能建议 2:游戏BUG 3:其他问题 */
+  @NotNull(message = "站内信类型不能为空")
   @ApiModelProperty("站内信类型，0:活动建议 1:功能建议 2:游戏BUG 3:其他问题")
   private String letterType;
 
@@ -51,6 +55,7 @@ public class MessageFeedbackAddDTO implements Serializable {
   private Integer status;
 
   /** 信件类别(0:普通信件,1:活动信件,2:回复信件,3:系统消息) */
+  @NotNull(message = "信件类别不能为空")
   @ApiModelProperty("信件类别(0:普通信件,1:活动信件,2:回复信件,3:系统消息)")
   private Integer type;
 

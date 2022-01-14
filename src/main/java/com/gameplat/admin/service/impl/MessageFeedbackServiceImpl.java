@@ -13,12 +13,12 @@ import com.gameplat.admin.model.dto.MessageFeedbackQueryDTO;
 import com.gameplat.admin.model.dto.MessageFeedbackUpdateDTO;
 import com.gameplat.admin.model.vo.MessageFeedbackVO;
 import com.gameplat.admin.service.MessageFeedbackService;
+import com.gameplat.base.common.exception.ServiceException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
-import org.springframework.data.elasticsearch.repository.ElasticsearchRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+
 
 /**
  * @author lily
@@ -27,6 +27,7 @@ import java.util.List;
  */
 
 @Service
+@Slf4j
 public class MessageFeedbackServiceImpl extends ServiceImpl<MessageFeedbackMapper, MessageFeedback> implements MessageFeedbackService {
 
     @Autowired
@@ -35,7 +36,8 @@ public class MessageFeedbackServiceImpl extends ServiceImpl<MessageFeedbackMappe
     /** 写反馈 */
     @Override
     public void insertMessage(MessageFeedbackAddDTO dto) {
-        this.save(messageFeedbackConvert.toEntity(dto));
+        MessageFeedback messageFeedback = messageFeedbackConvert.toEntity(dto);
+        this.save(messageFeedback);
     }
 
     /** 读反馈 */
@@ -43,7 +45,8 @@ public class MessageFeedbackServiceImpl extends ServiceImpl<MessageFeedbackMappe
     public void updateMessage(MessageFeedbackUpdateDTO dto) {
         dto.setIsRead(1);
         this.update(messageFeedbackConvert.toEntity(dto),
-                new LambdaQueryWrapper<MessageFeedback>().eq(MessageFeedback::getId, dto.getId())
+                new LambdaQueryWrapper<MessageFeedback>()
+                        .eq(MessageFeedback::getId, dto.getId())
         );
     }
 
@@ -62,6 +65,18 @@ public class MessageFeedbackServiceImpl extends ServiceImpl<MessageFeedbackMappe
                 .eq(ObjectUtil.isNotEmpty(dto.getType()), MessageFeedback::getType, dto.getType())
                 .page(page)
                 .convert(messageFeedbackConvert::toVo);
+    }
+
+    /** 根据id查询反馈内容 */
+    @Override
+    public MessageFeedbackVO getById(Long id){
+        if (ObjectUtil.isEmpty(id)){
+            throw new ServiceException("反馈id不能为空");
+        }
+        MessageFeedback messageFeedback = this.lambdaQuery()
+                .eq(MessageFeedback::getId, id)
+                .one();
+        return messageFeedbackConvert.toVo(messageFeedback);
     }
 
 

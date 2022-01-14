@@ -451,7 +451,7 @@ public class MemberGrowthRecordServiceImpl extends ServiceImpl<MemberGrowthRecor
         messageMapper.saveReturnId(message);
 
         MessageDistribute messageDistribute = new MessageDistribute();
-//        messageDistribute.setMessageId(message.getId());
+        messageDistribute.setMessageId(message.getId());
         messageDistribute.setUserId(member.getId());
         messageDistribute.setUserAccount(member.getAccount());
         messageDistribute.setRechargeLevel(member.getUserLevel());

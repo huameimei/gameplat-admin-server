@@ -83,7 +83,7 @@ public class PayAccountServiceImpl extends ServiceImpl<PayAccountMapper, PayAcco
             dto.getRiskControlValue(), dto.getRiskControlType());
     dto.setRiskControlValue(riskControlValue);
     conver2PayAccount(dto);
-    dto.setStatus(0);
+    dto.setStatus(1);
     dto.setRechargeTimes(0L);
     dto.setRechargeAmount(BigDecimal.ZERO);
     if (!this.save(payAccountConvert.toEntity(dto))) {

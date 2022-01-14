@@ -12,6 +12,7 @@ import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.constant.MemberServiceKeyConstant;
 import com.gameplat.admin.convert.MemberWealConvert;
+import com.gameplat.admin.convert.MessageInfoConvert;
 import com.gameplat.admin.enums.LanguageEnum;
 import com.gameplat.admin.enums.MemberBillTransTypeEnum;
 import com.gameplat.admin.enums.PushMessageEnum;
@@ -76,6 +77,7 @@ public class MemberWealServiceImpl extends ServiceImpl<MemberWealMapper, MemberW
     @Autowired private MessageDistributeService messageDistributeService;
     @Autowired private MemberInfoService memberInfoService;
     @Autowired private MemberBillService memberBillService;
+    @Autowired private MessageInfoConvert messageInfoConvert;
 
     /**
      * 获取等级俸禄达标会员
@@ -425,22 +427,24 @@ public class MemberWealServiceImpl extends ServiceImpl<MemberWealMapper, MemberW
                                     memberWealReword.setStatus(1);
                                 }
                                 //6.5 通知 发个人消息
-                                MessageInfoAddDTO message = new MessageInfoAddDTO();
-                                message.setTitle("VIP福利奖励");
-                                message.setContent(content);
-                                message.setCategory(PushMessageEnum.MessageCategory.SYS_SEND.getValue());
-                                message.setPosition(PushMessageEnum.MessageCategory.CATE_DEF.getValue());
-                                message.setShowType(PushMessageEnum.MessageShowType.SHOW_DEF.getValue());
-                                message.setPopsCount(PushMessageEnum.PopCount.POP_COUNT_DEF.getValue());
-                                message.setPushRange(PushMessageEnum.UserRange.SOME_MEMBERS.getValue());
-                                message.setLinkAccount(member.getAccount());
-                                message.setType(1);
-                                message.setStatus(1);
-                                message.setCreateBy("System");
-                                messageMapper.saveReturnId(message);
+                                MessageInfoAddDTO messageInfoAddDTO = new MessageInfoAddDTO();
+                                MessageInfo messageInfo = messageInfoConvert.toEntity(messageInfoAddDTO);
+
+                                messageInfo.setTitle("VIP福利奖励");
+                                messageInfo.setContent(content);
+                                messageInfo.setCategory(PushMessageEnum.MessageCategory.SYS_SEND.getValue());
+                                messageInfo.setPosition(PushMessageEnum.MessageCategory.CATE_DEF.getValue());
+                                messageInfo.setShowType(PushMessageEnum.MessageShowType.SHOW_DEF.getValue());
+                                messageInfo.setPopsCount(PushMessageEnum.PopCount.POP_COUNT_DEF.getValue());
+                                messageInfo.setPushRange(PushMessageEnum.UserRange.SOME_MEMBERS.getValue());
+                                messageInfo.setLinkAccount(member.getAccount());
+                                messageInfo.setType(1);
+                                messageInfo.setStatus(1);
+                                messageInfo.setCreateBy("System");
+                                messageMapper.saveReturnId(messageInfo);
 
                                 MessageDistribute messageDistribute = new MessageDistribute();
-                                messageDistribute.setMessageId(message.getId());
+                                messageDistribute.setMessageId(messageInfo.getId());
                                 messageDistribute.setUserId(member.getId());
                                 messageDistribute.setUserAccount(member.getAccount());
                                 messageDistribute.setRechargeLevel(member.getUserLevel());

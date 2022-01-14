@@ -9,6 +9,9 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.springframework.format.annotation.DateTimeFormat;
 
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
+
 /**
  * 新增活动DTO
  *
@@ -24,12 +27,16 @@ public class ActivityInfoAddDTO implements Serializable {
   @ApiModelProperty(value = "编号")
   private Long id;
 
+  @NotNull(message = "活动类型不能为空")
   @ApiModelProperty(value = "类型")
   private Integer activityType;
 
+  @NotNull(message = "活动标题不能为空")
   @ApiModelProperty(value = "活动标题")
   private String title;
 
+  @NotNull(message = "活动类型不能为空")
+  @Min(value = 1, message = "活动类型必须为正数")
   @ApiModelProperty(value = "活动类型") // 体育1、彩票2、真人3、棋牌4、电竞5、电游6、捕鱼7、动物竞技8
   private Integer type;
 

@@ -12,13 +12,12 @@ import org.mapstruct.Mapper;
  * @author kenvin
  */
 @Mapper(componentModel = "spring")
-public interface MessageConvert {
+public interface MessageInfoConvert {
 
     MessageInfo toEntity(MessageInfoAddDTO messageInfoAddDTO);
 
     MessageInfo toEntity(MessageInfoEditDTO messageInfoEditDTO);
 
     MessageInfoVO toVo(MessageInfo messageInfo);
-
 
 }

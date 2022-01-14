@@ -16,9 +16,9 @@ import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
-
 
 /**
  * banner管理
@@ -31,65 +31,62 @@ import springfox.documentation.annotations.ApiIgnore;
 @RequestMapping("/api/admin/system/banner")
 public class OpenBannerController {
 
-    @Autowired
-    private SysBannerInfoService sysBannerInfoService;
+  @Autowired private SysBannerInfoService sysBannerInfoService;
 
-    /**
-     * banner列表
-     *
-     * @param page
-     * @param language
-     * @return
-     */
-    @ApiOperation(value = "banner列表")
-    @GetMapping("/list")
-    @PreAuthorize("hasAuthority('system:banner:list')")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "current", value = "分页参数：当前页", defaultValue = "1"),
-            @ApiImplicitParam(name = "size", value = "每页条数"),
-    })
-    public IPage<SysBannerInfoVO> list(@ApiIgnore PageDTO<SysBannerInfo> page, String language) {
-        return sysBannerInfoService.list(page, language);
+  /**
+   * banner列表
+   *
+   * @param page
+   * @param language
+   * @return
+   */
+  @ApiOperation(value = "banner列表")
+  @GetMapping("/list")
+  @PreAuthorize("hasAuthority('system:banner:list')")
+  @ApiImplicitParams({
+    @ApiImplicitParam(name = "current", value = "分页参数：当前页", defaultValue = "1"),
+    @ApiImplicitParam(name = "size", value = "每页条数"),
+  })
+  public IPage<SysBannerInfoVO> list(@ApiIgnore PageDTO<SysBannerInfo> page, String language) {
+    return sysBannerInfoService.list(page, language);
+  }
+
+  /**
+   * 新增banner
+   *
+   * @param sysBannerInfoAddDTO
+   */
+  @ApiOperation(value = "新增banner")
+  @PostMapping("/add")
+  @PreAuthorize("hasAuthority('system:banner:add')")
+  public void add(@Validated @RequestBody SysBannerInfoAddDTO sysBannerInfoAddDTO) {
+    sysBannerInfoService.add(sysBannerInfoAddDTO);
+  }
+
+  /**
+   * 编辑banner
+   *
+   * @param sysBannerInfoEditDTO
+   */
+  @ApiOperation(value = "编辑banner")
+  @PostMapping("/edit")
+  @PreAuthorize("hasAuthority('system:banner:add')")
+  public void edit(@Validated @RequestBody SysBannerInfoEditDTO sysBannerInfoEditDTO) {
+    sysBannerInfoService.edit(sysBannerInfoEditDTO);
+  }
+
+  /**
+   * 删除banner
+   *
+   * @param ids
+   */
+  @ApiOperation(value = "删除banner")
+  @DeleteMapping("/delete")
+  @PreAuthorize("hasAuthority('system:banner:remove')")
+  public void delete(@RequestBody String ids) {
+    if (StringUtils.isBlank(ids)) {
+      throw new ServiceException("ids不能为空");
     }
-
-    /**
-     * 新增banner
-     *
-     * @param sysBannerInfoAddDTO
-     */
-    @ApiOperation(value = "新增banner")
-    @PostMapping("/add")
-    @PreAuthorize("hasAuthority('system:banner:add')")
-    public void add(@RequestBody SysBannerInfoAddDTO sysBannerInfoAddDTO) {
-        sysBannerInfoService.add(sysBannerInfoAddDTO);
-    }
-
-    /**
-     * 编辑banner
-     *
-     * @param sysBannerInfoEditDTO
-     */
-    @ApiOperation(value = "编辑banner")
-    @PostMapping("/edit")
-    @PreAuthorize("hasAuthority('system:banner:add')")
-    public void edit(@RequestBody SysBannerInfoEditDTO sysBannerInfoEditDTO) {
-        sysBannerInfoService.edit(sysBannerInfoEditDTO);
-    }
-
-    /**
-     * 删除banner
-     *
-     * @param ids
-     */
-    @ApiOperation(value = "删除banner")
-    @DeleteMapping("/delete")
-    @PreAuthorize("hasAuthority('system:banner:remove')")
-    public void delete(@RequestBody String ids) {
-        if (StringUtils.isBlank(ids)) {
-            throw new ServiceException("ids不能为空");
-        }
-        sysBannerInfoService.delete(ids);
-    }
-
-
+    sysBannerInfoService.delete(ids);
+  }
 }

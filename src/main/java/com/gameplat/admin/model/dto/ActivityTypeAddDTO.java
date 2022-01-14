@@ -22,6 +22,7 @@ public class ActivityTypeAddDTO implements Serializable {
 
   private static final long serialVersionUID = 1L;
 
+  @NotNull(message = "活动类型编码不能为空")
   @ApiModelProperty(value = "活动类型")
   private String typeCode;
 
@@ -33,13 +34,15 @@ public class ActivityTypeAddDTO implements Serializable {
   private String remark;
 
   @NotNull(message = "排序不能为空")
-  @Min(value = 1, message = "排序必须大于0")
+  @Min(value = 0, message = "排序必须大于0")
   @ApiModelProperty(value = "排序")
   private Integer sort;
 
+  @NotNull(message = "状态不能为空")
   @ApiModelProperty(value = "状态,0 无效,1 有效")
   private Integer typeStatus;
 
+  @NotNull(message = "浮窗状态不能为空")
   @ApiModelProperty(value = "浮窗状态,0 无效,1 有效")
   private Integer floatStatus;
 

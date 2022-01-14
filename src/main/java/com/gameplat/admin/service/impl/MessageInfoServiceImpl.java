@@ -5,7 +5,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.gameplat.admin.convert.MessageConvert;
+import com.gameplat.admin.convert.MessageInfoConvert;
 import com.gameplat.admin.convert.MessageDistributeConvert;
 import com.gameplat.admin.enums.PushMessageEnum;
 import com.gameplat.admin.mapper.MessageMapper;
@@ -40,7 +40,7 @@ import java.util.List;
 public class MessageInfoServiceImpl extends ServiceImpl<MessageMapper, MessageInfo>
     implements MessageInfoService {
 
-  @Autowired private MessageConvert messageConvert;
+  @Autowired private MessageInfoConvert messageInfoConvert;
 
   @Autowired private MessageDistributeConvert messageDistributeConvert;
 
@@ -117,7 +117,7 @@ public class MessageInfoServiceImpl extends ServiceImpl<MessageMapper, MessageIn
                 MessageInfo::getLanguage,
                 messageInfoQueryDTO.getLanguage())
             .page(page)
-            .convert(messageConvert::toVo);
+            .convert(messageInfoConvert::toVo);
     if (CollectionUtils.isNotEmpty(iPage.getRecords())) {
       for (MessageInfoVO messageInfoVO : iPage.getRecords()) {
         // 时间超过了后，消息失效
@@ -134,7 +134,7 @@ public class MessageInfoServiceImpl extends ServiceImpl<MessageMapper, MessageIn
   public void insertMessage(MessageInfoAddDTO messageInfoAddDTO) {
     validMessageInfo(messageInfoAddDTO);
 
-    MessageInfo messageInfo = messageConvert.toEntity(messageInfoAddDTO);
+    MessageInfo messageInfo = messageInfoConvert.toEntity(messageInfoAddDTO);
     messageInfo.setStatus(BooleanEnum.YES.value());
     this.save(messageInfo);
 
@@ -351,7 +351,7 @@ public class MessageInfoServiceImpl extends ServiceImpl<MessageMapper, MessageIn
     BeanUtils.copyBeanProp(messageInfoAddDTO, messageInfoEditDTO);
 //    validMessageInfo(messageInfoAddDTO);
 
-    MessageInfo messageInfo = messageConvert.toEntity(messageInfoEditDTO);
+    MessageInfo messageInfo = messageInfoConvert.toEntity(messageInfoEditDTO);
     this.updateById(messageInfo);
 
     List<MessageDistribute> messageList = new ArrayList<>();

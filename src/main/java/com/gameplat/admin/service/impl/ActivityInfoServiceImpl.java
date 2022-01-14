@@ -203,9 +203,7 @@ public class ActivityInfoServiceImpl extends ServiceImpl<ActivityInfoMapper, Act
   public List<ActivityInfo> list(ActivityInfo activityInfo) {
     LambdaQueryChainWrapper<ActivityInfo> queryWrapper = this.lambdaQuery();
     queryWrapper.eq(
-        activityInfo.getStatus() != null && activityInfo.getStatus() != 0,
-        ActivityInfo::getStatus,
-        activityInfo.getStatus());
+        activityInfo.getStatus() != null, ActivityInfo::getStatus, activityInfo.getStatus());
     return queryWrapper.list();
   }
 

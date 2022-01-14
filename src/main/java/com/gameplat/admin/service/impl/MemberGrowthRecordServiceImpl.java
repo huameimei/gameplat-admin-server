@@ -11,6 +11,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.constant.MemberServiceKeyConstant;
 import com.gameplat.admin.convert.MemberGrowthRecordConvert;
+import com.gameplat.admin.convert.MessageInfoConvert;
 import com.gameplat.admin.enums.GrowthChangeEnum;
 import com.gameplat.admin.enums.LanguageEnum;
 import com.gameplat.admin.enums.MemberBillTransTypeEnum;
@@ -82,6 +83,8 @@ public class MemberGrowthRecordServiceImpl extends ServiceImpl<MemberGrowthRecor
     private MemberInfoService memberInfoService;
     @Autowired
     private MemberBillService memberBillService;
+    @Autowired
+    private MessageInfoConvert messageInfoConvert;
 
     public static final String kindName = "{\"en-US\": \"platform\", \"in-ID\": \"peron\", \"th-TH\": \"แพลตฟอร์ม\", \"vi-VN\": \"nền tảng\", \"zh-CN\": \"平台\"}";
 
@@ -432,7 +435,8 @@ public class MemberGrowthRecordServiceImpl extends ServiceImpl<MemberGrowthRecor
         }
         //通知 发个人消息
         log.info("发送消息");
-        MessageInfoAddDTO message = new MessageInfoAddDTO();
+        MessageInfoAddDTO messageInfoAddDTO = new MessageInfoAddDTO();
+        MessageInfo message = messageInfoConvert.toEntity(messageInfoAddDTO);
         message.setTitle("VIP等级升级");
         message.setContent(content);
         message.setCategory(PushMessageEnum.MessageCategory.SYS_SEND.getValue());

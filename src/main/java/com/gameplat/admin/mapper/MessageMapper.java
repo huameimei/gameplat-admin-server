@@ -6,5 +6,5 @@ import com.gameplat.admin.model.dto.MessageInfoAddDTO;
 
 public interface MessageMapper extends BaseMapper<MessageInfo> {
 
-    void saveReturnId(MessageInfoAddDTO dto);
+    void saveReturnId(MessageInfo messageInfo);
 }

@@ -13,17 +13,17 @@ public class MemberBankVO implements Serializable {
 
   private String account;
 
-  private String realName;
+  private String cardHolder;
 
   private String bankName;
 
-  private String subAddress;
+  private String address;
 
   private String cardNo;
 
-  private String province;
+  private String network;
 
-  private String city;
+  private String alias;
 
   private String type;
 

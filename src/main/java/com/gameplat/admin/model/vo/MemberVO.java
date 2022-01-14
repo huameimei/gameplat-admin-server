@@ -1,16 +1,14 @@
 package com.gameplat.admin.model.vo;
 
-import java.io.Serializable;
-import java.math.BigDecimal;
-import java.util.Date;
-
 import cn.afterturn.easypoi.excel.annotation.Excel;
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.gameplat.admin.util.Date2LongSerializerUtils;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
-import org.springframework.format.annotation.DateTimeFormat;
+
+import java.io.Serializable;
+import java.math.BigDecimal;
+import java.util.Date;
 
 @Data
 public class MemberVO implements Serializable {
@@ -42,7 +40,11 @@ public class MemberVO implements Serializable {
   private String parentName;
 
   /** 用户类型 */
-  @Excel(name = "会员类型", replace = {"会员_M", "代理_A", "推广_P", "试玩_T"}, width = 30, isImportField = "true_st")
+  @Excel(
+      name = "会员类型",
+      replace = {"会员_M", "代理_A", "推广_P", "试玩_T"},
+      width = 30,
+      isImportField = "true_st")
   private String userType;
 
   /** 会员层级 */
@@ -53,7 +55,11 @@ public class MemberVO implements Serializable {
   @Excel(name = "下级人数", width = 30, isImportField = "true_st")
   private String lowerNum;
 
-  @Excel(name = "提现状态", replace = {"启用_Y", "禁用_N"}, width = 30, isImportField = "true_st")
+  @Excel(
+      name = "提现状态",
+      replace = {"启用_Y", "禁用_N"},
+      width = 30,
+      isImportField = "true_st")
   private String withdrawFlag;
 
   /** 账户余额 单位分 */
@@ -97,7 +103,11 @@ public class MemberVO implements Serializable {
   private String registerHost;
 
   /** 会员状态 */
-  @Excel(name = "账户状态", replace = {"禁用_-1", "停用_0", "正常_1"}, width = 30, isImportField = "true_st")
+  @Excel(
+      name = "账户状态",
+      replace = {"禁用_-1", "停用_0", "正常_1"},
+      width = 30,
+      isImportField = "true_st")
   private Integer status;
 
   /** 是否在线 */
@@ -135,5 +145,4 @@ public class MemberVO implements Serializable {
 
   @ApiModelProperty(value = "当前会员成长值")
   private Integer growth;
-
 }

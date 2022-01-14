@@ -1,7 +1,6 @@
 package com.gameplat.admin.service.impl;
 
 import com.gameplat.admin.cache.AdminCache;
-import com.gameplat.admin.constant.RsaConstant;
 import com.gameplat.admin.enums.ErrorPasswordLimit;
 import com.gameplat.admin.model.domain.SysUser;
 import com.gameplat.admin.model.dto.AdminLoginDTO;
@@ -86,7 +85,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     // 解密密码并登陆
-    String password = passwordService.decode(dto.getPassword(), RsaConstant.PRIVATE_KEY);
+    String password = passwordService.decode(dto.getPassword());
     UserCredential credential = jwtTokenService.signIn(request, user.getUserName(), password);
 
     // 删除密码错误次数记录

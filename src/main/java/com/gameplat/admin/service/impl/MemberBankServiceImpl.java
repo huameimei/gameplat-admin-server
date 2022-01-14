@@ -1,5 +1,6 @@
 package com.gameplat.admin.service.impl;
 
+import cn.hutool.core.lang.Assert;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.convert.MemberBankConvert;
 import com.gameplat.admin.enums.MemberBankEnums;
@@ -13,11 +14,13 @@ import com.gameplat.admin.service.MemberBankService;
 import com.gameplat.admin.service.MemberService;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.StringUtils;
-import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.Optional;
 
 @Service
 @Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)
@@ -37,87 +40,105 @@ public class MemberBankServiceImpl extends ServiceImpl<MemberBankMapper, MemberB
 
   @Override
   public void add(MemberBankAddDTO dto) {
-    Member member = memberService.getById(dto.getMemberId());
-    if (null == member) {
-      throw new ServiceException("会员信息不存在");
-    }
-
-    // 处理银行卡真实姓名
     if (MemberBankEnums.TYPE.BANKCARD.match(dto.getType())) {
-      if (StringUtils.isEmpty(member.getRealName())) {
-        // 更新真实姓名
-        if (!memberService.updateById(
-            Member.builder().id(member.getId()).realName(dto.getRealName()).build())) {
-          throw new ServiceException("更新会员真实姓名失败!");
-        }
-      } else if (!member.getRealName().equals(dto.getRealName())) {
-        throw new ServiceException("银行卡真实姓名与系统预留不匹配");
-      }
-    }
-
-    // 判断是否存在了默认卡号
-    if (MemberBankEnums.DEFAULT.Y.match(dto.getIsDefault()) && this.hasDefaultBankcard(dto)) {
-      throw new ServiceException("已存在默认卡号");
-    }
-
-    if (!this.save(memberBankConvert.toEntity(dto))) {
-      throw new ServiceException("添加会员银行卡失败!");
+      this.addBankcard(dto);
+    } else {
+      this.addCryptocurrency(dto);
     }
   }
 
   @Override
   public void edit(MemberBankEditDTO dto) {
-    MemberBank memberBank = this.getById(dto.getId());
-    if (null == memberBank) {
-      throw new ServiceException("信息不存在!");
+    MemberBank memberBank =
+        Optional.ofNullable(this.getById(dto.getId()))
+            .orElseThrow(() -> new ServiceException("银行卡信息不存在!"));
+
+    if (MemberBankEnums.TYPE.BANKCARD.match(memberBank.getType())) {
+      this.checkBankcardParams(dto.getCardHolder(), dto.getBankName(), dto.getAddress());
+    } else {
+      this.checkCryptocurrencyParams(dto.getAlias(), dto.getNetwork(), dto.getCurrency());
     }
 
-    if (!this.updateById(memberBankConvert.toEntity(dto))) {
-      throw new ServiceException("修改失败!");
-    }
+    Assert.isTrue(updateById(memberBankConvert.toEntity(dto)), () -> new ServiceException("修改失败!"));
   }
 
   @Override
   public void setDefault(Long id) {
-    MemberBank memberBank = this.getById(id);
-    if (null == memberBank) {
-      throw new ServiceException("银行卡信息不存在!");
-    }
+    MemberBank memberBank =
+        Optional.ofNullable(this.getById(id)).orElseThrow(() -> new ServiceException("银行卡信息不存在!"));
 
-    if (MemberBankEnums.DEFAULT.Y.match(memberBank.getIsDefault())) {
-      throw new ServiceException("当前卡号已经是默认卡号");
-    }
+    Assert.isFalse(
+        MemberBankEnums.DEFAULT.Y.match(memberBank.getIsDefault()),
+        () -> new ServiceException("当前卡号已经是默认卡号"));
 
     // 取消其他默认
-    if (!this.lambdaUpdate()
-        .set(MemberBank::getIsDefault, MemberBankEnums.DEFAULT.N.value())
-        .eq(MemberBank::getType, memberBank.getType())
-        .eq(MemberBank::getMemberId, memberBank.getMemberId())
-        .update()) {
-      throw new ServiceException("更新卡信息失败!");
-    }
+    this.resetDefault(memberBank.getMemberId(), memberBank.getType());
 
     // 设置当前卡为默认
-    if (!this.lambdaUpdate()
-        .set(MemberBank::getIsDefault, MemberBankEnums.DEFAULT.Y.value())
-        .eq(MemberBank::getId, id)
-        .update(new MemberBank())) {
-      throw new ServiceException("设置默认卡失败");
+    Assert.isTrue(
+        this.lambdaUpdate()
+            .set(MemberBank::getIsDefault, MemberBankEnums.DEFAULT.Y.value())
+            .eq(MemberBank::getId, id)
+            .update(new MemberBank()),
+        () -> new ServiceException("设置默认卡失败"));
+  }
+
+  private void checkBankcardParams(String cardholder, String bankName, String address) {
+    Assert.notBlank(cardholder, () -> new ServiceException("持卡人不能为空"));
+    Assert.notBlank(bankName, () -> new ServiceException("银行卡号不能为空"));
+    Assert.notBlank(address, () -> new ServiceException("开户行地址不能为空"));
+  }
+
+  private void checkCryptocurrencyParams(String alias, String network, String currency) {
+    Assert.notBlank(alias, () -> new ServiceException("地址别名不能为空"));
+    Assert.notBlank(network, () -> new ServiceException("转账网络不能为空"));
+    Assert.notBlank(currency, () -> new ServiceException("币种不能为空"));
+  }
+
+  private void addCryptocurrency(MemberBankAddDTO dto) {
+    this.checkCryptocurrencyParams(dto.getAlias(), dto.getNetwork(), dto.getCurrency());
+
+    // 将其他卡设置为非默认
+    Member member = memberService.getById(dto.getMemberId());
+    if (MemberBankEnums.DEFAULT.Y.match(dto.getIsDefault())) {
+      this.resetDefault(member.getId(), dto.getType());
     }
+
+    MemberBank memberBank = memberBankConvert.toEntity(dto);
+    Assert.isTrue(this.save(memberBank), () -> new ServiceException("添加虚拟货币地址失败!"));
+  }
+
+  private void addBankcard(MemberBankAddDTO dto) {
+    this.checkBankcardParams(dto.getCardHolder(), dto.getBankName(), dto.getAddress());
+
+    Member member = memberService.getById(dto.getMemberId());
+    if (StringUtils.isEmpty(member.getRealName())) {
+      // 更新真实姓名
+      memberService.updateRealName(member.getId(), dto.getCardHolder());
+    } else if (!member.getRealName().equals(dto.getCardHolder())) {
+      throw new ServiceException("银行卡真实姓名与系统预留不匹配");
+    }
+
+    // 将其他卡设置为非默认
+    if (MemberBankEnums.DEFAULT.Y.match(dto.getIsDefault())) {
+      this.resetDefault(member.getId(), dto.getType());
+    }
+
+    MemberBank memberBank = memberBankConvert.toEntity(dto);
+    Assert.isTrue(this.save(memberBank), () -> new ServiceException("添加会员银行卡失败!"));
   }
 
   /**
-   * 是否有默认卡号
+   * 重置默认卡
    *
-   * @param dto MemberBankAddDTO
-   * @return boolean
+   * @param memberId Long
+   * @param type String
    */
-  private boolean hasDefaultBankcard(MemberBankAddDTO dto) {
-    return 0
-        < this.lambdaQuery()
-            .eq(MemberBank::getMemberId, dto.getMemberId())
-            .eq(MemberBank::getType, dto.getType())
-            .eq(MemberBank::getIsDefault, MemberBankEnums.DEFAULT.Y.value())
-            .count();
+  private void resetDefault(Long memberId, String type) {
+    this.lambdaUpdate()
+        .set(MemberBank::getIsDefault, MemberBankEnums.DEFAULT.N.value())
+        .eq(MemberBank::getType, type)
+        .eq(MemberBank::getMemberId, memberId)
+        .update();
   }
 }

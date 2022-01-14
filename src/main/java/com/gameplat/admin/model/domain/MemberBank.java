@@ -34,6 +34,12 @@ public class MemberBank {
 
   private String remark;
 
+  private String network;
+
+  private String alias;
+
+  private String cardHolder;
+
   /** 创建者 */
   @TableField(fill = FieldFill.INSERT)
   private String createBy;

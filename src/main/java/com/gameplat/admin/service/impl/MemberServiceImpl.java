@@ -1,6 +1,7 @@
 package com.gameplat.admin.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.lang.Assert;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -11,25 +12,22 @@ import com.gameplat.admin.enums.MemberEnums;
 import com.gameplat.admin.mapper.MemberMapper;
 import com.gameplat.admin.model.domain.Member;
 import com.gameplat.admin.model.domain.MemberInfo;
-import com.gameplat.admin.model.dto.MemberAddDTO;
-import com.gameplat.admin.model.dto.MemberContactCleanDTO;
-import com.gameplat.admin.model.dto.MemberContactUpdateDTO;
-import com.gameplat.admin.model.dto.MemberEditDTO;
-import com.gameplat.admin.model.dto.MemberQueryDTO;
+import com.gameplat.admin.model.dto.*;
 import com.gameplat.admin.model.vo.MemberInfoVO;
 import com.gameplat.admin.model.vo.MemberVO;
 import com.gameplat.admin.service.MemberInfoService;
+import com.gameplat.admin.service.MemberRemarkService;
 import com.gameplat.admin.service.MemberService;
+import com.gameplat.admin.service.PasswordService;
 import com.gameplat.base.common.exception.ServiceException;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)
@@ -42,6 +40,10 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
   @Autowired private MemberInfoService memberInfoService;
 
   @Autowired private MemberQueryCondition memberQueryCondition;
+
+  @Autowired private PasswordService passwordService;
+
+  @Autowired private MemberRemarkService memberRemarkService;
 
   @Override
   public IPage<MemberVO> queryPage(Page<Member> page, MemberQueryDTO dto) {
@@ -110,12 +112,13 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
 
   @Override
   public void update(MemberEditDTO dto) {
-    if (this.updateById(memberConvert.toEntity(dto))) {
-      MemberInfo memberInfo =
-          MemberInfo.builder().memberId(dto.getId()).rebate(dto.getRebate()).build();
-      if (!memberInfoService.updateById(memberInfo)) {
-        throw new ServiceException("修改会员信息失败!");
-      }
+    MemberInfo memberInfo =
+        MemberInfo.builder().memberId(dto.getId()).rebate(dto.getRebate()).build();
+
+    // 更新会员信息和会员详情
+    if (!this.updateById(memberConvert.toEntity(dto))
+        || !memberInfoService.updateById(memberInfo)) {
+      throw new ServiceException("修改会员信息失败!");
     }
   }
 
@@ -135,6 +138,14 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
         .func(query -> dto.getFields().forEach(field -> query.set(field, null)))
         .between("create_time", dto.getStartTime(), dto.getEndTime())
         .update(new Member());
+  }
+
+  @Override
+  public Member getById(Long id) {
+    return this.lambdaQuery()
+        .eq(Member::getId, id)
+        .oneOpt()
+        .orElseThrow(() -> new ServiceException("会员信息不存在!"));
   }
 
   @Override
@@ -174,16 +185,72 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
   }
 
   @Override
-  public List<Member> getListByUserLevel(List<String> userLevelList) {
-    if (CollectionUtil.isEmpty(userLevelList)) {
-      return null;
+  public void resetPassword(MemberPwdUpdateDTO dto) {
+    Member member = this.getById(dto.getId());
+    String password = passwordService.encrypt(dto.getPassword(), member.getAccount());
+    if (!this.lambdaUpdate()
+        .set(Member::getPassword, password)
+        .eq(Member::getId, member.getId())
+        .update(new Member())) {
+      throw new ServiceException("重置会员密码失败!");
     }
-    return this.lambdaQuery().in(Member::getUserLevel, userLevelList).list();
+
+    // 更新会员备注
+    memberRemarkService.update(dto.getId(), dto.getRemark());
+  }
+
+  @Override
+  public void resetWithdrawPassword(MemberWithdrawPwdUpdateDTO dto) {
+    Member member = this.getById(dto.getId());
+    String password = passwordService.encrypt(dto.getPassword(), member.getAccount());
+    Assert.isTrue(
+        memberInfoService
+            .lambdaUpdate()
+            .set(MemberInfo::getCashPassword, password)
+            .eq(MemberInfo::getMemberId, member.getId())
+            .update(new MemberInfo()),
+        () -> new ServiceException("重置会员提现密码失败!"));
+  }
+
+  @Override
+  public void changeWithdrawFlag(Long id, String flag) {
+    Assert.isTrue(
+        this.lambdaUpdate()
+            .set(Member::getWithdrawFlag, flag)
+            .eq(Member::getId, id)
+            .update(new Member()),
+        () -> new ServiceException("修改会员提现状态失败!"));
+  }
+
+  @Override
+  public void resetRealName(MemberResetRealNameDTO dto) {
+    Member member = this.getById(dto.getId());
+    Assert.isTrue(
+        this.lambdaUpdate()
+            .set(Member::getRealName, dto.getRealName())
+            .eq(Member::getId, member.getId())
+            .update(new Member()),
+        () -> new ServiceException("重置会员真实姓名失败!"));
+  }
+
+  @Override
+  public List<Member> getListByUserLevel(List<String> userLevelList) {
+    return Optional.ofNullable(userLevelList)
+        .filter(CollectionUtil::isNotEmpty)
+        .map(e -> this.lambdaQuery().in(Member::getUserLevel, e).list())
+        .orElse(null);
   }
 
   @Override
   public List<Member> getListByAgentAccount(String agentAccout) {
     return memberMapper.getListByAgentAccout(agentAccout);
+  }
+
+  @Override
+  public void updateRealName(Long memberId, String realName) {
+    Assert.isTrue(
+        this.lambdaUpdate().set(Member::getRealName, realName).eq(Member::getId, memberId).update(),
+        () -> new ServiceException("修改会员真实姓名失败!"));
   }
 
   /**
@@ -193,9 +260,7 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
    * @param status int
    */
   private void changeStatus(List<Long> ids, int status) {
-    if (CollectionUtil.isEmpty(ids)) {
-      throw new ServiceException("会员ID不能为空");
-    }
+    Assert.notEmpty(ids, () -> new ServiceException("会员ID不能为空"));
 
     if (!this.lambdaUpdate()
         .set(Member::getStatus, status)

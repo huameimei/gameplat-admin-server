@@ -2,7 +2,6 @@ package com.gameplat.admin.service;
 
 import cn.hutool.json.JSONObject;
 import com.alibaba.csp.sentinel.annotation.SentinelResource;
-import com.gameplat.admin.constant.RsaConstant;
 import com.gameplat.admin.enums.SysUserEnums;
 import com.gameplat.admin.mapper.SysMenuMapper;
 import com.gameplat.admin.mapper.SysUserMapper;
@@ -16,6 +15,7 @@ import com.gameplat.base.common.json.JsonUtils;
 import com.gameplat.base.common.util.RSAUtils;
 import com.gameplat.base.common.util.StringUtils;
 import com.gameplat.common.enums.BooleanEnum;
+import com.gameplat.common.enums.RsaConstant;
 import com.gameplat.security.SecurityUserHolder;
 import com.gameplat.security.service.JwtTokenService;
 import java.util.ArrayList;

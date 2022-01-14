@@ -12,14 +12,15 @@ import com.gameplat.admin.model.vo.MemberRemarkVO;
 import com.gameplat.admin.service.MemberRemarkService;
 import com.gameplat.admin.service.MemberService;
 import com.gameplat.base.common.exception.ServiceException;
-import java.util.List;
-import java.util.stream.Collectors;
-
 import com.gameplat.common.constant.CachedKeys;
+import com.google.common.collect.Lists;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)
@@ -33,23 +34,14 @@ public class MemberRemarkServiceImpl extends ServiceImpl<MemberRemarkMapper, Mem
   @Override
   @CacheInvalidate(name = CachedKeys.MEMBER_REMARK_CACHE, key = "#dto.ids", multi = true)
   public void update(MemberRemarkAddDTO dto) {
-    if (!memberService
-        .lambdaUpdate()
-        .in(Member::getId, dto.getIds())
-        .set(Member::getRemark, dto.getRemark())
-        .update(new Member())) {
-      throw new ServiceException("批量修改会员备注失败!");
-    }
+    this.batchUpdateRemark(dto.getIds(), dto.getRemark());
+  }
 
-    // 批量添加备注
-    List<MemberRemark> remarks =
-        memberService.listByIds(dto.getIds()).stream()
-            .map(member -> this.builderRemarkForAdd(member, dto.getRemark()))
-            .collect(Collectors.toList());
-
-    if (!this.saveBatch(remarks)) {
-      throw new ServiceException("批量添加备注失败!");
-    }
+  @Override
+  @CacheInvalidate(name = CachedKeys.MEMBER_REMARK_CACHE, key = "#memberId")
+  public void update(Long memberId, String remark) {
+    List<Long> ids = Lists.newArrayList(memberId);
+    this.batchUpdateRemark(ids, remark);
   }
 
   @Override
@@ -62,6 +54,26 @@ public class MemberRemarkServiceImpl extends ServiceImpl<MemberRemarkMapper, Mem
         .stream()
         .map(memberRemarkConvert::toVo)
         .collect(Collectors.toList());
+  }
+
+  private void batchUpdateRemark(List<Long> ids, String remark) {
+    if (!memberService
+        .lambdaUpdate()
+        .in(Member::getId, ids)
+        .set(Member::getRemark, remark)
+        .update(new Member())) {
+      throw new ServiceException("批量修改会员备注失败!");
+    }
+
+    // 批量添加备注
+    List<MemberRemark> remarks =
+        memberService.listByIds(ids).stream()
+            .map(member -> this.builderRemarkForAdd(member, remark))
+            .collect(Collectors.toList());
+
+    if (!this.saveBatch(remarks)) {
+      throw new ServiceException("批量添加备注失败!");
+    }
   }
 
   private MemberRemark builderRemarkForAdd(Member member, String remark) {

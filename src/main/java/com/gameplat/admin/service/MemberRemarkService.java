@@ -10,5 +10,7 @@ public interface MemberRemarkService extends IService<MemberRemark> {
 
   void update(MemberRemarkAddDTO dto);
 
+  void update(Long memberId, String remark);
+
   List<MemberRemarkVO> getByMemberId(Long memberId);
 }

@@ -59,6 +59,7 @@ public class SysCommonService {
               jsonObject.put("label", item.getDictLabel());
               jsonObject.put("value", item.getDictValue());
               jsonObject.put("key", item.getDictType());
+              jsonObject.put("name",item.getDictName());
               return jsonObject;
             })
         .collect(Collectors.groupingBy(item -> item.get("key")));

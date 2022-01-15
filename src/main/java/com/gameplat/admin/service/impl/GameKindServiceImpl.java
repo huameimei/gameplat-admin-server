@@ -14,7 +14,7 @@ import com.gameplat.admin.model.dto.OperGameKindDTO;
 import com.gameplat.admin.model.vo.GameKindVO;
 import com.gameplat.admin.service.GameKindService;
 import com.gameplat.base.common.exception.ServiceException;
-import com.gameplat.common.enums.LiveDemoEnableEnum;
+import com.gameplat.common.enums.GameDemoEnableEnum;
 import com.google.common.collect.Lists;
 import java.util.Date;
 import javax.annotation.Resource;
@@ -71,7 +71,7 @@ public class GameKindServiceImpl extends ServiceImpl<GameKindMapper, GameKind>
     update.set(ObjectUtils.isNotNull(operGameKindDTO.getDemoEnable()),GameKind::getDemoEnable,operGameKindDTO.getDemoEnable());
     update.set(GameKind::getUpdateTime,new Date());
     //仅修改支持试玩的
-    update.ne(GameKind::getDemoEnable,LiveDemoEnableEnum.NOT_SUPPORT.getCode());
+    update.ne(GameKind::getDemoEnable, GameDemoEnableEnum.NOT_SUPPORT.getCode());
     gameKindMapper.update(null,update);
   }
 }

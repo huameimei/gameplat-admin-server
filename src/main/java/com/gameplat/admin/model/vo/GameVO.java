@@ -38,10 +38,10 @@ public class GameVO implements Serializable {
     @ApiModelProperty(value = "游戏类别")
     private String gameKind;
 
-    @ApiModelProperty(value = "是否支持H5")
+    @ApiModelProperty(value = "是否支持H5 (0：否；1:是)")
     private Integer isH5;
 
-    @ApiModelProperty(value = "是否支持电脑端")
+    @ApiModelProperty(value = "是否支持电脑端(0：否；1:是)")
     private Integer isFlash;
 
     @ApiModelProperty(value = "H5图片")

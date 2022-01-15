@@ -3,9 +3,8 @@ package com.gameplat.admin.service.game.api.ae;
 
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.json.JSONUtil;
-import com.gameplat.admin.model.domain.LiveTransferRecord;
-import com.gameplat.admin.model.dto.LiveTransferRecordQueryDTO;
-import com.gameplat.admin.service.LiveTransferRecordService;
+import com.gameplat.admin.model.domain.GameTransferRecord;
+import com.gameplat.admin.service.GameTransferRecordService;
 import com.gameplat.admin.service.game.GameApi;
 import com.gameplat.admin.service.game.api.ae.config.AeConfig;
 import com.gameplat.admin.service.game.api.ae.feign.AeFeignClient;
@@ -40,10 +39,8 @@ import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
 
 @Slf4j
-@Component(AeApi.LIVE_CODE + "Api")
+@Component("aeApi")
 public class AeApi implements GameApi {
-
-  public static final String LIVE_CODE = "ae";
 
   public static final String LIVE_NAME = "AE真人";
 
@@ -68,7 +65,7 @@ public class AeApi implements GameApi {
   private AeFeignClient aeFeignClient;
 
   @Autowired
-  private LiveTransferRecordService liveTransferRecordService;
+  private GameTransferRecordService liveTransferRecordService;
 
   @Override
   @Retryable(value = Exception.class, backoff = @Backoff(delay = RETRY_DELAY))
@@ -249,9 +246,9 @@ public class AeApi implements GameApi {
    */
 
   public void createMember(String account) throws Exception {
-    LiveTransferRecord dto = new LiveTransferRecord();
+    GameTransferRecord dto = new GameTransferRecord();
     dto.setAccount(account);
-    dto.setLiveCode(GamePlatformEnum.AE.getCode());
+    dto.setPlatformCode(GamePlatformEnum.AE.getCode());
     if(liveTransferRecordService.findTransferRecordCount(dto)){
       log.info("用户{}在真人游戏平台{}已有账号",account,GamePlatformEnum.AE.getName());
       return;

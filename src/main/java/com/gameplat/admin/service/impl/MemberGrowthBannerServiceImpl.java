@@ -7,12 +7,12 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.convert.MemberGrowthBannerConvert;
 import com.gameplat.admin.mapper.MemberGrowthBannerMapper;
 import com.gameplat.admin.model.domain.MemberGrowthBanner;
-import com.gameplat.admin.model.dto.MemberGrowthBannerDTO;
+import com.gameplat.admin.model.dto.MemberGrowthBannerAddDTO;
+import com.gameplat.admin.model.dto.MemberGrowthBannerEditDTO;
 import com.gameplat.admin.model.vo.MemberGrowthBannerVO;
 import com.gameplat.admin.service.MemberGrowthBannerService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,7 +33,7 @@ public class MemberGrowthBannerServiceImpl extends ServiceImpl<MemberGrowthBanne
 
     /** 增 */
     @Override
-    public void addBanner(MemberGrowthBannerDTO dto) {
+    public void addBanner(MemberGrowthBannerAddDTO dto) {
         this.save(memberGrowthBannerConvert.toEntity(dto));
     }
 
@@ -45,13 +45,13 @@ public class MemberGrowthBannerServiceImpl extends ServiceImpl<MemberGrowthBanne
 
     /** 改 */
     @Override
-    public void updateBanner(MemberGrowthBannerDTO dto) {
+    public void updateBanner(MemberGrowthBannerEditDTO dto) {
         this.updateById(memberGrowthBannerConvert.toEntity(dto));
     }
 
     /** 查 */
     @Override
-    public IPage<MemberGrowthBannerVO> getList(PageDTO<MemberGrowthBanner> page, MemberGrowthBannerDTO dto) {
+    public IPage<MemberGrowthBannerVO> getList(PageDTO<MemberGrowthBanner> page, MemberGrowthBannerAddDTO dto) {
         return this.lambdaQuery()
                 .eq(ObjectUtil.isNotEmpty(dto.getCilentType()), MemberGrowthBanner::getCilentType, dto.getCilentType())
                 .eq(ObjectUtil.isNotEmpty(dto.getAreaType()), MemberGrowthBanner::getAreaType, dto.getAreaType())

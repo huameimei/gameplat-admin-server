@@ -5,7 +5,6 @@ import lombok.Data;
 
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
-import java.util.Date;
 
 /**
  * @author lily
@@ -13,10 +12,7 @@ import java.util.Date;
  * @date 2022/1/15
  */
 @Data
-public class MemberGrowthBannerDTO implements Serializable {
-
-    @ApiModelProperty(value = "主键")
-    private Long id;
+public class MemberGrowthBannerAddDTO implements Serializable {
 
     @ApiModelProperty(value = "终端: 0 WEB  1 H5  2 ANDRIOD  3 IOS")
     @NotNull(message = "终端类型不能为空")
@@ -31,18 +27,6 @@ public class MemberGrowthBannerDTO implements Serializable {
 
     @ApiModelProperty(value = "排序值")
     private Integer sort;
-
-    @ApiModelProperty(value = "创建人")
-    private String createBy;
-
-    @ApiModelProperty(value = "创建时间")
-    private Date createTime;
-
-    @ApiModelProperty(value = "修改人")
-    private String updateBy;
-
-    @ApiModelProperty(value = "修改时间")
-    private Date updateTime;
 
     @ApiModelProperty(value = "备注")
     private String remark;

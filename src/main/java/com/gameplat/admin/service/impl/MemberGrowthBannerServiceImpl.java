@@ -9,6 +9,7 @@ import com.gameplat.admin.mapper.MemberGrowthBannerMapper;
 import com.gameplat.admin.model.domain.MemberGrowthBanner;
 import com.gameplat.admin.model.dto.MemberGrowthBannerAddDTO;
 import com.gameplat.admin.model.dto.MemberGrowthBannerEditDTO;
+import com.gameplat.admin.model.dto.MemberGrowthBannerQueryDTO;
 import com.gameplat.admin.model.vo.MemberGrowthBannerVO;
 import com.gameplat.admin.service.MemberGrowthBannerService;
 import lombok.RequiredArgsConstructor;
@@ -51,7 +52,7 @@ public class MemberGrowthBannerServiceImpl extends ServiceImpl<MemberGrowthBanne
 
     /** 查 */
     @Override
-    public IPage<MemberGrowthBannerVO> getList(PageDTO<MemberGrowthBanner> page, MemberGrowthBannerAddDTO dto) {
+    public IPage<MemberGrowthBannerVO> getList(PageDTO<MemberGrowthBanner> page, MemberGrowthBannerQueryDTO dto) {
         return this.lambdaQuery()
                 .eq(ObjectUtil.isNotEmpty(dto.getCilentType()), MemberGrowthBanner::getCilentType, dto.getCilentType())
                 .eq(ObjectUtil.isNotEmpty(dto.getAreaType()), MemberGrowthBanner::getAreaType, dto.getAreaType())

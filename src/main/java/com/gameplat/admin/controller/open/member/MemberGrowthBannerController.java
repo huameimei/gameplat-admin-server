@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.gameplat.admin.model.domain.MemberGrowthBanner;
 import com.gameplat.admin.model.dto.MemberGrowthBannerAddDTO;
 import com.gameplat.admin.model.dto.MemberGrowthBannerEditDTO;
+import com.gameplat.admin.model.dto.MemberGrowthBannerQueryDTO;
 import com.gameplat.admin.model.vo.MemberGrowthBannerVO;
 import com.gameplat.admin.service.MemberGrowthBannerService;
 import io.swagger.annotations.Api;
@@ -54,7 +55,7 @@ public class MemberGrowthBannerController {
     /** 查 */
     @GetMapping("/page")
     @ApiOperation(value = "VIP banner图列表")
-    public IPage<MemberGrowthBannerVO> findTrendsList(PageDTO<MemberGrowthBanner> page, MemberGrowthBannerAddDTO dto) {
+    public IPage<MemberGrowthBannerVO> findTrendsList(PageDTO<MemberGrowthBanner> page, MemberGrowthBannerQueryDTO dto) {
         return memberGrowthBannerService.getList(page, dto);
     }
 }

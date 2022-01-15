@@ -88,7 +88,7 @@ public class ActivityTypeServiceImpl extends ServiceImpl<ActivityTypeMapper, Act
     }
     ActivityType activityType1 = activityTypeConvert.toEntity(activityTypeUpdateDTO);
     if (activityType1.getTypeStatus() == null) {
-      activityType1.setTypeStatus(1);
+      activityType1.setTypeStatus(BooleanEnum.YES.value());
     }
     this.updateById(activityType1);
   }

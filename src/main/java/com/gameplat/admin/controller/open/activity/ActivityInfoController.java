@@ -3,6 +3,7 @@ package com.gameplat.admin.controller.open.activity;
 import com.alibaba.fastjson.JSONArray;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
+import com.gameplat.admin.enums.ActivityInfoEnum;
 import com.gameplat.admin.model.domain.ActivityInfo;
 import com.gameplat.admin.model.dto.ActivityInfoAddDTO;
 import com.gameplat.admin.model.dto.ActivityInfoQueryDTO;
@@ -94,7 +95,7 @@ public class ActivityInfoController {
   public void add(
       @RequestBody ActivityInfoAddDTO activityInfoAddDTO,
       @RequestHeader(value = "country", required = false, defaultValue = "zh-CN") String country) {
-    if (activityInfoAddDTO.getValidStatus() == 2) {
+    if (activityInfoAddDTO.getValidStatus() == ActivityInfoEnum.ValidStatus.TIME_LIMIT.value()) {
       if (DateUtil.strToDate(activityInfoAddDTO.getEndTime(), "yyyy-MM-dd")
           .before(DateUtil.strToDate(activityInfoAddDTO.getBeginTime(), "yyyy-MM-dd"))) {
         throw new ServiceException("活动结束时间不能小于活动开始时间");
@@ -119,7 +120,7 @@ public class ActivityInfoController {
   public void update(
       @RequestBody ActivityInfoUpdateDTO activityInfoUpdateDTO,
       @RequestHeader(value = "country", required = false, defaultValue = "zh-CN") String country) {
-    if (activityInfoUpdateDTO.getValidStatus() == 2) {
+    if (activityInfoUpdateDTO.getValidStatus() == ActivityInfoEnum.ValidStatus.TIME_LIMIT.value()) {
       if (DateUtil.strToDate(activityInfoUpdateDTO.getEndTime(), "yyyy-MM-dd")
           .before(DateUtil.strToDate(activityInfoUpdateDTO.getBeginTime(), "yyyy-MM-dd"))) {
         throw new ServiceException("活动结束时间不能小于活动开始时间");
@@ -183,9 +184,9 @@ public class ActivityInfoController {
     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     activityList.forEach(
         o -> {
-          if (o.getValidStatus() == 1) {
+          if (o.getValidStatus() == ActivityInfoEnum.ValidStatus.PERMANENT.value()) {
             result.add(o);
-          } else if (o.getValidStatus() == 2) {
+          } else if (o.getValidStatus() == ActivityInfoEnum.ValidStatus.TIME_LIMIT.value()) {
             String beginDate = o.getBeginTime().concat(" 00:00:00");
             String endDate = o.getEndTime().concat(" 23:59:59");
             try {

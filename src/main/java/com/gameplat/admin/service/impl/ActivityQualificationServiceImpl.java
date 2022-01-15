@@ -28,6 +28,7 @@ import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.DateUtil;
 import com.gameplat.base.common.util.RandomUtil;
 import com.gameplat.base.common.util.StringUtils;
+import com.gameplat.common.enums.BooleanEnum;
 import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
@@ -69,12 +70,11 @@ public class ActivityQualificationServiceImpl
             ActivityQualification::getActivityId,
             activityQualification.getActivityId())
         .eq(
-            activityQualification.getDeleteFlag() != null
-                && activityQualification.getDeleteFlag() != 0,
+            activityQualification.getDeleteFlag() != null,
             ActivityQualification::getDeleteFlag,
             activityQualification.getDeleteFlag())
         .eq(
-            activityQualification.getStatus() != null && activityQualification.getStatus() != 0,
+            activityQualification.getStatus() != null,
             ActivityQualification::getStatus,
             activityQualification.getStatus())
         .eq(ActivityQualification::getDeleteFlag, 1) // 是否逻辑删除
@@ -154,14 +154,14 @@ public class ActivityQualificationServiceImpl
           qm.setUserId(memberInfo.getId());
           qm.setUsername(username1);
           qm.setApplyTime(new Date());
-          qm.setStatus(1);
+          qm.setStatus(BooleanEnum.YES.value());
           qm.setActivityStartTime(activityLobbyDTO.getStartTime());
           qm.setActivityEndTime(activityLobbyDTO.getEndTime());
-          qm.setDeleteFlag(1);
+          qm.setDeleteFlag(BooleanEnum.YES.value());
           qm.setDrawNum(1);
           qm.setEmployNum(0);
           qm.setQualificationActivityId(IdWorker.getIdStr());
-          qm.setQualificationStatus(1);
+          qm.setQualificationStatus(BooleanEnum.YES.value());
           qm.setStatisItem(activityLobbyDTO.getStatisItem());
           qm.setMaxMoney(
               lobbyDiscount.stream().mapToInt(ActivityLobbyDiscountDTO::getPresenterValue).sum());
@@ -194,7 +194,7 @@ public class ActivityQualificationServiceImpl
         throw new ServiceException(
             "您选择的数据有【" + qualification.getActivityName() + "】已审核的数据，请勿重复审核！");
       }
-      if (qualification.getQualificationStatus() == 0) {
+      if (qualification.getQualificationStatus() == BooleanEnum.NO.value()) {
         throw new ServiceException("您选择的数据有资格状态被禁用的数据，禁用状态不能审核！");
       }
       // 更新数据

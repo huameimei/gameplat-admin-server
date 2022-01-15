@@ -341,7 +341,7 @@ public class MessageInfoServiceImpl extends ServiceImpl<MessageMapper, MessageIn
       throw new ServiceException("id不能为空");
     }
 
-    if (messageInfoEditDTO.getShowType() == PushMessageEnum.MessageShowType.PIC_POPUP.getValue()
+    if (messageInfoEditDTO.getShowType() == PushMessageEnum.MessageShowType.PIC_POPUP.value()
         && (StringUtils.isBlank(messageInfoEditDTO.getAppImage())
             || StringUtils.isBlank(messageInfoEditDTO.getPcImage()))) {
       throw new ServiceException("选择消息类型为图片弹窗，web端和移动端图片不能为空");
@@ -349,7 +349,7 @@ public class MessageInfoServiceImpl extends ServiceImpl<MessageMapper, MessageIn
 
     MessageInfoAddDTO messageInfoAddDTO = new MessageInfoAddDTO();
     BeanUtils.copyBeanProp(messageInfoAddDTO, messageInfoEditDTO);
-//    validMessageInfo(messageInfoAddDTO);
+    validMessageInfo(messageInfoAddDTO);
 
     MessageInfo messageInfo = messageInfoConvert.toEntity(messageInfoEditDTO);
     this.updateById(messageInfo);
@@ -372,7 +372,7 @@ public class MessageInfoServiceImpl extends ServiceImpl<MessageMapper, MessageIn
    * @param messageInfoAddDTO
    */
   private void validMessageInfo(MessageInfoAddDTO messageInfoAddDTO) {
-    if (messageInfoAddDTO.getShowType() == PushMessageEnum.MessageShowType.PIC_POPUP.getValue()
+    if (messageInfoAddDTO.getShowType() == PushMessageEnum.MessageShowType.PIC_POPUP.value()
         && (StringUtils.isBlank(messageInfoAddDTO.getAppImage())
             || StringUtils.isBlank(messageInfoAddDTO.getPcImage()))) {
       throw new ServiceException("选择消息类型为图片弹窗，web端和移动端图片不能为空");

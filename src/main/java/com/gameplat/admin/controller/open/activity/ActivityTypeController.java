@@ -14,6 +14,7 @@ import com.gameplat.admin.service.ActivityTypeService;
 import com.gameplat.admin.service.ConfigService;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.StringUtils;
+import com.gameplat.common.enums.BooleanEnum;
 import com.gameplat.common.enums.DictDataEnum;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -118,7 +119,7 @@ public class ActivityTypeController {
       activityTypeUpdateDTO.setLanguage(country);
     }
     if (activityTypeUpdateDTO.getFloatStatus() != null
-        && activityTypeUpdateDTO.getFloatStatus() != 0) {
+        && activityTypeUpdateDTO.getFloatStatus() != BooleanEnum.NO.value()) {
       if (StringUtils.isBlank(activityTypeUpdateDTO.getFloatLogo())) {
         throw new ServiceException("开启浮窗开关，浮窗图片不能为空");
       }

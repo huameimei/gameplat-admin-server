@@ -86,7 +86,7 @@ public class ActivityDistributeServiceImpl
       PageDTO<ActivityDistribute> page, ActivityDistributeQueryDTO activityDistributeQueryDTO) {
     LambdaQueryChainWrapper<ActivityDistribute> lambdaQuery = this.lambdaQuery();
     lambdaQuery
-            //未删除
+        // 未删除
         .eq(ActivityDistribute::getDeleteFlag, BooleanEnum.YES.value())
         .like(
             StringUtils.isNotBlank(activityDistributeQueryDTO.getUsername()),
@@ -211,7 +211,7 @@ public class ActivityDistributeServiceImpl
     for (String idStr : idArr) {
       ActivityDistribute activityDistribute = new ActivityDistribute();
       activityDistribute.setDistributeId(Long.parseLong(idStr));
-      activityDistribute.setDeleteFlag(0);
+      activityDistribute.setDeleteFlag(BooleanEnum.NO.value());
       activityDistributeList.add(activityDistribute);
     }
     return this.updateBatchById(activityDistributeList);

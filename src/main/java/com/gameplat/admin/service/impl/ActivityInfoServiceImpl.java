@@ -19,6 +19,7 @@ import com.gameplat.admin.model.dto.ActivityInfoUpdateSortDTO;
 import com.gameplat.admin.model.vo.ActivityInfoVO;
 import com.gameplat.admin.service.*;
 import com.gameplat.base.common.exception.ServiceException;
+import com.gameplat.common.enums.BooleanEnum;
 import com.gameplat.common.enums.DictDataEnum;
 import com.google.common.collect.Lists;
 import org.apache.commons.collections.CollectionUtils;
@@ -166,7 +167,7 @@ public class ActivityInfoServiceImpl extends ServiceImpl<ActivityInfoMapper, Act
   @Override
   public List<ActivityInfoVO> getAllActivity() {
     LambdaQueryChainWrapper<ActivityInfo> queryWrapper = this.lambdaQuery();
-    queryWrapper.eq(ActivityInfo::getStatus, 1);
+    queryWrapper.eq(ActivityInfo::getStatus, BooleanEnum.YES.value());
     List<ActivityInfo> activityInfoList = queryWrapper.list();
     // 查询关联数据
     List<Long> activityTypeIdList = new ArrayList<>();

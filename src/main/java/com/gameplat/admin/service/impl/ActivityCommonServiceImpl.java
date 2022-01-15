@@ -8,6 +8,7 @@ import cn.hutool.core.util.NumberUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
+import com.gameplat.admin.enums.ActivityInfoEnum;
 import com.gameplat.admin.enums.GameTypeEnum;
 import com.gameplat.admin.mapper.RechargeOrderMapper;
 import com.gameplat.admin.model.bean.ActivityStatisticItem;
@@ -70,76 +71,76 @@ public class ActivityCommonServiceImpl implements ActivityCommonService {
       String validAmount,
       String startTime,
       String endTime) {
-    Integer targetType = activityLobby.getStatisItem();
+    Integer statisItem = activityLobby.getStatisItem();
     String gameType = activityLobby.getGameType();
     StringBuilder sb = new StringBuilder();
     Integer applyWay = activityLobby.getApplyWay();
-    if (applyWay == 1) {
+    if (applyWay == ActivityInfoEnum.ApplyWayEnum.MANUAL.value()) {
       sb.append("申请方式:手动,");
     }
-    if (applyWay == 2) {
+    if (applyWay == ActivityInfoEnum.ApplyWayEnum.AUTOMATIC.value()) {
       sb.append("申请方式:自动,");
     }
     Integer auditWay = activityLobby.getAuditWay();
-    if (auditWay == 1) {
+    if (auditWay == ActivityInfoEnum.AuditWayEnum.MANUAL.value()) {
       sb.append("审核方式:手动,");
     }
-    if (auditWay == 2) {
+    if (auditWay == ActivityInfoEnum.AuditWayEnum.AUTOMATIC.value()) {
       sb.append("审核方式:自动,");
     }
     if (StringUtils.isNotEmpty(statisticValue)) {
       // 充值活动
       if (activityLobby.getType() == 1) {
-        if (targetType == 1) {
+        if (statisItem == 1) {
           sb.append("累计充值金额:").append(statisticValue);
         }
-        if (targetType == 2) {
+        if (statisItem == 2) {
           sb.append("累计充值天数:").append(statisticValue);
         }
-        if (targetType == 3) {
+        if (statisItem == 3) {
           sb.append("连续充值天数:").append(statisticValue);
         }
-        if (targetType == 4) {
+        if (statisItem == 4) {
           sb.append("单日首充金额:").append(statisticValue);
         }
-        if (targetType == 5) {
+        if (statisItem == 5) {
           sb.append("首充金额:").append(statisticValue);
         }
       }
       // 游戏活动
       else if (activityLobby.getType() == 2) {
-        if (targetType == 6) {
+        if (statisItem == 6) {
           sb.append("累计")
               .append(GameTypeEnum.getName(gameType))
               .append("打码金额:")
               .append(statisticValue);
         }
-        if (targetType == 7) {
+        if (statisItem == 7) {
           sb.append("累计")
               .append(GameTypeEnum.getName(gameType))
               .append("打码天数:")
               .append(statisticValue);
         }
-        if (targetType == 8) {
+        if (statisItem == 8) {
           sb.append("连续")
               .append(GameTypeEnum.getName(gameType))
               .append("打码天数:")
               .append(statisticValue);
         }
-        if (targetType == 9) {
+        if (statisItem == 9) {
           sb.append("单日")
               .append(GameTypeEnum.getName(gameType))
               .append("亏损金额:")
               .append(statisticValue);
         }
-        if (targetType == 10) {
+        if (statisItem == 10) {
           sb.append("指定比赛打码金额:").append(statisticValue);
         }
       }
     }
 
     if (StringUtils.isNotEmpty(validAmount)) {
-      if (targetType != 6 || targetType != 10) {
+      if (statisItem != 6 || statisItem != 10) {
         sb.append(",累计打码量:").append(validAmount);
       }
     }

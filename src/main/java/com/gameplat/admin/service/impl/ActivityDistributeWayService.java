@@ -10,6 +10,7 @@ import com.gameplat.admin.model.dto.MessageInfoAddDTO;
 import com.gameplat.admin.model.vo.MemberInfoVO;
 import com.gameplat.admin.service.*;
 import com.gameplat.base.common.exception.ServiceException;
+import com.gameplat.common.enums.BooleanEnum;
 import com.gameplat.redis.redisson.DistributedLocker;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -112,7 +113,8 @@ public class ActivityDistributeWayService
             new BigDecimal(activityDistribute.getWithdrawDml()).setScale(2, RoundingMode.HALF_UP));
 
         validWithdraw.setType(0);
-        validWithdraw.setStatus(0);
+        validWithdraw.setStatus(BooleanEnum.NO.value());
+
         validWithdraw.setDiscountMoney(BigDecimal.ZERO);
         validWithdraw.setRemark(getDistributeRemark(activityDistribute));
 
@@ -145,11 +147,11 @@ public class ActivityDistributeWayService
       message.setTitle("活动派发");
       message.setPushRange(PushMessageEnum.UserRange.SOME_MEMBERS.getValue());
       message.setLinkAccount(activityDistribute.getUsername());
-      message.setCategory(4);
-      message.setPosition(0);
-      message.setShowType(0);
-      message.setPopsCount(0);
-      message.setType(1);
+      message.setCategory(PushMessageEnum.MessageCategory.SYS_SEND.getValue());
+      message.setPosition(PushMessageEnum.Location.LOCATION_DEF.getValue());
+      message.setShowType(PushMessageEnum.MessageShowType.SHOW_DEF.value());
+      message.setPopsCount(PushMessageEnum.PopCount.POP_COUNT_DEF.getValue());
+      message.setType(PushMessageEnum.MessageType.SYSTEM_INFORMATION.value());
       message.setCreateBy("System");
       messageInfoService.insertMessage(message);
     } finally {
@@ -184,11 +186,11 @@ public class ActivityDistributeWayService
     message.setTitle("活动派发");
     message.setPushRange(PushMessageEnum.UserRange.SOME_MEMBERS.getValue());
     message.setLinkAccount(activityDistribute.getUsername());
-    message.setCategory(4);
-    message.setPosition(0);
-    message.setShowType(0);
-    message.setPopsCount(0);
-    message.setType(1);
+    message.setCategory(PushMessageEnum.MessageCategory.SYS_SEND.getValue());
+    message.setPosition(PushMessageEnum.Location.LOCATION_DEF.getValue());
+    message.setShowType(PushMessageEnum.MessageShowType.SHOW_DEF.value());
+    message.setPopsCount(PushMessageEnum.PopCount.POP_COUNT_DEF.getValue());
+    message.setType(PushMessageEnum.MessageType.SYSTEM_INFORMATION.value());
     message.setCreateBy("System");
     messageInfoService.insertMessage(message);
   }

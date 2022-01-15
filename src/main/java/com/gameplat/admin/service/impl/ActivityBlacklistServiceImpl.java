@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.convert.ActivityBlacklistConvert;
-import com.gameplat.admin.enums.ActivityBlacklistEnum;
+import com.gameplat.admin.enums.ActivityInfoEnum;
 import com.gameplat.admin.mapper.ActivityBlacklistMapper;
 import com.gameplat.admin.model.domain.ActivityBlacklist;
 import com.gameplat.admin.model.dto.ActivityBlacklistAddDTO;
@@ -60,15 +60,17 @@ public class ActivityBlacklistServiceImpl
 
   @Override
   public boolean add(ActivityBlacklistAddDTO activityBlacklistAddDTO) {
-    if (activityBlacklistAddDTO.getLimitedType() == ActivityBlacklistEnum.MEMBER.getValue()) {
+    if (activityBlacklistAddDTO.getLimitedType()
+        == ActivityInfoEnum.ActivityBlacklistEnum.MEMBER.value()) {
       MemberInfoVO memberInfo =
           memberService.getMemberInfo(activityBlacklistAddDTO.getLimitedContent());
       if (StringUtils.isNull(memberInfo)) {
         throw new ServiceException("限制内容框中输入的会员账号不存在");
       }
-    } else if (activityBlacklistAddDTO.getLimitedType() == ActivityBlacklistEnum.IP.getValue()) {
+    } else if (activityBlacklistAddDTO.getLimitedType()
+        == ActivityInfoEnum.ActivityBlacklistEnum.IP.value()) {
       if (!IpAddressUtils.inputIsIpAddress(activityBlacklistAddDTO.getLimitedContent())) {
-        throw new ServiceException("限制内容框中输入的IP地址不是一个有效的IP地址");
+        throw new ServiceException("限制内容框中输入的IP地址无效");
       }
     }
     ActivityBlacklist activityBlacklist =

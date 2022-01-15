@@ -434,7 +434,7 @@ public class MemberWealServiceImpl extends ServiceImpl<MemberWealMapper, MemberW
                                 messageInfo.setContent(content);
                                 messageInfo.setCategory(PushMessageEnum.MessageCategory.SYS_SEND.getValue());
                                 messageInfo.setPosition(PushMessageEnum.MessageCategory.CATE_DEF.getValue());
-                                messageInfo.setShowType(PushMessageEnum.MessageShowType.SHOW_DEF.getValue());
+                                messageInfo.setShowType(PushMessageEnum.MessageShowType.SHOW_DEF.value());
                                 messageInfo.setPopsCount(PushMessageEnum.PopCount.POP_COUNT_DEF.getValue());
                                 messageInfo.setPushRange(PushMessageEnum.UserRange.SOME_MEMBERS.getValue());
                                 messageInfo.setLinkAccount(member.getAccount());

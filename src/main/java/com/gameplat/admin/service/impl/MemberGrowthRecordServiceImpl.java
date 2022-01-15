@@ -441,7 +441,7 @@ public class MemberGrowthRecordServiceImpl extends ServiceImpl<MemberGrowthRecor
         message.setContent(content);
         message.setCategory(PushMessageEnum.MessageCategory.SYS_SEND.getValue());
         message.setPosition(PushMessageEnum.MessageCategory.CATE_DEF.getValue());
-        message.setShowType(PushMessageEnum.MessageShowType.SHOW_DEF.getValue());
+        message.setShowType(PushMessageEnum.MessageShowType.SHOW_DEF.value());
         message.setPopsCount(PushMessageEnum.PopCount.POP_COUNT_DEF.getValue());
         message.setPushRange(PushMessageEnum.UserRange.SOME_MEMBERS.getValue());
         message.setLinkAccount(member.getAccount());

@@ -20,6 +20,7 @@ import com.gameplat.admin.service.MemberRemarkService;
 import com.gameplat.admin.service.MemberService;
 import com.gameplat.admin.service.PasswordService;
 import com.gameplat.base.common.exception.ServiceException;
+import com.gameplat.base.common.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -69,45 +70,17 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
   public void add(MemberAddDTO dto) {
     Member member = memberConvert.toEntity(dto);
     member.setRegisterSource(MemberEnums.RegisterSource.BACKEND.value());
-    if (MemberEnums.Type.TEST.match(dto.getUserType())) {
-      // 测试账号挂在testRoot下
-      Member testRoot =
-          this.getByAccount(SystemConstant.DEFAULT_TEST_ROOT)
-              .orElseThrow(() -> new ServiceException("根代理账号不存在!"));
+    member.setPassword(passwordService.encrypt(member.getPassword(), dto.getAccount()));
 
-      member.setParentId(testRoot.getId());
-      member.setParentName(testRoot.getAccount());
-      member.setSuperPath(testRoot.getSuperPath().concat(dto.getAccount()).concat("/"));
-
-      // 更新下级人数
-      memberMapper.updateLowerNumByAccount(testRoot.getAccount(), 1);
-    } else {
-      // 推广账号和普通会员挂在webRoot下
-      Member webRoot =
-          this.getByAccount(SystemConstant.DEFAULT_WEB_ROOT)
-              .orElseThrow(() -> new ServiceException("根代理账号不存在!"));
-
-      if (MemberEnums.Type.AGENT.match(dto.getUserType())) {
-        // 设置代理账号代理等级
-        member.setAgentLevel(webRoot.getAgentLevel() + 1);
-      }
-
-      member.setParentId(webRoot.getId());
-      member.setParentName(webRoot.getAccount());
-      member.setSuperPath(webRoot.getSuperPath().concat(dto.getAccount()).concat("/"));
-
-      // 更新下级人数
-      memberMapper.updateLowerNumByAccount(webRoot.getAccount(), 1);
-    }
+    // 设置上级
+    this.setMemberParent(member);
 
     // 保存会员和会员详情
-    if (this.save(member)) {
-      MemberInfo memberInfo =
-          MemberInfo.builder().memberId(member.getId()).rebate(dto.getRebate()).build();
-      if (!memberInfoService.save(memberInfo)) {
-        throw new ServiceException("新增会员失败!");
-      }
-    }
+    Assert.isTrue(this.save(member), () -> new ServiceException("新增会员失败!"));
+    Assert.isTrue(
+        memberInfoService.save(
+            MemberInfo.builder().memberId(member.getId()).rebate(dto.getRebate()).build()),
+        () -> new ServiceException("新增会员失败!"));
   }
 
   @Override
@@ -251,6 +224,42 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
     Assert.isTrue(
         this.lambdaUpdate().set(Member::getRealName, realName).eq(Member::getId, memberId).update(),
         () -> new ServiceException("修改会员真实姓名失败!"));
+  }
+
+  /**
+   * 设置会员上级
+   *
+   * @param member Member
+   */
+  private void setMemberParent(Member member) {
+    String parentName =
+        StringUtils.getIfEmpty(
+            member.getParentName(), () -> this.getMemberRoot(member.getUserType()));
+
+    Member parent =
+        this.getByAccount(parentName).orElseThrow(() -> new ServiceException("代理账号不存在!"));
+
+    member.setParentId(parent.getId());
+    member.setParentName(parent.getAccount());
+    member.setSuperPath(parent.getSuperPath().concat(member.getAccount()).concat("/"));
+    if (MemberEnums.Type.AGENT.match(member.getUserType())) {
+      member.setAgentLevel(parent.getAgentLevel() + 1);
+    }
+
+    // 更新下级人数
+    memberMapper.updateLowerNumByAccount(parent.getAccount(), 1);
+  }
+
+  /**
+   * 根据会员类型获取根代理
+   *
+   * @param userType String
+   * @return String
+   */
+  private String getMemberRoot(String userType) {
+    return MemberEnums.Type.TEST.match(userType)
+        ? SystemConstant.DEFAULT_TEST_ROOT
+        : SystemConstant.DEFAULT_WEB_ROOT;
   }
 
   /**

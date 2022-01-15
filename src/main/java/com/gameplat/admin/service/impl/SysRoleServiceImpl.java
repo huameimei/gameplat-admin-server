@@ -1,5 +1,6 @@
 package com.gameplat.admin.service.impl;
 
+import cn.hutool.core.lang.Assert;
 import com.alibaba.csp.sentinel.annotation.SentinelResource;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -65,13 +66,8 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole>
   @SentinelResource(value = "deleteGroupById", fallback = "sentineFallBack")
   public void deleteGroupById(Long id) {
     SysRole role = this.getById(id);
-    if (null == role) {
-      throw new ServiceException("分组不存在!");
-    }
-
-    if (DefaultEnums.Y.match(role.getDefaultFlag())) {
-      throw new ServiceException("默认分组不能删除");
-    }
+    Assert.notNull(role, "分组不存在");
+    Assert.isFalse(DefaultEnums.Y.match(role.getDefaultFlag()), "默认分组不能删除");
 
     if (!this.removeById(id)) {
       throw new ServiceException("删除分组失败!");

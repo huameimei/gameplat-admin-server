@@ -52,7 +52,7 @@ public class MemberWealConfig implements Serializable {
 
     @ApiModelProperty(value = "修改人")
     @TableField(fill = FieldFill.INSERT_UPDATE)
-    private String updateB;
+    private String updateBy;
 
     @ApiModelProperty(value = "修改时间")
     @TableField(fill = FieldFill.INSERT_UPDATE)

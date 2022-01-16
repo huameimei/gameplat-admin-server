@@ -7,73 +7,73 @@ import lombok.Data;
 
 @Data
 public class GameBetRecordVO implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
     /**
-     * 订单号
+     * 单号
      */
     private String billNo;
+
     /**
-     * 玩家账号
+     * 租户编码
+     */
+    private String tenant;
+
+    /**
+     * 用户名
      */
     private String account;
 
     /**
-     *  游戏大类
+     * 平台编码
      */
-    private String gameType;
+    private String platformCode;
 
     /**
-     * 投注时间
+     * 游戏分类
      */
-    private Date betTime;
+    private String gameKind;
+
+    /**
+     * 一级分类
+     */
+    private String firstKind;
+
+    /**
+     * 游戏编码
+     */
+    private String gameCode;
+
+    /**
+     * 游戏名称
+     */
+    private String gameName;
+
+    /**
+     * 币种
+     */
+    private String currency;
+
+    /**
+     * 结算状态
+     */
+    private Integer settle;
 
     /**
      * 投注金额
      */
     private String betAmount;
+
     /**
-     * 有效投注金额
+     * 有效投注额
      */
     private String validAmount;
-    /**
-     * 水钱
-     */
-    private String revenue;
+
     /**
      * 输赢金额
      */
     private String winAmount;
-    /**
-     * 游戏分类
-     */
-    private String gameKind;
-    /**
-     * 状态
-     */
-    private Integer settle;
-    /**
-     * 下注时间转北京时间
-     */
-    private Date gmtBetTime;
-    /**
-     * 报表统计时间
-     */
-    private String statTime;
-    /**
-     * 采集回来记录添加时间
-     */
-    private Date createTime;
-    /**
-     * 更新时间
-     */
-    private Date updateTime;
-    /**
-     * 美东时间
-     */
-    private Date amesTime;
-    /**
-     * 游戏名称
-     */
-    private String chineseName;
 
     /**
      * 投注内容
@@ -81,29 +81,32 @@ public class GameBetRecordVO implements Serializable {
     private String betContent;
 
     /**
-     * 返水统计时间
+     * 投注时间
      */
-    private Date rebateTime;
+    private Date betTime;
 
     /**
-     * 返水统计时间
+     * 三方时间
      */
-    private Date addTime;
+    private Date thirdTime;
 
     /**
-     * 游戏房间号
+     * 结算时间
      */
-    private String room;
+    private Date settleTime;
 
     /**
-     * 游戏座位
+     * 报表统计时间
      */
-    private String chair;
+    private Date statTime;
 
     /**
-     * 一级分类
+     * 添加时间
      */
-    private String firstKind;
+    private Date createTime;
 
-
+    /**
+     * 更新时间
+     */
+    private Date updateTime;
 }

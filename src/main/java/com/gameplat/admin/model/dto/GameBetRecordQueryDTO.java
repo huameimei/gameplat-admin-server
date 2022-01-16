@@ -1,52 +1,65 @@
 package com.gameplat.admin.model.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+
 import java.io.Serializable;
+
 import lombok.Data;
 
 @Data
 public class GameBetRecordQueryDTO implements Serializable {
 
-  private String account;
+    private static final long serialVersionUID = 1L;
 
-  /** 局号 */
-  private String gameNo;
+    /**
+     * 唯一编码
+     */
+    private String billNo;
 
-  /** 订单号 */
-  private String billNo;
+    /**
+     * 用户名
+     */
+    private String account;
 
-  /** 报表统计时间 */
-  private String statTime;
-  /** 下注开始时间*/
-  @JsonFormat(locale ="zh", timezone ="GMT+8", pattern = "yyyy-MM-dd")
-  private String betStartDate;
-  /** 下注结束时间*/
-  @JsonFormat(locale ="zh", timezone ="GMT+8", pattern = "yyyy-MM-dd")
-  private String betEndDate;
+    /**
+     * 平台编码
+     */
+    private String platformCode;
 
-  /**
-   *  0 -- 下注时间,
-   *  1 -- 打码量统计时间
-   *  2 -- 返水统计时间,
-   *  3 -- 北京时间,
-   *  4 -- 报表统计时间
-   */
-  private Integer timeType = 0;
+    /**
+     * 游戏分类
+     */
+    private String gameKind;
 
-  private String gameKind;
+    /**
+     * 开始时间
+     */
+    @JsonFormat(locale = "zh", timezone = "GMT+8", pattern = "yyyy-MM-dd")
+    private String beginTime;
 
-  private String userPaths;
+    /**
+     * 结束时间
+     */
+    @JsonFormat(locale = "zh", timezone = "GMT+8", pattern = "yyyy-MM-dd")
+    private String endTime;
 
-  private String liveGameKind;
+    /**
+     * 1 -- 投注时间,
+     * 2 -- 三方时间,
+     * 3 -- 结算时间,
+     * 4 -- 报表时间
+     */
+    private Integer timeType;
 
-  private String superAccount;
+    private String userPaths;
 
-  private String liveGameKindList;
+    private String liveGameKind;
 
-  private String liveGameSuperType;
+    private String superAccount;
 
-  /**
-   *  游戏平台
-   */
-  private String liveCode;
+    private String liveGameKindList;
+
+    private String liveGameSuperType;
+
+    private String liveCode;
 }

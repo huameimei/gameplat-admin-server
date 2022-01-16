@@ -1,41 +1,46 @@
 package com.gameplat.admin.service.impl;
 
-import cn.hutool.core.util.NumberUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.gameplat.admin.convert.GameBetRecordConvert;
 import com.gameplat.admin.mapper.LiveBetRecordMapper;
 import com.gameplat.admin.model.bean.ActivityStatisticItem;
+import com.gameplat.admin.model.doc.GameBetRecord;
 import com.gameplat.admin.model.domain.LiveBetRecord;
 import com.gameplat.admin.model.dto.GameBetRecordQueryDTO;
 import com.gameplat.admin.model.vo.GameBetRecordVO;
 import com.gameplat.admin.model.vo.PageDtoVO;
 import com.gameplat.admin.service.GameBetRecordInfoService;
 import com.gameplat.admin.service.game.GameApi;
+import com.gameplat.base.common.constant.ContextConstant;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.common.enums.GamePlatformEnum;
 import com.gameplat.common.enums.TransferTypesEnum;
 import com.gameplat.common.game.LiveGameResult;
 import com.gameplat.elasticsearch.page.PageResponse;
 import com.gameplat.elasticsearch.service.IBaseElasticsearchService;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
+import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.search.sort.FieldSortBuilder;
+import org.elasticsearch.search.sort.SortBuilder;
+import org.elasticsearch.search.sort.SortBuilders;
+import org.elasticsearch.search.sort.SortOrder;
+import org.springframework.context.ApplicationContext;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import javax.annotation.Resource;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
-import org.elasticsearch.index.query.BoolQueryBuilder;
-import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.search.builder.SearchSourceBuilder;
-import org.springframework.context.ApplicationContext;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Isolation;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 
 
 @Slf4j
@@ -51,7 +56,10 @@ public class GameBetRecordInfoServiceImpl implements GameBetRecordInfoService {
     private LiveBetRecordMapper liveBetRecordMapper;
 
     @Resource
-    private IBaseElasticsearchService elasticsearchService;
+    private IBaseElasticsearchService baseElasticsearchService;
+
+    @Resource
+    private GameBetRecordConvert gameBetRecordConvert;
 
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
     public GameApi getGameApi(String liveCode) {
@@ -66,27 +74,30 @@ public class GameBetRecordInfoServiceImpl implements GameBetRecordInfoService {
 
     @Override
     public PageDtoVO<GameBetRecordVO> queryPageBetRecord(Page<GameBetRecordVO> page, GameBetRecordQueryDTO dto) {
-        //TODO 调用ES服务
-        PageDtoVO<GameBetRecordVO> pageDtoVO = new PageDtoVO();
-        Page resultPage = new Page();
-        //创建一个要搜索的索引库
-        BoolQueryBuilder queryBuilder = QueryBuilders.boolQuery();
-        queryBuilder.must(QueryBuilders.rangeQuery("statTime").from(dto.getBetStartDate()).to(dto.getBetEndDate()));
+        QueryBuilder builder = GameBetRecord.buildBetRecordSearch(dto);
+        // todo betTime
+        SortBuilder<FieldSortBuilder> sortBuilder = SortBuilders.fieldSort("betTime.keyword").order(SortOrder.DESC);
+        // todo kgsit
+        String indexName = ContextConstant.ES_INDEX.BET_RECORD_ + "kgsit";
+        PageResponse<GameBetRecord> result = baseElasticsearchService.search(builder, indexName, GameBetRecord.class,
+                (int) page.getCurrent(), (int) page.getSize(), sortBuilder);
 
-        SearchSourceBuilder builder = new SearchSourceBuilder();
-        String[] includes = new String[]{"billNo","account","gameType","betTime","betAmount","validAmount",
-            "winAmount","gameKind","settle","gmtBetTime","statTime","createTime","betContent"};
-        builder.fetchSource(includes,new String[]{});
-        builder.postFilter(queryBuilder);
+        List<GameBetRecordVO> betRecordList = new ArrayList<>();
+        if (CollectionUtils.isNotEmpty(result.getList())) {
+            result.getList().forEach(o -> betRecordList.add(gameBetRecordConvert.toVo(o)));
+        }
 
-        Integer pageNum = NumberUtil.parseInt(String.valueOf(page.getCurrent()));
-        Integer pageSize = NumberUtil.parseInt(String.valueOf(page.getSize()));
-        PageResponse result = elasticsearchService.search(dto.getLiveCode(),builder,LiveBetRecord.class,pageNum,pageSize);
-        resultPage.setRecords(result.getList());
-        Map<String, Object> otherData = new HashMap<>();
+        Page<GameBetRecordVO> resultPage = new Page<>();
+        resultPage.setRecords(betRecordList);
+
+        Map<String, Object> otherData = new HashMap<>(8);
+        // todo es 合计
         otherData.put("totalData", null);
+
+        PageDtoVO<GameBetRecordVO> pageDtoVO = new PageDtoVO<>();
         pageDtoVO.setPage(resultPage);
         pageDtoVO.setOtherData(otherData);
+
         return pageDtoVO;
     }
 

@@ -2,6 +2,7 @@ package com.gameplat.admin.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.gameplat.admin.model.domain.MemberGrowthLevel;
+import com.gameplat.admin.model.dto.GrowthLevelLogoEditDTO;
 import com.gameplat.admin.model.dto.MemberGrowthLevelEditDto;
 import com.gameplat.admin.model.vo.MemberGrowthLevelVO;
 import java.util.List;
@@ -29,5 +30,6 @@ public interface MemberGrowthLevelService extends IService<MemberGrowthLevel> {
      */
     void batchUpdateLevel(List<MemberGrowthLevelEditDto> list,  String language);
 
-
+    /** 修改logo */
+    void updateLogo(GrowthLevelLogoEditDTO dto);
 }

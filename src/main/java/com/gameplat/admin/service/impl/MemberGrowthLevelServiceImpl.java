@@ -9,6 +9,7 @@ import com.gameplat.admin.convert.MemberGrowthLevelConvert;
 import com.gameplat.admin.enums.LanguageEnum;
 import com.gameplat.admin.mapper.MemberGrowthLevelMapper;
 import com.gameplat.admin.model.domain.*;
+import com.gameplat.admin.model.dto.GrowthLevelLogoEditDTO;
 import com.gameplat.admin.model.dto.MemberGrowthLevelEditDto;
 import com.gameplat.admin.model.vo.MemberGrowthLevelVO;
 import com.gameplat.admin.service.*;
@@ -137,5 +138,11 @@ public class MemberGrowthLevelServiceImpl extends ServiceImpl<MemberGrowthLevelM
                 }
             }
         }
+    }
+
+    /** 修改logo */
+    @Override
+    public void updateLogo(GrowthLevelLogoEditDTO dto){
+        this.updateById(levelConvert.toEntity(dto));
     }
 }

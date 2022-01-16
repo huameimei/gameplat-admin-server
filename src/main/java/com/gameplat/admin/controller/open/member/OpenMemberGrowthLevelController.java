@@ -6,6 +6,7 @@ import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.gameplat.admin.enums.LanguageEnum;
+import com.gameplat.admin.model.dto.GrowthLevelLogoEditDTO;
 import com.gameplat.admin.model.dto.MemberGrowthConfigEditDto;
 import com.gameplat.admin.model.dto.MemberGrowthLevelEditDto;
 import com.gameplat.admin.model.vo.MemberConfigLevelVO;
@@ -24,6 +25,7 @@ import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -49,7 +51,7 @@ public class OpenMemberGrowthLevelController {
     @Autowired
     private MemberGrowthConfigService configService;
 
-    @ApiOperation(value = "VIP配置和VIP等级列表")
+    @ApiOperation(value = "VIP配置和VIP等级列表/查询logo配置列表")
     @GetMapping("/config")
     @PreAuthorize("hasAuthority('member:growthLevel:config')")
     public MemberConfigLevelVO getLevelConfig(@ApiParam(name = "language", value = "语言", required = false)
@@ -126,5 +128,12 @@ public class OpenMemberGrowthLevelController {
         } catch (Exception e) {
             throw new ServiceException("获取VIP等级列表失败:" + e);
         }
+    }
+
+    @ApiOperation(value = "修改logo配置")
+    @PutMapping("/updateLogo")
+    @PreAuthorize("hasAuthority('member:growthLevel:updateLogo')")
+    public void updateLogo(@Validated @RequestBody GrowthLevelLogoEditDTO dto) {
+        levelService.updateLogo(dto);
     }
 }

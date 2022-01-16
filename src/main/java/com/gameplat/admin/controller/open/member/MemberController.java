@@ -180,7 +180,7 @@ public class MemberController {
   public void exportList(MemberQueryDTO dto, HttpServletResponse response) {
     List<MemberVO> member = memberService.queryList(dto);
     ExportParams exportParams = new ExportParams("会员账号列表导出", "会员账号列表");
-    response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename = 会员账号列表.xls");
+    response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename = myExcel.xls");
 
     try (Workbook workbook = ExcelExportUtil.exportExcel(exportParams, MemberVO.class, member)) {
       workbook.write(response.getOutputStream());

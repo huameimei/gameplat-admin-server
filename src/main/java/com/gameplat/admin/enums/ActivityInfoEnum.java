@@ -97,11 +97,11 @@ public class ActivityInfoEnum {
       this.desc = desc;
     }
 
-    public int getValue() {
+    public int value() {
       return this.value;
     }
 
-    public String getDesc() {
+    public String desc() {
       return this.desc;
     }
   }
@@ -186,6 +186,10 @@ public class ActivityInfoEnum {
 
     public int value() {
       return this.value;
+    }
+
+    public String desc() {
+      return this.desc;
     }
   }
 

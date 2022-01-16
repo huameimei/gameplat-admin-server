@@ -102,8 +102,7 @@ public class ActivityLobbyServiceImpl extends ServiceImpl<ActivityLobbyMapper, A
         throw new ServiceException("活动开始和结束时间必须和指定比赛的比赛时间是同一天");
       }
       if (activityLobbyAddDTO.getNextDayApply() == null
-          || activityLobbyAddDTO.getNextDayApply()
-              != ActivityInfoEnum.NextDayApply.YES.getValue()) {
+          || activityLobbyAddDTO.getNextDayApply() != ActivityInfoEnum.NextDayApply.YES.value()) {
         throw new ServiceException("指定比赛必须选择隔天申请");
       }
     }
@@ -114,7 +113,7 @@ public class ActivityLobbyServiceImpl extends ServiceImpl<ActivityLobbyMapper, A
     String startTime;
     String endTime;
     // 隔天申请（0 否，1 是）
-    if (activityLobbyAddDTO.getNextDayApply() == ActivityInfoEnum.NextDayApply.YES.getValue()) {
+    if (activityLobbyAddDTO.getNextDayApply() == ActivityInfoEnum.NextDayApply.YES.value()) {
       detailDate = detailDate + 1;
       if (detailDate == 7) {
         detailDate = 0;
@@ -157,7 +156,7 @@ public class ActivityLobbyServiceImpl extends ServiceImpl<ActivityLobbyMapper, A
       List<Date> endDates =
           DateUtil2.findEndDates(
               activityLobbyAddDTO.getStartTime(), activityLobbyAddDTO.getEndTime());
-      if (activityLobbyAddDTO.getNextDayApply() == ActivityInfoEnum.NextDayApply.YES.getValue()) {
+      if (activityLobbyAddDTO.getNextDayApply() == ActivityInfoEnum.NextDayApply.YES.value()) {
         for (Date date : endDates) {
           applyDateList.add(
               DateUtil.dateToStr(
@@ -204,7 +203,7 @@ public class ActivityLobbyServiceImpl extends ServiceImpl<ActivityLobbyMapper, A
           applyDateList.add(DateUtil.dateToStr(date, DateUtil.YYYY_MM_DD));
         }
       }
-      if (activityLobbyAddDTO.getNextDayApply() == ActivityInfoEnum.NextDayApply.YES.getValue()) {
+      if (activityLobbyAddDTO.getNextDayApply() == ActivityInfoEnum.NextDayApply.YES.value()) {
         List<String> copyDateList = new ArrayList<>();
         copyDateList.addAll(applyDateList);
         applyDateList.clear();
@@ -309,7 +308,7 @@ public class ActivityLobbyServiceImpl extends ServiceImpl<ActivityLobbyMapper, A
       }
       if (activityLobbyUpdateDTO.getNextDayApply() == null
           || activityLobbyUpdateDTO.getNextDayApply()
-              != ActivityInfoEnum.NextDayApply.YES.getValue()) {
+              != ActivityInfoEnum.NextDayApply.YES.value()) {
         throw new ServiceException("指定比赛必须选择隔天申请");
       }
     }
@@ -319,7 +318,7 @@ public class ActivityLobbyServiceImpl extends ServiceImpl<ActivityLobbyMapper, A
     Integer detailDate = activityLobbyUpdateDTO.getDetailDate();
     String startTime;
     String endTime;
-    if (activityLobbyUpdateDTO.getNextDayApply() == ActivityInfoEnum.NextDayApply.YES.getValue()) {
+    if (activityLobbyUpdateDTO.getNextDayApply() == ActivityInfoEnum.NextDayApply.YES.value()) {
       detailDate = detailDate + 1;
       if (detailDate == 7) {
         detailDate = 0;
@@ -362,8 +361,7 @@ public class ActivityLobbyServiceImpl extends ServiceImpl<ActivityLobbyMapper, A
       List<Date> endDates =
           DateUtil2.findEndDates(
               activityLobbyUpdateDTO.getStartTime(), activityLobbyUpdateDTO.getEndTime());
-      if (activityLobbyUpdateDTO.getNextDayApply()
-          == ActivityInfoEnum.NextDayApply.YES.getValue()) {
+      if (activityLobbyUpdateDTO.getNextDayApply() == ActivityInfoEnum.NextDayApply.YES.value()) {
         for (Date date : endDates) {
           applyDateList.add(
               DateUtil.dateToStr(
@@ -411,8 +409,7 @@ public class ActivityLobbyServiceImpl extends ServiceImpl<ActivityLobbyMapper, A
           applyDateList.add(DateUtil.dateToStr(date, DateUtil.YYYY_MM_DD));
         }
       }
-      if (activityLobbyUpdateDTO.getNextDayApply()
-          == ActivityInfoEnum.NextDayApply.YES.getValue()) {
+      if (activityLobbyUpdateDTO.getNextDayApply() == ActivityInfoEnum.NextDayApply.YES.value()) {
         List<String> copyDateList = new ArrayList<>();
         copyDateList.addAll(applyDateList);
         applyDateList.clear();

@@ -45,13 +45,9 @@ public class RechargeOrderController {
 
   @PostMapping("/accept")
   @PreAuthorize("hasAuthority('finance:rechargeOrder:accept')")
-  public void accept(Long id) {
-    try {
+  public void accept(Long id) throws Exception{
       UserCredential userCredential = SecurityUserHolder.getCredential();
       rechargeOrderService.accept(id, userCredential);
-    } catch (Exception e) {
-      log.info("入款失败，异常信息" + e);
-    }
   }
 
   @PostMapping("/cancel")
@@ -88,18 +84,14 @@ public class RechargeOrderController {
 
   @PostMapping("/batchAccept")
   @PreAuthorize("hasAuthority('finance:rechargeOrder:accept')")
-  public void batchAccept(List<Long> ids) {
+  public void batchAccept(List<Long> ids) throws Exception{
     if (null == ids || ids.size() == 0) {
       throw new ServiceException("ids不能为空");
     }
-    try {
       UserCredential userCredential = SecurityUserHolder.getCredential();
       for (Long id : ids) {
         rechargeOrderService.accept(id, userCredential);
       }
-    } catch (Exception e) {
-      log.info("批量入款失败，异常信息" + e);
-    }
   }
 
   @PostMapping("/batchCancel")

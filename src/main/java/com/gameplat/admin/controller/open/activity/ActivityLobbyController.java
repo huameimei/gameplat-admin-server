@@ -2,6 +2,7 @@ package com.gameplat.admin.controller.open.activity;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
+import com.gameplat.admin.enums.ActivityInfoEnum;
 import com.gameplat.admin.model.domain.ActivityLobby;
 import com.gameplat.admin.model.domain.SysDictData;
 import com.gameplat.admin.model.dto.ActivityLobbyAddDTO;
@@ -26,6 +27,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
@@ -70,11 +72,12 @@ public class ActivityLobbyController {
   @ApiOperation(value = "新增活动大厅")
   @PostMapping("/add")
   @PreAuthorize("hasAuthority('activity:lobby:add')")
-  public void add(@RequestBody ActivityLobbyAddDTO activityLobbyAddDTO) {
+  public void add(@Validated @RequestBody ActivityLobbyAddDTO activityLobbyAddDTO) {
     if (StringUtils.isNull(activityLobbyAddDTO.getStatisDate())) {
       throw new ServiceException("请选择统计日期");
     }
-    if (activityLobbyAddDTO.getApplyWay() == 2 && activityLobbyAddDTO.getNextDayApply() == 0) {
+    if (activityLobbyAddDTO.getApplyWay() == ActivityInfoEnum.ApplyWayEnum.AUTOMATIC.value()
+        && activityLobbyAddDTO.getNextDayApply() == ActivityInfoEnum.NextDayApply.NO.value()) {
       throw new ServiceException("自动申请的活动必须勾选隔天申请");
     }
     if (activityLobbyAddDTO.getEndTime().before(activityLobbyAddDTO.getStartTime())) {
@@ -98,8 +101,8 @@ public class ActivityLobbyController {
     if (StringUtils.isNull(activityLobbyUpdateDTO.getStatisDate())) {
       throw new ServiceException("请选择统计日期");
     }
-    if (activityLobbyUpdateDTO.getApplyWay() == 2
-        && activityLobbyUpdateDTO.getNextDayApply() == 0) {
+    if (activityLobbyUpdateDTO.getApplyWay() == ActivityInfoEnum.ApplyWayEnum.AUTOMATIC.value()
+        && activityLobbyUpdateDTO.getNextDayApply() == ActivityInfoEnum.NextDayApply.NO.value()) {
       throw new ServiceException("自动申请的活动必须勾选隔天申请");
     }
     if (activityLobbyUpdateDTO.getEndTime().before(activityLobbyUpdateDTO.getStartTime())) {

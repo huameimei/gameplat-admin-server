@@ -507,7 +507,7 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
      * 在线商户充值金额更新
      */
     if (rechargeOrder.getTpMerchantId() != null) {
-      TpMerchant tpMerchant = tpMerchantService.getById(rechargeOrder.getMemberId());
+      TpMerchant tpMerchant = tpMerchantService.getById(rechargeOrder.getTpMerchantId());
       if (tpMerchant == null) {
         throw new ServiceException("请确认商户是否被删除?操作日志中可查询");
       }

@@ -448,7 +448,7 @@ public class MemberWealServiceImpl extends ServiceImpl<MemberWealMapper, MemberW
                                 messageDistribute.setUserId(member.getId());
                                 messageDistribute.setUserAccount(member.getAccount());
                                 messageDistribute.setRechargeLevel(member.getUserLevel());
-                                messageDistribute.setVipLevel(memberInfoService.getById(member.getId()).getLevel());
+                                messageDistribute.setVipLevel(memberInfoService.getById(member.getId()).getVipLevel());
                                 messageDistribute.setReadStatus(0);
                                 messageDistribute.setCreateBy("System");
                                 messageDistributeService.save(messageDistribute);

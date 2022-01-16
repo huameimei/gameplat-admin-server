@@ -98,9 +98,9 @@ public class MemberInfoVO implements Serializable {
   private String remark;
 
   /** 会员VIP等级 */
-  private Integer level;
+  private Integer vipLevel;
 
-  private Integer growth;
+  private Integer vipGrowth;
   /** 代理路径 */
   private String superPath;
 

@@ -8,7 +8,6 @@ import com.gameplat.admin.model.domain.MemberVipSignHistory;
 import com.gameplat.admin.model.domain.MemberVipSignStatis;
 import com.gameplat.admin.model.dto.MemberVipSignHistoryDTO;
 import com.gameplat.admin.model.dto.MemberVipSignStatisDTO;
-import com.gameplat.admin.model.vo.MemberVO;
 import com.gameplat.admin.model.vo.MemberVipSignHistoryVO;
 import com.gameplat.admin.model.vo.MemberVipSignStatisVO;
 import com.gameplat.admin.service.MemberVipSignHistoryService;

@@ -281,13 +281,13 @@ public class MemberGrowthRecordServiceImpl extends ServiceImpl<MemberGrowthRecor
             //VIP变动更新会员vip
             MemberInfo memberInfo = new MemberInfo();
             memberInfo.setMemberId(memberId);
-            memberInfo.setLevel(afterLevel);
+            memberInfo.setVipLevel(afterLevel);
             memberInfoService.updateById(memberInfo);
         } else {
             //VIP变动更新会员vip
             MemberInfo memberInfo = new MemberInfo();
             memberInfo.setMemberId(memberId);
-            memberInfo.setLevel(afterLevel);
+            memberInfo.setVipLevel(afterLevel);
             memberInfoService.updateById(memberInfo);
         }
     }
@@ -455,7 +455,7 @@ public class MemberGrowthRecordServiceImpl extends ServiceImpl<MemberGrowthRecor
         messageDistribute.setUserId(member.getId());
         messageDistribute.setUserAccount(member.getAccount());
         messageDistribute.setRechargeLevel(member.getUserLevel());
-        messageDistribute.setVipLevel(memberInfoService.getById(member.getId()).getLevel());
+        messageDistribute.setVipLevel(memberInfoService.getById(member.getId()).getVipLevel());
         messageDistribute.setReadStatus(0);
         messageDistribute.setCreateBy("System");
         messageDistributeService.save(messageDistribute);

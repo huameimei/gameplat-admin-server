@@ -132,8 +132,8 @@ public class MemberGrowthLevelServiceImpl extends ServiceImpl<MemberGrowthLevelM
                     };
                     MemberInfo member = new MemberInfo();
                     member.setMemberId(userRecord.getUserId());
-                    member.setLevel(newLevel);
-                    member.setGrowth(currentGrowth);
+                    member.setVipLevel(newLevel);
+                    member.setVipGrowth(currentGrowth);
                     memberInfoService.updateById(member);
                 }
             }

@@ -320,7 +320,7 @@ public class ActivityCommonServiceImpl implements ActivityCommonService {
 
     // 判断用户VIP等级是否满足活动要求
     String userLevelRequire = activityLobby.getUserLevel();
-    String userLevel = memberInfo.getLevel() != null ? String.valueOf(memberInfo.getLevel()) : "0";
+    String userLevel = memberInfo.getVipLevel() != null ? String.valueOf(memberInfo.getVipLevel()) : "0";
     if (StringUtils.isNotEmpty(userLevelRequire)) {
       String[] userLevels = userLevelRequire.split(",");
       List<String> userLevelList = Lists.newArrayList(userLevels);

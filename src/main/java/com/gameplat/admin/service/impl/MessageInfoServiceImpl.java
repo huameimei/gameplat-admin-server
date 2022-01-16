@@ -319,7 +319,7 @@ public class MessageInfoServiceImpl extends ServiceImpl<MessageMapper, MessageIn
     messageDistribute.setReadStatus(BooleanEnum.NO.value());
     // 会员层级
     messageDistribute.setRechargeLevel(memberInfoVO.getUserLevel());
-    messageDistribute.setVipLevel(memberInfoVO.getLevel());
+    messageDistribute.setVipLevel(memberInfoVO.getVipLevel());
     messageDistribute.setAcceptRemoveFlag(BooleanEnum.NO.value());
     messageDistribute.setReadStatus(BooleanEnum.NO.value());
     messageDistribute.setSendRemoveFlag(BooleanEnum.NO.value());

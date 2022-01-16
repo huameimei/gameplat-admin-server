@@ -111,8 +111,8 @@ public class MemberInfo {
   @Version private Integer version;
 
   @ApiModelProperty(value = "当前会员等级")
-  private Integer level;
+  private Integer vipLevel;
 
   @ApiModelProperty(value = "当前会员成长值")
-  private Integer growth;
+  private Integer vipGrowth;
 }

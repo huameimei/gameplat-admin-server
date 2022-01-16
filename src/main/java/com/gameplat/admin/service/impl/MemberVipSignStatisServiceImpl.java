@@ -39,7 +39,7 @@ public class MemberVipSignStatisServiceImpl extends ServiceImpl<MemberVipSignSta
      * 查询VIP会员签到记录列表
      */
     @Override
-    public IPage<MemberVipSignStatisVO> findSignList(IPage<MemberVipSignStatis> page, MemberVipSignStatisDTO queryDTO) {
+    public IPage<MemberVipSignStatisVO> findSignListPage(IPage<MemberVipSignStatis> page, MemberVipSignStatisDTO queryDTO) {
         return
                 this.lambdaQuery()
                         .like(ObjectUtils.isNotEmpty(queryDTO.getUserName()), MemberVipSignStatis::getUserName, queryDTO.getUserName())
@@ -54,24 +54,11 @@ public class MemberVipSignStatisServiceImpl extends ServiceImpl<MemberVipSignSta
      * 导出签名
      */
     @Override
-    public void exportSignStatis(MemberVipSignStatisDTO queryDTO, HttpServletResponse response) {
-
-        try{
-            List<MemberVipSignStatis> list = this.lambdaQuery()
+    public List<MemberVipSignStatis> findSignList(MemberVipSignStatisDTO queryDTO) {
+        return this.lambdaQuery()
                     .like(ObjectUtils.isNotEmpty(queryDTO.getUserName()), MemberVipSignStatis::getUserName, queryDTO.getUserName())
                     .ge(ObjectUtils.isNotEmpty(queryDTO.getBeginTime()), MemberVipSignStatis::getCreateTime, queryDTO.getBeginTime())
                     .le(ObjectUtils.isNotEmpty(queryDTO.getEndTime()), MemberVipSignStatis::getCreateTime, queryDTO.getEndTime())
                     .list();
-            response.setContentType("application/vnd.ms-excel");
-            response.setHeader("Content-disposition", "attachment;filename=myExcel.xls");
-            @Cleanup OutputStream ouputStream = null;
-            Workbook workbook = ExcelExportUtil.exportExcel(new ExportParams("VIP会员签到记录导出","VIP会员签到记录"),
-                    MemberVipSignStatis.class, list );
-            ouputStream = response.getOutputStream();
-            workbook.write(ouputStream);
-        }catch (IOException e) {
-            throw new ServiceException("导出失败:"+e);
-        }
-
     }
 }

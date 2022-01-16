@@ -6,6 +6,7 @@ import com.gameplat.admin.model.domain.MemberVipSignStatis;
 import com.gameplat.admin.model.dto.MemberVipSignStatisDTO;
 import com.gameplat.admin.model.vo.MemberVipSignStatisVO;
 import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 
 /**
  * @author lily
@@ -18,10 +19,7 @@ public interface MemberVipSignStatisService  extends IService<MemberVipSignStati
     /**
      * 查询VIP会员签到记录列表
      */
-    IPage<MemberVipSignStatisVO> findSignList(IPage<MemberVipSignStatis> page, MemberVipSignStatisDTO queryDTO);
+    IPage<MemberVipSignStatisVO> findSignListPage(IPage<MemberVipSignStatis> page, MemberVipSignStatisDTO queryDTO);
 
-    /**
-     * 导出签名
-     */
-    void exportSignStatis(MemberVipSignStatisDTO queryDTO, HttpServletResponse response);
+    List<MemberVipSignStatis> findSignList(MemberVipSignStatisDTO queryDTO);
 }

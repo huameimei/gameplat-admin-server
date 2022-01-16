@@ -31,11 +31,11 @@ public class MemberVipSignStatis implements Serializable {
     private Long userId;
 
     @ApiModelProperty("会员姓名")
-    @Excel(name = "会员账号", height = 20, width = 30, isImportField = "true_st")
+    @Excel(name = "会员账号", width = 20, isImportField = "true_st")
     private String userName;
 
     @ApiModelProperty("签到次数")
-    @Excel(name = "总签到次数", height = 20, width = 30, isImportField = "true_st")
+    @Excel(name = "总签到次数", width = 12, isImportField = "true_st")
     private Integer signCount;
 
     @ApiModelProperty("七天连续签到次数")
@@ -52,17 +52,29 @@ public class MemberVipSignStatis implements Serializable {
     private String createBy;
 
     @ApiModelProperty(value = "更新时间")
-    @TableField(fill = FieldFill.UPDATE)
-    @Excel(name = "最后签到时间", databaseFormat = "yyyyMMddHHmmss", format = "yyyy-MM-dd HH:mm:ss", isImportField = "true_st", width = 20)
+    @TableField(fill = FieldFill.INSERT_UPDATE)
+    @Excel(
+            name = "最后签到时间",
+            exportFormat = "yyyy-MM-dd HH:mm:ss",
+            format = "yyyy-MM-dd HH:mm:ss",
+            isImportField = "true_st",
+            width = 22
+    )
     private Date updateTime;
 
     @ApiModelProperty(value = "创建时间")
     @TableField(fill = FieldFill.INSERT)
-    @Excel(name = "创建时间", databaseFormat = "yyyyMMddHHmmss", format = "yyyy-MM-dd HH:mm:ss", isImportField = "true_st", width = 20)
+    @Excel(
+            name = "创建时间",
+            exportFormat = "yyyy-MM-dd HH:mm:ss",
+            format = "yyyy-MM-dd HH:mm:ss",
+            isImportField = "true_st",
+            width = 22
+    )
     private Date createTime;
 
     @ApiModelProperty(value = "更新人")
-    @TableField(fill = FieldFill.UPDATE)
+    @TableField(fill = FieldFill.INSERT_UPDATE)
     private String updateBy;
 
     @ApiModelProperty(value = "备注")

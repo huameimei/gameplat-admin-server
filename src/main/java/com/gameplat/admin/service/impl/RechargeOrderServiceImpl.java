@@ -634,7 +634,10 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
     rechargeOrder.setCreateTime(new Date());
     //设置充值订单用户类型
     rechargeOrder.setMemberType(member.getUserType());
-    // 填入校验字段
+    //设置超时时间
+    MemberRechargeLimit limit = limitInfoService
+        .getLimitInfo(LimitEnums.MEMBER_RECHARGE_LIMIT, MemberRechargeLimit.class);
+    rechargeOrder.setOrderExpireTime(limit.getOrderExpireTime());
     return rechargeOrder;
   }
 

@@ -1,0 +1,28 @@
+package com.gameplat.admin.service;
+
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.baomidou.mybatisplus.extension.service.IService;
+import com.gameplat.admin.model.bean.ActivityStatisticItem;
+import com.gameplat.admin.model.domain.GamePlatform;
+import com.gameplat.admin.model.domain.GameBetDailyReport;
+import com.gameplat.admin.model.dto.GameBetDailyReportQueryDTO;
+import com.gameplat.admin.model.vo.GameReportVO;
+import com.gameplat.admin.model.vo.PageDtoVO;
+import java.util.List;
+import java.util.Map;
+
+public interface GameBetDailyReportService extends IService<GameBetDailyReport> {
+
+  PageDtoVO queryPage(Page<GameBetDailyReport> page, GameBetDailyReportQueryDTO dto);
+
+  void saveGameBetDailyReport(String statTime, GamePlatform gamePlatform);
+
+  List<GameReportVO> queryReportList(GameBetDailyReportQueryDTO dto);
+
+  /**
+   *查询游戏统计
+   * @param map
+   * @return
+   */
+  List<ActivityStatisticItem> getGameReportInfo(Map map);
+}

@@ -174,6 +174,8 @@ public class RechargeOrder {
   @ApiModelProperty(value = "区块链交易ID")
   private String currencyTranceId;
 
+  @ApiModelProperty(value = "超时时间")
+  private Integer orderExpireTime;
   /**
    * 创建者
    */

@@ -53,11 +53,11 @@ public class ActivityCommonServiceImpl implements ActivityCommonService {
 
   @Autowired private RechargeOrderMapper rechargeOrderMapper;
 
-  @Autowired private LiveMemberDayReportService liveMemberDayReportService;
+  @Autowired private GameBetDailyReportService liveMemberDayReportService;
 
   @Autowired private RechargeOrderService rechargeOrderService;
 
-  @Resource private LiveBetRecordService liveBetRecordService;
+  @Resource private GameBetRecordInfoService liveBetRecordService;
 
   /**
    * 组装审核备注信息

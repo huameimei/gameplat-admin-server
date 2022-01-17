@@ -1,6 +1,10 @@
 package com.gameplat.admin.enums;
 
-/** 活动推送类型 */
+/**
+ * 活动推送类型
+ *
+ * @author kenvin
+ */
 public class PushMessageEnum {
 
   /** 推送范围 */

@@ -1,11 +1,10 @@
 package com.gameplat.admin.model.dto;
 
-import com.baomidou.mybatisplus.annotation.FieldFill;
-import com.baomidou.mybatisplus.annotation.TableField;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.Date;
@@ -22,13 +21,13 @@ public class MessageFeedbackAddDTO implements Serializable {
   private Long id;
 
   /** 反馈标题 */
-  @NotNull(message = "反馈标题不能为空")
+  @NotBlank(message = "反馈标题不能为空")
   @ApiModelProperty("反馈标题")
   private String title;
 
   /** 反馈内容 */
   @ApiModelProperty("反馈内容")
-  @NotNull(message = "反馈内容不能为空")
+  @NotBlank(message = "反馈内容不能为空")
   private String content;
 
   /** 反馈意见图片 */
@@ -40,7 +39,7 @@ public class MessageFeedbackAddDTO implements Serializable {
   private Integer isRead;
 
   /** 站内信类型，0:活动建议 1:功能建议 2:游戏BUG 3:其他问题 */
-  @NotNull(message = "站内信类型不能为空")
+  @NotBlank(message = "站内信类型不能为空")
   @ApiModelProperty("站内信类型，0:活动建议 1:功能建议 2:游戏BUG 3:其他问题")
   private String letterType;
 
@@ -71,21 +70,17 @@ public class MessageFeedbackAddDTO implements Serializable {
 
   /** 创建人 */
   @ApiModelProperty("创建人")
-  @TableField(fill = FieldFill.INSERT)
   private String createBy;
 
   /** 创建时间 */
   @ApiModelProperty("创建时间")
-  @TableField(fill = FieldFill.INSERT)
   private Date createTime;
 
   /** 更新人 */
   @ApiModelProperty("更新人")
-  @TableField(fill = FieldFill.INSERT_UPDATE)
   private String updateBy;
 
   /** 更新时间 */
   @ApiModelProperty("更新时间")
-  @TableField(fill = FieldFill.INSERT_UPDATE)
   private Date updateTime;
 }

@@ -4,6 +4,9 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -17,14 +20,18 @@ import java.util.Date;
 public class MessageFeedbackUpdateDTO implements Serializable {
 
   /** 主键ID */
+  @NotNull(message = "ID不能为空")
+  @Min(value = 1, message = "ID必须大于0")
   @ApiModelProperty("主键ID")
   private Long id;
 
   /** 反馈标题 */
+  @NotBlank(message = "反馈标题不能为空")
   @ApiModelProperty("反馈标题")
   private String title;
 
   /** 反馈内容 */
+  @NotBlank(message = "反馈内容不能为空")
   @ApiModelProperty("反馈内容")
   private String content;
 

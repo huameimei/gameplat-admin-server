@@ -2,6 +2,7 @@ package com.gameplat.admin.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
+import com.gameplat.admin.model.domain.SysDictData;
 import com.gameplat.admin.model.domain.SysSmsArea;
 import com.gameplat.admin.model.dto.*;
 import com.gameplat.admin.model.vo.AgentContacaVO;
@@ -24,7 +25,7 @@ public interface SystemConfigService {
 
   List<FileConfig> findFileList();
 
-  void updateSmsConfig(SmsConfig config);
+  void updateSmsConfig(SysDictData dictData);
 
   void updateFileConfig(FileConfig config);
 

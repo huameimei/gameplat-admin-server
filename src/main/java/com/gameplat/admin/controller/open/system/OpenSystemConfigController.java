@@ -81,8 +81,8 @@ public class OpenSystemConfigController {
   }
 
   @PutMapping("/sms/update")
-  public void updateSms(@RequestBody SmsConfig config) {
-    systemConfigService.updateSmsConfig(config);
+  public void updateSms(@RequestBody SysDictData dictData) {
+    systemConfigService.updateSmsConfig(dictData);
   }
 
   @PutMapping("/file/update")

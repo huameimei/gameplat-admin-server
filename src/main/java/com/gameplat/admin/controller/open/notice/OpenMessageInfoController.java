@@ -27,7 +27,7 @@ import springfox.documentation.annotations.ApiIgnore;
  *
  * @author kenvin
  */
-@Api(tags = "个人消息")
+@Api(tags = "消息管理")
 @RestController
 @RequestMapping("/api/admin/message")
 public class OpenMessageInfoController {
@@ -48,7 +48,7 @@ public class OpenMessageInfoController {
    * @param messageInfoQueryDTO
    * @return
    */
-  @ApiOperation(value = "分页查询个人消息")
+  @ApiOperation(value = "分页查询消息")
   @GetMapping("/page")
   @PreAuthorize("hasAuthority('operator:message:page')")
   @ApiImplicitParams({
@@ -65,7 +65,7 @@ public class OpenMessageInfoController {
    *
    * @param messageInfoAddDTO
    */
-  @ApiOperation(value = "新增个人消息")
+  @ApiOperation(value = "新增消息")
   @PostMapping("/save")
   @PreAuthorize("hasAuthority('operator:message:save')")
   public void save(@Validated @RequestBody MessageInfoAddDTO messageInfoAddDTO) {
@@ -77,7 +77,7 @@ public class OpenMessageInfoController {
    *
    * @param messageInfoEditDTO
    */
-  @ApiOperation(value = "编辑个人消息")
+  @ApiOperation(value = "编辑消息")
   @PostMapping("/edit")
   @PreAuthorize("hasAuthority('operator:message:edit')")
   public void edit(@Validated @RequestBody MessageInfoEditDTO messageInfoEditDTO) {
@@ -89,7 +89,7 @@ public class OpenMessageInfoController {
    *
    * @param ids
    */
-  @ApiOperation(value = "删除个人消息")
+  @ApiOperation(value = "删除消息")
   @DeleteMapping("/remove")
   @PreAuthorize("hasAuthority('operator:message:remove')")
   public void remove(@RequestBody String ids) {

@@ -1,7 +1,7 @@
 package com.gameplat.admin.service.impl;
 
+import cn.hutool.core.lang.Assert;
 import com.gameplat.admin.cache.AdminCache;
-import com.gameplat.admin.enums.ErrorPasswordLimit;
 import com.gameplat.admin.model.domain.SysUser;
 import com.gameplat.admin.model.dto.AdminLoginDTO;
 import com.gameplat.admin.model.vo.UserToken;
@@ -71,14 +71,11 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     // 判断密码错误次数
-    int errorPasswordCount = adminCache.getErrorPasswordCount(dto.getAccount());
-    this.checkPasswordErrorCount(limit, errorPasswordCount);
+    this.checkPasswordErrorCount(limit, dto.getAccount());
 
     // 校验安全码
     SysUser user = userService.getByUsername(dto.getAccount());
-    if (null == user) {
-      throw new UsernameNotFoundException("用户不存在或密码不正确！");
-    }
+    Assert.notNull(user, () -> new UsernameNotFoundException("用户不存在或密码不正确！"));
 
     if (BooleanEnum.YES.match(limit.getGoogleAuthSwitch())) {
       this.checkGoogleAuthCode(user.getSafeCode(), dto.getGoogleCode());
@@ -87,9 +84,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     // 解密密码并登陆
     String password = passwordService.decode(dto.getPassword());
     UserCredential credential = jwtTokenService.signIn(request, user.getUserName(), password);
-
-    // 删除密码错误次数记录
-    adminCache.cleanErrorPasswordCount(user.getUserName());
 
     // 更新用户登录信息
     user.setLoginIp(requestIp);
@@ -124,14 +118,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     jwtTokenService.logout();
   }
 
-  private void checkPasswordErrorCount(AdminLoginLimit limit, int errorPasswordCount) {
-    boolean checkErrorCount =
-        ErrorPasswordLimit.ADMIN_RELIEVE.match(limit.getPwdErrorCount())
-            || (ErrorPasswordLimit.DEFAULT.getKey().equals(limit.getPwdErrorCount())
-                && errorPasswordCount >= limit.getPwdErrorCount());
-    if (checkErrorCount) {
-      throw new ServiceException("密码错误次数超限!");
-    }
+  private void checkPasswordErrorCount(AdminLoginLimit limit, String account) {
+    int errorCount = adminCache.getErrorPasswordCount(account);
+    Assert.isFalse(errorCount > limit.getPwdErrorCount(), () -> new ServiceException("密码错误次数超限!"));
   }
 
   /**

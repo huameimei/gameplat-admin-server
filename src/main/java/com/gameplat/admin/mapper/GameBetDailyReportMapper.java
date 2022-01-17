@@ -28,4 +28,12 @@ public interface GameBetDailyReportMapper extends BaseMapper<GameBetDailyReport>
   List<ActivityStatisticItem> getGameReportInfo(Map map);
 
   List<ActivityStatisticItem> findGameDmlDateList(Map map);
+
+  /**
+   * 插入投注日报表
+   *
+   * @param betDailyReport List
+   */
+  void insertGameBetDailyReport(@Param("list") List<GameBetDailyReport> betDailyReport);
+
 }

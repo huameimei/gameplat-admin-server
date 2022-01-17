@@ -6,96 +6,105 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
+
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
+
 import lombok.Data;
 
 /**
- * 真人日报表
+ * 游戏日报表
  */
 @Data
 @TableName("game_bet_daily_report")
 public class GameBetDailyReport implements Serializable {
 
+    /**
+     * 主键
+     */
+    @TableId(type = IdType.AUTO)
+    private Long id;
 
-  /**
-   * 主键
-   */
-  @TableId(type = IdType.AUTO)
-  private Long id;
+    /**
+     * 账号编号
+     */
+    private Long memberId;
 
-  /**
-   * 账号编号
-   */
-  private Long memberId;
+    /**
+     * 账号
+     */
+    private String account;
 
-  /**
-   * 账号
-   */
-  private String account;
+    /**
+     * 用户真实姓名
+     */
+    private String realName;
 
-  /**
-   * 用户真实姓名
-   */
-  private String realName;
+    /**
+     * 代理路径
+     */
+    private String userPaths;
 
-  /**
-   * 代理路径
-   */
-  private String userPaths;
+    /**
+     * 游戏平台
+     */
+    private String platformCode;
 
-  /**
-   * 游戏平台
-   */
-  private String platformCode;
+    /**
+     * 游戏子类型
+     */
+    private String gameKind;
 
-  /**
-   * 游戏子类型
-   */
-  private String gameKind;
+    /**
+     * 一级分类
+     */
+    private String firstKind;
 
-  private String firstKind;
+    /**
+     * 投注金额
+     */
+    private BigDecimal betAmount;
 
-  /**
-   * 年月日
-   */
-  @JsonFormat(pattern = "yyyy-MM-dd")
-  private Date statTime;
+    /**
+     * 有效投注额
+     */
+    private BigDecimal validAmount;
 
-   /**
-   * 添加时间
-   */
-  @TableField(fill = FieldFill.INSERT)
-  @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-  private Date createTime;
+    /**
+     * 中奖金额
+     */
+    private Double winAmount;
 
-  /**
-   * 投注金额
-   */
-  private BigDecimal betAmount;
+    /**
+     * 水钱
+     */
+    private BigDecimal revenue;
 
-  /**
-   * 有效投注额
-   */
-  private BigDecimal validAmount;
+    /**
+     * 下注笔数
+     */
+    private Long betCount;
+    /**
+     * 中奖数
+     */
+    private Long winCount;
 
-  /**
-   * 水钱
-   */
-  private BigDecimal revenue;
+    /**
+     * 统计时间(年月日)
+     */
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private String statTime;
 
-  /**
-   * 中奖金额
-   */
-  private Double winAmount;
+    /**
+     * 创建时间
+     */
+    @TableField(fill = FieldFill.INSERT)
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private Date createTime;
 
-  /**
-   * 下注笔数
-   */
-  private Long betCount;
-  /**
-   * 中奖数
-   */
-  private Long winCount;
+    /**
+     * 更新时间
+     */
+    private Date updateTime;
 }

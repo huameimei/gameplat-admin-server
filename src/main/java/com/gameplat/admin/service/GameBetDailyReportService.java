@@ -8,6 +8,7 @@ import com.gameplat.admin.model.domain.GameBetDailyReport;
 import com.gameplat.admin.model.dto.GameBetDailyReportQueryDTO;
 import com.gameplat.admin.model.vo.GameReportVO;
 import com.gameplat.admin.model.vo.PageDtoVO;
+
 import java.util.List;
 import java.util.Map;
 
@@ -25,4 +26,11 @@ public interface GameBetDailyReportService extends IService<GameBetDailyReport> 
    * @return
    */
   List<ActivityStatisticItem> getGameReportInfo(Map map);
+
+  /**
+   * 汇总投注日报
+   *
+   * @param list List
+   */
+  void assembleBetDailyReport(List<String> list);
 }

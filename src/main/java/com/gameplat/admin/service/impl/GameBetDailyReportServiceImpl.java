@@ -1,5 +1,7 @@
 package com.gameplat.admin.service.impl;
 
+import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.date.DateTime;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
@@ -7,9 +9,10 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.mapper.GameBetDailyReportMapper;
+import com.gameplat.admin.mapper.MemberMapper;
 import com.gameplat.admin.model.bean.ActivityStatisticItem;
-import com.gameplat.admin.model.domain.GamePlatform;
 import com.gameplat.admin.model.domain.GameBetDailyReport;
+import com.gameplat.admin.model.domain.GamePlatform;
 import com.gameplat.admin.model.domain.Member;
 import com.gameplat.admin.model.dto.GameBetDailyReportQueryDTO;
 import com.gameplat.admin.model.vo.GameReportVO;
@@ -18,34 +21,52 @@ import com.gameplat.admin.service.GameBetDailyReportService;
 import com.gameplat.admin.service.MemberService;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.DateUtil;
+import com.gameplat.base.common.util.DateUtils;
 import com.gameplat.base.common.util.StringUtils;
+import com.gameplat.common.enums.SettleStatusEnum;
 import com.gameplat.common.enums.UserTypes;
 import com.google.common.collect.Lists;
-
-import java.util.*;
-import java.util.stream.Collectors;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.elasticsearch.action.search.SearchRequest;
+import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.client.HttpAsyncResponseConsumerFactory;
+import org.elasticsearch.client.RequestOptions;
+import org.elasticsearch.client.RestHighLevelClient;
+import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.search.aggregations.AggregationBuilders;
+import org.elasticsearch.search.aggregations.bucket.terms.TermsAggregationBuilder;
+import org.elasticsearch.search.aggregations.metrics.SumAggregationBuilder;
+import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
+import java.io.IOException;
+import java.util.*;
+import java.util.stream.Collectors;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)
-public class GameBetDailyReportServiceImpl extends
-        ServiceImpl<GameBetDailyReportMapper, GameBetDailyReport> implements
-    GameBetDailyReportService {
+public class GameBetDailyReportServiceImpl extends ServiceImpl<GameBetDailyReportMapper, GameBetDailyReport>
+        implements GameBetDailyReportService {
 
     @Autowired
     private MemberService memberService;
 
-    @Autowired
+    @Resource
     private GameBetDailyReportMapper gameBetDailyReportMapper;
 
+    @Resource
+    private MemberMapper memberMapper;
+
+    @Resource
+    public RestHighLevelClient restHighLevelClient;
 
     @Override
     public PageDtoVO queryPage(Page<GameBetDailyReport> page, GameBetDailyReportQueryDTO dto) {
@@ -94,10 +115,10 @@ public class GameBetDailyReportServiceImpl extends
         }
         queryWrapper.eq(ObjectUtils.isNotEmpty(dto.getLiveGameKind()), "game_kind", dto.getLiveGameKind());
         queryWrapper.eq(ObjectUtils.isNotEmpty(dto.getLiveGameSuperType()), "first_kind", dto.getLiveGameSuperType());
-        queryWrapper.apply(ObjectUtils.isNotEmpty(dto.getBetStartDate()), "stat_time >= STR_TO_DATE({0}, '%Y-%m-%d')",
-                dto.getBetStartDate());
-        queryWrapper.apply(ObjectUtils.isNotEmpty(dto.getBetEndDate()), "stat_time <= STR_TO_DATE({0}, '%Y-%m-%d')",
-                dto.getBetEndDate());
+        queryWrapper.apply(ObjectUtils.isNotEmpty(dto.getBeginTime()), "stat_time >= STR_TO_DATE({0}, '%Y-%m-%d')",
+                dto.getBeginTime());
+        queryWrapper.apply(ObjectUtils.isNotEmpty(dto.getEndTime()), "stat_time <= STR_TO_DATE({0}, '%Y-%m-%d')",
+                dto.getEndTime());
     }
 
 
@@ -162,5 +183,75 @@ public class GameBetDailyReportServiceImpl extends
             }
         }
         return activityStatisticItemVOList;
+    }
+
+    @Override
+    public void assembleBetDailyReport(List<String> list) {
+
+        List<GameBetDailyReport> assembleList = new ArrayList<>();
+        list.forEach(day -> {
+            DateTime parseTime = cn.hutool.core.date.DateUtil.parse(day, "yyyy-MM-dd");
+            String beginTime = cn.hutool.core.date.DateUtil.beginOfDay(parseTime).toString();
+            String endTime = cn.hutool.core.date.DateUtil.endOfDay(parseTime).toString();
+
+            log.info("{}~{}游戏日报表汇总，开始执行！", beginTime, endTime);
+
+            BoolQueryBuilder builder = QueryBuilders.boolQuery();
+            builder.must(QueryBuilders.termQuery("settle", SettleStatusEnum.YES.getValue()));
+            // 会员游戏表集合（北京时间） 按投注时间
+            builder.must(QueryBuilders.rangeQuery("betTime.keyword")
+                    .from(beginTime).to(endTime).format(DateUtils.DATE_TIME_PATTERN));
+            //todo
+            SearchRequest searchRequest = new SearchRequest(new String[]{"bet-record_kgsit"});
+            SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+            TermsAggregationBuilder userNameGroup = AggregationBuilders.terms("userNameGroup").field("account.keyword");
+            TermsAggregationBuilder firstKindGroup = AggregationBuilders.terms("firstKindGroup").field("firstKind.keyword");
+
+            SumAggregationBuilder sumBetAmount = AggregationBuilders.sum("betAmount").field("betAmount");
+            SumAggregationBuilder sumValidAmount = AggregationBuilders.sum("validAmount").field("validAmount");
+            SumAggregationBuilder sumWinAmount = AggregationBuilders.sum("winAmount").field("winAmount");
+
+            userNameGroup.subAggregation(sumBetAmount);
+            userNameGroup.subAggregation(sumValidAmount);
+            userNameGroup.subAggregation(sumWinAmount);
+
+            firstKindGroup.subAggregation(sumBetAmount);
+            firstKindGroup.subAggregation(sumValidAmount);
+            firstKindGroup.subAggregation(sumWinAmount);
+
+            userNameGroup.subAggregation(firstKindGroup);
+
+            searchSourceBuilder.query(builder);
+            searchSourceBuilder.aggregation(userNameGroup);
+            searchRequest.source(searchSourceBuilder);
+            try {
+                RequestOptions.Builder optionsBuilder = RequestOptions.DEFAULT.toBuilder();
+                optionsBuilder.setHttpAsyncResponseConsumerFactory(
+                        new HttpAsyncResponseConsumerFactory.HeapBufferedResponseConsumerFactory(31457280));
+                SearchResponse search = restHighLevelClient.search(searchRequest, optionsBuilder.build());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            if (CollectionUtil.isNotEmpty(assembleList)) {
+                assembleList.forEach(o -> o.setStatTime(day));
+            }
+            log.info("{}~{}游戏日报表汇总，执行结束！", beginTime, endTime);
+        });
+
+        if (CollectionUtil.isNotEmpty(assembleList)) {
+            List<String> accountList = assembleList.stream().map(GameBetDailyReport::getAccount).collect(Collectors.toList());
+            List<Member> infoList = memberMapper.getInfoByAccount(accountList);
+            assembleList.forEach(betDailyReport -> {
+                Optional<Member> any = infoList.stream().filter(o -> betDailyReport.getAccount().equals(o.getAccount())).findAny();
+                if (any.isPresent()) {
+                    Member member = any.get();
+                    betDailyReport.setMemberId(member.getId());
+                    betDailyReport.setRealName(member.getRealName());
+                    betDailyReport.setUserPaths(member.getSuperPath());
+                }
+            });
+            gameBetDailyReportMapper.insertGameBetDailyReport(assembleList);
+        }
     }
 }

@@ -62,4 +62,11 @@ public interface MemberMapper extends BaseMapper<Member> {
    * */
   List<Member> findByUserNameList(List<String> userNames);
 
+  /**
+   * 根据账号查询投注日报表所需数据
+   *
+   * @param accountList List
+   * @return List<Member>
+   * */
+  List<Member> getInfoByAccount(@Param("accountList") List<String> accountList);
 }

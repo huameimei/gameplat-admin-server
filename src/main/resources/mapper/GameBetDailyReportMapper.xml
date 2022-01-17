@@ -31,14 +31,14 @@
     dr.game_code
     FROM
     game_bet_daily_report dr where 1=1
-    <if test="betStartDate != null">
+    <if test="beginTime != null">
       <![CDATA[
-         and dr.stat_time >= #{betStartDate}
+         and dr.stat_time >= #{beginTime}
       ]]>
     </if>
-    <if test="betEndDate != null">
+    <if test="endTime != null">
       <![CDATA[
-        and dr.stat_time <= #{betEndDate}
+        and dr.stat_time <= #{endTime}
       ]]>
     </if>
     <if test="userPaths != null and userPaths != ''">
@@ -53,14 +53,14 @@
     rr.game_code
     FROM
     game_rebate_report rr where 1=1
-    <if test="betStartDate != null">
+    <if test="beginTime != null">
       <![CDATA[
-         and rr.stat_time >= #{betStartDate}
+         and rr.stat_time >= #{beginTime}
       ]]>
     </if>
-    <if test="betEndDate != null">
+    <if test="endTime != null">
       <![CDATA[
-         and rr.stat_time <= #{betEndDate}
+         and rr.stat_time <= #{endTime}
       ]]>
     </if>
     <if test="userPaths != null and userPaths != ''">
@@ -212,4 +212,25 @@
            JOIN member u ON ts.account = u.account
   </insert>
 
+  <!-- 插入投注日报表 -->
+  <insert id="insertGameBetDailyReport">
+    INSERT INTO game_bet_daily_report
+    (member_id,account,real_name,user_paths,platform_code,game_kind,first_kind,bet_amount,
+    valid_amount,win_amount,revenue,bet_count,win_count,stat_time,create_time
+    ) VALUES
+    <foreach collection="list" item="item" index="index" separator=",">
+      ( #{item.memberId}, #{item.account},#{item.realName},#{item.userPaths},
+      #{item.platformCode},#{item.gameKind},#{item.firstKind},#{item.betAmount},
+      #{item.validAmount},#{item.winAmount},#{item.revenue},#{item.betCount},
+      #{item.winCount},#{item.statTime},sysdate()
+      )
+    </foreach>
+    ON duplicate KEY UPDATE
+    bet_count = VALUES(bet_count),
+    bet_amount = VALUES(bet_amount),
+    valid_amount = VALUES(valid_amount),
+    win_amount = VALUES(win_amount),
+    revenue = VALUES(revenue),
+    update_time = sysdate()
+  </insert>
 </mapper>

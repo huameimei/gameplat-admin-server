@@ -285,4 +285,20 @@
         group by register_ip
         order by id desc, create_time desc
     </select>
+
+    <select id="getInfoByAccount" resultType="com.gameplat.admin.model.domain.Member">
+        select
+        id as id,
+        real_name as realName,
+        super_path as superPath
+        from member
+        <where>
+            <if test="accountList != null and accountList.size > 0">
+                account in
+                <foreach collection="accountList" item="account" open="(" close=")" separator="," index="index">
+                    #{account}
+                </foreach>
+            </if>
+        </where>
+    </select>
 </mapper>

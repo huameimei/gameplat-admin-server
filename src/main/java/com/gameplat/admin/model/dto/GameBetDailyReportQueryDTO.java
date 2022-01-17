@@ -25,12 +25,24 @@ public class GameBetDailyReportQueryDTO implements Serializable  {
    * 代理账号
    */
   private String superAccount;
-  /** 下注开始时间*/
-  @JsonFormat(locale ="zh", timezone ="GMT+8", pattern = "yyyy-MM-dd")
-  private String betStartDate;
-  /** 下注结束时间*/
-  @JsonFormat(locale ="zh", timezone ="GMT+8", pattern = "yyyy-MM-dd")
-  private String betEndDate;
+
+  /**
+   * 开始时间
+   */
+  @JsonFormat(locale = "zh", timezone = "GMT+8", pattern = "yyyy-MM-dd")
+  private String beginTime;
+
+  /**
+   * 结束时间
+   */
+  @JsonFormat(locale = "zh", timezone = "GMT+8", pattern = "yyyy-MM-dd")
+  private String endTime;
+
+  /**
+   * 1 - 投注时间(北京时间),
+   * 2 - 三方时间
+   */
+  private Integer timeType;
 
   private List<String> platformCodeList;
 

@@ -34,8 +34,9 @@ public class OpenMessageInfoController {
 
   @Autowired private MessageInfoService messageInfoService;
 
-  @ApiOperation(value = "公告消息和个人弹窗消息字典数据列表")
-  @GetMapping("/getTypes")
+//  @ApiOperation(value = "公告消息和个人弹窗消息字典数据列表")
+//  @GetMapping("/getTypes")
+  /** 公告消息和个人弹窗消息字典数据列表 */
   public MessageDictDataVO getDictData() {
     return messageInfoService.getDictData();
   }
@@ -48,13 +49,13 @@ public class OpenMessageInfoController {
    * @return
    */
   @ApiOperation(value = "分页查询个人消息")
-  @GetMapping("/list")
-  @PreAuthorize("hasAuthority('notice:message:list')")
+  @GetMapping("/page")
+  @PreAuthorize("hasAuthority('operator:message:page')")
   @ApiImplicitParams({
     @ApiImplicitParam(name = "current", value = "分页参数：当前页", defaultValue = "1"),
     @ApiImplicitParam(name = "size", value = "每页条数"),
   })
-  public IPage<MessageInfoVO> findMessageList(
+  public IPage<MessageInfoVO> page(
       @ApiIgnore PageDTO<MessageInfo> page, MessageInfoQueryDTO messageInfoQueryDTO) {
     return messageInfoService.findMessageList(page, messageInfoQueryDTO);
   }
@@ -65,9 +66,9 @@ public class OpenMessageInfoController {
    * @param messageInfoAddDTO
    */
   @ApiOperation(value = "新增个人消息")
-  @PostMapping("/add")
-  @PreAuthorize("hasAuthority('notice:message:add')")
-  public void add(@Validated @RequestBody MessageInfoAddDTO messageInfoAddDTO) {
+  @PostMapping("/save")
+  @PreAuthorize("hasAuthority('operator:message:save')")
+  public void save(@Validated @RequestBody MessageInfoAddDTO messageInfoAddDTO) {
     messageInfoService.insertMessage(messageInfoAddDTO);
   }
 
@@ -78,7 +79,7 @@ public class OpenMessageInfoController {
    */
   @ApiOperation(value = "编辑个人消息")
   @PostMapping("/edit")
-  @PreAuthorize("hasAuthority('notice:message:edit')")
+  @PreAuthorize("hasAuthority('operator:message:edit')")
   public void edit(@Validated @RequestBody MessageInfoEditDTO messageInfoEditDTO) {
     messageInfoService.editMessage(messageInfoEditDTO);
   }
@@ -89,8 +90,8 @@ public class OpenMessageInfoController {
    * @param ids
    */
   @ApiOperation(value = "删除个人消息")
-  @DeleteMapping("/delete")
-  @PreAuthorize("hasAuthority('notice:message:remove')")
+  @DeleteMapping("/remove")
+  @PreAuthorize("hasAuthority('operator:message:remove')")
   public void remove(@RequestBody String ids) {
     messageInfoService.deleteBatchMessage(ids);
   }
@@ -102,14 +103,14 @@ public class OpenMessageInfoController {
    * @param messageDistributeQueryDTO
    * @return
    */
-  @ApiOperation(value = "个人消息分发会员列表")
-  @GetMapping("/distribute/list")
-  @PreAuthorize("hasAuthority('notice:message:list')")
+  @ApiOperation(value = "查看推送目标会员")
+  @GetMapping("/distribute/page")
+  @PreAuthorize("hasAuthority('operator:message:distributePage')")
   @ApiImplicitParams({
     @ApiImplicitParam(name = "current", value = "分页参数：当前页", defaultValue = "1"),
     @ApiImplicitParam(name = "size", value = "每页条数"),
   })
-  public IPage<MessageDistributeVO> findMessageDistributeList(
+  public IPage<MessageDistributeVO> distributePage(
       @ApiIgnore PageDTO<MessageDistribute> page,
       MessageDistributeQueryDTO messageDistributeQueryDTO) {
     return messageInfoService.findMessageDistributeList(page, messageDistributeQueryDTO);

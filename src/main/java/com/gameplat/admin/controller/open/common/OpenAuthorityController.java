@@ -12,18 +12,12 @@ import com.gameplat.common.constant.ServiceName;
 import com.gameplat.common.model.bean.RefreshToken;
 import com.gameplat.log.annotation.Log;
 import com.gameplat.log.annotation.LoginLog;
-import com.gameplat.redis.idempoten.AutoIdempotent;
-import javax.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * 用户授权管理控制类
@@ -39,7 +33,6 @@ public class OpenAuthorityController {
 
   @Autowired private AuthenticationService authenticationService;
 
-  @AutoIdempotent(spelKey = "'login_'+#dto.account", expir = 3000L)
   @RequestMapping(value = "/login", method = RequestMethod.POST)
   @LoginLog(module = ServiceName.ADMIN_SERVICE, desc = "'账号'+#dto.account+'登录系统'")
   public UserToken login(@Validated @RequestBody AdminLoginDTO dto, HttpServletRequest request) {
@@ -66,7 +59,6 @@ public class OpenAuthorityController {
    * @param userName String
    * @return JSONObject
    */
-  @AutoIdempotent(spelKey = "'authCode_'+#userName", expir = 1000L)
   @GetMapping(value = "/authCode")
   public JSONObject getAuthCode(@RequestParam String userName, HttpServletRequest request) {
     String cDomain = ServletUtils.getBaseUrl(request);
@@ -85,7 +77,6 @@ public class OpenAuthorityController {
    * @param dto GoogleAuthDTO
    */
   @PostMapping("bindAuth")
-  @AutoIdempotent(spelKey = "'bindAuth_'+#authDTO.loginName", expir = 1000L)
   public void bindSecret(@Validated GoogleAuthDTO dto) {
     userService.bindSecret(dto);
   }

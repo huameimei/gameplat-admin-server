@@ -10,7 +10,6 @@ import com.gameplat.base.common.util.StringUtils;
 import com.gameplat.common.compent.kaptcha.Kaptcha;
 import com.gameplat.common.compent.kaptcha.KaptchaProducer;
 import com.gameplat.common.model.bean.limit.AdminLoginLimit;
-import com.gameplat.redis.idempoten.AutoIdempotent;
 import com.gameplat.security.SecurityUserHolder;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -65,7 +64,6 @@ public class OpenCommonController {
    */
   @ResponseBody
   @GetMapping("/menuList")
-  @AutoIdempotent(key = "menuList", expir = 1000L)
   public ArrayList<VueRouter<SysMenu>> menuList() {
     return permissionService.getMenuList(SecurityUserHolder.getUsername());
   }
@@ -74,7 +72,6 @@ public class OpenCommonController {
   @ApiOperation(value = "获取字典数据")
   @ResponseBody
   @GetMapping("/getDictByTypes/{types}")
-  @AutoIdempotent(key = "getDictByTypes", expir = 2000L)
   public Map<Object, List<JSONObject>> getDictByTypes(@PathVariable String types) {
     if (StringUtils.isEmpty(types)) {
       return null;
@@ -84,7 +81,6 @@ public class OpenCommonController {
 
   @ResponseBody
   @GetMapping("/language")
-  @AutoIdempotent(key = "language", expir = 2000L)
   public List<Language> getLanguage() {
     return commonService.language();
   }
@@ -96,7 +92,6 @@ public class OpenCommonController {
    */
   @ResponseBody
   @GetMapping("/checkAuth")
-  @AutoIdempotent(key = "language", expir = 2000L)
   public AdminLoginLimit checkAuth() {
     return commonService.checkAuth();
   }

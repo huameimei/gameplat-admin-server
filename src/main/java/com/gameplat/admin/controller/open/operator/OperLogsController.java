@@ -10,18 +10,14 @@ import com.gameplat.common.model.entity.MemberLogOper;
 import com.gameplat.common.model.vo.MemberLogVO;
 import com.gameplat.log.annotation.Log;
 import com.gameplat.log.enums.LogType;
-import com.gameplat.redis.idempoten.AutoIdempotent;
-import java.util.List;
-import javax.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 
 /**
  * 业主日志管理
@@ -44,7 +40,6 @@ public class OperLogsController {
 
   @PostMapping("/login/export")
   @PreAuthorize("hasAuthority('operator:loginLogs:export')")
-  @AutoIdempotent(spelKey = "LoginLogExport", expir = 5000L)
   @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.ADMIN, desc = "导出会员登录日志")
   public void loginExport(@RequestBody LogDTO logDTO, HttpServletResponse response) {
     List<MemberLogVO> logs = logService.loginExport(logDTO);
@@ -60,7 +55,6 @@ public class OperLogsController {
   @PostMapping("/oper/export")
   @PreAuthorize("hasAuthority('operator:operLogs:export')")
   @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.ADMIN, desc = "导出会员操作日志")
-  @AutoIdempotent(spelKey = "OperLogExport", expir = 5000L)
   public void operExport(@RequestBody LogDTO logDTO, HttpServletResponse response) {
     List<MemberLogVO> logs = logService.operExport(logDTO);
     EasyExcelUtil.downExcel("会员操作日志", logs, MemberLogVO.class, response);

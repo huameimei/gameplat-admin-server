@@ -22,26 +22,25 @@ import com.gameplat.admin.model.dto.UserDTO;
 import com.gameplat.admin.model.dto.UserResetPasswordDTO;
 import com.gameplat.admin.model.vo.RoleVo;
 import com.gameplat.admin.model.vo.UserVo;
+import com.gameplat.admin.service.PasswordService;
 import com.gameplat.admin.service.SysCommonService;
 import com.gameplat.admin.service.SysUserService;
 import com.gameplat.base.common.enums.EnableEnum;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.json.JsonUtils;
 import com.gameplat.base.common.util.GoogleAuthenticator;
-import com.gameplat.base.common.util.RSAUtils;
 import com.gameplat.base.common.util.StringUtils;
-import com.gameplat.common.enums.RsaConstant;
 import com.gameplat.common.enums.TrueFalse;
 import com.gameplat.common.enums.UserTypes;
 import com.gameplat.common.model.bean.limit.AdminLoginLimit;
 import com.gameplat.security.SecurityUserHolder;
-import java.util.ArrayList;
-import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)
@@ -52,8 +51,6 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
 
   @Autowired private SysUserMapper userMapper;
 
-  @Autowired private PasswordEncoder passwordEncoder;
-
   @Autowired private SysRoleMapper roleMapper;
 
   @Autowired private SysUserRoleMapper userRoleMapper;
@@ -61,6 +58,9 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
   @Autowired private AdminCache adminCache;
 
   @Autowired private UserConvert userConvert;
+
+  @Autowired
+  private PasswordService passwordService;
 
   @Override
   public SysUser getByUsername(String username) {
@@ -123,8 +123,8 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
     user.setSettings(JsonUtils.toJson(setting));
 
     // 生成密码
-    String rsaPassword = RSAUtils.decrypt(dto.getPassword(), RsaConstant.PRIVATE_KEY);
-    user.setPassword(passwordEncoder.encode(rsaPassword));
+    String rsaPassword = passwordService.decrypt(dto.getPassword());
+    user.setPassword(passwordService.encode(rsaPassword));
     user.setChangeFlag(limit.getResetPwdSwitch() == 1 ? 0 : 1);
 
     if (this.save(user)) {
@@ -192,9 +192,8 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
     SysUser user = userConvert.toEntity(dto);
     AdminLoginLimit loginLimit = commonService.getLoginLimit();
 
-    // RSA私钥解密
-    String newPassword = RSAUtils.decrypt(dto.getPassword(), RsaConstant.PRIVATE_KEY);
-    user.setPassword(passwordEncoder.encode(newPassword));
+    String newPassword = passwordService.decrypt(dto.getPassword());
+    user.setPassword(passwordService.encode(newPassword));
     user.setChangeFlag(loginLimit.getResetPwdSwitch() == TrueFalse.TRUE.getValue() ? TrueFalse.TRUE.getValue() : TrueFalse.FALSE.getValue());
 
     if (this.updateById(user)) {

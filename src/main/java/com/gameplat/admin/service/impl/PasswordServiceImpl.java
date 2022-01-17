@@ -15,23 +15,23 @@ public class PasswordServiceImpl implements PasswordService {
 
   @Autowired private PasswordEncoder passwordEncoder;
 
-  @Override
-  public String encrypt(String password) {
-    return passwordEncoder.encode(password);
-  }
-
   @Value("${security.rsa.privateKey}")
   private String privateKey;
 
   @Override
-  public String encrypt(String password, String salt) {
+  public String encode(String password) {
+    return passwordEncoder.encode(password);
+  }
+
+  @Override
+  public String encode(String password, String salt) {
     Assert.notEmpty(salt, "密码盐不能为空");
     String cipherText = MD5.create().digestHex(salt.concat("@").concat(password));
     return passwordEncoder.encode(cipherText);
   }
 
   @Override
-  public String decode(String password) {
+  public String decrypt(String password) {
     return new RSA(privateKey, null).decryptStr(password, KeyType.PrivateKey);
   }
 }

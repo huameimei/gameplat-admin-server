@@ -15,7 +15,6 @@ import com.gameplat.base.common.json.JsonUtils;
 import com.gameplat.base.common.util.RSAUtils;
 import com.gameplat.base.common.util.StringUtils;
 import com.gameplat.common.enums.BooleanEnum;
-import com.gameplat.common.enums.RsaConstant;
 import com.gameplat.security.SecurityUserHolder;
 import com.gameplat.security.service.JwtTokenService;
 import java.util.ArrayList;
@@ -40,13 +39,10 @@ public class UserCenterService {
 
   @Autowired private JwtTokenService jwtTokenService;
 
+  @Autowired private PasswordService passwordService;
+
   @Autowired private PasswordEncoder passwordEncoder;
 
-  /**
-   * 取用户信息
-   *
-   * @return
-   */
   @SentinelResource(value = "current")
   public ProFileVo current(String username) {
     SysUser user = userMapper.selectUserByUserName(username);
@@ -117,7 +113,7 @@ public class UserCenterService {
    * @return
    */
   @SentinelResource(value = "changePassword")
-  public void changePassword(ChangePasswordDTO changePassword) {
+  public void changePassword(ChangePasswordDTO dto) {
     String username = SecurityUserHolder.getUsername();
     SysUser user = userMapper.selectUserByUserName(username);
     if (StringUtils.isNull(user)) {
@@ -126,12 +122,12 @@ public class UserCenterService {
     }
 
     // RSA私钥解密
-    String oldPassword = RSAUtils.decrypt(changePassword.getOldPassWord(), RsaConstant.PRIVATE_KEY);
+    String oldPassword = passwordService.decrypt(dto.getOldPassWord());
     if (StringUtils.isBlank(oldPassword)) {
       throw new ServiceException("旧密码不正确");
     }
 
-    String newPassword = RSAUtils.decrypt(changePassword.getNewPassWord(), RsaConstant.PRIVATE_KEY);
+    String newPassword = passwordService.decrypt(dto.getNewPassWord());
     if (StringUtils.isBlank(newPassword)) {
       throw new ServiceException("新密码不符合规范");
     }

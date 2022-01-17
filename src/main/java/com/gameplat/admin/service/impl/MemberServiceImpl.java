@@ -70,7 +70,7 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
   public void add(MemberAddDTO dto) {
     Member member = memberConvert.toEntity(dto);
     member.setRegisterSource(MemberEnums.RegisterSource.BACKEND.value());
-    member.setPassword(passwordService.encrypt(member.getPassword(), dto.getAccount()));
+    member.setPassword(passwordService.encode(member.getPassword(), dto.getAccount()));
 
     // 设置上级
     this.setMemberParent(member);
@@ -160,7 +160,7 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
   @Override
   public void resetPassword(MemberPwdUpdateDTO dto) {
     Member member = this.getById(dto.getId());
-    String password = passwordService.encrypt(dto.getPassword(), member.getAccount());
+    String password = passwordService.encode(dto.getPassword(), member.getAccount());
     if (!this.lambdaUpdate()
         .set(Member::getPassword, password)
         .eq(Member::getId, member.getId())
@@ -175,7 +175,7 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
   @Override
   public void resetWithdrawPassword(MemberWithdrawPwdUpdateDTO dto) {
     Member member = this.getById(dto.getId());
-    String password = passwordService.encrypt(dto.getPassword(), member.getAccount());
+    String password = passwordService.encode(dto.getPassword(), member.getAccount());
     Assert.isTrue(
         memberInfoService
             .lambdaUpdate()

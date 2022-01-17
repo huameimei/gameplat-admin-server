@@ -50,12 +50,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
   @Override
   public UserToken login(AdminLoginDTO dto, HttpServletRequest request) {
-    // 获取管理员登录限制信息
     AdminLoginLimit limit =
         limitInfoService.getLimitInfo(LimitEnums.ADMIN_LOGIN_CONFIG, AdminLoginLimit.class);
-    if (null == limit) {
-      throw new ServiceException("登录配置信息未配置");
-    }
+    Assert.notNull(limit, () -> new ServiceException("登录配置信息未配置"));
 
     // 是否开启后台白名单
     String requestIp = IPUtils.getIpAddress(request);
@@ -82,7 +79,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     // 解密密码并登陆
-    String password = passwordService.decode(dto.getPassword());
+    String password = passwordService.decrypt(dto.getPassword());
     UserCredential credential = jwtTokenService.signIn(request, user.getUserName(), password);
 
     // 更新用户登录信息
@@ -105,7 +102,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
   @Override
   public RefreshToken refreshToken(String refreshToken) {
     UserCredential credential = jwtTokenService.refreshToken(refreshToken);
-
     return RefreshToken.builder()
         .refreshToken(credential.getRefreshToken())
         .accessToken(credential.getAccessToken())

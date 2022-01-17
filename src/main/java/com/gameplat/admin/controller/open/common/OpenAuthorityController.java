@@ -35,7 +35,7 @@ public class OpenAuthorityController {
 
   @RequestMapping(value = "/login", method = RequestMethod.POST)
   @LoginLog(module = ServiceName.ADMIN_SERVICE, desc = "'账号'+#dto.account+'登录系统'")
-  public UserToken login(@Validated @RequestBody AdminLoginDTO dto, HttpServletRequest request) {
+  public UserToken login(@Validated AdminLoginDTO dto, HttpServletRequest request) {
     return authenticationService.login(dto, request);
   }
 

@@ -7,7 +7,6 @@ import com.gameplat.admin.model.dto.MemberWealRewordAddDTO;
 import com.gameplat.admin.model.dto.MemberWealRewordDTO;
 import com.gameplat.admin.model.vo.MemberWealRewordVO;
 import java.util.List;
-import javax.servlet.http.HttpServletResponse;
 
 public interface MemberWealRewordService extends IService<MemberWealReword> {
 
@@ -15,11 +14,6 @@ public interface MemberWealRewordService extends IService<MemberWealReword> {
      * 获取VIP福利记录列表 分页
      */
     IPage<MemberWealRewordVO> findWealRewordList(IPage<MemberWealReword> page, MemberWealRewordDTO queryDTO);
-
-    /**
-     * 导出VIP福利记录列表
-     */
-    void exportWealReword(MemberWealRewordDTO queryDTO, HttpServletResponse response);
 
     Integer findCountReword(MemberWealRewordDTO dto);
     /**

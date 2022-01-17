@@ -55,7 +55,7 @@ public class MemberWealReword implements Serializable {
     private Integer currentLevel;
 
     @ApiModelProperty("派发金额")
-    @Excel(name = "派发金额", width = 10, isImportField = "true_st")
+    @Excel(name = "派发金额", width = 12, isImportField = "true_st")
     private BigDecimal rewordAmount;
 
     @ApiModelProperty("提现打码量")
@@ -65,7 +65,7 @@ public class MemberWealReword implements Serializable {
     @Excel(
             name = "类型",
             replace = { "升级奖励_0", "周俸禄_1", "月俸禄_2", "生日礼金_3", "每月红包_4" },
-            width = 8,
+            width = 10,
             isImportField = "true_st")
     private Integer type;
 
@@ -86,7 +86,7 @@ public class MemberWealReword implements Serializable {
             name = "创建时间",
             exportFormat = "yyyy-MM-dd HH:mm:ss",
             isImportField = "true_st",
-            width = 15)
+            width = 20)
     @TableField(fill = FieldFill.INSERT)
     private Date createTime;
 

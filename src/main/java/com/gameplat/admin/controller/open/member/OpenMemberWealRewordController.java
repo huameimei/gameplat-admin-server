@@ -51,7 +51,7 @@ public class OpenMemberWealRewordController {
     public void exportWealReword(@RequestBody MemberWealRewordDTO queryDTO, HttpServletResponse response){
         List<MemberWealReword> list = rewordService.findList(queryDTO);
         ExportParams exportParams = new ExportParams("VIP福利记录列表", "VIP福利记录列表");
-        response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename = vip.xls");
+        response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename = vipWealReword.xls");
 
         try (Workbook workbook = ExcelExportUtil.exportExcel(exportParams, MemberWealReword.class, list)) {
             workbook.write(response.getOutputStream());

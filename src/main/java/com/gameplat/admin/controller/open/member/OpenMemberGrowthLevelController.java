@@ -82,7 +82,7 @@ public class OpenMemberGrowthLevelController {
     @PreAuthorize("hasAuthority('member:growthLevel:edit')")
     @PutMapping("/update")
     public void update(@ApiParam(name = "修改VIP配置入参", value = "传入json格式", required = true)
-                       @RequestBody MemberGrowthConfigEditDto configEditDto) {
+                           @Validated @RequestBody MemberGrowthConfigEditDto configEditDto) {
 
         if (ObjectUtils.isEmpty(configEditDto.getId())) {
             throw new ServiceException(" 编号不能为空");

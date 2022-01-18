@@ -172,9 +172,6 @@ public class OpenMemberWealController {
         memberWealDetailService.deleteById(id);
     }
 
-    /**
-     *删除详情中的用户
-     */
     @PutMapping("/updateRewordAmount")
     @ApiOperation(value = "修改会员俸禄")
     @PreAuthorize("hasAuthority('member:weal:edit')")

@@ -1,5 +1,6 @@
 package com.gameplat.admin.service.impl;
 
+import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -100,6 +101,9 @@ public class MessageInfoServiceImpl extends ServiceImpl<MessageMapper, MessageIn
       PageDTO<MessageInfo> page, MessageInfoQueryDTO messageInfoQueryDTO) {
     IPage<MessageInfoVO> iPage =
         this.lambdaQuery()
+            .eq(ObjectUtil.isNotEmpty(messageInfoQueryDTO.getType()),
+                MessageInfo::getType,
+                messageInfoQueryDTO.getType())
             .eq(
                 StringUtils.isNotBlank(messageInfoQueryDTO.getTitle()),
                 MessageInfo::getTitle,

@@ -31,4 +31,7 @@ public class MessageInfoQueryDTO {
     @ApiModelProperty(value = "结束时间")
     private Date endTime;
 
+    @ApiModelProperty(value = "消息类型：2 公告  3 个人消息")
+    private Integer type;
+
 }

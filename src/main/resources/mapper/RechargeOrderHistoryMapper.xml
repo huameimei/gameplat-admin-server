@@ -25,5 +25,20 @@
        ORDER BY create_Time desc
    </select>
 
-
+    <select id="page" parameterType="com.gameplat.admin.model.dto.IpAnalysisDTO" resultType="com.gameplat.admin.model.vo.IpAnalysisVO">
+        SELECT
+                distinct account,
+                         nickname fullName,
+                         member_id as memberId,
+                         ip_address as ipAddress,
+                         balance money,
+                        (select count(COALESCE(ip_address,'null')) from recharge_order_history where 1=1 and ip_address = ipAddress) ipCount
+        from recharge_order_history
+        WHERE 1=1
+        and account = #{}
+        and ip_address = #{loginIp}
+        and add_time between
+        group by member_id, ip_address
+        order by member_id desc, create_time desc
+    </select>
 </mapper>

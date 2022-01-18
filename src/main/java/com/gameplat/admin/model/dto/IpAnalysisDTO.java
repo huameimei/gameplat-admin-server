@@ -28,8 +28,7 @@ public class IpAnalysisDTO {
 	@ApiModelProperty(value = "用户id")
 	private Integer memberId;
 
-  @ApiModelProperty(value = "类型")
+    @ApiModelProperty(value = "类型")
 	private Integer type;
-
 }
 

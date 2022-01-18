@@ -1,7 +1,9 @@
 package com.gameplat.admin.model.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.Date;
 
@@ -26,9 +28,11 @@ public class MessageInfoQueryDTO {
     private String language;
 
     @ApiModelProperty(value = "开始时间")
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private Date beginTime;
 
     @ApiModelProperty(value = "结束时间")
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private Date endTime;
 
     @ApiModelProperty(value = "消息类型：2 公告  3 个人消息")

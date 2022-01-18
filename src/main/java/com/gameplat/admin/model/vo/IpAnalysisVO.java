@@ -35,5 +35,4 @@ public class IpAnalysisVO {
 
 	@ApiModelProperty(value = "账户余额")
 	private BigDecimal money;
-
 }

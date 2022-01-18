@@ -120,6 +120,14 @@ public class MessageInfoServiceImpl extends ServiceImpl<MessageMapper, MessageIn
                 StringUtils.isNotBlank(messageInfoQueryDTO.getLanguage()),
                 MessageInfo::getLanguage,
                 messageInfoQueryDTO.getLanguage())
+            .ge(
+                ObjectUtil.isNotEmpty(messageInfoQueryDTO.getBeginTime()),
+                MessageInfo::getBeginTime,
+                messageInfoQueryDTO.getBeginTime()+" "+"00:00:00")
+            .le(
+                ObjectUtil.isNotEmpty(messageInfoQueryDTO.getEndTime()),
+                MessageInfo::getEndTime,
+                messageInfoQueryDTO.getEndTime()+" "+"23:59:59")
             .page(page)
             .convert(messageInfoConvert::toVo);
     if (CollectionUtils.isNotEmpty(iPage.getRecords())) {

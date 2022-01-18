@@ -1,5 +1,8 @@
 package com.gameplat.admin.service.impl;
 
+import static com.gameplat.common.enums.DictDataEnum.MAX_DISCOUNT_MONEY;
+import static com.gameplat.common.enums.DictDataEnum.MAX_RECHARGE_MONEY;
+
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -16,29 +19,43 @@ import com.gameplat.admin.enums.MemberEnums.Type;
 import com.gameplat.admin.enums.RechargeStatus;
 import com.gameplat.admin.mapper.RechargeOrderHistoryMapper;
 import com.gameplat.admin.mapper.RechargeOrderMapper;
-import com.gameplat.admin.model.bean.*;
+import com.gameplat.admin.model.bean.ActivityStatisticItem;
+import com.gameplat.admin.model.bean.AdminLimitInfo;
+import com.gameplat.admin.model.bean.ChannelLimitsBean;
+import com.gameplat.admin.model.bean.ManualRechargeOrderBo;
+import com.gameplat.admin.model.bean.PageExt;
 import com.gameplat.admin.model.domain.DiscountType;
 import com.gameplat.admin.model.domain.Member;
 import com.gameplat.admin.model.domain.MemberBill;
 import com.gameplat.admin.model.domain.MemberInfo;
-import com.gameplat.admin.model.domain.MemberLevel;
 import com.gameplat.admin.model.domain.PayAccount;
 import com.gameplat.admin.model.domain.RechargeOrder;
 import com.gameplat.admin.model.domain.RechargeOrderHistory;
-import com.gameplat.admin.model.domain.SysDictData;
 import com.gameplat.admin.model.domain.SysUser;
 import com.gameplat.admin.model.domain.TpMerchant;
 import com.gameplat.admin.model.domain.TpPayChannel;
 import com.gameplat.admin.model.dto.RechargeOrderQueryDTO;
 import com.gameplat.admin.model.vo.RechargeOrderVO;
 import com.gameplat.admin.model.vo.SummaryVO;
-import com.gameplat.admin.service.*;
+import com.gameplat.admin.service.ConfigService;
+import com.gameplat.admin.service.DiscountTypeService;
+import com.gameplat.admin.service.LimitInfoService;
+import com.gameplat.admin.service.MemberBillService;
+import com.gameplat.admin.service.MemberInfoService;
+import com.gameplat.admin.service.MemberLevelService;
+import com.gameplat.admin.service.MemberService;
+import com.gameplat.admin.service.PayAccountService;
+import com.gameplat.admin.service.RechargeOrderService;
+import com.gameplat.admin.service.SysUserService;
+import com.gameplat.admin.service.TpMerchantService;
+import com.gameplat.admin.service.TpPayChannelService;
+import com.gameplat.admin.service.ValidWithdrawService;
 import com.gameplat.admin.util.MoneyUtils;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.json.JsonUtils;
 import com.gameplat.base.common.snowflake.IdGeneratorSnowflake;
-import com.gameplat.common.enums.*;
 import com.gameplat.base.common.util.DateUtil;
+import com.gameplat.common.enums.BooleanEnum;
 import com.gameplat.common.enums.LimitEnums;
 import com.gameplat.common.enums.MemberEnums;
 import com.gameplat.common.enums.SwitchStatusEnum;
@@ -46,11 +63,16 @@ import com.gameplat.common.enums.UserTypes;
 import com.gameplat.common.model.bean.limit.MemberRechargeLimit;
 import com.gameplat.security.SecurityUserHolder;
 import com.gameplat.security.context.UserCredential;
-
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
-
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -59,9 +81,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
-
-import static com.gameplat.common.enums.DictDataEnum.MAX_DISCOUNT_MONEY;
-import static com.gameplat.common.enums.DictDataEnum.MAX_RECHARGE_MONEY;
 
 @Slf4j
 @Service
@@ -219,7 +238,7 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
 
 
   @Override
-  public void accept(Long id, UserCredential userCredential) throws Exception {
+  public void accept(Long id, UserCredential userCredential, String auditRemarks) throws Exception {
     RechargeOrder rechargeOrder = this.getById(id);
     // 校验订单状态
     verifyRechargeOrderForAuditing(rechargeOrder);
@@ -251,6 +270,9 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
     // 更新订单状态
     rechargeOrder.setAuditorAccount(userCredential.getUsername());
     rechargeOrder.setAuditTime(new Date());
+    if (null != auditRemarks) {
+      rechargeOrder.setAuditRemarks(auditRemarks);
+    }
     rechargeOrder.setStatus(RechargeStatus.SUCCESS.getValue());
     updateRechargeOrder(rechargeOrder);
 
@@ -323,8 +345,8 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
 
     if (manualRechargeOrderBo.isSkipAuditing()) {
       String auditRemarks =
-          StringUtils.isNotBlank(manualRechargeOrderBo.getAuditRemarks()) ? null : "直接入款";
-      accept(rechargeOrder.getId(), userCredential);
+          StringUtils.isBlank(manualRechargeOrderBo.getAuditRemarks()) ? null : "直接入款";
+      accept(rechargeOrder.getId(), userCredential, auditRemarks);
     }
   }
 
@@ -378,7 +400,7 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
   public void crossAccountCheck(UserCredential userCredential, RechargeOrder rechargeOrder)
       throws ServiceException {
     MemberRechargeLimit limit = limitInfoService
-            .getLimitInfo(LimitEnums.MEMBER_RECHARGE_LIMIT, MemberRechargeLimit.class);
+        .getLimitInfo(LimitEnums.MEMBER_RECHARGE_LIMIT, MemberRechargeLimit.class);
     boolean toCheck =
         BooleanEnum.NO.match(limit.getIsHandledAllowOthersOperate())
             && !userCredential.isSuperAdmin();

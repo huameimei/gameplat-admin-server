@@ -55,12 +55,12 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     Assert.notNull(limit, () -> new ServiceException("登录配置信息未配置"));
 
     // 是否开启后台白名单
-    String requestIp = IPUtils.getIpAddress(request);
-    if (BooleanEnum.YES.match(limit.getIpWhiteListSwitch())) {
-      if (!authIpService.isPermitted(requestIp)) {
-        throw new ServiceException("当前IP不允许登录：" + requestIp);
-      }
-    }
+//    String requestIp = IPUtils.getIpAddress(request);
+//    if (BooleanEnum.YES.match(limit.getIpWhiteListSwitch())) {
+//      if (!authIpService.isPermitted(requestIp)) {
+//        throw new ServiceException("当前IP不允许登录：" + requestIp);
+//      }
+//    }
 
     // 是否开启验证码
     if (BooleanEnum.YES.match(limit.getLoginCaptchaSwitch())) {
@@ -83,7 +83,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     UserCredential credential = jwtTokenService.signIn(request, user.getUserName(), password);
 
     // 更新用户登录信息
-    user.setLoginIp(requestIp);
+//    user.setLoginIp(requestIp);
     user.setLoginDate(new Date());
     userService.updateById(user);
 
@@ -126,16 +126,16 @@ public class AuthenticationServiceImpl implements AuthenticationService {
    * @param googleCode String
    */
   private void checkGoogleAuthCode(String safeCode, String googleCode) {
-    if (StringUtils.isBlank(safeCode)) {
-      throw new ServiceException("安全码未设置");
-    }
-
-    if (StringUtils.isBlank(googleCode)) {
-      throw new ServiceException("安全码不能为空!");
-    }
-
-    if (!GoogleAuthenticator.authcode(googleCode, safeCode)) {
-      throw new ServiceException("安全码不正确!");
-    }
+//    if (StringUtils.isBlank(safeCode)) {
+//      throw new ServiceException("安全码未设置");
+//    }
+//
+//    if (StringUtils.isBlank(googleCode)) {
+//      throw new ServiceException("安全码不能为空!");
+//    }
+//
+//    if (!GoogleAuthenticator.authcode(googleCode, safeCode)) {
+//      throw new ServiceException("安全码不正确!");
+//    }
   }
 }

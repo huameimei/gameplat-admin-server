@@ -28,7 +28,7 @@ public interface RechargeOrderService extends IService<RechargeOrder> {
 
     void unHandle(Long id, UserCredential userCredential);
 
-    void accept(Long id, UserCredential userCredential) throws Exception;
+    void accept(Long id, UserCredential userCredential,String auditRemarks) throws Exception;
 
     void cancel(Long id, UserCredential userCredential);
 

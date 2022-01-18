@@ -47,7 +47,7 @@ public class RechargeOrderController {
   @PreAuthorize("hasAuthority('finance:rechargeOrder:accept')")
   public void accept(Long id) throws Exception{
       UserCredential userCredential = SecurityUserHolder.getCredential();
-      rechargeOrderService.accept(id, userCredential);
+      rechargeOrderService.accept(id, userCredential,null);
   }
 
   @PostMapping("/cancel")
@@ -90,7 +90,7 @@ public class RechargeOrderController {
     }
       UserCredential userCredential = SecurityUserHolder.getCredential();
       for (Long id : ids) {
-        rechargeOrderService.accept(id, userCredential);
+        rechargeOrderService.accept(id, userCredential,null);
       }
   }
 

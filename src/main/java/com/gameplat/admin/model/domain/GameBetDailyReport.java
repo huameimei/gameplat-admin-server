@@ -74,7 +74,7 @@ public class GameBetDailyReport implements Serializable {
     /**
      * 中奖金额
      */
-    private Double winAmount;
+    private BigDecimal winAmount;
 
     /**
      * 水钱

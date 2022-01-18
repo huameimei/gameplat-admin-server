@@ -21,7 +21,6 @@ import com.gameplat.admin.service.GameBetDailyReportService;
 import com.gameplat.admin.service.MemberService;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.DateUtil;
-import com.gameplat.base.common.util.DateUtils;
 import com.gameplat.base.common.util.StringUtils;
 import com.gameplat.common.enums.SettleStatusEnum;
 import com.gameplat.common.enums.UserTypes;
@@ -33,12 +32,16 @@ import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.HttpAsyncResponseConsumerFactory;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
+import org.elasticsearch.common.Strings;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
+import org.elasticsearch.search.aggregations.bucket.terms.Terms;
 import org.elasticsearch.search.aggregations.bucket.terms.TermsAggregationBuilder;
+import org.elasticsearch.search.aggregations.metrics.ParsedSum;
 import org.elasticsearch.search.aggregations.metrics.SumAggregationBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.elasticsearch.search.fetch.subphase.FetchSourceContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -46,6 +49,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -197,10 +201,12 @@ public class GameBetDailyReportServiceImpl extends ServiceImpl<GameBetDailyRepor
             log.info("{}~{}游戏日报表汇总，开始执行！", beginTime, endTime);
 
             BoolQueryBuilder builder = QueryBuilders.boolQuery();
+            builder.must(QueryBuilders.termQuery("tenant", "kgsit"));
             builder.must(QueryBuilders.termQuery("settle", SettleStatusEnum.YES.getValue()));
+
             // 会员游戏表集合（北京时间） 按投注时间
-            builder.must(QueryBuilders.rangeQuery("betTime.keyword")
-                    .from(beginTime).to(endTime).format(DateUtils.DATE_TIME_PATTERN));
+//            builder.must(QueryBuilders.rangeQuery("betTime.keyword")
+//                    .from(beginTime).to(endTime).format(DateUtils.DATE_TIME_PATTERN));
             //todo
             SearchRequest searchRequest = new SearchRequest(new String[]{"bet-record_kgsit"});
             SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
@@ -211,24 +217,46 @@ public class GameBetDailyReportServiceImpl extends ServiceImpl<GameBetDailyRepor
             SumAggregationBuilder sumValidAmount = AggregationBuilders.sum("validAmount").field("validAmount");
             SumAggregationBuilder sumWinAmount = AggregationBuilders.sum("winAmount").field("winAmount");
 
-            userNameGroup.subAggregation(sumBetAmount);
-            userNameGroup.subAggregation(sumValidAmount);
-            userNameGroup.subAggregation(sumWinAmount);
-
             firstKindGroup.subAggregation(sumBetAmount);
             firstKindGroup.subAggregation(sumValidAmount);
             firstKindGroup.subAggregation(sumWinAmount);
-
             userNameGroup.subAggregation(firstKindGroup);
 
+            searchSourceBuilder.size(0);
             searchSourceBuilder.query(builder);
             searchSourceBuilder.aggregation(userNameGroup);
+            searchSourceBuilder.fetchSource(new FetchSourceContext(
+                    true, new String[]{"platformCode", "gameKind"}, Strings.EMPTY_ARRAY));
             searchRequest.source(searchSourceBuilder);
             try {
                 RequestOptions.Builder optionsBuilder = RequestOptions.DEFAULT.toBuilder();
                 optionsBuilder.setHttpAsyncResponseConsumerFactory(
                         new HttpAsyncResponseConsumerFactory.HeapBufferedResponseConsumerFactory(31457280));
                 SearchResponse search = restHighLevelClient.search(searchRequest, optionsBuilder.build());
+                Terms terms = search.getAggregations().get("userNameGroup");
+
+                for (Terms.Bucket bucket : terms.getBuckets()) {
+                    String account = bucket.getKeyAsString();
+                    Terms terms2 = bucket.getAggregations().get("firstKindGroup");
+                    for (Terms.Bucket bucket2 : terms2.getBuckets()) {
+                        String firstKind = bucket2.getKeyAsString();
+                        long count = bucket2.getDocCount();
+                        double betAmount = ((ParsedSum) bucket2.getAggregations().get("betAmount")).getValue();
+                        double validAmount = ((ParsedSum) bucket2.getAggregations().get("validAmount")).getValue();
+                        double winAmount = ((ParsedSum) bucket2.getAggregations().get("winAmount")).getValue();
+
+                        GameBetDailyReport report = new GameBetDailyReport();
+                        report.setAccount(account);
+                        report.setPlatformCode(firstKind.split("_")[0]);
+                        report.setGameKind(firstKind.split("_")[1]);
+                        report.setFirstKind(firstKind);
+                        report.setBetCount(count);
+                        report.setBetAmount(new BigDecimal(betAmount));
+                        report.setValidAmount(new BigDecimal(validAmount));
+                        report.setWinAmount(new BigDecimal(winAmount));
+                        assembleList.add(report);
+                    }
+                }
             } catch (IOException e) {
                 e.printStackTrace();
             }

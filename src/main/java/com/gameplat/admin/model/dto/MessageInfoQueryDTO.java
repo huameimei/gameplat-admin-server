@@ -29,11 +29,11 @@ public class MessageInfoQueryDTO {
 
     @ApiModelProperty(value = "开始时间")
     @JsonFormat(pattern = "yyyy-MM-dd")
-    private Date beginTime;
+    private String beginTime;
 
     @ApiModelProperty(value = "结束时间")
     @JsonFormat(pattern = "yyyy-MM-dd")
-    private Date endTime;
+    private String endTime;
 
     @ApiModelProperty(value = "消息类型：2 公告  3 个人消息")
     private Integer type;

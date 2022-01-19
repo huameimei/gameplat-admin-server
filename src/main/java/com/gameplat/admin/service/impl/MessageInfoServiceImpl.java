@@ -27,10 +27,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * 个人消息、站内信
@@ -133,8 +130,10 @@ public class MessageInfoServiceImpl extends ServiceImpl<MessageMapper, MessageIn
     if (CollectionUtils.isNotEmpty(iPage.getRecords())) {
       for (MessageInfoVO messageInfoVO : iPage.getRecords()) {
         // 时间超过了后，消息失效
-        if (messageInfoVO.getStatus() == SwitchStatusEnum.ENABLED.getValue()
-            && new Date().after(messageInfoVO.getEndTime())) {
+        if ( messageInfoVO.getEndTime() != null &&
+                new Date().after(messageInfoVO.getEndTime()) &&
+                Objects.equals(messageInfoVO.getStatus() ,SwitchStatusEnum.ENABLED.getValue())
+            ) {
           messageInfoVO.setStatus(SwitchStatusEnum.DISABLED.getValue());
         }
       }

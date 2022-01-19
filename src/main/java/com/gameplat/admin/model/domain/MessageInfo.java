@@ -3,6 +3,7 @@ package com.gameplat.admin.model.domain;
 import com.baomidou.mybatisplus.annotation.*;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -55,10 +56,10 @@ public class MessageInfo implements Serializable {
   private String linkAccount;
 
   /** 开始时间 */
-  private String beginTime;
+  private Date beginTime;
 
   /** 结束时间 */
-  private String endTime;
+  private Date endTime;
 
   /** 升序排序 */
   private Integer sort;
@@ -84,6 +85,7 @@ public class MessageInfo implements Serializable {
 
   /** 创建时间 */
   @TableField(fill = FieldFill.INSERT)
+  @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
   private Date createTime;
 
   /** 更新人 */

@@ -5,6 +5,7 @@ import com.gameplat.admin.model.dto.MessageInfoAddDTO;
 import com.gameplat.admin.model.dto.MessageInfoEditDTO;
 import com.gameplat.admin.model.vo.MessageInfoVO;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
 /**
  * 个人消息转换器
@@ -18,6 +19,7 @@ public interface MessageInfoConvert {
 
     MessageInfo toEntity(MessageInfoEditDTO messageInfoEditDTO);
 
+//    @Mapping(target = "endTime", dateFormat = "yyyy-MM-dd HH:mm:ss")
     MessageInfoVO toVo(MessageInfo messageInfo);
 
 }

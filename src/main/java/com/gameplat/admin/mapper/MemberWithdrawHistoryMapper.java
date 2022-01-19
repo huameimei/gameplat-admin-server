@@ -1,11 +1,14 @@
 package com.gameplat.admin.mapper;
 
-
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Constants;
+import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.gameplat.admin.model.domain.MemberWithdrawHistory;
+import com.gameplat.admin.model.dto.IpAnalysisDTO;
 import com.gameplat.admin.model.dto.QueryIpStatReportDTO;
+import com.gameplat.admin.model.vo.IpAnalysisVO;
 import com.gameplat.admin.model.vo.IpStatisticsVO;
 import com.gameplat.admin.model.vo.MemberWithdrawHistorySummaryVO;
 import org.apache.ibatis.annotations.Param;
@@ -25,4 +28,7 @@ public interface MemberWithdrawHistoryMapper extends BaseMapper<MemberWithdrawHi
 
   /** 提现IP统计 */
   List<IpStatisticsVO> findIp(QueryIpStatReportDTO dto);
+
+  /** 提现IP分析 */
+  IPage<IpAnalysisVO> page (PageDTO<IpAnalysisVO> page, IpAnalysisDTO dto);
 }

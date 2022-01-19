@@ -5,7 +5,10 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Constants;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.gameplat.admin.model.domain.Member;
+import com.gameplat.admin.model.dto.IpAnalysisDTO;
+import com.gameplat.admin.model.vo.IpAnalysisVO;
 import com.gameplat.admin.model.vo.MemberInfoVO;
 import com.gameplat.admin.model.vo.MemberVO;
 import java.util.List;
@@ -69,4 +72,7 @@ public interface MemberMapper extends BaseMapper<Member> {
    * @return List<Member>
    * */
   List<Member> getInfoByAccount(@Param("accountList") List<String> accountList);
+
+  /** 注册ip分析 */
+  IPage<IpAnalysisVO> page(PageDTO<IpAnalysisVO> page, IpAnalysisDTO dto);
 }

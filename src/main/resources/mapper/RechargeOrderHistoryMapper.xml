@@ -25,20 +25,26 @@
        ORDER BY create_Time desc
    </select>
 
+    <!--   充值IP分析  -->
     <select id="page" parameterType="com.gameplat.admin.model.dto.IpAnalysisDTO" resultType="com.gameplat.admin.model.vo.IpAnalysisVO">
-<!--        SELECT-->
-<!--                distinct account,-->
-<!--                         nickname fullName,-->
-<!--                         member_id as memberId,-->
-<!--                         ip_address as ipAddress,-->
-<!--                         balance money,-->
-<!--                        (select count(COALESCE(ip_address,'null')) from recharge_order_history where 1=1 and ip_address = ipAddress) ipCount-->
-<!--        from recharge_order_history-->
-<!--        WHERE 1=1-->
-<!--        and account = #{}-->
-<!--        and ip_address = #{loginIp}-->
-<!--        and add_time between-->
-<!--        group by member_id, ip_address-->
-<!--        order by member_id desc, create_time desc-->
+        SELECT
+            distinct member_id as memberId,
+            account,
+            nickname fullName,
+            ip_address as ipAddress,
+            balance money,
+            (select count(COALESCE(ip_address,'null')) from recharge_order_history where 1=1 and ip_address = ipAddress) ipCount
+        from recharge_order_history
+        WHERE 1 = 1
+            <if test="account != null"> and account = #{account}</if>
+            <if test="loginIp != null"> and ip_address = #{loginIp}</if>
+            <if test="beginTime != null and beginTime != ''">
+                and date_format(create_time,'%y%m%d') <![CDATA[ >= ]]> date_format(#{beginTime},'%y%m%d')
+            </if>
+            <if test="endTime != null and endTime != ''">
+                and date_format(create_time,'%y%m%d') <![CDATA[ <= ]]> date_format(#{endTime},'%y%m%d')
+            </if>
+            group by member_id, ip_address
+            order by member_id desc, create_time desc
     </select>
 </mapper>

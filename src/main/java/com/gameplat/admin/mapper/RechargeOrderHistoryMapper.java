@@ -30,5 +30,5 @@ public interface RechargeOrderHistoryMapper extends BaseMapper<RechargeOrderHist
   List<IpStatisticsVO> findIp(QueryIpStatReportDTO dto);
 
   /** 充值IP分析 */
-  IPage<IpAnalysisVO> page (PageDTO<IpAnalysisVO> page, IpAnalysisDTO dto);
+  IPage<IpAnalysisVO> page (PageDTO<IpAnalysisVO> page,@Param("dto") IpAnalysisDTO dto);
 }

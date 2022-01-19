@@ -307,8 +307,8 @@
     <select id="page" parameterType="com.gameplat.admin.model.dto.IpAnalysisDTO" resultType="com.gameplat.admin.model.vo.IpAnalysisVO">
         SELECT
             m.id as memberId,
-            m.account,
-            m.real_name fullName,
+            m.account as account,
+            m.real_name as fullName,
             m.register_ip as ipAddress,
             (select count(1) from member where 1=1 AND user_type = 'M' and register_ip = ipAddress) as ipCount,
             mi.balance as money
@@ -316,13 +316,13 @@
         left join member_info mi on m.id = mi.member_id
             where 1=1
             and user_type = 'M'
-            <if test="account != null"> and m.account = #{account}</if>
-            <if test="loginIp != null"> and m.register_ip = #{loginIp}</if>
-            <if test="beginTime != null and beginTime != ''">
-                and date_format(m.create_time,'%y%m%d') <![CDATA[ >= ]]> date_format(#{beginTime},'%y%m%d')
+            <if test="dto.account != null"> and m.account = #{dto.account}</if>
+            <if test="dto.loginIp != null"> and m.register_ip = #{dto.loginIp}</if>
+            <if test="dto.beginTime != null and dto.beginTime != ''">
+                and date_format(m.create_time,'%y%m%d') <![CDATA[ >= ]]> date_format(#{dto.beginTime},'%y%m%d')
             </if>
-            <if test="endTime != null and endTime != ''">
-                and date_format(m.create_time,'%y%m%d') <![CDATA[ <= ]]> date_format(#{endTime},'%y%m%d')
+            <if test="dto.endTime != null and dto.endTime != ''">
+                and date_format(m.create_time,'%y%m%d') <![CDATA[ <= ]]> date_format(#{dto.endTime},'%y%m%d')
             </if>
             group  by m.id, m.register_ip
             order by m.id desc, m.create_time desc

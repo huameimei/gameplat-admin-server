@@ -12,6 +12,8 @@ import com.gameplat.admin.model.vo.IpAnalysisVO;
 import com.gameplat.admin.model.vo.MemberInfoVO;
 import com.gameplat.admin.model.vo.MemberVO;
 import java.util.List;
+
+import io.swagger.v3.oas.annotations.Parameter;
 import org.apache.ibatis.annotations.Param;
 
 public interface MemberMapper extends BaseMapper<Member> {
@@ -74,5 +76,5 @@ public interface MemberMapper extends BaseMapper<Member> {
   List<Member> getInfoByAccount(@Param("accountList") List<String> accountList);
 
   /** 注册ip分析 */
-  IPage<IpAnalysisVO> page(PageDTO<IpAnalysisVO> page, IpAnalysisDTO dto);
+  IPage<IpAnalysisVO> page(PageDTO<IpAnalysisVO> page, @Param("dto") IpAnalysisDTO dto);
 }

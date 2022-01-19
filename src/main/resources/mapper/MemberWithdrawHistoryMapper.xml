@@ -34,15 +34,15 @@
         ip_address as loginAddress,
         (select count(distinct member_id,  COALESCE(ip_address,'null')) from member_withdraw_history where 1=1 and ip_address = loginAddress) as ipCount,
         account_money money
-        from recharge_order_history
+        from member_withdraw_history
         WHERE 1 = 1
-        <if test="account != null"> and account = #{account}</if>
-        <if test="loginIp != null"> and ip_address = #{loginIp}</if>
-        <if test="beginTime != null and beginTime != ''">
-            and date_format(create_time,'%y%m%d') <![CDATA[ >= ]]> date_format(#{beginTime},'%y%m%d')
+        <if test="dto.account != null"> and account = #{dto.account}</if>
+        <if test="dto.loginIp != null"> and ip_address = #{dto.loginIp}</if>
+        <if test="dto.beginTime != null and dto.beginTime != ''">
+            and date_format(create_time,'%y%m%d') <![CDATA[ >= ]]> date_format(#{dto.beginTime},'%y%m%d')
         </if>
-        <if test="endTime != null and endTime != ''">
-            and date_format(create_time,'%y%m%d') <![CDATA[ <= ]]> date_format(#{endTime},'%y%m%d')
+        <if test="dto.endTime != null and dto.endTime != ''">
+            and date_format(create_time,'%y%m%d') <![CDATA[ <= ]]> date_format(#{dto.endTime},'%y%m%d')
         </if>
         group by member_id, ip_address
         order by member_id desc, create_time desc

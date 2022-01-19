@@ -30,5 +30,5 @@ public interface MemberWithdrawHistoryMapper extends BaseMapper<MemberWithdrawHi
   List<IpStatisticsVO> findIp(QueryIpStatReportDTO dto);
 
   /** 提现IP分析 */
-  IPage<IpAnalysisVO> page (PageDTO<IpAnalysisVO> page, IpAnalysisDTO dto);
+  IPage<IpAnalysisVO> page (PageDTO<IpAnalysisVO> page, @Param("dto") IpAnalysisDTO dto);
 }

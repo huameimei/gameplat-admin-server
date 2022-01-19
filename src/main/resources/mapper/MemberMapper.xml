@@ -326,5 +326,5 @@
             </if>
             group  by m.id, m.register_ip
             order by m.id desc, m.create_time desc
-    </select>>
+    </select>
 </mapper>

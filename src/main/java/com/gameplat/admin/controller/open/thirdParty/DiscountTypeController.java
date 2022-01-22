@@ -7,6 +7,7 @@ import com.gameplat.admin.model.domain.DiscountType;
 import com.gameplat.admin.model.dto.DiscountTypeAddDTO;
 import com.gameplat.admin.model.dto.DiscountTypeEditDTO;
 import com.gameplat.admin.service.DiscountTypeService;
+import com.gameplat.base.common.enums.EnableEnum;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -58,7 +59,7 @@ public class DiscountTypeController {
   @GetMapping("/queryAll")
   @PreAuthorize("hasAuthority('thirdParty:discountType:queryAll')")
   public List<DiscountType> queryList() {
-    return discountTypeService.list();
+    return discountTypeService.lambdaQuery().eq(DiscountType::getStatus, EnableEnum.ENABLED.code()).list();
   }
 
 }

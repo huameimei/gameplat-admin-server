@@ -54,6 +54,6 @@ public class RechVirtualController {
     }
     dictData.setDictLabel(JSONObject.parseObject(dictData.getDictValue()).getString("configKey"));
     dictData.setDictType(DictTypeEnum.RECH_VIRTUAL.getValue());
-    dictDataService.updateDictData(dictData);
+    dictDataService.insertDictData(dictData);
   }
 }

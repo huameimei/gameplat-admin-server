@@ -10,6 +10,8 @@ public class DiscountTypeEditDTO implements Serializable {
 
   private String name;
 
+  private Integer discountRatio;
+
   private Integer sort;
 
 }

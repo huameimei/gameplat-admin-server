@@ -45,4 +45,15 @@ public class RechVirtualController {
     dictData.setDictType(DictTypeEnum.RECH_VIRTUAL.getValue());
     dictDataService.updateDictData(dictData);
   }
+
+  @PutMapping("/add")
+  @PreAuthorize("hasAuthority('thirdParty:rechVirtual:add')")
+  public void add(@RequestBody OperDictDataDTO dictData) {
+    if (StringUtils.isBlank(dictData.getDictValue())) {
+      throw new ServiceException("值不能为空");
+    }
+    dictData.setDictLabel(JSONObject.parseObject(dictData.getDictValue()).getString("configKey"));
+    dictData.setDictType(DictTypeEnum.RECH_VIRTUAL.getValue());
+    dictDataService.updateDictData(dictData);
+  }
 }

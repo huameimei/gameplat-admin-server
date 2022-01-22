@@ -29,6 +29,8 @@ public class DiscountType {
 
   private Integer sort;
 
+  private Integer discountRatio;
+
   @ApiModelProperty(value = "状态: [1 - 启用, 0 - 禁用]")
   private Integer status;
 

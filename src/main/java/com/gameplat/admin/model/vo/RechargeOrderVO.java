@@ -1,5 +1,6 @@
 package com.gameplat.admin.model.vo;
 
+import io.swagger.annotations.ApiModelProperty;
 import java.math.BigDecimal;
 import java.util.Date;
 import lombok.Data;
@@ -72,5 +73,7 @@ public class RechargeOrderVO {
   private String payType;
 
   private Long memberId;
+
+  private Integer pointFlag;
 
 }

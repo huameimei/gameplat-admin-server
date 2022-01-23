@@ -74,4 +74,7 @@ public class RechargeOrderHistoryVO {
   private Long memberId;
 
   private Integer memberLevel;
+
+  private Integer pointFlag;
+
 }

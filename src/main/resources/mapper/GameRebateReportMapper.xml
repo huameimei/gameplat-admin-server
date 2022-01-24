@@ -10,7 +10,7 @@
     <result property="userPaths" column="user_paths"/>
     <result property="platformCode" column="platform_code"/>
     <result property="gameKind" column="game_kind"/>
-    <result property="firstKind" column="first_kind"/>
+    <result property="gameType" column="game_type"/>
     <result property="rebateMoney" column="rebate_money"/>
     <result property="realRebateMoney" column="real_rebate_money"/>
     <result property="createTime" column="create_time"/>

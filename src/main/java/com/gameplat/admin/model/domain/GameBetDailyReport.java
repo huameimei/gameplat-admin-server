@@ -57,9 +57,9 @@ public class GameBetDailyReport implements Serializable {
     private String gameKind;
 
     /**
-     * 一级分类
+     * 游戏大类
      */
-    private String firstKind;
+    private String gameType;
 
     /**
      * 投注金额

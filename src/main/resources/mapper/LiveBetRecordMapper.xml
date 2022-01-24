@@ -7,7 +7,7 @@
         select
         gb.bill_no as billNo,
         gb.account as userName,
-        gb.first_kind as firstKind,
+        gb.game_type as gameType,
         gb.win_amount as winAmount,
         gb.bet_amount as betAmount,
         gb.valid_amount as validAmount,

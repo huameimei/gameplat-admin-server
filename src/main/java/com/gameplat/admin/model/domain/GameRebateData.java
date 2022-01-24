@@ -73,6 +73,6 @@ public class GameRebateData implements Serializable {
 
   private Integer winCount;
 
-  private String firstKind;
+  private String gameType;
 
 }

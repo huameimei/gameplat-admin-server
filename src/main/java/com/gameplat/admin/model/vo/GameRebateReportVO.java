@@ -39,7 +39,7 @@ public class GameRebateReportVO implements Serializable {
    */
   private String gameKind;
 
-  private String firstKind;
+  private String gameType;
 
   /**
    * 添加时间

@@ -249,7 +249,7 @@ public class GameBetDailyReportServiceImpl extends ServiceImpl<GameBetDailyRepor
                         report.setAccount(account);
                         report.setPlatformCode(firstKind.split("_")[0]);
                         report.setGameKind(firstKind.split("_")[1]);
-                        report.setFirstKind(firstKind);
+                        report.setGameType(firstKind);
                         report.setBetCount(count);
                         report.setBetAmount(new BigDecimal(betAmount));
                         report.setValidAmount(new BigDecimal(validAmount));

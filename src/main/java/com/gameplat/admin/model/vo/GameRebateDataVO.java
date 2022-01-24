@@ -57,7 +57,7 @@ public class GameRebateDataVO implements Serializable {
 
   private Integer winCount;
 
-  private String firstKind;
+  private String gameType;
 
   private String name;
 

@@ -103,10 +103,4 @@ public class LiveBetRecord implements Serializable {
      */
     private String chair;
 
-    /**
-     * 一级分类
-     */
-    private String firstKind;
-
-
 }

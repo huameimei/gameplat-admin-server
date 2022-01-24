@@ -48,7 +48,7 @@ public class GameMemberDayReportVO implements Serializable {
    */
   private String gameKind;
 
-  private String firstKind;
+  private String gameType;
 
   /**
    * 年月日

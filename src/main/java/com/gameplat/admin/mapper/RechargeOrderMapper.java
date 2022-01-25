@@ -19,11 +19,6 @@ public interface RechargeOrderMapper extends BaseMapper<RechargeOrder> {
     @Select("select sum(amount) from recharge_order ${ew.customSqlSegment}")
     BigDecimal summaryRechargeOrder(@Param(Constants.WRAPPER) Wrapper<RechargeOrder> wrapper);
 
-/*
-  @Select("select sum(amount) from recharge_order where status = #{status}")
-  RechargeSummaryVO summaryRechargeOrder(@Param("status") Integer status);
-*/
-
     /**
      * 获取充值金额达标的会员账号
      */

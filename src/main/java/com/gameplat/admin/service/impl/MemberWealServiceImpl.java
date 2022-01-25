@@ -383,8 +383,6 @@ public class MemberWealServiceImpl extends ServiceImpl<MemberWealMapper, MemberW
                                     validWithdraw.setDiscountMoney(BigDecimal.ZERO);
                                     validWithdraw.setRemark(member.getAccount() + content + "增加打码量");
                                     validWithdrawService.saveValidWithdraw(validWithdraw);
-                                    //todo 修改钱包 记录现金流水  插入`已完成`状态的 userGrowthReword 记录
-                                    // 给用户增加真币资产
                                     //账户资金锁
                                     String lockKey = MessageFormat.format(MemberServiceKeyConstant.MEMBER_FINANCIAL_LOCK, member.getAccount());
                                     try {

@@ -5,24 +5,53 @@
     <!--获取充值金额达标的会员账号-->
     <select id="getSatisfyRechargeAccount" parameterType="java.lang.String" resultType="java.lang.String">
         SELECT
+        account
+        FROM
+        (
+        SELECT
+        account
+        FROM
+        (
+        SELECT
         t.account
         FROM
         (
         SELECT
         account,
         sum( amount ) rechargeMoney
-        FROM recharge_order
+        FROM
+        recharge_order
         <where>
-            AND status = 3
+            STATUS = 3
             <if test="startTime != null and startTime != ''">
-                AND create_time &gt;= #{startTime}
+                and create_time &gt;= #{startTime}
             </if>
             <if test="endTime != null and endTime != ''">
-                AND create_time &lt;= #{endTime}
+                and create_time &lt;= #{endTime}
             </if>
-        </where>
-        GROUP BY member_id, account ) t
-        WHERE rechargeMoney >= #{minRechargeAmount}
+        </where> GROUP BY member_id, account ) t WHERE rechargeMoney >= #{minRechargeAmount}
+        ) r UNION ALL
+        SELECT
+        t.account
+        FROM
+        (
+        SELECT
+        account,
+        sum( amount ) rechargeMoney
+        FROM
+        recharge_order_history
+        <where>
+            and status = 3
+            <if test="startTime != null and startTime != ''">
+                and create_time &gt;= #{startTime}
+            </if>
+            <if test="endTime != null and endTime != ''">
+                and create_time &lt;= #{endTime}
+            </if>
+        </where> group by member_id, account ) t where rechargeMoney >= #{minRechargeAmount}
+        ) ro
+        GROUP BY
+        account
     </select>
 
     <select id="findRechargeInfo" resultType="com.gameplat.admin.model.bean.ActivityStatisticItem">

@@ -103,4 +103,28 @@ public class MemberGrowthConfigVO {
 
     @ApiModelProperty("其它提示")
     private String otherDesc;
+
+    @ApiModelProperty("VIP经验值描述 en-US")
+    private String growthDescEn;
+
+    @ApiModelProperty("VIP经验值描述 th-TH")
+    private String growthDescTh;
+
+    @ApiModelProperty("VIP经验值描述 in-ID")
+    private String growthDescIn;
+
+    @ApiModelProperty("VIP经验值描述 vi-VN")
+    private String growthDescVi;
+
+    @ApiModelProperty("其它提示 en-US")
+    private String otherDescEn;
+
+    @ApiModelProperty("其它提示 th-TH")
+    private String otherDescTh;
+
+    @ApiModelProperty("其它提示 in-ID")
+    private String otherDescIn;
+
+    @ApiModelProperty("其它提示 vi-VN")
+    private String otherDescVi;
 }

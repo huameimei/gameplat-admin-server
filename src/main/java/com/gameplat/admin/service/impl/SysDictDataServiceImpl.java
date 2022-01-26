@@ -121,9 +121,7 @@ public class SysDictDataServiceImpl extends ServiceImpl<SysDictDataMapper, SysDi
             ObjectUtils.isNotEmpty(dictData.getDictType()),
             SysDictData::getDictType,
             dictData.getDictType())
-        .eq(
-            SysDictData::getStatus,
-            1)
+        .eq(SysDictData::getStatus, 1)
         .list();
   }
 
@@ -164,7 +162,10 @@ public class SysDictDataServiceImpl extends ServiceImpl<SysDictDataMapper, SysDi
     if (null == status) {
       throw new ServiceException("状态不能为空!");
     }
-    this.lambdaUpdate().set(SysDictData::getStatus, status).eq(SysDictData::getId, id).update(new SysDictData());
+    this.lambdaUpdate()
+        .set(SysDictData::getStatus, status)
+        .eq(SysDictData::getId, id)
+        .update(new SysDictData());
   }
 
   @Override

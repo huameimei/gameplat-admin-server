@@ -8,6 +8,7 @@ import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.convert.RoleConvert;
+import com.gameplat.common.enums.BooleanEnum;
 import com.gameplat.common.enums.DefaultEnums;
 import com.gameplat.admin.mapper.SysRoleMapper;
 import com.gameplat.admin.mapper.SysRoleMenuMapper;
@@ -67,7 +68,7 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole>
   public void deleteGroupById(Long id) {
     SysRole role = this.getById(id);
     Assert.notNull(role, "分组不存在");
-    Assert.isFalse(DefaultEnums.Y.match(role.getDefaultFlag()), "默认分组不能删除");
+    Assert.isFalse(BooleanEnum.YES.match(role.getDefaultFlag()), "默认分组不能删除");
 
     if (!this.removeById(id)) {
       throw new ServiceException("删除分组失败!");

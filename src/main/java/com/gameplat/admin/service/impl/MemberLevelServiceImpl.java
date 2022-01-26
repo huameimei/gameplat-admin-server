@@ -233,10 +233,11 @@ public class MemberLevelServiceImpl extends ServiceImpl<MemberLevelMapper, Membe
       List<MemberLevel> levels, List<MemberInfo> memberInfos) {
     return memberInfos.stream()
         .map(
-            memberInfo -> {
-              Integer matched = this.getMatchedLevel(levels, memberInfo);
-              return Member.builder().id(memberInfo.getMemberId()).userLevel(matched).build();
-            })
+            memberInfo ->
+                Member.builder()
+                    .id(memberInfo.getMemberId())
+                    .userLevel(this.getMatchedLevel(levels, memberInfo))
+                    .build())
         .collect(Collectors.toList());
   }
 

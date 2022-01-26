@@ -31,4 +31,6 @@ public class AdminLoginDTO implements Serializable {
   private String userAgent;
 
   private String deviceId;
+
+  private String uuid;
 }

@@ -1,7 +1,6 @@
 package com.gameplat.admin.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
-import cn.hutool.core.lang.Assert;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -21,6 +20,7 @@ import com.gameplat.admin.service.MemberService;
 import com.gameplat.admin.service.PasswordService;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.StringUtils;
+import com.gameplat.common.lang.Assert;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -76,11 +76,11 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
     this.setMemberParent(member);
 
     // 保存会员和会员详情
-    Assert.isTrue(this.save(member), () -> new ServiceException("新增会员失败!"));
-    Assert.isTrue(
-        memberInfoService.save(
-            MemberInfo.builder().memberId(member.getId()).rebate(dto.getRebate()).build()),
-        () -> new ServiceException("新增会员失败!"));
+    Assert.isTrue(this.save(member), "新增会员失败!");
+
+    MemberInfo memberInfo =
+        MemberInfo.builder().memberId(member.getId()).rebate(dto.getRebate()).build();
+    Assert.isTrue(memberInfoService.save(memberInfo), "新增会员失败!");
   }
 
   @Override
@@ -89,10 +89,9 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
         MemberInfo.builder().memberId(dto.getId()).rebate(dto.getRebate()).build();
 
     // 更新会员信息和会员详情
-    if (!this.updateById(memberConvert.toEntity(dto))
-        || !memberInfoService.updateById(memberInfo)) {
-      throw new ServiceException("修改会员信息失败!");
-    }
+    Assert.isTrue(
+        this.updateById(memberConvert.toEntity(dto)) && memberInfoService.updateById(memberInfo),
+        "修改会员信息失败!");
   }
 
   @Override
@@ -161,12 +160,13 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
   public void resetPassword(MemberPwdUpdateDTO dto) {
     Member member = this.getById(dto.getId());
     String password = passwordService.encode(dto.getPassword(), member.getAccount());
-    if (!this.lambdaUpdate()
-        .set(Member::getPassword, password)
-        .eq(Member::getId, member.getId())
-        .update(new Member())) {
-      throw new ServiceException("重置会员密码失败!");
-    }
+
+    Assert.isTrue(
+        this.lambdaUpdate()
+            .set(Member::getPassword, password)
+            .eq(Member::getId, member.getId())
+            .update(new Member()),
+        "重置会员密码失败!");
 
     // 更新会员备注
     memberRemarkService.update(dto.getId(), dto.getRemark());
@@ -182,7 +182,7 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
             .set(MemberInfo::getCashPassword, password)
             .eq(MemberInfo::getMemberId, member.getId())
             .update(new MemberInfo()),
-        () -> new ServiceException("重置会员提现密码失败!"));
+        "重置会员提现密码失败!");
   }
 
   @Override
@@ -192,7 +192,7 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
             .set(Member::getWithdrawFlag, flag)
             .eq(Member::getId, id)
             .update(new Member()),
-        () -> new ServiceException("修改会员提现状态失败!"));
+        "修改会员提现状态失败!");
   }
 
   @Override
@@ -203,7 +203,7 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
             .set(Member::getRealName, dto.getRealName())
             .eq(Member::getId, member.getId())
             .update(new Member()),
-        () -> new ServiceException("重置会员真实姓名失败!"));
+        "重置会员真实姓名失败!");
   }
 
   @Override
@@ -223,7 +223,7 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
   public void updateRealName(Long memberId, String realName) {
     Assert.isTrue(
         this.lambdaUpdate().set(Member::getRealName, realName).eq(Member::getId, memberId).update(),
-        () -> new ServiceException("修改会员真实姓名失败!"));
+        "修改会员真实姓名失败!");
   }
 
   /**
@@ -242,6 +242,7 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
     member.setParentId(parent.getId());
     member.setParentName(parent.getAccount());
     member.setSuperPath(parent.getSuperPath().concat(member.getAccount()).concat("/"));
+
     if (MemberEnums.Type.AGENT.match(member.getUserType())) {
       member.setAgentLevel(parent.getAgentLevel() + 1);
     }
@@ -269,13 +270,13 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
    * @param status int
    */
   private void changeStatus(List<Long> ids, int status) {
-    Assert.notEmpty(ids, () -> new ServiceException("会员ID不能为空"));
+    Assert.notEmpty(ids, "会员ID不能为空");
 
-    if (!this.lambdaUpdate()
-        .set(Member::getStatus, status)
-        .in(Member::getId, ids)
-        .update(new Member())) {
-      throw new ServiceException("批量启用失败");
-    }
+    Assert.isTrue(
+        this.lambdaUpdate()
+            .set(Member::getStatus, status)
+            .in(Member::getId, ids)
+            .update(new Member()),
+        "批量启用失败!");
   }
 }

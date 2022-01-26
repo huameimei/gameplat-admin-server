@@ -28,4 +28,30 @@ public class SysUserEnums {
       return ADMIN.value.equals(value);
     }
   }
+
+  public enum Status {
+
+    /** 冻结 */
+    FROZEN(-1),
+
+    /** 禁用 */
+    DISABLED(0),
+
+    /** 启用 */
+    ENABLED(1);
+
+    private final int value;
+
+    Status(int value) {
+      this.value = value;
+    }
+
+    public boolean match(int value) {
+      return this.value == value;
+    }
+
+    public int value() {
+      return value;
+    }
+  }
 }

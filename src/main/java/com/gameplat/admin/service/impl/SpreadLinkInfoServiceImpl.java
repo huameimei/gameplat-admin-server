@@ -8,6 +8,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.convert.SpreadLinkInfoConvert;
 import com.gameplat.base.common.enums.EnableEnum;
+import com.gameplat.common.enums.BooleanEnum;
 import com.gameplat.common.enums.DefaultEnums;
 import com.gameplat.admin.mapper.SpreadLinkInfoMapper;
 import com.gameplat.admin.model.domain.SpreadLinkInfo;
@@ -156,11 +157,11 @@ public class SpreadLinkInfoServiceImpl extends ServiceImpl<SpreadLinkInfoMapper,
       throw new ServiceException("推广地址或推广码已被使用！");
     }
 
-    linkInfo.setExclusiveFlag(DefaultEnums.N.value());
+    linkInfo.setExclusiveFlag(BooleanEnum.NO.value());
     if (StringUtils.isNotBlank(linkInfo.getExternalUrl())
         && StringUtils.isNotBlank(linkInfo.getAgentAccount())) {
       // 设置专属
-      linkInfo.setExclusiveFlag(DefaultEnums.Y.value());
+      linkInfo.setExclusiveFlag(BooleanEnum.YES.value());
     }
 
     if (!this.save(linkInfo)) {

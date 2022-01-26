@@ -1,8 +1,8 @@
 package com.gameplat.admin.service.impl;
 
-import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.json.JSONObject;
 import com.alibaba.fastjson.JSONArray;
+import com.alicp.jetcache.anno.CacheInvalidate;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
@@ -24,12 +24,12 @@ import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.json.JsonUtils;
 import com.gameplat.base.common.util.StringUtils;
 import com.gameplat.common.compent.email.EmailSender;
-import com.gameplat.common.compent.oss.config.FileConfig;
-import com.gameplat.common.compent.sms.SmsConfig;
+import com.gameplat.common.constant.CachedKeys;
+import com.gameplat.common.enums.DefaultEnums;
 import com.gameplat.common.enums.DictDataEnum;
 import com.gameplat.common.enums.DictTypeEnum;
+import com.gameplat.common.lang.Assert;
 import com.gameplat.common.model.bean.EmailConfig;
-import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
@@ -38,7 +38,6 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -76,7 +75,7 @@ public class SystemConfigServiceImpl implements SystemConfigService {
     AgentContacaConfig agentContacaConfig = agentContacaConfigConvert.toEntity(dto);
     List<AgentContacaConfig> list = new ArrayList<>();
 
-    Boolean flag = false;
+    boolean flag = false;
     if (CollectionUtils.isNotEmpty(agentContacaConfigList)) {
       for (AgentContacaConfig contacaConfig : agentContacaConfigList) {
         if (contacaConfig.getId().equals(dto.getId())) {
@@ -136,71 +135,21 @@ public class SystemConfigServiceImpl implements SystemConfigService {
   }
 
   @Override
-  public List<SmsConfig> findSmsList() {
-    List<SysDictData> dictDataList =
-        dictDataService.getDictDataByType(DictTypeEnum.SMS_CONFIG.getValue());
-
-    if (CollectionUtils.isEmpty(dictDataList)) {
-      return Collections.emptyList();
-    }
-
-    return dictDataList.stream()
-        .map(e -> JsonUtils.parse(e.getDictValue(), SmsConfig.class))
-        .collect(Collectors.toList());
-  }
-
-  @Override
-  public List<FileConfig> findFileList() {
-    return Optional.ofNullable(configService.getValue(DictDataEnum.FILE))
-        .map(e -> JSONArray.parseArray(e, FileConfig.class))
-        .orElse(null);
-  }
-
-  @Override
-  public void updateSmsConfig(SysDictData dictData) {
-    List<SysDictData> dictDataList =
-        dictDataService.getDictDataByType(DictTypeEnum.SMS_CONFIG.getValue());
+  @CacheInvalidate(name = CachedKeys.DICT_DATA_CACHE, key = "#dictData.dictType")
+  public void updateConfig(SysDictData dictData) {
+    List<SysDictData> dictDataList = dictDataService.getDictDataByType(dictData.getDictType());
 
     if (CollectionUtils.isNotEmpty(dictDataList)) {
-      // 禁用全部
-      dictDataList.forEach(e -> e.setIsDefault("N"));
+      dictDataList.forEach(e -> e.setIsDefault(DefaultEnums.NO.value().toString()));
+      dictDataList.replaceAll(e -> e.getId().equals(dictData.getId()) ? dictData : e);
     }
 
-    // 保存
-    if (!dictDataService.saveOrUpdate(dictData)) {
-      throw new ServiceException("修改失败!");
-    }
+    Assert.isTrue(dictDataService.saveOrUpdateBatch(dictDataList), "修改失败!");
   }
 
   @Override
-  public void updateFileConfig(FileConfig config) {
-    // 设为启用
-    config.setEnable(true);
-
-    SysDictData dictData =
-        dictDataService.getDictData(
-            DictTypeEnum.FILE_CONFIG.getValue(), DictDataEnum.FILE.getLabel());
-
-    List<FileConfig> configs =
-        Optional.of(dictData)
-            .map(SysDictData::getDictValue)
-            .map(c -> JsonUtils.parse(c, new TypeReference<List<FileConfig>>() {}))
-            .filter(CollectionUtil::isNotEmpty)
-            .orElseGet(() -> Lists.newArrayList(config));
-
-    if (CollectionUtils.isNotEmpty(configs)) {
-      // 禁用全部
-      configs.forEach(e -> e.setEnable(false));
-
-      // 替换旧数据
-      configs.replaceAll(c -> c.getProvider().equals(config.getProvider()) ? config : c);
-    }
-
-    // 保存
-    dictData.setDictValue(JsonUtils.toJson(configs));
-    if (!dictDataService.saveOrUpdate(dictData)) {
-      throw new ServiceException("修改失败!");
-    }
+  public List<SysDictData> findList(String dictType) {
+    return dictDataService.getDictDataByType(dictType);
   }
 
   @Override
@@ -231,12 +180,10 @@ public class SystemConfigServiceImpl implements SystemConfigService {
   @Override
   public void updateEmail(EmailConfig config) {
     SysDictData dictData =
-        dictDataService.getDictData(
-            DictTypeEnum.EMAIL_CONFIG.getValue(), DictDataEnum.EMAIL.getLabel());
-
-    if (null == dictData) {
-      throw new ServiceException("邮箱配置不存在!");
-    }
+        Assert.notNull(
+            dictDataService.getDictData(
+                DictTypeEnum.EMAIL_CONFIG.getValue(), DictDataEnum.EMAIL.getLabel()),
+            "邮箱配置不存在!");
 
     dictDataService.updateDictData(
         OperDictDataDTO.builder()

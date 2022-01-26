@@ -1,7 +1,5 @@
 package com.gameplat.admin.service.impl;
 
-import cn.hutool.core.lang.Assert;
-import com.gameplat.admin.cache.AdminCache;
 import com.gameplat.admin.model.domain.SysUser;
 import com.gameplat.admin.model.dto.AdminLoginDTO;
 import com.gameplat.admin.model.vo.UserToken;
@@ -9,17 +7,15 @@ import com.gameplat.admin.service.*;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.GoogleAuthenticator;
 import com.gameplat.base.common.util.IPUtils;
-import com.gameplat.base.common.util.StringUtils;
-import com.gameplat.common.compent.kaptcha.KaptchaProducer;
 import com.gameplat.common.enums.BooleanEnum;
 import com.gameplat.common.enums.LimitEnums;
+import com.gameplat.common.lang.Assert;
 import com.gameplat.common.model.bean.RefreshToken;
 import com.gameplat.common.model.bean.limit.AdminLoginLimit;
 import com.gameplat.security.context.UserCredential;
 import com.gameplat.security.service.JwtTokenService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,12 +32,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
   @Autowired private SysUserService userService;
 
-  @Autowired private SysAuthIpService authIpService;
-
-  @Autowired private KaptchaProducer kaptchaProducer;
-
-  @Autowired private AdminCache adminCache;
-
   @Autowired private JwtTokenService jwtTokenService;
 
   @Autowired private PermissionService permissionService;
@@ -51,41 +41,22 @@ public class AuthenticationServiceImpl implements AuthenticationService {
   @Override
   public UserToken login(AdminLoginDTO dto, HttpServletRequest request) {
     AdminLoginLimit limit =
-        limitInfoService.getLimitInfo(LimitEnums.ADMIN_LOGIN_CONFIG, AdminLoginLimit.class);
-    Assert.notNull(limit, () -> new ServiceException("登录配置信息未配置"));
+        Assert.notNull(
+            limitInfoService.getLimitInfo(LimitEnums.ADMIN_LOGIN_CONFIG, AdminLoginLimit.class),
+            "登录配置信息未配置");
 
-    // 是否开启后台白名单
-//    String requestIp = IPUtils.getIpAddress(request);
-//    if (BooleanEnum.YES.match(limit.getIpWhiteListSwitch())) {
-//      if (!authIpService.isPermitted(requestIp)) {
-//        throw new ServiceException("当前IP不允许登录：" + requestIp);
-//      }
-//    }
-
-    // 是否开启验证码
-    if (BooleanEnum.YES.match(limit.getLoginCaptchaSwitch())) {
-      kaptchaProducer.validate(dto.getDeviceId(), dto.getValiCode());
-    }
-
-    // 判断密码错误次数
-    this.checkPasswordErrorCount(limit, dto.getAccount());
-
-    // 校验安全码
-    SysUser user = userService.getByUsername(dto.getAccount());
-    Assert.notNull(user, () -> new UsernameNotFoundException("用户不存在或密码不正确！"));
-
+    SysUser user = Assert.notNull(userService.getByUsername(dto.getAccount()), "用户不存在或密码不正确！");
     if (BooleanEnum.YES.match(limit.getGoogleAuthSwitch())) {
       this.checkGoogleAuthCode(user.getSafeCode(), dto.getGoogleCode());
     }
 
-    // 解密密码并登陆
     String password = passwordService.decrypt(dto.getPassword());
     UserCredential credential = jwtTokenService.signIn(request, user.getUserName(), password);
 
     // 更新用户登录信息
-//    user.setLoginIp(requestIp);
+    user.setLoginIp(IPUtils.getIpAddress(request));
     user.setLoginDate(new Date());
-    userService.updateById(user);
+    Assert.isTrue(userService.updateById(user), () -> new ServiceException("登录失败!"));
 
     return UserToken.builder()
         .nickName(user.getNickName())
@@ -114,11 +85,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     jwtTokenService.logout();
   }
 
-  private void checkPasswordErrorCount(AdminLoginLimit limit, String account) {
-    int errorCount = adminCache.getErrorPasswordCount(account);
-    Assert.isFalse(errorCount > limit.getPwdErrorCount(), () -> new ServiceException("密码错误次数超限!"));
-  }
-
   /**
    * 校验谷歌验证码是否正确
    *
@@ -126,16 +92,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
    * @param googleCode String
    */
   private void checkGoogleAuthCode(String safeCode, String googleCode) {
-//    if (StringUtils.isBlank(safeCode)) {
-//      throw new ServiceException("安全码未设置");
-//    }
-//
-//    if (StringUtils.isBlank(googleCode)) {
-//      throw new ServiceException("安全码不能为空!");
-//    }
-//
-//    if (!GoogleAuthenticator.authcode(googleCode, safeCode)) {
-//      throw new ServiceException("安全码不正确!");
-//    }
+    Assert.notBlank(safeCode, "安全码未设置");
+    Assert.notBlank(googleCode, "安全码不能为空!");
+    Assert.isTrue(GoogleAuthenticator.authcode(googleCode, safeCode), "安全码不正确!");
   }
 }

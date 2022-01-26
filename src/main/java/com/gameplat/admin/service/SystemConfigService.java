@@ -1,14 +1,10 @@
 package com.gameplat.admin.service;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.gameplat.admin.model.domain.SysDictData;
-import com.gameplat.admin.model.domain.SysSmsArea;
-import com.gameplat.admin.model.dto.*;
+import com.gameplat.admin.model.dto.AgentContacaDTO;
+import com.gameplat.admin.model.dto.EmailTestDTO;
+import com.gameplat.admin.model.dto.OperSystemConfigDTO;
 import com.gameplat.admin.model.vo.AgentContacaVO;
-import com.gameplat.admin.model.vo.SysSmsAreaVO;
-import com.gameplat.common.compent.oss.config.FileConfig;
-import com.gameplat.common.compent.sms.SmsConfig;
 import com.gameplat.common.model.bean.EmailConfig;
 
 import java.util.List;
@@ -21,13 +17,9 @@ public interface SystemConfigService {
 
   void delAgentContaca(Long id);
 
-  List<SmsConfig> findSmsList();
+  List<SysDictData> findList(String dictType);
 
-  List<FileConfig> findFileList();
-
-  void updateSmsConfig(SysDictData dictData);
-
-  void updateFileConfig(FileConfig config);
+  void updateConfig(SysDictData dictData);
 
   void configDataEdit(OperSystemConfigDTO dto);
 

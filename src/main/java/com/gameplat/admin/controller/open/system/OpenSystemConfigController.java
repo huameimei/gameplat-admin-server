@@ -2,18 +2,15 @@ package com.gameplat.admin.controller.open.system;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.json.JSONObject;
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.gameplat.admin.convert.DictDataConvert;
 import com.gameplat.admin.model.domain.SysDictData;
-import com.gameplat.admin.model.domain.SysSmsArea;
-import com.gameplat.admin.model.dto.*;
+import com.gameplat.admin.model.dto.AgentContacaDTO;
+import com.gameplat.admin.model.dto.EmailTestDTO;
+import com.gameplat.admin.model.dto.OperSystemConfigDTO;
+import com.gameplat.admin.model.dto.SysDictDataDTO;
 import com.gameplat.admin.model.vo.AgentContacaVO;
-import com.gameplat.admin.model.vo.SysSmsAreaVO;
 import com.gameplat.admin.service.SysDictDataService;
 import com.gameplat.admin.service.SystemConfigService;
-import com.gameplat.common.compent.oss.config.FileConfig;
-import com.gameplat.common.compent.sms.SmsConfig;
 import com.gameplat.common.model.bean.EmailConfig;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -70,32 +67,20 @@ public class OpenSystemConfigController {
     systemConfigService.delAgentContaca(id);
   }
 
-  @GetMapping("/sms/list")
-  public List<SmsConfig> findSmsList() {
-    return systemConfigService.findSmsList();
+  @GetMapping("/list/{dictType}")
+  public List<SysDictData> findList(@PathVariable String dictType) {
+    return systemConfigService.findList(dictType);
   }
 
-  @GetMapping("/file/list")
-  public List<FileConfig> findFileList() {
-    return systemConfigService.findFileList();
-  }
-
-  @PutMapping("/sms/update")
-  public void updateSms(@RequestBody SysDictData dictData) {
-    systemConfigService.updateSmsConfig(dictData);
-  }
-
-  @PutMapping("/file/update")
-  public void updateSms(@RequestBody FileConfig config) {
-    systemConfigService.updateFileConfig(config);
+  @PutMapping("/update/{dictType}")
+  public void updateConfig(@PathVariable String dictType, @RequestBody SysDictData dictData) {
+    systemConfigService.updateConfig(dictData);
   }
 
   @PutMapping("/update")
   public void configDataEdit(@RequestBody OperSystemConfigDTO dto) {
     systemConfigService.configDataEdit(dto);
   }
-
-
 
   @GetMapping("/email/list")
   public EmailConfig findEmailList() {

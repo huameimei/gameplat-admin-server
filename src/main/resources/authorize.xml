@@ -10,7 +10,6 @@
         <uri>/doc.html</uri>
         <uri>/webjars/**</uri>
         <uri>/api/admin/auth/login</uri>
-        <uri>/api/admin/auth/logout</uri>
         <uri>/api/admin/common/**</uri>
         <uri>/api/admin/spread/management/**</uri>
 <!--        <uri>/api/admin/operator/diffusion/spreadConfig/**</uri>-->

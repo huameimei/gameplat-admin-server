@@ -23,7 +23,7 @@ import com.gameplat.admin.model.dto.UserResetPasswordDTO;
 import com.gameplat.admin.model.vo.RoleVo;
 import com.gameplat.admin.model.vo.UserVo;
 import com.gameplat.admin.service.PasswordService;
-import com.gameplat.admin.service.SysCommonService;
+import com.gameplat.admin.service.CommonService;
 import com.gameplat.admin.service.SysUserService;
 import com.gameplat.base.common.enums.EnableEnum;
 import com.gameplat.base.common.exception.ServiceException;
@@ -32,6 +32,7 @@ import com.gameplat.base.common.util.GoogleAuthenticator;
 import com.gameplat.base.common.util.StringUtils;
 import com.gameplat.common.enums.TrueFalse;
 import com.gameplat.common.enums.UserTypes;
+import com.gameplat.common.lang.Assert;
 import com.gameplat.common.model.bean.limit.AdminLoginLimit;
 import com.gameplat.security.SecurityUserHolder;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,7 +48,7 @@ import java.util.List;
 public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
     implements SysUserService {
 
-  @Autowired private SysCommonService commonService;
+  @Autowired private CommonService commonService;
 
   @Autowired private SysUserMapper userMapper;
 
@@ -59,8 +60,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
 
   @Autowired private UserConvert userConvert;
 
-  @Autowired
-  private PasswordService passwordService;
+  @Autowired private PasswordService passwordService;
 
   @Override
   public SysUser getByUsername(String username) {
@@ -80,9 +80,8 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
             ObjectUtils.isNotEmpty(userDTO.getNickName()),
             SysUser::getNickName,
             userDTO.getNickName())
-        .like(ObjectUtils.isNotEmpty(userDTO.getLoginIp()),
-            SysUser::getLoginIp,
-            userDTO.getLoginIp())
+        .like(
+            ObjectUtils.isNotEmpty(userDTO.getLoginIp()), SysUser::getLoginIp, userDTO.getLoginIp())
         .eq(
             ObjectUtils.isNotNull(userDTO.getUserType()),
             SysUser::getUserType,
@@ -101,14 +100,10 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
   @Override
   @SentinelResource(value = "insertUser")
   public void insertUser(OperUserDTO dto) {
-    if (this.lambdaQuery().eq(SysUser::getUserName, dto.getAccount()).exists()) {
-      throw new ServiceException("账号已存在");
-    }
+    Assert.isFalse(this.lambdaQuery().eq(SysUser::getUserName, dto.getAccount()).exists(), "账号已存在");
 
     AdminLoginLimit limit = commonService.getLoginLimit();
-    if (null == limit) {
-      throw new ServiceException("登录配置信息未配置");
-    }
+    Assert.notNull(limit, "登录配置信息未配置");
 
     SysUser user = userConvert.toEntity(dto);
     if (UserTypes.ADMIN.match(dto.getUserType())) {
@@ -152,19 +147,12 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
   @Override
   @SentinelResource(value = "deleteUserById")
   public void deleteUserById(Long id) {
-    if (1 == id) {
-      throw new ServiceException("不允许删除超级管理员用户");
-    }
-
-    if (id.equals(SecurityUserHolder.getUserId())) {
-      throw new ServiceException("不允许操作自己账号");
-    }
+    Assert.isTrue(1 == id, "不允许删除超级管理员用户!");
+    Assert.isFalse(id.equals(SecurityUserHolder.getUserId()), "不允许操作自己账号");
 
     // 删除用户角色表
     userRoleMapper.deleteUserRole(new Long[] {id});
-    if (!this.removeById(id)) {
-      throw new ServiceException("删除用户失败!");
-    }
+    Assert.isTrue(this.removeById(id), "删除用户失败!");
   }
 
   @Override
@@ -194,7 +182,10 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
 
     String newPassword = passwordService.decrypt(dto.getPassword());
     user.setPassword(passwordService.encode(newPassword));
-    user.setChangeFlag(loginLimit.getResetPwdSwitch() == TrueFalse.TRUE.getValue() ? TrueFalse.TRUE.getValue() : TrueFalse.FALSE.getValue());
+    user.setChangeFlag(
+        loginLimit.getResetPwdSwitch() == TrueFalse.TRUE.getValue()
+            ? TrueFalse.TRUE.getValue()
+            : TrueFalse.FALSE.getValue());
 
     if (this.updateById(user)) {
       // 重置用户密码错误次数
@@ -207,57 +198,32 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
   @Override
   @SentinelResource(value = "resetGoogleSecret")
   public void resetGoogleSecret(Long id) {
-    SysUser user = this.getById(id);
-    if (null == user) {
-      throw new ServiceException("用户不存在!");
-    }
-
+    SysUser user = Assert.notNull(this.getById(id), "用户不存在!");
     user.setSafeCode(null);
-    if (!this.updateById(user)) {
-      throw new ServiceException("重置安全码失败!");
-    }
+    Assert.isTrue(this.updateById(user), "重置安全码失败!");
   }
 
   @Override
-  @SentinelResource(value = "resetGoogleSecret")
+  @SentinelResource(value = "changeStatus")
   public void changeStatus(Long id, Integer status) {
-    if (id.equals(SecurityUserHolder.getUserId())) {
-      throw new ServiceException("不允许操作自己账号");
-    }
-
-    SysUser user = this.getById(id);
-    if (null == user) {
-      throw new ServiceException("用户不存在!");
-    }
-
+    Assert.isTrue(!id.equals(SecurityUserHolder.getUserId()), "不允许操作自己账号!");
+    SysUser user = Assert.notNull(this.getById(id), "用户不存在!");
     user.setStatus(status);
-    if (!this.updateById(user)) {
-      throw new ServiceException("修改状态失败!");
-    }
+    Assert.isTrue(this.updateById(user), "修改状态失败!");
   }
 
   @Override
   @SentinelResource(value = "bindSecret")
-  public void bindSecret(GoogleAuthDTO authDTO) {
+  public void bindSecret(GoogleAuthDTO dto) {
     // 先校验验证码是否正确
-    Boolean authcode = GoogleAuthenticator.authcode(authDTO.getSafeCode(), authDTO.getSecret());
-    if (!authcode) {
-      throw new ServiceException("安全码错误");
-    }
-    SysUser user = userMapper.selectUserByUserName(authDTO.getLoginName());
-    if (StringUtils.isNull(user)) {
-      throw new ServiceException("账号错误");
-    }
+    Boolean authcode = GoogleAuthenticator.authcode(dto.getSafeCode(), dto.getSecret());
+    Assert.state(authcode, "安全码错误");
 
-    if (!this.updateById(
-        new SysUser() {
-          {
-            setUserId(user.getUserId());
-            setSafeCode(authDTO.getSecret());
-          }
-        })) {
-      throw new ServiceException("绑定失败!");
-    }
+    SysUser user = userMapper.selectUserByUserName(dto.getLoginName());
+    Assert.notNull(user, "账号错误");
+
+    user.setSafeCode(dto.getSecret());
+    Assert.isTrue(this.updateById(user), "账号错误");
   }
 
   /**
@@ -267,14 +233,16 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
    * @param roleId Long
    */
   private void insertUserRole(Long userId, Long roleId) {
-    if (StringUtils.isNotNull(roleId)) {
-      // 新增用户与角色管理
-      List<SysUserRole> list = new ArrayList<>();
-      SysUserRole ur = new SysUserRole();
-      ur.setUserId(userId);
-      ur.setRoleId(roleId);
-      list.add(ur);
-      userRoleMapper.batchUserRole(list);
+    if (StringUtils.isNull(roleId)) {
+      return;
     }
+
+    // 新增用户与角色管理
+    List<SysUserRole> list = new ArrayList<>();
+    SysUserRole ur = new SysUserRole();
+    ur.setUserId(userId);
+    ur.setRoleId(roleId);
+    list.add(ur);
+    userRoleMapper.batchUserRole(list);
   }
 }

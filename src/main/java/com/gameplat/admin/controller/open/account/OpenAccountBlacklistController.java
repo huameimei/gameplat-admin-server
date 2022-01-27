@@ -2,7 +2,7 @@ package com.gameplat.admin.controller.open.account;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
-import com.gameplat.admin.enums.UserBlackGames;
+import com.gameplat.common.enums.UserBlackGames;
 import com.gameplat.admin.model.domain.AccountBlacklist;
 import com.gameplat.admin.model.dto.AccountBlacklistQueryDTO;
 import com.gameplat.admin.model.dto.OperAccountBlacklistDTO;

@@ -3,6 +3,7 @@ package com.gameplat.admin.model.dto;
 import java.io.Serializable;
 import java.util.List;
 import javax.validation.constraints.Max;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 import lombok.AllArgsConstructor;
@@ -23,6 +24,8 @@ import org.hibernate.validator.constraints.Length;
 public class MemberRemarkAddDTO implements Serializable {
 
   @NotNull(message = "会员ID不能为空")
+  private Long id;
+
   @Max(value = 500, message = "一次修改不能超过500个会员")
   private List<Long> ids;
 

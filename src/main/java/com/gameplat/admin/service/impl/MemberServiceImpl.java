@@ -169,7 +169,9 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
         "重置会员密码失败!");
 
     // 更新会员备注
-    memberRemarkService.update(dto.getId(), dto.getRemark());
+    if(StringUtils.isNotBlank(dto.getRemark())) {
+      memberRemarkService.update(dto.getId(), dto.getRemark());
+    }
   }
 
   @Override

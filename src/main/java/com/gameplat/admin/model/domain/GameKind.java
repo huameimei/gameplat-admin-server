@@ -64,6 +64,11 @@ public class GameKind implements Serializable {
   private String gameType;
 
   /**
+   * 返水最高比例
+   */
+  private Integer rebateRate;
+
+  /**
    * 维护开始时间
    */
   @TableField(updateStrategy = FieldStrategy.IGNORED)

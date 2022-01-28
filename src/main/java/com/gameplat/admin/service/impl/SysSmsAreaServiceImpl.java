@@ -12,70 +12,46 @@ import com.gameplat.admin.model.dto.SmsAreaEditDTO;
 import com.gameplat.admin.model.dto.SmsAreaQueryDTO;
 import com.gameplat.admin.model.vo.SysSmsAreaVO;
 import com.gameplat.admin.service.SysSmsAreaService;
-import com.gameplat.base.common.exception.ServiceException;
-import lombok.RequiredArgsConstructor;
+import com.gameplat.common.lang.Assert;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-@RequiredArgsConstructor
 public class SysSmsAreaServiceImpl extends ServiceImpl<SysSmsAreaMapper, SysSmsArea>
     implements SysSmsAreaService {
 
-    @Autowired
-    private SysSmsAreaConvert areaConvert;
-    @Autowired
-    private SysSmsAreaMapper areaMapper;
+  @Autowired private SysSmsAreaConvert areaConvert;
 
-    @Override
-    public IPage<SysSmsAreaVO> findSmsAreaList(PageDTO<SysSmsArea> page, SmsAreaQueryDTO queryDTO) {
-        return this.lambdaQuery()
-                .eq(ObjectUtils.isNotEmpty(queryDTO.getCode()), SysSmsArea::getCode, queryDTO.getCode())
-                .eq(ObjectUtils.isNotEmpty(queryDTO.getName()), SysSmsArea::getName, queryDTO.getName())
-                .page(page)
-                .convert(areaConvert::toVo);
-    }
+  @Override
+  public IPage<SysSmsAreaVO> findSmsAreaList(PageDTO<SysSmsArea> page, SmsAreaQueryDTO queryDTO) {
+    return this.lambdaQuery()
+        .eq(ObjectUtils.isNotEmpty(queryDTO.getCode()), SysSmsArea::getCode, queryDTO.getCode())
+        .eq(ObjectUtils.isNotEmpty(queryDTO.getName()), SysSmsArea::getName, queryDTO.getName())
+        .page(page)
+        .convert(areaConvert::toVo);
+  }
 
-    @Override
-    public void addSmsArea(SmsAreaAddDTO addDTO) {
-        SysSmsArea sysSmsArea = areaConvert.toEntity(addDTO);
-        if (areaMapper.insert(sysSmsArea) == 0) {
-            throw new ServiceException("新增区号配置失败");
-        }
-    }
+  @Override
+  public void addSmsArea(SmsAreaAddDTO addDTO) {
+    SysSmsArea sysSmsArea = areaConvert.toEntity(addDTO);
+    Assert.isTrue(this.save(sysSmsArea), "新增区号配置失败!");
+  }
 
-    @Override
-    public void editSmsArea(SmsAreaEditDTO editDTO) {
-        SysSmsArea area = this.getById(editDTO.getId());
-        if(ObjectUtils.isNull(area)) {
-            throw new ServiceException("该区号设置不存在");
-        }
-        SysSmsArea sysSmsArea = areaConvert.toEntity(editDTO);
-        if (areaMapper.updateById(sysSmsArea) == 0) {
-            throw new ServiceException("更新区号配置失败!");
-        }
-    }
+  @Override
+  public void editSmsArea(SmsAreaEditDTO editDTO) {
+    SysSmsArea sysSmsArea = areaConvert.toEntity(editDTO);
+    Assert.isTrue(this.updateById(sysSmsArea), "更新区号配置失败!");
+  }
 
-    @Override
-    public void deleteAreaById(Long id) {
-        SysSmsArea area = this.getById(id);
-        if(ObjectUtils.isNull(area)) {
-            throw new ServiceException("该区号设置不存在");
-        }
-        if (areaMapper.deleteById(id) == 0) {
-            throw new ServiceException("删除区号配置失败!");
-        }
-    }
+  @Override
+  public void deleteAreaById(Long id) {
+    Assert.isTrue(this.removeById(id), "删除区号配置失败!");
+  }
 
-    @Override
-    public void changeStatus(Long id, Integer status) {
-        SysSmsArea area = this.getById(id);
-        if(ObjectUtils.isNull(area)) {
-            throw new ServiceException("修改状态失败");
-        }
-        area.setStatus(status);
-        if(areaMapper.updateById(area) == 0) {
-            throw new ServiceException("修改状态失败");
-        }
-    }
+  @Override
+  public void changeStatus(Long id, Integer status) {
+    SysSmsArea area = Assert.notNull(this.getById(id), "区号不存在");
+    area.setStatus(status);
+    Assert.isTrue(this.updateById(area), "修改状态失败");
+  }
 }

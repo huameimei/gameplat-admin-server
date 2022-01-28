@@ -19,54 +19,47 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
-
-/**
- * 区号设置控制器
- *
- * @author three
- */
+/** 区号设置控制器 */
 @Slf4j
 @RestController
-@RequiredArgsConstructor
 @Api(tags = "区号设置API")
 @RequestMapping("/api/admin/system/smsArea")
 public class OpenAreaController {
 
-    @Autowired
-    private SysSmsAreaService areaService;
+  @Autowired private SysSmsAreaService areaService;
 
-    @ApiOperation("列表查询")
-    @GetMapping("/list")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "current", value = "分页参数：当前页", defaultValue = "1"),
-            @ApiImplicitParam(name = "size", value = "每页条数"),
-    })
-    public IPage<SysSmsAreaVO> findSmsAreaList(@ApiIgnore PageDTO<SysSmsArea> page, SmsAreaQueryDTO queryDTO) {
-        return areaService.findSmsAreaList(page, queryDTO);
-    }
+  @ApiOperation("列表查询")
+  @GetMapping("/list")
+  @ApiImplicitParams({
+    @ApiImplicitParam(name = "current", value = "分页参数：当前页", defaultValue = "1"),
+    @ApiImplicitParam(name = "size", value = "每页条数"),
+  })
+  public IPage<SysSmsAreaVO> findSmsAreaList(
+      @ApiIgnore PageDTO<SysSmsArea> page, SmsAreaQueryDTO queryDTO) {
+    return areaService.findSmsAreaList(page, queryDTO);
+  }
 
-    @ApiOperation("新增")
-    @PostMapping("/add")
-    public void saveArea(@Validated @RequestBody SmsAreaAddDTO addDTO) {
-        areaService.addSmsArea(addDTO);
-    }
+  @ApiOperation("新增")
+  @PostMapping("/add")
+  public void saveArea(@Validated @RequestBody SmsAreaAddDTO addDTO) {
+    areaService.addSmsArea(addDTO);
+  }
 
-    @ApiOperation("编辑")
-    @PutMapping("/edit")
-    public void updateArea(@Validated @RequestBody SmsAreaEditDTO editDTO) {
-        areaService.editSmsArea(editDTO);
-    }
+  @ApiOperation("编辑")
+  @PutMapping("/edit")
+  public void updateArea(@Validated @RequestBody SmsAreaEditDTO editDTO) {
+    areaService.editSmsArea(editDTO);
+  }
 
-    @ApiOperation("删除")
-    @DeleteMapping("/delete/{id}")
-    public void deleteById(@PathVariable Long id) {
-        areaService.deleteAreaById(id);
-    }
+  @ApiOperation("删除")
+  @DeleteMapping("/delete/{id}")
+  public void deleteById(@PathVariable Long id) {
+    areaService.deleteAreaById(id);
+  }
 
-    @ApiOperation("改变状态")
-    @PutMapping("/changeStatus/{id}/{status}")
-    public void changeStatus(@PathVariable Long id, @PathVariable Integer status) {
-        areaService.changeStatus(id, status);
-    }
-
+  @ApiOperation("改变状态")
+  @PutMapping("/changeStatus/{id}/{status}")
+  public void changeStatus(@PathVariable Long id, @PathVariable Integer status) {
+    areaService.changeStatus(id, status);
+  }
 }

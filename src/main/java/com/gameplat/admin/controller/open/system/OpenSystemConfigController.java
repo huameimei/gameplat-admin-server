@@ -73,8 +73,8 @@ public class OpenSystemConfigController {
   }
 
   @PutMapping("/update/{dictType}")
-  public void updateConfig(@PathVariable String dictType, @RequestBody SysDictData dictData) {
-    systemConfigService.updateConfig(dictData);
+  public void updateConfig(@PathVariable String dictType, @RequestBody List<SysDictData> dictDataList) {
+    systemConfigService.updateConfig(dictType, dictDataList);
   }
 
   @PutMapping("/update")

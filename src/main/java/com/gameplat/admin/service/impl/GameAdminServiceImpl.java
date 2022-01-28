@@ -150,7 +150,7 @@ public class GameAdminServiceImpl implements GameAdminService {
             throw new ServiceException("请查询会员余额是否存在");
           }
           //平台入款操作
-          memberInfoService.updateBalanceWithRecharge(member.getId(),record.getAmount());
+          memberInfoService.updateBalanceWithRecharge(member.getId(),record.getAmount(),record.getAmount());
           memberBill.setBalance(memberInfo.getBalance());
           memberBill.setAmount(record.getAmount());
           memberBill.setTranType(TranTypes.LIVE_IN.getValue());
@@ -370,7 +370,7 @@ public class GameAdminServiceImpl implements GameAdminService {
       }
       try{
         // 4. 我们平台入款操作
-        memberInfoService.updateBalanceWithRecharge(memberInfo.getMemberId(),amount);
+        memberInfoService.updateBalanceWithRecharge(memberInfo.getMemberId(),amount,amount);
         // 5. 记录现金流水
         MemberBill bill = new MemberBill();
         bill.setAmount(amount);

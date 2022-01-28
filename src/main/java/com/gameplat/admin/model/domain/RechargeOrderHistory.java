@@ -92,6 +92,9 @@ public class RechargeOrderHistory {
   @ApiModelProperty(value = "充值金额")
   private BigDecimal amount;
 
+  @ApiModelProperty(value = "实际支付金额")
+  private BigDecimal payAmount;
+
   @ApiModelProperty(value = "优惠金额")
   private BigDecimal discountAmount;
 

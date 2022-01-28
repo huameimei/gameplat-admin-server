@@ -18,7 +18,7 @@ import java.util.List;
 
 public interface RechargeOrderHistoryMapper extends BaseMapper<RechargeOrderHistory> {
 
-  @Select("SELECT COUNT(DISTINCT member_id) as memberCount, COUNT(1) AS rechargeCount, sum(amount) AS amount, sum(discount_amount) AS discountAmount,"
+  @Select("SELECT COUNT(DISTINCT member_id) as memberCount, COUNT(1) AS rechargeCount, sum(pay_amount) AS amount, sum(discount_amount) AS discountAmount,"
       + "             sum(total_amount) AS totalAmount, "
       + "             sum(currency_count) as currencyCount "
       + "             FROM recharge_order_history "

@@ -22,7 +22,7 @@ public interface MemberInfoService extends IService<MemberInfo> {
    * @param memberId Long
    * @param amount 金额，正数
    */
-  void updateBalanceWithRecharge(Long memberId, BigDecimal amount);
+  void updateBalanceWithRecharge(Long memberId, BigDecimal amount, BigDecimal totalAmount);
 
   /**
    * 更新余额<br>

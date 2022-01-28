@@ -16,7 +16,7 @@ import org.apache.ibatis.annotations.Select;
 
 public interface RechargeOrderMapper extends BaseMapper<RechargeOrder> {
 
-    @Select("select sum(amount) from recharge_order ${ew.customSqlSegment}")
+    @Select("select sum(pay_amount) from recharge_order ${ew.customSqlSegment}")
     BigDecimal summaryRechargeOrder(@Param(Constants.WRAPPER) Wrapper<RechargeOrder> wrapper);
 
     /**

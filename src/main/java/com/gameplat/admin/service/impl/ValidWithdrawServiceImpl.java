@@ -29,7 +29,7 @@ public class ValidWithdrawServiceImpl extends
         validWithdraw.setAccount(rechargeOrder.getAccount());
         validWithdraw.setType(0);
         validWithdraw.setRechId(rechargeOrder.getId().toString());
-        validWithdraw.setRechMoney(rechargeOrder.getAmount());
+        validWithdraw.setRechMoney(rechargeOrder.getPayAmount());
         validWithdraw.setDiscountMoney(rechargeOrder.getDiscountAmount());
         validWithdraw.setDiscountDml(rechargeOrder.getDiscountDml());
         validWithdraw.setMormDml(rechargeOrder.getNormalDml());

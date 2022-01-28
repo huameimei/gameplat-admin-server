@@ -287,7 +287,7 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
 
     //更新会员充值信息
     memberInfoService
-        .updateBalanceWithRecharge(memberInfo.getMemberId(), rechargeOrder.getTotalAmount());
+        .updateBalanceWithRecharge(memberInfo.getMemberId(),rechargeOrder.getPayAmount(), rechargeOrder.getTotalAmount());
 
     // 判断充值是否计算积分
     if (TrueFalse.TRUE.getValue() != rechargeOrder.getPointFlag()) {
@@ -510,7 +510,7 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
         payAccountService.lambdaUpdate()
             .set(PayAccount::getRechargeTimes, payAccount.getRechargeTimes() + 1)
             .set(PayAccount::getRechargeAmount,
-                payAccount.getRechargeAmount().add(rechargeOrder.getAmount()))
+                payAccount.getRechargeAmount().add(rechargeOrder.getPayAmount()))
             .eq(PayAccount::getId, payAccount.getId()).update(new PayAccount());
 
       }
@@ -536,7 +536,7 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
       LambdaUpdateWrapper<TpMerchant> update = Wrappers.lambdaUpdate();
       update.set(TpMerchant::getRechargeTimes, tpMerchant.getRechargeTimes() + 1)
           .set(TpMerchant::getRechargeAmount,
-              tpMerchant.getRechargeAmount().add(rechargeOrder.getAmount()))
+              tpMerchant.getRechargeAmount().add(rechargeOrder.getPayAmount()))
           .eq(TpMerchant::getId, tpMerchant.getId());
       tpMerchantService.update(new TpMerchant(), update);
     }
@@ -553,7 +553,7 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
         LambdaUpdateWrapper<TpPayChannel> update = Wrappers.lambdaUpdate();
         update.set(TpPayChannel::getRechargeTimes, tpPayChannel.getRechargeTimes() + 1)
             .set(TpPayChannel::getRechargeAmount,
-                tpPayChannel.getRechargeAmount().add(rechargeOrder.getAmount()))
+                tpPayChannel.getRechargeAmount().add(rechargeOrder.getPayAmount()))
             .eq(TpPayChannel::getId, tpPayChannel.getId());
         tpPayChannelService.update(update);
       }
@@ -593,7 +593,7 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
     /* 校验充值金额 */
     verifyAmount(manualRechargeOrderBo.getAmount(), manualRechargeOrderBo.getDiscountAmount());
     rechargeOrder.setAmount(manualRechargeOrderBo.getAmount());
-
+    rechargeOrder.setPayAmount(manualRechargeOrderBo.getAmount());
     boolean isDiscountIgnored = false;
     if (manualRechargeOrderBo.getPointFlag() == TrueFalse.TRUE.getValue()
         && manualRechargeOrderBo.getDiscountType() != null) {
@@ -618,7 +618,7 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
       rechargeOrder.setDiscountDml(BigDecimal.ZERO);
     }
 
-    // 充值总金额 = 充值金额 + 优惠金额
+    // 充值总金额 = 支付金额 + 优惠金额
     rechargeOrder
         .setTotalAmount(manualRechargeOrderBo.getAmount().add(rechargeOrder.getDiscountAmount()));
 
@@ -731,7 +731,7 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
     StringBuilder sb = new StringBuilder();
     java.text.DecimalFormat df = new java.text.DecimalFormat("0.00");
     sb.append("订单编号 ").append(rechargeOrder.getOrderNo()).append("，充值金额 ")
-        .append(rechargeOrder.getAmount())
+        .append(rechargeOrder.getPayAmount())
         .append("，优惠金额 ").append(rechargeOrder.getDiscountAmount()).append("，余额 ")
         .append(df.format(balance.add(rechargeOrder.getTotalAmount())));
     if (StringUtils.isNotEmpty(rechargeOrder.getPayType())) {
@@ -761,7 +761,7 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
     bill.setBalance(balance);
     bill.setOrderNo(rechargeOrder.getOrderNo());
     bill.setTranType(RechargeMode.getTranType(rechargeOrder.getMode()));
-    bill.setAmount(rechargeOrder.getAmount());
+    bill.setAmount(rechargeOrder.getTotalAmount());
     bill.setContent(content);
     bill.setOperator(operator);
     if (remark != null && remark.length > 0 && StringUtils.isNotEmpty(remark[0])) {

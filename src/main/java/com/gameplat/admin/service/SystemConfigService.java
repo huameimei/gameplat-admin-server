@@ -19,7 +19,7 @@ public interface SystemConfigService {
 
   List<SysDictData> findList(String dictType);
 
-  void updateConfig(SysDictData dictData);
+  void updateConfig(String dictType, List<SysDictData> dictDataList);
 
   void configDataEdit(OperSystemConfigDTO dto);
 

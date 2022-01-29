@@ -15,11 +15,14 @@ import org.mapstruct.Mapping;
 @Mapper(componentModel = "spring")
 public interface MessageInfoConvert {
 
+    @Mapping(target = "beginTime", dateFormat = "yyyy-MM-dd HH:mm:ss")
+    @Mapping(target = "endTime", dateFormat = "yyyy-MM-dd HH:mm:ss")
     MessageInfo toEntity(MessageInfoAddDTO messageInfoAddDTO);
 
+    @Mapping(target = "beginTime", dateFormat = "yyyy-MM-dd HH:mm:ss")
+    @Mapping(target = "endTime", dateFormat = "yyyy-MM-dd HH:mm:ss")
     MessageInfo toEntity(MessageInfoEditDTO messageInfoEditDTO);
 
-//    @Mapping(target = "endTime", dateFormat = "yyyy-MM-dd HH:mm:ss")
     MessageInfoVO toVo(MessageInfo messageInfo);
 
 }

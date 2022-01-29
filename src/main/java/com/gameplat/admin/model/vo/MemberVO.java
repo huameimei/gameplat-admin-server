@@ -32,7 +32,7 @@ public class MemberVO implements Serializable {
 
   @Excel(name = "VIP等级", width = 8, isImportField = "true_st")
   @ApiModelProperty(value = "VIP等级")
-  private Integer level;
+  private Integer vipLevel;
 
   /** 会员备注 */
   @Excel(name = "会员备注", width = 20, isImportField = "true_st")

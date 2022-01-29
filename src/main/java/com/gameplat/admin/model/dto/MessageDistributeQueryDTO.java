@@ -1,12 +1,9 @@
 package com.gameplat.admin.model.dto;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.gameplat.base.common.util.DateUtil;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
-
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
-import java.util.Date;
 
 /**
  * 消息分发到会员查询DTO
@@ -20,6 +17,7 @@ public class MessageDistributeQueryDTO implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    @NotNull(message = "消息id不能为空")
     @ApiModelProperty(value = "消息id")
     private Long messageId;
 
@@ -35,13 +33,11 @@ public class MessageDistributeQueryDTO implements Serializable {
     @ApiModelProperty(value = "VIP等级")
     private Integer vipLevel;
 
-    @JsonFormat(pattern = DateUtil.YYYY_MM_DD_HH_MM_SS)
     @ApiModelProperty(value = "开始时间")
-    private Date beginTime;
+    private String beginTime;
 
-    @JsonFormat(pattern = DateUtil.YYYY_MM_DD_HH_MM_SS)
     @ApiModelProperty(value = "结束时间")
-    private Date endTime;
+    private String endTime;
 
 
 }

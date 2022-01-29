@@ -135,16 +135,13 @@ public class SystemConfigServiceImpl implements SystemConfigService {
   }
 
   @Override
-  @CacheInvalidate(name = CachedKeys.DICT_DATA_CACHE, key = "#dictData.dictType")
-  public void updateConfig(SysDictData dictData) {
-    List<SysDictData> dictDataList = dictDataService.getDictDataByType(dictData.getDictType());
+  @CacheInvalidate(name = CachedKeys.DICT_DATA_CACHE, key = "#dictType")
+  public void updateConfig(String dictType, List<SysDictData> dictDataList) {
+    List<SysDictData> dictDatas = dictDataService.getDictDataByType(dictType);
+    dictDatas.forEach(e -> e.setIsDefault(DefaultEnums.NO.value().toString()));
+    dictDataList.forEach(e -> dictDatas.replaceAll(c -> c.getId().equals(e.getId()) ? e : c));
 
-    if (CollectionUtils.isNotEmpty(dictDataList)) {
-      dictDataList.forEach(e -> e.setIsDefault(DefaultEnums.NO.value().toString()));
-      dictDataList.replaceAll(e -> e.getId().equals(dictData.getId()) ? dictData : e);
-    }
-
-    Assert.isTrue(dictDataService.saveOrUpdateBatch(dictDataList), "修改失败!");
+    Assert.isTrue(dictDataService.saveOrUpdateBatch(dictDatas), "修改失败!");
   }
 
   @Override

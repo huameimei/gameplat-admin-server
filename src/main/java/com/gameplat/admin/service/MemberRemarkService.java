@@ -8,9 +8,14 @@ import java.util.List;
 
 public interface MemberRemarkService extends IService<MemberRemark> {
 
-  void update(MemberRemarkAddDTO dto);
+  List<MemberRemarkVO> getByMemberId(Long memberId);
 
   void update(Long memberId, String remark);
 
-  List<MemberRemarkVO> getByMemberId(Long memberId);
+  void batchAdd(MemberRemarkAddDTO dto);
+
+  void deleteById(Long id);
+
+  void cleanByMemberId(Long memberId);
+
 }

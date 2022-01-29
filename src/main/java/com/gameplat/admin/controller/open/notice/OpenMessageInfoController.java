@@ -1,6 +1,5 @@
 package com.gameplat.admin.controller.open.notice;
 
-import cn.hutool.core.date.DateUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.gameplat.admin.model.domain.MessageDistribute;
@@ -9,7 +8,6 @@ import com.gameplat.admin.model.dto.MessageDistributeQueryDTO;
 import com.gameplat.admin.model.dto.MessageInfoAddDTO;
 import com.gameplat.admin.model.dto.MessageInfoEditDTO;
 import com.gameplat.admin.model.dto.MessageInfoQueryDTO;
-import com.gameplat.admin.model.vo.MessageDictDataVO;
 import com.gameplat.admin.model.vo.MessageDistributeVO;
 import com.gameplat.admin.model.vo.MessageInfoVO;
 import com.gameplat.admin.service.MessageInfoService;
@@ -34,13 +32,6 @@ import springfox.documentation.annotations.ApiIgnore;
 public class OpenMessageInfoController {
 
   @Autowired private MessageInfoService messageInfoService;
-
-//  @ApiOperation(value = "公告消息和个人弹窗消息字典数据列表")
-//  @GetMapping("/getTypes")
-  /** 公告消息和个人弹窗消息字典数据列表 */
-  public MessageDictDataVO getDictData() {
-    return messageInfoService.getDictData();
-  }
 
   /**
    * 分页查询个人消息
@@ -69,7 +60,7 @@ public class OpenMessageInfoController {
   @ApiOperation(value = "新增消息")
   @PostMapping("/save")
   @PreAuthorize("hasAuthority('operator:message:save')")
-  public void save(@Validated @RequestBody MessageInfoAddDTO messageInfoAddDTO) {
+  public void save(@Validated MessageInfoAddDTO messageInfoAddDTO) {
     messageInfoService.insertMessage(messageInfoAddDTO);
   }
 
@@ -81,7 +72,7 @@ public class OpenMessageInfoController {
   @ApiOperation(value = "编辑消息")
   @PostMapping("/edit")
   @PreAuthorize("hasAuthority('operator:message:edit')")
-  public void edit(@Validated @RequestBody MessageInfoEditDTO messageInfoEditDTO) {
+  public void edit(@Validated MessageInfoEditDTO messageInfoEditDTO) {
     messageInfoService.editMessage(messageInfoEditDTO);
   }
 
@@ -93,7 +84,7 @@ public class OpenMessageInfoController {
   @ApiOperation(value = "删除消息")
   @DeleteMapping("/remove")
   @PreAuthorize("hasAuthority('operator:message:remove')")
-  public void remove(@RequestBody String ids) {
+  public void remove(String ids) {
     messageInfoService.deleteBatchMessage(ids);
   }
 
@@ -113,7 +104,7 @@ public class OpenMessageInfoController {
   })
   public IPage<MessageDistributeVO> distributePage(
       @ApiIgnore PageDTO<MessageDistribute> page,
-      MessageDistributeQueryDTO messageDistributeQueryDTO) {
+      @Validated MessageDistributeQueryDTO messageDistributeQueryDTO) {
     return messageInfoService.findMessageDistributeList(page, messageDistributeQueryDTO);
   }
 }

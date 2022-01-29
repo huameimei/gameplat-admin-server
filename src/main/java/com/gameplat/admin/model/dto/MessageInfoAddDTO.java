@@ -21,11 +21,11 @@ public class MessageInfoAddDTO implements Serializable {
 
   private static final long serialVersionUID = 1L;
 
-  @NotBlank(message = "消息标题不能为空")
+  @NotNull(message = "消息标题不能为空")
   @ApiModelProperty(value = "消息标题")
   private String title;
 
-  @NotBlank(message = "消息内容不能为空")
+  @NotNull(message = "消息内容不能为空")
   @ApiModelProperty(value = "消息内容")
   private String content;
 
@@ -59,15 +59,16 @@ public class MessageInfoAddDTO implements Serializable {
 
   @NotNull(message = "开始时间不能为空")
   @ApiModelProperty(value = "开始时间")
-  private Date beginTime;
+  private String beginTime;
 
   @NotNull(message = "结束时间不能为空")
   @ApiModelProperty(value = "结束时间")
-  private Date endTime;
+  private String endTime;
 
   @ApiModelProperty(value = "升序排序")
   private Integer sort;
 
+  @NotNull(message = "消息类型不能为空")
   @ApiModelProperty(value = "消息类型（1.系统消息、2.平台公告、3.个人弹窗消息）")
   private Integer type;
 

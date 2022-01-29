@@ -26,6 +26,8 @@ import com.gameplat.common.enums.UserTypes;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
@@ -35,6 +37,7 @@ import java.util.*;
  * @author admin
  */
 @Service
+@Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)
 public class MessageInfoServiceImpl extends ServiceImpl<MessageMapper, MessageInfo>
     implements MessageInfoService {
 
@@ -396,6 +399,17 @@ public class MessageInfoServiceImpl extends ServiceImpl<MessageMapper, MessageIn
     return messageDistributeService
         .lambdaQuery()
         .eq(MessageDistribute::getMessageId, messageDistributeQueryDTO.getMessageId())
+        .eq(ObjectUtil.isNotEmpty(messageDistributeQueryDTO.getUserAccount()), MessageDistribute::getUserAccount, messageDistributeQueryDTO.getUserAccount())
+        .eq(ObjectUtil.isNotEmpty(messageDistributeQueryDTO.getRechargeLevel()), MessageDistribute::getRechargeLevel, messageDistributeQueryDTO.getRechargeLevel())
+        .eq(ObjectUtil.isNotEmpty(messageDistributeQueryDTO.getVipLevel()), MessageDistribute::getVipLevel, messageDistributeQueryDTO.getVipLevel())
+        .ge(
+            ObjectUtil.isNotEmpty(messageDistributeQueryDTO.getBeginTime()),
+            MessageDistribute::getCreateTime,
+           messageDistributeQueryDTO.getBeginTime()+" "+"00:00:00")
+        .le(
+            ObjectUtil.isNotEmpty(messageDistributeQueryDTO.getEndTime()),
+            MessageDistribute::getCreateTime,
+            messageDistributeQueryDTO.getEndTime()+" "+"23:59:59")
         .page(page)
         .convert(messageDistributeConvert::toVo);
   }

@@ -30,7 +30,8 @@ public class MemberRemark {
   private String account;
 
   private String content;
-
+  /** 是否已删除 */
+  private Integer deleteFlag;
   /** 创建者 */
   @TableField(fill = FieldFill.INSERT)
   private String createBy;

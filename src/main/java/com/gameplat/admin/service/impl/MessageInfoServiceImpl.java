@@ -396,6 +396,17 @@ public class MessageInfoServiceImpl extends ServiceImpl<MessageMapper, MessageIn
     return messageDistributeService
         .lambdaQuery()
         .eq(MessageDistribute::getMessageId, messageDistributeQueryDTO.getMessageId())
+        .eq(ObjectUtil.isNotEmpty(messageDistributeQueryDTO.getUserAccount()), MessageDistribute::getUserAccount, messageDistributeQueryDTO.getUserAccount())
+        .eq(ObjectUtil.isNotEmpty(messageDistributeQueryDTO.getRechargeLevel()), MessageDistribute::getRechargeLevel, messageDistributeQueryDTO.getRechargeLevel())
+        .eq(ObjectUtil.isNotEmpty(messageDistributeQueryDTO.getVipLevel()), MessageDistribute::getVipLevel, messageDistributeQueryDTO.getVipLevel())
+        .ge(
+            ObjectUtil.isNotEmpty(messageDistributeQueryDTO.getBeginTime()),
+            MessageDistribute::getCreateTime,
+           messageDistributeQueryDTO.getBeginTime()+" "+"00:00:00")
+        .le(
+            ObjectUtil.isNotEmpty(messageDistributeQueryDTO.getEndTime()),
+            MessageDistribute::getCreateTime,
+            messageDistributeQueryDTO.getEndTime()+" "+"23:59:59")
         .page(page)
         .convert(messageDistributeConvert::toVo);
   }

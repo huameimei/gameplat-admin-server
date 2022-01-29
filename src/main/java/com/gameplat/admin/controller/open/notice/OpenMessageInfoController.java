@@ -72,7 +72,7 @@ public class OpenMessageInfoController {
   @ApiOperation(value = "编辑消息")
   @PostMapping("/edit")
   @PreAuthorize("hasAuthority('operator:message:edit')")
-  public void edit(@Validated @RequestBody MessageInfoEditDTO messageInfoEditDTO) {
+  public void edit(@Validated MessageInfoEditDTO messageInfoEditDTO) {
     messageInfoService.editMessage(messageInfoEditDTO);
   }
 
@@ -84,7 +84,7 @@ public class OpenMessageInfoController {
   @ApiOperation(value = "删除消息")
   @DeleteMapping("/remove")
   @PreAuthorize("hasAuthority('operator:message:remove')")
-  public void remove(@RequestBody String ids) {
+  public void remove(String ids) {
     messageInfoService.deleteBatchMessage(ids);
   }
 

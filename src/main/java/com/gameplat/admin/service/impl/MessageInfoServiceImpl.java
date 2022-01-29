@@ -26,6 +26,8 @@ import com.gameplat.common.enums.UserTypes;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
@@ -35,6 +37,7 @@ import java.util.*;
  * @author admin
  */
 @Service
+@Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)
 public class MessageInfoServiceImpl extends ServiceImpl<MessageMapper, MessageInfo>
     implements MessageInfoService {
 

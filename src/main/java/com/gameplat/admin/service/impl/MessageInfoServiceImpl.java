@@ -23,6 +23,7 @@ import com.gameplat.base.common.util.StringUtils;
 import com.gameplat.common.enums.BooleanEnum;
 import com.gameplat.common.enums.SwitchStatusEnum;
 import com.gameplat.common.enums.UserTypes;
+import com.gameplat.security.context.UserCredential;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -128,6 +129,7 @@ public class MessageInfoServiceImpl extends ServiceImpl<MessageMapper, MessageIn
                 ObjectUtil.isNotEmpty(messageInfoQueryDTO.getEndTime()),
                 MessageInfo::getEndTime,
                 messageInfoQueryDTO.getEndTime()+" "+"23:59:59")
+                .orderByDesc(MessageInfo::getCreateTime)
             .page(page)
             .convert(messageInfoConvert::toVo);
     if (CollectionUtils.isNotEmpty(iPage.getRecords())) {
@@ -239,14 +241,17 @@ public class MessageInfoServiceImpl extends ServiceImpl<MessageMapper, MessageIn
         break;
       case ONLINE_MEMBER:
         // 3-在线会员
-        onlineUserService
-            .getOnlineUsers()
-            .forEach(
-                user -> {
-                  MemberInfoVO memberInfoVO = new MemberInfoVO();
-                  BeanUtils.copyBeanProp(memberInfoVO, user);
+        List<UserCredential> onlineUsers = onlineUserService.getOnlineUsers();
+        System.out.println(onlineUsers);
+        if (CollectionUtils.isNotEmpty(onlineUsers)){
+          onlineUsers.forEach(
+              user -> {
+                MemberInfoVO memberInfoVO = memberService.getInfo(user.getUserId());
+                if (ObjectUtil.isNotNull(memberInfoVO)) {
                   buildMessageDistribute(messageInfo, memberInfoVO, messageList);
-                });
+                }
+              });
+        }
         break;
       case USER_LEVEL:
         // 4-会员层级

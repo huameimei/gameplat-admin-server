@@ -7,10 +7,14 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.convert.AccountBlacklistConvert;
 import com.gameplat.admin.mapper.AccountBlacklistMapper;
 import com.gameplat.admin.model.domain.AccountBlacklist;
+import com.gameplat.admin.model.domain.Member;
 import com.gameplat.admin.model.dto.AccountBlacklistQueryDTO;
 import com.gameplat.admin.model.dto.OperAccountBlacklistDTO;
 import com.gameplat.admin.service.AccountBlacklistService;
+import com.gameplat.admin.service.MemberService;
 import com.gameplat.base.common.exception.ServiceException;
+import com.gameplat.base.common.util.StringUtils;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -24,7 +28,11 @@ public class AccountBlacklistServiceImpl
     extends ServiceImpl<AccountBlacklistMapper, AccountBlacklist>
     implements AccountBlacklistService {
 
-  @Autowired private AccountBlacklistConvert accountBlacklistConvert;
+  @Autowired
+  private AccountBlacklistConvert accountBlacklistConvert;
+
+  @Autowired
+  private MemberService memberService;
 
   @Override
   public IPage<AccountBlacklist> selectAccountBlacklistList(
@@ -41,6 +49,12 @@ public class AccountBlacklistServiceImpl
   @Override
   public void update(OperAccountBlacklistDTO dto) {
     AccountBlacklist accountBlacklist = accountBlacklistConvert.toEntity(dto);
+    if (StringUtils.isNotBlank(dto.getAccount())) {
+      memberService.getByAccount(dto.getAccount()).orElseThrow(() -> new ServiceException("会员信息不存在！"));
+    }
+    if (StringUtils.isBlank(dto.getAccount()) && StringUtils.isBlank(dto.getIp())) {
+      throw new ServiceException("会员帐号和IP地址不能同时为空");
+    }
     if (!this.updateById(accountBlacklist)) {
       throw new ServiceException("更新会员黑名单失败!");
     }
@@ -49,6 +63,12 @@ public class AccountBlacklistServiceImpl
   @Override
   public void save(OperAccountBlacklistDTO dto) {
     AccountBlacklist accountBlacklist = accountBlacklistConvert.toEntity(dto);
+    if (StringUtils.isNotBlank(dto.getAccount())) {
+      memberService.getByAccount(dto.getAccount()).orElseThrow(() -> new ServiceException("会员信息不存在！"));
+    }
+    if (StringUtils.isBlank(dto.getAccount()) && StringUtils.isBlank(dto.getIp())) {
+      throw new ServiceException("会员帐号和IP地址不能同时为空");
+    }
     if (!this.save(accountBlacklist)) {
       throw new ServiceException("新增会员黑名单失败!");
     }

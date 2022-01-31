@@ -23,6 +23,9 @@ public class RechargeOrder {
   @ApiModelProperty(value = "校验字段")
   private String fk;
 
+  @ApiModelProperty(value = "聊天室客服ID")
+  private Long sysUserId;
+
   @ApiModelProperty(value = "会员ID")
   private Long memberId;
 

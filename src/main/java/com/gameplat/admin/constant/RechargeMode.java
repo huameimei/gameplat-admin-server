@@ -10,7 +10,8 @@ import java.util.stream.Stream;
 public enum RechargeMode {
   TRANSFER(1, TranTypes.BANK_RECH.getValue(), "转账汇款"),
   ONLINE_PAY(2, TranTypes.RECH.getValue(), "在线支付"),
-  MANUAL(3, TranTypes.TRANSFER_IN.getValue(), "后台人工转入");
+  MANUAL(3, TranTypes.TRANSFER_IN.getValue(), "后台人工转入"),
+  CUSTOMER(4, TranTypes.CUSTOMER.getValue(), "客服聊天提单");
 
   private int value;
 

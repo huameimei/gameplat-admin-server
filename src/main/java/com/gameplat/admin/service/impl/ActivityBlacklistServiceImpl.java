@@ -14,7 +14,7 @@ import com.gameplat.admin.model.vo.MemberInfoVO;
 import com.gameplat.admin.service.ActivityBlacklistService;
 import com.gameplat.admin.service.MemberService;
 import com.gameplat.base.common.exception.ServiceException;
-import com.gameplat.base.common.util.IpAddressUtils;
+import com.gameplat.base.common.ip.IpAddressParser;
 import com.gameplat.base.common.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -69,7 +69,7 @@ public class ActivityBlacklistServiceImpl
       }
     } else if (activityBlacklistAddDTO.getLimitedType()
         == ActivityInfoEnum.ActivityBlacklistEnum.IP.value()) {
-      if (!IpAddressUtils.inputIsIpAddress(activityBlacklistAddDTO.getLimitedContent())) {
+      if (!IpAddressParser.inputIsIpAddress(activityBlacklistAddDTO.getLimitedContent())) {
         throw new ServiceException("限制内容框中输入的IP地址无效");
       }
     }

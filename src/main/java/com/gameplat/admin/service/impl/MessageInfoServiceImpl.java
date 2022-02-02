@@ -27,6 +27,7 @@ import com.gameplat.common.enums.UserTypes;
 import com.gameplat.security.context.UserCredential;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -120,16 +121,6 @@ public class MessageInfoServiceImpl extends ServiceImpl<MessageMapper, MessageIn
                         StringUtils.isNotBlank(messageInfoQueryDTO.getContent()),
                         MessageInfo::getContent,
                         messageInfoQueryDTO.getContent())
-                .and(
-                        wrapper -> wrapper.eq(messageInfoQueryDTO.getStatus() != null,
-                                MessageInfo::getStatus,
-                                messageInfoQueryDTO.getStatus()).or()
-                                .lt(messageInfoQueryDTO.getStatus() == BooleanEnum.NO.value(),
-                                        MessageInfo::getEndTime,
-                                        new Date())
-                                .gt(messageInfoQueryDTO.getStatus() == BooleanEnum.NO.value(),
-                                        MessageInfo::getEndTime,
-                                        new Date()))
                 .eq(
                         StringUtils.isNotBlank(messageInfoQueryDTO.getLanguage()),
                         MessageInfo::getLanguage,
@@ -160,6 +151,7 @@ public class MessageInfoServiceImpl extends ServiceImpl<MessageMapper, MessageIn
                                 .or()
                                 .ge(MessageInfo::getBeginTime, date)
                                 .le(MessageInfo::getEndTime, date))
+                .in(MessageInfo::getType, 2,3)
                 ;
             }
         }
@@ -176,6 +168,9 @@ public class MessageInfoServiceImpl extends ServiceImpl<MessageMapper, MessageIn
                         Objects.equals(messageInfoVO.getStatus(), SwitchStatusEnum.ENABLED.getValue())
                 ) {
                     messageInfoVO.setStatus(SwitchStatusEnum.DISABLED.getValue());
+                    MessageInfo messageInfo = new MessageInfo();
+                    BeanUtils.copyBeanProp(messageInfo, messageInfoVO);
+                    this.updateById(messageInfo);
                 }
             }
         }

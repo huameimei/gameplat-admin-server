@@ -84,9 +84,7 @@ public class ActivityLobbyServiceImpl extends ServiceImpl<ActivityLobbyMapper, A
   @Transactional(rollbackFor = Throwable.class)
   public void add(ActivityLobbyAddDTO activityLobbyAddDTO) {
     ActivityLobby activityLobby = activityLobbyConvert.toEntity(activityLobbyAddDTO);
-    // 优惠打折列表
-    List<ActivityLobbyDiscount> activityLobbyDiscounts =
-        BeanUtils.mapList(activityLobbyAddDTO.getLobbyDiscountList(), ActivityLobbyDiscount.class);
+
     // 指定比赛
     if (activityLobbyAddDTO.getStatisItem()
         == ActivityInfoEnum.StatisItem.CUMULATIVE_SPORTS_RECHARGE_AMOUNT.getValue()) {
@@ -222,6 +220,10 @@ public class ActivityLobbyServiceImpl extends ServiceImpl<ActivityLobbyMapper, A
     if (StringUtils.isEmpty(applyDateList)) {
       throw new ServiceException("统计日期不在活动有效期内！");
     }
+
+    // 优惠打折列表
+    List<ActivityLobbyDiscount> activityLobbyDiscounts =
+            BeanUtils.mapList(activityLobbyAddDTO.getLobbyDiscountList(), ActivityLobbyDiscount.class);
 
     List<Integer> targetValueList =
         activityLobbyDiscounts.stream()

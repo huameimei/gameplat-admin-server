@@ -54,7 +54,7 @@ public class ActivityLobbyController {
   /** 活动大厅列表 */
   @ApiOperation(value = "活动大厅列表")
   @GetMapping("/list")
-  @PreAuthorize("hasAuthority('activity:lobby:list')")
+  @PreAuthorize("hasAuthority('activity:lobby:page')")
   @ApiImplicitParams({
     @ApiImplicitParam(name = "current", value = "分页参数：当前页", defaultValue = "1"),
     @ApiImplicitParam(name = "size", value = "每页条数"),
@@ -93,7 +93,7 @@ public class ActivityLobbyController {
    */
   @ApiOperation(value = "修改活动大厅")
   @PutMapping("/update")
-  @PreAuthorize("hasAuthority('activity:lobby:edit')")
+  @PreAuthorize("hasAuthority('activity:lobby:update')")
   public void update(@RequestBody ActivityLobbyUpdateDTO activityLobbyUpdateDTO) {
     if (activityLobbyUpdateDTO.getId() == null || activityLobbyUpdateDTO.getId() == 0) {
       throw new ServiceException("id不能为空");
@@ -133,7 +133,7 @@ public class ActivityLobbyController {
    */
   @ApiOperation(value = "更新活动大厅状态")
   @PutMapping("/updateStatus")
-  @PreAuthorize("hasAuthority('activity:lobby:edit')")
+  @PreAuthorize("hasAuthority('activity:lobby:updateStatus')")
   public void updateStatus(@RequestBody ActivityLobbyUpdateStatusDTO activityLobbyUpdateStatusDTO) {
     if (activityLobbyUpdateStatusDTO.getId() == null || activityLobbyUpdateStatusDTO.getId() == 0) {
       throw new ServiceException("id不能为空");
@@ -152,7 +152,7 @@ public class ActivityLobbyController {
   /** 游戏类型列表 */
   @ApiOperation(value = "游戏类型列表")
   @GetMapping("/gameTypeList")
-  @PreAuthorize("hasAuthority('activity:lobby:list')")
+  @PreAuthorize("hasAuthority('activity:lobby:gameTypeList')")
   public List<CodeDataVO> gameTypeList() {
     SysDictData dictData = new SysDictData();
     dictData.setDictType(DictTypeEnum.LIVE_GAME_TYPE.getValue());
@@ -176,7 +176,7 @@ public class ActivityLobbyController {
   /** 游戏类型列表 */
   @ApiOperation(value = "游戏列表")
   @GetMapping("/gameList")
-  @PreAuthorize("hasAuthority('activity:lobby:list')")
+  @PreAuthorize("hasAuthority('activity:lobby:gameList')")
   @ApiImplicitParams({
     @ApiImplicitParam(name = "gameTypeCode", value = "游戏类型"),
   })

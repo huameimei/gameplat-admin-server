@@ -80,19 +80,19 @@ public class MessageInfoServiceImpl extends ServiceImpl<MessageMapper, MessageIn
         List messageCate = new ArrayList();
         List messageShowType = new ArrayList();
         for (SysDictData dictDataByType : dictDataByTypes) {
-            if (dictDataByType.getDictType().equals("MESSAGE_MEMBER_RANGE")) {
+            if ("MESSAGE_MEMBER_RANGE".equals(dictDataByType.getDictType())) {
                 userRange.add(dictDataByType);
             }
-            if (dictDataByType.getDictType().equals("MESSAGE_LOCATION")) {
+            if ("MESSAGE_LOCATION".equals(dictDataByType.getDictType())) {
                 location.add(dictDataByType);
             }
-            if (dictDataByType.getDictType().equals("MESSAGE_POP_COUNT")) {
+            if ("MESSAGE_POP_COUNT".equals(dictDataByType.getDictType())) {
                 popCount.add(dictDataByType);
             }
-            if (dictDataByType.getDictType().equals("MESSAGE_CATEGORY")) {
+            if ("MESSAGE_CATEGORY".equals(dictDataByType.getDictType())) {
                 messageCate.add(dictDataByType);
             }
-            if (dictDataByType.getDictType().equals("MESSAGE_SHOW_TYPE")) {
+            if ("MESSAGE_SHOW_TYPE".equals(dictDataByType.getDictType())) {
                 messageShowType.add(dictDataByType);
             }
         }
@@ -120,16 +120,6 @@ public class MessageInfoServiceImpl extends ServiceImpl<MessageMapper, MessageIn
                         StringUtils.isNotBlank(messageInfoQueryDTO.getContent()),
                         MessageInfo::getContent,
                         messageInfoQueryDTO.getContent())
-                .and(
-                        wrapper -> wrapper.eq(messageInfoQueryDTO.getStatus() != null,
-                                MessageInfo::getStatus,
-                                messageInfoQueryDTO.getStatus()).or()
-                                .lt(messageInfoQueryDTO.getStatus() == BooleanEnum.NO.value(),
-                                        MessageInfo::getEndTime,
-                                        new Date())
-                                .gt(messageInfoQueryDTO.getStatus() == BooleanEnum.NO.value(),
-                                        MessageInfo::getEndTime,
-                                        new Date()))
                 .eq(
                         StringUtils.isNotBlank(messageInfoQueryDTO.getLanguage()),
                         MessageInfo::getLanguage,
@@ -150,16 +140,17 @@ public class MessageInfoServiceImpl extends ServiceImpl<MessageMapper, MessageIn
                 queryChainWrapper
                         .and(wrapper -> wrapper.eq(MessageInfo::getStatus, BooleanEnum.NO.value())
                                 .or()
-                                .lt(MessageInfo::getEndTime, new Date()));
+                                .lt(MessageInfo::getEndTime, new Date())
+                                .in(MessageInfo::getType, 2,3)
+                        );
                 //消息状态--有效
             } else if (messageInfoQueryDTO.getStatus() == BooleanEnum.YES.value()) {
                 Date date = new Date();
                 queryChainWrapper
-                        .and(wrapper -> wrapper.eq(MessageInfo::getStatus,
-                                messageInfoQueryDTO.getStatus())
-                                .or()
+                        .and(wrapper -> wrapper.eq(MessageInfo::getStatus, BooleanEnum.YES.value())
                                 .ge(MessageInfo::getBeginTime, date)
                                 .le(MessageInfo::getEndTime, date))
+                                .in(MessageInfo::getType, 2,3)
                 ;
             }
         }
@@ -176,6 +167,9 @@ public class MessageInfoServiceImpl extends ServiceImpl<MessageMapper, MessageIn
                         Objects.equals(messageInfoVO.getStatus(), SwitchStatusEnum.ENABLED.getValue())
                 ) {
                     messageInfoVO.setStatus(SwitchStatusEnum.DISABLED.getValue());
+                    MessageInfo messageInfo = new MessageInfo();
+                    BeanUtils.copyBeanProp(messageInfo, messageInfoVO);
+                    this.updateById(messageInfo);
                 }
             }
         }

@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -13,10 +14,13 @@ import com.gameplat.admin.mapper.MemberMapper;
 import com.gameplat.admin.model.bean.ActivityStatisticItem;
 import com.gameplat.admin.model.domain.GameBetDailyReport;
 import com.gameplat.admin.model.domain.GamePlatform;
+import com.gameplat.admin.model.domain.GameRebateDetail;
 import com.gameplat.admin.model.domain.Member;
 import com.gameplat.admin.model.dto.GameBetDailyReportQueryDTO;
+import com.gameplat.admin.model.vo.GameBetReportVO;
 import com.gameplat.admin.model.vo.GameReportVO;
 import com.gameplat.admin.model.vo.PageDtoVO;
+import com.gameplat.admin.model.vo.TpPayChannelVO;
 import com.gameplat.admin.service.GameBetDailyReportService;
 import com.gameplat.admin.service.MemberService;
 import com.gameplat.base.common.exception.ServiceException;
@@ -149,6 +153,17 @@ public class GameBetDailyReportServiceImpl extends ServiceImpl<GameBetDailyRepor
     @Override
     public List<GameReportVO> queryReportList(GameBetDailyReportQueryDTO dto) {
         return gameBetDailyReportMapper.queryReportList(dto);
+    }
+
+
+    @Override
+    public PageDtoVO<GameBetReportVO> querybetReportList(Page<GameBetDailyReportQueryDTO> page, GameBetDailyReportQueryDTO dto) {
+        Page<GameBetReportVO> gameBetReportVOPage = gameBetDailyReportMapper.querybetReportList(page,dto);
+        PageDtoVO<GameBetReportVO> pageDtoVO = new PageDtoVO<>();
+        Map<String, Object> map = gameBetDailyReportMapper.querySumReport(dto);
+        pageDtoVO.setPage(gameBetReportVOPage);
+        pageDtoVO.setOtherData(map);
+        return pageDtoVO;
     }
 
     @Override

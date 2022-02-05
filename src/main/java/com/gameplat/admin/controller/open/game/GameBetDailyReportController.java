@@ -1,17 +1,25 @@
 package com.gameplat.admin.controller.open.game;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.gameplat.admin.model.domain.GamePlatform;
 import com.gameplat.admin.model.domain.GameBetDailyReport;
+import com.gameplat.admin.model.domain.SysDictData;
 import com.gameplat.admin.model.dto.GameBetDailyReportQueryDTO;
 import com.gameplat.admin.model.dto.OperGameMemberDayReportDTO;
+import com.gameplat.admin.model.vo.GameBetReportVO;
 import com.gameplat.admin.model.vo.GameReportVO;
 import com.gameplat.admin.model.vo.PageDtoVO;
 import com.gameplat.admin.service.GamePlatformService;
 import com.gameplat.admin.service.GameBetDailyReportService;
 import com.gameplat.base.common.exception.ServiceException;
+
+import java.util.Date;
 import java.util.List;
 import javax.annotation.Resource;
+
+import com.gameplat.base.common.util.DateUtil;
+import com.gameplat.base.common.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,8 +71,36 @@ public class GameBetDailyReportController {
    */
   @GetMapping(value = "/queryReport")
   public List<GameReportVO> queryReport(GameBetDailyReportQueryDTO dto) {
+    if (StringUtils.isBlank(dto.getBeginTime())) {
+        String beginTime = DateUtil.getDateToString(new Date());
+        dto.setBeginTime(beginTime);
+    }
+    if (StringUtils.isBlank(dto.getEndTime())) {
+        String endTime = DateUtil.getDateToString(new Date());
+        dto.setEndTime(endTime);
+    }
     return gameBetDailyReportService.queryReportList(dto);
   }
 
-  // TODO 导出真人投注报表
+  /**
+   * 查询投注日报表记录
+   */
+  @GetMapping(value = "/queryBetReport")
+  public PageDtoVO<GameBetReportVO> queryBetReport(Page<GameBetDailyReportQueryDTO> page, GameBetDailyReportQueryDTO dto) {
+      if (StringUtils.isEmpty(dto.getBeginTime())) {
+          String beginTime = DateUtil.getDateToString(new Date());
+          dto.setBeginTime(beginTime);
+      }
+      if (StringUtils.isEmpty(dto.getEndTime())) {
+          String endTime = DateUtil.getDateToString(new Date());
+          dto.setEndTime(endTime);
+      }
+      if (StringUtils.isEmpty(dto.getPlatformCode())) {
+          dto.setLiveGameSuperType("");
+      }
+    return gameBetDailyReportService.querybetReportList(page,dto);
+  }
+
+
+
 }

@@ -10,6 +10,12 @@ public class GameReportVO implements Serializable {
    * 平台
    */
   private String platformCode;
+
+  /**
+   * 平台
+   */
+  private String platformName;
+
   /**
    * 投注金额
    */

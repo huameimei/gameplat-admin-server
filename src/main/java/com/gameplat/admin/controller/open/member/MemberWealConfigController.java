@@ -6,6 +6,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,21 +29,24 @@ public class MemberWealConfigController {
     /** 增 */
     @PostMapping("/add")
     @ApiOperation(value = "新增权益配置")
-    public void addWealConfig(@Validated @RequestBody MemberWealConfigAddDTO dto) {
+    @PreAuthorize("hasAuthority('member:wealConfig:add')")
+    public void addWealConfig(@Validated MemberWealConfigAddDTO dto) {
         memberWealConfigService.addWealConfig(dto);
     }
 
     /** 删 */
     @ApiOperation(value = "删除权益配置")
-    @DeleteMapping("/remove")
-    public void removeWealConfig(Long id){
+    @DeleteMapping("/remove/{id}")
+    @PreAuthorize("hasAuthority('member:wealConfig:remove')")
+    public void removeWealConfig(@PathVariable Long id){
         memberWealConfigService.removeWealConfig(id);
     }
 
     /** 改 */
     @PutMapping("/edit")
     @ApiOperation(value = "修改权益配置")
-    public void updateBanner(@Validated @RequestBody MemberWealConfigEditDTO dto) {
+    @PreAuthorize("hasAuthority('member:wealConfig:edit')")
+    public void updateBanner(@Validated MemberWealConfigEditDTO dto) {
         memberWealConfigService.updateWealConfig(dto);
     }
 }

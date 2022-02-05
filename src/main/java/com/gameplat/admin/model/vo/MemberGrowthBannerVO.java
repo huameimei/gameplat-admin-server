@@ -16,7 +16,6 @@ import java.util.Date;
 @Data
 public class MemberGrowthBannerVO implements Serializable {
     @ApiModelProperty(value = "主键")
-    @TableId(type = IdType.AUTO)
     private Long id;
 
     @ApiModelProperty(value = "终端: 0 WEB  1 H5  2 ANDRIOD  3 IOS")

@@ -12,6 +12,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -34,27 +35,31 @@ public class MemberGrowthBannerController {
     /** 增 */
     @PostMapping("/add")
     @ApiOperation(value = "新增banner图")
-    public void addBanner(@Validated @RequestBody MemberGrowthBannerAddDTO dto) {
+    @PreAuthorize("hasAuthority('member:growthBanner:add')")
+    public void addBanner(@Validated MemberGrowthBannerAddDTO dto) {
         memberGrowthBannerService.addBanner(dto);
     }
 
     /** 删 */
     @ApiOperation(value = "删除VIP banner图")
-    @DeleteMapping("/remove")
-    public void removeBanner(Long id){
+    @DeleteMapping("/remove/{id}")
+    @PreAuthorize("hasAuthority('member:growthBanner:remove')")
+    public void removeBanner(@PathVariable Long id){
         memberGrowthBannerService.remove(id);
     }
 
     /** 改 */
     @PutMapping("/edit")
     @ApiOperation(value = "修改VIP banner图")
-    public void updateBanner(@Validated @RequestBody MemberGrowthBannerEditDTO dto) {
+    @PreAuthorize("hasAuthority('member:growthBanner:edit')")
+    public void updateBanner(@Validated MemberGrowthBannerEditDTO dto) {
         memberGrowthBannerService.updateBanner(dto);
     }
 
     /** 查 */
     @GetMapping("/page")
     @ApiOperation(value = "VIP banner图列表")
+    @PreAuthorize("hasAuthority('member:growthBanner:page')")
     public IPage<MemberGrowthBannerVO> findTrendsList(PageDTO<MemberGrowthBanner> page, MemberGrowthBannerQueryDTO dto) {
         return memberGrowthBannerService.getList(page, dto);
     }

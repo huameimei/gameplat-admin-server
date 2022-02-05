@@ -1,10 +1,13 @@
 package com.gameplat.admin.model.domain;
 
+import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.Date;
 import lombok.Data;
 
 @Data
@@ -30,4 +33,16 @@ public class GameRebateConfig implements Serializable {
   private String json;
 
   private String expand;
+
+  @TableField(fill = FieldFill.INSERT)
+  private String createBy;
+
+  @TableField(fill = FieldFill.INSERT)
+  private Date createTime;
+
+  @TableField(fill = FieldFill.UPDATE)
+  private String updateBy;
+
+  @TableField(fill = FieldFill.UPDATE)
+  private Date updateTime;
 }

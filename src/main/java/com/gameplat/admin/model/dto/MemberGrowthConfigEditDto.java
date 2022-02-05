@@ -132,4 +132,28 @@ public class MemberGrowthConfigEditDto implements Serializable {
 
     @ApiModelProperty("其它提示 vi-VN")
     private String otherDescVi;
+
+    @ApiModelProperty("移动端VIP图片")
+    private String mobileVipImage;
+
+    @ApiModelProperty("WEB端VIP图片")
+    private String webVipImage;
+
+    @ApiModelProperty("移动端达成背景图片")
+    private String mobileReachBackImage;
+
+    @ApiModelProperty("移动端未达成背景图片")
+    private String mobileUnreachBackImage;
+
+    @ApiModelProperty("移动端达成VIP图片")
+    private String mobileReachVipImage;
+
+    @ApiModelProperty("移动端未达成VIP图片")
+    private String mobileUnreachVipImage;
+
+    @ApiModelProperty("WEB端达成VIP图片")
+    private String webReachVipImage;
+
+    @ApiModelProperty("WEB端未达成VIP图片")
+    private String webUnreachVipImage;
 }

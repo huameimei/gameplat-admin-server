@@ -95,9 +95,36 @@ public class GameBetDailyReportController {
           String endTime = DateUtil.getDateToString(new Date());
           dto.setEndTime(endTime);
       }
-      if (StringUtils.isEmpty(dto.getPlatformCode())) {
-          dto.setLiveGameSuperType("");
+      if (StringUtils.isNotEmpty(dto.getLiveGameSuperType())) {
+          StringBuilder sb = new StringBuilder();
+          sb.append("(");
+          String[] split = dto.getLiveGameSuperType().split(",");
+          for (int i = 0; i < split.length; i++) {
+              sb.append("'"+split[i]+"'").append(",");
+          }
+          sb.deleteCharAt(sb.toString().length()-1);
+          sb.append(")");
+          String str = sb.toString();
+          dto.setLiveGameSuperType(str);
       }
+
+
+      if (StringUtils.isNotEmpty(dto.getPlatformCode())) {
+          dto.setLiveGameSuperType("");
+          StringBuilder sb = new StringBuilder();
+          sb.append("(");
+          String[] split = dto.getPlatformCode().split(",");
+          for (int i = 0; i < split.length; i++) {
+              sb.append("'"+split[i]+"'").append(",");
+          }
+          sb.deleteCharAt(sb.toString().length()-1);
+          sb.append(")");
+          String str = sb.toString();
+          dto.setPlatformCode(str);
+      }
+
+
+
     return gameBetDailyReportService.querybetReportList(page,dto);
   }
 

@@ -138,14 +138,10 @@
                 and account like #{dto.account}
             </if>
             <if test="dto.liveGameSuperType!=null and dto.liveGameSuperType!=''">
-                and game_type in
-                <foreach collection="dto.liveGameSuperType.split(',')" item="item"
-                         index="index" open="(" separator="," close=")">#{item}</foreach>
+                and game_type in ${dto.liveGameSuperType}
             </if>
             <if test="dto.platformCode!=null and dto.platformCode!=''">
-                and platform_code in
-                <foreach collection="dto.platformCode.split(',')" item="item"
-                         index="index" open="(" separator="," close=")">#{item}</foreach>
+                and platform_code in ${dto.platformCode}
             </if>
 
         GROUP BY t.platform_code,t.stat_time,account,t.game_type
@@ -174,14 +170,10 @@
                 and account like #{account}
             </if>
             <if test="liveGameSuperType!=null and liveGameSuperType!=''">
-                and game_type in
-                <foreach collection="liveGameSuperType.split(',')" item="item"
-                         index="index" open="(" separator="," close=")">#{item}</foreach>
+                and game_type in ${liveGameSuperType}
             </if>
             <if test="platformCode!=null and platformCode!=''">
-                and platform_code in
-                <foreach collection="platformCode.split(',')" item="item"
-                         index="index" open="(" separator="," close=")">#{item}</foreach>
+                and platform_code in ${platformCode}
             </if>
     </select>
 

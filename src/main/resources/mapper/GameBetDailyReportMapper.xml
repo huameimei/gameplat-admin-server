@@ -45,10 +45,10 @@
           and t.stat_time BETWEEN #{beginTime} AND #{endTime}
       </if>
       <if test="userPaths != null and userPaths != ''">
-        and t.user_paths like #{userPaths}
+        and t.user_paths = #{userPaths}
       </if>
       <if test="account != null and account != ''">
-        and t.account like #{dto.account}
+        and t.account = #{account}
       </if>
       GROUP BY
       t.game_type
@@ -67,10 +67,10 @@
         AND #{endTime}
       </if>
       <if test="userPaths != null and userPaths != ''">
-        and user_paths like #{userPaths}
+        and user_paths = #{userPaths}
       </if>
       <if test="account != null and account != ''">
-        and account like #{account}
+        and account = #{account}
       </if>
         GROUP BY
       game_type
@@ -132,10 +132,10 @@
                 AND #{dto.endTime}
             </if>
             <if test="dto.userPaths != null and dto.userPaths != ''">
-                and user_paths like #{dto.userPaths}
+                and user_paths = #{dto.userPaths}
             </if>
             <if test="dto.account != null and dto.account != ''">
-                and account like #{dto.account}
+                and account = #{dto.account}
             </if>
             <if test="dto.liveGameSuperType!=null and dto.liveGameSuperType!=''">
                 and game_type in ${dto.liveGameSuperType}
@@ -164,10 +164,10 @@
                 AND #{endTime}
             </if>
             <if test="userPaths != null and userPaths != ''">
-                and user_paths like #{userPaths}
+                and user_paths = #{userPaths}
             </if>
             <if test="account != null and account != ''">
-                and account like #{account}
+                and account = #{account}
             </if>
             <if test="liveGameSuperType!=null and liveGameSuperType!=''">
                 and game_type in ${liveGameSuperType}

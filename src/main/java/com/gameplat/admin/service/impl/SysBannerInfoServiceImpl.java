@@ -53,7 +53,7 @@ public class SysBannerInfoServiceImpl extends ServiceImpl<SysBannerInfoMapper, S
     public IPage<SysBannerInfoVO> list(PageDTO<SysBannerInfo> page, String language, Integer type) {
         return this.lambdaQuery()
                 .eq(type != null && type != 0, SysBannerInfo::getType, type)
-                .eq(SysBannerInfo::getLanguage, language)
+                .eq(StringUtils.isNotBlank(language),SysBannerInfo::getLanguage, language)
                 .page(page)
                 .convert(sysBannerInfoConvert::toVo);
     }

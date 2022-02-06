@@ -44,7 +44,7 @@ public class OpenBannerController {
      */
     @ApiOperation(value = "banner列表")
     @GetMapping("/list")
-    @PreAuthorize("hasAuthority('system:banner:list')")
+    @PreAuthorize("hasAuthority('system:banner:page')")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "current", value = "分页参数：当前页", defaultValue = "1"),
             @ApiImplicitParam(name = "size", value = "每页条数"),

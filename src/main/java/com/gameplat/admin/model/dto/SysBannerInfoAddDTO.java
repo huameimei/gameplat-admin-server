@@ -71,7 +71,7 @@ public class SysBannerInfoAddDTO implements Serializable {
     /**
      * 语种
      */
-    @NotBlank(message = "语言不能为空")
+//    @NotBlank(message = "语言不能为空")
     @ApiModelProperty("语言")
     private String language;
 

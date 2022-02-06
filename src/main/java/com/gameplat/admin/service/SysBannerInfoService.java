@@ -36,9 +36,10 @@ public interface SysBannerInfoService {
    *
    * @param page
    * @param language
+   * @param type
    * @return
    */
-  IPage<SysBannerInfoVO> list(PageDTO<SysBannerInfo> page, String language);
+  IPage<SysBannerInfoVO> list(PageDTO<SysBannerInfo> page, String language, Integer type);
 
   /**
    * 添加

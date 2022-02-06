@@ -18,6 +18,13 @@ public class SysBannerInfoAddDTO implements Serializable {
     /**
      * banner类型
      */
+    @NotNull(message = "banner大类不能为空")
+    @ApiModelProperty("banner大类，1 体育banner配置，2 彩票banner配置")
+    private Integer type;
+
+    /**
+     * banner类型
+     */
     @NotNull(message = "banner类型不能为空")
     @ApiModelProperty("banner类型")
     private Integer bannerType;

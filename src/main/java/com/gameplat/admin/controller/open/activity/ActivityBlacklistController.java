@@ -42,7 +42,7 @@ public class ActivityBlacklistController {
    */
   @ApiOperation(value = "活动黑名单列表")
   @GetMapping("/list")
-  @PreAuthorize("hasAuthority('activity:blacklist:list')")
+  @PreAuthorize("hasAuthority('activity:blacklist:page')")
   @ApiImplicitParams({
     @ApiImplicitParam(name = "current", value = "分页参数：当前页", defaultValue = "1"),
     @ApiImplicitParam(name = "size", value = "每页条数"),

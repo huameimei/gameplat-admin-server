@@ -25,6 +25,12 @@ public class SysBannerInfoVO implements Serializable {
     private Long id;
 
     /**
+     *  banner大类，1 体育banner配置，2 彩票banner配置
+     */
+    @ApiModelProperty("banner大类，1 体育banner配置，2 彩票banner配置")
+    private Integer type;
+
+    /**
      * banner类型
      */
     @ApiModelProperty("banner类型")
@@ -59,6 +65,12 @@ public class SysBannerInfoVO implements Serializable {
      */
     @ApiModelProperty("状态")
     private Integer status;
+
+    /**
+     * 排序
+     */
+    @ApiModelProperty("排序")
+    private Integer sort;
 
     /**
      * 创建时间

@@ -22,7 +22,6 @@ public class MessageFeedbackVO implements Serializable {
 
   /** 主键ID */
   @ApiModelProperty("主键ID")
-  @TableId(value = "id", type = IdType.AUTO)
   private Long id;
 
   /** 反馈标题 */

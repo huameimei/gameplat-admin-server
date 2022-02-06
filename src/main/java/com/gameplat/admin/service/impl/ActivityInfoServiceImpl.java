@@ -235,6 +235,7 @@ public class ActivityInfoServiceImpl extends ServiceImpl<ActivityInfoMapper, Act
         }
         //--todo,需添加判断活动状态
 
+
         this.removeByIds(idList);
     }
 

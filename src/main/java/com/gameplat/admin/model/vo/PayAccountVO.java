@@ -48,6 +48,8 @@ public class PayAccountVO extends Model<PayAccountVO> {
   @ApiModelProperty(value = "0:启用，1：关闭")
   private Integer orderRemarkStatus;
 
+  private String type;
+
   private String limitInfo;
 
   private String handleTip;

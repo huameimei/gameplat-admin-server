@@ -4,6 +4,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 
@@ -33,7 +34,7 @@ public class SysBannerInfoEditDTO implements Serializable {
     /**
      * banner类型
      */
-    @NotNull(message = "banner类型不能为空")
+//    @NotNull(message = "banner类型不能为空")
     @ApiModelProperty("banner类型")
     private Integer bannerType;
 
@@ -52,6 +53,7 @@ public class SysBannerInfoEditDTO implements Serializable {
     /**
      * pc端图片地址
      */
+    @NotBlank(message = "pc端图片地址不能为空")
     @ApiModelProperty("pc端图片地址")
     private String pcPicUrl;
 
@@ -64,7 +66,7 @@ public class SysBannerInfoEditDTO implements Serializable {
     /**
      * 状态
      */
-    @ApiModelProperty("状态")
+    @ApiModelProperty("状态（0禁用 1启用）")
     private Integer status;
 
     /**

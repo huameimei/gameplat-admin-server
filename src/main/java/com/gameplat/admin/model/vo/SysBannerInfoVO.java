@@ -63,7 +63,7 @@ public class SysBannerInfoVO implements Serializable {
     /**
      * 状态
      */
-    @ApiModelProperty("状态")
+    @ApiModelProperty("状态（0禁用 1启用）")
     private Integer status;
 
     /**

@@ -51,7 +51,7 @@ public class SysBannerInfoAddDTO implements Serializable {
     /**
      * app端图片地址
      */
-    @NotBlank(message = "app端图片地址不能为空")
+//    @NotBlank(message = "app端图片地址不能为空")
     @ApiModelProperty("app端图片地址")
     private String appPicUrl;
 
@@ -59,7 +59,7 @@ public class SysBannerInfoAddDTO implements Serializable {
      * 状态
      */
     @NotNull(message = "状态不能为空")
-    @ApiModelProperty("状态")
+    @ApiModelProperty("状态（0禁用 1启用）")
     private Integer status;
 
     /**

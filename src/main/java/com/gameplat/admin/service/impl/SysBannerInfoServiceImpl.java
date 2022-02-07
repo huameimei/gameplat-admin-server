@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.convert.SysBannerInfoConvert;
+import com.gameplat.admin.enums.SysBannerInfoEnum;
 import com.gameplat.admin.mapper.SysBannerInfoMapper;
 import com.gameplat.admin.model.domain.SysBannerInfo;
 import com.gameplat.admin.model.dto.SysBannerInfoAddDTO;
@@ -53,7 +54,7 @@ public class SysBannerInfoServiceImpl extends ServiceImpl<SysBannerInfoMapper, S
     public IPage<SysBannerInfoVO> list(PageDTO<SysBannerInfo> page, String language, Integer type) {
         return this.lambdaQuery()
                 .eq(type != null && type != 0, SysBannerInfo::getType, type)
-                .eq(StringUtils.isNotBlank(language),SysBannerInfo::getLanguage, language)
+                .eq(StringUtils.isNotBlank(language), SysBannerInfo::getLanguage, language)
                 .page(page)
                 .convert(sysBannerInfoConvert::toVo);
     }
@@ -73,32 +74,34 @@ public class SysBannerInfoServiceImpl extends ServiceImpl<SysBannerInfoMapper, S
      * @param sysBannerInfo
      */
     private void validBannerInfo(SysBannerInfo sysBannerInfo) {
-        // 校验选择不同类型的数据判断
-        // 活动优惠
-        if (sysBannerInfo
-                .getBannerType()
-                .equals(configService.getValueInteger(DictDataEnum.ACTIVITY))) {
-            if (sysBannerInfo.getChildType() == null || sysBannerInfo.getChildType() == 0) {
-                throw new ServiceException("活动优惠，子分类不能为空");
+        if (sysBannerInfo.getType() == SysBannerInfoEnum.Type.SPORT.getValue()) {
+            // 校验选择不同类型的数据判断
+            // 活动优惠
+            if (sysBannerInfo
+                    .getBannerType()
+                    .equals(configService.getValueInteger(DictDataEnum.ACTIVITY))) {
+                if (sysBannerInfo.getChildType() == null || sysBannerInfo.getChildType() == 0) {
+                    throw new ServiceException("活动优惠，子分类不能为空");
+                }
             }
-        }
-        // 配置跳转页
-        else if (sysBannerInfo
-                .getBannerType()
-                .equals(configService.getValueInteger(DictDataEnum.JUMP_PAGES))) {
-            if (StringUtils.isBlank(sysBannerInfo.getJumpUrl())) {
-                throw new ServiceException("配置跳转页，调整地址不能为空");
+            // 配置跳转页
+            else if (sysBannerInfo
+                    .getBannerType()
+                    .equals(configService.getValueInteger(DictDataEnum.JUMP_PAGES))) {
+                if (StringUtils.isBlank(sysBannerInfo.getJumpUrl())) {
+                    throw new ServiceException("配置跳转页，调整地址不能为空");
+                }
             }
-        }
-        // 游戏分类
-        else if (sysBannerInfo
-                .getBannerType()
-                .equals(configService.getValueInteger(DictDataEnum.GAME_CATEGORY))) {
-            if (StringUtils.isBlank(sysBannerInfo.getGameKind())) {
-                throw new ServiceException("选择游戏分类，游戏类别不能为空");
-            }
-            if (StringUtils.isBlank(sysBannerInfo.getGameCode())) {
-                throw new ServiceException("选择游戏分类，关联游戏不能为空");
+            // 游戏分类
+            else if (sysBannerInfo
+                    .getBannerType()
+                    .equals(configService.getValueInteger(DictDataEnum.GAME_CATEGORY))) {
+                if (StringUtils.isBlank(sysBannerInfo.getGameKind())) {
+                    throw new ServiceException("选择游戏分类，游戏类别不能为空");
+                }
+                if (StringUtils.isBlank(sysBannerInfo.getGameCode())) {
+                    throw new ServiceException("选择游戏分类，关联游戏不能为空");
+                }
             }
         }
     }

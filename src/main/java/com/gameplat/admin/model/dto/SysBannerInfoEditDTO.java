@@ -34,7 +34,7 @@ public class SysBannerInfoEditDTO implements Serializable {
     /**
      * banner类型
      */
-    @NotNull(message = "banner类型不能为空")
+//    @NotNull(message = "banner类型不能为空")
     @ApiModelProperty("banner类型")
     private Integer bannerType;
 

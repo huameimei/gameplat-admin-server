@@ -2,6 +2,8 @@ package com.gameplat.admin.enums;
 
 /**
  * banner枚举
+ *
+ * @author admin
  */
 public class SysBannerInfoEnum {
 
@@ -17,6 +19,29 @@ public class SysBannerInfoEnum {
         private String desc;
 
         Status(int value, String desc) {
+            this.value = value;
+            this.desc = desc;
+        }
+
+        public int getValue() {
+            return this.value;
+        }
+
+
+    }
+
+    /**
+     * banner类型
+     */
+    public enum Type {
+        SPORT(1, "体育"),
+        LOTTERY(2, "彩票"),
+        ;
+
+        private int value;
+        private String desc;
+
+        Type(int value, String desc) {
             this.value = value;
             this.desc = desc;
         }

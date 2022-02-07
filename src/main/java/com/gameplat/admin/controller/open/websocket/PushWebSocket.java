@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import javax.websocket.*;
+import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
 import java.io.IOException;
 
@@ -16,7 +17,7 @@ import java.io.IOException;
  **/
 @Slf4j
 @Component
-@ServerEndpoint(value = "/api/admin/webSocket/push")
+@ServerEndpoint(value = "/ws/adminPush/{userName}")
 public class PushWebSocket extends AbstractWsSessionManager {
 
     private Session session;
@@ -26,7 +27,7 @@ public class PushWebSocket extends AbstractWsSessionManager {
      * 连接建立
      */
     @OnOpen
-    public void onOpen(Session session) {
+    public void onOpen(Session session,@PathParam("userName") String userName) {
         this.session = session;
         SessionChannel channel = new SessionChannel();
         channel.setSession(session);
@@ -43,7 +44,7 @@ public class PushWebSocket extends AbstractWsSessionManager {
      * 连接关闭
      */
     @OnClose
-    public void onClose(Session session) {
+    public void onClose(Session session,@PathParam("userName") String userName) {
         log.info("-------连接关闭");
     }
 
@@ -52,7 +53,7 @@ public class PushWebSocket extends AbstractWsSessionManager {
      *
      */
     @OnMessage
-    public void onMessage(String message, Session session) {
+    public void onMessage(String message, Session session,@PathParam("userName") String userName) {
         try {
             log.info("-------客户端消息" + message);
         } catch (Exception e) {

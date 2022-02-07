@@ -1,30 +1,22 @@
 package com.gameplat.admin.service.impl;
 
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.convert.SpreadUnionConvert;
 import com.gameplat.admin.mapper.SpreadUnionMapper;
-import com.gameplat.admin.model.domain.ActivityType;
-import com.gameplat.admin.model.domain.MemberBill;
 import com.gameplat.admin.model.domain.SpreadLinkInfo;
 import com.gameplat.admin.model.domain.SpreadUnion;
 import com.gameplat.admin.model.dto.SpreadUnionDTO;
-import com.gameplat.admin.model.dto.SpreadUnionPackageDTO;
-import com.gameplat.admin.model.vo.SpreadUnionPackageVO;
 import com.gameplat.admin.model.vo.SpreadUnionVO;
 import com.gameplat.admin.service.SpreadLinkInfoService;
 import com.gameplat.admin.service.SpreadUnionService;
 import com.gameplat.base.common.exception.ServiceException;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.List;
 

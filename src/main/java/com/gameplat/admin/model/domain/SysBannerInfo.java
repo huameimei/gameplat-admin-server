@@ -16,52 +16,94 @@ import java.util.Date;
 @TableName("sys_banner_info")
 public class SysBannerInfo {
 
-  /** 主键 */
-  @TableId(value = "id", type = IdType.AUTO)
-  private Long id;
+    /**
+     * 主键
+     */
+    @TableId(value = "id", type = IdType.AUTO)
+    private Long id;
 
-  /** banner类型 */
-  private Integer bannerType;
+    /**
+     *  banner大类，1 体育banner配置，2 彩票banner配置
+     */
+    private Integer type;
 
-  /** banner子类型 */
-  private Long childType;
+    /**
+     * banner类型
+     */
+    private Integer bannerType;
 
-  /** banner子类型名称 */
-  private String childName;
+    /**
+     * banner子类型
+     */
+    private Long childType;
 
-  /** pc端图片地址 */
-  private String pcPicUrl;
+    /**
+     * banner子类型名称
+     */
+    private String childName;
 
-  /** app端图片地址 */
-  private String appPicUrl;
+    /**
+     * pc端图片地址
+     */
+    private String pcPicUrl;
 
-  /** 状态 */
-  private Integer status;
+    /**
+     * app端图片地址
+     */
+    private String appPicUrl;
 
-  /** 创建时间 */
-  private Date createTime;
+    /**
+     * 状态
+     */
+    private Integer status;
 
-  /** 创建人 */
-  private String createBy;
+    /**
+     * 创建时间
+     */
+    private Date createTime;
 
-  /** 更新时间 */
-  private Date updateTime;
+    /**
+     * 创建人
+     */
+    private String createBy;
 
-  /** 更新人 */
-  private String updateBy;
+    /**
+     * 更新时间
+     */
+    private Date updateTime;
 
-  /** 备注 */
-  private String remark;
+    /**
+     * 更新人
+     */
+    private String updateBy;
 
-  /** 语种 */
-  private String language;
+    /**
+     * 备注
+     */
+    private String remark;
 
-  /** 跳转地址 */
-  private String jumpUrl;
+    /**
+     * 语种
+     */
+    private String language;
 
-  /** 游戏类别 */
-  private String gameKind;
+    /**
+     * 跳转地址
+     */
+    private String jumpUrl;
 
-  /** 关联游戏 */
-  private String gameCode;
+    /**
+     * 游戏类别
+     */
+    private String gameKind;
+
+    /**
+     * 关联游戏
+     */
+    private String gameCode;
+
+    /**
+     * 排序
+     */
+    private Integer sort;
 }

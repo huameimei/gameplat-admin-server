@@ -6,7 +6,6 @@ import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.gameplat.admin.enums.LanguageEnum;
-import com.gameplat.admin.model.dto.GrowthLevelLogoEditDTO;
 import com.gameplat.admin.model.dto.MemberGrowthConfigEditDto;
 import com.gameplat.admin.model.dto.MemberGrowthLevelEditDto;
 import com.gameplat.admin.model.vo.MemberConfigLevelVO;
@@ -128,12 +127,5 @@ public class OpenMemberGrowthLevelController {
         } catch (Exception e) {
             throw new ServiceException("获取VIP等级列表失败:" + e);
         }
-    }
-
-    @ApiOperation(value = "修改logo配置")
-    @PutMapping("/updateLogo")
-    @PreAuthorize("hasAuthority('member:growthLevel:updateLogo')")
-    public void updateLogo(@Validated @RequestBody GrowthLevelLogoEditDTO dto) {
-        levelService.updateLogo(dto);
     }
 }

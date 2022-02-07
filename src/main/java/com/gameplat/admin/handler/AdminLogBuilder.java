@@ -22,7 +22,7 @@ public class AdminLogBuilder implements LogBuilder {
     private String dbSuffix;
 
     @Override
-    public SysLog build() {
+    public SysLog build() throws Exception {
 
         UserTypes userTypes =
                 SecurityUserHolder.isSuperAdmin() ?

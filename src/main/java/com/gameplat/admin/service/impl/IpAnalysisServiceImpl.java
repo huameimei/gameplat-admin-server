@@ -18,6 +18,7 @@ import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.StringUtils;
 import com.gameplat.elasticsearch.page.PageResponse;
 import com.gameplat.elasticsearch.service.IBaseElasticsearchService;
+import org.apache.lucene.search.vectorhighlight.ScoreOrderFragmentsBuilder;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.RequestOptions;
@@ -97,12 +98,17 @@ public class IpAnalysisServiceImpl implements IpAnalysisService {
             list = pagelist.getRecords();
         } else if (IpAnalysisEnum.LOGIN.getCode().equals(dto.getType())) {
         // 登录
-            QueryBuilder builder = IpAnalysisServiceImpl.buildSearch(dto);
-            //按时间排序
-            SortBuilder<FieldSortBuilder> sortBuilder = SortBuilders.fieldSort("createTime.keyword").order(SortOrder.DESC);
-            PageResponse<JSON> result = baseElasticsearchService.search(builder, INDEX + tenant, JSON.class,
-                (int) page.getCurrent(), (int) page.getSize(), sortBuilder);
-            List<JSON> log = result.getList();
+        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder().query(IpAnalysisServiceImpl.buildSearch(dto));
+//        TermsAggregationBuilder aggregation =
+//                AggregationBuilders.terms("username")
+//                        .subAggregation(AggregationBuilders.terms("ipAddress").field("ipAddress.keyword"))
+//                        .field("username.keyword").size(200);
+        TermsAggregationBuilder username = AggregationBuilders.terms("username").field("username.keyword");
+        TermsAggregationBuilder ipAddress = AggregationBuilders.terms("ipAddress").field("ipAddress.keyword");
+        TermsAggregationBuilder termsAggregationBuilder = username.subAggregation(ipAddress);
+        searchSourceBuilder.aggregation(termsAggregationBuilder).sort(SortBuilders.fieldSort("createTime.keyword").order(SortOrder.DESC));
+        PageResponse<JSON> result = baseElasticsearchService.search(INDEX + tenant, searchSourceBuilder, JSON.class, (int) page.getCurrent(), (int) page.getSize());
+        List<JSON> log = result.getList();
             for (int i = 0; i < log.size(); i++) {
                 IpAnalysisEsVO esVO = JSON.toJavaObject(log.get(i), IpAnalysisEsVO.class);
                 IpAnalysisVO vo = new IpAnalysisVO(){{
@@ -155,10 +161,7 @@ public class IpAnalysisServiceImpl implements IpAnalysisService {
     public static QueryBuilder buildSearch(IpAnalysisDTO dto) {
         BoolQueryBuilder builder = QueryBuilders.boolQuery();
         if (StringUtils.isNotBlank(dto.getAccount())) {
-            builder.must(QueryBuilders.termQuery("username", dto.getAccount()));
-        }
-        if (ObjectUtils.isNotNull(dto.getMemberId())) {
-            builder.must(QueryBuilders.matchQuery("memberId", dto.getMemberId()));
+            builder.must(QueryBuilders.termQuery("username.keyword", dto.getAccount()));
         }
         if (ObjectUtils.isNotNull(dto.getLoginIp())) {
             builder.must(QueryBuilders.matchQuery("ipAddress", dto.getLoginIp()));
@@ -214,15 +217,13 @@ public class IpAnalysisServiceImpl implements IpAnalysisService {
     public Map<String, Long> aggregationSearchDoc(IpAnalysisDTO dto){
         String index = INDEX+tenant;
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder().query(IpAnalysisServiceImpl.buildSearch(dto));
-        CardinalityAggregationBuilder distinct_count = AggregationBuilders.cardinality("distinct_count").field("username.keyword");
+//        CardinalityAggregationBuilder distinct_count = AggregationBuilders.cardinality("distinct_count").field("username.keyword");
 
-        TermsAggregationBuilder aggregation = AggregationBuilders.terms("by_group")
-                .field("username.keyword")
-                .field("ipAddress.keyword")
-                .subAggregation(distinct_count)
-                .order(BucketOrder.aggregation("distinct_count", false));
+        TermsAggregationBuilder aggregation = AggregationBuilders.terms("username").subAggregation(AggregationBuilders.terms("ipAddress").field("ipAddress.keyword").size(10))
+                .field("username")
+                .order(BucketOrder.aggregation("createTime", false));
         searchSourceBuilder.aggregation(aggregation);
-        Map<String, Long> by_group = baseElasticsearchService.aggregationSearchDoc(index, searchSourceBuilder, "by_group");
+        Map<String, Long> by_group = baseElasticsearchService.aggregationSearchDoc(index, searchSourceBuilder, "username");
         System.out.println(by_group);
         return by_group;
     }

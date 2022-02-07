@@ -23,6 +23,6 @@ public class SysBannerInfoUpdateStatusDTO implements Serializable {
   private Long id;
 
   @NotNull(message = "状态不能为空")
-  @ApiModelProperty("状态")
+  @ApiModelProperty("状态（0禁用 1启用）")
   private Integer status;
 }

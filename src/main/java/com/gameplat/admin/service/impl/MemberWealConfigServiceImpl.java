@@ -50,15 +50,14 @@ public class MemberWealConfigServiceImpl extends ServiceImpl<MemberWealConfigMap
     }
 
     @Override
-    public IPage<MemberWealConfigVO> page(PageDTO<MemberWealConfig> page, String language){
+    public IPage<MemberWealConfig> page(PageDTO<MemberWealConfig> page, String language){
         if (StringUtils.isEmpty(language)){
-            language = "zh-CN";
+            language = "zh-cn";
         }
         return
             this.lambdaQuery()
                     .eq(MemberWealConfig::getLanguage, language)
-                    .page(page)
-                    .convert(memberWealConfigConvert::toVo);
+                    .page(page);
     }
 
 }

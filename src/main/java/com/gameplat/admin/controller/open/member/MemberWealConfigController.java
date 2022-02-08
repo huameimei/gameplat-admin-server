@@ -58,7 +58,7 @@ public class MemberWealConfigController {
     @GetMapping("/page")
     @ApiOperation(value = "查询权益列表")
     @PreAuthorize("hasAuthority('member:wealConfig:page')")
-    public IPage<MemberWealConfigVO> page(PageDTO<MemberWealConfig> page, String language) {
+    public IPage<MemberWealConfig> page(PageDTO<MemberWealConfig> page, String language) {
         return memberWealConfigService.page(page, language);
     }
 }

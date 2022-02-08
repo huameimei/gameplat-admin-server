@@ -1,27 +1,158 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.gameplat.admin.mapper.MemberDayReportMapper">
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gameplat.admin.mapper.GameMemberReportMapper">
 
-	<!--获取达到有效投注金额的会员账号-->
-	<select id="getSatisfyBetAccount" resultType="java.lang.String">
-		SELECT
-		t.userName
-		FROM
-		(
-		SELECT
-		user_name userName,
-		sum( valid_amount ) validAmount
-		FROM member_day_report
-		<where>
-			<if test="startTime != null and startTime != ''">
-				AND count_date &gt;= #{startTime}
-			</if>
-			<if test="endTime != null and endTime != ''">
-				AND count_date &lt;= #{endTime}
-			</if>
-		</where>
-		GROUP BY user_id, user_name ) t
-		WHERE validAmount >= #{minBetAmount}
-	</select>
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.gameplat.admin.model.domain.MemberDayReport">
+        <id column="count_date" property="countDate"/>
+        <result column="user_id" property="userId"/>
+        <result column="user_name" property="userName"/>
+        <result column="parent_id" property="parentId"/>
+        <result column="parent_name" property="parentName"/>
+        <result column="user_type" property="userType"/>
+        <result column="vip_level" property="vipLevel"/>
+        <result column="user_level" property="userLevel"/>
+        <result column="agent_path" property="agentPath"/>
+        <result column="recharge_count" property="rechargeCount"/>
+        <result column="recharge_amount" property="rechargeAmount"/>
+        <result column="discount_amount" property="discountAmount"/>
+        <result column="jackpot_amount" property="jackpotAmount"/>
+        <result column="withdraw_count" property="withdrawCount"/>
+        <result column="withdraw_amount" property="withdrawAmount"/>
+        <result column="fee_amount" property="feeAmount"/>
+        <result column="bet_amount" property="betAmount"/>
+        <result column="valid_amount" property="validAmount"/>
+        <result column="win_amount" property="winAmount"/>
+        <result column="water_amount" property="waterAmount"/>
+        <result column="first_recharge_amount" property="firstRechargeAmount"/>
+        <result column="first_withdraw_amount" property="firstWithdrawAmount"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="abnormal_income" property="abnormalIncome"/>
+        <result column="abnormal_outcome" property="abnormalOutcome"/>
+        <result column="lottery_order_count" property="lotteryOrderCount"/>
+        <result column="sport_order_count" property="sportOrderCount"/>
+        <result column="real_order_count" property="realOrderCount"/>
+        <result column="lottery_win_order_count" property="lotteryWinOrderCount"/>
+        <result column="sport_win_order_count" property="sportWinOrderCount"/>
+        <result column="real_win_order_count" property="realWinOrderCount"/>
+        <result column="lottery_valid_amount" property="lotteryValidAmount"/>
+        <result column="sport_valid_amount" property="sportValidAmount"/>
+        <result column="real_valid_amount" property="realValidAmount"/>
+        <result column="lottery_win_amount" property="lotteryWinAmount"/>
+        <result column="sport_win_amount" property="sportWinAmount"/>
+        <result column="real_win_amount" property="realWinAmount"/>
+        <result column="lottery_water_amount" property="lotteryWaterAmount"/>
+        <result column="sport_water_amount" property="sportWaterAmount"/>
+        <result column="real_water_amount" property="realWaterAmount"/>
+        <result column="lottery_profit_rate" property="lotteryProfitRate"/>
+        <result column="sport_profit_rate" property="sportProfitRate"/>
+        <result column="real_profit_rate" property="realProfitRate"/>
+        <result column="lottery_win_rate" property="lotteryWinRate"/>
+        <result column="sport_win_rate" property="sportWinRate"/>
+        <result column="real_win_rate" property="realWinRate"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        `count_date`, `user_id`, `user_name`, `parent_id`, `parent_name`, `user_type`, `vip_level`, `user_level`, `agent_path`, `recharge_count`,          `recharge_amount`, `discount_amount`, `jackpot_amount`, `withdraw_count`, `withdraw_amount`, `fee_amount`, `bet_amount`, `valid_amount`,          `win_amount`, `water_amount`, `first_recharge_amount`, `first_withdraw_amount`, `create_time`, `update_time`, `abnormal_income`,                  `abnormal_outcome`, `lottery_order_count`, `sport_order_count`, `real_order_count`, `lottery_win_order_count`, `sport_win_order_count`,           `real_win_order_count`, `lottery_valid_amount`, `sport_valid_amount`, `real_valid_amount`, `lottery_win_amount`, `sport_win_amount`,              `real_win_amount`, `lottery_water_amount`, `sport_water_amount`, `real_water_amount`, `lottery_profit_rate`, `sport_profit_rate`,                 `real_profit_rate`, `lottery_win_rate`, `sport_win_rate`, `real_win_rate`
+	</sql>
+
+
+    <select id="findMemberDayReportPage" resultMap="BaseResultMap">
+      SELECT
+        user_name,
+        parent_name,
+        vip_level,
+        user_level,
+        sum( recharge_count ) recharge_count,
+        sum( recharge_amount ) recharge_amount,
+        sum( first_recharge_amount ) first_recharge_amount,
+        sum( discount_amount ) discount_amount,
+        sum( jackpot_amount ) jackpot_amount,
+        sum( withdraw_count ) withdraw_count,
+        sum( withdraw_amount ) withdraw_amount,
+        sum( first_withdraw_amount ) first_withdraw_amount,
+        sum( fee_amount ) fee_amount,
+        sum( bet_amount ) bet_amount,
+        sum( valid_amount ) valid_amount,
+        sum( win_amount ) win_amount,
+        sum( water_amount ) water_amount
+      FROM
+        member_day_report
+        WHERE 1= 1
+        <if test="dto.userName != null and dto.userName != ''">
+             and user_name = #{dto.userName}
+        </if>
+        <if test="dto.startTime != null and dto.endTime != null">
+            and count_date BETWEEN #{dto.startTime}
+            AND #{dto.endTime}
+        </if>
+        <if test="dto.isFristCharge != null and dto.isFristCharge != ''">
+            <if test="dto.isFristCharge == N" >
+                and first_recharge_amount is null
+            </if>
+            <if test="dto.isFristCharge == Y" >
+               and first_recharge_amount is not null
+            </if>
+        </if>
+        <if test="dto.isFristWithdraw != null and dto.isFristWithdraw != ''">
+            <if test="dto.isFristWithdraw == N" >
+                and first_withdraw_amount is null
+            </if>
+            <if test="dto.isFristWithdraw == Y" >
+                and first_withdraw_amount is not null
+            </if>
+        </if>
+      GROUP BY
+        user_name
+    </select>
+
+
+    <select id="findSumMemberDayReport" resultType="map">
+        SELECT
+            sum( recharge_count ) sumRechargeCount,
+            sum( recharge_amount ) sumRrechargeAmount,
+            sum( first_recharge_amount ) sumFirstRechargeAmount,
+            sum( discount_amount ) sumDiscountAmount,
+            sum( jackpot_amount ) sumJackpotAmount,
+            sum( withdraw_count ) sumWithdrawCount,
+            sum( withdraw_amount ) sumWwithdrawAmount,
+            sum( first_withdraw_amount ) sumFirstWithdrawAmount,
+            sum( fee_amount ) sumFeeAmount,
+            sum( bet_amount ) sumBetAmount,
+            sum( valid_amount ) sumValidAmount,
+            sum( win_amount ) sumWinAmount,
+            sum( water_amount ) sumWaterAmount
+        FROM
+        member_day_report
+        WHERE 1= 1
+        <if test="userName != null and userName != ''">
+            and user_name = #{userName}
+        </if>
+        <if test="startTime != null and endTime != null">
+           and  count_date BETWEEN #{startTime}
+            AND #{endTime}
+        </if>
+        <if test="isFristCharge != null and isFristCharge != ''">
+            <if test="isFristCharge == N" >
+                and first_recharge_amount is null
+            </if>
+            <if test="isFristCharge == Y" >
+                and first_recharge_amount is not null
+            </if>
+        </if>
+        <if test="isFristWithdraw != null and isFristWithdraw != ''">
+            <if test="isFristWithdraw == N" >
+                and first_withdraw_amount is null
+            </if>
+            <if test="isFristWithdraw == Y" >
+                and first_withdraw_amount is not null
+            </if>
+        </if>
+
+    </select>
+
+
+
 </mapper>

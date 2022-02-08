@@ -38,6 +38,13 @@ public class MemberDayReport implements Serializable {
 	@ApiModelProperty(value = "用户类型")
 	private Integer userType;
 
+	@ApiModelProperty(value = "vip等级")
+	private String vipLevel;
+
+	@ApiModelProperty(value = "用户层级")
+	private String userLevel;
+
+
 	@ApiModelProperty(value = "会员账号")
 	private String agentPath;
 

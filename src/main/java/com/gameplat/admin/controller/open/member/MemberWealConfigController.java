@@ -1,6 +1,10 @@
 package com.gameplat.admin.controller.open.member;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
+import com.gameplat.admin.model.domain.MemberWealConfig;
 import com.gameplat.admin.model.dto.*;
+import com.gameplat.admin.model.vo.MemberWealConfigVO;
 import com.gameplat.admin.service.MemberWealConfigService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -48,5 +52,13 @@ public class MemberWealConfigController {
     @PreAuthorize("hasAuthority('member:wealConfig:edit')")
     public void updateBanner(@Validated MemberWealConfigEditDTO dto) {
         memberWealConfigService.updateWealConfig(dto);
+    }
+
+    /** 改 */
+    @GetMapping("/page")
+    @ApiOperation(value = "查询权益列表")
+    @PreAuthorize("hasAuthority('member:wealConfig:page')")
+    public IPage<MemberWealConfigVO> page(PageDTO<MemberWealConfig> page, String language) {
+        return memberWealConfigService.page(page, language);
     }
 }

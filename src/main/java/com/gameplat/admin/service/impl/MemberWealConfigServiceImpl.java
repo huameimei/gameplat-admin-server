@@ -1,12 +1,16 @@
 package com.gameplat.admin.service.impl;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.convert.MemberWealConfigConvert;
 import com.gameplat.admin.mapper.MemberWealConfigMapper;
 import com.gameplat.admin.model.domain.MemberWealConfig;
 import com.gameplat.admin.model.dto.MemberWealConfigAddDTO;
 import com.gameplat.admin.model.dto.MemberWealConfigEditDTO;
+import com.gameplat.admin.model.vo.MemberWealConfigVO;
 import com.gameplat.admin.service.MemberWealConfigService;
+import com.gameplat.base.common.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -43,6 +47,18 @@ public class MemberWealConfigServiceImpl extends ServiceImpl<MemberWealConfigMap
     @Override
     public void updateWealConfig(MemberWealConfigEditDTO dto) {
         this.updateById(memberWealConfigConvert.toEntity(dto));
+    }
+
+    @Override
+    public IPage<MemberWealConfigVO> page(PageDTO<MemberWealConfig> page, String language){
+        if (StringUtils.isEmpty(language)){
+            language = "zh-CN";
+        }
+        return
+            this.lambdaQuery()
+                    .eq(MemberWealConfig::getLanguage, language)
+                    .page(page)
+                    .convert(memberWealConfigConvert::toVo);
     }
 
 }

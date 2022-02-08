@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.*;
 @Api(tags = "VIP轮播图配置")
 @Slf4j
 @RestController
-@RequestMapping("/api/admin/member/growthBanner")
+@RequestMapping("/api/admin/member/banner")
 public class MemberGrowthBannerController {
 
     @Autowired
@@ -35,7 +35,7 @@ public class MemberGrowthBannerController {
     /** 增 */
     @PostMapping("/add")
     @ApiOperation(value = "新增banner图")
-    @PreAuthorize("hasAuthority('member:growthBanner:add')")
+    @PreAuthorize("hasAuthority('member:banner:add')")
     public void addBanner(@Validated MemberGrowthBannerAddDTO dto) {
         memberGrowthBannerService.addBanner(dto);
     }
@@ -43,7 +43,7 @@ public class MemberGrowthBannerController {
     /** 删 */
     @ApiOperation(value = "删除VIP banner图")
     @DeleteMapping("/remove/{id}")
-    @PreAuthorize("hasAuthority('member:growthBanner:remove')")
+    @PreAuthorize("hasAuthority('member:banner:remove')")
     public void removeBanner(@PathVariable Long id){
         memberGrowthBannerService.remove(id);
     }
@@ -51,7 +51,7 @@ public class MemberGrowthBannerController {
     /** 改 */
     @PutMapping("/edit")
     @ApiOperation(value = "修改VIP banner图")
-    @PreAuthorize("hasAuthority('member:growthBanner:edit')")
+    @PreAuthorize("hasAuthority('member:banner:edit')")
     public void updateBanner(@Validated MemberGrowthBannerEditDTO dto) {
         memberGrowthBannerService.updateBanner(dto);
     }
@@ -59,7 +59,7 @@ public class MemberGrowthBannerController {
     /** 查 */
     @GetMapping("/page")
     @ApiOperation(value = "VIP banner图列表")
-    @PreAuthorize("hasAuthority('member:growthBanner:page')")
+    @PreAuthorize("hasAuthority('member:banner:page')")
     public IPage<MemberGrowthBannerVO> findTrendsList(PageDTO<MemberGrowthBanner> page, MemberGrowthBannerQueryDTO dto) {
         return memberGrowthBannerService.getList(page, dto);
     }

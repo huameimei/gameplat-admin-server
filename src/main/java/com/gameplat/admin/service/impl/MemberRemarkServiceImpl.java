@@ -39,6 +39,7 @@ public class MemberRemarkServiceImpl extends ServiceImpl<MemberRemarkMapper, Mem
   @Cached(name = CachedKeys.MEMBER_REMARK_CACHE, key = "#memberId", expire = 7200)
   public List<MemberRemarkVO> getByMemberId(Long memberId) {
     return this.lambdaQuery()
+            .eq(MemberRemark::getDeleteFlag, BooleanEnum.NO.value())
             .eq(MemberRemark::getMemberId, memberId)
             .orderByDesc(MemberRemark::getCreateTime)
             .list()

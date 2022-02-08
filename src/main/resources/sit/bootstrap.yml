@@ -16,7 +16,7 @@ spring:
         refresh-enabled: true
         shared-dataids: redis.yml,spring-kafka-log.yml,spring-kafka-producer-config.yml
       discovery:
-        service: admin-server
+        service: ${spring.application.name}
         namespace: ${spring.cloud.nacos.config.namespace}
         group: SERVICE_GROUP
         server-addr: ${spring.cloud.nacos.config.server-addr}

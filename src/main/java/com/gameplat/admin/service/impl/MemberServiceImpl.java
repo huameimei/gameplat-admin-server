@@ -256,7 +256,7 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
    * @return MemberVO
    */
   private MemberVO setOnlineStatus(MemberVO vo) {
-    vo.setOnline(onlineUserService.isOnline(vo.getAccount()));
+//    vo.setOnline(onlineUserService.isOnline(vo.getAccount()));
     return vo;
   }
 

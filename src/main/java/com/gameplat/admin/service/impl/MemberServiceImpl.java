@@ -1,6 +1,7 @@
 package com.gameplat.admin.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
+import com.alicp.jetcache.anno.CacheInvalidate;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -14,18 +15,17 @@ import com.gameplat.admin.model.domain.MemberInfo;
 import com.gameplat.admin.model.dto.*;
 import com.gameplat.admin.model.vo.MemberInfoVO;
 import com.gameplat.admin.model.vo.MemberVO;
-import com.gameplat.admin.service.MemberInfoService;
-import com.gameplat.admin.service.MemberRemarkService;
-import com.gameplat.admin.service.MemberService;
-import com.gameplat.admin.service.PasswordService;
+import com.gameplat.admin.service.*;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.StringUtils;
+import com.gameplat.common.constant.CachedKeys;
 import com.gameplat.common.lang.Assert;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -46,9 +46,13 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
 
   @Autowired private MemberRemarkService memberRemarkService;
 
+  @Autowired private OnlineUserService onlineUserService;
+
   @Override
   public IPage<MemberVO> queryPage(Page<Member> page, MemberQueryDTO dto) {
-    return memberMapper.queryPage(page, memberQueryCondition.builderQueryWrapper(dto));
+    return memberMapper
+        .queryPage(page, memberQueryCondition.builderQueryWrapper(dto))
+        .convert(this::setOnlineStatus);
   }
 
   @Override
@@ -169,7 +173,7 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
         "重置会员密码失败!");
 
     // 更新会员备注
-    if(StringUtils.isNotBlank(dto.getRemark())) {
+    if (StringUtils.isNotBlank(dto.getRemark())) {
       memberRemarkService.update(dto.getId(), dto.getRemark());
     }
   }
@@ -226,6 +230,34 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
     Assert.isTrue(
         this.lambdaUpdate().set(Member::getRealName, realName).eq(Member::getId, memberId).update(),
         "修改会员真实姓名失败!");
+  }
+
+  @Override
+  @CacheInvalidate(name = CachedKeys.MEMBER_REMARK_CACHE, key = "#memberIds", multi = true)
+  public void updateRemark(List<Long> memberIds, String remark) {
+    Assert.isTrue(
+        this.lambdaUpdate()
+            .in(Member::getId, memberIds)
+            .set(Member::getRemark, remark)
+            .update(new Member()),
+        "批量修改会员备注失败!");
+  }
+
+  @Override
+  @CacheInvalidate(name = CachedKeys.MEMBER_REMARK_CACHE, key = "#memberId")
+  public void updateRemark(Long memberId, String remark) {
+    this.updateRemark(Collections.singletonList(memberId), remark);
+  }
+
+  /**
+   * 设置在线状态
+   *
+   * @param vo MemberVO
+   * @return MemberVO
+   */
+  private MemberVO setOnlineStatus(MemberVO vo) {
+    vo.setOnline(onlineUserService.isOnline(vo.getAccount()));
+    return vo;
   }
 
   /**

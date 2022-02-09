@@ -73,4 +73,8 @@ public interface MemberService extends IService<Member> {
    * @return List
    */
   List<Member> getListByAgentAccount(String agentAccount);
+
+  void updateRemark(Long memberId, String remark);
+
+  void updateRemark(List<Long> memberIds, String remark);
 }

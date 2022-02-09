@@ -3,10 +3,12 @@ package com.gameplat.admin.controller.open.member;
 import com.gameplat.admin.model.dto.MemberRemarkAddDTO;
 import com.gameplat.admin.model.vo.MemberRemarkVO;
 import com.gameplat.admin.service.MemberRemarkService;
-import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/admin/member/remark")
@@ -20,16 +22,10 @@ public class MemberRemarkController {
     return memberRemarkService.getByMemberId(memberId);
   }
 
-  @PostMapping("/add")
-  @PreAuthorize("hasAuthority('member:remark:add')")
-  public void add(@RequestBody MemberRemarkAddDTO addDTO) {
-    memberRemarkService.update(addDTO.getId(), addDTO.getRemark());
-  }
-
   @PostMapping("/batchAdd")
   @PreAuthorize("hasAuthority('member:remark:batchAdd')")
-  public void batchAdd(@RequestBody MemberRemarkAddDTO addDTO) {
-    memberRemarkService.batchAdd(addDTO);
+  public void batchAdd(@Validated @RequestBody MemberRemarkAddDTO dto) {
+    memberRemarkService.batchAdd(dto);
   }
 
   @DeleteMapping("/delete/{id}")
@@ -43,6 +39,4 @@ public class MemberRemarkController {
   public void cleanByMemberId(@PathVariable Long memberId) {
     memberRemarkService.cleanByMemberId(memberId);
   }
-
-
 }

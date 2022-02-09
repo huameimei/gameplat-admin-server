@@ -17,5 +17,4 @@ public interface MemberRemarkService extends IService<MemberRemark> {
   void deleteById(Long id);
 
   void cleanByMemberId(Long memberId);
-
 }

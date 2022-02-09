@@ -124,16 +124,16 @@
             <if test="perfectUserInfoField != null and perfectUserInfoField != ''">perfect_user_info_field = #{perfectUserInfoField},</if>
             <if test="carousel != null and carousel != ''">carousel = #{carousel},</if>
             <if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
-            <if test='growthDesc != null and growthDesc != "" and language != null and language == "zh-CN"'>growth_desc = #{growthDesc},</if>
-            <if test='growthDesc != null and growthDesc != "" and language != null and language == "en-US"'>growth_desc_en = #{growthDesc},</if>
-            <if test='growthDesc != null and growthDesc != "" and language != null and language == "th-TH"'>growth_desc_th = #{growthDesc},</if>
-            <if test='growthDesc != null and growthDesc != "" and language != null and language == "in-ID"'>growth_desc_in = #{growthDesc},</if>
-            <if test='growthDesc != null and growthDesc != "" and language != null and language == "vi-VN"'>growth_desc_vi = #{growthDesc},</if>
-            <if test='otherDesc != null and otherDesc != "" and language != null and language == "zh-CN"'>other_desc = #{otherDesc},</if>
-            <if test='otherDesc != null and otherDesc != "" and language != null and language == "en-US"'>other_desc_en = #{otherDesc},</if>
-            <if test='otherDesc != null and otherDesc != "" and language != null and language == "th-TH"'>other_desc_th = #{otherDesc},</if>
-            <if test='otherDesc != null and otherDesc != "" and language != null and language == "in-ID"'>other_desc_in = #{otherDesc},</if>
-            <if test='otherDesc != null and otherDesc != "" and language != null and language == "vi-VN"'>other_desc_vi = #{otherDesc},</if>
+            <if test='growthDesc != null and growthDesc != "" and language != null and language == "zh_cn"'>growth_desc = #{growthDesc},</if>
+            <if test='growthDesc != null and growthDesc != "" and language != null and language == "en"'>growth_desc_en = #{growthDesc},</if>
+            <if test='growthDesc != null and growthDesc != "" and language != null and language == "th"'>growth_desc_th = #{growthDesc},</if>
+            <if test='growthDesc != null and growthDesc != "" and language != null and language == "id"'>growth_desc_in = #{growthDesc},</if>
+            <if test='growthDesc != null and growthDesc != "" and language != null and language == "vi"'>growth_desc_vi = #{growthDesc},</if>
+            <if test='otherDesc != null and otherDesc != "" and language != null and language == "zh_cn"'>other_desc = #{otherDesc},</if>
+            <if test='otherDesc != null and otherDesc != "" and language != null and language == "en"'>other_desc_en = #{otherDesc},</if>
+            <if test='otherDesc != null and otherDesc != "" and language != null and language == "th"'>other_desc_th = #{otherDesc},</if>
+            <if test='otherDesc != null and otherDesc != "" and language != null and language == "id"'>other_desc_in = #{otherDesc},</if>
+            <if test='otherDesc != null and otherDesc != "" and language != null and language == "vi"'>other_desc_vi = #{otherDesc},</if>
             update_time = now()
         </set>
         where id = #{id}

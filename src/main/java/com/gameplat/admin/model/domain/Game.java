@@ -18,20 +18,18 @@ public class Game implements Serializable {
    */
   private String gameCode;
 
-  /**
-   * 游戏中文名
-   */
-  private String chineseName;
+  private String playCode;
 
   /**
-   * 游戏英文名
+   * 游戏名
    */
-  private String englishName;
+  private String gameName;
+
 
   /**
-   * 图片名称
+   * PC图片地址
    */
-  private String imageName;
+  private String pcImgUrl;
 
   /**
    * 平台编码
@@ -39,7 +37,7 @@ public class Game implements Serializable {
   private String platformCode;
 
   /**
-   * 游戏类型
+   * 游戏大类
    */
   private String gameType;
 
@@ -59,10 +57,9 @@ public class Game implements Serializable {
   private Integer isFlash;
 
   /**
-   * 手机端图片名称
+   * 手机端图片地址
    */
-  private String h5ImageName;
-
+  private String appImgUrl;
 
   /**
    * 游戏排序

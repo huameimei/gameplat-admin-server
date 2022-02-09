@@ -44,13 +44,17 @@ public class GameKindVO implements Serializable {
   private Integer sort;
 
   /**
-   * 图片地址
+   * PC图片地址
    */
-  private String imgUrl;
-
+  private String pcPicUrl;
 
   /**
-   * 游戏类型
+   * 手机图片地址
+   */
+  private String appPicUrl;
+
+  /**
+   * 游戏大类
    */
   private String gameType;
 
@@ -84,7 +88,6 @@ public class GameKindVO implements Serializable {
    */
   @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss" )
   private Date demoMaintenanceTimeEnd;
-
 
   /**
    * 更新时间

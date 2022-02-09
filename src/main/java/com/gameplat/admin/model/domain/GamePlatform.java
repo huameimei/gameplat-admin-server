@@ -31,8 +31,22 @@ public class GamePlatform implements Serializable {
   @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
   private Date createTime;
 
+  /**
+   * 创建者
+   */
+  @TableField(fill = FieldFill.INSERT)
+  @ApiModelProperty(value = "创建者")
+  private String createBy;
+
   @TableField(fill = FieldFill.INSERT_UPDATE)
   @ApiModelProperty(value = "更新时间")
   @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
   private Date updateTime;
+
+  /**
+   * 更新者
+   */
+  @TableField(fill = FieldFill.INSERT_UPDATE)
+  @ApiModelProperty(value = "更新者")
+  private String updateBy;
 }

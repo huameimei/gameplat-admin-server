@@ -34,7 +34,7 @@ public class GameServiceImpl extends ServiceImpl<GameMapper, Game> implements Ga
     @SentinelResource(value = "selectGameList")
     public IPage<Game> selectGameList(PageDTO<Game> page, GameQueryDTO dto) {
         return this.lambdaQuery()
-                .like(ObjectUtils.isNotEmpty(dto.getGameName()), Game::getChineseName, dto.getGameName())
+                .like(ObjectUtils.isNotEmpty(dto.getGameName()), Game::getGameName, dto.getGameName())
                 .eq(
                         ObjectUtils.isNotEmpty(dto.getPlatformCode()),
                         Game::getPlatformCode,

@@ -38,9 +38,9 @@ public class MemberGrowthConfigController {
 
     @ApiOperation(value = "修改")
     @PreAuthorize("hasAuthority('member:growthConfig:edit')")
-    @PutMapping("/update")
+    @PutMapping("/edit")
     public void update(@ApiParam(name = "修改VIP配置入参", value = "传入json格式", required = true)
-                       @Validated @RequestBody MemberGrowthConfigEditDto configEditDto) {
+                       @Validated MemberGrowthConfigEditDto configEditDto) {
 
         if (StrUtil.isBlank(configEditDto.getLanguage())) {
             configEditDto.setLanguage(LanguageEnum.app_zh_CN.getCode());

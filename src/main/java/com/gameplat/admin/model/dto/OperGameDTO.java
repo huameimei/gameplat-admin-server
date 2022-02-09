@@ -8,11 +8,11 @@ public class OperGameDTO implements Serializable {
 
   private String gameCode;
 
-  private String chineseName;
+  private String gameName;
 
-  private String englishName;
+  private String pcImgUrl;
 
-  private String imageName;
+  private String appImgUrl;
 
   private String platformCode;
 
@@ -21,8 +21,6 @@ public class OperGameDTO implements Serializable {
   private Integer isH5;
 
   private Integer isFlash;
-
-  private String h5ImageName;
 
   private Integer sort;
 }

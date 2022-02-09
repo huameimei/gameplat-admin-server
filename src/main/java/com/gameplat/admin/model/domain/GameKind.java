@@ -53,9 +53,14 @@ public class GameKind implements Serializable {
   private Integer sort;
 
   /**
-   * 图片地址
+   * PC图片地址
    */
-  private String imgUrl;
+  private String pcPicUrl;
+
+  /**
+   * APP图片地址
+   */
+  private String appPicUrl;
 
 
   /**
@@ -104,11 +109,25 @@ public class GameKind implements Serializable {
   private Date createTime;
 
   /**
+   * 创建者
+   */
+  @TableField(fill = FieldFill.INSERT)
+  @ApiModelProperty(value = "创建者")
+  private String createBy;
+
+  /**
    * 更新时间
    */
   @TableField(fill = FieldFill.INSERT_UPDATE)
   @ApiModelProperty(value = "更新时间")
   @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
   private Date updateTime;
+
+  /**
+   * 更新者
+   */
+  @TableField(fill = FieldFill.INSERT_UPDATE)
+  @ApiModelProperty(value = "更新者")
+  private String updateBy;
 
 }

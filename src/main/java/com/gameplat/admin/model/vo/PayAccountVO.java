@@ -89,6 +89,11 @@ public class PayAccountVO extends Model<PayAccountVO> {
   private String riskControlValue;
 
   /**
+   * 虚拟货币类型
+   */
+  private String currencyType;
+
+  /**
    * 创建者
    */
   @ApiModelProperty(value = "创建者")

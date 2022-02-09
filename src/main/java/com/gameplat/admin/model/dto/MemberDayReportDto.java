@@ -34,4 +34,10 @@ public class MemberDayReportDto implements Serializable {
 
     @ApiModelProperty(value = "是否首提 N 否 Y 是")
     private String isFristWithdraw;
+
+
+    private String isNFristCharge = "N";
+    private String isYFristCharge = "Y";
+    private String isNFristWithdraw = "N";
+    private String isYFristWithdraw = "Y";
 }

@@ -89,18 +89,18 @@
             AND #{dto.endTime}
         </if>
         <if test="dto.isFristCharge != null and dto.isFristCharge != ''">
-            <if test="dto.isFristCharge == N" >
+            <if test="dto.isFristCharge == dto.isNFristCharge" >
                 and first_recharge_amount is null
             </if>
-            <if test="dto.isFristCharge == Y" >
+            <if test="dto.isFristCharge == dto.isYFristCharge" >
                and first_recharge_amount is not null
             </if>
         </if>
         <if test="dto.isFristWithdraw != null and dto.isFristWithdraw != ''">
-            <if test="dto.isFristWithdraw == N" >
+            <if test="dto.isFristWithdraw == dto.isNFristWithdraw" >
                 and first_withdraw_amount is null
             </if>
-            <if test="dto.isFristWithdraw == Y" >
+            <if test="dto.isFristWithdraw == dto.isYFristWithdraw" >
                 and first_withdraw_amount is not null
             </if>
         </if>
@@ -111,21 +111,21 @@
 
     <select id="findSumMemberDayReport" resultType="map">
         SELECT
-            sum( recharge_count ) sumRechargeCount,
-            sum( recharge_amount ) sumRrechargeAmount,
-            sum( first_recharge_amount ) sumFirstRechargeAmount,
-            sum( discount_amount ) sumDiscountAmount,
-            sum( jackpot_amount ) sumJackpotAmount,
-            sum( withdraw_count ) sumWithdrawCount,
-            sum( withdraw_amount ) sumWwithdrawAmount,
-            sum( first_withdraw_amount ) sumFirstWithdrawAmount,
-            sum( fee_amount ) sumFeeAmount,
-            sum( bet_amount ) sumBetAmount,
-            sum( valid_amount ) sumValidAmount,
-            sum( win_amount ) sumWinAmount,
-            sum( water_amount ) sumWaterAmount
+            ifnull(sum( recharge_count ),0) sumRechargeCount,
+            ifnull(sum( recharge_amount ),0) sumRrechargeAmount,
+            ifnull(sum( first_recharge_amount ),0) sumFirstRechargeAmount,
+            ifnull(sum( discount_amount ),0) sumDiscountAmount,
+            ifnull(sum( jackpot_amount ),0) sumJackpotAmount,
+            ifnull(sum( withdraw_count ),0) sumWithdrawCount,
+            ifnull(sum( withdraw_amount ),0) sumWwithdrawAmount,
+            ifnull(sum( first_withdraw_amount ),0) sumFirstWithdrawAmount,
+            ifnull(sum( fee_amount ),0) sumFeeAmount,
+            ifnull(sum( bet_amount ),0) sumBetAmount,
+            ifnull(sum( valid_amount ),0) sumValidAmount,
+            ifnull(sum( win_amount ),0) sumWinAmount,
+            ifnull(sum( water_amount ),0) sumWaterAmount
         FROM
-        member_day_report
+          member_day_report
         WHERE 1= 1
         <if test="userName != null and userName != ''">
             and user_name = #{userName}
@@ -135,22 +135,21 @@
             AND #{endTime}
         </if>
         <if test="isFristCharge != null and isFristCharge != ''">
-            <if test="isFristCharge == N" >
+            <if test="isFristCharge == isNFristCharge" >
                 and first_recharge_amount is null
             </if>
-            <if test="isFristCharge == Y" >
+            <if test="isFristCharge == isYFristCharge" >
                 and first_recharge_amount is not null
             </if>
         </if>
         <if test="isFristWithdraw != null and isFristWithdraw != ''">
-            <if test="isFristWithdraw == N" >
+            <if test="isFristWithdraw == isNFristWithdraw" >
                 and first_withdraw_amount is null
             </if>
-            <if test="isFristWithdraw == Y" >
+            <if test="isFristWithdraw == isYFristWithdraw" >
                 and first_withdraw_amount is not null
             </if>
         </if>
-
     </select>
 
 

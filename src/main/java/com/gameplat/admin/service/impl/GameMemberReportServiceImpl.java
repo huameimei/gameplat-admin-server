@@ -51,6 +51,7 @@ public class GameMemberReportServiceImpl extends ServiceImpl <GameMemberReportMa
         resultPage.setRecords(memberDayReportVos);
         pageDtoVO.setOtherData(sumMemberDayReport);
         pageDtoVO.setPage(resultPage);
+        pageDtoVO.getPage().setTotal(memberDayReportPage.getTotal());
 
         return pageDtoVO;
     }

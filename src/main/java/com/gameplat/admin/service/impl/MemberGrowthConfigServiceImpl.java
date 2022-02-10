@@ -1,6 +1,7 @@
 package com.gameplat.admin.service.impl;
 
 import cn.hutool.core.util.StrUtil;
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.convert.MemberGrowthConfigConvert;
 import com.gameplat.admin.enums.LanguageEnum;
@@ -9,6 +10,8 @@ import com.gameplat.admin.model.domain.MemberGrowthConfig;
 import com.gameplat.admin.model.dto.MemberGrowthConfigEditDto;
 import com.gameplat.admin.model.vo.MemberGrowthConfigVO;
 import com.gameplat.admin.service.MemberGrowthConfigService;
+import com.gameplat.base.common.exception.ServiceException;
+import com.gameplat.base.common.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -51,6 +54,20 @@ public class MemberGrowthConfigServiceImpl extends ServiceImpl<MemberGrowthConfi
      * */
     @Override
     public void updateGrowthConfig(MemberGrowthConfigEditDto configEditDto) {
+        MemberGrowthConfig before = this.lambdaQuery()
+                .eq(MemberGrowthConfig::getId, configEditDto.getId()).one();
+        if (before == null){
+            throw new ServiceException("此id不存在");
+        }
+        if (StringUtils.isNotEmpty(configEditDto.getGoldCoinDesc())){
+            JSONObject jsonObject = new JSONObject();
+            String goldCoinDesc = before.getGoldCoinDesc();
+            if (StringUtils.isNotBlank(goldCoinDesc)){
+                jsonObject = JSONObject.parseObject(goldCoinDesc);
+            }
+            jsonObject.put(configEditDto.getLanguage(),configEditDto.getGoldCoinDesc());
+            configEditDto.setGoldCoinDesc(jsonObject.toJSONString());
+        }
         configMapper.updateGrowthConfig(configEditDto);
     }
 

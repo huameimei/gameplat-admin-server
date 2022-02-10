@@ -156,4 +156,13 @@ public class MemberGrowthConfigEditDto implements Serializable {
 
     @ApiModelProperty("WEB端未达成VIP图片")
     private String webUnreachVipImage;
+
+    @ApiModelProperty("金币成长值比例")
+    private Double coinRatio;
+
+    @ApiModelProperty("金币成长值速率")
+    private Double coinRate;
+
+    @ApiModelProperty("金币描述")
+    private String goldCoinDesc;
 }

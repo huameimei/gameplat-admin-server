@@ -133,4 +133,13 @@ public class MemberGrowthConfig implements Serializable {
 
     @ApiModelProperty("其它提示 vi-VN")
     private String otherDescVi;
+
+    @ApiModelProperty("金币成长值比例")
+    private Double coinRatio;
+
+    @ApiModelProperty("金币成长值速率")
+    private Double coinRate;
+
+    @ApiModelProperty("金币描述")
+    private String goldCoinDesc;
 }

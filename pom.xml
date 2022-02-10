@@ -24,6 +24,7 @@
         <gameplat-dependencies.version>1-0-0-SNAPSHOT</gameplat-dependencies.version>
         <org.mapstruct.version>1.4.2.Final</org.mapstruct.version>
         <gameplat-common.version>1-0-0-SNAPSHOT</gameplat-common.version>
+        <gameplat-common-game.version>1-0-0-SNAPSHOT</gameplat-common-game.version>
         <easy-poi.version>4.4.0</easy-poi.version>
     </properties>
 
@@ -145,6 +146,11 @@
             <groupId>com.gameplat</groupId>
             <artifactId>gameplat-common</artifactId>
             <version>${gameplat-common.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.gameplat</groupId>
+            <artifactId>gameplat-common-game</artifactId>
+            <version>${gameplat-common-game.version}</version>
         </dependency>
 
         <dependency>

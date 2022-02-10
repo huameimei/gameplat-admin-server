@@ -54,13 +54,13 @@ public class GameAdminController {
   @GetMapping(value = "/selectGameBalance")
   public GameBalanceVO selectGameBalance(GameBalanceQueryDTO dto) throws Exception {
     GameBalanceVO gameBalanceVO = new GameBalanceVO();
-    gameBalanceVO.setLiveType(dto.getPlatform().get("liveType"));
+    gameBalanceVO.setPlatformCode(dto.getPlatform().get("platformCode"));
     Member member = memberService.getByAccount(dto.getAccount()).orElse(null);
     if (member == null) {
       throw new ServiceException("会员账号不存在");
     }
     gameBalanceVO
-        .setBalance(gameAdminService.getBalance(dto.getPlatform().get("liveType"), member));
+        .setBalance(gameAdminService.getBalance(dto.getPlatform().get("platformCode"), member));
     return gameBalanceVO;
   }
 
@@ -76,7 +76,7 @@ public class GameAdminController {
       if (member == null) {
         throw new ServiceException("会员账号不存在");
       }
-      gameAdminService.transferOut(record.getPlatformCode(), record.getAmount(), member, true);
+      gameAdminService.transferOut(record.getPlatformCode(), record.getAmount(), member, false);
     } finally {
       redisService.getKeyOps().delete(key);
     }
@@ -175,7 +175,7 @@ public class GameAdminController {
   @PostMapping(value = "/recyclingAmountByAccount")
   public Map<String, Object> recyclingAmountByAccount(@RequestBody GameBalanceQueryDTO dto) throws Exception {
     Map<String, Object> map = new HashMap();
-    if (null == dto.getPlatform() || null == dto.getPlatform().get("liveType")) {
+    if (null == dto.getPlatform() || null == dto.getPlatform().get("platformCode")) {
       map.put("errorCode", "真人类型不正确");
       return map;
     }
@@ -188,18 +188,18 @@ public class GameAdminController {
       map.put("errorCode", "会员账号不存在，请重新检查");
       return map;
     }
-    String liveCode = dto.getPlatform().get("liveType");
+    String platformCode = dto.getPlatform().get("platformCode");
     try {
-      BigDecimal money = gameAdminService.getBalance(liveCode, member);
+      BigDecimal money = gameAdminService.getBalance(platformCode, member);
       if (null != money && money.compareTo(BigDecimal.ONE) > 0) {
         BigDecimal transferMoney = new BigDecimal((int) Double.parseDouble(money.toString()));
         gameAdminService
-            .transfer(liveCode, TransferTypesEnum.SELF.getCode(), transferMoney, member, false);
+            .transfer(platformCode, TransferTypesEnum.SELF.getCode(), transferMoney, member, false);
         map.put("balance", transferMoney);
         //记录日志
         StringBuffer log = new StringBuffer();
         log.append("真人额度回收:会员账号:" + dto.getAccount() + ",");
-        log.append("真人类型：" + liveCode + ",");
+        log.append("真人类型：" + platformCode + ",");
         log.append("金额：" + transferMoney);
         // TODO 日志记录
       } else {
@@ -219,7 +219,7 @@ public class GameAdminController {
   @PostMapping(value = "/selectGameBalanceByAccount")
   public Map<String,Object> selectGameBalanceByAccount(@RequestBody GameBalanceQueryDTO dto) throws Exception{
     Map<String,Object> map = new HashMap();
-    if(null == dto.getPlatform() || null == dto.getPlatform().get("liveType")){
+    if(null == dto.getPlatform() || null == dto.getPlatform().get("platformCode")){
       map.put("errorCode","真人类型不正确");
       return map;
     }
@@ -233,8 +233,8 @@ public class GameAdminController {
       return map;
     }
     try{
-      map.put("liveType",dto.getPlatform().get("liveType"));
-      map.put("balance",gameAdminService.getBalance(dto.getPlatform().get("liveType"),member));
+      map.put("platformCode",dto.getPlatform().get("platformCode"));
+      map.put("balance",gameAdminService.getBalance(dto.getPlatform().get("platformCode"),member));
     }catch (Exception e){
       e.printStackTrace();
       map.put("errorCode","获取真人信息错误，请联系客服查看");

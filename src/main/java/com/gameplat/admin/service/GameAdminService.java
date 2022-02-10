@@ -11,8 +11,7 @@ public interface GameAdminService {
   void transferOut(String transferIn, BigDecimal amount, Member member, boolean transferType)
       throws Exception;
 
-  void transfer(String transferOut,
-      String transferIn, BigDecimal amount, Member member,Boolean isWeb) throws Exception;
+  void transfer(String transferOut,String transferIn, BigDecimal amount, Member member,Boolean isWeb) throws Exception;
 
   void fillOrders(OperGameTransferRecordDTO liveTransferRecord) throws Exception;
 

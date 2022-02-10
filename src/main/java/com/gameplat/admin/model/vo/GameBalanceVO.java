@@ -6,7 +6,7 @@ import lombok.Data;
 
 @Data
 public class GameBalanceVO implements Serializable {
-  private String liveType;
+  private String platformCode;
 
   private BigDecimal balance;
 }

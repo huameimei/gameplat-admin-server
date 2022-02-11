@@ -43,6 +43,9 @@ public class TpPayType {
   @ApiModelProperty(value = "调度方法POST/GET")
   private String dispatchMethod;
 
+  @ApiModelProperty(value = "参数类型 1-Parameter,2-Payload")
+  private Integer parameterType;
+
   @ApiModelProperty(value = "名称")
   private String name;
 

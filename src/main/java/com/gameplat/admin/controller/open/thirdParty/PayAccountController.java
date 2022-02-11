@@ -9,6 +9,7 @@ import com.gameplat.admin.model.dto.PayAccountEditDTO;
 import com.gameplat.admin.model.dto.PayAccountQueryDTO;
 import com.gameplat.admin.model.vo.PayAccountVO;
 import com.gameplat.admin.service.PayAccountService;
+import com.gameplat.common.enums.PayAccountTypeEnum;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -35,6 +36,14 @@ public class PayAccountController {
   @PostMapping("/add")
   @PreAuthorize("hasAuthority('thirdParty:payAccount:add')")
   public void add(@RequestBody PayAccountAddDTO dto) {
+    dto.setType(PayAccountTypeEnum.ORDINARY_ACCOUNT.getValue());
+    payAccountService.save(dto);
+  }
+
+  @PostMapping("/addVip")
+  @PreAuthorize("hasAuthority('thirdParty:payAccount:add')")
+  public void addVip(@RequestBody PayAccountAddDTO dto) {
+    dto.setType(PayAccountTypeEnum.VIP_ACCOUNT.getValue());
     payAccountService.save(dto);
   }
 

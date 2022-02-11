@@ -18,5 +18,5 @@ public class PayAccountQueryDTO implements Serializable {
   private Integer status;
 
   @ApiModelProperty(value = "1:普通账户，2：vpi账户")
-  private String type;
+  private Integer type;
 }

@@ -14,15 +14,7 @@ public class TpInterfacePayTypeVo extends Model<TpInterfacePayTypeVo> {
 
   private String code;
 
-  private String version;
-
-  private String charset;
-
-  private Integer dispatchType;
-
-  private String dispatchMethod;
-
-  private String dispatchUrl;
+  private Integer parameterType;
 
   private Integer status;
 

@@ -51,14 +51,14 @@ public class OpenMessageFeedbackController {
   @ApiOperation(value = "修改意见反馈")
   @PutMapping("/edit")
   @PreAuthorize("hasAuthority('notice:feedback:edit')")
-  public void updateMessage(@Validated @RequestBody MessageFeedbackUpdateDTO dto) {
+  public void updateMessage(@Validated MessageFeedbackUpdateDTO dto) {
     messageFeedbackService.updateMessage(dto);
   }
 
   @ApiOperation(value = "新增意见反馈")
   @PostMapping("/add")
   @PreAuthorize("hasAuthority('notice:feedback:edit')")
-  public void insertMessage(@Validated @RequestBody MessageFeedbackAddDTO dto) {
+  public void insertMessage(@Validated MessageFeedbackAddDTO dto) {
     messageFeedbackService.insertMessage(dto);
   }
 

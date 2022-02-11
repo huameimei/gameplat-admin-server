@@ -95,4 +95,11 @@ public class MessageInfo implements Serializable {
   /** 更新时间 */
   @TableField(fill = FieldFill.INSERT_UPDATE)
   private Date updateTime;
+
+  @ApiModelProperty("意见反馈类型 0:活动建议 1:功能建议 2:游戏BUG 3:其他问题")
+  private String feedbackType;
+
+  /** 更新人 */
+  @ApiModelProperty("意见反馈回复图片内容")
+  private String feedbackImage;
 }

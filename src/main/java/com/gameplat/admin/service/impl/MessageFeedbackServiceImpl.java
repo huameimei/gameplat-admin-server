@@ -16,6 +16,7 @@ import com.gameplat.admin.model.vo.MessageFeedbackVO;
 import com.gameplat.admin.service.MessageFeedbackService;
 import com.gameplat.admin.service.MessageInfoService;
 import com.gameplat.base.common.exception.ServiceException;
+import com.gameplat.base.common.util.StringUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -42,19 +43,24 @@ public class MessageFeedbackServiceImpl extends ServiceImpl<MessageFeedbackMappe
     /** 写反馈 */
     @Override
     public void insertMessage(MessageFeedbackAddDTO dto) {
+        dto.setType(4);
         MessageFeedback messageFeedback = messageFeedbackConvert.toEntity(dto);
         this.save(messageFeedback);
 
         MessageInfoAddDTO messageInfoAddDTO = new MessageInfoAddDTO();
         messageInfoAddDTO.setType(4);
-        messageInfoAddDTO.setTitle(dto.getTitle());
+        if (StringUtils.isNotBlank(dto.getTitle())){
+            messageInfoAddDTO.setTitle(dto.getTitle());
+        }
         messageInfoAddDTO.setContent(dto.getContent());
         messageInfoAddDTO.setCategory(4);
         messageInfoAddDTO.setPushRange(2);
         messageInfoAddDTO.setLinkAccount(dto.getUsername());
         messageInfoAddDTO.setStatus(1);
         messageInfoAddDTO.setFeedbackType(dto.getLetterType());
-        messageInfoAddDTO.setFeedbackImage(dto.getImgUrl());
+        if (StringUtils.isNotBlank(dto.getImgUrl())){
+            messageInfoAddDTO.setFeedbackImage(dto.getImgUrl());
+        }
         messageInfoService.insertMessage(messageInfoAddDTO);
 
     }

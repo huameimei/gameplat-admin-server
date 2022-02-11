@@ -1,5 +1,6 @@
 package com.gameplat.admin.service.impl;
 
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
@@ -22,6 +23,7 @@ import com.gameplat.base.common.util.StringUtils;
 import com.gameplat.common.enums.BooleanEnum;
 import com.gameplat.common.enums.SwitchStatusEnum;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.time.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -120,11 +122,11 @@ public class MessageInfoServiceImpl extends ServiceImpl<MessageMapper, MessageIn
                         messageInfoQueryDTO.getLanguage())
                 .ge(
                         ObjectUtil.isNotEmpty(messageInfoQueryDTO.getBeginTime()),
-                        MessageInfo::getBeginTime,
+                        MessageInfo::getCreateTime,
                         messageInfoQueryDTO.getBeginTime() + " " + "00:00:00")
                 .le(
                         ObjectUtil.isNotEmpty(messageInfoQueryDTO.getEndTime()),
-                        MessageInfo::getEndTime,
+                        MessageInfo::getCreateTime,
                         messageInfoQueryDTO.getEndTime() + " " + "23:59:59");
 
 
@@ -135,16 +137,13 @@ public class MessageInfoServiceImpl extends ServiceImpl<MessageMapper, MessageIn
                         .and(wrapper -> wrapper.eq(MessageInfo::getStatus, BooleanEnum.NO.value())
                                 .or()
                                 .lt(MessageInfo::getEndTime, new Date())
-                                .in(MessageInfo::getType, 2,3)
                         );
                 //消息状态--有效
             } else if (messageInfoQueryDTO.getStatus() == BooleanEnum.YES.value()) {
-                Date date = new Date();
+                String currentTime = DateUtil.now();
                 queryChainWrapper
                         .and(wrapper -> wrapper.eq(MessageInfo::getStatus, BooleanEnum.YES.value())
-                                .ge(MessageInfo::getBeginTime, date)
-                                .le(MessageInfo::getEndTime, date))
-                                .in(MessageInfo::getType, 2,3)
+                        .last("and "+"'"+currentTime+"' " +"between begin_time and end_time"))
                 ;
             }
         }
@@ -326,4 +325,5 @@ public class MessageInfoServiceImpl extends ServiceImpl<MessageMapper, MessageIn
         }
         return memberPage;
     }
+
 }

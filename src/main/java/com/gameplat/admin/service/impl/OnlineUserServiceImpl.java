@@ -37,6 +37,8 @@ public class OnlineUserServiceImpl implements OnlineUserService {
 
   private static final String TOKEN_PREFIX = "token:*:*";
 
+  private static final String MEMBER_TOKEN_PREFIX = "token:web:";
+
   @Autowired private SysUserService userService;
 
   @Autowired private ConfigService configService;
@@ -48,6 +50,11 @@ public class OnlineUserServiceImpl implements OnlineUserService {
   @Override
   public List<UserCredential> getOnlineUsers() {
     return this.getOnlineUsers(this.getOnlineUserKeys());
+  }
+
+  @Override
+  public Boolean isOnline(String account) {
+    return redisTemplate.hasKey(MEMBER_TOKEN_PREFIX + account);
   }
 
   @Override

@@ -254,7 +254,15 @@ public class MessageInfoServiceImpl extends ServiceImpl<MessageMapper, MessageIn
             //设置读取状态
             IPage<MessageDistributeVO> messageDistributePage = readStatus(page, memberQueryDTO, messageDistributeQueryDTO);
             List<MessageDistributeVO> collect = messageDistributePage.getRecords().stream().filter(m -> m.getOnline()).collect(Collectors.toList());
-            return messageDistributePage.setRecords(collect);
+            long total = (int)collect.size();
+            long size = page.getSize();
+            long pages = total % size == 0 ? total/size :(total/size)+1;
+            messageDistributePage.setCurrent(page.getCurrent());
+            messageDistributePage.setSize(size);
+            messageDistributePage.setTotal(total);
+            messageDistributePage.setPages(pages);
+            messageDistributePage.setRecords(collect);
+            return messageDistributePage;
         }
         //充值层级
         if (messageDistributeQueryDTO.getPushRange().equals(4)){
@@ -293,6 +301,7 @@ public class MessageInfoServiceImpl extends ServiceImpl<MessageMapper, MessageIn
 
         List<MessageDistributeVO> records = memberPage.getRecords();
         for (int i = 0; i < records.size(); i++) {
+            records.get(i).setMessageId(messageDistributeQueryDTO.getMessageId());
             MessageDistribute messageDistribute = messageDistributeService.lambdaQuery()
                     .eq(MessageDistribute::getMessageId, messageDistributeQueryDTO.getMessageId())
                     .eq(MessageDistribute::getUserAccount, records.get(i).getUserAccount())
@@ -306,6 +315,13 @@ public class MessageInfoServiceImpl extends ServiceImpl<MessageMapper, MessageIn
         memberPage.setRecords(records);
         if(ObjectUtil.isNotNull(messageDistributeQueryDTO.getRead())){
             List<MessageDistributeVO> collect = memberPage.getRecords().stream().filter(n -> n.getReadStatus().equals(messageDistributeQueryDTO.getRead())).collect(Collectors.toList());
+            long total = (int)collect.size();
+            long size = page.getSize();
+            long pages = total % size == 0 ? total/size :(total/size)+1;
+            memberPage.setCurrent(page.getCurrent());
+            memberPage.setSize(size);
+            memberPage.setTotal(total);
+            memberPage.setPages(pages);
             memberPage.setRecords(collect);
         }
         return memberPage;

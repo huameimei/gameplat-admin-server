@@ -86,4 +86,11 @@ public class MessageInfoAddDTO implements Serializable {
 
   @ApiModelProperty(value = "创建人")
   private String createBy;
+
+  @ApiModelProperty("意见反馈类型 0:活动建议 1:功能建议 2:游戏BUG 3:其他问题")
+  private String feedbackType;
+
+  /** 更新人 */
+  @ApiModelProperty("意见反馈回复图片内容")
+  private String feedbackImage;
 }

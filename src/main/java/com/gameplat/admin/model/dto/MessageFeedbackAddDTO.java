@@ -83,4 +83,8 @@ public class MessageFeedbackAddDTO implements Serializable {
   /** 更新时间 */
   @ApiModelProperty("更新时间")
   private Date updateTime;
+
+  /** 更新人 */
+  @ApiModelProperty("意见反馈回复图片内容")
+  private String feedbackImage;
 }

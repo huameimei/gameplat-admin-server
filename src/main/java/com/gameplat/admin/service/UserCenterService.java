@@ -8,11 +8,10 @@ import com.gameplat.admin.mapper.SysUserMapper;
 import com.gameplat.admin.model.domain.SysUser;
 import com.gameplat.admin.model.dto.ChangePasswordDTO;
 import com.gameplat.admin.model.dto.UserSettingDTO;
-import com.gameplat.admin.model.vo.ProFileVo;
+import com.gameplat.admin.model.vo.ProfileVO;
 import com.gameplat.base.common.enums.EnableEnum;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.json.JsonUtils;
-import com.gameplat.base.common.util.RSAUtils;
 import com.gameplat.base.common.util.StringUtils;
 import com.gameplat.common.enums.BooleanEnum;
 import com.gameplat.security.SecurityUserHolder;
@@ -44,7 +43,7 @@ public class UserCenterService {
   @Autowired private PasswordEncoder passwordEncoder;
 
   @SentinelResource(value = "current")
-  public ProFileVo current(String username) {
+  public ProfileVO current(String username) {
     SysUser user = userMapper.selectUserByUserName(username);
     if (StringUtils.isNull(user)) {
       log.info("未找到用户信息[{}]", username);
@@ -59,7 +58,7 @@ public class UserCenterService {
 
     // 获取用户权限列表
     List<String> permisList = getPermisList(user);
-    ProFileVo userVo = new ProFileVo();
+    ProfileVO userVo = new ProfileVO();
     userVo.setUserName(user.getUserName());
     userVo.setNickName(user.getNickName());
     userVo.setPhone(user.getPhone());

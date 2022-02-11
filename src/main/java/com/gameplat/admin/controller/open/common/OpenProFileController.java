@@ -5,7 +5,7 @@ import com.gameplat.admin.model.bean.router.VueRouter;
 import com.gameplat.admin.model.domain.SysMenu;
 import com.gameplat.admin.model.dto.ChangePasswordDTO;
 import com.gameplat.admin.model.dto.UserSettingDTO;
-import com.gameplat.admin.model.vo.ProFileVo;
+import com.gameplat.admin.model.vo.ProfileVO;
 import com.gameplat.admin.service.PermissionService;
 import com.gameplat.admin.service.SysLogService;
 import com.gameplat.admin.service.UserCenterService;
@@ -47,7 +47,7 @@ public class OpenProFileController {
    * @return ProFileVo
    */
   @GetMapping("/info")
-  public ProFileVo userInfo(Authentication authentication) {
+  public ProfileVO userInfo(Authentication authentication) {
     return userCenterService.current(authentication.getName());
   }
 

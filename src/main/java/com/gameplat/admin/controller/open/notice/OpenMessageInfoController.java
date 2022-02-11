@@ -1,13 +1,16 @@
 package com.gameplat.admin.controller.open.notice;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
+import com.gameplat.admin.model.domain.Member;
 import com.gameplat.admin.model.domain.MessageDistribute;
 import com.gameplat.admin.model.domain.MessageInfo;
 import com.gameplat.admin.model.dto.MessageDistributeQueryDTO;
 import com.gameplat.admin.model.dto.MessageInfoAddDTO;
 import com.gameplat.admin.model.dto.MessageInfoEditDTO;
 import com.gameplat.admin.model.dto.MessageInfoQueryDTO;
+import com.gameplat.admin.model.vo.MemberVO;
 import com.gameplat.admin.model.vo.MessageDistributeVO;
 import com.gameplat.admin.model.vo.MessageInfoVO;
 import com.gameplat.admin.service.MessageInfoService;
@@ -53,7 +56,7 @@ public class OpenMessageInfoController {
   }
 
   /**
-   * 新增个人消息
+   * 新增消息
    *
    * @param messageInfoAddDTO
    */
@@ -90,9 +93,6 @@ public class OpenMessageInfoController {
 
   /**
    * 个人消息分发会员列表
-   *
-   * @param page
-   * @param messageDistributeQueryDTO
    * @return
    */
   @ApiOperation(value = "查看推送目标会员")
@@ -103,8 +103,7 @@ public class OpenMessageInfoController {
     @ApiImplicitParam(name = "size", value = "每页条数"),
   })
   public IPage<MessageDistributeVO> distributePage(
-      @ApiIgnore PageDTO<MessageDistribute> page,
-      @Validated MessageDistributeQueryDTO messageDistributeQueryDTO) {
+          Page<Member> page, MessageDistributeQueryDTO messageDistributeQueryDTO) {
     return messageInfoService.findMessageDistributeList(page, messageDistributeQueryDTO);
   }
 }

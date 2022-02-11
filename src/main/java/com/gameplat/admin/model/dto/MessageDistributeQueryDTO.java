@@ -22,6 +22,7 @@ public class MessageDistributeQueryDTO implements Serializable {
     private Long messageId;
 
     @ApiModelProperty(value = "推送范围")
+    @NotNull(message = "推送范围不能为空")
     private Integer pushRange;
 
     @ApiModelProperty(value = "会员账号")
@@ -33,11 +34,13 @@ public class MessageDistributeQueryDTO implements Serializable {
     @ApiModelProperty(value = "VIP等级")
     private Integer vipLevel;
 
-    @ApiModelProperty(value = "开始时间")
-    private String beginTime;
+    @ApiModelProperty(value = "读取状态")
+    private Integer read;
 
-    @ApiModelProperty(value = "结束时间")
-    private String endTime;
+    @ApiModelProperty(value = "代理线")
+    private Integer agentLevel;
 
+    @ApiModelProperty(value = "关联会员账号")
+    private String linkAccount;
 
 }

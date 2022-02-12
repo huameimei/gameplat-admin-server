@@ -113,9 +113,8 @@ public class SpreadUnionServiceImpl extends ServiceImpl<SpreadUnionMapper, Sprea
     @Override
     public List<JSONObject> getUnionReportList() {
         List<SpreadUnion> list = this.list();
-        //获取注册人数
+        //获取代理线下得信息
         List<Member> agentMember = memberMapper.getAgentMember(list);
-//        String agentAccount = this.lambdaQuery().getEntity().getAgentAccount();
         return null;
     }
 

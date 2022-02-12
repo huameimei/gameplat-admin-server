@@ -25,7 +25,7 @@ import springfox.documentation.annotations.ApiIgnore;
 /**
  * 个人消息
  *
- * @author kenvin
+ * @author lily
  */
 @Api(tags = "消息管理")
 @RestController
@@ -34,13 +34,6 @@ public class OpenMessageInfoController {
 
   @Autowired private MessageInfoService messageInfoService;
 
-  /**
-   * 分页查询个人消息
-   *
-   * @param page
-   * @param messageInfoQueryDTO
-   * @return
-   */
   @ApiOperation(value = "分页查询消息")
   @GetMapping("/page")
   @PreAuthorize("hasAuthority('operator:message:page')")
@@ -53,11 +46,6 @@ public class OpenMessageInfoController {
     return messageInfoService.findMessageList(page, messageInfoQueryDTO);
   }
 
-  /**
-   * 新增消息
-   *
-   * @param messageInfoAddDTO
-   */
   @ApiOperation(value = "新增消息")
   @PostMapping("/save")
   @PreAuthorize("hasAuthority('operator:message:save')")
@@ -65,11 +53,6 @@ public class OpenMessageInfoController {
     messageInfoService.insertMessage(messageInfoAddDTO);
   }
 
-  /**
-   * 编辑个人消息
-   *
-   * @param messageInfoEditDTO
-   */
   @ApiOperation(value = "编辑消息")
   @PostMapping("/edit")
   @PreAuthorize("hasAuthority('operator:message:edit')")
@@ -77,11 +60,6 @@ public class OpenMessageInfoController {
     messageInfoService.editMessage(messageInfoEditDTO);
   }
 
-  /**
-   * 删除个人消息
-   *
-   * @param ids
-   */
   @ApiOperation(value = "删除消息")
   @DeleteMapping("/remove")
   @PreAuthorize("hasAuthority('operator:message:remove')")
@@ -89,10 +67,6 @@ public class OpenMessageInfoController {
     messageInfoService.deleteBatchMessage(ids);
   }
 
-  /**
-   * 个人消息分发会员列表
-   * @return
-   */
   @ApiOperation(value = "查看推送目标会员")
   @GetMapping("/distribute/page")
   @PreAuthorize("hasAuthority('operator:message:distributePage')")

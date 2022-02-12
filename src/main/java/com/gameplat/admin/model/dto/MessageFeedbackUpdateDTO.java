@@ -21,7 +21,6 @@ public class MessageFeedbackUpdateDTO implements Serializable {
 
   /** 主键ID */
   @NotNull(message = "ID不能为空")
-  @Min(value = 1, message = "ID必须大于0")
   @ApiModelProperty("主键ID")
   private Long id;
 

@@ -37,9 +37,6 @@ public class MessageDistributeQueryDTO implements Serializable {
     @ApiModelProperty(value = "读取状态")
     private Integer read;
 
-    @ApiModelProperty(value = "代理线")
-    private Integer agentLevel;
-
     @ApiModelProperty(value = "关联会员账号")
     private String linkAccount;
 

@@ -28,6 +28,7 @@ public class MemberQueryCondition {
     query
         .eq(ObjectUtils.isNotEmpty(dto.getNickname()), "t1.nickname", dto.getNickname())
         .eq(ObjectUtils.isNotNull(dto.getUserType()), "t1.user_type", dto.getUserType())
+        .eq(ObjectUtils.isNotEmpty(dto.getParentName()), "t1.parent_name", dto.getParentName())
         .eq(ObjectUtils.isNotNull(dto.getStatus()), "t1.status", dto.getStatus())
         .eq(ObjectUtils.isNotEmpty(dto.getPhone()), "t1.phone", dto.getPhone())
         .eq(ObjectUtils.isNotEmpty(dto.getQq()), "t1.qq", dto.getQq())

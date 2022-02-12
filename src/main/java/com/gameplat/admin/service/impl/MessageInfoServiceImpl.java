@@ -242,7 +242,6 @@ public class MessageInfoServiceImpl extends ServiceImpl<MessageMapper, MessageIn
         //部分会员
         if (messageDistributeQueryDTO.getPushRange().equals(2)){
             memberQueryDTO.setAccount(messageDistributeQueryDTO.getLinkAccount());
-            //设置读取状态
             IPage<MessageDistributeVO> messageDistributePage = readStatus(page, memberQueryDTO, messageDistributeQueryDTO);
             return messageDistributePage;
         }
@@ -250,7 +249,6 @@ public class MessageInfoServiceImpl extends ServiceImpl<MessageMapper, MessageIn
         if (messageDistributeQueryDTO.getPushRange().equals(3)){
             memberQueryDTO.setUserType("M");
             memberQueryDTO.setStatus(1);
-            //设置读取状态
             IPage<MessageDistributeVO> messageDistributePage = readStatus(page, memberQueryDTO, messageDistributeQueryDTO);
             List<MessageDistributeVO> collect = messageDistributePage.getRecords().stream().filter(m -> m.getOnline()).collect(Collectors.toList());
             long total = (int)collect.size();
@@ -267,8 +265,7 @@ public class MessageInfoServiceImpl extends ServiceImpl<MessageMapper, MessageIn
         if (messageDistributeQueryDTO.getPushRange().equals(4)){
             memberQueryDTO.setUserType("M");
             memberQueryDTO.setStatus(1);
-            memberQueryDTO.setUserLevel(messageDistributeQueryDTO.getRechargeLevel());
-            //设置读取状态
+            memberQueryDTO.setUserLevel(Integer.parseInt(messageDistributeQueryDTO.getLinkAccount()));
             IPage<MessageDistributeVO> messageDistributePage = readStatus(page, memberQueryDTO, messageDistributeQueryDTO);
             return messageDistributePage;
         }
@@ -276,8 +273,7 @@ public class MessageInfoServiceImpl extends ServiceImpl<MessageMapper, MessageIn
         if (messageDistributeQueryDTO.getPushRange().equals(5)){
             memberQueryDTO.setUserType("M");
             memberQueryDTO.setStatus(1);
-            memberQueryDTO.setLevel(messageDistributeQueryDTO.getVipLevel());
-            //设置读取状态
+            memberQueryDTO.setLevel(Integer.parseInt(messageDistributeQueryDTO.getLinkAccount()));
             IPage<MessageDistributeVO> messageDistributePage = readStatus(page, memberQueryDTO, messageDistributeQueryDTO);
             return messageDistributePage;
         }
@@ -285,8 +281,7 @@ public class MessageInfoServiceImpl extends ServiceImpl<MessageMapper, MessageIn
         if (messageDistributeQueryDTO.getPushRange().equals(6)){
             memberQueryDTO.setUserType("M");
             memberQueryDTO.setStatus(1);
-            memberQueryDTO.setAgentLevel(messageDistributeQueryDTO.getAgentLevel());
-            //设置读取状态
+            memberQueryDTO.setParentName(messageDistributeQueryDTO.getLinkAccount());
             IPage<MessageDistributeVO> messageDistributePage = readStatus(page, memberQueryDTO, messageDistributeQueryDTO);
             return messageDistributePage;
         }else{

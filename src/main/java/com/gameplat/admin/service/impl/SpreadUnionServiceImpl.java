@@ -1,11 +1,15 @@
 package com.gameplat.admin.service.impl;
 
 
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.convert.SpreadUnionConvert;
+import com.gameplat.admin.mapper.MemberMapper;
 import com.gameplat.admin.mapper.SpreadUnionMapper;
+import com.gameplat.admin.model.domain.Member;
 import com.gameplat.admin.model.domain.SpreadLinkInfo;
 import com.gameplat.admin.model.domain.SpreadUnion;
 import com.gameplat.admin.model.dto.SpreadUnionDTO;
@@ -96,6 +100,23 @@ public class SpreadUnionServiceImpl extends ServiceImpl<SpreadUnionMapper, Sprea
         if (!this.removeByIds(id)){
             throw new ServiceException("删除联盟设置异常");
         }
+    }
+
+    @Autowired
+    private MemberMapper memberMapper;
+
+    /**
+     * 获取联盟报表
+     * @return
+     *  一级  todo 日期   联盟名称  联运类型  代理账号  联运平台  联运收益  充值金额  提现金额  注册人数  更新时间
+     */
+    @Override
+    public List<JSONObject> getUnionReportList() {
+        List<SpreadUnion> list = this.list();
+        //获取注册人数
+        List<Member> agentMember = memberMapper.getAgentMember(list);
+//        String agentAccount = this.lambdaQuery().getEntity().getAgentAccount();
+        return null;
     }
 
 }

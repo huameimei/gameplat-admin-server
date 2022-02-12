@@ -1,5 +1,7 @@
 package com.gameplat.admin.mapper;
 
+import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.JSONPObject;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -7,6 +9,7 @@ import com.baomidou.mybatisplus.core.toolkit.Constants;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.gameplat.admin.model.domain.Member;
+import com.gameplat.admin.model.domain.SpreadUnion;
 import com.gameplat.admin.model.dto.IpAnalysisDTO;
 import com.gameplat.admin.model.vo.IpAnalysisVO;
 import com.gameplat.admin.model.vo.MemberInfoVO;
@@ -77,4 +80,10 @@ public interface MemberMapper extends BaseMapper<Member> {
 
   /** 注册ip分析 */
   IPage<IpAnalysisVO> page(PageDTO<IpAnalysisVO> page, @Param("dto") IpAnalysisDTO dto);
+
+  /**
+   * 获取代理下的所有用户
+   */
+  List<Member> getAgentMember(@Param("list")List<SpreadUnion> list);
+
 }

@@ -13,7 +13,6 @@ import com.gameplat.admin.service.SpreadUnionPackageService;
 import com.gameplat.admin.service.SpreadUnionService;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
@@ -88,5 +87,21 @@ public class SpreadUnionController {
 //    @PreAuthorize("hasAuthority('spreadUnion:unionpackage:remove')")
     public void removeUnionPackage(@RequestBody List<Long> idList){
         spreadUnionPackageService.removeUnionPackage(idList);
+    }
+
+
+    @ApiOperation(value = "联盟报表列表")
+    @GetMapping("/unionReportList")
+//    @PreAuthorize("hasAuthority('spreadUnion:unionpackage:remove')")
+    public Object unionReportList(){
+       return spreadUnionService.getUnionReportList();
+    }
+
+
+    @ApiOperation(value = "联盟报表详情")
+    @GetMapping("/unionReportInfo")
+//    @PreAuthorize("hasAuthority('spreadUnion:unionpackage:remove')")
+    public Object unionReportInfo(){
+        return null;
     }
 }

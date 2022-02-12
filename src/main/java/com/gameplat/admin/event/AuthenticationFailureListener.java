@@ -2,6 +2,7 @@ package com.gameplat.admin.event;
 
 import com.gameplat.admin.cache.AdminCache;
 import com.gameplat.admin.service.LimitInfoService;
+import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.StringUtils;
 import com.gameplat.common.enums.LimitEnums;
 import com.gameplat.common.model.bean.limit.AdminLoginLimit;
@@ -30,9 +31,7 @@ public class AuthenticationFailureListener
       return;
     }
 
-    AdminLoginLimit limit =
-        limitInfoService.getLimitInfo(LimitEnums.ADMIN_LOGIN_CONFIG, AdminLoginLimit.class);
-
+    AdminLoginLimit limit = limitInfoService.getAdminLimit();
     int errorCount = adminCache.getErrorPasswordCount(username);
     if (errorCount < limit.getPwdErrorCount()) {
       // 更新密码错误次数

@@ -5,16 +5,19 @@ import com.gameplat.admin.model.domain.SysUser;
 import com.gameplat.admin.service.SysMenuService;
 import com.gameplat.admin.service.SysRoleService;
 import com.gameplat.admin.service.SysUserService;
+import com.gameplat.base.common.util.StringUtils;
 import com.gameplat.security.context.UserCredential;
 import com.gameplat.security.util.SecurityUtil;
-import java.util.Collection;
-import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+
+import java.util.Collection;
+import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class JwtUserDetailsServiceImpl implements UserDetailsService {
@@ -27,13 +30,11 @@ public class JwtUserDetailsServiceImpl implements UserDetailsService {
 
   @Override
   public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-    SysUser user = userService.getByUsername(username);
-    if (null == user) {
-      throw new UsernameNotFoundException("用户名不存在或密码错误!");
-    }
+    SysUser user =
+        Optional.ofNullable(userService.getByUsername(username))
+            .orElseThrow(() -> new UsernameNotFoundException("用户名不存在或密码错误!"));
 
     Set<String> roles = roleService.getRolesByUserId(user.getUserId());
-
     Set<String> permissions = menuService.getPermissionsByUserId(user.getUserId());
     Collection<? extends GrantedAuthority> authorities =
         SecurityUtil.createAuthorityList(permissions);
@@ -48,6 +49,7 @@ public class JwtUserDetailsServiceImpl implements UserDetailsService {
         .isSuperAdmin(SysUserEnums.UserType.isAdmin(user.getUserType()))
         .password(user.getPassword())
         .authorities(authorities)
+        .isEnable2FA(StringUtils.isNotEmpty(user.getSafeCode()))
         .build();
   }
 }

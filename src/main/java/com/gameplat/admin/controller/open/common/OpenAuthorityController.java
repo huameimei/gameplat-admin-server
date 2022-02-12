@@ -1,23 +1,27 @@
 package com.gameplat.admin.controller.open.common;
 
-import com.alibaba.fastjson.JSONObject;
 import com.gameplat.admin.model.dto.AdminLoginDTO;
 import com.gameplat.admin.model.dto.GoogleAuthDTO;
+import com.gameplat.admin.model.vo.GoogleAuthCodeVO;
 import com.gameplat.admin.model.vo.UserToken;
 import com.gameplat.admin.service.AuthenticationService;
-import com.gameplat.admin.service.SysUserService;
-import com.gameplat.base.common.util.GoogleAuthenticator;
-import com.gameplat.base.common.util.ServletUtils;
 import com.gameplat.common.constant.ServiceName;
 import com.gameplat.common.model.bean.RefreshToken;
 import com.gameplat.log.annotation.Log;
 import com.gameplat.log.annotation.LoginLog;
+import com.gameplat.security.context.UserCredential;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.constraints.NotEmpty;
 
 /**
  * 用户授权管理控制类
@@ -25,14 +29,15 @@ import javax.servlet.http.HttpServletRequest;
  * @author three
  */
 @Slf4j
+@Validated
+@Api(tags = "登录")
 @RestController
 @RequestMapping("/api/admin/auth")
 public class OpenAuthorityController {
 
-  @Autowired private SysUserService userService;
-
   @Autowired private AuthenticationService authenticationService;
 
+  @ApiOperation("登录")
   @RequestMapping(value = "/login", method = RequestMethod.POST)
   @LoginLog(module = ServiceName.ADMIN_SERVICE, desc = "'账号'+#dto.account+'登录系统'")
   public UserToken login(@Validated AdminLoginDTO dto, HttpServletRequest request) {
@@ -53,22 +58,19 @@ public class OpenAuthorityController {
     return authenticationService.refreshToken(refreshToken);
   }
 
-  /**
-   * 获取二维码路径
-   *
-   * @param userName String
-   * @return JSONObject
-   */
+  /** 获取谷歌认证码 */
+  @SneakyThrows
   @GetMapping(value = "/authCode")
-  public JSONObject getAuthCode(@RequestParam String userName, HttpServletRequest request) {
-    String cDomain = ServletUtils.getBaseUrl(request);
-    // 生成密钥
-    String secret = GoogleAuthenticator.genSecret(userName, cDomain);
-    String url = GoogleAuthenticator.getQRBarcodeURL(userName, "KgSport", secret);
-    JSONObject jsonObject = new JSONObject();
-    jsonObject.put("url", url);
-    jsonObject.put("secret", secret);
-    return jsonObject;
+  public GoogleAuthCodeVO getAuthCode(@AuthenticationPrincipal UserCredential credential) {
+    return authenticationService.create2FA(credential.getUsername());
+  }
+
+  @PostMapping("/verify2fa")
+  @PreAuthorize("hasRole('ROLE_2FA_VERIFICATION_USER')")
+  public RefreshToken verifyCode(
+      @AuthenticationPrincipal UserCredential credential,
+      @NotEmpty(message = "请输入安全码") String code) {
+    return authenticationService.verify2FA(credential, code);
   }
 
   /**
@@ -76,8 +78,9 @@ public class OpenAuthorityController {
    *
    * @param dto GoogleAuthDTO
    */
-  @PostMapping("bindAuth")
-  public void bindSecret(@Validated GoogleAuthDTO dto) {
-    userService.bindSecret(dto);
+  @PostMapping("/bindSecret")
+  public RefreshToken bindSecret(
+      @AuthenticationPrincipal UserCredential credential, @Validated GoogleAuthDTO dto) {
+    return authenticationService.bindSecret(credential, dto);
   }
 }

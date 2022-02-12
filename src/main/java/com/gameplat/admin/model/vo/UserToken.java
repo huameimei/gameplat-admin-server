@@ -1,11 +1,12 @@
 package com.gameplat.admin.model.vo;
 
-import java.io.Serializable;
-import java.util.Date;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.io.Serializable;
+import java.util.Date;
 
 @Data
 @Builder
@@ -41,8 +42,12 @@ public class UserToken implements Serializable {
 
   private Date loginDate;
 
-  /**
-   * 访问日志Token
-   */
+  /** 访问日志Token */
   private String accessLogToken;
+
+  /** 是否通过了2FA认证 */
+  private boolean authenticated;
+
+  /** 是否启用了双因素认证 */
+  private boolean isEnable2FA;
 }

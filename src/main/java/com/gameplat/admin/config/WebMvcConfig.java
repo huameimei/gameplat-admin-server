@@ -1,5 +1,6 @@
 package com.gameplat.admin.config;
 
+import com.gameplat.admin.interceptor.IpWhitelistInterceptor;
 import com.gameplat.admin.interceptor.LoginInterceptor;
 import com.gameplat.web.config.web.WebMvcConfigurationAdapter;
 import lombok.extern.slf4j.Slf4j;
@@ -26,6 +27,12 @@ public class WebMvcConfig extends WebMvcConfigurationAdapter {
     return new LoginInterceptor();
   }
 
+  @Bean
+  public IpWhitelistInterceptor ipWhitelistInterceptor() {
+    log.info("----初始化IP白名单拦截器----");
+    return new IpWhitelistInterceptor();
+  }
+
   @Override
   public void addInterceptors(InterceptorRegistry registry) {
     registry
@@ -33,6 +40,7 @@ public class WebMvcConfig extends WebMvcConfigurationAdapter {
         .addPathPatterns("/**")
         .excludePathPatterns(
             "/webjars/*", "/**.html", "/swagger-resources/**", "/actuator/refresh");
+    registry.addInterceptor(ipWhitelistInterceptor()).addPathPatterns("/api/admin/**");
     registry.addInterceptor(loginInterceptor()).addPathPatterns("/api/admin/auth/login");
   }
 }

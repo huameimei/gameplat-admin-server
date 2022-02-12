@@ -399,8 +399,7 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
    */
   public void crossAccountCheck(UserCredential userCredential, RechargeOrder rechargeOrder)
       throws ServiceException {
-    MemberRechargeLimit limit = limitInfoService
-        .getLimitInfo(LimitEnums.MEMBER_RECHARGE_LIMIT, MemberRechargeLimit.class);
+    MemberRechargeLimit limit = limitInfoService.getRechargeLimit();
     boolean toCheck =
         BooleanEnum.NO.match(limit.getIsHandledAllowOthersOperate())
             && !userCredential.isSuperAdmin();
@@ -656,9 +655,8 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
     rechargeOrder.setCreateTime(new Date());
     //设置充值订单用户类型
     rechargeOrder.setMemberType(member.getUserType());
-    //设置超时时间
-    MemberRechargeLimit limit = limitInfoService
-        .getLimitInfo(LimitEnums.MEMBER_RECHARGE_LIMIT, MemberRechargeLimit.class);
+    // 设置超时时间
+    MemberRechargeLimit limit = limitInfoService.getRechargeLimit();
     rechargeOrder.setOrderExpireTime(limit.getOrderExpireTime());
     return rechargeOrder;
   }

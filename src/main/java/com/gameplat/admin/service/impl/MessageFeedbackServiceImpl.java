@@ -3,6 +3,7 @@ package com.gameplat.admin.service.impl;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.convert.MessageFeedbackConvert;
@@ -43,12 +44,10 @@ public class MessageFeedbackServiceImpl extends ServiceImpl<MessageFeedbackMappe
     /** 写反馈 */
     @Override
     public void insertMessage(MessageFeedbackAddDTO dto) {
-        dto.setType(4);
         MessageFeedback messageFeedback = messageFeedbackConvert.toEntity(dto);
         this.save(messageFeedback);
 
         MessageInfoAddDTO messageInfoAddDTO = new MessageInfoAddDTO();
-        messageInfoAddDTO.setType(4);
         if (StringUtils.isNotBlank(dto.getTitle())){
             messageInfoAddDTO.setTitle(dto.getTitle());
         }
@@ -104,5 +103,14 @@ public class MessageFeedbackServiceImpl extends ServiceImpl<MessageFeedbackMappe
         return messageFeedbackConvert.toVo(messageFeedback);
     }
 
+    /** 查看已回复信件 */
+    @Override
+    public IPage<MessageFeedbackVO> getReplyContent(PageDTO<MessageFeedback> page) {
+        return this.lambdaQuery()
+                .eq(MessageFeedback::getType, 2)
+                .eq(MessageFeedback::getStatus, 1)
+                .page(page)
+                .convert(messageFeedbackConvert::toVo);
+    }
 
 }

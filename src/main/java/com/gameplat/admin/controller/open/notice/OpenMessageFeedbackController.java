@@ -48,11 +48,14 @@ public class OpenMessageFeedbackController {
     return messageFeedbackService.getById(id);
   }
 
-  @ApiOperation(value = "修改意见反馈")
-  @PutMapping("/edit")
-  @PreAuthorize("hasAuthority('notice:feedback:edit')")
-  public void updateMessage(@Validated MessageFeedbackUpdateDTO dto) {
-    messageFeedbackService.updateMessage(dto);
+  @ApiOperation(value = "读反馈")
+  @PutMapping("/read")
+  @PreAuthorize("hasAuthority('notice:feedback:read')")
+  public void updateMessage(Long id) {
+    messageFeedbackService.updateMessage(new MessageFeedbackUpdateDTO(){{
+                                                              setIsRead(1);
+                                                              setId(id);
+    }});
   }
 
   @ApiOperation(value = "新增意见反馈")
@@ -68,4 +71,12 @@ public class OpenMessageFeedbackController {
   public void removeMessage(@RequestParam(name = "id") Long id) {
     messageFeedbackService.removeMessage(id);
   }
+
+  @ApiOperation(value = "查看已回复信件")
+  @GetMapping("/getReplyContent")
+  @PreAuthorize("hasAuthority('notice:feedback:getReplyContent')")
+  public IPage<MessageFeedbackVO> getReplyContent(PageDTO<MessageFeedback> page) {
+      return messageFeedbackService.getReplyContent(page);
+  }
+
 }

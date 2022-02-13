@@ -6,6 +6,7 @@ import com.gameplat.admin.model.domain.MemberBill;
 import com.gameplat.admin.model.domain.MemberInfo;
 import com.gameplat.admin.model.dto.OperGameTransferRecordDTO;
 import com.gameplat.admin.service.GameAdminService;
+import com.gameplat.admin.service.GameConfigService;
 import com.gameplat.admin.service.GameTransferInfoService;
 import com.gameplat.admin.service.GameTransferRecordService;
 import com.gameplat.admin.service.MemberBillService;
@@ -56,6 +57,9 @@ public class GameAdminServiceImpl implements GameAdminService {
   @Resource
   private GameTransferInfoService gameTransferInfoService;
 
+  @Resource
+  private GameConfigService gameConfigService;
+
   @Transactional(propagation = Propagation.NOT_SUPPORTED)
   public GameApi getGameApi(String liveCode) {
     GameApi api = applicationContext.getBean(liveCode.toLowerCase() + GameApi.Suffix, GameApi.class);
@@ -80,6 +84,8 @@ public class GameAdminServiceImpl implements GameAdminService {
     gameBizBean.setAccount(member.getAccount());
     gameBizBean.setAmount(amount.negate());
     gameBizBean.setOrderNo(orderNo);
+    gameBizBean.setTransferIn(transferIn);
+    gameBizBean.setConfig(gameConfigService.queryGameConfigInfoByPlatCode(transferIn));
     gameApi.transfer(gameBizBean);
     /*
      * TODO 推送站内消息
@@ -133,6 +139,7 @@ public class GameAdminServiceImpl implements GameAdminService {
     gameBizBean.setOrderNo(record.getOrderNo());
     gameBizBean.setAccount(record.getAccount());
     gameBizBean.setAmount(status == GameTransferStatus.IN.getValue() ? record.getAmount().negate() : record.getAmount());
+    gameBizBean.setConfig(gameConfigService.queryGameConfigInfoByPlatCode(liveTransferRecord.getPlatformCode()));
     boolean isSuccess = gameApi.queryOrderStatus(gameBizBean);
     if(isSuccess){
       // 额度转换已成功更新记录
@@ -187,6 +194,8 @@ public class GameAdminServiceImpl implements GameAdminService {
         //游戏平台是的余额查询
         GameBizBean bizBean = new GameBizBean();
         bizBean.setAccount(liveTransferRecord.getAccount());
+        bizBean.setPlatformCode(liveTransferRecord.getPlatformCode());
+        bizBean.setConfig(gameConfigService.queryGameConfigInfoByPlatCode(liveTransferRecord.getPlatformCode()));
         BigDecimal balance = gameApi.getBalance(bizBean);
         String orderNo = record.getOrderNo();
         MemberBill bill = new MemberBill();
@@ -214,6 +223,7 @@ public class GameAdminServiceImpl implements GameAdminService {
         bizBean.setAccount(record.getAccount());
         bizBean.setAmount(record.getAmount());
         bizBean.setOrderNo(orderNo);
+        bizBean.setConfig(gameConfigService.queryGameConfigInfoByPlatCode(liveTransferRecord.getPlatformCode()));
         gameApi.transfer(bizBean);
         // 真人转出失败
       }else if(status ==  GameTransferStatus.IN_LIVE_FAIL.getValue()){
@@ -233,6 +243,7 @@ public class GameAdminServiceImpl implements GameAdminService {
     try{
       GameBizBean bizBean = new GameBizBean();
       bizBean.setAccount(member.getAccount());
+      bizBean.setConfig(gameConfigService.queryGameConfigInfoByPlatCode(platformCode));
       return gameApi.getBalance(bizBean);
     }catch (Exception ex){
       throw ex;
@@ -247,8 +258,8 @@ public class GameAdminServiceImpl implements GameAdminService {
    * @param transferType  true:自动额度转换的，false: 表示是手动转换
    */
   @Override
-  public void transferOut(String transferIn,BigDecimal amount, Member member,boolean transferType) throws Exception{
-    GameApi gameApi = getGameApi(transferIn);
+  public void transferOut(String transferOut,BigDecimal amount, Member member,boolean transferType) throws Exception{
+    GameApi gameApi = getGameApi(transferOut);
     gameApi.isOpen();
     //1.获取账号信息 获取余额
     String account = member.getAccount();
@@ -268,6 +279,7 @@ public class GameAdminServiceImpl implements GameAdminService {
     //2.查询转入游戏平台的余额
     GameBizBean gameBizBean = new GameBizBean();
     gameBizBean.setAccount(account);
+    gameBizBean.setConfig(gameConfigService.queryGameConfigInfoByPlatCode(transferOut));
     BigDecimal balance = gameApi.getBalance(gameBizBean);
     //3.平台出款操作
     memberInfoService.updateBalanceWithWithdraw(memberInfo.getMemberId(),amount);
@@ -280,8 +292,8 @@ public class GameAdminServiceImpl implements GameAdminService {
     bill.setOrderNo(orderNo);
     bill.setTranType(TranTypes.LIVE_OUT.getValue());
     StringBuffer content = new StringBuffer();
-    content.append("系统转").append(GamePlatformEnum.getName(transferIn.toLowerCase())).append("，金额：").append(CNYUtils.formatYuanAsYuan(amount)).append("，转出前系统余额：")
-        .append(CNYUtils.formatYuanAsYuan(memberInfo.getBalance())).append("，").append(TransferTypesEnum.get(transferIn).getName())
+    content.append("系统转").append(GamePlatformEnum.getName(transferOut.toLowerCase())).append("，金额：").append(CNYUtils.formatYuanAsYuan(amount)).append("，转出前系统余额：")
+        .append(CNYUtils.formatYuanAsYuan(memberInfo.getBalance())).append("，").append(TransferTypesEnum.get(transferOut).getName())
         .append("：").append(CNYUtils.formatYuanAsYuan(balance));
     bill.setContent(content.toString());
     bill.setBalance(memberInfo.getBalance());
@@ -295,27 +307,28 @@ public class GameAdminServiceImpl implements GameAdminService {
       gameBizBean.setAccount(member.getAccount());
       gameBizBean.setAmount(amount);
       gameBizBean.setOrderNo(orderNo);
+      gameBizBean.setConfig(gameConfigService.queryGameConfigInfoByPlatCode(transferOut));
       gameApi.transfer(gameBizBean);
-      remark = "系统转" + GamePlatformEnum.getName(transferIn.toLowerCase()) + "，金额：" + CNYUtils.formatYuanAsYuan(amount)
+      remark = "系统转" + GamePlatformEnum.getName(transferOut.toLowerCase()) + "，金额：" + CNYUtils.formatYuanAsYuan(amount)
           + "，转出前系统余额：" + CNYUtils.formatYuanAsYuan(memberInfo.getBalance()) + ","
-          + TransferTypesEnum.get(transferIn).getName() + ":" +  CNYUtils.formatYuanAsYuan(balance);
+          + TransferTypesEnum.get(transferOut).getName() + ":" +  CNYUtils.formatYuanAsYuan(balance);
       status = GameTransferStatus.SUCCESS.getValue();
       //7. 添加额度转换记录  自动转换才需要更新
       if(transferType) {
-        gameTransferInfoService.update(memberInfo.getMemberId(), transferIn, orderNo);
+        gameTransferInfoService.update(memberInfo.getMemberId(), transferOut, orderNo);
       }
     }catch (LiveException | LiveRollbackException ex) {
       boolean bool = gameApi.queryOrderStatus(gameBizBean);
       if(bool){
-        remark = "系统转" + GamePlatformEnum.getName(transferIn.toLowerCase()) + "，金额：" + CNYUtils.formatYuanAsYuan(amount)
+        remark = "系统转" + GamePlatformEnum.getName(transferOut.toLowerCase()) + "，金额：" + CNYUtils.formatYuanAsYuan(amount)
             + "，转出前系统余额：" + CNYUtils.formatYuanAsYuan(memberInfo.getBalance()) + ","
-            + TransferTypesEnum.get(transferIn).getName() + ":" +  CNYUtils.formatYuanAsYuan(balance);
+            + TransferTypesEnum.get(transferOut).getName() + ":" +  CNYUtils.formatYuanAsYuan(balance);
         status = GameTransferStatus.SUCCESS.getValue();
       }else {
         if(ex instanceof LiveNoRollbackTransferException){
-          remark +=  "系统转出成功，" + GamePlatformEnum.getName(transferIn) + "转入失败";
+          remark +=  "系统转出成功，" + GamePlatformEnum.getName(transferOut) + "转入失败";
         }else{
-          remark = GamePlatformEnum.getName(transferIn) + "转入失败,系统转出金额退回";
+          remark = GamePlatformEnum.getName(transferOut) + "转入失败,系统转出金额退回";
           status = GameTransferStatus.ROLL_BACK.getValue();
           throw ex;
         }
@@ -323,7 +336,7 @@ public class GameAdminServiceImpl implements GameAdminService {
     }catch (Exception ex) {
       // 真人转入失败不做事务回滚,平台还是按转出成功处理,因为可以会有网络问题,真人可能已转入成功
       // logger.error("系统转出成功，" + LiveGame.getName(transferIn) + "转入失败，金额：" + amount + "，会员账号：" + userInfo.getAccount(), ex);
-      remark +=  "系统转出成功，" + GamePlatformEnum.getName(transferIn) + "转入失败";
+      remark +=  "系统转出成功，" + GamePlatformEnum.getName(transferOut) + "转入失败";
     } finally {
       GameTransferRecord transferRecord = new GameTransferRecord();
       transferRecord.setAmount(amount);
@@ -333,7 +346,7 @@ public class GameAdminServiceImpl implements GameAdminService {
       transferRecord.setBalance(balance);
       transferRecord.setOrderNo(orderNo);
       transferRecord.setMemberId(member.getId());
-      transferRecord.setPlatformCode(transferIn);
+      transferRecord.setPlatformCode(transferOut);
       transferRecord.setRemark(remark);
       transferRecord.setTransferStatus(transferType ? 1 : 0);
       saveTransferRecord(transferRecord);
@@ -356,6 +369,7 @@ public class GameAdminServiceImpl implements GameAdminService {
     //2.获取会员在游戏平台的余额
     GameBizBean gameBizBean = new GameBizBean();
     gameBizBean.setAccount(account);
+    gameBizBean.setConfig(gameConfigService.queryGameConfigInfoByPlatCode(transferIn));
     BigDecimal balance = gameApi.getBalance(gameBizBean);
     //自动转动实际上回收的是在第三方游戏的所有余额
     if (transferType){
@@ -382,6 +396,7 @@ public class GameAdminServiceImpl implements GameAdminService {
         gameBizBean.setAccount(account);
         gameBizBean.setAmount(balance.negate());
         gameBizBean.setOrderNo(orderNo);
+        gameBizBean.setConfig(gameConfigService.queryGameConfigInfoByPlatCode(transferIn));
         transferResource = gameApi.transfer(gameBizBean);
         if(transferResource.getOrderNo() != null) {
           orderNo = transferResource.getOrderNo();

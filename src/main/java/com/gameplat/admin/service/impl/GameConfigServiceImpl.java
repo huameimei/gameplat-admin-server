@@ -32,14 +32,14 @@ public class GameConfigServiceImpl extends ServiceImpl<GameConfigMapper, GameCon
 
   @Override
   @Cached(name = CachedKeys.GAME_CONFIG_CACHE, key = "#platCode", expire = 7200)
-  public   Map<String,String> queryGameConfigInfoByPlatCode(String platCode){
+  public  GameConfig queryGameConfigInfoByPlatCode(String platCode){
     LambdaQueryWrapper<GameConfig>  queryWrapper = Wrappers.lambdaQuery();
     queryWrapper.eq(GameConfig::getPlatCode,platCode);
     GameConfig  gameConfig = gameConfigMapper.selectOne(queryWrapper);
     if (ObjectUtil.isNotNull(gameConfig)) {
-        return JSONUtil.toBean(gameConfig.getConfig(), HashMap.class);
+        return gameConfig;
     }
-    return Collections.emptyMap();
+    return null;
   }
 
 

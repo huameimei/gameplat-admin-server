@@ -66,7 +66,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
   public UserToken login(AdminLoginDTO dto, HttpServletRequest request) {
     AdminLoginLimit limit = limitInfoService.getAdminLimit();
     // 是否启用了双因素认证
-    limit.setGoogleAuthSwitch(1);
     boolean authenticated = EnableEnum.DISABLED.match(limit.getGoogleAuthSwitch());
     String password = passwordService.decrypt(dto.getPassword());
     UserCredential credential =

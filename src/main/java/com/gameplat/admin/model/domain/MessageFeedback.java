@@ -9,7 +9,7 @@ import java.util.Date;
 /**
  * 反馈消息
  *
- * @author kenvin
+ * @author lily
  */
 @Data
 @TableName("message_feedback")
@@ -51,6 +51,12 @@ public class MessageFeedback implements Serializable {
 
   /** 用户名 */
   private String username;
+
+  /** 用户发送的内容 */
+  private String userContent;
+
+  /** 用户发送的图片*/
+  private String userImgUrl;
 
   /** 创建人 */
   @TableField(fill = FieldFill.INSERT)

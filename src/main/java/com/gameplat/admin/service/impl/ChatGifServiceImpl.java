@@ -72,7 +72,7 @@ public class ChatGifServiceImpl extends ServiceImpl<ChatGifMapper, ChatGif> impl
     /** 判断文件是否是图片 */
     private boolean isImage(MultipartFile file) {
         String contentType = file.getContentType();
-        if (org.apache.commons.lang3.StringUtils.isBlank(contentType) || !contentType.matches("image/(bmp|jpg|jpeg|png|gif)")) {
+        if (StringUtils.isBlank(contentType) || !contentType.matches("image/(bmp|jpg|jpeg|png|gif)")) {
             return false;
         }
         return true;
@@ -81,8 +81,8 @@ public class ChatGifServiceImpl extends ServiceImpl<ChatGifMapper, ChatGif> impl
     /** 生成文件UUID名称 */
     public static String getRandomName(String fileName){
         int index = fileName.lastIndexOf(".");
-        String suffix = fileName.substring(index);//获取后缀名
-        String uuidFileName= UUIDUtils.getUUID32()+suffix;
-        return uuidFileName;
+        //获取后缀名
+        String suffix = fileName.substring(index);
+        return UUIDUtils.getUUID32()+suffix;
     }
 }

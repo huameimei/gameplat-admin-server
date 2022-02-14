@@ -2,6 +2,7 @@ package com.gameplat.admin.service.impl;
 
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.json.JSONUtil;
+import com.alibaba.fastjson.JSONObject;
 import com.alicp.jetcache.anno.Cached;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -32,14 +33,11 @@ public class GameConfigServiceImpl extends ServiceImpl<GameConfigMapper, GameCon
 
   @Override
   @Cached(name = CachedKeys.GAME_CONFIG_CACHE, key = "#platCode", expire = 7200)
-  public  GameConfig queryGameConfigInfoByPlatCode(String platCode){
+  public JSONObject queryGameConfigInfoByPlatCode(String platCode){
     LambdaQueryWrapper<GameConfig>  queryWrapper = Wrappers.lambdaQuery();
     queryWrapper.eq(GameConfig::getPlatCode,platCode);
     GameConfig  gameConfig = gameConfigMapper.selectOne(queryWrapper);
-    if (ObjectUtil.isNotNull(gameConfig)) {
-        return gameConfig;
-    }
-    return null;
+    return JSONObject.parseObject(gameConfig.getConfig());
   }
 
 

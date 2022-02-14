@@ -140,4 +140,6 @@ public class Member extends Model<Member> {
   private Integer superAgentLevel;
 
   private Integer tableIndex;
+
+  private String gameAccount;
 }

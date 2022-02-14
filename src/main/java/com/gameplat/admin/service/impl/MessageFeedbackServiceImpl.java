@@ -3,7 +3,6 @@ package com.gameplat.admin.service.impl;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.convert.MessageFeedbackConvert;
@@ -88,6 +87,7 @@ public class MessageFeedbackServiceImpl extends ServiceImpl<MessageFeedbackMappe
                 .like(ObjectUtil.isNotEmpty(dto.getTitle()), MessageFeedback::getTitle, dto.getTitle())
                 .eq(ObjectUtil.isNotEmpty(dto.getIsRead()), MessageFeedback::getIsRead, dto.getIsRead())
                 .eq(ObjectUtil.isNotEmpty(dto.getType()), MessageFeedback::getType, dto.getType())
+                .orderByDesc(MessageFeedback::getCreateTime)
                 .page(page)
                 .convert(messageFeedbackConvert::toVo);
     }
@@ -110,6 +110,7 @@ public class MessageFeedbackServiceImpl extends ServiceImpl<MessageFeedbackMappe
         return this.lambdaQuery()
                 .eq(MessageFeedback::getType, 2)
                 .eq(MessageFeedback::getStatus, 1)
+                .orderByDesc(MessageFeedback::getCreateTime)
                 .page(page)
                 .convert(messageFeedbackConvert::toVo);
     }

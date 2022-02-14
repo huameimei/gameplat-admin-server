@@ -5,7 +5,6 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -65,6 +64,9 @@ public class MessageFeedbackAddDTO implements Serializable {
   /** 用户名 */
   @ApiModelProperty("用户名")
   private String username;
+
+  @ApiModelProperty("用户反馈的内容")
+  private String userContent;
 
   /** 创建人 */
   @ApiModelProperty("创建人")

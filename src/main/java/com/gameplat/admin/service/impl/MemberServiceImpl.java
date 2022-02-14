@@ -15,6 +15,7 @@ import com.gameplat.admin.model.domain.MemberInfo;
 import com.gameplat.admin.model.dto.*;
 import com.gameplat.admin.model.vo.MemberInfoVO;
 import com.gameplat.admin.model.vo.MemberVO;
+import com.gameplat.admin.model.vo.MessageDistributeVO;
 import com.gameplat.admin.service.*;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.StringUtils;
@@ -53,6 +54,13 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
     return memberMapper
         .queryPage(page, memberQueryCondition.builderQueryWrapper(dto))
         .convert(this::setOnlineStatus);
+  }
+
+  @Override
+  public IPage<MessageDistributeVO> pageMessageDistribute(Page<Member> page, MemberQueryDTO dto) {
+    return memberMapper.queryPage(page, memberQueryCondition.builderQueryWrapper(dto))
+            .convert(this::setOnlineStatus)
+            .convert(memberConvert::toVo);
   }
 
   @Override
@@ -256,7 +264,7 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
    * @return MemberVO
    */
   private MemberVO setOnlineStatus(MemberVO vo) {
-//    vo.setOnline(onlineUserService.isOnline(vo.getAccount()));
+    vo.setOnline(onlineUserService.isOnline(vo.getAccount()));
     return vo;
   }
 

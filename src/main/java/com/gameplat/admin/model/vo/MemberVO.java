@@ -114,7 +114,7 @@ public class MemberVO implements Serializable {
   private Integer status;
 
   /** 是否在线 */
-  private Integer online;
+  private Boolean online;
 
   /** 最近登录IP */
   @Excel(name = "最后登录IP", width = 17, isImportField = "true_st")

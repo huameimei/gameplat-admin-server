@@ -432,7 +432,7 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
     memberInfoService.updateBalanceWithWithdraw(memberId, memberWithdraw.getCashMoney());
 
     // 添加用户账户金额的变更记录
-    String content = "管理员" /*+ admin.getAccount() */ + "于" + DateUtil.getNowTime() + "向用户"
+    String content = "管理员" + sysUser.getUserName() + "于" + DateUtil.getNowTime() + "向用户"
         + member.getAccount() + "成功通过后台转出" + String.format("%.3f",
         cashMoney)
         + "元,账户余额变更为:" + String.format("%.3f", (memberInfo.getBalance().subtract(cashMoney)))
@@ -519,11 +519,7 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
     if (userCredential != null
         && StringUtils.isNotEmpty(userCredential.getUsername())
         && null != memberWithdraw) {
-      MemberRechargeLimit limitInfo =
-          Optional.ofNullable(
-              limitInfoService.getLimitInfo(
-                  LimitEnums.MEMBER_RECHARGE_LIMIT, MemberRechargeLimit.class))
-              .orElseThrow(() -> new ServiceException("加载出入款配置信息失败，请联系客服！"));
+      MemberRechargeLimit limitInfo = limitInfoService.getRechargeLimit();
       boolean toCheck =
           BooleanEnum.NO.match(limitInfo.getIsHandledAllowOthersOperate())
               && !userCredential.isSuperAdmin();

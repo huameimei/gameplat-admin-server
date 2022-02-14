@@ -33,7 +33,7 @@ public class PayAccountEditDTO implements Serializable {
   private String url;
 
   @ApiModelProperty(value = "1:普通账户，2：vpi账户")
-  private String type;
+  private Integer type;
 
   @ApiModelProperty(value = "状态: [0 - 启用, 1 - 禁用]")
   private Integer status;

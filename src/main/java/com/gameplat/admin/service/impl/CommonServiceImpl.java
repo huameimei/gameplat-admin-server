@@ -28,14 +28,12 @@ public class CommonServiceImpl implements CommonService {
 
   @Autowired private ConfigService configService;
 
-  @Autowired private SysUserService userService;
-
   @Autowired private LimitInfoService limitInfoService;
 
   @Override
   @SentinelResource(value = "getLoginLimit")
   public AdminLoginLimit getLoginLimit() {
-    return limitInfoService.getLimitInfo(LimitEnums.ADMIN_LOGIN_CONFIG, AdminLoginLimit.class);
+    return limitInfoService.getAdminLimit();
   }
 
   @Override
@@ -61,17 +59,6 @@ public class CommonServiceImpl implements CommonService {
         .loginConfig(this.getLoginLimit())
         .languages(this.getLanguages())
         .build();
-  }
-
-  @Override
-  @SentinelResource(value = "bindSecret")
-  public void bindSecret(GoogleAuthDTO dto) {
-    Boolean authCode = GoogleAuthenticator.authcode(dto.getSafeCode(), dto.getSecret());
-    Assert.isTrue(authCode, "安全码错误!");
-
-    SysUser user = Assert.notNull(userService.getByUsername(dto.getLoginName()), "账号错误!");
-    user.setSafeCode(dto.getSecret());
-    Assert.isTrue(userService.updateById(user), "绑定失败!");
   }
 
   /** 获取平台语言配置 */

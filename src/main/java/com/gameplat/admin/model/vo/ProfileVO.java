@@ -6,38 +6,31 @@ import lombok.Data;
 
 /**
  * 用戶信息Vo
+ *
  * @author three
  */
 @Data
-public class ProFileVo {
+public class ProfileVO {
 
-  /**
-   * 用户名称
-   */
+  /** 用户名称 */
   private String userName;
-  /**
-   * 昵称
-   */
+
+  /** 昵称 */
   private String nickName;
-  /**
-   * 是否修改密码
-   */
+
+  /** 是否修改密码 */
   private Integer isChange;
-  /**
-   * 电话
-   */
+
+  /** 电话 */
   private String phone;
-  /**
-   * 权限列表
-   */
+
+  /** 权限列表 */
   private List<String> permis;
-  /**
-   * 用户个性设置
-   */
+
+  /** 用户个性设置 */
   private String setting;
-  /**
-   * 创建时间
-   */
+
+  /** 创建时间 */
   private Date createTime;
 
   private String userLevel;
@@ -45,5 +38,4 @@ public class ProFileVo {
   private String limitInfo;
 
   private String userType;
-
 }

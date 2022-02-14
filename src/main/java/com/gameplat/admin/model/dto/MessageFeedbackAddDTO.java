@@ -55,8 +55,6 @@ public class MessageFeedbackAddDTO implements Serializable {
   @ApiModelProperty("消息状态，1 有效，0 无效")
   private Integer status;
 
-  /** 信件类别(0:普通信件,1:活动信件,2:回复信件,3:系统消息) */
-  @NotNull(message = "信件类别不能为空")
   @ApiModelProperty("信件类别(0:普通信件,1:活动信件,2:回复信件,3:系统消息)")
   private Integer type;
 

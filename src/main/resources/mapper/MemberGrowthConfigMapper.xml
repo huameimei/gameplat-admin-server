@@ -41,6 +41,9 @@
         <result property="otherDescTh" column="other_desc_th"/>
         <result property="otherDescIn" column="other_desc_in"/>
         <result property="otherDescVi" column="other_desc_vi"/>
+        <result property="coinRatio" column="coin_ratio"/>
+        <result property="coinRate" column="coin_rate"/>
+        <result property="goldCoinDesc" column="gold_coin_desc"/>
     </resultMap>
 
 
@@ -76,24 +79,27 @@
         remark,
         (
             case #{language}
-                when 'zh-CN' then growth_desc
-                when 'en-US' then growth_desc_en
-                when 'th-TH' then growth_desc_th
-                when 'in-ID' then growth_desc_in
-                when 'vi-VN' then growth_desc_vi
+                when 'zh_cn' then growth_desc
+                when 'en' then growth_desc_en
+                when 'th' then growth_desc_th
+                when 'in' then growth_desc_in
+                when 'vi' then growth_desc_vi
                 else growth_desc
             end
         ) growth_desc,
         (
             case #{language}
-                when 'zh-CN' then other_desc
-                when 'en-US' then other_desc_en
-                when 'th-TH' then other_desc_th
-                when 'in-ID' then other_desc_in
-                when 'vi-VN' then other_desc_vi
+                when 'zh_cn' then other_desc
+                when 'en' then other_desc_en
+                when 'th' then other_desc_th
+                when 'in' then other_desc_in
+                when 'vi' then other_desc_vi
                 else other_desc
             end
-        ) other_desc
+        ) other_desc,
+        coin_ratio,
+        coin_rate,
+        JSON_UNQUOTE(json_extract(gold_coin_desc, concat('$.',concat('"',concat(#{language},'"'))))) as gold_coin_desc
         from member_growth_config
         order by create_time desc limit 1
     </select>
@@ -134,6 +140,7 @@
             <if test='otherDesc != null and otherDesc != "" and language != null and language == "th"'>other_desc_th = #{otherDesc},</if>
             <if test='otherDesc != null and otherDesc != "" and language != null and language == "id"'>other_desc_in = #{otherDesc},</if>
             <if test='otherDesc != null and otherDesc != "" and language != null and language == "vi"'>other_desc_vi = #{otherDesc},</if>
+            <if test="goldCoinDesc != null and goldCoinDesc != ''">gold_coin_desc = #{goldCoinDesc},</if>
             update_time = now()
         </set>
         where id = #{id}

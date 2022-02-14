@@ -17,6 +17,8 @@ public interface OnlineUserService {
 
   List<UserCredential> getOnlineUsers();
 
+  Boolean isOnline(String account);
+
   /**
    * 取在线用户列表
    *

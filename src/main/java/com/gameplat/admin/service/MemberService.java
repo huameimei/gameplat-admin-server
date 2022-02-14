@@ -7,6 +7,7 @@ import com.gameplat.admin.model.domain.Member;
 import com.gameplat.admin.model.dto.*;
 import com.gameplat.admin.model.vo.MemberInfoVO;
 import com.gameplat.admin.model.vo.MemberVO;
+import com.gameplat.admin.model.vo.MessageDistributeVO;
 
 import java.util.List;
 import java.util.Optional;
@@ -19,6 +20,8 @@ import java.util.Optional;
 public interface MemberService extends IService<Member> {
 
   IPage<MemberVO> queryPage(Page<Member> page, MemberQueryDTO dto);
+
+  IPage<MessageDistributeVO> pageMessageDistribute(Page<Member> page, MemberQueryDTO dto);
 
   List<MemberVO> queryList(MemberQueryDTO dto);
 

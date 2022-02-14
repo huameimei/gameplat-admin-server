@@ -24,20 +24,8 @@ public class TpInterface {
   @ApiModelProperty(value = "编码")
   private String code;
 
-  @ApiModelProperty(value = "版本号")
-  private String version;
-
-  @ApiModelProperty(value = "字符集")
-  private String charset;
-
-  @ApiModelProperty(value = "调度类型: [0 - 表单提交, 1 - HttpClient获取]")
-  private Integer dispatchType;
-
-  @ApiModelProperty(value = "调度方法: [GET, POST]")
-  private String dispatchMethod;
-
-  @ApiModelProperty(value = "调度地址")
-  private String dispatchUrl;
+  @ApiModelProperty(value = "参数类型 1-Parameter,2-Payload")
+  private Integer parameterType;
 
   @ApiModelProperty(value = "状态: [1 - 启用, 0 - 禁用]")
   private Integer status;

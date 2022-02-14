@@ -9,7 +9,7 @@ import com.gameplat.common.enums.BooleanEnum;
 import com.gameplat.common.lang.Assert;
 import com.gameplat.common.model.bean.limit.AdminLoginLimit;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.servlet.HandlerInterceptor;
+import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -19,13 +19,11 @@ import javax.servlet.http.HttpServletResponse;
  *
  * @author robben
  */
-public class LoginInterceptor implements HandlerInterceptor {
+public class LoginInterceptor extends HandlerInterceptorAdapter {
 
   private static final String ACCOUNT = "account";
 
   @Autowired private CommonService commonService;
-
-  @Autowired private SysAuthIpService authIpService;
 
   @Autowired private CaptchaStrategyContext captchaStrategyContext;
 
@@ -35,9 +33,6 @@ public class LoginInterceptor implements HandlerInterceptor {
   public boolean preHandle(
       HttpServletRequest request, HttpServletResponse response, Object handler) {
     AdminLoginLimit limit = Assert.notNull(commonService.getLoginLimit(), "登录配置信息未配置");
-
-    // 检查IP是否在白名单内
-    this.checkIpWhiteList(limit.getIpWhiteListSwitch(), IPUtils.getIpAddress(request));
 
     // 验证验证码
     this.checkCaptchaCode(limit.getLoginCaptchaSwitch(), request);
@@ -57,18 +52,6 @@ public class LoginInterceptor implements HandlerInterceptor {
   private void checkCaptchaCode(int loginCaptchaSwitch, HttpServletRequest request) {
     if (BooleanEnum.YES.match(loginCaptchaSwitch)) {
       captchaStrategyContext.getImage().verify(request);
-    }
-  }
-
-  /**
-   * 验证IP白名单
-   *
-   * @param ipWhiteListSwitch 是否开启了白名单
-   * @param ip IP
-   */
-  private void checkIpWhiteList(int ipWhiteListSwitch, String ip) {
-    if (BooleanEnum.YES.match(ipWhiteListSwitch)) {
-      Assert.isTrue(authIpService.isPermitted(ip), "当前IP不允许登录：{}", ip);
     }
   }
 

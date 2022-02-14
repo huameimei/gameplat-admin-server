@@ -15,7 +15,7 @@ import org.springframework.scheduling.annotation.EnableAsync;
 @EnableLogging
 @EnableCaching(basePackages = "com.gameplat")
 @EnableDiscoveryClient
-@EnableFeignClients
+@EnableFeignClients(basePackages = "com.gameplat")
 @MapperScan("com.gameplat.admin.mapper")
 @SpringBootApplication(scanBasePackages = "com.gameplat")
 public class AdminServiceApplication {

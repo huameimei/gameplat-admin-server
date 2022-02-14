@@ -6,5 +6,5 @@ import java.util.Map;
 
 public interface GameConfigService extends IService<GameConfig> {
 
-  Map<String,String> queryGameConfigInfoByPlatCode(String platCode);
+  GameConfig queryGameConfigInfoByPlatCode(String platCode);
 }

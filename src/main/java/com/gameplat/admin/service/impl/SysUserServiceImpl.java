@@ -1,6 +1,7 @@
 package com.gameplat.admin.service.impl;
 
 import com.alibaba.csp.sentinel.annotation.SentinelResource;
+import com.alicp.jetcache.anno.Cached;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
@@ -16,20 +17,19 @@ import com.gameplat.admin.model.bean.UserSetting;
 import com.gameplat.admin.model.domain.SysRole;
 import com.gameplat.admin.model.domain.SysUser;
 import com.gameplat.admin.model.domain.SysUserRole;
-import com.gameplat.admin.model.dto.GoogleAuthDTO;
 import com.gameplat.admin.model.dto.OperUserDTO;
 import com.gameplat.admin.model.dto.UserDTO;
 import com.gameplat.admin.model.dto.UserResetPasswordDTO;
 import com.gameplat.admin.model.vo.RoleVo;
 import com.gameplat.admin.model.vo.UserVo;
-import com.gameplat.admin.service.PasswordService;
 import com.gameplat.admin.service.CommonService;
+import com.gameplat.admin.service.PasswordService;
 import com.gameplat.admin.service.SysUserService;
 import com.gameplat.base.common.enums.EnableEnum;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.json.JsonUtils;
-import com.gameplat.base.common.util.GoogleAuthenticator;
 import com.gameplat.base.common.util.StringUtils;
+import com.gameplat.common.constant.CachedKeys;
 import com.gameplat.common.enums.TrueFalse;
 import com.gameplat.common.enums.UserTypes;
 import com.gameplat.common.lang.Assert;
@@ -204,6 +204,11 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
   }
 
   @Override
+  public String getSecret(Long id) {
+    return this.getById(id).getSafeCode();
+  }
+
+  @Override
   @SentinelResource(value = "changeStatus")
   public void changeStatus(Long id, Integer status) {
     Assert.isTrue(!id.equals(SecurityUserHolder.getUserId()), "不允许操作自己账号!");
@@ -213,17 +218,10 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
   }
 
   @Override
-  @SentinelResource(value = "bindSecret")
-  public void bindSecret(GoogleAuthDTO dto) {
-    // 先校验验证码是否正确
-    Boolean authcode = GoogleAuthenticator.authcode(dto.getSafeCode(), dto.getSecret());
-    Assert.state(authcode, "安全码错误");
-
-    SysUser user = userMapper.selectUserByUserName(dto.getLoginName());
-    Assert.notNull(user, "账号错误");
-
-    user.setSafeCode(dto.getSecret());
-    Assert.isTrue(this.updateById(user), "账号错误");
+  public void bindSecret(Long id, String secret) {
+    Assert.isTrue(
+        this.lambdaUpdate().set(SysUser::getSafeCode, secret).eq(SysUser::getUserId, id).update(),
+        "绑定失败!");
   }
 
   /**

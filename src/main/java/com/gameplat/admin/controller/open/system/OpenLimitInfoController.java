@@ -29,12 +29,6 @@ public class OpenLimitInfoController {
   @PutMapping(value = "/add")
   @PreAuthorize("hasAuthority('system:limit:add')")
   public void save(@RequestBody LimitInfoDTO limitInfoDTO) {
-    if (StringUtils.isBlank(limitInfoDTO.getName())) {
-      throw new ServiceException("名称不能为空");
-    }
-    if (Objects.isNull(limitInfoDTO.getParams())) {
-      throw new ServiceException("数据不能为空");
-    }
     limitInfoService.insertLimitInfo(limitInfoDTO);
   }
 

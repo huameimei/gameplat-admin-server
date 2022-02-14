@@ -152,4 +152,6 @@ public class MemberQueryDTO implements Serializable {
   private Integer level;
 
   private List levels;
+
+  private String parentName;
 }

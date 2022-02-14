@@ -128,6 +128,7 @@ public class PayAccountServiceImpl extends ServiceImpl<PayAccountMapper, PayAcco
     vo.setMaxAmountPerOrder(limitInfo.getBigDecimal("maxAmountPerOrder"));
     vo.setRiskControlType(limitInfo.getInteger("riskControlType"));
     vo.setRiskControlValue(limitInfo.getString("riskControlValue"));
+    vo.setCurrencyType(limitInfo.getString("currencyType"));
   }
 
   private void conver2PayAccount(PayAccountAddDTO dto) {

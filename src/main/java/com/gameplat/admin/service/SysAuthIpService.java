@@ -71,14 +71,6 @@ public interface SysAuthIpService extends IService<SysAuthIp> {
   Set<String> getAllList();
 
   /**
-   * 是否有权限
-   *
-   * @param ip
-   * @return
-   */
-  boolean isPermitted(String ip);
-
-  /**
    * 是否存在
    *
    * @param ip

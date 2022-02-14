@@ -67,6 +67,14 @@ public interface SysUserService extends IService<SysUser> {
   void resetGoogleSecret(Long id);
 
   /**
+   * 获取安全码
+   *
+   * @param id Long
+   * @return String
+   */
+  String getSecret(Long id);
+
+  /**
    * 修改账号状态
    *
    * @param id Long
@@ -75,9 +83,10 @@ public interface SysUserService extends IService<SysUser> {
   void changeStatus(Long id, Integer status);
 
   /**
-   * 用户绑定谷歌密钥
+   * 绑定安全码
    *
-   * @param authDTO GoogleAuthDTO
+   * @param id Long
+   * @param secret String
    */
-  void bindSecret(GoogleAuthDTO authDTO);
+  void bindSecret(Long id, String secret);
 }

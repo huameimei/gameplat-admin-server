@@ -1,14 +1,17 @@
 package com.gameplat.admin.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.gameplat.admin.model.domain.Member;
 import com.gameplat.admin.model.domain.MessageInfo;
 import com.gameplat.admin.model.domain.MessageDistribute;
 import com.gameplat.admin.model.dto.MessageInfoAddDTO;
 import com.gameplat.admin.model.dto.MessageDistributeQueryDTO;
 import com.gameplat.admin.model.dto.MessageInfoEditDTO;
 import com.gameplat.admin.model.dto.MessageInfoQueryDTO;
+import com.gameplat.admin.model.vo.MemberVO;
 import com.gameplat.admin.model.vo.MessageDictDataVO;
 import com.gameplat.admin.model.vo.MessageDistributeVO;
 import com.gameplat.admin.model.vo.MessageInfoVO;
@@ -60,11 +63,7 @@ public interface MessageInfoService extends IService<MessageInfo> {
 
   /**
    * 查询分发用户列表
-   *
-   * @param page
-   * @param messageDistributeQueryDTO
    * @return
    */
-  IPage<MessageDistributeVO> findMessageDistributeList(
-      PageDTO<MessageDistribute> page, MessageDistributeQueryDTO messageDistributeQueryDTO);
+  IPage<MessageDistributeVO> findMessageDistributeList(Page<Member> page, MessageDistributeQueryDTO messageDistributeQueryDTO);
 }

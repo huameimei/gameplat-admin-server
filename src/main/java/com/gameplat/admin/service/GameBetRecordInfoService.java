@@ -14,7 +14,7 @@ public interface GameBetRecordInfoService {
 
     PageDtoVO<GameBetRecordVO> queryPageBetRecord(Page<GameBetRecordVO> page, GameBetRecordQueryDTO dto);
 
-    LiveGameResult getGameResult(String liveCode, String billNo) throws Exception;
+    LiveGameResult getGameResult(GameBetRecordQueryDTO dto) throws Exception;
 
     List<ActivityStatisticItem> xjAssignMatchDml(Map map);
 }

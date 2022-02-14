@@ -1,28 +1,26 @@
 package com.gameplat.admin.service;
 
-import cn.hutool.json.JSONObject;
 import com.alibaba.csp.sentinel.annotation.SentinelResource;
+import com.gameplat.admin.convert.UserConvert;
 import com.gameplat.admin.enums.SysUserEnums;
 import com.gameplat.admin.mapper.SysMenuMapper;
-import com.gameplat.admin.mapper.SysUserMapper;
 import com.gameplat.admin.model.domain.SysUser;
 import com.gameplat.admin.model.dto.ChangePasswordDTO;
+import com.gameplat.admin.model.dto.UserDTO;
+import com.gameplat.admin.model.dto.UserInfoDTO;
 import com.gameplat.admin.model.dto.UserSettingDTO;
-import com.gameplat.admin.model.vo.ProFileVo;
-import com.gameplat.base.common.enums.EnableEnum;
-import com.gameplat.base.common.exception.ServiceException;
+import com.gameplat.admin.model.vo.ProfileVO;
 import com.gameplat.base.common.json.JsonUtils;
-import com.gameplat.base.common.util.RSAUtils;
-import com.gameplat.base.common.util.StringUtils;
 import com.gameplat.common.enums.BooleanEnum;
+import com.gameplat.common.lang.Assert;
 import com.gameplat.security.SecurityUserHolder;
-import com.gameplat.security.service.JwtTokenService;
-import java.util.ArrayList;
-import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 个人中心服务
@@ -33,114 +31,49 @@ import org.springframework.stereotype.Service;
 @Service
 public class UserCenterService {
 
-  @Autowired private SysUserMapper userMapper;
+  @Autowired private SysUserService userService;
 
   @Autowired private SysMenuMapper menuMapper;
-
-  @Autowired private JwtTokenService jwtTokenService;
 
   @Autowired private PasswordService passwordService;
 
   @Autowired private PasswordEncoder passwordEncoder;
 
+  @Autowired private UserConvert userConvert;
+
   @SentinelResource(value = "current")
-  public ProFileVo current(String username) {
-    SysUser user = userMapper.selectUserByUserName(username);
-    if (StringUtils.isNull(user)) {
-      log.info("未找到用户信息[{}]", username);
-      throw new ServiceException("未找到用户信息");
-    }
-
-    // 删除用户凭证
-    if (EnableEnum.DISABLED.match(user.getStatus())) {
-      jwtTokenService.removeToken(username);
-      throw new ServiceException("账号已停用");
-    }
-
-    // 获取用户权限列表
-    List<String> permisList = getPermisList(user);
-    ProFileVo userVo = new ProFileVo();
-    userVo.setUserName(user.getUserName());
-    userVo.setNickName(user.getNickName());
-    userVo.setPhone(user.getPhone());
-    userVo.setCreateTime(user.getCreateTime());
-    userVo.setIsChange(user.getChangeFlag());
-    userVo.setPermis(permisList);
-    userVo.setSetting(user.getSettings());
-    userVo.setUserLevel(user.getUserLevel());
-    userVo.setLimitInfo(user.getLimitInfo());
-    userVo.setUserType(user.getUserType());
-    return userVo;
+  public ProfileVO current(String username) {
+    SysUser user = Assert.notNull(userService.getByUsername(username), "未找到用户信息");
+    ProfileVO profileVO = userConvert.toProFileVo(user);
+    profileVO.setPermis(getPermisList(user));
+    return profileVO;
   }
 
-  @SentinelResource(value = "saveUserSetting")
-  public void saveUserSetting(UserSettingDTO settingDTO) {
+  @SentinelResource(value = "update")
+  public void update(UserInfoDTO dto) {
     String username = SecurityUserHolder.getUsername();
-    SysUser user = userMapper.selectUserByUserName(username);
-    if (StringUtils.isNull(user)) {
-      log.info("未找到用户信息[{}]", username);
-      throw new ServiceException("未找到用户信息");
-    }
+    SysUser user = Assert.notNull(userService.getByUsername(username), "未找到用户信息");
 
-    JSONObject json = new JSONObject();
-    // 用户设置json
-    json.putOnce("indexUrl", settingDTO.getIndexUrl());
-    json.putOnce("defaultPageSize", settingDTO.getDefaultPageSize());
-    json.putOnce("receiptOrder", settingDTO.getReceiptOrder());
-    json.putOnce("withdrawOrder", settingDTO.getWithdrawOrder());
-    json.putOnce("thousandsSeparator", settingDTO.getThousandsSeparator());
-    json.putOnce("fractionCount", settingDTO.getFractionCount());
-    json.putOnce("openDefaultNavMenu", settingDTO.getOpenDefaultNavMenu());
-    json.putOnce("specialMemberWarn", settingDTO.getSpecialMemberWarn());
-    json.putOnce("themeColor", settingDTO.getThemeColor());
-    json.putOnce("tagsView", settingDTO.getTagsView());
-    json.putOnce("sidebarLogo", settingDTO.getSidebarLogo());
-    json.putOnce("showTimeType", settingDTO.getShowTimeType());
-    json.putOnce("sidebarShow", settingDTO.getSidebarShow());
-    String setting = JsonUtils.toJson(json);
-    user.setSettings(setting);
-    user.setNickName(settingDTO.getNickName());
-    user.setPhone(settingDTO.getPhone());
-    if (userMapper.updateById(user) <= 0) {
-      throw new ServiceException("更新用户信息失败!");
-    }
+    user.setSettings(JsonUtils.toJson(dto.getSettings()));
+    user.setNickName(dto.getNickname());
+    user.setPhone(dto.getPhone());
+
+    Assert.isTrue(userService.updateById(user), "更新用户信息失败!");
   }
 
-  /**
-   * 修改密码
-   *
-   * @param changePassword
-   * @return
-   */
   @SentinelResource(value = "changePassword")
   public void changePassword(ChangePasswordDTO dto) {
     String username = SecurityUserHolder.getUsername();
-    SysUser user = userMapper.selectUserByUserName(username);
-    if (StringUtils.isNull(user)) {
-      log.info("未找到用户信息[{}]", username);
-      throw new ServiceException("旧密码不正确");
-    }
+    SysUser user = Assert.notNull(userService.getByUsername(username), "旧密码不正确");
 
     // RSA私钥解密
-    String oldPassword = passwordService.decrypt(dto.getOldPassWord());
-    if (StringUtils.isBlank(oldPassword)) {
-      throw new ServiceException("旧密码不正确");
-    }
-
+    String oldPassword = Assert.notEmpty(passwordService.decrypt(dto.getOldPassWord()), "旧密码不正确");
     String newPassword = passwordService.decrypt(dto.getNewPassWord());
-    if (StringUtils.isBlank(newPassword)) {
-      throw new ServiceException("新密码不符合规范");
-    }
-
-    if (!passwordEncoder.matches(oldPassword, user.getPassword())) {
-      throw new ServiceException("旧密码不正确!");
-    }
+    Assert.isTrue(passwordEncoder.matches(oldPassword, user.getPassword()), "旧密码不正确!");
 
     user.setChangeFlag(BooleanEnum.YES.value());
     user.setPassword(passwordEncoder.encode(newPassword));
-    if (userMapper.updateById(user) <= 0) {
-      throw new ServiceException("密码修改失败!");
-    }
+    Assert.isTrue(userService.updateById(user), "密码修改失败!");
   }
 
   /**

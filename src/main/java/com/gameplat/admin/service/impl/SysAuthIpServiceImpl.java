@@ -1,6 +1,11 @@
 package com.gameplat.admin.service.impl;
 
 import com.alibaba.csp.sentinel.annotation.SentinelResource;
+import com.alicp.jetcache.Cache;
+import com.alicp.jetcache.anno.CachePenetrationProtect;
+import com.alicp.jetcache.anno.CacheRefresh;
+import com.alicp.jetcache.anno.Cached;
+import com.alicp.jetcache.anno.CreateCache;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -13,11 +18,14 @@ import com.gameplat.admin.model.vo.AuthIpVo;
 import com.gameplat.admin.service.SysAuthIpService;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.StringUtils;
+import com.gameplat.common.constant.CachedKeys;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
 
 /**
  * ip白名单 服务实现层
@@ -25,13 +33,10 @@ import org.springframework.stereotype.Service;
  * @author three
  */
 @Service
-@RequiredArgsConstructor
 public class SysAuthIpServiceImpl extends ServiceImpl<SysAuthIpMapper, SysAuthIp>
     implements SysAuthIpService {
 
-  private final SysAuthIpMapper authIpMapper;
-
-  private final AuthIpConvert authIpConvert;
+  @Autowired private AuthIpConvert authIpConvert;
 
   @Override
   @SentinelResource(value = "selectAuthIpList")
@@ -93,17 +98,14 @@ public class SysAuthIpServiceImpl extends ServiceImpl<SysAuthIpMapper, SysAuthIp
   }
 
   @Override
+  @CachePenetrationProtect
+  @Cached(name = CachedKeys.ADMIN_AUTH_IP, expire = 3600)
+  @CacheRefresh(refresh = 600, stopRefreshAfterLastAccess = 7200)
+  @SentinelResource(value = "getAllList")
   public Set<String> getAllList() {
     return this.lambdaQuery().list().stream()
         .map(SysAuthIp::getAllowIp)
         .collect(Collectors.toSet());
-  }
-
-  @Override
-  public boolean isPermitted(String ip) {
-    Set<String> permittedIpSet =
-        this.lambdaQuery().list().stream().map(SysAuthIp::getAllowIp).collect(Collectors.toSet());
-    return permittedIpSet.isEmpty() || permittedIpSet.contains(ip);
   }
 
   @Override

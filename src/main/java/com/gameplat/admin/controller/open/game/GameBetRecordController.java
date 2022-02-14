@@ -31,6 +31,6 @@ public class GameBetRecordController {
 
   @GetMapping(value = "/getGameResult")
   public LiveGameResult getGameResult(GameBetRecordQueryDTO dto,HttpServletResponse response) throws Exception {
-    return gameBetRecordInfoService.getGameResult(dto.getLiveCode(),dto.getBillNo());
+    return gameBetRecordInfoService.getGameResult(dto);
   }
 }

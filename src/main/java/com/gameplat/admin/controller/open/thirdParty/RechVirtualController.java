@@ -11,6 +11,7 @@ import com.gameplat.admin.service.SysDictDataService;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.StringUtils;
 import com.gameplat.common.enums.DictTypeEnum;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,7 +27,6 @@ public class RechVirtualController {
   @Autowired private SysDictDataService dictDataService;
 
   @GetMapping("/list")
-  @PreAuthorize("hasAuthority('thirdParty:rechVirtual:list')")
   public IPage<DictDataVo> list(PageDTO<SysDictData> page, SysDictDataDTO dictData) {
     dictData.setDictType(DictTypeEnum.RECH_VIRTUAL.getValue());
     return dictDataService.selectDictDataList(page, dictData);

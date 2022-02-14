@@ -11,12 +11,14 @@ import com.gameplat.admin.model.dto.GameBetRecordQueryDTO;
 import com.gameplat.admin.model.vo.GameBetRecordVO;
 import com.gameplat.admin.model.vo.PageDtoVO;
 import com.gameplat.admin.service.GameBetRecordInfoService;
-import com.gameplat.admin.service.game.GameApi;
+import com.gameplat.admin.service.GameConfigService;
 import com.gameplat.base.common.constant.ContextConstant;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.common.enums.GamePlatformEnum;
 import com.gameplat.common.enums.TransferTypesEnum;
+import com.gameplat.common.game.GameBizBean;
 import com.gameplat.common.game.LiveGameResult;
+import com.gameplat.common.game.api.GameApi;
 import com.gameplat.elasticsearch.page.PageResponse;
 import com.gameplat.elasticsearch.service.IBaseElasticsearchService;
 import lombok.RequiredArgsConstructor;
@@ -61,6 +63,9 @@ public class GameBetRecordInfoServiceImpl implements GameBetRecordInfoService {
     @Resource
     private GameBetRecordConvert gameBetRecordConvert;
 
+    @Resource
+    private GameConfigService gameConfigService;
+
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
     public GameApi getGameApi(String liveCode) {
         GameApi api = applicationContext.getBean(liveCode + GameApi.Suffix, GameApi.class);
@@ -102,12 +107,15 @@ public class GameBetRecordInfoServiceImpl implements GameBetRecordInfoService {
     }
 
     @Override
-    public LiveGameResult getGameResult(String liveCode, String billNo) throws Exception {
+    public LiveGameResult getGameResult(GameBetRecordQueryDTO dto) throws Exception {
         // TODO 直接连游戏查询结果
-        GameApi gameApi = getGameApi(liveCode);
-        LiveGameResult liveGameResult = gameApi.getGameResult(billNo);;
+        GameApi gameApi = getGameApi(dto.getPlatformCode());
+        GameBizBean gameBizBean = new GameBizBean();
+        gameBizBean.setOrderNo(dto.getBillNo());
+        gameBizBean.setConfig(gameConfigService.queryGameConfigInfoByPlatCode(dto.getPlatformCode()));
+        LiveGameResult liveGameResult = gameApi.getGameResult(gameBizBean);
         if (StringUtils.isBlank(liveGameResult.getData())) {
-            throw new ServiceException(GamePlatformEnum.getName(liveCode) + "暂不支持查看游戏结果");
+            throw new ServiceException(GamePlatformEnum.getName(dto.getPlatformCode()) + "暂不支持查看游戏结果");
         }
         return liveGameResult;
     }

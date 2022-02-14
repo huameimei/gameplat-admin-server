@@ -7,13 +7,13 @@ package com.gameplat.admin.enums;
  **/
 public enum LanguageEnum {
     //客户端传参
-    app_zh_CN("zh-cn", "简体中文(中国)"),
+    app_zh_CN("zh_cn", "简体中文(中国)"),
     app_en_US("en", "英文(美国)"),
     app_in_ID("in","印尼"),
     app_th_TH("th","泰文"),
     app_vi_VN("vi","越南语"),
     //第三方
-    zh_CN("zh_CN", "简体中文(中国)"), // BG
+    zh_CN("zh_cn", "简体中文(中国)"), // BG
     CHN("CHN", "简体中文"),
     CN("CN", "简体中文"),
     cn("cn", "简体中文"), //AE

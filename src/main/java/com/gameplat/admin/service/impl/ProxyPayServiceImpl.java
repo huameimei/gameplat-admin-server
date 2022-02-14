@@ -274,11 +274,7 @@ public class ProxyPayServiceImpl implements ProxyPayService {
     if (userCredential != null
         && StringUtils.isNotEmpty(userCredential.getUsername())
         && null != memberWithdraw) {
-      MemberRechargeLimit limitInfo =
-          Optional.ofNullable(
-                  limitInfoService.getLimitInfo(
-                      LimitEnums.MEMBER_RECHARGE_LIMIT, MemberRechargeLimit.class))
-              .orElseThrow(() -> new ServiceException("加载出入款配置信息失败，请联系客服！"));
+      MemberRechargeLimit limitInfo = limitInfoService.getRechargeLimit();
       boolean toCheck =
           BooleanEnum.NO.match(limitInfo.getIsHandledAllowOthersOperate())
               && !userCredential.isSuperAdmin();

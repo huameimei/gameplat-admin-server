@@ -63,4 +63,7 @@ public class MessageDistributeVO implements Serializable {
     @JsonSerialize(using = Date2LongSerializerUtils.class)
     @ApiModelProperty(value = "更新时间")
     private Date updateTime;
+
+    @ApiModelProperty(value = "在线状态")
+    private Boolean online;
 }

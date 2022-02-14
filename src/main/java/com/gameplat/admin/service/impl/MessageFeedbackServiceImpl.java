@@ -57,6 +57,7 @@ public class MessageFeedbackServiceImpl extends ServiceImpl<MessageFeedbackMappe
         messageInfoAddDTO.setLinkAccount(dto.getUsername());
         messageInfoAddDTO.setStatus(1);
         messageInfoAddDTO.setFeedbackType(dto.getLetterType());
+        messageInfoAddDTO.setType(4);
         if (StringUtils.isNotBlank(dto.getImgUrl())){
             messageInfoAddDTO.setFeedbackImage(dto.getImgUrl());
         }

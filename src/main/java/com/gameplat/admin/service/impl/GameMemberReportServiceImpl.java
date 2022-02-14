@@ -1,14 +1,13 @@
 package com.gameplat.admin.service.impl;
 
-import com.alibaba.fastjson.JSON;
+import cn.hutool.core.convert.Convert;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.mapper.GameMemberReportMapper;
 import com.gameplat.admin.model.domain.MemberDayReport;
+import com.gameplat.admin.model.dto.DepositReportDto;
 import com.gameplat.admin.model.dto.MemberDayReportDto;
-import com.gameplat.admin.model.vo.GameBetRecordVO;
-import com.gameplat.admin.model.vo.MemberDayReportVo;
-import com.gameplat.admin.model.vo.PageDtoVO;
+import com.gameplat.admin.model.vo.*;
 import com.gameplat.admin.service.GameMemberReportService;
 import com.gameplat.base.common.util.BeanUtils;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -53,6 +53,23 @@ public class GameMemberReportServiceImpl extends ServiceImpl <GameMemberReportMa
         pageDtoVO.setPage(resultPage);
         pageDtoVO.getPage().setTotal(memberDayReportPage.getTotal());
 
+        return pageDtoVO;
+    }
+
+
+    @Override
+    public PageDtoVO<MemberRWReportVo> findSumMemberRWReport(Page<MemberRWReportVo> page, DepositReportDto depositReportDto) {
+        Page<MemberRWReportVo> memberRWReportPage = gameMemberReportMapper.findMemberRWReport(page, depositReportDto);
+        Map<String, Object> sumMemberRWReport = gameMemberReportMapper.findSumMemberRWReport(depositReportDto);
+        if (sumMemberRWReport == null) {
+            Object totailRechargeAmount = sumMemberRWReport.get("totailRechargeAmount");
+            Object totailWithdrawAmount = sumMemberRWReport.get("totailWithdrawAmount");
+            BigDecimal totalRWAmount =  (totailRechargeAmount == null ? Convert.toBigDecimal(0) : Convert.toBigDecimal(totailWithdrawAmount)).subtract(totailWithdrawAmount == null ? Convert.toBigDecimal(0) : Convert.toBigDecimal(totailWithdrawAmount));
+            sumMemberRWReport.put("totalRWAmount",totalRWAmount);
+        }
+        PageDtoVO<MemberRWReportVo> pageDtoVO = new PageDtoVO<>();
+        pageDtoVO.setPage(memberRWReportPage);
+        pageDtoVO.setOtherData(sumMemberRWReport);
         return pageDtoVO;
     }
 }

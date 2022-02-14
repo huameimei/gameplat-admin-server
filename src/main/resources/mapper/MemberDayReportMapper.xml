@@ -112,12 +112,12 @@
     <select id="findSumMemberDayReport" resultType="map">
         SELECT
             ifnull(sum( recharge_count ),0) sumRechargeCount,
-            ifnull(sum( recharge_amount ),0) sumRrechargeAmount,
+            ifnull(sum( recharge_amount ),0) sumRechargeAmount,
             ifnull(sum( first_recharge_amount ),0) sumFirstRechargeAmount,
             ifnull(sum( discount_amount ),0) sumDiscountAmount,
             ifnull(sum( jackpot_amount ),0) sumJackpotAmount,
             ifnull(sum( withdraw_count ),0) sumWithdrawCount,
-            ifnull(sum( withdraw_amount ),0) sumWwithdrawAmount,
+            ifnull(sum( withdraw_amount ),0) sumWithdrawAmount,
             ifnull(sum( first_withdraw_amount ),0) sumFirstWithdrawAmount,
             ifnull(sum( fee_amount ),0) sumFeeAmount,
             ifnull(sum( bet_amount ),0) sumBetAmount,
@@ -153,5 +153,146 @@
     </select>
 
 
+
+    <resultMap id="memberRwReport" type="com.gameplat.admin.model.vo.MemberRWReportVo">
+        <result column="account" property="userName"/>
+        <result column="bank_count" property="bankCount"/>
+        <result column="bank_money" property="bankMoney"/>
+        <result column="online_count" property="onlineCount"/>
+        <result column="online_money" property="onlineMoney"/>
+        <result column="hand_rech_count" property="handRechCount"/>
+        <result column="hand_rech_money" property="handRechMoney"/>
+        <result column="first_rech_money" property="firstRechMoney"/>
+        <result column="rech_discount" property="rechDiscount"/>
+        <result column="other_discount" property="otherDiscount"/>
+        <result column="withdraw_count" property="withdrawCount"/>
+        <result column="withdraw_money" property="withdrawMoney"/>
+        <result column="hand_withdraw_count" property="handWithdrawCount"/>
+        <result column="hand_withdraw_money" property="handWithdrawMoney"/>
+        <result column="first_withdraw_money" property="firstWithdrawMoney"/>
+        <result column="counter_fee" property="counterFee"/>
+        <result column="totail_recharge_amount" property="totailRechargeAmount"/>
+        <result column="totail_discout_amount" property="totailDiscoutAmount"/>
+        <result column="totail_withdraw_amount" property="totailWithdrawAmount"/>
+        <result column="total_rw_amount" property="totalRWAmount"/>
+    </resultMap>
+
+
+    <sql id="memberRwReportSql">
+        account,
+        bank_count,
+        bank_money,
+        online_count,
+        online_money,
+        hand_rech_count,
+        hand_rech_money,
+        first_rech_money,
+        rech_discount,
+        other_discount,
+        withdraw_count,
+        withdraw_money,
+        hand_withdraw_count,
+        hand_withdraw_money,
+        first_withdraw_money,
+        counter_fee,
+        totail_recharge_amount,
+        totail_discout_amount,
+        totail_withdraw_amount,
+        total_rw_amount
+    </sql>
+
+
+    <select id="findMemberRWReport" resultMap="memberRwReport">
+      select
+        account,
+        sum(bank_count) bank_count,
+        sum(bank_money) bank_money,
+        sum(online_count) online_count,
+        sum(online_money) online_money,
+        sum(hand_rech_count) hand_rech_count,
+        sum(hand_rech_money) hand_rech_money,
+        sum(first_rech_money) first_rech_money,
+        sum(rech_discount) rech_discount,
+        sum(other_discount) other_discount,
+        sum(withdraw_count) withdraw_count,
+        sum(withdraw_money) withdraw_money,
+        sum(hand_withdraw_count) hand_withdraw_count,
+        sum(hand_withdraw_money) hand_withdraw_money,
+        sum(first_withdraw_money) first_withdraw_money,
+        sum(counter_fee) counter_fee,
+        (bank_money+ online_money +hand_rech_money)  totail_recharge_amount,
+        (rech_discount + other_discount) totail_discout_amount,
+        (withdraw_money+ hand_withdraw_money) totail_withdraw_amount,
+        ((bank_money+ online_money +hand_rech_money) - (withdraw_money+ hand_withdraw_money))   total_rw_amount
+      from member_rw_report
+      where  stat_time BETWEEN #{dto.startTime} and #{dto.endTime}
+        <if test="dto.username != null and dto.username != ''">
+            and account = #{dto.username}
+        </if>
+        <if test="dto.isFristCharge != null and dto.isFristCharge != ''">
+            <if test="dto.isFristCharge == dto.isYFristCharge">
+                and first_rech_money > 0
+            </if>
+        </if>
+        <if test="dto.startRNum != null and dto.endRNum != null">
+            and ((bank_count BETWEEN #{dto.startRNum} and #{dto.endRNum}) or (online_count BETWEEN #{dto.startRNum} and #{dto.endRNum})  or (hand_rech_count BETWEEN #{dto.startRNum} and #{dto.endRNum}))
+        </if>
+        <if test="dto.startRAmount != null and dto.endRAmount != null">
+            and ((bank_money BETWEEN #{dto.startRAmount} and #{dto.endRAmount}) or (online_money BETWEEN #{dto.startRAmount} and #{dto.endRAmount})  or (hand_rech_money BETWEEN #{dto.startRAmount} and #{dto.endRAmount}))
+        </if>
+        <if test="dto.startWNum != null and dto.endWNum != null">
+            and ((withdraw_count BETWEEN #{dto.startWNum} and #{dto.endWNum}) or (hand_withdraw_count BETWEEN #{dto.startWNum} and #{dto.endWNum}))
+        </if>
+        <if test="dto.startWAmount != null and dto.endWAmount != null">
+            and ((withdraw_money BETWEEN #{dto.startWAmount} and #{dto.endWAmount}) or (hand_withdraw_money BETWEEN #{dto.startWAmount} and #{dto.endWAmount}))
+        </if>
+        group by account
+    </select>
+
+
+    <select id="findSumMemberRWReport" resultType="map">
+        select
+        sum(ifnull(bank_count,0)) bankCount,
+        sum(ifnull(bank_money,0)) bankMoney,
+        sum(ifnull(online_count,0)) onlineCount,
+        sum(ifnull(online_money,0)) onlineMoney,
+        sum(ifnull(hand_rech_count,0)) handRechCount,
+        sum(ifnull(hand_rech_money,0)) handRechMoney,
+        sum(ifnull(first_rech_money,0)) firstRechMoney,
+        sum(ifnull(rech_discount,0)) rechDiscount,
+        sum(ifnull(other_discount,0)) otherDiscount,
+        sum(ifnull(withdraw_count,0)) withdrawCount,
+        sum(ifnull(withdraw_money,0)) withdrawMoney,
+        sum(ifnull(hand_withdraw_count,0)) handWithdrawCount,
+        sum(ifnull(hand_withdraw_money,0)) handWithdrawMoney,
+        sum(ifnull(first_withdraw_money,0)) firstWithdrawMoney,
+        sum(ifnull(counter_fee,0)) counterFee,
+        sum(ifnull(bank_money,0)+ ifnull(online_money,0) +ifnull(hand_rech_money,0))  totailRechargeAmount,
+        sum(ifnull(rech_discount,0) + ifnull(other_discount,0)) totailDiscoutAmount,
+        sum(ifnull(withdraw_money,0)+ ifnull(hand_withdraw_money,0)) totailWithdrawAmount
+        from member_rw_report
+        where  stat_time BETWEEN #{startTime} and #{endTime}
+        <if test="username != null and username != ''">
+            and account = #{username}
+        </if>
+        <if test="isFristCharge != null and isFristCharge != ''">
+            <if test="isFristCharge == isYFristCharge">
+                and first_rech_money > 0
+            </if>
+        </if>
+        <if test="startRNum != null and endRNum != null">
+            and ((bank_count BETWEEN #{startRNum} and #{endRNum}) or (online_count BETWEEN #{startRNum} and #{endRNum})  or (hand_rech_count BETWEEN #{startRNum} and #{endRNum}))
+        </if>
+        <if test="startRAmount != null and endRAmount != null">
+            and ((bank_money BETWEEN #{startRAmount} and #{endRAmount}) or (online_money BETWEEN #{startRAmount} and #{endRAmount})  or (hand_rech_money BETWEEN #{startRAmount} and #{endRAmount}))
+        </if>
+        <if test="startWNum != null and endWNum != null">
+            and ((withdraw_count BETWEEN #{startWNum} and #{endWNum}) or (hand_withdraw_count BETWEEN #{startWNum} and #{endWNum}))
+        </if>
+        <if test="startWAmount != null and endWAmount != null">
+            and ((withdraw_money BETWEEN #{startWAmount} and #{endWAmount}) or (hand_withdraw_money BETWEEN #{startWAmount} and #{endWAmount}))
+        </if>
+
+    </select>
 
 </mapper>

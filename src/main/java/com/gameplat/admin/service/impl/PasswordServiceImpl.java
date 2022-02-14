@@ -34,4 +34,10 @@ public class PasswordServiceImpl implements PasswordService {
   public String decrypt(String password) {
     return new RSA(privateKey, null).decryptStr(password, KeyType.PrivateKey);
   }
+
+  @Override
+  public String encryptCashPassword(String cashPassword) {
+    MD5 md5 = MD5.create();
+    return md5.digestHex(md5.digestHex(cashPassword));
+  }
 }

@@ -189,7 +189,7 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
   @Override
   public void resetWithdrawPassword(MemberWithdrawPwdUpdateDTO dto) {
     Member member = this.getById(dto.getId());
-    String password = passwordService.encode(dto.getPassword(), member.getAccount());
+    String password = passwordService.encryptCashPassword(dto.getPassword());
     Assert.isTrue(
         memberInfoService
             .lambdaUpdate()

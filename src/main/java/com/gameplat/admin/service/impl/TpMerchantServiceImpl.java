@@ -54,6 +54,9 @@ public class TpMerchantServiceImpl extends ServiceImpl<TpMerchantMapper, TpMerch
     TpMerchant tpMerchant = this.getById(dto.getId());
     TpInterfaceVO tpInterfaceVO =
         tpInterfaceService.queryTpInterface(tpMerchant.getTpInterfaceCode());
+    if(null == tpInterfaceVO){
+      throw new ServiceException("支付接口不存在或已被删除，请删除商户重新配置");
+    }
     Map<String, String> oriMerchantParameters = JSONObject
         .parseObject(tpMerchant.getParameters(), Map.class);
     List<String> tpInterfaceParameters =
@@ -109,6 +112,9 @@ public class TpMerchantServiceImpl extends ServiceImpl<TpMerchantMapper, TpMerch
         tpPayTypeService.queryTpPayTypes(tpMerchantPayTypeVO.getTpInterfaceCode()));
     TpInterfaceVO tpInterfaceVO =
         tpInterfaceService.queryTpInterface(tpMerchantPayTypeVO.getTpInterfaceCode());
+    if(null == tpInterfaceVO){
+      throw new ServiceException("支付接口不存在或已被删除，请删除商户重新配置");
+    }
     tpMerchantPayTypeVO.setTpInterfaceVO(tpInterfaceVO);
     Map<String, String> merchantParameters = JSONObject
         .parseObject(tpMerchantPayTypeVO.getParameters(), Map.class);

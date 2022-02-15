@@ -48,6 +48,9 @@ public class PpMerchantServiceImpl extends ServiceImpl<PpMerchantMapper, PpMerch
   public void update(PpMerchantEditDTO dto) {
     PpMerchant ppMerchant = this.getById(dto.getId());
     PpInterfaceVO ppInterfaceVO = ppInterfaceService.queryPpInterface(dto.getPpInterfaceCode());
+    if(null == ppInterfaceVO){
+      throw new ServiceException("代付接口不存在或已被删除，请删除商户重新配置");
+    }
     Map<String, String> oriMerchantParameters = JSONObject
         .parseObject(ppMerchant.getParameters(), Map.class);
     List<String> ppInterfaceParameters =
@@ -105,6 +108,9 @@ public class PpMerchantServiceImpl extends ServiceImpl<PpMerchantMapper, PpMerch
     PpInterfaceVO ppInterfaceVO =
         ppInterfaceService.queryPpInterface(ppMerchantVO.getPpInterfaceCode());
     ppMerchantVO.setPpInterfaceVO(ppInterfaceVO);
+    if(null == ppInterfaceVO){
+      throw new ServiceException("代付接口不存在或已被删除，请删除商户重新配置");
+    }
     Map<String, String> merchantParameters = JSONObject
         .parseObject(ppMerchantVO.getParameters(), Map.class);
     List<String> ppInterfaceParameters =

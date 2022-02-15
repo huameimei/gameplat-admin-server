@@ -52,5 +52,5 @@ public class OperDictDataDTO implements Serializable {
 
   private Integer isVisible;
 
-  private Integer isDefault;
+  private CharSequence isDefault;
 }

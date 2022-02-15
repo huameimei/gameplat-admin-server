@@ -138,7 +138,7 @@ public class SystemConfigServiceImpl implements SystemConfigService {
   @CacheInvalidate(name = CachedKeys.DICT_DATA_CACHE, key = "#dictType")
   public void updateConfig(String dictType, List<SysDictData> dictDataList) {
     List<SysDictData> dictDatas = dictDataService.getDictDataByType(dictType);
-    dictDatas.forEach(e -> e.setIsDefault(DefaultEnums.NO.value().toString()));
+    dictDatas.forEach(e -> e.setIsDefault(DefaultEnums.NO.value()));
     dictDataList.forEach(e -> dictDatas.replaceAll(c -> c.getId().equals(e.getId()) ? e : c));
 
     Assert.isTrue(dictDataService.saveOrUpdateBatch(dictDatas), "修改失败!");

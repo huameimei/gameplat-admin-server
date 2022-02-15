@@ -2,6 +2,7 @@ package com.gameplat.admin.service.impl;
 
 import com.alibaba.csp.sentinel.annotation.SentinelResource;
 import com.alicp.jetcache.anno.CacheInvalidate;
+import com.alicp.jetcache.anno.CacheInvalidateContainer;
 import com.alicp.jetcache.anno.Cached;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
@@ -170,11 +171,13 @@ public class SysDictDataServiceImpl extends ServiceImpl<SysDictDataMapper, SysDi
 
   @Override
   @SentinelResource(value = "addOrUpdateUserWithdrawLimit")
-  public void addOrUpdateUserWithdrawLimit(UserWithdrawLimitInfo limitInfo) {
-    String dictType = DictTypeEnum.USER_WITHDRAW_LIMIT.getValue();
-    String dictLabel =
-        DictTypeEnum.USER_WITHDRAW_LIMIT.getValue() + limitInfo.getTimesForWithdrawal();
-
+  @CacheInvalidateContainer(
+      value = {
+        @CacheInvalidate(name = CachedKeys.DICT_DATA_CACHE, key = "#dictType"),
+        @CacheInvalidate(name = CachedKeys.DICT_DATA_CACHE, key = "#dictType + ':' + #dictLabel")
+      })
+  public void addOrUpdateUserWithdrawLimit(
+      String dictType, String dictLabel, UserWithdrawLimitInfo limitInfo) {
     if (this.lambdaQuery()
         .eq(SysDictData::getDictType, dictType)
         .eq(SysDictData::getDictLabel, dictLabel)
@@ -196,7 +199,11 @@ public class SysDictDataServiceImpl extends ServiceImpl<SysDictDataMapper, SysDi
 
   @Override
   @SentinelResource(value = "deleteByDictLabel")
-  @CacheInvalidate(name = CachedKeys.DICT_DATA_CACHE, key = "#dictType + ':' + #dictLabel")
+  @CacheInvalidateContainer(
+      value = {
+        @CacheInvalidate(name = CachedKeys.DICT_DATA_CACHE, key = "#dictType"),
+        @CacheInvalidate(name = CachedKeys.DICT_DATA_CACHE, key = "#dictType + ':' + #dictLabel")
+      })
   public void delete(String dictType, String dictLabel) {
     if (!this.lambdaUpdate()
         .eq(SysDictData::getDictType, dictType)

@@ -5,7 +5,9 @@ import com.gameplat.admin.service.ConfigService;
 import com.gameplat.admin.service.SysDictDataService;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.json.JsonUtils;
+import com.gameplat.common.enums.DefaultEnums;
 import com.gameplat.common.enums.DictDataEnum;
+import com.gameplat.common.enums.DictTypeEnum;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -78,6 +80,15 @@ public class ConfigServiceImpl implements ConfigService {
   @Override
   public Boolean getValueBoolean(DictDataEnum dataEnum) {
     return this.getValueBoolean(dataEnum, Boolean.FALSE);
+  }
+
+  @Override
+  public <T> T getDefaultConfig(DictTypeEnum type, Class<T> clazz) {
+    return dictDataService.getDictDataByType(type.getValue()).stream()
+        .filter(e -> DefaultEnums.YES.match(e.getIsDefault()))
+        .map(e -> JsonUtils.parse(e.getDictValue(), clazz))
+        .findAny()
+        .orElseThrow(() -> new ServiceException("配置信息不存在或未指定默认配置!"));
   }
 
   private Optional<String> getDictData(DictDataEnum dataEnum) {

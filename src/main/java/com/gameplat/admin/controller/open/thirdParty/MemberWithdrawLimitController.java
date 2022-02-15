@@ -1,6 +1,5 @@
 package com.gameplat.admin.controller.open.thirdParty;
 
-
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.gameplat.admin.model.bean.UserWithdrawLimitInfo;
@@ -22,8 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/admin/thirdParty/userWithdrawLimit")
 public class MemberWithdrawLimitController {
 
-  @Autowired
-  private SysDictDataService dictDataService;
+  @Autowired private SysDictDataService dictDataService;
 
   @DeleteMapping("/remove/{timesForWithdrawal}")
   @PreAuthorize("hasAuthority('thirdParty:memberWithdrawLimit:remove')")
@@ -35,8 +33,11 @@ public class MemberWithdrawLimitController {
 
   @PostMapping("/addOrEdit")
   @PreAuthorize("hasAuthority('thirdParty:memberWithdrawLimit:add')")
-  public void addOrEdit(@RequestBody UserWithdrawLimitInfo userWithdrawLimitInfo) {
-    dictDataService.addOrUpdateUserWithdrawLimit(userWithdrawLimitInfo);
+  public void addOrEdit(@RequestBody UserWithdrawLimitInfo limitInfo) {
+    String dictType = DictTypeEnum.USER_WITHDRAW_LIMIT.getValue();
+    String dictLabel =
+        DictTypeEnum.USER_WITHDRAW_LIMIT.getValue() + limitInfo.getTimesForWithdrawal();
+    dictDataService.addOrUpdateUserWithdrawLimit(dictType, dictLabel, limitInfo);
   }
 
   @PostMapping("/page")
@@ -44,5 +45,4 @@ public class MemberWithdrawLimitController {
   public IPage<MemberWithdrawDictDataVo> queryPage(Page<SysDictData> page) {
     return dictDataService.queryWithdrawPage(page);
   }
-
 }

@@ -87,6 +87,8 @@ public class MessageFeedbackServiceImpl extends ServiceImpl<MessageFeedbackMappe
                 .like(ObjectUtil.isNotEmpty(dto.getTitle()), MessageFeedback::getTitle, dto.getTitle())
                 .eq(ObjectUtil.isNotEmpty(dto.getIsRead()), MessageFeedback::getIsRead, dto.getIsRead())
                 .eq(ObjectUtil.isNotEmpty(dto.getType()), MessageFeedback::getType, dto.getType())
+                .ge(ObjectUtil.isNotEmpty(dto.getBeginTime()), MessageFeedback::getCreateTime, dto.getBeginTime())
+                .le(ObjectUtil.isNotEmpty(dto.getEndTime()), MessageFeedback::getCreateTime, dto.getEndTime())
                 .orderByDesc(MessageFeedback::getCreateTime)
                 .page(page)
                 .convert(messageFeedbackConvert::toVo);

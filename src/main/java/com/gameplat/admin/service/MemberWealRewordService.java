@@ -15,7 +15,7 @@ public interface MemberWealRewordService extends IService<MemberWealReword> {
      */
     IPage<MemberWealRewordVO> findWealRewordList(IPage<MemberWealReword> page, MemberWealRewordDTO queryDTO);
 
-    Integer findCountReword(MemberWealRewordDTO dto);
+    Long findCountReword(MemberWealRewordDTO dto);
     /**
      * 新增福利记录
      */

@@ -358,7 +358,7 @@ public class MemberGrowthRecordServiceImpl extends ServiceImpl<MemberGrowthRecor
                     MemberWealRewordDTO queryDto = new MemberWealRewordDTO();
                     queryDto.setUserId(member.getId());
                     queryDto.setVipLevel(i);
-                    int isPayCount = memberWealRewordService.findCountReword(queryDto);
+                    Long isPayCount = memberWealRewordService.findCountReword(queryDto);
                     log.info("不允许重复派发升级奖励:用户({0}),当前判断等级:VIP{1},是否发放:{2}", member.getId(), i, isPayCount);
                     if (isPayCount > 0) {
                         continue;

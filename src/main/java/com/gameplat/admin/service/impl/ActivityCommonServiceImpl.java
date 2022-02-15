@@ -264,7 +264,7 @@ public class ActivityCommonServiceImpl implements ActivityCommonService {
                   .eq(ActivityBlacklist::getLimitedContent, memberInfo.getLastLoginIp()));
     }
 
-    Integer count = activityBlacklistLambdaQueryChainWrapper.count();
+    Long count = activityBlacklistLambdaQueryChainWrapper.count();
     if (count > 0) {
       // 您已被禁止参加此活动，如有疑问，请联系客服
       throw new ServiceException("您已被禁止参加此活动，如有疑问，请联系客服");
@@ -283,7 +283,7 @@ public class ActivityCommonServiceImpl implements ActivityCommonService {
       query.setSoleIdentifier(IdempotentKeyUtils.md5(DateUtil.formatDate(countDate)));
     }
 
-    Integer count =
+    Long count =
         activityQualificationService
             .lambdaQuery()
             .eq(ActivityQualification::getActivityId, activityLobby.getId())

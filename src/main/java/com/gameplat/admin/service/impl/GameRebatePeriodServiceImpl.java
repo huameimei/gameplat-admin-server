@@ -146,7 +146,7 @@ public class GameRebatePeriodServiceImpl extends
   }
 
 
-  public int countByDateRange(Long id, Date beginDate, Date endDate) {
+  public Long countByDateRange(Long id, Date beginDate, Date endDate) {
     return this.lambdaQuery()
         .ne(ObjectUtil.isNotEmpty(id), GameRebatePeriod::getId, id)
         .and(wrapper -> wrapper.and(i ->

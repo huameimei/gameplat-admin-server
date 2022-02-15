@@ -16,6 +16,9 @@ public class ChatRedEnvelopeVO implements Serializable {
   @ApiModelProperty(value = "主键ID")
   private Long id;
 
+  @ApiModelProperty(value = "红包配置ID")
+  private Long redConfigId;
+
   @ApiModelProperty(value = "红包名称")
   private String name;
 

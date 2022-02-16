@@ -6,8 +6,11 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.gameplat.admin.model.domain.ChatGif;
 import com.gameplat.admin.model.dto.ChatGifEditDTO;
 import com.gameplat.admin.model.vo.ChatGifVO;
+import com.gameplat.common.compent.oss.config.FileConfig;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 public interface ChatGifService extends IService<ChatGif> {
 
@@ -15,11 +18,13 @@ public interface ChatGifService extends IService<ChatGif> {
     IPage<ChatGifVO> page(PageDTO<ChatGif> page, String name);
 
     /** 增 */
-    void add(MultipartFile file, String name);
+    void add(MultipartFile file, String name) throws IOException;
 
     /** 删 */
     void remove(@PathVariable Integer id);
 
     /** 改 */
     void edit(ChatGifEditDTO dto);
+
+    int findMD5(String md5);
 }

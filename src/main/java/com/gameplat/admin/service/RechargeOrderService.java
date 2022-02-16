@@ -6,7 +6,9 @@ import com.gameplat.admin.model.bean.ActivityStatisticItem;
 import com.gameplat.admin.model.bean.ManualRechargeOrderBo;
 import com.gameplat.admin.model.bean.PageExt;
 import com.gameplat.admin.model.domain.RechargeOrder;
+import com.gameplat.admin.model.dto.MemberActivationDTO;
 import com.gameplat.admin.model.dto.RechargeOrderQueryDTO;
+import com.gameplat.admin.model.vo.MemberActivationVO;
 import com.gameplat.admin.model.vo.RechargeOrderVO;
 import com.gameplat.admin.model.vo.SummaryVO;
 import com.gameplat.security.context.UserCredential;
@@ -52,4 +54,7 @@ public interface RechargeOrderService extends IService<RechargeOrder> {
      * @return
      */
     List<ActivityStatisticItem> findAllFirstRechargeAmount(Map map);
+
+    /** 根据会员和最后修改时间获取充值次数、充值金额、充值优惠、其它优惠 */
+    MemberActivationVO getRechargeInfoByNameAndUpdateTime(MemberActivationDTO memberActivationDTO);
 }

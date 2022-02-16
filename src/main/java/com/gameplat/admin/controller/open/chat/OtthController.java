@@ -3,7 +3,10 @@ package com.gameplat.admin.controller.open.chat;
 import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.gameplat.admin.model.bean.RoomMember;
+import com.gameplat.admin.model.dto.PushCPBetMessageReq;
+import com.gameplat.admin.model.vo.ChatUserVO;
 import com.gameplat.admin.model.vo.LotteryCodeVo;
+import com.gameplat.admin.model.vo.PushLottWinVo;
 import com.gameplat.admin.service.*;
 import com.gameplat.base.common.context.DyDataSourceContextHolder;
 import com.gameplat.base.common.enums.EnableEnum;
@@ -76,6 +79,29 @@ public class OtthController {
         return otthService.otthProxyHttpPost(apiUrl, body, request, dbSuffix);
     }
 
+    @GetMapping(value = "/{url}", produces = {"application/json;charset=UTF-8"})
+    public void get(@PathVariable String url, HttpServletRequest request, HttpServletResponse response) throws Exception {
+        String apiUrl = getApiUrl(url);
+        otthService.otthProxyHttpGet(apiUrl, request, response);
+    }
+
+    @GetMapping(value = "/getLottTypeList", produces = {"application/json;charset=UTF-8"})
+    public List<LotteryCodeVo> getLottTypeList() throws Exception {
+        return otthService.getLottTypeList();
+    }
+
+    /** 中奖推送接口 */
+    @PostMapping("/pushLotteryWin")
+    public void pushLotteryWin(@RequestBody List<PushLottWinVo> lottWinVos, HttpServletRequest request) {
+        otthService.pushLotteryWin(lottWinVos, request);
+    }
+
+    /** 分享彩票下注 */
+    @RequestMapping(value = "/cpbet", method = RequestMethod.POST)
+    public void cpbet(@RequestBody List<PushCPBetMessageReq> req, HttpServletRequest request) {
+        otthService.cpbet(req, request);
+    }
+
     /** 修改平台聊天室开关 */
     private void updateChatEnable(String body) {
         JSONObject json = JSONObject.parseObject(body);
@@ -87,6 +113,12 @@ public class OtthController {
             cpChatEnable = "on";
         }
         sysTenantSettingService.updateChatEnable(cpChatEnable);
+    }
+
+    /** 查找聊天室会员 */
+    @RequestMapping(value = "/getChatUser", method = RequestMethod.GET)
+    public ChatUserVO getChatUser(String account) throws Exception {
+        return otthService.getChatUser(account);
     }
 
     private String getApiUrl(String url){

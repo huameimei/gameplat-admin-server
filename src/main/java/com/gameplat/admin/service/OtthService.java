@@ -1,12 +1,19 @@
 package com.gameplat.admin.service;
 
+import com.alibaba.excel.util.DateUtils;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.gameplat.admin.enums.ChatConfigEnum;
 import com.gameplat.admin.enums.ClientTypeEnum;
 import com.gameplat.admin.feign.RemoteLogService;
-import com.gameplat.admin.model.vo.LotteryCodeVo;
-import com.gameplat.admin.model.vo.LotteryTypeListVo;
+import com.gameplat.admin.model.doc.ChatPushCPBet;
+import com.gameplat.admin.model.doc.PushCPMessageReq;
+import com.gameplat.admin.model.doc.PushLotteryWin;
+import com.gameplat.admin.model.domain.Member;
+import com.gameplat.admin.model.dto.MemberActivationDTO;
+import com.gameplat.admin.model.dto.PushCPBetMessageReq;
+import com.gameplat.admin.model.vo.*;
 import com.gameplat.admin.util.HttpClient;
 import com.gameplat.base.common.context.DyDataSourceContextHolder;
 import com.gameplat.base.common.context.GlobalContextHolder;
@@ -24,13 +31,22 @@ import org.apache.http.Header;
 import org.apache.http.message.BasicHeader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.task.TaskExecutor;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static com.alibaba.excel.util.DateUtils.DATE_FORMAT_10;
 
 /** 聊天室业务层处理 */
 @Service
@@ -43,6 +59,10 @@ public class OtthService {
     private final String Lott_CONFIG_URL = "/api-manage/chatRoom/updateChatRoomStatus";
     private static String IP_PCONLINE_URL = "http://whois.pconline.com.cn/ipJson.jsp";
 
+    /** 聊天室彩票中奖推送设置 */
+    public static final String CHAT_PUSH_CP_WIN = "CHAT_PUSH_CP_WIN";
+    /** 聊天室彩票下注推送配置 */
+    public static final String CHAT_PUSH_CP_BET = "CHAT_PUSH_CP_BET";
     // 聊天室下注推送策略
     private final String CHAT_PUSH_SP_BET =
         "{\"autoShare\":0,\"gameIds\":\"23,25,29,27,,33,131,70,173\",\"isOpen\":1,\"notPushAccount\":\"baozi\",\"notPushPlayCode\":\"\",\"onlyPushAccount\":0,\"pushAccount\":\"jeff13,sss111\",\"pushPlayCode\":\"\",\"rechCount\":0,\"rechMoney\":0.0,\"showHeel\":1,\"showHeelMinMoney\":20.0,\"todayRechMoney\":0.0,\"totalMoney\":0.0,\"validBetMoney\":0.0}";
@@ -57,6 +77,12 @@ public class OtthService {
     private TenantDomainService tenantDomainService;
     @Autowired
     private RemoteLogService remoteLogService;
+    @Autowired
+    private MemberService memberService;
+    @Autowired
+    private RedisTemplate redisTemplate;
+    @Autowired
+    private RechargeOrderService rechargeOrderService;
 
 
 
@@ -224,6 +250,291 @@ public class OtthService {
         return result;
     }
 
+    public void otthProxyHttpGet(String apiUrl, HttpServletRequest request, HttpServletResponse response) throws IOException, ServiceException {
+        String dbSuffix = DyDataSourceContextHolder.getTenant();
+        Enumeration<String> names = request.getParameterNames();
+        Map<String, String> params = new HashMap<>();
+        while (names.hasMoreElements()) {
+            String name = names.nextElement();
+            params.put(name, request.getParameter(name));
+        }
+        params.put("platCode", dbSuffix);
+        HttpClient httpClient = HttpClient.build().get(apiUrl);
+        httpClient.setPara(params);
+        httpClient.addHead("plat_code", dbSuffix);
+
+        // httpClient.addHead("Cookie", request.getHeader("Cookie"));
+        HttpRespBean respBean = httpClient.execute();
+        handleResponse(respBean, response);
+    }
+
+    private void handleResponse(HttpRespBean respBean, HttpServletResponse response) throws IOException {
+        if (respBean.getStatus() == 200) {
+            response.getOutputStream().write(respBean.getRespBody().getBytes("utf-8"));
+            response.flushBuffer();
+        } else {
+            try {
+                JSONObject jsonObject = JSON.parseObject(respBean.getRespBody());
+                if (jsonObject.containsKey("code") && jsonObject.containsKey("msg")) {
+                     throw new ServiceException(Integer.parseInt(jsonObject.getString("code")), jsonObject.getString("msg"));
+                }
+            } catch (Throwable e) {
+                 throw new ServiceException(e.getMessage());
+            }
+             throw new ServiceException(respBean.getStatus(), respBean.getRespBody());
+        }
+    }
+
+    /** 中奖推送接口 */
+    public void pushLotteryWin(List<PushLottWinVo> lottWinVos, HttpServletRequest request) {
+        // 中奖推送接口地址
+        String apiUrl = getApiUrl("api/push/cpwin");
+        String dbSuffix = DyDataSourceContextHolder.getTenant();
+        if (dbSuffix == null) {
+            throw new ServiceException("推送失败,获取不到租户标识");
+        }
+        List<PushCPMessageReq> list = new ArrayList<>();
+        // 填充开奖必须数据
+        for (PushLottWinVo lottWinVo : lottWinVos) {
+            Member user = memberService.getByAccount(lottWinVo.getAccount().replaceAll(dbSuffix, "")).get();
+            if (user == null) {
+                log.info("找不到用户:" + lottWinVo.getAccount());
+                continue;
+            }
+            PushCPMessageReq pushCPMessageReq = new PushCPMessageReq();
+            pushCPMessageReq.setGameName(lottWinVo.getGameName()).setGameId(lottWinVo.getGameId())
+                    .setWinMoney(lottWinVo.getWinMoney()).setAccount(user.getAccount()).setUserId(user.getId());
+            list.add(pushCPMessageReq);
+        }
+
+        if (list.isEmpty()) {
+            throw new ServiceException("没有此用户数据");
+        }
+        Stream<PushCPMessageReq> stream = list.stream();
+        // 获取配置数据
+        PushLotteryWin pushLotteryWin = (PushLotteryWin)redisTemplate.opsForValue().get(String.format("%s_%s", dbSuffix, CHAT_PUSH_CP_WIN));
+        if (pushLotteryWin == null) {
+            String chatConfig = menuService.queryChatConfig(ChatConfigEnum.CHAT_PUSH_CP_WIN);
+            pushLotteryWin = JSON.parseObject(chatConfig, PushLotteryWin.class);
+            if (pushLotteryWin != null) {
+                redisTemplate.opsForValue().set(String.format("%s_%s", dbSuffix, CHAT_PUSH_CP_WIN), pushLotteryWin);
+            }
+        }
+        PushLotteryWin finalPushLotteryWin = pushLotteryWin;
+        // 开始过滤数据
+        if (pushLotteryWin != null) {
+            // if (pushLotteryWin.getIsOpen()==0){
+            // return RetUtils.error("中奖推送已关闭");
+            // }
+            String[] lottCodes = pushLotteryWin.getVipEnterLevels().split(",");
+            String[] accouts = pushLotteryWin.getBlackAccounts().split(",");
+
+            // 过滤掉设置不推送的账号
+            List<String> accountList = Arrays.asList(accouts);
+            stream = stream.filter(x -> !accountList.contains(x.getAccount()));
+            // 过滤掉设置不推送的游戏
+            List<String> lottList = Arrays.asList(lottCodes);
+            stream = stream.filter(x -> lottList.contains(x.getGameId()));
+            // 过滤掉中奖金额设置
+            if (pushLotteryWin.getWinMoney() != null && pushLotteryWin.getWinMoney() > 0) {
+                stream = stream.filter(x -> x.getWinMoney() > finalPushLotteryWin.getWinMoney());
+            }
+            // 最终发送数据
+            list = stream.collect(Collectors.toList());
+
+            // 只显示中奖最高前几名
+            if (pushLotteryWin.getTopNum() != null && pushLotteryWin.getTopNum() > 0
+                    && list.size() > pushLotteryWin.getTopNum()) {
+                list.sort((o1, o2) -> (int)(o2.getWinMoney() - o1.getWinMoney()));
+                list = list.subList(0, pushLotteryWin.getTopNum());
+            }
+        }
+
+        //
+        if (list.isEmpty()) {
+            log.info("开奖推送数据过滤之后为空");
+            return;
+        }
+        try {
+            otthProxyHttpPost(apiUrl, JSON.toJSONString(list), request, dbSuffix);
+            log.info("开奖推送成功:" + list);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new ServiceException("开奖推送失败,错误为:" + e);
+        }
+        return;
+    }
+
+    /** 分享彩票下注 */
+    public void cpbet(List<PushCPBetMessageReq> req, HttpServletRequest request) {
+        log.info("收到彩票服传来的分享订单" + req);
+        if (req == null || req.isEmpty()) {
+            throw new ServiceException("数据不能为空");
+        }
+        // 分享推送接口地址
+        String apiUrl = getApiUrl("/api/push/cpbet");
+        String dbSuffix = DyDataSourceContextHolder.getTenant();
+        if (dbSuffix == null) {
+            throw new ServiceException("推送失败,获取不到租户标识");
+        }
+        // 获取分享配置
+        ChatPushCPBet config = (ChatPushCPBet)redisTemplate.opsForValue().get(String.format("%s_%s", dbSuffix, CHAT_PUSH_CP_BET));
+        if (config == null) {
+            String chatConfig = menuService.queryChatConfig(ChatConfigEnum.CHAT_PUSH_CP_BET);
+            config = JSON.parseObject(chatConfig, ChatPushCPBet.class);
+            if (config != null) {
+                redisTemplate.opsForValue().set(String.format("%s_%s", dbSuffix, CHAT_PUSH_CP_BET), config);
+            }
+        }
+        ChatPushCPBet finalConfig = config;
+        req.forEach(x -> {
+            x.setAccount(x.getAccount().replaceAll(dbSuffix, ""));
+            Member user = memberService.getByAccount(x.getAccount()).get();
+            if (user == null) {
+                log.info("找不到用户:" + x.getAccount());
+                return;
+            }
+            x.setUserId(user.getId());
+        });
+        // 过滤掉设置不推送的游戏
+        if (config != null) {
+            // 是否只直推会员
+            if (config.getOnlyPushAccount() != null && config.getOnlyPushAccount() == 1) {
+                // 直推会员的名单
+                String pushAccount = config.getPushAccount();
+                if (StringUtils.isNotBlank(pushAccount)) {
+                    String[] split = pushAccount.split(",");
+                    List<String> list = Arrays.asList(split);
+                    req = req.stream().filter(x -> list.contains(x.getAccount())).collect(Collectors.toList());
+                }
+            }
+            // 推送黑名单
+            if (StringUtils.isNotBlank(config.getNotPushAccount())) {
+                String noPushAccount = config.getNotPushAccount();
+                String[] split = noPushAccount.split(",");
+                List<String> list = Arrays.asList(split);
+                req = req.stream().filter(x -> !list.contains(x.getAccount())).collect(Collectors.toList());
+            }
+
+            if (req.isEmpty()) {
+                throw new ServiceException("账号禁止推送到聊天室");
+            }
+            String statTime = DateUtils.format(new Date(), DATE_FORMAT_10);
+            MemberActivationDTO memberActivationDTO = new MemberActivationDTO();
+            // 总充值次数过滤
+            if (config.getRechCount() != null && config.getRechCount() > 0) {
+                req = req.stream().filter(x -> {
+                    memberActivationDTO.setUsername(x.getAccount());
+                    MemberActivationVO todayMoney = rechargeOrderService.getRechargeInfoByNameAndUpdateTime(memberActivationDTO);
+                    if (todayMoney == null || todayMoney.getRechargeCount() == null) {
+                        return false;
+                    }
+                    return todayMoney.getRechargeCount() > finalConfig.getRechCount();
+                }).collect(Collectors.toList());
+            }
+            if (req.isEmpty()) {
+                throw new ServiceException(String.format("充值次数未达到要求%d次", finalConfig.getRechCount()));
+            }
+            // 总充值金额过滤
+            if (config.getRechMoney() != null && config.getRechMoney().compareTo(BigDecimal.ZERO) > 0) {
+                req = req.stream().filter(x -> {
+                    memberActivationDTO.setUsername(x.getAccount());
+                    MemberActivationVO todayMoney = rechargeOrderService.getRechargeInfoByNameAndUpdateTime(memberActivationDTO);
+                    if (todayMoney == null || todayMoney.getRechargeMoney() == null) {
+                        return false;
+                    }
+                    return todayMoney.getRechargeMoney().compareTo(finalConfig.getRechMoney()) > 0;
+                }).collect(Collectors.toList());
+            }
+            if (req.isEmpty()) {
+                throw new ServiceException("总充值金额未达到要求" + finalConfig.getRechMoney() + "元");
+            }
+            // 当日总充值金额过滤
+            if (config.getTodayRechMoney() != null && config.getTodayRechMoney().compareTo(BigDecimal.ZERO) > 0) {
+                memberActivationDTO.setEndTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format((new Date())));
+                memberActivationDTO.setBeginTime(statTime);
+                req = req.stream().filter(x -> {
+                    memberActivationDTO.setUsername(x.getAccount());
+                    MemberActivationVO todayMoney = rechargeOrderService.getRechargeInfoByNameAndUpdateTime(memberActivationDTO);
+                    if (todayMoney == null || todayMoney.getRechargeMoney() == null) {
+                        return false;
+                    }
+                    return todayMoney.getRechargeMoney().compareTo(finalConfig.getTodayRechMoney()) > 0;
+                }).collect(Collectors.toList());
+            }
+
+            if (req.isEmpty()) {
+                throw new ServiceException("今日充值金额不达标,还需要" + finalConfig.getTodayRechMoney() + "元");
+            }
+
+            // 过滤只推送哪个玩法
+            if (StringUtils.isNotBlank(config.getPushPlayCode())) {
+                String[] split = config.getPushPlayCode().split(",");
+                List<String> list = Arrays.asList(split);
+                req = req.stream().filter(x -> list.contains(x.getPlayCode())).collect(Collectors.toList());
+            }
+
+            // 过滤不推送哪个玩法
+            if (StringUtils.isNotBlank(config.getNotPushPlayCode())) {
+                String[] split = config.getNotPushPlayCode().split(",");
+                List<String> list = Arrays.asList(split);
+                req = req.stream().filter(x -> !list.contains(x.getPlayCode())).collect(Collectors.toList());
+            }
+
+            if (req.isEmpty()) {
+                throw new ServiceException("该玩法不支持分享");
+            }
+            // 过滤游戏
+            if (StringUtils.isBlank(config.getVipEnterLevels())) {
+                throw new ServiceException("该彩种不支持分享");
+            } else {
+                String[] split = config.getVipEnterLevels().split(",");
+                List<String> list = Arrays.asList(split);
+                req = req.stream().filter(x -> list.contains(x.getGameId())).collect(Collectors.toList());
+            }
+
+            if (req.isEmpty()) {
+                throw new ServiceException("该彩种不支持分享");
+            }
+
+        }
+        try {
+            otthProxyHttpPost(apiUrl, JSON.toJSONString(req), request, dbSuffix);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new ServiceException("开奖推送失败,错误为:" + e);
+        };
+    }
+
+    /** 查找聊天室会员 */
+    public ChatUserVO getChatUser(String account) throws Exception {
+        Member user = memberService.getByAccount(account).get();
+        if (user == null) {
+            throw new ServiceException("用户不存在");
+        }
+        String chatDomain = tenantDomainService.getChatDomain();
+        if (org.apache.commons.lang3.StringUtils.isBlank(chatDomain)) {
+            throw new ServiceException("未配服务");
+        }
+        String apiUrl = chatDomain + "/api/u/simpleUserInfoList";
+        String proxy = DyDataSourceContextHolder.getTenant();
+        Map<String, String> params = new HashMap<>();
+        params.put("userIds", user.getId().toString());
+        params.put("platCode", proxy);
+        HttpClient httpClient = HttpClient.build().get(apiUrl);
+        httpClient.setPara(params);
+        httpClient.addHead("plat_code", proxy);
+        HttpRespBean respBean = httpClient.execute();
+        if (respBean != null) {
+            List<ChatUserVO> chatUserVOS = JSON.parseArray(respBean.getRespBody(), ChatUserVO.class);
+            if (chatUserVOS != null && !chatUserVOS.isEmpty()) {
+                return chatUserVOS.get(0);
+            }
+
+        }
+        throw new ServiceException("聊天室不存在此账号");
+    }
+
     //获取ip归属地
     public static String getAddressByIp_third(String ip) {
         String serviceUrl = IP_PCONLINE_URL + "?json=true&ip=" + ip;
@@ -242,4 +553,9 @@ public class OtthService {
         return "未知";
     }
 
+    private String getApiUrl(String url) throws ServiceException {
+        String chatDomain = tenantDomainService.getChatDomain();
+        url = chatDomain + "/" + url.replace("_", "/");
+        return url;
+    }
 }

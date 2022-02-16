@@ -1,6 +1,6 @@
 package com.gameplat.admin.service;
 
-import com.gameplat.common.enums.GameCodeEnum;
+import com.gameplat.common.enums.GameKindEnum;
 
 public interface MemberDmlService {
 
@@ -9,5 +9,5 @@ public interface MemberDmlService {
    *
    * @param gameCode GameCode
    */
-  void calcGameDml(GameCodeEnum gameCode);
+  void calcGameDml(GameKindEnum gameCode);
 }

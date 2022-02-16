@@ -4,7 +4,7 @@ import com.gameplat.admin.mapper.AeBetRecordMapper;
 import com.gameplat.admin.model.domain.AeBetRecord;
 import com.gameplat.admin.service.GameBetRecordService;
 import com.gameplat.admin.service.MemberDmlService;
-import com.gameplat.common.enums.GameCodeEnum;
+import com.gameplat.common.enums.GameKindEnum;
 import java.util.Date;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +29,6 @@ public class AeBetRecordServiceImpl implements GameBetRecordService<AeBetRecord>
   @Override
   public void calcGameDml() {
     // 计算打码量
-    memberDmlService.calcGameDml(GameCodeEnum.AE_LIVE);
+    memberDmlService.calcGameDml(GameKindEnum.AE_LIVE);
   }
 }

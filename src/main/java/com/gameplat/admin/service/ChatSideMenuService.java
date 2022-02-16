@@ -97,6 +97,32 @@ public class ChatSideMenuService {
         return result;
     }
 
+    /** 修改侧边栏 */
+    public void edit(String config){
+        List<ChatSideMenuVO> settingMenuList = JSON.parseArray(config, ChatSideMenuVO.class);
+        settingMenuList = settingMenuList.stream().filter(x -> x.getOpen() == 1).collect(Collectors.toList());
+        String initDoc = dictDataService
+                .getDictData(ChatConfigEnum.CHAT_ROOM_SIDE_MENU.getType().getValue(), ChatConfigEnum.CHAT_ROOM_SIDE_MENU.getLabel())
+                .getDictValue();
+        List<ChatSideMenuVO> initMenu = JSON.parseArray(initDoc, ChatSideMenuVO.class);
+        List<String> menuNames = settingMenuList.stream().map(ChatSideMenuVO::getName).collect(Collectors.toList());
+        List<ChatSideMenuVO> newMenu = initMenu.stream()
+                .filter(m -> !menuNames.contains(m.getName()))
+                .peek(m -> {
+                    m.setSort(0);
+                    m.setRemark("");
+                    m.setOpen(0);
+                }).collect(Collectors.toList());
+        settingMenuList.addAll(newMenu);
+        settingMenuList.sort(Comparator.comparingInt(ChatSideMenuVO::getSort));
+        String jsonObj = JSON.toJSONString(settingMenuList);
+        dictDataService.updateByTypeAndLabel(new SysDictData(){{
+            setDictType(ChatConfigEnum.CHAT_ROOM_SETTING_MENU.getType().getValue());
+            setDictLabel(ChatConfigEnum.CHAT_ROOM_SETTING_MENU.getLabel());
+            setDictValue(jsonObj);
+        }});
+    }
+
     private static <T> Predicate<T> distinctByKey(Function<? super T, Object> keyExtractor) {
         Map<Object, Boolean> map = new ConcurrentHashMap<>();
         return t -> map.putIfAbsent(keyExtractor.apply(t), Boolean.TRUE) == null;

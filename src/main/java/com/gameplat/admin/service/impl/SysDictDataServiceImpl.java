@@ -4,6 +4,7 @@ import com.alibaba.csp.sentinel.annotation.SentinelResource;
 import com.alicp.jetcache.anno.CacheInvalidate;
 import com.alicp.jetcache.anno.CacheInvalidateContainer;
 import com.alicp.jetcache.anno.Cached;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -242,4 +243,14 @@ public class SysDictDataServiceImpl extends ServiceImpl<SysDictDataMapper, SysDi
   public boolean saveOrUpdate(SysDictData entity) {
     return super.saveOrUpdate(entity);
   }
+
+  @Override
+  public void updateByTypeAndLabel(SysDictData data) {
+    LambdaUpdateWrapper<SysDictData> updateWrapper = new LambdaUpdateWrapper<>();
+    updateWrapper.eq(SysDictData::getDictLabel, data.getDictLabel())
+            .eq(SysDictData::getDictType, data.getDictType())
+            .set(SysDictData::getDictValue, data.getDictValue());
+    update(updateWrapper);
+  }
+
 }

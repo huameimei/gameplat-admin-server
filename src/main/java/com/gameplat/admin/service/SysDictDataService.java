@@ -10,7 +10,6 @@ import com.gameplat.admin.model.dto.OperDictDataDTO;
 import com.gameplat.admin.model.dto.SysDictDataDTO;
 import com.gameplat.admin.model.vo.DictDataVo;
 import com.gameplat.admin.model.vo.MemberWithdrawDictDataVo;
-import com.gameplat.common.enums.DictTypeEnum;
 
 import java.util.List;
 
@@ -49,4 +48,6 @@ public interface SysDictDataService extends IService<SysDictData> {
   void delete(String dictType, String dictLabel);
 
   List<SysDictData> getDictListAll(SysDictDataDTO dictData);
+
+  void updateByTypeAndLabel(SysDictData data);
 }

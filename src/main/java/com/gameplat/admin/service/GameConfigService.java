@@ -8,4 +8,6 @@ import java.util.Map;
 public interface GameConfigService extends IService<GameConfig> {
 
   JSONObject queryGameConfigInfoByPlatCode(String platCode);
+
+  JSONObject getGameConfig(String platCode);
 }

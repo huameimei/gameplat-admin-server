@@ -102,6 +102,7 @@ public class SysDictDataServiceImpl extends ServiceImpl<SysDictDataMapper, SysDi
         .eq(SysDictData::getStatus, EnableEnum.ENABLED.code())
         .eq(SysDictData::getDictType, dictType)
         .eq(SysDictData::getDictLabel, dictLabel)
+        .eq(SysDictData::getStatus, 1)
         .oneOpt()
         .map(SysDictData::getDictValue)
         .orElse(null);

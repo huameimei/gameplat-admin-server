@@ -33,7 +33,7 @@ public class ChatSideMenuController {
         return chatSideMenuService.queryAllSideMenu();
     }
 
-    @ApiOperation(value = "修改侧边栏")
+    @ApiOperation(value = "编辑")
     @PreAuthorize("hasAuthority('chat:menu:edit')")
     @PutMapping("/edit")
     public void edit(String config) {

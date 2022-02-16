@@ -127,4 +127,8 @@ public class ChatSideMenuService {
         Map<Object, Boolean> map = new ConcurrentHashMap<>();
         return t -> map.putIfAbsent(keyExtractor.apply(t), Boolean.TRUE) == null;
     }
+
+    public String queryChatConfig(ChatConfigEnum dataEnum) {
+        return dictDataService.getDictDataValue(dataEnum.getType().getValue(), dataEnum.getLabel());
+    }
 }

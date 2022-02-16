@@ -17,6 +17,8 @@ import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -34,6 +36,7 @@ import java.util.stream.Collectors;
 @Api(tags = "聊天室侧滑菜单管理")
 @RestController
 @RequestMapping("/api/admin/chat/menu")
+@Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)
 public class OtthController {
 
     @Autowired
@@ -46,6 +49,8 @@ public class OtthController {
     private ChatLeaderBoardService chatLeaderBoardService;
     @Autowired
     private SysTenantSettingService sysTenantSettingService;
+    @Autowired
+    private ChatPushPlanService chatPushPlanService;
 
     private static final String ROOM_MEMBER_BATCHADD_URL = "api_room_batchAddMember";
     public static final String API_PLAT_UPDATE = "api_plat_update";
@@ -119,6 +124,15 @@ public class OtthController {
     @RequestMapping(value = "/getChatUser", method = RequestMethod.GET)
     public ChatUserVO getChatUser(String account) throws Exception {
         return otthService.getChatUser(account);
+    }
+
+    /** 给游戏调用的更新游戏状态 */
+    @PostMapping("updateGameStatus")
+    public void updateGameStuats(String gameId, int gameStatus) {
+        //游戏维护更新自定义中奖推送
+        chatPushPlanService.updatePushPlan(gameId, gameStatus);
+        //更新房间管理
+        otthService.updateGameStuats(gameId,gameStatus);
     }
 
     private String getApiUrl(String url){

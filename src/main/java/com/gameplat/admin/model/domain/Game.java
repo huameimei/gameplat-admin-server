@@ -4,6 +4,8 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
+import java.util.Date;
+
 import lombok.Data;
 
 @Data
@@ -18,18 +20,15 @@ public class Game implements Serializable {
    */
   private String gameCode;
 
+  /**
+   * 玩游戏编码
+   */
   private String playCode;
 
   /**
    * 游戏名
    */
   private String gameName;
-
-
-  /**
-   * PC图片地址
-   */
-  private String pcImgUrl;
 
   /**
    * 平台编码
@@ -54,15 +53,25 @@ public class Game implements Serializable {
   /**
    * 支持电脑端（0:支持，1：不支持）
    */
-  private Integer isFlash;
-
-  /**
-   * 手机端图片地址
-   */
-  private String appImgUrl;
+  private Integer isPc;
 
   /**
    * 游戏排序
    */
   private Integer sort;
+
+  /**
+   * 图片地址
+   */
+  private String imgUrl;
+
+  /**
+   * 更新时间
+   */
+  private Date updateTime;
+
+  /**
+   * 更新者
+   */
+  private String updateBy;
 }

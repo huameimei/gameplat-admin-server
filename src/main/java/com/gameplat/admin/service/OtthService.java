@@ -14,7 +14,7 @@ import com.gameplat.admin.model.domain.Member;
 import com.gameplat.admin.model.dto.MemberActivationDTO;
 import com.gameplat.admin.model.dto.PushCPBetMessageReq;
 import com.gameplat.admin.model.vo.*;
-import com.gameplat.admin.util.HttpClient;
+import com.gameplat.common.util.HttpClient;
 import com.gameplat.base.common.context.DyDataSourceContextHolder;
 import com.gameplat.base.common.context.GlobalContextHolder;
 import com.gameplat.base.common.exception.ServiceException;

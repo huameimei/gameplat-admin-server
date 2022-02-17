@@ -13,7 +13,7 @@ import com.gameplat.admin.model.domain.ChatLeaderBoard;
 import com.gameplat.admin.model.domain.Member;
 import com.gameplat.admin.model.vo.ChatLeaderBoardVO;
 import com.gameplat.admin.service.*;
-import com.gameplat.admin.util.HttpClient;
+import com.gameplat.common.util.HttpClient;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.HttpRespBean;
 import com.gameplat.common.util.HttpClientUtils;
@@ -25,6 +25,7 @@ import org.apache.http.Header;
 import org.apache.http.message.BasicHeader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -76,6 +77,7 @@ public class ChatLeaderBoardServiceImpl extends ServiceImpl<ChatLeaderBoardMappe
     public static final String CHAT_LEADER_BOARD = "CHAT_LEADER_BOARD";
 
     /** 创建聊天室排行榜 */
+    @Scheduled(cron = "0 0/1 * * * ?")
     @Override
     public void creatLeaderBoard(String jsonStrParam) throws ServiceException {
         log.info("开始创建排行榜ing"+ new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));

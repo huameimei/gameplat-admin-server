@@ -41,7 +41,7 @@ public class GameServiceImpl extends ServiceImpl<GameMapper, Game> implements Ga
                         dto.getPlatformCode())
                 .eq(ObjectUtils.isNotEmpty(dto.getGameType()), Game::getGameType, dto.getGameType())
                 .eq(ObjectUtils.isNotEmpty(dto.getIsH5()), Game::getIsH5, dto.getIsH5())
-                .eq(ObjectUtils.isNotEmpty(dto.getIsFlash()), Game::getIsFlash, dto.getIsFlash())
+                .eq(ObjectUtils.isNotEmpty(dto.getIsPc()), Game::getIsPc, dto.getIsPc())
                 .page(page);
     }
 

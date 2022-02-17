@@ -13,5 +13,5 @@ public class GameQueryDTO implements Serializable {
 
   private Integer isH5;
 
-  private Integer isFlash;
+  private Integer isPc;
 }

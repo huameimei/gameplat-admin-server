@@ -61,9 +61,14 @@ public class Game implements Serializable {
   private Integer sort;
 
   /**
-   * 图片地址
+   * APP图片地址
    */
-  private String imgUrl;
+  private String appImgUrl;
+
+  /**
+   * PC图片地址
+   */
+  private String pcImgUrl;
 
   /**
    * 更新时间

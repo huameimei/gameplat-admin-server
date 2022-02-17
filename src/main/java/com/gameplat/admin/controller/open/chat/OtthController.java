@@ -63,7 +63,7 @@ public class OtthController {
         chatLeaderBoardService.creatLeaderBoard(null);
     }
 
-    @ApiOperation(value = "修改平台聊天室限制配置")
+    @ApiOperation(value = "平台聊天室限制配置/聊天室成员管理/关键词管理/聊天室房间管理/角色管理/聊天室自定义消息管理")
     @PostMapping(value = "/{url}", produces = {"application/json;charset=UTF-8"})
     public String post(@PathVariable String url, @RequestBody String body, HttpServletRequest request, HttpServletResponse response) throws Exception {
         String apiUrl = getApiUrl(url);
@@ -86,7 +86,7 @@ public class OtthController {
         return otthService.otthProxyHttpPost(apiUrl, body, request, dbSuffix);
     }
 
-    @ApiOperation(value = "查看平台聊天室限制配置")
+    @ApiOperation(value = "平台聊天室限制配置/聊天室成员管理/关键词管理/聊天室房间管理/角色管理/聊天室自定义消息管理")
     @GetMapping(value = "/{url}", produces = {"application/json;charset=UTF-8"})
     public void get(@PathVariable String url, HttpServletRequest request, HttpServletResponse response) throws Exception {
         String apiUrl = getApiUrl(url);

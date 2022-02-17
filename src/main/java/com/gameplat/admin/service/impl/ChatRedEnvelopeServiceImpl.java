@@ -16,6 +16,7 @@ import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.common.enums.BooleanEnum;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.poi.ss.formula.functions.Now;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -43,6 +44,7 @@ public class ChatRedEnvelopeServiceImpl extends ServiceImpl<ChatRedEnvelopeMappe
         return lambdaQuery()
                 .eq(ObjectUtil.isNotEmpty(dto.getOpen()), ChatRedEnvelope::getOpen, dto.getOpen())
                 .like(ObjectUtil.isNotEmpty(dto.getName()), ChatRedEnvelope::getName, dto.getName())
+                .last("now()>"+dto.getStartTime())
                 .orderByDesc(ChatRedEnvelope::getLastTime)
                 .page(page)
                 .convert(chatRedEnvelopeConvert::toVo);

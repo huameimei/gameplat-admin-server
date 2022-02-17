@@ -45,7 +45,7 @@ public class SysDictData implements Serializable {
   private Integer isVisible;
 
   @ApiModelProperty(value = "是否默认（Y是 N否）")
-  private String isDefault;
+  private Character isDefault;
 
   @ApiModelProperty(value = "状态（1正常 0停用）")
   private Integer status;

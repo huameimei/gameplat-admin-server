@@ -42,9 +42,12 @@ public interface SysDictDataService extends IService<SysDictData> {
 
   IPage<MemberWithdrawDictDataVo> queryWithdrawPage(Page<SysDictData> page);
 
-  void addOrUpdateUserWithdrawLimit(UserWithdrawLimitInfo userWithdrawLimitInfo);
+  void addOrUpdateUserWithdrawLimit(
+      String dictType, String dictLabel, UserWithdrawLimitInfo limitInfo);
 
   void delete(String dictType, String dictLabel);
 
   List<SysDictData> getDictListAll(SysDictDataDTO dictData);
+
+  void updateByTypeAndLabel(SysDictData data);
 }

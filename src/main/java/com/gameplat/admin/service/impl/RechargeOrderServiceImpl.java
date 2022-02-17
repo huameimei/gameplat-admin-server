@@ -4,10 +4,12 @@ import static com.gameplat.common.enums.DictDataEnum.MAX_DISCOUNT_MONEY;
 import static com.gameplat.common.enums.DictDataEnum.MAX_RECHARGE_MONEY;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.conditions.ChainWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.constant.BuildInDiscountType;
@@ -34,7 +36,9 @@ import com.gameplat.admin.model.domain.RechargeOrderHistory;
 import com.gameplat.admin.model.domain.SysUser;
 import com.gameplat.admin.model.domain.TpMerchant;
 import com.gameplat.admin.model.domain.TpPayChannel;
+import com.gameplat.admin.model.dto.MemberActivationDTO;
 import com.gameplat.admin.model.dto.RechargeOrderQueryDTO;
+import com.gameplat.admin.model.vo.MemberActivationVO;
 import com.gameplat.admin.model.vo.RechargeOrderVO;
 import com.gameplat.admin.model.vo.SummaryVO;
 import com.gameplat.admin.service.ConfigService;
@@ -378,6 +382,12 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
   public List<ActivityStatisticItem> findAllFirstRechargeAmount(Map map) {
 
     return null;
+  }
+
+  /** 根据会员和最后修改时间获取充值次数、充值金额、充值优惠、其它优惠 */
+  @Override
+  public MemberActivationVO getRechargeInfoByNameAndUpdateTime(MemberActivationDTO memberActivationDTO) {
+    return rechargeOrderMapper.getRechargeInfoByNameAndUpdateTime(memberActivationDTO);
   }
 
   private void verifyRechargeOrderForAuditing(RechargeOrder rechargeOrder) {

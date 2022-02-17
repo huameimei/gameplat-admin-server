@@ -187,4 +187,32 @@
         GROUP BY member_id
         ORDER BY recharge_time,id
     </select>
+
+    <!--根据会员和时间获取充值次数、充值金额、充值优惠、其它优惠-->
+    <select id="getRechargeInfoByNameAndUpdateTime" resultType="com.gameplat.admin.model.vo.MemberActivationVO">
+        SELECT sum( rechargeCount ), sum( rechargeMoney ), sum( rechargeDiscounts )
+        FROM ( SELECT count( amount ) rechargeCount, sum( amount ) rechargeMoney, sum( discount_amount ) rechargeDiscounts FROM recharge_order
+                WHERE STATUS = 3
+                <if test="username != null and username != ''">
+                    and account = #{username}
+                </if>
+                <if test="beginTime != null and beginTime != ''">
+                    and update_time &gt;= #{beginTime}
+                </if>
+                <if test="endTime != null and endTime != ''">
+                    and update_time &lt;= #{endTime}
+                </if>
+                UNION ALL
+                SELECT count( amount ) rechargeCount, sum( amount ) rechargeMoney, sum( discount_amount ) rechargeDiscounts FROM recharge_order_history
+                 WHERE STATUS = 3
+                <if test="username != null and username != ''">
+                    and account = #{username}
+                </if>
+                <if test="beginTime != null and beginTime != ''">
+                    and update_time &gt;= #{beginTime}
+                </if>
+                <if test="endTime != null and endTime != ''">
+                    and update_time &lt;= #{endTime}
+                </if>) r
+    </select>
 </mapper>

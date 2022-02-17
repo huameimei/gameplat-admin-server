@@ -155,7 +155,7 @@ public class ActivityInfoServiceImpl extends ServiceImpl<ActivityInfoMapper, Act
     public void checkActivityLobbyId(Long activityLobbyId, Long id) {
         LambdaQueryChainWrapper<ActivityInfo> queryWrapper = this.lambdaQuery();
         queryWrapper.eq(ActivityInfo::getActivityLobbyId, activityLobbyId).eq(ActivityInfo::getId, id);
-        int count = queryWrapper.count();
+        Long count = queryWrapper.count();
         if (count > 0) {
             throw new ServiceException("您绑定的活动大厅已经绑定其他活动,请选择其他活动大厅绑定此活动发布");
         }

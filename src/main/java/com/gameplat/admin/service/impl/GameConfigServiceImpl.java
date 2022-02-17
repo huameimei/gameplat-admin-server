@@ -10,6 +10,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.mapper.GameConfigMapper;
 import com.gameplat.admin.model.domain.GameConfig;
 import com.gameplat.admin.service.GameConfigService;
+import com.gameplat.base.common.util.StringUtils;
 import com.gameplat.common.constant.CachedKeys;
 import java.util.Collections;
 import java.util.HashMap;
@@ -38,6 +39,21 @@ public class GameConfigServiceImpl extends ServiceImpl<GameConfigMapper, GameCon
     queryWrapper.eq(GameConfig::getPlatCode,platCode);
     GameConfig  gameConfig = gameConfigMapper.selectOne(queryWrapper);
     return JSONObject.parseObject(gameConfig.getConfig());
+  }
+
+  @Override
+  public JSONObject getGameConfig(String platCode) {
+    JSONObject jsonObject;
+    GameConfig gameConfig = this.lambdaQuery()
+            .eq(GameConfig::getPlatCode, platCode)
+            .one();
+    if (StringUtils.isNotNull(gameConfig)) {
+      jsonObject = JSONObject.parseObject(gameConfig.getConfig());
+      jsonObject.put("currency", gameConfig.getCurrency());
+    } else {
+      return null;
+    }
+    return jsonObject;
   }
 
 

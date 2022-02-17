@@ -137,7 +137,7 @@ public class MemberWithdraw {
   @ApiModelProperty(value = "会员出款备注")
   private String memberMemo;
 
-  @ApiModelProperty(value = "会员类型HY会员TEST试玩会员,VHY 推广账号")
+  @ApiModelProperty(value = "用户类型（会员:M 代理：A 推广:P 试玩 :T）")
   private String memberType;
 
   @ApiModelProperty(value = "取款类型（BANK 银行   USDT BTC ）")

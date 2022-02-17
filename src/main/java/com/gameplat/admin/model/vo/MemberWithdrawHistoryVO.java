@@ -45,6 +45,8 @@ public class MemberWithdrawHistoryVO {
 
   private String memberMemo;
 
+  private String memberType;
+
   private String withdrawType;
 
   private BigDecimal currencyRate;

@@ -2,7 +2,9 @@ package com.gameplat.admin.service.impl;
 
 import com.alibaba.csp.sentinel.annotation.SentinelResource;
 import com.alicp.jetcache.anno.CacheInvalidate;
+import com.alicp.jetcache.anno.CacheInvalidateContainer;
 import com.alicp.jetcache.anno.Cached;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -100,6 +102,7 @@ public class SysDictDataServiceImpl extends ServiceImpl<SysDictDataMapper, SysDi
         .eq(SysDictData::getStatus, EnableEnum.ENABLED.code())
         .eq(SysDictData::getDictType, dictType)
         .eq(SysDictData::getDictLabel, dictLabel)
+        .eq(SysDictData::getStatus, 1)
         .oneOpt()
         .map(SysDictData::getDictValue)
         .orElse(null);
@@ -170,11 +173,13 @@ public class SysDictDataServiceImpl extends ServiceImpl<SysDictDataMapper, SysDi
 
   @Override
   @SentinelResource(value = "addOrUpdateUserWithdrawLimit")
-  public void addOrUpdateUserWithdrawLimit(UserWithdrawLimitInfo limitInfo) {
-    String dictType = DictTypeEnum.USER_WITHDRAW_LIMIT.getValue();
-    String dictLabel =
-        DictTypeEnum.USER_WITHDRAW_LIMIT.getValue() + limitInfo.getTimesForWithdrawal();
-
+  @CacheInvalidateContainer(
+      value = {
+        @CacheInvalidate(name = CachedKeys.DICT_DATA_CACHE, key = "#dictType"),
+        @CacheInvalidate(name = CachedKeys.DICT_DATA_CACHE, key = "#dictType + ':' + #dictLabel")
+      })
+  public void addOrUpdateUserWithdrawLimit(
+      String dictType, String dictLabel, UserWithdrawLimitInfo limitInfo) {
     if (this.lambdaQuery()
         .eq(SysDictData::getDictType, dictType)
         .eq(SysDictData::getDictLabel, dictLabel)
@@ -196,7 +201,11 @@ public class SysDictDataServiceImpl extends ServiceImpl<SysDictDataMapper, SysDi
 
   @Override
   @SentinelResource(value = "deleteByDictLabel")
-  @CacheInvalidate(name = CachedKeys.DICT_DATA_CACHE, key = "#dictType + ':' + #dictLabel")
+  @CacheInvalidateContainer(
+      value = {
+        @CacheInvalidate(name = CachedKeys.DICT_DATA_CACHE, key = "#dictType"),
+        @CacheInvalidate(name = CachedKeys.DICT_DATA_CACHE, key = "#dictType + ':' + #dictLabel")
+      })
   public void delete(String dictType, String dictLabel) {
     if (!this.lambdaUpdate()
         .eq(SysDictData::getDictType, dictType)
@@ -235,4 +244,14 @@ public class SysDictDataServiceImpl extends ServiceImpl<SysDictDataMapper, SysDi
   public boolean saveOrUpdate(SysDictData entity) {
     return super.saveOrUpdate(entity);
   }
+
+  @Override
+  public void updateByTypeAndLabel(SysDictData data) {
+    LambdaUpdateWrapper<SysDictData> updateWrapper = new LambdaUpdateWrapper<>();
+    updateWrapper.eq(SysDictData::getDictLabel, data.getDictLabel())
+            .eq(SysDictData::getDictType, data.getDictType())
+            .set(SysDictData::getDictValue, data.getDictValue());
+    update(updateWrapper);
+  }
+
 }

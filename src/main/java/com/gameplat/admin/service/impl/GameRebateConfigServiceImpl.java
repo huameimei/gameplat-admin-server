@@ -74,7 +74,7 @@ public class GameRebateConfigServiceImpl
     }
   }
 
-  private int countByMoney(GameRebateConfig gameRebateConfig) {
+    private Long countByMoney(GameRebateConfig gameRebateConfig) {
     return this.lambdaQuery()
         .eq(
             ObjectUtils.isNotEmpty(gameRebateConfig.getMoney()),
@@ -87,7 +87,7 @@ public class GameRebateConfigServiceImpl
         .count();
   }
 
-  private int countByIdNotAndMoney(GameRebateConfig gameRebateConfig) {
+  private Long countByIdNotAndMoney(GameRebateConfig gameRebateConfig) {
     return this.lambdaQuery()
         .eq(
             ObjectUtils.isNotEmpty(gameRebateConfig.getMoney()),

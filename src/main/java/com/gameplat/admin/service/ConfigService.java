@@ -2,6 +2,7 @@ package com.gameplat.admin.service;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.gameplat.common.enums.DictDataEnum;
+import com.gameplat.common.enums.DictTypeEnum;
 
 public interface ConfigService {
 
@@ -28,4 +29,6 @@ public interface ConfigService {
   <T> T get(DictDataEnum dataEnum, Class<T> clazz);
 
   <T> T get(DictDataEnum dataEnum, TypeReference<T> clazz);
+
+  <T> T getDefaultConfig(DictTypeEnum type, Class<T> clazz);
 }

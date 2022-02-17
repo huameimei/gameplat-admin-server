@@ -6,12 +6,16 @@ import com.gameplat.admin.model.domain.ChatGif;
 import com.gameplat.admin.model.dto.ChatGifEditDTO;
 import com.gameplat.admin.model.vo.ChatGifVO;
 import com.gameplat.admin.service.ChatGifService;
+import com.gameplat.admin.service.ConfigService;
+import com.gameplat.common.compent.oss.FileStorageStrategyContext;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 /**
  * @author lily
@@ -27,6 +31,12 @@ public class ChatGifController {
     @Autowired
     private ChatGifService chatGifService;
 
+    @Autowired
+    private ConfigService configService;
+
+    @Autowired
+    private FileStorageStrategyContext fileStorageStrategyContext;
+
     @ApiOperation(value = "分页列表")
     @GetMapping("/page")
     @PreAuthorize("hasAuthority('chat:gif:page')")
@@ -34,10 +44,10 @@ public class ChatGifController {
         return chatGifService.page(page, name);
     }
 
-    @ApiOperation(value = "增")
+    @ApiOperation(value = "增/上传图片")
     @PostMapping("/add")
     @PreAuthorize("hasAuthority('chat:gif:add')")
-    public void add(@RequestPart MultipartFile file, String name){
+    public void add(@RequestPart MultipartFile file, String name) throws IOException {
         chatGifService.add(file, name);
     }
 
@@ -54,4 +64,6 @@ public class ChatGifController {
     public void edit(ChatGifEditDTO dto){
         chatGifService.edit(dto);
     }
+
+
 }

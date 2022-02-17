@@ -26,4 +26,10 @@ public class MessageFeedbackQueryDTO implements Serializable {
   /** 信件类别(0:普通信件,1:活动信件,2:回复信件,3:系统消息) */
   @ApiModelProperty("信件类别(0:普通信件,1:活动信件,2:回复信件,3:系统消息)")
   private Integer type;
+
+  @ApiModelProperty("开始时间")
+  private String beginTime;
+
+  @ApiModelProperty("结束时间")
+  private String endTime;
 }

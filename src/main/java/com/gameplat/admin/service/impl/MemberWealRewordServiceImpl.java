@@ -79,7 +79,7 @@ public class MemberWealRewordServiceImpl extends ServiceImpl<MemberWealRewordMap
     }
 
     @Override
-    public Integer findCountReword(MemberWealRewordDTO dto) {
+    public Long findCountReword(MemberWealRewordDTO dto) {
         return this.lambdaQuery()
                 .eq(MemberWealReword::getType, 0)
                 .eq(MemberWealReword::getUserId, dto.getUserId())

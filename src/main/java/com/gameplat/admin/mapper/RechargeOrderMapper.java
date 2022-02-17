@@ -11,6 +11,8 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
+import com.gameplat.admin.model.dto.MemberActivationDTO;
+import com.gameplat.admin.model.vo.MemberActivationVO;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
@@ -49,4 +51,7 @@ public interface RechargeOrderMapper extends BaseMapper<RechargeOrder> {
      * @return
      */
     List<ActivityStatisticItem> findFirstRechargeAmount(Map map);
+
+    /** 根据会员和最后修改时间获取充值次数、充值金额、充值优惠、其它优惠 */
+    MemberActivationVO getRechargeInfoByNameAndUpdateTime(MemberActivationDTO memberActivationDTO);
 }

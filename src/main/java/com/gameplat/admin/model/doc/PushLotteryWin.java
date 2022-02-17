@@ -1,33 +1,28 @@
 package com.gameplat.admin.model.doc;
 
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.io.Serializable;
 
 @Data
 public class PushLotteryWin implements Serializable {
+
     private static final long serialVersionUID = 1L;
 
-    /**
-     * 不推送会员账号
-     */
+    @ApiModelProperty(value = "不推送会员账号")
     private String blackAccounts;
-    /**
-     * 是否开启
-     */
+
+    @ApiModelProperty(value = "是否开启")
     private Integer isOpen;
-    /**
-     * 中奖最高前几名
-     */
+
+    @ApiModelProperty(value = "中奖最高前几名")
     private Integer topNum;
-    /**
-     * 最低中奖金额
-     */
+
+    @ApiModelProperty(value = "最低中奖金额")
     private Double winMoney;
 
-    /**
-     *  房间进入特效
-     */
+    @ApiModelProperty(value = "房间进入特效")
     private String vipEnterLevels;
 }
 

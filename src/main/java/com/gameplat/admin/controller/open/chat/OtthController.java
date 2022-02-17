@@ -14,6 +14,7 @@ import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.json.JsonUtils;
 import com.google.common.base.Joiner;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,6 +63,7 @@ public class OtthController {
         chatLeaderBoardService.creatLeaderBoard(null);
     }
 
+    @ApiOperation(value = "修改平台聊天室限制配置")
     @PostMapping(value = "/{url}", produces = {"application/json;charset=UTF-8"})
     public String post(@PathVariable String url, @RequestBody String body, HttpServletRequest request, HttpServletResponse response) throws Exception {
         String apiUrl = getApiUrl(url);
@@ -84,12 +86,14 @@ public class OtthController {
         return otthService.otthProxyHttpPost(apiUrl, body, request, dbSuffix);
     }
 
+    @ApiOperation(value = "查看平台聊天室限制配置")
     @GetMapping(value = "/{url}", produces = {"application/json;charset=UTF-8"})
     public void get(@PathVariable String url, HttpServletRequest request, HttpServletResponse response) throws Exception {
         String apiUrl = getApiUrl(url);
         otthService.otthProxyHttpGet(apiUrl, request, response);
     }
 
+    @ApiOperation(value = "获取彩票游戏类型")
     @GetMapping(value = "/getLottTypeList", produces = {"application/json;charset=UTF-8"})
     public List<LotteryCodeVo> getLottTypeList() throws Exception {
         return otthService.getLottTypeList();

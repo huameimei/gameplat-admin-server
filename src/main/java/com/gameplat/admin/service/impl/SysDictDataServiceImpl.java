@@ -231,7 +231,7 @@ public class SysDictDataServiceImpl extends ServiceImpl<SysDictDataMapper, SysDi
   @Override
   @CacheInvalidate(
       name = CachedKeys.DICT_DATA_CACHE,
-      key = "#entity.dictType + ':' + #entity.label")
+      key = "#entity.dictType + ':' + #entity.dictLabel")
   public boolean updateById(SysDictData entity) {
     return super.updateById(entity);
   }
@@ -245,6 +245,11 @@ public class SysDictDataServiceImpl extends ServiceImpl<SysDictDataMapper, SysDi
     return super.saveOrUpdate(entity);
   }
 
+  @CacheInvalidateContainer(
+          value = {
+                  @CacheInvalidate(name = CachedKeys.DICT_DATA_CACHE, key = "#data.dictType"),
+                  @CacheInvalidate(name = CachedKeys.DICT_DATA_CACHE, key = "#data.dictType + ':' + #data.dictLabel")
+          })
   @Override
   public void updateByTypeAndLabel(SysDictData data) {
     LambdaUpdateWrapper<SysDictData> updateWrapper = new LambdaUpdateWrapper<>();

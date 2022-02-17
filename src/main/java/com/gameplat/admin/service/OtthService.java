@@ -113,7 +113,7 @@ public class OtthService {
     }
 
     /** 获取额度转换配置 */
-    private JSONObject getLottConfig() {
+    public JSONObject getLottConfig() {
         JSONObject gameConfig = gameConfigService.queryGameConfigInfoByPlatCode(TransferTypesEnum.KGNL.getCode());
         return JSONObject.parseObject(gameConfig.get("config").toString());
     }
@@ -124,7 +124,7 @@ public class OtthService {
                 new BasicHeader("attribution", tenant),};
     }
 
-    public void pushChatOpen(String body) {
+    public void pushChatOpen(String body){
         JSONObject json = getLottConfig();
         String host = json.getString("host");
         String platform = json.getString("platform");

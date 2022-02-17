@@ -7,6 +7,7 @@ import com.gameplat.admin.mapper.GameMemberReportMapper;
 import com.gameplat.admin.model.domain.MemberDayReport;
 import com.gameplat.admin.model.dto.DepositReportDto;
 import com.gameplat.admin.model.dto.MemberDayReportDto;
+import com.gameplat.admin.model.dto.MemberReportDto;
 import com.gameplat.admin.model.vo.*;
 import com.gameplat.admin.service.GameMemberReportService;
 import com.gameplat.base.common.util.BeanUtils;
@@ -61,15 +62,26 @@ public class GameMemberReportServiceImpl extends ServiceImpl <GameMemberReportMa
     public PageDtoVO<MemberRWReportVo> findSumMemberRWReport(Page<MemberRWReportVo> page, DepositReportDto depositReportDto) {
         Page<MemberRWReportVo> memberRWReportPage = gameMemberReportMapper.findMemberRWReport(page, depositReportDto);
         Map<String, Object> sumMemberRWReport = gameMemberReportMapper.findSumMemberRWReport(depositReportDto);
-        if (sumMemberRWReport == null) {
+        if (sumMemberRWReport != null) {
             Object totailRechargeAmount = sumMemberRWReport.get("totailRechargeAmount");
             Object totailWithdrawAmount = sumMemberRWReport.get("totailWithdrawAmount");
-            BigDecimal totalRWAmount =  (totailRechargeAmount == null ? Convert.toBigDecimal(0) : Convert.toBigDecimal(totailWithdrawAmount)).subtract(totailWithdrawAmount == null ? Convert.toBigDecimal(0) : Convert.toBigDecimal(totailWithdrawAmount));
+            BigDecimal totalRWAmount =  (totailRechargeAmount == null ? Convert.toBigDecimal(0) : Convert.toBigDecimal(totailRechargeAmount)).subtract(totailWithdrawAmount == null ? Convert.toBigDecimal(0) : Convert.toBigDecimal(totailWithdrawAmount));
             sumMemberRWReport.put("totalRWAmount",totalRWAmount);
         }
         PageDtoVO<MemberRWReportVo> pageDtoVO = new PageDtoVO<>();
         pageDtoVO.setPage(memberRWReportPage);
         pageDtoVO.setOtherData(sumMemberRWReport);
+        return pageDtoVO;
+    }
+
+
+    @Override
+    public PageDtoVO<MemberGameDayReportVo> findSumMemberGameDayReport(Page<MemberGameDayReportVo> page, MemberReportDto memberReportDto) {
+        Page<MemberGameDayReportVo> memberGameDayReport = gameMemberReportMapper.findMemberGameDayReport(page, memberReportDto);
+        Map<String, Object> sumMemberGameDayReport = gameMemberReportMapper.findSumMemberGameDayReport(memberReportDto);
+        PageDtoVO<MemberGameDayReportVo> pageDtoVO = new PageDtoVO<>();
+        pageDtoVO.setPage(memberGameDayReport);
+        pageDtoVO.setOtherData(sumMemberGameDayReport);
         return pageDtoVO;
     }
 }

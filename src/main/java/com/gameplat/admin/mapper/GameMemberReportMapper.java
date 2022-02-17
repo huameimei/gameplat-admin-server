@@ -5,7 +5,9 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.gameplat.admin.model.domain.MemberDayReport;
 import com.gameplat.admin.model.dto.DepositReportDto;
 import com.gameplat.admin.model.dto.MemberDayReportDto;
+import com.gameplat.admin.model.dto.MemberReportDto;
 import com.gameplat.admin.model.vo.MemberDayReportVo;
+import com.gameplat.admin.model.vo.MemberGameDayReportVo;
 import com.gameplat.admin.model.vo.MemberRWReportVo;
 import org.apache.ibatis.annotations.Param;
 
@@ -28,4 +30,9 @@ public interface GameMemberReportMapper extends BaseMapper<MemberDayReport> {
     Page<MemberRWReportVo> findMemberRWReport(Page<MemberRWReportVo> page, @Param("dto") DepositReportDto depositReportDto);
 
     Map<String,Object> findSumMemberRWReport(DepositReportDto depositReportDto);
+
+
+    Page<MemberGameDayReportVo> findMemberGameDayReport(Page<MemberGameDayReportVo> page, @Param("dto") MemberReportDto memberReportDto);
+
+    Map<String,Object> findSumMemberGameDayReport(MemberReportDto memberReportDto);
 }

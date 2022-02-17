@@ -4,7 +4,7 @@ import com.alibaba.excel.util.DateUtils;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.gameplat.admin.enums.ChatConfigEnum;
+import com.gameplat.common.enums.ChatConfigEnum;
 import com.gameplat.admin.enums.ClientTypeEnum;
 import com.gameplat.admin.feign.RemoteLogService;
 import com.gameplat.admin.model.doc.ChatPushCPBet;

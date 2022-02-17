@@ -1,7 +1,7 @@
 package com.gameplat.admin.service;
 
 import com.alibaba.fastjson.JSON;
-import com.gameplat.admin.enums.ChatConfigEnum;
+import com.gameplat.common.enums.ChatConfigEnum;
 import com.gameplat.admin.model.domain.SysDictData;
 import com.gameplat.admin.model.vo.ChatSideMenuVO;
 import com.gameplat.admin.model.vo.LotteryCodeVo;

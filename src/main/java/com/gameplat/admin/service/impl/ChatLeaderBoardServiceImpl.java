@@ -6,7 +6,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 
-import com.gameplat.admin.enums.ChatConfigEnum;
+import com.gameplat.common.enums.ChatConfigEnum;
 import com.gameplat.admin.mapper.ChatLeaderBoardMapper;
 import com.gameplat.admin.model.doc.ChatPushCPBet;
 import com.gameplat.admin.model.domain.ChatLeaderBoard;

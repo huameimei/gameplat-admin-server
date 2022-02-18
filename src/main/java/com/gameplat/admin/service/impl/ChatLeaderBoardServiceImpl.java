@@ -77,7 +77,6 @@ public class ChatLeaderBoardServiceImpl extends ServiceImpl<ChatLeaderBoardMappe
     public static final String CHAT_LEADER_BOARD = "CHAT_LEADER_BOARD";
 
     /** 创建聊天室排行榜 */
-    @Scheduled(cron = "0 0/1 * * * ?")
     @Override
     public void creatLeaderBoard(String jsonStrParam) throws ServiceException {
         log.info("开始创建排行榜ing"+ new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));

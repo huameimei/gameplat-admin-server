@@ -4,6 +4,7 @@ import com.alibaba.excel.util.DateUtils;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.gameplat.admin.config.TenantConfig;
 import com.gameplat.common.enums.ChatConfigEnum;
 import com.gameplat.admin.enums.ClientTypeEnum;
 import com.gameplat.admin.feign.RemoteLogService;
@@ -68,6 +69,8 @@ public class OtthService {
         "{\"autoShare\":0,\"gameIds\":\"23,25,29,27,,33,131,70,173\",\"isOpen\":1,\"notPushAccount\":\"baozi\",\"notPushPlayCode\":\"\",\"onlyPushAccount\":0,\"pushAccount\":\"jeff13,sss111\",\"pushPlayCode\":\"\",\"rechCount\":0,\"rechMoney\":0.0,\"showHeel\":1,\"showHeelMinMoney\":20.0,\"todayRechMoney\":0.0,\"totalMoney\":0.0,\"validBetMoney\":0.0}";
 
     @Autowired
+    private TenantConfig tenantConfig;
+    @Autowired
     private ChatSideMenuService menuService;
     @Autowired
     private TaskExecutor taskExecutor;
@@ -115,7 +118,7 @@ public class OtthService {
     /** 获取额度转换配置 */
     public JSONObject getLottConfig() {
         JSONObject gameConfig = gameConfigService.queryGameConfigInfoByPlatCode(TransferTypesEnum.KGNL.getCode());
-        return JSONObject.parseObject(gameConfig.get("config").toString());
+        return gameConfig;
     }
 
     /** 获取头信息  */
@@ -170,7 +173,7 @@ public class OtthService {
         if (org.apache.commons.lang3.StringUtils.isBlank(chatDomain)) {
             throw new ServiceException("未配服务");
         }
-        String dbSuffix = DyDataSourceContextHolder.getTenant();
+        String dbSuffix = tenantConfig.getTenantCode();
 
         String apiUrl = chatDomain + "/api/room/query";
         HttpClient httpClient = HttpClient.build().get(apiUrl);
@@ -251,7 +254,7 @@ public class OtthService {
     }
 
     public void otthProxyHttpGet(String apiUrl, HttpServletRequest request, HttpServletResponse response) throws IOException, ServiceException {
-        String dbSuffix = DyDataSourceContextHolder.getTenant();
+        String dbSuffix = tenantConfig.getTenantCode();
         Enumeration<String> names = request.getParameterNames();
         Map<String, String> params = new HashMap<>();
         while (names.hasMoreElements()) {
@@ -289,7 +292,7 @@ public class OtthService {
     public void pushLotteryWin(List<PushLottWinVo> lottWinVos, HttpServletRequest request) {
         // 中奖推送接口地址
         String apiUrl = getApiUrl("api/push/cpwin");
-        String dbSuffix = DyDataSourceContextHolder.getTenant();
+        String dbSuffix = tenantConfig.getTenantCode();
         if (dbSuffix == null) {
             throw new ServiceException("推送失败,获取不到租户标识");
         }
@@ -373,7 +376,7 @@ public class OtthService {
         }
         // 分享推送接口地址
         String apiUrl = getApiUrl("/api/push/cpbet");
-        String dbSuffix = DyDataSourceContextHolder.getTenant();
+        String dbSuffix = tenantConfig.getTenantCode();
         if (dbSuffix == null) {
             throw new ServiceException("推送失败,获取不到租户标识");
         }
@@ -517,7 +520,7 @@ public class OtthService {
             throw new ServiceException("未配服务");
         }
         String apiUrl = chatDomain + "/api/u/simpleUserInfoList";
-        String proxy = DyDataSourceContextHolder.getTenant();
+        String proxy = tenantConfig.getTenantCode();
         Map<String, String> params = new HashMap<>();
         params.put("userIds", user.getId().toString());
         params.put("platCode", proxy);

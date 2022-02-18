@@ -25,86 +25,92 @@ public class SysTenantSetting implements Serializable {
         this.tenant = tenant;
     }
 
-    /** 主键 */
+    @ApiModelProperty(value = "主键")
     private Integer id;
 
-    /** 租户标识 */
+    @ApiModelProperty(value = "租户标识")
     private String tenant;
 
-    /** 设置类型 */
+    @ApiModelProperty(value = "设置类型")
     private String settingType;
 
-    /** 设置code */
+    @ApiModelProperty(value = "设置code")
     private String settingCode;
 
-    /** 设置名称 */
+    @ApiModelProperty(value = "设置名称")
     private String settingLabel;
 
-    /** 设置值/url地址 */
+    @ApiModelProperty(value = "设置值/url地址")
     private String settingValue;
 
-    /** 设置描述 */
+    @ApiModelProperty(value = "设置描述")
     private String settingDesc;
 
-    /** 是否启用(0/1) */
+    @ApiModelProperty(value = "是否启用(0/1)")
     private Integer display;
 
-    /**排序*/
+    @ApiModelProperty(value = "排序")
     private Integer sort;
 
-    /** 文件地址 */
+    @ApiModelProperty(value = "文件地址")
     private String filePath;
 
-    /** 文件地址 */
+    @ApiModelProperty(value = "文件地址")
     private String picturePath;
 
-    /** 是否默认首页 **/
+    @ApiModelProperty(value = "是否默认首页")
     private Integer isIndex;
 
-    /** 国际化语言 */
-    private String i18n;
-
-    private String zhCn;
-    private String enUs;
-    private String thTh;
-    private String viVn;
-    private String inId;
-
-    /** 扩展字段1 */
+    @ApiModelProperty(value = "扩展字段1")
+    @TableField(value = "extend_1")
     private String extend1;
 
-    /** 扩展字段2 */
+    @ApiModelProperty(value = "扩展字段2")
+    @TableField(value = "extend_2")
     private String extend2;
 
-    /** 扩展字段3 */
+    @ApiModelProperty(value = "扩展字段3")
+    @TableField(value = "extend_3")
     private String extend3;
 
-    /** 扩展字段4 */
+    @ApiModelProperty(value = "扩展字段4")
+    @TableField(value = "extend_4")
     private String extend4;
-    /** 主题 */
-    private String theme;
 
-    /** 扩展字段5 */
+    @ApiModelProperty(value = "扩展字段5")
+    @TableField(value = "extend_5")
     private String extend5;
 
-    @ApiModelProperty(value = "维护状态 0正常 1维护中")
-    private Integer status;
-
-    /** 创建者 */
     @TableField(fill = FieldFill.INSERT)
     private String createBy;
 
-    /** 创建时间 */
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = TimeZones.GMT_ID + "+8")
     @TableField(fill = FieldFill.INSERT)
     private Date createTime;
 
-    /** 更新者 */
     @TableField(fill = FieldFill.INSERT_UPDATE)
     private String updateBy;
 
-    /** 更新时间 */
     @TableField(fill = FieldFill.INSERT_UPDATE)
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = TimeZones.GMT_ID + "+8")
     private Date updateTime;
+
+    @ApiModelProperty(value = "主题")
+    @TableField(exist = false)
+    private String theme;
+    @ApiModelProperty(value = "维护状态 0正常 1维护中")
+    @TableField(exist = false)
+    private Integer status;
+    @TableField(exist = false)
+    private String i18n;
+    @TableField(exist = false)
+    private String zhCn;
+    @TableField(exist = false)
+    private String enUs;
+    @TableField(exist = false)
+    private String thTh;
+    @TableField(exist = false)
+    private String viVn;
+    @TableField(exist = false)
+    private String inId;
 }

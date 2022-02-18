@@ -2,6 +2,7 @@ package com.gameplat.admin.controller.open.chat;
 
 import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.gameplat.admin.config.TenantConfig;
 import com.gameplat.admin.model.bean.RoomMember;
 import com.gameplat.admin.model.dto.PushCPBetMessageReq;
 import com.gameplat.admin.model.vo.ChatUserVO;
@@ -52,6 +53,8 @@ public class OtthController {
     private SysTenantSettingService sysTenantSettingService;
     @Autowired
     private ChatPushPlanService chatPushPlanService;
+    @Autowired
+    private TenantConfig tenantConfig;
 
     private static final String ROOM_MEMBER_BATCHADD_URL = "api_room_batchAddMember";
     public static final String API_PLAT_UPDATE = "api_plat_update";
@@ -68,7 +71,7 @@ public class OtthController {
     public String post(@PathVariable String url, @RequestBody String body, HttpServletRequest request, HttpServletResponse response) throws Exception {
         String apiUrl = getApiUrl(url);
         //获取当前租户标识
-        String dbSuffix = DyDataSourceContextHolder.getTenant();
+        String dbSuffix = tenantConfig.getTenantCode();
         //聊天室批量添加请求特殊处理处理
         if (StringUtils.contains(url, ROOM_MEMBER_BATCHADD_URL)) {
             body = dealAddRoomMenberBody(body, dbSuffix);

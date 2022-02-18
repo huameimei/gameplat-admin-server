@@ -14,7 +14,9 @@ import com.gameplat.common.enums.DictTypeEnum;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -41,7 +43,6 @@ public class RechVirtualController {
     if (StringUtils.isBlank(dictData.getDictValue())) {
       throw new ServiceException("值不能为空");
     }
-    dictData.setDictLabel(JSONObject.parseObject(dictData.getDictValue()).getString("configKey"));
     dictData.setDictType(DictTypeEnum.RECH_VIRTUAL.getValue());
     dictDataService.updateDictData(dictData);
   }
@@ -52,8 +53,21 @@ public class RechVirtualController {
     if (StringUtils.isBlank(dictData.getDictValue())) {
       throw new ServiceException("值不能为空");
     }
-    dictData.setDictLabel(JSONObject.parseObject(dictData.getDictValue()).getString("configKey"));
     dictData.setDictType(DictTypeEnum.RECH_VIRTUAL.getValue());
     dictDataService.insertDictData(dictData);
   }
+
+  @DeleteMapping("/delete")
+  @PreAuthorize("hasAuthority('thirdParty:rechVirtual:delete')")
+  public void remove(@RequestBody Long id) {
+    dictDataService.removeById(id);
+  }
+
+  @PostMapping("/editStatus")
+  @PreAuthorize("hasAuthority('thirdParty:rechVirtual:editStatus')")
+  public void updateStatus(Long id, Integer status) {
+    dictDataService.updateStatus(id, status);
+  }
+
+
 }

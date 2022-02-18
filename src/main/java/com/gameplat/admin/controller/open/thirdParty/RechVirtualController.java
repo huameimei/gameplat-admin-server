@@ -1,6 +1,5 @@
 package com.gameplat.admin.controller.open.thirdParty;
 
-import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.gameplat.admin.model.domain.SysDictData;
@@ -11,11 +10,11 @@ import com.gameplat.admin.service.SysDictDataService;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.StringUtils;
 import com.gameplat.common.enums.DictTypeEnum;
-import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -57,9 +56,9 @@ public class RechVirtualController {
     dictDataService.insertDictData(dictData);
   }
 
-  @DeleteMapping("/delete")
+  @DeleteMapping("/delete/{id}")
   @PreAuthorize("hasAuthority('thirdParty:rechVirtual:delete')")
-  public void remove(@RequestBody Long id) {
+  public void remove(@PathVariable Long id) {
     dictDataService.removeById(id);
   }
 

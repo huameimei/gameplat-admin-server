@@ -10,4 +10,6 @@ public interface ChatRedEnvelopeRecordService extends IService<ChatRedEnvelopeRe
 
     /** 红包领取记录 */
     IPage<ChatRedEnvelopeRecord> page(PageDTO<ChatRedEnvelopeRecord> page, ChatRedEnvelopeRecordQueryDTO dto);
+
+    void add(ChatRedEnvelopeRecord redEnvelopeRecord);
 }

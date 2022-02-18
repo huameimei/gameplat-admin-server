@@ -35,4 +35,10 @@ public class ChatRedEnvelopeRecordServiceImpl extends ServiceImpl<ChatRedEnvelop
                 .orderByDesc(ChatRedEnvelopeRecord::getCreateTime)
                 .page(page);
     }
+
+    @Override
+    public void add(ChatRedEnvelopeRecord redEnvelopeRecord) {
+        redEnvelopeRecord.setCreateTime(System.currentTimeMillis());
+        save(redEnvelopeRecord);
+    }
 }

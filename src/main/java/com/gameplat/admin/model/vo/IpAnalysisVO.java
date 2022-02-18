@@ -33,6 +33,9 @@ public class IpAnalysisVO {
 	@ApiModelProperty(value = "在线状态 0不在线 1在线")
 	private Integer offline;
 
+	@ApiModelProperty(value = "在线状态 0不在线 1在线")
+	private String uuid;
+
 //	@ApiModelProperty(value = "账户余额")
 //	private BigDecimal money;
 }

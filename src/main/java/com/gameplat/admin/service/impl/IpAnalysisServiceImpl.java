@@ -14,10 +14,12 @@ import com.gameplat.admin.model.dto.IpAnalysisDTO;
 import com.gameplat.admin.model.vo.IpAnalysisEsVO;
 import com.gameplat.admin.model.vo.IpAnalysisVO;
 import com.gameplat.admin.service.IpAnalysisService;
+import com.gameplat.admin.service.OnlineUserService;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.StringUtils;
 import com.gameplat.elasticsearch.page.PageResponse;
 import com.gameplat.elasticsearch.service.IBaseElasticsearchService;
+import com.gameplat.security.context.UserCredential;
 import org.apache.lucene.search.vectorhighlight.ScoreOrderFragmentsBuilder;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
@@ -57,6 +59,9 @@ import java.util.Objects;
 @Service
 @Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)
 public class IpAnalysisServiceImpl implements IpAnalysisService {
+
+    @Autowired
+    private OnlineUserService onlineUserService;
 
     @Autowired
     private RechargeOrderHistoryMapper rechargeOrderHistoryMapper;
@@ -103,10 +108,13 @@ public class IpAnalysisServiceImpl implements IpAnalysisService {
 //                AggregationBuilders.terms("username")
 //                        .subAggregation(AggregationBuilders.terms("ipAddress").field("ipAddress.keyword"))
 //                        .field("username.keyword").size(200);
+
         TermsAggregationBuilder username = AggregationBuilders.terms("username").field("username.keyword");
         TermsAggregationBuilder ipAddress = AggregationBuilders.terms("ipAddress").field("ipAddress.keyword");
-        TermsAggregationBuilder termsAggregationBuilder = username.subAggregation(ipAddress);
-        searchSourceBuilder.aggregation(termsAggregationBuilder).sort(SortBuilders.fieldSort("createTime.keyword").order(SortOrder.DESC));
+
+        // 去重
+        CardinalityAggregationBuilder distinct_username = AggregationBuilders.cardinality("distinct_username").field("username.keyword");
+        searchSourceBuilder.aggregation(username.subAggregation(ipAddress).subAggregation(distinct_username) ).sort(SortBuilders.fieldSort("createTime.keyword").order(SortOrder.DESC));
         PageResponse<JSON> result = baseElasticsearchService.search(INDEX + tenant, searchSourceBuilder, JSON.class, (int) page.getCurrent(), (int) page.getSize());
         List<JSON> log = result.getList();
             for (int i = 0; i < log.size(); i++) {
@@ -116,6 +124,10 @@ public class IpAnalysisServiceImpl implements IpAnalysisService {
                     setIpAddress(esVO.getIpAddress());
                 }};
                 list.add(vo);
+                SearchSourceBuilder searchSourceBuilder1 =
+                        new SearchSourceBuilder().query(QueryBuilders.boolQuery().must(QueryBuilders.matchQuery("ipAddress", esVO.getIpAddress())))
+                        .aggregation(AggregationBuilders.count("ipAddress_count").field("ipAddress.keyword"));
+                Map<String, Long> ipAddress1 = baseElasticsearchService.aggregationSearchDoc(INDEX + tenant, searchSourceBuilder1, "ipAddress_count");
                 pagelist.setRecords(list);
 
         }
@@ -131,9 +143,6 @@ public class IpAnalysisServiceImpl implements IpAnalysisService {
                 pagelist.setCurrent(page.getCurrent());
             }
             pagelist.setPages(page.getTotal() % page.getSize() == 0 ? page.getTotal() / page.getSize() : page.getTotal() / page.getSize() + 1);
-
-        searchEs(dto);
-        aggregationSearchDoc(dto);
         } else if (IpAnalysisEnum.RECHARGE.getCode().equals(dto.getType())) {
             // 充值
             pagelist = rechargeOrderHistoryMapper.page(page, dto);
@@ -143,10 +152,13 @@ public class IpAnalysisServiceImpl implements IpAnalysisService {
             list = pagelist.getRecords();
         }
         // 判断会员是否在线
+
         if (CollectionUtils.isNotEmpty(list)) {
             for (int i = 0; i < list.size(); i++) {
                 IpAnalysisVO ipAnalysis = list.get(i);
                 if (redisTemplate.hasKey(TOKEN_PREFIX + ipAnalysis.getAccount())) {
+                    UserCredential userCredential = (UserCredential)redisTemplate.opsForValue().get(TOKEN_PREFIX + ipAnalysis.getAccount());
+                    ipAnalysis.setUuid(userCredential.getUuid());
                     ipAnalysis.setOffline(1);
                     pagelist.getRecords().set(i, ipAnalysis);
                 } else {
@@ -169,7 +181,6 @@ public class IpAnalysisServiceImpl implements IpAnalysisService {
         if (ObjectUtils.isNotNull(dto.getBeginTime()) && ObjectUtils.isNotNull(dto.getEndTime())) {
             builder.must(QueryBuilders.rangeQuery("createTime").from(dto.getBeginTime()).to(dto.getEndTime()));
         }
-//        builder.must(QueryBuilders.matchQuery("subject", "web"));
         return builder;
     }
 

@@ -36,7 +36,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @Api(tags = "聊天室侧滑菜单管理")
 @RestController
-@RequestMapping("/api/admin/chat/menu")
+@RequestMapping("/api/admin/chat")
 @Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)
 public class OtthController {
 

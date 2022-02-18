@@ -30,5 +30,8 @@ public class IpAnalysisDTO {
 
     @ApiModelProperty(value = "类型")
 	private Integer type;
+
+    @ApiModelProperty("在线状态")
+	private Integer online;
 }
 

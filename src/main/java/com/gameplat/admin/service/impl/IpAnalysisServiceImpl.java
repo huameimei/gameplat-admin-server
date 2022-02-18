@@ -50,6 +50,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * @author lily
@@ -93,11 +94,10 @@ public class IpAnalysisServiceImpl implements IpAnalysisService {
     public IPage<IpAnalysisVO> page(PageDTO<IpAnalysisVO> page, IpAnalysisDTO dto) {
         IPage<IpAnalysisVO> pagelist = new PageDTO<>();
         List<IpAnalysisVO> list = new ArrayList<>();
-
         if (Objects.equals(dto.getType(), null)) {
             throw new ServiceException("分析类型不能为空");
         }
-    if (IpAnalysisEnum.REGISTER.getCode().equals(dto.getType())) {
+        if (IpAnalysisEnum.REGISTER.getCode().equals(dto.getType())) {
             // 注册
             pagelist = memberMapper.page(page, dto);
             list = pagelist.getRecords();
@@ -167,6 +167,17 @@ public class IpAnalysisServiceImpl implements IpAnalysisService {
                 }
             }
         }
+        if (ObjectUtils.isNotEmpty(dto.getOnline())){
+            list = pagelist.getRecords().stream().filter(x -> x.getOffline().equals(dto.getOnline())).collect(Collectors.toList());
+        }
+        Integer total = list.size();
+        Long size = page.getSize();
+        Long pages = total % size == 0 ? total / size : total / size + 1 ;
+        pagelist.setCurrent(page.getCurrent());
+        pagelist.setSize(size);
+        pagelist.setTotal(total);
+        pagelist.setPages(pages);
+        pagelist.setRecords(list);
         return pagelist;
     }
 

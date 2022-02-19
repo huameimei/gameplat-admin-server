@@ -9,6 +9,6 @@ import org.springframework.context.annotation.Configuration;
 @RefreshScope
 @Data
 public class TenantConfig {
-    @Value(value = "${tenant}")
+//    @Value(value = "${tenant}")
     private String tenantCode;
 }

@@ -1,9 +1,9 @@
 package com.gameplat.admin.service.impl;
 
 
+import com.alibaba.csp.sentinel.annotation.SentinelResource;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.convert.SpreadUnionConvert;
@@ -34,6 +34,9 @@ public class SpreadUnionServiceImpl extends ServiceImpl<SpreadUnionMapper, Sprea
         implements SpreadUnionService {
 
     @Autowired
+    private MemberMapper memberMapper;
+
+    @Autowired
     private SpreadUnionConvert spreadUnionConvert;
 
     @Autowired
@@ -44,6 +47,7 @@ public class SpreadUnionServiceImpl extends ServiceImpl<SpreadUnionMapper, Sprea
      * 创建联运设置
      */
     @Override
+    @SentinelResource(value = "creatUnion")
     public void creatUnion(SpreadUnionDTO spreadUnionDTO) {
         List<SpreadLinkInfo> spreadList = spreadLinkInfoService.getSpreadList(spreadUnionDTO.getAgentAccount());
         if (spreadList.size() == 0){
@@ -61,6 +65,7 @@ public class SpreadUnionServiceImpl extends ServiceImpl<SpreadUnionMapper, Sprea
      *  联盟名称，代理账号，渠道类型
      */
     @Override
+    @SentinelResource(value = "getUnion")
     public IPage<SpreadUnionVO> getUnion(PageDTO<SpreadUnion> page ,SpreadUnionDTO spreadUnionDTO) {
         IPage<SpreadUnionVO> convert = this.lambdaQuery()
                 .eq(spreadUnionDTO.getUnionName() != null, SpreadUnion::getUnionName, spreadUnionDTO.getUnionName())
@@ -74,6 +79,7 @@ public class SpreadUnionServiceImpl extends ServiceImpl<SpreadUnionMapper, Sprea
      * 修改联盟设置
      */
     @Override
+    @SentinelResource(value = "editUnion")
     public void editUnion(SpreadUnionDTO spreadUnionDTO) {
         List<SpreadLinkInfo> spreadList = spreadLinkInfoService.getSpreadList(spreadUnionDTO.getAgentAccount());
         if (spreadList.size() == 0){
@@ -102,8 +108,6 @@ public class SpreadUnionServiceImpl extends ServiceImpl<SpreadUnionMapper, Sprea
         }
     }
 
-    @Autowired
-    private MemberMapper memberMapper;
 
     /**
      * 获取联盟报表

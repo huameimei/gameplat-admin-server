@@ -1,4 +1,4 @@
-package com.gameplat.admin.controller.open;
+package com.gameplat.admin.controller.open.operator;
 
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -19,7 +19,7 @@ import springfox.documentation.annotations.ApiIgnore;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/admin/spread/management")
+@RequestMapping("/api/admin/operator/management")
 public class SpreadUnionController {
 
     @Autowired

@@ -1,26 +1,17 @@
 package com.gameplat.admin.service.impl;
 
 
+import com.alibaba.csp.sentinel.annotation.SentinelResource;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
-import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.convert.SpreadUnionConvert;
-import com.gameplat.admin.mapper.SpreadUnionMapper;
 import com.gameplat.admin.mapper.SpreadUnionPackageMapper;
-import com.gameplat.admin.model.domain.PayAccount;
-import com.gameplat.admin.model.domain.SpreadLinkInfo;
-import com.gameplat.admin.model.domain.SpreadUnion;
 import com.gameplat.admin.model.domain.SpreadUnionPackage;
-import com.gameplat.admin.model.dto.SpreadUnionDTO;
 import com.gameplat.admin.model.dto.SpreadUnionPackageDTO;
 import com.gameplat.admin.model.vo.SpreadUnionPackageVO;
-import com.gameplat.admin.model.vo.SpreadUnionVO;
-import com.gameplat.admin.service.SpreadLinkInfoService;
 import com.gameplat.admin.service.SpreadUnionPackageService;
-import com.gameplat.admin.service.SpreadUnionService;
 import com.gameplat.base.common.exception.ServiceException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,9 +33,6 @@ public class SpreadUnionPackageServiceImpl extends ServiceImpl<SpreadUnionPackag
     private SpreadUnionConvert spreadUnionConvert;
 
     @Autowired
-    private SpreadLinkInfoService spreadLinkInfoService;
-
-    @Autowired
     private SpreadUnionPackageMapper spreadUnionPackageMapper;
 
 
@@ -55,6 +43,7 @@ public class SpreadUnionPackageServiceImpl extends ServiceImpl<SpreadUnionPackag
      *  代理账号，联盟名称，联运类型
      */
     @Override
+    @SentinelResource(value = "getUnionPackage")
     public List<SpreadUnionPackageVO> getUnionPackage(PageDTO<SpreadUnionPackage> page ,SpreadUnionPackageDTO spreadUnionPackageDTO) {
         List<SpreadUnionPackageVO> unionPackage = spreadUnionPackageMapper.getUnionPackage(spreadUnionPackageDTO);
         return unionPackage;
@@ -64,6 +53,7 @@ public class SpreadUnionPackageServiceImpl extends ServiceImpl<SpreadUnionPackag
      * 联盟包设置增加
      */
     @Override
+    @SentinelResource(value = "insertUnionPackage")
     public void insertUnionPackage(SpreadUnionPackageDTO spreadUnionPackageDTO) {
         if (!this.save(spreadUnionConvert.toSpreadUnionPackageDTO(spreadUnionPackageDTO))){
             log.error("增加联盟包设置失败,传入的参数 {}",spreadUnionPackageDTO);
@@ -75,6 +65,7 @@ public class SpreadUnionPackageServiceImpl extends ServiceImpl<SpreadUnionPackag
      * 联盟包设置修改
      */
     @Override
+    @SentinelResource(value = "editUnionPackage")
     public void editUnionPackage(SpreadUnionPackageDTO spreadUnionPackageDTO) {
         if (!this.lambdaUpdate()
                 .set(spreadUnionPackageDTO.getUnionId() != null, SpreadUnionPackage::getUnionId, spreadUnionPackageDTO.getUnionId())
@@ -97,6 +88,7 @@ public class SpreadUnionPackageServiceImpl extends ServiceImpl<SpreadUnionPackag
      * @param id 编号Id
      */
     @Override
+    @SentinelResource(value = "removeUnionPackage")
     public void removeUnionPackage(List<Long> id) {
         if (!this.removeByIds(id)){
             log.error("联盟包删除失败,传入的id集合是  {} ",id);
@@ -111,6 +103,7 @@ public class SpreadUnionPackageServiceImpl extends ServiceImpl<SpreadUnionPackag
      */
     @Override
     @Transactional
+    @SentinelResource(value = "removeByUnionId")
     public void removeByUnionId(List<Long> unionId) {
         LambdaQueryWrapper<SpreadUnionPackage> query = Wrappers.lambdaQuery();
         query.in(SpreadUnionPackage::getUnionId,unionId);

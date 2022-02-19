@@ -615,4 +615,26 @@
             ) b ON a.type = b.type
     </select>
 
+    <!--获取达到有效投注金额的会员账号-->
+    <select id="getSatisfyBetAccount" resultType="java.lang.String">
+        SELECT
+        t.userName
+        FROM
+        (
+        SELECT
+        user_name userName,
+        sum( valid_amount ) validAmount
+        FROM member_day_report
+        <where>
+            <if test="startTime != null and startTime != ''">
+                AND count_date &gt;= #{startTime}
+            </if>
+            <if test="endTime != null and endTime != ''">
+                AND count_date &lt;= #{endTime}
+            </if>
+        </where>
+        GROUP BY user_id, user_name ) t
+        WHERE validAmount >= #{minBetAmount}
+    </select>
+
 </mapper>

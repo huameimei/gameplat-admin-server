@@ -63,7 +63,7 @@ public class MemberWealServiceImpl extends ServiceImpl<MemberWealMapper, MemberW
     @Autowired private MemberWealMapper mapper;
     @Autowired private MemberGrowthRecordMapper memberGrowthRecordMapper;
     @Autowired private RechargeOrderMapper rechargeOrderMapper;
-    @Autowired private MemberDayReportMapper dayReportMapper;
+    @Autowired private GameMemberReportMapper dayReportMapper;
     @Autowired private MemberMapper memberMapper;
     @Autowired private MemberBlackListService blackListService;
     @Autowired private MemberWealDetailService wealDetailService;

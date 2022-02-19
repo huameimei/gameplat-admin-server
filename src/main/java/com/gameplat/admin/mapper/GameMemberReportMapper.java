@@ -11,6 +11,7 @@ import com.gameplat.admin.model.vo.MemberGameDayReportVo;
 import com.gameplat.admin.model.vo.MemberRWReportVo;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.List;
 import java.util.Map;
 
 
@@ -35,4 +36,16 @@ public interface GameMemberReportMapper extends BaseMapper<MemberDayReport> {
     Page<MemberGameDayReportVo> findMemberGameDayReport(Page<MemberGameDayReportVo> page, @Param("dto") MemberReportDto memberReportDto);
 
     Map<String,Object> findSumMemberGameDayReport(MemberReportDto memberReportDto);
+
+    /**
+     * 获取达到有效投注金额的会员账号
+     *
+     * @param minBetAmount
+     * @param startTime
+     * @param endTime
+     * @return
+     */
+    List<String> getSatisfyBetAccount(@Param("minBetAmount") String minBetAmount,
+                                      @Param("startTime") String startTime,
+                                      @Param("endTime") String endTime);
 }

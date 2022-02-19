@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gameplat.admin.mapper.MemberGrowthConfigMapper">
+
+	<resultMap type="com.gameplat.admin.model.domain.MemberGrowthConfig" id="memberGrowthConfigResult">
+        <result property="id" column="id"/>
+        <result property="isEnableVip" column="is_enable_vip"/>
+        <result property="isEnableRecharge" column="is_enable_recharge"/>
+        <result property="isEnableSign" column="is_enable_sign"/>
+        <result property="isEnableDama" column="is_enable_dama"/>
+        <result property="isPayUpReword" column="is_pay_up_reword"/>
+        <result property="isRepeatPayUpReword" column="is_repeat_pay_up_reword"/>
+        <result property="isAutoPayReword" column="is_auto_pay_reword"/>
+        <result property="signEveryDayGrowth" column="sign_every_day_growth"/>
+        <result property="signMaxGrowth" column="sign_max_growth"/>
+        <result property="signMinRechargeAmount" column="sign_min_recharge_amount"/>
+        <result property="signDayMinRechargeAmount" column="sign_day_min_recharge_amount"/>
+        <result property="signIpLimitCount" column="sign_ip_limit_count"/>
+        <result property="rechageRate" column="rechage_rate"/>
+        <result property="damaRate" column="dama_rate"/>
+        <result property="bindBankGrowth" column="bind_bank_growth"/>
+        <result property="perfectUserInfoGrowth" column="perfect_user_info_growth"/>
+        <result property="perfectUserInfoField" column="perfect_user_info_field"/>
+        <result property="demoteCycle" column="demote_cycle"/>
+        <result property="receiveLimitCycle" column="receive_limit_cycle"/>
+        <result property="limitLevel" column="limit_level"/>
+        <result property="growthDesc" column="growth_desc"/>
+        <result property="otherDesc" column="other_desc"/>
+        <result property="carousel" column="carousel"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="createBy" column="create_by"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="remark" column="remark"/>
+        <result property="growthDescEn" column="growth_desc_en"/>
+        <result property="growthDescTh" column="growth_desc_th"/>
+        <result property="growthDescVi" column="growth_desc_vi"/>
+        <result property="growthDescIn" column="growth_desc_in"/>
+        <result property="otherDescEn" column="other_desc_en"/>
+        <result property="otherDescTh" column="other_desc_th"/>
+        <result property="otherDescIn" column="other_desc_in"/>
+        <result property="otherDescVi" column="other_desc_vi"/>
+    </resultMap>
+
+
+<!-- 只查询一条 -->
+    <select id="findOneConfig" resultMap="memberGrowthConfigResult">
+        select
+        id,
+        is_enable_vip,
+        is_enable_recharge,
+        is_enable_sign,
+        is_enable_dama,
+        is_pay_up_reword,
+        is_repeat_pay_up_reword,
+        is_auto_pay_reword,
+        sign_every_day_growth,
+        sign_max_growth,
+        sign_min_recharge_amount,
+        sign_day_min_recharge_amount,
+        sign_ip_limit_count,
+        rechage_rate,
+        dama_rate,
+        bind_bank_growth,
+        perfect_user_info_growth,
+        perfect_user_info_field,
+        demote_cycle,
+        limit_level,
+        receive_limit_cycle,
+        carousel,
+        create_by,
+        create_time,
+        update_by,
+        update_time,
+        remark,
+        (
+            case #{language}
+                when 'zh-CN' then growth_desc
+                when 'en-US' then growth_desc_en
+                when 'th-TH' then growth_desc_th
+                when 'in-ID' then growth_desc_in
+                when 'vi-VN' then growth_desc_vi
+                else growth_desc
+            end
+        ) growth_desc,
+        (
+            case #{language}
+                when 'zh-CN' then other_desc
+                when 'en-US' then other_desc_en
+                when 'th-TH' then other_desc_th
+                when 'in-ID' then other_desc_in
+                when 'vi-VN' then other_desc_vi
+                else other_desc
+            end
+        ) other_desc
+        from member_growth_config
+        order by create_time desc limit 1
+    </select>
+</mapper>

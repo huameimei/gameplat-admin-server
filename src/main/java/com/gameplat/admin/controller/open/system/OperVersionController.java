@@ -25,46 +25,13 @@ public class OperVersionController {
 
   private final SysVersionService versionService;
 
-  private final VersionControlService sysService;
-
   @GetMapping("/list")
   public IPage<SysVersion> list(PageDTO<SysVersion> page, VersionDTO versionDTO) {
     return versionService.selectVersionList(page, versionDTO);
   }
 
 
-  /**
-   * 获取发版信息列表
-   */
-  @GetMapping("/getVersionInfo")
-  public IPage<VersionControl> packageInfo(PageDTO<VersionControl> page, VersionControlDTO dto){
-    return sysService.getSysPackageInfo(page,dto);
-  }
 
-
-  /**
-   * 新增发版
-   */
-  @PostMapping("/createVersionInfo")
-  public boolean createPackageInfo(@RequestBody VersionControlDTO dto){
-    return sysService.createSysPackageInfo(dto);
-  }
-
-  /**
-   * 修改发版信息
-   */
-  @PostMapping("/editVersionInfo")
-  public int editVersionInfo(@RequestBody VersionControlDTO dto){
-    return sysService.editSysPackageInfo(dto);
-  }
-
-  /**
-   * 删除发版信息
-   */
-  @DeleteMapping("/removeVersionInfo")
-  public boolean removeVersionInfo(Integer id){
-    return sysService.removeSysPackageInfo(id);
-  }
 
 
 }

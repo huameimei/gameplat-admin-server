@@ -44,6 +44,7 @@ public class VersionControlServiceImpl extends ServiceImpl<VersionControlMapper,
    * 创建新的发版信息
    */
   @Override
+  @SentinelResource(value = "createSysPackageInfo")
   public boolean createSysPackageInfo(VersionControlDTO dto) {
     UserCredential credential = SecurityUserHolder.getCredential();
     dto.setCreateBy(credential.getUsername());
@@ -54,6 +55,7 @@ public class VersionControlServiceImpl extends ServiceImpl<VersionControlMapper,
    * 编辑发版信息
    */
   @Override
+  @SentinelResource(value = "editSysPackageInfo")
   public int editSysPackageInfo(VersionControlDTO dto) {
     UserCredential credential = SecurityUserHolder.getCredential();
     dto.setCreateBy(credential.getUsername());
@@ -77,6 +79,7 @@ public class VersionControlServiceImpl extends ServiceImpl<VersionControlMapper,
    * 删除发版信息
    */
   @Override
+  @SentinelResource(value = "removeSysPackageInfo")
   public boolean removeSysPackageInfo(Integer id) {
     return this.removeById(id);
   }

@@ -35,7 +35,7 @@ public class VersionControl {
     private Integer type;
 
     @ApiModelProperty(value = "状态 0 失效 1 有效")
-    private Integer start;
+    private Integer state;
 
     @ApiModelProperty(value = "安卓包下载地址")
     private String androidUrl;

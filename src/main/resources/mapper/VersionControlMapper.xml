@@ -9,7 +9,7 @@
         <result property="forceUpdate"      column="force_update"      />
         <result property="content"      column="content"     />
         <result property="type"         column="type"   />
-        <result property="start"          column="start"         />
+        <result property="state"          column="state"         />
         <result property="androidUrl"       column="android_url"         />
         <result property="iosEnterpriseSing"       column="ios_enterprise_sing"         />
         <result property="iosSuperSing"       column="ios_super_sing"         />

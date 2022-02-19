@@ -65,7 +65,7 @@ public class VersionControlServiceImpl extends ServiceImpl<VersionControlMapper,
     update.set(ObjectUtils.isNotNull(dto.getForceUpdate()), VersionControl::getForceUpdate,dto.getForceUpdate());
     update.set(ObjectUtils.isNotNull(dto.getContent()), VersionControl::getContent,dto.getContent());
     update.set(ObjectUtils.isNotNull(dto.getType()), VersionControl::getType,dto.getType());
-    update.set(ObjectUtils.isNotNull(dto.getStart()), VersionControl::getStart,dto.getStart());
+    update.set(ObjectUtils.isNotNull(dto.getState()), VersionControl::getState,dto.getState());
     update.set(ObjectUtils.isNotNull(dto.getAndroidUrl()), VersionControl::getAndroidUrl,dto.getAndroidUrl());
     update.set(ObjectUtils.isNotNull(dto.getAndroidUrlType()), VersionControl::getAndroidUrlType,dto.getAndroidUrlType());
     update.set(ObjectUtils.isNotNull(dto.getIosEnterpriseSing()), VersionControl::getIosEnterpriseSing,dto.getIosEnterpriseSing());

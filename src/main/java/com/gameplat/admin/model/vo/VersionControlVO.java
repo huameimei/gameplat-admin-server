@@ -22,7 +22,7 @@ public class VersionControlVO {
 
     private String type;
 
-    private Integer start;
+    private Integer state;
 
     private String androidUrl;
 

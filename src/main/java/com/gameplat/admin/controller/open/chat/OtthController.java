@@ -1,7 +1,11 @@
 package com.gameplat.admin.controller.open.chat;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gameplat.admin.config.TenantConfig;
 import com.gameplat.admin.model.bean.RoomMember;
 import com.gameplat.admin.model.dto.PushCPBetMessageReq;
@@ -55,7 +59,7 @@ public class OtthController {
     private ChatPushPlanService chatPushPlanService;
     @Autowired
     private TenantConfig tenantConfig;
-
+    private static final ObjectMapper objectMapper = new ObjectMapper();
     private static final String ROOM_MEMBER_BATCHADD_URL = "api_room_batchAddMember";
     public static final String API_PLAT_UPDATE = "api_plat_update";
     private static final String API_ROOM_UPDATE = "api_room_update";
@@ -148,9 +152,10 @@ public class OtthController {
         return url;
     }
 
-    private String dealAddRoomMenberBody(String body, String plateCode) throws ServiceException {
-        List<RoomMember> roomMembers = JsonUtils.readValue(body, new TypeReference<List<RoomMember>>() {
-        });
+    private String dealAddRoomMenberBody(String body, String plateCode) throws Exception{
+
+        List<RoomMember> roomMembers = JSONArray.parseArray(body, RoomMember.class);
+
         roomMembers.forEach(roomMember -> {
             roomMember.setPlatCode(plateCode);
             // 設置會員層級與平臺層級一樣

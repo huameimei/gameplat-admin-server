@@ -31,7 +31,6 @@ public class ChatRedEnvelopeRecordServiceImpl extends ServiceImpl<ChatRedEnvelop
     public IPage<ChatRedEnvelopeRecord> page(PageDTO<ChatRedEnvelopeRecord> page, ChatRedEnvelopeRecordQueryDTO dto) {
         return lambdaQuery()
                 .eq(ObjectUtil.isNotEmpty(dto.getRedConfigId()), ChatRedEnvelopeRecord::getRedConfigId, dto.getRedConfigId())
-                .last("unix_timestamp(now())*1000 > "+dto.getCreateTime())
                 .orderByDesc(ChatRedEnvelopeRecord::getCreateTime)
                 .page(page);
     }

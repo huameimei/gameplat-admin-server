@@ -44,7 +44,6 @@ public class ChatRedEnvelopeServiceImpl extends ServiceImpl<ChatRedEnvelopeMappe
         return lambdaQuery()
                 .eq(ObjectUtil.isNotEmpty(dto.getOpen()), ChatRedEnvelope::getOpen, dto.getOpen())
                 .like(ObjectUtil.isNotEmpty(dto.getName()), ChatRedEnvelope::getName, dto.getName())
-                .last("now()>"+dto.getStartTime())
                 .orderByDesc(ChatRedEnvelope::getLastTime)
                 .page(page)
                 .convert(chatRedEnvelopeConvert::toVo);

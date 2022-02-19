@@ -1,12 +1,17 @@
 package com.gameplat.admin.model.bean;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 
 @Data
-public class RoomMember implements Serializable {
+@NoArgsConstructor
+@AllArgsConstructor
+public class RoomMember implements Serializable{
+
 
     private String platCode; // 平台编码
 

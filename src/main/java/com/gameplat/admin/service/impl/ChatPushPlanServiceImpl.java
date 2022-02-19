@@ -84,7 +84,6 @@ public class ChatPushPlanServiceImpl extends ServiceImpl<ChatPushPlanMapper, Cha
         dto.setLastPushTime(dto.getBeginTime());
         dto.setCreateTime(Long.parseLong(DateUtil.getCurrentTime()));
         save(chatPushPlanConvert.toEntity(dto));
-
     }
 
     /** 编辑自定义中奖推送 */

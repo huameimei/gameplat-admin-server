@@ -33,9 +33,11 @@ public class ChatPushPlan implements Serializable {
   private String gameName;
 
   @ApiModelProperty(value = "中奖最小金额")
+  @TableField(value = "min_winMoney")
   private double minWinMoney;
 
   @ApiModelProperty(value = "中奖最大金额")
+  @TableField(value = "max_winMoney")
   private double maxWinMoney;
 
   @ApiModelProperty(value = "开始时间")
@@ -45,6 +47,7 @@ public class ChatPushPlan implements Serializable {
   private Long endTime;
 
   @ApiModelProperty(value = "推送间隔")
+  @TableField(value = "`interval`")
   private Integer interval;
 
   @ApiModelProperty(value = "状态1启用，0禁用")

@@ -3,7 +3,7 @@
 <mapper namespace="com.gameplat.admin.mapper.VersionControlMapper">
 
     <resultMap id="SysRoleResult" type="com.gameplat.admin.model.domain.VersionControl">
-        <id     property="id"           column="role_id"        />
+        <id     property="id"           column="id"        />
         <result property="title"        column="title"      />
         <result property="version"   column="version"       />
         <result property="forceUpdate"      column="force_update"      />

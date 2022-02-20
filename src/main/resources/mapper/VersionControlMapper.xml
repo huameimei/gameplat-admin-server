@@ -11,6 +11,7 @@
         <result property="type"         column="type"   />
         <result property="state"          column="state"         />
         <result property="androidUrl"       column="android_url"         />
+        <result property="urlType"       column="url_type"         />
         <result property="iosEnterpriseSing"       column="ios_enterprise_sing"         />
         <result property="iosSuperSing"       column="ios_super_sing"         />
         <result property="iosDescribeUrl"      column="ios_describe_url"         />

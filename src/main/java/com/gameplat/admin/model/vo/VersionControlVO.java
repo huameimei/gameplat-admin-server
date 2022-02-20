@@ -26,6 +26,8 @@ public class VersionControlVO {
 
     private String androidUrl;
 
+    private String urlType;
+
     private String iosEnterpriseSing;
 
     private String iosSuperSing;

@@ -1,8 +1,5 @@
 package com.gameplat.admin.model.dto;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
-import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.util.Date;
@@ -29,7 +26,7 @@ public class VersionControlDTO {
 
     private String androidUrl;
 
-    private Integer androidUrlType;
+    private Integer urlType;
 
     private String iosEnterpriseSing;
 

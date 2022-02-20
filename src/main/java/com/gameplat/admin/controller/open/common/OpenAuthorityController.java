@@ -5,6 +5,7 @@ import com.gameplat.admin.model.dto.GoogleAuthDTO;
 import com.gameplat.admin.model.vo.GoogleAuthCodeVO;
 import com.gameplat.admin.model.vo.UserToken;
 import com.gameplat.admin.service.AuthenticationService;
+import com.gameplat.admin.service.TwoFactorAuthenticationService;
 import com.gameplat.common.constant.ServiceName;
 import com.gameplat.common.model.bean.RefreshToken;
 import com.gameplat.log.annotation.Log;
@@ -37,6 +38,8 @@ public class OpenAuthorityController {
 
   @Autowired private AuthenticationService authenticationService;
 
+  @Autowired private TwoFactorAuthenticationService twoFactorAuthenticationService;
+
   @ApiOperation("登录")
   @RequestMapping(value = "/login", method = RequestMethod.POST)
   @LoginLog(module = ServiceName.ADMIN_SERVICE, desc = "'账号'+#dto.account+'登录系统'")
@@ -58,19 +61,19 @@ public class OpenAuthorityController {
     return authenticationService.refreshToken(refreshToken);
   }
 
-  /** 获取谷歌认证码 */
-  @SneakyThrows
-  @GetMapping(value = "/authCode")
-  public GoogleAuthCodeVO getAuthCode(@AuthenticationPrincipal UserCredential credential) {
-    return authenticationService.create2FA(credential.getUsername());
-  }
-
   @PostMapping("/verify2fa")
   @PreAuthorize("hasRole('ROLE_2FA_VERIFICATION_USER')")
   public RefreshToken verifyCode(
       @AuthenticationPrincipal UserCredential credential,
       @NotEmpty(message = "请输入安全码") String code) {
-    return authenticationService.verify2FA(credential, code);
+    return authenticationService.verify2Fa(credential, code);
+  }
+
+  /** 获取谷歌认证码 */
+  @SneakyThrows
+  @GetMapping(value = "/authCode")
+  public GoogleAuthCodeVO getAuthCode(@AuthenticationPrincipal UserCredential credential) {
+    return twoFactorAuthenticationService.create2Fa(credential.getUsername());
   }
 
   /**
@@ -79,8 +82,7 @@ public class OpenAuthorityController {
    * @param dto GoogleAuthDTO
    */
   @PostMapping("/bindSecret")
-  public RefreshToken bindSecret(
-      @AuthenticationPrincipal UserCredential credential, @Validated GoogleAuthDTO dto) {
-    return authenticationService.bindSecret(credential, dto);
+  public void bindSecret(@Validated GoogleAuthDTO dto) {
+    twoFactorAuthenticationService.bindSecret(dto);
   }
 }

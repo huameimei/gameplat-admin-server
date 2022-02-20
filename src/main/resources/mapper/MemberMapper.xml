@@ -336,9 +336,6 @@
             concat('^/',#{obj.agentAccount})
         </foreach>
         )
-        <!--        <foreach collection="list" item="list" open="'" close="'" separator="|">-->
-        <!--            concat('^/',#{list.agentAccount})-->
-        <!--        </foreach>-->
     </select>
 
 

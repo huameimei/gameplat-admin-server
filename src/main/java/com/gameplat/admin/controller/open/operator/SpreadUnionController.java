@@ -93,15 +93,9 @@ public class SpreadUnionController {
     @ApiOperation(value = "联盟报表列表")
     @GetMapping("/unionReportList")
 //    @PreAuthorize("hasAuthority('spreadUnion:unionpackage:remove')")
-    public Object unionReportList(){
-       return spreadUnionService.getUnionReportList();
+    public Object unionReportList(@RequestBody SpreadUnionDTO dto){
+       return spreadUnionService.getUnionReportList(dto);
     }
 
 
-    @ApiOperation(value = "联盟报表详情")
-    @GetMapping("/unionReportInfo")
-//    @PreAuthorize("hasAuthority('spreadUnion:unionpackage:remove')")
-    public Object unionReportInfo(){
-        return null;
-    }
 }

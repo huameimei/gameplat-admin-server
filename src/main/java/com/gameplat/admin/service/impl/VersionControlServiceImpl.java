@@ -58,7 +58,7 @@ public class VersionControlServiceImpl extends ServiceImpl<VersionControlMapper,
   @SentinelResource(value = "editSysPackageInfo")
   public int editSysPackageInfo(VersionControlDTO dto) {
     UserCredential credential = SecurityUserHolder.getCredential();
-    dto.setCreateBy(credential.getUsername());
+    dto.setUpdateBy(credential.getUsername());
     LambdaUpdateWrapper<VersionControl> update = Wrappers.lambdaUpdate();
     update.set(ObjectUtils.isNotNull(dto.getTitle()), VersionControl::getTitle,dto.getTitle());
     update.set(ObjectUtils.isNotNull(dto.getVersion()), VersionControl::getVersion,dto.getVersion());
@@ -71,6 +71,7 @@ public class VersionControlServiceImpl extends ServiceImpl<VersionControlMapper,
     update.set(ObjectUtils.isNotNull(dto.getIosEnterpriseSing()), VersionControl::getIosEnterpriseSing,dto.getIosEnterpriseSing());
     update.set(ObjectUtils.isNotNull(dto.getIosSuperSing()), VersionControl::getIosSuperSing,dto.getIosSuperSing());
     update.set(ObjectUtils.isNotNull(dto.getIosDescribeUrl()), VersionControl::getIosDescribeUrl,dto.getIosDescribeUrl());
+    update.set( VersionControl::getUpdateBy,dto.getUpdateBy());
     update.eq(VersionControl::getId,dto.getId());
     return sysPackageInfoMapper.update(null,update);
   }

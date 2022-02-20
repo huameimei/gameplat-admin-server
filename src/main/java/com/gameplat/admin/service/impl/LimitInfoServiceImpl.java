@@ -82,4 +82,15 @@ public class LimitInfoServiceImpl extends ServiceImpl<LimitInfoMapper, LimitInfo
     return this.getLimitInfo(LimitEnums.MEMBER_RECHARGE_LIMIT, MemberRechargeLimit.class)
         .orElseThrow(() -> new ServiceException("加载出入款配置信息失败，请联系客服!"));
   }
+
+  @Override
+  public <T> T get(LimitEnums limit) {
+    return (T)
+            this.lambdaQuery()
+                    .eq(LimitInfo::getName, limit.getName())
+                    .oneOpt()
+                    .map(LimitInfo::getValue)
+                    .map(v -> JsonUtils.parse(v, limit.getValue()))
+                    .orElse(null);
+  }
 }

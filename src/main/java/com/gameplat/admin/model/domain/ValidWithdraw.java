@@ -56,6 +56,19 @@ public class ValidWithdraw implements Serializable {
 
   private String remark;
 
+
+  public BigDecimal getBetAmount() {
+    return cpDml.add(sportsDml).add(videoDml);
+  }
+
+
+
+
+  public BigDecimal getDmlClaim() {
+    return mormDml.add(discountDml);
+  }
+
+
   @Override
   public String toString() {
     return "ValidWithdraw{" +

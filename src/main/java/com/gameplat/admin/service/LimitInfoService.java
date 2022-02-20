@@ -20,4 +20,7 @@ public interface LimitInfoService extends IService<LimitInfo> {
   MemberRechargeLimit getRechargeLimit();
 
   LimitInfo<?> getLimitInfo(String name);
+
+  <T> T get(LimitEnums limit);
+
 }

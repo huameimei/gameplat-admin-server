@@ -12,7 +12,7 @@ import java.util.List;
 
 public interface GameService extends IService<Game> {
 
-  IPage<Game> selectGameList(PageDTO<Game> page, GameQueryDTO dto);
+  IPage<GameVO> selectGameList(PageDTO<Game> page, GameQueryDTO dto);
 
   void updateGame(OperGameDTO operGameDTO);
 

@@ -32,7 +32,7 @@ public class GameServiceImpl extends ServiceImpl<GameMapper, Game> implements Ga
 
     @Override
     @SentinelResource(value = "selectGameList")
-    public IPage<Game> selectGameList(PageDTO<Game> page, GameQueryDTO dto) {
+    public IPage<GameVO> selectGameList(PageDTO<Game> page, GameQueryDTO dto) {
         return this.lambdaQuery()
                 .like(ObjectUtils.isNotEmpty(dto.getGameName()), Game::getGameName, dto.getGameName())
                 .eq(
@@ -42,7 +42,7 @@ public class GameServiceImpl extends ServiceImpl<GameMapper, Game> implements Ga
                 .eq(ObjectUtils.isNotEmpty(dto.getGameType()), Game::getGameType, dto.getGameType())
                 .eq(ObjectUtils.isNotEmpty(dto.getIsH5()), Game::getIsH5, dto.getIsH5())
                 .eq(ObjectUtils.isNotEmpty(dto.getIsPc()), Game::getIsPc, dto.getIsPc())
-                .page(page);
+                .page(page).convert(gameConvert::toVo);
     }
 
     @Override

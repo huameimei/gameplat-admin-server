@@ -2,8 +2,11 @@ package com.gameplat.admin.config;
 
 import com.gameplat.admin.interceptor.IpWhitelistInterceptor;
 import com.gameplat.admin.interceptor.LoginInterceptor;
+import com.gameplat.admin.interceptor.TwoFactorAuthenticationInterceptor;
+import com.gameplat.security.authz.URIAdapter;
 import com.gameplat.web.config.web.WebMvcConfigurationAdapter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
@@ -12,6 +15,8 @@ import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
 @Slf4j
 @Configuration
 public class WebMvcConfig extends WebMvcConfigurationAdapter {
+
+  @Autowired private URIAdapter uriAdapter;
 
   @Bean
   public LocaleChangeInterceptor localeChangeInterceptor() {
@@ -33,6 +38,12 @@ public class WebMvcConfig extends WebMvcConfigurationAdapter {
     return new IpWhitelistInterceptor();
   }
 
+  @Bean
+  public TwoFactorAuthenticationInterceptor twoFactorAuthenicationInterceptor() {
+    log.info("----初始化两步验证拦截器----");
+    return new TwoFactorAuthenticationInterceptor();
+  }
+
   @Override
   public void addInterceptors(InterceptorRegistry registry) {
     registry
@@ -42,5 +53,11 @@ public class WebMvcConfig extends WebMvcConfigurationAdapter {
             "/webjars/*", "/**.html", "/swagger-resources/**", "/actuator/refresh");
     registry.addInterceptor(ipWhitelistInterceptor()).addPathPatterns("/api/admin/**");
     registry.addInterceptor(loginInterceptor()).addPathPatterns("/api/admin/auth/login");
+    registry
+        .addInterceptor(twoFactorAuthenicationInterceptor())
+        .addPathPatterns("/api/admin/**")
+        .excludePathPatterns(uriAdapter.getPermitUri())
+        .excludePathPatterns(
+            "/api/admin/profile/info", "/api/admin/profile/menuList", "/api/admin/auth/authCode");
   }
 }

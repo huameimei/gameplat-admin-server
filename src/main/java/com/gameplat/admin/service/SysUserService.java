@@ -75,6 +75,14 @@ public interface SysUserService extends IService<SysUser> {
   String getSecret(Long id);
 
   /**
+   * 检查安全码是否存在
+   *
+   * @param secret String
+   * @return String
+   */
+  boolean isSecretExist(String secret);
+
+  /**
    * 修改账号状态
    *
    * @param id Long

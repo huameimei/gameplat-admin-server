@@ -20,4 +20,10 @@ public class SpreadUnionDTO implements Serializable {
     @ApiModelProperty(value = "渠道类型")
     private String channel;
 
+    /**
+     * 日期
+     */
+    private String startTime;
+    private String endTime;
+
 }

@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.convert.SpreadUnionConvert;
+import com.gameplat.admin.mapper.MemberBackupMapper;
 import com.gameplat.admin.mapper.MemberMapper;
 import com.gameplat.admin.mapper.SpreadUnionMapper;
 import com.gameplat.admin.model.domain.Member;
@@ -35,6 +36,9 @@ public class SpreadUnionServiceImpl extends ServiceImpl<SpreadUnionMapper, Sprea
 
     @Autowired
     private MemberMapper memberMapper;
+
+    @Autowired
+    private MemberBackupMapper memberBackupMapper;
 
     @Autowired
     private SpreadUnionConvert spreadUnionConvert;
@@ -115,7 +119,7 @@ public class SpreadUnionServiceImpl extends ServiceImpl<SpreadUnionMapper, Sprea
      *  一级  todo 日期   联盟名称  联运类型  代理账号  联运平台  联运收益  充值金额  提现金额  注册人数  更新时间
      */
     @Override
-    public List<JSONObject> getUnionReportList() {
+    public List<JSONObject> getUnionReportList(SpreadUnionDTO dto) {
         List<SpreadUnion> list = this.list();
         //获取代理线下得信息
         List<Member> agentMember = memberMapper.getAgentMember(list);

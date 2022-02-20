@@ -41,7 +41,7 @@ public class VersionControl {
     private String androidUrl;
 
     @ApiModelProperty(value = "1 内链  2 外链")
-    private Integer androidUrlType;
+    private Integer urlType;
 
     @ApiModelProperty(value = "ios企业签")
     private String iosEnterpriseSing;

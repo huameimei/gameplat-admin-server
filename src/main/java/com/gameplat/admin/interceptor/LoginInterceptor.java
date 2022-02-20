@@ -2,8 +2,6 @@ package com.gameplat.admin.interceptor;
 
 import com.gameplat.admin.cache.AdminCache;
 import com.gameplat.admin.service.CommonService;
-import com.gameplat.admin.service.SysAuthIpService;
-import com.gameplat.base.common.util.IPUtils;
 import com.gameplat.common.compent.captcha.CaptchaStrategyContext;
 import com.gameplat.common.enums.BooleanEnum;
 import com.gameplat.common.lang.Assert;
@@ -38,7 +36,8 @@ public class LoginInterceptor extends HandlerInterceptorAdapter {
     this.checkCaptchaCode(limit.getLoginCaptchaSwitch(), request);
 
     // 判断密码错误次数
-    this.checkPasswordErrorCount(limit.getPwdErrorCount(), request.getParameter(ACCOUNT));
+    String account = request.getParameter(ACCOUNT);
+    this.checkPasswordErrorCount(limit.getPwdErrorCount(), account);
 
     return true;
   }

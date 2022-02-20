@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.gameplat.admin.model.domain.Game;
 import com.gameplat.admin.model.dto.GameQueryDTO;
 import com.gameplat.admin.model.dto.OperGameDTO;
+import com.gameplat.admin.model.vo.GameVO;
 import com.gameplat.admin.service.GameService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +25,7 @@ public class GameController {
 
   @GetMapping("/list")
   @PreAuthorize("hasAuthority('game:game:list')")
-  public IPage<Game> selectGameList(PageDTO<Game> page, GameQueryDTO dto) {
+  public IPage<GameVO> selectGameList(PageDTO<Game> page, GameQueryDTO dto) {
     return gameService.selectGameList(page, dto);
   }
 

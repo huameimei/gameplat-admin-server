@@ -1,5 +1,7 @@
 package com.gameplat.admin.model.vo;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.gameplat.common.util.I18nSerializerUtils;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -21,6 +23,7 @@ public class GameVO implements Serializable {
     private String gameCode;
 
     @ApiModelProperty(value = "游戏名")
+    @JsonSerialize(using = I18nSerializerUtils.class)
     private String gameName;
 
     @ApiModelProperty(value = "PC图片地址")
@@ -42,7 +45,7 @@ public class GameVO implements Serializable {
     private Integer isH5;
 
     @ApiModelProperty(value = "是否支持电脑端(0：否；1:是)")
-    private Integer isFlash;
+    private Integer isPc;
 
     @ApiModelProperty(value = "游戏排序")
     private Integer sort;

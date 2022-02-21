@@ -95,9 +95,9 @@ public class OtthController {
 
     @ApiOperation(value = "平台聊天室限制配置/聊天室成员管理/关键词管理/聊天室房间管理/角色管理/聊天室自定义消息管理")
     @GetMapping(value = "/{url}", produces = {"application/json;charset=UTF-8"})
-    public void get(@PathVariable String url, HttpServletRequest request, HttpServletResponse response) throws Exception {
+    public Object get(@PathVariable String url, HttpServletRequest request, HttpServletResponse response) throws Exception {
         String apiUrl = getApiUrl(url);
-        otthService.otthProxyHttpGet(apiUrl, request, response);
+        return otthService.otthProxyHttpGet(apiUrl, request, response);
     }
 
     @ApiOperation(value = "获取彩票游戏类型")

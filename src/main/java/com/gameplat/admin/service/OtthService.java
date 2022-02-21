@@ -253,7 +253,7 @@ public class OtthService {
         return result;
     }
 
-    public void otthProxyHttpGet(String apiUrl, HttpServletRequest request, HttpServletResponse response) throws IOException, ServiceException {
+    public Object otthProxyHttpGet(String apiUrl, HttpServletRequest request, HttpServletResponse response) throws IOException, ServiceException {
         String dbSuffix = tenantConfig.getTenantCode();
         Enumeration<String> names = request.getParameterNames();
         Map<String, String> params = new HashMap<>();
@@ -265,16 +265,18 @@ public class OtthService {
         HttpClient httpClient = HttpClient.build().get(apiUrl);
         httpClient.setPara(params);
         httpClient.addHead("plat_code", dbSuffix);
-
-        // httpClient.addHead("Cookie", request.getHeader("Cookie"));
+        httpClient.addHead("Cookie", request.getHeader("Cookie"));
         HttpRespBean respBean = httpClient.execute();
-        handleResponse(respBean, response);
+        return handleResponse(respBean, response);
     }
 
-    private void handleResponse(HttpRespBean respBean, HttpServletResponse response) throws IOException {
+    private Object handleResponse(HttpRespBean respBean, HttpServletResponse response) throws IOException {
         if (respBean.getStatus() == 200) {
-            response.getOutputStream().write(respBean.getRespBody().getBytes("utf-8"));
-            response.flushBuffer();
+            String respBody = respBean.getRespBody();
+            if(StringUtils.isBlank(respBody)){
+                return new Object();
+            }
+            return JSON.parse(respBody);
         } else {
             try {
                 JSONObject jsonObject = JSON.parseObject(respBean.getRespBody());

@@ -19,6 +19,9 @@ public interface ChatGifService extends IService<ChatGif> {
     /** 增 */
     void add(MultipartFile file, String name) throws IOException;
 
+    /** 增 */
+    String upload(MultipartFile file) throws IOException;
+
     /** 删 */
     void remove(@PathVariable Integer id);
 

@@ -20,12 +20,10 @@ import com.gameplat.common.compent.oss.FileStorageEnum;
 import com.gameplat.common.compent.oss.FileStorageProvider;
 import com.gameplat.common.compent.oss.FileStorageStrategyContext;
 import com.gameplat.common.compent.oss.config.FileConfig;
-import com.gameplat.common.constant.FileConstant;
 import com.gameplat.common.enums.DictTypeEnum;
 import com.gameplat.common.util.FileUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -79,20 +77,7 @@ public class ChatGifServiceImpl extends ServiceImpl<ChatGifMapper, ChatGif> impl
     /** 增 */
     @Override
     public void add(MultipartFile file, String name) throws IOException {
-        if (!isImage(file)){
-            throw new ServiceException("不支持此格式！");
-        }
-        //重新生成文件名称
-        String fKey = FileUtils.getRandomName(file.getOriginalFilename());
-
-        String fType = FileConstant.PICTURE;
-
-        //上传图片
-        FileConfig fileConfig = configService.getDefaultConfig(DictTypeEnum.FILE_CONFIG, FileConfig.class);
-        FileStorageProvider fileStorageProvider = fileStorageStrategyContext.getProvider(fileConfig);
-        //上传成功，返回图片地址
-        String url = fileStorageProvider.upload(file.getResource().getFile());
-        fType = FilenameUtils.getBaseName(url);
+        String url = upload(file);
         File file1 = new File(file.getOriginalFilename());
         try {
             FileUtils.copyInputStreamToFile(file.getInputStream(), file1);
@@ -123,18 +108,13 @@ public class ChatGifServiceImpl extends ServiceImpl<ChatGifMapper, ChatGif> impl
 //        }else{
 //            chatGif.setServiceFileName(fType + fKey);
 //        }
-        chatGif.setServiceFileName(fType + fKey);  //picture/randomName
         chatGif.setName(name);
         if (bufferedImage!=null){
             chatGif.setHeight(bufferedImage.getHeight());
             chatGif.setWidth(bufferedImage.getWidth());
         }
         chatGif.setFileUrl(url);
-        chatGif.setFileType(FileUtils.getFileType(fKey));
-        //存储文件名
-        chatGif.setStoreFileName(fKey);
         chatGif.setMd5(SecureUtil.md5(file.getInputStream()));
-        chatGif.setServiceProvider(fileConfig.getProvider());
 
         //如果是异步上传，如果响应时间太长，request关闭，也就获取不到请求头的token，也就拿不到LoginAppUser对象
         //所以需要在异步线程将上传人加入到本地线程，在保存上传记录时，上传者从本地线程中拿值
@@ -143,6 +123,19 @@ public class ChatGifServiceImpl extends ServiceImpl<ChatGifMapper, ChatGif> impl
             chatGif.setCreateBy(userName);
         }
         save(chatGif);
+    }
+
+    @Override
+    public String upload(MultipartFile file) throws IOException {
+        if (!isImage(file)){
+            throw new ServiceException("不支持此格式！");
+        }
+        //上传图片
+        FileConfig fileConfig = configService.getDefaultConfig(DictTypeEnum.FILE_CONFIG, FileConfig.class);
+        FileStorageProvider fileStorageProvider = fileStorageStrategyContext.getProvider(fileConfig);
+        //上传成功，返回图片地址
+        String url = fileStorageProvider.upload(file.getResource().getFile());
+        return url;
     }
 
     /** 删 */

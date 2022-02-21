@@ -51,6 +51,13 @@ public class ChatGifController {
         chatGifService.add(file, name);
     }
 
+    @ApiOperation(value = "上传图片")
+    @PostMapping("/upload")
+    @PreAuthorize("hasAuthority('chat:gif:upload')")
+    public String upload(@RequestPart MultipartFile file) throws IOException {
+        return chatGifService.upload(file);
+    }
+
     @ApiOperation(value = "删")
     @DeleteMapping("/remove/{id}")
     @PreAuthorize("hasAuthority('chat:gif:remove')")

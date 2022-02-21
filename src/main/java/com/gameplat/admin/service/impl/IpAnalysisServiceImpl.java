@@ -1,5 +1,6 @@
 package com.gameplat.admin.service.impl;
 
+import ch.qos.logback.core.rolling.helper.IntegerTokenConverter;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -23,6 +24,7 @@ import com.gameplat.security.context.UserCredential;
 import org.apache.lucene.search.vectorhighlight.ScoreOrderFragmentsBuilder;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.action.search.SearchTask;
 import org.elasticsearch.client.HttpAsyncResponseConsumerFactory;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
@@ -35,6 +37,8 @@ import org.elasticsearch.search.aggregations.*;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms;
 import org.elasticsearch.search.aggregations.bucket.terms.TermsAggregationBuilder;
 import org.elasticsearch.search.aggregations.metrics.CardinalityAggregationBuilder;
+import org.elasticsearch.search.aggregations.metrics.ValueCountAggregationBuilder;
+import org.elasticsearch.search.aggregations.pipeline.BucketSortPipelineAggregationBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.fetch.subphase.FetchSourceContext;
 import org.elasticsearch.search.sort.FieldSortBuilder;
@@ -49,10 +53,7 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -175,25 +176,27 @@ public class IpAnalysisServiceImpl implements IpAnalysisService {
     //es聚合查询
     public List<IpAnalysisVO> aggregationSearchDoc(PageDTO<IpAnalysisVO> page,IpAnalysisDTO dto){
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder().query(IpAnalysisServiceImpl.buildSearch(dto));
-        TermsAggregationBuilder username = AggregationBuilders.terms("username").field("username.keyword");
-        TermsAggregationBuilder ipAddress = AggregationBuilders.terms("ipAddress").field("ipAddress.keyword");
-        //ipAddress.subAggregation(AggregationBuilders.cardinality("ipCount").field("ipAddress.keyword"));
+        TermsAggregationBuilder username = AggregationBuilders.terms("username").field("username.keyword").size((int)page.getSize());
+        TermsAggregationBuilder ipAddress = AggregationBuilders.terms("ipAddress").field("ipAddress.keyword").size(1);
+
+        BucketSortPipelineAggregationBuilder bucketSort = new BucketSortPipelineAggregationBuilder("bucket_sort",null)
+                .from(((int)page.getCurrent() - 1) * (int)page.getSize())
+                .size((int)page.getSize());
+
+        ipAddress.subAggregation(bucketSort);
         username.subAggregation(ipAddress);
+
         searchSourceBuilder.aggregation(username);
-        SearchRequest searchRequest = new SearchRequest(new String[]{INDEX+tenant});
+        SearchRequest searchRequest = new SearchRequest(INDEX+tenant);
+
+        searchSourceBuilder.sort(SortBuilders.fieldSort("createTime.keyword").order(SortOrder.DESC));
         searchRequest.source(searchSourceBuilder);
-
-
-        searchSourceBuilder.size(0);
-        searchSourceBuilder.fetchSource(new FetchSourceContext(
-                true, new String[]{"ipAddress", "username"}, Strings.EMPTY_ARRAY));
-        searchRequest.source(searchSourceBuilder);
-
 
         RequestOptions.Builder optionsBuilder = RequestOptions.DEFAULT.toBuilder();
         optionsBuilder.setHttpAsyncResponseConsumerFactory(
                 new HttpAsyncResponseConsumerFactory.HeapBufferedResponseConsumerFactory(31457280));
         List<IpAnalysisVO> list = new ArrayList<>();
+        Set<String> ips = new HashSet<>();
         try {
             SearchResponse search = restHighLevelClient.search(searchRequest, optionsBuilder.build());
             Terms terms = search.getAggregations().get("username");
@@ -202,17 +205,55 @@ public class IpAnalysisServiceImpl implements IpAnalysisService {
                 Terms terms2 = bucket.getAggregations().get("ipAddress");
                 for (Terms.Bucket bucket2 : terms2.getBuckets()) {
                     String ip = bucket2.getKeyAsString();
-                    long count = bucket2.getDocCount();
+                    long docCount = bucket2.getDocCount();
+                    ips.add(ip);
                     IpAnalysisVO vo = new IpAnalysisVO();
                     vo.setAccount(account);
                     vo.setIpAddress(ip);
-                    vo.setIpCount((int)count);
+                    vo.setIpCount((int)docCount);
                     list.add(vo);
                 }
             }
+
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+        Map<String, Integer> ipMap = aggregationSearchDoc(ips);
+        list.forEach(l -> l.setIpCount(ipMap.get(l.getIpAddress())));
         return list;
+    }
+
+
+
+
+    public Map<String,Integer> aggregationSearchDoc(Set<String> ips){
+        Map<String,Integer> map = new HashMap<>();
+        if(ips == null || ips.isEmpty()){
+            return map;
+        }
+        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder().query( QueryBuilders.termsQuery("ipAddress",ips));
+        TermsAggregationBuilder ipCount = AggregationBuilders.terms("ipCount").field("ipAddress.keyword");
+        searchSourceBuilder.aggregation(ipCount);
+        SearchRequest searchRequest = new SearchRequest(INDEX+tenant);
+        searchSourceBuilder.size(0);
+        searchRequest.source(searchSourceBuilder);
+
+        RequestOptions.Builder optionsBuilder = RequestOptions.DEFAULT.toBuilder();
+        optionsBuilder.setHttpAsyncResponseConsumerFactory(
+                new HttpAsyncResponseConsumerFactory.HeapBufferedResponseConsumerFactory(31457280));
+        try {
+            SearchResponse search = restHighLevelClient.search(searchRequest, optionsBuilder.build());
+            Terms terms = search.getAggregations().get("ipCount");
+            for (Terms.Bucket bucket : terms.getBuckets()) {
+                String ip = bucket.getKeyAsString();
+                long docCount = bucket.getDocCount();
+                map.put(ip,(int)docCount);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return map;
     }
 }

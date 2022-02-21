@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.validator.constraints.Range;
 
 import java.math.BigDecimal;
 import java.util.Date;
@@ -68,6 +69,12 @@ public class RecommendConfigVo {
 
     @ApiModelProperty(value = "开启打码量计算后的倍数")
     private BigDecimal validWithdrawMult;
+
+    @ApiModelProperty(value = "是否开启代理后台敏感字段")
+    private Integer isOpenSensitive;
+
+    @ApiModelProperty(value = "代理后台名字段")
+    private String sensitiveColumn;
 
     private Date createTime;
 

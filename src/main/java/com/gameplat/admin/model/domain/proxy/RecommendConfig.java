@@ -71,6 +71,13 @@ public class RecommendConfig extends Model<RecommendConfig> {
     @ApiModelProperty(value = "开启打码量计算后的倍数")
     private BigDecimal validWithdrawMult;
 
+    @ApiModelProperty(value = "是否开启代理后台敏感字段")
+    private Integer isOpenSensitive;
+
+    @ApiModelProperty(value = "代理后台名字段")
+    @TableField(updateStrategy = FieldStrategy.IGNORED)
+    private String sensitiveColumn;
+
     @TableField(fill = FieldFill.INSERT)
     private Date createTime;
 

@@ -18,6 +18,7 @@ import java.util.Optional;
  * @author three
  */
 public interface MemberService extends IService<Member> {
+  Member getForAccount(String account);
 
   IPage<MemberVO> queryPage(Page<Member> page, MemberQueryDTO dto);
 

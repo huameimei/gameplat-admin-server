@@ -513,7 +513,7 @@ public class OtthService {
 
     /** 查找聊天室会员 */
     public ChatUserVO getChatUser(String account) throws Exception {
-        Member user = memberService.getByAccount(account).get();
+        Member user = memberService.getForAccount(account);
         if (user == null) {
             throw new ServiceException("用户不存在");
         }

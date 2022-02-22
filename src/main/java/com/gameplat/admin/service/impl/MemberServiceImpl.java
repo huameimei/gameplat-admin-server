@@ -50,6 +50,11 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
   @Autowired private OnlineUserService onlineUserService;
 
   @Override
+  public Member getForAccount(String account) {
+    return this.lambdaQuery().eq(Member::getAccount, account).one();
+  }
+
+  @Override
   public IPage<MemberVO> queryPage(Page<Member> page, MemberQueryDTO dto) {
     return memberMapper
         .queryPage(page, memberQueryCondition.builderQueryWrapper(dto))

@@ -645,8 +645,7 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
       boolean contains = Arrays.stream(levelArr).anyMatch(memberWithdraw.getMemberLevel()::equals);
       if (contains) {
         if (pointFlag == 1) {
-          discountAmount = (approveMoney.multiply(discountPercentage)).divide(new BigDecimal(100))
-              .setScale(2, BigDecimal.ROUND_HALF_UP);
+          discountAmount = (approveMoney.multiply(discountPercentage)).divide(new BigDecimal(100),2, BigDecimal.ROUND_HALF_UP);
         }
       }
     }

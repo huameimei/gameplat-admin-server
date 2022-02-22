@@ -56,6 +56,8 @@ public class ValidWithdraw implements Serializable {
 
   private String remark;
 
+  private Date endTime;
+
 
   public BigDecimal getBetAmount() {
     return cpDml.add(sportsDml).add(videoDml);
@@ -87,6 +89,7 @@ public class ValidWithdraw implements Serializable {
         ", type=" + type +
         ", createTime=" + createTime +
         ", updateTime=" + updateTime +
+        ", updateTime=" + endTime +
         ", remark='" + remark + '\'' +
         '}';
   }

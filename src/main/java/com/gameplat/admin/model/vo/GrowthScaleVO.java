@@ -11,8 +11,8 @@ import lombok.Data;
 @Data
 public class GrowthScaleVO {
 
-    private Integer currentGrowth;
+    private Long currentGrowth;
 
-    private Integer lowerGrowth;
+    private Long lowerGrowth;
 
 }

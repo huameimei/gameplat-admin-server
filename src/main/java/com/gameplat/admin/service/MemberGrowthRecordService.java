@@ -24,7 +24,7 @@ public interface MemberGrowthRecordService extends IService<MemberGrowthRecord> 
 
     IPage<MemberGrowthRecordVO> findRecordList(PageDTO<MemberGrowthRecord> page, MemberGrowthRecordDTO dto);
 
-    Integer dealUpLevel(Integer afterGrowth, MemberGrowthConfig memberGrowthConfig);
+    Integer dealUpLevel(Long afterGrowth, MemberGrowthConfig memberGrowthConfig);
 
     List<MemberGrowthRecord> findRecordGroupBy(MemberGrowthRecord entity);
 

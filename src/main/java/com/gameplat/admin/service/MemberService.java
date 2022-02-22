@@ -81,4 +81,6 @@ public interface MemberService extends IService<Member> {
   void updateRemark(Long memberId, String remark);
 
   void updateRemark(List<Long> memberIds, String remark);
+
+  Member getMemberAndFillGameAccount(String account);
 }

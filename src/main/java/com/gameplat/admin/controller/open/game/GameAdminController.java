@@ -55,7 +55,7 @@ public class GameAdminController {
   public GameBalanceVO selectGameBalance(GameBalanceQueryDTO dto) throws Exception {
     GameBalanceVO gameBalanceVO = new GameBalanceVO();
     gameBalanceVO.setPlatformCode(dto.getPlatform().get("platformCode"));
-    Member member = memberService.getByAccount(dto.getAccount()).orElse(null);
+    Member member = memberService.getMemberAndFillGameAccount(dto.getAccount());
     if (member == null) {
       throw new ServiceException("会员账号不存在");
     }
@@ -72,7 +72,7 @@ public class GameAdminController {
     String key = "self_" + record.getPlatformCode() + '_' + record.getAccount();
     try {
       redisService.getStringOps().setEx(key, "game_transfer", 3, TimeUnit.MINUTES);
-      Member member = memberService.getByAccount(record.getAccount()).orElse(null);
+      Member member = memberService.getMemberAndFillGameAccount(record.getAccount());
       if (member == null) {
         throw new ServiceException("会员账号不存在");
       }
@@ -88,7 +88,7 @@ public class GameAdminController {
   @PostMapping(value = "/recyclingAmount")
   public Map<String, String> recyclingAmount(@RequestBody GameBalanceQueryDTO dto) {
     Map<String, String> map = new HashMap();
-    Member member = memberService.getByAccount(dto.getAccount()).orElse(null);
+    Member member = memberService.getMemberAndFillGameAccount(dto.getAccount());
     if (member == null) {
       throw new ServiceException("会员账号不存在");
     }
@@ -121,7 +121,7 @@ public class GameAdminController {
   @ResponseBody
   public Map<String, String> confiscated(@RequestBody GameBalanceQueryDTO dto) throws Exception {
     Map<String, String> map = new HashMap();
-    Member member = memberService.getByAccount(dto.getAccount()).orElse(null);
+    Member member = memberService.getMemberAndFillGameAccount(dto.getAccount());
     if (member == null) {
       throw new ServiceException("会员账号不存在");
     }
@@ -151,6 +151,7 @@ public class GameAdminController {
   @GetMapping(value = "/selectGameAllBalance")
   public Map<String, BigDecimal> selectGameAllBalance(MemberInfo memberInfo) {
     Member member = memberService.getById(memberInfo.getMemberId());
+    member = memberService.getMemberAndFillGameAccount(member.getAccount())
     if (member == null) {
       throw new ServiceException("会员账号不存在");
     }
@@ -183,7 +184,7 @@ public class GameAdminController {
       map.put("errorCode", "会员账号不能为空");
       return map;
     }
-    Member member = memberService.getByAccount(dto.getAccount()).orElse(null);
+    Member member = memberService.getMemberAndFillGameAccount(dto.getAccount());
     if (null == member) {
       map.put("errorCode", "会员账号不存在，请重新检查");
       return map;
@@ -227,7 +228,7 @@ public class GameAdminController {
       map.put("errorCode","会员账号不能为空");
       return map;
     }
-    Member member = memberService.getByAccount(dto.getAccount()).orElse(null);
+    Member member = memberService.getMemberAndFillGameAccount(dto.getAccount());
     if(null == member) {
       map.put("errorCode","会员账号不存在，请重新检查");
       return map;

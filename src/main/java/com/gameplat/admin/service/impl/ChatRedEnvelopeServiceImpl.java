@@ -69,11 +69,12 @@ public class ChatRedEnvelopeServiceImpl extends ServiceImpl<ChatRedEnvelopeMappe
     public void update(ChatRedEnvelopeEditDTO dto) {
         ChatRedEnvelope entity = new ChatRedEnvelope();
         entity.setId(dto.getId().longValue());
-        if (dto.getOpen().equals(BooleanEnum.YES.value())){
-            entity.setOpen(BooleanEnum.NO.value());
-        }else if (dto.getOpen().equals(BooleanEnum.NO.value())){
-            entity.setOpen(BooleanEnum.YES.value());
-        }
+        entity.setOpen(dto.getOpen());
+//        if (dto.getOpen().equals(BooleanEnum.YES.value())){
+//            entity.setOpen(BooleanEnum.NO.value());
+//        }else if (dto.getOpen().equals(BooleanEnum.NO.value())){
+//            entity.setOpen(BooleanEnum.YES.value());
+//        }
         updateById(entity);
     }
 

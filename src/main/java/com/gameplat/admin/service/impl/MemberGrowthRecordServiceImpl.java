@@ -178,7 +178,7 @@ public class MemberGrowthRecordServiceImpl extends ServiceImpl<MemberGrowthRecor
             memberGrowthRecord.setCurrentLevel(0);
         }
         //当前成长值
-        Integer oldGrowth = memberGrowthRecord.getCurrentGrowth();
+        Long oldGrowth = memberGrowthRecord.getCurrentGrowth();
         //最终变动成长值  由于类型不同  可能最终变成的成长值倍数也不同
         Integer changeFinalGrowth = 0;
         MemberGrowthRecord saveRecord = new MemberGrowthRecord();

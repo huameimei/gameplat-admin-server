@@ -44,10 +44,10 @@ public class MemberGrowthConfig implements Serializable {
     private Integer isAutoPayReword;
 
     @ApiModelProperty("每日签到奖励成长值")
-    private Integer signEveryDayGrowth;
+    private Long signEveryDayGrowth;
 
     @ApiModelProperty("单个会员总的签到最大成长值")
-    private Integer signMaxGrowth;
+    private Long signMaxGrowth;
 
     @ApiModelProperty("每日签到最少充值金额")
     private BigDecimal signDayMinRechargeAmount;
@@ -65,10 +65,10 @@ public class MemberGrowthConfig implements Serializable {
     private BigDecimal damaRate;
 
     @ApiModelProperty("绑定银行卡奖励成长值")
-    private Integer bindBankGrowth;
+    private Long bindBankGrowth;
 
     @ApiModelProperty("完善用户资料奖励成长值")
-    private Integer perfectUserInfoGrowth;
+    private Long perfectUserInfoGrowth;
 
     @ApiModelProperty("所需完善用户的资料列")
     private String perfectUserInfoField;

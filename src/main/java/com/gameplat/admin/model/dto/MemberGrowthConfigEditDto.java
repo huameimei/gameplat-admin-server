@@ -56,16 +56,16 @@ public class MemberGrowthConfigEditDto implements Serializable {
     private BigDecimal damaRate;
 
     @ApiModelProperty(value = "每日签到奖励成长值", name = "signEveryDayGrowth", required = false)
-    private Integer signEveryDayGrowth;
+    private Long signEveryDayGrowth;
 
     @ApiModelProperty(value = "每日签到奖励成长值", name = "signEveryDayGrowth", required = false)
-    private Integer bindBankGrowth;
+    private Long bindBankGrowth;
 
     @ApiModelProperty(value = "每日签到最少充值金额", name = "signDayMinRechargeAmount", required = false)
     private BigDecimal signDayMinRechargeAmount;
 
     @ApiModelProperty(value = "签到最大成长值", name = "signMaxGrowth", required = false)
-    private Integer signMaxGrowth;
+    private Long signMaxGrowth;
 
     @ApiModelProperty(value = "是否重复发放升级奖励", name = "isRepeatPayUpReword", required = false)
     private Integer isRepeatPayUpReword;
@@ -83,7 +83,7 @@ public class MemberGrowthConfigEditDto implements Serializable {
     private String language;
 
     @ApiModelProperty("完善用户资料奖励成长值")
-    private Integer perfectUserInfoGrowth;
+    private Long perfectUserInfoGrowth;
 
     @ApiModelProperty("所需完善用户的资料列")
     private String perfectUserInfoField;

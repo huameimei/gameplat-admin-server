@@ -2,6 +2,7 @@ package com.gameplat.admin.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -45,11 +46,12 @@ public class MemberBackupServiceImpl extends ServiceImpl<MemberBackupMapper, Mem
   }
 
   @Override
-  public List<String> getContent(String serialNo) {
+  public List<String> getContent(String serialNo,String endTime,String startTime) {
     List<String> backupContents =
         this.lambdaQuery()
             .select(MemberBackup::getContent)
-            .eq(MemberBackup::getSerialNo, serialNo)
+            .eq(ObjectUtils.isNotNull(serialNo),MemberBackup::getSerialNo, serialNo)
+            .between(ObjectUtils.isNotNull(endTime) && ObjectUtils.isNotNull(startTime),MemberBackup::getCreateTime,endTime,startTime)
             .list()
             .stream()
             .map(MemberBackup::getContent)

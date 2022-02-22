@@ -13,5 +13,5 @@ public interface MemberBackupService extends IService<MemberBackup> {
 
   List<MemberBackup> getBySerialNo(String serialNo);
 
-  List<String> getContent(String serialNo);
+  List<String> getContent(String serialNo,String endTime,String startTime);
 }

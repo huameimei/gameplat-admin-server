@@ -1,5 +1,6 @@
 package com.gameplat.admin.mapper;
 
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.gameplat.admin.model.domain.MemberDayReport;
@@ -48,4 +49,12 @@ public interface GameMemberReportMapper extends BaseMapper<MemberDayReport> {
     List<String> getSatisfyBetAccount(@Param("minBetAmount") String minBetAmount,
                                       @Param("startTime") String startTime,
                                       @Param("endTime") String endTime);
+
+
+
+    /**
+     * 获取数据（总报表）
+     */
+    List<JSONObject> getSpreadReport(@Param("account") String account,@Param("startTime") String startTime,@Param("endTime") String endTime);
+
 }

@@ -14,6 +14,7 @@ import com.gameplat.admin.model.vo.MemberInfoVO;
 import com.gameplat.admin.model.vo.MemberVO;
 import java.util.List;
 
+import com.gameplat.admin.model.vo.SpreadUnionVO;
 import org.apache.ibatis.annotations.Param;
 
 public interface MemberMapper extends BaseMapper<Member> {
@@ -77,5 +78,5 @@ public interface MemberMapper extends BaseMapper<Member> {
   IPage<IpAnalysisVO> page(PageDTO<IpAnalysisVO> page, @Param("dto") IpAnalysisDTO dto);
 
   /** 获取代理下的所有用户 */
-  List<Member> getAgentMember(@Param("list") List<SpreadUnion> list);
+  List<Member> getAgentMember(@Param("list")List<SpreadUnionVO> list, @Param("startTime")String startTime, @Param("endTime")String endTime);
 }

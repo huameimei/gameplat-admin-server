@@ -246,8 +246,10 @@ public class MemberLevelServiceImpl extends ServiceImpl<MemberLevelMapper, Membe
   }
 
   private Integer getMatchedLevel(List<MemberLevel> levelList, MemberInfo memberInfo) {
+      //先根据充值金额倒序排列，再根据层级值倒序排列，如果有两条层级配置的充值金额和充值次数一样，会员将被分配到层级值较大的那一层
     return levelList.stream()
-        .sorted(Comparator.comparing(MemberLevel::getTotalRechAmount).reversed())
+        .sorted(Comparator.comparing(MemberLevel::getTotalRechAmount, Comparator.reverseOrder())
+                        .thenComparing(MemberLevel::getLevelValue, Comparator.reverseOrder()))
         .filter(level -> this.isMatchLevel(level, memberInfo))
         .map(MemberLevel::getLevelValue)
         .findFirst()

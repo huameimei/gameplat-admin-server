@@ -151,8 +151,8 @@ public class GameAdminController {
   @GetMapping(value = "/selectGameAllBalance")
   public Map<String, BigDecimal> selectGameAllBalance(MemberInfo memberInfo) {
     Member member = memberService.getById(memberInfo.getMemberId());
-    member = memberService.getMemberAndFillGameAccount(member.getAccount())
-    if (member == null) {
+    Member memberAccount = memberService.getMemberAndFillGameAccount(member.getAccount());
+    if (memberAccount == null) {
       throw new ServiceException("会员账号不存在");
     }
     Map<String, BigDecimal> map = new HashMap<>();
@@ -160,7 +160,7 @@ public class GameAdminController {
     if (!CollectionUtils.isEmpty(gamePlatformList)) {
       gamePlatformList.stream().parallel().forEach(gamePlatform -> {
         try {
-          map.put(gamePlatform.getCode(), gameAdminService.getBalance(gamePlatform.getCode(), member));
+          map.put(gamePlatform.getCode(), gameAdminService.getBalance(gamePlatform.getCode(), memberAccount));
         } catch (Exception e) {
           log.info(gamePlatform.getCode() + "游戏查询异常：", e);
           map.put(gamePlatform.getCode(), BigDecimal.ZERO);

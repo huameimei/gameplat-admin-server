@@ -35,16 +35,16 @@ public class MemberGrowthRecordVO implements Serializable {
     private Integer currentLevel;
 
     @ApiModelProperty(value = "变动前的成长值")
-    private Integer oldGrowth;
+    private Long oldGrowth;
 
     @ApiModelProperty(value = "变动倍数")
     private Double changeMult;
 
     @ApiModelProperty(value = "变动的成长值")
-    private Integer changeGrowth;
+    private Long changeGrowth;
 
     @ApiModelProperty(value = "变动后的成长值")
-    private Integer currentGrowth;
+    private Long currentGrowth;
 
     @ApiModelProperty(value = "创建时间")
     @JsonSerialize(using = Date2LongSerializerUtils.class)

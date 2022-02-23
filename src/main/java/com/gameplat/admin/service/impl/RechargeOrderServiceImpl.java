@@ -3,6 +3,7 @@ package com.gameplat.admin.service.impl;
 import static com.gameplat.common.enums.DictDataEnum.MAX_DISCOUNT_MONEY;
 import static com.gameplat.common.enums.DictDataEnum.MAX_RECHARGE_MONEY;
 
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
@@ -26,16 +27,7 @@ import com.gameplat.admin.model.bean.AdminLimitInfo;
 import com.gameplat.admin.model.bean.ChannelLimitsBean;
 import com.gameplat.admin.model.bean.ManualRechargeOrderBo;
 import com.gameplat.admin.model.bean.PageExt;
-import com.gameplat.admin.model.domain.DiscountType;
-import com.gameplat.admin.model.domain.Member;
-import com.gameplat.admin.model.domain.MemberBill;
-import com.gameplat.admin.model.domain.MemberInfo;
-import com.gameplat.admin.model.domain.PayAccount;
-import com.gameplat.admin.model.domain.RechargeOrder;
-import com.gameplat.admin.model.domain.RechargeOrderHistory;
-import com.gameplat.admin.model.domain.SysUser;
-import com.gameplat.admin.model.domain.TpMerchant;
-import com.gameplat.admin.model.domain.TpPayChannel;
+import com.gameplat.admin.model.domain.*;
 import com.gameplat.admin.model.dto.MemberActivationDTO;
 import com.gameplat.admin.model.dto.RechargeOrderQueryDTO;
 import com.gameplat.admin.model.vo.MemberActivationVO;
@@ -389,6 +381,7 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
   public MemberActivationVO getRechargeInfoByNameAndUpdateTime(MemberActivationDTO memberActivationDTO) {
     return rechargeOrderMapper.getRechargeInfoByNameAndUpdateTime(memberActivationDTO);
   }
+
 
   private void verifyRechargeOrderForAuditing(RechargeOrder rechargeOrder) {
     if (rechargeOrder == null) {
@@ -776,6 +769,15 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
       bill.setRemark(remark[0]);
     }
     memberBillService.save(member, bill);
+  }
+
+
+  /**
+   * 获取某时间段内某代理下所有会员的充值数据
+   */
+  @Override
+  public List<JSONObject> getSpreadReport(List<SpreadUnion> list, String startTime, String endTime) {
+    return rechargeOrderMapper.getSpreadReport(list,startTime,endTime);
   }
 
 }

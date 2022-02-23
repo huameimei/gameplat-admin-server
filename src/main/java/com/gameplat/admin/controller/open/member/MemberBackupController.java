@@ -25,6 +25,6 @@ public class MemberBackupController {
 
   @GetMapping("/getContent/{serialNo}")
   public List<String> getContent(@PathVariable String serialNo) {
-    return memberBackupService.getContent(serialNo);
+    return memberBackupService.getContent(serialNo,null,null);
   }
 }

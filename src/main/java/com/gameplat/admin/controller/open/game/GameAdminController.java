@@ -36,209 +36,210 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/admin/game")
 public class GameAdminController {
 
-  @Resource
-  private GameAdminService gameAdminService;
+    @Resource
+    private GameAdminService gameAdminService;
 
-  @Resource
-  private MemberService memberService;
+    @Resource
+    private MemberService memberService;
 
-  @Resource
-  private RedisService redisService;
+    @Resource
+    private RedisService redisService;
 
-  @Resource
-  private GamePlatformService gamePlatformService;
+    @Resource
+    private GamePlatformService gamePlatformService;
 
-  /**
-   * 查询单个真人平台余额
-   */
-  @GetMapping(value = "/selectGameBalance")
-  public GameBalanceVO selectGameBalance(GameBalanceQueryDTO dto) throws Exception {
-    GameBalanceVO gameBalanceVO = new GameBalanceVO();
-    gameBalanceVO.setPlatformCode(dto.getPlatform().get("platformCode"));
-    Member member = memberService.getByAccount(dto.getAccount()).orElse(null);
-    if (member == null) {
-      throw new ServiceException("会员账号不存在");
-    }
-    gameBalanceVO
-        .setBalance(gameAdminService.getBalance(dto.getPlatform().get("platformCode"), member));
-    return gameBalanceVO;
-  }
-
-  /**
-   * 转账到真人
-   */
-  @PostMapping(value = "/transferToGame")
-  public void transferToGame(@RequestBody OperGameTransferRecordDTO record) throws Exception {
-    String key = "self_" + record.getPlatformCode() + '_' + record.getAccount();
-    try {
-      redisService.getStringOps().setEx(key, "game_transfer", 3, TimeUnit.MINUTES);
-      Member member = memberService.getByAccount(record.getAccount()).orElse(null);
-      if (member == null) {
-        throw new ServiceException("会员账号不存在");
-      }
-      gameAdminService.transferOut(record.getPlatformCode(), record.getAmount(), member, false);
-    } finally {
-      redisService.getKeyOps().delete(key);
-    }
-  }
-
-  /**
-   * 回收金额
-   */
-  @PostMapping(value = "/recyclingAmount")
-  public Map<String, String> recyclingAmount(@RequestBody GameBalanceQueryDTO dto) {
-    Map<String, String> map = new HashMap();
-    Member member = memberService.getByAccount(dto.getAccount()).orElse(null);
-    if (member == null) {
-      throw new ServiceException("会员账号不存在");
-    }
-    dto.getPlatform()
-        .forEach((key, value) -> {
-              try {
-                if (StringUtils.isNotBlank(value) && (int) Double.parseDouble(value) >= 1) {
-                  gameAdminService
-                      .transfer(key, TransferTypesEnum.SELF.getCode(), new BigDecimal(value), member,
-                          false);
-                  dto.getPlatform().put(key, (int) Double.parseDouble(value) + "");
-                } else {
-                  dto.getPlatform().put(key, "0");
-                  map.put(key, "金额必须大于或等于1");
-                }
-              } catch (Exception e) {
-                log.info(e.getMessage());
-                map.put(key, e.getMessage());
-              }
-            }
-        );
-    return map;
-  }
-
-
-  /**
-   * 没收真人余额
-   */
-  @RequestMapping(value = "/confiscated", method = RequestMethod.POST)
-  @ResponseBody
-  public Map<String, String> confiscated(@RequestBody GameBalanceQueryDTO dto) throws Exception {
-    Map<String, String> map = new HashMap();
-    Member member = memberService.getByAccount(dto.getAccount()).orElse(null);
-    if (member == null) {
-      throw new ServiceException("会员账号不存在");
-    }
-    dto.getPlatform()
-        .forEach((key, value) -> {
-          try {
-            if (StringUtils.isNotBlank(value)
-                && new BigDecimal(value).compareTo(BigDecimal.ZERO) > 0) {
-              gameAdminService.confiscated(key, new BigDecimal(value), member);
-            } else {
-              map.put(key, "金额必须大于零");
-              dto.getPlatform().put(key, "0");
-            }
-          } catch (Exception e) {
-            log.info(e.getMessage());
-            e.printStackTrace();
-            map.put(key, e.getMessage());
-          }
-        });
-    return map;
-  }
-
-
-  /**
-   * 查询所有真人游戏平台余额
-   */
-  @GetMapping(value = "/selectGameAllBalance")
-  public Map<String, BigDecimal> selectGameAllBalance(MemberInfo memberInfo) {
-    Member member = memberService.getById(memberInfo.getMemberId());
-    if (member == null) {
-      throw new ServiceException("会员账号不存在");
-    }
-    Map<String, BigDecimal> map = new HashMap<>();
-    List<GamePlatform> gamePlatformList = gamePlatformService.queryByTransfer();
-    if (!CollectionUtils.isEmpty(gamePlatformList)) {
-      gamePlatformList.stream().parallel().forEach(gamePlatform -> {
-        try {
-          map.put(gamePlatform.getCode(), gameAdminService.getBalance(gamePlatform.getCode(), member));
-        } catch (Exception e) {
-          log.info(gamePlatform.getCode() + "游戏查询异常：", e);
-          map.put(gamePlatform.getCode(), BigDecimal.ZERO);
+    /**
+     * 查询单个真人平台余额
+     */
+    @GetMapping(value = "/selectGameBalance")
+    public GameBalanceVO selectGameBalance(GameBalanceQueryDTO dto) throws Exception {
+        GameBalanceVO gameBalanceVO = new GameBalanceVO();
+        gameBalanceVO.setPlatformCode(dto.getPlatform().get("platformCode"));
+        Member member = memberService.getMemberAndFillGameAccount(dto.getAccount());
+        if (member == null) {
+            throw new ServiceException("会员账号不存在");
         }
-      });
+        gameBalanceVO
+                .setBalance(gameAdminService.getBalance(dto.getPlatform().get("platformCode"), member));
+        return gameBalanceVO;
     }
-    return map;
-  }
 
-  /**
-   * 回收金额
-   */
-  @PostMapping(value = "/recyclingAmountByAccount")
-  public Map<String, Object> recyclingAmountByAccount(@RequestBody GameBalanceQueryDTO dto) throws Exception {
-    Map<String, Object> map = new HashMap();
-    if (null == dto.getPlatform() || null == dto.getPlatform().get("platformCode")) {
-      map.put("errorCode", "真人类型不正确");
-      return map;
+    /**
+     * 转账到真人
+     */
+    @PostMapping(value = "/transferToGame")
+    public void transferToGame(@RequestBody OperGameTransferRecordDTO record) throws Exception {
+        String key = "self_" + record.getPlatformCode() + '_' + record.getAccount();
+        try {
+            redisService.getStringOps().setEx(key, "game_transfer", 3, TimeUnit.MINUTES);
+            Member member = memberService.getMemberAndFillGameAccount(record.getAccount());
+            if (member == null) {
+                throw new ServiceException("会员账号不存在");
+            }
+            gameAdminService.transferOut(record.getPlatformCode(), record.getAmount(), member, false);
+        } finally {
+            redisService.getKeyOps().delete(key);
+        }
     }
-    if (StringUtils.isBlank(dto.getAccount())) {
-      map.put("errorCode", "会员账号不能为空");
-      return map;
-    }
-    Member member = memberService.getByAccount(dto.getAccount()).orElse(null);
-    if (null == member) {
-      map.put("errorCode", "会员账号不存在，请重新检查");
-      return map;
-    }
-    String platformCode = dto.getPlatform().get("platformCode");
-    try {
-      BigDecimal money = gameAdminService.getBalance(platformCode, member);
-      if (null != money && money.compareTo(BigDecimal.ONE) > 0) {
-        BigDecimal transferMoney = new BigDecimal((int) Double.parseDouble(money.toString()));
-        gameAdminService
-            .transfer(platformCode, TransferTypesEnum.SELF.getCode(), transferMoney, member, false);
-        map.put("balance", transferMoney);
-        //记录日志
-        StringBuffer log = new StringBuffer();
-        log.append("真人额度回收:会员账号:" + dto.getAccount() + ",");
-        log.append("真人类型：" + platformCode + ",");
-        log.append("金额：" + transferMoney);
-        // TODO 日志记录
-      } else {
-        map.put("errorCode", "回收金额必须大于或等于1");
+
+    /**
+     * 回收金额
+     */
+    @PostMapping(value = "/recyclingAmount")
+    public Map<String, String> recyclingAmount(@RequestBody GameBalanceQueryDTO dto) {
+        Map<String, String> map = new HashMap();
+        Member member = memberService.getMemberAndFillGameAccount(dto.getAccount());
+        if (member == null) {
+            throw new ServiceException("会员账号不存在");
+        }
+        dto.getPlatform()
+                .forEach((key, value) -> {
+                            try {
+                                if (StringUtils.isNotBlank(value) && (int) Double.parseDouble(value) >= 1) {
+                                    gameAdminService
+                                            .transfer(key, TransferTypesEnum.SELF.getCode(), new BigDecimal(value), member,
+                                                    false);
+                                    dto.getPlatform().put(key, (int) Double.parseDouble(value) + "");
+                                } else {
+                                    dto.getPlatform().put(key, "0");
+                                    map.put(key, "金额必须大于或等于1");
+                                }
+                            } catch (Exception e) {
+                                log.info(e.getMessage());
+                                map.put(key, e.getMessage());
+                            }
+                        }
+                );
         return map;
-      }
-    } catch (Exception e) {
-      e.printStackTrace();
-      map.put("errorCode", "获取真人信息错误，请联系客服查看");
     }
-    return map;
-  }
 
-  /**
-   * 查询单个真人平台余额
-   */
-  @PostMapping(value = "/selectGameBalanceByAccount")
-  public Map<String,Object> selectGameBalanceByAccount(@RequestBody GameBalanceQueryDTO dto) throws Exception{
-    Map<String,Object> map = new HashMap();
-    if(null == dto.getPlatform() || null == dto.getPlatform().get("platformCode")){
-      map.put("errorCode","真人类型不正确");
-      return map;
+
+    /**
+     * 没收真人余额
+     */
+    @RequestMapping(value = "/confiscated", method = RequestMethod.POST)
+    @ResponseBody
+    public Map<String, String> confiscated(@RequestBody GameBalanceQueryDTO dto) throws Exception {
+        Map<String, String> map = new HashMap();
+        Member member = memberService.getMemberAndFillGameAccount(dto.getAccount());
+        if (member == null) {
+            throw new ServiceException("会员账号不存在");
+        }
+        dto.getPlatform()
+                .forEach((key, value) -> {
+                    try {
+                        if (StringUtils.isNotBlank(value)
+                                && new BigDecimal(value).compareTo(BigDecimal.ZERO) > 0) {
+                            gameAdminService.confiscated(key, new BigDecimal(value), member);
+                        } else {
+                            map.put(key, "金额必须大于零");
+                            dto.getPlatform().put(key, "0");
+                        }
+                    } catch (Exception e) {
+                        log.info(e.getMessage());
+                        e.printStackTrace();
+                        map.put(key, e.getMessage());
+                    }
+                });
+        return map;
     }
-    if(StringUtils.isBlank(dto.getAccount())){
-      map.put("errorCode","会员账号不能为空");
-      return map;
+
+
+    /**
+     * 查询所有真人游戏平台余额
+     */
+    @GetMapping(value = "/selectGameAllBalance")
+    public Map<String, BigDecimal> selectGameAllBalance(MemberInfo memberInfo) {
+        Member member = memberService.getById(memberInfo.getMemberId());
+        Member memberAccount = memberService.getMemberAndFillGameAccount(member.getAccount());
+        if (memberAccount == null) {
+            throw new ServiceException("会员账号不存在");
+        }
+        Map<String, BigDecimal> map = new HashMap<>();
+        List<GamePlatform> gamePlatformList = gamePlatformService.queryByTransfer();
+        if (!CollectionUtils.isEmpty(gamePlatformList)) {
+            gamePlatformList.stream().parallel().forEach(gamePlatform -> {
+                try {
+                    map.put(gamePlatform.getCode(), gameAdminService.getBalance(gamePlatform.getCode(), memberAccount));
+                } catch (Exception e) {
+                    log.info(gamePlatform.getCode() + "游戏查询异常：", e);
+                    map.put(gamePlatform.getCode(), BigDecimal.ZERO);
+                }
+            });
+        }
+        return map;
     }
-    Member member = memberService.getByAccount(dto.getAccount()).orElse(null);
-    if(null == member) {
-      map.put("errorCode","会员账号不存在，请重新检查");
-      return map;
+
+    /**
+     * 回收金额
+     */
+    @PostMapping(value = "/recyclingAmountByAccount")
+    public Map<String, Object> recyclingAmountByAccount(@RequestBody GameBalanceQueryDTO dto) throws Exception {
+        Map<String, Object> map = new HashMap();
+        if (null == dto.getPlatform() || null == dto.getPlatform().get("platformCode")) {
+            map.put("errorCode", "真人类型不正确");
+            return map;
+        }
+        if (StringUtils.isBlank(dto.getAccount())) {
+            map.put("errorCode", "会员账号不能为空");
+            return map;
+        }
+        Member member = memberService.getMemberAndFillGameAccount(dto.getAccount());
+        if (null == member) {
+            map.put("errorCode", "会员账号不存在，请重新检查");
+            return map;
+        }
+        String platformCode = dto.getPlatform().get("platformCode");
+        try {
+            BigDecimal money = gameAdminService.getBalance(platformCode, member);
+            if (null != money && money.compareTo(BigDecimal.ONE) > 0) {
+                BigDecimal transferMoney = new BigDecimal((int) Double.parseDouble(money.toString()));
+                gameAdminService
+                        .transfer(platformCode, TransferTypesEnum.SELF.getCode(), transferMoney, member, false);
+                map.put("balance", transferMoney);
+                //记录日志
+                StringBuffer log = new StringBuffer();
+                log.append("真人额度回收:会员账号:" + dto.getAccount() + ",");
+                log.append("真人类型：" + platformCode + ",");
+                log.append("金额：" + transferMoney);
+                // TODO 日志记录
+            } else {
+                map.put("errorCode", "回收金额必须大于或等于1");
+                return map;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            map.put("errorCode", "获取真人信息错误，请联系客服查看");
+        }
+        return map;
     }
-    try{
-      map.put("platformCode",dto.getPlatform().get("platformCode"));
-      map.put("balance",gameAdminService.getBalance(dto.getPlatform().get("platformCode"),member));
-    }catch (Exception e){
-      e.printStackTrace();
-      map.put("errorCode","获取真人信息错误，请联系客服查看");
+
+    /**
+     * 查询单个真人平台余额
+     */
+    @PostMapping(value = "/selectGameBalanceByAccount")
+    public Map<String,Object> selectGameBalanceByAccount(@RequestBody GameBalanceQueryDTO dto) throws Exception{
+        Map<String,Object> map = new HashMap();
+        if(null == dto.getPlatform() || null == dto.getPlatform().get("platformCode")){
+            map.put("errorCode","真人类型不正确");
+            return map;
+        }
+        if(StringUtils.isBlank(dto.getAccount())){
+            map.put("errorCode","会员账号不能为空");
+            return map;
+        }
+        Member member = memberService.getMemberAndFillGameAccount(dto.getAccount());
+        if(null == member) {
+            map.put("errorCode","会员账号不存在，请重新检查");
+            return map;
+        }
+        try{
+            map.put("platformCode",dto.getPlatform().get("platformCode"));
+            map.put("balance",gameAdminService.getBalance(dto.getPlatform().get("platformCode"),member));
+        }catch (Exception e){
+            e.printStackTrace();
+            map.put("errorCode","获取真人信息错误，请联系客服查看");
+        }
+        return map;
     }
-    return map;
-  }
 }

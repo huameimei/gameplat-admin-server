@@ -215,4 +215,20 @@
                     and update_time &lt;= #{endTime}
                 </if>) r
     </select>
+    <!-- 获取时间段内某代理下的所有数据-->
+    <select id="getSpreadReport" resultType="com.alibaba.fastjson.JSONObject">
+        SELECT account,count(0) countSize,sum(amount) amountSum, sum(discount_amount) discountAmountSum
+        FROM recharge_order
+        WHERE
+        create_time BETWEEN #{startTime} AND #{endTime}
+        AND
+        status = 3
+        AND
+        super_path regexp concat(
+        <foreach collection="list" item="obj" open="" close="" separator=",'|',">
+            concat('^/',#{obj.agentAccount})
+        </foreach>
+        )
+        GROUP BY account
+    </select>
 </mapper>

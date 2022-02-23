@@ -1,17 +1,20 @@
 package com.gameplat.admin.service;
 
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.gameplat.admin.model.bean.ActivityStatisticItem;
 import com.gameplat.admin.model.bean.ManualRechargeOrderBo;
 import com.gameplat.admin.model.bean.PageExt;
 import com.gameplat.admin.model.domain.RechargeOrder;
+import com.gameplat.admin.model.domain.SpreadUnion;
 import com.gameplat.admin.model.dto.MemberActivationDTO;
 import com.gameplat.admin.model.dto.RechargeOrderQueryDTO;
 import com.gameplat.admin.model.vo.MemberActivationVO;
 import com.gameplat.admin.model.vo.RechargeOrderVO;
 import com.gameplat.admin.model.vo.SummaryVO;
 import com.gameplat.security.context.UserCredential;
+import org.apache.ibatis.annotations.Param;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -57,4 +60,9 @@ public interface RechargeOrderService extends IService<RechargeOrder> {
 
     /** 根据会员和最后修改时间获取充值次数、充值金额、充值优惠、其它优惠 */
     MemberActivationVO getRechargeInfoByNameAndUpdateTime(MemberActivationDTO memberActivationDTO);
+
+    /**
+     * 获取时间段内某代理下的所有充值成功数据
+     */
+    List<JSONObject> getSpreadReport(List<SpreadUnion> list,String startTime, String endTime);
 }

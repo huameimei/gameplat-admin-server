@@ -1,7 +1,5 @@
 package com.gameplat.admin.mapper;
 
-import com.alibaba.fastjson.JSONObject;
-import com.alibaba.fastjson.JSONPObject;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -16,7 +14,7 @@ import com.gameplat.admin.model.vo.MemberInfoVO;
 import com.gameplat.admin.model.vo.MemberVO;
 import java.util.List;
 
-import io.swagger.v3.oas.annotations.Parameter;
+import com.gameplat.admin.model.vo.SpreadUnionVO;
 import org.apache.ibatis.annotations.Param;
 
 public interface MemberMapper extends BaseMapper<Member> {
@@ -65,9 +63,7 @@ public interface MemberMapper extends BaseMapper<Member> {
    */
   List<Member> getListByAgentAccout(String agentAccout);
 
-  /**
-   * 根据用户名查生日信息
-   * */
+  /** 根据用户名查生日信息 */
   List<Member> findByUserNameList(List<String> userNames);
 
   /**
@@ -75,15 +71,12 @@ public interface MemberMapper extends BaseMapper<Member> {
    *
    * @param accountList List
    * @return List<Member>
-   * */
+   */
   List<Member> getInfoByAccount(@Param("accountList") List<String> accountList);
 
   /** 注册ip分析 */
   IPage<IpAnalysisVO> page(PageDTO<IpAnalysisVO> page, @Param("dto") IpAnalysisDTO dto);
 
-  /**
-   * 获取代理下的所有用户
-   */
-  List<Member> getAgentMember(@Param("list")List<SpreadUnion> list);
-
+  /** 获取代理下的所有用户 */
+  List<Member> getAgentMember(@Param("list")List<SpreadUnionVO> list, @Param("startTime")String startTime, @Param("endTime")String endTime);
 }

@@ -29,10 +29,10 @@ public class MemberGrowthLevelEditDto implements Serializable {
     private String levelName;
 
     @ApiModelProperty(value = "晋升下级所需成长值", required = false)
-    private Integer growth;
+    private Long growth;
 
     @ApiModelProperty(value = "保级成长值", required = false)
-    private Integer limitGrowth;
+    private Long limitGrowth;
 
     @ApiModelProperty(value = "升级奖励", required = false)
     private BigDecimal upReward;

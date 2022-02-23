@@ -1,11 +1,13 @@
 package com.gameplat.admin.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.util.RandomUtil;
 import com.alicp.jetcache.anno.CacheInvalidate;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.component.MemberQueryCondition;
+import com.gameplat.admin.config.TenantConfig;
 import com.gameplat.admin.constant.SystemConstant;
 import com.gameplat.admin.convert.MemberConvert;
 import com.gameplat.admin.enums.MemberEnums;
@@ -48,6 +50,13 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
   @Autowired private MemberRemarkService memberRemarkService;
 
   @Autowired private OnlineUserService onlineUserService;
+
+  @Autowired private TenantConfig  tenantConfig;
+
+  @Override
+  public Member getForAccount(String account) {
+    return this.lambdaQuery().eq(Member::getAccount, account).one();
+  }
 
   @Override
   public IPage<MemberVO> queryPage(Page<Member> page, MemberQueryDTO dto) {
@@ -320,5 +329,20 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
             .in(Member::getId, ids)
             .update(new Member()),
         "批量启用失败!");
+  }
+
+  @Override
+  public Member getMemberAndFillGameAccount(String account) {
+    Member member = this.getByAccount(account)
+            .orElseThrow(() -> new ServiceException("会员信息不存在!"));
+    if(StringUtils.isBlank(member.getGameAccount())){
+      Assert.notNull(tenantConfig.getTenantCode(),"平台编码未配置，请联系客服");
+      //固定13位
+      StringBuffer gameAccount = new StringBuffer(tenantConfig.getTenantCode()).append(member.getId());
+      String suffix = RandomUtil.randomString(13 - gameAccount.length());
+      member.setGameAccount(gameAccount.append(suffix).toString());
+      Assert.isTrue(this.updateById(member), "添加会员游戏账号信息!");
+    }
+    return member;
   }
 }

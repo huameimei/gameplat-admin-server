@@ -331,7 +331,10 @@
     <!-- 根据代理获取代理下的信息 -->
     <select id="getAgentMember" resultType="com.gameplat.admin.model.domain.Member">
         SELECT id,account FROM member
-        WHERE super_path regexp concat(
+        WHERE
+        create_time BETWEEN #{startTime} AND #{endTime}
+        AND
+        super_path regexp concat(
         <foreach collection="list" item="obj" open="" close="" separator=",'|',">
             concat('^/',#{obj.agentAccount})
         </foreach>

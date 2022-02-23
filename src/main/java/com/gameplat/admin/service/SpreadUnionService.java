@@ -38,7 +38,12 @@ public interface SpreadUnionService extends IService<SpreadUnion> {
     /**
      * 获取联盟报表
      */
-    List<JSONObject> getUnionReportList(SpreadUnionDTO dto);
+    Object getUnionReportList(SpreadUnionDTO dto);
+
+    /**
+     * 联盟报表详情
+     */
+    List<JSONObject> unionReportInfo(String account,String startTime,String endTime);
 
 
 }

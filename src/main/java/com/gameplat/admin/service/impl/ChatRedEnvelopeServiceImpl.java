@@ -13,10 +13,8 @@ import com.gameplat.admin.model.dto.ChatRedEnvelopeQueryDTO;
 import com.gameplat.admin.model.vo.ChatRedEnvelopeVO;
 import com.gameplat.admin.service.ChatRedEnvelopeService;
 import com.gameplat.base.common.exception.ServiceException;
-import com.gameplat.common.enums.BooleanEnum;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.poi.ss.formula.functions.Now;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -67,14 +65,10 @@ public class ChatRedEnvelopeServiceImpl extends ServiceImpl<ChatRedEnvelopeMappe
     /** 启用禁用 */
     @Override
     public void update(ChatRedEnvelopeEditDTO dto) {
-        ChatRedEnvelope entity = new ChatRedEnvelope();
-        entity.setId(dto.getId().longValue());
-        if (dto.getOpen().equals(BooleanEnum.YES.value())){
-            entity.setOpen(BooleanEnum.NO.value());
-        }else if (dto.getOpen().equals(BooleanEnum.NO.value())){
-            entity.setOpen(BooleanEnum.YES.value());
-        }
-        updateById(entity);
+        updateById(new ChatRedEnvelope(){{
+            setId(dto.getId().longValue());
+            setOpen(dto.getOpen());
+        }});
     }
 
 

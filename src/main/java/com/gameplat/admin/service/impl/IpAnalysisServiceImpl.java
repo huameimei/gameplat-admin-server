@@ -1,5 +1,6 @@
 package com.gameplat.admin.service.impl;
 
+import ch.qos.logback.core.rolling.helper.IntegerTokenConverter;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -23,8 +24,11 @@ import com.gameplat.security.context.UserCredential;
 import org.apache.lucene.search.vectorhighlight.ScoreOrderFragmentsBuilder;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.action.search.SearchTask;
+import org.elasticsearch.client.HttpAsyncResponseConsumerFactory;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
+import org.elasticsearch.common.Strings;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
@@ -33,7 +37,10 @@ import org.elasticsearch.search.aggregations.*;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms;
 import org.elasticsearch.search.aggregations.bucket.terms.TermsAggregationBuilder;
 import org.elasticsearch.search.aggregations.metrics.CardinalityAggregationBuilder;
+import org.elasticsearch.search.aggregations.metrics.ValueCountAggregationBuilder;
+import org.elasticsearch.search.aggregations.pipeline.BucketSortPipelineAggregationBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.elasticsearch.search.fetch.subphase.FetchSourceContext;
 import org.elasticsearch.search.sort.FieldSortBuilder;
 import org.elasticsearch.search.sort.SortBuilder;
 import org.elasticsearch.search.sort.SortBuilders;
@@ -46,10 +53,7 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -103,34 +107,8 @@ public class IpAnalysisServiceImpl implements IpAnalysisService {
             list = pagelist.getRecords();
         } else if (IpAnalysisEnum.LOGIN.getCode().equals(dto.getType())) {
         // 登录
-        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder().query(IpAnalysisServiceImpl.buildSearch(dto));
-//        TermsAggregationBuilder aggregation =
-//                AggregationBuilders.terms("username")
-//                        .subAggregation(AggregationBuilders.terms("ipAddress").field("ipAddress.keyword"))
-//                        .field("username.keyword").size(200);
-
-        TermsAggregationBuilder username = AggregationBuilders.terms("username").field("username.keyword");
-        TermsAggregationBuilder ipAddress = AggregationBuilders.terms("ipAddress").field("ipAddress.keyword");
-
-        // 去重
-        CardinalityAggregationBuilder distinct_username = AggregationBuilders.cardinality("distinct_username").field("username.keyword");
-        searchSourceBuilder.aggregation(username.subAggregation(ipAddress).subAggregation(distinct_username) ).sort(SortBuilders.fieldSort("createTime.keyword").order(SortOrder.DESC));
-        PageResponse<JSON> result = baseElasticsearchService.search(INDEX + tenant, searchSourceBuilder, JSON.class, (int) page.getCurrent(), (int) page.getSize());
-        List<JSON> log = result.getList();
-            for (int i = 0; i < log.size(); i++) {
-                IpAnalysisEsVO esVO = JSON.toJavaObject(log.get(i), IpAnalysisEsVO.class);
-                IpAnalysisVO vo = new IpAnalysisVO(){{
-                    setAccount(esVO.getUsername());
-                    setIpAddress(esVO.getIpAddress());
-                }};
-                list.add(vo);
-                SearchSourceBuilder searchSourceBuilder1 =
-                        new SearchSourceBuilder().query(QueryBuilders.boolQuery().must(QueryBuilders.matchQuery("ipAddress", esVO.getIpAddress())))
-                        .aggregation(AggregationBuilders.count("ipAddress_count").field("ipAddress.keyword"));
-                Map<String, Long> ipAddress1 = baseElasticsearchService.aggregationSearchDoc(INDEX + tenant, searchSourceBuilder1, "ipAddress_count");
-                pagelist.setRecords(list);
-
-        }
+            list = aggregationSearchDoc(page, dto);
+            pagelist.setRecords(list);
             pagelist.setTotal(list.size());
             if (ObjectUtils.isNull(page.getSize())){
                 pagelist.setSize(10);
@@ -195,58 +173,87 @@ public class IpAnalysisServiceImpl implements IpAnalysisService {
         return builder;
     }
 
-    public void searchEs(IpAnalysisDTO dto){
-        // 创建search请求
-        SearchRequest searchRequest = new SearchRequest(INDEX+tenant);
-        // 用SearchSourceBuilder来构造查询请求体
-        SearchSourceBuilder sourceBuilder = new SearchSourceBuilder().query(IpAnalysisServiceImpl.buildSearch(dto));
-        // 去重
-        CardinalityAggregationBuilder distinct_count = AggregationBuilders.cardinality("distinct_count")
-                .field("username.keyword");
-        // 根据 会员账号 ip 分组 而后根据 会员账号去重 而后根据时间排序
-        TermsAggregationBuilder aggregation = AggregationBuilders.terms("by_group")
-                .field("username.keyword")
-                .field("ipAddress.keyword")
-                .subAggregation(distinct_count)
-                .order(BucketOrder.aggregation("distinct_count", false));
+    //es聚合查询
+    public List<IpAnalysisVO> aggregationSearchDoc(PageDTO<IpAnalysisVO> page,IpAnalysisDTO dto){
+        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder().query(IpAnalysisServiceImpl.buildSearch(dto));
+        TermsAggregationBuilder username = AggregationBuilders.terms("username").field("username.keyword").size((int)page.getSize());
+        TermsAggregationBuilder ipAddress = AggregationBuilders.terms("ipAddress").field("ipAddress.keyword").size(1);
 
-        sourceBuilder.aggregation(aggregation);
-        searchRequest.source(sourceBuilder);
-        //3、发送请求
-        SearchResponse searchResponse = null;
+        BucketSortPipelineAggregationBuilder bucketSort = new BucketSortPipelineAggregationBuilder("bucket_sort",null)
+                .from(((int)page.getCurrent() - 1) * (int)page.getSize())
+                .size((int)page.getSize());
+
+        ipAddress.subAggregation(bucketSort);
+        username.subAggregation(ipAddress);
+
+        searchSourceBuilder.aggregation(username);
+        SearchRequest searchRequest = new SearchRequest(INDEX+tenant);
+
+        searchSourceBuilder.sort(SortBuilders.fieldSort("createTime.keyword").order(SortOrder.DESC));
+        searchRequest.source(searchSourceBuilder);
+
+        RequestOptions.Builder optionsBuilder = RequestOptions.DEFAULT.toBuilder();
+        optionsBuilder.setHttpAsyncResponseConsumerFactory(
+                new HttpAsyncResponseConsumerFactory.HeapBufferedResponseConsumerFactory(31457280));
+        List<IpAnalysisVO> list = new ArrayList<>();
+        Set<String> ips = new HashSet<>();
         try {
-            searchResponse = restHighLevelClient.search(searchRequest, RequestOptions.DEFAULT);
-        } catch (IOException e) {
+            SearchResponse search = restHighLevelClient.search(searchRequest, optionsBuilder.build());
+            Terms terms = search.getAggregations().get("username");
+            for (Terms.Bucket bucket : terms.getBuckets()) {
+                String account = bucket.getKeyAsString();
+                Terms terms2 = bucket.getAggregations().get("ipAddress");
+                for (Terms.Bucket bucket2 : terms2.getBuckets()) {
+                    String ip = bucket2.getKeyAsString();
+                    long docCount = bucket2.getDocCount();
+                    ips.add(ip);
+                    IpAnalysisVO vo = new IpAnalysisVO();
+                    vo.setAccount(account);
+                    vo.setIpAddress(ip);
+                    vo.setIpCount((int)docCount);
+                    list.add(vo);
+                }
+            }
+
+        } catch (Exception e) {
             e.printStackTrace();
         }
-        if (RestStatus.OK.equals(searchResponse.status())) {
-            // 获取聚合结果
-            Aggregations aggregations = searchResponse.getAggregations();
-            Terms byAgeAggregation = aggregations.get("by_group");
-            for (Terms.Bucket buck : byAgeAggregation.getBuckets()) {
-                String ip = buck.getKeyAsString();
-                Aggregations aggregations1 = buck.getAggregations();
-                Aggregation distinct_count1 = aggregations1.get("distinct_count");
-                JSONObject jsonObject = JSON.parseObject(JSON.toJSONString(distinct_count1));
-                System.out.println(jsonObject);
-                String cardinalityValue = jsonObject.getString("username");
-                System.out.println(ip +"\t\t" + cardinalityValue);
-            }
-        }
+
+        Map<String, Integer> ipMap = aggregationSearchDoc(ips);
+        list.forEach(l -> l.setIpCount(ipMap.get(l.getIpAddress())));
+        return list;
     }
 
-    //聚合查詢
-    public Map<String, Long> aggregationSearchDoc(IpAnalysisDTO dto){
-        String index = INDEX+tenant;
-        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder().query(IpAnalysisServiceImpl.buildSearch(dto));
-//        CardinalityAggregationBuilder distinct_count = AggregationBuilders.cardinality("distinct_count").field("username.keyword");
 
-        TermsAggregationBuilder aggregation = AggregationBuilders.terms("username").subAggregation(AggregationBuilders.terms("ipAddress").field("ipAddress.keyword").size(10))
-                .field("username")
-                .order(BucketOrder.aggregation("createTime", false));
-        searchSourceBuilder.aggregation(aggregation);
-        Map<String, Long> by_group = baseElasticsearchService.aggregationSearchDoc(index, searchSourceBuilder, "username");
-        System.out.println(by_group);
-        return by_group;
+
+
+    public Map<String,Integer> aggregationSearchDoc(Set<String> ips){
+        Map<String,Integer> map = new HashMap<>();
+        if(ips == null || ips.isEmpty()){
+            return map;
+        }
+        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder().query( QueryBuilders.termsQuery("ipAddress",ips));
+        TermsAggregationBuilder ipCount = AggregationBuilders.terms("ipCount").field("ipAddress.keyword");
+        searchSourceBuilder.aggregation(ipCount);
+        SearchRequest searchRequest = new SearchRequest(INDEX+tenant);
+        searchSourceBuilder.size(0);
+        searchRequest.source(searchSourceBuilder);
+
+        RequestOptions.Builder optionsBuilder = RequestOptions.DEFAULT.toBuilder();
+        optionsBuilder.setHttpAsyncResponseConsumerFactory(
+                new HttpAsyncResponseConsumerFactory.HeapBufferedResponseConsumerFactory(31457280));
+        try {
+            SearchResponse search = restHighLevelClient.search(searchRequest, optionsBuilder.build());
+            Terms terms = search.getAggregations().get("ipCount");
+            for (Terms.Bucket bucket : terms.getBuckets()) {
+                String ip = bucket.getKeyAsString();
+                long docCount = bucket.getDocCount();
+                map.put(ip,(int)docCount);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return map;
     }
 }

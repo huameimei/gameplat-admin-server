@@ -114,5 +114,5 @@ public class MemberInfo {
   private Integer vipLevel;
 
   @ApiModelProperty(value = "当前会员成长值")
-  private Integer vipGrowth;
+  private Long vipGrowth;
 }

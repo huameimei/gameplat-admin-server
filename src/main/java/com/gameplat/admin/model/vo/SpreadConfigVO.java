@@ -64,6 +64,14 @@ public class SpreadConfigVO {
      * 状态
      */
     private Integer status;
+    /**
+     * 是否开启层层代分红预设
+     */
+    private Integer isOpenDividePreset;
+    /**
+     * 分红预设配置
+     */
+    private String divideConfig;
 
     private Date createTime;
 

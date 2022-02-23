@@ -3,10 +3,10 @@ package com.gameplat.admin.model.domain;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import lombok.Data;
+
 import java.io.Serializable;
 import java.util.Date;
-
-import lombok.Data;
 
 @Data
 @TableName("game")
@@ -46,6 +46,16 @@ public class Game implements Serializable {
   private String gameKind;
 
   /**
+   * 是否开放(0：否；1:是)
+   */
+  private Integer enable;
+
+  /**
+   * 是否热门(0：否；1:是)
+   */
+  private Integer hot;
+
+  /**
    * 支持手机端（0：支持，1：不支持）
    */
   private Integer isH5;
@@ -54,6 +64,16 @@ public class Game implements Serializable {
    * 支持电脑端（0:支持，1：不支持）
    */
   private Integer isPc;
+
+  /**
+   * 是否外跳(0：否；1:是)
+   */
+  private Integer isJump;
+
+  /**
+   * 是否竖屏(0：否；1:是)
+   */
+  private Integer isVertical;
 
   /**
    * 游戏排序

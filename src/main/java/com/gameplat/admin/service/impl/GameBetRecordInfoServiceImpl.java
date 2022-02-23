@@ -2,6 +2,7 @@ package com.gameplat.admin.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.gameplat.admin.config.TenantConfig;
 import com.gameplat.admin.convert.GameBetRecordConvert;
 import com.gameplat.admin.mapper.LiveBetRecordMapper;
 import com.gameplat.admin.model.bean.ActivityStatisticItem;
@@ -66,6 +67,9 @@ public class GameBetRecordInfoServiceImpl implements GameBetRecordInfoService {
     @Resource
     private GameConfigService gameConfigService;
 
+    @Resource
+    private TenantConfig tenantConfig;
+
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
     public GameApi getGameApi(String liveCode) {
         GameApi api = applicationContext.getBean(liveCode + GameApi.Suffix, GameApi.class);
@@ -81,17 +85,16 @@ public class GameBetRecordInfoServiceImpl implements GameBetRecordInfoService {
     public PageDtoVO<GameBetRecordVO> queryPageBetRecord(Page<GameBetRecordVO> page, GameBetRecordQueryDTO dto) {
         QueryBuilder builder = GameBetRecord.buildBetRecordSearch(dto);
         // todo betTime
-        SortBuilder<FieldSortBuilder> sortBuilder = SortBuilders.fieldSort("betTime.keyword").order(SortOrder.DESC);
+        SortBuilder<FieldSortBuilder> sortBuilder = SortBuilders.fieldSort(convertTimeType(dto.getTimeType())+ ".keyword").order(SortOrder.DESC);
         // todo kgsit
-        String indexName = ContextConstant.ES_INDEX.BET_RECORD_ + "kgsit";
+        String indexName = ContextConstant.ES_INDEX.BET_RECORD_ + tenantConfig.getTenantCode();
         PageResponse<GameBetRecord> result = baseElasticsearchService.search(builder, indexName, GameBetRecord.class,
-                (int) page.getCurrent(), (int) page.getSize(), sortBuilder);
+                (int) page.getCurrent() - 1, (int) page.getSize(), sortBuilder);
 
         List<GameBetRecordVO> betRecordList = new ArrayList<>();
         if (CollectionUtils.isNotEmpty(result.getList())) {
             result.getList().forEach(o -> betRecordList.add(gameBetRecordConvert.toVo(o)));
         }
-
         Page<GameBetRecordVO> resultPage = new Page<>();
         resultPage.setRecords(betRecordList);
 
@@ -104,6 +107,27 @@ public class GameBetRecordInfoServiceImpl implements GameBetRecordInfoService {
         pageDtoVO.setOtherData(otherData);
 
         return pageDtoVO;
+    }
+
+    public String  convertTimeType(Integer timeType){
+        /**
+         * 1 -- 投注时间,
+         * 2 -- 三方时间,
+         * 3 -- 结算时间,
+         * 4 -- 报表时间
+         */
+        switch (timeType){
+            case 1:
+                return "betTime";
+            case 2:
+                return  "amesTime";
+            case 3:
+                return "settleTime";
+            case 4:
+                return "statTime";
+            default:
+                return "betTime";
+        }
     }
 
     @Override

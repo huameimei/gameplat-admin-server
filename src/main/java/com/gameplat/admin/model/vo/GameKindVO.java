@@ -95,4 +95,19 @@ public class GameKindVO implements Serializable {
   @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss" )
   private Date updateTime;
 
+  /**
+   * 是否外跳(0：否；1:是)
+   */
+  private Integer isJump;
+
+  /**
+   * 是否竖屏(0：否；1:是)
+   */
+  private Integer isVertical;
+
+  /**
+   * 运营状态(0已下架、1下架中、2运营中)
+   */
+  private Integer status;
+
 }

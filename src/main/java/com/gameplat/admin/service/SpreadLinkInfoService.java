@@ -1,5 +1,6 @@
 package com.gameplat.admin.service;
 
+import cn.hutool.json.JSONArray;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.baomidou.mybatisplus.extension.service.IService;
@@ -14,43 +15,57 @@ import java.util.List;
 
 public interface SpreadLinkInfoService extends IService<SpreadLinkInfo> {
 
-  IPage<SpreadConfigVO> page(PageDTO<SpreadLinkInfo> page, SpreadLinkInfoDTO dto);
+    IPage<SpreadConfigVO> page(PageDTO<SpreadLinkInfo> page, SpreadLinkInfoDTO dto);
 
-  void exportList(SpreadLinkInfoDTO dto, HttpServletResponse response);
+    void exportList(SpreadLinkInfoDTO dto, HttpServletResponse response);
 
-  void add(SpreadLinkInfoAddDTO configAddDTO);
+    void add(SpreadLinkInfoAddDTO configAddDTO);
 
-  void update(SpreadLinkInfoEditDTO configEditDTO);
+    void update(SpreadLinkInfoEditDTO configEditDTO);
 
-  void deleteById(Long id);
+    void deleteById(Long id);
 
-  void changeStatus(SpreadLinkInfoEditDTO configEditDTO);
+    void changeStatus(SpreadLinkInfoEditDTO configEditDTO);
 
-  /**
-   * 增加推广码时间
-   *
-   * @param id
-   */
-  void changeReleaseTime(Long id);
+    /**
+     * 增加推广码时间
+     *
+     * @param id
+     */
+    void changeReleaseTime(Long id);
 
-  void batchEnableStatus(List<Long> ids);
+    void batchEnableStatus(List<Long> ids);
 
-  /**
-   * 批量关闭状态
-   *
-   * @param ids
-   */
-  void batchDisableStatus(List<Long> ids);
+    /**
+     * 批量关闭状态
+     *
+     * @param ids
+     */
+    void batchDisableStatus(List<Long> ids);
 
-  /**
-   * 批量删除
-   *
-   * @param ids
-   */
-  void batchDeleteByIds(List<Long> ids);
+    /**
+     * 批量删除
+     *
+     * @param ids
+     */
+    void batchDeleteByIds(List<Long> ids);
 
-  /**
-   * 根据代理账号获取代理信息
-   */
-  List<SpreadLinkInfo> getSpreadList(String agentAccount);
+    /**
+     * 根据代理账号获取代理信息
+     */
+    List<SpreadLinkInfo> getSpreadList(String agentAccount);
+
+    /**
+     * 校验推广码
+     *
+     * @param code
+     */
+    void checkCode(String code);
+
+    /**
+     * 根据用户名获取返点等级下拉
+     * @param account
+     * @return
+     */
+    JSONArray getSpreadLinkRebate(String account, Boolean statisMax, Boolean statisMin);
 }

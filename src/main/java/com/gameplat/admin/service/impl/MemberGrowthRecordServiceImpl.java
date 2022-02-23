@@ -116,7 +116,7 @@ public class MemberGrowthRecordServiceImpl extends ServiceImpl<MemberGrowthRecor
      * 成长值变动后重新计算新的等级
      */
     @Override
-    public Integer dealUpLevel(Integer afterGrowth, MemberGrowthConfig memberGrowthConfig) {
+    public Integer dealUpLevel(Long afterGrowth, MemberGrowthConfig memberGrowthConfig) {
         //todo 1.先获取所有成长值等级
         Integer limitLevel = memberGrowthConfig.getLimitLevel();
         if (limitLevel == null) {
@@ -165,22 +165,22 @@ public class MemberGrowthRecordServiceImpl extends ServiceImpl<MemberGrowthRecor
             throw new ServiceException("此次变动金额参数不存在");
         }
         //变动的成长值
-        Integer changeGrowth = dto.getChangeGrowth();
+        Long changeGrowth = dto.getChangeGrowth();
         //todo 1.获取用户成长值汇总数据
         List<MemberGrowthRecord> memberGrowthRecords = this.findOne(dto);
         MemberGrowthRecord memberGrowthRecord = new MemberGrowthRecord();
         if (ObjectUtils.isNotEmpty(memberGrowthRecords)) {
             memberGrowthRecord = memberGrowthRecords.get(0);
         } else {
-            memberGrowthRecord.setOldGrowth(0);
-            memberGrowthRecord.setCurrentGrowth(0);
+            memberGrowthRecord.setOldGrowth(0L);
+            memberGrowthRecord.setCurrentGrowth(0L);
             memberGrowthRecord.setOldLevel(0);
             memberGrowthRecord.setCurrentLevel(0);
         }
         //当前成长值
-        Integer oldGrowth = memberGrowthRecord.getCurrentGrowth();
+        Long oldGrowth = memberGrowthRecord.getCurrentGrowth();
         //最终变动成长值  由于类型不同  可能最终变成的成长值倍数也不同
-        Integer changeFinalGrowth = 0;
+        Long changeFinalGrowth = 0L;
         MemberGrowthRecord saveRecord = new MemberGrowthRecord();
         //todo 3.按变动类型执行不同逻辑
         if (type == GrowthChangeEnum.recharge.getCode()) {
@@ -188,7 +188,7 @@ public class MemberGrowthRecordServiceImpl extends ServiceImpl<MemberGrowthRecor
             //判断是否开启了充值
             if (BooleanEnum.YES.match(growthConfig.getIsEnableRecharge())) {
                 //获取充值 成长值 兑换比例
-                changeFinalGrowth = growthConfig.getRechageRate().multiply(BigDecimal.valueOf(changeGrowth)).intValue();
+                changeFinalGrowth = growthConfig.getRechageRate().multiply(BigDecimal.valueOf(changeGrowth)).longValue();
                 saveRecord.setKindName(kindName);
                 saveRecord.setKindCode("plat");
                 saveRecord.setChangeMult(growthConfig.getRechageRate());
@@ -199,12 +199,12 @@ public class MemberGrowthRecordServiceImpl extends ServiceImpl<MemberGrowthRecor
             //签到
             //判断是否开启了签到
             if (BooleanEnum.YES.match(growthConfig.getIsEnableSign())) {
-                Integer oldSignGrowth = memberGrowthRecord.getOldGrowth();
+                Long oldSignGrowth = memberGrowthRecord.getOldGrowth();
                 if (oldSignGrowth >= growthConfig.getSignMaxGrowth()) {
                     return;
                 }
                 changeFinalGrowth = changeGrowth;
-                Integer currentSignGrowth = oldSignGrowth + changeFinalGrowth;
+                Long currentSignGrowth = oldSignGrowth + changeFinalGrowth;
                 if (currentSignGrowth > growthConfig.getSignMaxGrowth()) {
                     return;
                 }
@@ -219,7 +219,7 @@ public class MemberGrowthRecordServiceImpl extends ServiceImpl<MemberGrowthRecor
         } else if (type == GrowthChangeEnum.dama.getCode()) {
             //判断是否开启了打码量
             if (BooleanEnum.YES.match(growthConfig.getIsEnableDama())) {
-                changeFinalGrowth = growthConfig.getDamaRate().multiply(BigDecimal.valueOf(changeGrowth)).intValue();
+                changeFinalGrowth = growthConfig.getDamaRate().multiply(BigDecimal.valueOf(changeGrowth)).longValue();
                 saveRecord.setKindName(dto.getKindName());
                 saveRecord.setKindCode(dto.getKindCode());
                 saveRecord.setChangeMult(growthConfig.getDamaRate().multiply(dto.getChangeMult()).setScale(2));
@@ -255,13 +255,13 @@ public class MemberGrowthRecordServiceImpl extends ServiceImpl<MemberGrowthRecor
         Integer beforeLevel = memberGrowthRecord.getCurrentLevel();
         //todo 4.通过变动后的最新成长值 执行 增加成长值升级
         if (memberGrowthRecord.getCurrentGrowth() < 0) {
-            memberGrowthRecord.setCurrentGrowth(0);
+            memberGrowthRecord.setCurrentGrowth(0L);
         }
         //成长值变动后重新计算新的等级
         Integer afterLevel = this.dealUpLevel(memberGrowthRecord.getCurrentGrowth(), growthConfig);
         memberGrowthRecord.setCurrentLevel(afterLevel);
         //todo 5.记录成长值变动记录  重新更新 会员成长值汇总
-        Integer tempGrowth = changeFinalGrowth;
+        Long tempGrowth = changeFinalGrowth;
         //添加成长值变动记录
         saveRecord.setUserId(memberId);
         saveRecord.setUserName(member.getAccount());
@@ -311,8 +311,8 @@ public class MemberGrowthRecordServiceImpl extends ServiceImpl<MemberGrowthRecor
             throw new ServiceException("无此等级配置信息");
         }
         //晋级到下级所需的成长值
-        Integer growth = growthLevel.getGrowth();
-        Integer currentGrowth = 0;
+        Long growth = growthLevel.getGrowth();
+        Long currentGrowth = 0L;
         //当前成长值
         MemberGrowthRecord growthRecord = this.getOne(new QueryWrapper<MemberGrowthRecord>()
                 .select("user_id userId", "current_growth currentGrowth", "max(create_time) createTime")
@@ -321,7 +321,7 @@ public class MemberGrowthRecordServiceImpl extends ServiceImpl<MemberGrowthRecor
             currentGrowth = growthRecord.getCurrentGrowth();
         }
 
-        Integer finalCurrentGrowth = currentGrowth;
+        Long finalCurrentGrowth = currentGrowth;
         return new GrowthScaleVO() {{
             setLowerGrowth(growth);
             setCurrentGrowth(finalCurrentGrowth);

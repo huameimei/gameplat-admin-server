@@ -60,7 +60,7 @@
 
 
     <select id="findMemberDayReportPage" resultMap="BaseResultMap">
-      SELECT
+        SELECT
         user_name,
         parent_name,
         vip_level,
@@ -78,11 +78,11 @@
         sum( valid_amount ) valid_amount,
         sum( win_amount ) win_amount,
         sum( water_amount ) water_amount
-      FROM
+        FROM
         member_day_report
         WHERE 1= 1
         <if test="dto.userName != null and dto.userName != ''">
-             and user_name = #{dto.userName}
+            and user_name = #{dto.userName}
         </if>
         <if test="dto.startTime != null and dto.endTime != null">
             and count_date BETWEEN #{dto.startTime}
@@ -93,7 +93,7 @@
                 and first_recharge_amount is null
             </if>
             <if test="dto.isFristCharge == dto.isYFristCharge" >
-               and first_recharge_amount is not null
+                and first_recharge_amount is not null
             </if>
         </if>
         <if test="dto.isFristWithdraw != null and dto.isFristWithdraw != ''">
@@ -104,34 +104,34 @@
                 and first_withdraw_amount is not null
             </if>
         </if>
-      GROUP BY
+        GROUP BY
         user_name
     </select>
 
 
     <select id="findSumMemberDayReport" resultType="map">
         SELECT
-            ifnull(sum( recharge_count ),0) sumRechargeCount,
-            ifnull(sum( recharge_amount ),0) sumRechargeAmount,
-            ifnull(sum( first_recharge_amount ),0) sumFirstRechargeAmount,
-            ifnull(sum( discount_amount ),0) sumDiscountAmount,
-            ifnull(sum( jackpot_amount ),0) sumJackpotAmount,
-            ifnull(sum( withdraw_count ),0) sumWithdrawCount,
-            ifnull(sum( withdraw_amount ),0) sumWithdrawAmount,
-            ifnull(sum( first_withdraw_amount ),0) sumFirstWithdrawAmount,
-            ifnull(sum( fee_amount ),0) sumFeeAmount,
-            ifnull(sum( bet_amount ),0) sumBetAmount,
-            ifnull(sum( valid_amount ),0) sumValidAmount,
-            ifnull(sum( win_amount ),0) sumWinAmount,
-            ifnull(sum( water_amount ),0) sumWaterAmount
+        ifnull(sum( recharge_count ),0) sumRechargeCount,
+        ifnull(sum( recharge_amount ),0) sumRechargeAmount,
+        ifnull(sum( first_recharge_amount ),0) sumFirstRechargeAmount,
+        ifnull(sum( discount_amount ),0) sumDiscountAmount,
+        ifnull(sum( jackpot_amount ),0) sumJackpotAmount,
+        ifnull(sum( withdraw_count ),0) sumWithdrawCount,
+        ifnull(sum( withdraw_amount ),0) sumWithdrawAmount,
+        ifnull(sum( first_withdraw_amount ),0) sumFirstWithdrawAmount,
+        ifnull(sum( fee_amount ),0) sumFeeAmount,
+        ifnull(sum( bet_amount ),0) sumBetAmount,
+        ifnull(sum( valid_amount ),0) sumValidAmount,
+        ifnull(sum( win_amount ),0) sumWinAmount,
+        ifnull(sum( water_amount ),0) sumWaterAmount
         FROM
-          member_day_report
+        member_day_report
         WHERE 1= 1
         <if test="userName != null and userName != ''">
             and user_name = #{userName}
         </if>
         <if test="startTime != null and endTime != null">
-           and  count_date BETWEEN #{startTime}
+            and  count_date BETWEEN #{startTime}
             AND #{endTime}
         </if>
         <if test="isFristCharge != null and isFristCharge != ''">
@@ -203,7 +203,7 @@
 
 
     <select id="findMemberRWReport" resultMap="memberRwReport">
-      select
+        select
         account,
         sum(bank_count) bank_count,
         sum(bank_money) bank_money,
@@ -224,8 +224,8 @@
         sum(rech_discount + other_discount) totail_discout_amount,
         sum(withdraw_money+ hand_withdraw_money) totail_withdraw_amount,
         sum((bank_money+ online_money +hand_rech_money) - (withdraw_money+ hand_withdraw_money))   total_rw_amount
-      from member_rw_report
-      where  stat_time BETWEEN #{dto.startTime} and #{dto.endTime}
+        from member_rw_report
+        where  stat_time BETWEEN #{dto.startTime} and #{dto.endTime}
         <if test="dto.username != null and dto.username != ''">
             and account = #{dto.username}
         </if>
@@ -417,202 +417,202 @@
 
 
     <select id="findMemberGameDayReport" resultMap="memberGameDayReport">
-      SELECT
-            d.count_date,
-            ifnull(a.bank_count,0) bank_count,
-            ifnull(a.bank_money,0) bank_money,
-            ifnull(a.online_count,0) online_count,
-            ifnull(a.online_money,0) online_money,
-            ifnull(a.hand_rech_count,0) hand_rech_count,
-            ifnull(a.hand_rech_money,0) hand_rech_money,
-            ifnull(a.totail_recharge_amount,0) totail_recharge_amount,
-            ifnull(a.rech_discount,0) rech_discount,
-            ifnull(a.other_discount,0) other_discount,
-            ifnull(a.abnormal_income,0) abnormal_income,
-            ifnull(a.withdraw_count,0) withdraw_count,
-            ifnull(a.withdraw_money,0) withdraw_money,
-            ifnull(a.hand_withdraw_count,0) hand_withdraw_count,
-            ifnull(a.hand_withdraw_money,0) hand_withdraw_money,
-            ifnull(a.totail_withdraw_amount,0) totail_withdraw_amount,
-            ifnull(a.counter_fee,0) counter_fee ,
-            ifnull(a.abnormal_outcome,0) abnormal_outcome,
-            ifnull(a.total_rw_amount,0) total_rw_amount,
-            ifnull(b.sport_valid_amount,0) sport_valid_amount,
-            ifnull(b.sport_win_amount,0)	sport_win_amount,
-            ifnull(b.lottery_valid_amount,0) lottery_valid_amount,
-            ifnull(b.lottery_win_amount,0) lottery_win_amount,
-            ifnull(b.real_valid_amount,0) real_valid_amount,
-            ifnull(b.real_win_amount,0) real_win_amount ,
-            ifnull(b.real_water_amount,0) real_water_amount,
-            ifnull(b.totail_game_winAmout,0)  totail_game_winAmout
+        SELECT
+        d.count_date,
+        ifnull(a.bank_count,0) bank_count,
+        ifnull(a.bank_money,0) bank_money,
+        ifnull(a.online_count,0) online_count,
+        ifnull(a.online_money,0) online_money,
+        ifnull(a.hand_rech_count,0) hand_rech_count,
+        ifnull(a.hand_rech_money,0) hand_rech_money,
+        ifnull(a.totail_recharge_amount,0) totail_recharge_amount,
+        ifnull(a.rech_discount,0) rech_discount,
+        ifnull(a.other_discount,0) other_discount,
+        ifnull(a.abnormal_income,0) abnormal_income,
+        ifnull(a.withdraw_count,0) withdraw_count,
+        ifnull(a.withdraw_money,0) withdraw_money,
+        ifnull(a.hand_withdraw_count,0) hand_withdraw_count,
+        ifnull(a.hand_withdraw_money,0) hand_withdraw_money,
+        ifnull(a.totail_withdraw_amount,0) totail_withdraw_amount,
+        ifnull(a.counter_fee,0) counter_fee ,
+        ifnull(a.abnormal_outcome,0) abnormal_outcome,
+        ifnull(a.total_rw_amount,0) total_rw_amount,
+        ifnull(b.sport_valid_amount,0) sport_valid_amount,
+        ifnull(b.sport_win_amount,0)	sport_win_amount,
+        ifnull(b.lottery_valid_amount,0) lottery_valid_amount,
+        ifnull(b.lottery_win_amount,0) lottery_win_amount,
+        ifnull(b.real_valid_amount,0) real_valid_amount,
+        ifnull(b.real_win_amount,0) real_win_amount ,
+        ifnull(b.real_water_amount,0) real_water_amount,
+        ifnull(b.totail_game_winAmout,0)  totail_game_winAmout
         FROM
         tab_qp_date d left JOIN
-            (
-            SELECT
-                stat_time,
-                sum( bank_count ) bank_count,
-                sum( bank_money ) bank_money,
-                sum( online_count ) online_count,
-                sum( online_money ) online_money,
-                sum( hand_rech_count ) hand_rech_count,
-                sum( hand_rech_money ) hand_rech_money,
-                sum( bank_money + online_money + hand_withdraw_money ) totail_recharge_amount,
-                sum( rech_discount ) rech_discount,
-                sum( other_discount ) other_discount,
-                sum( exception_recharge_amount ) abnormal_income,
-                sum( withdraw_count ) withdraw_count,
-                sum( withdraw_money ) withdraw_money,
-                sum( hand_withdraw_count ) hand_withdraw_count,
-                sum( hand_withdraw_money ) hand_withdraw_money,
-                sum( hand_withdraw_money + withdraw_money ) totail_withdraw_amount,
-                sum( counter_fee ) counter_fee,
-                sum( exception_withdraw_amount ) abnormal_outcome,
-                (
-                sum( bank_money + online_money + hand_withdraw_money )- sum( hand_withdraw_money + withdraw_money )) total_rw_amount
-            FROM
-                member_rw_report
-              where
-               stat_time BETWEEN #{dto.startTime} and #{dto.endTime}
-                <if test="dto.type != null and dto.type == 1">
-                    <if test="dto.username != null and dto.username != ''">
-                        and super_path like concat('%',#{dto.username},'%')
-                    </if>
-                </if>
-                <if test="dto.type == null or dto.type != 1">
-                    <if test="dto.username != null and dto.username != ''">
-                        and account =  #{dto.username}
-                    </if>
-                </if>
-            GROUP BY
-                stat_time
-            ) a on d.count_date = a.stat_time
-            left JOIN (
-            SELECT
-                count_date,
-                sum( sport_valid_amount ) sport_valid_amount,
-                sum( sport_win_amount ) sport_win_amount,
-                sum( lottery_valid_amount ) lottery_valid_amount,
-                sum( lottery_win_amount ) lottery_win_amount,
-                sum( real_valid_amount ) real_valid_amount,
-                sum( real_win_amount ) real_win_amount,
-                sum( real_water_amount ) real_water_amount,
-                sum( lottery_win_amount + sport_win_amount + real_win_amount ) totail_game_winAmout
-            FROM
-                member_day_report
-            where
-               count_date BETWEEN #{dto.startTime} and #{dto.endTime}
-            <if test="dto.type != null and dto.type == 1">
-                <if test="dto.username != null and dto.username != ''">
-                    and agent_path like concat('%',#{dto.username},'%')
-                </if>
+        (
+        SELECT
+        stat_time,
+        sum( bank_count ) bank_count,
+        sum( bank_money ) bank_money,
+        sum( online_count ) online_count,
+        sum( online_money ) online_money,
+        sum( hand_rech_count ) hand_rech_count,
+        sum( hand_rech_money ) hand_rech_money,
+        sum( bank_money + online_money + hand_withdraw_money ) totail_recharge_amount,
+        sum( rech_discount ) rech_discount,
+        sum( other_discount ) other_discount,
+        sum( exception_recharge_amount ) abnormal_income,
+        sum( withdraw_count ) withdraw_count,
+        sum( withdraw_money ) withdraw_money,
+        sum( hand_withdraw_count ) hand_withdraw_count,
+        sum( hand_withdraw_money ) hand_withdraw_money,
+        sum( hand_withdraw_money + withdraw_money ) totail_withdraw_amount,
+        sum( counter_fee ) counter_fee,
+        sum( exception_withdraw_amount ) abnormal_outcome,
+        (
+        sum( bank_money + online_money + hand_withdraw_money )- sum( hand_withdraw_money + withdraw_money )) total_rw_amount
+        FROM
+        member_rw_report
+        where
+        stat_time BETWEEN #{dto.startTime} and #{dto.endTime}
+        <if test="dto.type != null and dto.type == 1">
+            <if test="dto.username != null and dto.username != ''">
+                and super_path like concat('%',#{dto.username},'%')
             </if>
-            <if test="dto.type == null or dto.type != 1">
-                <if test="dto.username != null and dto.username != ''">
-                    and user_name =  #{dto.username}
-                </if>
+        </if>
+        <if test="dto.type == null or dto.type != 1">
+            <if test="dto.username != null and dto.username != ''">
+                and account =  #{dto.username}
             </if>
-            GROUP BY
-            count_date
-            ) b ON d.count_date = b.count_date
-            where
-              d.count_date BETWEEN #{dto.startTime} and #{dto.endTime}
+        </if>
+        GROUP BY
+        stat_time
+        ) a on d.count_date = a.stat_time
+        left JOIN (
+        SELECT
+        count_date,
+        sum( sport_valid_amount ) sport_valid_amount,
+        sum( sport_win_amount ) sport_win_amount,
+        sum( lottery_valid_amount ) lottery_valid_amount,
+        sum( lottery_win_amount ) lottery_win_amount,
+        sum( real_valid_amount ) real_valid_amount,
+        sum( real_win_amount ) real_win_amount,
+        sum( real_water_amount ) real_water_amount,
+        sum( lottery_win_amount + sport_win_amount + real_win_amount ) totail_game_winAmout
+        FROM
+        member_day_report
+        where
+        count_date BETWEEN #{dto.startTime} and #{dto.endTime}
+        <if test="dto.type != null and dto.type == 1">
+            <if test="dto.username != null and dto.username != ''">
+                and agent_path like concat('%',#{dto.username},'%')
+            </if>
+        </if>
+        <if test="dto.type == null or dto.type != 1">
+            <if test="dto.username != null and dto.username != ''">
+                and user_name =  #{dto.username}
+            </if>
+        </if>
+        GROUP BY
+        count_date
+        ) b ON d.count_date = b.count_date
+        where
+        d.count_date BETWEEN #{dto.startTime} and #{dto.endTime}
     </select>
 
 
 
     <select id="findSumMemberGameDayReport" resultType="map">
         SELECT
-            ifnull( a.bank_count, 0 ) bank_count,
-            ifnull( a.bank_money, 0 ) bank_money,
-            ifnull( a.online_count, 0 ) online_count,
-            ifnull( a.online_money, 0 ) online_money,
-            ifnull( a.hand_rech_count, 0 ) hand_rech_count,
-            ifnull( a.hand_rech_money, 0 ) hand_rech_money,
-            ifnull( a.totail_recharge_amount, 0 ) totail_recharge_amount,
-            ifnull( a.rech_discount, 0 ) rech_discount,
-            ifnull( a.other_discount, 0 ) other_discount,
-            ifnull( a.abnormal_income, 0 ) abnormal_income,
-            ifnull( a.withdraw_count, 0 ) withdraw_count,
-            ifnull( a.withdraw_money, 0 ) withdraw_money,
-            ifnull( a.hand_withdraw_count, 0 ) hand_withdraw_count,
-            ifnull( a.hand_withdraw_money, 0 ) hand_withdraw_money,
-            ifnull( a.totail_withdraw_amount, 0 ) totail_withdraw_amount,
-            ifnull( a.counter_fee, 0 ) counter_fee,
-            ifnull( a.abnormal_outcome, 0 ) abnormal_outcome,
-            ifnull( a.total_rw_amount, 0 ) total_rw_amount,
-            ifnull( b.sport_valid_amount, 0 ) sport_valid_amount,
-            ifnull( b.sport_win_amount, 0 ) sport_win_amount,
-            ifnull( b.lottery_valid_amount, 0 ) lottery_valid_amount,
-            ifnull( b.lottery_win_amount, 0 ) lottery_win_amount,
-            ifnull( b.real_valid_amount, 0 ) real_valid_amount,
-            ifnull( b.real_win_amount, 0 ) real_win_amount,
-            ifnull( b.real_water_amount, 0 ) real_water_amount,
-            ifnull( b.totail_game_winAmout, 0 ) totail_game_winAmout
+        ifnull( a.bank_count, 0 ) bank_count,
+        ifnull( a.bank_money, 0 ) bank_money,
+        ifnull( a.online_count, 0 ) online_count,
+        ifnull( a.online_money, 0 ) online_money,
+        ifnull( a.hand_rech_count, 0 ) hand_rech_count,
+        ifnull( a.hand_rech_money, 0 ) hand_rech_money,
+        ifnull( a.totail_recharge_amount, 0 ) totail_recharge_amount,
+        ifnull( a.rech_discount, 0 ) rech_discount,
+        ifnull( a.other_discount, 0 ) other_discount,
+        ifnull( a.abnormal_income, 0 ) abnormal_income,
+        ifnull( a.withdraw_count, 0 ) withdraw_count,
+        ifnull( a.withdraw_money, 0 ) withdraw_money,
+        ifnull( a.hand_withdraw_count, 0 ) hand_withdraw_count,
+        ifnull( a.hand_withdraw_money, 0 ) hand_withdraw_money,
+        ifnull( a.totail_withdraw_amount, 0 ) totail_withdraw_amount,
+        ifnull( a.counter_fee, 0 ) counter_fee,
+        ifnull( a.abnormal_outcome, 0 ) abnormal_outcome,
+        ifnull( a.total_rw_amount, 0 ) total_rw_amount,
+        ifnull( b.sport_valid_amount, 0 ) sport_valid_amount,
+        ifnull( b.sport_win_amount, 0 ) sport_win_amount,
+        ifnull( b.lottery_valid_amount, 0 ) lottery_valid_amount,
+        ifnull( b.lottery_win_amount, 0 ) lottery_win_amount,
+        ifnull( b.real_valid_amount, 0 ) real_valid_amount,
+        ifnull( b.real_win_amount, 0 ) real_win_amount,
+        ifnull( b.real_water_amount, 0 ) real_water_amount,
+        ifnull( b.totail_game_winAmout, 0 ) totail_game_winAmout
         FROM
-            (
-            SELECT
-                'aa' type,
-                sum( bank_count ) bank_count,
-                sum( bank_money ) bank_money,
-                sum( online_count ) online_count,
-                sum( online_money ) online_money,
-                sum( hand_rech_count ) hand_rech_count,
-                sum( hand_rech_money ) hand_rech_money,
-                sum( bank_money + online_money + hand_withdraw_money ) totail_recharge_amount,
-                sum( rech_discount ) rech_discount,
-                sum( other_discount ) other_discount,
-                sum( exception_recharge_amount ) abnormal_income,
-                sum( withdraw_count ) withdraw_count,
-                sum( withdraw_money ) withdraw_money,
-                sum( hand_withdraw_count ) hand_withdraw_count,
-                sum( hand_withdraw_money ) hand_withdraw_money,
-                sum( hand_withdraw_money + withdraw_money ) totail_withdraw_amount,
-                sum( counter_fee ) counter_fee,
-                sum( exception_withdraw_amount ) abnormal_outcome,
-                (
-                sum( bank_money + online_money + hand_withdraw_money )- sum( hand_withdraw_money + withdraw_money )) total_rw_amount
-            FROM
-                member_rw_report
-            WHERE
-                stat_time BETWEEN #{startTime} and #{endTime}
-                <if test="type != null and type == 1">
-                    <if test="username != null and username != ''">
-                        and super_path like concat('%',#{username},'%')
-                    </if>
-                </if>
-                <if test="type == null or type != 1">
-                    <if test="username != null and username != ''">
-                        and account =  #{username}
-                    </if>
-                </if>
-            ) a
-            LEFT JOIN (
-            SELECT
-                'aa' type,
-                sum( sport_valid_amount ) sport_valid_amount,
-                sum( sport_win_amount ) sport_win_amount,
-                sum( lottery_valid_amount ) lottery_valid_amount,
-                sum( lottery_win_amount ) lottery_win_amount,
-                sum( real_valid_amount ) real_valid_amount,
-                sum( real_win_amount ) real_win_amount,
-                sum( real_water_amount ) real_water_amount,
-                sum( lottery_win_amount + sport_win_amount + real_win_amount ) totail_game_winAmout
-            FROM
-                member_day_report
-            WHERE
-                count_date BETWEEN #{startTime} and #{endTime}
-                <if test="type != null and type == 1">
-                    <if test="username != null and username != ''">
-                        and agent_path like concat('%',#{username},'%')
-                    </if>
-                </if>
-                <if test="type == null or type != 1">
-                    <if test="username != null and username != ''">
-                        and user_name =  #{username}
-                    </if>
-                </if>
+        (
+        SELECT
+        'aa' type,
+        sum( bank_count ) bank_count,
+        sum( bank_money ) bank_money,
+        sum( online_count ) online_count,
+        sum( online_money ) online_money,
+        sum( hand_rech_count ) hand_rech_count,
+        sum( hand_rech_money ) hand_rech_money,
+        sum( bank_money + online_money + hand_withdraw_money ) totail_recharge_amount,
+        sum( rech_discount ) rech_discount,
+        sum( other_discount ) other_discount,
+        sum( exception_recharge_amount ) abnormal_income,
+        sum( withdraw_count ) withdraw_count,
+        sum( withdraw_money ) withdraw_money,
+        sum( hand_withdraw_count ) hand_withdraw_count,
+        sum( hand_withdraw_money ) hand_withdraw_money,
+        sum( hand_withdraw_money + withdraw_money ) totail_withdraw_amount,
+        sum( counter_fee ) counter_fee,
+        sum( exception_withdraw_amount ) abnormal_outcome,
+        (
+        sum( bank_money + online_money + hand_withdraw_money )- sum( hand_withdraw_money + withdraw_money )) total_rw_amount
+        FROM
+        member_rw_report
+        WHERE
+        stat_time BETWEEN #{startTime} and #{endTime}
+        <if test="type != null and type == 1">
+            <if test="username != null and username != ''">
+                and super_path like concat('%',#{username},'%')
+            </if>
+        </if>
+        <if test="type == null or type != 1">
+            <if test="username != null and username != ''">
+                and account =  #{username}
+            </if>
+        </if>
+        ) a
+        LEFT JOIN (
+        SELECT
+        'aa' type,
+        sum( sport_valid_amount ) sport_valid_amount,
+        sum( sport_win_amount ) sport_win_amount,
+        sum( lottery_valid_amount ) lottery_valid_amount,
+        sum( lottery_win_amount ) lottery_win_amount,
+        sum( real_valid_amount ) real_valid_amount,
+        sum( real_win_amount ) real_win_amount,
+        sum( real_water_amount ) real_water_amount,
+        sum( lottery_win_amount + sport_win_amount + real_win_amount ) totail_game_winAmout
+        FROM
+        member_day_report
+        WHERE
+        count_date BETWEEN #{startTime} and #{endTime}
+        <if test="type != null and type == 1">
+            <if test="username != null and username != ''">
+                and agent_path like concat('%',#{username},'%')
+            </if>
+        </if>
+        <if test="type == null or type != 1">
+            <if test="username != null and username != ''">
+                and user_name =  #{username}
+            </if>
+        </if>
 
-            ) b ON a.type = b.type
+        ) b ON a.type = b.type
     </select>
 
     <!--获取达到有效投注金额的会员账号-->
@@ -636,5 +636,56 @@
         GROUP BY user_id, user_name ) t
         WHERE validAmount >= #{minBetAmount}
     </select>
+
+    <select id="getSpreadReportInfo" resultType="com.alibaba.fastjson.JSONObject">
+        SELECT
+        m.user_level userLevel,
+        m.lower_num mLower,
+        mdr.user_name userName,
+        sum(mdr.recharge_count) rechargeCount,
+        sum(mdr.recharge_amount) rechargeAmount,
+        sum(mdr.discount_amount) discountAmount,
+        sum(mdr.jackpot_amount) jackpotAmount,
+        sum(mdr.withdraw_count) withdrawCount,
+        sum(mdr.withdraw_amount) withdrawAmount,
+        sum(mdr.fee_amount) feeAmount,
+        sum(mdr.bet_amount) betAmount,
+        sum(mdr.valid_amount) validAmount,
+        sum(mdr.win_amount) winAmount,
+        sum(mdr.water_amount) waterAmount,
+        (sum(mdr.recharge_amount) - sum(mdr.withdraw_amount))  income
+        FROM
+        member_day_report mdr
+        INNER JOIN member m on m.id = mdr.user_id
+        WHERE
+        mdr.count_date BETWEEN #{startTime} AND #{endTime}
+        AND
+        agent_path regexp concat('^/',#{account})
+        GROUP BY mdr.user_name
+    </select>
+
+
+    <select id="getSpreadReport" resultType="com.alibaba.fastjson.JSONObject">
+         SELECT
+        m.account,
+        m.lower_num mLower,
+        mdr.agent_path agentPath,
+        sum(mdr.recharge_amount) rechargeAmount,
+        sum(mdr.withdraw_amount) withdrawAmount,
+        (sum(mdr.recharge_amount) - sum(mdr.withdraw_amount))  income
+        FROM
+        member_day_report mdr
+        INNER JOIN member m on m.id = mdr.user_id
+        WHERE
+        count_date BETWEEN #{startTime} AND #{endTime}
+        AND
+        agent_path regexp concat(
+        <foreach collection="list" item="obj" open="" close="" separator=",'|',">
+            concat('^/',#{obj.agentAccount})
+        </foreach>
+        )
+        GROUP BY mdr.user_name
+    </select>
+
 
 </mapper>

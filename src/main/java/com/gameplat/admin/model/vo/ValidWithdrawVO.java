@@ -62,13 +62,10 @@ public class ValidWithdrawVO implements Serializable {
     @ApiModelProperty(value = "备注")
     private String remark;
 
-    /**
-     * 截止时间
-     */
+    @ApiModelProperty(value = "截止时间")
     private Date endTime;
-    /**
-     * 投注内容
-     */
+
+    @ApiModelProperty(value = "投注内容")
     private String betContext;
 
 }

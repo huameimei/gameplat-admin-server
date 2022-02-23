@@ -50,13 +50,13 @@ public class MemberGrowthRecord implements Serializable {
     private BigDecimal changeMult;
 
     @ApiModelProperty(value = "变动的成长值")
-    private Integer changeGrowth;
+    private Long changeGrowth;
 
     @ApiModelProperty(value = "变动前的成长值")
-    private Integer oldGrowth;
+    private Long oldGrowth;
 
     @ApiModelProperty(value = "变动后的成长值")
-    private Integer currentGrowth;
+    private Long currentGrowth;
 
     @ApiModelProperty(value = "创建人")
     @TableField(fill = FieldFill.INSERT)

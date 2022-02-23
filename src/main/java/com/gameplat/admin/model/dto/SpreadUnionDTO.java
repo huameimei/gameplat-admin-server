@@ -3,6 +3,7 @@ package com.gameplat.admin.model.dto;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import javax.validation.constraints.NotEmpty;
 import java.io.Serializable;
 
 @Data
@@ -23,7 +24,9 @@ public class SpreadUnionDTO implements Serializable {
     /**
      * 日期
      */
+    @NotEmpty(message = "开始时间不能为空")
     private String startTime;
+    @NotEmpty(message = "结束时间不能为空")
     private String endTime;
 
 }

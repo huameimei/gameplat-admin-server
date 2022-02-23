@@ -30,10 +30,10 @@ public class MemberGrowthLevel implements Serializable {
     private String levelName;
 
     @ApiModelProperty("成长值")
-    private Integer growth;
+    private Long growth;
 
     @ApiModelProperty("等级保级成长值")
-    private Integer limitGrowth;
+    private Long limitGrowth;
 
     @ApiModelProperty("升级奖励")
     private BigDecimal upReward;

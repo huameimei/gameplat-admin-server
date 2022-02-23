@@ -226,7 +226,7 @@ public class GameBetDailyReportServiceImpl extends ServiceImpl<GameBetDailyRepor
             SearchRequest searchRequest = new SearchRequest(new String[]{"bet-record_kgsit"});
             SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
             TermsAggregationBuilder userNameGroup = AggregationBuilders.terms("userNameGroup").field("account.keyword");
-            TermsAggregationBuilder firstKindGroup = AggregationBuilders.terms("firstKindGroup").field("firstKind.keyword");
+            TermsAggregationBuilder firstKindGroup = AggregationBuilders.terms("gameKindGroup").field("gameKind.keyword");
 
             SumAggregationBuilder sumBetAmount = AggregationBuilders.sum("betAmount").field("betAmount");
             SumAggregationBuilder sumValidAmount = AggregationBuilders.sum("validAmount").field("validAmount");
@@ -252,7 +252,7 @@ public class GameBetDailyReportServiceImpl extends ServiceImpl<GameBetDailyRepor
 
                 for (Terms.Bucket bucket : terms.getBuckets()) {
                     String account = bucket.getKeyAsString();
-                    Terms terms2 = bucket.getAggregations().get("firstKindGroup");
+                    Terms terms2 = bucket.getAggregations().get("gameKindGroup");
                     for (Terms.Bucket bucket2 : terms2.getBuckets()) {
                         String firstKind = bucket2.getKeyAsString();
                         long count = bucket2.getDocCount();

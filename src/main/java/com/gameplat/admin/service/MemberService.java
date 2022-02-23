@@ -18,6 +18,7 @@ import java.util.Optional;
  * @author three
  */
 public interface MemberService extends IService<Member> {
+  Member getForAccount(String account);
 
   IPage<MemberVO> queryPage(Page<Member> page, MemberQueryDTO dto);
 
@@ -80,4 +81,6 @@ public interface MemberService extends IService<Member> {
   void updateRemark(Long memberId, String remark);
 
   void updateRemark(List<Long> memberIds, String remark);
+
+  Member getMemberAndFillGameAccount(String account);
 }

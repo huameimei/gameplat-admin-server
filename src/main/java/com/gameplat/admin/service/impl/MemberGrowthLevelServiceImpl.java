@@ -115,14 +115,14 @@ public class MemberGrowthLevelServiceImpl extends ServiceImpl<MemberGrowthLevelM
                     record.setChangeMult(new BigDecimal("1"));
                     record.setOldGrowth(userRecord.getCurrentGrowth());
 
-                    Integer currentGrowth = userRecord.getCurrentGrowth();
+                    Long currentGrowth = userRecord.getCurrentGrowth();
                     if (newLevel < userRecord.getCurrentLevel()){
                         currentGrowth = this.lambdaQuery().eq(MemberGrowthLevel::getLevel, newLevel - 1).one().getGrowth();
                         record.setCurrentGrowth(currentGrowth);
                         record.setChangeGrowth(currentGrowth - userRecord.getCurrentGrowth());
                     }else if ((newLevel > userRecord.getCurrentLevel())){
                         record.setCurrentGrowth(userRecord.getCurrentGrowth());
-                        record.setChangeGrowth(0);
+                        record.setChangeGrowth(0L);
                     }
                     record.setCreateBy(GlobalContextHolder.getContext().getUsername());
                     record.setCreateTime(new Date());

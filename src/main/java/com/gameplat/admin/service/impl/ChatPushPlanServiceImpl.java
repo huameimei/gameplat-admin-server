@@ -81,6 +81,7 @@ public class ChatPushPlanServiceImpl extends ServiceImpl<ChatPushPlanMapper, Cha
             throw new ServiceException("最小推送金额不能大于最大推送金额");
         }
         dto.setState(1);
+        dto.setGameStatus(1);
         dto.setLastPushTime(dto.getBeginTime());
         dto.setCreateTime(Long.parseLong(DateUtil.getCurrentTime()));
         save(chatPushPlanConvert.toEntity(dto));
@@ -113,5 +114,4 @@ public class ChatPushPlanServiceImpl extends ServiceImpl<ChatPushPlanMapper, Cha
         }
         removeById(id);
     }
-
 }

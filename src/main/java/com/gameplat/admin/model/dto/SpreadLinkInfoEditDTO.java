@@ -28,6 +28,10 @@ public class SpreadLinkInfoEditDTO {
      */
     private Integer userType;
     /**
+     * 是否专属 1 是  0 否
+     */
+    private Integer exclusiveFlag;
+    /**
      * 用户层级
      */
     private Integer userLevel;

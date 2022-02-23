@@ -18,8 +18,8 @@ public class MemberGrowthChangeDto {
     @ApiModelProperty("会员账号")
     private String userName;
 
-    @ApiModelProperty("此次变动金额")
-    private Integer changeGrowth;
+    @ApiModelProperty("此次变动成长值")
+    private Long changeGrowth;
 
     @ApiModelProperty(required = true, value = "类型：0:充值  1:签到 2:投注打码量 3:后台修改 4:完善资料 5：绑定银行卡")
     private Integer type;

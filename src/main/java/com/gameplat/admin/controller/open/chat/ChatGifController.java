@@ -47,14 +47,14 @@ public class ChatGifController {
     @ApiOperation(value = "增/上传图片")
     @PostMapping("/add")
     @PreAuthorize("hasAuthority('chat:gif:add')")
-    public void add(@RequestPart MultipartFile file, String name) throws IOException {
+    public void add(@RequestPart MultipartFile file, String name) throws Exception {
         chatGifService.add(file, name);
     }
 
     @ApiOperation(value = "上传图片")
     @PostMapping("/upload")
     @PreAuthorize("hasAuthority('chat:gif:upload')")
-    public String upload(@RequestPart MultipartFile file) throws IOException {
+    public String upload(@RequestPart MultipartFile file) throws Exception {
         return chatGifService.upload(file);
     }
 

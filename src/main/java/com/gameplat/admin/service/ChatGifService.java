@@ -17,10 +17,10 @@ public interface ChatGifService extends IService<ChatGif> {
     IPage<ChatGifVO> page(PageDTO<ChatGif> page, String name);
 
     /** 增 */
-    void add(MultipartFile file, String name) throws IOException;
+    void add(MultipartFile file, String name) throws Exception;
 
     /** 增 */
-    String upload(MultipartFile file) throws IOException;
+    String upload(MultipartFile file) throws Exception;
 
     /** 删 */
     void remove(@PathVariable Integer id);

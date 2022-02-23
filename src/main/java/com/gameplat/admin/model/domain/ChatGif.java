@@ -36,7 +36,7 @@ public class ChatGif implements Serializable {
     private Integer width;
 
     @ApiModelProperty(value = "使用次数")
-    private Integer userCount;
+    private Integer useCount;
 
     @ApiModelProperty(value = "md5值")
     private String md5;

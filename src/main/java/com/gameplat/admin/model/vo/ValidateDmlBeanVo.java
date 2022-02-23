@@ -11,7 +11,7 @@ public class ValidateDmlBeanVo implements Serializable {
 
   private static final long serialVersionUID = 7033215796225338417L;
 
-  private String usename;
+  private String username;
   private List<ValidWithdrawVO> rows;
   /**
    * 要求打码量

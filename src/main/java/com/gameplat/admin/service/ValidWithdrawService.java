@@ -21,4 +21,6 @@ public interface ValidWithdrawService extends IService<ValidWithdraw> {
 
   ValidateDmlBeanVo validateByMemberId(MemberWithdrawLimit memberWithdrawLimit, String username, boolean ignoreOuted)
           throws ServiceException;
+
+  void countAccountValidWithdraw(String username);
 }

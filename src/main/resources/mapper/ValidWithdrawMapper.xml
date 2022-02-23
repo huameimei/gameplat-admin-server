@@ -181,4 +181,48 @@
             and id = #{id}
         </if>
     </update>
+
+
+
+    <update id="updateByBetId">
+        update valid_withdraw
+        <set>
+            <if test="betContext != null and betContext != ''">
+                bet_context = #{betContext},
+            </if>
+            <if test="vaildAmount != null">
+                video_dml = #{vaildAmount},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+
+    <select id="findAccountValidWithdraw" parameterType="string" resultType="com.gameplat.admin.model.vo.ValidAccoutWithdrawVo">
+        SELECT
+            a.id id,
+            a.member_id memberId,
+            a.account account,
+            ( a.morm_dml + a.discount_dml ) dmlClaim,
+            a.create_time createTime,
+            ifnull(
+                a.end_time,
+            sysdate()) AS endTime,
+            b.game_kind gameKind,
+            b.stat_time statTime,
+            b.platform_code platformCode,
+            ( a.rech_money + a.discount_money ) rechMoney,
+            g.`name` gameName
+        FROM
+            valid_withdraw AS a
+            LEFT JOIN game_bet_daily_report AS b ON a.account = b.account
+            AND b.stat_time BETWEEN DATE_FORMAT( a.create_time, '%Y-%m-%d' )
+            AND DATE_FORMAT( ifnull( a.end_time, SYSDATE()), '%Y-%m-%d' )
+            left JOIN game_kind g on b.game_kind = g.`code`
+        WHERE
+            a.STATUS = 0
+            AND a.account = #{account}
+        ORDER BY
+            a.id ASC
+    </select>
 </mapper>

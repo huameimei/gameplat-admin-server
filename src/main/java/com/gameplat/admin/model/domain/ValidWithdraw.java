@@ -54,8 +54,13 @@ public class ValidWithdraw implements Serializable {
   @TableField(fill = FieldFill.UPDATE)
   private Date updateTime;
 
+
+  private Date endTime;
+
   private String remark;
 
+
+  private String betContext;
 
   public BigDecimal getBetAmount() {
     return cpDml.add(sportsDml).add(videoDml);

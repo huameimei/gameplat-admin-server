@@ -1,33 +1,40 @@
 package com.gameplat.admin.service.impl;
 
 import cn.hutool.core.convert.Convert;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.mapper.ValidWithdrawMapper;
+import com.gameplat.admin.model.doc.GameBetRecord;
 import com.gameplat.admin.model.domain.RechargeOrder;
 import com.gameplat.admin.model.domain.ValidWithdraw;
-import com.gameplat.admin.model.vo.ValidWithdrawVO;
-import com.gameplat.admin.model.vo.ValidateDmlBeanVo;
+import com.gameplat.admin.model.dto.GameVaildBetRecordQueryDTO;
+import com.gameplat.admin.model.vo.*;
 import com.gameplat.admin.service.ValidWithdrawService;
-
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
-
+import com.gameplat.base.common.constant.ContextConstant;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.BeanUtils;
-import com.gameplat.base.common.util.DateUtil;
 import com.gameplat.base.common.util.StringUtils;
 import com.gameplat.common.model.bean.limit.MemberWithdrawLimit;
+import com.gameplat.elasticsearch.page.PageResponse;
+import com.gameplat.elasticsearch.service.IBaseElasticsearchService;
 import lombok.extern.log4j.Log4j2;
+import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.search.sort.FieldSortBuilder;
+import org.elasticsearch.search.sort.SortBuilder;
+import org.elasticsearch.search.sort.SortBuilders;
+import org.elasticsearch.search.sort.SortOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
+
+import javax.annotation.Resource;
 
 @Service
 @Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)
@@ -120,6 +127,7 @@ public class ValidWithdrawServiceImpl extends
         List<ValidWithdraw> validWithdraws = this
                 .queryByMemberIdAndAddTimeLessThanOrEqualToAndStatus(name, status);
         if (validWithdraws.stream().map(ValidWithdraw::getStatus).anyMatch(s -> 0 == s)) {
+            countAccountValidWithdraw(name);
             // 有未出款打码量时，过滤掉已出款记录，防止打码量操作并发时充值没有正常删除掉已出款记录
             validWithdraws = validWithdraws.stream().filter(v -> 0 == v.getStatus())
                     .collect(Collectors.toList());
@@ -136,7 +144,7 @@ public class ValidWithdrawServiceImpl extends
         BigDecimal count = getCount(validWithdraws);
         log.info("打码量计算:{}",count);
         validateDmlBean.setRemainRequiredDml(BigDecimal.ZERO);
-        validateDmlBean.setUsename(username);
+        validateDmlBean.setUsername(username);
         //常态打码量
         BigDecimal requireDML = validWithdraws.stream().map(ValidWithdraw::getDmlClaim).reduce(BigDecimal.ZERO, BigDecimal::add);
         log.info("总共要求打码量：{}", requireDML);
@@ -205,7 +213,7 @@ public class ValidWithdrawServiceImpl extends
             validateDmlBean.setRemainRequiredDml(BigDecimal.ZERO);
 
         }
-        validateDmlBean.setUsename(username);
+        validateDmlBean.setUsername(username);
         //常态打码量
         BigDecimal requireDML = validWithdraws.stream().map(ValidWithdraw::getDmlClaim).reduce(BigDecimal.ZERO, BigDecimal::add);
         log.info("总共要求打码量：{}", requireDML);
@@ -251,4 +259,81 @@ public class ValidWithdrawServiceImpl extends
     public static BigDecimal toFix(int digital, BigDecimal num) {
         return num.setScale(digital, BigDecimal.ROUND_HALF_UP);
     }
+
+    @Resource
+    private IBaseElasticsearchService baseElasticsearchService;
+    /**
+     * 计算打码量
+     */
+
+    @Override
+    public void countAccountValidWithdraw(String username) {
+        List<ValidAccoutWithdrawVo> accountValidWithdraw = validWithdrawMapper.findAccountValidWithdraw(username);
+        if (StringUtils.isEmpty(accountValidWithdraw)) {
+            return;
+        }
+        List<GameBetValidRecordVo> list = new ArrayList<>();
+        List<GameBetValidRecordVo> finalList = list;
+        String indexName = ContextConstant.ES_INDEX.BET_RECORD_ + "kgsit";
+        accountValidWithdraw.forEach(a ->{
+            GameVaildBetRecordQueryDTO dto = new GameVaildBetRecordQueryDTO(){{
+                setAccount(a.getAccount());
+                setBeginTime(a.getCreateTime());
+                setEndTime(a.getEndTime());
+                setPlatformCode(a.getPlatformCode());
+                setState("1");
+                setGameKind(a.getGameKind());
+            }};
+            dto.setAccount(a.getAccount());
+            QueryBuilder builder = GameBetRecord.buildBetRecordSearch(dto);
+            // todo betTime
+            SortBuilder<FieldSortBuilder> sortBuilder = SortBuilders.fieldSort("betTime.keyword").order(SortOrder.DESC);
+            PageResponse<GameBetValidRecordVo> result = baseElasticsearchService.search(builder, indexName, GameBetValidRecordVo.class,
+                     0,  9999, sortBuilder);
+            if (StringUtils.isNotEmpty(result.getList())) {
+                result.getList().forEach(b ->{
+
+                    b.setValidId(a.getId());
+                    b.setGameName(a.getGameName());
+                    finalList.add(b);
+                });
+            }
+        });
+        List<GameBetValidRecordVo> listAll = finalList.stream().filter(a ->Convert.toBigDecimal(a.getValidAmount()).compareTo(BigDecimal.ZERO) !=0).collect(Collectors.toList());
+        if (StringUtils.isEmpty(listAll)) {
+            return;
+        }
+        //按照打码量id进行分组
+        Map<Long ,List<GameBetValidRecordVo>> map = listAll.stream().collect(Collectors.groupingBy(GameBetValidRecordVo::getValidId));
+
+        map.keySet().forEach(a ->{
+            List<Object> vailList = new ArrayList();
+            //
+            ValidAccoutWithdrawVo validAccoutWithdrawVo = new ValidAccoutWithdrawVo();
+            //每笔总投注记录
+            BigDecimal add =map.get(a).stream().map(GameBetValidRecordVo::getVailbetAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
+            log.info("每笔总投注记录:{}",add);
+            validAccoutWithdrawVo.setVaildAmount(add);
+            validAccoutWithdrawVo.setId(a);
+            //添加一个游戏的详情（gameKind,gameName,betAmount）
+
+            //根据游戏类型进行分组
+            Map<String,List<GameBetValidRecordVo>> gameBetAmount = map.get(a).stream().collect(Collectors.groupingBy(GameBetValidRecordVo::getGameKind));
+            gameBetAmount.keySet().forEach(b ->{
+                JSONObject jsonObject = new JSONObject();
+                BigDecimal vaildBetAmount = gameBetAmount.get(b).stream().map(GameBetValidRecordVo::getVailbetAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
+                String gameName = gameBetAmount.get(b).get(0).getGameName();
+                jsonObject.put("vaildBetAmount",vaildBetAmount);
+                jsonObject.put("gameKind",b);
+                jsonObject.put("gameName",gameName);
+                vailList.add(jsonObject);
+            });
+            validAccoutWithdrawVo.setBetContext(JSONArray.toJSONString(vailList));
+            validWithdrawMapper.updateByBetId(validAccoutWithdrawVo);
+        });
+
+
+    }
+
+
 }

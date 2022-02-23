@@ -16,7 +16,6 @@ import com.gameplat.admin.service.ChatGifService;
 import com.gameplat.admin.service.ConfigService;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.StringUtils;
-import com.gameplat.common.compent.oss.FileStorageEnum;
 import com.gameplat.common.compent.oss.FileStorageProvider;
 import com.gameplat.common.compent.oss.FileStorageStrategyContext;
 import com.gameplat.common.compent.oss.config.FileConfig;
@@ -65,18 +64,18 @@ public class ChatGifServiceImpl extends ServiceImpl<ChatGifMapper, ChatGif> impl
                 .orderByDesc(ChatGif::getCreateTime)
                 .page(page)
                 .convert(chatGifConvert::toVo);
-        FileConfig fileConfig = configService.getDefaultConfig(DictTypeEnum.FILE_CONFIG, FileConfig.class);
-        for (int i = 0; i < pageList.getRecords().size(); i++) {
-            if (!pageList.getRecords().get(i).getFileUrl().startsWith("http") || !pageList.getRecords().get(i).getFileUrl().startsWith("https")) {
-                pageList.getRecords().get(i).setFileUrl(fileConfig.getEndpoint()+"/" + pageList.getRecords().get(i).getFileUrl());
-            }
-        }
+//        FileConfig fileConfig = configService.getDefaultConfig(DictTypeEnum.FILE_CONFIG, FileConfig.class);
+//        for (int i = 0; i < pageList.getRecords().size(); i++) {
+//            if (!pageList.getRecords().get(i).getFileUrl().startsWith("http") || !pageList.getRecords().get(i).getFileUrl().startsWith("https")) {
+//                pageList.getRecords().get(i).setFileUrl(fileConfig.getEndpoint()+"/" + pageList.getRecords().get(i).getFileUrl());
+//            }
+//        }
         return pageList;
     }
 
     /** 增 */
     @Override
-    public void add(MultipartFile file, String name) throws IOException {
+    public void add(MultipartFile file, String name) throws Exception {
         String url = upload(file);
         File file1 = new File(file.getOriginalFilename());
         try {
@@ -126,15 +125,12 @@ public class ChatGifServiceImpl extends ServiceImpl<ChatGifMapper, ChatGif> impl
     }
 
     @Override
-    public String upload(MultipartFile file) throws IOException {
-        if (!isImage(file)){
-            throw new ServiceException("不支持此格式！");
-        }
+    public String upload(MultipartFile file) throws Exception {
         //上传图片
         FileConfig fileConfig = configService.getDefaultConfig(DictTypeEnum.FILE_CONFIG, FileConfig.class);
         FileStorageProvider fileStorageProvider = fileStorageStrategyContext.getProvider(fileConfig);
         //上传成功，返回图片地址
-        String url = fileStorageProvider.upload(file.getResource().getFile());
+        String url = fileStorageProvider.upload(file.getInputStream(),file.getContentType(), file.getOriginalFilename());
         return url;
     }
 
@@ -145,20 +141,12 @@ public class ChatGifServiceImpl extends ServiceImpl<ChatGifMapper, ChatGif> impl
         if(ObjectUtil.isEmpty(chatGif)){
             throw new ServiceException("存储位置未知");
         }
-        // 服务器名称
-        String serviceFileName = chatGif.getServiceFileName();
-        //本地
-        if(FileStorageEnum.LOCAL.getValue() == chatGif.getServiceProvider()){
-            //存储文件名
-            String fType = FileUtils.getFileTypeName(chatGif.getStoreFileName());
-            // serviceFileName =  ossPath + "/" + tenantId + "/" + fType + sysOss.getStoreFileName();
-        }
         //删储服务器图片
         FileConfig fileConfig = configService.getDefaultConfig(DictTypeEnum.FILE_CONFIG, FileConfig.class);
         FileStorageProvider fileStorageProvider = fileStorageStrategyContext.getProvider(fileConfig);
-        fileStorageProvider.delete(serviceFileName);
+        fileStorageProvider.delete(chatGif.getFileUrl());
         //删库
-        this.remove(id);
+        super.removeById(id);
     }
 
     /** 改 */
@@ -174,16 +162,5 @@ public class ChatGifServiceImpl extends ServiceImpl<ChatGifMapper, ChatGif> impl
         Map<String, Object> map = this.getMap(queryWrapper);
         return Integer.parseInt(map.get("count").toString());
     }
-
-    /** 判断文件是否是图片 */
-    private boolean isImage(MultipartFile file) {
-        String contentType = file.getContentType();
-        if (StringUtils.isBlank(contentType) || !contentType.matches("image/(bmp|jpg|jpeg|png|gif)")) {
-            return false;
-        }
-        return true;
-    }
-
-
 
 }

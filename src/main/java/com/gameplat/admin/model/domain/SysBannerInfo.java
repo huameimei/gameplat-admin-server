@@ -100,7 +100,7 @@ public class SysBannerInfo {
     /**
      * 关联游戏
      */
-    private String gameCode;
+    private String gameConfig;
 
     /**
      * 排序

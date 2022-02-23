@@ -99,9 +99,9 @@ public class SysBannerInfoServiceImpl extends ServiceImpl<SysBannerInfoMapper, S
                 if (StringUtils.isBlank(sysBannerInfo.getGameKind())) {
                     throw new ServiceException("选择游戏分类，游戏类别不能为空");
                 }
-                if (StringUtils.isBlank(sysBannerInfo.getGameCode())) {
-                    throw new ServiceException("选择游戏分类，关联游戏不能为空");
-                }
+//                if (StringUtils.isBlank(sysBannerInfo.getGameCode())) {
+//                    throw new ServiceException("选择游戏分类，关联游戏不能为空");
+//                }
             }
         }
     }

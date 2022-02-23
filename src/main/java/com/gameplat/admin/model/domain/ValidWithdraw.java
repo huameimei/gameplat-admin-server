@@ -59,8 +59,6 @@ public class ValidWithdraw implements Serializable {
 
   private String remark;
 
-  private Date endTime;
-
 
   private String betContext;
 

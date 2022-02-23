@@ -1,6 +1,5 @@
 package com.gameplat.admin.service;
 
-import com.alibaba.fastjson.JSONObject;
 import com.gameplat.admin.model.dto.HGSportDTO;
 
 /**
@@ -10,66 +9,66 @@ import com.gameplat.admin.model.dto.HGSportDTO;
  */
 public interface HGSportService {
 
-    JSONObject queryHGBetOrder(HGSportDTO dto);
+    Object queryHGBetOrder(HGSportDTO dto);
 
-    JSONObject queryHGBetLimitList(HGSportDTO dto);
+    Object queryHGBetLimitList(HGSportDTO dto);
 
-    JSONObject queryHGSportLeague(HGSportDTO dto);
+    Object queryHGSportLeague(HGSportDTO dto);
 
-    JSONObject queryHGSportResult(HGSportDTO dto);
+    Object queryHGSportResult(HGSportDTO dto);
 
-    JSONObject queryHGCurBetOrder(HGSportDTO dto);
+    Object queryHGCurBetOrder(HGSportDTO dto);
 
-    JSONObject queryHGBetsDetail(HGSportDTO dto);
+    Object queryHGBetsDetail(HGSportDTO dto);
 
-    JSONObject queryHGBetConfigs(HGSportDTO dto);
+    Object queryHGBetConfigs(HGSportDTO dto);
 
-    JSONObject queryHGEntryResult(HGSportDTO dto);
+    Object queryHGEntryResult(HGSportDTO dto);
 
-    JSONObject queryHGUserLimit(HGSportDTO dto);
+    Object queryHGUserLimit(HGSportDTO dto);
 
-    JSONObject queryHGSportMessage(HGSportDTO dto);
+    Object queryHGSportMessage(HGSportDTO dto);
 
-    JSONObject queryHGChangeNotice(HGSportDTO dto);
+    Object queryHGChangeNotice(HGSportDTO dto);
 
-    JSONObject queryHGHandOrdersDetail(HGSportDTO dto);
+    Object queryHGHandOrdersDetail(HGSportDTO dto);
 
-    JSONObject updateHgConfigModify(HGSportDTO dto);
+    Object updateHgConfigModify(HGSportDTO dto);
 
-    JSONObject queryHgSportConfig(HGSportDTO dto);
+    Object queryHgSportConfig(HGSportDTO dto);
 
-    JSONObject inputResultForFoot(HGSportDTO dto);
+    Object inputResultForFoot(HGSportDTO dto);
 
-    JSONObject inputResultForBasketball(HGSportDTO dto);
+    Object inputResultForBasketball(HGSportDTO dto);
 
-    JSONObject updateSportStatus(HGSportDTO dto);
+    Object updateSportStatus(HGSportDTO dto);
 
-    JSONObject updateSportBetLimitMoney(HGSportDTO dto);
+    Object updateSportBetLimitMoney(HGSportDTO dto);
 
-    JSONObject updateBetConfig(HGSportDTO dto);
+    Object updateBetConfig(HGSportDTO dto);
 
-    JSONObject betUpdateActions(HGSportDTO dto);
+    Object betUpdateActions(HGSportDTO dto);
 
-    JSONObject batchActionsByStatus(HGSportDTO dto);
+    Object batchActionsByStatus(HGSportDTO dto);
 
-    JSONObject settlingResultForFoot(HGSportDTO dto);
+    Object settlingResultForFoot(HGSportDTO dto);
 
-    JSONObject settlingResultForBasketball(HGSportDTO dto);
+    Object settlingResultForBasketball(HGSportDTO dto);
 
-    JSONObject saveUserLimit(HGSportDTO dto);
+    Object saveUserLimit(HGSportDTO dto);
 
-    JSONObject updateUserLimit(HGSportDTO dto);
+    Object updateUserLimit(HGSportDTO dto);
 
-    JSONObject removeUserLimit(HGSportDTO dto);
+    Object removeUserLimit(HGSportDTO dto);
 
-    JSONObject saveSportMessage(HGSportDTO dto);
+    Object saveSportMessage(HGSportDTO dto);
 
-    JSONObject removeSportMessage(HGSportDTO dto);
+    Object removeSportMessage(HGSportDTO dto);
 
-    JSONObject modifySportMessage(HGSportDTO dto);
+    Object modifySportMessage(HGSportDTO dto);
 
-    JSONObject sportChangeNotice(HGSportDTO dto);
+    Object sportChangeNotice(HGSportDTO dto);
 
-    JSONObject queryHGConfigGetOne(HGSportDTO dto);
+    Object queryHGConfigGetOne(HGSportDTO dto);
 
 }

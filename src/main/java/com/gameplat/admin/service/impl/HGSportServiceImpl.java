@@ -195,7 +195,7 @@ public class HGSportServiceImpl implements HGSportService {
         requestParam.put("vendorId", hgConfig.getVendorId());
         requestParam.put("operatorId", hgConfig.getOperatorId());
         log.info("获取HG{}，请求地址:{}，请求参数:{}", describe, url, dto);
-        String result = HttpRequest.get(url).header("tenant", "kgsit").form(requestParam).execute().body();
+        String result = HttpRequest.get(url).header("tenant", "kguat").form(requestParam).execute().body();
         log.info("获取HG{}，请求响应:{}", describe, result);
         if (StringUtils.isEmpty(result)) {
             throw new ServiceException("皇冠体育请求响应为空");
@@ -224,7 +224,7 @@ public class HGSportServiceImpl implements HGSportService {
         requestParam.put("vendorId", hgConfig.getVendorId());
         requestParam.put("operatorId", hgConfig.getOperatorId());
         log.info("获取HG{}，请求地址:{}，请求参数:{}", describe, url, dto);
-        String result = HttpRequest.post(url).header("tenant", "kgsit").form(requestParam).execute().body();
+        String result = HttpRequest.post(url).header("tenant", "kguat").form(requestParam).execute().body();
         log.info("获取HG{}，请求响应:{}", describe, result);
         if (StringUtils.isEmpty(result)) {
             throw new ServiceException("皇冠体育请求响应为空");

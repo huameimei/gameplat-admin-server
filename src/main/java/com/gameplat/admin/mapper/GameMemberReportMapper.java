@@ -10,6 +10,7 @@ import com.gameplat.admin.model.dto.MemberReportDto;
 import com.gameplat.admin.model.vo.MemberDayReportVo;
 import com.gameplat.admin.model.vo.MemberGameDayReportVo;
 import com.gameplat.admin.model.vo.MemberRWReportVo;
+import com.gameplat.admin.model.vo.SpreadUnionVO;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -53,8 +54,13 @@ public interface GameMemberReportMapper extends BaseMapper<MemberDayReport> {
 
 
     /**
+     * 获取数据（详细）
+     */
+    List<JSONObject> getSpreadReportInfo(@Param("account") String account, @Param("startTime") String startTime, @Param("endTime") String endTime);
+
+    /**
      * 获取数据（总报表）
      */
-    List<JSONObject> getSpreadReport(@Param("account") String account,@Param("startTime") String startTime,@Param("endTime") String endTime);
+    List<JSONObject> getSpreadReport(@Param("list") List<SpreadUnionVO> list, @Param("startTime") String startTime, @Param("endTime") String endTime);
 
 }

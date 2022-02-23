@@ -1,6 +1,5 @@
 package com.gameplat.admin.model.vo;
 
-import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
@@ -44,5 +43,7 @@ public class SpreadUnionVO implements Serializable {
     private BigDecimal rechargeAmount;
     @ApiModelProperty(value = "提现金额")
     private BigDecimal withdrawAmount;
+
+
 
 }

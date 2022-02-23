@@ -9,7 +9,7 @@ import com.gameplat.admin.service.HGSportService;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.StringUtils;
 import com.gameplat.common.enums.GamePlatformEnum;
-import com.gameplat.common.game.api.hg.bean.HGConfig;
+import com.gameplat.common.game.api.hg.config.HGConfig;
 import com.gameplat.common.game.api.hg.enums.API;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -217,6 +217,12 @@ public class HGSportServiceImpl implements HGSportService {
         log.info("获取HG{}，请求响应:{}", describe, result);
         if (StringUtils.isEmpty(result)) {
             throw new ServiceException("皇冠体育请求响应为空");
+        }
+        JSONObject resultJson = JSONObject.parseObject(result);
+        if(StringUtils.isNotNull(resultJson.getInteger("code")) && resultJson.getInteger("code") == 0){
+            resultJson.getJSONObject("data");
+        } else {
+            throw new ServiceException("皇冠体育请求响应异常");
         }
         return JSONObject.parseObject(result);
     }

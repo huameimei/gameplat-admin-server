@@ -55,10 +55,10 @@ public class HGSportDTO implements Serializable {
     private Boolean queryLikeLeague;
 
     @ApiModelProperty(value = "当前记录起始索引  默认0")
-    private Integer pageNum;
+    private Integer current;
 
     @ApiModelProperty(value = "每页显示记录数 默认10")
-    private Integer pageSize;
+    private Integer size;
 
     private String username;
 

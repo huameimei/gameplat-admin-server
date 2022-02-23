@@ -43,6 +43,7 @@ public class SpreadUnionVO implements Serializable {
     private BigDecimal rechargeAmount;
     @ApiModelProperty(value = "提现金额")
     private BigDecimal withdrawAmount;
+    private Integer count;
 
 
 

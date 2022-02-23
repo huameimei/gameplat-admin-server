@@ -165,6 +165,7 @@ public class SpreadUnionServiceImpl extends ServiceImpl<SpreadUnionMapper, Sprea
             BigDecimal reAmount = new BigDecimal("0");
             BigDecimal wiAmount = new BigDecimal("0");
             BigDecimal reIncome = new BigDecimal("0");
+            int i = 0;
             for (JSONObject y : spreadReport) {
                 if (Pattern.matches(agentPat, y.getString("agentPath"))) {
                     BigDecimal rechargeAmount = y.getBigDecimal("rechargeAmount");
@@ -173,11 +174,13 @@ public class SpreadUnionServiceImpl extends ServiceImpl<SpreadUnionMapper, Sprea
                     reAmount = reAmount.add(rechargeAmount);
                     wiAmount = wiAmount.add(withdrawAmount);
                     reIncome = reIncome.add(income);
+                    i ++;
                 }
             }
             x.setRechargeAmount(reAmount);
             x.setWithdrawAmount(wiAmount);
             x.setIncome(reIncome);
+            x.setCount(i);
         }
 
         //统计总数

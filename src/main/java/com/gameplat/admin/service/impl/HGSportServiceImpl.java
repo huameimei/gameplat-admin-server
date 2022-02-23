@@ -199,7 +199,13 @@ public class HGSportServiceImpl implements HGSportService {
         if (StringUtils.isEmpty(result)) {
             throw new ServiceException("皇冠体育请求响应为空");
         }
-        return JSONObject.parseObject(result);
+        JSONObject resultJson = JSONObject.parseObject(result);
+        if(StringUtils.isNotNull(resultJson.getInteger("code")) && resultJson.getInteger("code") == 1){
+            resultJson.getJSONObject("data");
+        } else {
+            throw new ServiceException("皇冠体育请求响应异常");
+        }
+        return resultJson;
     }
 
     public JSONObject doPostRequest(String apiUrl, HGSportDTO dto, String describe) {
@@ -219,12 +225,12 @@ public class HGSportServiceImpl implements HGSportService {
             throw new ServiceException("皇冠体育请求响应为空");
         }
         JSONObject resultJson = JSONObject.parseObject(result);
-        if(StringUtils.isNotNull(resultJson.getInteger("code")) && resultJson.getInteger("code") == 0){
+        if(StringUtils.isNotNull(resultJson.getInteger("code")) && resultJson.getInteger("code") == 1){
             resultJson.getJSONObject("data");
         } else {
             throw new ServiceException("皇冠体育请求响应异常");
         }
-        return JSONObject.parseObject(result);
+        return resultJson;
     }
 
 

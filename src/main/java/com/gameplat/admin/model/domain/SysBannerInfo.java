@@ -92,10 +92,10 @@ public class SysBannerInfo {
      */
     private String jumpUrl;
 
-    /**
-     * 游戏类别
-     */
-    private String gameKind;
+//    /**
+//     * 游戏类别
+//     */
+//    private String gameKind;
 
     /**
      * 关联游戏

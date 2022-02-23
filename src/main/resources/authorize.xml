@@ -13,8 +13,6 @@
         <uri>/api/admin/auth/logout</uri>
         <uri>/api/admin/common/**</uri>
         <uri>/api/admin/spread/management/**</uri>
-        <uri>/api/admin/operator/management/unionReportList</uri>
-        <uri>/api/admin/operator/management/unionReportInfo</uri>
 <!--        <uri>/api/admin/operator/diffusion/spreadConfig/**</uri>-->
     </uri-list>
 </permit-uri>

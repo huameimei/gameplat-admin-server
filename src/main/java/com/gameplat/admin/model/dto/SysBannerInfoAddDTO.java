@@ -1,5 +1,7 @@
 package com.gameplat.admin.model.dto;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
@@ -84,4 +86,5 @@ public class SysBannerInfoAddDTO implements Serializable {
 
     @ApiModelProperty("排序")
     private Integer sort;
+
 }

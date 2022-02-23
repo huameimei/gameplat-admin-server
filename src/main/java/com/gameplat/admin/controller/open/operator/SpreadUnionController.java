@@ -1,6 +1,7 @@
 package com.gameplat.admin.controller.open.operator;
 
 
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.gameplat.admin.model.domain.SpreadUnion;
@@ -93,9 +94,16 @@ public class SpreadUnionController {
     @ApiOperation(value = "联盟报表列表")
     @GetMapping("/unionReportList")
 //    @PreAuthorize("hasAuthority('spreadUnion:unionpackage:remove')")
-    public Object unionReportList(@RequestBody SpreadUnionDTO dto){
+    public Object unionReportList(SpreadUnionDTO dto){
        return spreadUnionService.getUnionReportList(dto);
     }
 
+
+    @ApiOperation(value = "获取联盟报表详情")
+    @GetMapping("/unionReportInfo")
+//    @PreAuthorize("hasAuthority('spreadUnion:unionpackage:remove')")
+    public List<JSONObject> unionReportInfo(@RequestParam("account")String account,@RequestParam("startTime") String startTime,@RequestParam("endTime") String endTime){
+        return spreadUnionService.unionReportInfo(account,startTime,endTime);
+    }
 
 }

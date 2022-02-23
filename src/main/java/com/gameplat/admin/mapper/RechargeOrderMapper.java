@@ -1,6 +1,7 @@
 package com.gameplat.admin.mapper;
 
 
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.toolkit.Constants;
@@ -11,6 +12,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
+import com.gameplat.admin.model.domain.SpreadUnion;
 import com.gameplat.admin.model.dto.MemberActivationDTO;
 import com.gameplat.admin.model.vo.MemberActivationVO;
 import org.apache.ibatis.annotations.Param;
@@ -54,4 +56,9 @@ public interface RechargeOrderMapper extends BaseMapper<RechargeOrder> {
 
     /** 根据会员和最后修改时间获取充值次数、充值金额、充值优惠、其它优惠 */
     MemberActivationVO getRechargeInfoByNameAndUpdateTime(MemberActivationDTO memberActivationDTO);
+
+    /**
+     * 根据代理线获取时间段内的充值数据
+     */
+    List<JSONObject> getSpreadReport(@Param("list")List<SpreadUnion> list, @Param("startTime")String startTime, @Param("endTime")String endTime);
 }

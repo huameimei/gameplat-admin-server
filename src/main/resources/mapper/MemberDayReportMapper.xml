@@ -637,4 +637,31 @@
         WHERE validAmount >= #{minBetAmount}
     </select>
 
+    <select id="getSpreadReport" resultType="com.alibaba.fastjson.JSONObject">
+        SELECT
+        m.user_level userLevel,
+        m.lower_num mLower,
+        mdr.user_name userName,
+        sum(mdr.recharge_count) rechargeCount,
+        sum(mdr.recharge_amount) rechargeAmount,
+        sum(mdr.discount_amount) discountAmount,
+        sum(mdr.jackpot_amount) jackpotAmount,
+        sum(mdr.withdraw_count) withdrawCount,
+        sum(mdr.withdraw_amount) withdrawAmount,
+        sum(mdr.fee_amount) feeAmount,
+        sum(mdr.bet_amount) betAmount,
+        sum(mdr.valid_amount) validAmount,
+        sum(mdr.win_amount) winAmount,
+        sum(mdr.water_amount) waterAmount,
+        (sum(mdr.recharge_amount) - sum(mdr.withdraw_amount))  income
+        FROM
+        member_day_report mdr
+        INNER JOIN member m on m.id = mdr.user_id
+        WHERE
+        mdr.count_date BETWEEN #{startTime} AND #{endTime}
+        AND
+        agent_path regexp concat('^/',#{account})
+        GROUP BY mdr.user_name
+    </select>
+
 </mapper>

@@ -18,6 +18,7 @@ public class GameKind implements Serializable {
 
   @TableId(type = IdType.AUTO)
   private Long id;
+
   /** 平台编码 */
   private String code;
 
@@ -36,6 +37,11 @@ public class GameKind implements Serializable {
    * 是否开放(0：否；1:是)
    */
   private Integer enable;
+
+  /**
+   * 运营状态(0已下架、1下架中、2运营中)
+   */
+  private Integer status;
 
   /**
    * 是否热门(0：否；1:是)
@@ -72,6 +78,16 @@ public class GameKind implements Serializable {
    * 返水最高比例
    */
   private Integer rebateRate;
+
+  /**
+   * 是否外跳(0：否；1:是)
+   */
+  private Integer isJump;
+
+  /**
+   * 是否竖屏(0：否；1:是)
+   */
+  private Integer isVertical;
 
   /**
    * 维护开始时间

@@ -46,7 +46,7 @@ public class ChatGifController {
     @PostMapping("/upload")
     @PreAuthorize("hasAuthority('chat:gif:upload')")
     public String upload(@RequestPart MultipartFile file) throws Exception {
-        return chatGifService.upload(file);
+        return chatGifService.upload(file, null);
     }
 
     @ApiOperation(value = "删")

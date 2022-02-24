@@ -20,7 +20,7 @@ public interface ChatGifService extends IService<ChatGif> {
     void add(MultipartFile file, String name) throws Exception;
 
     /** 增 */
-    String upload(MultipartFile file) throws Exception;
+    String upload(MultipartFile file, ChatGif chatGif) throws Exception;
 
     /** 删 */
     void remove(@PathVariable Integer id);

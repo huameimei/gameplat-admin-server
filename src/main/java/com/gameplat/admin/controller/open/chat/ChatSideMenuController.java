@@ -36,7 +36,7 @@ public class ChatSideMenuController {
     @ApiOperation(value = "编辑")
     @PreAuthorize("hasAuthority('chat:menu:edit')")
     @PutMapping("/edit")
-    public void edit(String config) {
+    public void edit(@RequestBody String config) {
         chatSideMenuService.edit(config);
     }
 

@@ -688,4 +688,46 @@
     </select>
 
 
+
+    <select id="findMemberbetAnalysis" parameterType="com.gameplat.admin.model.dto.MemberbetAnalysisdto" resultType="com.gameplat.admin.model.vo.MemberbetAnalysisVo">
+        SELECT
+            ifnull(sum( lottery_order_count ),0) lotteryOrderCount ,
+            ifnull(sum( sport_order_count ),0) sportOrderCount,
+            ifnull(sum( real_order_count ),0) realOrderCount,
+            ifnull(sum( lottery_win_order_count ),0) lotteryWinOrderCount,
+            ifnull(sum( sport_win_order_count ),0) sportWinOrderCount,
+            ifnull(sum( real_win_order_count ),0) realWinOrderCount,
+            ifnull(sum( lottery_valid_amount ),0) lotteryValidAmount,
+            ifnull(sum( sport_valid_amount ),0) sportValidAmount,
+            ifnull(sum( real_valid_amount ),0) realValidAmount,
+            ifnull(sum( lottery_win_amount ),0) lotteryWinAmount,
+            ifnull(sum( sport_win_amount ),0) sportWinAmount,
+            ifnull(sum( real_win_amount ),0) realWinAmount,
+            ifnull(sum( lottery_water_amount ),0) lotteryWaterAmount,
+            ifnull(sum( sport_water_amount ),0) sportWaterAmount,
+            ifnull(sum( real_water_amount ),0) realWaterAmount,
+            ifnull(sum( lottery_profit_rate ),0) lotteryProfitRate,
+            ifnull(sum( sport_profit_rate ),0) sportProfitRate,
+            ifnull(sum( real_profit_rate ),0) realProfitRate,
+            ifnull(sum( lottery_win_rate ),0) lotteryWinRate,
+            ifnull(sum( sport_win_rate ),0) sportWinRate,
+            ifnull(sum( real_win_rate ),0) realWinRate
+        FROM
+            member_day_report
+        WHERE
+            count_date BETWEEN #{startTime}
+            AND #{endTime}
+            <choose>
+                <when test="isTrue != null and isTrue != 1">
+                    <if test="account != null and account != ''">
+                        and parent_name = #{account} or user_name = #{account}
+                    </if>
+                </when>
+                <otherwise>
+                    <if test="account != null and account != ''">
+                        and user_name = #{account}
+                    </if>
+                </otherwise>
+            </choose>
+    </select>
 </mapper>

@@ -6,10 +6,8 @@ import com.gameplat.admin.model.domain.MemberDayReport;
 import com.gameplat.admin.model.dto.DepositReportDto;
 import com.gameplat.admin.model.dto.MemberDayReportDto;
 import com.gameplat.admin.model.dto.MemberReportDto;
-import com.gameplat.admin.model.vo.MemberDayReportVo;
-import com.gameplat.admin.model.vo.MemberGameDayReportVo;
-import com.gameplat.admin.model.vo.MemberRWReportVo;
-import com.gameplat.admin.model.vo.PageDtoVO;
+import com.gameplat.admin.model.dto.MemberbetAnalysisdto;
+import com.gameplat.admin.model.vo.*;
 
 
 public interface GameMemberReportService extends IService<MemberDayReport> {
@@ -23,4 +21,5 @@ public interface GameMemberReportService extends IService<MemberDayReport> {
     PageDtoVO<MemberGameDayReportVo> findSumMemberGameDayReport(Page<MemberGameDayReportVo> page, MemberReportDto memberReportDto);
 
 
+    MemberbetAnalysisVo findMemberbetAnalysis(MemberbetAnalysisdto dto);
 }

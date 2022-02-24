@@ -5,8 +5,10 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.gameplat.admin.mapper.MemberBusDayReportMapper;
 import com.gameplat.admin.model.dto.DayReportDTO;
 import com.gameplat.admin.model.dto.MemberReportDto;
+import com.gameplat.admin.model.dto.MemberbetAnalysisdto;
 import com.gameplat.admin.model.vo.DayReportVO;
 import com.gameplat.admin.model.vo.MemberGameDayReportVo;
+import com.gameplat.admin.model.vo.MemberbetAnalysisVo;
 import com.gameplat.admin.model.vo.PageDtoVO;
 import com.gameplat.admin.service.GameMemberReportService;
 import com.gameplat.base.common.util.DateUtil;
@@ -43,6 +45,7 @@ public class MemberDayReportController {
 
     private final GameMemberReportService gameMemberReportService;
 
+
     @GetMapping("/list")
     @ApiOperation(value = "查询会员日报列表")
     @PreAuthorize("hasAuthority('member:dayReport:list')")
@@ -69,5 +72,21 @@ public class MemberDayReportController {
         return gameMemberReportService.findSumMemberGameDayReport(page,dto);
     }
 
+
+
+    @ApiOperation(value = "投注分析")
+    @GetMapping(value = "findMemberbetAnalysis")
+    public MemberbetAnalysisVo findMemberbetAnalysis(MemberbetAnalysisdto dto) {
+        log.info("会员日报表入参：{}", JSON.toJSONString(dto));
+        if (StringUtils.isEmpty(dto.getStartTime())) {
+            String beginTime = DateUtil.getDateToString(new Date());
+            dto.setStartTime(beginTime);
+        }
+        if (StringUtils.isEmpty(dto.getEndTime())) {
+            String endTime = DateUtil.getDateToString(new Date());
+            dto.setEndTime(endTime);
+        }
+        return gameMemberReportService.findMemberbetAnalysis(dto);
+    }
 
 }

@@ -8,6 +8,7 @@ import com.gameplat.admin.model.domain.MemberDayReport;
 import com.gameplat.admin.model.dto.DepositReportDto;
 import com.gameplat.admin.model.dto.MemberDayReportDto;
 import com.gameplat.admin.model.dto.MemberReportDto;
+import com.gameplat.admin.model.dto.MemberbetAnalysisdto;
 import com.gameplat.admin.model.vo.*;
 import com.gameplat.admin.service.GameMemberReportService;
 import com.gameplat.base.common.util.BeanUtils;
@@ -83,5 +84,10 @@ public class GameMemberReportServiceImpl extends ServiceImpl <GameMemberReportMa
         pageDtoVO.setPage(memberGameDayReport);
         pageDtoVO.setOtherData(sumMemberGameDayReport);
         return pageDtoVO;
+    }
+
+    @Override
+    public MemberbetAnalysisVo findMemberbetAnalysis(MemberbetAnalysisdto dto) {
+        return gameMemberReportMapper.findMemberbetAnalysis(dto);
     }
 }

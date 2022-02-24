@@ -7,10 +7,8 @@ import com.gameplat.admin.model.domain.MemberDayReport;
 import com.gameplat.admin.model.dto.DepositReportDto;
 import com.gameplat.admin.model.dto.MemberDayReportDto;
 import com.gameplat.admin.model.dto.MemberReportDto;
-import com.gameplat.admin.model.vo.MemberDayReportVo;
-import com.gameplat.admin.model.vo.MemberGameDayReportVo;
-import com.gameplat.admin.model.vo.MemberRWReportVo;
-import com.gameplat.admin.model.vo.SpreadUnionVO;
+import com.gameplat.admin.model.dto.MemberbetAnalysisdto;
+import com.gameplat.admin.model.vo.*;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -62,5 +60,13 @@ public interface GameMemberReportMapper extends BaseMapper<MemberDayReport> {
      * 获取数据（总报表）
      */
     List<JSONObject> getSpreadReport(@Param("list") List<SpreadUnionVO> list, @Param("startTime") String startTime, @Param("endTime") String endTime);
+
+
+    /**
+     * 投注分析
+     * @param dto
+     * @return
+     */
+    MemberbetAnalysisVo findMemberbetAnalysis(MemberbetAnalysisdto dto);
 
 }

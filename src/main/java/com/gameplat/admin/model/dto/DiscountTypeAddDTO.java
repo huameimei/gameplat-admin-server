@@ -3,6 +3,7 @@ package com.gameplat.admin.model.dto;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModelProperty;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Date;
 import lombok.Data;
 
@@ -19,7 +20,7 @@ public class DiscountTypeAddDTO implements Serializable {
 
   private Integer mode;
 
-  private Integer discountAmount;
+  private BigDecimal discountAmount;
 
   /**
    * 创建者

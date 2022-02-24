@@ -1,7 +1,10 @@
 package com.gameplat.admin.model.vo;
 
 import io.swagger.annotations.ApiModelProperty;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 
@@ -11,6 +14,9 @@ import java.math.BigDecimal;
  * @Date : 2021/12/23
  */
 @Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class GameDivideVo {
     @ApiModelProperty(value = "游戏大类")
     private String liveGameName;

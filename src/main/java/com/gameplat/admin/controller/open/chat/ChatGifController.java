@@ -6,8 +6,6 @@ import com.gameplat.admin.model.domain.ChatGif;
 import com.gameplat.admin.model.dto.ChatGifEditDTO;
 import com.gameplat.admin.model.vo.ChatGifVO;
 import com.gameplat.admin.service.ChatGifService;
-import com.gameplat.admin.service.ConfigService;
-import com.gameplat.common.compent.oss.FileStorageStrategyContext;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +13,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 
 /**
  * @author lily
@@ -30,12 +27,6 @@ public class ChatGifController {
 
     @Autowired
     private ChatGifService chatGifService;
-
-    @Autowired
-    private ConfigService configService;
-
-    @Autowired
-    private FileStorageStrategyContext fileStorageStrategyContext;
 
     @ApiOperation(value = "分页列表")
     @GetMapping("/page")

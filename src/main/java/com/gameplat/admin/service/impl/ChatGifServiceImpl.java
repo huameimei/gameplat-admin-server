@@ -92,19 +92,12 @@ public class ChatGifServiceImpl extends ServiceImpl<ChatGifMapper, ChatGif>
       log.info("异常原因{}", e);
       throw new ServiceException("此图片已破损");
     }
-    //        // 特殊处理本地服务器
-    //        if(FileStorageEnum.LOCAL.getValue() == fileConfig.getProvider()){
-    //            //服务器名称
-    //            chatGif.setServiceFileName(DyDataSourceContextHolder.getTenant() + "/" + fType +
-    // fKey);
-    //        }else{
-    //            chatGif.setServiceFileName(fType + fKey);
-    //        }
     chatGif.setName(name);
     if (bufferedImage != null) {
       chatGif.setHeight(bufferedImage.getHeight());
       chatGif.setWidth(bufferedImage.getWidth());
     }
+    chatGif.setStoreFileName(file.getOriginalFilename());
     chatGif.setFileUrl(url);
     chatGif.setMd5(SecureUtil.md5(file.getInputStream()));
 
@@ -145,7 +138,7 @@ public class ChatGifServiceImpl extends ServiceImpl<ChatGifMapper, ChatGif>
     FileConfig fileConfig =
         configService.getDefaultConfig(DictTypeEnum.FILE_CONFIG, FileConfig.class);
     FileStorageProvider fileStorageProvider = fileStorageStrategyContext.getProvider(fileConfig);
-    fileStorageProvider.delete(chatGif.getFileUrl());
+    fileStorageProvider.delete(chatGif.getStoreFileName());
     // 删库
     super.removeById(id);
   }

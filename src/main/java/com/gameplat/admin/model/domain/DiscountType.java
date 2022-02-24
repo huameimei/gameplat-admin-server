@@ -9,6 +9,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.gameplat.admin.util.Date2LongSerializerUtils;
 import io.swagger.annotations.ApiModelProperty;
+import java.math.BigDecimal;
 import java.util.Date;
 import lombok.Data;
 
@@ -32,7 +33,7 @@ public class DiscountType {
   @ApiModelProperty(value = "优惠模式: [1 - 固定金额, 0 - 百分比]")
   private Integer mode;
 
-  private Integer discountAmount;
+  private BigDecimal discountAmount;
 
   @ApiModelProperty(value = "状态: [1 - 启用, 0 - 禁用]")
   private Integer status;

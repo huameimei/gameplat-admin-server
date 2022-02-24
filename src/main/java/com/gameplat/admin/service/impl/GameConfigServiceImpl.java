@@ -36,7 +36,7 @@ public class GameConfigServiceImpl extends ServiceImpl<GameConfigMapper, GameCon
   @Cached(name = CachedKeys.GAME_CONFIG_CACHE, key = "#platCode", expire = 7200)
   public JSONObject queryGameConfigInfoByPlatCode(String platCode){
     LambdaQueryWrapper<GameConfig>  queryWrapper = Wrappers.lambdaQuery();
-    queryWrapper.eq(GameConfig::getPlatCode,platCode);
+    queryWrapper.eq(GameConfig::getPlatformCode,platCode);
     GameConfig  gameConfig = gameConfigMapper.selectOne(queryWrapper);
     return JSONObject.parseObject(gameConfig.getConfig());
   }
@@ -45,7 +45,7 @@ public class GameConfigServiceImpl extends ServiceImpl<GameConfigMapper, GameCon
   public JSONObject getGameConfig(String platCode) {
     JSONObject jsonObject;
     GameConfig gameConfig = this.lambdaQuery()
-            .eq(GameConfig::getPlatCode, platCode)
+            .eq(GameConfig::getPlatformCode, platCode)
             .one();
     if (StringUtils.isNotNull(gameConfig)) {
       jsonObject = JSONObject.parseObject(gameConfig.getConfig());

@@ -71,7 +71,7 @@ public class RecommendConfigServiceImpl extends ServiceImpl<RecommendConfigMappe
         String layerPresetValue = recommendConfig.getLayerPresetValue();
         if (StrUtil.isBlank(layerPresetValue)) {
             // 初始化
-            layerPresetValue = this.initDivideConfig(liveGameTypeList, lang);
+            layerPresetValue = this.initDivideConfig(lang);
         }
         Map<String, JSONObject> ownerConfigMap = JSONUtil.toBean(layerPresetValue, Map.class);
         liveGameTypeList.forEach(gameType -> {
@@ -110,7 +110,7 @@ public class RecommendConfigServiceImpl extends ServiceImpl<RecommendConfigMappe
         String fixPresetValue = recommendConfig.getFixPresetValue();
         if (StrUtil.isBlank(fixPresetValue)) {
             // 初始化
-            fixPresetValue = this.initDivideConfig(liveGameTypeList, lang);
+            fixPresetValue = this.initDivideConfig(lang);
         }
         Map<String,JSONObject> ownerFixConfigMap = JSONUtil.toBean(fixPresetValue, Map.class);
         liveGameTypeList.forEach(gameType -> {
@@ -146,7 +146,7 @@ public class RecommendConfigServiceImpl extends ServiceImpl<RecommendConfigMappe
         String fissionPresetValue = recommendConfig.getFissionPresetValue();
         if (StrUtil.isBlank(fissionPresetValue)) {
             // 初始化
-            fissionPresetValue = this.initFissionDivideConfig(liveGameTypeList, lang);
+            fissionPresetValue = this.initFissionDivideConfig(lang);
         }
         Map<String,JSONObject> ownerFissionConfigMap = JSONUtil.toBean(fissionPresetValue, Map.class);
         liveGameTypeList.forEach(gameType -> {
@@ -251,8 +251,13 @@ public class RecommendConfigServiceImpl extends ServiceImpl<RecommendConfigMappe
      * @return
      */
     @Override
-    public String initDivideConfig(List<SysDictData> dictDataList, String lang) {
-        Map<String, List<SysDictData>> dictMap = dictDataList.stream().collect(Collectors.groupingBy(SysDictData::getDictValue));
+    public String initDivideConfig(String lang) {
+        List<SysDictData> liveGameTypeList = sysDictDataMapper.findDataByType("LIVE_GAME_TYPE", "1");
+        if (CollectionUtil.isEmpty(liveGameTypeList)) {
+            log.error("游戏大类字典数据为空！");
+            return "";
+        }
+        Map<String, List<SysDictData>> dictMap = liveGameTypeList.stream().collect(Collectors.groupingBy(SysDictData::getDictValue));
 
         List<GameKind> levelOneList = gameKindMapper.selectList(
                 new QueryWrapper<GameKind>().eq("enable", EnableEnum.ENABLED.code())
@@ -263,18 +268,15 @@ public class RecommendConfigServiceImpl extends ServiceImpl<RecommendConfigMappe
             if (BeanUtil.isEmpty(sysDictData)) {
                 continue;
             }
-            GameDivideVo saveVo = new GameDivideVo();
-            saveVo.setLiveGameName(sysDictData.getDictLabel());
-            saveVo.setLiveGameCode(sysDictData.getDictValue());
-            saveVo.setCode(levelOne.getCode());
-            saveVo.setName(levelOne.getName());
-            // 默认 投注额
-            saveVo.setSettleType(2);
-            saveVo.setAmountRatio(BigDecimal.ZERO);
-            // 此用户分配的比例设置成初始值0
-            saveVo.setDivideRatio(BigDecimal.ZERO);
-            // 上级所剩分红比例
-            saveVo.setParentDivideRatio(BigDecimal.ZERO);
+            GameDivideVo saveVo = GameDivideVo.builder()
+                    .liveGameName(sysDictData.getDictLabel())
+                    .liveGameCode(sysDictData.getDictValue())
+                    .code(levelOne.getCode())
+                    .name(levelOne.getName())
+                    .settleType(2)
+                    .amountRatio(BigDecimal.ZERO)
+                    .divideRatio(BigDecimal.ZERO)
+                    .parentDivideRatio(BigDecimal.ZERO).build();
             saveMap.put(levelOne.getCode(),JSONUtil.parseObj(saveVo));
         }
         return JSONUtil.toJsonStr(saveMap);
@@ -286,8 +288,13 @@ public class RecommendConfigServiceImpl extends ServiceImpl<RecommendConfigMappe
      * @return
      */
     @Override
-    public String initFissionDivideConfig(List<SysDictData> dictDataList, String lang) {
-        Map<String, List<SysDictData>> dictMap = dictDataList.stream().collect(Collectors.groupingBy(SysDictData::getDictValue));
+    public String initFissionDivideConfig(String lang) {
+        List<SysDictData> liveGameTypeList = sysDictDataMapper.findDataByType("LIVE_GAME_TYPE", "1");
+        if (CollectionUtil.isEmpty(liveGameTypeList)) {
+            log.error("游戏大类字典数据为空！");
+            return "";
+        }
+        Map<String, List<SysDictData>> dictMap = liveGameTypeList.stream().collect(Collectors.groupingBy(SysDictData::getDictValue));
 
         List<GameKind> levelOneList = gameKindMapper.selectList(
                 new QueryWrapper<GameKind>().eq("enable", EnableEnum.ENABLED.code())

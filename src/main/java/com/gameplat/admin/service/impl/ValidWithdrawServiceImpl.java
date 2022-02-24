@@ -292,6 +292,9 @@ public class ValidWithdrawServiceImpl extends
         List<GameBetValidRecordVo> finalList = list;
         String indexName = ContextConstant.ES_INDEX.BET_RECORD_ + "kgsit";
         accountValidWithdraw.forEach(a ->{
+            if (StringUtils.isEmpty(a.getGameKind()) || StringUtils.isEmpty(a.getPlatformCode())) {
+                return;
+            }
             GameVaildBetRecordQueryDTO dto = new GameVaildBetRecordQueryDTO(){{
                 setAccount(a.getAccount());
                 setBeginTime(a.getCreateTime());

@@ -38,6 +38,11 @@ public class PpMerchantVO extends Model<PpMerchantVO> {
 
   private PpInterfaceVO ppInterfaceVO;
 
+  private String createBy;
+
+  @JsonSerialize(using = Date2LongSerializerUtils.class)
+  private Date createTime;
+
   private String updateBy;
 
   @JsonSerialize(using = Date2LongSerializerUtils.class)

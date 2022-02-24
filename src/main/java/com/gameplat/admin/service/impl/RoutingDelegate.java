@@ -1,26 +1,19 @@
-package com.gameplat.admin.controller.open.lottery;
+package com.gameplat.admin.service.impl;
 
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.RequestEntity;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.*;
+import java.util.Map.Entry;
 
 @Slf4j
 @Service
@@ -80,7 +73,7 @@ public class RoutingDelegate {
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         Map<String, String[]> map = request.getParameterMap();
         for (Iterator<Entry<String, String[]>> itr = map.entrySet().iterator(); itr.hasNext(); ) {
-            Map.Entry<String, String[]> entry = itr.next();
+            Entry<String, String[]> entry = itr.next();
             String key = entry.getKey();
             String[] value = entry.getValue();
             params.put(key, Arrays.asList(value));

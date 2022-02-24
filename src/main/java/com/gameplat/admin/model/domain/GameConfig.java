@@ -20,8 +20,8 @@ public class GameConfig implements Serializable {
   @TableId(type = IdType.AUTO)
   private Long id;
 
-  @ApiModelProperty("游戏编码")
-  private String platCode;
+  @ApiModelProperty("游戏平台编码")
+  private String platformCode;
 
   @ApiModelProperty("游戏配置 json")
   private String config;

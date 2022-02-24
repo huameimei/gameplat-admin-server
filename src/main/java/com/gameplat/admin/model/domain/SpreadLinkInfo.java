@@ -69,6 +69,10 @@ public class SpreadLinkInfo {
   @Excel(name = "状态", replace = {"启用_1", "未启用_0"}, height = 20, width = 30, isImportField = "true_st")
   private Integer status;
 
+  private Integer isOpenDividePreset;
+
+  private String divideConfig;
+
   @TableField(fill = FieldFill.INSERT)
   @ApiModelProperty(value = "创建者")
   private String createBy;

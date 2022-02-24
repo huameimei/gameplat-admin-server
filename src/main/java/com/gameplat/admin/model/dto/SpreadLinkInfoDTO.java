@@ -35,5 +35,4 @@ public class SpreadLinkInfoDTO {
      * 排序
      */
     private String sortBy;
-
 }

@@ -28,7 +28,7 @@ public interface RecommendConfigService extends IService<RecommendConfig> {
      * @param lang
      * @return
      */
-    String initDivideConfig(List<SysDictData> dictDataList, String lang);
+    String initDivideConfig(String lang);
 
     /**
      * 初始化裂变配置
@@ -36,7 +36,7 @@ public interface RecommendConfigService extends IService<RecommendConfig> {
      * @param lang
      * @return
      */
-    String initFissionDivideConfig(List<SysDictData> dictDataList, String lang);
+    String initFissionDivideConfig(String lang);
 
     /**
      * 获取固定模式配置

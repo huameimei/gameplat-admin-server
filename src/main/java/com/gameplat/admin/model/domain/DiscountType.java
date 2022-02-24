@@ -29,7 +29,10 @@ public class DiscountType {
 
   private Integer sort;
 
-  private Integer discountRatio;
+  @ApiModelProperty(value = "优惠模式: [1 - 固定金额, 0 - 百分比]")
+  private Integer mode;
+
+  private Integer discountAmount;
 
   @ApiModelProperty(value = "状态: [1 - 启用, 0 - 禁用]")
   private Integer status;

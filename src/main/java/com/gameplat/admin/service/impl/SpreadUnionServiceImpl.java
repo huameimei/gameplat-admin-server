@@ -130,7 +130,7 @@ public class SpreadUnionServiceImpl extends ServiceImpl<SpreadUnionMapper, Sprea
             throw new RuntimeException("请确认需要查询的时间段范围");
         }
 
-        List<SpreadUnionVO> list = this.list().stream().map(spreadUnionConvert :: toSpreadUnionVO).collect(Collectors.toList());;
+        List<SpreadUnionVO> list = this.lambdaQuery().eq(SpreadUnion::getAgentAccount,dto.getAgentAccount()).like(SpreadUnion::getUnionName,dto.getUnionName()).list().stream().map(spreadUnionConvert :: toSpreadUnionVO).collect(Collectors.toList());;
 //
 //        //会员表。获取代理线下的所有会员
 //        List<Member> agentMember = memberMapper.getAgentMember(list,dto.getStartTime(), dto.getEndTime());

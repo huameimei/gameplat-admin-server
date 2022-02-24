@@ -17,7 +17,9 @@ public class DiscountTypeAddDTO implements Serializable {
 
   private Integer sort;
 
-  private Integer discountRatio;
+  private Integer mode;
+
+  private Integer discountAmount;
 
   /**
    * 创建者

@@ -1,6 +1,7 @@
 package com.gameplat.admin.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.RandomUtil;
 import com.alicp.jetcache.anno.CacheInvalidate;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -12,6 +13,7 @@ import com.gameplat.admin.constant.SystemConstant;
 import com.gameplat.admin.convert.MemberConvert;
 import com.gameplat.admin.enums.MemberEnums;
 import com.gameplat.admin.mapper.MemberMapper;
+import com.gameplat.admin.model.domain.GameTransferInfo;
 import com.gameplat.admin.model.domain.Member;
 import com.gameplat.admin.model.domain.MemberInfo;
 import com.gameplat.admin.model.dto.*;
@@ -22,6 +24,7 @@ import com.gameplat.admin.service.*;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.StringUtils;
 import com.gameplat.common.constant.CachedKeys;
+import com.gameplat.common.enums.TransferTypesEnum;
 import com.gameplat.common.lang.Assert;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -52,6 +55,8 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
   @Autowired private OnlineUserService onlineUserService;
 
   @Autowired private TenantConfig  tenantConfig;
+
+  @Autowired private GameTransferInfoService gameTransferInfoService;
 
   @Override
   public Member getForAccount(String account) {
@@ -342,6 +347,14 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
       String suffix = RandomUtil.randomString(13 - gameAccount.length());
       member.setGameAccount(gameAccount.append(suffix).toString());
       Assert.isTrue(this.updateById(member), "添加会员游戏账号信息!");
+    }
+    //会员余额存在哪个游戏中
+    if(ObjectUtil.isNull(gameTransferInfoService.getInfoByMemberId(member.getId()))){
+      GameTransferInfo gameTransferInfo = new GameTransferInfo();
+      gameTransferInfo.setPlatformCode(TransferTypesEnum.SELF.getCode());
+      gameTransferInfo.setAccount(member.getAccount());
+      gameTransferInfo.setMemberId(member.getId());
+      gameTransferInfoService.saveOrUpdate(gameTransferInfo);
     }
     return member;
   }

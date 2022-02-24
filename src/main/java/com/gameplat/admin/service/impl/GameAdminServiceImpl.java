@@ -314,10 +314,8 @@ public class GameAdminServiceImpl implements GameAdminService {
           + "，转出前系统余额：" + CNYUtils.formatYuanAsYuan(memberInfo.getBalance()) + ","
           + TransferTypesEnum.get(transferOut).getName() + ":" +  CNYUtils.formatYuanAsYuan(balance);
       status = GameTransferStatus.SUCCESS.getValue();
-      //7. 添加额度转换记录  自动转换才需要更新
-      if(transferType) {
-        gameTransferInfoService.update(memberInfo.getMemberId(), transferOut, orderNo);
-      }
+      //7. 添加额度转换记录
+      gameTransferInfoService.update(memberInfo.getMemberId(), transferOut, orderNo);
     }catch (LiveException | LiveRollbackException ex) {
       boolean bool = gameApi.queryOrderStatus(gameBizBean);
       if(bool){

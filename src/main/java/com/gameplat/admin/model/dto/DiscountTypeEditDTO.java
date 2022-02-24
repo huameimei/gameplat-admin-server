@@ -1,6 +1,7 @@
 package com.gameplat.admin.model.dto;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import lombok.Data;
 
 @Data
@@ -14,6 +15,6 @@ public class DiscountTypeEditDTO implements Serializable {
 
   private Integer mode;
 
-  private Integer discountAmount;
+  private BigDecimal discountAmount;
 
 }

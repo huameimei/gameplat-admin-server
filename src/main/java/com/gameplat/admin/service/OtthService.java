@@ -4,6 +4,7 @@ import com.alibaba.excel.util.DateUtils;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.gameplat.admin.config.TenantConfig;
 import com.gameplat.common.enums.ChatConfigEnum;
 import com.gameplat.admin.enums.ClientTypeEnum;
@@ -253,7 +254,7 @@ public class OtthService {
         return result;
     }
 
-    public Object otthProxyHttpGet(String apiUrl, HttpServletRequest request, HttpServletResponse response) throws IOException, ServiceException {
+    public Object otthProxyHttpGet(String apiUrl, HttpServletRequest request, HttpServletResponse response, PageDTO page) throws IOException, ServiceException {
         String dbSuffix = tenantConfig.getTenantCode();
         Enumeration<String> names = request.getParameterNames();
         Map<String, String> params = new HashMap<>();
@@ -262,6 +263,8 @@ public class OtthService {
             params.put(name, request.getParameter(name));
         }
         params.put("platCode", dbSuffix);
+        params.put("page", String.valueOf(page.getCurrent()));
+        params.put("rows", String.valueOf(page.getSize()));
         HttpClient httpClient = HttpClient.build().get(apiUrl);
         httpClient.setPara(params);
         httpClient.addHead("plat_code", dbSuffix);

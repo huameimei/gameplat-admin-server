@@ -2,6 +2,7 @@ package com.gameplat.admin.controller.open.chat;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JavaType;
@@ -95,9 +96,9 @@ public class OtthController {
 
     @ApiOperation(value = "平台聊天室限制配置/聊天室成员管理/关键词管理/聊天室房间管理/角色管理/聊天室自定义消息管理")
     @GetMapping(value = "/{url}", produces = {"application/json;charset=UTF-8"})
-    public Object get(@PathVariable String url, HttpServletRequest request, HttpServletResponse response) throws Exception {
+    public Object get(@PathVariable String url, HttpServletRequest request, HttpServletResponse response, PageDTO page) throws Exception {
         String apiUrl = getApiUrl(url);
-        return otthService.otthProxyHttpGet(apiUrl, request, response);
+        return otthService.otthProxyHttpGet(apiUrl, request, response, page);
     }
 
     @ApiOperation(value = "获取彩票游戏类型")

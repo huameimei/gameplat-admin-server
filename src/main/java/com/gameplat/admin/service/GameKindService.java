@@ -8,6 +8,8 @@ import com.gameplat.admin.model.dto.GameKindQueryDTO;
 import com.gameplat.admin.model.dto.OperGameKindDTO;
 import com.gameplat.admin.model.vo.GameKindVO;
 
+import java.util.List;
+
 public interface GameKindService extends IService<GameKind> {
 
   IPage<GameKindVO> selectGameKindList(PageDTO<GameKind> page, GameKindQueryDTO dto);
@@ -17,4 +19,9 @@ public interface GameKindService extends IService<GameKind> {
   void updateEnable(OperGameKindDTO operGameKindDTO);
 
   void updateDemoEnable(OperGameKindDTO operGameKindDTO);
+
+  /**
+   * 根据游戏大类类型获取相关游戏平台
+   */
+  List<GameKindVO> getGameKindInBanner(String gameType);
 }

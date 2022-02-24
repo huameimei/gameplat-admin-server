@@ -1,5 +1,6 @@
 package com.gameplat.admin.service.impl;
 
+import com.alibaba.csp.sentinel.annotation.SentinelResource;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
@@ -17,9 +18,12 @@ import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.common.enums.GameDemoEnableEnum;
 import com.google.common.collect.Lists;
 import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 import javax.annotation.Resource;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -74,4 +78,16 @@ public class GameKindServiceImpl extends ServiceImpl<GameKindMapper, GameKind>
     update.ne(GameKind::getDemoEnable, GameDemoEnableEnum.NOT_SUPPORT.getCode());
     gameKindMapper.update(null,update);
   }
+
+  /**
+   * 根据gameType(LIVE，CHESS 。。。) 获取游戏平台
+   */
+  @Override
+  @SentinelResource(value = "getGameKindInBanner")
+  public List<GameKindVO> getGameKindInBanner(String gameType) {
+    return this.lambdaQuery().eq(GameKind::getGameType,gameType)
+            .eq(GameKind::getEnable,1).list().stream().map(gameKindConvert::toVo).collect(Collectors.toList());
+  }
+
+
 }

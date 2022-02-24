@@ -6,6 +6,8 @@ import lombok.Data;
 @Data
 public class OperGameDTO implements Serializable {
 
+  private Long id;
+
   private String gameCode;
 
   private String gameName;

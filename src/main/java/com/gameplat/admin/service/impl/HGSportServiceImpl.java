@@ -194,7 +194,7 @@ public class HGSportServiceImpl implements HGSportService {
         JSONObject requestParam = JSONObject.parseObject(JSONObject.toJSONString(dto));
         requestParam.put("vendorId", hgConfig.getVendorId());
         requestParam.put("operatorId", hgConfig.getOperatorId());
-        log.info("获取HG{}，请求地址:{}，请求参数:{}", describe, url, dto);
+        log.info("获取HG{}，请求地址:{}，请求参数:{}", describe, url, requestParam);
         String result = HttpRequest.get(url).header("tenant", "kguat").form(requestParam).execute().body();
         log.info("获取HG{}，请求响应:{}", describe, result);
         if (StringUtils.isEmpty(result)) {
@@ -202,15 +202,21 @@ public class HGSportServiceImpl implements HGSportService {
         }
         JSONObject resultJson = JSONObject.parseObject(result);
         Integer code = resultJson.getInteger("code");
-        if (StringUtils.isNotNull(code) && code == 1) {
-            if (resultJson.get("data") instanceof JSONArray) {
-                return resultJson.getJSONArray("data");
-            } else {
-                return resultJson.getJSONObject("data");
+        String i18nKey = resultJson.getString("i18nKey");
+        String message = resultJson.getString("message");
+        if (StringUtils.isNotNull(code)) {
+            if (code == 1) {
+                if (resultJson.get("data") instanceof JSONArray) {
+                    return resultJson.getJSONArray("data");
+                } else {
+                    return resultJson.getJSONObject("data");
+                }
+            } else if (code == 0 && StringUtils.isEmpty(i18nKey)) {
+                throw new ServiceException(message);
             }
-        } else {
-            throw new ServiceException("皇冠体育请求响应异常");
         }
+
+        throw new ServiceException("皇冠体育请求响应异常");
     }
 
     public Object doPostRequest(String apiUrl, HGSportDTO dto, String describe) {
@@ -223,7 +229,7 @@ public class HGSportServiceImpl implements HGSportService {
         JSONObject requestParam = JSONObject.parseObject(JSONObject.toJSONString(dto));
         requestParam.put("vendorId", hgConfig.getVendorId());
         requestParam.put("operatorId", hgConfig.getOperatorId());
-        log.info("获取HG{}，请求地址:{}，请求参数:{}", describe, url, dto);
+        log.info("获取HG{}，请求地址:{}，请求参数:{}", describe, url, requestParam);
         String result = HttpRequest.post(url).header("tenant", "kguat").form(requestParam).execute().body();
         log.info("获取HG{}，请求响应:{}", describe, result);
         if (StringUtils.isEmpty(result)) {
@@ -231,15 +237,22 @@ public class HGSportServiceImpl implements HGSportService {
         }
         JSONObject resultJson = JSONObject.parseObject(result);
         Integer code = resultJson.getInteger("code");
-        if (StringUtils.isNotNull(code) && code == 1) {
-            if (resultJson.get("data") instanceof JSONArray) {
-                return resultJson.getJSONArray("data");
-            } else {
-                return resultJson.getJSONObject("data");
+        String i18nKey = resultJson.getString("i18nKey");
+        String message = resultJson.getString("message");
+        if (StringUtils.isNotNull(code)) {
+            if (code == 1) {
+                if (resultJson.get("data") instanceof JSONArray) {
+                    return resultJson.getJSONArray("data");
+                } else {
+                    return resultJson.getJSONObject("data");
+                }
+            } else if (code == 0 && StringUtils.isEmpty(i18nKey)) {
+                throw new ServiceException(message);
             }
-        } else {
-            throw new ServiceException("皇冠体育请求响应异常");
         }
+
+        throw new ServiceException("皇冠体育请求响应异常");
+
     }
 
 

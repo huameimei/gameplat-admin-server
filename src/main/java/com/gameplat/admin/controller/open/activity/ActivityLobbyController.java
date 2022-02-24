@@ -11,8 +11,9 @@ import com.gameplat.admin.model.dto.ActivityLobbyUpdateDTO;
 import com.gameplat.admin.model.dto.ActivityLobbyUpdateStatusDTO;
 import com.gameplat.admin.model.vo.ActivityLobbyVO;
 import com.gameplat.admin.model.vo.CodeDataVO;
-import com.gameplat.admin.model.vo.GameVO;
+import com.gameplat.admin.model.vo.GameKindVO;
 import com.gameplat.admin.service.ActivityLobbyService;
+import com.gameplat.admin.service.GameKindService;
 import com.gameplat.admin.service.GameService;
 import com.gameplat.admin.service.SysDictDataService;
 import com.gameplat.base.common.enums.EnableEnum;
@@ -53,6 +54,9 @@ public class ActivityLobbyController {
 
     @Autowired
     private GameService gameService;
+
+    @Autowired
+    private GameKindService gameKindService;
 
     /**
      * 活动大厅列表
@@ -187,12 +191,12 @@ public class ActivityLobbyController {
      */
     @ApiOperation(value = "游戏列表")
     @GetMapping("/gameList")
-    @PreAuthorize("hasAuthority('activity:lobby:gameList')")
+    @PreAuthorize("hasAuthority('activity:lobby:gameKindList')")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "gameTypeCode", value = "游戏类型"),
     })
-    public List<GameVO> gameList(String gameTypeCode) {
-        List<GameVO> gameList = gameService.findByGameTypeCode(gameTypeCode);
-        return gameList;
+    public List<GameKindVO> getGameKindInBanner(@RequestParam String gameTypeCode) {
+//        List<GameVO> gameList = gameService.findByGameTypeCode(gameTypeCode);
+        return gameKindService.getGameKindInBanner(gameTypeCode);
     }
 }

@@ -1,5 +1,7 @@
 package com.gameplat.admin.model.dto;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
@@ -78,12 +80,11 @@ public class SysBannerInfoAddDTO implements Serializable {
     @ApiModelProperty("跳转地址")
     private String jumpUrl;
 
-    @ApiModelProperty("游戏类别")
-    private String gameKind;
 
-    @ApiModelProperty("关联游戏")
-    private String gameCode;
+    @ApiModelProperty("相关的游戏配置")
+    private String gameConfig;
 
     @ApiModelProperty("排序")
     private Integer sort;
+
 }

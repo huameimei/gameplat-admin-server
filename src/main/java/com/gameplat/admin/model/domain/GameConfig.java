@@ -1,8 +1,12 @@
 package com.gameplat.admin.model.domain;
 
 
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
+
 import java.io.Serializable;
+import java.util.Date;
+
+import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -12,30 +16,44 @@ import lombok.Data;
 @Builder
 @AllArgsConstructor
 public class GameConfig implements Serializable {
+
+  @TableId(type = IdType.AUTO)
   private Long id;
 
-  /**
-   * 游戏编码
-   */
+  @ApiModelProperty("游戏编码")
   private String platCode;
 
-  /**
-   * 游戏配置 json
-   */
+  @ApiModelProperty("游戏配置 json")
   private String config;
 
-  /**
-   * 币种
-   */
+  @ApiModelProperty("租户标识")
+  private String tenantCode;
+
+  @ApiModelProperty("三方代理编号  游戏平台_三方代理号")
+  private String agentCode;
+
+  @ApiModelProperty("币种")
   private String currency;
 
-  /**
-   * 三方代理编号  游戏平台_三方代理号
-   */
-  private String agentId;
+  @ApiModelProperty("开关 0关 1开")
+  private Integer IsOpen;
 
-  /**
-   * 租户标识
-   */
-  private String tenantCode;
+  @ApiModelProperty("备注")
+  private String remark;
+
+  @ApiModelProperty("创建时间")
+  @TableField(fill = FieldFill.INSERT)
+  private Date createTime;
+
+  @ApiModelProperty("创建者")
+  @TableField(fill = FieldFill.INSERT)
+  private String createBy;
+
+  @ApiModelProperty("更新者")
+  @TableField(fill = FieldFill.INSERT_UPDATE)
+  private String updateBy;
+
+  @ApiModelProperty("更新时间")
+  @TableField(fill = FieldFill.INSERT_UPDATE)
+  private Date updateTime;
 }

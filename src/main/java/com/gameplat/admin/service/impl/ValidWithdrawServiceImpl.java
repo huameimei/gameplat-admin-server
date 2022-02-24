@@ -6,11 +6,13 @@ import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.gameplat.admin.convert.ValidWithdrawConvert;
 import com.gameplat.admin.mapper.ValidWithdrawMapper;
 import com.gameplat.admin.model.doc.GameBetRecord;
 import com.gameplat.admin.model.domain.RechargeOrder;
 import com.gameplat.admin.model.domain.ValidWithdraw;
 import com.gameplat.admin.model.dto.GameVaildBetRecordQueryDTO;
+import com.gameplat.admin.model.dto.ValidWithdrawDto;
 import com.gameplat.admin.model.vo.*;
 import com.gameplat.admin.service.ValidWithdrawService;
 import java.math.BigDecimal;
@@ -33,6 +35,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
 
 import javax.annotation.Resource;
 
@@ -45,6 +48,9 @@ public class ValidWithdrawServiceImpl extends
 
     @Autowired(required = false)
     private ValidWithdrawMapper validWithdrawMapper;
+
+    @Autowired(required = false)
+    private ValidWithdrawConvert validWithdrawConvert;
 
     @Override
     public void addRechargeOrder(RechargeOrder rechargeOrder) throws Exception {
@@ -81,6 +87,14 @@ public class ValidWithdrawServiceImpl extends
     private void deleteByUserId(Long memberId, Integer status) throws Exception {
         LambdaQueryWrapper<ValidWithdraw> query = Wrappers.lambdaQuery();
         query.eq(ValidWithdraw::getMemberId, memberId)
+                .eq(ValidWithdraw::getStatus, status);
+        this.remove(query);
+    }
+
+
+    private void deleteByUserName(String member, Integer status) throws Exception {
+        LambdaQueryWrapper<ValidWithdraw> query = Wrappers.lambdaQuery();
+        query.eq(ValidWithdraw::getAccount, member)
                 .eq(ValidWithdraw::getStatus, status);
         this.remove(query);
     }
@@ -124,10 +138,12 @@ public class ValidWithdrawServiceImpl extends
     public ValidateDmlBeanVo validateByMemberId(MemberWithdrawLimit memberWithdrawLimit,String name, boolean ignoreOuted)
             throws ServiceException {
         Integer status = ignoreOuted ? 0 : null;
+        //计算未完成的打码量
+        countAccountValidWithdraw(name);
         List<ValidWithdraw> validWithdraws = this
                 .queryByMemberIdAndAddTimeLessThanOrEqualToAndStatus(name, status);
         if (validWithdraws.stream().map(ValidWithdraw::getStatus).anyMatch(s -> 0 == s)) {
-            countAccountValidWithdraw(name);
+
             // 有未出款打码量时，过滤掉已出款记录，防止打码量操作并发时充值没有正常删除掉已出款记录
             validWithdraws = validWithdraws.stream().filter(v -> 0 == v.getStatus())
                     .collect(Collectors.toList());
@@ -336,4 +352,16 @@ public class ValidWithdrawServiceImpl extends
     }
 
 
+    @Override
+    public void updateValidWithdraw(ValidWithdrawDto dto) {
+        // 更新会员信息和会员详情
+        Assert.isTrue(
+                this.updateById(validWithdrawConvert.toEntity(dto)),
+                "修改打码量信息失败!");
+    }
+
+    @Override
+    public void delValidWithdraw(String member) throws Exception {
+        this.deleteByUserName(member,0);
+    }
 }

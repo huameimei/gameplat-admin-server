@@ -21,10 +21,10 @@ import java.math.BigDecimal;
  */
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("api-manage/manager")
+@RequestMapping("/api/admin/lottery/")
 @Slf4j
 @ApiOperation("彩票管理")
-public class LotterManagerController {
+public class LotteryManagerController {
 
     @Autowired(required = false)
     private NewLotteryForwardService serviceHandler;

@@ -44,7 +44,7 @@ public class RoutingDelegate {
 
     private String createRedirectUrl(HttpServletRequest request, String routeUrl, String prefix) {
         String queryString = request.getQueryString();
-        return routeUrl + request.getRequestURI().replace(prefix, "") + (queryString != null ? "?" + queryString : "");
+        return routeUrl + request.getRequestURI().replace(prefix, "/api-manage/manager") + (queryString != null ? "?" + queryString : "");
     }
 
     private RequestEntity createRequestEntity(HttpServletRequest request, String url) throws URISyntaxException, IOException {

@@ -12,8 +12,8 @@ import lombok.Data;
 @Builder
 @AllArgsConstructor
 public class GameConfig implements Serializable {
-  private Long id;
 
+  private Long id;
   /**
    * 游戏编码
    */
@@ -25,17 +25,27 @@ public class GameConfig implements Serializable {
   private String config;
 
   /**
+   * 租户标识
+   */
+  private String tenantCode;
+
+  /**
+   * 三方代理编码
+   */
+  private String agentCode;
+
+  /**
    * 币种
    */
   private String currency;
 
   /**
-   * 三方代理编号  游戏平台_三方代理号
+   * 开关 0关 1开
    */
-  private String agentId;
+  private Integer isOpen;
 
   /**
-   * 租户标识
+   * 备注
    */
-  private String tenantCode;
+  private String remark;
 }

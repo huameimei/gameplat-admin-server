@@ -4,7 +4,6 @@ import cn.hutool.http.HttpStatus;
 import cn.hutool.json.JSONUtil;
 import com.gameplat.admin.config.LotteryConfig;
 import com.gameplat.admin.service.NewLotteryForwardService;
-import com.gameplat.admin.util.lottery.RoutingDelegate;
 import com.gameplat.base.common.util.StringUtils;
 import com.gameplat.base.common.web.Result;
 import com.gameplat.security.SecurityUserHolder;

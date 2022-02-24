@@ -8,10 +8,12 @@ import com.gameplat.admin.model.domain.SpreadLinkInfo;
 import com.gameplat.admin.model.dto.SpreadLinkInfoAddDTO;
 import com.gameplat.admin.model.dto.SpreadLinkInfoDTO;
 import com.gameplat.admin.model.dto.SpreadLinkInfoEditDTO;
+import com.gameplat.admin.model.vo.GameDivideVo;
 import com.gameplat.admin.model.vo.SpreadConfigVO;
 
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
+import java.util.Map;
 
 public interface SpreadLinkInfoService extends IService<SpreadLinkInfo> {
 
@@ -68,4 +70,6 @@ public interface SpreadLinkInfoService extends IService<SpreadLinkInfo> {
      * @return
      */
     JSONArray getSpreadLinkRebate(String account, Boolean statisMax, Boolean statisMin);
+
+    void saveOrEditDivideConfig(Long linkId, String agentAccount, Map<String, List<GameDivideVo>> paramOwnerConfigMap);
 }

@@ -3,10 +3,12 @@ package com.gameplat.admin.service.impl;
 import cn.afterturn.easypoi.excel.ExcelExportUtil;
 import cn.afterturn.easypoi.excel.entity.ExportParams;
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
+import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -16,9 +18,12 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.constant.SystemConstant;
 import com.gameplat.admin.convert.SpreadLinkInfoConvert;
+import com.gameplat.admin.mapper.DivideLayerConfigMapper;
 import com.gameplat.admin.mapper.MemberInfoMapper;
 import com.gameplat.admin.model.domain.Member;
 import com.gameplat.admin.model.domain.MemberInfo;
+import com.gameplat.admin.model.domain.proxy.DivideLayerConfig;
+import com.gameplat.admin.model.vo.GameDivideVo;
 import com.gameplat.admin.service.MemberInfoService;
 import com.gameplat.admin.service.MemberService;
 import com.gameplat.base.common.enums.EnableEnum;
@@ -39,7 +44,9 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.gameplat.common.enums.UserTypes;
 import com.gameplat.common.lang.Assert;
@@ -72,6 +79,9 @@ public class SpreadLinkInfoServiceImpl extends ServiceImpl<SpreadLinkInfoMapper,
 
     @Autowired
     private MemberInfoMapper memberInfoMapper;
+
+    @Autowired
+    private DivideLayerConfigMapper layerConfigMapper;
 
     @Override
     public IPage<SpreadConfigVO> page(PageDTO<SpreadLinkInfo> page, SpreadLinkInfoDTO dto) {
@@ -171,6 +181,7 @@ public class SpreadLinkInfoServiceImpl extends ServiceImpl<SpreadLinkInfoMapper,
         if (StrUtil.isBlank(linkInfo.getCode())) {
             linkInfo.setCode(RandomStringUtils.random(6, true, true).toLowerCase());
         }
+        linkInfo.setIsOpenDividePreset(dto.getIsOpenDividePreset());
         // 校验推广码格式 并且是否已经存在
         this.checkCode(linkInfo.getCode());
         // 当推广链接不为空时 需要校验 此推广链接地址是否被其它代理作为了专属域名
@@ -184,7 +195,12 @@ public class SpreadLinkInfoServiceImpl extends ServiceImpl<SpreadLinkInfoMapper,
                 throw new ServiceException("推广链接地址已被使用！");
             }
         }
-        Assert.isTrue(this.save(linkInfo), "创建失败！");
+        boolean saveResult = this.save(linkInfo);
+        Assert.isTrue(saveResult, "创建失败！");
+        if (saveResult && linkInfo.getIsOpenDividePreset() == 1 &&
+                linkInfo.getUserType() == 1 && BeanUtil.isNotEmpty(dto.getOwnerConfigMap())) {
+            this.saveOrEditDivideConfig(linkInfo.getId(), linkInfo.getAgentAccount(), dto.getOwnerConfigMap());
+        }
     }
 
     @Override
@@ -196,6 +212,8 @@ public class SpreadLinkInfoServiceImpl extends ServiceImpl<SpreadLinkInfoMapper,
         // 校验账号的用户类型
         Member member = memberService.getByAccount(linkInfo.getAgentAccount()).orElseThrow(() -> new ServiceException("代理账号不存在!"));
         Assert.isTrue(UserTypes.AGENT.value().equalsIgnoreCase(member.getUserType()), "账号类型不支持！");
+        linkInfo.setIsOpenDividePreset(dto.getIsOpenDividePreset());
+
         // 当推广链接不为空时 需要校验 此推广链接地址是否被其它代理作为了专属域名
         if (StrUtil.isNotBlank(linkInfo.getExternalUrl())) {
             boolean exists = this.lambdaQuery()
@@ -207,7 +225,12 @@ public class SpreadLinkInfoServiceImpl extends ServiceImpl<SpreadLinkInfoMapper,
                 throw new ServiceException("推广链接地址已被使用！");
             }
         }
-        Assert.isTrue(this.updateById(linkInfo), "编辑失败！");
+        boolean updateResult = this.updateById(linkInfo);
+        Assert.isTrue(updateResult, "编辑失败！");
+        if (updateResult && linkInfo.getIsOpenDividePreset() == 1 &&
+                linkInfo.getUserType() == 1 && BeanUtil.isNotEmpty(dto.getOwnerConfigMap())) {
+            this.saveOrEditDivideConfig(linkInfo.getId(), linkInfo.getAgentAccount(), dto.getOwnerConfigMap());
+        }
     }
 
     @Override
@@ -333,24 +356,34 @@ public class SpreadLinkInfoServiceImpl extends ServiceImpl<SpreadLinkInfoMapper,
         return jsonArray;
     }
 
-    public static void main(String[] args) {
-        BigDecimal min = new BigDecimal("0").setScale(1,BigDecimal.ROUND_HALF_UP);
-        BigDecimal max = new BigDecimal("9").setScale(1,BigDecimal.ROUND_HALF_UP);
-        JSONArray jsonArray = new JSONArray();
-        BigDecimal rebate = max;
-        Integer base = 1800;
-        BigDecimal value = BigDecimal.ZERO;
-        String text = "";
-        while (rebate.compareTo(min) >= 0) {
-            JSONObject jsonObject = new JSONObject();
-            value = rebate;
-            Integer baseData = base + value.multiply(BigDecimal.valueOf(20L)).intValue();
-            text = rebate.toString().concat("% ---- ").concat(baseData.toString());
-            jsonObject.set("value", value);
-            jsonObject.set("text", text);
-            jsonArray.add(jsonObject);
-            rebate = rebate.subtract(BigDecimal.valueOf(0.1)).setScale(2,BigDecimal.ROUND_HALF_UP);
+    @Override
+    public void saveOrEditDivideConfig(Long linkId, String agentAccount, Map<String, List<GameDivideVo>> paramOwnerConfigMap) {
+        if (BeanUtil.isEmpty(paramOwnerConfigMap)) {
+            return;
         }
-        System.out.println(jsonArray);
+        Map<String, JSONObject> saveMap = new HashMap<>();
+        for (Map.Entry<String,List<GameDivideVo>> map : paramOwnerConfigMap.entrySet()) {
+            List<GameDivideVo> value = map.getValue();
+            for (GameDivideVo vo : value) {
+                saveMap.put(vo.getCode(), JSONUtil.parseObj(vo));
+            }
+        }
+        if (CollectionUtil.isNotEmpty(saveMap)) {
+            // 获取到自己的分红配置
+            DivideLayerConfig layerConfig = layerConfigMapper.getByUserName(agentAccount);
+            if (BeanUtil.isEmpty(layerConfig) || StrUtil.isBlank(layerConfig.getDivideConfig())) {
+                return;
+            }
+            Map<String,JSONObject> map = JSONUtil.toBean(layerConfig.getDivideConfig(),Map.class);
+            for (Map.Entry<String,JSONObject> m : saveMap.entrySet()) {
+                m.getValue().put("parentDivideRatio",
+                        map.get(m.getKey()).getBigDecimal("divideRatio").subtract(m.getValue().getBigDecimal("divideRatio"))
+                );
+            }
+            this.lambdaUpdate()
+                    .set(SpreadLinkInfo::getDivideConfig, JSONUtil.toJsonStr(saveMap))
+                    .eq(SpreadLinkInfo::getId, linkId)
+                    .update(new SpreadLinkInfo());
+        }
     }
 }

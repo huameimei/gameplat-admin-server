@@ -68,7 +68,8 @@ public class ChatGifServiceImpl extends ServiceImpl<ChatGifMapper, ChatGif>
   /** 增 */
   @Override
   public void add(MultipartFile file, String name) throws Exception {
-    String url = upload(file);
+    ChatGif chatGif = new ChatGif();
+    String url = upload(file, chatGif);
     File file1 = new File(file.getOriginalFilename());
     try {
       FileUtils.copyInputStreamToFile(file.getInputStream(), file1);
@@ -79,7 +80,6 @@ public class ChatGifServiceImpl extends ServiceImpl<ChatGifMapper, ChatGif>
     if (file1.exists()) {
       file1.delete();
     }
-    ChatGif chatGif = new ChatGif();
     BufferedImage bufferedImage = null;
     try {
       // 通过MultipartFile得到InputStream，从而得到BufferedImage
@@ -111,11 +111,15 @@ public class ChatGifServiceImpl extends ServiceImpl<ChatGifMapper, ChatGif>
   }
 
   @Override
-  public String upload(MultipartFile file) throws Exception {
+  public String upload(MultipartFile file, ChatGif chatGif) throws Exception {
     // 上传图片
     FileConfig fileConfig =
         configService.getDefaultConfig(DictTypeEnum.FILE_CONFIG, FileConfig.class);
     FileStorageProvider fileStorageProvider = fileStorageStrategyContext.getProvider(fileConfig);
+    if(ObjectUtil.isNotNull(chatGif)){
+      chatGif.setServiceProvider(fileConfig.getProvider());
+    }
+
     String md5 = SecureUtil.md5(file.getInputStream());
     if (findMD5(md5) > 0) {
       throw new ServiceException("不允许相同图片");

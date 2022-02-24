@@ -1,6 +1,10 @@
 package com.gameplat.admin.model.dto;
 
 import java.math.BigDecimal;
+import java.util.List;
+import java.util.Map;
+
+import com.gameplat.admin.model.vo.GameDivideVo;
 import lombok.Data;
 
 @Data
@@ -51,5 +55,9 @@ public class SpreadLinkInfoEditDTO {
      * 注册送彩金
      */
     private BigDecimal discountAmount;
+
+    private Integer isOpenDividePreset;
+
+    Map<String, List<GameDivideVo>> ownerConfigMap;
 
 }

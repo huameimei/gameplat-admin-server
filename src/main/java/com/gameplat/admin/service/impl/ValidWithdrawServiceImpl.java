@@ -284,7 +284,9 @@ public class ValidWithdrawServiceImpl extends
 
     @Override
     public void countAccountValidWithdraw(String username) {
-        List<ValidAccoutWithdrawVo> accountValidWithdraw = validWithdrawMapper.findAccountValidWithdraw(username);
+        List<ValidAccoutWithdrawVo> validWithdraw = validWithdrawMapper.findAccountValidWithdraw(username);
+        ////过滤会员是否存在打码
+        List<ValidAccoutWithdrawVo> accountValidWithdraw  = validWithdraw.stream().filter(a -> StringUtils.isNotEmpty(a.getGameKind()) && StringUtils.isNotEmpty(a.getPlatformCode())).collect(Collectors.toList());
         if (StringUtils.isEmpty(accountValidWithdraw)) {
             return;
         }

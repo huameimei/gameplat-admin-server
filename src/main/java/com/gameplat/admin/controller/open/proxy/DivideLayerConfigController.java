@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.gameplat.admin.model.domain.proxy.DivideLayerConfig;
 import com.gameplat.admin.model.dto.DivideConfigDTO;
+import com.gameplat.admin.model.dto.SpreadLinkInfoDTO;
 import com.gameplat.admin.model.vo.DivideLayerConfigVo;
 import com.gameplat.admin.service.DivideLayerConfigService;
 import com.gameplat.base.common.exception.ServiceException;
@@ -33,9 +34,34 @@ public class DivideLayerConfigController {
         return layerConfigService.page(page, divideConfigDTO);
     }
 
+    /**
+     * 编辑层层代分红配置前获取
+     * @param divideConfigDTO
+     * @return
+     */
     @GetMapping("/getLayerConfigForEdit")
     public Map<String,Object> getLayerConfigForEdit(DivideConfigDTO divideConfigDTO){
         return layerConfigService.getLayerConfigForEdit(divideConfigDTO.getUserName(), "zh-CN");
+    }
+
+    /**
+     * 添加代理推广链接前获取
+     * @param divideConfigDTO
+     * @return
+     */
+    @GetMapping("/getLayerConfigForLinkAdd")
+    public Map<String,Object> getLayerConfigForLinkAdd(DivideConfigDTO divideConfigDTO){
+        return layerConfigService.getLayerConfigForLinkAdd(divideConfigDTO.getUserName(), "zh-CN");
+    }
+
+    /**
+     * 编辑代理推广链接前获取
+     * @param divideConfigDTO
+     * @return
+     */
+    @GetMapping("/getLayerConfigForLinkEdit")
+    public Map<String,Object> getLayerConfigForLinkEdit(SpreadLinkInfoDTO spreadLinkInfoDTO){
+        return layerConfigService.getLayerConfigForLinkEdit(spreadLinkInfoDTO.getId(), "zh-CN");
     }
 
     @PostMapping("/add")

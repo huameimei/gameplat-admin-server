@@ -22,7 +22,11 @@ public interface DivideLayerConfigService extends IService<DivideLayerConfig> {
 
     void edit(DivideConfigDTO divideConfigDTO, String s);
 
-    Map<String, Object> getLayerConfigForEdit(String userName, String s);
+    Map<String, Object> getLayerConfigForEdit(String userName, String lang);
 
     void remove(String ids);
+
+    Map<String, Object> getLayerConfigForLinkAdd(String userName, String lang);
+
+    Map<String, Object> getLayerConfigForLinkEdit(Long id, String lang);
 }

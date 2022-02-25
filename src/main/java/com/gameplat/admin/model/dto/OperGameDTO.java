@@ -10,8 +10,6 @@ public class OperGameDTO implements Serializable {
 
   private String gameCode;
 
-  private String gameName;
-
   private String pcImgUrl;
 
   private String appImgUrl;

@@ -1,5 +1,6 @@
 package com.gameplat.admin.service.impl;
 
+import com.alicp.jetcache.anno.Cached;
 import com.gameplat.admin.model.domain.GameTransferRecord;
 import com.gameplat.admin.model.domain.Member;
 import com.gameplat.admin.model.domain.MemberBill;
@@ -14,6 +15,7 @@ import com.gameplat.admin.service.MemberInfoService;
 import com.gameplat.admin.service.MemberService;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.DateUtil;
+import com.gameplat.common.constant.CachedKeys;
 import com.gameplat.common.enums.GamePlatformEnum;
 import com.gameplat.common.enums.GameTransferStatus;
 import com.gameplat.common.enums.TranTypes;
@@ -233,6 +235,7 @@ public class GameAdminServiceImpl implements GameAdminService {
   }
 
   @Override
+  //@Cached(name = CachedKeys.GAME_BALANCE_CACHE, key = "#platformCode + '_' + #member.id", expire = 7200)
   public BigDecimal getBalance(String platformCode, Member member) throws Exception {
     if (TransferTypesEnum.SELF.getCode().equals(platformCode)) {
       return memberInfoService.getById(member.getId()).getBalance();

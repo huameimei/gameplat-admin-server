@@ -1,9 +1,11 @@
 package com.gameplat.admin.model.dto;
 
-import com.baomidou.mybatisplus.annotation.TableName;
 import com.gameplat.admin.model.vo.GameDivideVo;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.Date;
 import java.util.List;
@@ -45,16 +47,15 @@ public class DivideConfigDTO {
     @ApiModelProperty(value = "更新人")
     private String updateBy;
 
-    @ApiModelProperty(value = "下级默认彩票投注返点")
-    private Double lotteryBetRate;
-
     @ApiModelProperty(value = "是否只查询下级")
     private Integer isOnlyQueryChild;
-
-    @ApiModelProperty(value = "修改的分红参数")
-    Map<String, List<GameDivideVo>> ownerConfigMap;
 
     @ApiModelProperty(value = "查询下级属性  1 只查直属下级  2 查询所有下级")
     private Integer queryChild;
 
+    @ApiModelProperty(value = "修改的分红参数")
+    Map<String, List<GameDivideVo>> ownerConfigMap;
+
+    @ApiModelProperty(value = "修改的分红参数")
+    Map<String, List<GameDivideVo>> ownerFixConfigMap;
 }

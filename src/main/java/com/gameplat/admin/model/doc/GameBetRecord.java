@@ -148,6 +148,12 @@ public class GameBetRecord implements Serializable {
         if (StringUtils.isNotEmpty(dto.getBillNo())) {
             builder.must(QueryBuilders.matchQuery("billNo", dto.getBillNo()));
         }
+        if (StringUtils.isNotEmpty(dto.getPlatformCode())) {
+            builder.must(QueryBuilders.matchQuery("platformCode", dto.getBillNo()));
+        }
+        if (StringUtils.isNotEmpty(dto.getGameKind())) {
+            builder.must(QueryBuilders.matchQuery("gameKind", dto.getBillNo()));
+        }
         if (null != dto.getTimeType() && StringUtils.isNotBlank(dto.getBeginTime())) {
             String keyword = "betTime.keyword";
             if (TimeTypeEnum.BET_TIME.getValue() == dto.getTimeType()) {

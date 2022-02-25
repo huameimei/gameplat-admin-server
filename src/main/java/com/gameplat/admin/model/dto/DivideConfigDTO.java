@@ -1,5 +1,7 @@
 package com.gameplat.admin.model.dto;
 
+import com.gameplat.admin.model.vo.FissionConfigLevelVo;
+import com.gameplat.admin.model.vo.FissionDivideConfigVo;
 import com.gameplat.admin.model.vo.GameDivideVo;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
@@ -7,6 +9,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -58,4 +62,17 @@ public class DivideConfigDTO {
 
     @ApiModelProperty(value = "修改的分红参数")
     Map<String, List<GameDivideVo>> ownerFixConfigMap;
+
+    @ApiModelProperty(value = "修改的裂变模式分红map参数")
+    Map<String, List<FissionDivideConfigVo>> ownerFissionConfigMap;
+
+    @ApiModelProperty(value = "裂变模式周期配置")
+    private List<FissionConfigLevelVo> fissionConfigLevelVos = new ArrayList<>();
+
+    @ApiModelProperty(value = "周期配置")
+    private String recycleConfig;
+
+    @ApiModelProperty(value = "周期外分红点")
+    private BigDecimal outRecycleConfig;
+
 }

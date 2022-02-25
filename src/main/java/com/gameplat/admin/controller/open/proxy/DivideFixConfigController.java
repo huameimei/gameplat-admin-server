@@ -34,7 +34,6 @@ public class DivideFixConfigController {
         LambdaQueryWrapper<DivideFixConfig> queryWrapper = new LambdaQueryWrapper();
         queryWrapper.eq(StrUtil.isNotBlank(queryObj.getUserName()), DivideFixConfig::getUserName, queryObj.getUserName());
         return fixConfigService.page(page, queryWrapper);
-//        return fixConfigService.page(page, queryObj);
     }
 
     @PostMapping("/add")

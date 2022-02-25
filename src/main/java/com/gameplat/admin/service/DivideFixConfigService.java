@@ -17,4 +17,6 @@ public interface DivideFixConfigService extends IService<DivideFixConfig> {
     Map<String, Object> getFixConfigForEdit(String userName, String s);
 
     void edit(DivideConfigDTO divideConfigDTO, String lang);
+
+    void remove(String ids);
 }

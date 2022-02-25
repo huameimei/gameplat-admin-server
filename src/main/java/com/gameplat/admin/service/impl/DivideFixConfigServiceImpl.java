@@ -14,7 +14,9 @@ import com.gameplat.admin.model.domain.GameKind;
 import com.gameplat.admin.model.domain.Member;
 import com.gameplat.admin.model.domain.SysDictData;
 import com.gameplat.admin.model.domain.proxy.DivideFixConfig;
+import com.gameplat.admin.model.domain.proxy.DivideLayerConfig;
 import com.gameplat.admin.model.dto.DivideConfigDTO;
+import com.gameplat.admin.model.vo.DivideLayerConfigVo;
 import com.gameplat.admin.model.vo.GameDivideVo;
 import com.gameplat.admin.service.DivideFixConfigService;
 import com.gameplat.admin.service.MemberService;
@@ -145,5 +147,13 @@ public class DivideFixConfigServiceImpl extends ServiceImpl<DivideFixConfigMappe
                 .build();
         Assert.isTrue(this.updateById(editObj),"编辑失败！");
 
+    }
+
+    @Override
+    public void remove(String ids) {
+        String[] idArr = ids.split(",");
+        for (String idStr: idArr) {
+            fixConfigMapper.deleteById(Long.valueOf(idStr));
+        }
     }
 }

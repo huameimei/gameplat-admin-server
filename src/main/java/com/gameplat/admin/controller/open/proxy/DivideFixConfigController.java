@@ -7,6 +7,8 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.gameplat.admin.model.domain.proxy.DivideFixConfig;
 import com.gameplat.admin.model.dto.DivideConfigDTO;
 import com.gameplat.admin.service.DivideFixConfigService;
+import com.gameplat.base.common.exception.ServiceException;
+import com.gameplat.base.common.util.StringUtils;
 import com.gameplat.common.constant.ServiceName;
 import com.gameplat.log.annotation.Log;
 import com.gameplat.log.enums.LogType;
@@ -59,5 +61,15 @@ public class DivideFixConfigController {
     @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.AGENT, desc = "新增固定比例分红配置")
     public void edit(@Validated @RequestBody DivideConfigDTO divideConfigDTO) {
         fixConfigService.edit(divideConfigDTO, "zh-CN");
+    }
+
+    @ApiOperation(value = "删除固定分红配置")
+    @DeleteMapping("/delete")
+    @PreAuthorize("hasAuthority('agent:bonusFixconfig:remove')")
+    public void remove(@RequestBody String ids) {
+        if (StringUtils.isBlank(ids)) {
+            throw new ServiceException("ids不能为空");
+        }
+        fixConfigService.remove(ids);
     }
 }

@@ -48,7 +48,7 @@ public class GameServiceImpl extends ServiceImpl<GameMapper, Game> implements Ga
     @Override
     public void updateGame(OperGameDTO operGameDTO) {
         Game game = gameConvert.toEntity(operGameDTO);
-        if (this.updateById(game)) {
+        if (!this.updateById(game)) {
             throw new ServiceException("更新游戏信息失败!");
         }
     }

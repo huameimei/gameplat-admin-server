@@ -48,12 +48,22 @@ public class GameBetDailyReportController {
     return gameBetDailyReportService.queryPage(page, dto);
   }
 
+  /**
+   * 游戏平台维度数据统计
+   * @param dto
+   * @return
+   */
+  @GetMapping(value = "/queryGamePlatformReport")
+  public List<GameReportVO> queryGamePlatformReport(GameBetDailyReportQueryDTO dto) {
+    return gameBetDailyReportService.queryGamePlatformReport(dto);
+  }
+
 
   // TODO 导出真人投注日报表
 
 
   /**
-   * 真人重新生成日报表
+   * 游戏重新生成日报表
    */
   @PostMapping(value = "/resetDayReport")
   public void resetDayReport(@RequestBody OperGameMemberDayReportDTO dto) throws ServiceException {

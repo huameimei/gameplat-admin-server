@@ -22,7 +22,6 @@ public interface GameBetDailyReportMapper extends BaseMapper<GameBetDailyReport>
 
   int getDayCount(@Param("statTime") String statTime,@Param("tableName") String tableName);
 
-  int saveMemberDayReport(@Param("statTime") String statTime, @Param("gamePlatform") GamePlatform gamePlatform,@Param("tableName") String tableName);
 
   List<GameReportVO> queryReportList(GameBetDailyReportQueryDTO dto);
 
@@ -45,4 +44,5 @@ public interface GameBetDailyReportMapper extends BaseMapper<GameBetDailyReport>
    */
   void insertGameBetDailyReport(@Param("list") List<GameBetDailyReport> betDailyReport);
 
+  List<GameReportVO> queryGamePlatformReport(GameBetDailyReportQueryDTO dto);
 }

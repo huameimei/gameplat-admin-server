@@ -56,9 +56,9 @@ public class GameBetRecord implements Serializable {
     private String gameKind;
 
     /**
-     * 一级分类
+     * 游戏大类
      */
-    private String firstKind;
+    private String gameType;
 
     /**
      * 游戏编码
@@ -114,7 +114,7 @@ public class GameBetRecord implements Serializable {
      * 下注美东时间
      */
     @Field(type = FieldType.Date, format = DateFormat.custom, pattern = "yyyy-MM-dd HH:mm:ss||epoch_second")
-    private Date thirdTime;
+    private Date amesTime;
 
     /**
      * 结算时间
@@ -160,7 +160,7 @@ public class GameBetRecord implements Serializable {
                 keyword = "betTime.keyword";
             }
             if (TimeTypeEnum.THIRD_TIME.getValue() == dto.getTimeType()) {
-                keyword = "thirdTime.keyword";
+                keyword = "amesTime.keyword";
             }
             if (TimeTypeEnum.SETTLE_TIME.getValue() == dto.getTimeType()) {
                 keyword = "settleTime.keyword";

@@ -22,16 +22,29 @@ import com.gameplat.common.game.LiveGameResult;
 import com.gameplat.common.game.api.GameApi;
 import com.gameplat.elasticsearch.page.PageResponse;
 import com.gameplat.elasticsearch.service.IBaseElasticsearchService;
+import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
+import org.elasticsearch.action.search.SearchRequest;
+import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.client.HttpAsyncResponseConsumerFactory;
+import org.elasticsearch.client.RequestOptions;
+import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.search.aggregations.Aggregation;
+import org.elasticsearch.search.aggregations.AggregationBuilders;
+import org.elasticsearch.search.aggregations.metrics.ParsedSum;
+import org.elasticsearch.search.aggregations.metrics.SumAggregationBuilder;
+import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.sort.FieldSortBuilder;
 import org.elasticsearch.search.sort.SortBuilder;
 import org.elasticsearch.search.sort.SortBuilders;
 import org.elasticsearch.search.sort.SortOrder;
+import org.redisson.misc.Hash;
 import org.springframework.context.ApplicationContext;
+import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
@@ -70,6 +83,9 @@ public class GameBetRecordInfoServiceImpl implements GameBetRecordInfoService {
     @Resource
     private TenantConfig tenantConfig;
 
+    @Resource
+    private RestHighLevelClient restHighLevelClient;
+
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
     public GameApi getGameApi(String liveCode) {
         GameApi api = applicationContext.getBean(liveCode + GameApi.Suffix, GameApi.class);
@@ -99,13 +115,36 @@ public class GameBetRecordInfoServiceImpl implements GameBetRecordInfoService {
         resultPage.setRecords(betRecordList);
 
         Map<String, Object> otherData = new HashMap<>(8);
-        // todo es 合计
-        otherData.put("totalData", null);
+        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+        SumAggregationBuilder betAmountSumBuilder = AggregationBuilders.sum("betAmountSum").field("betAmount");
+        SumAggregationBuilder validAmountSumBuilder = AggregationBuilders.sum("validAmountSum").field("validAmount");
+        SumAggregationBuilder winAmountSumBuilder = AggregationBuilders.sum("winAmountSum").field("winAmount");
+        searchSourceBuilder.aggregation(betAmountSumBuilder).aggregation(validAmountSumBuilder).aggregation(winAmountSumBuilder);
+        searchSourceBuilder.query(builder);
+        searchSourceBuilder.sort(sortBuilder);
 
+        SearchRequest searchRequest = new SearchRequest(indexName);
+        searchRequest.source(searchSourceBuilder);
+        RequestOptions.Builder optionsBuilder = RequestOptions.DEFAULT.toBuilder();
+        optionsBuilder.setHttpAsyncResponseConsumerFactory(
+            new HttpAsyncResponseConsumerFactory.HeapBufferedResponseConsumerFactory(31457280));
+        try {
+           SearchResponse searchResponse =  restHighLevelClient.search(searchRequest,optionsBuilder.build());
+            Map<String, Aggregation> aggregationMap = searchResponse.getAggregations().getAsMap();
+            double betAmount = ((ParsedSum) aggregationMap.get("betAmountSum")).getValue();
+            double validAmount = ((ParsedSum) aggregationMap.get("validAmountSum")).getValue();
+            double winAmount = ((ParsedSum) aggregationMap.get("winAmountSum")).getValue();
+            otherData.put("betAmount",betAmount);
+            otherData.put("validAmount",validAmount);
+            otherData.put("winAmount",winAmount);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        // todo es 合计
+        otherData.put("totalData", otherData);
         PageDtoVO<GameBetRecordVO> pageDtoVO = new PageDtoVO<>();
         pageDtoVO.setPage(resultPage);
         pageDtoVO.setOtherData(otherData);
-
         return pageDtoVO;
     }
 

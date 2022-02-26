@@ -97,7 +97,7 @@ public class GameBetDailyReportServiceImpl extends ServiceImpl<GameBetDailyRepor
         Page<GameBetDailyReport> result = gameBetDailyReportMapper.selectPage(page, queryWrapper);
 
         QueryWrapper<GameBetDailyReport> queryOne = Wrappers.query();
-        queryOne.select("sum(bet_amount) as bet_amount,sum(valid_amount) as valid_amount,sum(win_amount) as win_amount,sum(revenue) as revenue");
+        queryOne.select("sum(bet_amount) as bet_amount,sum(valid_amount) as valid_amount,sum(win_amount) as win_amount");
         fillQueryWrapper(dto, queryOne);
         GameBetDailyReport gameBetDailyReport = gameBetDailyReportMapper.selectOne(queryOne);
         Map<String, Object> otherData = new HashMap<>();
@@ -132,7 +132,8 @@ public class GameBetDailyReportServiceImpl extends ServiceImpl<GameBetDailyRepor
 
     @Override
     public void saveGameBetDailyReport(String statTime, GamePlatform gamePlatform) {
-        log.info("{}[{}],statTime:[{}]> Start saveSysBannerInfo game_bet_daily_report", gamePlatform.getName(), gamePlatform.getCode(), statTime);
+        //TODO  等确认再说
+      /*  log.info("{}[{}],statTime:[{}]> Start saveSysBannerInfo game_bet_daily_report", gamePlatform.getName(), gamePlatform.getCode(), statTime);
         String tableName = String.format("live_%s_bet_record", gamePlatform.getCode());
         int count = gameBetDailyReportMapper.getDayCount(statTime, tableName);
         if (count > 0) {
@@ -147,7 +148,7 @@ public class GameBetDailyReportServiceImpl extends ServiceImpl<GameBetDailyRepor
         } else {
             log.info("{}[{}],statTime:[{}]> no data saveSysBannerInfo to game_bet_daily_report", gamePlatform.getName(), gamePlatform.getCode(), statTime);
         }
-        log.info("{}[{}],statTime:[{}]> End saveSysBannerInfo game_bet_daily_report", gamePlatform.getName(), gamePlatform.getCode(), statTime);
+        log.info("{}[{}],statTime:[{}]> End saveSysBannerInfo game_bet_daily_report", gamePlatform.getName(), gamePlatform.getCode(), statTime);*/
     }
 
     @Override
@@ -296,5 +297,18 @@ public class GameBetDailyReportServiceImpl extends ServiceImpl<GameBetDailyRepor
             });
             gameBetDailyReportMapper.insertGameBetDailyReport(assembleList);
         }
+    }
+
+    @Override
+    public List<GameReportVO> queryGamePlatformReport(GameBetDailyReportQueryDTO dto) {
+        if (StringUtils.isBlank(dto.getBeginTime())) {
+            String beginTime = DateUtil.getDateToString(new Date());
+            dto.setBeginTime(beginTime);
+        }
+        if (StringUtils.isBlank(dto.getEndTime())) {
+            String endTime = DateUtil.getDateToString(new Date());
+            dto.setEndTime(endTime);
+        }
+        return gameBetDailyReportMapper.queryGamePlatformReport(dto);
     }
 }

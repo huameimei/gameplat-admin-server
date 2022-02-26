@@ -46,6 +46,8 @@ public class DiscountTypeServiceImpl extends ServiceImpl<DiscountTypeMapper, Dis
 
   @Override
   public void save(DiscountTypeAddDTO dto) {
+    dto.setDateType(1);
+    dto.setStatus(1);
     if (!this.save(discountTypeConvert.toEntity(dto))) {
       throw new ServiceException("添加失败!");
     }

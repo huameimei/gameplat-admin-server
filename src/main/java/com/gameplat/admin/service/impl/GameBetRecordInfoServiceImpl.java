@@ -141,7 +141,6 @@ public class GameBetRecordInfoServiceImpl implements GameBetRecordInfoService {
             e.printStackTrace();
         }
         // todo es 合计
-        otherData.put("totalData", otherData);
         PageDtoVO<GameBetRecordVO> pageDtoVO = new PageDtoVO<>();
         pageDtoVO.setPage(resultPage);
         pageDtoVO.setOtherData(otherData);

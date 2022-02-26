@@ -14,5 +14,6 @@
         <uri>/api/admin/common/**</uri>
         <uri>/api/admin/spread/management/**</uri>
 <!--        <uri>/api/admin/operator/diffusion/spreadConfig/**</uri>-->
+        <uri>/websocket/**</uri>
     </uri-list>
 </permit-uri>

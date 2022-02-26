@@ -1,6 +1,5 @@
 package com.gameplat.admin.interceptor;
 
-import com.gameplat.admin.model.domain.SysAuthIp;
 import com.gameplat.admin.service.CommonService;
 import com.gameplat.admin.service.SysAuthIpService;
 import com.gameplat.base.common.exception.ServiceException;

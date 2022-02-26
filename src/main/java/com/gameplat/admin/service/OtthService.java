@@ -45,6 +45,7 @@ import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -74,7 +75,7 @@ public class OtthService {
     @Autowired
     private ChatSideMenuService menuService;
     @Autowired
-    private TaskExecutor taskExecutor;
+    private Executor asyncExecutor;
     @Autowired
     private GameConfigService gameConfigService;
     @Autowired
@@ -248,7 +249,7 @@ public class OtthService {
                 sysLog.setDoTime((System.currentTimeMillis() - start) + "");
                 //保存操作日志
                 remoteLogService.saveOperLog(sysLog);
-            }, taskExecutor);
+            }, asyncExecutor);
         }
 
         return result;

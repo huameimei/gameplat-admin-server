@@ -72,9 +72,10 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
 
   @Override
   public IPage<MessageDistributeVO> pageMessageDistribute(Page<Member> page, MemberQueryDTO dto) {
-    return memberMapper.queryPage(page, memberQueryCondition.builderQueryWrapper(dto))
-            .convert(this::setOnlineStatus)
-            .convert(memberConvert::toVo);
+    return memberMapper
+        .queryPage(page, memberQueryCondition.builderQueryWrapper(dto))
+        .convert(this::setOnlineStatus)
+        .convert(memberConvert::toVo);
   }
 
   @Override
@@ -128,6 +129,7 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
   @Override
   public void disable(List<Long> ids) {
     this.changeStatus(ids, MemberEnums.Status.DISABLED.value());
+    // TODO 查询是否有进入第三方游戏，第三方游戏踢线并回收额度
   }
 
   @Override

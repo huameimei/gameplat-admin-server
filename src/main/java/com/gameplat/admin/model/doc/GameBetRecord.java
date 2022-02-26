@@ -149,10 +149,13 @@ public class GameBetRecord implements Serializable {
             builder.must(QueryBuilders.matchQuery("billNo", dto.getBillNo()));
         }
         if (StringUtils.isNotEmpty(dto.getPlatformCode())) {
-            builder.must(QueryBuilders.matchQuery("platformCode", dto.getBillNo()));
+            builder.must(QueryBuilders.matchQuery("platformCode", dto.getPlatformCode()));
         }
         if (StringUtils.isNotEmpty(dto.getGameKind())) {
-            builder.must(QueryBuilders.matchQuery("gameKind", dto.getBillNo()));
+            builder.must(QueryBuilders.matchQuery("gameKind", dto.getGameKind()));
+        }
+        if (StringUtils.isNotEmpty(dto.getLiveGameSuperType())) {
+            builder.must(QueryBuilders.matchQuery("gameType", dto.getLiveGameSuperType()));
         }
         if (null != dto.getTimeType() && StringUtils.isNotBlank(dto.getBeginTime())) {
             String keyword = "betTime.keyword";
@@ -170,7 +173,7 @@ public class GameBetRecord implements Serializable {
             }
             builder.must(QueryBuilders.rangeQuery(keyword)
                     .from(dto.getBeginTime())
-                    .to(dto.getEndTime() == null ? "now" : dto.getBeginTime())
+                    .to(dto.getEndTime() == null ? "now" : dto.getEndTime())
                     .format(DateUtils.DATE_TIME_PATTERN));
         }
         return builder;
@@ -210,7 +213,7 @@ public class GameBetRecord implements Serializable {
             }
             builder.must(QueryBuilders.rangeQuery(keyword)
                     .from(dto.getBeginTime())
-                    .to(dto.getEndTime() == null ? "now" : dto.getBeginTime())
+                    .to(dto.getEndTime() == null ? "now" : dto.getEndTime())
                     .format(DateUtils.DATE_TIME_PATTERN));
         }
         return builder;

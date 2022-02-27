@@ -17,10 +17,6 @@ public class GameBetRecordVO implements Serializable {
      */
     private String billNo;
 
-    /**
-     * 租户编码
-     */
-    private String tenant;
 
     /**
      * 用户名
@@ -88,10 +84,6 @@ public class GameBetRecordVO implements Serializable {
      */
     private Date betTime;
 
-    /**
-     * 三方时间
-     */
-    private Date thirdTime;
 
     /**
      * 结算时间

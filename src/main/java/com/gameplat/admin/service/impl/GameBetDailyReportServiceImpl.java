@@ -120,7 +120,7 @@ public class GameBetDailyReportServiceImpl extends ServiceImpl<GameBetDailyRepor
                     Arrays.asList(dto.getLiveGameKindList().split(",")));
         }
         queryWrapper.eq(ObjectUtils.isNotEmpty(dto.getLiveGameKind()), "game_kind", dto.getLiveGameKind());
-        queryWrapper.eq(ObjectUtils.isNotEmpty(dto.getLiveGameSuperType()), "first_kind", dto.getLiveGameSuperType());
+        queryWrapper.eq(ObjectUtils.isNotEmpty(dto.getLiveGameSuperType()), "game_type", dto.getLiveGameSuperType());
         queryWrapper.apply(ObjectUtils.isNotEmpty(dto.getBeginTime()), "stat_time >= STR_TO_DATE({0}, '%Y-%m-%d')",
                 dto.getBeginTime());
         queryWrapper.apply(ObjectUtils.isNotEmpty(dto.getEndTime()), "stat_time <= STR_TO_DATE({0}, '%Y-%m-%d')",

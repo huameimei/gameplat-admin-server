@@ -23,7 +23,7 @@
       ifnull( b.real_rebate_money, 0 ) rebateMoney,
       (
       a.win_amount - ifnull( b.real_rebate_money, 0 )) companyAmount ,
-      a.game_type gameType,
+      a.game_type gameTypeCode,
       a.game_type_name gameTypeName
     FROM
       (

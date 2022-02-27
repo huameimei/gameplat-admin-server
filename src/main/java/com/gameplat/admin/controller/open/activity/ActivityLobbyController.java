@@ -192,9 +192,6 @@ public class ActivityLobbyController {
             @ApiImplicitParam(name = "gameTypeCode", value = "游戏类型"),
     })
     public List<GameKindVO> getGameKindInBanner(String gameTypeCode) {
-        if(StringUtils.isBlank(gameTypeCode)){
-            return new ArrayList<>();
-        }
         return gameKindService.getGameKindInBanner(gameTypeCode);
     }
 }

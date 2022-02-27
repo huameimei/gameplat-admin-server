@@ -1,30 +1,28 @@
 package com.gameplat.admin.service.impl;
 
-import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.gameplat.admin.config.TenantConfig;
 import com.gameplat.admin.mapper.GameBetDailyReportMapper;
-import com.gameplat.admin.mapper.MemberMapper;
 import com.gameplat.admin.model.bean.ActivityStatisticItem;
 import com.gameplat.admin.model.domain.GameBetDailyReport;
 import com.gameplat.admin.model.domain.GamePlatform;
-import com.gameplat.admin.model.domain.GameRebateDetail;
 import com.gameplat.admin.model.domain.Member;
 import com.gameplat.admin.model.dto.GameBetDailyReportQueryDTO;
 import com.gameplat.admin.model.vo.GameBetReportVO;
 import com.gameplat.admin.model.vo.GameReportVO;
 import com.gameplat.admin.model.vo.PageDtoVO;
-import com.gameplat.admin.model.vo.TpPayChannelVO;
 import com.gameplat.admin.service.GameBetDailyReportService;
 import com.gameplat.admin.service.MemberService;
+import com.gameplat.base.common.constant.ContextConstant.ES_INDEX;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.DateUtil;
+import com.gameplat.base.common.util.DateUtils;
 import com.gameplat.base.common.util.StringUtils;
 import com.gameplat.common.enums.SettleStatusEnum;
 import com.gameplat.common.enums.UserTypes;
@@ -70,8 +68,8 @@ public class GameBetDailyReportServiceImpl extends ServiceImpl<GameBetDailyRepor
     @Resource
     private GameBetDailyReportMapper gameBetDailyReportMapper;
 
-    @Resource
-    private MemberMapper memberMapper;
+    @Autowired
+    private TenantConfig tenantConfig;
 
     @Resource
     public RestHighLevelClient restHighLevelClient;
@@ -207,40 +205,38 @@ public class GameBetDailyReportServiceImpl extends ServiceImpl<GameBetDailyRepor
 
     @Override
     public void assembleBetDailyReport(List<String> list) {
-
+        //todo 待完善
         List<GameBetDailyReport> assembleList = new ArrayList<>();
         list.forEach(day -> {
             DateTime parseTime = cn.hutool.core.date.DateUtil.parse(day, "yyyy-MM-dd");
             String beginTime = cn.hutool.core.date.DateUtil.beginOfDay(parseTime).toString();
             String endTime = cn.hutool.core.date.DateUtil.endOfDay(parseTime).toString();
 
-            log.info("{}~{}游戏日报表汇总，开始执行！", beginTime, endTime);
+            log.info("{}~{}游戏日报表汇总，开始执行...", beginTime, endTime);
 
             BoolQueryBuilder builder = QueryBuilders.boolQuery();
-            builder.must(QueryBuilders.termQuery("tenant", "kgsit"));
+            builder.must(QueryBuilders.termQuery("tenant.keyword", tenantConfig.getTenantCode()));
             builder.must(QueryBuilders.termQuery("settle", SettleStatusEnum.YES.getValue()));
+            builder.must(QueryBuilders.rangeQuery("settleTime.keyword")
+                    .from(beginTime).to(endTime).format(DateUtils.DATE_TIME_PATTERN));
 
-            // 会员游戏表集合（北京时间） 按投注时间
-//            builder.must(QueryBuilders.rangeQuery("betTime.keyword")
-//                    .from(beginTime).to(endTime).format(DateUtils.DATE_TIME_PATTERN));
-            //todo
-            SearchRequest searchRequest = new SearchRequest(new String[]{"bet-record_kgsit"});
+            SearchRequest searchRequest = new SearchRequest(ES_INDEX.BET_RECORD_ + tenantConfig.getTenantCode());
             SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
-            TermsAggregationBuilder userNameGroup = AggregationBuilders.terms("userNameGroup").field("account.keyword");
-            TermsAggregationBuilder firstKindGroup = AggregationBuilders.terms("gameKindGroup").field("gameKind.keyword");
+            TermsAggregationBuilder accountGroup = AggregationBuilders.terms("accountGroup").field("account.keyword");
+            TermsAggregationBuilder gameKindGroup = AggregationBuilders.terms("gameKindGroup").field("gameKind.keyword");
 
             SumAggregationBuilder sumBetAmount = AggregationBuilders.sum("betAmount").field("betAmount");
             SumAggregationBuilder sumValidAmount = AggregationBuilders.sum("validAmount").field("validAmount");
             SumAggregationBuilder sumWinAmount = AggregationBuilders.sum("winAmount").field("winAmount");
 
-            firstKindGroup.subAggregation(sumBetAmount);
-            firstKindGroup.subAggregation(sumValidAmount);
-            firstKindGroup.subAggregation(sumWinAmount);
-            userNameGroup.subAggregation(firstKindGroup);
+            gameKindGroup.subAggregation(sumBetAmount);
+            gameKindGroup.subAggregation(sumValidAmount);
+            gameKindGroup.subAggregation(sumWinAmount);
+            accountGroup.subAggregation(gameKindGroup);
 
             searchSourceBuilder.size(0);
             searchSourceBuilder.query(builder);
-            searchSourceBuilder.aggregation(userNameGroup);
+            searchSourceBuilder.aggregation(accountGroup);
             searchSourceBuilder.fetchSource(new FetchSourceContext(
                     true, new String[]{"platformCode", "gameKind"}, Strings.EMPTY_ARRAY));
             searchRequest.source(searchSourceBuilder);
@@ -249,13 +245,13 @@ public class GameBetDailyReportServiceImpl extends ServiceImpl<GameBetDailyRepor
                 optionsBuilder.setHttpAsyncResponseConsumerFactory(
                         new HttpAsyncResponseConsumerFactory.HeapBufferedResponseConsumerFactory(31457280));
                 SearchResponse search = restHighLevelClient.search(searchRequest, optionsBuilder.build());
-                Terms terms = search.getAggregations().get("userNameGroup");
+                Terms terms = search.getAggregations().get("accountGroup");
 
                 for (Terms.Bucket bucket : terms.getBuckets()) {
                     String account = bucket.getKeyAsString();
                     Terms terms2 = bucket.getAggregations().get("gameKindGroup");
                     for (Terms.Bucket bucket2 : terms2.getBuckets()) {
-                        String firstKind = bucket2.getKeyAsString();
+                        String gameKind = bucket2.getKeyAsString();
                         long count = bucket2.getDocCount();
                         double betAmount = ((ParsedSum) bucket2.getAggregations().get("betAmount")).getValue();
                         double validAmount = ((ParsedSum) bucket2.getAggregations().get("validAmount")).getValue();
@@ -263,40 +259,24 @@ public class GameBetDailyReportServiceImpl extends ServiceImpl<GameBetDailyRepor
 
                         GameBetDailyReport report = new GameBetDailyReport();
                         report.setAccount(account);
-                        report.setPlatformCode(firstKind.split("_")[0]);
-                        report.setGameKind(firstKind.split("_")[1]);
-                        report.setGameType(firstKind);
+                        report.setPlatformCode(gameKind.split("_")[0]);
+                        report.setGameKind(gameKind);
+                        report.setGameType(gameKind.split("_")[1]);
                         report.setBetCount(count);
                         report.setBetAmount(new BigDecimal(betAmount));
                         report.setValidAmount(new BigDecimal(validAmount));
                         report.setWinAmount(new BigDecimal(winAmount));
+                        report.setStatTime(day);
                         assembleList.add(report);
                     }
                 }
             } catch (IOException e) {
                 e.printStackTrace();
             }
-
-            if (CollectionUtil.isNotEmpty(assembleList)) {
-                assembleList.forEach(o -> o.setStatTime(day));
-            }
-            log.info("{}~{}游戏日报表汇总，执行结束！", beginTime, endTime);
+            log.info("{}~{}游戏日报表汇总，执行结束。。。", beginTime, endTime);
         });
 
-        if (CollectionUtil.isNotEmpty(assembleList)) {
-            List<String> accountList = assembleList.stream().map(GameBetDailyReport::getAccount).collect(Collectors.toList());
-            List<Member> infoList = memberMapper.getInfoByAccount(accountList);
-            assembleList.forEach(betDailyReport -> {
-                Optional<Member> any = infoList.stream().filter(o -> betDailyReport.getAccount().equals(o.getAccount())).findAny();
-                if (any.isPresent()) {
-                    Member member = any.get();
-                    betDailyReport.setMemberId(member.getId());
-                    betDailyReport.setRealName(member.getRealName());
-                    betDailyReport.setUserPaths(member.getSuperPath());
-                }
-            });
-            gameBetDailyReportMapper.insertGameBetDailyReport(assembleList);
-        }
+        gameBetDailyReportMapper.insertGameBetDailyReport(assembleList);
     }
 
     @Override

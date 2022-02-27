@@ -100,9 +100,8 @@ public class GameBetRecordInfoServiceImpl implements GameBetRecordInfoService {
     @Override
     public PageDtoVO<GameBetRecordVO> queryPageBetRecord(Page<GameBetRecordVO> page, GameBetRecordQueryDTO dto) {
         QueryBuilder builder = GameBetRecord.buildBetRecordSearch(dto);
-        // todo betTime
         SortBuilder<FieldSortBuilder> sortBuilder = SortBuilders.fieldSort(convertTimeType(dto.getTimeType())+ ".keyword").order(SortOrder.DESC);
-        // todo kgsit
+
         String indexName = ContextConstant.ES_INDEX.BET_RECORD_ + tenantConfig.getTenantCode();
         PageResponse<GameBetRecord> result = baseElasticsearchService.search(builder, indexName, GameBetRecord.class,
                 (int) page.getCurrent() - 1, (int) page.getSize(), sortBuilder);
@@ -140,7 +139,7 @@ public class GameBetRecordInfoServiceImpl implements GameBetRecordInfoService {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        // todo es 合计
+
         PageDtoVO<GameBetRecordVO> pageDtoVO = new PageDtoVO<>();
         pageDtoVO.setPage(resultPage);
         pageDtoVO.setOtherData(otherData);

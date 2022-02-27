@@ -203,7 +203,7 @@ public class GameBetRecord implements Serializable {
                 keyword = "betTime.keyword";
             }
             if (TimeTypeEnum.THIRD_TIME.getValue() == dto.getTimeType()) {
-                keyword = "thirdTime.keyword";
+                keyword = "amesTime.keyword";
             }
             if (TimeTypeEnum.SETTLE_TIME.getValue() == dto.getTimeType()) {
                 keyword = "settleTime.keyword";

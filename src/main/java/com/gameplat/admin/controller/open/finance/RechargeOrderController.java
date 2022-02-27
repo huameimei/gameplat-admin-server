@@ -10,10 +10,12 @@ import com.gameplat.admin.model.vo.RechargeOrderVO;
 import com.gameplat.admin.model.vo.SummaryVO;
 import com.gameplat.admin.service.RechargeOrderService;
 import com.gameplat.base.common.exception.ServiceException;
+import com.gameplat.common.model.bean.UserEquipment;
 import com.gameplat.security.SecurityUserHolder;
 import com.gameplat.security.context.UserCredential;
 import java.math.BigDecimal;
 import java.util.List;
+import javax.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -127,8 +129,9 @@ public class RechargeOrderController {
 
   @PostMapping("/manual")
   @PreAuthorize("hasAuthority('finance:rechargeOrder:manual')")
-  public void manual(ManualRechargeOrderBo manualRechargeOrderBo) throws Exception {
+  public void manual(ManualRechargeOrderBo manualRechargeOrderBo, HttpServletRequest request) throws Exception {
     UserCredential userCredential = SecurityUserHolder.getCredential();
-    rechargeOrderService.manual(manualRechargeOrderBo, userCredential);
+    UserEquipment clientInfo = UserEquipment.create(request);
+    rechargeOrderService.manual(manualRechargeOrderBo, userCredential,clientInfo);
   }
 }

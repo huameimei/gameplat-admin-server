@@ -9,10 +9,12 @@ import com.gameplat.admin.model.dto.MemberWithdrawQueryDTO;
 import com.gameplat.admin.model.vo.MemberWithdrawVO;
 import com.gameplat.admin.model.vo.SummaryVO;
 import com.gameplat.admin.service.MemberWithdrawService;
+import com.gameplat.common.model.bean.UserEquipment;
 import com.gameplat.security.SecurityUserHolder;
 import com.gameplat.security.context.UserCredential;
 import java.math.BigDecimal;
 import java.util.List;
+import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -29,10 +31,10 @@ public class MemberWithdrawController {
   @PostMapping("/modifyCashStatus")
   @PreAuthorize("hasAuthority('finance:memberWithdraw:modifyCashStatus')")
   public void modifyCashStatus(Long id, Integer cashStatus, Integer curStatus, boolean isDirect,
-      String approveReason) throws Exception{
+      String approveReason,HttpServletRequest request) throws Exception{
     UserCredential userCredential = SecurityUserHolder.getCredential();
-
-    userWithdrawService.modify(id, cashStatus, curStatus, isDirect, approveReason, userCredential);
+    UserEquipment clientInfo = UserEquipment.create(request);
+    userWithdrawService.modify(id, cashStatus, curStatus, isDirect, approveReason, userCredential,clientInfo);
   }
 
   @PostMapping("/editDiscount")

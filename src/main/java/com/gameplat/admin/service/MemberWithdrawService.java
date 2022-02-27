@@ -8,6 +8,7 @@ import com.gameplat.admin.model.domain.PpMerchant;
 import com.gameplat.admin.model.dto.MemberWithdrawQueryDTO;
 import com.gameplat.admin.model.vo.MemberWithdrawVO;
 import com.gameplat.admin.model.vo.SummaryVO;
+import com.gameplat.common.model.bean.UserEquipment;
 import com.gameplat.security.context.UserCredential;
 import java.math.BigDecimal;
 import java.util.List;
@@ -22,7 +23,7 @@ public interface MemberWithdrawService extends IService<MemberWithdraw> {
 
   void modify(Long id, Integer cashStatus, Integer curStatus, boolean isDirect,
       String approveReason,
-      UserCredential userCredential) throws Exception;
+      UserCredential userCredential, UserEquipment userEquipment) throws Exception;
 
   List<PpMerchant> queryProxyMerchant(Long id);
 

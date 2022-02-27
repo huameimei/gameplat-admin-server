@@ -16,7 +16,11 @@ public class DiscountTypeAddDTO implements Serializable {
 
   private Integer value;
 
+  private Integer dateType;
+
   private Integer sort;
+
+  private Integer status;
 
   private Integer mode;
 

@@ -14,6 +14,7 @@ import com.gameplat.admin.model.dto.PayTypeAddDTO;
 import com.gameplat.admin.model.dto.PayTypeEditDTO;
 import com.gameplat.admin.model.vo.PayTypeVO;
 import com.gameplat.admin.service.PayTypeService;
+import com.gameplat.base.common.enums.EnableEnum;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.common.enums.SwitchStatusEnum;
 import java.util.List;
@@ -100,9 +101,11 @@ public class PayTypeServiceImpl extends ServiceImpl<PayTypeMapper, PayType>
   }
 
   @Override
-  public List<PayTypeVO> queryEnablePayTypes() {
+  public List<PayTypeVO> queryEnableVirtual() {
     LambdaQueryWrapper<PayType> query = Wrappers.lambdaQuery();
-    query.eq(PayType::getStatus, SwitchStatusEnum.ENABLED).orderByAsc(PayType::getSort);
+    query.eq(PayType::getStatus, EnableEnum.ENABLED.code()).
+        eq(PayType::getBankFlag, 2).
+        orderByAsc(PayType::getSort);
     return this.list(query).stream().map(e -> payTypeConvert.toVo(e)).collect(Collectors.toList());
   }
 }

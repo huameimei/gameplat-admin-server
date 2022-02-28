@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 
@@ -26,11 +27,11 @@ public class ActivityTypeUpdateDTO implements Serializable {
   @ApiModelProperty(value = "编号")
   private Long id;
 
-  @NotNull(message = "活动类型不能为空")
+  @NotBlank(message = "活动类型不能为空")
   @ApiModelProperty(value = "活动类型")
   private String typeCode;
 
-  @NotNull(message = "活动类型名称不能为空")
+  @NotBlank(message = "活动类型名称不能为空")
   @ApiModelProperty(value = "活动类型名称")
   private String typeName;
 

@@ -10,6 +10,7 @@ import lombok.EqualsAndHashCode;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 /**
@@ -31,7 +32,7 @@ public class ActivityInfoAddDTO implements Serializable {
   @ApiModelProperty(value = "类型")
   private Integer activityType;
 
-  @NotNull(message = "活动标题不能为空")
+  @NotBlank(message = "活动标题不能为空")
   @ApiModelProperty(value = "活动标题")
   private String title;
 

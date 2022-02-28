@@ -219,7 +219,7 @@ public class ActivityInfoServiceImpl extends ServiceImpl<ActivityInfoMapper, Act
     }
 
     @Override
-    public void update(ActivityInfoUpdateDTO activityInfoUpdateDTO, String country) {
+    public void update(ActivityInfoUpdateDTO activityInfoUpdateDTO, String language) {
         ActivityInfo activityInfo = activityInfoConvert.toEntity(activityInfoUpdateDTO);
         if (!this.saveActivityInfo(activityInfo)) {
             throw new ServiceException("修改组合活动失败！");

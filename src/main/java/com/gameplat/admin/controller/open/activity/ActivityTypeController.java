@@ -24,6 +24,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -83,17 +84,13 @@ public class ActivityTypeController {
      * 新增活动板块
      *
      * @param activityTypeAddDTO
-     * @param country
      */
     @ApiOperation(value = "新增活动板块")
     @PostMapping("/add")
     @PreAuthorize("hasAuthority('activity:type:add')")
     public void add(
-            @Validated @RequestBody ActivityTypeAddDTO activityTypeAddDTO,
-            @RequestHeader(value = "country", defaultValue = "zh-CN", required = false) String country) {
-        if (StringUtils.isBlank(activityTypeAddDTO.getLanguage())) {
-            activityTypeAddDTO.setLanguage(country);
-        }
+            @Validated @RequestBody ActivityTypeAddDTO activityTypeAddDTO) {
+        activityTypeAddDTO.setLanguage(LocaleContextHolder.getLocale().getLanguage());
         if (activityTypeAddDTO.getFloatStatus() != null && activityTypeAddDTO.getFloatStatus() != 0) {
             if (StringUtils.isBlank(activityTypeAddDTO.getFloatLogo())) {
                 throw new ServiceException("开启浮窗开关，浮窗图片不能为空");
@@ -109,17 +106,13 @@ public class ActivityTypeController {
      * 更新活动板块
      *
      * @param activityTypeUpdateDTO
-     * @param country
      */
     @ApiOperation(value = "更新活动板块")
     @PutMapping("/update")
     @PreAuthorize("hasAuthority('activity:type:update')")
     public void update(
-            @Validated @RequestBody ActivityTypeUpdateDTO activityTypeUpdateDTO,
-            @RequestHeader(value = "country", defaultValue = "zh-CN", required = false) String country) {
-        if (StringUtils.isBlank(activityTypeUpdateDTO.getLanguage())) {
-            activityTypeUpdateDTO.setLanguage(country);
-        }
+            @Validated @RequestBody ActivityTypeUpdateDTO activityTypeUpdateDTO) {
+        activityTypeUpdateDTO.setLanguage(LocaleContextHolder.getLocale().getLanguage());
         if (activityTypeUpdateDTO.getFloatStatus() != null
                 && activityTypeUpdateDTO.getFloatStatus() != BooleanEnum.NO.value()) {
             if (StringUtils.isBlank(activityTypeUpdateDTO.getFloatLogo())) {

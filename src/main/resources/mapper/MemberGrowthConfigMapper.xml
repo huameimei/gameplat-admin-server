@@ -79,7 +79,7 @@
                 when 'zh-CN' then growth_desc
                 when 'en-US' then growth_desc_en
                 when 'th-TH' then growth_desc_th
-                when 'in-ID' then growth_desc_in
+                when 'id-ID' then growth_desc_in
                 when 'vi-VN' then growth_desc_vi
                 else growth_desc
             end
@@ -89,7 +89,7 @@
                 when 'zh-CN' then other_desc
                 when 'en-US' then other_desc_en
                 when 'th-TH' then other_desc_th
-                when 'in-ID' then other_desc_in
+                when 'id-ID' then other_desc_in
                 when 'vi-VN' then other_desc_vi
                 else other_desc
             end
@@ -126,12 +126,12 @@
             <if test='growthDesc != null and growthDesc != "" and language != null and language == "zh-CN"'>growth_desc = #{growthDesc},</if>
             <if test='growthDesc != null and growthDesc != "" and language != null and language == "en-US"'>growth_desc_en = #{growthDesc},</if>
             <if test='growthDesc != null and growthDesc != "" and language != null and language == "th-TH"'>growth_desc_th = #{growthDesc},</if>
-            <if test='growthDesc != null and growthDesc != "" and language != null and language == "in-ID"'>growth_desc_in = #{growthDesc},</if>
+            <if test='growthDesc != null and growthDesc != "" and language != null and language == "id-ID"'>growth_desc_in = #{growthDesc},</if>
             <if test='growthDesc != null and growthDesc != "" and language != null and language == "vi-VN"'>growth_desc_vi = #{growthDesc},</if>
             <if test='otherDesc != null and otherDesc != "" and language != null and language == "zh-CN"'>other_desc = #{otherDesc},</if>
             <if test='otherDesc != null and otherDesc != "" and language != null and language == "en-US"'>other_desc_en = #{otherDesc},</if>
             <if test='otherDesc != null and otherDesc != "" and language != null and language == "th-TH"'>other_desc_th = #{otherDesc},</if>
-            <if test='otherDesc != null and otherDesc != "" and language != null and language == "in-ID"'>other_desc_in = #{otherDesc},</if>
+            <if test='otherDesc != null and otherDesc != "" and language != null and language == "id-ID"'>other_desc_in = #{otherDesc},</if>
             <if test='otherDesc != null and otherDesc != "" and language != null and language == "vi-VN"'>other_desc_vi = #{otherDesc},</if>
             update_time = now()
         </set>

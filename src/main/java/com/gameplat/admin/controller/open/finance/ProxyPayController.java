@@ -4,6 +4,9 @@ package com.gameplat.admin.controller.open.finance;
 import com.gameplat.admin.model.bean.ReturnMessage;
 import com.gameplat.admin.service.ProxyPayService;
 import com.gameplat.base.common.util.ServletUtils;
+import com.gameplat.common.constant.ServiceName;
+import com.gameplat.log.annotation.Log;
+import com.gameplat.log.enums.LogType;
 import com.gameplat.security.SecurityUserHolder;
 import com.gameplat.security.context.UserCredential;
 import javax.servlet.http.HttpServletRequest;
@@ -24,6 +27,7 @@ public class ProxyPayController {
 
   @PostMapping("/relProxyPay")
   @PreAuthorize("hasAuthority('finance:memberWithdraw:relProxyPay')")
+  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.WITHDRAW, desc = "'第三方代付出款商户:'#ppMerchantId")
   public void proxyPay(@NotNull(message = "{NoNull}") Long id,
       @NotNull(message = "{NoNull}") Long ppMerchantId, HttpServletRequest request)
       throws Exception {

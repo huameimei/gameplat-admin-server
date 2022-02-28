@@ -9,7 +9,10 @@ import com.gameplat.admin.model.vo.DictDataVo;
 import com.gameplat.admin.service.SysDictDataService;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.StringUtils;
+import com.gameplat.common.constant.ServiceName;
 import com.gameplat.common.enums.DictTypeEnum;
+import com.gameplat.log.annotation.Log;
+import com.gameplat.log.enums.LogType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -35,6 +38,7 @@ public class RechVirtualController {
 
   @PutMapping("/edit")
   @PreAuthorize("hasAuthority('thirdParty:rechVirtual:edit')")
+  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.RECHARGE, desc = "'修改虚拟币id=' + #dictData.id")
   public void update(@RequestBody OperDictDataDTO dictData) {
     if (StringUtils.isNull(dictData.getId())) {
       throw new ServiceException("主键不正确");
@@ -48,6 +52,7 @@ public class RechVirtualController {
 
   @PutMapping("/add")
   @PreAuthorize("hasAuthority('thirdParty:rechVirtual:add')")
+  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.RECHARGE, desc = "'新增虚拟币id=' + #dictData.id")
   public void add(@RequestBody OperDictDataDTO dictData) {
     if (StringUtils.isBlank(dictData.getDictValue())) {
       throw new ServiceException("值不能为空");
@@ -58,12 +63,14 @@ public class RechVirtualController {
 
   @DeleteMapping("/delete/{id}")
   @PreAuthorize("hasAuthority('thirdParty:rechVirtual:delete')")
+  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.RECHARGE, desc = "'删除虚拟币id=' + #id")
   public void remove(@PathVariable Long id) {
     dictDataService.removeById(id);
   }
 
   @PostMapping("/editStatus")
   @PreAuthorize("hasAuthority('thirdParty:rechVirtual:editStatus')")
+  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.RECHARGE, desc = "'修改虚拟币状态id=' + #id")
   public void updateStatus(Long id, Integer status) {
     dictDataService.updateStatus(id, status);
   }

@@ -9,7 +9,10 @@ import com.gameplat.admin.model.dto.PayAccountEditDTO;
 import com.gameplat.admin.model.dto.PayAccountQueryDTO;
 import com.gameplat.admin.model.vo.PayAccountVO;
 import com.gameplat.admin.service.PayAccountService;
+import com.gameplat.common.constant.ServiceName;
 import com.gameplat.common.enums.PayAccountTypeEnum;
+import com.gameplat.log.annotation.Log;
+import com.gameplat.log.enums.LogType;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -29,12 +32,14 @@ public class PayAccountController {
 
   @DeleteMapping("/remove/{id}")
   @PreAuthorize("hasAuthority('thirdParty:payAccount:remove')")
+  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.RECHARGE, desc = "'删除收款值账户：' + #id")
   public void remove(@PathVariable Long id) {
     payAccountService.delete(id);
   }
 
   @PostMapping("/add")
   @PreAuthorize("hasAuthority('thirdParty:payAccount:add')")
+  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.RECHARGE, desc = "'新增收款值账户id=' + #dto.id")
   public void add(@RequestBody PayAccountAddDTO dto) {
     dto.setType(PayAccountTypeEnum.ORDINARY_ACCOUNT.getValue());
     payAccountService.save(dto);
@@ -42,6 +47,7 @@ public class PayAccountController {
 
   @PostMapping("/addVip")
   @PreAuthorize("hasAuthority('thirdParty:payAccount:add')")
+  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.RECHARGE, desc = "'新增VIP收款值账户id=' + #dto.id")
   public void addVip(@RequestBody PayAccountAddDTO dto) {
     dto.setType(PayAccountTypeEnum.VIP_ACCOUNT.getValue());
     payAccountService.save(dto);
@@ -49,12 +55,14 @@ public class PayAccountController {
 
   @PostMapping("/edit")
   @PreAuthorize("hasAuthority('thirdParty:payAccount:edit')")
+  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.RECHARGE, desc = "'修改收款值账户id=' + #dto.id")
   public void edit(@RequestBody PayAccountEditDTO dto) {
     payAccountService.update(dto);
   }
 
   @PostMapping("/editStatus")
   @PreAuthorize("hasAuthority('thirdParty:payAccount:editStatus')")
+  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.RECHARGE, desc = "'修改收款值账户状态id=' + #id")
   public void updateStatus(Long id, Integer status) {
     payAccountService.updateStatus(id, status);
   }

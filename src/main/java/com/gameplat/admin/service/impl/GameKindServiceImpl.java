@@ -90,7 +90,9 @@ public class GameKindServiceImpl extends ServiceImpl<GameKindMapper, GameKind>
     @SentinelResource(value = "getGameKindInBanner")
     public List<GameKindVO> getGameKindInBanner(String gameType) {
         return this.lambdaQuery().eq(StringUtils.isNotBlank(gameType), GameKind::getGameType, gameType)
-                .eq(GameKind::getEnable, 1).list().stream().map(gameKindConvert::toVo)
+                .eq(GameKind::getStatus,2)
+                .eq(GameKind::getEnable, 1)
+                .list().stream().map(gameKindConvert::toVo)
                 .collect(Collectors.toList());
     }
 

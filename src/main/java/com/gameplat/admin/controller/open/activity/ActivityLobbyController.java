@@ -188,9 +188,7 @@ public class ActivityLobbyController {
     @ApiOperation(value = "游戏列表")
     @GetMapping("/gameList")
     @PreAuthorize("hasAuthority('activity:lobby:gameKindList')")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "gameTypeCode", value = "游戏类型"),
-    })
+    @ApiImplicitParam(name = "gameTypeCode", value = "游戏类型")
     public List<GameKindVO> getGameKindInBanner(String gameTypeCode) {
         return gameKindService.getGameKindInBanner(gameTypeCode);
     }

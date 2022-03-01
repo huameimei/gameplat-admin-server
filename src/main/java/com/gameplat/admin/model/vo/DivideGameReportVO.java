@@ -1,29 +1,24 @@
-package com.gameplat.admin.model.domain;
+package com.gameplat.admin.model.vo;
 
-import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 
-import lombok.Data;
-
-/**
- * 游戏日报表
- */
 @Data
-@TableName("game_bet_daily_report")
-public class GameBetDailyReport implements Serializable {
-
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+public class DivideGameReportVO {
     /**
      * 主键
      */
-    @TableId(type = IdType.AUTO)
     private Long id;
 
     /**
@@ -61,6 +56,8 @@ public class GameBetDailyReport implements Serializable {
      */
     private String userType;
 
+    private Integer agentLevel;
+
     /**
      * 游戏平台
      */
@@ -71,10 +68,14 @@ public class GameBetDailyReport implements Serializable {
      */
     private String gameKind;
 
+    private String gameKindName;
+
     /**
      * 游戏大类
      */
     private String gameType;
+
+    private String gameTypeName;
 
     /**
      * 投注金额
@@ -110,7 +111,6 @@ public class GameBetDailyReport implements Serializable {
     /**
      * 创建时间
      */
-    @TableField(fill = FieldFill.INSERT)
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date createTime;
 

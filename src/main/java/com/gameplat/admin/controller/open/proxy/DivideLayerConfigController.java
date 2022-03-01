@@ -84,9 +84,6 @@ public class DivideLayerConfigController {
     @DeleteMapping("/delete")
     @PreAuthorize("hasAuthority('agent:bonusconfig:remove')")
     public void remove(@RequestBody String ids) {
-        if (StringUtils.isBlank(ids)) {
-            throw new ServiceException("ids不能为空");
-        }
         layerConfigService.remove(ids);
     }
 }

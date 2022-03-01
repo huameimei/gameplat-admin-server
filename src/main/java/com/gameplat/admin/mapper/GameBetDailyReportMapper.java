@@ -8,13 +8,11 @@ import com.gameplat.admin.model.domain.GamePlatform;
 import com.gameplat.admin.model.domain.GameBetDailyReport;
 import com.gameplat.admin.model.domain.GameRebatePeriod;
 import com.gameplat.admin.model.dto.GameBetDailyReportQueryDTO;
-import com.gameplat.admin.model.vo.GameBetReportVO;
-import com.gameplat.admin.model.vo.GameMemberDayReportVO;
-import com.gameplat.admin.model.vo.GameReportVO;
+import com.gameplat.admin.model.vo.*;
+
 import java.util.List;
 import java.util.Map;
 
-import com.gameplat.admin.model.vo.PageDtoVO;
 import org.apache.ibatis.annotations.Param;
 
 public interface GameBetDailyReportMapper extends BaseMapper<GameBetDailyReport> {
@@ -45,4 +43,13 @@ public interface GameBetDailyReportMapper extends BaseMapper<GameBetDailyReport>
   void insertGameBetDailyReport(@Param("list") List<GameBetDailyReport> betDailyReport);
 
   List<GameReportVO> queryGamePlatformReport(GameBetDailyReportQueryDTO dto);
+
+  /**
+   * 分组获取会员游戏报表
+   * @param startDate
+   * @param endDate
+   * @return
+   */
+  List<DivideGameReportVO> findReportForDivide(@Param("startDate") String startDate,
+                                               @Param("endDate") String endDate);
 }

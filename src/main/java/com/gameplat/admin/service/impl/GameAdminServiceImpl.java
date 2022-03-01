@@ -1,12 +1,14 @@
 package com.gameplat.admin.service.impl;
 
-import com.alicp.jetcache.anno.Cached;
+import cn.hutool.core.util.ObjectUtil;
+import com.gameplat.admin.model.domain.GameAmountControl;
 import com.gameplat.admin.model.domain.GameTransferRecord;
 import com.gameplat.admin.model.domain.Member;
 import com.gameplat.admin.model.domain.MemberBill;
 import com.gameplat.admin.model.domain.MemberInfo;
 import com.gameplat.admin.model.dto.OperGameTransferRecordDTO;
 import com.gameplat.admin.service.GameAdminService;
+import com.gameplat.admin.service.GameAmountControlService;
 import com.gameplat.admin.service.GameConfigService;
 import com.gameplat.admin.service.GameTransferInfoService;
 import com.gameplat.admin.service.GameTransferRecordService;
@@ -15,7 +17,7 @@ import com.gameplat.admin.service.MemberInfoService;
 import com.gameplat.admin.service.MemberService;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.DateUtil;
-import com.gameplat.common.constant.CachedKeys;
+import com.gameplat.common.enums.GameAmountControlTypeEnum;
 import com.gameplat.common.enums.GamePlatformEnum;
 import com.gameplat.common.enums.GameTransferStatus;
 import com.gameplat.common.enums.TranTypes;
@@ -61,6 +63,9 @@ public class GameAdminServiceImpl implements GameAdminService {
 
   @Resource
   private GameConfigService gameConfigService;
+
+  @Resource
+  private GameAmountControlService gameAmountControlService;
 
   @Transactional(propagation = Propagation.NOT_SUPPORTED)
   public GameApi getGameApi(String liveCode) {
@@ -276,6 +281,12 @@ public class GameAdminServiceImpl implements GameAdminService {
         return;
       }
     }
+    // 转换成功需要增加游戏使用额度
+    GameAmountControl gameAmountControl = gameAmountControlService.findInfoByType(
+        GameAmountControlTypeEnum.checkGameAmountControlType(transferOut));
+    if (ObjectUtil.isNotNull(gameAmountControl) && gameAmountControl.getUseAmount().add(amount.abs()).compareTo(gameAmountControl.getAmount()) >= 0){
+      throw new ServiceException("转入金额已经超过剩余可用额度，请联系客服");
+    }
     //转出平台余额小于转账余额则抛出错误信息
     if (memberInfo.getBalance().compareTo(amount) < 0) {
       throw new ServiceException(member.getAccount() + " 用户账号余额为："+memberInfo.getBalance()+"，账户余额不足");
@@ -319,6 +330,9 @@ public class GameAdminServiceImpl implements GameAdminService {
       status = GameTransferStatus.SUCCESS.getValue();
       //7. 添加额度转换记录
       gameTransferInfoService.update(memberInfo.getMemberId(), transferOut, orderNo);
+      //8. 增加转出额度数据
+      gameAmountControl.setUseAmount(gameAmountControl.getUseAmount().add(amount.abs()));
+      gameAmountControlService.save(gameAmountControl);
     }catch (LiveException | LiveRollbackException ex) {
       boolean bool = gameApi.queryOrderStatus(gameBizBean);
       if(bool){

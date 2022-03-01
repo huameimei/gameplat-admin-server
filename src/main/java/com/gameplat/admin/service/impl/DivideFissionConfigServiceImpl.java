@@ -58,7 +58,7 @@ public class DivideFissionConfigServiceImpl extends ServiceImpl<DivideFissionCon
     public void add(String userName, String lang) {
         Assert.isTrue(StrUtil.isNotBlank(userName), "用户名参数缺失！");
         Member member = memberService.getAgentByAccount(userName).orElseThrow(() -> new ServiceException("代理账号不存在!"));
-        Assert.isTrue(member.getAgentLevel() == 1, "非顶级代理！");
+        Assert.isTrue(member.getAgentLevel() == 1, "非一级代理！");
         Long count = this.lambdaQuery().eq(DivideFissionConfig::getUserName, userName).count();
         Assert.isTrue(count <= 0,"不能重复添加！");
         DivideFissionConfig saveObj = DivideFissionConfig.builder()
@@ -81,7 +81,7 @@ public class DivideFissionConfigServiceImpl extends ServiceImpl<DivideFissionCon
     public Map<String, Object> getFissionConfigForEdit(String userName, String lang) {
         Assert.isTrue(StrUtil.isNotBlank(userName), "用户名参数缺失！");
         Member member = memberService.getAgentByAccount(userName).orElseThrow(() -> new ServiceException("代理账号不存在!"));
-        Assert.isTrue(member.getAgentLevel() == 1, "非顶级代理！");
+        Assert.isTrue(member.getAgentLevel() == 1, "非一级代理！");
         // 获取到自己的分红配置
         DivideFissionConfig ownerFissionConfig = fissionConfigMapper.getByUserName(userName);
         if (BeanUtil.isEmpty(ownerFissionConfig) || StrUtil.isBlank(ownerFissionConfig.getDivideConfig())) {
@@ -138,6 +138,8 @@ public class DivideFissionConfigServiceImpl extends ServiceImpl<DivideFissionCon
         Assert.isTrue(divideConfigDTO.getUserId() != null, "用户ID丢失！");
         Assert.isTrue(StrUtil.isNotBlank(divideConfigDTO.getUserName()), "用户名参数丢失！");
         Assert.isTrue(CollectionUtil.isNotEmpty(divideConfigDTO.getOwnerFissionConfigMap()), "分红配置参数丢失！");
+        Member member = memberService.getAgentByAccount(divideConfigDTO.getUserName()).orElseThrow(() -> new ServiceException("代理账号不存在!"));
+        Assert.isTrue(member.getAgentLevel() == 1, "非一级代理！");
 
         DivideFissionConfig editObj = DivideFissionConfig.builder()
                 .id(divideConfigDTO.getId())
@@ -179,4 +181,20 @@ public class DivideFissionConfigServiceImpl extends ServiceImpl<DivideFissionCon
             fissionConfigMapper.deleteById(Long.valueOf(idStr));
         }
     }
+
+    @Override
+    public GameDivideVo getConfigByFirstCode(String superName, String code) {
+        String configByFidAndCode = fissionConfigMapper.getConfigByGameCode(superName, code);
+        if (StrUtil.isBlank(configByFidAndCode)) {
+            return new GameDivideVo();
+        } else {
+            return JSONUtil.toBean(configByFidAndCode,GameDivideVo.class);
+        }
+    }
+
+    @Override
+    public DivideFissionConfig getByAccount(String account) {
+        return fissionConfigMapper.getByUserName(account);
+    }
+
 }

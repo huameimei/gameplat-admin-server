@@ -14,4 +14,7 @@ import org.apache.ibatis.annotations.Select;
 public interface DivideFixConfigMapper extends BaseMapper<DivideFixConfig> {
     @Select("select * from divide_fix_config where user_name = #{userName}")
     DivideFixConfig getByUserName(@Param("userName") String userName);
+
+    String getConfigByGameCode(@Param("superName") String superName,
+                               @Param("code") String code);
 }

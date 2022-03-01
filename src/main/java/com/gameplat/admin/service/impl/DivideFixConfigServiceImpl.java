@@ -54,7 +54,7 @@ public class DivideFixConfigServiceImpl extends ServiceImpl<DivideFixConfigMappe
     public void add(String userName, String lang) {
         Assert.isTrue(StrUtil.isNotBlank(userName), "用户名参数缺失！");
         Member member = memberService.getAgentByAccount(userName).orElseThrow(() -> new ServiceException("代理账号不存在!"));
-        Assert.isTrue(member.getAgentLevel() == 1, "非顶级代理！");
+        Assert.isTrue(member.getAgentLevel() == 1, "非一级代理！");
         Long count = this.lambdaQuery().eq(DivideFixConfig::getUserName, userName).count();
         Assert.isTrue(count <= 0,"不能重复添加！");
         DivideFixConfig saveObj = DivideFixConfig.builder()
@@ -76,14 +76,14 @@ public class DivideFixConfigServiceImpl extends ServiceImpl<DivideFixConfigMappe
     public Map<String, Object> getFixConfigForEdit(String userName, String s) {
         Assert.isTrue(StrUtil.isNotBlank(userName), "用户名参数缺失！");
         Member member = memberService.getAgentByAccount(userName).orElseThrow(() -> new ServiceException("代理账号不存在!"));
-        Assert.isTrue(member.getAgentLevel() == 1, "非顶级代理！");
+        Assert.isTrue(member.getAgentLevel() == 1, "非一级代理！");
         // 获取到自己的分红配置
         DivideFixConfig ownerFixConfig = fixConfigMapper.getByUserName(userName);
         if (BeanUtil.isEmpty(ownerFixConfig) || StrUtil.isBlank(ownerFixConfig.getDivideConfig())) {
             throw new ServiceException("分红配置为空！");
         }
         Map<String,Object> returnMap = new HashMap<>();
-        Map<String, JSONObject> ownerFixConfigMap = JSONUtil.toBean(ownerFixConfig.getDivideConfig(),Map.class);
+        Map<String, JSONObject> ownerFixConfigMap = JSONUtil.toBean(ownerFixConfig.getDivideConfig(), Map.class);
         List<SysDictData> liveGameTypeList = sysDictDataMapper.findDataByType("LIVE_GAME_TYPE", "1");
         if (CollectionUtil.isEmpty(liveGameTypeList)) {
             throw new ServiceException("游戏大类数据为空");
@@ -138,7 +138,7 @@ public class DivideFixConfigServiceImpl extends ServiceImpl<DivideFixConfigMappe
         }
         Assert.isTrue(BeanUtil.isNotEmpty(saveMap), "分红配置参数为空！");
         Member member = memberService.getAgentByAccount(divideConfigDTO.getUserName()).orElseThrow(() -> new ServiceException("代理账号不存在!"));
-        Assert.isTrue(member.getAgentLevel() == 1, "非顶级代理！");
+        Assert.isTrue(member.getAgentLevel() == 1, "非一级代理！");
         DivideFixConfig editObj = DivideFixConfig.builder()
                 .id(divideConfigDTO.getId())
                 .userId(divideConfigDTO.getUserId())
@@ -154,6 +154,16 @@ public class DivideFixConfigServiceImpl extends ServiceImpl<DivideFixConfigMappe
         String[] idArr = ids.split(",");
         for (String idStr: idArr) {
             fixConfigMapper.deleteById(Long.valueOf(idStr));
+        }
+    }
+
+    @Override
+    public GameDivideVo getConfigByGameCode(String superName, String code) {
+        String configByFidAndCode = fixConfigMapper.getConfigByGameCode(superName, code);
+        if (StrUtil.isBlank(configByFidAndCode)) {
+            return new GameDivideVo();
+        } else {
+            return JSONUtil.toBean(configByFidAndCode,GameDivideVo.class);
         }
     }
 }

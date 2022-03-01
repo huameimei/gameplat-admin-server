@@ -13,4 +13,9 @@ import org.apache.ibatis.annotations.Select;
 public interface DivideSummaryMapper extends BaseMapper<DivideSummary> {
 
     Integer getMaxLevel(@Param("periodsId") Long periodsId);
+
+    @Select("select * from divide_summary where account = #{userName} order by create_time desc limit 1")
+    DivideSummary getByUserName(@Param("userName") String userName);
+
+
 }

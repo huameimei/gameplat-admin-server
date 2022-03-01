@@ -1,25 +1,18 @@
-package com.gameplat.admin.model.domain.proxy;
+package com.gameplat.admin.model.dto;
 
-import com.baomidou.mybatisplus.annotation.*;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
-import java.util.Date;
 
-/**
- * @Description : 分红统计详情
- * @Author : cc
- * @Date : 2022/2/26
- */
-@Data
 @Builder
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
-@EqualsAndHashCode(of = "id", callSuper = false)
-@TableName("divide_detail")
-public class DivideDetail {
-    @TableId(type = IdType.AUTO)
+public class DivideDetailDto {
     private Long id;
 
     @ApiModelProperty(value = "分红期数表主键ID")
@@ -42,6 +35,10 @@ public class DivideDetail {
 
     @ApiModelProperty(value = "分红代理的代理路径")
     private String superPath;
+
+    private Long superId;
+
+    private String superName;
 
     @ApiModelProperty(value = "游戏大类code")
     private String liveCode;
@@ -69,20 +66,4 @@ public class DivideDetail {
 
     @ApiModelProperty(value = "分红公式")
     private String divideFormula;
-
-    @TableField(fill = FieldFill.INSERT)
-    private Date createTime;
-
-    @ApiModelProperty(value = "创建人")
-    @TableField(fill = FieldFill.INSERT)
-    private String createBy;
-
-    @TableField(fill = FieldFill.UPDATE)
-    private String updateBy;
-
-    @TableField(fill = FieldFill.UPDATE)
-    private Date updateTime;
-
-    @ApiModelProperty(value = "备注")
-    private String remark;
 }

@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.gameplat.admin.model.domain.proxy.DivideLayerConfig;
 import com.gameplat.admin.model.dto.DivideConfigDTO;
 import com.gameplat.admin.model.vo.DivideLayerConfigVo;
+import com.gameplat.admin.model.vo.GameDivideVo;
 
 import java.util.Map;
 
@@ -29,4 +30,8 @@ public interface DivideLayerConfigService extends IService<DivideLayerConfig> {
     Map<String, Object> getLayerConfigForLinkAdd(String userName, String lang);
 
     Map<String, Object> getLayerConfigForLinkEdit(Long id, String lang);
+
+    String getRealSuperName(String superPath, Integer userLevel);
+
+    GameDivideVo getConfigByGameCode(String userName, String code);
 }

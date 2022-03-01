@@ -3,6 +3,8 @@ package com.gameplat.admin.model.vo;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
+
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 @Data
@@ -107,4 +109,7 @@ public class MemberInfoVO implements Serializable {
   private String agentLevel;
 
   private Integer tableIndex;
+
+  @ApiModelProperty(value = "玩家金币数" )
+  private Integer goldCoin;
 }

@@ -53,7 +53,8 @@ public class OpenBannerController {
             @ApiImplicitParam(name = "type", value = "banner大类，1 体育banner配置，2 彩票banner配置")
     })
     public IPage<SysBannerInfoVO> list(
-            @ApiIgnore PageDTO<SysBannerInfo> page, Integer type) {
+            @ApiIgnore PageDTO<SysBannerInfo> page,
+            @RequestParam(defaultValue = "zh-CN") String language, Integer type) {
         return sysBannerInfoService.list(page, LocaleContextHolder.getLocale().toLanguageTag(), type);
     }
 

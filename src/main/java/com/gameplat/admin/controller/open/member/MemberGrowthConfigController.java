@@ -34,7 +34,7 @@ public class MemberGrowthConfigController {
     @GetMapping("/get")
     @PreAuthorize("hasAuthority('member:growthConfig:get')")
     public MemberGrowthConfigVO getOne(){
-        return memberGrowthConfigService.findOneConfig(LocaleContextHolder.getLocale().getLanguage());
+        return memberGrowthConfigService.findOneConfig(LocaleContextHolder.getLocale().toLanguageTag());
     }
 
     @ApiOperation(value = "修改")
@@ -42,7 +42,7 @@ public class MemberGrowthConfigController {
     @PutMapping("/edit")
     public void update(@ApiParam(name = "修改VIP配置入参", value = "传入json格式", required = true)
                        @Validated MemberGrowthConfigEditDto configEditDto) {
-        configEditDto.setLanguage(LocaleContextHolder.getLocale().getLanguage());
+        configEditDto.setLanguage(LocaleContextHolder.getLocale().toLanguageTag());
         if (StrUtil.isBlank(configEditDto.getLanguage())) {
             configEditDto.setLanguage(LanguageEnum.app_zh_CN.getCode());
         }

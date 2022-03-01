@@ -115,4 +115,7 @@ public class MemberInfo {
 
   @ApiModelProperty(value = "当前会员成长值")
   private Long vipGrowth;
+
+  @ApiModelProperty(value = "玩家金币数" )
+  private Integer goldCoin;
 }

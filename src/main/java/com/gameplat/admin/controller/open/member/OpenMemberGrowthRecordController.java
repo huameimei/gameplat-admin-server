@@ -40,7 +40,7 @@ public class OpenMemberGrowthRecordController {
     @ApiOperation(value = "查询成长值记录列表")
     @PreAuthorize("hasAuthority('member:growthRecord:list')")
     public IPage<MemberGrowthRecordVO> listWealGrowthRecord(PageDTO<MemberGrowthRecord> page, MemberGrowthRecordDTO dto) {
-        dto.setLanguage(LocaleContextHolder.getLocale().getLanguage());
+        dto.setLanguage(LocaleContextHolder.getLocale().toLanguageTag());
         return memberGrowthRecordService.findRecordList(page, dto);
     }
 

@@ -10,65 +10,56 @@ import java.io.Serializable;
 
 /**
  * 游戏VO
+ *
  * @author kenvin
  */
 @Data
 @ApiModel("游戏VO")
 public class GameVO implements Serializable {
 
-    @ApiModelProperty(value = "主键ID")
-    private Long id;
+  @ApiModelProperty(value = "主键ID")
+  private Long id;
 
-    @ApiModelProperty(value = "游戏编码")
-    private String gameCode;
+  @ApiModelProperty(value = "游戏编码")
+  private String gameCode;
 
-    @ApiModelProperty(value = "游戏名")
-    @JsonSerialize(using = I18nSerializerUtils.class)
-    private String gameName;
+  @ApiModelProperty(value = "游戏名")
+  @JsonSerialize(using = I18nSerializerUtils.class)
+  private String gameName;
 
-    @ApiModelProperty(value = "PC图片地址")
-    private String pcImgUrl;
+  @ApiModelProperty(value = "PC图片地址")
+  private String pcImgUrl;
 
-    @ApiModelProperty(value = "APP图片地址")
-    private String appImgUrl;
+  @ApiModelProperty(value = "APP图片地址")
+  private String appImgUrl;
 
-    @ApiModelProperty(value = "游戏平台")
-    private String platformCode;
+  @ApiModelProperty(value = "游戏平台")
+  private String platformCode;
 
-    @ApiModelProperty(value = "游戏大类")
-    private String gameType;
+  @ApiModelProperty(value = "游戏大类")
+  private String gameType;
 
-    @ApiModelProperty(value = "游戏类别")
-    private String gameKind;
+  @ApiModelProperty(value = "游戏类别")
+  private String gameKind;
 
-    @ApiModelProperty(value = "是否支持H5 (0：否；1:是)")
-    private Integer isH5;
+  @ApiModelProperty(value = "是否支持H5 (0：否；1:是)")
+  private Integer isH5;
 
-    @ApiModelProperty(value = "是否支持电脑端(0：否；1:是)")
-    private Integer isPc;
+  @ApiModelProperty(value = "是否支持电脑端(0：否；1:是)")
+  private Integer isPc;
 
-    @ApiModelProperty(value = "游戏排序")
-    private Integer sort;
+  @ApiModelProperty(value = "游戏排序")
+  private Integer sort;
 
-    /**
-     * 是否开放(0：否；1:是)
-     */
-    private Integer enable;
+  /** 是否开放(0：否；1:是) */
+  private Integer enable;
 
-    /**
-     * 是否热门(0：否；1:是)
-     */
-    private Integer hot;
+  /** 是否热门(0：否；1:是) */
+  private Integer hot;
 
-    /**
-     * 是否外跳(0：否；1:是)
-     */
-    private Integer isJump;
+  /** 是否外跳(0：否；1:是) */
+  private Integer isJump;
 
-    /**
-     * 是否竖屏(0：否；1:是)
-     */
-    private Integer isVertical;
-
-
+  /** 是否竖屏(0：否；1:是) */
+  private Integer isVertical;
 }

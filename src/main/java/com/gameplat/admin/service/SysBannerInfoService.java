@@ -2,11 +2,11 @@ package com.gameplat.admin.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
-import com.gameplat.admin.model.domain.SysBannerInfo;
 import com.gameplat.admin.model.dto.SysBannerInfoAddDTO;
 import com.gameplat.admin.model.dto.SysBannerInfoEditDTO;
 import com.gameplat.admin.model.dto.SysBannerInfoUpdateStatusDTO;
 import com.gameplat.admin.model.vo.SysBannerInfoVO;
+import com.gameplat.model.entity.sys.SysBannerInfo;
 
 import java.util.List;
 

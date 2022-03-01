@@ -10,20 +10,20 @@ import java.util.Date;
 @Accessors(chain = true)
 public class ChatLeaderBoardVO implements Serializable {
 
-	private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
-	private Long userId;
+  private Long userId;
 
-	private String account;
+  private String account;
 
-	private String nickName;
+  private String nickName;
 
-	private Double winMoney;
+  private Double winMoney;
 
-	private String avatar;
+  private String avatar;
 
-	//数据类型:1-后台添加，0-统计添加
-	private Integer type;
+  // 数据类型:1-后台添加，0-统计添加
+  private Integer type;
 
-	private Date createTime;
+  private Date createTime;
 }

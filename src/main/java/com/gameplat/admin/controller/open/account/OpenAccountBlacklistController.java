@@ -2,24 +2,18 @@ package com.gameplat.admin.controller.open.account;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
-import com.gameplat.common.enums.UserBlackGames;
-import com.gameplat.admin.model.domain.AccountBlacklist;
 import com.gameplat.admin.model.dto.AccountBlacklistQueryDTO;
 import com.gameplat.admin.model.dto.OperAccountBlacklistDTO;
 import com.gameplat.admin.service.AccountBlacklistService;
-import java.util.List;
-import java.util.Map;
+import com.gameplat.common.enums.UserBlackGames;
+import com.gameplat.model.entity.blacklist.AccountBlacklist;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @RestController

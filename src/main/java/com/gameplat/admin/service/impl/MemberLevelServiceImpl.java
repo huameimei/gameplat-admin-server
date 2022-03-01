@@ -8,9 +8,6 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.convert.MemberLevelConvert;
 import com.gameplat.admin.enums.MemberLevelEnums;
 import com.gameplat.admin.mapper.MemberLevelMapper;
-import com.gameplat.admin.model.domain.Member;
-import com.gameplat.admin.model.domain.MemberInfo;
-import com.gameplat.admin.model.domain.MemberLevel;
 import com.gameplat.admin.model.dto.MemberLevelAddDTO;
 import com.gameplat.admin.model.dto.MemberLevelAllocateDTO;
 import com.gameplat.admin.model.dto.MemberLevelEditDTO;
@@ -18,19 +15,18 @@ import com.gameplat.admin.model.vo.MemberLevelVO;
 import com.gameplat.admin.service.MemberLevelService;
 import com.gameplat.admin.service.MemberService;
 import com.gameplat.base.common.exception.ServiceException;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
 import com.gameplat.common.constant.CachedKeys;
+import com.gameplat.model.entity.member.Member;
+import com.gameplat.model.entity.member.MemberInfo;
+import com.gameplat.model.entity.member.MemberLevel;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -246,10 +242,11 @@ public class MemberLevelServiceImpl extends ServiceImpl<MemberLevelMapper, Membe
   }
 
   private Integer getMatchedLevel(List<MemberLevel> levelList, MemberInfo memberInfo) {
-      //先根据充值金额倒序排列，再根据层级值倒序排列，如果有两条层级配置的充值金额和充值次数一样，会员将被分配到层级值较大的那一层
+    // 先根据充值金额倒序排列，再根据层级值倒序排列，如果有两条层级配置的充值金额和充值次数一样，会员将被分配到层级值较大的那一层
     return levelList.stream()
-        .sorted(Comparator.comparing(MemberLevel::getTotalRechAmount, Comparator.reverseOrder())
-                        .thenComparing(MemberLevel::getLevelValue, Comparator.reverseOrder()))
+        .sorted(
+            Comparator.comparing(MemberLevel::getTotalRechAmount, Comparator.reverseOrder())
+                .thenComparing(MemberLevel::getLevelValue, Comparator.reverseOrder()))
         .filter(level -> this.isMatchLevel(level, memberInfo))
         .map(MemberLevel::getLevelValue)
         .findFirst()

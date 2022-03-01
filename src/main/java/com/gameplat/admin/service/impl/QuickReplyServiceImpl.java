@@ -7,15 +7,16 @@ import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapp
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.convert.QuickReplyConvert;
 import com.gameplat.admin.mapper.QuickReplyMapper;
-import com.gameplat.admin.model.domain.QuickReply;
 import com.gameplat.admin.model.dto.QuickReplyDTO;
 import com.gameplat.admin.model.vo.QuickReplyVO;
 import com.gameplat.admin.service.QuickReplyService;
 import com.gameplat.base.common.exception.ServiceException;
+import com.gameplat.model.entity.QuickReply;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import java.util.List;
 import java.util.Objects;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
 
 /**
  * 快捷回复 服务实现层
@@ -23,11 +24,10 @@ import org.springframework.stereotype.Service;
  * @author three
  */
 @Service
-@RequiredArgsConstructor
 public class QuickReplyServiceImpl extends ServiceImpl<QuickReplyMapper, QuickReply>
     implements QuickReplyService {
 
-  private final QuickReplyConvert quickReplyConvert;
+  @Autowired private QuickReplyConvert quickReplyConvert;
 
   @Override
   @SentinelResource(value = "selectQuickReplyList")
@@ -83,7 +83,6 @@ public class QuickReplyServiceImpl extends ServiceImpl<QuickReplyMapper, QuickRe
     if (!ObjectUtils.isNotEmpty(messageType)) {
       throw new ServiceException("快速回复类型不能为空!");
     }
-    return this.lambdaQuery()
-        .eq(QuickReply::getMessageType, messageType).list();
+    return this.lambdaQuery().eq(QuickReply::getMessageType, messageType).list();
   }
 }

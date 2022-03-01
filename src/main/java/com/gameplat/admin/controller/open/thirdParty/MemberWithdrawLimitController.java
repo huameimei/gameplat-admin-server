@@ -3,7 +3,6 @@ package com.gameplat.admin.controller.open.thirdParty;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.gameplat.admin.model.bean.UserWithdrawLimitInfo;
-import com.gameplat.admin.model.domain.SysDictData;
 import com.gameplat.admin.model.vo.MemberWithdrawDictDataVo;
 import com.gameplat.admin.service.SysDictDataService;
 import com.gameplat.common.constant.ServiceName;
@@ -11,14 +10,10 @@ import com.gameplat.common.enums.DictDataEnum;
 import com.gameplat.common.enums.DictTypeEnum;
 import com.gameplat.log.annotation.Log;
 import com.gameplat.log.enums.LogType;
+import com.gameplat.model.entity.sys.SysDictData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/admin/thirdParty/userWithdrawLimit")

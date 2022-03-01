@@ -2,10 +2,11 @@ package com.gameplat.admin.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.gameplat.admin.model.domain.SysAuthIp;
 import com.gameplat.admin.model.dto.AuthIpDTO;
 import com.gameplat.admin.model.dto.OperAuthIpDTO;
 import com.gameplat.admin.model.vo.AuthIpVo;
+import com.gameplat.model.entity.sys.SysAuthIp;
+
 import java.util.Set;
 
 /**

@@ -2,13 +2,12 @@ package com.gameplat.admin.controller.open.operator;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
-import com.gameplat.admin.model.domain.SysEmail;
 import com.gameplat.admin.model.dto.EmailDTO;
 import com.gameplat.admin.model.vo.EmailVO;
 import com.gameplat.admin.service.SysEmailService;
 import com.gameplat.common.constant.ServiceName;
 import com.gameplat.log.annotation.Log;
-import lombok.RequiredArgsConstructor;
+import com.gameplat.model.entity.sys.SysEmail;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -24,7 +23,6 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @Slf4j
 @RestController
-@RequiredArgsConstructor
 @RequestMapping("/api/admin/operator/logs/email")
 public class OpenEmailController {
 
@@ -38,7 +36,7 @@ public class OpenEmailController {
 
   @DeleteMapping("/clean")
   @PreAuthorize("hasAuthority('logs:email:clean')")
-  @Log(module = ServiceName.ADMIN_SERVICE, param = true, desc = "清空邮件记录表")
+  @Log(module = ServiceName.ADMIN_SERVICE, desc = "清空邮件记录表")
   public void clean() {
     emailService.cleanEmail();
   }

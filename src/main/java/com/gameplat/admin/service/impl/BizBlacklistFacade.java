@@ -1,15 +1,17 @@
 package com.gameplat.admin.service.impl;
 
 import com.gameplat.admin.enums.BlacklistConstant.BizBlacklistType;
-import com.gameplat.admin.model.domain.Member;
 import com.gameplat.admin.service.BizBlacklistService;
-import java.util.Set;
-import javax.annotation.Resource;
+import com.gameplat.model.entity.member.Member;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.Set;
 
 @Component
 public class BizBlacklistFacade {
-  @Resource private BizBlacklistService bizBlacklistService;
+
+  @Autowired private BizBlacklistService bizBlacklistService;
 
   public boolean isUserInBlacklist(Long userId, BizBlacklistType bizBlacklistType) {
     return isUserInBlacklist(

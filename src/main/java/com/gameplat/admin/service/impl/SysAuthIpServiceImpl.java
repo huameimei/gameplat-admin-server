@@ -1,17 +1,14 @@
 package com.gameplat.admin.service.impl;
 
 import com.alibaba.csp.sentinel.annotation.SentinelResource;
-import com.alicp.jetcache.Cache;
 import com.alicp.jetcache.anno.CachePenetrationProtect;
 import com.alicp.jetcache.anno.CacheRefresh;
 import com.alicp.jetcache.anno.Cached;
-import com.alicp.jetcache.anno.CreateCache;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.convert.AuthIpConvert;
 import com.gameplat.admin.mapper.SysAuthIpMapper;
-import com.gameplat.admin.model.domain.SysAuthIp;
 import com.gameplat.admin.model.dto.AuthIpDTO;
 import com.gameplat.admin.model.dto.OperAuthIpDTO;
 import com.gameplat.admin.model.vo.AuthIpVo;
@@ -19,11 +16,13 @@ import com.gameplat.admin.service.SysAuthIpService;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.StringUtils;
 import com.gameplat.common.constant.CachedKeys;
+import com.gameplat.model.entity.sys.SysAuthIp;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -33,6 +32,7 @@ import java.util.stream.Collectors;
  * @author three
  */
 @Service
+@Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)
 public class SysAuthIpServiceImpl extends ServiceImpl<SysAuthIpMapper, SysAuthIp>
     implements SysAuthIpService {
 

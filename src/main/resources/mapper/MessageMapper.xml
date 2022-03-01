@@ -3,7 +3,8 @@
 <mapper namespace="com.gameplat.admin.mapper.MessageMapper">
 
 
-    <insert id="saveReturnId" useGeneratedKeys="true" keyProperty="id" parameterType="com.gameplat.admin.model.domain.MessageInfo">
+    <insert id="saveReturnId" useGeneratedKeys="true" keyProperty="id"
+            parameterType="com.gameplat.model.entity.message.Message">
         insert into message_info
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="title != null">

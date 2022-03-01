@@ -7,19 +7,20 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.convert.DictTypeConvert;
 import com.gameplat.admin.mapper.SysDictTypeMapper;
-import com.gameplat.admin.model.domain.SysDictType;
 import com.gameplat.admin.model.dto.OperDictTypeDTO;
 import com.gameplat.admin.model.vo.DictTypeVO;
 import com.gameplat.admin.service.SysDictTypeService;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.snowflake.IdGeneratorSnowflake;
-import java.util.List;
-import java.util.stream.Collectors;
+import com.gameplat.model.entity.sys.SysDictType;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 字典类型 业务层处理

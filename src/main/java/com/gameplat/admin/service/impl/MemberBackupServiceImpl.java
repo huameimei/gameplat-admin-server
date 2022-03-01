@@ -9,18 +9,19 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.gameplat.admin.convert.MemberBackupConvert;
 import com.gameplat.admin.mapper.MemberBackupMapper;
-import com.gameplat.admin.model.domain.MemberBackup;
 import com.gameplat.admin.model.vo.MemberBackupVO;
 import com.gameplat.admin.service.MemberBackupService;
 import com.gameplat.base.common.json.JsonUtils;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
+import com.gameplat.model.entity.member.MemberBackup;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)
@@ -46,12 +47,16 @@ public class MemberBackupServiceImpl extends ServiceImpl<MemberBackupMapper, Mem
   }
 
   @Override
-  public List<String> getContent(String serialNo,String endTime,String startTime) {
+  public List<String> getContent(String serialNo, String endTime, String startTime) {
     List<String> backupContents =
         this.lambdaQuery()
             .select(MemberBackup::getContent)
-            .eq(ObjectUtils.isNotNull(serialNo),MemberBackup::getSerialNo, serialNo)
-            .between(ObjectUtils.isNotNull(endTime) && ObjectUtils.isNotNull(startTime),MemberBackup::getCreateTime,endTime,startTime)
+            .eq(ObjectUtils.isNotNull(serialNo), MemberBackup::getSerialNo, serialNo)
+            .between(
+                ObjectUtils.isNotNull(endTime) && ObjectUtils.isNotNull(startTime),
+                MemberBackup::getCreateTime,
+                endTime,
+                startTime)
             .list()
             .stream()
             .map(MemberBackup::getContent)

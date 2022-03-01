@@ -3,16 +3,15 @@ package com.gameplat.admin.service.impl;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.mapper.LimitInfoMapper;
-import com.gameplat.admin.model.domain.LimitInfo;
 import com.gameplat.admin.model.dto.LimitInfoDTO;
 import com.gameplat.admin.service.LimitInfoService;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.json.JsonUtils;
 import com.gameplat.common.enums.LimitEnums;
 import com.gameplat.common.lang.Assert;
-import com.gameplat.common.model.bean.AdminLimitInfo;
 import com.gameplat.common.model.bean.limit.AdminLoginLimit;
 import com.gameplat.common.model.bean.limit.MemberRechargeLimit;
+import com.gameplat.model.entity.limit.LimitInfo;
 import com.gameplat.security.SecurityUserHolder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -40,17 +39,15 @@ public class LimitInfoServiceImpl extends ServiceImpl<LimitInfoMapper, LimitInfo
     LimitInfo info = lambdaQuery().eq(LimitInfo::getName, limitInfoDTO.getName()).one();
     if (info != null) {
       info.setUpdateTime(new Date());
-      info.setLimit(obj);
       info.setValue(JsonUtils.toJson(obj));
       info.setOperator(username);
-      LambdaUpdateWrapper<LimitInfo> lambdaUpdateWrapper = new LambdaUpdateWrapper();
+      LambdaUpdateWrapper<LimitInfo> lambdaUpdateWrapper = new LambdaUpdateWrapper<>();
       lambdaUpdateWrapper.eq(LimitInfo::getName, info.getName());
       Assert.isTrue(this.update(info, lambdaUpdateWrapper), "修改失败!");
     } else {
-      LimitInfo<Object> limit = new LimitInfo<>();
+      LimitInfo limit = new LimitInfo();
       limit.setName(limitInfoDTO.getName());
       limit.setOperator(username);
-      limit.setLimit(obj);
       limit.setValue(JsonUtils.toJson(obj));
       limit.setValueClass(LimitEnums.getClass(limitInfoDTO.getName()).getName());
       Assert.isTrue(this.save(limit), "添加失败!");
@@ -58,7 +55,7 @@ public class LimitInfoServiceImpl extends ServiceImpl<LimitInfoMapper, LimitInfo
   }
 
   @Override
-  public LimitInfo<?> getLimitInfo(String name) {
+  public LimitInfo getLimitInfo(String name) {
     return this.lambdaQuery().eq(LimitInfo::getName, name).one();
   }
 
@@ -67,7 +64,7 @@ public class LimitInfoServiceImpl extends ServiceImpl<LimitInfoMapper, LimitInfo
     return lambdaQuery()
         .eq(LimitInfo::getName, limit.getName())
         .oneOpt()
-        .map(LimitInfo::getValue)
+        .map(JsonUtils::toJson)
         .map(v -> JsonUtils.parse(v, t));
   }
 
@@ -86,11 +83,11 @@ public class LimitInfoServiceImpl extends ServiceImpl<LimitInfoMapper, LimitInfo
   @Override
   public <T> T get(LimitEnums limit) {
     return (T)
-            this.lambdaQuery()
-                    .eq(LimitInfo::getName, limit.getName())
-                    .oneOpt()
-                    .map(LimitInfo::getValue)
-                    .map(v -> JsonUtils.parse(v, limit.getValue()))
-                    .orElse(null);
+        this.lambdaQuery()
+            .eq(LimitInfo::getName, limit.getName())
+            .oneOpt()
+            .map(LimitInfo::getValue)
+            .map(v -> JsonUtils.parse(v, limit.getValue()))
+            .orElse(null);
   }
 }

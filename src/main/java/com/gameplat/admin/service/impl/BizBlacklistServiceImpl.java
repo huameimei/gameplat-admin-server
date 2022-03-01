@@ -11,29 +11,24 @@ import com.gameplat.admin.enums.BlacklistConstant.BizBlacklistStatus;
 import com.gameplat.admin.enums.BlacklistConstant.BizBlacklistTargetType;
 import com.gameplat.admin.enums.BlacklistConstant.BizBlacklistType;
 import com.gameplat.admin.mapper.BizBlacklistMapper;
-import com.gameplat.admin.model.domain.BizBlacklist;
-import com.gameplat.admin.model.domain.Member;
 import com.gameplat.admin.model.dto.BizBlacklistQueryDTO;
 import com.gameplat.admin.model.dto.OperBizBlacklistDTO;
 import com.gameplat.admin.service.BizBlacklistService;
 import com.gameplat.admin.service.MemberService;
 import com.gameplat.base.common.exception.ServiceException;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import lombok.RequiredArgsConstructor;
+import com.gameplat.model.entity.blacklist.BizBlacklist;
+import com.gameplat.model.entity.member.Member;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 @Service
-@RequiredArgsConstructor
 @Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)
 public class BizBlacklistServiceImpl extends ServiceImpl<BizBlacklistMapper, BizBlacklist>
     implements BizBlacklistService {

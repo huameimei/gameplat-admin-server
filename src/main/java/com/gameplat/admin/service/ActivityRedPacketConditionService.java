@@ -1,8 +1,6 @@
 package com.gameplat.admin.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.gameplat.admin.model.domain.ActivityRedPacketCondition;
+import com.gameplat.model.entity.activity.ActivityRedPacketCondition;
 
-public interface ActivityRedPacketConditionService extends IService<ActivityRedPacketCondition> {
-
-}
+public interface ActivityRedPacketConditionService extends IService<ActivityRedPacketCondition> {}

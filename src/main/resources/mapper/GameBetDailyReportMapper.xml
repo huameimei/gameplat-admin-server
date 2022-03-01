@@ -334,40 +334,23 @@
 
 
     <select id="findReportForDivide" resultType="com.gameplat.admin.model.vo.DivideGameReportVO">
-        select
-            t.memberId,
-            t.account,
-            t.superId,
-            t.superAccount,
-            t.userPaths,
-            t.userType,
-            t.gameKind,
-            t.gameType,
-            t.validAmount,
-            t.winAmount,
-            (pm.agent_level+1) as agentLevel
-        from (
-            SELECT
-                r.member_id as memberId,
-                r.account as account,
-                r.super_id as superId,
-                r.super_account as superAccount,
-                r.user_paths as userPaths,
-                r.user_type as userType,
-                r.game_kind as gameKind,
-                r.game_type as gameType,
-                IFNULL(SUM(r.valid_amount),0) as validAmount,
-                IFNULL(SUM(r.win_amount),0) as winAmount
-                FROM `game_bet_daily_report` as r
-                inner join member as m on r.account = m.account
-                where DATE_FORMAT(r.stat_time,'%Y-%m-%d')
-                BETWEEN DATE_FORMAT(#{startDate},'%Y-%m-%d') and DATE_FORMAT(#{endDate},'%Y-%m-%d')
-                <if test="isIncludeAgent != null or isIncludeAgent == 0">
-                    and r.user_type != 'A'
-                </if>
-                GROUP BY r.account,r.super_id,r.super_account,r.user_paths,r.user_type,r.game_kind,r.game_type
-            ) as t
-            inner join member as pm on pm.account = t.superAccount
+        SELECT
+            r.member_id as memberId,
+            r.account as account,
+            r.super_id as superId,
+            r.super_account as superAccount,
+            r.user_paths as userPaths,
+            r.user_type as userType,
+            r.game_kind as gameKind,
+            r.game_type as gameType,
+            IFNULL(SUM(r.valid_amount),0) as validAmount,
+            IFNULL(SUM(r.win_amount),0) as winAmount,
+            m.agent_level as agentLevel
+        FROM `game_bet_daily_report` as r
+        inner join member as m on r.account = m.account
+        where DATE_FORMAT(r.stat_time,'%Y-%m-%d')
+        BETWEEN DATE_FORMAT(#{startDate},'%Y-%m-%d') and DATE_FORMAT(#{endDate},'%Y-%m-%d')
+        GROUP BY r.account,r.super_id,r.super_account,r.user_paths,r.user_type,r.game_kind,r.game_type
     </select>
 
 

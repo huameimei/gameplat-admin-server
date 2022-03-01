@@ -5,11 +5,11 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.gameplat.admin.model.bean.UserWithdrawLimitInfo;
-import com.gameplat.admin.model.domain.SysDictData;
 import com.gameplat.admin.model.dto.OperDictDataDTO;
 import com.gameplat.admin.model.dto.SysDictDataDTO;
 import com.gameplat.admin.model.vo.DictDataVo;
 import com.gameplat.admin.model.vo.MemberWithdrawDictDataVo;
+import com.gameplat.model.entity.sys.SysDictData;
 
 import java.util.List;
 

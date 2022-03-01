@@ -1,7 +1,7 @@
 package com.gameplat.admin.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.gameplat.admin.model.domain.ActivityLobby;
+import com.gameplat.model.entity.activity.ActivityLobby;
 
 /**
  * @author lyq @Description 数据层

@@ -3,7 +3,7 @@
 <mapper namespace="com.gameplat.admin.mapper.ChatLeaderBoardMapper">
 
     <!-- 通用查询映射结果 -->
-    <resultMap id="BaseResultMap" type="com.gameplat.admin.model.domain.ChatLeaderBoard">
+    <resultMap id="BaseResultMap" type="com.gameplat.model.entity.chart.ChatLeaderBoard">
         <id column="id" property="id"/>
         <result column="user_id" property="userId"/>
         <result column="account" property="account"/>

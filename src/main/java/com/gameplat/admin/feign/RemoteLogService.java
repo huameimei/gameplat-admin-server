@@ -2,19 +2,15 @@ package com.gameplat.admin.feign;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.gameplat.admin.feign.factory.RemoteLogFallbackFactory;
-import com.gameplat.admin.model.domain.SysLogLogin;
 import com.gameplat.base.common.log.SysLog;
 import com.gameplat.base.common.web.Result;
 import com.gameplat.common.constant.ServiceName;
 import com.gameplat.common.model.dto.LogDTO;
 import com.gameplat.common.model.vo.UserLogVO;
+import com.gameplat.model.entity.sys.SysLogLogin;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * 日志 Feign接口
@@ -49,6 +45,7 @@ public interface RemoteLogService {
 
   /**
    * 保存操作日志
+   *
    * @param log
    */
   @PostMapping(value = "/api/logs/internal/oper/save")

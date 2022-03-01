@@ -3,8 +3,6 @@ package com.gameplat.admin.controller.open.system;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.gameplat.admin.model.bean.router.VueRouter;
-import com.gameplat.admin.model.domain.SysMenu;
-import com.gameplat.admin.model.domain.SysRole;
 import com.gameplat.admin.model.dto.AuthMenuDTO;
 import com.gameplat.admin.model.dto.OperRoleDTO;
 import com.gameplat.admin.model.dto.RoleDTO;
@@ -15,21 +13,17 @@ import com.gameplat.common.constant.ServiceName;
 import com.gameplat.common.group.Groups;
 import com.gameplat.log.annotation.Log;
 import com.gameplat.log.enums.LogType;
+import com.gameplat.model.entity.sys.SysMenu;
+import com.gameplat.model.entity.sys.SysRole;
 import com.gameplat.security.SecurityUserHolder;
-import java.util.ArrayList;
-import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 分组管理控制类

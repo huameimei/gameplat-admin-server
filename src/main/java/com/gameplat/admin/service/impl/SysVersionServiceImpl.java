@@ -5,12 +5,13 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.mapper.SysVersionMapper;
-import com.gameplat.admin.model.domain.SysVersion;
 import com.gameplat.admin.model.dto.VersionDTO;
 import com.gameplat.admin.service.SysVersionService;
 import com.gameplat.base.common.enums.EnableEnum;
-import lombok.RequiredArgsConstructor;
+import com.gameplat.model.entity.sys.SysVersion;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * 系统版本 业务实现层
@@ -18,7 +19,7 @@ import org.springframework.stereotype.Service;
  * @author three
  */
 @Service
-@RequiredArgsConstructor
+@Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)
 public class SysVersionServiceImpl extends ServiceImpl<SysVersionMapper, SysVersion>
     implements SysVersionService {
 

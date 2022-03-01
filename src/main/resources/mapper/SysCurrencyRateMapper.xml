@@ -3,46 +3,47 @@
 <mapper namespace="com.gameplat.admin.mapper.SysCurrencyRateMapper">
 
     <!-- 通用查询映射结果 -->
-    <resultMap id="BaseResultMap" type="com.gameplat.admin.model.domain.SysCurrencyRate">
-        <id column="currency_id" property="currencyId" />
-        <result column="recharge_currency_name" property="rechargeCurrencyName" />
-        <result column="recharge_loge" property="rechargeLoge" />
-        <result column="recharge_ios_rate" property="rechargeIosRate" />
-        <result column="recharge_android_rate" property="rechargeAndroidRate" />
-        <result column="recharge_integral_rate" property="rechargeIntegralRate" />
-        <result column="recharge_integral_switch" property="rechargeIntegralSwitch" />
-        <result column="integral_name" property="integralName" />
-        <result column="integral_loge" property="integralLoge" />
-        <result column="integral_recharge_rate" property="integralRechargeRate" />
-        <result column="integral_recharge_switch" property="integralRechargeSwitch" />
-        <result column="withdraw_name" property="withdrawName" />
-        <result column="withdraw_loge" property="withdrawLoge" />
-        <result column="recharge_withdraw_rate" property="rechargeWithdrawRate" />
-        <result column="recharge_withdraw_switch" property="rechargeWithdrawSwitch" />
-        <result column="withdraw_recharge_rate" property="withdrawRechargeRate" />
-        <result column="withdraw_recharge_switch" property="withdrawRechargeSwitch" />
-        <result column="remark" property="remark" />
-        <result column="create_by" property="createBy" />
-        <result column="create_time" property="createTime" />
-        <result column="update_by" property="updateBy" />
-        <result column="update_time" property="updateTime" />
+    <resultMap id="BaseResultMap" type="com.gameplat.model.entity.sys.SysCurrencyRate">
+        <id column="currency_id" property="currencyId"/>
+        <result column="recharge_currency_name" property="rechargeCurrencyName"/>
+        <result column="recharge_loge" property="rechargeLoge"/>
+        <result column="recharge_ios_rate" property="rechargeIosRate"/>
+        <result column="recharge_android_rate" property="rechargeAndroidRate"/>
+        <result column="recharge_integral_rate" property="rechargeIntegralRate"/>
+        <result column="recharge_integral_switch" property="rechargeIntegralSwitch"/>
+        <result column="integral_name" property="integralName"/>
+        <result column="integral_loge" property="integralLoge"/>
+        <result column="integral_recharge_rate" property="integralRechargeRate"/>
+        <result column="integral_recharge_switch" property="integralRechargeSwitch"/>
+        <result column="withdraw_name" property="withdrawName"/>
+        <result column="withdraw_loge" property="withdrawLoge"/>
+        <result column="recharge_withdraw_rate" property="rechargeWithdrawRate"/>
+        <result column="recharge_withdraw_switch" property="rechargeWithdrawSwitch"/>
+        <result column="withdraw_recharge_rate" property="withdrawRechargeRate"/>
+        <result column="withdraw_recharge_switch" property="withdrawRechargeSwitch"/>
+        <result column="remark" property="remark"/>
+        <result column="create_by" property="createBy"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_by" property="updateBy"/>
+        <result column="update_time" property="updateTime"/>
     </resultMap>
 
     <!-- 通用查询结果列 -->
-	<sql id="Base_Column_List">
-		currency_id, recharge_currency_name, recharge_loge, recharge_ios_rate,
+    <sql id="Base_Column_List">
+        currency_id
+        , recharge_currency_name, recharge_loge, recharge_ios_rate,
 		recharge_android_rate, recharge_integral_rate,
 		recharge_integral_switch, integral_name, integral_loge,
 		integral_recharge_rate, integral_recharge_switch, withdraw_name,
 		withdraw_loge, recharge_withdraw_rate, recharge_withdraw_switch,
 		withdraw_recharge_rate, withdraw_recharge_switch, remark, create_by,
 		create_time, update_by, update_time
-	</sql>
+    </sql>
 
-	<select id="getConfig" resultMap="BaseResultMap">
-		select
-		<include refid="Base_Column_List" />
-		from sys_currency_rate where currency_id=1
-	</select>
+    <select id="getConfig" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from sys_currency_rate where currency_id=1
+    </select>
 
 </mapper>

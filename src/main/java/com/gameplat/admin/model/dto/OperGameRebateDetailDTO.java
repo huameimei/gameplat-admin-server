@@ -1,9 +1,10 @@
 package com.gameplat.admin.model.dto;
 
+import lombok.Data;
+
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
-import lombok.Data;
 
 @Data
 public class OperGameRebateDetailDTO implements Serializable {
@@ -39,6 +40,4 @@ public class OperGameRebateDetailDTO implements Serializable {
   private BigDecimal validAmount;
 
   private String statTime;
-
-
 }

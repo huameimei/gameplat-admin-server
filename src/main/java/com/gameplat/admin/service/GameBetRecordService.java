@@ -1,6 +1,7 @@
 package com.gameplat.admin.service;
 
 import com.gameplat.common.message.GameBetRecordMessage;
+
 import java.util.List;
 
 /**

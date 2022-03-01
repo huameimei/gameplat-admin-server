@@ -3,9 +3,9 @@ package com.gameplat.admin.service;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.gameplat.admin.model.domain.DiscountType;
 import com.gameplat.admin.model.dto.DiscountTypeAddDTO;
 import com.gameplat.admin.model.dto.DiscountTypeEditDTO;
+import com.gameplat.model.entity.DiscountType;
 
 public interface DiscountTypeService extends IService<DiscountType> {
 

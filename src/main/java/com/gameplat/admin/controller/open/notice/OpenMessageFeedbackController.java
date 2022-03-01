@@ -2,10 +2,12 @@ package com.gameplat.admin.controller.open.notice;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
-import com.gameplat.admin.model.domain.MessageFeedback;
-import com.gameplat.admin.model.dto.*;
+import com.gameplat.admin.model.dto.MessageFeedbackAddDTO;
+import com.gameplat.admin.model.dto.MessageFeedbackQueryDTO;
+import com.gameplat.admin.model.dto.MessageFeedbackUpdateDTO;
 import com.gameplat.admin.model.vo.MessageFeedbackVO;
 import com.gameplat.admin.service.MessageFeedbackService;
+import com.gameplat.model.entity.message.MessageFeedback;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -52,10 +54,13 @@ public class OpenMessageFeedbackController {
   @PutMapping("/read")
   @PreAuthorize("hasAuthority('notice:feedback:read')")
   public void updateMessage(Long id) {
-    messageFeedbackService.updateMessage(new MessageFeedbackUpdateDTO(){{
-                                                              setIsRead(1);
-                                                              setId(id);
-    }});
+    messageFeedbackService.updateMessage(
+        new MessageFeedbackUpdateDTO() {
+          {
+            setIsRead(1);
+            setId(id);
+          }
+        });
   }
 
   @ApiOperation(value = "新增意见反馈")
@@ -76,7 +81,6 @@ public class OpenMessageFeedbackController {
   @GetMapping("/getReplyContent")
   @PreAuthorize("hasAuthority('notice:feedback:getReplyContent')")
   public IPage<MessageFeedbackVO> getReplyContent(PageDTO<MessageFeedback> page) {
-      return messageFeedbackService.getReplyContent(page);
+    return messageFeedbackService.getReplyContent(page);
   }
-
 }

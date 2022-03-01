@@ -15,29 +15,24 @@ import java.util.List;
  * @description 聊天室侧滑菜单管理
  * @date 2022/2/15
  */
-
 @Api(tags = "聊天室侧滑菜单管理")
 @RestController
 @RequestMapping("/api/admin/chat/menu")
 public class ChatSideMenuController {
 
-    @Autowired
-    private ChatSideMenuService chatSideMenuService;
+  @Autowired private ChatSideMenuService chatSideMenuService;
 
-    private final String lottUrl = "/api-manage/chatRoom/updateChatRoomStatus";
+  @ApiOperation(value = "聊天室侧滑菜单列表")
+  @PreAuthorize("hasAuthority('chat:menu:list')")
+  @GetMapping("/list")
+  public List<ChatSideMenuVO> queryAllSideMenu() {
+    return chatSideMenuService.queryAllSideMenu();
+  }
 
-    @ApiOperation(value = "聊天室侧滑菜单列表")
-    @PreAuthorize("hasAuthority('chat:menu:list')")
-    @GetMapping("/list")
-    public List<ChatSideMenuVO> queryAllSideMenu() {
-        return chatSideMenuService.queryAllSideMenu();
-    }
-
-    @ApiOperation(value = "编辑")
-    @PreAuthorize("hasAuthority('chat:menu:edit')")
-    @PutMapping("/edit")
-    public void edit(@RequestBody String config) {
-        chatSideMenuService.edit(config);
-    }
-
+  @ApiOperation(value = "编辑")
+  @PreAuthorize("hasAuthority('chat:menu:edit')")
+  @PutMapping("/edit")
+  public void edit(@RequestBody String config) {
+    chatSideMenuService.edit(config);
+  }
 }

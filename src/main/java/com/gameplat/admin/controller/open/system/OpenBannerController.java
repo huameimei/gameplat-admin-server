@@ -2,14 +2,13 @@ package com.gameplat.admin.controller.open.system;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
-import com.gameplat.admin.model.domain.SysBannerInfo;
 import com.gameplat.admin.model.dto.SysBannerInfoAddDTO;
 import com.gameplat.admin.model.dto.SysBannerInfoEditDTO;
 import com.gameplat.admin.model.dto.SysBannerInfoUpdateStatusDTO;
 import com.gameplat.admin.model.vo.SysBannerInfoVO;
 import com.gameplat.admin.service.SysBannerInfoService;
-import com.gameplat.base.common.exception.ServiceException;
-import com.gameplat.base.common.util.StringUtils;
+import com.gameplat.common.lang.Assert;
+import com.gameplat.model.entity.sys.SysBannerInfo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -33,8 +32,7 @@ import springfox.documentation.annotations.ApiIgnore;
 @RequestMapping("/api/admin/system/banner")
 public class OpenBannerController {
 
-    @Autowired
-    private SysBannerInfoService sysBannerInfoService;
+  @Autowired private SysBannerInfoService sysBannerInfoService;
 
     /**
      * banner列表
@@ -58,54 +56,52 @@ public class OpenBannerController {
         return sysBannerInfoService.list(page, LocaleContextHolder.getLocale().toLanguageTag(), type);
     }
 
-    /**
-     * 新增banner
-     *
-     * @param sysBannerInfoAddDTO
-     */
-    @ApiOperation(value = "新增banner")
-    @PostMapping("/add")
-    @PreAuthorize("hasAuthority('system:banner:add')")
-    public void add(@Validated @RequestBody SysBannerInfoAddDTO sysBannerInfoAddDTO) {
-        sysBannerInfoService.add(sysBannerInfoAddDTO);
-    }
+  /**
+   * 新增banner
+   *
+   * @param sysBannerInfoAddDTO
+   */
+  @ApiOperation(value = "新增banner")
+  @PostMapping("/add")
+  @PreAuthorize("hasAuthority('system:banner:add')")
+  public void add(@Validated @RequestBody SysBannerInfoAddDTO sysBannerInfoAddDTO) {
+    sysBannerInfoService.add(sysBannerInfoAddDTO);
+  }
 
-    /**
-     * 编辑banner
-     *
-     * @param sysBannerInfoEditDTO
-     */
-    @ApiOperation(value = "编辑banner")
-    @PutMapping("/edit")
-    @PreAuthorize("hasAuthority('system:banner:edit')")
-    public void edit(@Validated @RequestBody SysBannerInfoEditDTO sysBannerInfoEditDTO) {
-        sysBannerInfoService.edit(sysBannerInfoEditDTO);
-    }
+  /**
+   * 编辑banner
+   *
+   * @param sysBannerInfoEditDTO
+   */
+  @ApiOperation(value = "编辑banner")
+  @PutMapping("/edit")
+  @PreAuthorize("hasAuthority('system:banner:edit')")
+  public void edit(@Validated @RequestBody SysBannerInfoEditDTO sysBannerInfoEditDTO) {
+    sysBannerInfoService.edit(sysBannerInfoEditDTO);
+  }
 
-    /**
-     * 删除banner
-     *
-     * @param ids
-     */
-    @ApiOperation(value = "删除banner")
-    @DeleteMapping("/delete")
-    @PreAuthorize("hasAuthority('system:banner:remove')")
-    public void delete(@RequestBody String ids) {
-        if (StringUtils.isBlank(ids)) {
-            throw new ServiceException("ids不能为空");
-        }
-        sysBannerInfoService.delete(ids);
-    }
+  /**
+   * 删除banner
+   *
+   * @param ids
+   */
+  @ApiOperation(value = "删除banner")
+  @DeleteMapping("/delete")
+  @PreAuthorize("hasAuthority('system:banner:remove')")
+  public void delete(@RequestBody String ids) {
+    Assert.notEmpty(ids, "ids不能为空");
+    sysBannerInfoService.delete(ids);
+  }
 
-    /**
-     * 修改banner状态
-     *
-     * @param dto
-     */
-    @ApiOperation(value = "修改banner状态")
-    @PutMapping("/updateStatus")
-    @PreAuthorize("hasAuthority('system:banner:edit')")
-    public void updateStatus(@Validated @RequestBody SysBannerInfoUpdateStatusDTO dto) {
-        sysBannerInfoService.updateStatus(dto);
-    }
+  /**
+   * 修改banner状态
+   *
+   * @param dto
+   */
+  @ApiOperation(value = "修改banner状态")
+  @PutMapping("/updateStatus")
+  @PreAuthorize("hasAuthority('system:banner:edit')")
+  public void updateStatus(@Validated @RequestBody SysBannerInfoUpdateStatusDTO dto) {
+    sysBannerInfoService.updateStatus(dto);
+  }
 }

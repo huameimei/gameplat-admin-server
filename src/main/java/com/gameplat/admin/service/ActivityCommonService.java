@@ -1,8 +1,8 @@
 package com.gameplat.admin.service;
 
-import com.gameplat.admin.model.domain.ActivityLobby;
-import com.gameplat.admin.model.domain.ActivityQualification;
 import com.gameplat.admin.model.vo.MemberInfoVO;
+import com.gameplat.model.entity.activity.ActivityLobby;
+import com.gameplat.model.entity.activity.ActivityQualification;
 
 import java.util.Date;
 import java.util.List;

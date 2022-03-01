@@ -1,11 +1,9 @@
 package com.gameplat.admin.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.gameplat.admin.model.domain.MemberWeal;
-
+import com.gameplat.model.entity.member.MemberWeal;
 
 /**
  * @author Lily
  */
-public interface MemberWealMapper extends BaseMapper<MemberWeal> {
-}
+public interface MemberWealMapper extends BaseMapper<MemberWeal> {}

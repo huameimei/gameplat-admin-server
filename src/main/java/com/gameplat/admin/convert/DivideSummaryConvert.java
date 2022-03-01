@@ -1,6 +1,6 @@
 package com.gameplat.admin.convert;
 
-import com.gameplat.admin.model.domain.proxy.DivideSummary;
+import com.gameplat.model.entity.proxy.DivideSummary;
 import com.gameplat.admin.model.dto.DivideSummaryDto;
 import com.gameplat.admin.model.vo.DivideSummaryVO;
 import org.mapstruct.Mapper;

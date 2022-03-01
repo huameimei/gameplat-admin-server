@@ -1,9 +1,9 @@
 package com.gameplat.admin.convert;
 
-import com.gameplat.admin.model.domain.SysMenu;
 import com.gameplat.admin.model.dto.MenuDTO;
 import com.gameplat.admin.model.dto.OperMenuDTO;
 import com.gameplat.admin.model.vo.MenuVo;
+import com.gameplat.model.entity.sys.SysMenu;
 import org.mapstruct.Mapper;
 
 

@@ -15,7 +15,6 @@ import com.gameplat.base.common.util.DateUtil;
 import com.gameplat.base.common.util.StringUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -31,62 +30,52 @@ import java.util.List;
  * @description 会员日报表
  * @date 2022/1/8
  */
-
 @Api(tags = "会员日报表")
 @Slf4j
 @RestController
-@RequiredArgsConstructor
 @RequestMapping("/api/admin/member/dayReport")
 public class MemberDayReportController {
 
+  @Autowired(required = false)
+  private MemberBusDayReportMapper memberBusDayReportMapper;
 
-    @Autowired(required = false)
-    private MemberBusDayReportMapper memberBusDayReportMapper;
+  @Autowired private GameMemberReportService gameMemberReportService;
 
-    private final GameMemberReportService gameMemberReportService;
+  @GetMapping("/list")
+  @ApiOperation(value = "查询会员日报列表")
+  @PreAuthorize("hasAuthority('member:dayReport:list')")
+  public List<DayReportVO> findList(DayReportDTO dto) {
+    return memberBusDayReportMapper.findList(dto);
+  }
 
-
-    @GetMapping("/list")
-    @ApiOperation(value = "查询会员日报列表")
-    @PreAuthorize("hasAuthority('member:dayReport:list')")
-    public List<DayReportVO> findList(DayReportDTO dto){
-        return memberBusDayReportMapper.findList(dto);
+  @ApiOperation(value = "会员日报表")
+  @GetMapping(value = "memberGameDayReport")
+  public PageDtoVO<MemberGameDayReportVo> queryBetReport(
+      Page<MemberGameDayReportVo> page, MemberReportDto dto) {
+    log.info("会员日报表入参：{}", JSON.toJSONString(dto));
+    if (StringUtils.isEmpty(dto.getStartTime())) {
+      String beginTime = DateUtil.getDateToString(new Date());
+      dto.setStartTime(beginTime);
     }
-
-
-
-
-
-    @ApiOperation(value = "会员日报表")
-    @GetMapping(value = "memberGameDayReport")
-    public PageDtoVO<MemberGameDayReportVo> queryBetReport(Page<MemberGameDayReportVo> page, MemberReportDto dto) {
-        log.info("会员日报表入参：{}", JSON.toJSONString(dto));
-        if (StringUtils.isEmpty(dto.getStartTime())) {
-            String beginTime = DateUtil.getDateToString(new Date());
-            dto.setStartTime(beginTime);
-        }
-        if (StringUtils.isEmpty(dto.getEndTime())) {
-            String endTime = DateUtil.getDateToString(new Date());
-            dto.setEndTime(endTime);
-        }
-        return gameMemberReportService.findSumMemberGameDayReport(page,dto);
+    if (StringUtils.isEmpty(dto.getEndTime())) {
+      String endTime = DateUtil.getDateToString(new Date());
+      dto.setEndTime(endTime);
     }
+    return gameMemberReportService.findSumMemberGameDayReport(page, dto);
+  }
 
-
-
-    @ApiOperation(value = "投注分析")
-    @GetMapping(value = "findMemberbetAnalysis")
-    public MemberbetAnalysisVo findMemberbetAnalysis(MemberbetAnalysisdto dto) {
-        log.info("会员日报表入参：{}", JSON.toJSONString(dto));
-        if (StringUtils.isEmpty(dto.getStartTime())) {
-            String beginTime = DateUtil.getDateToString(new Date());
-            dto.setStartTime(beginTime);
-        }
-        if (StringUtils.isEmpty(dto.getEndTime())) {
-            String endTime = DateUtil.getDateToString(new Date());
-            dto.setEndTime(endTime);
-        }
-        return gameMemberReportService.findMemberbetAnalysis(dto);
+  @ApiOperation(value = "投注分析")
+  @GetMapping(value = "findMemberbetAnalysis")
+  public MemberbetAnalysisVo findMemberbetAnalysis(MemberbetAnalysisdto dto) {
+    log.info("会员日报表入参：{}", JSON.toJSONString(dto));
+    if (StringUtils.isEmpty(dto.getStartTime())) {
+      String beginTime = DateUtil.getDateToString(new Date());
+      dto.setStartTime(beginTime);
     }
-
+    if (StringUtils.isEmpty(dto.getEndTime())) {
+      String endTime = DateUtil.getDateToString(new Date());
+      dto.setEndTime(endTime);
+    }
+    return gameMemberReportService.findMemberbetAnalysis(dto);
+  }
 }

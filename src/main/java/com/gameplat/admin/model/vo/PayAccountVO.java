@@ -5,9 +5,10 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.gameplat.admin.util.Date2LongSerializerUtils;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
+
 import java.math.BigDecimal;
 import java.util.Date;
-import lombok.Data;
 
 @Data
 public class PayAccountVO extends Model<PayAccountVO> {
@@ -88,34 +89,24 @@ public class PayAccountVO extends Model<PayAccountVO> {
   /** 风控值 */
   private String riskControlValue;
 
-  /**
-   * 虚拟货币类型
-   */
+  /** 虚拟货币类型 */
   private String currencyType;
 
-  /**
-   * 创建者
-   */
+  /** 创建者 */
   @ApiModelProperty(value = "创建者")
   private String createBy;
 
-  /**
-   * 创建时间
-   */
+  /** 创建时间 */
   @ApiModelProperty(value = "创建时间")
   @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
   @JsonSerialize(using = Date2LongSerializerUtils.class)
   private Date createTime;
 
-  /**
-   * 更新者
-   */
+  /** 更新者 */
   @ApiModelProperty(value = "更新者")
   private String updateBy;
 
-  /**
-   * 更新时间
-   */
+  /** 更新时间 */
   @ApiModelProperty(value = "更新时间")
   @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
   @JsonSerialize(using = Date2LongSerializerUtils.class)

@@ -1,7 +1,7 @@
 package com.gameplat.admin.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.gameplat.admin.model.domain.SysAuthIp;
+import com.gameplat.model.entity.sys.SysAuthIp;
 
 /**
  * ip白名单 数据层

@@ -2,11 +2,11 @@ package com.gameplat.admin.feign.factory;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.gameplat.admin.feign.RemoteLogService;
-import com.gameplat.admin.model.domain.SysLogLogin;
 import com.gameplat.base.common.log.SysLog;
 import com.gameplat.base.common.web.Result;
 import com.gameplat.common.model.dto.LogDTO;
 import com.gameplat.common.model.vo.UserLogVO;
+import com.gameplat.model.entity.sys.SysLogLogin;
 import feign.hystrix.FallbackFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;

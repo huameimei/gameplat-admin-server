@@ -1,10 +1,9 @@
 package com.gameplat.admin.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.gameplat.admin.model.domain.MessageInfo;
-import com.gameplat.admin.model.dto.MessageInfoAddDTO;
+import com.gameplat.model.entity.message.Message;
 
-public interface MessageMapper extends BaseMapper<MessageInfo> {
+public interface MessageMapper extends BaseMapper<Message> {
 
-    void saveReturnId(MessageInfo messageInfo);
+  void saveReturnId(Message message);
 }

@@ -1,7 +1,7 @@
 package com.gameplat.admin.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.gameplat.admin.model.domain.proxy.DivideDetail;
+import com.gameplat.model.entity.proxy.DivideDetail;
 
 /**
  * @Description : 分红详情

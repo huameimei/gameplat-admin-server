@@ -4,6 +4,6 @@ import lombok.Data;
 
 @Data
 public class LotteryCodeVo {
-    private String lottCode;
-    private String lottName;
+  private String lottCode;
+  private String lottName;
 }

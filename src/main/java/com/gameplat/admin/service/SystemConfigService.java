@@ -1,11 +1,11 @@
 package com.gameplat.admin.service;
 
-import com.gameplat.admin.model.domain.SysDictData;
 import com.gameplat.admin.model.dto.AgentContacaDTO;
 import com.gameplat.admin.model.dto.EmailTestDTO;
 import com.gameplat.admin.model.dto.OperSystemConfigDTO;
 import com.gameplat.admin.model.vo.AgentContacaVO;
 import com.gameplat.common.model.bean.EmailConfig;
+import com.gameplat.model.entity.sys.SysDictData;
 
 import java.util.List;
 

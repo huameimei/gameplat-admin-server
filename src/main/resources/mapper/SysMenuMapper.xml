@@ -3,7 +3,7 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.gameplat.admin.mapper.SysMenuMapper">
 
-    <resultMap id="SysMenuResult" type="com.gameplat.admin.model.domain.SysMenu">
+    <resultMap id="SysMenuResult" type="com.gameplat.model.entity.sys.SysMenu">
         <id property="menuId" column="menu_id"/>
         <result property="menuName" column="menu_name"/>
         <result property="title" column="title"/>
@@ -28,19 +28,54 @@
     </resultMap>
 
     <sql id="selectMenuVo">
-        SELECT menu_id, menu_name, title, parent_id, parent_name, menu_sort, component, `path`, url, menu_type, visible, i_frame, cache_flag, ifnull(perms,'') AS perms, icon, status, create_by, create_time
-		FROM sys_menu
+        SELECT menu_id,
+               menu_name,
+               title,
+               parent_id,
+               parent_name,
+               menu_sort,
+               component,
+               `path`,
+               url,
+               menu_type,
+               visible,
+               i_frame,
+               cache_flag,
+               ifnull(perms, '') AS perms,
+               icon,
+               status,
+               create_by,
+               create_time
+        FROM sys_menu
     </sql>
 
     <select id="selectMenusByUserId" parameterType="Long" resultMap="SysMenuResult">
-		SELECT DISTINCT m.menu_id, m.parent_id, m.menu_name, m.title, m.component, m.path, m.url, m.visible, i_frame, m.menu_sort, cache_flag, ifnull(m.perms,'') as perms, m.menu_type, m.icon, m.status, m.create_time
-		FROM sys_menu m
-			 LEFT JOIN sys_role_menu rm ON m.menu_id = rm.menu_id
-			 left join sys_user_role ur ON rm.role_id = ur.role_id
-			 LEFT JOIN sys_role ro ON ur.role_id = ro.role_id
-		WHERE ur.user_id = #{userId} AND m.menu_type IN ('M', 'C') AND m.visible = 0  AND ro.status = 1
-		ORDER BY m.parent_id, m.menu_sort
-	</select>
+        SELECT DISTINCT m.menu_id,
+                        m.parent_id,
+                        m.menu_name,
+                        m.title,
+                        m.component,
+                        m.path,
+                        m.url,
+                        m.visible,
+                        i_frame,
+                        m.menu_sort,
+                        cache_flag,
+                        ifnull(m.perms, '') as perms,
+                        m.menu_type,
+                        m.icon,
+                        m.status,
+                        m.create_time
+        FROM sys_menu m
+                 LEFT JOIN sys_role_menu rm ON m.menu_id = rm.menu_id
+                 left join sys_user_role ur ON rm.role_id = ur.role_id
+                 LEFT JOIN sys_role ro ON ur.role_id = ro.role_id
+        WHERE ur.user_id = #{userId}
+          AND m.menu_type IN ('M', 'C')
+          AND m.visible = 0
+          AND ro.status = 1
+        ORDER BY m.parent_id, m.menu_sort
+    </select>
 
     <select id="selectMenuAll" resultMap="SysMenuResult">
         <include refid="selectMenuVo"/>
@@ -48,30 +83,47 @@
     </select>
 
     <select id="selectMenuNormalAll" resultMap="SysMenuResult">
-		SELECT DISTINCT m.menu_id, m.parent_id, m.menu_name, m.title, m.component, m.path, m.url, m.visible, i_frame, cache_flag, ifnull(m.perms,'') as perms, m.menu_type, m.icon, m.menu_sort, m.create_time
-		FROM sys_menu m
-		WHERE m.menu_type IN ('M', 'C') AND m.visible = 0
-		ORDER BY m.parent_id, m.menu_sort
-	</select>
+        SELECT DISTINCT m.menu_id,
+                        m.parent_id,
+                        m.menu_name,
+                        m.title,
+                        m.component,
+                        m.path,
+                        m.url,
+                        m.visible,
+                        i_frame,
+                        cache_flag,
+                        ifnull(m.perms, '') as perms,
+                        m.menu_type,
+                        m.icon,
+                        m.menu_sort,
+                        m.create_time
+        FROM sys_menu m
+        WHERE m.menu_type IN ('M', 'C')
+          AND m.visible = 0
+        ORDER BY m.parent_id, m.menu_sort
+    </select>
 
     <select id="selectPermsByUserId" parameterType="Long" resultType="String">
-		SELECT DISTINCT m.perms
-		FROM sys_menu m
-			 LEFT JOIN sys_role_menu rm ON m.menu_id = rm.menu_id
-			 LEFT JOIN sys_user_role ur ON rm.role_id = ur.role_id
-			 LEFT JOIN sys_role r ON r.role_id = ur.role_id
-		WHERE m.visible = 0 AND r.status = 1 AND ur.user_id = #{userId}
-	</select>
+        SELECT DISTINCT m.perms
+        FROM sys_menu m
+                 LEFT JOIN sys_role_menu rm ON m.menu_id = rm.menu_id
+                 LEFT JOIN sys_user_role ur ON rm.role_id = ur.role_id
+                 LEFT JOIN sys_role r ON r.role_id = ur.role_id
+        WHERE m.visible = 0
+          AND r.status = 1
+          AND ur.user_id = #{userId}
+    </select>
 
     <select id="selectMenuTree" parameterType="Long" resultType="String">
-		SELECT concat(m.menu_id, ifnull(m.perms,'')) AS perms
-		FROM sys_menu m
-			LEFT JOIN sys_role_menu rm ON m.menu_id = rm.menu_id
-		WHERE rm.role_id = #{roleId}
-		ORDER BY m.parent_id, m.menu_sort
-	</select>
+        SELECT concat(m.menu_id, ifnull(m.perms, '')) AS perms
+        FROM sys_menu m
+                 LEFT JOIN sys_role_menu rm ON m.menu_id = rm.menu_id
+        WHERE rm.role_id = #{roleId}
+        ORDER BY m.parent_id, m.menu_sort
+    </select>
 
-    <select id="selectMenuList" parameterType="com.gameplat.admin.model.domain.SysMenu"
+    <select id="selectMenuList" parameterType="com.gameplat.model.entity.sys.SysMenu"
             resultMap="SysMenuResult">
         <include refid="selectMenuVo"/>
         <where>
@@ -85,7 +137,7 @@
         ORDER BY parent_id, menu_sort
     </select>
 
-    <insert id="insertMenu" parameterType="com.gameplat.admin.model.domain.SysMenu">
+    <insert id="insertMenu" parameterType="com.gameplat.model.entity.sys.SysMenu">
         INSERT INTO sys_menu(
         <if test="menuId != null and menuId != 0">menu_id,</if>
         <if test="parentId != null and parentId != 0">parent_id,</if>
@@ -129,7 +181,7 @@
         )
     </insert>
 
-    <update id="updateMenu" parameterType="com.gameplat.admin.model.domain.SysMenu">
+    <update id="updateMenu" parameterType="com.gameplat.model.entity.sys.SysMenu">
         UPDATE sys_menu
         <set>
             <if test="menuName != null and menuName != ''">menu_name = #{menuName},</if>
@@ -156,14 +208,14 @@
     </update>
 
     <delete id="deleteMenuByIds" parameterType="Long">
-	    DELETE FROM sys_menu WHERE menu_id IN
+        DELETE FROM sys_menu WHERE menu_id IN
         <foreach collection="array" item="ids" open="(" separator="," close=")">
             #{ids}
         </foreach>
 
     </delete>
 
-    <select id="checkMenuNameUnique" parameterType="com.gameplat.admin.model.domain.SysMenu"
+    <select id="checkMenuNameUnique" parameterType="com.gameplat.model.entity.sys.SysMenu"
             resultMap="SysMenuResult">
         <include refid="selectMenuVo"/>
         WHERE menu_name = #{menuName} AND parent_id = #{parentId}

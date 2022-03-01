@@ -13,22 +13,23 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * @author lily
  * @description
  * @date 2022/1/15
  */
-
 @Api(tags = "VIP说明配置")
 @Slf4j
 @RestController
 @RequestMapping("/api/admin/member/growthConfig")
 public class MemberGrowthConfigController {
 
-    @Autowired
-    private MemberGrowthConfigService memberGrowthConfigService;
+  @Autowired private MemberGrowthConfigService memberGrowthConfigService;
 
     @ApiOperation(value = "查询")
     @GetMapping("/get")
@@ -37,16 +38,16 @@ public class MemberGrowthConfigController {
         return memberGrowthConfigService.findOneConfig(LocaleContextHolder.getLocale().toLanguageTag());
     }
 
-    @ApiOperation(value = "修改")
-    @PreAuthorize("hasAuthority('member:growthConfig:edit')")
-    @PutMapping("/edit")
-    public void update(@ApiParam(name = "修改VIP配置入参", value = "传入json格式", required = true)
-                       @Validated MemberGrowthConfigEditDto configEditDto) {
+  @ApiOperation(value = "修改")
+  @PreAuthorize("hasAuthority('member:growthConfig:edit')")
+  @PutMapping("/edit")
+  public void update(
+      @ApiParam(name = "修改VIP配置入参", value = "传入json格式", required = true) @Validated
+          MemberGrowthConfigEditDto configEditDto) {
         configEditDto.setLanguage(LocaleContextHolder.getLocale().toLanguageTag());
-        if (StrUtil.isBlank(configEditDto.getLanguage())) {
-            configEditDto.setLanguage(LanguageEnum.app_zh_CN.getCode());
-        }
-        memberGrowthConfigService.updateGrowthConfig(configEditDto);
+    if (StrUtil.isBlank(configEditDto.getLanguage())) {
+      configEditDto.setLanguage(LanguageEnum.app_zh_CN.getCode());
     }
-
+    memberGrowthConfigService.updateGrowthConfig(configEditDto);
+  }
 }

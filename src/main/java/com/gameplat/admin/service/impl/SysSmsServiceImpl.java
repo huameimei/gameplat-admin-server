@@ -6,16 +6,18 @@ import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.convert.SmsConvert;
 import com.gameplat.admin.mapper.SysSmsMapper;
-import com.gameplat.admin.model.domain.SysSMS;
 import com.gameplat.admin.model.dto.OperSmsDTO;
 import com.gameplat.admin.model.dto.SmsDTO;
 import com.gameplat.admin.model.vo.SMSVO;
 import com.gameplat.admin.service.SysSmsService;
 import com.gameplat.base.common.exception.ServiceException;
-import java.util.Date;
-import lombok.RequiredArgsConstructor;
+import com.gameplat.model.entity.sys.SysSMS;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Date;
 
 /**
  * 短信记录 服务实现层
@@ -23,7 +25,7 @@ import org.springframework.stereotype.Service;
  * @author three
  */
 @Service
-@RequiredArgsConstructor
+@Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)
 public class SysSmsServiceImpl extends ServiceImpl<SysSmsMapper, SysSMS> implements SysSmsService {
 
   @Autowired private SysSmsMapper smsMapper;

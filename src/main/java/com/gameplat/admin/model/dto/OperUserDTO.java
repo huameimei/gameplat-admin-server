@@ -1,10 +1,11 @@
 package com.gameplat.admin.model.dto;
 
 import com.gameplat.common.group.Groups;
-import java.io.Serializable;
+import lombok.Data;
+
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-import lombok.Data;
+import java.io.Serializable;
 
 @Data
 public class OperUserDTO implements Serializable {

@@ -70,6 +70,4 @@ public class ChatPushPlanAddOrEditDTO implements Serializable {
 
   @ApiModelProperty(value = "修改时间")
   private Long updateTime;
-
-
 }

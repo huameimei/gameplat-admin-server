@@ -2,7 +2,6 @@ package com.gameplat.admin.controller.open.system;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
-import com.gameplat.admin.model.domain.QuickReply;
 import com.gameplat.admin.model.dto.QuickReplyDTO;
 import com.gameplat.admin.model.vo.QuickReplyVO;
 import com.gameplat.admin.service.QuickReplyService;
@@ -10,20 +9,14 @@ import com.gameplat.common.constant.ServiceName;
 import com.gameplat.common.group.Groups;
 import com.gameplat.log.annotation.Log;
 import com.gameplat.log.enums.LogType;
-import java.util.List;
-import lombok.RequiredArgsConstructor;
+import com.gameplat.model.entity.QuickReply;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * 快捷回复控制器
@@ -32,7 +25,6 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @Slf4j
 @RestController
-@RequiredArgsConstructor
 @RequestMapping("/api/admin/system/quick")
 public class OpenQuickReplyController {
 
@@ -82,5 +74,4 @@ public class OpenQuickReplyController {
   public List<QuickReply> getAll() {
     return replyService.list();
   }
-
 }

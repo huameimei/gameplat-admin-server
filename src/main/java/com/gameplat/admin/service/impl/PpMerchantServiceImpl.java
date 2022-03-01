@@ -11,7 +11,6 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.convert.PpMerchantConvert;
 import com.gameplat.admin.mapper.PpMerchantMapper;
 import com.gameplat.admin.model.bean.ProxyPayMerBean;
-import com.gameplat.admin.model.domain.PpMerchant;
 import com.gameplat.admin.model.dto.PpMerchantAddDTO;
 import com.gameplat.admin.model.dto.PpMerchantEditDTO;
 import com.gameplat.admin.model.vo.PpInterfaceVO;
@@ -21,8 +20,7 @@ import com.gameplat.admin.service.PpMerchantService;
 import com.gameplat.admin.util.EncryptUtils;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.json.JsonUtils;
-import java.util.List;
-import java.util.Map;
+import com.gameplat.model.entity.pay.PpMerchant;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,29 +28,29 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.Map;
+
 @Service
 @Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)
 public class PpMerchantServiceImpl extends ServiceImpl<PpMerchantMapper, PpMerchant>
     implements PpMerchantService {
 
-  @Autowired
-  private PpMerchantConvert ppMerchantConvert;
+  @Autowired private PpMerchantConvert ppMerchantConvert;
 
-  @Autowired
-  private PpMerchantMapper ppMerchantMapper;
+  @Autowired private PpMerchantMapper ppMerchantMapper;
 
-  @Autowired
-  private PpInterfaceService ppInterfaceService;
+  @Autowired private PpInterfaceService ppInterfaceService;
 
   @Override
   public void update(PpMerchantEditDTO dto) {
     PpMerchant ppMerchant = this.getById(dto.getId());
     PpInterfaceVO ppInterfaceVO = ppInterfaceService.queryPpInterface(dto.getPpInterfaceCode());
-    if(null == ppInterfaceVO){
+    if (null == ppInterfaceVO) {
       throw new ServiceException("代付接口不存在或已被删除，请删除商户重新配置");
     }
-    Map<String, String> oriMerchantParameters = JSONObject
-        .parseObject(ppMerchant.getParameters(), Map.class);
+    Map<String, String> oriMerchantParameters =
+        JSONObject.parseObject(ppMerchant.getParameters(), Map.class);
     List<String> ppInterfaceParameters =
         JSON.parseArray(ppInterfaceVO.getParameters(), String.class);
     Map<String, String> parametersMap = JSONObject.parseObject(dto.getParameters(), Map.class);
@@ -108,11 +106,11 @@ public class PpMerchantServiceImpl extends ServiceImpl<PpMerchantMapper, PpMerch
     PpInterfaceVO ppInterfaceVO =
         ppInterfaceService.queryPpInterface(ppMerchantVO.getPpInterfaceCode());
     ppMerchantVO.setPpInterfaceVO(ppInterfaceVO);
-    if(null == ppInterfaceVO){
+    if (null == ppInterfaceVO) {
       throw new ServiceException("代付接口不存在或已被删除，请删除商户重新配置");
     }
-    Map<String, String> merchantParameters = JSONObject
-        .parseObject(ppMerchantVO.getParameters(), Map.class);
+    Map<String, String> merchantParameters =
+        JSONObject.parseObject(ppMerchantVO.getParameters(), Map.class);
     List<String> ppInterfaceParameters =
         JSON.parseArray(ppInterfaceVO.getParameters(), String.class);
     // 商户号秘钥等信息加密展示处理
@@ -138,7 +136,7 @@ public class PpMerchantServiceImpl extends ServiceImpl<PpMerchantMapper, PpMerch
     }
     LambdaUpdateWrapper<PpMerchant> update = Wrappers.lambdaUpdate();
     update.set(PpMerchant::getStatus, status).eq(PpMerchant::getId, id);
-    this.update(new PpMerchant(),update);
+    this.update(new PpMerchant(), update);
   }
 
   @Override

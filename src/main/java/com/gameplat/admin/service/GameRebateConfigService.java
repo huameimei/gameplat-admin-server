@@ -1,7 +1,8 @@
 package com.gameplat.admin.service;
 
-import com.gameplat.admin.model.domain.GameRebateConfig;
 import com.gameplat.admin.model.dto.OperGameRebateConfigDTO;
+import com.gameplat.model.entity.game.GameRebateConfig;
+
 import java.util.List;
 
 public interface GameRebateConfigService {

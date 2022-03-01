@@ -2,7 +2,7 @@ package com.gameplat.admin.controller.open.member;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
-import com.gameplat.admin.model.domain.MemberGoldCoinRecord;
+import com.gameplat.model.entity.member.MemberGoldCoinRecord;
 import com.gameplat.admin.model.dto.MemberGoldCoinRecordQueryDTO;
 import com.gameplat.admin.model.vo.MemberGoldCoinRecordVO;
 import com.gameplat.admin.service.MemberGoldCoinRecordService;

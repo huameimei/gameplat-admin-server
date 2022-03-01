@@ -1,6 +1,6 @@
 package com.gameplat.admin.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.gameplat.admin.model.domain.Game;
+import com.gameplat.model.entity.game.Game;
 
 public interface GameMapper extends BaseMapper<Game> {}

@@ -7,9 +7,9 @@ import java.io.Serializable;
 
 /**
  * 聊天室红包
+ *
  * @author lily
  */
-
 @Data
 public class ChatRedEnvelopeVO implements Serializable {
 

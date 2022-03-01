@@ -1,7 +1,8 @@
 package com.gameplat.admin.model.vo;
 
-import java.math.BigDecimal;
 import lombok.Data;
+
+import java.math.BigDecimal;
 
 @Data
 public class RechargeHistorySummaryVO {
@@ -18,39 +19,38 @@ public class RechargeHistorySummaryVO {
 
   private String currencyCount;
 
-
-//
-//  public BigDecimal getAmount() {
-//    if (null == amount) {
-//      return BigDecimal.ZERO;
-//    }
-//    return amount;
-//  }
-//
-//  public void setAmount(BigDecimal amount) {
-//    this.amount = (null == amount ? BigDecimal.ZERO : amount);
-//  }
-//
-//  public BigDecimal getDiscountAmount() {
-//    if (null == discountAmount) {
-//      return BigDecimal.ZERO;
-//    }
-//    return discountAmount;
-//  }
-//
-//  public void setDiscountAmount(BigDecimal discountAmount) {
-//    this.discountAmount = (null == discountAmount ? BigDecimal.ZERO : discountAmount);
-//  }
-//
-//  public BigDecimal getTotalAmount() {
-//    if (null == totalAmount) {
-//      return BigDecimal.ZERO;
-//    }
-//    return totalAmount;
-//  }
-//
-//  public void setTotalAmount(BigDecimal totalAmount) {
-//    this.totalAmount = (null == totalAmount ? BigDecimal.ZERO : totalAmount);
-//  }
+  //
+  //  public BigDecimal getAmount() {
+  //    if (null == amount) {
+  //      return BigDecimal.ZERO;
+  //    }
+  //    return amount;
+  //  }
+  //
+  //  public void setAmount(BigDecimal amount) {
+  //    this.amount = (null == amount ? BigDecimal.ZERO : amount);
+  //  }
+  //
+  //  public BigDecimal getDiscountAmount() {
+  //    if (null == discountAmount) {
+  //      return BigDecimal.ZERO;
+  //    }
+  //    return discountAmount;
+  //  }
+  //
+  //  public void setDiscountAmount(BigDecimal discountAmount) {
+  //    this.discountAmount = (null == discountAmount ? BigDecimal.ZERO : discountAmount);
+  //  }
+  //
+  //  public BigDecimal getTotalAmount() {
+  //    if (null == totalAmount) {
+  //      return BigDecimal.ZERO;
+  //    }
+  //    return totalAmount;
+  //  }
+  //
+  //  public void setTotalAmount(BigDecimal totalAmount) {
+  //    this.totalAmount = (null == totalAmount ? BigDecimal.ZERO : totalAmount);
+  //  }
 
 }

@@ -1,10 +1,8 @@
 package com.gameplat.admin.controller.open.finance;
 
-
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.gameplat.admin.model.bean.ManualRechargeOrderBo;
 import com.gameplat.admin.model.bean.PageExt;
-import com.gameplat.admin.model.domain.RechargeOrder;
 import com.gameplat.admin.model.dto.RechargeOrderQueryDTO;
 import com.gameplat.admin.model.vo.RechargeOrderVO;
 import com.gameplat.admin.model.vo.SummaryVO;
@@ -14,11 +12,9 @@ import com.gameplat.common.constant.ServiceName;
 import com.gameplat.common.model.bean.UserEquipment;
 import com.gameplat.log.annotation.Log;
 import com.gameplat.log.enums.LogType;
+import com.gameplat.model.entity.recharge.RechargeOrder;
 import com.gameplat.security.SecurityUserHolder;
 import com.gameplat.security.context.UserCredential;
-import java.math.BigDecimal;
-import java.util.List;
-import javax.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -26,13 +22,16 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
+import java.math.BigDecimal;
+import java.util.List;
+
 @Slf4j
 @RestController
 @RequestMapping("/api/admin/finance/rechargeOrder")
 public class RechargeOrderController {
 
-  @Autowired
-  private RechargeOrderService rechargeOrderService;
+  @Autowired private RechargeOrderService rechargeOrderService;
 
   @PostMapping("/handle")
   @PreAuthorize("hasAuthority('finance:rechargeOrder:handle')")
@@ -90,7 +89,6 @@ public class RechargeOrderController {
     for (Long id : ids) {
       rechargeOrderService.unHandle(id, userCredential);
     }
-
   }
 
   @PostMapping("/batchAccept")
@@ -122,8 +120,8 @@ public class RechargeOrderController {
   @PostMapping("/editDiscount")
   @PreAuthorize("hasAuthority('finance:rechargeOrder:editDiscount')")
   @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.RECHARGE, desc = "'修改优惠金额为：' + #discountAmount")
-  public void updateDiscount(Long id, Integer discountType, BigDecimal discountAmount,
-      BigDecimal discountDml) {
+  public void updateDiscount(
+      Long id, Integer discountType, BigDecimal discountAmount, BigDecimal discountDml) {
     rechargeOrderService.updateDiscount(id, discountType, discountAmount, discountDml);
   }
 

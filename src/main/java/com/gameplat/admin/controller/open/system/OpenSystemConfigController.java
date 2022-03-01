@@ -3,7 +3,6 @@ package com.gameplat.admin.controller.open.system;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.json.JSONObject;
 import com.gameplat.admin.convert.DictDataConvert;
-import com.gameplat.admin.model.domain.SysDictData;
 import com.gameplat.admin.model.dto.AgentContacaDTO;
 import com.gameplat.admin.model.dto.EmailTestDTO;
 import com.gameplat.admin.model.dto.OperSystemConfigDTO;
@@ -12,9 +11,9 @@ import com.gameplat.admin.model.vo.AgentContacaVO;
 import com.gameplat.admin.service.SysDictDataService;
 import com.gameplat.admin.service.SystemConfigService;
 import com.gameplat.common.model.bean.EmailConfig;
+import com.gameplat.model.entity.sys.SysDictData;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -24,7 +23,6 @@ import java.util.List;
 
 @Slf4j
 @RestController
-@RequiredArgsConstructor
 @Api(tags = "系统配置API")
 @RequestMapping("/api/admin/system/config")
 public class OpenSystemConfigController {
@@ -73,7 +71,8 @@ public class OpenSystemConfigController {
   }
 
   @PutMapping("/update/{dictType}")
-  public void updateConfig(@PathVariable String dictType, @RequestBody List<SysDictData> dictDataList) {
+  public void updateConfig(
+      @PathVariable String dictType, @RequestBody List<SysDictData> dictDataList) {
     systemConfigService.updateConfig(dictType, dictDataList);
   }
 

@@ -10,7 +10,6 @@ import com.gameplat.common.model.entity.MemberLogOper;
 import com.gameplat.common.model.vo.MemberLogVO;
 import com.gameplat.log.annotation.Log;
 import com.gameplat.log.enums.LogType;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -26,7 +25,6 @@ import java.util.List;
  */
 @Slf4j
 @RestController
-@RequiredArgsConstructor
 @RequestMapping("/api/admin/operator/logs")
 public class OperLogsController {
 

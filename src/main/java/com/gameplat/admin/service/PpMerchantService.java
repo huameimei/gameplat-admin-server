@@ -3,10 +3,11 @@ package com.gameplat.admin.service;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.gameplat.admin.model.domain.PpMerchant;
 import com.gameplat.admin.model.dto.PpMerchantAddDTO;
 import com.gameplat.admin.model.dto.PpMerchantEditDTO;
 import com.gameplat.admin.model.vo.PpMerchantVO;
+import com.gameplat.model.entity.pay.PpMerchant;
+
 import java.util.List;
 
 public interface PpMerchantService extends IService<PpMerchant> {

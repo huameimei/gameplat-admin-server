@@ -2,9 +2,10 @@ package com.gameplat.admin.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.gameplat.admin.model.domain.QuickReply;
 import com.gameplat.admin.model.dto.QuickReplyDTO;
 import com.gameplat.admin.model.vo.QuickReplyVO;
+import com.gameplat.model.entity.QuickReply;
+
 import java.util.List;
 
 public interface QuickReplyService extends IService<QuickReply> {
@@ -18,5 +19,4 @@ public interface QuickReplyService extends IService<QuickReply> {
   void deleteQuickReply(Long id);
 
   List<QuickReply> getByType(String messageType);
-
 }

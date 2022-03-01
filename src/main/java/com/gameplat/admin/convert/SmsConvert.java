@@ -1,9 +1,9 @@
 package com.gameplat.admin.convert;
 
-import com.gameplat.admin.model.domain.SysSMS;
 import com.gameplat.admin.model.dto.OperSmsDTO;
 import com.gameplat.admin.model.dto.SmsDTO;
 import com.gameplat.admin.model.vo.SMSVO;
+import com.gameplat.model.entity.sys.SysSMS;
 import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")

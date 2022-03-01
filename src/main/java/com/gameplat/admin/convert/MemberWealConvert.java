@@ -1,9 +1,9 @@
 package com.gameplat.admin.convert;
 
-import com.gameplat.admin.model.domain.MemberWeal;
 import com.gameplat.admin.model.dto.MemberWealAddDTO;
 import com.gameplat.admin.model.dto.MemberWealEditDTO;
 import com.gameplat.admin.model.vo.MemberWealVO;
+import com.gameplat.model.entity.member.MemberWeal;
 import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")

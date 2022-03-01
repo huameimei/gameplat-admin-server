@@ -4,24 +4,22 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.gameplat.admin.model.domain.Member;
-import com.gameplat.admin.model.domain.MessageInfo;
-import com.gameplat.admin.model.domain.MessageDistribute;
-import com.gameplat.admin.model.dto.MessageInfoAddDTO;
 import com.gameplat.admin.model.dto.MessageDistributeQueryDTO;
+import com.gameplat.admin.model.dto.MessageInfoAddDTO;
 import com.gameplat.admin.model.dto.MessageInfoEditDTO;
 import com.gameplat.admin.model.dto.MessageInfoQueryDTO;
-import com.gameplat.admin.model.vo.MemberVO;
 import com.gameplat.admin.model.vo.MessageDictDataVO;
 import com.gameplat.admin.model.vo.MessageDistributeVO;
 import com.gameplat.admin.model.vo.MessageInfoVO;
+import com.gameplat.model.entity.member.Member;
+import com.gameplat.model.entity.message.Message;
 
 /**
  * 消息业务处理
  *
  * @author kenvin
  */
-public interface MessageInfoService extends IService<MessageInfo> {
+public interface MessageInfoService extends IService<Message> {
 
   /**
    * 获取数据字典数据
@@ -38,7 +36,7 @@ public interface MessageInfoService extends IService<MessageInfo> {
    * @return
    */
   IPage<MessageInfoVO> findMessageList(
-      PageDTO<MessageInfo> page, MessageInfoQueryDTO messageInfoQueryDTO);
+      PageDTO<Message> page, MessageInfoQueryDTO messageInfoQueryDTO);
 
   /**
    * 新增个人消息
@@ -63,7 +61,9 @@ public interface MessageInfoService extends IService<MessageInfo> {
 
   /**
    * 查询分发用户列表
+   *
    * @return
    */
-  IPage<MessageDistributeVO> findMessageDistributeList(Page<Member> page, MessageDistributeQueryDTO messageDistributeQueryDTO);
+  IPage<MessageDistributeVO> findMessageDistributeList(
+      Page<Member> page, MessageDistributeQueryDTO messageDistributeQueryDTO);
 }

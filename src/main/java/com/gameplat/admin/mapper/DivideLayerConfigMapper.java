@@ -31,4 +31,7 @@ public interface DivideLayerConfigMapper extends BaseMapper<DivideLayerConfig> {
     Integer countTeam(@Param("userName") String userName);
 
     BigDecimal getChildMaxDivideRatio(@Param("userName") String userName, @Param("code") String code);
+
+    String getConfigByGameCode(@Param("userName") String userName,
+                               @Param("code") String code);
 }

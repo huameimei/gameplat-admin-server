@@ -3,6 +3,7 @@ package com.gameplat.admin.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.gameplat.admin.model.domain.proxy.DivideFissionConfig;
 import com.gameplat.admin.model.dto.DivideConfigDTO;
+import com.gameplat.admin.model.vo.GameDivideVo;
 
 import java.util.Map;
 
@@ -19,4 +20,8 @@ public interface DivideFissionConfigService extends IService<DivideFissionConfig
     void edit(DivideConfigDTO divideConfigDTO, String lang);
 
     void remove(String ids);
+
+    GameDivideVo getConfigByFirstCode(String superName, String code);
+
+    DivideFissionConfig getByAccount(String account);
 }

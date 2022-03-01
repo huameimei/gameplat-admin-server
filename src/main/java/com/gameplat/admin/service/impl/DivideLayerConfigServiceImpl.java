@@ -216,7 +216,7 @@ public class DivideLayerConfigServiceImpl extends ServiceImpl<DivideLayerConfigM
         Map<String,JSONObject> ownerLayerConfigMap = JSONUtil.toBean(ownerLayerConfig.getDivideConfig(),Map.class);
 
         Map<String, JSONObject> parentLayerConfigMap = new HashMap<>();
-        if (member.getAgentLevel() > 1) {
+        if (member.getAgentLevel() > 0) {
             DivideLayerConfig parentLayerConfig = layerConfigMapper.getByUserName(member.getParentName());
             if (BeanUtil.isEmpty(parentLayerConfig) || StrUtil.isBlank(parentLayerConfig.getDivideConfig())) {
                 throw new ServiceException("上级代理：" + member.getParentName() + "未设置分红配置,无法添加");
@@ -250,7 +250,7 @@ public class DivideLayerConfigServiceImpl extends ServiceImpl<DivideLayerConfigM
                 }
                 if (dictData.getDictValue().equalsIgnoreCase(voMap.getValue().getStr("liveGameCode"))) {
                     // 填充最大可编辑的分红点数值
-                    if (member.getAgentLevel() == 1) {
+                    if (member.getAgentLevel() == 0) {
                         voMap.getValue().put("maxRatio", new BigDecimal("100"));
                     } else {
                         // 如果不是顶级代理 则可调整的最大值就是他直属上级被直属上级的直属上级所分配的分红比例 即 他直属上级的divideRatio值
@@ -305,8 +305,6 @@ public class DivideLayerConfigServiceImpl extends ServiceImpl<DivideLayerConfigM
         }
     }
 
-
-
     /**
      * 添加层层代分红配置
      * @param divideConfigDTO
@@ -323,57 +321,50 @@ public class DivideLayerConfigServiceImpl extends ServiceImpl<DivideLayerConfigM
                 .build();
 
         Map<String,GameDivideVo> saveMap = new HashMap<>();
-        if (member.getAgentLevel() != 1) {
-            // 判断直属上级是否添加了分红  系统默认代理不用判断
-            if (!member.getParentName().equalsIgnoreCase(SystemConstant.DEFAULT_WEB_ROOT) &&
-                    !member.getParentName().equalsIgnoreCase(SystemConstant.DEFAULT_TEST_ROOT) &&
-                        !member.getParentName().equalsIgnoreCase(SystemConstant.DEFAULT_WAP_ROOT)) {
-                Assert.isTrue(StrUtil.isNotBlank(member.getSuperPath()), "代理路径为空！");
-                // 顶级上级名称
-                String realSuperName = this.getRealSuperName(member.getSuperPath());
-                DivideLayerConfig superParentDivide = layerConfigMapper.getByUserName(realSuperName);
-                if (BeanUtil.isEmpty(superParentDivide) || StrUtil.isBlank(superParentDivide.getDivideConfig())) {
-                    throw new ServiceException("上级代理未添加分红！");
-                }
-
-                DivideLayerConfig parentDivide = new DivideLayerConfig();
-                // 判断顶级上级和直属上级是不是同一个  是得话 可以避免一次查询
-                if (member.getParentName().equalsIgnoreCase(realSuperName)) {
-                    parentDivide = superParentDivide;
-                } else {
-                    parentDivide = layerConfigMapper.getByUserName(member.getParentName());
-                }
-                if (BeanUtil.isEmpty(parentDivide) || StrUtil.isBlank(parentDivide.getDivideConfig())) {
-                    throw new ServiceException("上级代理未添加分红！");
-                }
-
-                // 将顶级的分红配置格式化取出来
-                Map<String, JSONObject> superConfigMap = JSONUtil.toBean(superParentDivide.getDivideConfig(), Map.class);
-                Map<String, JSONObject> parentConfigMap = JSONUtil.toBean(parentDivide.getDivideConfig(), Map.class);
-                for (Map.Entry<String, JSONObject> divMap: superConfigMap.entrySet()) {
-                    // 一级游戏编码
-                    String code = divMap.getKey();
-                    JSONObject json = divMap.getValue();
-                    GameDivideVo saveVo = GameDivideVo.builder()
-                            .liveGameName(json.getStr("liveGameName"))//游戏大类名称
-                            .liveGameCode(json.getStr("liveGameCode"))//游戏大类编码
-                            .code(json.getStr("code"))//一级游戏编码
-                            .name(json.getStr("name"))//一级游戏名称
-                            .amountRatio(json.getBigDecimal("amountRatio"))//金额比例
-                            .settleType(json.getInt("settleType"))//结算方式
-                            .divideRatio(BigDecimal.ZERO)//分红比例
-                            .build();
-                    if (ObjectUtils.isNull(parentConfigMap.get(code))) {
-                        saveVo.setParentDivideRatio(BigDecimal.ZERO);
-                    } else {
-                        saveVo.setParentDivideRatio(parentConfigMap.get(code).getBigDecimal("divideRatio"));
-                    }
-                    saveMap.put(code,saveVo);
-                }
-                saveObj.setDivideConfig(JSONUtil.toJsonStr(saveMap));
-            } else {// 走初始化流程
-                saveObj.setDivideConfig(recommendConfigService.initDivideConfig(lang));
+        if (member.getAgentLevel() > 1) {
+            Assert.isTrue(StrUtil.isNotBlank(member.getSuperPath()), "代理路径为空！");
+            // 顶级上级名称
+            String realSuperName = this.getRealSuperName(member.getSuperPath(), member.getAgentLevel());
+            DivideLayerConfig superParentDivide = layerConfigMapper.getByUserName(realSuperName);
+            if (BeanUtil.isEmpty(superParentDivide) || StrUtil.isBlank(superParentDivide.getDivideConfig())) {
+                throw new ServiceException("上级代理未添加分红！");
             }
+
+            DivideLayerConfig parentDivide = new DivideLayerConfig();
+            // 判断顶级上级和直属上级是不是同一个  是得话 可以避免一次查询
+            if (member.getParentName().equalsIgnoreCase(realSuperName)) {
+                parentDivide = superParentDivide;
+            } else {
+                parentDivide = layerConfigMapper.getByUserName(member.getParentName());
+            }
+            if (BeanUtil.isEmpty(parentDivide) || StrUtil.isBlank(parentDivide.getDivideConfig())) {
+                throw new ServiceException("上级代理未添加分红！");
+            }
+
+            // 将顶级的分红配置格式化取出来
+            Map<String, JSONObject> superConfigMap = JSONUtil.toBean(superParentDivide.getDivideConfig(), Map.class);
+            Map<String, JSONObject> parentConfigMap = JSONUtil.toBean(parentDivide.getDivideConfig(), Map.class);
+            for (Map.Entry<String, JSONObject> divMap: superConfigMap.entrySet()) {
+                // 一级游戏编码
+                String code = divMap.getKey();
+                JSONObject json = divMap.getValue();
+                GameDivideVo saveVo = GameDivideVo.builder()
+                        .liveGameName(json.getStr("liveGameName"))//游戏大类名称
+                        .liveGameCode(json.getStr("liveGameCode"))//游戏大类编码
+                        .code(json.getStr("code"))//一级游戏编码
+                        .name(json.getStr("name"))//一级游戏名称
+                        .amountRatio(json.getBigDecimal("amountRatio"))//金额比例
+                        .settleType(json.getInt("settleType"))//结算方式
+                        .divideRatio(BigDecimal.ZERO)//分红比例
+                        .build();
+                if (ObjectUtils.isNull(parentConfigMap.get(code))) {
+                    saveVo.setParentDivideRatio(BigDecimal.ZERO);
+                } else {
+                    saveVo.setParentDivideRatio(parentConfigMap.get(code).getBigDecimal("divideRatio"));
+                }
+                saveMap.put(code,saveVo);
+            }
+            saveObj.setDivideConfig(JSONUtil.toJsonStr(saveMap));
         } else {// 也走初始化流程
             saveObj.setDivideConfig(recommendConfigService.initDivideConfig(lang));
         }
@@ -506,10 +497,12 @@ public class DivideLayerConfigServiceImpl extends ServiceImpl<DivideLayerConfigM
      * @param oldSuperPath
      * @return
      */
-    public String getRealSuperPath(String oldSuperPath) {
-        oldSuperPath = oldSuperPath.replace("/".concat(SystemConstant.DEFAULT_WEB_ROOT).concat("/"),"");
-        oldSuperPath = oldSuperPath.replace("/".concat(SystemConstant.DEFAULT_TEST_ROOT).concat("/"),"");
-        oldSuperPath = oldSuperPath.replace("/".concat(SystemConstant.DEFAULT_WAP_ROOT).concat("/"),"");
+    public String getRealSuperPath(String oldSuperPath, Integer userLevel) {
+        if (userLevel > 1) {
+            oldSuperPath = oldSuperPath.replace("/".concat(SystemConstant.DEFAULT_WEB_ROOT).concat("/"),"");
+            oldSuperPath = oldSuperPath.replace("/".concat(SystemConstant.DEFAULT_TEST_ROOT).concat("/"),"");
+            oldSuperPath = oldSuperPath.replace("/".concat(SystemConstant.DEFAULT_WAP_ROOT).concat("/"),"");
+        }
         return oldSuperPath;
     }
 
@@ -518,8 +511,9 @@ public class DivideLayerConfigServiceImpl extends ServiceImpl<DivideLayerConfigM
      * @param superPath
      * @return
      */
-    public String getRealSuperName(String superPath){
-        superPath = getRealSuperPath(superPath);
+    @Override
+    public String getRealSuperName(String superPath, Integer userLevel){
+        superPath = getRealSuperPath(superPath, userLevel);
         if (superPath.startsWith("/")) {
             superPath = superPath.substring(1);
         }
@@ -527,6 +521,16 @@ public class DivideLayerConfigServiceImpl extends ServiceImpl<DivideLayerConfigM
             superPath = superPath.substring(0, superPath.length()-1);
         }
         return superPath.split("/")[0];
+    }
+
+    @Override
+    public GameDivideVo getConfigByGameCode(String userName, String code) {
+        String configByNameAndCode = layerConfigMapper.getConfigByGameCode(userName, code);
+        if (StrUtil.isBlank(configByNameAndCode)) {
+            return new GameDivideVo();
+        } else {
+            return JSONUtil.toBean(configByNameAndCode,GameDivideVo.class);
+        }
     }
 
     /**

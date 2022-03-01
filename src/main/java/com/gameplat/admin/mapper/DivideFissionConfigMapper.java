@@ -14,4 +14,7 @@ import org.apache.ibatis.annotations.Select;
 public interface DivideFissionConfigMapper extends BaseMapper<DivideFissionConfig> {
     @Select("select * from divide_fission_config where user_name = #{userName}")
     DivideFissionConfig getByUserName(@Param("userName") String userName);
+
+    String getConfigByGameCode(@Param("superName") String superName,
+                               @Param("code") String code);
 }

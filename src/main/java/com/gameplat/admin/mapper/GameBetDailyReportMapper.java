@@ -51,5 +51,6 @@ public interface GameBetDailyReportMapper extends BaseMapper<GameBetDailyReport>
    * @return
    */
   List<DivideGameReportVO> findReportForDivide(@Param("startDate") String startDate,
-                                               @Param("endDate") String endDate);
+                                               @Param("endDate") String endDate,
+                                               @Param("isIncludeAgent") Integer isIncludeAgent);
 }

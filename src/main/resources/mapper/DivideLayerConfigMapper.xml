@@ -91,4 +91,10 @@
 	        where m.parent_name = #{userName} and m.account != #{userName}
 	    ) tmp
     </select>
+
+    <select id="getConfigByGameCode" resultType="string">
+        select
+            JSON_UNQUOTE(json_extract(divide_config,CONCAT('$.',concat('"', concat(#{code},'"')))))
+        from divide_layer_config where user_name = #{userName}
+    </select>
 </mapper>

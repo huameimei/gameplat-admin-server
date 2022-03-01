@@ -32,6 +32,7 @@ import com.gameplat.base.common.util.StringUtils;
 import com.gameplat.common.enums.*;
 import com.gameplat.common.enums.MemberEnums;
 import com.gameplat.common.model.bean.Builder;
+import com.gameplat.common.model.bean.UserEquipment;
 import com.gameplat.common.model.bean.limit.MemberRechargeLimit;
 import com.gameplat.security.context.UserCredential;
 import jodd.util.StringUtil;
@@ -214,7 +215,8 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
       Integer curStatus,
       boolean isDirect,
       String approveReason,
-      UserCredential userCredential) throws Exception {
+      UserCredential userCredential,
+      UserEquipment userEquipment) throws Exception {
     if (cashStatus.equals(curStatus) || null == id || null == cashStatus || null == curStatus) {
       throw new ServiceException("错误的参数.");
     }
@@ -293,7 +295,7 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
         validWithdrawService.remove(memberWithdraw.getMemberId(), memberWithdraw.getCreateTime());
         // 免提直充
         if (isDirect) {
-          this.directCharge(memberWithdraw, userCredential);
+          this.directCharge(memberWithdraw, userCredential,userEquipment);
         }
 
       } else if (WithdrawStatus.CANCELLED.getValue() == cashStatus) { // 取消出款操作
@@ -619,7 +621,7 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
    * @param userCredential
    * @throws Exception
    */
-  public void directCharge(MemberWithdraw memberWithdraw, UserCredential userCredential) throws Exception {
+  public void directCharge(MemberWithdraw memberWithdraw, UserCredential userCredential,UserEquipment userEquipment) throws Exception {
     String configValue = configService.getValue(DictDataEnum.DIRECT_CHARGE);
     Optional.ofNullable(configValue).orElseThrow(() -> new ServiceException("免提直充配置异常，请检查配置是否正确。"));
     DirectCharge directCharge = JSON.parseObject(configValue, DirectCharge.class);
@@ -671,7 +673,7 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
         .with(ManualRechargeOrderBo::setDiscountType, discountType)
         .with(ManualRechargeOrderBo::setRemarks, directCharge.getRemarks())
         .build();
-    rechargeOrderService.manual(manualRechargeOrderBo, userCredential);
+    rechargeOrderService.manual(manualRechargeOrderBo, userCredential,userEquipment);
     log.info("\n免提直充配置:{},\n充值信息： 会员账号：{}，入款金额：{}，优惠金额：{}，常态打码量：{},优惠打码量：{},备注：{},层级：{}",
         directCharge.toString(),
         manualRechargeOrderBo.getAccount(), manualRechargeOrderBo.getAmount(),

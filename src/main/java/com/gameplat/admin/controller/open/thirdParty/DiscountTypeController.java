@@ -8,6 +8,9 @@ import com.gameplat.admin.model.dto.DiscountTypeAddDTO;
 import com.gameplat.admin.model.dto.DiscountTypeEditDTO;
 import com.gameplat.admin.service.DiscountTypeService;
 import com.gameplat.base.common.enums.EnableEnum;
+import com.gameplat.common.constant.ServiceName;
+import com.gameplat.log.annotation.Log;
+import com.gameplat.log.enums.LogType;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -28,24 +31,28 @@ public class DiscountTypeController {
 
   @DeleteMapping("/remove/{id}")
   @PreAuthorize("hasAuthority('thirdParty:discountType:remove')")
+  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.RECHARGE, desc = "'删除：' + #id")
   public void remove(@PathVariable Long id) {
     discountTypeService.delete(id);
   }
 
   @PostMapping("/add")
   @PreAuthorize("hasAuthority('thirdParty:discountType:add')")
+  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.RECHARGE, desc = "新增优惠类型")
   public void add(@RequestBody DiscountTypeAddDTO dto) {
     discountTypeService.save(dto);
   }
 
   @PostMapping("/edit")
   @PreAuthorize("hasAuthority('thirdParty:discountType:edit')")
+  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.RECHARGE, desc = "修改优惠类型")
   public void edit(@RequestBody DiscountTypeEditDTO dto) {
     discountTypeService.update(dto);
   }
 
   @PostMapping("/editStatus")
   @PreAuthorize("hasAuthority('thirdParty:discountType:editStatus')")
+  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.RECHARGE, desc = "'修改优惠状态：' + status")
   public void updateStatus(Long id, Integer status) {
     discountTypeService.updateStatus(id, status);
   }

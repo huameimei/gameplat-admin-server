@@ -23,6 +23,7 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
@@ -89,16 +90,14 @@ public class ActivityInfoController {
      * 新增活动
      *
      * @param activityInfoAddDTO
-     * @param country
      */
     @ApiOperation(value = "新增活动")
     @PostMapping("/add")
     @PreAuthorize("hasAuthority('activity:info:add')")
     public void add(
-            @RequestBody ActivityInfoAddDTO activityInfoAddDTO,
-            @RequestHeader(value = "country", required = false, defaultValue = "zh-CN") String country) {
+            @RequestBody ActivityInfoAddDTO activityInfoAddDTO) {
         checkActivityInfo(activityInfoAddDTO.getValidStatus(), activityInfoAddDTO.getEndTime(), activityInfoAddDTO.getBeginTime(), activityInfoAddDTO.getActivityLobbyId(), activityInfoAddDTO.getId());
-        activityInfoService.add(activityInfoAddDTO, country);
+        activityInfoService.add(activityInfoAddDTO, LocaleContextHolder.getLocale().getLanguage());
     }
 
     /**
@@ -126,16 +125,14 @@ public class ActivityInfoController {
      * 编辑活动
      *
      * @param activityInfoUpdateDTO
-     * @param country
      */
     @ApiOperation(value = "编辑活动")
     @PostMapping("/update")
     @PreAuthorize("hasAuthority('activity:info:update')")
     public void update(
-            @RequestBody ActivityInfoUpdateDTO activityInfoUpdateDTO,
-            @RequestHeader(value = "country", required = false, defaultValue = "zh-CN") String country) {
+            @RequestBody ActivityInfoUpdateDTO activityInfoUpdateDTO) {
         checkActivityInfo(activityInfoUpdateDTO.getValidStatus(), activityInfoUpdateDTO.getEndTime(), activityInfoUpdateDTO.getBeginTime(), activityInfoUpdateDTO.getActivityLobbyId(), activityInfoUpdateDTO.getId());
-        activityInfoService.update(activityInfoUpdateDTO, country);
+        activityInfoService.update(activityInfoUpdateDTO, LocaleContextHolder.getLocale().getLanguage());
     }
 
     /**

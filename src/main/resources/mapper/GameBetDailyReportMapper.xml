@@ -23,8 +23,8 @@
       ifnull( b.real_rebate_money, 0 ) rebateMoney,
       (
       a.win_amount - ifnull( b.real_rebate_money, 0 )) companyAmount ,
-      a.game_type platformCode,
-      a.platformName platformName
+      a.game_type gameTypeCode,
+      a.game_type_name gameTypeName
     FROM
       (
       SELECT
@@ -36,7 +36,7 @@
           sum( t.win_amount ) win_amount,
           t.game_kind ,
           t.game_type game_type,
-          d.dict_label platformName
+          d.dict_label game_type_name
       FROM
       game_bet_daily_report t
       LEFT JOIN sys_dict_data d on d.dict_type = 'LIVE_GAME_TYPE' and d.dict_value = t.game_type
@@ -265,42 +265,16 @@
   </select>
 
 
-  <insert id="saveMemberDayReport">
-    INSERT INTO game_bet_daily_report (account, bet_amount, valid_amount, win_amount, stat_time,
-                                      game_code, game_kind, first_kind, create_time, bet_count,
-                                      win_count, revenue, member_id, real_name, user_paths)
-    SELECT ts.*, u.id, u.real_name, u.super_path AS user_paths
-    FROM (
-           SELECT re.account,
-                  SUM(re.bet_amount)               AS bet_amount,
-                  SUM(re.valid_amount)             AS valid_amount,
-                  SUM(re.win_amount)               AS win_amount,
-                  re.rebate_time                   as stat_time,
-                  #{gamePlatform.code}             AS game_code,
-                  re.game_kind,
-                  re.first_kind,
-                  SYSDATE()                        AS create_time,
-                  COUNT(1)                         AS bet_count,
-                  SUM(IF(re.win_amount > 0, 1, 0)) AS win_count,
-                  SUM(re.revenue)                  as revenue
-           FROM ${tableName} re
-           WHERE 1 = 1
-             AND re.rebate_time = #{statTime}
-             AND re.settle = 1
-           GROUP BY re.account, re.game_kind) ts
-           JOIN member u ON ts.account = u.account
-  </insert>
-
   <!-- 插入投注日报表 -->
   <insert id="insertGameBetDailyReport">
     INSERT INTO game_bet_daily_report
     (member_id,account,real_name,user_paths,platform_code,game_kind,game_type,bet_amount,
-    valid_amount,win_amount,revenue,bet_count,win_count,stat_time,create_time
+    valid_amount,win_amount,bet_count,win_count,stat_time,create_time
     ) VALUES
     <foreach collection="list" item="item" index="index" separator=",">
       ( #{item.memberId}, #{item.account},#{item.realName},#{item.userPaths},
       #{item.platformCode},#{item.gameKind},#{item.gameType},#{item.betAmount},
-      #{item.validAmount},#{item.winAmount},#{item.revenue},#{item.betCount},
+      #{item.validAmount},#{item.winAmount},#{item.betCount},
       #{item.winCount},#{item.statTime},sysdate()
       )
     </foreach>
@@ -312,4 +286,72 @@
     revenue = VALUES(revenue),
     update_time = sysdate()
   </insert>
+
+  <select id="queryGamePlatformReport"   resultType="com.gameplat.admin.model.vo.GameReportVO">
+    SELECT s1.betAmount,
+           s1.validAmount,
+           s1.gameCount,
+           s1.winAmount,
+           s1.userNumber,
+           s1.platform_code platformCode,
+           IF(s2.rebateMoney is null,0,s2.rebateMoney) rebateMoney,
+           s1.winAmount - IF(s2.rebateMoney is null,0,s2.rebateMoney) companyAmount
+    from (
+        SELECT
+          sum(dr.bet_amount) betAmount,
+          sum(dr.valid_amount) validAmount,
+          sum(dr.bet_count) gameCount,
+          sum(dr.win_amount) winAmount,
+          count(DISTINCT dr.account) userNumber,
+          dr.platform_code
+          FROM game_bet_daily_report dr  where 1 = 1
+            <if test="beginTime != null and endTime != null">
+              and dr.stat_time BETWEEN #{beginTime} AND #{endTime}
+            </if>
+            <if test="userPaths != null and userPaths != ''">
+              and dr.user_paths like contact(#{userPaths},'%')
+            </if>
+            <if test="account != null and account != ''">
+              and dr.account = #{account}
+            </if>
+            GROUP BY dr.platform_code) s1 LEFT JOIN (
+        SELECT
+          sum(rr.real_rebate_money) rebateMoney,
+             rr.platform_code
+         FROM game_rebate_report rr where 1=1
+        <if test="beginTime != null and endTime != null">
+          and rr.stat_time BETWEEN #{beginTime} AND #{endTime}
+        </if>
+        <if test="userPaths != null and userPaths != ''">
+          and rr.user_paths like contact(#{userPaths},'%')
+        </if>
+        <if test="account != null and account != ''">
+          and rr.account = #{account}
+        </if>
+        GROUP BY rr.platform_code) s2
+      on s1.platform_code = s2.platform_code
+  </select>
+
+
+    <select id="findReportForDivide" resultType="com.gameplat.admin.model.vo.DivideGameReportVO">
+        SELECT
+            r.member_id as memberId,
+            r.account as account,
+            r.super_id as superId,
+            r.super_account as superAccount,
+            r.user_paths as userPaths,
+            r.user_type as userType,
+            r.game_kind as gameKind,
+            r.game_type as gameType,
+            IFNULL(SUM(r.valid_amount),0) as validAmount,
+            IFNULL(SUM(r.win_amount),0) as winAmount,
+            m.agent_level as agentLevel
+        FROM `game_bet_daily_report` as r
+        inner join member as m on r.account = m.account
+        where DATE_FORMAT(r.stat_time,'%Y-%m-%d')
+        BETWEEN DATE_FORMAT(#{startDate},'%Y-%m-%d') and DATE_FORMAT(#{endDate},'%Y-%m-%d')
+        GROUP BY r.account,r.super_id,r.super_account,r.user_paths,r.user_type,r.game_kind,r.game_type
+    </select>
+
+
 </mapper>

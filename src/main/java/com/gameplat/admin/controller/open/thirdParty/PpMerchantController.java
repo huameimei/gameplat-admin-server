@@ -7,7 +7,10 @@ import com.gameplat.admin.model.dto.PpMerchantAddDTO;
 import com.gameplat.admin.model.dto.PpMerchantEditDTO;
 import com.gameplat.admin.model.vo.PpMerchantVO;
 import com.gameplat.admin.service.PpMerchantService;
+import com.gameplat.common.constant.ServiceName;
 import com.gameplat.common.enums.SwitchStatusEnum;
+import com.gameplat.log.annotation.Log;
+import com.gameplat.log.enums.LogType;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -28,6 +31,7 @@ public class PpMerchantController {
 
   @DeleteMapping("/remove/{id}")
   @PreAuthorize("hasAuthority('thirdParty:ppMerchants:remove')")
+  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.WITHDRAW, desc = "'删除出款商户id=' + #id")
   public void remove(@PathVariable Long id) {
     ppMerchantService.delete(id);
   }
@@ -40,18 +44,21 @@ public class PpMerchantController {
 
   @PostMapping("/add")
   @PreAuthorize("hasAuthority('thirdParty:ppMerchants:add')")
+  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.WITHDRAW, desc = "'新增出款商户name=' + #dto.name")
   public void add(@RequestBody PpMerchantAddDTO dto) {
     ppMerchantService.save(dto);
   }
 
   @PostMapping("/edit")
   @PreAuthorize("hasAuthority('thirdParty:ppMerchants:edit')")
+  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.WITHDRAW, desc = "'修改出款商户id=' + #dto.id")
   public void edit(@RequestBody PpMerchantEditDTO dto) {
     ppMerchantService.update(dto);
   }
 
   @PostMapping("/editStatus")
   @PreAuthorize("hasAuthority('thirdParty:ppMerchants:editStatus')")
+  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.WITHDRAW, desc = "'修改出款商户状态id=' + #id")
   public void updateStatus(Long id, Integer status) {
     ppMerchantService.updateStatus(id, status);
   }

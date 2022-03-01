@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiModelProperty;
 
 import java.io.Serializable;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -25,7 +26,7 @@ public class ActivityLobbyUpdateStatusDTO implements Serializable {
     @ApiModelProperty(value = "主键")
     private Long id;
 
-    @NotBlank(message = "活动类型必选")
+    @NotNull(message = "活动类型必选")
     @ApiModelProperty(value = "活动类型（1 充值活动，2 游戏活动")
     private Integer activityType;
 
@@ -36,7 +37,7 @@ public class ActivityLobbyUpdateStatusDTO implements Serializable {
     @ApiModelProperty(value = "ip黑名单")
     private String ipBlacklist;
 
-    @NotBlank(message = "活动状态必选")
+    @NotNull(message = "活动状态必选")
     @ApiModelProperty(value = "活动状态（0 关闭，1 开启，2 失效）")
     private Integer status;
 

@@ -70,10 +70,6 @@ public class GameMemberDayReportVO implements Serializable {
    */
   private BigDecimal validAmount;
 
-  /**
-   * 水钱
-   */
-  private BigDecimal revenue;
 
   /**
    * 中奖金额

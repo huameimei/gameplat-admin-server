@@ -290,6 +290,7 @@ public class DivideLayerConfigServiceImpl extends ServiceImpl<DivideLayerConfigM
 
     @Override
     public void remove(String ids) {
+        Assert.isTrue(StrUtil.isNotBlank(ids),"参数为空！");
         String[] idArr = ids.split(",");
         for (String idStr: idArr) {
             DivideLayerConfig layerConfig = layerConfigMapper.selectById(idStr);

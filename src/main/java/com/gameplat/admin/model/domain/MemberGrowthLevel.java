@@ -122,4 +122,13 @@ public class MemberGrowthLevel implements Serializable {
 
     @ApiModelProperty("WEB端未达成VIP图片")
     private String webUnreachVipImage;
+
+    @ApiModelProperty("金币成长值比例")
+    private BigDecimal coinRatio;
+
+    @ApiModelProperty("金币最大获取数")
+    private Integer maxCoin;
+
+    @ApiModelProperty("金币最大获取数")
+    private Integer dailyMaxCoin;
 }

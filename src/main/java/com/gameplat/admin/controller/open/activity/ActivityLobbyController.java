@@ -14,7 +14,6 @@ import com.gameplat.admin.model.vo.CodeDataVO;
 import com.gameplat.admin.model.vo.GameKindVO;
 import com.gameplat.admin.service.ActivityLobbyService;
 import com.gameplat.admin.service.GameKindService;
-import com.gameplat.admin.service.GameService;
 import com.gameplat.admin.service.SysDictDataService;
 import com.gameplat.base.common.enums.EnableEnum;
 import com.gameplat.base.common.exception.ServiceException;
@@ -51,9 +50,6 @@ public class ActivityLobbyController {
 
     @Autowired
     private SysDictDataService sysDictDataService;
-
-    @Autowired
-    private GameService gameService;
 
     @Autowired
     private GameKindService gameKindService;
@@ -195,8 +191,7 @@ public class ActivityLobbyController {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "gameTypeCode", value = "游戏类型"),
     })
-    public List<GameKindVO> getGameKindInBanner(@RequestParam String gameTypeCode) {
-//        List<GameVO> gameList = gameService.findByGameTypeCode(gameTypeCode);
+    public List<GameKindVO> getGameKindInBanner(String gameTypeCode) {
         return gameKindService.getGameKindInBanner(gameTypeCode);
     }
 }

@@ -8,6 +8,7 @@ import lombok.EqualsAndHashCode;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.Date;
@@ -32,7 +33,7 @@ public class ActivityInfoUpdateDTO implements Serializable {
   @ApiModelProperty(value = "类型")
   private Integer activityType;
 
-  @NotNull(message = "活动标题不能为空")
+  @NotBlank(message = "活动标题不能为空")
   @ApiModelProperty(value = "活动标题")
   private String title;
 
@@ -78,11 +79,11 @@ public class ActivityInfoUpdateDTO implements Serializable {
   @ApiModelProperty(value = "活动有效状态（1永久有效 2有时限）")
   private Integer validStatus;
 
-  @NotNull(message = "活动开始时间不能为空")
+  @NotBlank(message = "活动开始时间不能为空")
   @ApiModelProperty(value = "活动开始时间")
   private String beginTime;
 
-  @NotNull(message = "活动结束时间不能为空")
+  @NotBlank(message = "活动结束时间不能为空")
   @ApiModelProperty(value = "活动结束时间")
   private String endTime;
 

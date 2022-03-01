@@ -16,6 +16,7 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -54,7 +55,7 @@ public class OpenBannerController {
     public IPage<SysBannerInfoVO> list(
             @ApiIgnore PageDTO<SysBannerInfo> page,
             @RequestParam(defaultValue = "zh-CN") String language, Integer type) {
-        return sysBannerInfoService.list(page, language, type);
+        return sysBannerInfoService.list(page, LocaleContextHolder.getLocale().toLanguageTag(), type);
     }
 
     /**

@@ -9,10 +9,15 @@ import com.gameplat.admin.model.dto.MemberWithdrawQueryDTO;
 import com.gameplat.admin.model.vo.MemberWithdrawVO;
 import com.gameplat.admin.model.vo.SummaryVO;
 import com.gameplat.admin.service.MemberWithdrawService;
+import com.gameplat.common.constant.ServiceName;
+import com.gameplat.common.model.bean.UserEquipment;
+import com.gameplat.log.annotation.Log;
+import com.gameplat.log.enums.LogType;
 import com.gameplat.security.SecurityUserHolder;
 import com.gameplat.security.context.UserCredential;
 import java.math.BigDecimal;
 import java.util.List;
+import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -28,21 +33,24 @@ public class MemberWithdrawController {
 
   @PostMapping("/modifyCashStatus")
   @PreAuthorize("hasAuthority('finance:memberWithdraw:modifyCashStatus')")
+  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.WITHDRAW, desc = "'修改提款订单状态为:' + #cashStatus")
   public void modifyCashStatus(Long id, Integer cashStatus, Integer curStatus, boolean isDirect,
-      String approveReason) throws Exception{
+      String approveReason,HttpServletRequest request) throws Exception{
     UserCredential userCredential = SecurityUserHolder.getCredential();
-
-    userWithdrawService.modify(id, cashStatus, curStatus, isDirect, approveReason, userCredential);
+    UserEquipment clientInfo = UserEquipment.create(request);
+    userWithdrawService.modify(id, cashStatus, curStatus, isDirect, approveReason, userCredential,clientInfo);
   }
 
   @PostMapping("/editDiscount")
   @PreAuthorize("hasAuthority('finance:memberWithdraw:editDiscount')")
+  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.WITHDRAW, desc = "'修改手续费为:' + #afterCounterFee")
   public void updateDiscount(Long id, BigDecimal afterCounterFee) {
     userWithdrawService.updateCounterFee(id, afterCounterFee);
   }
 
   @PostMapping("/editRemarks")
   @PreAuthorize("hasAuthority('finance:memberWithdraw:editRemarks')")
+  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.WITHDRAW, desc = "'修改备注为:' + #remarks")
   public void updateRemarks(Long id, String remarks) {
     userWithdrawService.updateRemarks(id, remarks);
   }
@@ -61,6 +69,7 @@ public class MemberWithdrawController {
 
   @PostMapping("/save")
   @PreAuthorize("hasAuthority('finance:memberWithdraw:save')")
+  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.WITHDRAW, desc = "'人工出款memberId =' + #memberId")
   public void save(BigDecimal cashMoney, String cashReason, Integer handPoints,Long memberId)
       throws Exception {
     UserCredential userCredential = SecurityUserHolder.getCredential();

@@ -37,4 +37,6 @@ public interface GameBetDailyReportService extends IService<GameBetDailyReport> 
    * @param list List
    */
   void assembleBetDailyReport(List<String> list);
+
+  List<GameReportVO> queryGamePlatformReport(GameBetDailyReportQueryDTO dto);
 }

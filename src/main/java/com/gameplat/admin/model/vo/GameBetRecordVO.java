@@ -1,5 +1,7 @@
 package com.gameplat.admin.model.vo;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.gameplat.common.util.I18nSerializerUtils;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -15,10 +17,6 @@ public class GameBetRecordVO implements Serializable {
      */
     private String billNo;
 
-    /**
-     * 租户编码
-     */
-    private String tenant;
 
     /**
      * 用户名
@@ -38,7 +36,7 @@ public class GameBetRecordVO implements Serializable {
     /**
      * 一级分类
      */
-    private String firstKind;
+    private String gameType;
 
     /**
      * 游戏编码
@@ -48,6 +46,7 @@ public class GameBetRecordVO implements Serializable {
     /**
      * 游戏名称
      */
+    @JsonSerialize(using = I18nSerializerUtils.class)
     private String gameName;
 
     /**
@@ -85,10 +84,6 @@ public class GameBetRecordVO implements Serializable {
      */
     private Date betTime;
 
-    /**
-     * 三方时间
-     */
-    private Date thirdTime;
 
     /**
      * 结算时间

@@ -13,6 +13,7 @@ import com.gameplat.admin.model.dto.RechargeOrderQueryDTO;
 import com.gameplat.admin.model.vo.MemberActivationVO;
 import com.gameplat.admin.model.vo.RechargeOrderVO;
 import com.gameplat.admin.model.vo.SummaryVO;
+import com.gameplat.common.model.bean.UserEquipment;
 import com.gameplat.security.context.UserCredential;
 import org.apache.ibatis.annotations.Param;
 
@@ -39,7 +40,8 @@ public interface RechargeOrderService extends IService<RechargeOrder> {
 
     void updateStatus(Long id, Integer curStatus, Integer newStatus, String auditorAccount);
 
-    void manual(ManualRechargeOrderBo manualRechargeOrderBo, UserCredential userCredential)
+    void manual(ManualRechargeOrderBo manualRechargeOrderBo, UserCredential userCredential,
+        UserEquipment userEquipment)
             throws Exception;
 
     /**

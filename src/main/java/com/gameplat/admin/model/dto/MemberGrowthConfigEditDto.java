@@ -158,7 +158,13 @@ public class MemberGrowthConfigEditDto implements Serializable {
     private String webUnreachVipImage;
 
     @ApiModelProperty("金币成长值比例")
-    private Double coinRatio;
+    private BigDecimal coinRatio;
+
+    @ApiModelProperty("金币最大获取数")
+    private Integer maxCoin;
+
+    @ApiModelProperty("金币最大获取数")
+    private Integer dailyMaxCoin;
 
     @ApiModelProperty("金币成长值速率")
     private Double coinRate;

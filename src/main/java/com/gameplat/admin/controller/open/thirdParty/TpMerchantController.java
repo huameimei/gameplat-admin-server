@@ -8,7 +8,10 @@ import com.gameplat.admin.model.dto.TpMerchantEditDTO;
 import com.gameplat.admin.model.vo.TpMerchantPayTypeVO;
 import com.gameplat.admin.model.vo.TpMerchantVO;
 import com.gameplat.admin.service.TpMerchantService;
+import com.gameplat.common.constant.ServiceName;
 import com.gameplat.common.enums.SwitchStatusEnum;
+import com.gameplat.log.annotation.Log;
+import com.gameplat.log.enums.LogType;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -28,6 +31,7 @@ public class TpMerchantController {
 
   @DeleteMapping("/remove/{id}")
   @PreAuthorize("hasAuthority('thirdParty:tpMerchants:remove')")
+  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.RECHARGE, desc = "'删除入款商户id=' + #id")
   public void remove(@PathVariable Long id) {
     tpMerchantService.delete(id);
   }
@@ -40,18 +44,21 @@ public class TpMerchantController {
 
   @PostMapping("/add")
   @PreAuthorize("hasAuthority('thirdParty:tpMerchants:add')")
+  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.RECHARGE, desc = "'新增入款商户name=' + #dto.name")
   public void add(@RequestBody TpMerchantAddDTO dto) {
     tpMerchantService.save(dto);
   }
 
   @PostMapping("/edit")
   @PreAuthorize("hasAuthority('thirdParty:tpMerchants:edit')")
+  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.RECHARGE, desc = "'修改入款商户id=' + #dto.id")
   public void edit(@RequestBody TpMerchantEditDTO dto) {
     tpMerchantService.update(dto);
   }
 
   @PostMapping("/editStatus")
   @PreAuthorize("hasAuthority('thirdParty:tpMerchants:editStatus')")
+  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.RECHARGE, desc = "'修改入款商户状态id=' + #id")
   public void updateStatus(Long id, Integer status) {
     tpMerchantService.updateStatus(id, status);
   }

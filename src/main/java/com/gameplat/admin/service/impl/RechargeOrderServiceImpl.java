@@ -56,6 +56,7 @@ import com.gameplat.common.enums.LimitEnums;
 import com.gameplat.common.enums.MemberEnums;
 import com.gameplat.common.enums.SwitchStatusEnum;
 import com.gameplat.common.enums.UserTypes;
+import com.gameplat.common.model.bean.UserEquipment;
 import com.gameplat.common.model.bean.limit.MemberRechargeLimit;
 import com.gameplat.security.SecurityUserHolder;
 import com.gameplat.security.context.UserCredential;
@@ -332,11 +333,12 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
    * @throws Exception 校验不通过抛出异常
    */
   @Override
-  public void manual(ManualRechargeOrderBo manualRechargeOrderBo, UserCredential userCredential)
+  public void manual(ManualRechargeOrderBo manualRechargeOrderBo, UserCredential userCredential,UserEquipment userEquipment)
       throws Exception {
 
     RechargeOrder rechargeOrder = buildManualRechargeOrder(manualRechargeOrderBo);
-
+    // 填充客户端信息
+    fillClientInfo(rechargeOrder, userEquipment);
     this.save(rechargeOrder);
 
     if (manualRechargeOrderBo.isSkipAuditing()) {
@@ -769,6 +771,13 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
       bill.setRemark(remark[0]);
     }
     memberBillService.save(member, bill);
+  }
+
+  private void fillClientInfo(RechargeOrder rechargeOrder, UserEquipment clientInfo) {
+    rechargeOrder.setBrowser(clientInfo.getUserAgent().getBrowser().getName());
+    rechargeOrder.setOs(clientInfo.getUserAgent().getOs().getName());
+    rechargeOrder.setIpAddress(clientInfo.getIpAddress());
+    rechargeOrder.setUserAgent(clientInfo.getUserAgentString());
   }
 
 

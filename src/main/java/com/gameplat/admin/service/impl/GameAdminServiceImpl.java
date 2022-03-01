@@ -271,7 +271,7 @@ public class GameAdminServiceImpl implements GameAdminService {
     if(transferType){
       //自动转换 直接amount就是会员余额
       amount = memberInfo.getBalance();
-      if(amount.compareTo(BigDecimal.ONE) > 0 ){
+      if(amount.compareTo(BigDecimal.ZERO) > 0 ){
         log.info("余额为"+amount);
         return;
       }
@@ -376,7 +376,7 @@ public class GameAdminServiceImpl implements GameAdminService {
     //自动转动实际上回收的是在第三方游戏的所有余额
     if (transferType){
       amount = balance;
-      if(balance.compareTo(BigDecimal.ONE) < 0) {
+      if(balance.compareTo(BigDecimal.ZERO) < 0) {
         log.info(transferIn + "真人余额不足,不能转出" + balance);
         return;
       }

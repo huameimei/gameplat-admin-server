@@ -42,9 +42,24 @@ public class GameBetDailyReport implements Serializable {
     private String realName;
 
     /**
+     * 上级ID
+     */
+    private Long superId;
+
+    /**
+     * 上级名称
+     */
+    private String superAccount;
+
+    /**
      * 代理路径
      */
     private String userPaths;
+
+    /**
+     * 用户类型
+     */
+    private String userType;
 
     /**
      * 游戏平台
@@ -76,10 +91,6 @@ public class GameBetDailyReport implements Serializable {
      */
     private BigDecimal winAmount;
 
-    /**
-     * 水钱
-     */
-    private BigDecimal revenue;
 
     /**
      * 下注笔数

@@ -139,4 +139,10 @@
         </set>
         where id = #{id}
     </update>
+
+    <!-- 后台获取金币说明配置 -->
+    <select id="getGoldCoinDesc" resultType="com.gameplat.model.entity.member.MemberGrowthConfig">
+        select id, coin_ratio coinRatio, coin_rate coinRate, JSON_UNQUOTE(json_extract(gold_coin_desc, concat('$.',concat('"',concat(#{language},'"'))))) as goldCoinDesc
+        from member_growth_config order by create_time desc limit 1
+    </select>
 </mapper>

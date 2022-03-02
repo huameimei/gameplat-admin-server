@@ -61,7 +61,7 @@ public class MemberGoldCoinRecordController {
 
     }
 
-    @PutMapping("/updateGoldCoinDesc.json")
+    @PutMapping("/updateGoldCoinDesc")
     @ApiOperation(value = "后台修改金币说明配置")
     public void updateGoldCoinDesc(GoldCoinDescUpdateDTO dto) {
         if (StrUtil.isBlank(dto.getLanguage())){

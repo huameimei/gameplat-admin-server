@@ -86,7 +86,7 @@ public class MemberGrowthConfigServiceImpl
     }
     MemberGrowthConfig memberGrowthConfig = this.lambdaQuery()
                                                 .eq(MemberGrowthConfig::getId, dto.getId()).one();
-    if (ObjectUtil.isNotNull(memberGrowthConfig)){
+    if (ObjectUtil.isNull(memberGrowthConfig)){
       throw new ServiceException("此id不存在！");
     }
     String goldCoinDesc = memberGrowthConfig.getGoldCoinDesc();

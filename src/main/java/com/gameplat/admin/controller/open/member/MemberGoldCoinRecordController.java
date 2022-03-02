@@ -36,7 +36,7 @@ public class MemberGoldCoinRecordController {
     private MemberGrowthConfigService memberGrowthConfigService;
 
     /** 增 */
-    @PostMapping("/page")
+    @GetMapping("/page")
     @ApiOperation(value = "分页查询VIP金币明细")
     @PreAuthorize("hasAuthority('member:coin:page')")
     public IPage<MemberGoldCoinRecordVO> page(PageDTO<MemberGoldCoinRecord> page, MemberGoldCoinRecordQueryDTO dto){

@@ -65,7 +65,6 @@ public class LimitInfoServiceImpl extends ServiceImpl<LimitInfoMapper, LimitInfo
         .eq(LimitInfo::getName, limit.getName())
         .oneOpt()
         .map(LimitInfo::getValue)
-        .map(JsonUtils::toJson)
         .map(v -> JsonUtils.parse(v, t));
   }
 

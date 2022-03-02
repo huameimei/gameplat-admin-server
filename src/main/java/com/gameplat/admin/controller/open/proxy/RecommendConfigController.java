@@ -27,35 +27,35 @@ public class RecommendConfigController {
 
   @Autowired private RecommendConfigService recommendConfigService;
 
-  @GetMapping("/get.json")
+  @GetMapping("/get")
   @ApiOperation(value = "获取层层代配置")
   public RecommendConfig getRecommendconfig(
       @RequestHeader(required = false, defaultValue = "zh-CN") String lang) {
     return recommendConfigService.getRecommendConfig();
   }
 
-  @GetMapping("/getLayerConfig.json")
+  @GetMapping("/getLayerConfig")
   @ApiOperation(value = "获取层层代分红模式配置预设")
   public Map<String, List<GameDivideVo>> getLayerConfig(
       @RequestHeader(required = false, defaultValue = "zh-CN") String lang) {
     return recommendConfigService.getDefaultLayerDivideConfig(lang);
   }
 
-  @GetMapping("/getFixConfig.json")
+  @GetMapping("/getFixConfig")
   @ApiOperation(value = "获取固定比例分红模式配置预设")
   public Map<String, List<GameDivideVo>> getFixConfig(
       @RequestHeader(required = false, defaultValue = "zh-CN") String lang) {
     return recommendConfigService.getDefaultFixDivideConfig(lang);
   }
 
-  @GetMapping("/getFissionConfig.json")
+  @GetMapping("/getFissionConfig")
   @ApiOperation(value = "获取裂变模式分红模式配置预设")
   public Map<String, Object> getFissionConfig(
       @RequestHeader(required = false, defaultValue = "zh-CN") String lang) {
     return recommendConfigService.getDefaultFissionDivideConfig(lang);
   }
 
-  @PostMapping("/edit.json")
+  @PostMapping("/edit")
   @ApiOperation(value = "编辑层层代配置")
   @PreAuthorize("hasAuthority('recommendConfig:edit')")
   @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.AGENT, desc = "编辑层层代配置")

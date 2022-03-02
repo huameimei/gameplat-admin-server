@@ -9,8 +9,6 @@ import com.gameplat.admin.convert.ActivityDistributeConvert;
 import com.gameplat.admin.enums.ActivityDistributeEnum;
 import com.gameplat.admin.mapper.ActivityDistributeMapper;
 import com.gameplat.admin.model.bean.PageExt;
-import com.gameplat.admin.model.domain.ActivityDistribute;
-import com.gameplat.admin.model.domain.MemberWealReword;
 import com.gameplat.admin.model.dto.ActivityDistributeQueryDTO;
 import com.gameplat.admin.model.vo.ActivityDistributeStatisticsVO;
 import com.gameplat.admin.model.vo.ActivityDistributeVO;
@@ -18,11 +16,15 @@ import com.gameplat.admin.service.ActivityDistributeService;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.StringUtils;
 import com.gameplat.common.enums.BooleanEnum;
+import com.gameplat.model.entity.activity.ActivityDistribute;
+import com.gameplat.model.entity.member.MemberWealReword;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -36,6 +38,7 @@ import java.util.Map;
  */
 @Slf4j
 @Service
+@Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)
 public class ActivityDistributeServiceImpl
     extends ServiceImpl<ActivityDistributeMapper, ActivityDistribute>
     implements ActivityDistributeService {
@@ -188,7 +191,6 @@ public class ActivityDistributeServiceImpl
         }
       } catch (Exception e) {
         log.error("活动派发异常,派发ID:{},异常原因:{}", activityDistribute.getActivityId(), e);
-        continue;
       }
     }
     log.info("派发活动奖励结束,{}", System.currentTimeMillis());

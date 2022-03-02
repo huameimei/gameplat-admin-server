@@ -13,10 +13,7 @@ import java.io.Serializable;
 @Data
 public class SysBannerInfoQueryDTO implements Serializable {
 
-    /**
-     * 语种
-     */
-    @ApiModelProperty("语种")
-    private String language;
-
+  /** 语种 */
+  @ApiModelProperty("语种")
+  private String language;
 }

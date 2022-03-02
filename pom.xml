@@ -25,6 +25,7 @@
         <org.mapstruct.version>1.4.2.Final</org.mapstruct.version>
         <gameplat-common.version>1-0-0-SNAPSHOT</gameplat-common.version>
         <gameplat-common-game.version>1-0-0-SNAPSHOT</gameplat-common-game.version>
+        <gameplat-model.version>1-0-0-SNAPSHOT</gameplat-model.version>
         <easy-poi.version>4.4.0</easy-poi.version>
     </properties>
 
@@ -110,6 +111,12 @@
         <dependency>
             <groupId>com.gameplat</groupId>
             <artifactId>elasticsearch-spring-boot-starter</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.gameplat</groupId>
+            <artifactId>gameplat-model</artifactId>
+            <version>${gameplat-model.version}</version>
         </dependency>
 
         <dependency>

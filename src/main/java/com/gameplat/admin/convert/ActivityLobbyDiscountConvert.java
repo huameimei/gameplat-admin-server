@@ -1,8 +1,8 @@
 package com.gameplat.admin.convert;
 
-import com.gameplat.admin.model.domain.ActivityLobbyDiscount;
 import com.gameplat.admin.model.dto.ActivityLobbyDiscountDTO;
 import com.gameplat.admin.model.vo.ActivityLobbyDiscountVO;
+import com.gameplat.model.entity.activity.ActivityLobbyDiscount;
 import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")

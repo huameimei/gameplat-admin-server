@@ -6,11 +6,11 @@ import lombok.Data;
 @Data
 public class TpInterfaceVO extends Model<TpInterfaceVO> {
 
-    private Long id;
+  private Long id;
 
-    private String name;
+  private String name;
 
-    private String code;
+  private String code;
 
-    private String parameters;
+  private String parameters;
 }

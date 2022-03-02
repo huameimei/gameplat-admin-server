@@ -11,18 +11,18 @@ import lombok.Data;
 @Data
 public class IpStatisticsDTO {
 
-    @ApiModelProperty(value = "IP地址")
-    private String loginIp;
+  @ApiModelProperty(value = "IP地址")
+  private String loginIp;
 
-    @ApiModelProperty(value = "次数")
-    private String frequency;
+  @ApiModelProperty(value = "次数")
+  private String frequency;
 
-    @ApiModelProperty(value = "分析类型")
-    private Integer type;
+  @ApiModelProperty(value = "分析类型")
+  private Integer type;
 
-    @ApiModelProperty(value = "开始时间")
-    private String beginTime;
+  @ApiModelProperty(value = "开始时间")
+  private String beginTime;
 
-    @ApiModelProperty(value = "结束时间")
-    private String endTime;
+  @ApiModelProperty(value = "结束时间")
+  private String endTime;
 }

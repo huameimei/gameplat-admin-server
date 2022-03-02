@@ -1,9 +1,9 @@
 package com.gameplat.admin.model.dto;
 
-import java.io.Serializable;
-import java.util.Date;
-import java.util.List;
 import lombok.Data;
+
+import java.io.Serializable;
+import java.util.List;
 
 @Data
 public class MemberQueryDTO implements Serializable {

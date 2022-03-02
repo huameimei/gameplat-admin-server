@@ -1,9 +1,10 @@
 package com.gameplat.admin.model.dto;
 
 import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
+
 import java.io.Serializable;
 import java.math.BigDecimal;
-import lombok.Data;
 
 @Data
 public class PayAccountAddDTO implements Serializable {
@@ -83,9 +84,6 @@ public class PayAccountAddDTO implements Serializable {
   /** 风控值 */
   private String riskControlValue;
 
-  /**
-   * 虚拟货币类型
-   */
+  /** 虚拟货币类型 */
   private String currencyType;
-
 }

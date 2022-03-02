@@ -8,11 +8,11 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.convert.DiscountTypeConvert;
 import com.gameplat.admin.mapper.DiscountTypeMapper;
-import com.gameplat.admin.model.domain.DiscountType;
 import com.gameplat.admin.model.dto.DiscountTypeAddDTO;
 import com.gameplat.admin.model.dto.DiscountTypeEditDTO;
 import com.gameplat.admin.service.DiscountTypeService;
 import com.gameplat.base.common.exception.ServiceException;
+import com.gameplat.model.entity.DiscountType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -41,7 +41,7 @@ public class DiscountTypeServiceImpl extends ServiceImpl<DiscountTypeMapper, Dis
     update
         .set(ObjectUtils.isNotEmpty(status), DiscountType::getStatus, status)
         .eq(DiscountType::getId, id);
-    this.update(new DiscountType(),update);
+    this.update(new DiscountType(), update);
   }
 
   @Override

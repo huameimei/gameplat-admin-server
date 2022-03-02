@@ -9,7 +9,6 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.context.JSONObjectContext;
 import com.gameplat.admin.convert.ChatGifConvert;
 import com.gameplat.admin.mapper.ChatGifMapper;
-import com.gameplat.admin.model.domain.ChatGif;
 import com.gameplat.admin.model.dto.ChatGifEditDTO;
 import com.gameplat.admin.model.vo.ChatGifVO;
 import com.gameplat.admin.service.ChatGifService;
@@ -21,7 +20,7 @@ import com.gameplat.common.compent.oss.FileStorageStrategyContext;
 import com.gameplat.common.compent.oss.config.FileConfig;
 import com.gameplat.common.enums.DictTypeEnum;
 import com.gameplat.common.util.FileUtils;
-import lombok.RequiredArgsConstructor;
+import com.gameplat.model.entity.chart.ChatGif;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -42,7 +41,6 @@ import java.util.Map;
  */
 @Service
 @Slf4j
-@RequiredArgsConstructor
 @Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)
 public class ChatGifServiceImpl extends ServiceImpl<ChatGifMapper, ChatGif>
     implements ChatGifService {
@@ -56,13 +54,11 @@ public class ChatGifServiceImpl extends ServiceImpl<ChatGifMapper, ChatGif>
   /** 分页列表 */
   @Override
   public IPage<ChatGifVO> page(PageDTO<ChatGif> page, String name) {
-    IPage<ChatGifVO> pageList =
-        this.lambdaQuery()
-            .like(StringUtils.isNotNull(name), ChatGif::getName, name)
-            .orderByDesc(ChatGif::getCreateTime)
-            .page(page)
-            .convert(chatGifConvert::toVo);
-    return pageList;
+    return this.lambdaQuery()
+        .like(StringUtils.isNotNull(name), ChatGif::getName, name)
+        .orderByDesc(ChatGif::getCreateTime)
+        .page(page)
+        .convert(chatGifConvert::toVo);
   }
 
   /** 增 */
@@ -116,7 +112,7 @@ public class ChatGifServiceImpl extends ServiceImpl<ChatGifMapper, ChatGif>
     FileConfig fileConfig =
         configService.getDefaultConfig(DictTypeEnum.FILE_CONFIG, FileConfig.class);
     FileStorageProvider fileStorageProvider = fileStorageStrategyContext.getProvider(fileConfig);
-    if(ObjectUtil.isNotNull(chatGif)){
+    if (ObjectUtil.isNotNull(chatGif)) {
       chatGif.setServiceProvider(fileConfig.getProvider());
     }
 

@@ -13,9 +13,6 @@ import com.gameplat.admin.constant.SystemConstant;
 import com.gameplat.admin.convert.MemberConvert;
 import com.gameplat.admin.enums.MemberEnums;
 import com.gameplat.admin.mapper.MemberMapper;
-import com.gameplat.admin.model.domain.GameTransferInfo;
-import com.gameplat.admin.model.domain.Member;
-import com.gameplat.admin.model.domain.MemberInfo;
 import com.gameplat.admin.model.dto.*;
 import com.gameplat.admin.model.vo.MemberInfoVO;
 import com.gameplat.admin.model.vo.MemberVO;
@@ -26,6 +23,9 @@ import com.gameplat.base.common.util.StringUtils;
 import com.gameplat.common.constant.CachedKeys;
 import com.gameplat.common.enums.TransferTypesEnum;
 import com.gameplat.common.lang.Assert;
+import com.gameplat.model.entity.game.GameTransferInfo;
+import com.gameplat.model.entity.member.Member;
+import com.gameplat.model.entity.member.MemberInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -54,7 +54,7 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
 
   @Autowired private OnlineUserService onlineUserService;
 
-  @Autowired private TenantConfig  tenantConfig;
+  @Autowired private TenantConfig tenantConfig;
 
   @Autowired private GameTransferInfoService gameTransferInfoService;
 
@@ -340,18 +340,18 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
 
   @Override
   public Member getMemberAndFillGameAccount(String account) {
-    Member member = this.getByAccount(account)
-            .orElseThrow(() -> new ServiceException("会员信息不存在!"));
-    if(StringUtils.isBlank(member.getGameAccount())){
-      Assert.notNull(tenantConfig.getTenantCode(),"平台编码未配置，请联系客服");
-      //固定13位
-      StringBuffer gameAccount = new StringBuffer(tenantConfig.getTenantCode()).append(member.getId());
+    Member member = this.getByAccount(account).orElseThrow(() -> new ServiceException("会员信息不存在!"));
+    if (StringUtils.isBlank(member.getGameAccount())) {
+      Assert.notNull(tenantConfig.getTenantCode(), "平台编码未配置，请联系客服");
+      // 固定13位
+      StringBuffer gameAccount =
+          new StringBuffer(tenantConfig.getTenantCode()).append(member.getId());
       String suffix = RandomUtil.randomString(13 - gameAccount.length());
       member.setGameAccount(gameAccount.append(suffix).toString());
       Assert.isTrue(this.updateById(member), "添加会员游戏账号信息!");
     }
-    //会员余额存在哪个游戏中
-    if(ObjectUtil.isNull(gameTransferInfoService.getInfoByMemberId(member.getId()))){
+    // 会员余额存在哪个游戏中
+    if (ObjectUtil.isNull(gameTransferInfoService.getInfoByMemberId(member.getId()))) {
       GameTransferInfo gameTransferInfo = new GameTransferInfo();
       gameTransferInfo.setPlatformCode(TransferTypesEnum.SELF.getCode());
       gameTransferInfo.setAccount(member.getAccount());

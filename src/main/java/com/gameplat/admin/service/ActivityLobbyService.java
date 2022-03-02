@@ -3,12 +3,12 @@ package com.gameplat.admin.service;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.gameplat.admin.model.domain.ActivityLobby;
 import com.gameplat.admin.model.dto.ActivityLobbyAddDTO;
 import com.gameplat.admin.model.dto.ActivityLobbyQueryDTO;
 import com.gameplat.admin.model.dto.ActivityLobbyUpdateDTO;
 import com.gameplat.admin.model.dto.ActivityLobbyUpdateStatusDTO;
 import com.gameplat.admin.model.vo.ActivityLobbyVO;
+import com.gameplat.model.entity.activity.ActivityLobby;
 
 import java.util.List;
 
@@ -57,7 +57,9 @@ public interface ActivityLobbyService extends IService<ActivityLobby> {
    */
   void deleteActivityLobby(String ids);
 
-  /** @param activityLobbyUpdateStatusDTO */
+  /**
+   * @param activityLobbyUpdateStatusDTO
+   */
   void updateStatus(ActivityLobbyUpdateStatusDTO activityLobbyUpdateStatusDTO);
 
   /**

@@ -4,17 +4,16 @@ import com.alibaba.csp.sentinel.annotation.SentinelResource;
 import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.gameplat.admin.model.bean.Language;
-import com.gameplat.admin.model.domain.SysUser;
-import com.gameplat.admin.model.dto.GoogleAuthDTO;
 import com.gameplat.admin.model.vo.ConfigVO;
-import com.gameplat.admin.service.*;
-import com.gameplat.base.common.util.GoogleAuthenticator;
+import com.gameplat.admin.service.CommonService;
+import com.gameplat.admin.service.ConfigService;
+import com.gameplat.admin.service.LimitInfoService;
+import com.gameplat.admin.service.SysDictDataService;
 import com.gameplat.common.enums.DictDataEnum;
-import com.gameplat.common.enums.LimitEnums;
-import com.gameplat.common.lang.Assert;
 import com.gameplat.common.model.bean.limit.AdminLoginLimit;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
 import java.util.List;
@@ -22,6 +21,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
+@Transactional(readOnly = true)
 public class CommonServiceImpl implements CommonService {
 
   @Autowired private SysDictDataService dictDataService;

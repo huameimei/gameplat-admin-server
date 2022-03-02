@@ -10,10 +10,6 @@ import com.gameplat.admin.convert.ActivityLobbyConvert;
 import com.gameplat.admin.convert.ActivityLobbyDiscountConvert;
 import com.gameplat.admin.enums.ActivityInfoEnum;
 import com.gameplat.admin.mapper.ActivityLobbyMapper;
-import com.gameplat.admin.model.domain.ActivityDistribute;
-import com.gameplat.admin.model.domain.ActivityLobby;
-import com.gameplat.admin.model.domain.ActivityLobbyDiscount;
-import com.gameplat.admin.model.domain.ActivityQualification;
 import com.gameplat.admin.model.dto.*;
 import com.gameplat.admin.model.vo.ActivityLobbyDiscountVO;
 import com.gameplat.admin.model.vo.ActivityLobbyVO;
@@ -27,6 +23,10 @@ import com.gameplat.base.common.util.BeanUtils;
 import com.gameplat.base.common.util.DateUtil;
 import com.gameplat.base.common.util.StringUtils;
 import com.gameplat.common.enums.BooleanEnum;
+import com.gameplat.model.entity.activity.ActivityDistribute;
+import com.gameplat.model.entity.activity.ActivityLobby;
+import com.gameplat.model.entity.activity.ActivityLobbyDiscount;
+import com.gameplat.model.entity.activity.ActivityQualification;
 import com.google.common.collect.Lists;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -223,7 +223,7 @@ public class ActivityLobbyServiceImpl extends ServiceImpl<ActivityLobbyMapper, A
 
     // 优惠打折列表
     List<ActivityLobbyDiscount> activityLobbyDiscounts =
-            BeanUtils.mapList(activityLobbyAddDTO.getLobbyDiscountList(), ActivityLobbyDiscount.class);
+        BeanUtils.mapList(activityLobbyAddDTO.getLobbyDiscountList(), ActivityLobbyDiscount.class);
 
     List<Integer> targetValueList =
         activityLobbyDiscounts.stream()

@@ -1,7 +1,7 @@
 package com.gameplat.admin.convert;
 
-import com.gameplat.admin.model.domain.GameTransferRecord;
 import com.gameplat.admin.model.vo.GameTransferRecordVO;
+import com.gameplat.model.entity.game.GameTransferRecord;
 import org.mapstruct.Mapper;
 import org.springframework.stereotype.Repository;
 
@@ -9,5 +9,5 @@ import org.springframework.stereotype.Repository;
 @Mapper(componentModel = "spring")
 public interface GameTransferRecordConvert {
 
-  GameTransferRecordVO toVo(GameTransferRecord liveTransferRecord);
+  GameTransferRecordVO toVo(GameTransferRecord entity);
 }

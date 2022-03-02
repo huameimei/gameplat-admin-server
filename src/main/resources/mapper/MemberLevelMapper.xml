@@ -4,7 +4,7 @@
 <mapper namespace="com.gameplat.admin.mapper.MemberLevelMapper">
 
     <!--根据层级获取用于分层的会员信息-->
-    <select id="getMemberInfoByLevel" parameterType="java.lang.Integer" resultType="MemberInfo">
+    <select id="getMemberInfoByLevel" parameterType="java.lang.Integer" resultType="com.gameplat.model.entity.member.MemberInfo">
         SELECT t2.member_id,
                t2.total_rech_times,
                t2.total_rech_amount

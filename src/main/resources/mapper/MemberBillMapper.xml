@@ -3,7 +3,7 @@
 <mapper namespace="com.gameplat.admin.mapper.MemberBillMapper">
 
     <!-- 通用查询映射结果 -->
-    <resultMap id="BaseResultMap" type="com.gameplat.admin.model.domain.MemberBill">
+    <resultMap id="BaseResultMap" type="com.gameplat.model.entity.member.MemberBill">
         <id column="id" property="id"/>
         <result column="member_id" property="memberId"/>
         <result column="account" property="account"/>
@@ -21,8 +21,9 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        id, member_id, account, member_path, tran_type, order_no, amount, balance, remark, content, operator, table_index, create_time
-	</sql>
+        id
+        , member_id, account, member_path, tran_type, order_no, amount, balance, remark, content, operator, table_index, create_time
+    </sql>
 
     <select id="findyByTableIndex" resultType="com.gameplat.admin.model.vo.MemberBillVO">
         SELECT
@@ -30,15 +31,19 @@
         FROM
         (SELECT * FROM member_bill
         WHERE 1 = 1
-        <if test="account != null"> and account = #{account}</if>
-        <if test="orderNo != null and orderNo !=''"> and order_no = #{orderNo}</if>
-        <if test="tranTypes != null and tranTypes.size()>0"> and tran_type in
+        <if test="account != null">and account = #{account}</if>
+        <if test="orderNo != null and orderNo !=''">and order_no = #{orderNo}</if>
+        <if test="tranTypes != null and tranTypes.size()>0">and tran_type in
             <foreach item="item" index="index" collection="tranTypes" open="(" separator="," close=")">
                 #{item}
             </foreach>
         </if>
-        <if test="beginTime != null and beginTime != ''"> and date_format(create_time,'%y%m%d') <![CDATA[ >= ]]> date_format(#{beginTime},'%y%m%d')</if>
-        <if test="endTime != null and endTime != ''"> and date_format(create_time,'%y%m%d') <![CDATA[ <= ]]> date_format(#{endTime},'%y%m%d')</if>
+        <if test="beginTime != null and beginTime != ''">and date_format(create_time,'%y%m%d') <![CDATA[ >= ]]>
+            date_format(#{beginTime},'%y%m%d')
+        </if>
+        <if test="endTime != null and endTime != ''">and date_format(create_time,'%y%m%d') <![CDATA[ <= ]]>
+            date_format(#{endTime},'%y%m%d')
+        </if>
         ORDER BY create_time DESC,id DESC
         <if test="tableIndex == null ">
         </if>
@@ -47,15 +52,19 @@
             UNION ALL
             SELECT * FROM member_bill_${tableIndex}
             WHERE 1 = 1
-            <if test="account != null"> and account = #{account}</if>
-            <if test="orderNo != null and orderNo !=''"> and order_no = #{orderNo}</if>
-            <if test="tranTypes != null and tranTypes.size()>0"> and tran_type in
+            <if test="account != null">and account = #{account}</if>
+            <if test="orderNo != null and orderNo !=''">and order_no = #{orderNo}</if>
+            <if test="tranTypes != null and tranTypes.size()>0">and tran_type in
                 <foreach item="item" index="index" collection="tranTypes" open="(" separator="," close=")">
                     #{item}
                 </foreach>
             </if>
-            <if test="beginTime != null and beginTime != ''"> and date_format(create_time,'%y%m%d') <![CDATA[ >= ]]> date_format(#{beginTime},'%y%m%d')</if>
-            <if test="endTime != null and endTime != ''"> and date_format(create_time,'%y%m%d') <![CDATA[ <= ]]> date_format(#{endTime},'%y%m%d')</if>
+            <if test="beginTime != null and beginTime != ''">and date_format(create_time,'%y%m%d') <![CDATA[ >= ]]>
+                date_format(#{beginTime},'%y%m%d')
+            </if>
+            <if test="endTime != null and endTime != ''">and date_format(create_time,'%y%m%d') <![CDATA[ <= ]]>
+                date_format(#{endTime},'%y%m%d')
+            </if>
             ORDER BY create_time DESC,id DESC
         </if>
 
@@ -64,7 +73,7 @@
 
     <select id="findBillByTableIndex" resultMap="BaseResultMap">
         select
-        <include refid="Base_Column_List" />
+        <include refid="Base_Column_List"/>
         from member_bill_${tableIndex}
         <where>
             <if test="orderNo != null and orderNo != ''">
@@ -75,7 +84,6 @@
             </if>
         </where>
     </select>
-
 
 
 </mapper>

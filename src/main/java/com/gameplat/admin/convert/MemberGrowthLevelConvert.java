@@ -1,8 +1,8 @@
 package com.gameplat.admin.convert;
 
-import com.gameplat.admin.model.domain.MemberGrowthLevel;
 import com.gameplat.admin.model.dto.GrowthLevelLogoEditDTO;
 import com.gameplat.admin.model.vo.MemberGrowthLevelVO;
+import com.gameplat.model.entity.member.MemberGrowthLevel;
 import org.mapstruct.Mapper;
 
 /**

@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.gameplat.admin.mapper.ValidWithdrawMapper">
 
-    <resultMap id="BaseResultMap" type="com.gameplat.admin.model.domain.ValidWithdraw">
+    <resultMap id="BaseResultMap" type="com.gameplat.model.entity.ValidWithdraw">
         <id column="id" property="id"/>
         <result column="member_id" property="memberId"/>
         <result column="account" property="account"/>
@@ -21,7 +21,8 @@
         <result column="remark" property="remark"/>
     </resultMap>
 
-    <select id="findValidWithdraw" parameterType="com.gameplat.admin.model.domain.ValidWithdraw" resultMap="BaseResultMap">
+    <select id="findValidWithdraw" parameterType="com.gameplat.model.entity.ValidWithdraw"
+            resultMap="BaseResultMap">
         select
         *
         from valid_withdraw
@@ -70,7 +71,7 @@
     </select>
 
 
-    <insert id="save" parameterType="com.gameplat.admin.model.domain.ValidWithdraw">
+    <insert id="save" parameterType="com.gameplat.model.entity.ValidWithdraw">
         insert into valid_withdraw
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="memberId != null">
@@ -138,7 +139,7 @@
         </trim>
     </insert>
 
-    <update id="updateByUserId" parameterType="com.gameplat.admin.model.domain.ValidWithdraw">
+    <update id="updateByUserId" parameterType="com.gameplat.model.entity.ValidWithdraw">
         update valid_withdraw
         <set>
             <if test="account != null">
@@ -171,17 +172,16 @@
 
         </set>
         where (type = 0 or status = 1)
-        <if test="account != null and account != ''" >
+        <if test="account != null and account != ''">
             and account = #{account}
         </if>
         <if test="memberId != null">
             and member_id = #{memberId}
         </if>
-        <if test="id != null" >
+        <if test="id != null">
             and id = #{id}
         </if>
     </update>
-
 
 
     <update id="updateByBetId">
@@ -197,32 +197,28 @@
         where id = #{id}
     </update>
 
-
-    <select id="findAccountValidWithdraw" parameterType="string" resultType="com.gameplat.admin.model.vo.ValidAccoutWithdrawVo">
-        SELECT
-            a.id id,
-            a.member_id memberId,
-            a.account account,
-            ( a.morm_dml + a.discount_dml ) dmlClaim,
-            a.create_time createTime,
-            ifnull(
-                a.end_time,
-            sysdate()) AS endTime,
-            b.game_kind gameKind,
-            b.stat_time statTime,
-            b.platform_code platformCode,
-            ( a.rech_money + a.discount_money ) rechMoney,
-            g.`name` gameName
-        FROM
-            valid_withdraw AS a
-            LEFT JOIN game_bet_daily_report AS b ON a.account = b.account
-            AND b.stat_time BETWEEN DATE_FORMAT( a.create_time, '%Y-%m-%d' )
-            AND DATE_FORMAT( ifnull( a.end_time, SYSDATE()), '%Y-%m-%d' )
-            left JOIN game_kind g on b.game_kind = g.`code`
-        WHERE
-            a.STATUS = 0
-            AND a.account = #{account}
-        ORDER BY
-            a.id ASC
+    <select id="findAccountValidWithdraw" parameterType="string"
+            resultType="com.gameplat.admin.model.vo.ValidAccoutWithdrawVo">
+        SELECT a.id                              id,
+               a.member_id                       memberId,
+               a.account                         account,
+               (a.morm_dml + a.discount_dml)     dmlClaim,
+               a.create_time                     createTime,
+               ifnull(
+                       a.end_time,
+                       sysdate()) AS             endTime,
+               b.game_kind                       gameKind,
+               b.stat_time                       statTime,
+               b.platform_code                   platformCode,
+               (a.rech_money + a.discount_money) rechMoney,
+               g.`name`                          gameName
+        FROM valid_withdraw AS a
+                 LEFT JOIN game_bet_daily_report AS b ON a.account = b.account
+            AND b.stat_time BETWEEN DATE_FORMAT(a.create_time, '%Y-%m-%d')
+                                                             AND DATE_FORMAT(ifnull(a.end_time, SYSDATE()), '%Y-%m-%d')
+                 left JOIN game_kind g on b.game_kind = g.`code`
+        WHERE a.STATUS = 0
+          AND a.account = #{account}
+        ORDER BY a.id ASC
     </select>
 </mapper>

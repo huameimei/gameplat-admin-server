@@ -9,35 +9,38 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.convert.MemberWithdrawHistoryConvert;
 import com.gameplat.admin.enums.OprateMode;
 import com.gameplat.admin.mapper.MemberWithdrawHistoryMapper;
-import com.gameplat.admin.model.domain.MemberWithdrawHistory;
 import com.gameplat.admin.model.dto.MemberWithdrawHistoryQueryDTO;
 import com.gameplat.admin.model.vo.MemberWithdrawHistorySummaryVO;
 import com.gameplat.admin.model.vo.MemberWithdrawHistoryVO;
 import com.gameplat.admin.service.MemberWithdrawHistoryService;
+import com.gameplat.base.common.util.StringUtils;
+import com.gameplat.model.entity.member.MemberWithdrawHistory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Arrays;
+
 @Service
 @Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)
-public class MemberWithdrawHistoryServiceImpl extends
-    ServiceImpl<MemberWithdrawHistoryMapper, MemberWithdrawHistory>
+public class MemberWithdrawHistoryServiceImpl
+    extends ServiceImpl<MemberWithdrawHistoryMapper, MemberWithdrawHistory>
     implements MemberWithdrawHistoryService {
 
-  @Autowired
-  private MemberWithdrawHistoryConvert userWithdrawHistoryConvert;
+  @Autowired private MemberWithdrawHistoryConvert userWithdrawHistoryConvert;
 
-  @Autowired
-  private MemberWithdrawHistoryMapper memberWithdrawHistoryMapper;
+  @Autowired private MemberWithdrawHistoryMapper memberWithdrawHistoryMapper;
 
   @Override
-  public IPage<MemberWithdrawHistoryVO> findPage(Page<MemberWithdrawHistory> page,
-      MemberWithdrawHistoryQueryDTO dto) {
+  public IPage<MemberWithdrawHistoryVO> findPage(
+      Page<MemberWithdrawHistory> page, MemberWithdrawHistoryQueryDTO dto) {
     LambdaQueryWrapper<MemberWithdrawHistory> query = buildSql(dto);
-    query.orderBy(ObjectUtils.isNotEmpty(dto.getOrder()),
+    query.orderBy(
+        ObjectUtils.isNotEmpty(dto.getOrder()),
         ObjectUtils.isEmpty(dto.getOrder()) ? false : dto.getOrder().equals("ASC"),
-        dto.getOrderBy().equals("createTime") ? MemberWithdrawHistory::getCreateTime
+        dto.getOrderBy().equals("createTime")
+            ? MemberWithdrawHistory::getCreateTime
             : MemberWithdrawHistory::getOperatorTime);
     return this.page(page, query).convert(userWithdrawHistoryConvert::toVo);
   }
@@ -49,64 +52,92 @@ public class MemberWithdrawHistoryServiceImpl extends
     return memberWithdrawHistoryMapper.summaryMemberWithdrawHistory(query);
   }
 
-  private LambdaQueryWrapper buildSql(MemberWithdrawHistoryQueryDTO dto) {
+  private LambdaQueryWrapper<MemberWithdrawHistory> buildSql(MemberWithdrawHistoryQueryDTO dto) {
     LambdaQueryWrapper<MemberWithdrawHistory> query = Wrappers.lambdaQuery();
-    query.in(ObjectUtils.isNotNull(dto.getBankNameList()), MemberWithdrawHistory::getBankName,
-        dto.getBankNameList())
-        .eq(ObjectUtils.isNotEmpty(dto.getSuperName()), MemberWithdrawHistory::getSuperName,
+    query
+        .in(
+            ObjectUtils.isNotNull(dto.getBankNameList()),
+            MemberWithdrawHistory::getBankName,
+            dto.getBankNameList())
+        .eq(
+            ObjectUtils.isNotEmpty(dto.getSuperName()),
+            MemberWithdrawHistory::getSuperName,
             dto.getSuperName())
-        .eq(ObjectUtils.isNotEmpty(dto.getCashMode()), MemberWithdrawHistory::getCashMode,
+        .eq(
+            ObjectUtils.isNotEmpty(dto.getCashMode()),
+            MemberWithdrawHistory::getCashMode,
             dto.getCashMode())
-        .eq(ObjectUtils.isNotEmpty(dto.getCashStatus()), MemberWithdrawHistory::getCashStatus,
+        .eq(
+            ObjectUtils.isNotEmpty(dto.getCashStatus()),
+            MemberWithdrawHistory::getCashStatus,
             dto.getCashStatus())
-        .eq(ObjectUtils.isNotEmpty(dto.getPpMerchantId()), MemberWithdrawHistory::getPpMerchantId,
+        .eq(
+            ObjectUtils.isNotEmpty(dto.getPpMerchantId()),
+            MemberWithdrawHistory::getPpMerchantId,
             dto.getPpMerchantId())
-        .eq(ObjectUtils.isNotEmpty(dto.getProxyPayStatus()),
+        .eq(
+            ObjectUtils.isNotEmpty(dto.getProxyPayStatus()),
             MemberWithdrawHistory::getProxyPayStatus,
             dto.getProxyPayStatus())
-        .ge(ObjectUtils.isNotEmpty(dto.getCashMoneyFrom()), MemberWithdrawHistory::getCashMoney,
+        .ge(
+            ObjectUtils.isNotEmpty(dto.getCashMoneyFrom()),
+            MemberWithdrawHistory::getCashMoney,
             dto.getCashMoneyFrom())
-        .le(ObjectUtils.isNotEmpty(dto.getCashMoneyFromTo()), MemberWithdrawHistory::getCashMoney,
+        .le(
+            ObjectUtils.isNotEmpty(dto.getCashMoneyFromTo()),
+            MemberWithdrawHistory::getCashMoney,
             dto.getCashMoneyFromTo())
-        .eq(ObjectUtils.isNotEmpty(dto.getMemberType()), MemberWithdrawHistory::getMemberType,
+        .eq(
+            ObjectUtils.isNotEmpty(dto.getMemberType()),
+            MemberWithdrawHistory::getMemberType,
             dto.getMemberType())
-        .eq(ObjectUtils.isNotEmpty(dto.getCashOrderNo()), MemberWithdrawHistory::getCashOrderNo,
+        .eq(
+            ObjectUtils.isNotEmpty(dto.getCashOrderNo()),
+            MemberWithdrawHistory::getCashOrderNo,
             dto.getCashOrderNo())
-        .in(ObjectUtils.isNotNull(dto.getMemberLevelList()), MemberWithdrawHistory::getMemberLevel,
+        .in(
+            ObjectUtils.isNotNull(dto.getMemberLevelList()),
+            MemberWithdrawHistory::getMemberLevel,
             dto.getMemberLevelList())
-        .eq(ObjectUtils.isNotEmpty(dto.getBankCard()), MemberWithdrawHistory::getBankCard,
+        .eq(
+            ObjectUtils.isNotEmpty(dto.getBankCard()),
+            MemberWithdrawHistory::getBankCard,
             dto.getBankCard());
     if (ObjectUtils.isNotEmpty(dto.getAccounts())) {
-      query.in(MemberWithdrawHistory::getAccount, dto.getAccounts().split(","));
+      query.in(
+          MemberWithdrawHistory::getAccount,
+          Arrays.asList(StringUtils.split(dto.getAccounts(), ",")));
     }
     if (ObjectUtils.isNotEmpty(dto.getOperatorAccounts())) {
-      query.in(MemberWithdrawHistory::getOperatorAccount, dto.getOperatorAccounts().split(","));
+      query.in(
+          MemberWithdrawHistory::getOperatorAccount,
+          Arrays.asList(StringUtils.split(dto.getOperatorAccounts())));
     }
     if (dto.isAllSubs()) {
-      query.like(ObjectUtils.isNotEmpty(dto.getSuperName()),
+      query.like(
+          ObjectUtils.isNotEmpty(dto.getSuperName()),
           MemberWithdrawHistory::getSuperPath,
           dto.getSuperName());
     } else {
-      query.eq(ObjectUtils.isNotEmpty(dto.getSuperName()),
+      query.eq(
+          ObjectUtils.isNotEmpty(dto.getSuperName()),
           MemberWithdrawHistory::getSuperName,
           dto.getSuperName());
     }
-    if (OprateMode.OPRATE_MANUAL.value() == dto.getOprateMode()) {
-      query.isNull(MemberWithdrawHistory::getPpMerchantId)
+    if (OprateMode.OPRATE_MANUAL.match(dto.getOprateMode())) {
+      query
+          .isNull(MemberWithdrawHistory::getPpMerchantId)
           .eq(MemberWithdrawHistory::getWithdrawType, "BANK");
     }
-    if (OprateMode.OPRATE_ATUO.value() == dto.getOprateMode()) {
+    if (OprateMode.OPRATE_ATUO.match(dto.getOprateMode())) {
       query.isNotNull(MemberWithdrawHistory::getPpMerchantId);
     }
-    if (OprateMode.OPRATE_VIRTUAL.value() == dto.getOprateMode()) {
-      query.notIn(MemberWithdrawHistory::getWithdrawType,
-          "BANK", "MANUAL", "DIRECT");
+    if (OprateMode.OPRATE_VIRTUAL.match(dto.getOprateMode())) {
+      query.notIn(MemberWithdrawHistory::getWithdrawType, "BANK", "MANUAL", "DIRECT");
     }
-    if (OprateMode.OPRATE_MODE.value() == dto.getOprateMode()) {
+    if (OprateMode.OPRATE_MODE.match(dto.getOprateMode())) {
       query.eq(MemberWithdrawHistory::getWithdrawType, "DIRECT");
     }
     return query;
   }
-
-
 }

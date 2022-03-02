@@ -8,9 +8,7 @@ import lombok.EqualsAndHashCode;
 import java.io.Serializable;
 
 /**
- * <p>
  * 活动转盘奖品配置VO
- * </p>
  *
  * @author kenvin
  */
@@ -19,30 +17,29 @@ import java.io.Serializable;
 @ApiModel(value = "活动转盘奖品配置VO", description = "活动转盘奖品配置")
 public class ActivityTurntablePrizeConfigVO implements Serializable {
 
-    private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
-    @ApiModelProperty("奖项ID")
-    private Integer prizeId;
+  @ApiModelProperty("奖项ID")
+  private Integer prizeId;
 
-    @ApiModelProperty("转盘角度最小值")
-    private String min;
+  @ApiModelProperty("转盘角度最小值")
+  private String min;
 
-    @ApiModelProperty("转盘角度最大值")
-    private String max;
+  @ApiModelProperty("转盘角度最大值")
+  private String max;
 
-    @ApiModelProperty("奖项名称")
-    private String prizeName;
+  @ApiModelProperty("奖项名称")
+  private String prizeName;
 
-    @ApiModelProperty("奖金")
-    private Double prizeMoney;
+  @ApiModelProperty("奖金")
+  private Double prizeMoney;
 
-    @ApiModelProperty("中奖名额")
-    private Integer quantity;
+  @ApiModelProperty("中奖名额")
+  private Integer quantity;
 
-    @ApiModelProperty("奖项描述")
-    private String prizeDesc;
+  @ApiModelProperty("奖项描述")
+  private String prizeDesc;
 
-    @ApiModelProperty("中将概率")
-    private Double probability;
-
+  @ApiModelProperty("中将概率")
+  private Double probability;
 }

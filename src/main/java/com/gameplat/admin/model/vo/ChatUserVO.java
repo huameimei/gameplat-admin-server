@@ -9,14 +9,13 @@ import java.io.Serializable;
 @Accessors(chain = true)
 public class ChatUserVO implements Serializable {
 
-	private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
-	private Long userId;
+  private Long userId;
 
-	private String account;
+  private String account;
 
-	private String nickName;
+  private String nickName;
 
-	private String avatar;
-
+  private String avatar;
 }

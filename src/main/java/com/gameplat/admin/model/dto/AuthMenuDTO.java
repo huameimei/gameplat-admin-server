@@ -1,9 +1,10 @@
 package com.gameplat.admin.model.dto;
 
-import java.util.List;
+import lombok.Data;
+
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-import lombok.Data;
+import java.util.List;
 
 /**
  * 角色授权菜单DTO

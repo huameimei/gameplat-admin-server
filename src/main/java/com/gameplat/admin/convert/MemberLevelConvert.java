@@ -1,9 +1,9 @@
 package com.gameplat.admin.convert;
 
-import com.gameplat.admin.model.domain.MemberLevel;
 import com.gameplat.admin.model.dto.MemberLevelAddDTO;
 import com.gameplat.admin.model.dto.MemberLevelEditDTO;
 import com.gameplat.admin.model.vo.MemberLevelVO;
+import com.gameplat.model.entity.member.MemberLevel;
 import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")

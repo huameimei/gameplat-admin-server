@@ -4,44 +4,39 @@ import lombok.Data;
 
 import java.util.Date;
 
-/**
- * 系统发版信息
- */
+/** 系统发版信息 */
 @Data
 public class VersionControlDTO {
 
-    private Long id;
+  private Long id;
 
-    private String title;
+  private String title;
 
-    private String version;
+  private String version;
 
-    private Integer forceUpdate;
+  private Integer forceUpdate;
 
-    private String content;
+  private String content;
 
-    private String type;
+  private String type;
 
-    private Integer state;
+  private Integer state;
 
-    private String androidUrl;
+  private String androidUrl;
 
-    private Integer urlType;
+  private Integer urlType;
 
-    private String iosEnterpriseSing;
+  private String iosEnterpriseSing;
 
-    private String iosSuperSing;
+  private String iosSuperSing;
 
-    private String iosDescribeUrl;
+  private String iosDescribeUrl;
 
-    private String createBy;
+  private String createBy;
 
-    private Date createTime;
+  private Date createTime;
 
-    private String updateBy;
+  private String updateBy;
 
-    private Date updateTime;
-
-
-
+  private Date updateTime;
 }

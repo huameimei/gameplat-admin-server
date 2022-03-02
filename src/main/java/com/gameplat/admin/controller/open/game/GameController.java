@@ -2,22 +2,16 @@ package com.gameplat.admin.controller.open.game;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
-import com.gameplat.admin.model.domain.Game;
 import com.gameplat.admin.model.dto.GameQueryDTO;
 import com.gameplat.admin.model.dto.OperGameDTO;
 import com.gameplat.admin.model.vo.GameVO;
 import com.gameplat.admin.service.GameService;
-import lombok.RequiredArgsConstructor;
+import com.gameplat.model.entity.game.Game;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequiredArgsConstructor
 @RequestMapping("/api/admin/game/game")
 public class GameController {
 

@@ -1,6 +1,6 @@
 package com.gameplat.admin.model.dto;
 
-import com.baomidou.mybatisplus.annotation.*;
+import com.baomidou.mybatisplus.annotation.TableName;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
@@ -24,5 +24,4 @@ public class ChatPushPlanQueryDTO implements Serializable {
 
   @ApiModelProperty(value = "游戏id")
   private String gameId;
-
 }

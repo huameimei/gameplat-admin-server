@@ -1,13 +1,13 @@
 package com.gameplat.admin.service;
 
-
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.gameplat.admin.model.domain.PayType;
 import com.gameplat.admin.model.dto.PayTypeAddDTO;
 import com.gameplat.admin.model.dto.PayTypeEditDTO;
 import com.gameplat.admin.model.vo.PayTypeVO;
+import com.gameplat.model.entity.pay.PayType;
+
 import java.util.List;
 
 public interface PayTypeService extends IService<PayType> {

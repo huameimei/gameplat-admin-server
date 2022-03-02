@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.gameplat.admin.mapper.MemberMapper">
-    <select id="queryPage" resultType="MemberVO">
+    <select id="queryPage" resultType="com.gameplat.admin.model.vo.MemberVO">
         SELECT t1.id,
                t1.account,
                t1.nickname,
@@ -44,7 +44,7 @@
             ${ew.customSqlSegment}
     </select>
 
-    <select id="queryList" resultType="MemberVO">
+    <select id="queryList" resultType="com.gameplat.admin.model.vo.MemberVO">
         SELECT t1.id,
                t1.account,
                t1.nickname,
@@ -86,7 +86,7 @@
                 ${ew.customSqlSegment}
     </select>
 
-    <select id="getMemberInfo" parameterType="java.lang.Long" resultType="MemberInfoVO">
+    <select id="getMemberInfo" parameterType="java.lang.Long" resultType="com.gameplat.admin.model.vo.MemberInfoVO">
         SELECT t1.id,
                t1.account,
                t1.nickname,
@@ -139,12 +139,12 @@
     </sql>
 
     <!-- 仅转移下级-->
-    <select id="batchUpdateSuperPathExcludeSelf" parameterType="Member">
+    <select id="batchUpdateSuperPathExcludeSelf" parameterType="com.gameplat.model.entity.member.Member">
         <include refid="batchUpdateSuperPathSql"/>
         WHERE parent_name = #{account}
     </select>
 
-    <select id="batchUpdateSuperPath" parameterType="Member">
+    <select id="batchUpdateSuperPath" parameterType="com.gameplat.model.entity.member.Member">
         <include refid="batchUpdateSuperPathSql"/>
         WHERE parent_name = #{account} OR account = #{account}
     </select>
@@ -193,7 +193,7 @@
         WHERE t1.account = #{account}
     </select>
 
-    <select id="getListByAgentAccout" resultType="com.gameplat.admin.model.domain.Member">
+    <select id="getListByAgentAccout" resultType="com.gameplat.model.entity.member.Member">
         SELECT t1.id,
                t1.account,
                t1.nickname,
@@ -232,7 +232,7 @@
         WHERE t1.super_path LIKE concat('%', #{agentAccout},'%')
     </select>
 
-    <select id="findByUserNameList" resultType="com.gameplat.admin.model.domain.Member">
+    <select id="findByUserNameList" resultType="com.gameplat.model.entity.member.Member">
         select * from member t where t.nickname in
         <foreach item="userName" collection="userNames" open="(" separator="," close=")">
             #{userName}
@@ -289,7 +289,7 @@
         order by id desc, create_time desc
     </select>
 
-    <select id="getInfoByAccount" resultType="com.gameplat.admin.model.domain.Member">
+    <select id="getInfoByAccount" resultType="com.gameplat.model.entity.member.Member">
         select
         id as id,
         account as account,
@@ -332,7 +332,7 @@
     </select>
 
     <!-- 根据代理获取代理下的信息 -->
-    <select id="getAgentMember" resultType="com.gameplat.admin.model.domain.Member">
+    <select id="getAgentMember" resultType="com.gameplat.model.entity.member.Member">
         SELECT id,account FROM member
         WHERE
         create_time BETWEEN #{startTime} AND #{endTime}

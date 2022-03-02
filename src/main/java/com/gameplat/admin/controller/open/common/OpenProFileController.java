@@ -2,7 +2,6 @@ package com.gameplat.admin.controller.open.common;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.gameplat.admin.model.bean.router.VueRouter;
-import com.gameplat.admin.model.domain.SysMenu;
 import com.gameplat.admin.model.dto.ChangePasswordDTO;
 import com.gameplat.admin.model.dto.UserInfoDTO;
 import com.gameplat.admin.model.vo.ProfileVO;
@@ -16,6 +15,7 @@ import com.gameplat.common.model.dto.LogDTO;
 import com.gameplat.common.model.vo.UserLogVO;
 import com.gameplat.log.annotation.Log;
 import com.gameplat.log.enums.LogType;
+import com.gameplat.model.entity.sys.SysMenu;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;

@@ -1,16 +1,15 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.gameplat.admin.mapper.GameRebatePeriodMapper">
 
-
-  <select id="queryGameRebateCount"
-    resultType="com.gameplat.admin.model.vo.GameRebatePeriodVO">
-    SELECT period_id               AS id,
-           COUNT(DISTINCT account) AS liveRebateCount,
-           SUM(real_rebate_money)  AS real_rebate_money
-    FROM game_rebate_detail
-    where status !='2' and status !='3'
-    GROUP BY period_id
-  </select>
+    <select id="queryGameRebateCount"
+            resultType="com.gameplat.admin.model.vo.GameRebatePeriodVO">
+        SELECT period_id               AS id,
+               COUNT(DISTINCT account) AS liveRebateCount,
+               SUM(real_rebate_money)  AS real_rebate_money
+        FROM game_rebate_detail
+        where status !='2' and status !='3'
+        GROUP BY period_id
+    </select>
 </mapper>

@@ -13,9 +13,9 @@ import java.io.Serializable;
 @Data
 public class ChatGifAddDTO implements Serializable {
 
-    @ApiModelProperty(value = "关键词")
-    private String name;
+  @ApiModelProperty(value = "关键词")
+  private String name;
 
-    @ApiModelProperty(value = "图片地址")
-    private String fileUrl;
+  @ApiModelProperty(value = "图片地址")
+  private String fileUrl;
 }

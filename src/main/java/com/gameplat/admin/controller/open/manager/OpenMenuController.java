@@ -1,7 +1,6 @@
 package com.gameplat.admin.controller.open.manager;
 
 import com.gameplat.admin.enums.SysMenuEnums;
-import com.gameplat.admin.model.domain.SysMenu;
 import com.gameplat.admin.model.dto.MenuDTO;
 import com.gameplat.admin.model.dto.OperMenuDTO;
 import com.gameplat.admin.service.SysMenuService;
@@ -9,19 +8,16 @@ import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.StringUtils;
 import com.gameplat.common.constant.ServiceName;
 import com.gameplat.common.group.Groups;
+import com.gameplat.common.lang.Assert;
 import com.gameplat.log.annotation.Log;
-import java.util.List;
+import com.gameplat.model.entity.sys.SysMenu;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * 菜单管理
@@ -72,14 +68,8 @@ public class OpenMenuController {
 
   @GetMapping("/checkMenuNameUnique")
   public boolean checkMenuNameUnique(OperMenuDTO dto) {
-    if (StringUtils.isBlank(dto.getMenuName())) {
-      throw new ServiceException("缺少参数");
-    }
-
-    if (StringUtils.isNull(dto.getParentId())) {
-      throw new ServiceException("缺少参数");
-    }
-
+    Assert.notNull(dto.getParentId(), "缺少参数");
+    Assert.notEmpty(dto.getMenuName(), "缺少参数");
     return menuService.checkMenuNameUnique(dto);
   }
 }

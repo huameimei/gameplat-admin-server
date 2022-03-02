@@ -1,7 +1,8 @@
 package com.gameplat.admin.model.vo;
 
-import java.util.List;
 import lombok.Data;
+
+import java.util.List;
 
 /**
  * @author lily
@@ -11,7 +12,7 @@ import lombok.Data;
 @Data
 public class MemberConfigLevelVO {
 
-    private MemberGrowthConfigVO configVO;
+  private MemberGrowthConfigVO configVO;
 
-    private List<MemberGrowthLevelVO> levelVO;
+  private List<MemberGrowthLevelVO> levelVO;
 }

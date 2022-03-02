@@ -3,9 +3,9 @@ package com.gameplat.admin.service;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.gameplat.admin.model.domain.AccountBlacklist;
 import com.gameplat.admin.model.dto.AccountBlacklistQueryDTO;
 import com.gameplat.admin.model.dto.OperAccountBlacklistDTO;
+import com.gameplat.model.entity.blacklist.AccountBlacklist;
 
 public interface AccountBlacklistService extends IService<AccountBlacklist> {
 

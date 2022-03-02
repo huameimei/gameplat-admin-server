@@ -9,27 +9,26 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.convert.GameBlacklistConvert;
 import com.gameplat.admin.enums.BlacklistConstant.BizBlacklistTargetType;
 import com.gameplat.admin.mapper.GameBlacklistMapper;
-import com.gameplat.admin.model.domain.GameBlacklist;
 import com.gameplat.admin.model.dto.GameBlacklistQueryDTO;
 import com.gameplat.admin.model.dto.OperGameBlacklistDTO;
 import com.gameplat.admin.service.GameBlacklistService;
 import com.gameplat.base.common.exception.ServiceException;
+import com.gameplat.model.entity.game.GameBlacklist;
 import com.gameplat.security.SecurityUserHolder;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 @Service
-@RequiredArgsConstructor
 @Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)
 public class GameBlacklistServiceImpl extends ServiceImpl<GameBlacklistMapper, GameBlacklist>
     implements GameBlacklistService {
@@ -121,14 +120,21 @@ public class GameBlacklistServiceImpl extends ServiceImpl<GameBlacklistMapper, G
   }
 
   @Override
-  public List<GameBlacklist> selectGameBlackList(GameBlacklist black){
+  public List<GameBlacklist> selectGameBlackList(GameBlacklist black) {
     return this.lambdaQuery()
-        .eq(ObjectUtils.isNotEmpty(black.getBlackType()), GameBlacklist::getBlackType,black.getBlackType())
-        .like(ObjectUtils.isNotEmpty(black.getLiveCategory()),
-            GameBlacklist::getLiveCategory,","+black.getLiveCategory()+",")
-        .eq(ObjectUtils.isNotEmpty(black.getTargetType()), GameBlacklist::getTargetType,black.getTargetType())
+        .eq(
+            ObjectUtils.isNotEmpty(black.getBlackType()),
+            GameBlacklist::getBlackType,
+            black.getBlackType())
+        .like(
+            ObjectUtils.isNotEmpty(black.getLiveCategory()),
+            GameBlacklist::getLiveCategory,
+            "," + black.getLiveCategory() + ",")
+        .eq(
+            ObjectUtils.isNotEmpty(black.getTargetType()),
+            GameBlacklist::getTargetType,
+            black.getTargetType())
         .eq(ObjectUtils.isNotEmpty(black.getTarget()), GameBlacklist::getTarget, black.getTarget())
         .list();
   }
-
 }

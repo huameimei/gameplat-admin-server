@@ -1,8 +1,8 @@
 package com.gameplat.admin.convert;
 
-import com.gameplat.admin.model.domain.ActivityBlacklist;
 import com.gameplat.admin.model.dto.ActivityBlacklistAddDTO;
 import com.gameplat.admin.model.vo.ActivityBlacklistVO;
+import com.gameplat.model.entity.activity.ActivityBlacklist;
 import org.mapstruct.Mapper;
 
 /**

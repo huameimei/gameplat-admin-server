@@ -3,13 +3,12 @@ package com.gameplat.admin.service;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.gameplat.admin.model.domain.Member;
-import com.gameplat.admin.model.domain.MemberBill;
 import com.gameplat.admin.model.dto.MemberBillDTO;
 import com.gameplat.admin.model.vo.MemberBillVO;
 import com.gameplat.common.model.bean.TranTypeBean;
+import com.gameplat.model.entity.member.Member;
+import com.gameplat.model.entity.member.MemberBill;
 
-import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
 public interface MemberBillService extends IService<MemberBill> {

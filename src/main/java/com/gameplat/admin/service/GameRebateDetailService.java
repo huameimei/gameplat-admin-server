@@ -1,8 +1,9 @@
 package com.gameplat.admin.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.gameplat.admin.model.domain.GameRebateDetail;
-import com.gameplat.admin.model.domain.GameRebatePeriod;
+import com.gameplat.model.entity.game.GameRebateDetail;
+import com.gameplat.model.entity.game.GameRebatePeriod;
+
 import java.util.List;
 
 public interface GameRebateDetailService extends IService<GameRebateDetail> {

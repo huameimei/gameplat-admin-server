@@ -1,20 +1,20 @@
 package com.gameplat.admin.convert;
 
-import com.gameplat.admin.model.domain.PayType;
 import com.gameplat.admin.model.dto.PayTypeAddDTO;
 import com.gameplat.admin.model.dto.PayTypeEditDTO;
 import com.gameplat.admin.model.dto.PayTypeQueryDTO;
 import com.gameplat.admin.model.vo.PayTypeVO;
+import com.gameplat.model.entity.pay.PayType;
 import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")
 public interface PayTypeConvert {
 
-    PayTypeVO toVo(PayType entity);
+  PayTypeVO toVo(PayType entity);
 
-    PayType toEntity(PayTypeAddDTO payTypeAddDTO);
+  PayType toEntity(PayTypeAddDTO payTypeAddDTO);
 
-    PayType toEntity(PayTypeQueryDTO payTypeQueryDTO);
+  PayType toEntity(PayTypeQueryDTO payTypeQueryDTO);
 
-    PayType toEntity(PayTypeEditDTO payTypeEditDTO);
+  PayType toEntity(PayTypeEditDTO payTypeEditDTO);
 }

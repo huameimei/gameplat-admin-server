@@ -1,7 +1,6 @@
 package com.gameplat.admin.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.gameplat.admin.model.domain.SysTenantSetting;
+import com.gameplat.model.entity.sys.SysTenantSetting;
 
-public interface SysTenantSettingMapper extends BaseMapper<SysTenantSetting> {
-}
+public interface SysTenantSettingMapper extends BaseMapper<SysTenantSetting> {}

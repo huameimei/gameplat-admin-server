@@ -3,10 +3,11 @@ package com.gameplat.admin.model.bean;
 import com.gameplat.admin.enums.RiskControllerTypeEnum;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.json.JsonUtils;
-import java.math.BigDecimal;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
+
+import java.math.BigDecimal;
+import java.util.Objects;
+import java.util.regex.Pattern;
 
 /** 转换类 */
 public class ChannelLimitsBean {
@@ -69,6 +70,84 @@ public class ChannelLimitsBean {
     this.riskControlType = riskControlType;
     this.riskControlValue = riskControlValue;
     this.currencyType = currencyType;
+  }
+
+  public static ChannelLimitsBean conver2Bean(String beanStr) {
+    if (StringUtils.isBlank(beanStr)) {
+      return new ChannelLimitsBean();
+    }
+    return JsonUtils.parse(beanStr, ChannelLimitsBean.class);
+  }
+
+  /**
+   * 检验风控金额的合法性
+   *
+   * @param riskControlValue
+   * @return
+   */
+  public static String validateRiskControlValue(String riskControlValue, Integer riskControlType) {
+    /** 随意金额风控值校验 */
+    if (RiskControllerTypeEnum.ANY_AMOUNT.getType().equals(riskControlType)) {
+      return "";
+    }
+    if (RiskControllerTypeEnum.FLOAT_AMOUNT.getType().equals(riskControlType)) {
+      if (StringUtils.isBlank(riskControlValue)) {
+        throw new ServiceException("风控金额值配置有误，请检查");
+      }
+      if (!(Pattern.matches("^\\d-\\d$", riskControlValue) && isCompaire(riskControlValue))) {
+        throw new ServiceException("风控金额值配置有误，请检查");
+      }
+      return riskControlValue;
+    } else if (Objects.equals(RiskControllerTypeEnum.FIXED_ACCOUNT.getType(), riskControlType)) {
+      if (StringUtils.isBlank(riskControlValue)) {
+        throw new ServiceException("风控金额值配置有误，请检查");
+      }
+      if (!Pattern.matches("^\\d[\\d|.]+\\d$", riskControlValue)) {
+        throw new ServiceException("风控金额值配置有误，请检查");
+      }
+      return rebuildValues(riskControlValue);
+    } else {
+      if (StringUtils.isBlank(riskControlValue)) {
+        throw new ServiceException("风控金额值配置有误，请检查");
+      }
+      if (!(Pattern.matches("^[\\d-|@]+$", riskControlValue) && isCompaire(riskControlValue))) {
+        throw new ServiceException("风控金额值配置有误，请检查");
+      }
+      String[] arrays = riskControlValue.split("@");
+      return arrays[0] + "@" + rebuildValues(arrays[1]);
+    }
+  }
+
+  private static String rebuildValues(String values) throws ServiceException {
+    String[] arrays = values.split("\\|");
+    StringBuilder resultBuff = new StringBuilder();
+    for (int i = 0; i < arrays.length; i++) {
+      if (StringUtils.isNotBlank(arrays[i])) {
+        /** 允许有小数点 */
+        String[] moneys = arrays[i].split(".");
+        if (moneys.length > 2) {
+          throw new ServiceException("风控金额值配置有误");
+        }
+        resultBuff.append(arrays[i]).append("|");
+      }
+    }
+    if (StringUtils.isBlank(resultBuff.toString())) {
+      throw new ServiceException("风控金额值配置有误");
+    }
+    return resultBuff.deleteCharAt(resultBuff.lastIndexOf("|")).toString();
+  }
+
+  private static boolean isCompaire(String riskControlValue) {
+    String[] values = riskControlValue.split("@")[0].split("-");
+    int min = Integer.parseInt(values[0]) * 100;
+    int max = Integer.parseInt(values[1]) * 100;
+    return max > min;
+  }
+
+  /** 选择随机加减开关 */
+  public static Integer selectAddOrSubSwitch() {
+    Integer[] symbol = {0, 1};
+    return symbol[(int) (0 + Math.random() * (symbol.length - 1 + 1))];
   }
 
   public Integer getLimitStatus() {
@@ -187,91 +266,5 @@ public class ChannelLimitsBean {
 
   public void setCurrencyType(String currencyType) {
     this.currencyType = currencyType;
-  }
-
-  public static ChannelLimitsBean conver2Bean(String beanStr) {
-    if (StringUtils.isBlank(beanStr)) {
-      return new ChannelLimitsBean();
-    }
-    return JsonUtils.parse(beanStr, ChannelLimitsBean.class);
-  }
-
-  /**
-   * 检验风控金额的合法性
-   *
-   * @param riskControlValue
-   * @return
-   */
-  public static String validateRiskControlValue(String riskControlValue, Integer riskControlType) {
-    /** 随意金额风控值校验 */
-    if (RiskControllerTypeEnum.ANY_AMOUNT.getType() == riskControlType) {
-      return "";
-    }
-    if (RiskControllerTypeEnum.FLOAT_AMOUNT.getType() == riskControlType) {
-      if (StringUtils.isBlank(riskControlValue)) {
-        throw new ServiceException("风控金额值配置有误，请检查");
-      }
-      Pattern p = Pattern.compile("^\\d-\\d$");
-      Matcher m = p.matcher(riskControlValue);
-      if (!(m.matches() && isCompaire(riskControlValue))) {
-        throw new ServiceException("风控金额值配置有误，请检查");
-      }
-      return riskControlValue;
-    } else if (RiskControllerTypeEnum.FIXED_ACCOUNT.getType() == riskControlType) {
-      if (StringUtils.isBlank(riskControlValue)) {
-        throw new ServiceException("风控金额值配置有误，请检查");
-      }
-      Pattern p = Pattern.compile("^\\d[\\d|.]+\\d$");
-      Matcher m = p.matcher(riskControlValue);
-      boolean result = m.matches();
-      if (!result) {
-        throw new ServiceException("风控金额值配置有误，请检查");
-      }
-      return rebuildValues(riskControlValue);
-    } else {
-      if (StringUtils.isBlank(riskControlValue)) {
-        throw new ServiceException("风控金额值配置有误，请检查");
-      }
-      Pattern p = Pattern.compile("^[\\d-|@]+$");
-      Matcher m = p.matcher(riskControlValue);
-
-      if (!(m.matches() && isCompaire(riskControlValue))) {
-        throw new ServiceException("风控金额值配置有误，请检查");
-      }
-      String[] arrays = riskControlValue.split("@");
-      return arrays[0] + "@" + rebuildValues(arrays[1]);
-    }
-  }
-
-  private static String rebuildValues(String values) throws ServiceException {
-    String[] arrays = values.split("\\|");
-    StringBuilder resultBuff = new StringBuilder();
-    for (int i = 0; i < arrays.length; i++) {
-      if (StringUtils.isNotBlank(arrays[i])) {
-        /** 允许有小数点 */
-        String[] moneys = arrays[i].split(".");
-        if (moneys.length > 2) {
-          throw new ServiceException("风控金额值配置有误");
-        }
-        resultBuff.append(arrays[i]).append("|");
-      }
-    }
-    if (StringUtils.isBlank(resultBuff.toString())) {
-      throw new ServiceException("风控金额值配置有误");
-    }
-    return resultBuff.deleteCharAt(resultBuff.lastIndexOf("|")).toString();
-  }
-
-  private static boolean isCompaire(String riskControlValue) {
-    String[] values = riskControlValue.split("@")[0].split("-");
-    int min = Integer.parseInt(values[0]) * 100;
-    int max = Integer.parseInt(values[1]) * 100;
-    return max > min;
-  }
-
-  /** 选择随机加减开关 */
-  public static Integer selectAddOrSubSwitch() {
-    Integer[] symbol = {0, 1};
-    return symbol[(int) (0 + Math.random() * (symbol.length - 1 + 1))];
   }
 }

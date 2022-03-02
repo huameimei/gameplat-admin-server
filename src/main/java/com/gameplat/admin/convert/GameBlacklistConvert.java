@@ -1,7 +1,7 @@
 package com.gameplat.admin.convert;
 
-import com.gameplat.admin.model.domain.GameBlacklist;
 import com.gameplat.admin.model.dto.OperGameBlacklistDTO;
+import com.gameplat.model.entity.game.GameBlacklist;
 import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")

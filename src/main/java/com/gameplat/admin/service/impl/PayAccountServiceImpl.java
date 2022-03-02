@@ -11,7 +11,6 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.convert.PayAccountConvert;
 import com.gameplat.admin.mapper.PayAccountMapper;
 import com.gameplat.admin.model.bean.ChannelLimitsBean;
-import com.gameplat.admin.model.domain.PayAccount;
 import com.gameplat.admin.model.dto.PayAccountAddDTO;
 import com.gameplat.admin.model.dto.PayAccountEditDTO;
 import com.gameplat.admin.model.dto.PayAccountQueryDTO;
@@ -19,13 +18,15 @@ import com.gameplat.admin.model.vo.PayAccountVO;
 import com.gameplat.admin.service.PayAccountService;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.json.JsonUtils;
-import java.math.BigDecimal;
-import java.util.List;
-import java.util.stream.Collectors;
+import com.gameplat.model.entity.pay.PayAccount;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)
@@ -72,7 +73,7 @@ public class PayAccountServiceImpl extends ServiceImpl<PayAccountMapper, PayAcco
     }
     LambdaUpdateWrapper<PayAccount> update = Wrappers.lambdaUpdate();
     update.set(PayAccount::getStatus, status).eq(PayAccount::getId, id);
-    this.update(new PayAccount(),update);
+    this.update(new PayAccount(), update);
   }
 
   @Override
@@ -98,22 +99,16 @@ public class PayAccountServiceImpl extends ServiceImpl<PayAccountMapper, PayAcco
 
   @Override
   public IPage<PayAccountVO> findPayAccountPage(Page<PayAccount> page, PayAccountQueryDTO dto) {
-    IPage<PayAccountVO> ipage = payAccountMapper.findPayAccountPage(page, dto);
-    List<PayAccountVO> list = ipage.getRecords();
-    list.stream()
-        .forEach(
-            (vo -> {
-              this.conver2LimitInfo(vo);
-            }));
-    return ipage;
+    IPage<PayAccountVO> pager = payAccountMapper.findPayAccountPage(page, dto);
+    pager.getRecords().forEach((this::conver2LimitInfo));
+    return pager;
   }
 
   @Override
   public List<String> queryOwners() {
     QueryWrapper<PayAccount> query = Wrappers.query();
     query.select("distinct owner");
-    List<String> list = this.list(query).stream().map(a->a.getOwner()).collect(Collectors.toList());
-    return list;
+    return this.list(query).stream().map(PayAccount::getOwner).collect(Collectors.toList());
   }
 
   private void conver2LimitInfo(PayAccountVO vo) {

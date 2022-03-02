@@ -6,7 +6,6 @@ import com.gameplat.common.model.bean.RefreshToken;
 import com.gameplat.security.context.UserCredential;
 
 import javax.servlet.http.HttpServletRequest;
-import java.sql.Ref;
 
 public interface AuthenticationService {
 

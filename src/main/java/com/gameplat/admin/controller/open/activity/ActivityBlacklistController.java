@@ -2,13 +2,13 @@ package com.gameplat.admin.controller.open.activity;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
-import com.gameplat.admin.model.domain.ActivityBlacklist;
 import com.gameplat.admin.model.dto.ActivityBlacklistAddDTO;
 import com.gameplat.admin.model.dto.ActivityBlacklistQueryDTO;
 import com.gameplat.admin.model.vo.ActivityBlacklistVO;
 import com.gameplat.admin.service.ActivityBlacklistService;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.StringUtils;
+import com.gameplat.model.entity.activity.ActivityBlacklist;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;

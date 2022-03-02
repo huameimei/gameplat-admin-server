@@ -1,14 +1,15 @@
 package com.gameplat.admin.listener;
 
-import com.gameplat.admin.model.domain.RechargeOrder;
 import com.gameplat.admin.service.RechargeOrderService;
 import com.gameplat.common.enums.RechargeStatus;
-import java.util.Date;
+import com.gameplat.model.entity.recharge.RechargeOrder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.connection.Message;
 import org.springframework.data.redis.listener.KeyExpirationEventMessageListener;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
+
+import java.util.Date;
 
 @Slf4j
 public class RechargeOrderExpiredListener extends KeyExpirationEventMessageListener {

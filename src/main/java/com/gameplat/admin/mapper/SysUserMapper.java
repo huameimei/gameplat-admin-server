@@ -5,7 +5,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Constants;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.gameplat.admin.model.domain.SysUser;
+import com.gameplat.model.entity.sys.SysUser;
 import org.apache.ibatis.annotations.Param;
 
 /** 用户 数据层 */

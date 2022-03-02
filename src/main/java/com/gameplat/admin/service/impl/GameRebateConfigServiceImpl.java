@@ -4,32 +4,29 @@ import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.convert.GameRebateConfigConvert;
 import com.gameplat.admin.mapper.GameRebateConfigMapper;
-import com.gameplat.admin.model.domain.GameRebateConfig;
 import com.gameplat.admin.model.dto.OperGameRebateConfigDTO;
 import com.gameplat.admin.service.GameRebateConfigService;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.json.JsonUtils;
-import java.util.List;
-import java.util.Map;
-import lombok.RequiredArgsConstructor;
+import com.gameplat.model.entity.game.GameRebateConfig;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.Map;
+
 @Service
-@RequiredArgsConstructor
 @Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)
 public class GameRebateConfigServiceImpl
     extends ServiceImpl<GameRebateConfigMapper, GameRebateConfig>
     implements GameRebateConfigService {
 
-  @Autowired
-  GameRebateConfigMapper gameRebateConfigMapper;
+  @Autowired GameRebateConfigMapper gameRebateConfigMapper;
 
-  @Autowired
-  GameRebateConfigConvert gameRebateConfigConvert;
+  @Autowired GameRebateConfigConvert gameRebateConfigConvert;
 
   @Override
   public List<GameRebateConfig> queryAll(String userLevel) {
@@ -74,7 +71,7 @@ public class GameRebateConfigServiceImpl
     }
   }
 
-    private Long countByMoney(GameRebateConfig gameRebateConfig) {
+  private Long countByMoney(GameRebateConfig gameRebateConfig) {
     return this.lambdaQuery()
         .eq(
             ObjectUtils.isNotEmpty(gameRebateConfig.getMoney()),

@@ -3,7 +3,7 @@
 <mapper namespace="com.gameplat.admin.mapper.SpreadUnionMapper">
 
     <!-- 通用查询映射结果 -->
-    <resultMap id="BaseResultMap" type="com.gameplat.admin.model.domain.SpreadUnion">
+    <resultMap id="BaseResultMap" type="com.gameplat.model.entity.spread.SpreadUnion">
         <id column="id" property="id"/>
         <result column="union_name" property="unionName"/>
         <result column="agent_account" property="agentAccount"/>

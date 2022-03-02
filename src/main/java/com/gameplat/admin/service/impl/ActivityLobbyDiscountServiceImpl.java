@@ -3,14 +3,17 @@ package com.gameplat.admin.service.impl;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.convert.ActivityLobbyDiscountConvert;
 import com.gameplat.admin.mapper.ActivityLobbyDiscountMapper;
-import com.gameplat.admin.model.domain.ActivityLobbyDiscount;
 import com.gameplat.admin.model.vo.ActivityLobbyDiscountVO;
 import com.gameplat.admin.service.ActivityLobbyDiscountService;
-import java.util.ArrayList;
-import java.util.List;
+import com.gameplat.model.entity.activity.ActivityLobbyDiscount;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 活动大厅业务
@@ -18,6 +21,7 @@ import org.springframework.stereotype.Service;
  * @author kenvin
  */
 @Service
+@Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)
 public class ActivityLobbyDiscountServiceImpl
     extends ServiceImpl<ActivityLobbyDiscountMapper, ActivityLobbyDiscount>
     implements ActivityLobbyDiscountService {

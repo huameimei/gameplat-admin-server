@@ -2,65 +2,70 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.gameplat.admin.mapper.MemberBusDayReportMapper">
 
-    <select id="findList" resultType="com.gameplat.admin.model.vo.DayReportVO" parameterType="com.gameplat.admin.model.dto.DayReportDTO">
+    <select id="findList" resultType="com.gameplat.admin.model.vo.DayReportVO"
+            parameterType="com.gameplat.admin.model.dto.DayReportDTO">
         select
-                bus.stat_time statTime,
-                IFNULL(SUM(rw.withdraw_money),0) AS withdrawMoney,
-                IFNULL(SUM(rw.withdraw_count),0) AS withdrawCount,
-                IFNULL(SUM(rw.counter_fee),0) AS counterFee,
-                IFNULL(SUM(rw.hand_withdraw_money),0) AS handWithdrawMoney,
-                IFNULL(SUM(rw.hand_withdraw_count),0) AS handWithdrawCount,
-                IFNULL(SUM(rw.bank_money),0) AS bankMoney,
-                IFNULL(SUM(rw.bank_count),0) AS bankCount,
-                IFNULL(SUM(rw.online_money),0) AS onlineMoney,
-                IFNULL(SUM(rw.online_count),0) AS onlineCount,
-                IFNULL(SUM(rw.hand_rech_money),0) AS handRechMoney,
-                IFNULL(SUM(rw.hand_rech_count),0) AS handRechCount,
-                IFNULL(SUM(rw.bank_money+rw.online_money+rw.hand_rech_money),0) AS totalRechargeAmount,
-                IFNULL(SUM(rw.bank_count+rw.online_count+rw.hand_rech_count),0) AS totalRechargeCount,
-                IFNULL(SUM(rw.withdraw_money+rw.hand_withdraw_money),0) AS totalWithdrawAmount,
-                IFNULL(SUM(rw.withdraw_count+rw.hand_withdraw_count),0) AS totalWithdrawCount,
-                IFNULL(SUM(bus.cp_bet_money - bus.cp_win_money - bus.cp_draw_money - bus.cp_rebate_money+bus.sp_win_money+bus.live_win_money),0) AS totalWinOrcloseMoney,
-                IFNULL(SUM(bus.cp_bet_money - bus.cp_win_money - bus.cp_draw_money - bus.cp_rebate_money+bus.sp_win_money+bus.live_win_money+IFNULL(rw.counter_fee,0)-bus.live_rebate_money-IFNULL(rw.rech_discount,0)-IFNULL(rw.other_discount,0)-bus.dl_rebate_money-bus.dl_bonuus-bus.dl_day_wage),0) AS totalRemainAmount,
-                IFNULL(SUM(rw.bank_money+rw.online_money+rw.hand_rech_money-rw.withdraw_money-rw.hand_withdraw_money),0) AS inAndOut,
-                IFNULL(SUM(rw.rech_discount),0) AS rechDiscount,
-                IFNULL(SUM(rw.other_discount),0) AS otherDiscount,
-                IFNULL(SUM(rw.exception_recharge_amount),0) AS exceptionRechargeAmount,
-                IFNULL(SUM(rw.exception_withdraw_amount),0) AS exceptionWithdrawAmount,
-                SUM(bus.cp_bet_money - bus.cp_win_money - bus.cp_draw_money - bus.cp_rebate_money) AS cpWinMoney,
-                SUM(bus.cp_bet_money - bus.cp_draw_money) AS cpBetMoney,
-                SUM(bus.cp_rebate_money) AS cpRebateMoney,
-                SUM(bus.`dl_rebate_money`) AS dlRebateMoney,
-                SUM(bus.`live_win_money`) AS liveWinMoney,
-                SUM(bus.`live_valid_money`) AS liveBetMoney,
-                SUM(bus.`live_rebate_money`) AS liveRebateMoney,
-                SUM(bus.`dl_bonuus`) AS dlBonuus,
-                SUM(bus.dl_day_wage) AS dlDayWage,
-                SUM(bus.dl_ratio) AS dlRatio,
-                SUM(bus.month_paid) AS monthPaid,
-                SUM(bus.week_paid) AS weekPaid,
-                SUM(bus.winnings) AS winnings,
-                SUM(bus.`sp_win_money`) AS spWinMoney,
-                SUM(bus.`sp_bet_money`-bus.`sp_draw_money`) AS spBetMoney,
-                SUM(bus.`sp_rebate_money`) AS spRebateMoney,
-                bus.team_wage teamWage
+        bus.stat_time statTime,
+        IFNULL(SUM(rw.withdraw_money),0) AS withdrawMoney,
+        IFNULL(SUM(rw.withdraw_count),0) AS withdrawCount,
+        IFNULL(SUM(rw.counter_fee),0) AS counterFee,
+        IFNULL(SUM(rw.hand_withdraw_money),0) AS handWithdrawMoney,
+        IFNULL(SUM(rw.hand_withdraw_count),0) AS handWithdrawCount,
+        IFNULL(SUM(rw.bank_money),0) AS bankMoney,
+        IFNULL(SUM(rw.bank_count),0) AS bankCount,
+        IFNULL(SUM(rw.online_money),0) AS onlineMoney,
+        IFNULL(SUM(rw.online_count),0) AS onlineCount,
+        IFNULL(SUM(rw.hand_rech_money),0) AS handRechMoney,
+        IFNULL(SUM(rw.hand_rech_count),0) AS handRechCount,
+        IFNULL(SUM(rw.bank_money+rw.online_money+rw.hand_rech_money),0) AS totalRechargeAmount,
+        IFNULL(SUM(rw.bank_count+rw.online_count+rw.hand_rech_count),0) AS totalRechargeCount,
+        IFNULL(SUM(rw.withdraw_money+rw.hand_withdraw_money),0) AS totalWithdrawAmount,
+        IFNULL(SUM(rw.withdraw_count+rw.hand_withdraw_count),0) AS totalWithdrawCount,
+        IFNULL(SUM(bus.cp_bet_money - bus.cp_win_money - bus.cp_draw_money -
+        bus.cp_rebate_money+bus.sp_win_money+bus.live_win_money),0) AS totalWinOrcloseMoney,
+        IFNULL(SUM(bus.cp_bet_money - bus.cp_win_money - bus.cp_draw_money -
+        bus.cp_rebate_money+bus.sp_win_money+bus.live_win_money+IFNULL(rw.counter_fee,0)-bus.live_rebate_money-IFNULL(rw.rech_discount,0)-IFNULL(rw.other_discount,0)-bus.dl_rebate_money-bus.dl_bonuus-bus.dl_day_wage),0)
+        AS totalRemainAmount,
+        IFNULL(SUM(rw.bank_money+rw.online_money+rw.hand_rech_money-rw.withdraw_money-rw.hand_withdraw_money),0) AS
+        inAndOut,
+        IFNULL(SUM(rw.rech_discount),0) AS rechDiscount,
+        IFNULL(SUM(rw.other_discount),0) AS otherDiscount,
+        IFNULL(SUM(rw.exception_recharge_amount),0) AS exceptionRechargeAmount,
+        IFNULL(SUM(rw.exception_withdraw_amount),0) AS exceptionWithdrawAmount,
+        SUM(bus.cp_bet_money - bus.cp_win_money - bus.cp_draw_money - bus.cp_rebate_money) AS cpWinMoney,
+        SUM(bus.cp_bet_money - bus.cp_draw_money) AS cpBetMoney,
+        SUM(bus.cp_rebate_money) AS cpRebateMoney,
+        SUM(bus.`dl_rebate_money`) AS dlRebateMoney,
+        SUM(bus.`live_win_money`) AS liveWinMoney,
+        SUM(bus.`live_valid_money`) AS liveBetMoney,
+        SUM(bus.`live_rebate_money`) AS liveRebateMoney,
+        SUM(bus.`dl_bonuus`) AS dlBonuus,
+        SUM(bus.dl_day_wage) AS dlDayWage,
+        SUM(bus.dl_ratio) AS dlRatio,
+        SUM(bus.month_paid) AS monthPaid,
+        SUM(bus.week_paid) AS weekPaid,
+        SUM(bus.winnings) AS winnings,
+        SUM(bus.`sp_win_money`) AS spWinMoney,
+        SUM(bus.`sp_bet_money`-bus.`sp_draw_money`) AS spBetMoney,
+        SUM(bus.`sp_rebate_money`) AS spRebateMoney,
+        bus.team_wage teamWage
         from member_bus_day_report bus
         left join member_rw_report rw
         on bus.member_id = rw.member_id and bus.stat_time = rw.stat_time
         where 1=1
-          AND bus.user_type='M'
-            <if test="superPath != null">
-                AND bus.super_path like #{superPath}
-            </if>
-            <if test="memberId != null">
-                and bus.member_id = #{memberId}
-            </if>
-            <if test="account != null">
-                and bus.account = #{account}
-            </if>
-            <if test="beginDate != null and endDate != null">
-                and bus.stat_time between date_format(#{beginDate},'%y%m%d') and date_format(#{endDate},'%y%m%d')
-            </if>
+        AND bus.user_type='M'
+        <if test="superPath != null">
+            AND bus.super_path like #{superPath}
+        </if>
+        <if test="memberId != null">
+            and bus.member_id = #{memberId}
+        </if>
+        <if test="account != null">
+            and bus.account = #{account}
+        </if>
+        <if test="beginDate != null and endDate != null">
+            and bus.stat_time between date_format(#{beginDate},'%y%m%d') and date_format(#{endDate},'%y%m%d')
+        </if>
         GROUP BY bus.stat_time
         order by bus.stat_time
     </select>

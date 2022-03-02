@@ -13,9 +13,9 @@ import java.io.Serializable;
 @Data
 public class ChatNoticeQueryDTO implements Serializable {
 
-    @ApiModelProperty(value = "公告标题")
-    private String noticeTitle;
+  @ApiModelProperty(value = "公告标题")
+  private String noticeTitle;
 
-    @ApiModelProperty(value = "状态")
-    private Integer status;
+  @ApiModelProperty(value = "状态")
+  private Integer status;
 }

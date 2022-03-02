@@ -1,28 +1,19 @@
 package com.gameplat.admin.model.vo;
 
-import java.math.BigDecimal;
 import lombok.Data;
 
-/**
- * 提款限额配置
- */
+import java.math.BigDecimal;
+
+/** 提款限额配置 */
 @Data
 public class MemberWithdrawDictDataVo {
 
-    /**
-     * 会员第几次提现
-     */
-    private Long timesForWithdrawal;
-    /**
-     * 单笔提现最低金额
-     */
-    private BigDecimal minAmountPerOrder;
-    /**
-     * 单笔提现最高金额
-     */
-    private Long maxAmountPerOrder;
-    /**
-     * 单日提现最高金额上限
-     */
-    private BigDecimal dayMaxAmount;
+  /** 会员第几次提现 */
+  private Long timesForWithdrawal;
+  /** 单笔提现最低金额 */
+  private BigDecimal minAmountPerOrder;
+  /** 单笔提现最高金额 */
+  private Long maxAmountPerOrder;
+  /** 单日提现最高金额上限 */
+  private BigDecimal dayMaxAmount;
 }

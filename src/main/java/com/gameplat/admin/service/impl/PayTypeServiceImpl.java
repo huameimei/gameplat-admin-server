@@ -9,37 +9,38 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.convert.PayTypeConvert;
 import com.gameplat.admin.mapper.PayTypeMapper;
-import com.gameplat.admin.model.domain.PayType;
 import com.gameplat.admin.model.dto.PayTypeAddDTO;
 import com.gameplat.admin.model.dto.PayTypeEditDTO;
 import com.gameplat.admin.model.vo.PayTypeVO;
 import com.gameplat.admin.service.PayTypeService;
 import com.gameplat.base.common.enums.EnableEnum;
 import com.gameplat.base.common.exception.ServiceException;
-import com.gameplat.common.enums.SwitchStatusEnum;
-import java.util.List;
-import java.util.stream.Collectors;
+import com.gameplat.model.entity.pay.PayType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)
 public class PayTypeServiceImpl extends ServiceImpl<PayTypeMapper, PayType>
     implements PayTypeService {
 
-  @Autowired
-  private PayTypeConvert payTypeConvert;
+  @Autowired private PayTypeConvert payTypeConvert;
 
-  @Autowired
-  private PayTypeMapper payTypeMapper;
+  @Autowired private PayTypeMapper payTypeMapper;
 
   @Override
   public List<PayTypeVO> queryList(String name) {
     return this.lambdaQuery()
         .like(ObjectUtils.isNotEmpty(name), PayType::getName, name)
-        .list().stream().map(e -> payTypeConvert.toVo(e)).collect(Collectors.toList());
+        .list()
+        .stream()
+        .map(payTypeConvert::toVo)
+        .collect(Collectors.toList());
   }
 
   @Override
@@ -57,7 +58,7 @@ public class PayTypeServiceImpl extends ServiceImpl<PayTypeMapper, PayType>
 
   @Override
   public void update(PayTypeEditDTO dto) {
-    PayType payType = null;
+    PayType payType;
     if (1 == dto.getIsSysCode()) {
       payType = new PayType();
       payType.setId(dto.getId());
@@ -80,7 +81,7 @@ public class PayTypeServiceImpl extends ServiceImpl<PayTypeMapper, PayType>
     }
     LambdaUpdateWrapper<PayType> update = Wrappers.lambdaUpdate();
     update.set(PayType::getStatus, status).eq(PayType::getId, id);
-    this.update(new PayType(),update);
+    this.update(new PayType(), update);
   }
 
   @Override
@@ -91,7 +92,6 @@ public class PayTypeServiceImpl extends ServiceImpl<PayTypeMapper, PayType>
     }
     this.removeById(id);
   }
-
 
   @Override
   public IPage<PayType> queryPage(Page<PayType> page) {

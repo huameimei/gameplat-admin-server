@@ -6,40 +6,37 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.convert.TpInterfaceConvert;
 import com.gameplat.admin.mapper.TpInterfaceMapper;
 import com.gameplat.admin.mapper.TpPayTypeMapper;
-import com.gameplat.admin.model.domain.TpInterface;
-import com.gameplat.admin.model.domain.TpPayType;
 import com.gameplat.admin.model.vo.TpInterfacePayTypeVo;
 import com.gameplat.admin.model.vo.TpInterfaceVO;
 import com.gameplat.admin.service.TpInterfaceService;
 import com.gameplat.admin.service.TpPayTypeService;
 import com.gameplat.base.common.exception.ServiceException;
-import java.util.List;
-import java.util.stream.Collectors;
+import com.gameplat.model.entity.pay.TpInterface;
+import com.gameplat.model.entity.pay.TpPayType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)
 public class TpInterfaceServiceImpl extends ServiceImpl<TpInterfaceMapper, TpInterface>
     implements TpInterfaceService {
 
-  @Autowired
-  private TpInterfaceConvert tpInterfaceConvert;
+  @Autowired private TpInterfaceConvert tpInterfaceConvert;
 
-  @Autowired
-  private TpInterfaceMapper tpInterfaceMapper;
+  @Autowired private TpInterfaceMapper tpInterfaceMapper;
 
-  @Autowired
-  private TpPayTypeMapper tpPayTypeMapper;
+  @Autowired private TpPayTypeMapper tpPayTypeMapper;
 
-  @Autowired
-  private TpPayTypeService tpPayTypeService;
+  @Autowired private TpPayTypeService tpPayTypeService;
 
   @Override
   public List<TpInterfaceVO> queryAll() {
-    return this.list().stream().map(e -> tpInterfaceConvert.toVo(e)).collect(Collectors.toList());
+    return this.list().stream().map(tpInterfaceConvert::toVo).collect(Collectors.toList());
   }
 
   @Override
@@ -51,8 +48,8 @@ public class TpInterfaceServiceImpl extends ServiceImpl<TpInterfaceMapper, TpInt
 
   @Override
   public TpInterfacePayTypeVo queryTpInterfacePayType(Long id) {
-    TpInterfacePayTypeVo tpInterfacePayTypeVo = tpInterfaceConvert
-        .toTpInterfacePayTypeVo(tpInterfaceMapper.selectById(id));
+    TpInterfacePayTypeVo tpInterfacePayTypeVo =
+        tpInterfaceConvert.toTpInterfacePayTypeVo(tpInterfaceMapper.selectById(id));
     if (null == tpInterfacePayTypeVo) {
       throw new ServiceException("第三方接口不存在!");
     }
@@ -76,7 +73,7 @@ public class TpInterfaceServiceImpl extends ServiceImpl<TpInterfaceMapper, TpInt
             .filter(
                 a ->
                     !tpInterface.getTpPayTypeList().stream()
-                        .map(b -> b.getId())
+                        .map(TpPayType::getId)
                         .collect(Collectors.toList())
                         .contains(a.getId()))
             .collect(Collectors.toList());
@@ -111,5 +108,4 @@ public class TpInterfaceServiceImpl extends ServiceImpl<TpInterfaceMapper, TpInt
     tpInterfaceMapper.insert(tpInterface);
     tpPayTypeService.saveBatch(tpInterface.getTpPayTypeList());
   }
-
 }

@@ -1,9 +1,10 @@
 package com.gameplat.admin.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.gameplat.admin.model.domain.SysDictType;
 import com.gameplat.admin.model.dto.OperDictTypeDTO;
 import com.gameplat.admin.model.vo.DictTypeVO;
+import com.gameplat.model.entity.sys.SysDictType;
+
 import java.util.List;
 
 /**

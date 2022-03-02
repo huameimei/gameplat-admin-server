@@ -3,10 +3,10 @@ package com.gameplat.admin.service;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.gameplat.admin.model.bean.PageExt;
-import com.gameplat.admin.model.domain.ActivityDistribute;
 import com.gameplat.admin.model.dto.ActivityDistributeQueryDTO;
 import com.gameplat.admin.model.vo.ActivityDistributeStatisticsVO;
 import com.gameplat.admin.model.vo.ActivityDistributeVO;
+import com.gameplat.model.entity.activity.ActivityDistribute;
 
 import java.util.List;
 

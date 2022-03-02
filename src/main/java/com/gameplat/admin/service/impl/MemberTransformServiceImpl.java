@@ -4,8 +4,6 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.gameplat.admin.constant.SystemConstant;
 import com.gameplat.admin.enums.MemberBackupEnums;
 import com.gameplat.admin.mapper.MemberMapper;
-import com.gameplat.admin.model.domain.Member;
-import com.gameplat.admin.model.domain.MemberBackup;
 import com.gameplat.admin.model.dto.MemberTransBackupDTO;
 import com.gameplat.admin.model.dto.MemberTransformDTO;
 import com.gameplat.admin.model.dto.UpdateLowerNumDTO;
@@ -15,15 +13,18 @@ import com.gameplat.admin.service.MemberTransformService;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.json.JsonUtils;
 import com.gameplat.base.common.util.StringUtils;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
+import com.gameplat.model.entity.member.Member;
+import com.gameplat.model.entity.member.MemberBackup;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service

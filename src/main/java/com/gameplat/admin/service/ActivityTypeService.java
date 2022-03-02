@@ -3,11 +3,11 @@ package com.gameplat.admin.service;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.gameplat.admin.model.domain.ActivityType;
 import com.gameplat.admin.model.dto.ActivityTypeAddDTO;
 import com.gameplat.admin.model.dto.ActivityTypeQueryDTO;
 import com.gameplat.admin.model.dto.ActivityTypeUpdateDTO;
 import com.gameplat.admin.model.vo.ActivityTypeVO;
+import com.gameplat.model.entity.activity.ActivityType;
 
 import java.util.List;
 

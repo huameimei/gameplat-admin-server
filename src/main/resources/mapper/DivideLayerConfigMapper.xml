@@ -3,7 +3,7 @@
 <mapper namespace="com.gameplat.admin.mapper.DivideLayerConfigMapper">
 
     <!-- 通用查询映射结果 -->
-    <resultMap id="BaseResultMap" type="com.gameplat.admin.model.domain.proxy.DivideLayerConfig">
+    <resultMap id="BaseResultMap" type="com.gameplat.model.entity.proxy.DivideLayerConfig">
         <id column="id" property="id"/>
         <result property="userId" column="user_id"/>
         <result property="userName" column="user_name"/>
@@ -15,7 +15,8 @@
     </resultMap>
 
     <sql id="base_column">
-        id,
+        id
+        ,
         user_id,
         user_name,
         divide_config,
@@ -66,29 +67,40 @@
     </select>
 
     <select id="getTeamList" resultType="com.gameplat.admin.model.vo.DivideLayerConfigVo">
-        SELECT
-            dl.id as id,
-            m.parent_id as parentId,
-            m.parent_name as parentName,
-            dl.divide_config as divideConfig
+        SELECT dl.id            as id,
+               m.parent_id      as parentId,
+               m.parent_name    as parentName,
+               dl.divide_config as divideConfig
         FROM divide_layer_config dl
-        INNER JOIN member m on dl.user_id = m.id
+                 INNER JOIN member m on dl.user_id = m.id
         where 1 = 1
-        and m.account != #{userName}
-        and m.super_path like concat('%/',#{userName},'/%')
+          and m.account != #{userName}
+          and m.super_path like concat('%/'
+            , #{userName}
+            , '/%')
     </select>
 
     <select id="getChildMaxDivideRatio" parameterType="string" resultType="java.math.BigDecimal">
-        select IFNULL(max(maxRatio),0) as minRatio from (
-            select JSON_UNQUOTE(
-                    json_extract(
-                            json_extract(
-                                dl.divide_config,CONCAT('$.',concat('"', concat(#{code},'"')))),CONCAT('$.',concat('"', concat('divideRatio','"'))
-                            )
-                        )
-                    ) AS maxRatio
-            from divide_layer_config dl INNER JOIN member m on dl.user_id = m.id
-	        where m.parent_name = #{userName} and m.account != #{userName}
-	    ) tmp
+        select IFNULL(max(maxRatio), 0) as minRatio
+        from (
+                 select JSON_UNQUOTE(
+                                json_extract(
+                                        json_extract(
+                                                dl.divide_config, CONCAT('$.', concat('"', concat(#{code}, '"')))),
+                                        CONCAT('$.', concat('"', concat('divideRatio', '"'))
+                                            )
+                                    )
+                            ) AS maxRatio
+                 from divide_layer_config dl
+                          INNER JOIN member m on dl.user_id = m.id
+                 where m.parent_name = #{userName}
+                   and m.account != #{userName}
+             ) tmp
+    </select>
+
+    <select id="getConfigByGameCode" resultType="string">
+        select
+            JSON_UNQUOTE(json_extract(divide_config,CONCAT('$.',concat('"', concat(#{code},'"')))))
+        from divide_layer_config where user_name = #{userName}
     </select>
 </mapper>

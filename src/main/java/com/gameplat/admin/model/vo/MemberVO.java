@@ -121,7 +121,11 @@ public class MemberVO implements Serializable {
   private String lastLoginIp;
 
   /** 最近登录时间 */
-  @Excel(name = "最后登录时间", width = 21, isImportField = "true_st", exportFormat = "yyyy-MM-dd HH:mm:ss")
+  @Excel(
+      name = "最后登录时间",
+      width = 21,
+      isImportField = "true_st",
+      exportFormat = "yyyy-MM-dd HH:mm:ss")
   @JsonSerialize(using = Date2LongSerializerUtils.class)
   private Date lastLoginTime;
 

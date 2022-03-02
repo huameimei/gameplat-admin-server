@@ -3,11 +3,11 @@ package com.gameplat.admin.service;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.gameplat.admin.model.domain.ChatNotice;
 import com.gameplat.admin.model.dto.ChatNoticeAddDTO;
 import com.gameplat.admin.model.dto.ChatNoticeEditDTO;
 import com.gameplat.admin.model.dto.ChatNoticeQueryDTO;
 import com.gameplat.admin.model.vo.ChatNoticeVO;
+import com.gameplat.model.entity.chart.ChatNotice;
 
 /**
  * @Author lily

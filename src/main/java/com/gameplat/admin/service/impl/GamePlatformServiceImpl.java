@@ -6,23 +6,22 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.convert.GamePlatformConvert;
 import com.gameplat.admin.mapper.GamePlatformMapper;
-import com.gameplat.admin.model.domain.GamePlatform;
 import com.gameplat.admin.model.dto.GamePlatformQueryDTO;
 import com.gameplat.admin.model.dto.OperGamePlatformDTO;
 import com.gameplat.admin.service.GamePlatformService;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.common.enums.TrueFalse;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import lombok.RequiredArgsConstructor;
+import com.gameplat.model.entity.game.GamePlatform;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+
 @Service
-@RequiredArgsConstructor
 @Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)
 public class GamePlatformServiceImpl extends ServiceImpl<GamePlatformMapper, GamePlatform>
     implements GamePlatformService {
@@ -51,8 +50,7 @@ public class GamePlatformServiceImpl extends ServiceImpl<GamePlatformMapper, Gam
 
   @Override
   public List<GamePlatform> queryByTransfer() {
-    return Optional.ofNullable(this.query()
-        .eq("transfer", TrueFalse.TRUE.getValue()).list())
+    return Optional.ofNullable(this.query().eq("transfer", TrueFalse.TRUE.getValue()).list())
         .orElse(Collections.emptyList());
   }
 }

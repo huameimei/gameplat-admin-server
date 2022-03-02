@@ -1,11 +1,11 @@
 package com.gameplat.admin.service.impl;
 
-import com.gameplat.admin.model.domain.SysUser;
 import com.gameplat.admin.model.dto.AdminLoginDTO;
 import com.gameplat.admin.model.vo.UserToken;
 import com.gameplat.admin.service.*;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.common.model.bean.RefreshToken;
+import com.gameplat.model.entity.sys.SysUser;
 import com.gameplat.security.context.UserCredential;
 import com.gameplat.security.manager.JwtTokenAuthenticationManager;
 import lombok.extern.slf4j.Slf4j;

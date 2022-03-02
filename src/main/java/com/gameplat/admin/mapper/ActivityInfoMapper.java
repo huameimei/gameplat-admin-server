@@ -1,7 +1,7 @@
 package com.gameplat.admin.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.gameplat.admin.model.domain.ActivityInfo;
+import com.gameplat.model.entity.activity.ActivityInfo;
 
 /**
  * 活动信息表 Mapper 接口

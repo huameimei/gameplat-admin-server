@@ -4,42 +4,55 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.gameplat.admin.mapper.SysDictDataMapper">
 
-    <resultMap type="com.gameplat.admin.model.domain.SysDictData" id="SysDictDataResult">
-        <id     property="id"     column="id"   />
-        <result property="dictSort"     column="dict_sort"   />
-        <result property="dictName"     column="dict_name"   />
-        <result property="dictLabel"    column="dict_label"  />
-        <result property="dictValue"    column="dict_value"  />
-        <result property="dictType"     column="dict_type"   />
-        <result property="cssClass"     column="css_class"   />
-        <result property="listClass"    column="list_class"  />
-        <result property="isVisible"    column="is_visible"  />
-        <result property="isDefault"    column="is_default"  />
-        <result property="status"       column="status"      />
-        <result property="createBy"     column="create_by"   />
-        <result property="createTime"   column="create_time" />
-        <result property="updateBy"     column="update_by"   />
-        <result property="updateTime"   column="update_time" />
-        <result property="remark"   column="remark" />
+    <resultMap type="com.gameplat.model.entity.sys.SysDictData" id="SysDictDataResult">
+        <id property="id" column="id"/>
+        <result property="dictSort" column="dict_sort"/>
+        <result property="dictName" column="dict_name"/>
+        <result property="dictLabel" column="dict_label"/>
+        <result property="dictValue" column="dict_value"/>
+        <result property="dictType" column="dict_type"/>
+        <result property="cssClass" column="css_class"/>
+        <result property="listClass" column="list_class"/>
+        <result property="isVisible" column="is_visible"/>
+        <result property="isDefault" column="is_default"/>
+        <result property="status" column="status"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="remark" column="remark"/>
     </resultMap>
 
     <!--查询语句-->
     <sql id="selectDictDataVo">
-        SELECT id, dict_sort, dict_name, dict_label, dict_value, dict_type, css_class, list_class, is_visible, is_default, status, create_by, create_time, remark
-		FROM sys_dict_data
+        SELECT id,
+               dict_sort,
+               dict_name,
+               dict_label,
+               dict_value,
+               dict_type,
+               css_class,
+               list_class,
+               is_visible,
+               is_default,
+               status,
+               create_by,
+               create_time,
+               remark
+        FROM sys_dict_data
     </sql>
 
-	<select id="findDataByType" resultMap="SysDictDataResult">
-		SELECT 
-		id, dict_sort, dict_name, dict_label, dict_value,
-		dict_type, css_class, list_class, is_visible, is_default, status,
-		create_by, create_time, remark
-		FROM sys_dict_data 
-		where dict_type=#{type}
-		<if test="status != null and status!=''">
-			and `status`=#{status}
-		</if>
-		order by dict_sort
-	</select>
+    <select id="findDataByType" resultMap="SysDictDataResult">
+        SELECT
+        id, dict_sort, dict_name, dict_label, dict_value,
+        dict_type, css_class, list_class, is_visible, is_default, status,
+        create_by, create_time, remark
+        FROM sys_dict_data
+        where dict_type=#{type}
+        <if test="status != null and status!=''">
+            and `status`=#{status}
+        </if>
+        order by dict_sort
+    </select>
 
 </mapper>

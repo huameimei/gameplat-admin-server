@@ -1,7 +1,7 @@
 package com.gameplat.admin.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.gameplat.admin.model.domain.QuickReply;
+import com.gameplat.model.entity.QuickReply;
 
 /**
  * 快捷回复 数据层

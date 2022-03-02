@@ -1,11 +1,11 @@
 package com.gameplat.admin.model.vo;
 
+import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
+
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
-
-import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
 
 @Data
 public class MemberInfoVO implements Serializable {
@@ -27,7 +27,7 @@ public class MemberInfoVO implements Serializable {
   /** 用户类型 */
   private String userType;
 
-  /** 会员状态 禁用：-1；停用：0；正常：1*/
+  /** 会员状态 禁用：-1；停用：0；正常：1 */
   private Integer status;
 
   private String withdrawFlag;
@@ -53,7 +53,7 @@ public class MemberInfoVO implements Serializable {
   /** 邀请码 */
   private String invitationCode;
 
-  /** 账户余额*/
+  /** 账户余额 */
   private BigDecimal balance;
 
   private String rebate;

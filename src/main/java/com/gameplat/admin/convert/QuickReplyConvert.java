@@ -1,8 +1,8 @@
 package com.gameplat.admin.convert;
 
-import com.gameplat.admin.model.domain.QuickReply;
 import com.gameplat.admin.model.dto.QuickReplyDTO;
 import com.gameplat.admin.model.vo.QuickReplyVO;
+import com.gameplat.model.entity.QuickReply;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 

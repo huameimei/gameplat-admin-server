@@ -1,7 +1,7 @@
 package com.gameplat.admin.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.gameplat.admin.model.domain.SysSMS;
+import com.gameplat.model.entity.sys.SysSMS;
 import org.apache.ibatis.annotations.Select;
 
 /**

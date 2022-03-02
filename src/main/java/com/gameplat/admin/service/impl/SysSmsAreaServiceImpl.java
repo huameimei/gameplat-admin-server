@@ -6,17 +6,20 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.convert.SysSmsAreaConvert;
 import com.gameplat.admin.mapper.SysSmsAreaMapper;
-import com.gameplat.admin.model.domain.SysSmsArea;
 import com.gameplat.admin.model.dto.SmsAreaAddDTO;
 import com.gameplat.admin.model.dto.SmsAreaEditDTO;
 import com.gameplat.admin.model.dto.SmsAreaQueryDTO;
 import com.gameplat.admin.model.vo.SysSmsAreaVO;
 import com.gameplat.admin.service.SysSmsAreaService;
 import com.gameplat.common.lang.Assert;
+import com.gameplat.model.entity.sys.SysSmsArea;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)
 public class SysSmsAreaServiceImpl extends ServiceImpl<SysSmsAreaMapper, SysSmsArea>
     implements SysSmsAreaService {
 

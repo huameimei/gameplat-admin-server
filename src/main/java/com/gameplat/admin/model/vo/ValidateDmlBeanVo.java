@@ -13,32 +13,18 @@ public class ValidateDmlBeanVo implements Serializable {
 
   private String username;
   private List<ValidWithdrawVO> rows;
-  /**
-   * 要求打码量
-   */
+  /** 要求打码量 */
   private BigDecimal requireDML;
-  /**
-   * 放宽额度
-   */
+  /** 放宽额度 */
   private BigDecimal relaxQuota;
-  /**
-   * 有效投注额
-   */
+  /** 有效投注额 */
   private BigDecimal sumAllDml;
-  /**
-   * 总打码量 通过-true，不通过false
-   */
+  /** 总打码量 通过-true，不通过false */
   private boolean allDmlPass;
-  /**
-   *
-   提现需打码金额
-   */
+  /** 提现需打码金额 */
   private BigDecimal remainRequiredDml;
-  /**
-   * 需要扣除金额
-   */
+  /** 需要扣除金额 */
   private BigDecimal sumAllDeduct;
+
   private BigDecimal yetWithdraw;
-
-
 }

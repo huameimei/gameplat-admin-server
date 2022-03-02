@@ -8,12 +8,8 @@ import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.convert.RoleConvert;
-import com.gameplat.common.enums.BooleanEnum;
-import com.gameplat.common.enums.DefaultEnums;
 import com.gameplat.admin.mapper.SysRoleMapper;
 import com.gameplat.admin.mapper.SysRoleMenuMapper;
-import com.gameplat.admin.model.domain.SysRole;
-import com.gameplat.admin.model.domain.SysRoleMenu;
 import com.gameplat.admin.model.dto.AuthMenuDTO;
 import com.gameplat.admin.model.dto.OperRoleDTO;
 import com.gameplat.admin.model.dto.RoleDTO;
@@ -21,13 +17,19 @@ import com.gameplat.admin.model.vo.RoleVo;
 import com.gameplat.admin.service.SysRoleService;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.StringUtils;
+import com.gameplat.common.enums.BooleanEnum;
+import com.gameplat.model.entity.sys.SysRole;
+import com.gameplat.model.entity.sys.SysRoleMenu;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 /**
  * 角色管理 业务层处理
@@ -36,6 +38,7 @@ import org.springframework.stereotype.Service;
  */
 @Slf4j
 @Service
+@Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)
 public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole>
     implements SysRoleService {
 

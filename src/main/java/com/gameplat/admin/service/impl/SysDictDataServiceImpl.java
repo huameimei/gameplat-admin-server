@@ -13,7 +13,6 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.convert.DictDataConvert;
 import com.gameplat.admin.mapper.SysDictDataMapper;
 import com.gameplat.admin.model.bean.UserWithdrawLimitInfo;
-import com.gameplat.admin.model.domain.SysDictData;
 import com.gameplat.admin.model.dto.OperDictDataDTO;
 import com.gameplat.admin.model.dto.SysDictDataDTO;
 import com.gameplat.admin.model.vo.DictDataVo;
@@ -24,8 +23,11 @@ import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.json.JsonUtils;
 import com.gameplat.common.constant.CachedKeys;
 import com.gameplat.common.enums.DictTypeEnum;
+import com.gameplat.model.entity.sys.SysDictData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -35,6 +37,7 @@ import java.util.List;
  * @author three
  */
 @Service
+@Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)
 public class SysDictDataServiceImpl extends ServiceImpl<SysDictDataMapper, SysDictData>
     implements SysDictDataService {
 
@@ -246,17 +249,19 @@ public class SysDictDataServiceImpl extends ServiceImpl<SysDictDataMapper, SysDi
   }
 
   @CacheInvalidateContainer(
-          value = {
-                  @CacheInvalidate(name = CachedKeys.DICT_DATA_CACHE, key = "#data.dictType"),
-                  @CacheInvalidate(name = CachedKeys.DICT_DATA_CACHE, key = "#data.dictType + ':' + #data.dictLabel")
-          })
+      value = {
+        @CacheInvalidate(name = CachedKeys.DICT_DATA_CACHE, key = "#data.dictType"),
+        @CacheInvalidate(
+            name = CachedKeys.DICT_DATA_CACHE,
+            key = "#data.dictType + ':' + #data.dictLabel")
+      })
   @Override
   public void updateByTypeAndLabel(SysDictData data) {
     LambdaUpdateWrapper<SysDictData> updateWrapper = new LambdaUpdateWrapper<>();
-    updateWrapper.eq(SysDictData::getDictLabel, data.getDictLabel())
-            .eq(SysDictData::getDictType, data.getDictType())
-            .set(SysDictData::getDictValue, data.getDictValue());
+    updateWrapper
+        .eq(SysDictData::getDictLabel, data.getDictLabel())
+        .eq(SysDictData::getDictType, data.getDictType())
+        .set(SysDictData::getDictValue, data.getDictValue());
     update(updateWrapper);
   }
-
 }

@@ -1,8 +1,9 @@
 package com.gameplat.admin.model.vo;
 
+import lombok.Data;
+
 import java.math.BigDecimal;
 import java.util.Date;
-import lombok.Data;
 
 @Data
 public class MemberWithdrawHistoryVO {
@@ -68,5 +69,4 @@ public class MemberWithdrawHistoryVO {
   private Long id;
 
   private Long memberId;
-
 }

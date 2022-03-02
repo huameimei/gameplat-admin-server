@@ -2,10 +2,21 @@ package com.gameplat.admin.service.impl;
 
 import cn.hutool.core.util.ObjectUtil;
 import com.gameplat.admin.model.dto.OperGameTransferRecordDTO;
-import com.gameplat.admin.service.*;
+import com.gameplat.admin.service.GameAdminService;
+import com.gameplat.admin.service.GameAmountControlService;
+import com.gameplat.admin.service.GameConfigService;
+import com.gameplat.admin.service.GameTransferInfoService;
+import com.gameplat.admin.service.GameTransferRecordService;
+import com.gameplat.admin.service.MemberBillService;
+import com.gameplat.admin.service.MemberInfoService;
+import com.gameplat.admin.service.MemberService;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.DateUtil;
-import com.gameplat.common.enums.*;
+import com.gameplat.common.enums.GameAmountControlTypeEnum;
+import com.gameplat.common.enums.GamePlatformEnum;
+import com.gameplat.common.enums.GameTransferStatus;
+import com.gameplat.common.enums.TranTypes;
+import com.gameplat.common.enums.TransferTypesEnum;
 import com.gameplat.common.game.GameBizBean;
 import com.gameplat.common.game.TransferResource;
 import com.gameplat.common.game.api.GameApi;
@@ -18,6 +29,9 @@ import com.gameplat.model.entity.game.GameTransferRecord;
 import com.gameplat.model.entity.member.Member;
 import com.gameplat.model.entity.member.MemberBill;
 import com.gameplat.model.entity.member.MemberInfo;
+import java.math.BigDecimal;
+import java.util.Date;
+import javax.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -26,10 +40,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-
-import javax.annotation.Resource;
-import java.math.BigDecimal;
-import java.util.Date;
 
 @Slf4j
 @Service
@@ -534,7 +544,7 @@ public class GameAdminServiceImpl implements GameAdminService {
               + transferRecord.getRemark());
       gameTransferRecordService.save(transferRecord);
     } catch (Exception e) {
-      log.error("真人插入数据:gameCode=" + transferRecord.getOrderNo(), e);
+      log.error("真人插入数据:订单号=" + transferRecord.getOrderNo(), e);
     }
   }
 }

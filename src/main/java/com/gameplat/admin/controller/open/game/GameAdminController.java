@@ -8,21 +8,28 @@ import com.gameplat.admin.service.GamePlatformService;
 import com.gameplat.admin.service.MemberService;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.StringUtils;
+import com.gameplat.common.constant.ServiceName;
 import com.gameplat.common.enums.TransferTypesEnum;
+import com.gameplat.log.annotation.Log;
+import com.gameplat.log.enums.LogType;
 import com.gameplat.model.entity.game.GamePlatform;
 import com.gameplat.model.entity.member.Member;
 import com.gameplat.model.entity.member.MemberInfo;
 import com.gameplat.redis.api.RedisService;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.util.CollectionUtils;
-import org.springframework.web.bind.annotation.*;
-
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.CollectionUtils;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
 @RestController
@@ -79,13 +86,14 @@ public class GameAdminController {
         .forEach(
             (key, value) -> {
               try {
-                if (StringUtils.isNotBlank(value) && (int) Double.parseDouble(value) >= 1) {
+                if (StringUtils.isNotBlank(value)
+                    && new BigDecimal(value).compareTo(BigDecimal.ZERO) > 0) {
                   gameAdminService.transfer(
                       key, TransferTypesEnum.SELF.getCode(), new BigDecimal(value), member, false);
                   dto.getPlatform().put(key, (int) Double.parseDouble(value) + "");
                 } else {
                   dto.getPlatform().put(key, "0");
-                  map.put(key, "金额必须大于或等于1");
+                  map.put(key, "金额必须大于零");
                 }
               } catch (Exception e) {
                 log.info(e.getMessage());
@@ -97,7 +105,7 @@ public class GameAdminController {
 
   /** 没收真人余额 */
   @RequestMapping(value = "/confiscated", method = RequestMethod.POST)
-  @ResponseBody
+  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.ADMIN, desc = "'没收会员游戏金额，id='+#memberInfo.id")
   public Map<String, String> confiscated(@RequestBody GameBalanceQueryDTO dto) throws Exception {
     Map<String, String> map = new HashMap();
     Member member = memberService.getMemberAndFillGameAccount(dto.getAccount());
@@ -126,6 +134,7 @@ public class GameAdminController {
 
   /** 查询所有真人游戏平台余额 */
   @GetMapping(value = "/selectGameAllBalance")
+  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.ADMIN, desc = "'查询会员游戏金额，id='+#memberInfo.id")
   public Map<String, BigDecimal> selectGameAllBalance(MemberInfo memberInfo) {
     Member member = memberService.getById(memberInfo.getMemberId());
     Member memberAccount = memberService.getMemberAndFillGameAccount(member.getAccount());
@@ -154,6 +163,7 @@ public class GameAdminController {
 
   /** 回收金额 */
   @PostMapping(value = "/recyclingAmountByAccount")
+  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.ADMIN, desc = "'回收会员游戏金额，account='+#dto.account")
   public Map<String, Object> recyclingAmountByAccount(@RequestBody GameBalanceQueryDTO dto) {
     Map<String, Object> map = new HashMap();
     if (null == dto.getPlatform() || null == dto.getPlatform().get("platformCode")) {
@@ -178,13 +188,13 @@ public class GameAdminController {
             platformCode, TransferTypesEnum.SELF.getCode(), transferMoney, member, false);
         map.put("balance", transferMoney);
         // 记录日志
-        StringBuffer log = new StringBuffer();
-        log.append("真人额度回收:会员账号:" + dto.getAccount() + ",");
-        log.append("真人类型：" + platformCode + ",");
-        log.append("金额：" + transferMoney);
-        // TODO 日志记录
+        StringBuffer buffer = new StringBuffer();
+        buffer.append("真人额度回收:会员账号:" + dto.getAccount() + ",");
+        buffer.append("真人类型：" + platformCode + ",");
+        buffer.append("金额：" + transferMoney);
+        log.info(buffer.toString());
       } else {
-        map.put("errorCode", "回收金额必须大于或等于1");
+        map.put("errorCode", "回收金额必须大于0");
         return map;
       }
     } catch (Exception e) {

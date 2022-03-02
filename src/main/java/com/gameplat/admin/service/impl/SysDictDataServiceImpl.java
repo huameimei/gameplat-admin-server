@@ -63,7 +63,7 @@ public class SysDictDataServiceImpl extends ServiceImpl<SysDictDataMapper, SysDi
             ObjectUtils.isNotNull(dictData.getStatus()),
             SysDictData::getStatus,
             dictData.getStatus())
-        .orderByDesc(SysDictData::getDictSort)
+        .orderByAsc(SysDictData::getDictSort)
         .page(page)
         .convert(dictDataConvert::toVo);
   }

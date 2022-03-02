@@ -36,7 +36,7 @@ public class MemberWithdrawLimitController {
   public void addOrEdit(@RequestBody UserWithdrawLimitInfo limitInfo) {
     String dictType = DictTypeEnum.USER_WITHDRAW_LIMIT.getValue();
     String dictLabel =
-        DictTypeEnum.USER_WITHDRAW_LIMIT.getValue() + limitInfo.getTimesForWithdrawal();
+        DictDataEnum.WITHDRAW_LIMIT.getLabel() + limitInfo.getTimesForWithdrawal();
     dictDataService.addOrUpdateUserWithdrawLimit(dictType, dictLabel, limitInfo);
   }
 

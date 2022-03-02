@@ -203,6 +203,7 @@ public class DividePeriodsServiceImpl extends ServiceImpl<DividePeriodsMapper, D
      * @param dto
      */
     @Override
+    @SentinelResource(value = "grant")
     public void grant(DividePeriodsDTO dto) {
         UserCredential userCredential = SecurityUserHolder.getCredential();
         //获取需要派发的期数
@@ -249,6 +250,7 @@ public class DividePeriodsServiceImpl extends ServiceImpl<DividePeriodsMapper, D
      * @param dto
      */
     @Override
+    @SentinelResource(value = "recycle")
     public void recycle(DividePeriodsDTO dto) {
         UserCredential userCredential = SecurityUserHolder.getCredential();
         //获取需要派发的期数
@@ -469,7 +471,7 @@ public class DividePeriodsServiceImpl extends ServiceImpl<DividePeriodsMapper, D
                 }
             }
             // 上级的agentLevel值比投注人的还要大 则直接返回
-            if (currentMember.getAgentLevel() >= userLevelNum) {
+            if (currentMember.getAgentLevel() > userLevelNum) {
                 continue;
             }
 
@@ -478,8 +480,8 @@ public class DividePeriodsServiceImpl extends ServiceImpl<DividePeriodsMapper, D
                             .periodsId(periodsId)
                             .userId(gameReportVO.getMemberId())
                             .userName(gameReportVO.getAccount())
-                            .proxyId(gameReportVO.getSuperId())
-                            .proxyName(gameReportVO.getSuperAccount())
+                            .proxyId(currentMember.getId())
+                            .proxyName(currentMember.getAccount())
                             .agentLevel(currentMember.getAgentLevel())
                             .superPath(currentMember.getSuperPath())
                             .superId(currentMember.getParentId())
@@ -635,8 +637,8 @@ public class DividePeriodsServiceImpl extends ServiceImpl<DividePeriodsMapper, D
                             .periodsId(periodsId)
                             .userId(gameReportVO.getMemberId()) // 分红来源用户Id
                             .userName(gameReportVO.getAccount()) // 分红来源用户名称
-                            .proxyId(gameReportVO.getSuperId()) // 分红代理的ID
-                            .proxyName(gameReportVO.getSuperAccount()) // 分红代理的名称
+                            .proxyId(currentMember.getId()) // 分红代理的ID
+                            .proxyName(currentMember.getAccount()) // 分红代理的名称
                             .agentLevel(currentMember.getAgentLevel()) // 分红代理的级别
                             .superPath(currentMember.getSuperPath()) // 分红代理的代理路径
                             .superId(currentMember.getParentId())
@@ -756,8 +758,8 @@ public class DividePeriodsServiceImpl extends ServiceImpl<DividePeriodsMapper, D
                             .periodsId(periodsId)
                             .userId(gameReportVO.getMemberId()) // 分红来源用户Id
                             .userName(gameReportVO.getAccount()) // 分红来源用户名称
-                            .proxyId(gameReportVO.getSuperId()) // 分红代理的ID
-                            .proxyName(gameReportVO.getSuperAccount()) // 分红代理的名称
+                            .proxyId(currentMember.getId()) // 分红代理的ID
+                            .proxyName(currentMember.getAccount()) // 分红代理的名称
                             .agentLevel(currentMember.getAgentLevel()) // 分红代理的级别
                             .superPath(currentMember.getSuperPath()) // 分红代理的代理路径
                             .superId(currentMember.getParentId())

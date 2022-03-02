@@ -78,4 +78,7 @@ public class MemberRWReportVo implements Serializable {
 
   @ApiModelProperty(value = "充提总结余")
   private BigDecimal totalRWAmount;
+
+  @ApiModelProperty("代理账号")
+  private String superAccount;
 }

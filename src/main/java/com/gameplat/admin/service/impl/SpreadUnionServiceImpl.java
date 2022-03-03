@@ -34,9 +34,6 @@ import java.util.stream.Collectors;
 public class SpreadUnionServiceImpl extends ServiceImpl<SpreadUnionMapper, SpreadUnion>
         implements SpreadUnionService {
 
-  @Autowired private MemberMapper memberMapper;
-
-  @Autowired private MemberBackupService memberBackupService;
 
   @Autowired private SpreadUnionConvert spreadUnionConvert;
 
@@ -125,35 +122,37 @@ public class SpreadUnionServiceImpl extends ServiceImpl<SpreadUnionMapper, Sprea
             this.lambdaQuery()
                     .eq(StringUtils.isNotEmpty(dto.getAgentAccount()),SpreadUnion::getAgentAccount, dto.getAgentAccount())
                     .like(StringUtils.isNotEmpty(dto.getUnionName()),SpreadUnion::getUnionName, dto.getUnionName())
+                    .between(SpreadUnion::getCreateTime,dto.getStartTime(),dto.getEndTime())
                     .list()
                     .stream()
                     .map(spreadUnionConvert::toSpreadUnionVO)
                     .collect(Collectors.toList());
-    List<JSONObject> spreadReport =
-            reportMapper.getSpreadReport(list, dto.getStartTime(), dto.getEndTime());
-    for (SpreadUnionVO x : list) {
-      String agentPat = "/" + x.getAgentAccount() + "[\\s\\S]*";
-      BigDecimal reAmount = new BigDecimal("0");
-      BigDecimal wiAmount = new BigDecimal("0");
-      BigDecimal reIncome = new BigDecimal("0");
-      int i = 0;
-      for (JSONObject y : spreadReport) {
-        if (Pattern.matches(agentPat, y.getString("agentPath"))) {
-          BigDecimal rechargeAmount = y.getBigDecimal("rechargeAmount");
-          BigDecimal withdrawAmount = y.getBigDecimal("withdrawAmount");
-          BigDecimal income = y.getBigDecimal("income");
-          reAmount = reAmount.add(rechargeAmount);
-          wiAmount = wiAmount.add(withdrawAmount);
-          reIncome = reIncome.add(income);
-          i++;
+    if (list != null && list.size() > 0) {
+      List<JSONObject> spreadReport =
+              reportMapper.getSpreadReport(list, dto.getStartTime(), dto.getEndTime());
+      for (SpreadUnionVO x : list) {
+        String agentPat = "/" + x.getAgentAccount() + "[\\s\\S]*";
+        BigDecimal reAmount = new BigDecimal("0");
+        BigDecimal wiAmount = new BigDecimal("0");
+        BigDecimal reIncome = new BigDecimal("0");
+        int i = 0;
+        for (JSONObject y : spreadReport) {
+          if (Pattern.matches(agentPat, y.getString("agentPath"))) {
+            BigDecimal rechargeAmount = y.getBigDecimal("rechargeAmount");
+            BigDecimal withdrawAmount = y.getBigDecimal("withdrawAmount");
+            BigDecimal income = y.getBigDecimal("income");
+            reAmount = reAmount.add(rechargeAmount);
+            wiAmount = wiAmount.add(withdrawAmount);
+            reIncome = reIncome.add(income);
+            i++;
+          }
         }
+        x.setRechargeAmount(reAmount);
+        x.setWithdrawAmount(wiAmount);
+        x.setIncome(reIncome);
+        x.setCount(i);
       }
-      x.setRechargeAmount(reAmount);
-      x.setWithdrawAmount(wiAmount);
-      x.setIncome(reIncome);
-      x.setCount(i);
     }
-
     // 统计总数
     return list;
   }

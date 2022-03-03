@@ -92,5 +92,11 @@ public class GameKindServiceImpl extends ServiceImpl<GameKindMapper, GameKind>
                 .collect(Collectors.toList());
     }
 
+    @Override
+    @SentinelResource(value = "getByCode")
+    public GameKindVO getByCode(String code) {
+        return gameKindMapper.getByCode(code);
+    }
+
 
 }

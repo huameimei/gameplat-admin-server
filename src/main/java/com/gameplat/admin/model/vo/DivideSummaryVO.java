@@ -84,4 +84,7 @@ public class DivideSummaryVO implements Serializable {
     @ApiModelProperty(value = "备注")
     private String remark;
 
+    private String periodsStartDate;
+    private String periodsEndDate;
+
 }

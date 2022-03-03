@@ -9,18 +9,21 @@ import com.gameplat.admin.convert.DivideDetailConvert;
 import com.gameplat.admin.mapper.DivideDetailMapper;
 import com.gameplat.admin.model.dto.DivideDetailQueryDTO;
 import com.gameplat.admin.model.vo.DivideDetailVO;
+import com.gameplat.admin.model.vo.GameKindVO;
 import com.gameplat.admin.service.DivideDetailService;
+import com.gameplat.admin.service.GameKindService;
 import com.gameplat.model.entity.proxy.DivideDetail;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
+@SuppressWarnings("all")
 public class DivideDetailServiceImpl extends ServiceImpl<DivideDetailMapper, DivideDetail>
     implements DivideDetailService {
 
   @Autowired private DivideDetailMapper divideDetailMapper;
-
   @Autowired private DivideDetailConvert divideDetailConvert;
+  @Autowired private GameKindService gameKindService;
 
   @Override
   public IPage<DivideDetailVO> queryPage(PageDTO<DivideDetail> page, DivideDetailQueryDTO dto) {
@@ -30,6 +33,11 @@ public class DivideDetailServiceImpl extends ServiceImpl<DivideDetailMapper, Div
         .eq(ObjectUtils.isNotNull(dto.getPeriodsId()), "periods_id", dto.getPeriodsId())
         .eq(ObjectUtils.isNotNull(dto.getProxyId()), "proxy_id", dto.getProxyId())
         .orderByDesc("create_time");
-    return divideDetailMapper.selectPage(page, queryWrapper).convert(divideDetailConvert::toVo);
+    IPage<DivideDetailVO> pageResult = divideDetailMapper.selectPage(page, queryWrapper).convert(divideDetailConvert::toVo);
+    for (DivideDetailVO vo : pageResult.getRecords()) {
+      GameKindVO byCode = gameKindService.getByCode(vo.getCode());
+      vo.setName(byCode.getName());
+    }
+    return pageResult;
   }
 }

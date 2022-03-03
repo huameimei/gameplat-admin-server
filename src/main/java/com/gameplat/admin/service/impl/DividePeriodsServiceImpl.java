@@ -13,7 +13,6 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.constant.MemberServiceKeyConstant;
-import com.gameplat.admin.constant.RechargeMode;
 import com.gameplat.admin.constant.SystemConstant;
 import com.gameplat.admin.constant.TrueFalse;
 import com.gameplat.admin.convert.DivideDetailConvert;
@@ -33,7 +32,6 @@ import com.gameplat.admin.model.vo.GameDivideVo;
 import com.gameplat.admin.service.*;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.snowflake.IdGeneratorSnowflake;
-import com.gameplat.base.common.util.RandomUtil;
 import com.gameplat.common.enums.MemberEnums;
 import com.gameplat.common.enums.UserTypes;
 import com.gameplat.common.lang.Assert;
@@ -48,20 +46,16 @@ import com.gameplat.redis.redisson.DistributedLocker;
 import com.gameplat.security.SecurityUserHolder;
 import com.gameplat.security.context.UserCredential;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
-import org.springframework.aop.framework.autoproxy.BeanNameAutoProxyCreator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -478,14 +472,17 @@ public class DividePeriodsServiceImpl extends ServiceImpl<DividePeriodsMapper, D
             DivideDetailDto saveDetailDto =
                     DivideDetailDto.builder()
                             .periodsId(periodsId)
-                            .userId(gameReportVO.getMemberId())
-                            .userName(gameReportVO.getAccount())
-                            .proxyId(currentMember.getId())
-                            .proxyName(currentMember.getAccount())
-                            .agentLevel(currentMember.getAgentLevel())
-                            .superPath(currentMember.getSuperPath())
-                            .superId(currentMember.getParentId())
-                            .superName(currentMember.getParentName())
+                            .userId(gameReportVO.getMemberId()) // 分红来源用户Id
+                            .userName(gameReportVO.getAccount()) // 分红来源用户名称
+                            .agentLevel(gameReportVO.getAgentLevel())// 分红源的级别
+                            .superPath(gameReportVO.getUserPaths())// 分红源的代理路径
+                            .userType(gameReportVO.getUserType())// 分红源的用户类型
+                            .proxyId(currentMember.getId()) // 分红代理的ID
+                            .proxyName(currentMember.getAccount()) // 分红代理的名称
+                            .superId(currentMember.getParentId()) // 分红代理的上级
+                            .superName(currentMember.getParentName()) // 分红代理的上级
+                            .proxyAgentLevel(currentMember.getAgentLevel())
+                            .proxyAgentPath(currentMember.getSuperPath())
                             .liveCode(gameReportVO.getGameType())
                             .code(gameReportVO.getGameKind())
                             .validAmount(gameReportVO.getValidAmount())
@@ -637,12 +634,15 @@ public class DividePeriodsServiceImpl extends ServiceImpl<DividePeriodsMapper, D
                             .periodsId(periodsId)
                             .userId(gameReportVO.getMemberId()) // 分红来源用户Id
                             .userName(gameReportVO.getAccount()) // 分红来源用户名称
+                            .agentLevel(gameReportVO.getAgentLevel())// 分红源的级别
+                            .superPath(gameReportVO.getUserPaths())// 分红源的代理路径
+                            .userType(gameReportVO.getUserType())// 分红源的用户类型
                             .proxyId(currentMember.getId()) // 分红代理的ID
                             .proxyName(currentMember.getAccount()) // 分红代理的名称
-                            .agentLevel(currentMember.getAgentLevel()) // 分红代理的级别
-                            .superPath(currentMember.getSuperPath()) // 分红代理的代理路径
-                            .superId(currentMember.getParentId())
-                            .superName(currentMember.getParentName())
+                            .superId(currentMember.getParentId()) // 分红代理的上级
+                            .superName(currentMember.getParentName()) // 分红代理的上级
+                            .proxyAgentLevel(currentMember.getAgentLevel())
+                            .proxyAgentPath(currentMember.getSuperPath())
                             .liveCode(gameReportVO.getGameType()) // 游戏大类编码
                             .code(gameReportVO.getGameKind()) // 一级游戏编码
                             .validAmount(gameReportVO.getValidAmount()) // 有效投注
@@ -758,12 +758,15 @@ public class DividePeriodsServiceImpl extends ServiceImpl<DividePeriodsMapper, D
                             .periodsId(periodsId)
                             .userId(gameReportVO.getMemberId()) // 分红来源用户Id
                             .userName(gameReportVO.getAccount()) // 分红来源用户名称
+                            .agentLevel(gameReportVO.getAgentLevel())// 分红源的级别
+                            .superPath(gameReportVO.getUserPaths())// 分红源的代理路径
+                            .userType(gameReportVO.getUserType())// 分红源的用户类型
                             .proxyId(currentMember.getId()) // 分红代理的ID
                             .proxyName(currentMember.getAccount()) // 分红代理的名称
-                            .agentLevel(currentMember.getAgentLevel()) // 分红代理的级别
-                            .superPath(currentMember.getSuperPath()) // 分红代理的代理路径
-                            .superId(currentMember.getParentId())
-                            .superName(currentMember.getParentName())
+                            .superId(currentMember.getParentId()) // 分红代理的上级
+                            .superName(currentMember.getParentName()) // 分红代理的上级
+                            .proxyAgentLevel(currentMember.getAgentLevel())
+                            .proxyAgentPath(currentMember.getSuperPath())
                             .liveCode(gameReportVO.getGameType()) // 游戏大类编码
                             .code(gameReportVO.getGameKind()) // 一级游戏编码
                             .validAmount(gameReportVO.getValidAmount()) // 有效投注
@@ -913,6 +916,7 @@ public class DividePeriodsServiceImpl extends ServiceImpl<DividePeriodsMapper, D
             memberBill.setMemberId(member.getId());
             memberBill.setAccount(member.getAccount());
             memberBill.setMemberPath(member.getSuperPath());
+            memberBill.setTableIndex(member.getTableIndex());
             memberBill.setTranType(MemberBillTransTypeEnum.DIVIDE_AMOUNT.getCode());
             memberBill.setOrderNo(String.valueOf(IdGeneratorSnowflake.getInstance().nextId()));
             memberBill.setAmount(summary.getRealDivideAmount());
@@ -999,9 +1003,10 @@ public class DividePeriodsServiceImpl extends ServiceImpl<DividePeriodsMapper, D
             memberBill.setMemberId(member.getId());
             memberBill.setAccount(member.getAccount());
             memberBill.setMemberPath(member.getSuperPath());
+            memberBill.setTableIndex(member.getTableIndex());
             memberBill.setTranType(MemberBillTransTypeEnum.DIVIDE_AMOUNT_BACK.getCode());
             memberBill.setOrderNo(String.valueOf(IdGeneratorSnowflake.getInstance().nextId()));
-            memberBill.setAmount(summary.getRealDivideAmount());
+            memberBill.setAmount(summary.getRealDivideAmount().negate());
             memberBill.setBalance(memberInfo.getBalance());
             memberBill.setRemark(sb);
             memberBill.setContent(sb);
@@ -1020,7 +1025,7 @@ public class DividePeriodsServiceImpl extends ServiceImpl<DividePeriodsMapper, D
 
         // 计算变更后余额
         BigDecimal newBalance = memberInfo.getBalance().add(summary.getRealDivideAmount().negate());
-        if (newBalance.compareTo(BigDecimal.ZERO) <= 0) {
+        if (newBalance.compareTo(BigDecimal.ZERO) < 0) {
             return;
         }
         MemberInfo entity = MemberInfo.builder()
@@ -1051,8 +1056,8 @@ public class DividePeriodsServiceImpl extends ServiceImpl<DividePeriodsMapper, D
                             .periodsId(periodsId)
                             .userId(divideDetail.getProxyId())
                             .account(divideDetail.getProxyName())
-                            .agentLevel(divideDetail.getAgentLevel())
-                            .agentPath(divideDetail.getSuperPath())
+                            .agentLevel(divideDetail.getProxyAgentLevel())
+                            .agentPath(divideDetail.getProxyAgentPath())
                             .parentId(divideDetail.getSuperId())
                             .parentName(divideDetail.getSuperName())
                             .status(TrueFalse.TRUE.getValue())

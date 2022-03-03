@@ -136,14 +136,14 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
     if (ObjectUtils.isNotNull(dto.getRechargeStatusList())
         && dto.getRechargeStatusList().size() > 0) {
       query
-          .eq(dto.getRechargeStatusList().contains(3), MemberWithdraw::getWithdrawType, "BANK")
-          .eq(dto.getRechargeStatusList().contains(4), MemberWithdraw::getWithdrawType, "DIRECT")
+          .eq(dto.getRechargeStatusList().contains(3), MemberWithdraw::getWithdrawType,WithdrawTypeConstant.BANK)
+          .eq(dto.getRechargeStatusList().contains(4), MemberWithdraw::getWithdrawType, WithdrawTypeConstant.BANK)
           .notIn(
               dto.getRechargeStatusList().contains(5),
               MemberWithdraw::getWithdrawType,
-              "BANK",
-              "MANUAL",
-              "DIRECT")
+              WithdrawTypeConstant.BANK,
+              WithdrawTypeConstant.MANUAL,
+              WithdrawTypeConstant.BANK)
           .gt(dto.getRechargeStatusList().contains(6), MemberWithdraw::getCounterFee, 0);
     }
     if (ObjectUtils.isNotNull(dto.getCashStatusList())) {

@@ -23,6 +23,7 @@ import com.gameplat.base.common.util.StringUtils;
 import com.gameplat.common.constant.CachedKeys;
 import com.gameplat.common.enums.TransferTypesEnum;
 import com.gameplat.common.lang.Assert;
+import com.gameplat.common.util.TableIndexUtils;
 import com.gameplat.model.entity.game.GameTransferInfo;
 import com.gameplat.model.entity.member.Member;
 import com.gameplat.model.entity.member.MemberInfo;
@@ -104,6 +105,8 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
 
     // 保存会员和会员详情
     Assert.isTrue(this.save(member), "新增会员失败!");
+    // 更新会员分表下标
+    this.updateTableIndex(member.getId(), TableIndexUtils.getTableIndex(member.getId()));
 
     MemberInfo memberInfo =
         MemberInfo.builder().memberId(member.getId()).rebate(dto.getRebate()).build();
@@ -359,5 +362,10 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
       gameTransferInfoService.saveOrUpdate(gameTransferInfo);
     }
     return member;
+  }
+
+  @Override
+  public void updateTableIndex(Long memberId, int tableIndex) {
+    lambdaUpdate().set(Member::getTableIndex, tableIndex).eq(Member::getId, memberId).update();
   }
 }

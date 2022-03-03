@@ -23,7 +23,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class DiscountTypeServiceImpl extends ServiceImpl<DiscountTypeMapper, DiscountType>
     implements DiscountTypeService {
 
-  @Autowired private DiscountTypeConvert discountTypeConvert;
+  @Autowired
+  private DiscountTypeConvert discountTypeConvert;
 
   @Override
   public void update(DiscountTypeEditDTO dto) {
@@ -46,6 +47,9 @@ public class DiscountTypeServiceImpl extends ServiceImpl<DiscountTypeMapper, Dis
 
   @Override
   public void save(DiscountTypeAddDTO dto) {
+    if (null != this.lambdaQuery().eq(DiscountType::getValue, dto.getValue()).one()) {
+      throw new ServiceException("编码已存在!");
+    }
     dto.setDateType(1);
     dto.setStatus(1);
     if (!this.save(discountTypeConvert.toEntity(dto))) {

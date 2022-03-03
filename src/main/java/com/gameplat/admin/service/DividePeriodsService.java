@@ -18,4 +18,8 @@ public interface DividePeriodsService extends IService<DividePeriods> {
     void delete(String ids);
 
     void settle(DividePeriodsDTO dto);
+
+    void grant(DividePeriodsDTO dto);
+
+    void recycle(DividePeriodsDTO dto);
 }

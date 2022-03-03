@@ -62,4 +62,20 @@ public class DividePeriodsController {
         periodsService.settle(dto);
     }
 
+    @PostMapping("/grant")
+    @ApiOperation(value = "期数派发")
+    @PreAuthorize("hasAuthority('divide:periods:grant')")
+    @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.AGENT, desc = "期数派发")
+    public void grant(@Validated @RequestBody DividePeriodsDTO dto) {
+        periodsService.grant(dto);
+    }
+
+    @PostMapping("/recycle")
+    @ApiOperation(value = "期数回收")
+    @PreAuthorize("hasAuthority('divide:periods:recycle')")
+    @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.AGENT, desc = "期数回收")
+    public void recycle(@Validated @RequestBody DividePeriodsDTO dto) {
+        periodsService.recycle(dto);
+    }
+
 }

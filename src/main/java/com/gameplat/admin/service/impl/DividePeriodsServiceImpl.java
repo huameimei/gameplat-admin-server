@@ -12,40 +12,53 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.gameplat.admin.constant.MemberServiceKeyConstant;
 import com.gameplat.admin.constant.SystemConstant;
 import com.gameplat.admin.constant.TrueFalse;
 import com.gameplat.admin.convert.DivideDetailConvert;
 import com.gameplat.admin.convert.DividePeriodsConvert;
 import com.gameplat.admin.convert.DivideSummaryConvert;
+import com.gameplat.admin.convert.MessageInfoConvert;
 import com.gameplat.admin.enums.BlacklistConstant;
+import com.gameplat.admin.enums.DivideStatusEnum;
+import com.gameplat.admin.enums.MemberBillTransTypeEnum;
+import com.gameplat.admin.enums.PushMessageEnum;
 import com.gameplat.admin.mapper.*;
-import com.gameplat.admin.model.dto.DivideDetailDto;
-import com.gameplat.admin.model.dto.DividePeriodsDTO;
-import com.gameplat.admin.model.dto.DividePeriodsQueryDTO;
-import com.gameplat.admin.model.dto.DivideSummaryDto;
+import com.gameplat.admin.model.dto.*;
 import com.gameplat.admin.model.vo.DivideGameReportVO;
 import com.gameplat.admin.model.vo.DividePeriodsVO;
 import com.gameplat.admin.model.vo.FissionConfigLevelVo;
 import com.gameplat.admin.model.vo.GameDivideVo;
 import com.gameplat.admin.service.*;
 import com.gameplat.base.common.exception.ServiceException;
+import com.gameplat.base.common.snowflake.IdGeneratorSnowflake;
+import com.gameplat.common.enums.MemberEnums;
 import com.gameplat.common.enums.UserTypes;
 import com.gameplat.common.lang.Assert;
 import com.gameplat.model.entity.blacklist.BizBlacklist;
 import com.gameplat.model.entity.member.Member;
+import com.gameplat.model.entity.member.MemberBill;
+import com.gameplat.model.entity.member.MemberInfo;
+import com.gameplat.model.entity.message.Message;
+import com.gameplat.model.entity.message.MessageDistribute;
 import com.gameplat.model.entity.proxy.*;
 import com.gameplat.redis.redisson.DistributedLocker;
+import com.gameplat.security.SecurityUserHolder;
+import com.gameplat.security.context.UserCredential;
 import lombok.extern.slf4j.Slf4j;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Service
@@ -54,50 +67,27 @@ import java.util.stream.Collectors;
 public class DividePeriodsServiceImpl extends ServiceImpl<DividePeriodsMapper, DividePeriods>
         implements DividePeriodsService {
 
-    @Autowired
-    private DividePeriodsMapper dividePeriodsMapper;
-
-    @Autowired
-    private DividePeriodsConvert periodsConvert;
-
-    @Autowired
-    private RecommendConfigService recommendConfigService;
-
-    @Autowired
-    private DivideDetailMapper detailMapper;
-
-    @Autowired
-    private DivideSummaryMapper summaryMapper;
-
-    @Autowired
-    private StringRedisTemplate redisTemplate;
-
-    @Autowired
-    private DistributedLocker distributedLocker;
-
-    @Autowired
-    private GameBetDailyReportMapper betDailyReportMapper;
-
-    @Autowired
-    private BizBlacklistMapper blacklistMapper;
-
-    @Autowired
-    private MemberService memberService;
-
-    @Autowired
-    private DivideLayerConfigService layerConfigService;
-
-    @Autowired
-    private DivideFixConfigService fixConfigService;
-
-    @Autowired
-    private DivideDetailConvert detailConvert;
-
-    @Autowired
-    private DivideFissionConfigService fissionConfigService;
-
-    @Autowired
-    private DivideSummaryConvert summaryConvert;
+    @Autowired private DividePeriodsMapper dividePeriodsMapper;
+    @Autowired private DividePeriodsConvert periodsConvert;
+    @Autowired private RecommendConfigService recommendConfigService;
+    @Autowired private DivideDetailMapper detailMapper;
+    @Autowired private DivideSummaryMapper summaryMapper;
+    @Autowired private StringRedisTemplate redisTemplate;
+    @Autowired private DistributedLocker distributedLocker;
+    @Autowired private GameBetDailyReportMapper betDailyReportMapper;
+    @Autowired private BizBlacklistMapper blacklistMapper;
+    @Autowired private MemberService memberService;
+    @Autowired private DivideLayerConfigService layerConfigService;
+    @Autowired private DivideFixConfigService fixConfigService;
+    @Autowired private DivideDetailConvert detailConvert;
+    @Autowired private DivideFissionConfigService fissionConfigService;
+    @Autowired private DivideSummaryConvert summaryConvert;
+    @Autowired private MemberInfoService memberInfoService;
+    @Autowired private MemberBillService memberBillService;
+    @Autowired private MessageInfoConvert messageInfoConvert;
+    @Autowired private MessageMapper messageMapper;
+    @Autowired private MessageDistributeService messageDistributeService;
+    @Autowired private RedissonClient redissonClient;
 
     @Override
     @SentinelResource(value = "queryPage")
@@ -202,7 +192,102 @@ public class DividePeriodsServiceImpl extends ServiceImpl<DividePeriodsMapper, D
         }
     }
 
-//    @Async
+    /**
+     * 期数派发
+     * @param dto
+     */
+    @Override
+    @SentinelResource(value = "grant")
+    public void grant(DividePeriodsDTO dto) {
+        UserCredential userCredential = SecurityUserHolder.getCredential();
+        //获取需要派发的期数
+        Assert.isTrue(dto.getId() != null, "期数主键ID参数缺失！");
+        DividePeriods dividePeriods = dividePeriodsMapper.selectById(dto.getId());
+        Assert.isTrue(dividePeriods.getSettleStatus() == DivideStatusEnum.PERIODS_SETTLE_STATUS_SETTLEED.getValue(),
+                "请先结算！");
+        Assert.isTrue(dividePeriods.getGrantStatus() == DivideStatusEnum.PERIODS_GRANT_STATUS_UNGRANT.getValue(),
+                "必须为未派发状态！");
+        // 外层先锁住  防止重复点击
+        String key = "divide:grant:" + dto.getId();
+        RLock lock = redissonClient.getLock(key);
+        if (lock.isLocked()) {
+            return;
+        }
+        distributedLocker.lock(key);
+        try {
+            // 先获取得到当前未派发的分红汇总数据
+            QueryWrapper<DivideSummary> querySummaryWrapper = new QueryWrapper<>();
+            querySummaryWrapper.eq("periods_id", dto.getId());
+            querySummaryWrapper.eq("status",DivideStatusEnum.SUMMARY_STATUS_SETTLEED.getValue());
+            List<DivideSummary> divideSummaries = summaryMapper.selectList(querySummaryWrapper);
+            if (CollectionUtil.isNotEmpty(divideSummaries)) {
+                // 按分红汇总数据派发
+                this.summaryGrant(dividePeriods, divideSummaries, userCredential);
+            }
+            // 修改期数的状态
+            DividePeriodsDTO editDto = DividePeriodsDTO.builder()
+                    .id(dto.getId())
+                    .grantStatus(DivideStatusEnum.PERIODS_GRANT_STATUS_GRANTED.getValue())
+                    .build();
+            DividePeriods editPo = periodsConvert.toEntity(editDto);
+            int i = dividePeriodsMapper.updateById(editPo);
+            Assert.isTrue(i > 0,"派发失败！");
+        } catch (Exception e) {
+            throw new ServiceException("期数派发失败！");
+        } finally {
+            distributedLocker.unlock(key);
+        }
+    }
+
+    /**
+     * 期数回收
+     * @param dto
+     */
+    @Override
+    @SentinelResource(value = "recycle")
+    public void recycle(DividePeriodsDTO dto) {
+        UserCredential userCredential = SecurityUserHolder.getCredential();
+        //获取需要派发的期数
+        Assert.isTrue(dto.getId() != null, "期数主键ID参数缺失！");
+        DividePeriods dividePeriods = dividePeriodsMapper.selectById(dto.getId());
+        Assert.isTrue(dividePeriods.getGrantStatus() == DivideStatusEnum.PERIODS_GRANT_STATUS_GRANTED.getValue(),
+                "必须为已派发状态！");
+        // 外层先锁住  防止重复点击
+        String key = "divide:grant:" + dto.getId();
+        RLock lock = redissonClient.getLock(key);
+        if (lock.isLocked()) {
+            return;
+        }
+        distributedLocker.lock(key);
+        try {
+            // 查询此期已派发的汇总数据
+            QueryWrapper<DivideSummary> querySummaryWrapper = new QueryWrapper<>();
+            querySummaryWrapper.eq("periods_id", dto.getId());
+            querySummaryWrapper.eq("status",DivideStatusEnum.SUMMARY_STATUS_GRANTED.getValue());
+            List<DivideSummary> divideSummaries = summaryMapper.selectList(querySummaryWrapper);
+            if (CollectionUtil.isNotEmpty(divideSummaries)) {
+                // 按分红汇总数据派发
+                this.summaryRecycle(dividePeriods, divideSummaries, userCredential);
+            }
+            // 修改期数的状态
+            DividePeriodsDTO editDto = DividePeriodsDTO.builder()
+                    .id(dto.getId())
+                    .grantStatus(DivideStatusEnum.PERIODS_GRANT_STATUS_RECYCLE.getValue())
+                    .build();
+            DividePeriods editPo = periodsConvert.toEntity(editDto);
+            int i = dividePeriodsMapper.updateById(editPo);
+            Assert.isTrue(i > 0,"期数回收失败！");
+        } catch (Exception e) {
+            throw new ServiceException("期数回收失败!");
+        } finally {
+            distributedLocker.unlock(key);
+        }
+
+
+
+    }
+
+    //    @Async
     public void settleOther(Long periodsId) {
         DividePeriods periods = this.getById(periodsId);
         if (BeanUtil.isEmpty(periods) || periods.getGrantStatus() == 2) {
@@ -380,21 +465,24 @@ public class DividePeriodsServiceImpl extends ServiceImpl<DividePeriodsMapper, D
                 }
             }
             // 上级的agentLevel值比投注人的还要大 则直接返回
-            if (currentMember.getAgentLevel() >= userLevelNum) {
+            if (currentMember.getAgentLevel() > userLevelNum) {
                 continue;
             }
 
             DivideDetailDto saveDetailDto =
                     DivideDetailDto.builder()
                             .periodsId(periodsId)
-                            .userId(gameReportVO.getMemberId())
-                            .userName(gameReportVO.getAccount())
-                            .proxyId(gameReportVO.getSuperId())
-                            .proxyName(gameReportVO.getSuperAccount())
-                            .agentLevel(currentMember.getAgentLevel())
-                            .superPath(currentMember.getSuperPath())
-                            .superId(currentMember.getParentId())
-                            .superName(currentMember.getParentName())
+                            .userId(gameReportVO.getMemberId()) // 分红来源用户Id
+                            .userName(gameReportVO.getAccount()) // 分红来源用户名称
+                            .agentLevel(gameReportVO.getAgentLevel())// 分红源的级别
+                            .superPath(gameReportVO.getUserPaths())// 分红源的代理路径
+                            .userType(gameReportVO.getUserType())// 分红源的用户类型
+                            .proxyId(currentMember.getId()) // 分红代理的ID
+                            .proxyName(currentMember.getAccount()) // 分红代理的名称
+                            .superId(currentMember.getParentId()) // 分红代理的上级
+                            .superName(currentMember.getParentName()) // 分红代理的上级
+                            .proxyAgentLevel(currentMember.getAgentLevel())
+                            .proxyAgentPath(currentMember.getSuperPath())
                             .liveCode(gameReportVO.getGameType())
                             .code(gameReportVO.getGameKind())
                             .validAmount(gameReportVO.getValidAmount())
@@ -546,12 +634,15 @@ public class DividePeriodsServiceImpl extends ServiceImpl<DividePeriodsMapper, D
                             .periodsId(periodsId)
                             .userId(gameReportVO.getMemberId()) // 分红来源用户Id
                             .userName(gameReportVO.getAccount()) // 分红来源用户名称
-                            .proxyId(gameReportVO.getSuperId()) // 分红代理的ID
-                            .proxyName(gameReportVO.getSuperAccount()) // 分红代理的名称
-                            .agentLevel(currentMember.getAgentLevel()) // 分红代理的级别
-                            .superPath(currentMember.getSuperPath()) // 分红代理的代理路径
-                            .superId(currentMember.getParentId())
-                            .superName(currentMember.getParentName())
+                            .agentLevel(gameReportVO.getAgentLevel())// 分红源的级别
+                            .superPath(gameReportVO.getUserPaths())// 分红源的代理路径
+                            .userType(gameReportVO.getUserType())// 分红源的用户类型
+                            .proxyId(currentMember.getId()) // 分红代理的ID
+                            .proxyName(currentMember.getAccount()) // 分红代理的名称
+                            .superId(currentMember.getParentId()) // 分红代理的上级
+                            .superName(currentMember.getParentName()) // 分红代理的上级
+                            .proxyAgentLevel(currentMember.getAgentLevel())
+                            .proxyAgentPath(currentMember.getSuperPath())
                             .liveCode(gameReportVO.getGameType()) // 游戏大类编码
                             .code(gameReportVO.getGameKind()) // 一级游戏编码
                             .validAmount(gameReportVO.getValidAmount()) // 有效投注
@@ -667,12 +758,15 @@ public class DividePeriodsServiceImpl extends ServiceImpl<DividePeriodsMapper, D
                             .periodsId(periodsId)
                             .userId(gameReportVO.getMemberId()) // 分红来源用户Id
                             .userName(gameReportVO.getAccount()) // 分红来源用户名称
-                            .proxyId(gameReportVO.getSuperId()) // 分红代理的ID
-                            .proxyName(gameReportVO.getSuperAccount()) // 分红代理的名称
-                            .agentLevel(currentMember.getAgentLevel()) // 分红代理的级别
-                            .superPath(currentMember.getSuperPath()) // 分红代理的代理路径
-                            .superId(currentMember.getParentId())
-                            .superName(currentMember.getParentName())
+                            .agentLevel(gameReportVO.getAgentLevel())// 分红源的级别
+                            .superPath(gameReportVO.getUserPaths())// 分红源的代理路径
+                            .userType(gameReportVO.getUserType())// 分红源的用户类型
+                            .proxyId(currentMember.getId()) // 分红代理的ID
+                            .proxyName(currentMember.getAccount()) // 分红代理的名称
+                            .superId(currentMember.getParentId()) // 分红代理的上级
+                            .superName(currentMember.getParentName()) // 分红代理的上级
+                            .proxyAgentLevel(currentMember.getAgentLevel())
+                            .proxyAgentPath(currentMember.getSuperPath())
                             .liveCode(gameReportVO.getGameType()) // 游戏大类编码
                             .code(gameReportVO.getGameKind()) // 一级游戏编码
                             .validAmount(gameReportVO.getValidAmount()) // 有效投注
@@ -707,6 +801,245 @@ public class DividePeriodsServiceImpl extends ServiceImpl<DividePeriodsMapper, D
     }
 
     /**
+     * 汇总数据派发
+     * @param divideSummaries
+     */
+    public void summaryGrant(DividePeriods dividePeriods, List<DivideSummary> divideSummaries, UserCredential userCredential){
+        for (DivideSummary summary : divideSummaries) {
+            DivideSummaryDto editDto = DivideSummaryDto.builder()
+                    .id(summary.getId())
+                    .status(DivideStatusEnum.SUMMARY_STATUS_GRANTED.getValue())
+                    .build();
+            DivideSummary editObj = summaryConvert.toEntity(editDto);
+            int i = summaryMapper.updateById(editObj);
+            if (i < 1) {
+                continue;
+            }
+            if (summary.getAccount().equalsIgnoreCase(SystemConstant.DEFAULT_WEB_ROOT) ||
+                    summary.getAccount().equalsIgnoreCase(SystemConstant.DEFAULT_TEST_ROOT) ||
+                    summary.getAccount().equalsIgnoreCase(SystemConstant.DEFAULT_WAP_ROOT)) {
+                continue;
+            }
+            // 如果 真实分红金额 小于等于0 不用发生账变 资金变动
+            if (summary.getRealDivideAmount().compareTo(BigDecimal.ZERO) <= 0) {
+                continue;
+            }
+
+            // 校验会员账户状态
+            Member member = memberService.getById(summary.getUserId());
+            if (BeanUtil.isEmpty(member)) {
+                continue;
+            }
+            MemberInfo memberInfo = memberInfoService.getById(summary.getUserId());
+            if (BeanUtil.isEmpty(memberInfo)) {
+                continue;
+            }
+            if (!MemberEnums.Status.ENABlED.match(member.getStatus())) {
+                log.error(
+                        "--account:{},userId:{},state:{}--",
+                        member.getAccount(),
+                        member.getId(),
+                        member.getStatus());
+                continue;
+            }
+            try {
+                this.financialGrant(member, memberInfo, dividePeriods, summary, userCredential);
+            } catch (Exception e) {
+                log.error("会员{}分红期数{}派发资金处理失败！", member.getAccount(), dividePeriods.getId());
+                continue;
+            }
+        }
+    }
+
+    public void summaryRecycle(DividePeriods dividePeriods, List<DivideSummary> divideSummaries, UserCredential userCredential) {
+        for (DivideSummary summary : divideSummaries) {
+            DivideSummaryDto editDto = DivideSummaryDto.builder()
+                    .id(summary.getId())
+                    .status(DivideStatusEnum.SUMMARY_STATUS_RECYCLE.getValue())
+                    .build();
+            DivideSummary editObj = summaryConvert.toEntity(editDto);
+            int i = summaryMapper.updateById(editObj);
+            if (i < 1) {
+                continue;
+            }
+            if (summary.getAccount().equalsIgnoreCase(SystemConstant.DEFAULT_WEB_ROOT) ||
+                    summary.getAccount().equalsIgnoreCase(SystemConstant.DEFAULT_TEST_ROOT) ||
+                    summary.getAccount().equalsIgnoreCase(SystemConstant.DEFAULT_WAP_ROOT)) {
+                continue;
+            }
+            // 如果 真实分红金额 小于等于0 不用发生账变 资金变动
+            if (summary.getRealDivideAmount().compareTo(BigDecimal.ZERO) <= 0) {
+                continue;
+            }
+            // 校验会员账户状态
+            Member member = memberService.getById(summary.getUserId());
+            if (BeanUtil.isEmpty(member)) {
+                continue;
+            }
+            MemberInfo memberInfo = memberInfoService.getById(summary.getUserId());
+            if (BeanUtil.isEmpty(memberInfo)) {
+                continue;
+            }
+
+            try {
+                this.financialRecycle(member, memberInfo, dividePeriods, summary, userCredential);
+            } catch (Exception e) {
+                log.error("会员{}分红期数{}回收资金处理失败！", member.getAccount(), dividePeriods.getId());
+                continue;
+            }
+        }
+    }
+
+        public void financialGrant(Member member, MemberInfo memberInfo, DividePeriods dividePeriods, DivideSummary summary, UserCredential userCredential){
+        String sb = new StringBuilder()
+                .append(dividePeriods.getStartDate())
+                .append("~")
+                .append(dividePeriods.getEndDate())
+                .append("期分红资金派发 ")
+                .append(summary.getRealDivideAmount())
+                .append("元")
+                .toString();
+
+        // 账户资金锁
+        String lockKey =
+                MessageFormat.format(
+                        MemberServiceKeyConstant.MEMBER_FINANCIAL_LOCK, member.getAccount());
+        try {
+            // 获取资金锁（等待6秒，租期120秒）
+            boolean flag = distributedLocker.tryLock(lockKey, TimeUnit.SECONDS, 6, 120);
+            // 6秒获取不到资金锁
+            if (!flag) {
+                return;
+            }
+            // 添加流水记录
+            MemberBill memberBill = new MemberBill();
+            memberBill.setMemberId(member.getId());
+            memberBill.setAccount(member.getAccount());
+            memberBill.setMemberPath(member.getSuperPath());
+            memberBill.setTableIndex(member.getTableIndex());
+            memberBill.setTranType(MemberBillTransTypeEnum.DIVIDE_AMOUNT.getCode());
+            memberBill.setOrderNo(String.valueOf(IdGeneratorSnowflake.getInstance().nextId()));
+            memberBill.setAmount(summary.getRealDivideAmount());
+            memberBill.setBalance(memberInfo.getBalance());
+            memberBill.setOperator(userCredential.getUsername());
+            memberBill.setTableIndex(member.getTableIndex());
+            memberBill.setRemark(sb);
+            memberBill.setContent(sb);
+            memberBillService.save(memberBill);
+            // 计算变更后余额
+            BigDecimal newBalance = memberInfo.getBalance().add(summary.getRealDivideAmount());
+            if (newBalance.compareTo(BigDecimal.ZERO) <= 0) {
+                return;
+            }
+            MemberInfo entity = MemberInfo.builder()
+                    .memberId(member.getId())
+                    .balance(newBalance)
+                    .version(memberInfo.getVersion())
+                    .build();
+            boolean b = memberInfoService.updateById(entity);
+            if (!b) {
+                log.error("会员{}期数派发钱包余额变更失败！",member.getAccount());
+            }
+        } catch (Exception e) {
+            log.error(
+                    MessageFormat.format("会员{}分红账变, 失败原因：{}", member.getAccount(), e));
+            // 释放资金锁
+            distributedLocker.unlock(lockKey);
+        } finally {
+            // 释放资金锁
+            distributedLocker.unlock(lockKey);
+        }
+        // 6.5 通知 发个人消息
+        MessageInfoAddDTO dto = new MessageInfoAddDTO();
+        Message message = messageInfoConvert.toEntity(dto);
+        message.setTitle("层层代分红派发");
+        message.setContent(sb);
+        message.setCategory(PushMessageEnum.MessageCategory.SYS_SEND.getValue());
+        message.setPosition(PushMessageEnum.MessageCategory.CATE_DEF.getValue());
+        message.setShowType(PushMessageEnum.MessageShowType.SHOW_DEF.value());
+        message.setPopsCount(PushMessageEnum.PopCount.POP_COUNT_DEF.getValue());
+        message.setPushRange(PushMessageEnum.UserRange.SOME_MEMBERS.getValue());
+        message.setLinkAccount(member.getAccount());
+        message.setType(1);
+        message.setStatus(1);
+        message.setCreateBy(userCredential.getUsername());
+        messageMapper.saveReturnId(message);
+
+        MessageDistribute messageDistribute = new MessageDistribute();
+        messageDistribute.setMessageId(message.getId());
+        messageDistribute.setUserId(member.getId());
+        messageDistribute.setUserAccount(member.getAccount());
+        messageDistribute.setRechargeLevel(member.getUserLevel());
+        messageDistribute.setVipLevel(
+                memberInfoService.getById(member.getId()).getVipLevel());
+        messageDistribute.setReadStatus(0);
+        messageDistribute.setCreateBy(userCredential.getUsername());
+        messageDistributeService.save(messageDistribute);
+    }
+
+    public void financialRecycle(Member member, MemberInfo memberInfo, DividePeriods dividePeriods, DivideSummary summary, UserCredential userCredential){
+        String sb = new StringBuilder()
+                .append(dividePeriods.getStartDate())
+                .append("~")
+                .append(dividePeriods.getEndDate())
+                .append("期分红资金回收 ")
+                .append(summary.getRealDivideAmount().negate())
+                .append("元")
+                .toString();
+
+        // 账户资金锁
+        String lockKey =
+                MessageFormat.format(
+                        MemberServiceKeyConstant.MEMBER_FINANCIAL_LOCK, member.getAccount());
+
+        try {
+            // 获取资金锁（等待8秒，租期120秒）
+            boolean flag = distributedLocker.tryLock(lockKey, TimeUnit.SECONDS, 8, 120);
+            if (!flag) {
+                return;
+            }
+            // 添加流水记录
+            MemberBill memberBill = new MemberBill();
+            memberBill.setMemberId(member.getId());
+            memberBill.setAccount(member.getAccount());
+            memberBill.setMemberPath(member.getSuperPath());
+            memberBill.setTableIndex(member.getTableIndex());
+            memberBill.setTranType(MemberBillTransTypeEnum.DIVIDE_AMOUNT_BACK.getCode());
+            memberBill.setOrderNo(String.valueOf(IdGeneratorSnowflake.getInstance().nextId()));
+            memberBill.setAmount(summary.getRealDivideAmount().negate());
+            memberBill.setBalance(memberInfo.getBalance());
+            memberBill.setRemark(sb);
+            memberBill.setContent(sb);
+            memberBill.setOperator(userCredential.getUsername());
+            memberBill.setTableIndex(member.getTableIndex());
+            memberBillService.save(memberBill);
+        } catch (Exception e) {
+            log.error(
+                    MessageFormat.format("会员：{}，期数回收, 失败原因：{}", member.getAccount(), e));
+            // 释放资金锁
+            distributedLocker.unlock(lockKey);
+        } finally {
+            // 释放资金锁
+            distributedLocker.unlock(lockKey);
+        }
+
+        // 计算变更后余额
+        BigDecimal newBalance = memberInfo.getBalance().add(summary.getRealDivideAmount().negate());
+        if (newBalance.compareTo(BigDecimal.ZERO) < 0) {
+            return;
+        }
+        MemberInfo entity = MemberInfo.builder()
+                .memberId(member.getId())
+                .balance(newBalance)
+                .version(memberInfo.getVersion())
+                .build();
+        boolean b = memberInfoService.updateById(entity);
+        if (!b) {
+            log.error("会员{}期数回收钱包余额变更失败！",member.getAccount());
+        }
+    }
+
+    /**
      * 期数结算时 保存分红汇总
      *
      * @param groupByPname
@@ -723,8 +1056,8 @@ public class DividePeriodsServiceImpl extends ServiceImpl<DividePeriodsMapper, D
                             .periodsId(periodsId)
                             .userId(divideDetail.getProxyId())
                             .account(divideDetail.getProxyName())
-                            .agentLevel(divideDetail.getAgentLevel())
-                            .agentPath(divideDetail.getSuperPath())
+                            .agentLevel(divideDetail.getProxyAgentLevel())
+                            .agentPath(divideDetail.getProxyAgentPath())
                             .parentId(divideDetail.getSuperId())
                             .parentName(divideDetail.getSuperName())
                             .status(TrueFalse.TRUE.getValue())

@@ -36,17 +36,20 @@ public class DivideDetailVO implements Serializable {
     @ApiModelProperty(value = "用户名")
     private String userName;
 
-    @ApiModelProperty(value = "分红代理的用户主键id")
-    private Long proxyId;
-
-    @ApiModelProperty(value = "分红代理的名称")
-    private String proxyName;
-
     @ApiModelProperty(value = "分红代理的层级")
     private Integer agentLevel;
 
     @ApiModelProperty(value = "分红代理的代理路径")
     private String superPath;
+
+    @ApiModelProperty(value = "用户类型")
+    private String userType;
+
+    @ApiModelProperty(value = "分红代理的用户主键id")
+    private Long proxyId;
+
+    @ApiModelProperty(value = "分红代理的名称")
+    private String proxyName;
 
     @ApiModelProperty(value = "游戏大类code")
     private String liveCode;

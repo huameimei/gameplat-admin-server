@@ -365,7 +365,7 @@ public class GameAdminServiceImpl implements GameAdminService {
       gameTransferInfoService.update(memberInfo.getMemberId(), transferOut, orderNo);
       //8. 增加转出额度数据
       gameAmountControl.setUseAmount(gameAmountControl.getUseAmount().add(amount.abs()));
-      gameAmountControlService.save(gameAmountControl);
+      gameAmountControlService.updateById(gameAmountControl);
     } catch (LiveException | LiveRollbackException ex) {
       boolean bool = gameApi.queryOrderStatus(gameBizBean);
       if (bool) {

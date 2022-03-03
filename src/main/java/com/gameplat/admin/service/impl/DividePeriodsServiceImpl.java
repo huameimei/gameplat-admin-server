@@ -51,6 +51,7 @@ import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
@@ -64,6 +65,7 @@ import java.util.stream.Collectors;
 @Service
 @Slf4j
 @SuppressWarnings("all")
+@Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)
 public class DividePeriodsServiceImpl extends ServiceImpl<DividePeriodsMapper, DividePeriods>
         implements DividePeriodsService {
 
@@ -139,7 +141,6 @@ public class DividePeriodsServiceImpl extends ServiceImpl<DividePeriodsMapper, D
      * @param ids
      */
     @Override
-    @Transactional
     @SentinelResource("delete")
     public void delete(String ids) {
         Assert.isTrue(StrUtil.isNotBlank(ids), "参数为空！");

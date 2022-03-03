@@ -33,6 +33,7 @@ import java.util.stream.Collectors;
 
 @Service
 @Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)
+@SuppressWarnings("all")
 public class DivideFixConfigServiceImpl extends ServiceImpl<DivideFixConfigMapper, DivideFixConfig>
     implements DivideFixConfigService {
 

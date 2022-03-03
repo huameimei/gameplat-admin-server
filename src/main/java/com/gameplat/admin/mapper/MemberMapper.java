@@ -13,6 +13,7 @@ import com.gameplat.admin.model.vo.MemberVO;
 import com.gameplat.admin.model.vo.SpreadUnionVO;
 import com.gameplat.model.entity.member.Member;
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
 
@@ -78,4 +79,7 @@ public interface MemberMapper extends BaseMapper<Member> {
 
   /** 获取代理下的所有用户 */
   List<Member> getAgentMember(@Param("list")List<SpreadUnionVO> list, @Param("startTime")String startTime, @Param("endTime")String endTime);
+
+    @Select("select max(agent_level) from member")
+    Integer getMaxLevel();
 }

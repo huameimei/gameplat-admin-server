@@ -368,4 +368,9 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
   public void updateTableIndex(Long memberId, int tableIndex) {
     lambdaUpdate().set(Member::getTableIndex, tableIndex).eq(Member::getId, memberId).update();
   }
+
+  @Override
+  public Integer getMaxLevel() {
+    return memberMapper.getMaxLevel();
+  }
 }

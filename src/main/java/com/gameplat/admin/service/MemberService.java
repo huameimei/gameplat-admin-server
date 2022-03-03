@@ -85,4 +85,6 @@ public interface MemberService extends IService<Member> {
   Member getMemberAndFillGameAccount(String account);
 
   void updateTableIndex(Long memberId, int tableIndex);
+
+  Integer getMaxLevel();
 }

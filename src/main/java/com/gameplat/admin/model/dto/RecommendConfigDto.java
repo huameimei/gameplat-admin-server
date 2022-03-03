@@ -79,6 +79,10 @@ public class RecommendConfigDto implements Serializable {
   private Integer isOpenValidWithdraw;
   @ApiModelProperty(value = "开启打码量计算后的倍数")
   private BigDecimal validWithdrawMult;
+  @ApiModelProperty(value = "有效会员定义 最低投注额")
+  private BigDecimal validAmountLimit;
+  @ApiModelProperty(value = "有效会员定义 最低充值额")
+  private BigDecimal rechargeAmountLimit;
   @ApiModelProperty(value = "是否开启代理后台敏感字段")
   @Range(min = 0, max = 1, message = "只能未0过1")
   private Integer isOpenSensitive;

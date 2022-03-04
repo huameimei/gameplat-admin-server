@@ -120,11 +120,6 @@ public class MemberBillServiceImpl extends ServiceImpl<MemberBillMapper, MemberB
     }
     QueryWrapper<Member> memberQuery = Wrappers.query();
     memberQuery.eq(true, "account", dto.getAccount());
-    Integer tableIndex =
-        Optional.ofNullable(memberService.getOne(memberQuery))
-            .map(m -> m.getTableIndex())
-            .orElse(null);
-
     return memberBillMapper.findy(
         dto.getAccount(),
         dto.getOrderNo(),
@@ -136,7 +131,6 @@ public class MemberBillServiceImpl extends ServiceImpl<MemberBillMapper, MemberB
   @Override
   public MemberBill queryLiveBill(Long id, String orderNo, int tranType) {
     // TODO 获取额度转换流水记录
-    // 1. 现在在主表查询，接口为空就根据会员ID取模 到对应的历史表中获取数据
     MemberBill memberBill =
         this.lambdaQuery()
             .eq(ObjectUtils.isNotEmpty(id), MemberBill::getMemberId, id)
@@ -148,7 +142,6 @@ public class MemberBillServiceImpl extends ServiceImpl<MemberBillMapper, MemberB
       if (member == null) {
         throw new ServiceException("用户不存在");
       }
-      int tableIndex = member.getTableIndex();
       memberBill = memberBillMapper.findBill(orderNo, tranType);
     }
     return memberBill;
@@ -170,7 +163,6 @@ public class MemberBillServiceImpl extends ServiceImpl<MemberBillMapper, MemberB
     } catch (ParseException e) {
       e.printStackTrace();
     }
-
     // 今天
     if (beginTime.compareTo(nowDate) == 0 && endTime.compareTo(nowDate) == 0) {
       dto.setBeginTime(dto.getBeginTime() + " 00:00:00");
@@ -217,7 +209,6 @@ public class MemberBillServiceImpl extends ServiceImpl<MemberBillMapper, MemberB
               dto.getTranTypes(),
               dto.getBeginTime(),
               dto.getEndTime());
-
       return voList;
     }
   }

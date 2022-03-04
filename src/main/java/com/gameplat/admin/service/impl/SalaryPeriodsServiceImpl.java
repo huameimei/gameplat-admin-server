@@ -521,7 +521,9 @@ public class SalaryPeriodsServiceImpl
                 }
 
                 // 是否超过了 工资上限
-                finalSalaryAmount = finalSalaryAmount.compareTo(salaryAmountLimit) > 0 ? salaryAmountLimit : finalSalaryAmount;
+                if (salaryAmountLimit.compareTo(BigDecimal.ZERO) > 0){
+                    finalSalaryAmount = finalSalaryAmount.compareTo(salaryAmountLimit) > 0 ? salaryAmountLimit : finalSalaryAmount;
+                }
                 saveObj.setSalaryAmount(finalSalaryAmount);// 工资接内
 
                 saveObj.setReachStatus(isReach ? DivideStatusEnum.SALARY_REACH_STATUS_REACHED.getValue() : DivideStatusEnum.SALARY_REACH_STATUS_UNREACH.getValue());

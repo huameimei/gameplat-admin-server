@@ -467,7 +467,6 @@ public class MemberWealServiceImpl extends ServiceImpl<MemberWealMapper, MemberW
                     memberBill.setRemark(content);
                     memberBill.setContent(content);
                     memberBill.setOperator("system");
-                    memberBill.setTableIndex(member.getTableIndex());
                     memberBillService.save(memberBill);
 
                     // 已完成
@@ -636,7 +635,6 @@ public class MemberWealServiceImpl extends ServiceImpl<MemberWealMapper, MemberW
                   memberBill.setRemark(remark);
                   memberBill.setContent(remark);
                   memberBill.setOperator("system");
-                  memberBill.setTableIndex(member.getTableIndex());
                   memberBillService.save(memberBill);
                 } catch (Exception e) {
                   log.error(

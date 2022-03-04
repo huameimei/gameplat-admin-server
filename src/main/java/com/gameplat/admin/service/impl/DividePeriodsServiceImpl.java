@@ -917,13 +917,11 @@ public class DividePeriodsServiceImpl extends ServiceImpl<DividePeriodsMapper, D
             memberBill.setMemberId(member.getId());
             memberBill.setAccount(member.getAccount());
             memberBill.setMemberPath(member.getSuperPath());
-            memberBill.setTableIndex(member.getTableIndex());
             memberBill.setTranType(MemberBillTransTypeEnum.DIVIDE_AMOUNT.getCode());
             memberBill.setOrderNo(String.valueOf(IdGeneratorSnowflake.getInstance().nextId()));
             memberBill.setAmount(summary.getRealDivideAmount());
             memberBill.setBalance(memberInfo.getBalance());
             memberBill.setOperator(userCredential.getUsername());
-            memberBill.setTableIndex(member.getTableIndex());
             memberBill.setRemark(sb);
             memberBill.setContent(sb);
             memberBillService.save(memberBill);
@@ -1004,7 +1002,6 @@ public class DividePeriodsServiceImpl extends ServiceImpl<DividePeriodsMapper, D
             memberBill.setMemberId(member.getId());
             memberBill.setAccount(member.getAccount());
             memberBill.setMemberPath(member.getSuperPath());
-            memberBill.setTableIndex(member.getTableIndex());
             memberBill.setTranType(MemberBillTransTypeEnum.DIVIDE_AMOUNT_BACK.getCode());
             memberBill.setOrderNo(String.valueOf(IdGeneratorSnowflake.getInstance().nextId()));
             memberBill.setAmount(summary.getRealDivideAmount().negate());
@@ -1012,7 +1009,6 @@ public class DividePeriodsServiceImpl extends ServiceImpl<DividePeriodsMapper, D
             memberBill.setRemark(sb);
             memberBill.setContent(sb);
             memberBill.setOperator(userCredential.getUsername());
-            memberBill.setTableIndex(member.getTableIndex());
             memberBillService.save(memberBill);
         } catch (Exception e) {
             log.error(

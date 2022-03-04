@@ -17,6 +17,9 @@ public class MemberBillDTO implements Serializable {
   @ApiModelProperty(value = "账号")
   private String account;
 
+  @ApiModelProperty(value = "代理账号")
+  private String superPath;
+
   @ApiModelProperty(value = "订单号，关联其他业务订单号")
   private String orderNo;
 

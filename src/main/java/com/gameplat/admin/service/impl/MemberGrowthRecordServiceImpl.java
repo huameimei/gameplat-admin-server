@@ -445,7 +445,6 @@ public class MemberGrowthRecordServiceImpl
             memberBill.setContent(
                 member.getNickname() + "从VIP" + beforeLevel + "升至VIP" + afterLevel + "奖励金额");
             memberBill.setOperator("system");
-            memberBill.setTableIndex(member.getTableIndex());
             memberBillService.save(memberBill);
 
             saveRewordObj.setStatus(2);

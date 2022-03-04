@@ -143,7 +143,6 @@ public class ActivityDistributeWayService
       memberBill.setRemark(remark);
       memberBill.setContent(remark);
       memberBill.setOperator("system");
-      memberBill.setTableIndex(memberInfoVO.getTableIndex());
       memberBillService.save(memberBill);
 
       // 插入福利中心记录(已领取)

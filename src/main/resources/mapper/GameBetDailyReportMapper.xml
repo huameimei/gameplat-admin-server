@@ -15,65 +15,65 @@
     parameterType="com.gameplat.admin.model.dto.GameBetDailyReportQueryDTO">
 
     SELECT
-      a.num userNumber,
-      a.bet_count gameCount,
-      a.bet_amount betAmount,
-      a.valid_amount validAmount,
-      a.win_amount winAmount,
-      ifnull( b.real_rebate_money, 0 ) rebateMoney,
-      (
-      a.win_amount - ifnull( b.real_rebate_money, 0 )) companyAmount ,
-      a.game_type gameTypeCode,
-      a.game_type_name gameTypeName
+    a.num userNumber,
+    a.bet_count gameCount,
+    a.bet_amount betAmount,
+    a.valid_amount validAmount,
+    a.win_amount winAmount,
+    ifnull( b.real_rebate_money, 0 ) rebateMoney,
+    (
+    a.win_amount - ifnull( b.real_rebate_money, 0 )) companyAmount ,
+    a.game_type gameTypeCode,
+    a.game_type_name gameTypeName
     FROM
-      (
-      SELECT
-          count(
-          DISTINCT ( t.account )) num,
-          sum( t.bet_count ) bet_count,
-          sum( t.bet_amount ) bet_amount,
-          sum( t.valid_amount ) valid_amount,
-          sum( t.win_amount ) win_amount,
-          t.game_kind ,
-          t.game_type game_type,
-          d.dict_label game_type_name
-      FROM
-      game_bet_daily_report t
-      LEFT JOIN sys_dict_data d on d.dict_type = 'LIVE_GAME_TYPE' and d.dict_value = t.game_type
-      WHERE 1 = 1
-      <if test="beginTime != null and endTime != null">
-          and t.stat_time BETWEEN #{beginTime} AND #{endTime}
-      </if>
-      <if test="userPaths != null and userPaths != ''">
-        and t.super_account = #{userPaths}
-      </if>
-      <if test="account != null and account != ''">
-        and t.account = #{account}
-      </if>
-      GROUP BY
-      t.game_type
-      ) a
-      LEFT JOIN (
-        SELECT
-          game_type,
-          sum(
-          ifnull( real_rebate_money, 0 )) real_rebate_money
-        FROM
-          game_rebate_report
-        WHERE
-         STATUS = 1
-      <if test="beginTime != null and endTime != null">
-        AND period_name BETWEEN #{beginTime}
-        AND #{endTime}
-      </if>
-      <if test="userPaths != null and userPaths != ''">
-        and super_account = #{userPaths}
-      </if>
-      <if test="account != null and account != ''">
-        and account = #{account}
-      </if>
-        GROUP BY
-      game_type
+    (
+    SELECT
+    count(
+    DISTINCT ( t.account )) num,
+    sum( t.bet_count ) bet_count,
+    sum( t.bet_amount ) bet_amount,
+    sum( t.valid_amount ) valid_amount,
+    sum( t.win_amount ) win_amount,
+    t.game_kind ,
+    t.game_type game_type,
+    d.dict_label game_type_name
+    FROM
+    game_bet_daily_report t
+    LEFT JOIN game_type d on d.game_type_code = t.game_type
+    WHERE 1 = 1
+    <if test="beginTime != null and endTime != null">
+      and t.stat_time BETWEEN #{beginTime} AND #{endTime}
+    </if>
+    <if test="userPaths != null and userPaths != ''">
+      and t.super_account = #{userPaths}
+    </if>
+    <if test="account != null and account != ''">
+      and t.account = #{account}
+    </if>
+    GROUP BY
+    t.game_type
+    ) a
+    LEFT JOIN (
+    SELECT
+    game_type,
+    sum(
+    ifnull( real_rebate_money, 0 )) real_rebate_money
+    FROM
+    game_rebate_report
+    WHERE
+    STATUS = 1
+    <if test="beginTime != null and endTime != null">
+      AND period_name BETWEEN #{beginTime}
+      AND #{endTime}
+    </if>
+    <if test="userPaths != null and userPaths != ''">
+      and super_account = #{userPaths}
+    </if>
+    <if test="account != null and account != ''">
+      and account = #{account}
+    </if>
+    GROUP BY
+    game_type
     ) b on a.game_type = b.game_type
   </select>
 
@@ -97,7 +97,7 @@
     on t.member_id = u.id WHERE valid_amount > 0
     <choose>
       <when test="endDate == startDate">
-        AND  stat_time = #{startDate}
+        AND stat_time = #{startDate}
       </when>
       <otherwise>
         AND stat_time BETWEEN #{startDate} AND #{endDate}
@@ -107,49 +107,47 @@
   </select>
 
 
-
-    <select id="querybetReportList" resultType="com.gameplat.admin.model.vo.GameBetReportVO"
-            parameterType="com.gameplat.admin.model.dto.GameBetDailyReportQueryDTO">
-        SELECT
-            t.stat_time reportTime,
-            t.account account,
-            t.game_type gameCode,
-            d.dict_label gameName,
-            t.platform_code platformCode,
-            k.name platformName,
-            sum( t.bet_count ) gameCount,
-            sum( t.bet_amount ) betAmount,
-            sum( t.valid_amount ) validAmount,
-            sum( t.win_amount ) winAmount
-        FROM
-              game_bet_daily_report t
-        LEFT JOIN game_platform k on t.platform_code = k.`code`
-        LEFT JOIN sys_dict_data d on d.dict_type = 'LIVE_GAME_TYPE' and d.dict_value = t.game_type
-        WHERE
-            1 = 1
-            <if test="dto.beginTime != null and dto.endTime != null">
-                AND stat_time BETWEEN #{dto.beginTime}
-                AND #{dto.endTime}
-            </if>
-            <if test="dto.userPaths != null and dto.userPaths != ''">
-                and super_account = #{dto.userPaths}
-            </if>
-            <if test="dto.account != null and dto.account != ''">
-                and account = #{dto.account}
-            </if>
-            <if test="dto.liveGameSuperType!=null and dto.liveGameSuperType!=''">
-                and game_type in ${dto.liveGameSuperType}
-            </if>
-            <if test="dto.platformCode!=null and dto.platformCode!=''">
-                and platform_code in ${dto.platformCode}
-            </if>
-
-        GROUP BY t.platform_code,t.stat_time,account,t.game_type
-        order by t.stat_time desc
+  <select id="querybetReportList" resultType="com.gameplat.admin.model.vo.GameBetReportVO"
+    parameterType="com.gameplat.admin.model.dto.GameBetDailyReportQueryDTO">
+    SELECT
+    t.stat_time reportTime,
+    t.account account,
+    t.game_type gameCode,
+    d.dict_label gameName,
+    t.platform_code platformCode,
+    k.name platformName,
+    sum( t.bet_count ) gameCount,
+    sum( t.bet_amount ) betAmount,
+    sum( t.valid_amount ) validAmount,
+    sum( t.win_amount ) winAmount
+    FROM
+    game_bet_daily_report t
+    LEFT JOIN game_platform k on t.platform_code = k.`code`
+    LEFT JOIN game_type d on d.game_type_code = t.game_type
+    WHERE
+    1 = 1
+    <if test="dto.beginTime != null and dto.endTime != null">
+      AND stat_time BETWEEN #{dto.beginTime}
+      AND #{dto.endTime}
+    </if>
+    <if test="dto.userPaths != null and dto.userPaths != ''">
+      and super_account = #{dto.userPaths}
+    </if>
+    <if test="dto.account != null and dto.account != ''">
+      and account = #{dto.account}
+    </if>
+    <if test="dto.liveGameSuperType!=null and dto.liveGameSuperType!=''">
+      and game_type in ${dto.liveGameSuperType}
+    </if>
+    <if test="dto.platformCode!=null and dto.platformCode!=''">
+      and platform_code in ${dto.platformCode}
+    </if>
+    GROUP BY t.platform_code,t.stat_time,account,t.game_type
+    order by t.stat_time desc
   </select>
 
 
-    <select id="querySumReport" parameterType="com.gameplat.admin.model.dto.GameBetDailyReportQueryDTO" resultType="map">
+  <select id="querySumReport" parameterType="com.gameplat.admin.model.dto.GameBetDailyReportQueryDTO" resultType="map">
         SELECT
             sum( t.bet_count ) gameCount,
             sum( t.bet_amount ) betAmount,

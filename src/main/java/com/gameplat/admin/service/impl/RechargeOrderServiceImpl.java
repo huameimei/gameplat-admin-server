@@ -624,8 +624,7 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
     }
 
     // 充值总金额 = 支付金额 + 优惠金额
-    rechargeOrder.setTotalAmount(
-        manualRechargeOrderBo.getAmount().add(rechargeOrder.getDiscountAmount()));
+    rechargeOrder.setTotalAmount(rechargeOrder.getPayAmount().add(rechargeOrder.getDiscountAmount()));
 
     // 计算打码量
     rechargeOrder.setDmlFlag(manualRechargeOrderBo.getDmlFlag());

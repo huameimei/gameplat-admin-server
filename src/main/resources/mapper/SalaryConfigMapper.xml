@@ -2,5 +2,24 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.gameplat.admin.mapper.SalaryConfigMapper">
 
+    <select id="getConfig" resultType="com.gameplat.model.entity.proxy.SalaryConfig">
+        select
+            id,
+            settle_sort AS settleSort,
+            agent_level AS agentLevel,
+            game_type AS gameType,
+            win_amount_limit AS winAmountLimit,
+            valid_user_limit AS validUserLimit,
+            valid_amount_limit AS validAmountLimit,
+            recharge_amount_limit AS rechargeAmountLimit,
+            is_direct AS isDirect,
+            `type`,
+            amount,
+            amount_limit AS amountLimit
+        from salary_config
+        where agent_level = #{agentLevel} and game_type = #{kindCode}
+        order by settle_sort asc,create_time desc
+        LIMIT 1
+    </select>
 
 </mapper>

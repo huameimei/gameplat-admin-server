@@ -86,5 +86,16 @@ public interface MemberService extends IService<Member> {
 
   void updateTableIndex(Long memberId, int tableIndex);
 
+  /**
+   * 获取当前最高等级
+   * @return
+   */
   Integer getMaxLevel();
+
+  /**
+   * 获取开启了工资的代理
+   * @param list
+   * @return
+   */
+  List<Member> getOpenSalaryAgent(List<Integer> list);
 }

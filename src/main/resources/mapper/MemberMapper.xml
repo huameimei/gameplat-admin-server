@@ -344,6 +344,21 @@
         )
     </select>
 
-
-
+    <select id="getOpenSalaryAgent" resultType="com.gameplat.model.entity.member.Member">
+        select
+            m.id,
+            m.account,
+            m.agent_level as agentLevel,
+            m.super_path as superPath,
+            m.parent_id as parentId,
+            m.parent_name as parentName
+        from member as m inner join member_info as mi on m.id = mi.member_id
+        where mi.salary_flag = '1' and m.user_type = 'A'
+        <if test="list != null and list.size() > 0">
+            and m.agent_level in
+            <foreach collection="list" index="ind" item="level" open="(" separator="," close=")">
+                #{level}
+            </foreach>
+        </if>
+    </select>
 </mapper>

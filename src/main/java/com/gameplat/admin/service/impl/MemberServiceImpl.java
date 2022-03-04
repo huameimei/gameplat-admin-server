@@ -373,4 +373,14 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
   public Integer getMaxLevel() {
     return memberMapper.getMaxLevel();
   }
+
+  /**
+   * 获取开启了工资的代理
+   * @param list
+   * @return
+   */
+  @Override
+  public List<Member> getOpenSalaryAgent(List<Integer> list) {
+    return memberMapper.getOpenSalaryAgent(list);
+  }
 }

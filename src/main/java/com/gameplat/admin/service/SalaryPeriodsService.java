@@ -16,4 +16,10 @@ public interface SalaryPeriodsService extends IService<SalaryPeriods> {
     void edit(SalaryPeriodsDTO dto);
 
     void delete(String ids);
+
+    void settle(Long id);
+
+    void grant(Long id);
+
+    void recycle(Long id);
 }

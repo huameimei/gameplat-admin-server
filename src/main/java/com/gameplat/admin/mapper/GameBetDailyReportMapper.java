@@ -4,10 +4,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.gameplat.admin.model.bean.ActivityStatisticItem;
 import com.gameplat.admin.model.dto.GameBetDailyReportQueryDTO;
-import com.gameplat.admin.model.vo.DivideGameReportVO;
-import com.gameplat.admin.model.vo.GameBetReportVO;
-import com.gameplat.admin.model.vo.GameMemberDayReportVO;
-import com.gameplat.admin.model.vo.GameReportVO;
+import com.gameplat.admin.model.vo.*;
 import com.gameplat.model.entity.game.GameBetDailyReport;
 import com.gameplat.model.entity.game.GameRebatePeriod;
 import org.apache.ibatis.annotations.Param;
@@ -46,7 +43,7 @@ public interface GameBetDailyReportMapper extends BaseMapper<GameBetDailyReport>
   List<GameReportVO> queryGamePlatformReport(GameBetDailyReportQueryDTO dto);
 
   /**
-   * 分组获取会员游戏报表
+   * 分组获取会员游戏报表--分红统计
    * @param startDate
    * @param endDate
    * @return
@@ -54,4 +51,17 @@ public interface GameBetDailyReportMapper extends BaseMapper<GameBetDailyReport>
   List<DivideGameReportVO> findReportForDivide(@Param("startDate") String startDate,
                                                @Param("endDate") String endDate,
                                                @Param("isIncludeAgent") Integer isIncludeAgent);
+
+  /**
+   * 分组获取会员游戏报表--工资统计
+   * @param startDate
+   * @param endDate
+   * @return
+   */
+  List<SalaryRechargeVO> findReportForSalary(@Param("startDate") String startDate,
+                                             @Param("endDate") String endDate,
+                                             @Param("agentName") String agentName,
+                                             @Param("isInclude") Integer isInclude);
+
+
 }

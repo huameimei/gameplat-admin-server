@@ -171,11 +171,11 @@ public enum MemberBillTransTypeEnum {
     /** 层层代理分红金额 */
     DIVIDE_AMOUNT(55,"层层代分红"),
     /** 工资发放金额 */
-    SALARY_AMOUNT(56,"工资发放"),
+    SALARY_AMOUNT(56,"代理工资"),
     /** 层层代理分红金额 */
     DIVIDE_AMOUNT_BACK(57,"层层代分红回收"),
     /** 工资发放金额 */
-    SALARY_AMOUNT_BACK(58,"工资回收"),
+    SALARY_AMOUNT_BACK(58,"代理工资回收"),
     /** 平级分红 */
     SAME_DIVIDE_AMOUNT(59,"平级分红");
     ;

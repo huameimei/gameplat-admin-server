@@ -231,4 +231,22 @@
         )
         GROUP BY account
     </select>
+
+    <select id="getRechargeForSalary" resultType="com.gameplat.admin.model.vo.SalaryRechargeVO">
+        select
+        account as account,
+        ifnull(sum(amount), 0) as rechargeAmount
+        from recharge_order
+        where DATE_FORMAT(audit_time, '%Y-%m-%d' ) BETWEEN #{startDate} AND #{endDate}
+        and `status` = 3 and ( super_path like concat('%/',#{agentName},'/%')
+        <choose>
+            <when test="isInclude != null and isInclude == 0">
+                and account != #{agentName} )
+            </when>
+            <otherwise>
+                or  account = #{agentName} )
+            </otherwise>
+        </choose>
+        group by account
+    </select>
 </mapper>

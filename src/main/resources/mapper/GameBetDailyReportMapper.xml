@@ -360,14 +360,36 @@
                 IFNULL(SUM(r.valid_amount),0) as validAmount,
                 IFNULL(SUM(r.win_amount),0) as winAmount
             FROM `game_bet_daily_report` as r
-            inner join member as m on r.account = m.account
             where DATE_FORMAT(r.stat_time,'%Y-%m-%d')
             BETWEEN DATE_FORMAT(#{startDate},'%Y-%m-%d') and DATE_FORMAT(#{endDate},'%Y-%m-%d')
             <if test="isIncludeAgent != null and isIncludeAgent == 0">
                 and r.user_type != 'A'
             </if>
-            GROUP BY r.account,r.super_id,r.super_account,r.user_paths,r.user_type,r.game_kind,r.game_type
+            GROUP BY r.member_id,r.account,r.super_id,r.super_account,r.user_paths,r.user_type,r.game_kind,r.game_type
         ) as t INNER JOIN member as pm on pm.account = t.superAccount
+    </select>
+
+    <select id="findReportForSalary"  resultType="com.gameplat.admin.model.vo.SalaryRechargeVO">
+        SELECT
+        r.account as account,
+        r.super_account as superAccount,
+        r.game_kind as gameKind,
+        r.game_type as gameType,
+        IFNULL(SUM(r.valid_amount),0) as validAmount,
+        IFNULL(SUM(r.win_amount),0) as winAmount
+        FROM `game_bet_daily_report` as r
+        where DATE_FORMAT(r.stat_time,'%Y-%m-%d')
+        BETWEEN DATE_FORMAT(#{startDate},'%Y-%m-%d') and DATE_FORMAT(#{endDate},'%Y-%m-%d')
+        and ( user_paths like concat('%/',#{agentName},'/%')
+        <choose>
+            <when test="isInclude != null and isInclude == 0">
+                and account != #{agentName} )
+            </when>
+            <otherwise>
+                or account = #{agentName} )
+            </otherwise>
+        </choose>
+        GROUP BY r.account,r.super_account,r.game_kind,r.game_type
     </select>
 
 

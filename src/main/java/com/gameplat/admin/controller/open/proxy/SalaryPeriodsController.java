@@ -56,4 +56,28 @@ public class SalaryPeriodsController {
         salaryPeriodsService.delete(ids);
     }
 
+    @PostMapping("/settle")
+    @ApiOperation(value = "期数结算")
+    @PreAuthorize("hasAuthority('salary:periods:settle')")
+    @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.AGENT, desc = "期数结算")
+    public void settle(@Validated @RequestBody SalaryPeriodsDTO dto) {
+        salaryPeriodsService.settle(dto.getId());
+    }
+
+    @PostMapping("/grant")
+    @ApiOperation(value = "期数派发")
+    @PreAuthorize("hasAuthority('salary:periods:grant')")
+    @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.AGENT, desc = "期数派发")
+    public void grant(@Validated @RequestBody SalaryPeriodsDTO dto) {
+        salaryPeriodsService.grant(dto.getId());
+    }
+
+    @PostMapping("/recycle")
+    @ApiOperation(value = "期数回收")
+    @PreAuthorize("hasAuthority('salary:periods:recycle')")
+    @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.AGENT, desc = "期数回收")
+    public void recycle(@Validated @RequestBody SalaryPeriodsDTO dto) {
+        salaryPeriodsService.recycle(dto.getId());
+    }
+
 }

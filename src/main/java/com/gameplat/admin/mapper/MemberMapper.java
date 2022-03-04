@@ -82,4 +82,6 @@ public interface MemberMapper extends BaseMapper<Member> {
 
     @Select("select max(agent_level) from member")
     Integer getMaxLevel();
+
+    List<Member> getOpenSalaryAgent(@Param("list") List<Integer> list);
 }

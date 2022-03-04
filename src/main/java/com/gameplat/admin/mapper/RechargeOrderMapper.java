@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.core.toolkit.Constants;
 import com.gameplat.admin.model.bean.ActivityStatisticItem;
 import com.gameplat.admin.model.dto.MemberActivationDTO;
 import com.gameplat.admin.model.vo.MemberActivationVO;
+import com.gameplat.admin.model.vo.SalaryRechargeVO;
 import com.gameplat.model.entity.recharge.RechargeOrder;
 import com.gameplat.model.entity.spread.SpreadUnion;
 import org.apache.ibatis.annotations.Param;
@@ -59,4 +60,9 @@ public interface RechargeOrderMapper extends BaseMapper<RechargeOrder> {
       @Param("list") List<SpreadUnion> list,
       @Param("startTime") String startTime,
       @Param("endTime") String endTime);
+
+  List<SalaryRechargeVO> getRechargeForSalary(@Param("startDate") String startDate,
+                                              @Param("endDate") String endDate,
+                                              @Param("agentName") String agentName,
+                                              @Param("isInclude") Integer isInclude);
 }

@@ -55,32 +55,8 @@ public class MemberBillServiceImpl extends ServiceImpl<MemberBillMapper, MemberB
 
   @Override
   public IPage<MemberBillVO> findMemberBilllistPage(PageDTO<MemberBill> page, MemberBillDTO dto) {
-
-    if (ObjectUtils.isEmpty(dto.getBeginTime()) || ObjectUtils.isEmpty(dto.getEndTime())) {
-      throw new ServiceException("查询账变记录需选择时间段！");
-    }
-    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-    Date nowDate = null;
-    Date beginTime = null;
-    Date endTime = null;
-    try {
-      nowDate = sdf.parse(sdf.format(new Date()));
-      beginTime = sdf.parse(dto.getBeginTime());
-      endTime = sdf.parse(dto.getEndTime());
-    } catch (ParseException e) {
-      e.printStackTrace();
-    }
-
-    // 今天
-    if (beginTime.compareTo(nowDate) == 0 && endTime.compareTo(nowDate) == 0) {
-      dto.setBeginTime(dto.getBeginTime() + " 00:00:00");
-      dto.setEndTime(dto.getEndTime() + " 23:59:59");
-    } else if (ObjectUtils.isEmpty(dto.getAccount())) {
-      throw new ServiceException("查询【非当日】账变记录需提供【会员帐号】！");
-    }
     QueryWrapper<Member> memberQuery = Wrappers.query();
     memberQuery.eq(true, "account", dto.getAccount());
-
     IPage<MemberBillVO> pageList =
         memberBillMapper.findy(
             page,

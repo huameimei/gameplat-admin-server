@@ -39,9 +39,6 @@
         <if test="endTime != null and endTime != ''">and date_format(create_time,'%y%m%d') <![CDATA[ <= ]]>
             date_format(#{endTime},'%y%m%d')
         </if>
-        <if test="superPath != null and superPath != ''">
-            and member_path like concat('%/',#{superPath},'/%')
-        </if>
         ORDER BY create_time DESC,id DESC
     </select>
 

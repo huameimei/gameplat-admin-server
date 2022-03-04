@@ -15,21 +15,16 @@
         <result column="remark" property="remark"/>
         <result column="content" property="content"/>
         <result column="operator" property="operator"/>
-        <result column="table_index" property="tableIndex"/>
         <result column="create_time" property="createTime"/>
     </resultMap>
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        id
-        , member_id, account, member_path, tran_type, order_no, amount, balance, remark, content, operator, table_index, create_time
+        id, member_id, account, member_path, tran_type, order_no, amount, balance, remark, content, operator, create_time
     </sql>
 
-    <select id="findyByTableIndex" resultType="com.gameplat.admin.model.vo.MemberBillVO">
-        SELECT
-        <include refid="Base_Column_List"/>
-        FROM
-        (SELECT * FROM member_bill
+    <select id="findy" resultType="com.gameplat.admin.model.vo.MemberBillVO">
+        SELECT <include refid="Base_Column_List"/> FROM member_bill
         WHERE 1 = 1
         <if test="account != null">and account = #{account}</if>
         <if test="orderNo != null and orderNo !=''">and order_no = #{orderNo}</if>
@@ -45,36 +40,13 @@
             date_format(#{endTime},'%y%m%d')
         </if>
         ORDER BY create_time DESC,id DESC
-        <if test="tableIndex == null ">
-        </if>
-        ) t
-        <if test="tableIndex != null">
-            UNION ALL
-            SELECT * FROM member_bill_${tableIndex}
-            WHERE 1 = 1
-            <if test="account != null">and account = #{account}</if>
-            <if test="orderNo != null and orderNo !=''">and order_no = #{orderNo}</if>
-            <if test="tranTypes != null and tranTypes.size()>0">and tran_type in
-                <foreach item="item" index="index" collection="tranTypes" open="(" separator="," close=")">
-                    #{item}
-                </foreach>
-            </if>
-            <if test="beginTime != null and beginTime != ''">and date_format(create_time,'%y%m%d') <![CDATA[ >= ]]>
-                date_format(#{beginTime},'%y%m%d')
-            </if>
-            <if test="endTime != null and endTime != ''">and date_format(create_time,'%y%m%d') <![CDATA[ <= ]]>
-                date_format(#{endTime},'%y%m%d')
-            </if>
-            ORDER BY create_time DESC,id DESC
-        </if>
-
     </select>
 
 
-    <select id="findBillByTableIndex" resultMap="BaseResultMap">
+    <select id="findBill" resultMap="BaseResultMap">
         select
         <include refid="Base_Column_List"/>
-        from member_bill_${tableIndex}
+        from member_bill
         <where>
             <if test="orderNo != null and orderNo != ''">
                 and order_no = #{orderNo}

@@ -28,7 +28,4 @@ public class MemberBillDTO implements Serializable {
 
   @ApiModelProperty(value = "添加结束时间")
   private String endTime;
-
-  @ApiModelProperty(value = "分表ID")
-  private Integer tableIndex;
 }

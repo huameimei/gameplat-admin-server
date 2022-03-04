@@ -44,7 +44,6 @@ public class MemberBillServiceImpl extends ServiceImpl<MemberBillMapper, MemberB
   public void save(Member member, MemberBill memberBill) throws Exception {
     memberBill.setAccount(member.getAccount());
     memberBill.setMemberPath(member.getSuperPath());
-    memberBill.setTableIndex(member.getTableIndex());
     memberBill.setMemberId(member.getId());
     this.save(memberBill);
   }
@@ -81,20 +80,16 @@ public class MemberBillServiceImpl extends ServiceImpl<MemberBillMapper, MemberB
     }
     QueryWrapper<Member> memberQuery = Wrappers.query();
     memberQuery.eq(true, "account", dto.getAccount());
-    Integer tableIndex =
-        Optional.ofNullable(memberService.getOne(memberQuery))
-            .map(m -> m.getTableIndex())
-            .orElse(null);
 
     IPage<MemberBillVO> pageList =
-        memberBillMapper.findyByTableIndex(
+        memberBillMapper.findy(
             page,
             dto.getAccount(),
             dto.getOrderNo(),
             dto.getTranTypes(),
             dto.getBeginTime(),
-            dto.getEndTime(),
-            tableIndex);
+            dto.getEndTime()
+        );
     return pageList;
   }
 
@@ -130,13 +125,12 @@ public class MemberBillServiceImpl extends ServiceImpl<MemberBillMapper, MemberB
             .map(m -> m.getTableIndex())
             .orElse(null);
 
-    return memberBillMapper.findyByTableIndex(
+    return memberBillMapper.findy(
         dto.getAccount(),
         dto.getOrderNo(),
         dto.getTranTypes(),
         dto.getBeginTime(),
-        dto.getEndTime(),
-        tableIndex);
+        dto.getEndTime());
   }
 
   @Override
@@ -155,7 +149,7 @@ public class MemberBillServiceImpl extends ServiceImpl<MemberBillMapper, MemberB
         throw new ServiceException("用户不存在");
       }
       int tableIndex = member.getTableIndex();
-      memberBill = memberBillMapper.findBillByTableIndex(orderNo, tranType, tableIndex);
+      memberBill = memberBillMapper.findBill(orderNo, tranType);
     }
     return memberBill;
   }
@@ -216,24 +210,13 @@ public class MemberBillServiceImpl extends ServiceImpl<MemberBillMapper, MemberB
       if (ObjectUtils.isEmpty(dto.getAccount())) {
         throw new ServiceException("查询【非当日】账变记录需提供【会员帐号】！");
       }
-      Integer tableIndex =
-          this.lambdaQuery()
-              .eq(
-                  ObjectUtils.isNotEmpty(dto.getAccount()),
-                  MemberBill::getAccount,
-                  dto.getAccount())
-              .list()
-              .get(0)
-              .getTableIndex();
-
       voList =
-          memberBillMapper.findyByTableIndex(
+          memberBillMapper.findy(
               dto.getAccount(),
               dto.getOrderNo(),
               dto.getTranTypes(),
               dto.getBeginTime(),
-              dto.getEndTime(),
-              tableIndex);
+              dto.getEndTime());
 
       return voList;
     }

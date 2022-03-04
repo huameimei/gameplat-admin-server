@@ -10,22 +10,20 @@ import java.util.List;
 
 public interface MemberBillMapper extends BaseMapper<MemberBill> {
 
-  IPage<MemberBillVO> findyByTableIndex(
+  IPage<MemberBillVO> findy(
       PageDTO<MemberBill> page,
       String account,
       String orderNo,
       List<Integer> tranTypes,
       String beginTime,
-      String endTime,
-      Integer tableIndex);
+      String endTime);
 
-  List<MemberBillVO> findyByTableIndex(
+  List<MemberBillVO> findy(
       String account,
       String orderNo,
       List<Integer> tranTypes,
       String beginTime,
-      String endTime,
-      Integer tableIndex);
+      String endTime);
 
-  MemberBill findBillByTableIndex(String orderNo, int tranTypes, Integer tableIndex);
+  MemberBill findBill(String orderNo, int tranTypes);
 }

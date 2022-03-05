@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
+import com.esotericsoftware.minlog.Log;
 import com.gameplat.admin.enums.IpAnalysisEnum;
 import com.gameplat.admin.mapper.MemberMapper;
 import com.gameplat.admin.mapper.MemberWithdrawHistoryMapper;
@@ -179,6 +180,7 @@ public class IpAnalysisServiceImpl implements IpAnalysisService {
 
     searchSourceBuilder.aggregation(username);
     SearchRequest searchRequest = new SearchRequest(INDEX + tenant);
+    Log.info("查询索引为:{}, INDEX + tenant");
 
     searchSourceBuilder.sort(SortBuilders.fieldSort("createTime.keyword").order(SortOrder.DESC));
     searchRequest.source(searchSourceBuilder);

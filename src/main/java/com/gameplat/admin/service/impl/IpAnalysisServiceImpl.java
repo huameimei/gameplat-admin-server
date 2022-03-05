@@ -213,7 +213,7 @@ public class IpAnalysisServiceImpl implements IpAnalysisService {
       }
 
     } catch (Exception e) {
-      e.printStackTrace();
+      log.error("ip分析查询异常",e);
     }
 
     log.info("==========ip分析返回ips:\n"+ JSONArray.toJSONString(ips));

@@ -405,6 +405,10 @@ public class MemberGrowthRecordServiceImpl
         saveRewordObj.setRewordAmount(rewordAmount);
         saveRewordObj.setType(0);
         saveRewordObj.setSerialNumber(String.valueOf(IdWorker.getId()));
+        saveRewordObj.setParentId(member.getParentId());
+        saveRewordObj.setParentName(member.getParentName());
+        saveRewordObj.setAgentPath(member.getSuperPath());
+        saveRewordObj.setUserType(member.getUserType());
         // 是否自动派发
         if (BooleanEnum.YES.match(growthConfig.getIsAutoPayReword())) {
           String sourceId = String.valueOf(IdWorker.getId());

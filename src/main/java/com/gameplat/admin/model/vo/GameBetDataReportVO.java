@@ -37,6 +37,8 @@ public class GameBetDataReportVO implements Serializable {
     @ApiModelProperty(value = "返水金额")
     private BigDecimal waterAmount;
 
+    @ApiModelProperty(value = "游戏人数")
+    private int gameNum;
 
     public GameBetDataReportVO() {
         this.betAmount = BigDecimal.ZERO;
@@ -44,5 +46,6 @@ public class GameBetDataReportVO implements Serializable {
         this.winAmount = BigDecimal.ZERO;
         this.payoutAmount = BigDecimal.ZERO;
         this.waterAmount = BigDecimal.ZERO;
+        this.gameNum = 0;
     }
 }

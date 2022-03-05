@@ -24,6 +24,18 @@ public class MemberWealRewordAddDTO implements Serializable {
   @ApiModelProperty("状态： 0：待审核   1：未领取  2：已完成  3:已失效")
   private Integer status;
 
+  @ApiModelProperty("会员类型")
+  private String userType;
+
+  @ApiModelProperty("上级账号")
+  private String parentName;
+
+  @ApiModelProperty("上级id")
+  private Long parentId;
+
+  @ApiModelProperty("代理路由")
+  private String agentPath;
+
   @ApiModelProperty("老等级")
   private Integer oldLevel;
 

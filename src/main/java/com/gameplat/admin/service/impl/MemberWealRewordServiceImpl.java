@@ -8,8 +8,10 @@ import com.gameplat.admin.mapper.MemberWealRewordMapper;
 import com.gameplat.admin.model.dto.MemberWealRewordAddDTO;
 import com.gameplat.admin.model.dto.MemberWealRewordDTO;
 import com.gameplat.admin.model.vo.MemberWealRewordVO;
+import com.gameplat.admin.service.MemberService;
 import com.gameplat.admin.service.MemberWealRewordService;
 import com.gameplat.base.common.exception.ServiceException;
+import com.gameplat.model.entity.member.Member;
 import com.gameplat.model.entity.member.MemberWealReword;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -28,6 +30,8 @@ import java.util.List;
 public class MemberWealRewordServiceImpl
     extends ServiceImpl<MemberWealRewordMapper, MemberWealReword>
     implements MemberWealRewordService {
+
+  @Autowired private MemberService memberService;
 
   @Autowired private MemberWealRewordConvert rewordConvert;
 
@@ -112,6 +116,11 @@ public class MemberWealRewordServiceImpl
 
   @Override
   public void insertMemberWealReword(MemberWealRewordAddDTO dto) {
+    Member member = memberService.getById(dto.getUserId());
+    dto.setUserType(member.getUserType());
+    dto.setParentName(member.getParentName());
+    dto.setAgentPath(member.getSuperPath());
+    dto.setParentId(member.getParentId());
     MemberWealReword memberWealReword = rewordConvert.toEntity(dto);
     if (!this.save(memberWealReword)) {
       throw new ServiceException("新增福利记录失败！");

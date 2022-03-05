@@ -1,5 +1,6 @@
 package com.gameplat.admin.service.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
@@ -194,6 +195,7 @@ public class IpAnalysisServiceImpl implements IpAnalysisService {
     try {
       log.info("=====ip分析：\n"+searchSourceBuilder);
       SearchResponse search = restHighLevelClient.search(searchRequest, optionsBuilder.build());
+      log.info("=====ip分析查询结果：\n"+ JSON.toJSONString(search));
       Terms terms = search.getAggregations().get("username");
       for (Terms.Bucket bucket : terms.getBuckets()) {
         String account = bucket.getKeyAsString();

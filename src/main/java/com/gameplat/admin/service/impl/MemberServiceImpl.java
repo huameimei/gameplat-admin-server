@@ -15,6 +15,7 @@ import com.gameplat.admin.enums.MemberEnums;
 import com.gameplat.admin.mapper.MemberMapper;
 import com.gameplat.admin.model.dto.*;
 import com.gameplat.admin.model.vo.MemberInfoVO;
+import com.gameplat.admin.model.vo.MemberLevelVO;
 import com.gameplat.admin.model.vo.MemberVO;
 import com.gameplat.admin.model.vo.MessageDistributeVO;
 import com.gameplat.admin.service.*;
@@ -383,4 +384,33 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
   public List<Member> getOpenSalaryAgent(List<Integer> list) {
     return memberMapper.getOpenSalaryAgent(list);
   }
+
+    @Override
+    public List<Member> getListByAccountList(List<String> accountList) {
+        return Optional.ofNullable(accountList)
+                .filter(CollectionUtil::isNotEmpty)
+                .map(e -> this.lambdaQuery().in(Member::getAccount, e).list())
+                .orElse(null);
+    }
+
+    /**
+     * 获取各个充值层级下会员数量和锁定会员数量
+     *
+     * @return
+     */
+    @Override
+    public List<MemberLevelVO> getUserLevelAccountNum() {
+        return memberMapper.getUserLevelAccountNum();
+    }
+
+    /**
+     * 获取代理线下的会员账号信息
+     *
+     * @param memberQueryDTO MemberQueryDTO
+     * @return List
+     */
+    @Override
+    public List<Member> getMemberListByAgentAccount(MemberQueryDTO memberQueryDTO) {
+        return memberMapper.getMemberListByAgentAccount(memberQueryDTO);
+    }
 }

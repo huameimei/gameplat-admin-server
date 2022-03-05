@@ -1,15 +1,18 @@
 package com.gameplat.admin.controller.open.member;
 
-import com.gameplat.admin.model.dto.MemberLevelAddDTO;
-import com.gameplat.admin.model.dto.MemberLevelAllocateDTO;
-import com.gameplat.admin.model.dto.MemberLevelEditDTO;
+import com.gameplat.admin.model.dto.*;
 import com.gameplat.admin.model.vo.MemberLevelVO;
 import com.gameplat.admin.service.MemberLevelService;
+import com.gameplat.base.common.util.EasyExcelUtil;
+import com.gameplat.model.entity.member.Member;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
+import java.io.IOException;
 import java.util.List;
 
 @Validated
@@ -73,4 +76,26 @@ public class MemberLevelController {
   public void batchAllocate(@Valid @RequestBody List<MemberLevelAllocateDTO> dtos) {
     memberLevelService.batchAllocate(dtos);
   }
+
+    @ApiOperation(value = "根据输入账号分层")
+    @PostMapping("/allocateByUserNames")
+    public void allocateByUserNames(@Valid @RequestBody MemberLevelAllocateByUserNameDTO dto) {
+        memberLevelService.allocateByUserNames(dto);
+    }
+
+    @ApiOperation(value = "根据上传文件分层")
+    @PostMapping("/allocateByFile/{levelValue}")
+    public void allocateByFile(@PathVariable Integer levelValue, @RequestPart MultipartFile file) throws IOException {
+        List<MemberLevelFileDTO> list = EasyExcelUtil.readExcel(file.getInputStream(), MemberLevelFileDTO.class);
+        memberLevelService.allocateByFile(levelValue, list);
+    }
+
+    @ApiOperation(value = "根据筛选条件分层")
+    @PostMapping("/allocateByCondition")
+    public void allocateByCondition(@Valid @RequestBody MemberLevelAllocateByConditionDTO dto) {
+        memberLevelService.allocateByCondition(dto);
+    }
+
+
+
 }

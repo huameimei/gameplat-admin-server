@@ -163,6 +163,7 @@ public class MemberLevelServiceImpl extends ServiceImpl<MemberLevelMapper, Membe
   }
 
     @Override
+    @CacheInvalidate(name = CachedKeys.MEMBER_LEVEL_CACHE, key = "'all'")
     public void batchAllocate(List<MemberLevelAllocateDTO> dtos) {
         List<MemberLevel> memberLevels = this.getEnabledLevels();
         dtos.forEach(dto -> this.allocateLevel(memberLevels, dto));

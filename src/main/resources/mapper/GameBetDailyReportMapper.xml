@@ -281,7 +281,6 @@
     bet_amount = VALUES(bet_amount),
     valid_amount = VALUES(valid_amount),
     win_amount = VALUES(win_amount),
-    revenue = VALUES(revenue),
     update_time = sysdate()
   </insert>
 

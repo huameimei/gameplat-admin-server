@@ -4,7 +4,6 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.io.Serializable;
-import java.util.Date;
 
 /**
  * @author lily
@@ -14,20 +13,20 @@ import java.util.Date;
 @Data
 public class DayReportDTO implements Serializable {
 
-    private static final long serialVersionUID = 7169928923640880406L;
+  private static final long serialVersionUID = 7169928923640880406L;
 
-    @ApiModelProperty(value = "会员id")
-    private Long memberId;
+  @ApiModelProperty(value = "会员id")
+  private Long memberId;
 
-    @ApiModelProperty(value = "会员账号(精确)")
-    private String account;
+  @ApiModelProperty(value = "会员账号(精确)")
+  private String account;
 
-    @ApiModelProperty(value = "会员所属上级路径")
-    private String superPath;
+  @ApiModelProperty(value = "会员所属上级路径")
+  private String superPath;
 
-    @ApiModelProperty(value = "开始时间")
-    private String beginDate;
+  @ApiModelProperty(value = "开始时间")
+  private String beginDate;
 
-    @ApiModelProperty(value = "结束时间")
-    private String endDate;
+  @ApiModelProperty(value = "结束时间")
+  private String endDate;
 }

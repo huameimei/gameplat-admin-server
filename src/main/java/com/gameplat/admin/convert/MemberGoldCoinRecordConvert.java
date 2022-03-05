@@ -1,6 +1,6 @@
 package com.gameplat.admin.convert;
 
-import com.gameplat.admin.model.domain.MemberGoldCoinRecord;
+import com.gameplat.model.entity.member.MemberGoldCoinRecord;
 import com.gameplat.admin.model.dto.MemberGoldCoinRecordAddDTO;
 import com.gameplat.admin.model.dto.MemberGoldCoinRecordQueryDTO;
 import com.gameplat.admin.model.vo.MemberGoldCoinRecordVO;

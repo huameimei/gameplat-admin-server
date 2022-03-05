@@ -1,14 +1,12 @@
 package com.gameplat.admin.cache;
 
 import com.gameplat.base.common.constant.RedisCacheKey;
-import com.gameplat.base.common.util.StringUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
-import java.util.OptionalInt;
 
 /**
  * 后台账号Cache操作

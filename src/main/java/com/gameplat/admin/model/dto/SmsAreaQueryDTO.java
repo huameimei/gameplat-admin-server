@@ -10,20 +10,14 @@ import java.io.Serializable;
 @ApiModel("区号设置查询DTO")
 public class SmsAreaQueryDTO implements Serializable {
 
-    /**
-     * 编码
-     */
-    @ApiModelProperty("编码")
-    private String code;
-    /**
-     * 国家/地区
-     */
-    @ApiModelProperty("国家/地区")
-    private String name;
+  /** 编码 */
+  @ApiModelProperty("编码")
+  private String code;
+  /** 国家/地区 */
+  @ApiModelProperty("国家/地区")
+  private String name;
 
-    /**
-     * 状态 0 禁用 1 启用
-     */
-    @ApiModelProperty("状态 0 禁用 1 启用")
-    private String status;
+  /** 状态 0 禁用 1 启用 */
+  @ApiModelProperty("状态 0 禁用 1 启用")
+  private String status;
 }

@@ -1,7 +1,7 @@
 package com.gameplat.admin.convert;
 
-import com.gameplat.admin.model.domain.MessageDistribute;
 import com.gameplat.admin.model.vo.MessageDistributeVO;
+import com.gameplat.model.entity.message.MessageDistribute;
 import org.mapstruct.Mapper;
 
 /**
@@ -12,6 +12,5 @@ import org.mapstruct.Mapper;
 @Mapper(componentModel = "spring")
 public interface MessageDistributeConvert {
 
-    MessageDistributeVO toVo(MessageDistribute messageDistribute);
-
+  MessageDistributeVO toVo(MessageDistribute messageDistribute);
 }

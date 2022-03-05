@@ -2,17 +2,18 @@ package com.gameplat.admin.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.mapper.MemberInfoMapper;
-import com.gameplat.admin.model.domain.MemberInfo;
 import com.gameplat.admin.service.MemberInfoService;
 import com.gameplat.base.common.exception.ServiceException;
-import java.math.BigDecimal;
-import java.util.Date;
+import com.gameplat.model.entity.member.MemberInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.math.BigDecimal;
+import java.util.Date;
 
 @Slf4j
 @Service
@@ -58,8 +59,8 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
   @Override
   @Retryable(value = Exception.class, backoff = @Backoff(delay = 300L, multiplier = 1.5))
   public void updateBalanceWithRecharge(Long memberId, BigDecimal amount,BigDecimal totalAmount) {
-    if (BigDecimal.ZERO.compareTo(amount) >= 0) {
-      throw new ServiceException("金额不正确，金额必须大于0");
+    if (BigDecimal.ZERO.compareTo(amount) > 0) {
+      throw new ServiceException("金额不正确，金额必须大于等于0");
     }
 
     MemberInfo memberInfo = this.getById(memberId);

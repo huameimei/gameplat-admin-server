@@ -1,13 +1,14 @@
 package com.gameplat.admin.model.dto;
 
-import com.gameplat.admin.model.domain.Member;
+import com.gameplat.model.entity.member.Member;
+import lombok.Data;
+
 import java.io.Serializable;
 import java.util.Map;
-import lombok.Data;
 
 @Data
 public class OperGameBalanceDTO implements Serializable {
   private Map<String, String> platform;
-  private Member member;
 
+  private Member member;
 }

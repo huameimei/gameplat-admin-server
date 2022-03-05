@@ -1,7 +1,7 @@
 package com.gameplat.admin.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.gameplat.admin.model.domain.SysVersion;
+import com.gameplat.model.entity.sys.SysVersion;
 
 /**
  * 系统版本

@@ -2,7 +2,7 @@ package com.gameplat.admin.controller.open.proxy;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
-import com.gameplat.admin.model.domain.proxy.DividePeriods;
+import com.gameplat.model.entity.proxy.DividePeriods;
 import com.gameplat.admin.model.dto.DividePeriodsDTO;
 import com.gameplat.admin.model.dto.DividePeriodsQueryDTO;
 import com.gameplat.admin.model.vo.DividePeriodsVO;
@@ -60,6 +60,22 @@ public class DividePeriodsController {
     @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.AGENT, desc = "期数结算")
     public void settle(@Validated @RequestBody DividePeriodsDTO dto) {
         periodsService.settle(dto);
+    }
+
+    @PostMapping("/grant")
+    @ApiOperation(value = "期数派发")
+    @PreAuthorize("hasAuthority('divide:periods:grant')")
+    @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.AGENT, desc = "期数派发")
+    public void grant(@Validated @RequestBody DividePeriodsDTO dto) {
+        periodsService.grant(dto);
+    }
+
+    @PostMapping("/recycle")
+    @ApiOperation(value = "期数回收")
+    @PreAuthorize("hasAuthority('divide:periods:recycle')")
+    @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.AGENT, desc = "期数回收")
+    public void recycle(@Validated @RequestBody DividePeriodsDTO dto) {
+        periodsService.recycle(dto);
     }
 
 }

@@ -1,6 +1,5 @@
 package com.gameplat.admin.model.vo;
 
-
 import lombok.Data;
 
 /**
@@ -11,8 +10,7 @@ import lombok.Data;
 @Data
 public class GrowthScaleVO {
 
-    private Long currentGrowth;
+  private Long currentGrowth;
 
-    private Long lowerGrowth;
-
+  private Long lowerGrowth;
 }

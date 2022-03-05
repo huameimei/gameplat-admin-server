@@ -6,8 +6,6 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.convert.ActivityTypeConvert;
 import com.gameplat.admin.mapper.ActivityTypeMapper;
-import com.gameplat.admin.model.domain.ActivityInfo;
-import com.gameplat.admin.model.domain.ActivityType;
 import com.gameplat.admin.model.dto.ActivityTypeAddDTO;
 import com.gameplat.admin.model.dto.ActivityTypeQueryDTO;
 import com.gameplat.admin.model.dto.ActivityTypeUpdateDTO;
@@ -17,9 +15,13 @@ import com.gameplat.admin.service.ActivityTypeService;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.StringUtils;
 import com.gameplat.common.enums.BooleanEnum;
+import com.gameplat.model.entity.activity.ActivityInfo;
+import com.gameplat.model.entity.activity.ActivityType;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,6 +32,7 @@ import java.util.List;
  * @author kenvin
  */
 @Service
+@Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)
 public class ActivityTypeServiceImpl extends ServiceImpl<ActivityTypeMapper, ActivityType>
     implements ActivityTypeService {
 

@@ -10,7 +10,6 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.convert.TpPayChannelConvert;
 import com.gameplat.admin.mapper.TpPayChannelMapper;
 import com.gameplat.admin.model.bean.ChannelLimitsBean;
-import com.gameplat.admin.model.domain.TpPayChannel;
 import com.gameplat.admin.model.dto.TpPayChannelAddDTO;
 import com.gameplat.admin.model.dto.TpPayChannelEditDTO;
 import com.gameplat.admin.model.dto.TpPayChannelQueryDTO;
@@ -18,12 +17,14 @@ import com.gameplat.admin.model.vo.TpPayChannelVO;
 import com.gameplat.admin.service.TpPayChannelService;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.json.JsonUtils;
-import java.math.BigDecimal;
-import java.util.List;
+import com.gameplat.model.entity.pay.TpPayChannel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.math.BigDecimal;
+import java.util.List;
 
 @Service
 @Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)
@@ -66,7 +67,7 @@ public class TpPayChannelServiceImpl extends ServiceImpl<TpPayChannelMapper, TpP
     }
     LambdaUpdateWrapper<TpPayChannel> update = Wrappers.lambdaUpdate();
     update.set(TpPayChannel::getStatus, status).eq(TpPayChannel::getId, id);
-    this.update(new TpPayChannel(),update);
+    this.update(new TpPayChannel(), update);
   }
 
   @Override
@@ -94,12 +95,7 @@ public class TpPayChannelServiceImpl extends ServiceImpl<TpPayChannelMapper, TpP
   public IPage<TpPayChannelVO> findTpPayChannelPage(
       Page<TpPayChannel> page, TpPayChannelQueryDTO dto) {
     IPage<TpPayChannelVO> ipage = tpPayChannelMapper.findTpPayChannelPage(page, dto);
-    List<TpPayChannelVO> list = ipage.getRecords();
-    list.stream()
-        .forEach(
-            (a -> {
-              this.conver2LimitInfo(a);
-            }));
+    ipage.getRecords().forEach((this::conver2LimitInfo));
     return ipage;
   }
 

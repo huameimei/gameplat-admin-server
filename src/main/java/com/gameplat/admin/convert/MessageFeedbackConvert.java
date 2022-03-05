@@ -1,9 +1,9 @@
 package com.gameplat.admin.convert;
 
-import com.gameplat.admin.model.domain.MessageFeedback;
 import com.gameplat.admin.model.dto.MessageFeedbackAddDTO;
 import com.gameplat.admin.model.dto.MessageFeedbackUpdateDTO;
 import com.gameplat.admin.model.vo.MessageFeedbackVO;
+import com.gameplat.model.entity.message.MessageFeedback;
 import org.mapstruct.Mapper;
 
 /**
@@ -12,9 +12,9 @@ import org.mapstruct.Mapper;
 @Mapper(componentModel = "spring")
 public interface MessageFeedbackConvert {
 
-    MessageFeedback toEntity(MessageFeedbackAddDTO dto);
+  MessageFeedback toEntity(MessageFeedbackAddDTO dto);
 
-    MessageFeedback toEntity(MessageFeedbackUpdateDTO dto);
+  MessageFeedback toEntity(MessageFeedbackUpdateDTO dto);
 
-    MessageFeedbackVO toVo(MessageFeedback messageInfo);
+  MessageFeedbackVO toVo(MessageFeedback messageInfo);
 }

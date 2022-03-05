@@ -1,8 +1,8 @@
 package com.gameplat.admin.convert;
 
-import com.gameplat.admin.model.domain.SysRole;
 import com.gameplat.admin.model.dto.OperRoleDTO;
 import com.gameplat.admin.model.vo.RoleVo;
+import com.gameplat.model.entity.sys.SysRole;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 

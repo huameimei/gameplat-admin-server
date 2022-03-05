@@ -3,7 +3,7 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.gameplat.admin.mapper.MemberGrowthConfigMapper">
 
-	<resultMap type="com.gameplat.admin.model.domain.MemberGrowthConfig" id="memberGrowthConfigResult">
+    <resultMap type="com.gameplat.model.entity.member.MemberGrowthConfig" id="memberGrowthConfigResult">
         <result property="id" column="id"/>
         <result property="isEnableVip" column="is_enable_vip"/>
         <result property="isEnableRecharge" column="is_enable_recharge"/>
@@ -44,7 +44,7 @@
     </resultMap>
 
 
-<!-- 只查询一条 -->
+    <!-- 只查询一条 -->
     <select id="findOneConfig" resultMap="memberGrowthConfigResult">
         select
         id,
@@ -120,7 +120,9 @@
             <if test="receiveLimitCycle != null">receive_limit_cycle = #{receiveLimitCycle},</if>
             <if test="bindBankGrowth != null">bind_bank_growth = #{bindBankGrowth},</if>
             <if test="perfectUserInfoGrowth != null">perfect_user_info_growth = #{perfectUserInfoGrowth},</if>
-            <if test="perfectUserInfoField != null and perfectUserInfoField != ''">perfect_user_info_field = #{perfectUserInfoField},</if>
+            <if test="perfectUserInfoField != null and perfectUserInfoField != ''">perfect_user_info_field =
+                #{perfectUserInfoField},
+            </if>
             <if test="carousel != null and carousel != ''">carousel = #{carousel},</if>
             <if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
             <if test='growthDesc != null and growthDesc != "" and language != null and language == "zh-CN"'>growth_desc = #{growthDesc},</if>
@@ -137,4 +139,10 @@
         </set>
         where id = #{id}
     </update>
+
+    <!-- 后台获取金币说明配置 -->
+    <select id="getGoldCoinDesc" resultType="com.gameplat.model.entity.member.MemberGrowthConfig">
+        select id, coin_ratio coinRatio, coin_rate coinRate, JSON_UNQUOTE(json_extract(gold_coin_desc, concat('$.',concat('"',concat(#{language},'"'))))) as goldCoinDesc
+        from member_growth_config order by create_time desc limit 1
+    </select>
 </mapper>

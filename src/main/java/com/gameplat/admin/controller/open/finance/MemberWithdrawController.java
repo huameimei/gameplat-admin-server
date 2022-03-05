@@ -1,10 +1,7 @@
 package com.gameplat.admin.controller.open.finance;
 
-
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.gameplat.admin.model.bean.PageExt;
-import com.gameplat.admin.model.domain.MemberWithdraw;
-import com.gameplat.admin.model.domain.PpMerchant;
 import com.gameplat.admin.model.dto.MemberWithdrawQueryDTO;
 import com.gameplat.admin.model.vo.MemberWithdrawVO;
 import com.gameplat.admin.model.vo.SummaryVO;
@@ -13,23 +10,25 @@ import com.gameplat.common.constant.ServiceName;
 import com.gameplat.common.model.bean.UserEquipment;
 import com.gameplat.log.annotation.Log;
 import com.gameplat.log.enums.LogType;
+import com.gameplat.model.entity.member.MemberWithdraw;
+import com.gameplat.model.entity.pay.PpMerchant;
 import com.gameplat.security.SecurityUserHolder;
 import com.gameplat.security.context.UserCredential;
-import java.math.BigDecimal;
-import java.util.List;
-import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
+import java.math.BigDecimal;
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/admin/finance/memberWithdraw")
 public class MemberWithdrawController {
 
-  @Autowired
-  private MemberWithdrawService userWithdrawService;
+  @Autowired private MemberWithdrawService userWithdrawService;
 
   @PostMapping("/modifyCashStatus")
   @PreAuthorize("hasAuthority('finance:memberWithdraw:modifyCashStatus')")
@@ -57,7 +56,8 @@ public class MemberWithdrawController {
 
   @PostMapping("/page")
   @PreAuthorize("hasAuthority('finance:memberWithdraw:page')")
-  public PageExt<MemberWithdrawVO, SummaryVO> queryPage(Page<MemberWithdraw> page, MemberWithdrawQueryDTO dto) {
+  public PageExt<MemberWithdrawVO, SummaryVO> queryPage(
+          Page<MemberWithdraw> page, MemberWithdrawQueryDTO dto) {
     return userWithdrawService.findPage(page, dto);
   }
 
@@ -70,10 +70,9 @@ public class MemberWithdrawController {
   @PostMapping("/save")
   @PreAuthorize("hasAuthority('finance:memberWithdraw:save')")
   @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.WITHDRAW, desc = "'人工出款memberId =' + #memberId")
-  public void save(BigDecimal cashMoney, String cashReason, Integer handPoints,Long memberId)
+  public void save(BigDecimal cashMoney, String cashReason, Integer handPoints, Long memberId)
       throws Exception {
     UserCredential userCredential = SecurityUserHolder.getCredential();
     userWithdrawService.save(cashMoney, cashReason, handPoints, userCredential, memberId);
   }
-
 }

@@ -1,8 +1,9 @@
 package com.gameplat.admin.model.vo;
 
+import lombok.Data;
+
 import java.io.Serializable;
 import java.util.Date;
-import lombok.Data;
 
 @Data
 public class MemberBankVO implements Serializable {

@@ -3,11 +3,12 @@ package com.gameplat.admin.service;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.gameplat.admin.model.domain.SysRole;
 import com.gameplat.admin.model.dto.AuthMenuDTO;
 import com.gameplat.admin.model.dto.OperRoleDTO;
 import com.gameplat.admin.model.dto.RoleDTO;
 import com.gameplat.admin.model.vo.RoleVo;
+import com.gameplat.model.entity.sys.SysRole;
+
 import java.util.List;
 import java.util.Set;
 

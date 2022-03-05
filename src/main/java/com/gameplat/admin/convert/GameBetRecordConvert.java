@@ -1,7 +1,7 @@
 package com.gameplat.admin.convert;
 
-import com.gameplat.admin.model.doc.GameBetRecord;
 import com.gameplat.admin.model.vo.GameBetRecordVO;
+import com.gameplat.model.entity.game.GameBetRecord;
 import org.mapstruct.Mapper;
 
 /**
@@ -12,11 +12,11 @@ import org.mapstruct.Mapper;
 @Mapper(componentModel = "spring")
 public interface GameBetRecordConvert {
 
-    /**
-     * 转换为VO
-     *
-     * @param betRecord GameBetRecord
-     * @return GameBetRecordVO
-     */
-    GameBetRecordVO toVo(GameBetRecord betRecord);
+  /**
+   * 转换为VO
+   *
+   * @param betRecord GameBetRecord
+   * @return GameBetRecordVO
+   */
+  GameBetRecordVO toVo(GameBetRecord betRecord);
 }

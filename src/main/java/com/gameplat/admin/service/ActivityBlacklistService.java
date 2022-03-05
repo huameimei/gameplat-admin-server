@@ -3,10 +3,10 @@ package com.gameplat.admin.service;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.gameplat.admin.model.domain.ActivityBlacklist;
 import com.gameplat.admin.model.dto.ActivityBlacklistAddDTO;
 import com.gameplat.admin.model.dto.ActivityBlacklistQueryDTO;
 import com.gameplat.admin.model.vo.ActivityBlacklistVO;
+import com.gameplat.model.entity.activity.ActivityBlacklist;
 
 /**
  * 活动黑名单业务处理

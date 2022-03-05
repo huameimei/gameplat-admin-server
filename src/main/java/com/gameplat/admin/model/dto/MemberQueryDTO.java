@@ -1,9 +1,9 @@
 package com.gameplat.admin.model.dto;
 
-import java.io.Serializable;
-import java.util.Date;
-import java.util.List;
 import lombok.Data;
+
+import java.io.Serializable;
+import java.util.List;
 
 @Data
 public class MemberQueryDTO implements Serializable {
@@ -154,4 +154,7 @@ public class MemberQueryDTO implements Serializable {
   private List levels;
 
   private String parentName;
+
+  /**是否包含代理自己 */
+  private Boolean itself;
 }

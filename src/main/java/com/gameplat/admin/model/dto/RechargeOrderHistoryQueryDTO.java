@@ -1,10 +1,11 @@
 package com.gameplat.admin.model.dto;
 
+import lombok.Data;
+
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
-import lombok.Data;
 
 @Data
 public class RechargeOrderHistoryQueryDTO implements Serializable {
@@ -54,5 +55,4 @@ public class RechargeOrderHistoryQueryDTO implements Serializable {
   private List<String> payAccountOwnerList;
 
   private Date auditTime;
-
 }

@@ -7,9 +7,6 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.convert.ActivityRedPacketConvert;
 import com.gameplat.admin.mapper.ActivityRedPacketMapper;
-import com.gameplat.admin.model.domain.ActivityRedPacket;
-import com.gameplat.admin.model.domain.ActivityRedPacketCondition;
-import com.gameplat.admin.model.domain.SysDictData;
 import com.gameplat.admin.model.dto.*;
 import com.gameplat.admin.model.vo.ActivityRedPacketConfigVO;
 import com.gameplat.admin.model.vo.ActivityRedPacketVO;
@@ -19,9 +16,13 @@ import com.gameplat.admin.service.*;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.StringUtils;
 import com.gameplat.common.enums.DictDataEnum;
+import com.gameplat.model.entity.activity.ActivityRedPacket;
+import com.gameplat.model.entity.activity.ActivityRedPacketCondition;
+import com.gameplat.model.entity.sys.SysDictData;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
@@ -33,6 +34,7 @@ import java.util.List;
  * @author kenvin
  */
 @Service
+@Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)
 public class ActivityRedPacketServiceImpl
     extends ServiceImpl<ActivityRedPacketMapper, ActivityRedPacket>
     implements ActivityRedPacketService {

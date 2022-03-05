@@ -2,15 +2,11 @@ package com.gameplat.admin.controller.open.finance;
 
 import com.alibaba.fastjson.JSON;
 import com.gameplat.admin.model.bean.DirectCharge;
-import com.gameplat.admin.model.domain.SysDictData;
 import com.gameplat.admin.service.SysDictDataService;
+import com.gameplat.model.entity.sys.SysDictData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/admin/finance/directCharge")
@@ -31,5 +27,4 @@ public class DirectChargeController {
     sysDictData.setDictValue(JSON.toJSONString(directCharge));
     dictDataService.updateById(sysDictData);
   }
-
 }

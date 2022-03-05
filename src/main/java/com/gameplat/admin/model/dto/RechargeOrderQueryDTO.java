@@ -1,9 +1,10 @@
 package com.gameplat.admin.model.dto;
 
+import lombok.Data;
+
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.List;
-import lombok.Data;
 
 @Data
 public class RechargeOrderQueryDTO implements Serializable {
@@ -41,5 +42,4 @@ public class RechargeOrderQueryDTO implements Serializable {
   private boolean fullNameFuzzy;
 
   private String order;
-
 }

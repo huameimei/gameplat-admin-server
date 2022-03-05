@@ -1,9 +1,10 @@
 package com.gameplat.admin.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.gameplat.admin.model.domain.TpInterface;
 import com.gameplat.admin.model.vo.TpInterfacePayTypeVo;
 import com.gameplat.admin.model.vo.TpInterfaceVO;
+import com.gameplat.model.entity.pay.TpInterface;
+
 import java.util.List;
 
 public interface TpInterfaceService extends IService<TpInterface> {

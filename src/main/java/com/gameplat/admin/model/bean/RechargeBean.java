@@ -1,8 +1,9 @@
 package com.gameplat.admin.model.bean;
 
+import lombok.Data;
+
 import java.io.Serializable;
 import java.math.BigDecimal;
-import lombok.Data;
 
 @Data
 public class RechargeBean implements Serializable {
@@ -11,5 +12,4 @@ public class RechargeBean implements Serializable {
 
   private Integer rechargeTimes;
   private BigDecimal rechargeAmount;
-
 }

@@ -1,16 +1,17 @@
 package com.gameplat.admin.convert;
 
-import com.gameplat.admin.model.domain.SysUser;
 import com.gameplat.admin.model.dto.OperUserDTO;
 import com.gameplat.admin.model.dto.UserResetPasswordDTO;
 import com.gameplat.admin.model.vo.ProfileVO;
 import com.gameplat.admin.model.vo.UserInfoVo;
 import com.gameplat.admin.model.vo.UserVo;
+import com.gameplat.model.entity.sys.SysUser;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
 /**
  * 用户类型转换
+ *
  * @author three
  */
 @Mapper(componentModel = "spring")

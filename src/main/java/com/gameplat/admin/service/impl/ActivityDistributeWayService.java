@@ -3,17 +3,25 @@ package com.gameplat.admin.service.impl;
 import cn.hutool.core.util.NumberUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.constant.MemberServiceKeyConstant;
-import com.gameplat.admin.enums.*;
+import com.gameplat.admin.enums.ActivityDistributeEnum;
+import com.gameplat.admin.enums.MemberBillTransTypeEnum;
+import com.gameplat.admin.enums.MemberWealRewordEnums;
+import com.gameplat.admin.enums.PushMessageEnum;
 import com.gameplat.admin.mapper.ActivityDistributeMapper;
-import com.gameplat.admin.model.domain.*;
 import com.gameplat.admin.model.dto.MessageInfoAddDTO;
 import com.gameplat.admin.model.vo.MemberInfoVO;
 import com.gameplat.admin.service.*;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.common.enums.BooleanEnum;
+import com.gameplat.model.entity.ValidWithdraw;
+import com.gameplat.model.entity.activity.ActivityDistribute;
+import com.gameplat.model.entity.activity.ActivityQualification;
+import com.gameplat.model.entity.member.MemberBill;
+import com.gameplat.model.entity.member.MemberWealReword;
 import com.gameplat.redis.redisson.DistributedLocker;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
@@ -28,6 +36,7 @@ import java.util.concurrent.TimeUnit;
  * @desc
  */
 @Service
+@Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)
 public class ActivityDistributeWayService
     extends ServiceImpl<ActivityDistributeMapper, ActivityDistribute> {
 
@@ -134,11 +143,14 @@ public class ActivityDistributeWayService
       memberBill.setRemark(remark);
       memberBill.setContent(remark);
       memberBill.setOperator("system");
-      memberBill.setTableIndex(memberInfoVO.getTableIndex());
       memberBillService.save(memberBill);
 
       // 插入福利中心记录(已领取)
       wealReword.setStatus(MemberWealRewordEnums.MemberWealRewordStatus.COMPLETED.getValue());
+      wealReword.setUserType(memberInfoVO.getUserType());
+      wealReword.setParentId(memberInfoVO.getParentId().longValue());
+      wealReword.setParentName(memberInfoVO.getParentName());
+      wealReword.setAgentPath(memberInfoVO.getSuperPath());
       memberWealRewordService.save(wealReword);
 
       // 通知 发个人消息

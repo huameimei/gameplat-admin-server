@@ -11,9 +11,9 @@ import lombok.Data;
 @Data
 public class IpStatisticsVO {
 
-    @ApiModelProperty(value = "ip地址")
-    private String loginIp;
+  @ApiModelProperty(value = "ip地址")
+  private String loginIp;
 
-    @ApiModelProperty(value = "次数")
-    private String frequency;
+  @ApiModelProperty(value = "次数")
+  private String frequency;
 }

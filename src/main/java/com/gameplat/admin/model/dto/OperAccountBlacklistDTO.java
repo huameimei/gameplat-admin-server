@@ -1,8 +1,9 @@
 package com.gameplat.admin.model.dto;
 
-import java.io.Serializable;
-import javax.validation.constraints.NotNull;
 import lombok.Data;
+
+import javax.validation.constraints.NotNull;
+import java.io.Serializable;
 
 @Data
 public class OperAccountBlacklistDTO implements Serializable {
@@ -12,7 +13,5 @@ public class OperAccountBlacklistDTO implements Serializable {
 
   private String ip;
 
-  @NotNull
-  private String games;
-
+  @NotNull private String games;
 }

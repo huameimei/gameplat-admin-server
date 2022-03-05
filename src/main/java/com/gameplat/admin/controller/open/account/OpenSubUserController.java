@@ -2,7 +2,6 @@ package com.gameplat.admin.controller.open.account;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
-import com.gameplat.admin.model.domain.SysUser;
 import com.gameplat.admin.model.dto.OperUserDTO;
 import com.gameplat.admin.model.dto.UserDTO;
 import com.gameplat.admin.model.dto.UserResetPasswordDTO;
@@ -13,8 +12,9 @@ import com.gameplat.common.constant.ServiceName;
 import com.gameplat.common.group.Groups;
 import com.gameplat.log.annotation.Log;
 import com.gameplat.log.enums.LogType;
-import lombok.RequiredArgsConstructor;
+import com.gameplat.model.entity.sys.SysUser;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -28,11 +28,10 @@ import java.util.List;
  */
 @Slf4j
 @RestController
-@RequiredArgsConstructor
 @RequestMapping("/api/admin/account/subUser")
 public class OpenSubUserController {
 
-  private final SysUserService userService;
+  @Autowired private SysUserService userService;
 
   @GetMapping("/list")
   @PreAuthorize("hasAuthority('account:subUser:view')")

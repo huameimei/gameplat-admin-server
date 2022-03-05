@@ -11,39 +11,36 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * @Description:
- * @Author: Hoover
- * @Date: 20/11/2021 下午 6:49
- **/
+ * @Description: @Author: Hoover @Date: 20/11/2021 下午 6:49
+ */
 @Configuration
 public class AdminLogBuilder implements LogBuilder {
 
-    @Value("${syslog.tenant:#{null}}")
-    private String dbSuffix;
+  @Value("${syslog.tenant:#{null}}")
+  private String dbSuffix;
 
-    @Override
-    public SysLog build() throws Exception {
+  @Override
+  public SysLog build() throws Exception {
 
-        UserTypes userTypes =
-                SecurityUserHolder.isSuperAdmin() ?
-                        UserTypes.ADMIN : UserTypes.SUBUSER;
+    UserTypes userTypes = SecurityUserHolder.isSuperAdmin() ? UserTypes.ADMIN : UserTypes.SUBUSER;
 
-        String tenant = DyDataSourceContextHolder.getTenant();
-        tenant = StringUtils.isEmpty(tenant) ? dbSuffix : tenant;
-        return SysLog.builder()
-                .dbSuffix(tenant)
-                .userType(userTypes.key())
-                .registerTime(SecurityUserHolder.getCredential().getRegisterTime())
-                .username(SecurityUserHolder.getUsername())
-                .subject(SubjectEnum.ADMIN.getKey())
-                .build();
-    }
+    String tenant = DyDataSourceContextHolder.getTenant();
+    tenant = StringUtils.isEmpty(tenant) ? dbSuffix : tenant;
+    return SysLog.builder()
+        .dbSuffix(tenant)
+        .userType(userTypes.key())
+        .registerTime(SecurityUserHolder.getCredential().getRegisterTime())
+        .username(SecurityUserHolder.getUsername())
+        .subject(SubjectEnum.ADMIN.getKey())
+        .build();
+  }
 
-    /**
-     * 获取租户标识
-     * @return
-     */
-    public String getDbSuffix(){
-        return dbSuffix;
-    }
+  /**
+   * 获取租户标识
+   *
+   * @return
+   */
+  public String getDbSuffix() {
+    return dbSuffix;
+  }
 }

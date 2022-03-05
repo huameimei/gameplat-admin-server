@@ -1,7 +1,8 @@
 package com.gameplat.admin.model.vo;
 
-import java.io.Serializable;
 import lombok.Data;
+
+import java.io.Serializable;
 
 /**
  * 字典数据Vo

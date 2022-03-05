@@ -2,45 +2,63 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.gameplat.admin.mapper.SysRoleMapper">
 
-    <resultMap id="SysRoleResult" type="com.gameplat.admin.model.domain.SysRole">
-        <id     property="roleId"       column="role_id"        />
-        <result property="roleName"     column="role_name"      />
-        <result property="roleKey"      column="role_key"       />
-        <result property="roleSort"     column="role_sort"      />
-        <result property="dataScope"    column="data_scope"     />
-        <result property="defaultFlag"  column="default_flag"   />
-        <result property="status"       column="status"         />
-        <result property="createBy"     column="create_by"      />
-        <result property="createTime"   column="create_time"    />
-        <result property="updateBy"     column="update_by"      />
-        <result property="updateTime"   column="update_time"    />
-        <result property="remark"       column="remark"         />
+    <resultMap id="SysRoleResult" type="com.gameplat.model.entity.sys.SysRole">
+        <id property="roleId" column="role_id"/>
+        <result property="roleName" column="role_name"/>
+        <result property="roleKey" column="role_key"/>
+        <result property="roleSort" column="role_sort"/>
+        <result property="dataScope" column="data_scope"/>
+        <result property="defaultFlag" column="default_flag"/>
+        <result property="status" column="status"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="remark" column="remark"/>
     </resultMap>
 
-    <resultMap id="RoleMenuResult" type="com.gameplat.admin.model.domain.SysRoleMenu">
-        <result property="roleId"     column="role_id"      />
-        <result property="menuId"     column="menu_id"      />
+    <resultMap id="RoleMenuResult" type="com.gameplat.model.entity.sys.SysRoleMenu">
+        <result property="roleId" column="role_id"/>
+        <result property="menuId" column="menu_id"/>
     </resultMap>
 
     <sql id="selectRoleContactVo">
-        SELECT DISTINCT r.role_id, r.role_name, r.role_key, r.role_sort, r.data_scope,
-            r.default_flag, r.status, r.create_by, r.create_time, r.update_by, r.update_time, r.remark
+        SELECT DISTINCT r.role_id,
+                        r.role_name,
+                        r.role_key,
+                        r.role_sort,
+                        r.data_scope,
+                        r.default_flag,
+                        r.status,
+                        r.create_by,
+                        r.create_time,
+                        r.update_by,
+                        r.update_time,
+                        r.remark
         FROM sys_role r
-	        LEFT JOIN sys_user_role ur ON ur.role_id = r.role_id
-	        LEFT JOIN sys_user u ON u.user_id = ur.user_id
+                 LEFT JOIN sys_user_role ur ON ur.role_id = r.role_id
+                 LEFT JOIN sys_user u ON u.user_id = ur.user_id
     </sql>
 
     <sql id="selectRoleVo">
-		SELECT r.role_id, r.role_name, r.role_key, r.role_sort, r.data_scope, r.default_flag, r.status, r.create_time, r.remark
+        SELECT r.role_id,
+               r.role_name,
+               r.role_key,
+               r.role_sort,
+               r.data_scope,
+               r.default_flag,
+               r.status,
+               r.create_time,
+               r.remark
         FROM sys_role r
-	</sql>
+    </sql>
 
-    <select id="selectRoleList" parameterType="com.gameplat.admin.model.domain.SysRole" resultMap="SysRoleResult">
+    <select id="selectRoleList" parameterType="com.gameplat.model.entity.sys.SysRole" resultMap="SysRoleResult">
         <include refid="selectRoleContactVo"/>
-         ${ew.customSqlSegment}
+        ${ew.customSqlSegment}
     </select>
 
-    <select id="selectRoleById" parameterType="com.gameplat.admin.model.domain.SysRole" resultMap="SysRoleResult">
+    <select id="selectRoleById" parameterType="com.gameplat.model.entity.sys.SysRole" resultMap="SysRoleResult">
         <include refid="selectRoleContactVo"/>
         WHERE r.role_id = #{roleId}
     </select>
@@ -50,7 +68,8 @@
         WHERE ur.user_id = #{userId}
     </select>
 
-    <insert id="insertRole" parameterType="com.gameplat.admin.model.domain.SysRole" useGeneratedKeys="true" keyProperty="roleId">
+    <insert id="insertRole" parameterType="com.gameplat.model.entity.sys.SysRole" useGeneratedKeys="true"
+            keyProperty="roleId">
         INSERT INTO sys_role(
         <if test="roleId != null and roleId != 0">role_id,</if>
         <if test="roleName != null and roleName != ''">role_name,</if>
@@ -76,7 +95,7 @@
         )
     </insert>
 
-    <update id="updateRole" parameterType="com.gameplat.admin.model.domain.SysRole">
+    <update id="updateRole" parameterType="com.gameplat.model.entity.sys.SysRole">
         UPDATE sys_role
         <set>
             <if test="roleName != null and roleName != ''">role_name = #{roleName},</if>
@@ -112,7 +131,7 @@
         </where>
     </select>
 
-    <select id="checkRoleKeyUnique" parameterType="com.gameplat.admin.model.domain.SysRole" resultMap="SysRoleResult">
+    <select id="checkRoleKeyUnique" parameterType="com.gameplat.model.entity.sys.SysRole" resultMap="SysRoleResult">
         <include refid="selectRoleVo"/>
         <where>
             <if test="roleId != null">

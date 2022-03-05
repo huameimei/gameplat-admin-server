@@ -2,27 +2,19 @@ package com.gameplat.admin.controller.open.system;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
-import com.gameplat.admin.model.domain.SysAuthIp;
 import com.gameplat.admin.model.dto.AuthIpDTO;
 import com.gameplat.admin.model.dto.OperAuthIpDTO;
 import com.gameplat.admin.model.vo.AuthIpVo;
 import com.gameplat.admin.service.SysAuthIpService;
-import com.gameplat.base.common.exception.ServiceException;
-import com.gameplat.base.common.util.StringUtils;
 import com.gameplat.common.constant.ServiceName;
+import com.gameplat.common.lang.Assert;
 import com.gameplat.log.annotation.Log;
 import com.gameplat.log.enums.LogType;
-import lombok.RequiredArgsConstructor;
+import com.gameplat.model.entity.sys.SysAuthIp;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * ip白名单
@@ -31,7 +23,6 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @Slf4j
 @RestController
-@RequiredArgsConstructor
 @RequestMapping("/api/admin/system/authIp")
 public class OpenAuthIpController {
 
@@ -50,9 +41,7 @@ public class OpenAuthIpController {
       type = LogType.ADMIN,
       desc = "'添加IP白名单 【'+#authIpDTO.ip+'】'")
   public void save(OperAuthIpDTO authIpDTO) {
-    if (StringUtils.isBlank(authIpDTO.getIp())) {
-      throw new ServiceException("缺少ip参数");
-    }
+    Assert.notEmpty(authIpDTO.getIp(), "缺少ip参数");
     authIpService.insertAuthip(authIpDTO);
   }
 
@@ -63,13 +52,8 @@ public class OpenAuthIpController {
       type = LogType.ADMIN,
       desc = "'修改IP白名单 【'+#authIpDTO.ip+'】'")
   public void update(@RequestBody OperAuthIpDTO authIpDTO) {
-    if (StringUtils.isNull(authIpDTO.getId())) {
-      throw new ServiceException("缺少参数");
-    }
-
-    if (StringUtils.isBlank(authIpDTO.getIp())) {
-      throw new ServiceException("缺少ip参数");
-    }
+    Assert.notNull(authIpDTO.getId(), "缺少参数");
+    Assert.notEmpty(authIpDTO.getIp(), "缺少ip参数");
     authIpService.updateAuthIp(authIpDTO);
   }
 
@@ -77,17 +61,13 @@ public class OpenAuthIpController {
   @PreAuthorize("hasAuthority('system:authIp:remove')")
   @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.ADMIN, desc = "'删除IP白名单 id='+#ids")
   public void remove(@RequestBody String ids) {
-    if (StringUtils.isBlank(ids)) {
-      throw new ServiceException("参数不全");
-    }
+    Assert.notEmpty(ids, "参数不全");
     authIpService.deleteBatch(ids);
   }
 
   @GetMapping("/checkAuthIpUnique")
   public boolean checkAuthIpUnique(String ip) {
-    if (StringUtils.isBlank(ip)) {
-      throw new ServiceException("参数不全");
-    }
+    Assert.notEmpty(ip, "缺少参数");
     return authIpService.checkAuthIpUnique(ip);
   }
 }

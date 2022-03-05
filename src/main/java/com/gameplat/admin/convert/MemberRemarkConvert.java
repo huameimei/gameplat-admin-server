@@ -1,7 +1,7 @@
 package com.gameplat.admin.convert;
 
-import com.gameplat.admin.model.domain.MemberRemark;
 import com.gameplat.admin.model.vo.MemberRemarkVO;
+import com.gameplat.model.entity.member.MemberRemark;
 import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")

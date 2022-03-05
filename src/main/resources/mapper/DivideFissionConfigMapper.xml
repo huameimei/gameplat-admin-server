@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gameplat.admin.mapper.DivideFissionConfigMapper">
+
+    <select id="getConfigByGameCode" resultType="string">
+    select
+        JSON_UNQUOTE(json_extract(divide_config,CONCAT('$.',concat('"', concat(#{code},'"')))))
+    from divide_fission_config where user_name = #{superName}
+    </select>
+</mapper>

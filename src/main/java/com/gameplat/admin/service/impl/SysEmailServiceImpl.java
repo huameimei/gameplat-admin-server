@@ -6,16 +6,18 @@ import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.convert.EmailConvert;
 import com.gameplat.admin.mapper.SysEmailMapper;
-import com.gameplat.admin.model.domain.SysEmail;
 import com.gameplat.admin.model.dto.EmailDTO;
 import com.gameplat.admin.model.dto.OperEmailDTO;
 import com.gameplat.admin.model.vo.EmailVO;
 import com.gameplat.admin.service.SysEmailService;
 import com.gameplat.base.common.exception.ServiceException;
-import java.util.Date;
-import lombok.RequiredArgsConstructor;
+import com.gameplat.model.entity.sys.SysEmail;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Date;
 
 /**
  * 邮件记录 服务实现层
@@ -23,7 +25,7 @@ import org.springframework.stereotype.Service;
  * @author three
  */
 @Service
-@RequiredArgsConstructor
+@Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)
 public class SysEmailServiceImpl extends ServiceImpl<SysEmailMapper, SysEmail>
     implements SysEmailService {
 

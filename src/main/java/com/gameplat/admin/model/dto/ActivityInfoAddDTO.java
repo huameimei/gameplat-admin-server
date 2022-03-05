@@ -3,8 +3,6 @@ package com.gameplat.admin.model.dto;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import io.swagger.annotations.ApiModelProperty;
-import java.io.Serializable;
-import java.util.Date;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -12,6 +10,8 @@ import org.springframework.format.annotation.DateTimeFormat;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.io.Serializable;
+import java.util.Date;
 
 /**
  * 新增活动DTO
@@ -114,7 +114,7 @@ public class ActivityInfoAddDTO implements Serializable {
 
   // 2.13点击2.1开启弹窗，页面新增弹窗图片设置，点击上传按钮，分别添加移动端和Web对应的弹窗图片。
   @ApiModelProperty(value = "是否弹窗默认0 不弹 1弹窗")
-  private Boolean isPopup;
+  private Integer isPopup;
 
   @ApiModelProperty(value = "移动端弹窗图片")
   private String appPopupPic;

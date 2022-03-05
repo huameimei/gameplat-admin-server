@@ -3,7 +3,7 @@
 <mapper namespace="com.gameplat.admin.mapper.SpreadUnionPackageMapper">
 
     <!-- 通用查询映射结果 -->
-    <resultMap id="BaseResultMap" type="com.gameplat.admin.model.domain.SpreadUnionPackage">
+    <resultMap id="BaseResultMap" type="com.gameplat.model.entity.spread.SpreadUnionPackage">
         <id column="id" property="id"/>
         <result column="union_id" property="unionId"/>
         <result column="union_packageId" property="unionPackageId"/>
@@ -19,34 +19,33 @@
         <result column="update_by" property="updateBy"/>
     </resultMap>
 
-
     <select id="getUnionPackage" resultType="com.gameplat.admin.model.vo.SpreadUnionPackageVO">
-     SELECT
-      su.union_name unionName,
-      su.agent_account agentAccount,
-      su.channel,
-      su.id unionId,
-      sup.id,
-      sup.union_package_id unionPackageId,
-      sup.union_package_name unionPackageName,
-      sup.union_platform unionPlatform,
-      sup.union_status unionStatus,
-      sup.promotion_domain promotionDomain,
-      sup.ios_download_url iosDownloadUrl,
-      sup.app_download_url appDownloadUrl,
-      sup.create_time createTime,
-      sup.create_by createBy,
-      sup.update_by updateBy,
-      sup.update_time updateTime
-	 FROM
+        SELECT
+        su.union_name unionName,
+        su.agent_account agentAccount,
+        su.channel,
+        su.id unionId,
+        sup.id,
+        sup.union_package_id unionPackageId,
+        sup.union_package_name unionPackageName,
+        sup.union_platform unionPlatform,
+        sup.union_status unionStatus,
+        sup.promotion_domain promotionDomain,
+        sup.ios_download_url iosDownloadUrl,
+        sup.app_download_url appDownloadUrl,
+        sup.create_time createTime,
+        sup.create_by createBy,
+        sup.update_by updateBy,
+        sup.update_time updateTime
+        FROM
         spread_union_package sup
-     INNER JOIN spread_union su ON sup.union_id = su.id
-     <where>
-     1=1
-         <if test="unionName != null and unionName != ''">AND su.union_name = #{unionName}</if>
-         <if test="channel != null and channel !=  ''"> AND su.channel = #{channel}</if>
-         <if test="agentAccount != null and agentAccount !=  ''"> AND su.agent_account = #{agentAccount}</if>
-     </where>
+        INNER JOIN spread_union su ON sup.union_id = su.id
+        <where>
+            1=1
+            <if test="unionName != null and unionName != ''">AND su.union_name = #{unionName}</if>
+            <if test="channel != null and channel !=  ''">AND su.channel = #{channel}</if>
+            <if test="agentAccount != null and agentAccount !=  ''">AND su.agent_account = #{agentAccount}</if>
+        </where>
 
     </select>
 

@@ -8,8 +8,8 @@ import com.gameplat.admin.service.OnlineUserService;
 import com.gameplat.common.constant.ServiceName;
 import com.gameplat.log.annotation.Log;
 import com.gameplat.log.enums.LogType;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,11 +20,10 @@ import org.springframework.web.bind.annotation.*;
  */
 @Slf4j
 @RestController
-@RequiredArgsConstructor
 @RequestMapping("/api/admin/account/online")
 public class OpenOnlineController {
 
-  private final OnlineUserService onlineUserService;
+  @Autowired private OnlineUserService onlineUserService;
 
   @GetMapping("/list")
   public IPage<OnlineUserVo> onlineList(PageDTO<OnlineUserVo> page, OnlineUserDTO dto) {

@@ -1,11 +1,11 @@
 package com.gameplat.admin.service.impl;
 
 import com.gameplat.admin.enums.SysUserEnums;
-import com.gameplat.admin.model.domain.SysUser;
 import com.gameplat.admin.service.SysMenuService;
 import com.gameplat.admin.service.SysRoleService;
 import com.gameplat.admin.service.SysUserService;
 import com.gameplat.base.common.util.StringUtils;
+import com.gameplat.model.entity.sys.SysUser;
 import com.gameplat.security.context.UserCredential;
 import com.gameplat.security.util.SecurityUtil;
 import org.springframework.beans.factory.annotation.Autowired;

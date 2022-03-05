@@ -3,11 +3,11 @@ package com.gameplat.admin.service;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.gameplat.admin.model.domain.TpPayChannel;
 import com.gameplat.admin.model.dto.TpPayChannelAddDTO;
 import com.gameplat.admin.model.dto.TpPayChannelEditDTO;
 import com.gameplat.admin.model.dto.TpPayChannelQueryDTO;
 import com.gameplat.admin.model.vo.TpPayChannelVO;
+import com.gameplat.model.entity.pay.TpPayChannel;
 
 public interface TpPayChannelService extends IService<TpPayChannel> {
 

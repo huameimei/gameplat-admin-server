@@ -13,11 +13,9 @@ import com.gameplat.admin.constant.SystemConstant;
 import com.gameplat.admin.convert.MemberConvert;
 import com.gameplat.admin.enums.MemberEnums;
 import com.gameplat.admin.mapper.MemberMapper;
-import com.gameplat.admin.model.domain.GameTransferInfo;
-import com.gameplat.admin.model.domain.Member;
-import com.gameplat.admin.model.domain.MemberInfo;
 import com.gameplat.admin.model.dto.*;
 import com.gameplat.admin.model.vo.MemberInfoVO;
+import com.gameplat.admin.model.vo.MemberLevelVO;
 import com.gameplat.admin.model.vo.MemberVO;
 import com.gameplat.admin.model.vo.MessageDistributeVO;
 import com.gameplat.admin.service.*;
@@ -26,6 +24,10 @@ import com.gameplat.base.common.util.StringUtils;
 import com.gameplat.common.constant.CachedKeys;
 import com.gameplat.common.enums.TransferTypesEnum;
 import com.gameplat.common.lang.Assert;
+import com.gameplat.common.util.TableIndexUtils;
+import com.gameplat.model.entity.game.GameTransferInfo;
+import com.gameplat.model.entity.member.Member;
+import com.gameplat.model.entity.member.MemberInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -54,7 +56,7 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
 
   @Autowired private OnlineUserService onlineUserService;
 
-  @Autowired private TenantConfig  tenantConfig;
+  @Autowired private TenantConfig tenantConfig;
 
   @Autowired private GameTransferInfoService gameTransferInfoService;
 
@@ -104,6 +106,8 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
 
     // 保存会员和会员详情
     Assert.isTrue(this.save(member), "新增会员失败!");
+    // 更新会员分表下标
+    this.updateTableIndex(member.getId(), TableIndexUtils.getTableIndex(member.getId()));
 
     MemberInfo memberInfo =
         MemberInfo.builder().memberId(member.getId()).rebate(dto.getRebate()).build();
@@ -340,18 +344,18 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
 
   @Override
   public Member getMemberAndFillGameAccount(String account) {
-    Member member = this.getByAccount(account)
-            .orElseThrow(() -> new ServiceException("会员信息不存在!"));
-    if(StringUtils.isBlank(member.getGameAccount())){
-      Assert.notNull(tenantConfig.getTenantCode(),"平台编码未配置，请联系客服");
-      //固定13位
-      StringBuffer gameAccount = new StringBuffer(tenantConfig.getTenantCode()).append(member.getId());
+    Member member = this.getByAccount(account).orElseThrow(() -> new ServiceException("会员信息不存在!"));
+    if (StringUtils.isBlank(member.getGameAccount())) {
+      Assert.notNull(tenantConfig.getTenantCode(), "平台编码未配置，请联系客服");
+      // 固定13位
+      StringBuffer gameAccount =
+          new StringBuffer(tenantConfig.getTenantCode()).append(member.getId());
       String suffix = RandomUtil.randomString(13 - gameAccount.length());
       member.setGameAccount(gameAccount.append(suffix).toString());
       Assert.isTrue(this.updateById(member), "添加会员游戏账号信息!");
     }
-    //会员余额存在哪个游戏中
-    if(ObjectUtil.isNull(gameTransferInfoService.getInfoByMemberId(member.getId()))){
+    // 会员余额存在哪个游戏中
+    if (ObjectUtil.isNull(gameTransferInfoService.getInfoByMemberId(member.getId()))) {
       GameTransferInfo gameTransferInfo = new GameTransferInfo();
       gameTransferInfo.setPlatformCode(TransferTypesEnum.SELF.getCode());
       gameTransferInfo.setAccount(member.getAccount());
@@ -360,4 +364,53 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
     }
     return member;
   }
+
+  @Override
+  public void updateTableIndex(Long memberId, int tableIndex) {
+    lambdaUpdate().set(Member::getTableIndex, tableIndex).eq(Member::getId, memberId).update();
+  }
+
+  @Override
+  public Integer getMaxLevel() {
+    return memberMapper.getMaxLevel();
+  }
+
+  /**
+   * 获取开启了工资的代理
+   * @param list
+   * @return
+   */
+  @Override
+  public List<Member> getOpenSalaryAgent(List<Integer> list) {
+    return memberMapper.getOpenSalaryAgent(list);
+  }
+
+    @Override
+    public List<Member> getListByAccountList(List<String> accountList) {
+        return Optional.ofNullable(accountList)
+                .filter(CollectionUtil::isNotEmpty)
+                .map(e -> this.lambdaQuery().in(Member::getAccount, e).list())
+                .orElse(null);
+    }
+
+    /**
+     * 获取各个充值层级下会员数量和锁定会员数量
+     *
+     * @return
+     */
+    @Override
+    public List<MemberLevelVO> getUserLevelAccountNum() {
+        return memberMapper.getUserLevelAccountNum();
+    }
+
+    /**
+     * 获取代理线下的会员账号信息
+     *
+     * @param memberQueryDTO MemberQueryDTO
+     * @return List
+     */
+    @Override
+    public List<Member> getMemberListByAgentAccount(MemberQueryDTO memberQueryDTO) {
+        return memberMapper.getMemberListByAgentAccount(memberQueryDTO);
+    }
 }

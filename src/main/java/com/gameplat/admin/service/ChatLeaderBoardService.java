@@ -1,8 +1,8 @@
 package com.gameplat.admin.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.gameplat.admin.model.domain.ChatLeaderBoard;
 import com.gameplat.base.common.exception.ServiceException;
+import com.gameplat.model.entity.chart.ChatLeaderBoard;
 
 /**
  * @author lily
@@ -11,6 +11,6 @@ import com.gameplat.base.common.exception.ServiceException;
  */
 public interface ChatLeaderBoardService extends IService<ChatLeaderBoard> {
 
-    /** 创建聊天室排行榜 */
-    void creatLeaderBoard(String jsonStrParam) throws ServiceException;
+  /** 创建聊天室排行榜 */
+  void creatLeaderBoard(String jsonStrParam) throws ServiceException;
 }

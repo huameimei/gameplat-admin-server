@@ -1,9 +1,10 @@
 package com.gameplat.admin.model.dto;
 
+import lombok.Data;
+
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.List;
-import lombok.Data;
 
 @Data
 public class MemberWithdrawHistoryQueryDTO implements Serializable {
@@ -47,5 +48,4 @@ public class MemberWithdrawHistoryQueryDTO implements Serializable {
   private String orderBy;
 
   private Integer oprateMode;
-
 }

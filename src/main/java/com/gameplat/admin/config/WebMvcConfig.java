@@ -3,10 +3,12 @@ package com.gameplat.admin.config;
 import com.gameplat.admin.interceptor.IpWhitelistInterceptor;
 import com.gameplat.admin.interceptor.LoginInterceptor;
 import com.gameplat.admin.interceptor.TwoFactorAuthenticationInterceptor;
+import com.gameplat.admin.interceptor.VipInterceptor;
+import com.gameplat.admin.service.MemberGrowthConfigService;
 import com.gameplat.security.authz.URIAdapter;
 import com.gameplat.web.config.web.WebMvcConfigurationAdapter;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
@@ -14,9 +16,12 @@ import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
 
 @Slf4j
 @Configuration
+@RequiredArgsConstructor
 public class WebMvcConfig extends WebMvcConfigurationAdapter {
 
-  @Autowired private URIAdapter uriAdapter;
+  private final URIAdapter uriAdapter;
+
+  private final MemberGrowthConfigService memberGrowthConfigService;
 
   @Bean
   public LocaleChangeInterceptor localeChangeInterceptor() {
@@ -44,6 +49,12 @@ public class WebMvcConfig extends WebMvcConfigurationAdapter {
     return new TwoFactorAuthenticationInterceptor();
   }
 
+  @Bean
+  public VipInterceptor vipInterceptor() {
+    log.info("----初始化VIP验证拦截器----");
+    return new VipInterceptor(memberGrowthConfigService);
+  }
+
   @Override
   public void addInterceptors(InterceptorRegistry registry) {
     registry
@@ -51,13 +62,23 @@ public class WebMvcConfig extends WebMvcConfigurationAdapter {
         .addPathPatterns("/**")
         .excludePathPatterns(
             "/webjars/*", "/**.html", "/swagger-resources/**", "/actuator/refresh");
+
     registry.addInterceptor(ipWhitelistInterceptor()).addPathPatterns("/api/admin/**");
     registry.addInterceptor(loginInterceptor()).addPathPatterns("/api/admin/auth/login");
+
     registry
         .addInterceptor(twoFactorAuthenicationInterceptor())
         .addPathPatterns("/api/admin/**")
         .excludePathPatterns(uriAdapter.getPermitUri())
         .excludePathPatterns(
-            "/api/admin/profile/info", "/api/admin/profile/menuList", "/api/admin/auth/authCode");
+            "/api/admin/profile/info",
+            "/api/admin/profile/menuList",
+            "/api/admin/auth/authCode",
+            "/api/admin/auth/bindSecret");
+
+    registry
+        .addInterceptor(vipInterceptor())
+        .addPathPatterns("api/admin/member/weal/**")
+        .excludePathPatterns("api/admin/member/weal/list");
   }
 }

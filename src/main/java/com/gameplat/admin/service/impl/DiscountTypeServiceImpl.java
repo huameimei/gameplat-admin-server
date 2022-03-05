@@ -8,11 +8,11 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.convert.DiscountTypeConvert;
 import com.gameplat.admin.mapper.DiscountTypeMapper;
-import com.gameplat.admin.model.domain.DiscountType;
 import com.gameplat.admin.model.dto.DiscountTypeAddDTO;
 import com.gameplat.admin.model.dto.DiscountTypeEditDTO;
 import com.gameplat.admin.service.DiscountTypeService;
 import com.gameplat.base.common.exception.ServiceException;
+import com.gameplat.model.entity.DiscountType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -23,7 +23,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class DiscountTypeServiceImpl extends ServiceImpl<DiscountTypeMapper, DiscountType>
     implements DiscountTypeService {
 
-  @Autowired private DiscountTypeConvert discountTypeConvert;
+  @Autowired
+  private DiscountTypeConvert discountTypeConvert;
 
   @Override
   public void update(DiscountTypeEditDTO dto) {
@@ -41,11 +42,14 @@ public class DiscountTypeServiceImpl extends ServiceImpl<DiscountTypeMapper, Dis
     update
         .set(ObjectUtils.isNotEmpty(status), DiscountType::getStatus, status)
         .eq(DiscountType::getId, id);
-    this.update(new DiscountType(),update);
+    this.update(new DiscountType(), update);
   }
 
   @Override
   public void save(DiscountTypeAddDTO dto) {
+    if (null != this.lambdaQuery().eq(DiscountType::getValue, dto.getValue()).one()) {
+      throw new ServiceException("编码已存在!");
+    }
     dto.setDateType(1);
     dto.setStatus(1);
     if (!this.save(discountTypeConvert.toEntity(dto))) {

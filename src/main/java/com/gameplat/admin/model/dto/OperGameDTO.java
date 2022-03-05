@@ -1,7 +1,8 @@
 package com.gameplat.admin.model.dto;
 
-import java.io.Serializable;
 import lombok.Data;
+
+import java.io.Serializable;
 
 @Data
 public class OperGameDTO implements Serializable {
@@ -24,24 +25,15 @@ public class OperGameDTO implements Serializable {
 
   private Integer sort;
 
-  /**
-   * 是否开放(0：否；1:是)
-   */
+  /** 是否开放(0：否；1:是) */
   private Integer enable;
 
-  /**
-   * 是否热门(0：否；1:是)
-   */
+  /** 是否热门(0：否；1:是) */
   private Integer hot;
 
-  /**
-   * 是否外跳(0：否；1:是)
-   */
+  /** 是否外跳(0：否；1:是) */
   private Integer isJump;
 
-  /**
-   * 是否竖屏(0：否；1:是)
-   */
+  /** 是否竖屏(0：否；1:是) */
   private Integer isVertical;
-
 }

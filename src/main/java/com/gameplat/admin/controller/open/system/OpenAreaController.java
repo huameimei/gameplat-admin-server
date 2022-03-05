@@ -2,17 +2,16 @@ package com.gameplat.admin.controller.open.system;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
-import com.gameplat.admin.model.domain.SysSmsArea;
 import com.gameplat.admin.model.dto.SmsAreaAddDTO;
 import com.gameplat.admin.model.dto.SmsAreaEditDTO;
 import com.gameplat.admin.model.dto.SmsAreaQueryDTO;
 import com.gameplat.admin.model.vo.SysSmsAreaVO;
 import com.gameplat.admin.service.SysSmsAreaService;
+import com.gameplat.model.entity.sys.SysSmsArea;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
@@ -21,8 +20,8 @@ import springfox.documentation.annotations.ApiIgnore;
 
 /** 区号设置控制器 */
 @Slf4j
-@RestController
 @Api(tags = "区号设置API")
+@RestController
 @RequestMapping("/api/admin/system/smsArea")
 public class OpenAreaController {
 

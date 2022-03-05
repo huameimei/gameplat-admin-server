@@ -1,8 +1,8 @@
 package com.gameplat.admin.convert;
 
-import com.gameplat.admin.model.domain.SysAuthIp;
 import com.gameplat.admin.model.dto.OperAuthIpDTO;
 import com.gameplat.admin.model.vo.AuthIpVo;
+import com.gameplat.model.entity.sys.SysAuthIp;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 

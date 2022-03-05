@@ -1,8 +1,8 @@
 package com.gameplat.admin.convert;
 
-import com.gameplat.admin.model.domain.MemberWithdrawHistory;
 import com.gameplat.admin.model.dto.MemberWithdrawHistoryQueryDTO;
 import com.gameplat.admin.model.vo.MemberWithdrawHistoryVO;
+import com.gameplat.model.entity.member.MemberWithdrawHistory;
 import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")

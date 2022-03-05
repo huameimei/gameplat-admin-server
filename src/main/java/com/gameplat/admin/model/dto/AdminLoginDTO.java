@@ -1,9 +1,10 @@
 package com.gameplat.admin.model.dto;
 
-import java.io.Serializable;
-import javax.validation.constraints.NotEmpty;
 import lombok.Data;
 import org.springframework.validation.annotation.Validated;
+
+import javax.validation.constraints.NotEmpty;
+import java.io.Serializable;
 
 /**
  * 管理员登录DTO

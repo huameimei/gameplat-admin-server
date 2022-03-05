@@ -3,11 +3,12 @@ package com.gameplat.admin.service;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.gameplat.admin.model.domain.Member;
 import com.gameplat.admin.model.dto.*;
 import com.gameplat.admin.model.vo.MemberInfoVO;
+import com.gameplat.admin.model.vo.MemberLevelVO;
 import com.gameplat.admin.model.vo.MemberVO;
 import com.gameplat.admin.model.vo.MessageDistributeVO;
+import com.gameplat.model.entity.member.Member;
 
 import java.util.List;
 import java.util.Optional;
@@ -83,4 +84,30 @@ public interface MemberService extends IService<Member> {
   void updateRemark(List<Long> memberIds, String remark);
 
   Member getMemberAndFillGameAccount(String account);
+
+  void updateTableIndex(Long memberId, int tableIndex);
+
+  /**
+   * 获取当前最高等级
+   * @return
+   */
+  Integer getMaxLevel();
+
+  /**
+   * 获取开启了工资的代理
+   * @param list
+   * @return
+   */
+  List<Member> getOpenSalaryAgent(List<Integer> list);
+
+    /**
+     * 根据多个会员账号批量查询会员信息
+     * @param accountList
+     * @return
+     */
+  List<Member> getListByAccountList(List<String> accountList);
+
+  List<MemberLevelVO> getUserLevelAccountNum();
+
+  List<Member> getMemberListByAgentAccount(MemberQueryDTO memberQueryDTO);
 }

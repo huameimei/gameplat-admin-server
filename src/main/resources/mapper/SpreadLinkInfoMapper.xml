@@ -3,7 +3,7 @@
 <mapper namespace="com.gameplat.admin.mapper.SpreadLinkInfoMapper">
 
     <!-- 通用查询映射结果 -->
-    <resultMap id="BaseResultMap" type="com.gameplat.admin.model.domain.SpreadLinkInfo">
+    <resultMap id="BaseResultMap" type="com.gameplat.model.entity.spread.SpreadLinkInfo">
         <id column="id" property="id"/>
         <id column="agent_id" property="agentId"/>
         <id column="agent_account" property="agentAccount"/>
@@ -62,17 +62,20 @@
     </select>
 
     <select id="getlinkMaxDivideRatio" parameterType="string" resultType="java.math.BigDecimal">
-        select IFNULL(max(maxRatio),0) as minRatio from (
-            select JSON_UNQUOTE(
-                    json_extract(
-                            json_extract(
-                                sl.divide_config,CONCAT('$.',concat('"', concat(#{code},'"')))),CONCAT('$.',concat('"', concat('divideRatio','"'))
-                            )
-                        )
-                    ) AS maxRatio
-            from spread_link_info sl
-	        where sl.agent_account = #{userName} and sl.divide_config != '' and sl.user_type = 1
+        select IFNULL(max(maxRatio), 0) as minRatio
+        from (
+                 select JSON_UNQUOTE(
+                                json_extract(
+                                        json_extract(
+                                                sl.divide_config, CONCAT('$.', concat('"', concat(#{code}, '"')))),
+                                        CONCAT('$.', concat('"', concat('divideRatio', '"'))
+                                            )
+                                    )
+                            ) AS maxRatio
+                 from spread_link_info sl
+                 where sl.agent_account = #{userName}
+                   and sl.divide_config != '' and sl.user_type = 1
             and sl.divide_config is not null
-	    ) tmp
+             ) tmp
     </select>
 </mapper>

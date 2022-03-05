@@ -3,8 +3,6 @@ package com.gameplat.admin.controller.open.notice;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
-import com.gameplat.admin.model.domain.Member;
-import com.gameplat.admin.model.domain.MessageInfo;
 import com.gameplat.admin.model.dto.MessageDistributeQueryDTO;
 import com.gameplat.admin.model.dto.MessageInfoAddDTO;
 import com.gameplat.admin.model.dto.MessageInfoEditDTO;
@@ -12,6 +10,8 @@ import com.gameplat.admin.model.dto.MessageInfoQueryDTO;
 import com.gameplat.admin.model.vo.MessageDistributeVO;
 import com.gameplat.admin.model.vo.MessageInfoVO;
 import com.gameplat.admin.service.MessageInfoService;
+import com.gameplat.model.entity.member.Member;
+import com.gameplat.model.entity.message.Message;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -42,7 +42,7 @@ public class OpenMessageInfoController {
     @ApiImplicitParam(name = "size", value = "每页条数"),
   })
   public IPage<MessageInfoVO> page(
-      @ApiIgnore PageDTO<MessageInfo> page, MessageInfoQueryDTO messageInfoQueryDTO) {
+      @ApiIgnore PageDTO<Message> page, MessageInfoQueryDTO messageInfoQueryDTO) {
     return messageInfoService.findMessageList(page, messageInfoQueryDTO);
   }
 
@@ -75,7 +75,7 @@ public class OpenMessageInfoController {
     @ApiImplicitParam(name = "size", value = "每页条数"),
   })
   public IPage<MessageDistributeVO> distributePage(
-          Page<Member> page, MessageDistributeQueryDTO messageDistributeQueryDTO) {
+      Page<Member> page, MessageDistributeQueryDTO messageDistributeQueryDTO) {
     return messageInfoService.findMessageDistributeList(page, messageDistributeQueryDTO);
   }
 }

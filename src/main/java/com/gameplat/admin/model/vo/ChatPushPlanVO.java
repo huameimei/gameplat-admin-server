@@ -55,5 +55,4 @@ public class ChatPushPlanVO implements Serializable {
 
   @ApiModelProperty(value = "彩种状态")
   private int gameStatus;
-
 }

@@ -1,9 +1,7 @@
 package com.gameplat.admin.model.vo;
 
 import com.baomidou.mybatisplus.annotation.FieldFill;
-import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -77,6 +75,4 @@ public class MessageFeedbackVO implements Serializable {
   @ApiModelProperty("更新时间")
   @TableField(fill = FieldFill.INSERT_UPDATE)
   private Date updateTime;
-
-
 }

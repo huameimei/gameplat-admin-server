@@ -12,17 +12,16 @@ import java.io.Serializable;
  * @description
  * @date 2022/2/13
  */
-
 @Data
 public class ChatGifVO implements Serializable {
 
-    @ApiModelProperty(value = "主键")
-    @TableId(value = "id", type = IdType.AUTO)
-    private Integer id;
+  @ApiModelProperty(value = "主键")
+  @TableId(value = "id", type = IdType.AUTO)
+  private Integer id;
 
-    @ApiModelProperty(value = "关键词")
-    private String name;
+  @ApiModelProperty(value = "关键词")
+  private String name;
 
-    @ApiModelProperty(value = "图片地址")
-    private String fileUrl;
+  @ApiModelProperty(value = "图片地址")
+  private String fileUrl;
 }

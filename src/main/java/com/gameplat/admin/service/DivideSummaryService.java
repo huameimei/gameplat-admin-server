@@ -3,7 +3,7 @@ package com.gameplat.admin.service;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.gameplat.admin.model.domain.proxy.DivideSummary;
+import com.gameplat.model.entity.proxy.DivideSummary;
 import com.gameplat.admin.model.dto.DivideSummaryQueryDTO;
 import com.gameplat.admin.model.vo.DivideSummaryVO;
 

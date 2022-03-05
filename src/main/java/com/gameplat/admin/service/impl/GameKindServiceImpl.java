@@ -9,7 +9,6 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.convert.GameKindConvert;
 import com.gameplat.admin.mapper.GameKindMapper;
-import com.gameplat.admin.model.domain.GameKind;
 import com.gameplat.admin.model.dto.GameKindQueryDTO;
 import com.gameplat.admin.model.dto.OperGameKindDTO;
 import com.gameplat.admin.model.vo.GameKindVO;
@@ -17,22 +16,19 @@ import com.gameplat.admin.service.GameKindService;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.StringUtils;
 import com.gameplat.common.enums.GameDemoEnableEnum;
+import com.gameplat.model.entity.game.GameKind;
 import com.google.common.collect.Lists;
-
-import java.util.Date;
-import java.util.List;
-import java.util.stream.Collectors;
-import javax.annotation.Resource;
-
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
+import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
-@RequiredArgsConstructor
 @Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)
 public class GameKindServiceImpl extends ServiceImpl<GameKindMapper, GameKind>
         implements GameKindService {
@@ -90,8 +86,16 @@ public class GameKindServiceImpl extends ServiceImpl<GameKindMapper, GameKind>
     @SentinelResource(value = "getGameKindInBanner")
     public List<GameKindVO> getGameKindInBanner(String gameType) {
         return this.lambdaQuery().eq(StringUtils.isNotBlank(gameType), GameKind::getGameType, gameType)
-                .eq(GameKind::getEnable, 1).list().stream().map(gameKindConvert::toVo)
+                .eq(GameKind::getStatus,2)
+                .eq(GameKind::getEnable, 1)
+                .list().stream().map(gameKindConvert::toVo)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    @SentinelResource(value = "getByCode")
+    public GameKindVO getByCode(String code) {
+        return gameKindMapper.getByCode(code);
     }
 
 

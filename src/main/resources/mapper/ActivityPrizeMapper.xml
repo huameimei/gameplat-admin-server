@@ -4,8 +4,10 @@
 
 
     <select id="findActivityPrizeList" resultType="com.gameplat.admin.model.vo.MemberActivityPrizeVO">
-        SELECT a.id id,a.prize_chance prizeChance,a.prize_repertory prizeRepertory,a.give_amount giveAmount,p.prize_id prizeId,
-        p.prize_type prizeType, p.prize_level prizeLevel, p.prize_icon prizeIcon,p.prize_name prizeName,p.ticket_yard ticketYard
+        SELECT a.id id,a.prize_chance prizeChance,a.prize_repertory prizeRepertory,a.give_amount giveAmount,p.prize_id
+        prizeId,
+        p.prize_type prizeType, p.prize_level prizeLevel, p.prize_icon prizeIcon,p.prize_name prizeName,p.ticket_yard
+        ticketYard
         FROM member_prize p
         LEFT JOIN activity_prize a
         ON p.prize_id=a.activity_prize_id

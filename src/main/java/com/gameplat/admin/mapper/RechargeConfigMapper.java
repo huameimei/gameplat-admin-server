@@ -1,9 +1,6 @@
 package com.gameplat.admin.mapper;
 
-
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.gameplat.admin.model.domain.RechargeConfig;
-import org.springframework.stereotype.Repository;
+import com.gameplat.model.entity.recharge.RechargeConfig;
 
-@Repository
 public interface RechargeConfigMapper extends BaseMapper<RechargeConfig> {}

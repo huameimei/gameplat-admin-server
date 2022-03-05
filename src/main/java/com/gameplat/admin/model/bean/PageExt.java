@@ -2,11 +2,12 @@ package com.gameplat.admin.model.bean;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+
+import java.util.List;
 
 /**
  * 分页扩展

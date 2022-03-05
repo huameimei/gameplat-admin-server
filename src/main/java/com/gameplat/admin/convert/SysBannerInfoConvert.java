@@ -1,9 +1,9 @@
 package com.gameplat.admin.convert;
 
-import com.gameplat.admin.model.domain.SysBannerInfo;
 import com.gameplat.admin.model.dto.SysBannerInfoAddDTO;
 import com.gameplat.admin.model.dto.SysBannerInfoEditDTO;
 import com.gameplat.admin.model.vo.SysBannerInfoVO;
+import com.gameplat.model.entity.sys.SysBannerInfo;
 import org.mapstruct.Mapper;
 
 /**
@@ -14,9 +14,9 @@ import org.mapstruct.Mapper;
 @Mapper(componentModel = "spring")
 public interface SysBannerInfoConvert {
 
-    SysBannerInfoVO toVo(SysBannerInfo sysBannerInfo);
+  SysBannerInfoVO toVo(SysBannerInfo entity);
 
-    SysBannerInfo toEntity(SysBannerInfoAddDTO sysBannerInfoAddDTO);
+  SysBannerInfo toEntity(SysBannerInfoAddDTO dto);
 
-    SysBannerInfo toEntity(SysBannerInfoEditDTO sysBannerInfoEditDTO);
+  SysBannerInfo toEntity(SysBannerInfoEditDTO dto);
 }

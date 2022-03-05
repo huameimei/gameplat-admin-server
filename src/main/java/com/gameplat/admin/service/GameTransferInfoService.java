@@ -1,7 +1,7 @@
 package com.gameplat.admin.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.gameplat.admin.model.domain.GameTransferInfo;
+import com.gameplat.model.entity.game.GameTransferInfo;
 
 public interface GameTransferInfoService extends IService<GameTransferInfo> {
 

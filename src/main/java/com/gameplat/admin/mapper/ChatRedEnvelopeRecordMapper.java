@@ -1,7 +1,6 @@
 package com.gameplat.admin.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.gameplat.admin.model.domain.ChatRedEnvelopeRecord;
+import com.gameplat.model.entity.chart.ChatRedEnvelopeRecord;
 
-public interface ChatRedEnvelopeRecordMapper extends BaseMapper<ChatRedEnvelopeRecord> {
-}
+public interface ChatRedEnvelopeRecordMapper extends BaseMapper<ChatRedEnvelopeRecord> {}

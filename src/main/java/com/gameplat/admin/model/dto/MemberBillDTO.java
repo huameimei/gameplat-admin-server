@@ -1,9 +1,10 @@
 package com.gameplat.admin.model.dto;
 
 import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
+
 import java.io.Serializable;
 import java.util.List;
-import lombok.Data;
 
 /**
  * @author lily
@@ -13,22 +14,21 @@ import lombok.Data;
 @Data
 public class MemberBillDTO implements Serializable {
 
-    @ApiModelProperty(value = "账号")
-    private String account;
+  @ApiModelProperty(value = "账号")
+  private String account;
 
-    @ApiModelProperty(value = "订单号，关联其他业务订单号")
-    private String orderNo;
+  @ApiModelProperty(value = "代理账号")
+  private String superPath;
 
-    @ApiModelProperty(value = "账变类型：TranTypes中值")
-    private List<Integer> tranTypes;
+  @ApiModelProperty(value = "订单号，关联其他业务订单号")
+  private String orderNo;
 
-    @ApiModelProperty(value = "添加开始时间")
-    private String beginTime;
+  @ApiModelProperty(value = "账变类型：TranTypes中值")
+  private List<Integer> tranTypes;
 
-    @ApiModelProperty(value = "添加结束时间")
-    private String endTime;
+  @ApiModelProperty(value = "添加开始时间")
+  private String beginTime;
 
-    @ApiModelProperty(value = "分表ID")
-    private Integer tableIndex;
+  @ApiModelProperty(value = "添加结束时间")
+  private String endTime;
 }
-

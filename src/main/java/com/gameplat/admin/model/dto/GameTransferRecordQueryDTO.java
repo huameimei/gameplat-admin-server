@@ -1,16 +1,15 @@
 package com.gameplat.admin.model.dto;
 
-import java.io.Serializable;
 import lombok.Data;
+
+import java.io.Serializable;
 
 @Data
 public class GameTransferRecordQueryDTO implements Serializable {
 
   private String account;
 
-  /**
-   * 会员账号模糊匹配
-   */
+  /** 会员账号模糊匹配 */
   private Boolean accountFuzzy;
 
   private String orderNo;

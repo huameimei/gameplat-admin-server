@@ -4,6 +4,7 @@ import lombok.Data;
 
 /**
  * 系统语言
+ *
  * @author three
  */
 @Data

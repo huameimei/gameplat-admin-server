@@ -3,7 +3,7 @@
   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.gameplat.admin.mapper.PayAccountMapper">
 
-  <resultMap type="PayAccount" id="PayAccountMap">
+  <resultMap type="com.gameplat.model.entity.pay.PayAccount" id="PayAccountMap">
     <result property="id" column="id"/>
     <result property="name" column="name"/>
     <result property="account" column="account"/>
@@ -31,7 +31,7 @@
     <result property="typeSubscript" column="type_subscript"/>
   </resultMap>
 
-  <resultMap type="PayAccountVO" id="PayAccountVOMap" extends="PayAccountMap">
+  <resultMap type="com.gameplat.admin.model.vo.PayAccountVO" id="PayAccountVOMap" extends="PayAccountMap">
   </resultMap>
 
   <sql id="where">

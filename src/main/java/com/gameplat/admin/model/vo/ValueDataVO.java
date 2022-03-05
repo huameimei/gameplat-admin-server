@@ -13,10 +13,9 @@ import lombok.Data;
 @ApiModel("值类型VO")
 public class ValueDataVO {
 
-    @ApiModelProperty(value = "数值")
-    private String value;
+  @ApiModelProperty(value = "数值")
+  private String value;
 
-    @ApiModelProperty(value = "名称")
-    private String name;
-
+  @ApiModelProperty(value = "名称")
+  private String name;
 }

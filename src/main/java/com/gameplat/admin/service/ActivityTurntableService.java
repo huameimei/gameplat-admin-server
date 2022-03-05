@@ -1,10 +1,6 @@
 package com.gameplat.admin.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.gameplat.admin.model.domain.ActivityTurntable;
+import com.gameplat.model.entity.activity.ActivityTurntable;
 
-public interface ActivityTurntableService extends IService<ActivityTurntable> {
-
-
-
-}
+public interface ActivityTurntableService extends IService<ActivityTurntable> {}

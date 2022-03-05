@@ -8,50 +8,32 @@ import com.gameplat.admin.enums.CashEnum;
 import com.gameplat.admin.enums.ProxyPayStatusEnum;
 import com.gameplat.admin.enums.WithdrawStatus;
 import com.gameplat.admin.feign.PaymentCenterFeign;
-import com.gameplat.admin.model.bean.AdminLimitInfo;
-import com.gameplat.admin.model.bean.NameValuePair;
-import com.gameplat.admin.model.bean.ProxyCallbackContext;
-import com.gameplat.admin.model.bean.ProxyDispatchContext;
-import com.gameplat.admin.model.bean.ProxyPayBackResult;
-import com.gameplat.admin.model.bean.ProxyPayMerBean;
-import com.gameplat.admin.model.bean.ReturnMessage;
-import com.gameplat.admin.model.domain.Member;
-import com.gameplat.admin.model.domain.MemberWithdraw;
-import com.gameplat.admin.model.domain.MemberWithdrawHistory;
-import com.gameplat.admin.model.domain.PpInterface;
-import com.gameplat.admin.model.domain.PpMerchant;
-import com.gameplat.admin.model.domain.SysUser;
-import com.gameplat.admin.service.LimitInfoService;
-import com.gameplat.admin.service.MemberInfoService;
-import com.gameplat.admin.service.MemberService;
-import com.gameplat.admin.service.MemberWithdrawHistoryService;
-import com.gameplat.admin.service.MemberWithdrawService;
-import com.gameplat.admin.service.PpInterfaceService;
-import com.gameplat.admin.service.PpMerchantService;
-import com.gameplat.admin.service.ProxyPayService;
-import com.gameplat.admin.service.SysUserService;
+import com.gameplat.admin.model.bean.*;
+import com.gameplat.admin.service.*;
 import com.gameplat.admin.util.MoneyUtils;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.json.JsonUtils;
 import com.gameplat.base.common.util.StringUtils;
 import com.gameplat.common.enums.BooleanEnum;
-import com.gameplat.common.enums.LimitEnums;
 import com.gameplat.common.enums.SwitchStatusEnum;
 import com.gameplat.common.enums.UserTypes;
 import com.gameplat.common.model.bean.limit.MemberRechargeLimit;
+import com.gameplat.model.entity.member.Member;
+import com.gameplat.model.entity.member.MemberWithdraw;
+import com.gameplat.model.entity.member.MemberWithdrawHistory;
+import com.gameplat.model.entity.pay.PpInterface;
+import com.gameplat.model.entity.pay.PpMerchant;
+import com.gameplat.model.entity.sys.SysUser;
 import com.gameplat.security.context.UserCredential;
-import java.math.BigDecimal;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.math.BigDecimal;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -93,8 +75,7 @@ public class ProxyPayServiceImpl implements ProxyPayService {
 
     // 校验子账号当天取款审核额度
     SysUser sysUser = sysUserService.getByUsername(userCredential.getUsername());
-    AdminLimitInfo adminLimitInfo =
-        JsonUtils.parse(sysUser.getLimitInfo(), AdminLimitInfo.class);
+    AdminLimitInfo adminLimitInfo = JsonUtils.parse(sysUser.getLimitInfo(), AdminLimitInfo.class);
     if (null != adminLimitInfo
         && StringUtils.equals(UserTypes.SUBUSER.value(), sysUser.getUserType())) {
       checkZzhWithdrawAmountAudit(
@@ -472,7 +453,8 @@ public class ProxyPayServiceImpl implements ProxyPayService {
       throw new ServiceException("订单已处理");
     }
     // 更新会员信息表
-    memberInfoService.updateBalanceWithWithdraw(memberWithdraw.getMemberId(), memberWithdraw.getCashMoney());
+    memberInfoService.updateBalanceWithWithdraw(
+        memberWithdraw.getMemberId(), memberWithdraw.getCashMoney());
 
     // 删除出款验证打码量记录的数据
     //    validWithdrawService.remove(userWithdraw.getUserId(), userWithdraw.getAddTime());

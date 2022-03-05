@@ -1,7 +1,7 @@
 package com.gameplat.admin.convert;
 
-import com.gameplat.admin.model.domain.MemberGrowthConfig;
 import com.gameplat.admin.model.vo.MemberGrowthConfigVO;
+import com.gameplat.model.entity.member.MemberGrowthConfig;
 import org.mapstruct.Mapper;
 
 /**
@@ -9,8 +9,7 @@ import org.mapstruct.Mapper;
  * @description
  * @date 2021/11/20
  */
-
 @Mapper(componentModel = "spring")
 public interface MemberGrowthConfigConvert {
-    MemberGrowthConfigVO toVo(MemberGrowthConfig config);
+  MemberGrowthConfigVO toVo(MemberGrowthConfig config);
 }

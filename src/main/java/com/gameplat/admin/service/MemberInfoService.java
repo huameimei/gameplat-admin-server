@@ -1,7 +1,8 @@
 package com.gameplat.admin.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.gameplat.admin.model.domain.MemberInfo;
+import com.gameplat.model.entity.member.MemberInfo;
+
 import java.math.BigDecimal;
 
 public interface MemberInfoService extends IService<MemberInfo> {

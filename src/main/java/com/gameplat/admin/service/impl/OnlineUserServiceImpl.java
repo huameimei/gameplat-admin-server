@@ -1,13 +1,13 @@
 package com.gameplat.admin.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.crypto.digest.MD5;
 import com.alibaba.csp.sentinel.annotation.SentinelResource;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.gameplat.admin.model.bean.OnlineCount;
 import com.gameplat.admin.model.bean.PageExt;
-import com.gameplat.admin.model.domain.SysUser;
 import com.gameplat.admin.model.dto.OnlineUserDTO;
 import com.gameplat.admin.model.vo.MemberInfoVO;
 import com.gameplat.admin.model.vo.OnlineUserVo;
@@ -19,6 +19,7 @@ import com.gameplat.base.common.enums.ClientType;
 import com.gameplat.base.common.util.CollectorUtils;
 import com.gameplat.base.common.util.StringUtils;
 import com.gameplat.common.enums.UserTypes;
+import com.gameplat.model.entity.sys.SysUser;
 import com.gameplat.security.SecurityUserHolder;
 import com.gameplat.security.context.UserCredential;
 import lombok.extern.slf4j.Slf4j;
@@ -173,12 +174,13 @@ public class OnlineUserServiceImpl implements OnlineUserService {
     } else {
       // 查询会员信息
       MemberInfoVO memberInfo = memberService.getInfo(credential.getUserId());
-      onlineUser.setParentName(memberInfo.getParentName());
-      onlineUser.setRealName(memberInfo.getRealName());
-      onlineUser.setBalance(memberInfo.getBalance());
-      onlineUser.setNickname(memberInfo.getNickname());
+      if(ObjectUtil.isNotNull(memberInfo)){
+        onlineUser.setParentName(memberInfo.getParentName());
+        onlineUser.setRealName(memberInfo.getRealName());
+        onlineUser.setBalance(memberInfo.getBalance());
+        onlineUser.setNickname(memberInfo.getNickname());
+      }
     }
-
     return onlineUser;
   }
 

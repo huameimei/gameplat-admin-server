@@ -3,7 +3,7 @@
 <mapper namespace="com.gameplat.admin.mapper.GameMemberReportMapper">
 
     <!-- 通用查询映射结果 -->
-    <resultMap id="BaseResultMap" type="com.gameplat.admin.model.domain.MemberDayReport">
+    <resultMap id="BaseResultMap" type="com.gameplat.model.entity.member.MemberDayReport">
         <id column="count_date" property="countDate"/>
         <result column="user_id" property="userId"/>
         <result column="user_name" property="userName"/>
@@ -55,8 +55,9 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        `count_date`, `user_id`, `user_name`, `parent_id`, `parent_name`, `user_type`, `vip_level`, `user_level`, `agent_path`, `recharge_count`,          `recharge_amount`, `discount_amount`, `jackpot_amount`, `withdraw_count`, `withdraw_amount`, `fee_amount`, `bet_amount`, `valid_amount`,          `win_amount`, `water_amount`, `first_recharge_amount`, `first_withdraw_amount`, `create_time`, `update_time`, `abnormal_income`,                  `abnormal_outcome`, `lottery_order_count`, `sport_order_count`, `real_order_count`, `lottery_win_order_count`, `sport_win_order_count`,           `real_win_order_count`, `lottery_valid_amount`, `sport_valid_amount`, `real_valid_amount`, `lottery_win_amount`, `sport_win_amount`,              `real_win_amount`, `lottery_water_amount`, `sport_water_amount`, `real_water_amount`, `lottery_profit_rate`, `sport_profit_rate`,                 `real_profit_rate`, `lottery_win_rate`, `sport_win_rate`, `real_win_rate`
-	</sql>
+        `count_date`
+        , `user_id`, `user_name`, `parent_id`, `parent_name`, `user_type`, `vip_level`, `user_level`, `agent_path`, `recharge_count`,          `recharge_amount`, `discount_amount`, `jackpot_amount`, `withdraw_count`, `withdraw_amount`, `fee_amount`, `bet_amount`, `valid_amount`,          `win_amount`, `water_amount`, `first_recharge_amount`, `first_withdraw_amount`, `create_time`, `update_time`, `abnormal_income`,                  `abnormal_outcome`, `lottery_order_count`, `sport_order_count`, `real_order_count`, `lottery_win_order_count`, `sport_win_order_count`,           `real_win_order_count`, `lottery_valid_amount`, `sport_valid_amount`, `real_valid_amount`, `lottery_win_amount`, `sport_win_amount`,              `real_win_amount`, `lottery_water_amount`, `sport_water_amount`, `real_water_amount`, `lottery_profit_rate`, `sport_profit_rate`,                 `real_profit_rate`, `lottery_win_rate`, `sport_win_rate`, `real_win_rate`
+    </sql>
 
 
     <select id="findMemberDayReportPage" resultMap="BaseResultMap">
@@ -89,18 +90,18 @@
             AND #{dto.endTime}
         </if>
         <if test="dto.isFristCharge != null and dto.isFristCharge != ''">
-            <if test="dto.isFristCharge == dto.isNFristCharge" >
+            <if test="dto.isFristCharge == dto.isNFristCharge">
                 and first_recharge_amount is null
             </if>
-            <if test="dto.isFristCharge == dto.isYFristCharge" >
+            <if test="dto.isFristCharge == dto.isYFristCharge">
                 and first_recharge_amount is not null
             </if>
         </if>
         <if test="dto.isFristWithdraw != null and dto.isFristWithdraw != ''">
-            <if test="dto.isFristWithdraw == dto.isNFristWithdraw" >
+            <if test="dto.isFristWithdraw == dto.isNFristWithdraw">
                 and first_withdraw_amount is null
             </if>
-            <if test="dto.isFristWithdraw == dto.isYFristWithdraw" >
+            <if test="dto.isFristWithdraw == dto.isYFristWithdraw">
                 and first_withdraw_amount is not null
             </if>
         </if>
@@ -131,27 +132,26 @@
             and user_name = #{userName}
         </if>
         <if test="startTime != null and endTime != null">
-            and  count_date BETWEEN #{startTime}
+            and count_date BETWEEN #{startTime}
             AND #{endTime}
         </if>
         <if test="isFristCharge != null and isFristCharge != ''">
-            <if test="isFristCharge == isNFristCharge" >
+            <if test="isFristCharge == isNFristCharge">
                 and first_recharge_amount is null
             </if>
-            <if test="isFristCharge == isYFristCharge" >
+            <if test="isFristCharge == isYFristCharge">
                 and first_recharge_amount is not null
             </if>
         </if>
         <if test="isFristWithdraw != null and isFristWithdraw != ''">
-            <if test="isFristWithdraw == isNFristWithdraw" >
+            <if test="isFristWithdraw == isNFristWithdraw">
                 and first_withdraw_amount is null
             </if>
-            <if test="isFristWithdraw == isYFristWithdraw" >
+            <if test="isFristWithdraw == isYFristWithdraw">
                 and first_withdraw_amount is not null
             </if>
         </if>
     </select>
-
 
 
     <resultMap id="memberRwReport" type="com.gameplat.admin.model.vo.MemberRWReportVo">
@@ -179,7 +179,8 @@
 
 
     <sql id="memberRwReportSql">
-        account,
+        account
+        ,
         bank_count,
         bank_money,
         online_count,
@@ -220,12 +221,12 @@
         sum(hand_withdraw_money) hand_withdraw_money,
         sum(first_withdraw_money) first_withdraw_money,
         sum(counter_fee) counter_fee,
-        sum(bank_money+ online_money +hand_rech_money)  totail_recharge_amount,
+        sum(bank_money+ online_money +hand_rech_money) totail_recharge_amount,
         sum(rech_discount + other_discount) totail_discout_amount,
         sum(withdraw_money+ hand_withdraw_money) totail_withdraw_amount,
-        sum((bank_money+ online_money +hand_rech_money) - (withdraw_money+ hand_withdraw_money))   total_rw_amount
+        sum((bank_money+ online_money +hand_rech_money) - (withdraw_money+ hand_withdraw_money)) total_rw_amount
         from member_rw_report
-        where  stat_time BETWEEN #{dto.startTime} and #{dto.endTime}
+        where stat_time BETWEEN #{dto.startTime} and #{dto.endTime}
         <if test="dto.username != null and dto.username != ''">
             and account = #{dto.username}
         </if>
@@ -246,7 +247,7 @@
             and sum(bank_money+online_money+hand_rech_money) <![CDATA[ >= ]]> #{dto.startRAmount}
         </if>
         <if test="dto.endRAmount != null">
-            and sum(bank_money+online_money+hand_rech_money) &lt;=  #{dto.endRAmount}
+            and sum(bank_money+online_money+hand_rech_money) &lt;= #{dto.endRAmount}
         </if>
         <if test="dto.startWNum != null">
             and sum(withdraw_count + hand_withdraw_count)  <![CDATA[ >= ]]> #{dto.startWNum}
@@ -258,7 +259,7 @@
             and sum(withdraw_money + hand_withdraw_money) <![CDATA[ >= ]]>  #{dto.startWAmount}
         </if>
         <if test="dto.endWAmount != null">
-            and sum(withdraw_money + hand_withdraw_money) &lt;=  #{dto.endWAmount}
+            and sum(withdraw_money + hand_withdraw_money) &lt;= #{dto.endWAmount}
         </if>
 
     </select>
@@ -343,7 +344,7 @@
         ifnull( withdraw_money, 0 )+ ifnull( hand_withdraw_money, 0 )) totailWithdrawAmount
         FROM
         member_rw_report
-        where  stat_time BETWEEN #{startTime} and #{endTime}
+        where stat_time BETWEEN #{startTime} and #{endTime}
         <if test="username != null and username != ''">
             and account = #{username}
         </if>
@@ -438,13 +439,13 @@
         ifnull(a.abnormal_outcome,0) abnormal_outcome,
         ifnull(a.total_rw_amount,0) total_rw_amount,
         ifnull(b.sport_valid_amount,0) sport_valid_amount,
-        ifnull(b.sport_win_amount,0)	sport_win_amount,
+        ifnull(b.sport_win_amount,0) sport_win_amount,
         ifnull(b.lottery_valid_amount,0) lottery_valid_amount,
         ifnull(b.lottery_win_amount,0) lottery_win_amount,
         ifnull(b.real_valid_amount,0) real_valid_amount,
         ifnull(b.real_win_amount,0) real_win_amount ,
         ifnull(b.real_water_amount,0) real_water_amount,
-        ifnull(b.totail_game_winAmout,0)  totail_game_winAmout
+        ifnull(b.totail_game_winAmout,0) totail_game_winAmout
         FROM
         tab_qp_date d left JOIN
         (
@@ -468,7 +469,8 @@
         sum( counter_fee ) counter_fee,
         sum( exception_withdraw_amount ) abnormal_outcome,
         (
-        sum( bank_money + online_money + hand_withdraw_money )- sum( hand_withdraw_money + withdraw_money )) total_rw_amount
+        sum( bank_money + online_money + hand_withdraw_money )- sum( hand_withdraw_money + withdraw_money ))
+        total_rw_amount
         FROM
         member_rw_report
         where
@@ -480,7 +482,7 @@
         </if>
         <if test="dto.type == null or dto.type != 1">
             <if test="dto.username != null and dto.username != ''">
-                and account =  #{dto.username}
+                and account = #{dto.username}
             </if>
         </if>
         GROUP BY
@@ -508,7 +510,7 @@
         </if>
         <if test="dto.type == null or dto.type != 1">
             <if test="dto.username != null and dto.username != ''">
-                and user_name =  #{dto.username}
+                and user_name = #{dto.username}
             </if>
         </if>
         GROUP BY
@@ -517,7 +519,6 @@
         where
         d.count_date BETWEEN #{dto.startTime} and #{dto.endTime}
     </select>
-
 
 
     <select id="findSumMemberGameDayReport" resultType="map">
@@ -570,7 +571,8 @@
         sum( counter_fee ) counter_fee,
         sum( exception_withdraw_amount ) abnormal_outcome,
         (
-        sum( bank_money + online_money + hand_withdraw_money )- sum( hand_withdraw_money + withdraw_money )) total_rw_amount
+        sum( bank_money + online_money + hand_withdraw_money )- sum( hand_withdraw_money + withdraw_money ))
+        total_rw_amount
         FROM
         member_rw_report
         WHERE
@@ -582,7 +584,7 @@
         </if>
         <if test="type == null or type != 1">
             <if test="username != null and username != ''">
-                and account =  #{username}
+                and account = #{username}
             </if>
         </if>
         ) a
@@ -608,7 +610,7 @@
         </if>
         <if test="type == null or type != 1">
             <if test="username != null and username != ''">
-                and user_name =  #{username}
+                and user_name = #{username}
             </if>
         </if>
 
@@ -638,41 +640,37 @@
     </select>
 
     <select id="getSpreadReportInfo" resultType="com.alibaba.fastjson.JSONObject">
-        SELECT
-        m.user_level userLevel,
-        m.lower_num mLower,
-        mdr.user_name userName,
-        sum(mdr.recharge_count) rechargeCount,
-        sum(mdr.recharge_amount) rechargeAmount,
-        sum(mdr.discount_amount) discountAmount,
-        sum(mdr.jackpot_amount) jackpotAmount,
-        sum(mdr.withdraw_count) withdrawCount,
-        sum(mdr.withdraw_amount) withdrawAmount,
-        sum(mdr.fee_amount) feeAmount,
-        sum(mdr.bet_amount) betAmount,
-        sum(mdr.valid_amount) validAmount,
-        sum(mdr.win_amount) winAmount,
-        sum(mdr.water_amount) waterAmount,
-        (sum(mdr.recharge_amount) - sum(mdr.withdraw_amount))  income
-        FROM
-        member_day_report mdr
-        INNER JOIN member m on m.id = mdr.user_id
-        WHERE
-        mdr.count_date BETWEEN #{startTime} AND #{endTime}
-        AND
-        agent_path regexp concat('^/',#{account})
+        SELECT m.user_level                                          userLevel,
+               m.lower_num                                           mLower,
+               mdr.user_name                                         userName,
+               sum(mdr.recharge_count)                               rechargeCount,
+               sum(mdr.recharge_amount)                              rechargeAmount,
+               sum(mdr.discount_amount)                              discountAmount,
+               sum(mdr.jackpot_amount)                               jackpotAmount,
+               sum(mdr.withdraw_count)                               withdrawCount,
+               sum(mdr.withdraw_amount)                              withdrawAmount,
+               sum(mdr.fee_amount)                                   feeAmount,
+               sum(mdr.bet_amount)                                   betAmount,
+               sum(mdr.valid_amount)                                 validAmount,
+               sum(mdr.win_amount)                                   winAmount,
+               sum(mdr.water_amount)                                 waterAmount,
+               (sum(mdr.recharge_amount) - sum(mdr.withdraw_amount)) income
+        FROM member_day_report mdr
+                 INNER JOIN member m on m.id = mdr.user_id
+        WHERE mdr.count_date BETWEEN #{startTime} AND #{endTime}
+          AND agent_path regexp concat('^/',#{account})
         GROUP BY mdr.user_name
     </select>
 
 
     <select id="getSpreadReport" resultType="com.alibaba.fastjson.JSONObject">
-         SELECT
+        SELECT
         m.account,
         m.lower_num mLower,
         mdr.agent_path agentPath,
         sum(mdr.recharge_amount) rechargeAmount,
         sum(mdr.withdraw_amount) withdrawAmount,
-        (sum(mdr.recharge_amount) - sum(mdr.withdraw_amount))  income
+        (sum(mdr.recharge_amount) - sum(mdr.withdraw_amount)) income
         FROM
         member_day_report mdr
         INNER JOIN member m on m.id = mdr.user_id
@@ -688,46 +686,46 @@
     </select>
 
 
-
-    <select id="findMemberbetAnalysis" parameterType="com.gameplat.admin.model.dto.MemberbetAnalysisdto" resultType="com.gameplat.admin.model.vo.MemberbetAnalysisVo">
+    <select id="findMemberbetAnalysis" parameterType="com.gameplat.admin.model.dto.MemberbetAnalysisdto"
+            resultType="com.gameplat.admin.model.vo.MemberbetAnalysisVo">
         SELECT
-            ifnull(sum( lottery_order_count ),0) lotteryOrderCount ,
-            ifnull(sum( sport_order_count ),0) sportOrderCount,
-            ifnull(sum( real_order_count ),0) realOrderCount,
-            ifnull(sum( lottery_win_order_count ),0) lotteryWinOrderCount,
-            ifnull(sum( sport_win_order_count ),0) sportWinOrderCount,
-            ifnull(sum( real_win_order_count ),0) realWinOrderCount,
-            ifnull(sum( lottery_valid_amount ),0) lotteryValidAmount,
-            ifnull(sum( sport_valid_amount ),0) sportValidAmount,
-            ifnull(sum( real_valid_amount ),0) realValidAmount,
-            ifnull(sum( lottery_win_amount ),0) lotteryWinAmount,
-            ifnull(sum( sport_win_amount ),0) sportWinAmount,
-            ifnull(sum( real_win_amount ),0) realWinAmount,
-            ifnull(sum( lottery_water_amount ),0) lotteryWaterAmount,
-            ifnull(sum( sport_water_amount ),0) sportWaterAmount,
-            ifnull(sum( real_water_amount ),0) realWaterAmount,
-            ifnull(sum( lottery_profit_rate ),0) lotteryProfitRate,
-            ifnull(sum( sport_profit_rate ),0) sportProfitRate,
-            ifnull(sum( real_profit_rate ),0) realProfitRate,
-            ifnull(sum( lottery_win_rate ),0) lotteryWinRate,
-            ifnull(sum( sport_win_rate ),0) sportWinRate,
-            ifnull(sum( real_win_rate ),0) realWinRate
+        ifnull(sum( lottery_order_count ),0) lotteryOrderCount ,
+        ifnull(sum( sport_order_count ),0) sportOrderCount,
+        ifnull(sum( real_order_count ),0) realOrderCount,
+        ifnull(sum( lottery_win_order_count ),0) lotteryWinOrderCount,
+        ifnull(sum( sport_win_order_count ),0) sportWinOrderCount,
+        ifnull(sum( real_win_order_count ),0) realWinOrderCount,
+        ifnull(sum( lottery_valid_amount ),0) lotteryValidAmount,
+        ifnull(sum( sport_valid_amount ),0) sportValidAmount,
+        ifnull(sum( real_valid_amount ),0) realValidAmount,
+        ifnull(sum( lottery_win_amount ),0) lotteryWinAmount,
+        ifnull(sum( sport_win_amount ),0) sportWinAmount,
+        ifnull(sum( real_win_amount ),0) realWinAmount,
+        ifnull(sum( lottery_water_amount ),0) lotteryWaterAmount,
+        ifnull(sum( sport_water_amount ),0) sportWaterAmount,
+        ifnull(sum( real_water_amount ),0) realWaterAmount,
+        ifnull(sum( lottery_profit_rate ),0) lotteryProfitRate,
+        ifnull(sum( sport_profit_rate ),0) sportProfitRate,
+        ifnull(sum( real_profit_rate ),0) realProfitRate,
+        ifnull(sum( lottery_win_rate ),0) lotteryWinRate,
+        ifnull(sum( sport_win_rate ),0) sportWinRate,
+        ifnull(sum( real_win_rate ),0) realWinRate
         FROM
-            member_day_report
+        member_day_report
         WHERE
-            count_date BETWEEN #{startTime}
-            AND #{endTime}
-            <choose>
-                <when test="isTrue != null and isTrue != 1">
-                    <if test="account != null and account != ''">
-                        and parent_name = #{account} or user_name = #{account}
-                    </if>
-                </when>
-                <otherwise>
-                    <if test="account != null and account != ''">
-                        and user_name = #{account}
-                    </if>
-                </otherwise>
-            </choose>
+        count_date BETWEEN #{startTime}
+        AND #{endTime}
+        <choose>
+            <when test="isTrue != null and isTrue != 1">
+                <if test="account != null and account != ''">
+                    and parent_name = #{account} or user_name = #{account}
+                </if>
+            </when>
+            <otherwise>
+                <if test="account != null and account != ''">
+                    and user_name = #{account}
+                </if>
+            </otherwise>
+        </choose>
     </select>
 </mapper>

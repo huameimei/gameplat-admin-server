@@ -1,8 +1,8 @@
 package com.gameplat.admin.convert;
 
-import com.gameplat.admin.model.domain.GameRebatePeriod;
 import com.gameplat.admin.model.dto.OperGameRebatePeriodDTO;
 import com.gameplat.admin.model.vo.GameRebatePeriodVO;
+import com.gameplat.model.entity.game.GameRebatePeriod;
 import org.mapstruct.Mapper;
 import org.springframework.stereotype.Repository;
 

@@ -2,13 +2,13 @@ package com.gameplat.admin.controller.open.report;
 
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.gameplat.admin.model.domain.Member;
 import com.gameplat.admin.model.dto.GameRWDataReportDto;
 import com.gameplat.admin.model.vo.*;
 import com.gameplat.admin.service.DataReportService;
 import com.gameplat.admin.service.MemberService;
 import com.gameplat.base.common.util.DateUtils;
 import com.gameplat.base.common.util.StringUtils;
+import com.gameplat.model.entity.member.Member;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -16,9 +16,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
 import java.util.Date;
-import java.util.List;
+
 
 /**
  * @Author kb
@@ -30,7 +29,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/admin/report/data")
 public class DataReportController {
-
 
 
     @Autowired(required = false)
@@ -113,17 +111,17 @@ public class DataReportController {
         log.info("查询数据统注册入参：{}", JSON.toJSONString(dto));
         if (StringUtils.isEmpty(dto.getStartTime())) {
             String startTime = DateUtils.format(new Date());
-            startTime +=" 00:00:00";
+            startTime += " 00:00:00";
             dto.setStartTime(startTime);
         } else {
-            dto.setStartTime(dto.getStartTime()+" 00:00:00");
+            dto.setStartTime(dto.getStartTime() + " 00:00:00");
         }
         if (StringUtils.isEmpty(dto.getEndTime())) {
             String endTime = DateUtils.format(new Date());
             endTime += " 23:59:59";
             dto.setEndTime(endTime);
         } else {
-            dto.setEndTime(dto.getEndTime()+" 23:59:59");
+            dto.setEndTime(dto.getEndTime() + " 23:59:59");
         }
         if (StringUtils.isNotEmpty(dto.getSuperAccount())) {
             if (dto.getFlag() == ONE) {
@@ -132,7 +130,7 @@ public class DataReportController {
             }
         }
 
-        return dataReportService.findMemberReport(page,dto);
+        return dataReportService.findMemberReport(page, dto);
     }
 
     /**

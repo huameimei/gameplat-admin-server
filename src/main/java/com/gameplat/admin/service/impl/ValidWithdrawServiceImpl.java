@@ -9,9 +9,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.config.TenantConfig;
 import com.gameplat.admin.convert.ValidWithdrawConvert;
 import com.gameplat.admin.mapper.ValidWithdrawMapper;
-import com.gameplat.admin.model.doc.GameBetRecord;
-import com.gameplat.admin.model.domain.RechargeOrder;
-import com.gameplat.admin.model.domain.ValidWithdraw;
+import com.gameplat.admin.model.bean.GameBetRecordSearchBuilder;
 import com.gameplat.admin.model.dto.GameVaildBetRecordQueryDTO;
 import com.gameplat.admin.model.dto.ValidWithdrawDto;
 import com.gameplat.admin.model.vo.GameBetValidRecordVo;
@@ -26,6 +24,8 @@ import com.gameplat.base.common.util.StringUtils;
 import com.gameplat.common.model.bean.limit.MemberWithdrawLimit;
 import com.gameplat.elasticsearch.page.PageResponse;
 import com.gameplat.elasticsearch.service.IBaseElasticsearchService;
+import com.gameplat.model.entity.ValidWithdraw;
+import com.gameplat.model.entity.recharge.RechargeOrder;
 import lombok.extern.log4j.Log4j2;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.search.sort.FieldSortBuilder;
@@ -323,7 +323,7 @@ public class ValidWithdrawServiceImpl extends ServiceImpl<ValidWithdrawMapper, V
                 setGameKind(a.getGameKind());
             }};
             dto.setAccount(a.getAccount());
-            QueryBuilder builder = GameBetRecord.buildBetRecordSearch(dto);
+            QueryBuilder builder = GameBetRecordSearchBuilder.buildBetRecordSearch(dto);
             // todo betTime
             SortBuilder<FieldSortBuilder> sortBuilder = SortBuilders.fieldSort("betTime.keyword").order(SortOrder.DESC);
             PageResponse<GameBetValidRecordVo> result = baseElasticsearchService.search(builder, indexName, GameBetValidRecordVo.class,

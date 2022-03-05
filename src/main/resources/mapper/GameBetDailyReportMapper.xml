@@ -36,7 +36,7 @@
     sum( t.win_amount ) win_amount,
     t.game_kind ,
     t.game_type game_type,
-    d.dict_label game_type_name
+    d.game_type_name game_type_name
     FROM
     game_bet_daily_report t
     LEFT JOIN game_type d on d.game_type_code = t.game_type
@@ -113,7 +113,7 @@
     t.stat_time reportTime,
     t.account account,
     t.game_type gameCode,
-    d.dict_label gameName,
+    d.game_type_name gameName,
     t.platform_code platformCode,
     k.name platformName,
     sum( t.bet_count ) gameCount,

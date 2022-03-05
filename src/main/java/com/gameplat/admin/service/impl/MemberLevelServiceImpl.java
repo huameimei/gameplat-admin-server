@@ -175,6 +175,7 @@ public class MemberLevelServiceImpl extends ServiceImpl<MemberLevelMapper, Membe
     public void allocateByUserNames(MemberLevelAllocateByUserNameDTO dto) {
         String[] userNameArray = dto.getUserNames().split(",");
         List<String> accountList = Arrays.asList(userNameArray);
+        allocateAccountIsExist(accountList);
         List<Member> memberList = memberService.getListByAccountList(accountList);
         // 过滤层级无变化的会员
         memberList.removeIf(member -> member.getUserLevel().equals(dto.getLevelValue()));
@@ -198,6 +199,7 @@ public class MemberLevelServiceImpl extends ServiceImpl<MemberLevelMapper, Membe
             throw new ServiceException("上传文件不能为空！");
         }
         List<String> accountList = list.stream().map(MemberLevelFileDTO::getAccount).collect(Collectors.toList());
+        allocateAccountIsExist(accountList);
         List<Member> memberList = memberService.getListByAccountList(accountList);
         if (CollectionUtil.isNotEmpty(memberList)) {
             // 过滤层级无变化的会员
@@ -218,6 +220,7 @@ public class MemberLevelServiceImpl extends ServiceImpl<MemberLevelMapper, Membe
     public void allocateByCondition(MemberLevelAllocateByConditionDTO dto) {
         //代理账号集合
         List<String> parentNameList = Arrays.asList(dto.getParentNames().split(","));
+        allocateAccountIsExist(parentNameList);
         //筛选层级集合
         List<String> levelList = null;
         if(StringUtils.isNotEmpty(dto.getLevelValues())){
@@ -371,4 +374,23 @@ public class MemberLevelServiceImpl extends ServiceImpl<MemberLevelMapper, Membe
     return memberInfo.getTotalRechAmount().compareTo(level.getTotalRechAmount()) >= 0
         && memberInfo.getTotalRechTimes() >= level.getTotalRechTimes();
   }
+
+    /**
+     * 校验输入的会员(代理)是否存在
+     *
+     * @param accountList List
+     */
+    private void allocateAccountIsExist(List<String> accountList) {
+        List<String> nonentityAccount = new ArrayList<>();
+        accountList.forEach(account -> {
+            Member member = memberService.getByAccount(account).orElse(null);
+            if (member == null) {
+                nonentityAccount.add(account);
+            }
+        });
+
+        if (CollectionUtil.isNotEmpty(nonentityAccount)) {
+            throw new ServiceException("你有输入不存在的账号，不存在的账号：" + nonentityAccount.toString());
+        }
+    }
 }

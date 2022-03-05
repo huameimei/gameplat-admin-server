@@ -366,8 +366,8 @@
     <select id="getUserLevelAccountNum" resultType="com.gameplat.admin.model.vo.MemberLevelVO">
         SELECT
         user_level userLevel,
-        sum( CASE WHEN is_lock = 'N' THEN 1 ELSE 0 end ) memberNum,
-        sum( CASE WHEN is_lock = 'Y' THEN 1 ELSE 0 end) memberLockNum
+        sum( CASE WHEN level_lock_flag = 'N' THEN 1 ELSE 0 end ) memberNum,
+        sum( CASE WHEN level_lock_flag = 'Y' THEN 1 ELSE 0 end) memberLockNum
         FROM
         member where  user_type in (2,5)
         GROUP BY

@@ -6,6 +6,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.gameplat.admin.config.TenantConfig;
 import com.gameplat.admin.convert.ValidWithdrawConvert;
 import com.gameplat.admin.mapper.ValidWithdrawMapper;
 import com.gameplat.admin.model.doc.GameBetRecord;
@@ -51,6 +52,13 @@ public class ValidWithdrawServiceImpl extends
 
     @Autowired(required = false)
     private ValidWithdrawConvert validWithdrawConvert;
+
+
+    @Resource
+    private IBaseElasticsearchService baseElasticsearchService;
+
+    @Resource
+    private TenantConfig tenantConfig;
 
     @Override
     public void addRechargeOrder(RechargeOrder rechargeOrder) throws Exception {
@@ -276,12 +284,9 @@ public class ValidWithdrawServiceImpl extends
         return num.setScale(digital, BigDecimal.ROUND_HALF_UP);
     }
 
-    @Resource
-    private IBaseElasticsearchService baseElasticsearchService;
     /**
      * 计算打码量
      */
-
     @Override
     public void countAccountValidWithdraw(String username) {
         List<ValidAccoutWithdrawVo> validWithdraw = validWithdrawMapper.findAccountValidWithdraw(username);
@@ -292,7 +297,7 @@ public class ValidWithdrawServiceImpl extends
         }
         List<GameBetValidRecordVo> list = new ArrayList<>();
         List<GameBetValidRecordVo> finalList = list;
-        String indexName = ContextConstant.ES_INDEX.BET_RECORD_ + "kgsit";
+        String indexName = ContextConstant.ES_INDEX.BET_RECORD_ + tenantConfig.getTenantCode();
         accountValidWithdraw.forEach(a ->{
             if (StringUtils.isEmpty(a.getGameKind()) || StringUtils.isEmpty(a.getPlatformCode())) {
                 return;

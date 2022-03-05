@@ -1,7 +1,7 @@
 package com.gameplat.admin.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.gameplat.model.entity.TenantDomain;
+import com.gameplat.model.entity.setting.TenantDomain;
 
 /**
  * @author Lily

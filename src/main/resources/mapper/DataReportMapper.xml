@@ -301,8 +301,8 @@
     <!--优惠彩金数据 -->
     <select id="findDiscountDataReport" resultType="map">
         SELECT
-        CONVERT(sum( rech_discount ),DECIMAL(22,2)) rechDiscount,
-        CONVERT(sum( other_discount ),DECIMAL(22,2)) otherDiscount
+        ifnull(CONVERT(sum( rech_discount ),DECIMAL(22,2)),0) rechDiscount,
+        ifnull(CONVERT(sum( other_discount ),DECIMAL(22,2)),0) otherDiscount
         FROM
         member_rw_report
         <where>
@@ -314,7 +314,7 @@
     <!--vip彩金 -->
     <select id="findDividendDataReport" resultType="BIGDECIMAL">
         select
-            sum(reword_amount) rewordAmount
+            ifnull(sum(reword_amount),0) rewordAmount
         from member_weal_reword
         where
             status = 2 and type != 5
@@ -337,7 +337,7 @@
 
     <select id="findActivityDataReport" resultType="BIGDECIMAL">
         select
-          sum(discounts_money) discounts_money
+        ifnull(sum(discounts_money),0) discounts_money
         from activity_distribute
          where
             status = 2

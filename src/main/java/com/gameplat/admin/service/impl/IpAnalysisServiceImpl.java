@@ -252,7 +252,7 @@ public class IpAnalysisServiceImpl implements IpAnalysisService {
       }
 
     } catch (Exception e) {
-      e.printStackTrace();
+      log.error("ip分析分页统计异常",e);
     }
     return map;
   }

@@ -591,6 +591,7 @@ public class ActivityLobbyServiceImpl extends ServiceImpl<ActivityLobbyMapper, A
     @Override
     public List<ActivityLobbyVO> findUnboundLobbyList() {
         List<ActivityLobby> activityLobbyList = this.lambdaQuery()
+                .eq(ActivityLobby::getStatus, BooleanEnum.YES.value())
                 .orderByDesc(Lists.newArrayList(ActivityLobby::getCreateTime, ActivityLobby::getId)).list();
         List<ActivityLobbyVO> lobbyList = new ArrayList<>();
         if (CollectionUtils.isNotEmpty(activityLobbyList)) {

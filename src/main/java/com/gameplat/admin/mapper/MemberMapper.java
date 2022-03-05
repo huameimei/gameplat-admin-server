@@ -7,10 +7,8 @@ import com.baomidou.mybatisplus.core.toolkit.Constants;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.gameplat.admin.model.dto.IpAnalysisDTO;
-import com.gameplat.admin.model.vo.IpAnalysisVO;
-import com.gameplat.admin.model.vo.MemberInfoVO;
-import com.gameplat.admin.model.vo.MemberVO;
-import com.gameplat.admin.model.vo.SpreadUnionVO;
+import com.gameplat.admin.model.dto.MemberQueryDTO;
+import com.gameplat.admin.model.vo.*;
 import com.gameplat.model.entity.member.Member;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
@@ -84,4 +82,10 @@ public interface MemberMapper extends BaseMapper<Member> {
     Integer getMaxLevel();
 
     List<Member> getOpenSalaryAgent(@Param("list") List<Integer> list);
+
+  /** 获取各个充值层级下会员数量和锁定会员数量 */
+  List<MemberLevelVO> getUserLevelAccountNum();
+
+    /** 获取代理线下的会员账号信息 */
+    List<Member> getMemberListByAgentAccount(MemberQueryDTO memberQueryDTO);
 }

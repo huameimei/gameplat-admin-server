@@ -2,6 +2,8 @@ package com.gameplat.admin.model.vo;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.gameplat.admin.util.Date2LongSerializerUtils;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
@@ -55,6 +57,7 @@ public class SysBannerInfoVO implements Serializable {
 
   /** 创建时间 */
   @ApiModelProperty("创建时间")
+  @JsonSerialize(using = Date2LongSerializerUtils.class)
   private Date createTime;
 
   /** 创建人 */
@@ -63,6 +66,7 @@ public class SysBannerInfoVO implements Serializable {
 
   /** 更新时间 */
   @ApiModelProperty("更新时间")
+  @JsonSerialize(using = Date2LongSerializerUtils.class)
   private Date updateTime;
 
   /** 更新人 */

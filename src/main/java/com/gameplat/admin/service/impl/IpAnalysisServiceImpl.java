@@ -17,6 +17,7 @@ import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.StringUtils;
 import com.gameplat.elasticsearch.service.IBaseElasticsearchService;
 import com.gameplat.security.context.UserCredential;
+import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.HttpAsyncResponseConsumerFactory;
@@ -47,6 +48,7 @@ import java.util.stream.Collectors;
  * @description ip分析
  * @date 2022/1/19
  */
+@Slf4j
 @Service
 @Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)
 public class IpAnalysisServiceImpl implements IpAnalysisService {
@@ -191,6 +193,7 @@ public class IpAnalysisServiceImpl implements IpAnalysisService {
     List<IpAnalysisVO> list = new ArrayList<>();
     Set<String> ips = new HashSet<>();
     try {
+      log.info("=====ip分析：\n"+searchRequest.toString());
       SearchResponse search = restHighLevelClient.search(searchRequest, optionsBuilder.build());
       Terms terms = search.getAggregations().get("username");
       for (Terms.Bucket bucket : terms.getBuckets()) {
@@ -235,6 +238,7 @@ public class IpAnalysisServiceImpl implements IpAnalysisService {
     optionsBuilder.setHttpAsyncResponseConsumerFactory(
         new HttpAsyncResponseConsumerFactory.HeapBufferedResponseConsumerFactory(31457280));
     try {
+      log.info("=====ip分析分页统计：\n"+searchRequest.toString());
       SearchResponse search = restHighLevelClient.search(searchRequest, optionsBuilder.build());
       Terms terms = search.getAggregations().get("ipCount");
       for (Terms.Bucket bucket : terms.getBuckets()) {

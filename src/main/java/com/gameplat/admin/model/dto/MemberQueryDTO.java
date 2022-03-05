@@ -154,4 +154,7 @@ public class MemberQueryDTO implements Serializable {
   private List levels;
 
   private String parentName;
+
+  /**是否包含代理自己 */
+  private Boolean itself;
 }

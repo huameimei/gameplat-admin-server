@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.gameplat.admin.model.dto.*;
 import com.gameplat.admin.model.vo.MemberInfoVO;
+import com.gameplat.admin.model.vo.MemberLevelVO;
 import com.gameplat.admin.model.vo.MemberVO;
 import com.gameplat.admin.model.vo.MessageDistributeVO;
 import com.gameplat.model.entity.member.Member;
@@ -98,4 +99,15 @@ public interface MemberService extends IService<Member> {
    * @return
    */
   List<Member> getOpenSalaryAgent(List<Integer> list);
+
+    /**
+     * 根据多个会员账号批量查询会员信息
+     * @param accountList
+     * @return
+     */
+  List<Member> getListByAccountList(List<String> accountList);
+
+  List<MemberLevelVO> getUserLevelAccountNum();
+
+  List<Member> getMemberListByAgentAccount(MemberQueryDTO memberQueryDTO);
 }

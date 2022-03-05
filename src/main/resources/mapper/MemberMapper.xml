@@ -369,7 +369,7 @@
         sum( CASE WHEN level_lock_flag = 'N' THEN 1 ELSE 0 end ) memberNum,
         sum( CASE WHEN level_lock_flag = 'Y' THEN 1 ELSE 0 end) memberLockNum
         FROM
-        member where  user_type in (2,5)
+        member where  user_type in ('M','A')
         GROUP BY
         user_level
     </select>

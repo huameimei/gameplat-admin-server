@@ -193,7 +193,7 @@ public class IpAnalysisServiceImpl implements IpAnalysisService {
     List<IpAnalysisVO> list = new ArrayList<>();
     Set<String> ips = new HashSet<>();
     try {
-      log.info("=====ip分析：\n"+searchRequest.toString());
+      log.info("=====ip分析：\n"+searchSourceBuilder);
       SearchResponse search = restHighLevelClient.search(searchRequest, optionsBuilder.build());
       Terms terms = search.getAggregations().get("username");
       for (Terms.Bucket bucket : terms.getBuckets()) {
@@ -238,7 +238,7 @@ public class IpAnalysisServiceImpl implements IpAnalysisService {
     optionsBuilder.setHttpAsyncResponseConsumerFactory(
         new HttpAsyncResponseConsumerFactory.HeapBufferedResponseConsumerFactory(31457280));
     try {
-      log.info("=====ip分析分页统计：\n"+searchRequest.toString());
+      log.info("=====ip分析分页统计：\n"+searchSourceBuilder);
       SearchResponse search = restHighLevelClient.search(searchRequest, optionsBuilder.build());
       Terms terms = search.getAggregations().get("ipCount");
       for (Terms.Bucket bucket : terms.getBuckets()) {

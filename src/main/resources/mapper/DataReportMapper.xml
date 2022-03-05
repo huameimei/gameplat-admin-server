@@ -133,7 +133,7 @@
         FROM
         member_rw_report
         <where>
-            withdraw_money>0 or hand_withdraw_money > 0
+            (withdraw_money>0 or hand_withdraw_money > 0)
             <include refid="whereSql" />
         </where>
     </select>

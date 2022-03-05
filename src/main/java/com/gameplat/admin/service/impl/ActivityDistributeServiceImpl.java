@@ -13,10 +13,12 @@ import com.gameplat.admin.model.dto.ActivityDistributeQueryDTO;
 import com.gameplat.admin.model.vo.ActivityDistributeStatisticsVO;
 import com.gameplat.admin.model.vo.ActivityDistributeVO;
 import com.gameplat.admin.service.ActivityDistributeService;
+import com.gameplat.admin.service.MemberService;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.StringUtils;
 import com.gameplat.common.enums.BooleanEnum;
 import com.gameplat.model.entity.activity.ActivityDistribute;
+import com.gameplat.model.entity.member.Member;
 import com.gameplat.model.entity.member.MemberWealReword;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
@@ -46,6 +48,8 @@ public class ActivityDistributeServiceImpl
   @Autowired private ActivityDistributeConvert activityDistributeConvert;
 
   @Autowired private ActivityDistributeWayService activityDistributeWayService;
+
+  @Autowired private MemberService memberService;
 
   @Override
   public List<ActivityDistribute> findActivityDistributeList(
@@ -167,9 +171,14 @@ public class ActivityDistributeServiceImpl
     log.info("开始派发活动奖励,{}", System.currentTimeMillis());
     // 修改用户真币、资金流水
     for (ActivityDistribute activityDistribute : activityDistributeList) {
+      Member member = memberService.getById(activityDistribute.getUserId());
       Integer getWay = activityDistribute.getGetWay();
       // 福利中心记录
       MemberWealReword wealReword = new MemberWealReword();
+      wealReword.setUserType(member.getUserType());
+      wealReword.setParentId(member.getParentId().longValue());
+      wealReword.setParentName(member.getParentName());
+      wealReword.setAgentPath(member.getSuperPath());
       wealReword.setUserId(activityDistribute.getUserId());
       wealReword.setUserName(activityDistribute.getUsername());
       wealReword.setRewordAmount(activityDistribute.getDiscountsMoney());

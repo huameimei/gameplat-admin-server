@@ -147,6 +147,10 @@ public class ActivityDistributeWayService
 
       // 插入福利中心记录(已领取)
       wealReword.setStatus(MemberWealRewordEnums.MemberWealRewordStatus.COMPLETED.getValue());
+      wealReword.setUserType(memberInfoVO.getUserType());
+      wealReword.setParentId(memberInfoVO.getParentId().longValue());
+      wealReword.setParentName(memberInfoVO.getParentName());
+      wealReword.setAgentPath(memberInfoVO.getSuperPath());
       memberWealRewordService.save(wealReword);
 
       // 通知 发个人消息

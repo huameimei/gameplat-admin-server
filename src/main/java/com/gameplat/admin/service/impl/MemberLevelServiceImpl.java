@@ -40,7 +40,7 @@ public class MemberLevelServiceImpl extends ServiceImpl<MemberLevelMapper, Membe
   @Autowired private MemberLevelMapper memberLevelMapper;
 
   @Override
-  @Cached(name = CachedKeys.MEMBER_LEVEL_CACHE, key = "'all'", expire = 3600)
+//  @Cached(name = CachedKeys.MEMBER_LEVEL_CACHE, key = "'all'", expire = 3600)
   public List<MemberLevelVO> getList() {
       List<MemberLevelVO> memberLevelVOList = this.list().stream().map(memberLevelConvert::toVo).collect(Collectors.toList());
       // 如果有层级值配置

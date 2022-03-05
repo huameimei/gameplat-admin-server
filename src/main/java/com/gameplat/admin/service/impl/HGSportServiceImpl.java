@@ -9,7 +9,7 @@ import com.gameplat.admin.service.HGSportService;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.StringUtils;
 import com.gameplat.common.enums.GamePlatformEnum;
-import com.gameplat.common.game.api.hg.config.HGConfig;
+import com.gameplat.common.game.api.hg.config.HgConfig;
 import com.gameplat.common.game.api.hg.enums.API;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -209,7 +209,7 @@ public class HGSportServiceImpl implements HGSportService {
     if (StringUtils.isNull(configJson)) {
       throw new ServiceException("未找到皇冠体育游戏配置");
     }
-    HGConfig hgConfig = JSONObject.parseObject(configJson.toJSONString(), HGConfig.class);
+    HgConfig hgConfig = JSONObject.parseObject(configJson.toJSONString(), HgConfig.class);
     String url = hgConfig.getHost() + apiUrl;
     JSONObject requestParam = JSONObject.parseObject(JSONObject.toJSONString(dto));
     requestParam.put("vendorId", hgConfig.getVendorId());
@@ -246,7 +246,7 @@ public class HGSportServiceImpl implements HGSportService {
     if (StringUtils.isNull(configJson)) {
       throw new ServiceException("未找到皇冠体育游戏配置");
     }
-    HGConfig hgConfig = JSONObject.parseObject(configJson.toJSONString(), HGConfig.class);
+    HgConfig hgConfig = JSONObject.parseObject(configJson.toJSONString(), HgConfig.class);
     String url = hgConfig.getHost() + apiUrl;
     JSONObject requestParam = JSONObject.parseObject(JSONObject.toJSONString(dto));
     requestParam.put("vendorId", hgConfig.getVendorId());

@@ -1,5 +1,6 @@
 package com.gameplat.admin.service.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
@@ -194,8 +195,9 @@ public class IpAnalysisServiceImpl implements IpAnalysisService {
     List<IpAnalysisVO> list = new ArrayList<>();
     Set<String> ips = new HashSet<>();
     try {
-      log.info("=====ip分析：\n"+searchSourceBuilder);
+      log.info("搜索条件：\n" +dto+"\n=====ip分析：\n"+searchSourceBuilder);
       SearchResponse search = restHighLevelClient.search(searchRequest, optionsBuilder.build());
+      log.info("\n=====ip分析查询结果：\n"+ JSON.toJSONString(search));
       Terms terms = search.getAggregations().get("username");
       for (Terms.Bucket bucket : terms.getBuckets()) {
         String account = bucket.getKeyAsString();
@@ -213,7 +215,7 @@ public class IpAnalysisServiceImpl implements IpAnalysisService {
       }
 
     } catch (Exception e) {
-      e.printStackTrace();
+      log.error("ip分析查询异常",e);
     }
 
     log.info("==========ip分析返回ips:\n"+ JSONArray.toJSONString(ips));

@@ -3,7 +3,6 @@ package com.gameplat.admin.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.gameplat.admin.model.dto.*;
 import com.gameplat.admin.model.vo.MemberLevelVO;
-import com.gameplat.model.entity.member.Member;
 import com.gameplat.model.entity.member.MemberLevel;
 
 import java.util.List;
@@ -32,9 +31,9 @@ public interface MemberLevelService extends IService<MemberLevel> {
 
   void batchAllocate(List<MemberLevelAllocateDTO> dtos);
 
-    void allocateByUserNames(MemberLevelAllocateByUserNameDTO dto);
+  void allocateByUserNames(MemberLevelAllocateByUserNameDTO dto);
 
-    void allocateByFile(Integer levelValue, List<MemberLevelFileDTO> list);
+  void allocateByFile(Integer levelValue, List<MemberLevelFileDTO> list);
 
-    void allocateByCondition(MemberLevelAllocateByConditionDTO dto);
+  void allocateByCondition(MemberLevelAllocateByConditionDTO dto);
 }

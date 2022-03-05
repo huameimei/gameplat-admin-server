@@ -365,11 +365,11 @@
     <!-- 获取各个充值层级下会员数量和锁定会员数量 -->
     <select id="getUserLevelAccountNum" resultType="com.gameplat.admin.model.vo.MemberLevelVO">
         SELECT
-        user_level userLevel,
+        user_level levelValue,
         sum( CASE WHEN level_lock_flag = 'N' THEN 1 ELSE 0 end ) memberNum,
         sum( CASE WHEN level_lock_flag = 'Y' THEN 1 ELSE 0 end) memberLockNum
         FROM
-        member where  user_type in ('M','A')
+        member where user_type in ('M','A')
         GROUP BY
         user_level
     </select>

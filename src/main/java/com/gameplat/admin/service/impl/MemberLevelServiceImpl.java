@@ -169,7 +169,7 @@ public class MemberLevelServiceImpl extends ServiceImpl<MemberLevelMapper, Membe
     }
 
     @Override
-    @Transactional
+    @CacheInvalidate(name = CachedKeys.MEMBER_LEVEL_CACHE, key = "'all'")
     public void allocateByUserNames(MemberLevelAllocateByUserNameDTO dto) {
         String[] userNameArray = dto.getUserNames().split(",");
         List<String> accountList = Arrays.asList(userNameArray);
@@ -190,6 +190,7 @@ public class MemberLevelServiceImpl extends ServiceImpl<MemberLevelMapper, Membe
     }
 
     @Override
+    @CacheInvalidate(name = CachedKeys.MEMBER_LEVEL_CACHE, key = "'all'")
     public void allocateByFile(Integer levelValue, List<MemberLevelFileDTO> list) {
         if (CollectionUtil.isEmpty(list)) {
             throw new ServiceException("上传文件不能为空！");
@@ -211,6 +212,7 @@ public class MemberLevelServiceImpl extends ServiceImpl<MemberLevelMapper, Membe
     }
 
     @Override
+    @CacheInvalidate(name = CachedKeys.MEMBER_LEVEL_CACHE, key = "'all'")
     public void allocateByCondition(MemberLevelAllocateByConditionDTO dto) {
         //代理账号集合
         List<String> parentNameList = Arrays.asList(dto.getParentNames().split(","));

@@ -193,7 +193,7 @@ public class IpAnalysisServiceImpl implements IpAnalysisService {
     List<IpAnalysisVO> list = new ArrayList<>();
     Set<String> ips = new HashSet<>();
     try {
-      log.info("=====ip分析：\n"+searchSourceBuilder);
+      log.info("搜索条件：\n" +dto+"\n=====ip分析：\n"+searchSourceBuilder);
       SearchResponse search = restHighLevelClient.search(searchRequest, optionsBuilder.build());
       log.info("=====ip分析查询结果：\n"+ JSON.toJSONString(search));
       Terms terms = search.getAggregations().get("username");

@@ -423,6 +423,10 @@ public class MemberWealServiceImpl extends ServiceImpl<MemberWealMapper, MemberW
                 memberWealReword.setOldLevel(item.getLevel());
                 memberWealReword.setCurrentLevel(item.getLevel());
                 memberWealReword.setRewordAmount(item.getRewordAmount());
+                memberWealReword.setUserType(member.getUserType());
+                memberWealReword.setParentId(member.getParentId());
+                memberWealReword.setParentName(member.getParentName());
+                memberWealReword.setAgentPath(member.getSuperPath());
                 // 0 升级奖励  1：周俸禄  2：月俸禄  3：生日礼金  4：每月红包
                 memberWealReword.setType(type + 1);
                 memberWealReword.setSerialNumber(serialNumber);

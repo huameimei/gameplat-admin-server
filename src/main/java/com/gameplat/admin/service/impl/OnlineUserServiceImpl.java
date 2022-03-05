@@ -1,6 +1,7 @@
 package com.gameplat.admin.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.crypto.digest.MD5;
 import com.alibaba.csp.sentinel.annotation.SentinelResource;
 import com.alibaba.fastjson.JSONObject;
@@ -173,12 +174,13 @@ public class OnlineUserServiceImpl implements OnlineUserService {
     } else {
       // 查询会员信息
       MemberInfoVO memberInfo = memberService.getInfo(credential.getUserId());
-      onlineUser.setParentName(memberInfo.getParentName());
-      onlineUser.setRealName(memberInfo.getRealName());
-      onlineUser.setBalance(memberInfo.getBalance());
-      onlineUser.setNickname(memberInfo.getNickname());
+      if(ObjectUtil.isNotNull(memberInfo)){
+        onlineUser.setParentName(memberInfo.getParentName());
+        onlineUser.setRealName(memberInfo.getRealName());
+        onlineUser.setBalance(memberInfo.getBalance());
+        onlineUser.setNickname(memberInfo.getNickname());
+      }
     }
-
     return onlineUser;
   }
 

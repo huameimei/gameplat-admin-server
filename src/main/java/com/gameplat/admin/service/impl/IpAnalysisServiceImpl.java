@@ -195,9 +195,8 @@ public class IpAnalysisServiceImpl implements IpAnalysisService {
     List<IpAnalysisVO> list = new ArrayList<>();
     Set<String> ips = new HashSet<>();
     try {
-      log.info("搜索条件：\n" +dto+"\n=====ip分析：\n"+searchSourceBuilder);
+      log.info("搜索条件：\n" +dto+"\n=====ip统计搜索DSL：\n"+searchSourceBuilder);
       SearchResponse search = restHighLevelClient.search(searchRequest, optionsBuilder.build());
-      log.info("\n=====ip分析查询结果：\n"+ JSON.toJSONString(search));
       Terms terms = search.getAggregations().get("username");
       for (Terms.Bucket bucket : terms.getBuckets()) {
         String account = bucket.getKeyAsString();
@@ -218,14 +217,12 @@ public class IpAnalysisServiceImpl implements IpAnalysisService {
       log.error("ip分析查询异常",e);
     }
 
-    log.info("==========ip分析返回ips:\n"+ JSONArray.toJSONString(ips));
     Map<String, Integer> ipMap = aggregationSearchDoc(ips);
     list.forEach(l -> l.setIpCount(ipMap.get(l.getIpAddress())));
     if(list.size() > 0){
       int size = Math.min(list.size(), 10);
       list = list.subList(0,size);
     }
-    log.info("==========ip分析返回结果:\n"+ JSONArray.toJSONString(list));
     return list;
   }
 
@@ -247,7 +244,7 @@ public class IpAnalysisServiceImpl implements IpAnalysisService {
     optionsBuilder.setHttpAsyncResponseConsumerFactory(
         new HttpAsyncResponseConsumerFactory.HeapBufferedResponseConsumerFactory(31457280));
     try {
-      log.info("=====ip分析分页统计：\n"+searchSourceBuilder);
+      log.info("=====ip分析分页统计DSL：\n"+searchSourceBuilder);
       SearchResponse search = restHighLevelClient.search(searchRequest, optionsBuilder.build());
       Terms terms = search.getAggregations().get("ipCount");
       for (Terms.Bucket bucket : terms.getBuckets()) {
@@ -257,7 +254,7 @@ public class IpAnalysisServiceImpl implements IpAnalysisService {
       }
 
     } catch (Exception e) {
-      e.printStackTrace();
+      log.error("ip分析分页统计异常",e);
     }
     return map;
   }

@@ -6,6 +6,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.gameplat.admin.config.TenantConfig;
 import com.gameplat.admin.convert.ValidWithdrawConvert;
 import com.gameplat.admin.mapper.ValidWithdrawMapper;
 import com.gameplat.admin.model.bean.GameBetRecordSearchBuilder;
@@ -54,22 +55,29 @@ public class ValidWithdrawServiceImpl extends ServiceImpl<ValidWithdrawMapper, V
   @Autowired(required = false)
   private ValidWithdrawConvert validWithdrawConvert;
 
-  @Override
-  public void addRechargeOrder(RechargeOrder rechargeOrder) throws Exception {
-    ValidWithdraw validWithdraw = new ValidWithdraw();
-    validWithdraw.setMemberId(rechargeOrder.getMemberId());
-    validWithdraw.setAccount(rechargeOrder.getAccount());
-    validWithdraw.setType(0);
-    validWithdraw.setRechId(rechargeOrder.getId().toString());
-    validWithdraw.setRechMoney(rechargeOrder.getPayAmount());
-    validWithdraw.setDiscountMoney(rechargeOrder.getDiscountAmount());
-    validWithdraw.setDiscountDml(rechargeOrder.getDiscountDml());
-    validWithdraw.setMormDml(rechargeOrder.getNormalDml());
-    validWithdraw.setRemark(rechargeOrder.getRemarks());
-    deleteByUserId(rechargeOrder.getMemberId(), 1);
-    updateTypeByUserId(rechargeOrder.getMemberId());
-    this.save(validWithdraw);
-  }
+
+    @Resource
+    private IBaseElasticsearchService baseElasticsearchService;
+
+    @Resource
+    private TenantConfig tenantConfig;
+
+    @Override
+    public void addRechargeOrder(RechargeOrder rechargeOrder) throws Exception {
+        ValidWithdraw validWithdraw = new ValidWithdraw();
+        validWithdraw.setMemberId(rechargeOrder.getMemberId());
+        validWithdraw.setAccount(rechargeOrder.getAccount());
+        validWithdraw.setType(0);
+        validWithdraw.setRechId(rechargeOrder.getId().toString());
+        validWithdraw.setRechMoney(rechargeOrder.getPayAmount());
+        validWithdraw.setDiscountMoney(rechargeOrder.getDiscountAmount());
+        validWithdraw.setDiscountDml(rechargeOrder.getDiscountDml());
+        validWithdraw.setMormDml(rechargeOrder.getNormalDml());
+        validWithdraw.setRemark(rechargeOrder.getRemarks());
+        deleteByUserId(rechargeOrder.getMemberId(), 1);
+        updateTypeByUserId(rechargeOrder.getMemberId());
+        this.save(validWithdraw);
+    }
 
   @Override
   public void remove(Long memberId, Date cashDate) throws Exception {
@@ -288,60 +296,46 @@ public class ValidWithdrawServiceImpl extends ServiceImpl<ValidWithdrawMapper, V
     return num.setScale(digital, BigDecimal.ROUND_HALF_UP);
   }
 
-  @Resource private IBaseElasticsearchService baseElasticsearchService;
-  /** 计算打码量 */
-  @Override
-  public void countAccountValidWithdraw(String username) {
-    List<ValidAccoutWithdrawVo> validWithdraw =
-        validWithdrawMapper.findAccountValidWithdraw(username);
-    //// 过滤会员是否存在打码
-    List<ValidAccoutWithdrawVo> accountValidWithdraw =
-        validWithdraw.stream()
-            .filter(
-                a ->
-                    StringUtils.isNotEmpty(a.getGameKind())
-                        && StringUtils.isNotEmpty(a.getPlatformCode()))
-            .collect(Collectors.toList());
-    if (StringUtils.isEmpty(accountValidWithdraw)) {
-      return;
-    }
-    List<GameBetValidRecordVo> list = new ArrayList<>();
-    List<GameBetValidRecordVo> finalList = list;
-    String indexName = ContextConstant.ES_INDEX.BET_RECORD_ + "kgsit";
-    accountValidWithdraw.forEach(
-        a -> {
-          if (StringUtils.isEmpty(a.getGameKind()) || StringUtils.isEmpty(a.getPlatformCode())) {
+    /**
+     * 计算打码量
+     */
+    @Override
+    public void countAccountValidWithdraw(String username) {
+        List<ValidAccoutWithdrawVo> validWithdraw = validWithdrawMapper.findAccountValidWithdraw(username);
+        ////过滤会员是否存在打码
+        List<ValidAccoutWithdrawVo> accountValidWithdraw  = validWithdraw.stream().filter(a -> StringUtils.isNotEmpty(a.getGameKind()) && StringUtils.isNotEmpty(a.getPlatformCode())).collect(Collectors.toList());
+        if (StringUtils.isEmpty(accountValidWithdraw)) {
             return;
-          }
-          GameVaildBetRecordQueryDTO dto =
-              new GameVaildBetRecordQueryDTO() {
-                {
-                  setAccount(a.getAccount());
-                  setBeginTime(a.getCreateTime());
-                  setEndTime(a.getEndTime());
-                  setPlatformCode(a.getPlatformCode());
-                  setState("1");
-                  setGameKind(a.getGameKind());
-                }
-              };
-          dto.setAccount(a.getAccount());
-          QueryBuilder builder = GameBetRecordSearchBuilder.buildBetRecordSearch(dto);
-          // todo betTime
-          SortBuilder<FieldSortBuilder> sortBuilder =
-              SortBuilders.fieldSort("betTime.keyword").order(SortOrder.DESC);
-          PageResponse<GameBetValidRecordVo> result =
-              baseElasticsearchService.search(
-                  builder, indexName, GameBetValidRecordVo.class, 0, 9999, sortBuilder);
-          if (StringUtils.isNotEmpty(result.getList())) {
-            result
-                .getList()
-                .forEach(
-                    b -> {
-                      b.setValidId(a.getId());
-                      b.setGameName(a.getGameName());
-                      finalList.add(b);
-                    });
-          }
+        }
+        List<GameBetValidRecordVo> list = new ArrayList<>();
+        List<GameBetValidRecordVo> finalList = list;
+        String indexName = ContextConstant.ES_INDEX.BET_RECORD_ + tenantConfig.getTenantCode();
+        accountValidWithdraw.forEach(a ->{
+            if (StringUtils.isEmpty(a.getGameKind()) || StringUtils.isEmpty(a.getPlatformCode())) {
+                return;
+            }
+            GameVaildBetRecordQueryDTO dto = new GameVaildBetRecordQueryDTO(){{
+                setAccount(a.getAccount());
+                setBeginTime(a.getCreateTime());
+                setEndTime(a.getEndTime());
+                setPlatformCode(a.getPlatformCode());
+                setState("1");
+                setGameKind(a.getGameKind());
+            }};
+            dto.setAccount(a.getAccount());
+            QueryBuilder builder = GameBetRecordSearchBuilder.buildBetRecordSearch(dto);
+            // todo betTime
+            SortBuilder<FieldSortBuilder> sortBuilder = SortBuilders.fieldSort("betTime.keyword").order(SortOrder.DESC);
+            PageResponse<GameBetValidRecordVo> result = baseElasticsearchService.search(builder, indexName, GameBetValidRecordVo.class,
+                     0,  9999, sortBuilder);
+            if (StringUtils.isNotEmpty(result.getList())) {
+                result.getList().forEach(b ->{
+
+                    b.setValidId(a.getId());
+                    b.setGameName(a.getGameName());
+                    finalList.add(b);
+                });
+            }
         });
     List<GameBetValidRecordVo> listAll =
         finalList.stream()

@@ -34,6 +34,11 @@ public class GameAccountDataReportVo implements Serializable {
     @ApiModelProperty(value = " 可用额度")
     private BigDecimal quota;
 
+    @ApiModelProperty(value = " 全部会员")
+    private int accountNum;
+
+
     private List<AccountReportVo> list = new ArrayList<>();
+
 
 }

@@ -194,7 +194,9 @@ public class DataReportServiceImpl extends ServiceImpl<DataReportMapper, GameRec
 
         pageCurrent = (pageCurrent - 1) * pageSize;
         List<AccountReportVo> reportMemberBalance = dataReportMapper.findReportMemberBalance(dto,pageSize,pageCurrent);
+        int count = dataReportMapper.findReportMemberBalanceCount(dto);
         accountReportVo.setList(reportMemberBalance);
+        accountReportVo.setAccountNum(count);
         return accountReportVo;
     }
 

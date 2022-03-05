@@ -277,6 +277,27 @@
         ) a ORDER BY a.balance desc limit #{pageCurrent}, #{pageSize}
     </select>
 
+    <select id="findReportMemberBalanceCount" parameterType="com.gameplat.admin.model.dto.GameRWDataReportDto" resultType="integer" >
+        select count(a.balance) from ( select m.account account,CONVERT(info.balance,DECIMAL(22,2)) balance from member m INNER join
+        member_info info on m.id = info.member_id and info.balance > 0 where m.account != 'webRoot' and user_type in
+        ('M','A')
+        <if test="account != null and account != ''">
+            and account = #{account}
+        </if>
+        <if test="superAccount != null and superAccount != null">
+            <choose>
+                <when test="flag != null and flag == 1">
+                    AND parent_name = #{superAccount}
+                </when>
+                <otherwise>
+                    AND super_path like contact(#{superAccount},'%')
+                </otherwise>
+            </choose>
+        </if>
+        ) a
+    </select>
+
+
 
     <select id="findReportMemberAllBalance" parameterType="com.gameplat.admin.model.dto.GameRWDataReportDto" resultType="BIGDECIMAL" >
         select CONVERT(sum(info.balance),DECIMAL(22,2)) from member m  INNER  join member_info info on m.id = info.member_id and info.balance > 0 where m.account != 'webRoot' and user_type in ('M','A')

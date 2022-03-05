@@ -83,6 +83,8 @@ public interface DataReportMapper extends BaseMapper<GameRechDataReportVO> {
      */
     List<AccountReportVo> findReportMemberBalance(@Param("dto") GameRWDataReportDto dto, @Param("pageSize") long pageSize, @Param("pageCurrent")long pageCurrent);
 
+    int findReportMemberBalanceCount(GameRWDataReportDto dto);
+
 
     /**
      * @param dto  查询余额

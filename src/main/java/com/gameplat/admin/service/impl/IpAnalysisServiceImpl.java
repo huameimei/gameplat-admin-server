@@ -171,7 +171,7 @@ public class IpAnalysisServiceImpl implements IpAnalysisService {
     TermsAggregationBuilder username =
         AggregationBuilders.terms("username").field("username.keyword").size((int) page.getSize());
     TermsAggregationBuilder ipAddress =
-        AggregationBuilders.terms("ipAddress").field("ipAddress.keyword").size(1);
+        AggregationBuilders.terms("ipAddress").field("ipAddress.keyword").size((int) page.getSize());
 
     BucketSortPipelineAggregationBuilder bucketSort =
         new BucketSortPipelineAggregationBuilder("bucket_sort", null)
@@ -216,8 +216,13 @@ public class IpAnalysisServiceImpl implements IpAnalysisService {
       e.printStackTrace();
     }
 
+    log.info("==========ip分析返回ips:\n"+ JSONArray.toJSONString(ips));
     Map<String, Integer> ipMap = aggregationSearchDoc(ips);
     list.forEach(l -> l.setIpCount(ipMap.get(l.getIpAddress())));
+    if(list.size() > 0){
+      int size = Math.min(list.size(), 10);
+      list = list.subList(0,size);
+    }
     log.info("==========ip分析返回结果:\n"+ JSONArray.toJSONString(list));
     return list;
   }

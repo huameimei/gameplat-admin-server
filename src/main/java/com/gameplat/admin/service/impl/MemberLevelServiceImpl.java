@@ -101,7 +101,8 @@ public class MemberLevelServiceImpl extends ServiceImpl<MemberLevelMapper, Membe
       throw new ServiceException("层级已被锁定，无法删除!");
     }
 
-    if (level.getMemberNum() > 0) {
+    Integer totalAccountNum = memberService.getUserLevelTotalAccountNum(level.getLevelValue());
+    if (totalAccountNum > 0) {
       throw new ServiceException("层级内存在会员，无法删除!");
     }
 

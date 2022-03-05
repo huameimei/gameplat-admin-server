@@ -81,11 +81,14 @@ public interface MemberMapper extends BaseMapper<Member> {
     @Select("select max(agent_level) from member")
     Integer getMaxLevel();
 
-    List<Member> getOpenSalaryAgent(@Param("list") List<Integer> list);
+  List<Member> getOpenSalaryAgent(@Param("list") List<Integer> list);
 
   /** 获取各个充值层级下会员数量和锁定会员数量 */
   List<MemberLevelVO> getUserLevelAccountNum();
 
-    /** 获取代理线下的会员账号信息 */
-    List<Member> getMemberListByAgentAccount(MemberQueryDTO memberQueryDTO);
+    /** 获取某个充值层级下会员数量总数 */
+  Integer getUserLevelTotalAccountNum(@Param("userLevel") Integer userLevel);
+
+  /** 获取代理线下的会员账号信息 */
+  List<Member> getMemberListByAgentAccount(MemberQueryDTO memberQueryDTO);
 }

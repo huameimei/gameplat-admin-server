@@ -374,7 +374,18 @@
         user_level
     </select>
 
-    <!-- 获取各个充值层级下会员数量和锁定会员数量 -->
+    <!-- 获取某个充值层级下会员数量总数 -->
+    <select id="getUserLevelTotalAccountNum" resultType="java.lang.Integer">
+        SELECT
+        count(id)
+        FROM
+        member
+        where
+        user_type in ('M','A')
+        and user_level = #{userLevel}
+    </select>
+
+    <!-- 获取代理线下的会员信息 -->
     <select id="getMemberListByAgentAccount" resultType="com.gameplat.model.entity.member.Member">
         SELECT
         t1.id,

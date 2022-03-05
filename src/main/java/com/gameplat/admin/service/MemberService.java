@@ -9,6 +9,7 @@ import com.gameplat.admin.model.vo.MemberLevelVO;
 import com.gameplat.admin.model.vo.MemberVO;
 import com.gameplat.admin.model.vo.MessageDistributeVO;
 import com.gameplat.model.entity.member.Member;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 import java.util.Optional;
@@ -108,6 +109,8 @@ public interface MemberService extends IService<Member> {
   List<Member> getListByAccountList(List<String> accountList);
 
   List<MemberLevelVO> getUserLevelAccountNum();
+
+  Integer getUserLevelTotalAccountNum(Integer userLevel);
 
   List<Member> getMemberListByAgentAccount(MemberQueryDTO memberQueryDTO);
 }

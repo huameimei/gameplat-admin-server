@@ -1,5 +1,6 @@
 package com.gameplat.admin.service.impl;
 
+import com.alibaba.fastjson.JSONArray;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
@@ -217,6 +218,7 @@ public class IpAnalysisServiceImpl implements IpAnalysisService {
 
     Map<String, Integer> ipMap = aggregationSearchDoc(ips);
     list.forEach(l -> l.setIpCount(ipMap.get(l.getIpAddress())));
+    log.info("==========ip分析返回结果:\n"+ JSONArray.toJSONString(list));
     return list;
   }
 

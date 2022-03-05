@@ -403,6 +403,11 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
         return memberMapper.getUserLevelAccountNum();
     }
 
+    @Override
+    public Integer getUserLevelTotalAccountNum(Integer userLevel) {
+        return memberMapper.getUserLevelTotalAccountNum(userLevel);
+    }
+
     /**
      * 获取代理线下的会员账号信息
      *

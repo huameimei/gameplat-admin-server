@@ -361,4 +361,68 @@
             </foreach>
         </if>
     </select>
+
+    <!-- 获取各个充值层级下会员数量和锁定会员数量 -->
+    <select id="getUserLevelAccountNum" resultType="com.gameplat.admin.model.vo.MemberLevelVO">
+        SELECT
+        user_level userLevel,
+        sum( CASE WHEN is_lock = 'N' THEN 1 ELSE 0 end ) memberNum,
+        sum( CASE WHEN is_lock = 'Y' THEN 1 ELSE 0 end) memberLockNum
+        FROM
+        member where  user_type in (2,5)
+        GROUP BY
+        user_level
+    </select>
+
+    <!-- 获取各个充值层级下会员数量和锁定会员数量 -->
+    <select id="getMemberListByAgentAccount" resultType="com.gameplat.model.entity.member.Member">
+        SELECT
+        t1.id,
+        t1.account,
+        t1.user_level userLevel
+        FROM member t1
+        LEFT JOIN member_info t2 ON t1.id = t2.member_id
+        <where>
+            <if test="agentAccount != null and agentAccount != ''">
+                <choose>
+                    <when test="subordinateOnly != null and subordinateOnly == true">
+                        and t1.parent_name = #{agentAccount}
+                    </when>
+                    <otherwise>
+                        and t1.super_path LIKE concat('%', #{agentAccount},'%')
+                    </otherwise>
+                </choose>
+                <if test="itself != null and itself == 1">
+                    or t1.account = #{agentAccount}
+                </if>
+            </if>
+            <if test="levelList != null and levelList.size > 0">
+                and find_in_set(t1.user_level, #{levelList})
+            </if>
+            <if test="rechTimesFrom != null">
+                and t2.total_rech_times <![CDATA[>= ]]> #{rechTimesFrom}
+            </if>
+            <if test="rechTimesTo != null">
+                and t2.total_rech_times <![CDATA[<= ]]> #{rechTimesTo}
+            </if>
+            <if test="rechAmountFrom != null">
+                and t2.total_rech_amount <![CDATA[>= ]]> #{rechAmountFrom}
+            </if>
+            <if test="rechAmountTo != null">
+                and t2.total_rech_amount <![CDATA[<= ]]> #{rechAmountTo}
+            </if>
+            <if test="lastRechTimeFrom != null">
+                and t2.last_rech_time <![CDATA[>= ]]> #{lastRechTimeFrom}
+            </if>
+            <if test="lastRechTimeTo != null">
+                and t2.last_rech_time <![CDATA[>= ]]> #{lastRechTimeTo}
+            </if>
+            <if test="userType != null">
+                and t1.user_type = #{userType}
+            </if>
+        </where>
+    </select>
+
+
+
 </mapper>

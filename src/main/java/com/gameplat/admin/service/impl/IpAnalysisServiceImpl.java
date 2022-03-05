@@ -1,5 +1,7 @@
 package com.gameplat.admin.service.impl;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
@@ -16,6 +18,7 @@ import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.StringUtils;
 import com.gameplat.elasticsearch.service.IBaseElasticsearchService;
 import com.gameplat.security.context.UserCredential;
+import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.HttpAsyncResponseConsumerFactory;
@@ -46,6 +49,7 @@ import java.util.stream.Collectors;
  * @description ip分析
  * @date 2022/1/19
  */
+@Slf4j
 @Service
 @Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)
 public class IpAnalysisServiceImpl implements IpAnalysisService {
@@ -167,7 +171,7 @@ public class IpAnalysisServiceImpl implements IpAnalysisService {
     TermsAggregationBuilder username =
         AggregationBuilders.terms("username").field("username.keyword").size((int) page.getSize());
     TermsAggregationBuilder ipAddress =
-        AggregationBuilders.terms("ipAddress").field("ipAddress.keyword").size(1);
+        AggregationBuilders.terms("ipAddress").field("ipAddress.keyword").size((int) page.getSize());
 
     BucketSortPipelineAggregationBuilder bucketSort =
         new BucketSortPipelineAggregationBuilder("bucket_sort", null)
@@ -189,6 +193,7 @@ public class IpAnalysisServiceImpl implements IpAnalysisService {
     List<IpAnalysisVO> list = new ArrayList<>();
     Set<String> ips = new HashSet<>();
     try {
+      log.info("搜索条件：\n" +dto+"\n=====ip统计搜索DSL：\n"+searchSourceBuilder);
       SearchResponse search = restHighLevelClient.search(searchRequest, optionsBuilder.build());
       Terms terms = search.getAggregations().get("username");
       for (Terms.Bucket bucket : terms.getBuckets()) {
@@ -207,11 +212,15 @@ public class IpAnalysisServiceImpl implements IpAnalysisService {
       }
 
     } catch (Exception e) {
-      e.printStackTrace();
+      log.error("ip分析查询异常",e);
     }
 
     Map<String, Integer> ipMap = aggregationSearchDoc(ips);
     list.forEach(l -> l.setIpCount(ipMap.get(l.getIpAddress())));
+    if(list.size() > 0){
+      int size = Math.min(list.size(), 10);
+      list = list.subList(0,size);
+    }
     return list;
   }
 
@@ -233,6 +242,7 @@ public class IpAnalysisServiceImpl implements IpAnalysisService {
     optionsBuilder.setHttpAsyncResponseConsumerFactory(
         new HttpAsyncResponseConsumerFactory.HeapBufferedResponseConsumerFactory(31457280));
     try {
+      log.info("=====ip分析分页统计DSL：\n"+searchSourceBuilder);
       SearchResponse search = restHighLevelClient.search(searchRequest, optionsBuilder.build());
       Terms terms = search.getAggregations().get("ipCount");
       for (Terms.Bucket bucket : terms.getBuckets()) {
@@ -242,7 +252,7 @@ public class IpAnalysisServiceImpl implements IpAnalysisService {
       }
 
     } catch (Exception e) {
-      e.printStackTrace();
+      log.error("ip分析分页统计异常",e);
     }
     return map;
   }

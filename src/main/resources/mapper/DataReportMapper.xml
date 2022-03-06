@@ -210,7 +210,7 @@
             account
         from game_bet_daily_report
         <where>
-            <include refid="whereSql" />
+            <include refid="whereGameSql" />
         </where>
         GROUP BY account
     </select>

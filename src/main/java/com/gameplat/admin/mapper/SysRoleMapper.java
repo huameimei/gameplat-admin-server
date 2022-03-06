@@ -83,5 +83,13 @@ public interface SysRoleMapper extends BaseMapper<SysRole> {
    */
   SysRole checkRoleKeyUnique(SysRole role);
 
+  /**
+   * 校验角色权限是否唯一(不含包自己)
+   *
+   * @param role 角色
+   * @return 角色信息
+   */
+  SysRole checkRoleKeyIdUnique(SysRole role);
+
   Set<String> getRolesByUserId(Long userId);
 }

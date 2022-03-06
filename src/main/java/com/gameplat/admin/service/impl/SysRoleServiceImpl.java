@@ -111,6 +111,9 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole>
   @SentinelResource(value = "updateRole", fallback = "sentineFallBack")
   public void updateRole(OperRoleDTO dto) {
     SysRole role = roleConvert.toEntity(dto);
+    if (StringUtils.isNotNull(roleMapper.checkRoleKeyIdUnique(role))) {
+      throw new ServiceException("角色编码已存在");
+    }
     if (!this.updateById(role)) {
       throw new ServiceException("更新角色失败!");
     }

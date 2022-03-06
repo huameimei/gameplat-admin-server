@@ -144,6 +144,20 @@
         </where>
     </select>
 
+
+    <select id="checkRoleKeyIdUnique" parameterType="com.gameplat.model.entity.sys.SysRole" resultMap="SysRoleResult">
+        <include refid="selectRoleVo"/>
+        <where>
+            <if test="roleId != null">
+                AND r.role_id != #{roleId}
+            </if>
+            <if test="roleKey != null and roleKey != ''">
+                AND r.role_key = #{roleKey}
+            </if>
+
+        </where>
+    </select>
+
     <select id="getRolesByUserId" parameterType="java.lang.Long" resultType="java.lang.String">
         SELECT t3.role_key
         FROM sys_user t1

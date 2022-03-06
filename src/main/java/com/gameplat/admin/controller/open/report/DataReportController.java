@@ -6,6 +6,7 @@ import com.gameplat.admin.model.dto.GameRWDataReportDto;
 import com.gameplat.admin.model.vo.*;
 import com.gameplat.admin.service.DataReportService;
 import com.gameplat.admin.service.MemberService;
+import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.DateUtils;
 import com.gameplat.base.common.util.StringUtils;
 import com.gameplat.model.entity.member.Member;
@@ -54,7 +55,10 @@ public class DataReportController {
         }
         if (StringUtils.isNotEmpty(dto.getSuperAccount())) {
             if (dto.getFlag() == ONE) {
-                Member byAccount = memberService.getForAccount(dto.getAccount());
+                Member byAccount = memberService.getForAccount(dto.getSuperAccount());
+                if (byAccount == null) {
+                    throw new ServiceException("代理账号不存在");
+                }
                 dto.setSuperAccount(byAccount.getSuperPath());
             }
         }
@@ -76,7 +80,10 @@ public class DataReportController {
         }
         if (StringUtils.isNotEmpty(dto.getSuperAccount())) {
             if (dto.getFlag() == ONE) {
-                Member byAccount = memberService.getForAccount(dto.getAccount());
+                Member byAccount = memberService.getForAccount(dto.getSuperAccount());
+                if (byAccount == null) {
+                    throw new ServiceException("代理账号不存在");
+                }
                 dto.setSuperAccount(byAccount.getSuperPath());
             }
         }
@@ -97,7 +104,10 @@ public class DataReportController {
         }
         if (StringUtils.isNotEmpty(dto.getSuperAccount())) {
             if (dto.getFlag() == ONE) {
-                Member byAccount = memberService.getForAccount(dto.getAccount());
+                Member byAccount = memberService.getForAccount(dto.getSuperAccount());
+                if (byAccount == null) {
+                    throw new ServiceException("代理账号不存在");
+                }
                 dto.setSuperAccount(byAccount.getSuperPath());
             }
         }
@@ -125,7 +135,10 @@ public class DataReportController {
         }
         if (StringUtils.isNotEmpty(dto.getSuperAccount())) {
             if (dto.getFlag() == ONE) {
-                Member byAccount = memberService.getForAccount(dto.getAccount());
+                Member byAccount = memberService.getForAccount(dto.getSuperAccount());
+                if (byAccount == null) {
+                    throw new ServiceException("代理账号不存在");
+                }
                 dto.setSuperAccount(byAccount.getSuperPath());
             }
         }
@@ -152,7 +165,10 @@ public class DataReportController {
         }
         if (StringUtils.isNotEmpty(dto.getSuperAccount())) {
             if (dto.getFlag() == ONE) {
-                Member byAccount = memberService.getForAccount(dto.getAccount());
+                Member byAccount = memberService.getForAccount(dto.getSuperAccount());
+                if (byAccount == null) {
+                    throw new ServiceException("代理账号不存在");
+                }
                 dto.setSuperAccount(byAccount.getSuperPath());
             }
         }
@@ -174,7 +190,10 @@ public class DataReportController {
         }
         if (StringUtils.isNotEmpty(dto.getSuperAccount())) {
             if (dto.getFlag() == ONE) {
-                Member byAccount = memberService.getForAccount(dto.getAccount());
+                Member byAccount = memberService.getForAccount(dto.getSuperAccount());
+                if (byAccount == null) {
+                    throw new ServiceException("代理账号不存在");
+                }
                 dto.setSuperAccount(byAccount.getSuperPath());
             }
         }

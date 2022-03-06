@@ -38,7 +38,7 @@
                     AND parent_account = #{superAccount}
                 </when>
                 <otherwise>
-                    AND super_path like contact(#{superAccount},'%')
+                    AND super_path like concat('%',#{superAccount},'%')
                 </otherwise>
             </choose>
         </if>
@@ -58,7 +58,7 @@
                     AND super_account = #{superAccount}
                 </when>
                 <otherwise>
-                    AND user_paths like contact(#{superAccount},'%')
+                    AND user_paths like concat('%',#{superAccount},'%')
                 </otherwise>
             </choose>
         </if>
@@ -190,7 +190,7 @@
         <where>
             <include refid="whereGameSql" />
         </where>
-        GROUP BY game_type;
+        GROUP BY game_type
     </select>
 
     <!--返水数据 -->
@@ -228,7 +228,7 @@
                         AND parent_name = #{superAccount}
                     </when>
                     <otherwise>
-                        AND super_path like contact(#{superAccount},'%')
+                        AND super_path like concat('%',#{superAccount},'%')
                     </otherwise>
                 </choose>
             </if>
@@ -250,7 +250,7 @@
                         AND m.parent_name = #{superAccount}
                     </when>
                     <otherwise>
-                        AND m.super_path like contact(#{superAccount},'%')
+                        AND m.super_path like concat('%',#{superAccount},'%')
                     </otherwise>
                 </choose>
             </if>
@@ -271,7 +271,7 @@
                     AND parent_name = #{dto.superAccount}
                 </when>
                 <otherwise>
-                    AND super_path like contact(#{dto.superAccount},'%')
+                    AND super_path like concat('%',#{dto.superAccount},'%')
                 </otherwise>
             </choose>
         </if>
@@ -291,7 +291,7 @@
                     AND parent_name = #{superAccount}
                 </when>
                 <otherwise>
-                    AND super_path like contact(#{superAccount},'%')
+                    AND super_path like concat('%',#{superAccount},'%')
                 </otherwise>
             </choose>
         </if>
@@ -311,7 +311,7 @@
                     AND parent_name = #{superAccount}
                 </when>
                 <otherwise>
-                    AND super_path like contact(#{superAccount},'%')
+                    AND super_path like concat('%',#{superAccount},'%')
                 </otherwise>
             </choose>
         </if>
@@ -351,7 +351,7 @@
                     AND parent_name = #{superAccount}
                 </when>
                 <otherwise>
-                    AND agent_path like contact(#{superAccount},'%')
+                    AND agent_path like concat('%',#{superAccount},'%')
                 </otherwise>
             </choose>
         </if>
@@ -373,7 +373,7 @@
                         AND parent_name = #{superAccount}
                     </when>
                     <otherwise>
-                        AND agent_path like contact(#{superAccount},'%')
+                        AND agent_path like concat('%',#{superAccount},'%')
                     </otherwise>
                 </choose>
             </if>
@@ -394,7 +394,7 @@
                         AND parent_name = #{superAccount}
                     </when>
                     <otherwise>
-                        AND agent_path like contact(#{superAccount},'%')
+                        AND agent_path like concat('%',#{superAccount},'%')
                     </otherwise>
                 </choose>
             </if>

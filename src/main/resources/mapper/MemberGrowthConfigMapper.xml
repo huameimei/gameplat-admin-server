@@ -41,6 +41,8 @@
         <result property="otherDescTh" column="other_desc_th"/>
         <result property="otherDescIn" column="other_desc_in"/>
         <result property="otherDescVi" column="other_desc_vi"/>
+        <result property="isMemberLoan" column="is_member_loan"/>
+        <result property="isLoanMoney" column="is_loan_money"/>
     </resultMap>
 
 
@@ -74,6 +76,8 @@
         update_by,
         update_time,
         remark,
+        is_member_loan,
+        is_loan_money,
         (
             case #{language}
                 when 'zh-CN' then growth_desc
@@ -101,6 +105,8 @@
     <update id="updateGrowthConfig">
         update member_growth_config
         <set>
+            <if test="isMemberLoan != null">is_member_loan = #{isMemberLoan},</if>
+            <if test="isLoanMoney != null">is_loan_money = #{isLoanMoney},</if>
             <if test="isEnableVip != null">is_enable_vip = #{isEnableVip},</if>
             <if test="isEnableRecharge != null">is_enable_recharge = #{isEnableRecharge},</if>
             <if test="isEnableSign != null">is_enable_sign = #{isEnableSign},</if>

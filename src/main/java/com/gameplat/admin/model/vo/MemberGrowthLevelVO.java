@@ -96,6 +96,9 @@ public class MemberGrowthLevelVO {
     @ApiModelProperty("金币最大获取数")
     private Integer maxCoin;
 
-    @ApiModelProperty("金币最大获取数")
+    @ApiModelProperty("每日金币上限")
     private Integer dailyMaxCoin;
+
+    @ApiModelProperty("借呗额度")
+    private BigDecimal loanMoney;
 }

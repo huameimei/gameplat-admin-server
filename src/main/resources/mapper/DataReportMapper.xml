@@ -275,7 +275,7 @@
                 </otherwise>
             </choose>
         </if>
-        ) a ORDER BY a.balance desc limit #{pageCurrent}, #{pageSize}
+        ) a ORDER BY a.balance desc
     </select>
 
     <select id="findReportMemberBalanceCount" parameterType="com.gameplat.admin.model.dto.GameRWDataReportDto" resultType="integer" >

@@ -1,6 +1,7 @@
 package com.gameplat.admin.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.gameplat.admin.model.dto.GameRWDataReportDto;
 import com.gameplat.admin.model.vo.*;
 import org.apache.ibatis.annotations.Mapper;
@@ -81,7 +82,7 @@ public interface DataReportMapper extends BaseMapper<GameRechDataReportVO> {
      * @param dto  查询会员余额
      * @return int
      */
-    List<AccountReportVo> findReportMemberBalance(@Param("dto") GameRWDataReportDto dto, @Param("pageSize") long pageSize, @Param("pageCurrent")long pageCurrent);
+    Page<AccountReportVo> findReportMemberBalance(@Param("dto") GameRWDataReportDto dto, Page<AccountReportVo> page);
 
     int findReportMemberBalanceCount(GameRWDataReportDto dto);
 

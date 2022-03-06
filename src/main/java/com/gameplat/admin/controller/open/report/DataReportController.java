@@ -105,7 +105,7 @@ public class DataReportController {
     }
 
 
-    @ApiOperation("游戏数据统计")
+    @ApiOperation("会员数据统计")
     @GetMapping("findAccountDataReport")
     public GameAccountDataReportVo findAccountDataReport(Page<AccountReportVo> page, GameRWDataReportDto dto) {
         log.info("查询数据统注册入参：{}", JSON.toJSONString(dto));
@@ -157,6 +157,28 @@ public class DataReportController {
             }
         }
         return dataReportService.findDividendtDataReport(dto);
+    }
+
+
+    @ApiOperation("查询会员金额")
+    @GetMapping("findAccountReport")
+    public PageDtoVO<AccountReportVo>  findAccountReport (Page<AccountReportVo> page,GameRWDataReportDto dto) {
+        log.info("查询数据统计红利入参：{}", JSON.toJSONString(dto));
+        if (StringUtils.isEmpty(dto.getStartTime())) {
+            String startTime = DateUtils.format(new Date());
+            dto.setStartTime(startTime);
+        }
+        if (StringUtils.isEmpty(dto.getEndTime())) {
+            String endTime = DateUtils.format(new Date());
+            dto.setEndTime(endTime);
+        }
+        if (StringUtils.isNotEmpty(dto.getSuperAccount())) {
+            if (dto.getFlag() == ONE) {
+                Member byAccount = memberService.getForAccount(dto.getAccount());
+                dto.setSuperAccount(byAccount.getSuperPath());
+            }
+        }
+       return dataReportService.findAccountReport(page,dto);
     }
 
 }

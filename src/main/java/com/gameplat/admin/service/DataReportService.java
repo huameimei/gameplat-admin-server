@@ -22,4 +22,6 @@ public interface DataReportService {
     GameAccountDataReportVo findMemberReport(Page<AccountReportVo> page, GameRWDataReportDto dto);
 
     GameDividendDataVo findDividendtDataReport(GameRWDataReportDto dto);
+
+    PageDtoVO<AccountReportVo>  findAccountReport (Page<AccountReportVo> page,GameRWDataReportDto dto);
 }

@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -186,17 +187,6 @@ public class DataReportServiceImpl extends ServiceImpl<DataReportMapper, GameRec
         BigDecimal allBalance = dataReportMapper.findReportMemberAllBalance(dto);
         log.info("全部余额：{}",allBalance);
         accountReportVo.setGoodMoney(allBalance);
-        //当前页面条数大小
-        long pageSize =  page.getSize();;
-        //当前页面数
-        long pageCurrent = page.getCurrent();
-
-
-        pageCurrent = (pageCurrent - 1) * pageSize;
-        List<AccountReportVo> reportMemberBalance = dataReportMapper.findReportMemberBalance(dto,pageSize,pageCurrent);
-        int count = dataReportMapper.findReportMemberBalanceCount(dto);
-        accountReportVo.setList(reportMemberBalance);
-        accountReportVo.setAccountNum(count);
         return accountReportVo;
     }
 
@@ -237,5 +227,21 @@ public class DataReportServiceImpl extends ServiceImpl<DataReportMapper, GameRec
 
         gameDividendDataVo.setRedEnvelope(redDataReport);
         return gameDividendDataVo;
+    }
+
+
+    @Override
+    public PageDtoVO<AccountReportVo> findAccountReport(Page<AccountReportVo> page, GameRWDataReportDto dto) {
+        //当前页面数据
+        Page<AccountReportVo> reportMemberBalance = dataReportMapper.findReportMemberBalance(dto, page);
+        //全部余额
+        BigDecimal allBalance = dataReportMapper.findReportMemberAllBalance(dto);
+
+        PageDtoVO<AccountReportVo> pageDtoVO = new PageDtoVO<>();
+        pageDtoVO.setPage(reportMemberBalance);
+        Map<String, Object> map = new HashMap<String, Object>();
+        map.put("allBalance", allBalance);
+        pageDtoVO.setOtherData(map);
+        return pageDtoVO;
     }
 }

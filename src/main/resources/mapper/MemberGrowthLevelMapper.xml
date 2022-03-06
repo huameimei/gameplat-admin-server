@@ -28,7 +28,7 @@
         <result property="webReachVipImage" column="web_reach_vip_image"/>
         <result property="webUnreachVipImage" column="web_unreach_vip_image"/>
         <result property="coinRatio" column="coin_ratio"/>
-        <result property="max_Coin" column="max_coin"/>
+        <result property="maxCoin" column="max_coin"/>
         <result property="dailyMaxCoin" column="daily_max_coin"/>
         <result property="loanMoney" column="loan_money"/>
     </resultMap>

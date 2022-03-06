@@ -34,10 +34,23 @@ public class AuthenticationServiceImpl implements AuthenticationService {
   @Override
   public UserToken login(AdminLoginDTO dto, HttpServletRequest request) {
     String username = dto.getAccount();
-    String password = passwordService.decrypt(dto.getPassword());
-    boolean authenticated = twoFactorAuthenticationService.isEnabled();
-    UserCredential credential =
-        tokenAuthenticationManager.authenticate(username, password, request, !authenticated);
+    String password = "";
+    try {
+      password = passwordService.decrypt(dto.getPassword());
+    }catch (Exception e) {
+      log.info("密码错误：{}",e);
+      throw new ServiceException("用户名密码错误!");
+    }
+    UserCredential credential = null;
+    try {
+      boolean authenticated = twoFactorAuthenticationService.isEnabled();
+      credential =
+              tokenAuthenticationManager.authenticate(username, password, request, !authenticated);
+    } catch (Exception e) {
+      log.info("密码错误：{}",e);
+      throw new ServiceException("用户名密码错误!");
+    }
+
 
     // 更新用户登录信息
     this.updateLoginUserInfo(credential);

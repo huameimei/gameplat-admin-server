@@ -1,7 +1,9 @@
 package com.gameplat.admin.service.impl;
 
+import cn.hutool.core.bean.BeanUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
@@ -18,13 +20,14 @@ import com.gameplat.admin.enums.RechargeStatus;
 import com.gameplat.admin.mapper.RechargeOrderHistoryMapper;
 import com.gameplat.admin.mapper.RechargeOrderMapper;
 import com.gameplat.admin.model.bean.*;
+import com.gameplat.admin.model.dto.GameRWDataReportDto;
 import com.gameplat.admin.model.dto.MemberActivationDTO;
 import com.gameplat.admin.model.dto.RechargeOrderQueryDTO;
 import com.gameplat.admin.model.vo.MemberActivationVO;
 import com.gameplat.admin.model.vo.RechargeOrderVO;
 import com.gameplat.admin.model.vo.SummaryVO;
+import com.gameplat.admin.model.vo.ThreeRechReportVo;
 import com.gameplat.admin.service.*;
-import com.gameplat.admin.service.impl.BizBlacklistFacade;
 import com.gameplat.admin.util.MoneyUtils;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.json.JsonUtils;
@@ -73,9 +76,9 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
 
   @Autowired private RechargeOrderConvert rechargeOrderConvert;
 
-  @Autowired private RechargeOrderMapper rechargeOrderMapper;
+  @Autowired(required = false) private RechargeOrderMapper rechargeOrderMapper;
 
-  @Autowired private RechargeOrderHistoryMapper rechargeOrderHistoryMapper;
+  @Autowired(required = false) private RechargeOrderHistoryMapper rechargeOrderHistoryMapper;
 
   @Autowired private LimitInfoService limitInfoService;
 
@@ -794,5 +797,32 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
   public List<JSONObject> getSpreadReport(
       List<SpreadUnion> list, String startTime, String endTime) {
     return rechargeOrderMapper.getSpreadReport(list, startTime, endTime);
+  }
+
+
+  @Override
+  public List<ThreeRechReportVo> findThreeRechReport(GameRWDataReportDto dto){
+      List<RechargeOrder> list =  rechargeOrderMapper.selectList(this.builderMemberTodayQuery(dto));
+      return BeanUtil.copyToList(list, ThreeRechReportVo.class);
+  }
+
+  private final int ONE = 1;
+
+  private final int ZOO = 0;
+
+  /**
+   * 查询在线支付
+   */
+  private QueryWrapper<RechargeOrder> builderMemberTodayQuery(GameRWDataReportDto dto) {
+      QueryWrapper<RechargeOrder> queryWrapper = new QueryWrapper<>();
+      return queryWrapper.select("tp_interface_code,tp_interface_name,sum(amount) as amount")
+              .eq("status", com.gameplat.common.enums.RechargeStatus.SUCCESS.getValue())
+              .between("audit_time", dto.getStartTime(), dto.getEndTime())
+              .eq("mode", com.gameplat.common.enums.RechargeStatus.HANDLED.getValue())
+              .eq(StringUtils.isNotEmpty(dto.getAccount()),"account", dto.getAccount())
+              .eq(StringUtils.isNotEmpty(dto.getSuperAccount()) && ONE == dto.getFlag(),"super_account", dto.getSuperAccount())
+              .eq(StringUtils.isNotEmpty(dto.getSuperAccount()) && ZOO == dto.getFlag(),"super_path", dto.getSuperAccount())
+              .groupBy("tp_interface_code");
+
   }
 }

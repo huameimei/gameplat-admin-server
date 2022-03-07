@@ -1,17 +1,22 @@
 package com.gameplat.admin.service.impl;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
-import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import com.alibaba.fastjson.JSON;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.mapper.DataReportMapper;
 import com.gameplat.admin.model.dto.GameRWDataReportDto;
 import com.gameplat.admin.model.vo.*;
 import com.gameplat.admin.service.DataReportService;
-import com.gameplat.base.common.util.DateUtils;
+import com.gameplat.admin.service.RechargeOrderService;
 import com.gameplat.base.common.util.StringUtils;
+import com.gameplat.common.enums.RechargeStatus;
+import com.gameplat.common.enums.WithdrawStatus;
+import com.gameplat.model.entity.recharge.RechargeOrder;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,10 +24,7 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -67,6 +69,9 @@ public class DataReportServiceImpl extends ServiceImpl<DataReportMapper, GameRec
 
     private final String monthlyRed = "4";
 
+    @Autowired
+    RechargeOrderService rechargeOrderService;
+
 
     @Autowired(required = false)
     private DataReportMapper dataReportMapper;
@@ -78,7 +83,7 @@ public class DataReportServiceImpl extends ServiceImpl<DataReportMapper, GameRec
         log.info("查询充值数据：{}", JSON.toJSONString(rechReport));
         List<Map<String, Object>> rechReportNum = dataReportMapper.findRechReportNums(dto);
         rechReportNum.stream().forEach(a -> {
-           if (bank_count.equalsIgnoreCase(Convert.toStr(a.get("rechCode")))) {
+               if (bank_count.equalsIgnoreCase(Convert.toStr(a.get("rechCode")))) {
                rechReport.setBankCount(Convert.toInt(a.get("rechNum")));
                return;
            }
@@ -244,4 +249,12 @@ public class DataReportServiceImpl extends ServiceImpl<DataReportMapper, GameRec
         pageDtoVO.setOtherData(map);
         return pageDtoVO;
     }
+
+
+
+    @Override
+    public List<ThreeRechReportVo> findThreeRech(GameRWDataReportDto dto){
+        return  Optional.ofNullable(rechargeOrderService.findThreeRechReport(dto)).orElse(new ArrayList<>());
+    }
+
 }

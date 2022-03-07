@@ -40,6 +40,13 @@ public class GameBetDataReportVO implements Serializable {
     @ApiModelProperty(value = "游戏人数")
     private int gameNum;
 
+
+    public BigDecimal getWinAmount() {
+        return this.winAmount.negate();
+    }
+
+
+
     public GameBetDataReportVO() {
         this.betAmount = BigDecimal.ZERO;
         this.validAmount = BigDecimal.ZERO;

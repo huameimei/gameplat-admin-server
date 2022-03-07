@@ -6,11 +6,13 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.gameplat.admin.model.bean.ActivityStatisticItem;
 import com.gameplat.admin.model.bean.ManualRechargeOrderBo;
 import com.gameplat.admin.model.bean.PageExt;
+import com.gameplat.admin.model.dto.GameRWDataReportDto;
 import com.gameplat.admin.model.dto.MemberActivationDTO;
 import com.gameplat.admin.model.dto.RechargeOrderQueryDTO;
 import com.gameplat.admin.model.vo.MemberActivationVO;
 import com.gameplat.admin.model.vo.RechargeOrderVO;
 import com.gameplat.admin.model.vo.SummaryVO;
+import com.gameplat.admin.model.vo.ThreeRechReportVo;
 import com.gameplat.common.model.bean.UserEquipment;
 import com.gameplat.model.entity.recharge.RechargeOrder;
 import com.gameplat.model.entity.spread.SpreadUnion;
@@ -64,4 +66,6 @@ public interface RechargeOrderService extends IService<RechargeOrder> {
 
   /** 获取时间段内某代理下的所有充值成功数据 */
   List<JSONObject> getSpreadReport(List<SpreadUnion> list, String startTime, String endTime);
+
+  List<ThreeRechReportVo> findThreeRechReport(GameRWDataReportDto dto);
 }

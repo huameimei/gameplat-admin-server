@@ -1,5 +1,6 @@
 package com.gameplat.admin.service.impl;
 
+import cn.hutool.core.convert.Convert;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.gameplat.admin.config.TenantConfig;
@@ -122,9 +123,9 @@ public class GameBetRecordInfoServiceImpl implements GameBetRecordInfoService {
         try {
            SearchResponse searchResponse =  restHighLevelClient.search(searchRequest,optionsBuilder.build());
             Map<String, Aggregation> aggregationMap = searchResponse.getAggregations().getAsMap();
-            double betAmount = ((ParsedSum) aggregationMap.get("betAmountSum")).getValue();
-            double validAmount = ((ParsedSum) aggregationMap.get("validAmountSum")).getValue();
-            double winAmount = ((ParsedSum) aggregationMap.get("winAmountSum")).getValue();
+            BigDecimal betAmount = Convert.toBigDecimal(((ParsedSum)aggregationMap.get("betAmountSum")).getValue()).setScale(2,BigDecimal.ROUND_DOWN);
+            BigDecimal validAmount = Convert.toBigDecimal(( (ParsedSum) aggregationMap.get("validAmountSum")).getValue()).setScale(2,BigDecimal.ROUND_DOWN);
+            BigDecimal winAmount = Convert.toBigDecimal(( (ParsedSum)aggregationMap.get("winAmountSum")).getValue()).setScale(2,BigDecimal.ROUND_DOWN);
             otherData.put("betAmount",betAmount);
             otherData.put("validAmount",validAmount);
             otherData.put("winAmount",winAmount);

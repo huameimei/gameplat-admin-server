@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import java.util.Date;
+import java.util.List;
 
 
 /**
@@ -198,6 +199,38 @@ public class DataReportController {
             }
         }
        return dataReportService.findAccountReport(page,dto);
+    }
+
+
+
+    @ApiOperation("根据第三方查询第三方充值金额")
+    @GetMapping("findThreeRech")
+    public List<ThreeRechReportVo>  findThreeRech(GameRWDataReportDto dto) {
+        log.info("查询数据统计红利入参：{}", JSON.toJSONString(dto));
+        if (StringUtils.isEmpty(dto.getStartTime())) {
+            String startTime = DateUtils.format(new Date());
+            startTime += " 00:00:00";
+            dto.setStartTime(startTime);
+        } else {
+            dto.setStartTime(dto.getStartTime() + " 00:00:00");
+        }
+        if (StringUtils.isEmpty(dto.getEndTime())) {
+            String endTime = DateUtils.format(new Date());
+            endTime += " 23:59:59";
+            dto.setEndTime(endTime);
+        } else {
+            dto.setEndTime(dto.getEndTime() + " 23:59:59");
+        }
+        if (StringUtils.isNotEmpty(dto.getSuperAccount())) {
+            if (dto.getFlag() == ONE) {
+                Member byAccount = memberService.getForAccount(dto.getSuperAccount());
+                if (byAccount == null) {
+                    throw new ServiceException("代理账号不存在");
+                }
+                dto.setSuperAccount(byAccount.getSuperPath());
+            }
+        }
+        return dataReportService.findThreeRech(dto);
     }
 
 }

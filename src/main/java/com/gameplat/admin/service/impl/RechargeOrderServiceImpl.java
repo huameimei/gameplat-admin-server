@@ -104,6 +104,7 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
 
   @Autowired private ValidWithdrawService validWithdrawService;
 
+  @Autowired private MemberRwReportService memberRwReportService;
   @Override
   public PageExt<RechargeOrderVO, SummaryVO> findPage(
       Page<RechargeOrder> page, RechargeOrderQueryDTO dto) {
@@ -180,19 +181,15 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
       discountRechargeFlag = null;
     }
     UserCredential userCredential = SecurityUserHolder.getCredential();
-    LambdaUpdateWrapper<RechargeOrder> update = Wrappers.lambdaUpdate();
-    update
-        .set(ObjectUtils.isNotEmpty(discountType), RechargeOrder::getDiscountType, discountType)
-        .set(
-            ObjectUtils.isNotEmpty(discountAmount),
-            RechargeOrder::getDiscountAmount,
-            discountAmount)
-        .set(ObjectUtils.isNotEmpty(discountDml), RechargeOrder::getDiscountDml, discountDml)
-        .set(RechargeOrder::getDiscountRechargeFlag, discountRechargeFlag)
-        .set(RechargeOrder::getAuditorAccount, userCredential.getUsername())
-        .set(RechargeOrder::getAuditTime, new Date())
-        .eq(RechargeOrder::getId, id);
-    this.update(new RechargeOrder(), update);
+    RechargeOrder rechargeOrder = this.getById(id);
+    rechargeOrder.setAuditorAccount(userCredential.getUsername());
+    rechargeOrder.setAuditTime(new Date());
+    rechargeOrder.setDiscountType(discountType);
+    rechargeOrder.setDiscountAmount(discountAmount);
+    rechargeOrder.setDiscountDml(discountDml);
+    rechargeOrder.setTotalAmount(rechargeOrder.getPayAmount().add(discountAmount));
+    rechargeOrder.setDiscountRechargeFlag(discountRechargeFlag);
+    this.updateById(rechargeOrder);
   }
 
   @Override
@@ -270,6 +267,11 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
     }
     rechargeOrder.setStatus(RechargeStatus.SUCCESS.getValue());
     updateRechargeOrder(rechargeOrder);
+    // 更新充提报表
+    //过滤 推广账号 充值
+    if (!UserTypes.PROMOTION.value().equals(member.getUserType())) {
+      memberRwReportService.addRecharge(member, memberInfo.getTotalRechTimes(), rechargeOrder);
+    }
 
     if (rechargeOrder.getDmlFlag() == TrueFalse.TRUE.getValue()) {
       // 计算打码量

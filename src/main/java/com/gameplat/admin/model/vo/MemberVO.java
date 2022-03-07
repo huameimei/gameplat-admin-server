@@ -38,6 +38,8 @@ public class MemberVO implements Serializable {
   @Excel(name = "会员备注", width = 20, isImportField = "true_st")
   private String remark;
 
+  private Long parentId;
+
   /** 上级代理 */
   @Excel(name = "上级代理", width = 12, isImportField = "true_st")
   private String parentName;

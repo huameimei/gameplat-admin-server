@@ -20,11 +20,17 @@ public class MemberLoanQueryDTO implements Serializable {
     @ApiModelProperty("VIP等级")
     private Integer vipLevel;
 
-    @ApiModelProperty("欠款金额")
-    private Double overdraftMoney;
+    @ApiModelProperty("欠款金额区间")
+    private Double minOverdraftMoney;
 
-    @ApiModelProperty("借款时间")
-    private Date loanTime;
+    @ApiModelProperty("欠款金额区间")
+    private Double maxOverdraftMoney;
+
+    @ApiModelProperty("借款时间区间")
+    private String beginLoanTime;
+
+    @ApiModelProperty("借款时间区间")
+    private String endLoanTime;
 
     @ApiModelProperty("借款状态  0:成功  1:失败  2:已回收")
     private Integer loanStatus;

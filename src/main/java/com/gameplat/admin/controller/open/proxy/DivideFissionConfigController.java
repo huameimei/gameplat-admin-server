@@ -43,7 +43,8 @@ public class DivideFissionConfigController {
         queryWrapper.eq(
                 StrUtil.isNotBlank(queryObj.getUserName()),
                 DivideFissionConfig::getUserName,
-                queryObj.getUserName());
+                queryObj.getUserName())
+                .orderByDesc(DivideFissionConfig::getCreateTime);
         return fissionConfigService.page(page, queryWrapper);
     }
 

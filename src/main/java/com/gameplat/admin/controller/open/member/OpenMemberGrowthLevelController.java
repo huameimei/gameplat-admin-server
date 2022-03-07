@@ -10,7 +10,7 @@ import com.gameplat.admin.model.vo.MemberGrowthLevelVO;
 import com.gameplat.admin.service.MemberGrowthConfigService;
 import com.gameplat.admin.service.MemberGrowthLevelService;
 import com.gameplat.base.common.context.GlobalContextHolder;
-import com.gameplat.base.common.exception.ServiceException;
+import com.gameplat.base.coMemberQueryConditionmmon.exception.ServiceException;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;

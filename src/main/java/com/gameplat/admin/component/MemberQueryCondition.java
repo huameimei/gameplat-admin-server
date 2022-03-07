@@ -27,6 +27,7 @@ public class MemberQueryCondition {
   public QueryWrapper<Member> builderQueryWrapper(MemberQueryDTO dto) {
     QueryWrapper<Member> query = Wrappers.query();
     query
+        .eq(ObjectUtils.isNotEmpty(dto.getId()), "t1.id", dto.getId())
         .eq(ObjectUtils.isNotEmpty(dto.getNickname()), "t1.nickname", dto.getNickname())
         .eq(ObjectUtils.isNotNull(dto.getUserType()), "t1.user_type", dto.getUserType())
         .eq(ObjectUtils.isNotEmpty(dto.getParentName()), "t1.parent_name", dto.getParentName())

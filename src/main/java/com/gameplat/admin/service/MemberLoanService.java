@@ -11,4 +11,6 @@ public interface MemberLoanService extends IService<MemberLoan> {
 
     /** 分页查 */
     IPage<MemberLoanVO> page(PageDTO<MemberLoan> page, MemberLoanQueryDTO dto);
+
+    void editOrUpdate(MemberLoan memberLoan);
 }

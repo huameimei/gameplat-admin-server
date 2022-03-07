@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.cache.AdminCache;
@@ -84,6 +85,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
             ObjectUtils.isNotNull(userDTO.getUserType()),
             SysUser::getUserType,
             userDTO.getUserType())
+        .eq(ObjectUtils.isNotNull(userDTO.getRoleId()),SysUser::getRoleId,userDTO.getRoleId())
         .eq(ObjectUtils.isNotNull(userDTO.getStatus()), SysUser::getStatus, userDTO.getStatus())
         .eq(ObjectUtils.isNotEmpty(userDTO.getPhone()), SysUser::getPhone, userDTO.getPhone())
         .between(
@@ -93,6 +95,11 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
             userDTO.getEndTime());
 
     return userMapper.selectUserList(page, queryWrapper).convert(userConvert::toUserVo);
+  }
+
+  @Override
+  public List<SysUser> getUserByRoleId(Long id) {
+    return this.lambdaQuery().eq(SysUser::getRoleId, id).list();
   }
 
   @Override

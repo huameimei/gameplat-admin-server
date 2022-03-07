@@ -9,7 +9,6 @@ import com.gameplat.admin.mapper.RedEnvelopConfigMapper;
 import com.gameplat.admin.model.dto.RedEnvelopeConfigDTO;
 import com.gameplat.admin.service.RedEnvelopeConfigService;
 import com.gameplat.model.entity.recharge.RedEnvelopeConfig;
-import com.gameplat.model.entity.spread.SpreadUnion;
 import com.gameplat.security.SecurityUserHolder;
 import com.gameplat.security.context.UserCredential;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -58,9 +58,9 @@ public class RedEnvelopeInfoController {
     /**
      * 红包删除
      */
-    @DeleteMapping("/redDelete")
+    @PostMapping("/redDelete")
 //    @PreAuthorize("hasAuthority('operator:loginLogs:view')")
-    public Object redDelete(@RequestParam List<Integer> ids) {
+    public Object redDelete(@RequestBody List<Integer> ids) {
         return redEnvelopeService.redDelete(ids);
     }
 

@@ -408,8 +408,11 @@
                     or t1.account = #{agentAccount}
                 </if>
             </if>
-            <if test="levelList != null and levelList.size > 0">
-                and find_in_set(t1.user_level, #{levelList})
+            <if test="levelList != null and levelList.size() > 0">
+                and t1.user_level in
+                <foreach collection="levelList" item="level" open="(" close=")" separator="," index="index">
+                    #{level}
+                </foreach>
             </if>
             <if test="rechTimesFrom != null">
                 and t2.total_rech_times <![CDATA[>= ]]> #{rechTimesFrom}

@@ -136,4 +136,10 @@ public class MemberGrowthConfigVO {
 
   @ApiModelProperty("金币描述")
   private String goldCoinDesc;
+
+  @ApiModelProperty("是否开启借呗")
+  private Integer isMemberLoan;
+
+  @ApiModelProperty("是否开启借款")
+  private Integer isLoanMoney;
 }

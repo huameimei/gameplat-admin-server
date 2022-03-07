@@ -148,13 +148,13 @@ public class MemberQueryDTO implements Serializable {
   /** 未二次充值 */
   private Boolean notTwiceRech;
 
-  /** 会员当前等级 */
-  private Integer level;
-
   private List levels;
 
   private String parentName;
 
   /**是否包含代理自己 */
   private Boolean itself;
+
+  /** 会员当前等级 */
+  private Integer vipLevel;
 }

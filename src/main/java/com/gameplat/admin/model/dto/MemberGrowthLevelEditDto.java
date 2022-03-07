@@ -34,6 +34,12 @@ public class MemberGrowthLevelEditDto implements Serializable {
   @ApiModelProperty(value = "保级成长值", required = false)
   private Long limitGrowth;
 
+  @ApiModelProperty(value = "每日金币上限", required = false)
+  private Integer dailyMaxCoin;
+
+  @ApiModelProperty(value = "借呗额度", required = false)
+  private BigDecimal loanMoney;
+
   @ApiModelProperty(value = "升级奖励", required = false)
   private BigDecimal upReward;
 

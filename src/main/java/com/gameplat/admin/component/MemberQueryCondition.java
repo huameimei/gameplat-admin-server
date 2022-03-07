@@ -35,8 +35,8 @@ public class MemberQueryCondition {
         .eq(ObjectUtils.isNotEmpty(dto.getQq()), "t1.qq", dto.getQq())
         .eq(ObjectUtils.isNotEmpty(dto.getUserLevel()), "t1.user_level", dto.getUserLevel())
         .eq(ObjectUtils.isNotEmpty(dto.getAgentLevel()), "t1.agent_level", dto.getAgentLevel())
-        .eq(ObjectUtils.isNotEmpty(dto.getLevel()), "t2.level", dto.getLevel())
-        .in(ObjectUtils.isNotEmpty(dto.getLevels()), "t2.level", dto.getLevels())
+        .eq(ObjectUtils.isNotEmpty(dto.getVipLevel()), "t2.vip_level", dto.getVipLevel())
+        .in(ObjectUtils.isNotEmpty(dto.getLevels()), "t2.vip_level", dto.getLevels())
         .eq(
             ObjectUtils.isNotEmpty(dto.getInvitationCode()),
             "t2.invitation_code",

@@ -1,6 +1,7 @@
 package com.gameplat.admin.service.impl;
 
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
@@ -10,6 +11,8 @@ import com.gameplat.admin.enums.LanguageEnum;
 import com.gameplat.admin.mapper.MemberGrowthLevelMapper;
 import com.gameplat.admin.model.dto.GrowthLevelLogoEditDTO;
 import com.gameplat.admin.model.dto.MemberGrowthLevelEditDto;
+import com.gameplat.admin.model.vo.MemberConfigLevelVO;
+import com.gameplat.admin.model.vo.MemberGrowthConfigVO;
 import com.gameplat.admin.model.vo.MemberGrowthLevelVO;
 import com.gameplat.admin.service.MemberGrowthConfigService;
 import com.gameplat.admin.service.MemberGrowthLevelService;
@@ -51,6 +54,8 @@ public class MemberGrowthLevelServiceImpl
   @Autowired private MemberGrowthRecordService memberGrowthRecordService;
 
   @Autowired private MemberInfoService memberInfoService;
+
+  @Autowired private MemberGrowthConfigService configService;
 
   public static final String kindName =
       "{\"en-US\": \"platform\", \"in-ID\": \"peron\", \"th-TH\": \"แพลตฟอร์ม\", \"vi-VN\": \"nền tảng\", \"zh-CN\": \"平台\"}";
@@ -158,5 +163,66 @@ public class MemberGrowthLevelServiceImpl
   @Override
   public void updateLogo(GrowthLevelLogoEditDTO dto) {
     this.updateById(levelConvert.toEntity(dto));
+  }
+
+  /** VIP配置和VIP等级列表/查询logo配置列表 */
+  @Override
+  public MemberConfigLevelVO getLevelConfig(String language) {
+    try {
+      if (StrUtil.isBlank(language)) {
+        language = LanguageEnum.app_zh_CN.getCode();
+      }
+      // 经验值描述
+      MemberGrowthConfigVO config = configService.findOneConfig(language);
+      // 最高等级
+      Integer limitLevel = config.getLimitLevel();
+      if (limitLevel == null) {
+        limitLevel = 50;
+      }
+      // 用户成长等级配置
+      List<MemberGrowthLevelVO> levels = this.findList(limitLevel, language);
+      return new MemberConfigLevelVO() {
+        {
+          setConfigVO(config);
+          setLevelVO(levels);
+        }
+      };
+    } catch (Exception e) {
+      log.error(e.toString());
+      throw new ServiceException("获取成长等级和配置失败");
+    }
+  }
+
+  /** 后台批量修改VIP等级 */
+  @Override
+  public void batchUpdateLevel(JSONObject obj) {
+    String language = obj.get("language").toString();
+    language = StrUtil.isBlank(language) ? "zh-CN" : language;
+    Object levels = obj.get("levels");
+    JSONArray jsonArray = JSONUtil.parseArray(levels);
+    List<MemberGrowthLevelEditDto> list = jsonArray.toList(MemberGrowthLevelEditDto.class);
+    this.batchUpdateLevel(list, language);
+  }
+
+  /** VIP等级列表 */
+  @Override
+  public List<MemberGrowthLevelVO> vipList(String language) {
+    try {
+      if (StrUtil.isBlank(language)) {
+        language = LanguageEnum.app_zh_CN.getCode();
+      }
+      // 经验值描述
+      MemberGrowthConfigVO config = configService.findOneConfig(language);
+      // 最高等级
+      Integer limitLevel = config.getLimitLevel();
+      if (limitLevel == null) {
+        limitLevel = 50;
+      }
+      // 用户成长等级配置
+      return this.findList(limitLevel, language);
+    } catch (Exception e) {
+      log.error(e.toString());
+      throw new ServiceException("获取VIP等级列表失败");
+    }
   }
 }

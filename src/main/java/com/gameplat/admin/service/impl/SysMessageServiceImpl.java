@@ -12,6 +12,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 /**
  * 系统版本 业务实现层
  *
@@ -38,4 +40,10 @@ public class SysMessageServiceImpl extends ServiceImpl<SysMessageMapper, SysMess
                 .orderByDesc(SysMessage::getCreateTime)
                 .page(page);
     }
+
+    @Override
+    public List<SysMessage> lastList(SysMessageDTO dto) {
+        return this.lambdaQuery().apply(true, "TO_DAYS(NOW())-TO_DAYS(create_time) <=3").list();
+    }
+
 }

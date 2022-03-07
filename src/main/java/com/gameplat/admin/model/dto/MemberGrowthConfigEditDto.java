@@ -171,4 +171,10 @@ public class MemberGrowthConfigEditDto implements Serializable {
 
   @ApiModelProperty("金币描述")
   private String goldCoinDesc;
+
+  @ApiModelProperty("是否开启借呗")
+  private String isMemberLoan;
+
+  @ApiModelProperty("是否开启借款")
+  private Integer isLoanMoney;
 }

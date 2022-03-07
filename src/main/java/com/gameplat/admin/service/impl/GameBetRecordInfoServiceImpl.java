@@ -24,6 +24,14 @@ import com.gameplat.elasticsearch.page.PageResponse;
 import com.gameplat.elasticsearch.service.IBaseElasticsearchService;
 import com.gameplat.model.entity.game.GameBetRecord;
 import com.gameplat.model.entity.game.LiveBetRecord;
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+import javax.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
@@ -49,15 +57,6 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.Resource;
-import java.io.IOException;
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
 @Slf4j
 @Service
 @Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)
@@ -80,9 +79,10 @@ public class GameBetRecordInfoServiceImpl implements GameBetRecordInfoService {
     private RestHighLevelClient restHighLevelClient;
 
   @Transactional(propagation = Propagation.NOT_SUPPORTED)
-  public GameApi getGameApi(String liveCode) {
-    GameApi api = applicationContext.getBean(liveCode + GameApi.Suffix, GameApi.class);
-    TransferTypesEnum tt = TransferTypesEnum.get(liveCode);
+  public GameApi getGameApi(String platformCode) {
+    GameApi api = applicationContext
+        .getBean(platformCode.toLowerCase() + GameApi.Suffix, GameApi.class);
+    TransferTypesEnum tt = TransferTypesEnum.get(platformCode);
     // 1代表是否额度转换
     if (tt == null || tt.getType() != 1) {
       throw new ServiceException("游戏未接入");

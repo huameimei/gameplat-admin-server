@@ -17,6 +17,6 @@
         rec.multiple multiple,
         rec.receive_method receiveMethod
         FROM user_red_envelope ure
-        INNER red_envelope_config rec ON ure.red_envelope_id = rec.id
+        INNER JOIN red_envelope_config rec ON ure.red_envelope_id = rec.id
     </select>
 </mapper>

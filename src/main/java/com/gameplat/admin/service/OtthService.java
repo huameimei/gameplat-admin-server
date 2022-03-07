@@ -1,6 +1,5 @@
 package com.gameplat.admin.service;
 
-import com.alibaba.excel.util.DateUtils;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -18,6 +17,7 @@ import com.gameplat.base.common.context.DyDataSourceContextHolder;
 import com.gameplat.base.common.context.GlobalContextHolder;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.log.SysLog;
+import com.gameplat.base.common.util.DateUtils;
 import com.gameplat.base.common.util.HttpRespBean;
 import com.gameplat.base.common.util.IPUtils;
 import com.gameplat.common.enums.ChatConfigEnum;
@@ -250,7 +250,7 @@ public class OtthService {
             sysLog.setDesc(finalContent);
             sysLog.setPath(apiUrl);
             sysLog.setDbSuffix(proxy);
-            sysLog.setCreateTime(new Date());
+            sysLog.setCreateTime(DateUtils.get0ZoneDate(new Date(),DateUtils.DATE_TIME_PATTERN));
             sysLog.setDoTime((System.currentTimeMillis() - start) + "");
             // 保存操作日志
             remoteLogService.saveOperLog(sysLog);

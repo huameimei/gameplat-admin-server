@@ -2,6 +2,7 @@ package com.gameplat.admin.handler;
 
 import com.gameplat.base.common.context.DyDataSourceContextHolder;
 import com.gameplat.base.common.log.SysLog;
+import com.gameplat.base.common.util.DateUtils;
 import com.gameplat.base.common.util.StringUtils;
 import com.gameplat.common.enums.SubjectEnum;
 import com.gameplat.common.enums.UserTypes;
@@ -29,7 +30,7 @@ public class AdminLogBuilder implements LogBuilder {
     return SysLog.builder()
         .dbSuffix(tenant)
         .userType(userTypes.key())
-        .registerTime(SecurityUserHolder.getCredential().getRegisterTime())
+            .registerTime(DateUtils.get0ZoneDate(SecurityUserHolder.getCredential().getRegisterTime(),DateUtils.DATE_TIME_PATTERN))
         .username(SecurityUserHolder.getUsername())
         .subject(SubjectEnum.ADMIN.getKey())
         .build();

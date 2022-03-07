@@ -5,6 +5,7 @@ import cn.afterturn.easypoi.excel.entity.ExportParams;
 import cn.hutool.http.Header;
 import cn.hutool.http.useragent.UserAgent;
 import cn.hutool.http.useragent.UserAgentUtil;
+import cn.hutool.json.JSONArray;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.gameplat.admin.model.dto.*;
@@ -185,5 +186,17 @@ public class MemberController {
     try (Workbook workbook = ExcelExportUtil.exportExcel(exportParams, MemberVO.class, member)) {
       workbook.write(response.getOutputStream());
     }
+  }
+
+  @ApiOperation(value = "添加用户或添加下级时 彩票投注返点数据集")
+  @GetMapping("/getRebateOptionsForAdd")
+  public JSONArray getRebateOptionsForAdd(@RequestParam(required = false) String agentAccount) {
+    return memberService.getRebateForAdd(agentAccount);
+  }
+
+  @ApiOperation(value = "编辑用户时 彩票投注返点数据集")
+  @GetMapping("/getRebateOptionsForEdit")
+  public JSONArray getRebateOptionsForEdit(@RequestParam(required = false) String agentAccount) {
+    return memberService.getRebateForEdit(agentAccount);
   }
 }

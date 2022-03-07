@@ -1,10 +1,16 @@
 package com.gameplat.admin.service.impl;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.RandomUtil;
+import cn.hutool.core.util.StrUtil;
+import cn.hutool.json.JSONArray;
+import cn.hutool.json.JSONObject;
 import com.alicp.jetcache.anno.CacheInvalidate;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.component.MemberQueryCondition;
@@ -28,11 +34,14 @@ import com.gameplat.common.util.TableIndexUtils;
 import com.gameplat.model.entity.game.GameTransferInfo;
 import com.gameplat.model.entity.member.Member;
 import com.gameplat.model.entity.member.MemberInfo;
+import com.gameplat.model.entity.spread.SpreadLinkInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+import java.text.DecimalFormat;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -40,6 +49,7 @@ import java.util.stream.Collectors;
 
 @Service
 @Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)
+@SuppressWarnings("all")
 public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> implements MemberService {
 
   @Autowired private MemberMapper memberMapper;
@@ -59,6 +69,9 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
   @Autowired private TenantConfig tenantConfig;
 
   @Autowired private GameTransferInfoService gameTransferInfoService;
+
+  @Autowired
+  private SpreadLinkInfoService spreadLinkInfoService;
 
   @Override
   public Member getForAccount(String account) {
@@ -418,4 +431,102 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
     public List<Member> getMemberListByAgentAccount(MemberQueryDTO memberQueryDTO) {
         return memberMapper.getMemberListByAgentAccount(memberQueryDTO);
     }
+
+  /**
+   * 添加账号或添加下级时 彩票投注返点下拉
+   * @param agentAccount
+   * @return
+   */
+  @Override
+  public JSONArray getRebateForAdd(String agentAccount) {
+    BigDecimal max = new BigDecimal("9").setScale(2, BigDecimal.ROUND_HALF_UP);
+    BigDecimal min = new BigDecimal("0").setScale(2, BigDecimal.ROUND_HALF_UP);
+    if (StrUtil.isNotBlank(agentAccount)) {
+      BigDecimal userRebate = memberInfoService.findUserRebate(agentAccount);
+      max =
+              ObjectUtils.isNull(userRebate)
+                      ? max
+                      : userRebate.setScale(2, BigDecimal.ROUND_HALF_UP);
+    }
+    JSONArray jsonArray = new JSONArray();
+    BigDecimal rebate = max;
+    Integer base = 1800;
+    BigDecimal value = BigDecimal.ZERO;
+    String text = "";
+    DecimalFormat format = new DecimalFormat("0.00#");
+    while (rebate.compareTo(min) >= 0) {
+      JSONObject jsonObject = new JSONObject();
+      value = rebate;
+      Integer baseData = base + value.multiply(BigDecimal.valueOf(20L)).intValue();
+      text = rebate.toString().concat("% ---- ").concat(baseData.toString());
+      jsonObject.set("value", format.format(value));
+      jsonObject.set("text", text);
+      jsonArray.add(jsonObject);
+      rebate = rebate.subtract(BigDecimal.valueOf(0.1)).setScale(2, BigDecimal.ROUND_HALF_UP);
+    }
+    return jsonArray;
+  }
+
+  /**
+   * 编辑用户时 彩票投注返点数据集
+   * @param agentAccount
+   * @return
+   */
+  @Override
+  public JSONArray getRebateForEdit(String agentAccount) {
+    BigDecimal min = BigDecimal.ZERO;
+    BigDecimal max = BigDecimal.ZERO;
+    if (StrUtil.isBlank(agentAccount)) {
+      min = new BigDecimal("0").setScale(2, BigDecimal.ROUND_HALF_UP);
+      max = new BigDecimal("9").setScale(2, BigDecimal.ROUND_HALF_UP);
+    } else {
+      BigDecimal userRebate = memberInfoService.findUserRebate(agentAccount);
+      max =
+              ObjectUtils.isNull(userRebate)
+                      ? new BigDecimal("9").setScale(2, BigDecimal.ROUND_HALF_UP)
+                      : userRebate.setScale(2, BigDecimal.ROUND_HALF_UP);
+        // 获取直属下级的最大返点等级
+        BigDecimal userLowerMaxRebate = memberInfoService.findUserLowerMaxRebate(agentAccount);
+        min =
+                ObjectUtils.isNull(userLowerMaxRebate)
+                        ? new BigDecimal("0").setScale(2, BigDecimal.ROUND_HALF_UP)
+                        : userLowerMaxRebate.setScale(2, BigDecimal.ROUND_HALF_UP);
+        // 再获取此账号推广码的最大返点等级
+        LambdaQueryWrapper<SpreadLinkInfo> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper
+                .eq(SpreadLinkInfo::getAgentAccount, agentAccount)
+                .orderByDesc(SpreadLinkInfo::getRebate)
+                .last("limit 1")
+                .select(SpreadLinkInfo::getRebate);
+        SpreadLinkInfo linkMinRebateObj = spreadLinkInfoService.getOne(queryWrapper);
+        BigDecimal linkMinRebate = BigDecimal.ZERO;
+        if (BeanUtil.isEmpty(linkMinRebateObj)) {
+          linkMinRebate = new BigDecimal("0").setScale(2, BigDecimal.ROUND_HALF_UP);
+        } else {
+          linkMinRebate =
+                  BigDecimal.valueOf(linkMinRebateObj.getRebate())
+                          .setScale(2, BigDecimal.ROUND_HALF_UP);
+        }
+
+        min = min.compareTo(linkMinRebate) >= 0 ? min : linkMinRebate;
+    }
+
+    JSONArray jsonArray = new JSONArray();
+    BigDecimal rebate = max;
+    Integer base = 1800;
+    BigDecimal value = BigDecimal.ZERO;
+    String text = "";
+    DecimalFormat format = new DecimalFormat("0.00#");
+    while (rebate.compareTo(min) >= 0) {
+      JSONObject jsonObject = new JSONObject();
+      value = rebate;
+      Integer baseData = base + value.multiply(BigDecimal.valueOf(20L)).intValue();
+      text = rebate.toString().concat("% ---- ").concat(baseData.toString());
+      jsonObject.set("value", format.format(value));
+      jsonObject.set("text", text);
+      jsonArray.add(jsonObject);
+      rebate = rebate.subtract(BigDecimal.valueOf(0.1)).setScale(2, BigDecimal.ROUND_HALF_UP);
+    }
+    return jsonArray;
+  }
 }

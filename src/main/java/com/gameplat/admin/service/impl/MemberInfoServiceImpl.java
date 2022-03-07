@@ -6,6 +6,7 @@ import com.gameplat.admin.service.MemberInfoService;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.model.entity.member.MemberInfo;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
@@ -20,6 +21,9 @@ import java.util.Date;
 @Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)
 public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberInfo>
     implements MemberInfoService {
+
+  @Autowired
+  private MemberInfoMapper memberInfoMapper;
 
   @Override
   @Retryable(value = Exception.class, backoff = @Backoff(delay = 250L, multiplier = 1.5))
@@ -109,6 +113,16 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
       log.error("更新会员:{}余额失败，当前余额：{}，更新金额：{}", memberId, currentBalance, amount);
       throw new ServiceException("更新会员余额失败!");
     }
+  }
+
+  @Override
+  public BigDecimal findUserRebate(String account) {
+    return memberInfoMapper.findUserRebate(account);
+  }
+
+  @Override
+  public BigDecimal findUserLowerMaxRebate(String agentAccount) {
+    return memberInfoMapper.findUserLowerMaxRebate(agentAccount);
   }
 
   private BigDecimal getNewBalance(BigDecimal current, BigDecimal amount) {

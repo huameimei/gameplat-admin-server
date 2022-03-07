@@ -1,5 +1,6 @@
 package com.gameplat.admin.service;
 
+import cn.hutool.json.JSONArray;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
@@ -113,4 +114,8 @@ public interface MemberService extends IService<Member> {
   Integer getUserLevelTotalAccountNum(Integer userLevel);
 
   List<Member> getMemberListByAgentAccount(MemberQueryDTO memberQueryDTO);
+
+    JSONArray getRebateForAdd(String agentAccount);
+
+    JSONArray getRebateForEdit(String agentAccount);
 }

@@ -173,8 +173,8 @@ public class MemberLoanServiceImpl extends ServiceImpl<MemberLoanMapper, MemberL
                 setMemberBalance(newBalance);
             }});
             memberInfoService.update(new LambdaUpdateWrapper<MemberInfo>()
-                                                                    .set(MemberInfo::getBalance, newBalance)
-                                                                    .eq(MemberInfo::getMemberId, memberLoan.getMemberId())
+                    .set(MemberInfo::getBalance, newBalance)
+                    .eq(MemberInfo::getMemberId, memberLoan.getMemberId())
             );
 
             MemberBill memberBill = new MemberBill();
@@ -199,8 +199,6 @@ public class MemberLoanServiceImpl extends ServiceImpl<MemberLoanMapper, MemberL
             message.setStatus(1);
             message.setRemarks("借呗欠款回收");
             messageInfoService.save(message);
-
         }
-
     }
 }

@@ -34,125 +34,129 @@ import java.util.List;
 @Service
 @Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)
 public class ActivityTypeServiceImpl extends ServiceImpl<ActivityTypeMapper, ActivityType>
-    implements ActivityTypeService {
+        implements ActivityTypeService {
 
-  @Autowired private ActivityTypeConvert activityTypeConvert;
+    @Autowired
+    private ActivityTypeConvert activityTypeConvert;
 
-  @Autowired private ActivityInfoService activityInfoService;
+    @Autowired
+    private ActivityInfoService activityInfoService;
 
-  @Override
-  public List<ActivityType> findByTypeIdList(List<Long> activityTypeIdList) {
-    if (CollectionUtils.isEmpty(activityTypeIdList)) {
-      return new ArrayList<>();
-    }
-    return this.lambdaQuery().in(ActivityType::getId, activityTypeIdList).list();
-  }
-
-  @Override
-  public IPage<ActivityTypeVO> list(
-      PageDTO<ActivityType> page, ActivityTypeQueryDTO activityTypeQueryDTO) {
-    LambdaQueryChainWrapper<ActivityType> queryChainWrapper = this.lambdaQuery();
-    queryChainWrapper
-        .eq(ActivityType::getLanguage, activityTypeQueryDTO.getLanguage())
-        .eq(
-            activityTypeQueryDTO.getTypeStatus() != null,
-            ActivityType::getTypeStatus,
-            activityTypeQueryDTO.getTypeStatus());
-
-    return queryChainWrapper.page(page).convert(activityTypeConvert::toVo);
-  }
-
-  @Override
-  public void add(ActivityTypeAddDTO activityTypeAddDTO) {
-    // 查询是否已经添加
-    ActivityType activityType =
-        this.getByTypeNameAndLanguage(
-            activityTypeAddDTO.getTypeName(), activityTypeAddDTO.getLanguage(), null);
-    if (activityType != null) {
-      throw new ServiceException("活动类型名字或者活动类型已存在");
-    }
-    ActivityType activityType1 = activityTypeConvert.toEntity(activityTypeAddDTO);
-    if (activityType1.getTypeStatus() == null) {
-      activityType1.setTypeStatus(BooleanEnum.YES.value());
-    }
-    this.save(activityType1);
-  }
-
-  @Override
-  public void update(ActivityTypeUpdateDTO activityTypeUpdateDTO) {
-    // 查询是否已经添加
-    ActivityType activityType =
-        this.getByTypeNameAndLanguage(
-            activityTypeUpdateDTO.getTypeName(),
-            activityTypeUpdateDTO.getLanguage(),
-            activityTypeUpdateDTO.getId());
-    if (activityType != null) {
-      throw new ServiceException("活动类型名字或者活动类型已存在");
-    }
-    ActivityType activityType1 = activityTypeConvert.toEntity(activityTypeUpdateDTO);
-    if (activityType1.getTypeStatus() == null) {
-      activityType1.setTypeStatus(BooleanEnum.YES.value());
-    }
-    this.updateById(activityType1);
-  }
-
-  @Override
-  public void remove(String ids) {
-    String[] idArr = ids.split(",");
-    // 遍历是否有活动关联
-    StringBuilder stringBuilder = new StringBuilder();
-    List<Long> idList = new ArrayList<>();
-    for (String idStr : idArr) {
-      Long id = Long.parseLong(idStr);
-      List<ActivityInfo> activityInfoList = activityInfoService.findByTypeId(id);
-      if (CollectionUtils.isNotEmpty(activityInfoList)) {
-        ActivityType activityType = this.getById(id);
-        if (StringUtils.isBlank(stringBuilder)) {
-          stringBuilder.append(activityType.getTypeName());
-        } else {
-          stringBuilder.append(",").append(activityType.getTypeName());
+    @Override
+    public List<ActivityType> findByTypeIdList(List<Long> activityTypeIdList) {
+        if (CollectionUtils.isEmpty(activityTypeIdList)) {
+            return new ArrayList<>();
         }
-      }
-      idList.add(id);
+        return this.lambdaQuery().in(ActivityType::getId, activityTypeIdList).list();
     }
-    if (StringUtils.isNotBlank(stringBuilder)) {
-      String msg = stringBuilder.toString();
-      if (msg.startsWith(",")) {
-        msg = msg.substring(1);
-      }
 
-      msg = "活动模块【" + msg + "】下有活动,不能删除";
-      throw new ServiceException(msg);
-    }
-    if (CollectionUtils.isNotEmpty(idList)) {
-      this.removeByIds(idList);
-    }
-  }
+    @Override
+    public IPage<ActivityTypeVO> list(
+            PageDTO<ActivityType> page, ActivityTypeQueryDTO activityTypeQueryDTO) {
+        LambdaQueryChainWrapper<ActivityType> queryChainWrapper = this.lambdaQuery();
+        queryChainWrapper
+                .eq(ActivityType::getLanguage, activityTypeQueryDTO.getLanguage())
+                .eq(
+                        activityTypeQueryDTO.getTypeStatus() != null,
+                        ActivityType::getTypeStatus,
+                        activityTypeQueryDTO.getTypeStatus());
 
-  @Override
-  public List<ActivityTypeVO> listAll(String language) {
-    List<ActivityType> list = this.lambdaQuery().eq(ActivityType::getLanguage, language).list();
-    List<ActivityTypeVO> activityTypeVOList = new ArrayList<>();
-    if (CollectionUtils.isNotEmpty(list)) {
-      for (ActivityType type : list) {
-        activityTypeVOList.add(activityTypeConvert.toVo(type));
-      }
+        return queryChainWrapper.page(page).convert(activityTypeConvert::toVo);
     }
-    return activityTypeVOList;
-  }
 
-  /**
-   * 查询是否已经存在
-   *
-   * @param typeName
-   * @param language
-   * @return
-   */
-  private ActivityType getByTypeNameAndLanguage(String typeName, String language, Long id) {
-    return this.lambdaQuery()
-        .eq(ActivityType::getTypeName, typeName)
-        .eq(ActivityType::getLanguage, language)
-        .ne(id != null, ActivityType::getId, id)
-        .one();
-  }
+    @Override
+    public void add(ActivityTypeAddDTO activityTypeAddDTO) {
+        // 查询是否已经添加
+        ActivityType activityType =
+                this.getByTypeNameAndLanguage(
+                        activityTypeAddDTO.getTypeName(), activityTypeAddDTO.getLanguage(), null);
+        if (activityType != null) {
+            throw new ServiceException("活动类型名字或者活动类型已存在");
+        }
+        ActivityType activityType1 = activityTypeConvert.toEntity(activityTypeAddDTO);
+        if (activityType1.getTypeStatus() == null) {
+            activityType1.setTypeStatus(BooleanEnum.YES.value());
+        }
+        this.save(activityType1);
+    }
+
+    @Override
+    public void update(ActivityTypeUpdateDTO activityTypeUpdateDTO) {
+        // 查询是否已经添加
+        ActivityType activityType =
+                this.getByTypeNameAndLanguage(
+                        activityTypeUpdateDTO.getTypeName(),
+                        activityTypeUpdateDTO.getLanguage(),
+                        activityTypeUpdateDTO.getId());
+        if (activityType != null) {
+            throw new ServiceException("活动类型名字或者活动类型已存在");
+        }
+        ActivityType activityType1 = activityTypeConvert.toEntity(activityTypeUpdateDTO);
+        if (activityType1.getTypeStatus() == null) {
+            activityType1.setTypeStatus(BooleanEnum.YES.value());
+        }
+        this.updateById(activityType1);
+    }
+
+    @Override
+    public void remove(String ids) {
+        String[] idArr = ids.split(",");
+        // 遍历是否有活动关联
+        StringBuilder stringBuilder = new StringBuilder();
+        List<Long> idList = new ArrayList<>();
+        for (String idStr : idArr) {
+            Long id = Long.parseLong(idStr);
+            List<ActivityInfo> activityInfoList = activityInfoService.findByTypeId(id);
+            if (CollectionUtils.isNotEmpty(activityInfoList)) {
+                ActivityType activityType = this.getById(id);
+                if (StringUtils.isBlank(stringBuilder)) {
+                    stringBuilder.append(activityType.getTypeName());
+                } else {
+                    stringBuilder.append(",").append(activityType.getTypeName());
+                }
+            }
+            idList.add(id);
+        }
+        if (StringUtils.isNotBlank(stringBuilder)) {
+            String msg = stringBuilder.toString();
+            if (msg.startsWith(",")) {
+                msg = msg.substring(1);
+            }
+
+            msg = "活动模块【" + msg + "】下有活动,不能删除";
+            throw new ServiceException(msg);
+        }
+        if (CollectionUtils.isNotEmpty(idList)) {
+            this.removeByIds(idList);
+        }
+    }
+
+    @Override
+    public List<ActivityTypeVO> listAll(String language) {
+        List<ActivityType> list = this.lambdaQuery()
+                .eq(ActivityType::getTypeStatus, BooleanEnum.YES.value())
+                .eq(ActivityType::getLanguage, language).list();
+        List<ActivityTypeVO> activityTypeVOList = new ArrayList<>();
+        if (CollectionUtils.isNotEmpty(list)) {
+            for (ActivityType type : list) {
+                activityTypeVOList.add(activityTypeConvert.toVo(type));
+            }
+        }
+        return activityTypeVOList;
+    }
+
+    /**
+     * 查询是否已经存在
+     *
+     * @param typeName
+     * @param language
+     * @return
+     */
+    private ActivityType getByTypeNameAndLanguage(String typeName, String language, Long id) {
+        return this.lambdaQuery()
+                .eq(ActivityType::getTypeName, typeName)
+                .eq(ActivityType::getLanguage, language)
+                .ne(id != null, ActivityType::getId, id)
+                .one();
+    }
 }

@@ -95,7 +95,7 @@ public class ActivityInfoController {
     public void add(
             @RequestBody ActivityInfoAddDTO activityInfoAddDTO) {
         checkActivityInfo(activityInfoAddDTO.getValidStatus(), activityInfoAddDTO.getEndTime(), activityInfoAddDTO.getBeginTime(), activityInfoAddDTO.getActivityLobbyId(), activityInfoAddDTO.getId());
-        activityInfoService.add(activityInfoAddDTO, LocaleContextHolder.getLocale().getLanguage());
+        activityInfoService.add(activityInfoAddDTO, LocaleContextHolder.getLocale().toLanguageTag());
     }
 
   /**
@@ -131,7 +131,7 @@ public class ActivityInfoController {
     public void update(
             @RequestBody ActivityInfoUpdateDTO activityInfoUpdateDTO) {
         checkActivityInfo(activityInfoUpdateDTO.getValidStatus(), activityInfoUpdateDTO.getEndTime(), activityInfoUpdateDTO.getBeginTime(), activityInfoUpdateDTO.getActivityLobbyId(), activityInfoUpdateDTO.getId());
-        activityInfoService.update(activityInfoUpdateDTO, LocaleContextHolder.getLocale().getLanguage());
+        activityInfoService.update(activityInfoUpdateDTO, LocaleContextHolder.getLocale().toLanguageTag());
     }
 
   /**

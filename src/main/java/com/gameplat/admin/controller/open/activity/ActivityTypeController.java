@@ -44,37 +44,37 @@ import java.util.List;
 @RequestMapping("/api/admin/activity/type")
 public class ActivityTypeController {
 
-  @Autowired private ActivityTypeService activityTypeService;
+    @Autowired
+    private ActivityTypeService activityTypeService;
 
-  @Autowired private ConfigService configService;
+    @Autowired
+    private ConfigService configService;
 
-  /**
-   * 活动板块列表
-   *
-   * @param page
-   * @param activityTypeQueryDTO
-   * @param country
-   * @return
-   */
-  @ApiOperation(value = "活动板块列表")
-  @GetMapping("/list")
-  @PreAuthorize("hasAuthority('activity:type:page')")
-  @ApiImplicitParams({
-    @ApiImplicitParam(name = "current", value = "分页参数：当前页", defaultValue = "1"),
-    @ApiImplicitParam(name = "size", value = "每页条数"),
-  })
-  public IPage<ActivityTypeVO> list(
-      @ApiIgnore PageDTO<ActivityType> page,
-      ActivityTypeQueryDTO activityTypeQueryDTO,
-      @RequestHeader(value = "country", defaultValue = "zh-CN", required = false) String country) {
-    if (StringUtils.isBlank(activityTypeQueryDTO.getLanguage())) {
-      activityTypeQueryDTO.setLanguage(country);
+    /**
+     * 活动板块列表
+     *
+     * @param page
+     * @param activityTypeQueryDTO
+     * @return
+     */
+    @ApiOperation(value = "活动板块列表")
+    @GetMapping("/list")
+    @PreAuthorize("hasAuthority('activity:type:page')")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "current", value = "分页参数：当前页", defaultValue = "1"),
+            @ApiImplicitParam(name = "size", value = "每页条数"),
+    })
+    public IPage<ActivityTypeVO> list(
+            @ApiIgnore PageDTO<ActivityType> page,
+            ActivityTypeQueryDTO activityTypeQueryDTO) {
+        if (StringUtils.isBlank(activityTypeQueryDTO.getLanguage())) {
+            activityTypeQueryDTO.setLanguage(LocaleContextHolder.getLocale().toLanguageTag());
+        }
+        if (StringUtils.isBlank(activityTypeQueryDTO.getLanguage())) {
+            throw new ServiceException("语言language参数必传");
+        }
+        return activityTypeService.list(page, activityTypeQueryDTO);
     }
-    if (StringUtils.isBlank(activityTypeQueryDTO.getLanguage())) {
-      throw new ServiceException("语言language参数必传");
-    }
-    return activityTypeService.list(page, activityTypeQueryDTO);
-  }
 
     /**
      * 新增活动板块
@@ -86,7 +86,7 @@ public class ActivityTypeController {
     @PreAuthorize("hasAuthority('activity:type:add')")
     public void add(
             @Validated @RequestBody ActivityTypeAddDTO activityTypeAddDTO) {
-        activityTypeAddDTO.setLanguage(LocaleContextHolder.getLocale().getLanguage());
+        activityTypeAddDTO.setLanguage(LocaleContextHolder.getLocale().toLanguageTag());
         if (activityTypeAddDTO.getFloatStatus() != null && activityTypeAddDTO.getFloatStatus() != 0) {
             if (StringUtils.isBlank(activityTypeAddDTO.getFloatLogo())) {
                 throw new ServiceException("开启浮窗开关，浮窗图片不能为空");
@@ -108,7 +108,7 @@ public class ActivityTypeController {
     @PreAuthorize("hasAuthority('activity:type:update')")
     public void update(
             @Validated @RequestBody ActivityTypeUpdateDTO activityTypeUpdateDTO) {
-        activityTypeUpdateDTO.setLanguage(LocaleContextHolder.getLocale().getLanguage());
+        activityTypeUpdateDTO.setLanguage(LocaleContextHolder.getLocale().toLanguageTag());
         if (activityTypeUpdateDTO.getFloatStatus() != null
                 && activityTypeUpdateDTO.getFloatStatus() != BooleanEnum.NO.value()) {
             if (StringUtils.isBlank(activityTypeUpdateDTO.getFloatLogo())) {
@@ -121,82 +121,76 @@ public class ActivityTypeController {
         activityTypeService.update(activityTypeUpdateDTO);
     }
 
-  /**
-   * 删除活动板块
-   *
-   * @param ids
-   */
-  @ApiOperation(value = "删除活动板块")
-  @DeleteMapping("/delete")
-  @PreAuthorize("hasAuthority('activity:type:remove')")
-  public void remove(@RequestBody String ids) {
-    if (StringUtils.isBlank(ids)) {
-      throw new ServiceException("ids不能为空");
-    }
-    activityTypeService.remove(ids);
-  }
-
-  /**
-   * 类型编码列表
-   *
-   * @param language
-   * @param country
-   * @return
-   */
-  @ApiOperation(value = "类型编码列表")
-  @GetMapping("/typeCodeList")
-  @PreAuthorize("hasAuthority('activity:type:typeCodeList')")
-  @ApiImplicitParams({@ApiImplicitParam(name = "language", value = "语言", required = true)})
-  public List<CodeDataVO> typeCodeList(
-      String language,
-      @RequestHeader(value = "country", defaultValue = "zh-CN", required = false) String country) {
-    if (StringUtils.isBlank(language)) {
-      language = country;
-    }
-    if (StringUtils.isBlank(language)) {
-      throw new ServiceException("语言language参数不能为空");
-    }
-    String activityTypeConfig = configService.getValue(DictDataEnum.ACTIVITY_TYPE_CONFIG);
-    if (StringUtils.isEmpty(activityTypeConfig)) {
-      throw new ServiceException("活动板块类型配置信息不存在");
+    /**
+     * 删除活动板块
+     *
+     * @param ids
+     */
+    @ApiOperation(value = "删除活动板块")
+    @DeleteMapping("/delete")
+    @PreAuthorize("hasAuthority('activity:type:remove')")
+    public void remove(@RequestBody String ids) {
+        if (StringUtils.isBlank(ids)) {
+            throw new ServiceException("ids不能为空");
+        }
+        activityTypeService.remove(ids);
     }
 
-    JSONObject jsonObject = JSONObject.parseObject(activityTypeConfig);
-    JSONArray jsonArray = jsonObject.getJSONArray(language);
-    if (CollectionUtils.isEmpty(jsonArray)) {
-      throw new ServiceException("语言【" + language + "】活动板块类型配置信息不存在");
-    }
-    List<CodeDataVO> codeDataVOList = new ArrayList<>();
-    for (int i = 0; i < jsonArray.size(); i++) {
-      CodeDataVO codeDataVO = jsonArray.getObject(i, CodeDataVO.class);
-      codeDataVOList.add(codeDataVO);
-    }
-    return codeDataVOList;
-  }
+    /**
+     * 类型编码列表
+     *
+     * @param language
+     * @return
+     */
+    @ApiOperation(value = "类型编码列表")
+    @GetMapping("/typeCodeList")
+    @PreAuthorize("hasAuthority('activity:type:typeCodeList')")
+    @ApiImplicitParams({@ApiImplicitParam(name = "language", value = "语言", required = true)})
+    public List<CodeDataVO> typeCodeList(String language) {
+        if (StringUtils.isBlank(language)) {
+            language = LocaleContextHolder.getLocale().toLanguageTag();
+        }
+        if (StringUtils.isBlank(language)) {
+            throw new ServiceException("语言language参数不能为空");
+        }
+        String activityTypeConfig = configService.getValue(DictDataEnum.ACTIVITY_TYPE_CONFIG);
+        if (StringUtils.isEmpty(activityTypeConfig)) {
+            throw new ServiceException("活动板块类型配置信息不存在");
+        }
 
-  /**
-   * 活动板块查询所有列表
-   *
-   * @param language
-   * @param country
-   * @return
-   */
-  @ApiOperation(value = "活动板块查询所有列表")
-  @GetMapping("/listAll")
-  @PreAuthorize("hasAuthority('activity:type:listAll')")
-  @ApiImplicitParams({
-    @ApiImplicitParam(name = "language", value = "语言"),
-    @ApiImplicitParam(name = "country", value = "国家"),
-  })
-  public List<ActivityTypeVO> listAll(
-      @RequestParam(value = "language", required = false) String language,
-      @RequestHeader(value = "country", defaultValue = "zh-CN", required = false) String country) {
-    if (StringUtils.isBlank(language)) {
-      language = country;
+        JSONObject jsonObject = JSONObject.parseObject(activityTypeConfig);
+        JSONArray jsonArray = jsonObject.getJSONArray(language);
+        if (CollectionUtils.isEmpty(jsonArray)) {
+            throw new ServiceException("语言【" + language + "】活动板块类型配置信息不存在");
+        }
+        List<CodeDataVO> codeDataVOList = new ArrayList<>();
+        for (int i = 0; i < jsonArray.size(); i++) {
+            CodeDataVO codeDataVO = jsonArray.getObject(i, CodeDataVO.class);
+            codeDataVOList.add(codeDataVO);
+        }
+        return codeDataVOList;
     }
-    if (StringUtils.isBlank(language)) {
-      throw new ServiceException("语言language参数必传");
+
+    /**
+     * 活动板块查询所有列表
+     *
+     * @param language
+     * @return
+     */
+    @ApiOperation(value = "活动板块查询所有列表")
+    @GetMapping("/listAll")
+    @PreAuthorize("hasAuthority('activity:type:listAll')")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "language", value = "语言"),
+    })
+    public List<ActivityTypeVO> listAll(
+            @RequestParam(value = "language", required = false) String language) {
+        if (StringUtils.isBlank(language)) {
+            language = LocaleContextHolder.getLocale().toLanguageTag();
+        }
+        if (StringUtils.isBlank(language)) {
+            throw new ServiceException("语言language参数必传");
+        }
+        return activityTypeService.listAll(language);
     }
-    return activityTypeService.listAll(language);
-  }
 }

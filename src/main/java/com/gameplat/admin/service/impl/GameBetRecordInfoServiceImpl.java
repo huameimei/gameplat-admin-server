@@ -1,11 +1,9 @@
 package com.gameplat.admin.service.impl;
 
 import cn.hutool.core.convert.Convert;
-import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.gameplat.admin.config.TenantConfig;
 import com.gameplat.admin.convert.GameBetRecordConvert;
-import com.gameplat.admin.mapper.LiveBetRecordMapper;
 import com.gameplat.admin.model.bean.ActivityStatisticItem;
 import com.gameplat.admin.model.bean.GameBetRecordSearchBuilder;
 import com.gameplat.admin.model.dto.GameBetRecordQueryDTO;
@@ -23,15 +21,6 @@ import com.gameplat.common.game.api.GameApi;
 import com.gameplat.elasticsearch.page.PageResponse;
 import com.gameplat.elasticsearch.service.IBaseElasticsearchService;
 import com.gameplat.model.entity.game.GameBetRecord;
-import com.gameplat.model.entity.game.LiveBetRecord;
-import java.io.IOException;
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-import javax.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
@@ -57,6 +46,14 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 @Slf4j
 @Service
 @Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)
@@ -64,8 +61,6 @@ public class GameBetRecordInfoServiceImpl implements GameBetRecordInfoService {
 
   @Autowired
   private ApplicationContext applicationContext;
-
-  @Autowired private LiveBetRecordMapper liveBetRecordMapper;
 
   @Autowired private IBaseElasticsearchService baseElasticsearchService;
 
@@ -172,53 +167,6 @@ public class GameBetRecordInfoServiceImpl implements GameBetRecordInfoService {
   @Override
   public List<ActivityStatisticItem> xjAssignMatchDml(Map map) {
     List<ActivityStatisticItem> activityStatisticItemVOList = new ArrayList<>();
-    // 根据用户集合批量查询所有xj的注单信息
-    List<LiveBetRecord> xjBetRecordList = liveBetRecordMapper.queryGameBetRecords(map);
-    if (CollectionUtils.isNotEmpty(xjBetRecordList)) {
-      // 过滤出指定比赛的注单信息
-      List<LiveBetRecord> xjAssignMatchBetRecordList =
-          xjBetRecordList.stream()
-              .filter(
-                  item ->
-                      JSONObject.parseObject(item.getBetContent().replace("[", "").replace("]", ""))
-                          .getInteger("eventId")
-                          .equals(map.get("matchId")))
-              .collect(Collectors.toList());
-      if (CollectionUtils.isNotEmpty(xjAssignMatchBetRecordList)) {
-        // 根据账号对指定比赛的注单信息进行分组
-        Map<String, List<LiveBetRecord>> userGroupMap =
-            xjAssignMatchBetRecordList.stream()
-                .collect(Collectors.groupingBy(LiveBetRecord::getAccount));
-        List<String> userNameList = new ArrayList<>();
-        if (CollectionUtils.isNotEmpty((List<String>) map.get("userNameList"))) {
-          userNameList = (List<String>) map.get("userNameList");
-        } else {
-          for (String userName : userGroupMap.keySet()) {
-            userNameList.add(userName);
-          }
-        }
-
-        for (String userName : userNameList) {
-          List<LiveBetRecord> liveBetRecordList = userGroupMap.get(userName);
-          // 计算该用户这场比赛的总打码量
-          BigDecimal validAmount = BigDecimal.ZERO;
-          if (CollectionUtils.isNotEmpty(liveBetRecordList)) {
-            for (LiveBetRecord record : liveBetRecordList) {
-              validAmount =
-                  validAmount.add(
-                      (record.getValidAmount() == null
-                          ? BigDecimal.ZERO
-                          : new BigDecimal(record.getValidAmount())));
-            }
-          }
-          ActivityStatisticItem activityStatisticItemVO = new ActivityStatisticItem();
-          activityStatisticItemVO.setUserName(userName);
-          activityStatisticItemVO.setValidAmount(validAmount);
-          activityStatisticItemVOList.add(activityStatisticItemVO);
-        }
-      }
-    }
-
     return activityStatisticItemVOList;
   }
 }

@@ -10,6 +10,7 @@ import com.gameplat.admin.convert.MemberLoanConvert;
 import com.gameplat.admin.mapper.MemberLoanMapper;
 import com.gameplat.admin.model.dto.MemberLoanQueryDTO;
 import com.gameplat.admin.model.dto.MemberQueryDTO;
+import com.gameplat.admin.model.vo.LoanVO;
 import com.gameplat.admin.model.vo.MemberLoanVO;
 import com.gameplat.admin.model.vo.MemberVO;
 import com.gameplat.admin.service.*;
@@ -55,7 +56,7 @@ public class MemberLoanServiceImpl extends ServiceImpl<MemberLoanMapper, MemberL
      * 分页查
      */
     @Override
-    public IPage<MemberLoanVO> page(PageDTO<MemberLoan> page, MemberLoanQueryDTO dto) {
+    public LoanVO page(PageDTO<MemberLoan> page, MemberLoanQueryDTO dto) {
 
         //获取符合资格的会员
         List<MemberGrowthLevel> memberGrowthLevelList = memberGrowthLevelService.lambdaQuery()
@@ -99,13 +100,22 @@ public class MemberLoanServiceImpl extends ServiceImpl<MemberLoanMapper, MemberL
                 .eq(ObjectUtil.isNotNull(dto.getLoanStatus()), MemberLoan::getLoanStatus, dto.getLoanStatus())
                 .page(page)
                 .convert(memberLoanConvert::toVo);
-        BigDecimal totalOverdraftMoney = new BigDecimal(0.00);
-        List<MemberLoanVO> records = pageList.getRecords();
-        for (MemberLoanVO record : records) {
-            totalOverdraftMoney = totalOverdraftMoney.add(record.getOverdraftMoney());
+
+        LoanVO loanVO = new LoanVO();
+        loanVO.setMemberLoanVO(pageList);
+
+        BigDecimal subtotal = new BigDecimal(0.00);
+        for (MemberLoanVO record : pageList.getRecords()) {
+            subtotal = subtotal.add(record.getOverdraftMoney());
         }
-        records.get(0).setTotalOverdraftMoney(totalOverdraftMoney);
-        return pageList;
+        loanVO.setSubtotal(subtotal);
+
+        BigDecimal total = new BigDecimal(0.00);
+        for (MemberLoan memberLoan : this.lambdaQuery().list()) {
+            total = total.add(memberLoan.getOverdraftMoney());
+        }
+        loanVO.setTotal(total);
+        return loanVO;
     }
 
     @Override

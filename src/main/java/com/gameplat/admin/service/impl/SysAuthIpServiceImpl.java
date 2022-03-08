@@ -1,6 +1,7 @@
 package com.gameplat.admin.service.impl;
 
 import com.alibaba.csp.sentinel.annotation.SentinelResource;
+import com.alicp.jetcache.anno.CacheInvalidate;
 import com.alicp.jetcache.anno.CachePenetrationProtect;
 import com.alicp.jetcache.anno.CacheRefresh;
 import com.alicp.jetcache.anno.Cached;
@@ -13,9 +14,9 @@ import com.gameplat.admin.model.dto.AuthIpDTO;
 import com.gameplat.admin.model.dto.OperAuthIpDTO;
 import com.gameplat.admin.model.vo.AuthIpVo;
 import com.gameplat.admin.service.SysAuthIpService;
-import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.StringUtils;
 import com.gameplat.common.constant.CachedKeys;
+import com.gameplat.common.lang.Assert;
 import com.gameplat.model.entity.sys.SysAuthIp;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,8 +24,7 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.List;
 
 /**
  * ip白名单 服务实现层
@@ -55,40 +55,33 @@ public class SysAuthIpServiceImpl extends ServiceImpl<SysAuthIpMapper, SysAuthIp
   }
 
   @Override
-  @SentinelResource(value = "insertAuthip")
-  public void insertAuthip(OperAuthIpDTO operAuthIpDTO) {
-    SysAuthIp authIp = authIpConvert.toEntity(operAuthIpDTO);
-    if (isExist(operAuthIpDTO.getIp())) {
-      throw new ServiceException("IP已存在");
-    }
-    if (!this.save(authIp)) {
-      throw new ServiceException("保存失败!");
-    }
+  @SentinelResource(value = "addAuthIp")
+  @CacheInvalidate(name = CachedKeys.AUTH_IP, key = "'all'")
+  public void addAuthIp(OperAuthIpDTO dto) {
+    SysAuthIp authIp = authIpConvert.toEntity(dto);
+    Assert.isFalse(isExist(dto.getIp()), "IP已存在");
+    Assert.isTrue(this.save(authIp), "保存失败!");
   }
 
   @Override
   @SentinelResource(value = "updateAuthIp")
+  @CacheInvalidate(name = CachedKeys.AUTH_IP, key = "'all'")
   public void updateAuthIp(OperAuthIpDTO operAuthIpDTO) {
-    SysAuthIp authIp = authIpConvert.toEntity(operAuthIpDTO);
-    if (!this.updateById(authIp)) {
-      throw new ServiceException("更新失败!");
-    }
+    Assert.isTrue(this.updateById(authIpConvert.toEntity(operAuthIpDTO)), "更新失败!");
   }
 
   @Override
+  @CacheInvalidate(name = CachedKeys.AUTH_IP, key = "'all'")
   @SentinelResource(value = "deleteAuthIp")
   public void deleteAuthIp(Long id) {
-    if (!this.removeById(id)) {
-      throw new ServiceException("删除失败!");
-    }
+    Assert.isTrue(this.removeById(id), "删除失败!");
   }
 
   @Override
   @SentinelResource(value = "deleteBatch")
+  @CacheInvalidate(name = CachedKeys.AUTH_IP, key = "'all'")
   public void deleteBatch(String ids) {
-    if (!this.removeByIds(Arrays.asList(StringUtils.split(ids, ",")))) {
-      throw new ServiceException("批量删除失败!");
-    }
+    Assert.isTrue(this.removeByIds(Arrays.asList(StringUtils.split(ids, ","))), "批量删除失败!");
   }
 
   @Override
@@ -99,19 +92,15 @@ public class SysAuthIpServiceImpl extends ServiceImpl<SysAuthIpMapper, SysAuthIp
 
   @Override
   @CachePenetrationProtect
-  @Cached(name = CachedKeys.ADMIN_AUTH_IP, expire = 3600)
+  @Cached(name = CachedKeys.AUTH_IP, key = "'all'", expire = 3600)
   @CacheRefresh(refresh = 600, stopRefreshAfterLastAccess = 7200)
-  @SentinelResource(value = "getAllList")
-  public Set<String> getAllList() {
-    return this.lambdaQuery().list().stream()
-        .map(SysAuthIp::getAllowIp)
-        .collect(Collectors.toSet());
+  @SentinelResource(value = "getAll")
+  public List<SysAuthIp> getAll() {
+    return this.lambdaQuery().select(SysAuthIp::getAllowIp, SysAuthIp::getIpType).list();
   }
 
   @Override
   public boolean isExist(String ip) {
-    Set<String> permittedIpSet =
-        this.lambdaQuery().list().stream().map(SysAuthIp::getAllowIp).collect(Collectors.toSet());
-    return !permittedIpSet.isEmpty() && permittedIpSet.contains(ip);
+    return this.lambdaQuery().eq(SysAuthIp::getAllowIp, ip).exists();
   }
 }

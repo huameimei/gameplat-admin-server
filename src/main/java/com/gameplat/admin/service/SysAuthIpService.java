@@ -7,7 +7,7 @@ import com.gameplat.admin.model.dto.OperAuthIpDTO;
 import com.gameplat.admin.model.vo.AuthIpVo;
 import com.gameplat.model.entity.sys.SysAuthIp;
 
-import java.util.Set;
+import java.util.List;
 
 /**
  * IP白名单 业务层
@@ -19,63 +19,60 @@ public interface SysAuthIpService extends IService<SysAuthIp> {
   /**
    * 获取白名单列表
    *
-   * @param authIpDTO
-   * @return
+   * @param page IPage
+   * @param dto AuthIpDTO
+   * @return IPage
    */
-  IPage<AuthIpVo> selectAuthIpList(IPage<SysAuthIp> page, AuthIpDTO authIpDTO);
+  IPage<AuthIpVo> selectAuthIpList(IPage<SysAuthIp> page, AuthIpDTO dto);
 
   /**
    * 新增ip
    *
-   * @param operAuthIpDTO
-   * @return
+   * @param dto OperAuthIpDTO
    */
-  void insertAuthip(OperAuthIpDTO operAuthIpDTO);
+  void addAuthIp(OperAuthIpDTO dto);
 
   /**
    * 修改ip
    *
-   * @param operAuthIpDTO
-   * @return
+   * @param dto OperAuthIpDTO
    */
-  void updateAuthIp(OperAuthIpDTO operAuthIpDTO);
+  void updateAuthIp(OperAuthIpDTO dto);
 
   /**
    * 删除ip
    *
-   * @param id
-   * @return
+   * @param id Long
    */
   void deleteAuthIp(Long id);
 
   /**
    * 批量删除
    *
-   * @param ids
-   * @return
+   * @param ids String
    */
   void deleteBatch(String ids);
 
   /**
    * 校验ip是否唯一
    *
-   * @param ip
-   * @return
+   * @param ip String
+   * @return boolean
    */
   boolean checkAuthIpUnique(String ip);
 
   /**
-   * 取所有ip列表
+   * 获取所有IP
    *
-   * @return
+   * @return List
    */
-  Set<String> getAllList();
+  List<SysAuthIp> getAll();
 
   /**
    * 是否存在
    *
-   * @param ip
-   * @return
+   * @param ip String
+   * @return boolean
    */
   boolean isExist(String ip);
 }

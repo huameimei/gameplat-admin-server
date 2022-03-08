@@ -480,7 +480,9 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
       min = new BigDecimal("0").setScale(2, BigDecimal.ROUND_HALF_UP);
       max = new BigDecimal("9").setScale(2, BigDecimal.ROUND_HALF_UP);
     } else {
-      BigDecimal userRebate = memberInfoService.findUserRebate(agentAccount);
+      // 查询出父级的账号
+      MemberInfoVO memberInfoByAccount = memberMapper.getMemberInfoByAccount(agentAccount);
+      BigDecimal userRebate = memberInfoService.findUserRebate(memberInfoByAccount.getParentName());
       max =
               ObjectUtils.isNull(userRebate)
                       ? new BigDecimal("9").setScale(2, BigDecimal.ROUND_HALF_UP)

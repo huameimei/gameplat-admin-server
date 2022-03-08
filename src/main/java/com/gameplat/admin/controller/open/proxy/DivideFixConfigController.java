@@ -35,7 +35,8 @@ public class DivideFixConfigController {
         queryWrapper.eq(
                 StrUtil.isNotBlank(queryObj.getUserName()),
                 DivideFixConfig::getUserName,
-                queryObj.getUserName());
+                queryObj.getUserName())
+                .orderByDesc(DivideFixConfig::getCreateTime);
         return fixConfigService.page(page, queryWrapper);
     }
 

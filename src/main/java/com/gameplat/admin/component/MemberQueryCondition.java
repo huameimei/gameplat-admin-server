@@ -130,7 +130,9 @@ public class MemberQueryCondition {
         // 未首提
         .eq(Boolean.TRUE.equals(dto.getNoFirstWithdraw()), "t2.total_withdraw_times", 0)
         // 未二次充值
-        .lt(Boolean.TRUE.equals(dto.getNotTwiceRech()), "t2.total_rech_times", 2);
+        .lt(Boolean.TRUE.equals(dto.getNotTwiceRech()), "t2.total_rech_times", 2)
+        // 按创建时间默认降序
+        .orderByDesc("t1.create_time");
 
     return query;
   }

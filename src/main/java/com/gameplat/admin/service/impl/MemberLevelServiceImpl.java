@@ -319,7 +319,8 @@ public class MemberLevelServiceImpl extends ServiceImpl<MemberLevelMapper, Membe
    * @param members List
    */
   private void updateLevelMemberNum(Integer oldLevel, List<Member> members) {
-    Map<Integer, Integer> map = new HashMap<>(members.size());
+      return;
+    /*Map<Integer, Integer> map = new HashMap<>(members.size());
     members.stream()
         .map(Member::getUserLevel)
         .forEach(
@@ -332,19 +333,18 @@ public class MemberLevelServiceImpl extends ServiceImpl<MemberLevelMapper, Membe
 
     if (MapUtil.isNotEmpty(map)) {
       memberLevelMapper.batchUpdateMemberNum(map);
-    }
+    }*/
   }
 
-  private List<Member> builderMembersForUpdate(
-      List<MemberLevel> levels, List<MemberInfo> memberInfos) {
-    return memberInfos.stream()
-        .map(
-            memberInfo ->
-                Member.builder()
-                    .id(memberInfo.getMemberId())
-                    .userLevel(this.getMatchedLevel(levels, memberInfo))
-                    .build())
-        .collect(Collectors.toList());
+  private List<Member> builderMembersForUpdate(List<MemberLevel> levels, List<MemberInfo> memberInfos) {
+      return memberInfos.stream().filter(m -> m != null)
+              .map(
+                      memberInfo ->
+                              Member.builder()
+                                      .id(memberInfo.getMemberId())
+                                      .userLevel(this.getMatchedLevel(levels, memberInfo))
+                                      .build())
+              .collect(Collectors.toList());
   }
 
   private List<MemberLevel> getEnabledLevels() {

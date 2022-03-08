@@ -17,6 +17,7 @@ import com.gameplat.admin.convert.RechargeOrderConvert;
 import com.gameplat.admin.enums.BlacklistConstant.BizBlacklistType;
 import com.gameplat.admin.enums.MemberEnums.Type;
 import com.gameplat.admin.enums.RechargeStatus;
+import com.gameplat.admin.enums.SysUserEnums;
 import com.gameplat.admin.mapper.RechargeOrderHistoryMapper;
 import com.gameplat.admin.mapper.RechargeOrderMapper;
 import com.gameplat.admin.model.bean.*;
@@ -105,6 +106,10 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
   @Autowired private ValidWithdrawService validWithdrawService;
 
   @Autowired private MemberRwReportService memberRwReportService;
+
+
+
+
   @Override
   public PageExt<RechargeOrderVO, SummaryVO> findPage(
       Page<RechargeOrder> page, RechargeOrderQueryDTO dto) {
@@ -133,10 +138,12 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
             dto.getAmountFrom())
         .le(ObjectUtils.isNotEmpty(dto.getAmountTo()), RechargeOrder::getAmount, dto.getAmountTo())
         .eq(ObjectUtils.isNotEmpty(dto.getAccount()), RechargeOrder::getAccount, dto.getAccount())
-        .eq(
-            ObjectUtils.isNotEmpty(dto.getMemberType()),
+        .in(
+            ObjectUtils.isNotEmpty(dto.getMemberType()) && dto.getMemberType().equalsIgnoreCase(SysUserEnums.UserType.RECH_FORMAL_TYPE.value()),
             RechargeOrder::getMemberType,
-            dto.getMemberType())
+                SysUserEnums.UserType.RECH_FORMAL_TYPE_QUERY.value().split(","))
+         .eq(ObjectUtils.isNotEmpty(dto.getMemberType()) && dto.getMemberType().equalsIgnoreCase(SysUserEnums.UserType.RECH_TEST_TYPE.value()),
+                 RechargeOrder::getMemberType,dto.getMemberType())
         .eq(ObjectUtils.isNotEmpty(dto.getOrderNo()), RechargeOrder::getOrderNo, dto.getOrderNo())
         .eq(
             ObjectUtils.isNotEmpty(dto.getSuperAccount()),
@@ -316,6 +323,8 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
     LambdaUpdateWrapper<RechargeOrder> update = Wrappers.lambdaUpdate();
     update
         .set(RechargeOrder::getStatus, newStatus)
+        .set(RechargeOrder::getAcceptAccount, auditorAccount)
+        .set(RechargeOrder::getAcceptTime,new Date())
         .set(RechargeOrder::getAuditorAccount, auditorAccount)
         .set(RechargeOrder::getAuditTime, new Date())
         .eq(RechargeOrder::getId, id)
@@ -710,12 +719,19 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
     }
   }
 
+
+
   private SummaryVO amountSum(RechargeOrderQueryDTO dto) {
     LambdaQueryWrapper<RechargeOrder> queryHandle = Wrappers.lambdaQuery();
     SummaryVO summaryVO = new SummaryVO();
     queryHandle
         .eq(RechargeOrder::getStatus, RechargeStatus.HANDLED.getValue())
         .in(ObjectUtils.isNotNull(dto.getModeList()), RechargeOrder::getMode, dto.getModeList())
+        .in(ObjectUtils.isNotEmpty(dto.getMemberType()) && dto.getMemberType().equalsIgnoreCase(SysUserEnums.UserType.RECH_FORMAL_TYPE.value()),
+                RechargeOrder::getMemberType,
+                SysUserEnums.UserType.RECH_FORMAL_TYPE_QUERY.value().split(","))
+        .eq(ObjectUtils.isNotEmpty(dto.getMemberType()) && dto.getMemberType().equalsIgnoreCase(SysUserEnums.UserType.RECH_TEST_TYPE.value()),
+                RechargeOrder::getMemberType,dto.getMemberType())
         .in(
             ObjectUtils.isNotNull(dto.getMemberLevelList()),
             RechargeOrder::getMemberLevel,

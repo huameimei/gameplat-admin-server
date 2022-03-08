@@ -29,6 +29,8 @@ public interface SysUserService extends IService<SysUser> {
    */
   IPage<UserVo> selectUserList(PageDTO<SysUser> page, UserDTO userDTO);
 
+  List<SysUser> getUserByRoleId(Long id);
+
   /**
    * 新增用户信息
    *

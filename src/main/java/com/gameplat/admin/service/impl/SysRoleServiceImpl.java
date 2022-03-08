@@ -13,13 +13,17 @@ import com.gameplat.admin.mapper.SysRoleMenuMapper;
 import com.gameplat.admin.model.dto.AuthMenuDTO;
 import com.gameplat.admin.model.dto.OperRoleDTO;
 import com.gameplat.admin.model.dto.RoleDTO;
+import com.gameplat.admin.model.dto.UserDTO;
 import com.gameplat.admin.model.vo.RoleVo;
+import com.gameplat.admin.model.vo.UserVo;
 import com.gameplat.admin.service.SysRoleService;
+import com.gameplat.admin.service.SysUserService;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.StringUtils;
 import com.gameplat.common.enums.BooleanEnum;
 import com.gameplat.model.entity.sys.SysRole;
 import com.gameplat.model.entity.sys.SysRoleMenu;
+import com.gameplat.model.entity.sys.SysUser;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -40,13 +44,15 @@ import java.util.Set;
 @Service
 @Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)
 public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole>
-    implements SysRoleService {
+        implements SysRoleService {
 
   @Autowired private SysRoleMapper roleMapper;
 
   @Autowired private SysRoleMenuMapper roleMenuMapper;
 
   @Autowired private RoleConvert roleConvert;
+
+  @Autowired private com.gameplat.admin.service.SysUserService SysUserService;
 
   @Override
   @SentinelResource(value = "selectGroupList", fallback = "sentineFallBack")
@@ -71,8 +77,10 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole>
   public void deleteGroupById(Long id) {
     SysRole role = this.getById(id);
     Assert.notNull(role, "分组不存在");
+    //分组下存在用户不允许删除  bug单号 18894   测试提出
+    List<SysUser> userByRoleId = SysUserService.getUserByRoleId(id);
+    Assert.isFalse(userByRoleId.size() > 0,"分组下存在用户无法删除");
     Assert.isFalse(BooleanEnum.YES.match(role.getDefaultFlag()), "默认分组不能删除");
-
     if (!this.removeById(id)) {
       throw new ServiceException("删除分组失败!");
     }
@@ -83,9 +91,9 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole>
   public IPage<RoleVo> selectRoleList(PageDTO<SysRole> page, RoleDTO dto) {
     QueryWrapper<SysRole> queryWrapper = new QueryWrapper<>();
     queryWrapper
-        .eq(ObjectUtils.isNotEmpty(dto.getRoleName()), "r.role_name", dto.getRoleName())
-        .eq(ObjectUtils.isNotNull(dto.getStatus()), "r.status", dto.getStatus())
-        .like(ObjectUtils.isNotEmpty(dto.getRoleKey()), "r.role_key", dto.getRoleKey());
+            .eq(ObjectUtils.isNotEmpty(dto.getRoleName()), "r.role_name", dto.getRoleName())
+            .eq(ObjectUtils.isNotNull(dto.getStatus()), "r.status", dto.getStatus())
+            .like(ObjectUtils.isNotEmpty(dto.getRoleKey()), "r.role_key", dto.getRoleKey());
 
     return roleMapper.selectRoleList(page, queryWrapper).convert(roleConvert::toVo);
   }
@@ -132,14 +140,14 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole>
   @SentinelResource(value = "checkRoleNameUnique", fallback = "sentineFallBack")
   public boolean checkRoleNameUnique(Long id, String groupName) {
     return this.lambdaQuery().eq(SysRole::getRoleId, id).eq(SysRole::getRoleName, groupName).count()
-        > 0;
+            > 0;
   }
 
   @Override
   @SentinelResource(value = "checkRoleKeyUnique", fallback = "sentineFallBack")
   public boolean checkRoleKeyUnique(Long id, String roleKey) {
     return this.lambdaQuery().eq(SysRole::getRoleId, id).eq(SysRole::getRoleKey, roleKey).count()
-        > 0;
+            > 0;
   }
 
   @Override
@@ -156,13 +164,13 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole>
 
     List<SysRoleMenu> roleMenuList = new ArrayList<>();
     dto.getMenuIds()
-        .forEach(
-            menuId -> {
-              SysRoleMenu saveObj = new SysRoleMenu();
-              saveObj.setRoleId(roleId);
-              saveObj.setMenuId(menuId);
-              roleMenuList.add(saveObj);
-            });
+            .forEach(
+                    menuId -> {
+                      SysRoleMenu saveObj = new SysRoleMenu();
+                      saveObj.setRoleId(roleId);
+                      saveObj.setMenuId(menuId);
+                      roleMenuList.add(saveObj);
+                    });
 
     if (roleMenuMapper.batchRoleMenu(roleMenuList) <= 0) {
       throw new ServiceException("批量更新菜单失败!");
@@ -177,9 +185,9 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole>
   @Override
   public void changeDefault(Long id, Integer defaultFlag) {
     if (!this.lambdaUpdate()
-        .set(SysRole::getDefaultFlag, defaultFlag)
-        .eq(SysRole::getRoleId, id)
-        .update()) {
+            .set(SysRole::getDefaultFlag, defaultFlag)
+            .eq(SysRole::getRoleId, id)
+            .update()) {
       throw new ServiceException("更新角色失败!");
     }
   }

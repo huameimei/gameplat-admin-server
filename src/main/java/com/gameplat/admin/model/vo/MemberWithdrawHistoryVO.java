@@ -69,4 +69,8 @@ public class MemberWithdrawHistoryVO {
   private Long id;
 
   private Long memberId;
+
+  private String acceptAccount;
+
+  private Date acceptTime;
 }

@@ -8,7 +8,24 @@ public class SysUserEnums {
     ADMIN("ADMIN"),
 
     /** 子账号 */
-    SUB_USER("SUB_USER");
+    SUB_USER("SUB_USER"),
+
+    /**充值会员、代理 */
+    RECH_FORMAL_TYPE("M"),
+
+    /**查询会员类型 */
+    RECH_FORMAL_TYPE_QUERY("M,A"),
+
+    /**充值推广 */
+    RECH_TEST_TYPE("P"),
+
+    /**提现会员、代理 */
+    WITH_FORMAL_TYPE("HY"),
+
+    /** 提现推广 */
+    WITH_TEST_TYPE("VHY");
+
+
 
     private final String value;
 

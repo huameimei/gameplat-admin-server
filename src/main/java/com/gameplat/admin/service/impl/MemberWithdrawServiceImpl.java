@@ -257,6 +257,8 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
     if (isDirect) {
       approveReason = approveReason != null ? approveReason + "(免提直充)" : "免提直充";
     }
+    // 设置会员层级
+    memberWithdraw.setMemberLevel(member.getUserLevel());
     memberWithdraw.setCashStatus(cashStatus);
     memberWithdraw.setApproveReason(approveReason);
     memberWithdraw.setOperatorAccount(userCredential.getUsername());

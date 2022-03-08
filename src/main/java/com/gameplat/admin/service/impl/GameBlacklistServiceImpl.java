@@ -73,6 +73,15 @@ public class GameBlacklistServiceImpl extends ServiceImpl<GameBlacklistMapper, G
 
   @Override
   public void save(OperGameBlacklistDTO dto) {
+    if (StringUtils.isEmpty(dto.getTarget())) {
+      // 会员
+      if (dto.getTargetType() == BizBlacklistTargetType.USER.getValue()) {
+        throw new ServiceException("请选择要加入黑名单的会员");
+      } else {
+        // 层级
+        throw new ServiceException("请选择要加入黑名单的会员层级");
+      }
+    }
     GameBlacklist exists =
         this.lambdaQuery()
             .eq(ObjectUtils.isNotEmpty(dto.getTarget()), GameBlacklist::getTarget, dto.getTarget())

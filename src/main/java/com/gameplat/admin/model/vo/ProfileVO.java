@@ -29,7 +29,7 @@ public class ProfileVO {
   private List<String> permis;
 
   /** 用户个性设置 */
-  private String setting;
+  private String settings;
 
   /** 创建时间 */
   private Date createTime;

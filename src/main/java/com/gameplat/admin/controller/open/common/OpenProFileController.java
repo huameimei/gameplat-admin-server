@@ -22,6 +22,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -55,12 +56,10 @@ public class OpenProFileController {
 
   /**
    * 保存用户个性配置
-   *
-   * @return
    */
   @PostMapping("/update")
   @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.ADMIN, desc = "'修改个人资料'")
-  public void update(@Validated UserInfoDTO dto) {
+  public void update(@Validated @RequestBody UserInfoDTO dto) {
     userCenterService.update(dto);
   }
 

@@ -25,6 +25,6 @@ public class AdminServiceApplication {
   public static void main(String[] args) {
     SpringApplication.run(AdminServiceApplication.class, args);
     log.info(
-        "\n\n======================== adminServiceApplication is running ==========================\n\n");
+        "\n\n======================== AdminServiceApplication is running ==========================\n\n");
   }
 }

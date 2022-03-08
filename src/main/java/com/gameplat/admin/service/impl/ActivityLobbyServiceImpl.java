@@ -600,6 +600,7 @@ public class ActivityLobbyServiceImpl extends ServiceImpl<ActivityLobbyMapper, A
                 lobbyList.add(activityLobbyVO);
             }
         }
+        //test
         return lobbyList;
     }
 }

@@ -21,10 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -75,12 +72,9 @@ public class GameBlacklistServiceImpl extends ServiceImpl<GameBlacklistMapper, G
   public void save(OperGameBlacklistDTO dto) {
     if (StringUtils.isEmpty(dto.getTarget())) {
       // 会员
-      if (dto.getTargetType() == BizBlacklistTargetType.USER.getValue()) {
-        throw new ServiceException("请选择要加入黑名单的会员");
-      } else {
-        // 层级
-        throw new ServiceException("请选择要加入黑名单的会员层级");
-      }
+      String msg = Objects.equals(dto.getTargetType(), BizBlacklistTargetType.USER.getValue()) ?
+              "请选择要加入黑名单的会员" : "请选择要加入黑名单的会员层级";
+      throw new ServiceException(msg);
     }
     GameBlacklist exists =
         this.lambdaQuery()

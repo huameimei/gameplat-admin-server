@@ -14,6 +14,7 @@ import com.gameplat.model.entity.member.MemberWithdraw;
 import com.gameplat.model.entity.recharge.RechargeOrder;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -97,9 +98,9 @@ public class MemberRwReportServiceImpl extends ServiceImpl<MemberRwReportMapper,
 
   private MemberRwReport getOrCreateReportUserRw(Member member, Date date) throws Exception {
     MemberRwReport report = this.queryByMemberAndDate(member.getId(), date);
-    if (null == report) {// 新建记录 初始化
-      report.setMemberId(member.getId());
+    if (null == report.getId()) {// 新建记录 初始化
       report.setAccount(member.getAccount());
+      report.setMemberId(member.getId());
       report.setParentAccount(member.getParentName());
       report.setSuperPath(member.getSuperPath());
       report.setStatTime(DateUtil.dateToYMD(date));
@@ -143,8 +144,8 @@ public class MemberRwReportServiceImpl extends ServiceImpl<MemberRwReportMapper,
   }
 
   public MemberRwReport queryByMemberAndDate(Long memberId, Date statTime) {
-    return this.lambdaQuery().eq(MemberRwReport::getMemberId, memberId)
-        .eq(MemberRwReport::getStatTime, DateUtil.dateToYMD(statTime)).one();
+    return Optional.ofNullable(this.lambdaQuery().eq(MemberRwReport::getMemberId, memberId)
+        .eq(MemberRwReport::getStatTime, DateUtil.dateToYMD(statTime)).one()).orElse(new MemberRwReport());
   }
 
 }

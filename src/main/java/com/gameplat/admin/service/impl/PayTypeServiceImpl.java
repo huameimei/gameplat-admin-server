@@ -65,6 +65,7 @@ public class PayTypeServiceImpl extends ServiceImpl<PayTypeMapper, PayType>
       payType.setName(dto.getName());
       payType.setSort(dto.getSort());
       payType.setRechargeDesc(dto.getRechargeDesc());
+      payType.setUrl(dto.getUrl());
     } else {
       payType = payTypeConvert.toEntity(dto);
       payType.setIsSysCode(0);

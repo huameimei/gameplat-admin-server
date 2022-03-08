@@ -7,7 +7,6 @@ import com.gameplat.admin.model.dto.MemberLoanQueryDTO;
 import com.gameplat.admin.model.vo.MemberLoanVO;
 import com.gameplat.model.entity.member.MemberLoan;
 
-import java.math.BigDecimal;
 
 public interface MemberLoanService extends IService<MemberLoan> {
 

@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -35,5 +36,12 @@ public class MemberLoanController {
     @PreAuthorize("hasAuthority('member:loan:page')")
     public IPage<MemberLoanVO> page(PageDTO<MemberLoan> page, MemberLoanQueryDTO dto){
         return memberLoanService.page(page, dto);
+    }
+
+    @PutMapping("/recycle")
+    @ApiOperation(value = "欠款回收")
+    @PreAuthorize("hasAuthority('member:loan:recycle')")
+    public void recycle(String idList){
+        memberLoanService.recycle(idList);
     }
 }

@@ -41,4 +41,7 @@ public class MemberLoanVO implements Serializable {
 
     @ApiModelProperty("借款时间")
     private Date loanTime;
+
+    @ApiModelProperty("欠款金额")
+    private BigDecimal totalOverdraftMoney;
 }

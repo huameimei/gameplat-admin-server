@@ -89,7 +89,7 @@ public class MemberLoanServiceImpl extends ServiceImpl<MemberLoanMapper, MemberL
                 }
             }
         }
-        IPage<MemberLoanVO> memberLoanVO = this.lambdaQuery()
+        IPage<MemberLoanVO> pageList = this.lambdaQuery()
                 .eq(ObjectUtil.isNotNull(dto.getAccount()), MemberLoan::getAccount, dto.getAccount())
                 .eq(ObjectUtil.isNotNull(dto.getVipLevel()), MemberLoan::getVipLevel, dto.getVipLevel())
                 .ge(ObjectUtil.isNotNull(dto.getMinOverdraftMoney()), MemberLoan::getOverdraftMoney, dto.getMinOverdraftMoney())
@@ -99,8 +99,13 @@ public class MemberLoanServiceImpl extends ServiceImpl<MemberLoanMapper, MemberL
                 .eq(ObjectUtil.isNotNull(dto.getLoanStatus()), MemberLoan::getLoanStatus, dto.getLoanStatus())
                 .page(page)
                 .convert(memberLoanConvert::toVo);
-
-        return memberLoanVO;
+        BigDecimal totalOverdraftMoney = new BigDecimal(0.00);
+        List<MemberLoanVO> records = pageList.getRecords();
+        for (MemberLoanVO record : records) {
+            totalOverdraftMoney = totalOverdraftMoney.add(record.getOverdraftMoney());
+        }
+        records.get(0).setTotalOverdraftMoney(totalOverdraftMoney);
+        return pageList;
     }
 
     @Override
@@ -153,24 +158,27 @@ public class MemberLoanServiceImpl extends ServiceImpl<MemberLoanMapper, MemberL
             //欠款金额
             BigDecimal overdraftMoney = memberLoan.getOverdraftMoney();
             MemberInfo memberInfo = memberInfoService.lambdaQuery()
-                    .eq(MemberInfo::getMemberId, id)
+                    .eq(MemberInfo::getMemberId, memberLoan.getMemberId())
                     .one();
             BigDecimal balance = memberInfo.getBalance();
-            Member member = memberService.getById(id);
+            BigDecimal newBalance = balance.subtract(overdraftMoney);
+            Member member = memberService.getById(memberLoan.getMemberId());
             if (balance.compareTo(overdraftMoney) < 0) {
                 throw new ServiceException(member.getAccount() + " 余额不足，扣款失败!");
             }
             this.updateById(new MemberLoan() {{
                 setId(id);
+                setLoanStatus(3);
                 setOverdraftMoney(new BigDecimal(0.00));
+                setMemberBalance(newBalance);
             }});
-            LambdaUpdateWrapper<MemberInfo> wrapper = new LambdaUpdateWrapper<>();
-            wrapper.set(MemberInfo::getBalance, balance.subtract(overdraftMoney))
-                    .eq(MemberInfo::getMemberId, id);
-            memberInfoService.update(wrapper);
+            memberInfoService.update(new LambdaUpdateWrapper<MemberInfo>()
+                                                                    .set(MemberInfo::getBalance, newBalance)
+                                                                    .eq(MemberInfo::getMemberId, memberLoan.getMemberId())
+            );
 
             MemberBill memberBill = new MemberBill();
-            memberBill.setMemberId(id);
+            memberBill.setMemberId(memberLoan.getMemberId());
             memberBill.setAccount(member.getAccount());
             memberBill.setMemberPath(member.getSuperPath());
             memberBill.setTranType(TranTypes.LOAN_RECYCLE.getValue());

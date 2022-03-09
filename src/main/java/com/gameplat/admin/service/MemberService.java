@@ -117,5 +117,6 @@ public interface MemberService extends IService<Member> {
 
   JSONArray getRebateForAdd(String agentAccount);
 
-  JSONArray getRebateForEdit(String agentAccount);
+    JSONArray getRebateForEdit(String agentAccount);
+  void updateDaySalary(String ids,Integer state);
 }

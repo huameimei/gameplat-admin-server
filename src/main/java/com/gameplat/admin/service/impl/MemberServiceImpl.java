@@ -2,6 +2,7 @@ package com.gameplat.admin.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
@@ -18,6 +19,7 @@ import com.gameplat.admin.config.TenantConfig;
 import com.gameplat.admin.constant.SystemConstant;
 import com.gameplat.admin.convert.MemberConvert;
 import com.gameplat.admin.enums.MemberEnums;
+import com.gameplat.admin.enums.SysUserEnums;
 import com.gameplat.admin.mapper.MemberMapper;
 import com.gameplat.admin.model.dto.*;
 import com.gameplat.admin.model.vo.MemberInfoVO;
@@ -541,4 +543,23 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
     }
     return jsonArray;
   }
+
+  @Override
+  public void updateDaySalary(String ids,Integer state) {
+    Assert.notNull(ids, "请选择需要修改日工资的账户！");
+      String[] id = ids.split(",");
+      for (String memberId: id) {
+          Member member = this.getById(memberId);
+          if (member != null && SysUserEnums.UserType.DL_FORMAL_TYPE.value()
+                  .equalsIgnoreCase(member.getUserType())) {
+              MemberInfo memberInfo = new MemberInfo();
+              memberInfo.setMemberId(Convert.toLong(memberId));
+              memberInfo.setSalaryFlag(state);
+              memberInfoService.updateById(memberInfo);
+          }
+      }
+
+
+  }
+
 }

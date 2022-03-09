@@ -98,8 +98,8 @@ public class MemberRwReportServiceImpl extends ServiceImpl<MemberRwReportMapper,
 
   private MemberRwReport getOrCreateReportUserRw(Member member, Date date) throws Exception {
     MemberRwReport report = this.queryByMemberAndDate(member.getId(), date);
-    if (null == report) {// 新建记录 初始化
-      report = new MemberRwReport();
+    // 新建记录 初始化
+    if (null == report.getId()) {
       report.setMemberId(member.getId());
       report.setAccount(member.getAccount());
       report.setMemberId(member.getId());

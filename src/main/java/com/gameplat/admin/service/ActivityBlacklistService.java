@@ -21,7 +21,7 @@ public interface ActivityBlacklistService extends IService<ActivityBlacklist> {
    * @param activityBlacklistQueryDTO
    * @return
    */
-  IPage<ActivityBlacklistVO> list(
+  IPage<ActivityBlacklist> list(
       PageDTO<ActivityBlacklist> page, ActivityBlacklistQueryDTO activityBlacklistQueryDTO);
 
   /**

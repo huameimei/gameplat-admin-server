@@ -40,7 +40,7 @@ public class ActivityBlacklistServiceImpl
   @Autowired private MemberService memberService;
 
   @Override
-  public IPage<ActivityBlacklistVO> list(
+  public IPage<ActivityBlacklist> list(
       PageDTO<ActivityBlacklist> page, ActivityBlacklistQueryDTO activityBlacklistQueryDTO) {
     return this.lambdaQuery()
         .like(
@@ -57,8 +57,7 @@ public class ActivityBlacklistServiceImpl
                 && activityBlacklistQueryDTO.getActivityId() != 0,
             ActivityBlacklist::getActivityId,
             activityBlacklistQueryDTO.getActivityId())
-        .page(page)
-        .convert(activityBlacklistConvert::toVo);
+        .page(page);
   }
 
   @Override

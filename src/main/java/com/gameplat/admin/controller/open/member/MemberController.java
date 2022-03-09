@@ -199,4 +199,19 @@ public class MemberController {
   public JSONArray getRebateOptionsForEdit(@RequestParam(required = false) String agentAccount) {
     return memberService.getRebateForEdit(agentAccount);
   }
+
+
+  /**
+   *
+   * @param ids 会员id
+   * @param state 状态
+   */
+  @ApiOperation(value = "批量更改日工资")
+  @PostMapping("/updateDaySalary")
+  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.MEMBER, desc = "修改会员工资状态")
+  public void updateDaySalary(@RequestParam(required = true) String ids,
+                              @RequestParam(required = true) Integer state) {
+    memberService.updateDaySalary(ids,state);
+  }
+
 }

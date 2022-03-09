@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.mapper.MemberRwReportMapper;
 import com.gameplat.admin.service.MemberRwReportService;
 import com.gameplat.base.common.util.DateUtil;
+import com.gameplat.base.common.util.StringUtils;
 import com.gameplat.common.enums.CashEnum;
 import com.gameplat.common.enums.RechargeMode;
 import com.gameplat.common.enums.TrueFalse;
@@ -136,7 +137,8 @@ public class MemberRwReportServiceImpl extends ServiceImpl<MemberRwReportMapper,
       report.setVirtualWithdrawMoney(BigDecimal.ZERO);
       report.setVirtualWithdrawNumber(BigDecimal.ZERO);
 
-      String[] superPaths = UserDlUtil.getDlAccount(member.getSuperPath());
+      String[] superPaths = UserDlUtil.getDlAccount(StringUtils.isEmpty(member.getSuperPath()) ? "/webRoot/"+report.getAccount(): member.getSuperPath());
+      //String[] superPaths = UserDlUtil.getDlAccount(member.getSuperPath());
       report.setDgdAccount(superPaths[0]);
       report.setGdAccount(superPaths[1]);
       report.setZdlAccount(superPaths[2]);

@@ -7,14 +7,18 @@ import com.gameplat.admin.model.dto.OperAuthIpDTO;
 import com.gameplat.admin.model.vo.AuthIpVo;
 import com.gameplat.admin.service.SysAuthIpService;
 import com.gameplat.common.constant.ServiceName;
-import com.gameplat.common.lang.Assert;
+import com.gameplat.common.group.Groups;
 import com.gameplat.log.annotation.Log;
 import com.gameplat.log.enums.LogType;
 import com.gameplat.model.entity.sys.SysAuthIp;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import javax.validation.constraints.NotEmpty;
+import javax.websocket.server.PathParam;
 
 /**
  * ip白名单
@@ -22,6 +26,7 @@ import org.springframework.web.bind.annotation.*;
  * @author three
  */
 @Slf4j
+@Validated
 @RestController
 @RequestMapping("/api/admin/system/authIp")
 public class OpenAuthIpController {
@@ -36,38 +41,27 @@ public class OpenAuthIpController {
 
   @PostMapping("/add")
   @PreAuthorize("hasAuthority('system:authIp:add')")
-  @Log(
-      module = ServiceName.ADMIN_SERVICE,
-      type = LogType.ADMIN,
-      desc = "'添加IP白名单 【'+#authIpDTO.ip+'】'")
-  public void save(OperAuthIpDTO authIpDTO) {
-    Assert.notEmpty(authIpDTO.getIp(), "缺少ip参数");
-    authIpService.insertAuthip(authIpDTO);
+  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.ADMIN, desc = "'添加IP白名单 【'+#dto.ip+'】'")
+  public void save(@Validated(Groups.INSERT.class) OperAuthIpDTO dto) {
+    authIpService.addAuthIp(dto);
   }
 
   @PutMapping("/edit")
   @PreAuthorize("hasAuthority('system:authIp:edit')")
-  @Log(
-      module = ServiceName.ADMIN_SERVICE,
-      type = LogType.ADMIN,
-      desc = "'修改IP白名单 【'+#authIpDTO.ip+'】'")
-  public void update(@RequestBody OperAuthIpDTO authIpDTO) {
-    Assert.notNull(authIpDTO.getId(), "缺少参数");
-    Assert.notEmpty(authIpDTO.getIp(), "缺少ip参数");
-    authIpService.updateAuthIp(authIpDTO);
+  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.ADMIN, desc = "'修改IP白名单 【'+#dto.ip+'】'")
+  public void update(@RequestBody @Validated(Groups.UPDATE.class) OperAuthIpDTO dto) {
+    authIpService.updateAuthIp(dto);
   }
 
   @DeleteMapping("/delete")
   @PreAuthorize("hasAuthority('system:authIp:remove')")
   @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.ADMIN, desc = "'删除IP白名单 id='+#ids")
-  public void remove(@RequestBody String ids) {
-    Assert.notEmpty(ids, "参数不全");
+  public void remove(@RequestBody @NotEmpty(message = "缺少参数") String ids) {
     authIpService.deleteBatch(ids);
   }
 
-  @GetMapping("/checkAuthIpUnique")
-  public boolean checkAuthIpUnique(String ip) {
-    Assert.notEmpty(ip, "缺少参数");
+  @GetMapping("/checkAuthIpUnique/{ip}")
+  public boolean checkAuthIpUnique(@PathParam("ip") String ip) {
     return authIpService.checkAuthIpUnique(ip);
   }
 }

@@ -4,6 +4,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Date;
 
 /**
@@ -27,16 +28,16 @@ public class MemberLoanVO implements Serializable {
     private Integer vipLevel;
 
     @ApiModelProperty("账户余额")
-    private Double memberBalance;
+    private BigDecimal memberBalance;
 
     @ApiModelProperty("借呗额度")
-    private Double loanMoney;
+    private BigDecimal loanMoney;
 
     @ApiModelProperty("借款状态  0:借款中  1:未借款  2:已回收")
     private Integer loanStatus;
 
     @ApiModelProperty("欠款金额")
-    private Double overdraftMoney;
+    private BigDecimal overdraftMoney;
 
     @ApiModelProperty("借款时间")
     private Date loanTime;

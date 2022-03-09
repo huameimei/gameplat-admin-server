@@ -14,16 +14,10 @@ import com.gameplat.admin.model.dto.MemberGrowthLevelEditDto;
 import com.gameplat.admin.model.vo.MemberConfigLevelVO;
 import com.gameplat.admin.model.vo.MemberGrowthConfigVO;
 import com.gameplat.admin.model.vo.MemberGrowthLevelVO;
-import com.gameplat.admin.service.MemberGrowthConfigService;
-import com.gameplat.admin.service.MemberGrowthLevelService;
-import com.gameplat.admin.service.MemberGrowthRecordService;
-import com.gameplat.admin.service.MemberInfoService;
+import com.gameplat.admin.service.*;
 import com.gameplat.base.common.context.GlobalContextHolder;
 import com.gameplat.base.common.exception.ServiceException;
-import com.gameplat.model.entity.member.MemberGrowthConfig;
-import com.gameplat.model.entity.member.MemberGrowthLevel;
-import com.gameplat.model.entity.member.MemberGrowthRecord;
-import com.gameplat.model.entity.member.MemberInfo;
+import com.gameplat.model.entity.member.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -56,6 +50,8 @@ public class MemberGrowthLevelServiceImpl
   @Autowired private MemberInfoService memberInfoService;
 
   @Autowired private MemberGrowthConfigService configService;
+
+  @Autowired private MemberLoanService memberLoanService;
 
   public static final String kindName =
       "{\"en-US\": \"platform\", \"in-ID\": \"peron\", \"th-TH\": \"แพลตฟอร์ม\", \"vi-VN\": \"nền tảng\", \"zh-CN\": \"平台\"}";
@@ -119,6 +115,19 @@ public class MemberGrowthLevelServiceImpl
         // 得到重新计算后的等级
         Integer newLevel =
             memberGrowthRecordService.dealUpLevel(userRecord.getCurrentGrowth(), growthConfig);
+        //更新借呗表额度
+        BigDecimal loanMoney = this.lambdaQuery()
+                .eq(MemberGrowthLevel::getLevel, newLevel)
+                .one()
+                .getLoanMoney();
+        int money = loanMoney.compareTo(BigDecimal.ZERO);
+        if(money == 1){
+          memberLoanService.editOrUpdate(new MemberLoan(){{
+            setLoanMoney(loanMoney);
+            setMemberId(userRecord.getUserId());
+            setAccount(userRecord.getUserName());
+          }});
+        }
         // 如果等级有所变化，就添加一条变动记录
         if (!newLevel.equals(userRecord.getCurrentLevel())) {
           MemberGrowthRecord record = new MemberGrowthRecord();

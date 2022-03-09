@@ -8,12 +8,14 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.convert.MemberWithdrawHistoryConvert;
 import com.gameplat.admin.enums.OprateMode;
+import com.gameplat.admin.enums.SysUserEnums;
 import com.gameplat.admin.mapper.MemberWithdrawHistoryMapper;
 import com.gameplat.admin.model.dto.MemberWithdrawHistoryQueryDTO;
 import com.gameplat.admin.model.vo.MemberWithdrawHistorySummaryVO;
 import com.gameplat.admin.model.vo.MemberWithdrawHistoryVO;
 import com.gameplat.admin.service.MemberWithdrawHistoryService;
 import com.gameplat.base.common.util.StringUtils;
+import com.gameplat.model.entity.member.MemberWithdraw;
 import com.gameplat.model.entity.member.MemberWithdrawHistory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -30,7 +32,7 @@ public class MemberWithdrawHistoryServiceImpl
 
   @Autowired private MemberWithdrawHistoryConvert userWithdrawHistoryConvert;
 
-  @Autowired private MemberWithdrawHistoryMapper memberWithdrawHistoryMapper;
+  @Autowired(required = false) private MemberWithdrawHistoryMapper memberWithdrawHistoryMapper;
 
   @Override
   public IPage<MemberWithdrawHistoryVO> findPage(
@@ -87,10 +89,17 @@ public class MemberWithdrawHistoryServiceImpl
             ObjectUtils.isNotEmpty(dto.getCashMoneyFromTo()),
             MemberWithdrawHistory::getCashMoney,
             dto.getCashMoneyFromTo())
-        .eq(
+       /* .eq(
             ObjectUtils.isNotEmpty(dto.getMemberType()),
             MemberWithdrawHistory::getMemberType,
-            dto.getMemberType())
+            dto.getMemberType())*/
+        .in(ObjectUtils.isNotEmpty(dto.getMemberType())
+                        && dto.getMemberType().equalsIgnoreCase(SysUserEnums.UserType.WITH_FORMAL_TYPE.value()),
+                MemberWithdrawHistory::getMemberType,
+                SysUserEnums.UserType.RECH_FORMAL_TYPE_QUERY.value().split(","))
+        .eq(ObjectUtils.isNotEmpty(dto.getMemberType())
+                        && dto.getMemberType().equalsIgnoreCase(SysUserEnums.UserType.WITH_TEST_TYPE.value()),
+                MemberWithdrawHistory::getMemberType, dto.getMemberType())
         .eq(
             ObjectUtils.isNotEmpty(dto.getCashOrderNo()),
             MemberWithdrawHistory::getCashOrderNo,

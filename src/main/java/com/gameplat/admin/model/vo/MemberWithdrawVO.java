@@ -1,5 +1,6 @@
 package com.gameplat.admin.model.vo;
 
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -57,4 +58,8 @@ public class MemberWithdrawVO {
   private String cashReason;
 
   private Long memberId;
+
+  private String acceptAccount;
+
+  private Date acceptTime;
 }

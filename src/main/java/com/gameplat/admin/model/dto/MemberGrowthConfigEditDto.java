@@ -177,4 +177,13 @@ public class MemberGrowthConfigEditDto implements Serializable {
 
   @ApiModelProperty("是否开启借款")
   private Integer isLoanMoney;
+
+  @ApiModelProperty("单日借款上限")
+  private Integer dayLendLimit;
+
+  @ApiModelProperty("单日还款上限")
+  private Integer dayReturnLimit;
+
+  @ApiModelProperty("单次最低还款金额")
+  private BigDecimal lowerMoney;
 }

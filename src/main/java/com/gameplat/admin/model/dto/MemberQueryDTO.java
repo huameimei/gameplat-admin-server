@@ -8,6 +8,7 @@ import java.util.List;
 @Data
 public class MemberQueryDTO implements Serializable {
 
+  private Long id;
   /** 会员账号 */
   public String account;
 

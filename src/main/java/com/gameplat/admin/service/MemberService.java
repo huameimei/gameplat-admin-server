@@ -1,6 +1,5 @@
 package com.gameplat.admin.service;
 
-import cn.hutool.json.JSONArray;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
@@ -10,7 +9,9 @@ import com.gameplat.admin.model.vo.MemberLevelVO;
 import com.gameplat.admin.model.vo.MemberVO;
 import com.gameplat.admin.model.vo.MessageDistributeVO;
 import com.gameplat.model.entity.member.Member;
+
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -109,14 +110,38 @@ public interface MemberService extends IService<Member> {
    */
   List<Member> getListByAccountList(List<String> accountList);
 
+  /**
+   * 获取各个充值层级下会员数量和锁定会员数量
+   *
+   * @return List
+   */
   List<MemberLevelVO> getUserLevelAccountNum();
 
   Integer getUserLevelTotalAccountNum(Integer userLevel);
 
+  /**
+   * 获取代理线下的会员账号信息
+   *
+   * @param memberQueryDTO MemberQueryDTO
+   * @return List
+   */
   List<Member> getMemberListByAgentAccount(MemberQueryDTO memberQueryDTO);
 
-  JSONArray getRebateForAdd(String agentAccount);
+  /**
+   * 添加账号或添加下级时 彩票投注返点下拉
+   *
+   * @param agentAccount String
+   * @return JSONArray
+   */
+  List<Map<String, String>> getRebateForAdd(String agentAccount);
 
-    JSONArray getRebateForEdit(String agentAccount);
+  /**
+   * 编辑用户时 彩票投注返点数据集
+   *
+   * @param agentAccount String
+   * @return JSONArray
+   */
+  List<Map<String, String>> getRebateForEdit(String agentAccount);
+
   void updateDaySalary(String ids,Integer state);
 }

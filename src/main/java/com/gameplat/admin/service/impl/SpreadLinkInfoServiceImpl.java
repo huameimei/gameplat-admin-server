@@ -400,4 +400,17 @@ public class SpreadLinkInfoServiceImpl extends ServiceImpl<SpreadLinkInfoMapper,
           .update(new SpreadLinkInfo());
     }
   }
+
+  @Override
+  public BigDecimal getMaxSpreadLinkRebate(String account) {
+    return this.lambdaQuery()
+        .select(SpreadLinkInfo::getRebate)
+        .eq(SpreadLinkInfo::getAgentAccount, account)
+        .orderByDesc(SpreadLinkInfo::getRebate)
+        .last("LIMIT 1")
+        .oneOpt()
+        .map(SpreadLinkInfo::getRebate)
+        .map(BigDecimal::new)
+        .orElse(BigDecimal.ZERO);
+  }
 }

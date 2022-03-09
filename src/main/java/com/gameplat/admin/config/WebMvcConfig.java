@@ -1,9 +1,6 @@
 package com.gameplat.admin.config;
 
-import com.gameplat.admin.interceptor.IpWhitelistInterceptor;
-import com.gameplat.admin.interceptor.LoginInterceptor;
-import com.gameplat.admin.interceptor.TwoFactorAuthenticationInterceptor;
-import com.gameplat.admin.interceptor.VipInterceptor;
+import com.gameplat.admin.interceptor.*;
 import com.gameplat.admin.service.MemberGrowthConfigService;
 import com.gameplat.security.authz.URIAdapter;
 import com.gameplat.web.config.web.WebMvcConfigurationAdapter;
@@ -55,6 +52,12 @@ public class WebMvcConfig extends WebMvcConfigurationAdapter {
     return new VipInterceptor(memberGrowthConfigService);
   }
 
+  @Bean
+  public SecurityValidationInterceptor securityValidationInterceptor() {
+    log.info("----初始化安全校验拦截器----");
+    return new SecurityValidationInterceptor();
+  }
+
   @Override
   public void addInterceptors(InterceptorRegistry registry) {
     registry
@@ -65,6 +68,10 @@ public class WebMvcConfig extends WebMvcConfigurationAdapter {
 
     registry.addInterceptor(ipWhitelistInterceptor()).addPathPatterns("/api/admin/**");
     registry.addInterceptor(loginInterceptor()).addPathPatterns("/api/admin/auth/login");
+    registry
+        .addInterceptor(securityValidationInterceptor())
+        .excludePathPatterns(uriAdapter.getPermitUri())
+        .addPathPatterns("/api/admin/**");
 
     registry
         .addInterceptor(twoFactorAuthenicationInterceptor())

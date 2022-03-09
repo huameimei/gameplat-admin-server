@@ -1,15 +1,12 @@
 package com.gameplat.admin.service.impl;
 
-import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.convert.Convert;
+import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.json.JSONArray;
-import cn.hutool.json.JSONObject;
 import com.alicp.jetcache.anno.CacheInvalidate;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -32,21 +29,18 @@ import com.gameplat.base.common.util.StringUtils;
 import com.gameplat.common.constant.CachedKeys;
 import com.gameplat.common.enums.TransferTypesEnum;
 import com.gameplat.common.lang.Assert;
-import com.gameplat.common.util.TableIndexUtils;
 import com.gameplat.model.entity.game.GameTransferInfo;
 import com.gameplat.model.entity.member.Member;
 import com.gameplat.model.entity.member.MemberInfo;
-import com.gameplat.model.entity.spread.SpreadLinkInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.DecimalFormat;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -404,8 +398,8 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
   /**
    * 获取开启了工资的代理
    *
-   * @param list
-   * @return
+   * @param list List
+   * @return List
    */
   @Override
   public List<Member> getOpenSalaryAgent(List<Integer> list) {
@@ -420,11 +414,6 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
         .orElse(null);
   }
 
-  /**
-   * 获取各个充值层级下会员数量和锁定会员数量
-   *
-   * @return
-   */
   @Override
   public List<MemberLevelVO> getUserLevelAccountNum() {
     return memberMapper.getUserLevelAccountNum();
@@ -435,131 +424,78 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
     return memberMapper.getUserLevelTotalAccountNum(userLevel);
   }
 
-  /**
-   * 获取代理线下的会员账号信息
-   *
-   * @param memberQueryDTO MemberQueryDTO
-   * @return List
-   */
   @Override
   public List<Member> getMemberListByAgentAccount(MemberQueryDTO memberQueryDTO) {
     return memberMapper.getMemberListByAgentAccount(memberQueryDTO);
   }
 
-  /**
-   * 添加账号或添加下级时 彩票投注返点下拉
-   *
-   * @param agentAccount
-   * @return
-   */
   @Override
-  public JSONArray getRebateForAdd(String agentAccount) {
-    BigDecimal max = new BigDecimal("9").setScale(2, BigDecimal.ROUND_HALF_UP);
-    BigDecimal min = new BigDecimal("0").setScale(2, BigDecimal.ROUND_HALF_UP);
+  public List<Map<String, String>> getRebateForAdd(String agentAccount) {
+    BigDecimal max = new BigDecimal("9").setScale(2, RoundingMode.HALF_UP);
+    BigDecimal min = new BigDecimal("0").setScale(2, RoundingMode.HALF_UP);
     if (StrUtil.isNotBlank(agentAccount)) {
       BigDecimal userRebate = memberInfoService.findUserRebate(agentAccount);
-      max = ObjectUtils.isNull(userRebate) ? max : userRebate.setScale(2, BigDecimal.ROUND_HALF_UP);
+      max = ObjectUtils.isNull(userRebate) ? max : userRebate.setScale(2, RoundingMode.HALF_UP);
     }
-    JSONArray jsonArray = new JSONArray();
-    BigDecimal rebate = max;
-    Integer base = 1800;
-    BigDecimal value = BigDecimal.ZERO;
-    String text = "";
-    DecimalFormat format = new DecimalFormat("0.00#");
-    while (rebate.compareTo(min) >= 0) {
-      JSONObject jsonObject = new JSONObject();
-      value = rebate;
-      Integer baseData = base + value.multiply(BigDecimal.valueOf(20L)).intValue();
-      text = rebate.toString().concat("% ---- ").concat(baseData.toString());
-      jsonObject.set("value", format.format(value));
-      jsonObject.set("text", text);
-      jsonArray.add(jsonObject);
-      rebate = rebate.subtract(BigDecimal.valueOf(0.1)).setScale(2, BigDecimal.ROUND_HALF_UP);
-    }
-    return jsonArray;
+
+    return this.getLotteryRebates(max, min);
   }
 
-  /**
-   * 编辑用户时 彩票投注返点数据集
-   *
-   * @param agentAccount
-   * @return
-   */
   @Override
-  public JSONArray getRebateForEdit(String agentAccount) {
-    BigDecimal min = BigDecimal.ZERO;
-    BigDecimal max = BigDecimal.ZERO;
+  public List<Map<String, String>> getRebateForEdit(String agentAccount) {
+    BigDecimal min = new BigDecimal("0");
+    BigDecimal max = new BigDecimal("9");
     if (StrUtil.isBlank(agentAccount)) {
-      min = new BigDecimal("0").setScale(2, BigDecimal.ROUND_HALF_UP);
-      max = new BigDecimal("9").setScale(2, BigDecimal.ROUND_HALF_UP);
-    } else {
-      // 查询出父级的账号
-      MemberInfoVO memberInfoByAccount = memberMapper.getMemberInfoByAccount(agentAccount);
-      BigDecimal userRebate = memberInfoService.findUserRebate(memberInfoByAccount.getParentName());
-      max =
-          ObjectUtils.isNull(userRebate)
-              ? new BigDecimal("9").setScale(2, BigDecimal.ROUND_HALF_UP)
-              : userRebate.setScale(2, BigDecimal.ROUND_HALF_UP);
-      // 获取直属下级的最大返点等级
-      BigDecimal userLowerMaxRebate = memberInfoService.findUserLowerMaxRebate(agentAccount);
-      min =
-          ObjectUtils.isNull(userLowerMaxRebate)
-              ? new BigDecimal("0").setScale(2, BigDecimal.ROUND_HALF_UP)
-              : userLowerMaxRebate.setScale(2, BigDecimal.ROUND_HALF_UP);
-      // 再获取此账号推广码的最大返点等级
-      LambdaQueryWrapper<SpreadLinkInfo> queryWrapper = new LambdaQueryWrapper<>();
-      queryWrapper
-          .eq(SpreadLinkInfo::getAgentAccount, agentAccount)
-          .orderByDesc(SpreadLinkInfo::getRebate)
-          .last("limit 1")
-          .select(SpreadLinkInfo::getRebate);
-      SpreadLinkInfo linkMinRebateObj = spreadLinkInfoService.getOne(queryWrapper);
-      BigDecimal linkMinRebate = BigDecimal.ZERO;
-      if (BeanUtil.isEmpty(linkMinRebateObj)) {
-        linkMinRebate = new BigDecimal("0").setScale(2, BigDecimal.ROUND_HALF_UP);
-      } else {
-        linkMinRebate =
-            BigDecimal.valueOf(linkMinRebateObj.getRebate()).setScale(2, BigDecimal.ROUND_HALF_UP);
-      }
-
-      min = min.compareTo(linkMinRebate) >= 0 ? min : linkMinRebate;
+      return this.getLotteryRebates(max, min);
     }
 
-    JSONArray jsonArray = new JSONArray();
-    BigDecimal rebate = max;
-    Integer base = 1800;
-    BigDecimal value = BigDecimal.ZERO;
-    String text = "";
+    // 获取上级代理的返点
+    Member member = getByAccount(agentAccount).orElseThrow(() -> new ServiceException("代理账号不存在!"));
+    max = Optional.ofNullable(memberInfoService.findUserRebate(member.getParentName())).orElse(max);
+
+    // 获取直属下级的最大返点等级
+    min = Optional.ofNullable(memberInfoService.findUserLowerMaxRebate(agentAccount)).orElse(min);
+
+    // 再获取此账号推广码的最大返点等级
+    BigDecimal linkMaxRebate = spreadLinkInfoService.getMaxSpreadLinkRebate(agentAccount);
+    min = NumberUtil.max(min, linkMaxRebate);
+    return this.getLotteryRebates(max, min);
+  }
+
+  private List<Map<String, String>> getLotteryRebates(BigDecimal max, BigDecimal min) {
+    int base = 1800;
+    BigDecimal rebate = max, value;
+    String text;
     DecimalFormat format = new DecimalFormat("0.00#");
+
+    List<Map<String, String>> rebates = new ArrayList<>();
     while (rebate.compareTo(min) >= 0) {
-      JSONObject jsonObject = new JSONObject();
+      Map<String, String> map = new HashMap<>();
       value = rebate;
-      Integer baseData = base + value.multiply(BigDecimal.valueOf(20L)).intValue();
-      text = rebate.toString().concat("% ---- ").concat(baseData.toString());
-      jsonObject.set("value", format.format(value));
-      jsonObject.set("text", text);
-      jsonArray.add(jsonObject);
-      rebate = rebate.subtract(BigDecimal.valueOf(0.1)).setScale(2, BigDecimal.ROUND_HALF_UP);
+      int baseData = base + value.multiply(BigDecimal.valueOf(20L)).intValue();
+      text = rebate.toString().concat("% ---- ").concat(Integer.toString(baseData));
+      map.put("value", format.format(value));
+      map.put("text", text);
+      rebates.add(map);
+      rebate = rebate.subtract(BigDecimal.valueOf(0.1)).setScale(2, RoundingMode.HALF_UP);
     }
-    return jsonArray;
+
+    return rebates;
   }
 
   @Override
-  public void updateDaySalary(String ids,Integer state) {
+  public void updateDaySalary(String ids, Integer state) {
     Assert.notNull(ids, "请选择需要修改日工资的账户！");
-      String[] id = ids.split(",");
-      for (String memberId: id) {
-          Member member = this.getById(memberId);
-          if (member != null && SysUserEnums.UserType.DL_FORMAL_TYPE.value()
-                  .equalsIgnoreCase(member.getUserType())) {
-              MemberInfo memberInfo = new MemberInfo();
-              memberInfo.setMemberId(Convert.toLong(memberId));
-              memberInfo.setSalaryFlag(state);
-              memberInfoService.updateById(memberInfo);
-          }
+    String[] id = ids.split(",");
+    for (String memberId : id) {
+      Member member = this.getById(memberId);
+      if (member != null
+          && SysUserEnums.UserType.DL_FORMAL_TYPE.value().equalsIgnoreCase(member.getUserType())) {
+        MemberInfo memberInfo = new MemberInfo();
+        memberInfo.setMemberId(Convert.toLong(memberId));
+        memberInfo.setSalaryFlag(state);
+        memberInfoService.updateById(memberInfo);
       }
-
-
+    }
   }
-
 }

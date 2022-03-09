@@ -566,10 +566,7 @@ public class OtthService {
 
   /** 查找聊天室会员 */
   public ChatUserVO getChatUser(String account) throws Exception {
-    Member user = memberService.getForAccount(account);
-    if (user == null) {
-      throw new ServiceException("用户不存在");
-    }
+    Member user = memberService.getByAccount(account).orElseThrow(() -> new ServiceException("用户不存在"));
     String chatDomain = tenantDomainService.getChatDomain();
     if (org.apache.commons.lang3.StringUtils.isBlank(chatDomain)) {
       throw new ServiceException("未配服务");

@@ -51,7 +51,6 @@ import java.util.stream.Collectors;
 
 @Service
 @Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)
-@SuppressWarnings("all")
 public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> implements MemberService {
 
   @Autowired private MemberMapper memberMapper;
@@ -72,13 +71,7 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
 
   @Autowired private GameTransferInfoService gameTransferInfoService;
 
-  @Autowired
-  private SpreadLinkInfoService spreadLinkInfoService;
-
-  @Override
-  public Member getForAccount(String account) {
-    return this.lambdaQuery().eq(Member::getAccount, account).one();
-  }
+  @Autowired private SpreadLinkInfoService spreadLinkInfoService;
 
   @Override
   public IPage<MemberVO> queryPage(Page<Member> page, MemberQueryDTO dto) {
@@ -112,6 +105,8 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
 
   @Override
   public void add(MemberAddDTO dto) {
+    this.preAddCheck(dto);
+
     Member member = memberConvert.toEntity(dto);
     member.setRegisterSource(MemberEnums.RegisterSource.BACKEND.value());
     member.setPassword(passwordService.encode(member.getPassword(), dto.getAccount()));
@@ -121,8 +116,6 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
 
     // 保存会员和会员详情
     Assert.isTrue(this.save(member), "新增会员失败!");
-    // 更新会员分表下标
-    this.updateTableIndex(member.getId(), TableIndexUtils.getTableIndex(member.getId()));
 
     MemberInfo memberInfo =
         MemberInfo.builder().memberId(member.getId()).rebate(dto.getRebate()).build();
@@ -178,6 +171,15 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
         .eq(Member::getAccount, account)
         .eq(Member::getUserType, MemberEnums.Type.AGENT.value())
         .oneOpt();
+  }
+
+  @Override
+  public Optional<String> getSupperPath(String account) {
+    return this.lambdaQuery()
+        .select(Member::getSuperPath)
+        .eq(Member::getAccount, account)
+        .oneOpt()
+        .map(Member::getSuperPath);
   }
 
   @Override
@@ -292,6 +294,20 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
     this.updateRemark(Collections.singletonList(memberId), remark);
   }
 
+  public void preAddCheck(MemberAddDTO dto) {
+    Assert.isTrue(this.isExist(dto.getAccount()), "用户名已存在!");
+  }
+
+  /**
+   * 检查用户名是否存在
+   *
+   * @param account String
+   * @return boolean
+   */
+  private boolean isExist(String account) {
+    return this.lambdaQuery().eq(Member::getAccount, account).exists();
+  }
+
   /**
    * 设置在线状态
    *
@@ -381,17 +397,13 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
   }
 
   @Override
-  public void updateTableIndex(Long memberId, int tableIndex) {
-    lambdaUpdate().set(Member::getTableIndex, tableIndex).eq(Member::getId, memberId).update();
-  }
-
-  @Override
   public Integer getMaxLevel() {
     return memberMapper.getMaxLevel();
   }
 
   /**
    * 获取开启了工资的代理
+   *
    * @param list
    * @return
    */
@@ -400,42 +412,43 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
     return memberMapper.getOpenSalaryAgent(list);
   }
 
-    @Override
-    public List<Member> getListByAccountList(List<String> accountList) {
-        return Optional.ofNullable(accountList)
-                .filter(CollectionUtil::isNotEmpty)
-                .map(e -> this.lambdaQuery().in(Member::getAccount, e).list())
-                .orElse(null);
-    }
+  @Override
+  public List<Member> getListByAccountList(List<String> accountList) {
+    return Optional.ofNullable(accountList)
+        .filter(CollectionUtil::isNotEmpty)
+        .map(e -> this.lambdaQuery().in(Member::getAccount, e).list())
+        .orElse(null);
+  }
 
-    /**
-     * 获取各个充值层级下会员数量和锁定会员数量
-     *
-     * @return
-     */
-    @Override
-    public List<MemberLevelVO> getUserLevelAccountNum() {
-        return memberMapper.getUserLevelAccountNum();
-    }
+  /**
+   * 获取各个充值层级下会员数量和锁定会员数量
+   *
+   * @return
+   */
+  @Override
+  public List<MemberLevelVO> getUserLevelAccountNum() {
+    return memberMapper.getUserLevelAccountNum();
+  }
 
-    @Override
-    public Integer getUserLevelTotalAccountNum(Integer userLevel) {
-        return memberMapper.getUserLevelTotalAccountNum(userLevel);
-    }
+  @Override
+  public Integer getUserLevelTotalAccountNum(Integer userLevel) {
+    return memberMapper.getUserLevelTotalAccountNum(userLevel);
+  }
 
-    /**
-     * 获取代理线下的会员账号信息
-     *
-     * @param memberQueryDTO MemberQueryDTO
-     * @return List
-     */
-    @Override
-    public List<Member> getMemberListByAgentAccount(MemberQueryDTO memberQueryDTO) {
-        return memberMapper.getMemberListByAgentAccount(memberQueryDTO);
-    }
+  /**
+   * 获取代理线下的会员账号信息
+   *
+   * @param memberQueryDTO MemberQueryDTO
+   * @return List
+   */
+  @Override
+  public List<Member> getMemberListByAgentAccount(MemberQueryDTO memberQueryDTO) {
+    return memberMapper.getMemberListByAgentAccount(memberQueryDTO);
+  }
 
   /**
    * 添加账号或添加下级时 彩票投注返点下拉
+   *
    * @param agentAccount
    * @return
    */
@@ -445,10 +458,7 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
     BigDecimal min = new BigDecimal("0").setScale(2, BigDecimal.ROUND_HALF_UP);
     if (StrUtil.isNotBlank(agentAccount)) {
       BigDecimal userRebate = memberInfoService.findUserRebate(agentAccount);
-      max =
-              ObjectUtils.isNull(userRebate)
-                      ? max
-                      : userRebate.setScale(2, BigDecimal.ROUND_HALF_UP);
+      max = ObjectUtils.isNull(userRebate) ? max : userRebate.setScale(2, BigDecimal.ROUND_HALF_UP);
     }
     JSONArray jsonArray = new JSONArray();
     BigDecimal rebate = max;
@@ -471,6 +481,7 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
 
   /**
    * 编辑用户时 彩票投注返点数据集
+   *
    * @param agentAccount
    * @return
    */
@@ -486,33 +497,32 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
       MemberInfoVO memberInfoByAccount = memberMapper.getMemberInfoByAccount(agentAccount);
       BigDecimal userRebate = memberInfoService.findUserRebate(memberInfoByAccount.getParentName());
       max =
-              ObjectUtils.isNull(userRebate)
-                      ? new BigDecimal("9").setScale(2, BigDecimal.ROUND_HALF_UP)
-                      : userRebate.setScale(2, BigDecimal.ROUND_HALF_UP);
-        // 获取直属下级的最大返点等级
-        BigDecimal userLowerMaxRebate = memberInfoService.findUserLowerMaxRebate(agentAccount);
-        min =
-                ObjectUtils.isNull(userLowerMaxRebate)
-                        ? new BigDecimal("0").setScale(2, BigDecimal.ROUND_HALF_UP)
-                        : userLowerMaxRebate.setScale(2, BigDecimal.ROUND_HALF_UP);
-        // 再获取此账号推广码的最大返点等级
-        LambdaQueryWrapper<SpreadLinkInfo> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper
-                .eq(SpreadLinkInfo::getAgentAccount, agentAccount)
-                .orderByDesc(SpreadLinkInfo::getRebate)
-                .last("limit 1")
-                .select(SpreadLinkInfo::getRebate);
-        SpreadLinkInfo linkMinRebateObj = spreadLinkInfoService.getOne(queryWrapper);
-        BigDecimal linkMinRebate = BigDecimal.ZERO;
-        if (BeanUtil.isEmpty(linkMinRebateObj)) {
-          linkMinRebate = new BigDecimal("0").setScale(2, BigDecimal.ROUND_HALF_UP);
-        } else {
-          linkMinRebate =
-                  BigDecimal.valueOf(linkMinRebateObj.getRebate())
-                          .setScale(2, BigDecimal.ROUND_HALF_UP);
-        }
+          ObjectUtils.isNull(userRebate)
+              ? new BigDecimal("9").setScale(2, BigDecimal.ROUND_HALF_UP)
+              : userRebate.setScale(2, BigDecimal.ROUND_HALF_UP);
+      // 获取直属下级的最大返点等级
+      BigDecimal userLowerMaxRebate = memberInfoService.findUserLowerMaxRebate(agentAccount);
+      min =
+          ObjectUtils.isNull(userLowerMaxRebate)
+              ? new BigDecimal("0").setScale(2, BigDecimal.ROUND_HALF_UP)
+              : userLowerMaxRebate.setScale(2, BigDecimal.ROUND_HALF_UP);
+      // 再获取此账号推广码的最大返点等级
+      LambdaQueryWrapper<SpreadLinkInfo> queryWrapper = new LambdaQueryWrapper<>();
+      queryWrapper
+          .eq(SpreadLinkInfo::getAgentAccount, agentAccount)
+          .orderByDesc(SpreadLinkInfo::getRebate)
+          .last("limit 1")
+          .select(SpreadLinkInfo::getRebate);
+      SpreadLinkInfo linkMinRebateObj = spreadLinkInfoService.getOne(queryWrapper);
+      BigDecimal linkMinRebate = BigDecimal.ZERO;
+      if (BeanUtil.isEmpty(linkMinRebateObj)) {
+        linkMinRebate = new BigDecimal("0").setScale(2, BigDecimal.ROUND_HALF_UP);
+      } else {
+        linkMinRebate =
+            BigDecimal.valueOf(linkMinRebateObj.getRebate()).setScale(2, BigDecimal.ROUND_HALF_UP);
+      }
 
-        min = min.compareTo(linkMinRebate) >= 0 ? min : linkMinRebate;
+      min = min.compareTo(linkMinRebate) >= 0 ? min : linkMinRebate;
     }
 
     JSONArray jsonArray = new JSONArray();

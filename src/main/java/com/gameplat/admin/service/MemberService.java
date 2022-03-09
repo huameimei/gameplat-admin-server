@@ -10,8 +10,6 @@ import com.gameplat.admin.model.vo.MemberLevelVO;
 import com.gameplat.admin.model.vo.MemberVO;
 import com.gameplat.admin.model.vo.MessageDistributeVO;
 import com.gameplat.model.entity.member.Member;
-import org.apache.ibatis.annotations.Param;
-
 import java.util.List;
 import java.util.Optional;
 
@@ -21,7 +19,6 @@ import java.util.Optional;
  * @author three
  */
 public interface MemberService extends IService<Member> {
-  Member getForAccount(String account);
 
   IPage<MemberVO> queryPage(Page<Member> page, MemberQueryDTO dto);
 
@@ -36,6 +33,8 @@ public interface MemberService extends IService<Member> {
   Optional<Member> getByAccount(String account);
 
   Optional<Member> getAgentByAccount(String account);
+
+  Optional<String> getSupperPath(String account);
 
   List<Member> getByParentName(String parentName);
 
@@ -76,7 +75,7 @@ public interface MemberService extends IService<Member> {
   /**
    * 查询代理线的会员列表
    *
-   * @param agentAccount
+   * @param agentAccount String
    * @return List
    */
   List<Member> getListByAgentAccount(String agentAccount);
@@ -87,26 +86,27 @@ public interface MemberService extends IService<Member> {
 
   Member getMemberAndFillGameAccount(String account);
 
-  void updateTableIndex(Long memberId, int tableIndex);
-
   /**
    * 获取当前最高等级
-   * @return
+   *
+   * @return Integer
    */
   Integer getMaxLevel();
 
   /**
    * 获取开启了工资的代理
-   * @param list
-   * @return
+   *
+   * @param list List
+   * @return List
    */
   List<Member> getOpenSalaryAgent(List<Integer> list);
 
-    /**
-     * 根据多个会员账号批量查询会员信息
-     * @param accountList
-     * @return
-     */
+  /**
+   * 根据多个会员账号批量查询会员信息
+   *
+   * @param accountList List
+   * @return List
+   */
   List<Member> getListByAccountList(List<String> accountList);
 
   List<MemberLevelVO> getUserLevelAccountNum();
@@ -115,7 +115,7 @@ public interface MemberService extends IService<Member> {
 
   List<Member> getMemberListByAgentAccount(MemberQueryDTO memberQueryDTO);
 
-    JSONArray getRebateForAdd(String agentAccount);
+  JSONArray getRebateForAdd(String agentAccount);
 
     JSONArray getRebateForEdit(String agentAccount);
   void updateDaySalary(String ids,Integer state);

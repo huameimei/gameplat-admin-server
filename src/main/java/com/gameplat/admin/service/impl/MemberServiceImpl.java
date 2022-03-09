@@ -1,8 +1,8 @@
 package com.gameplat.admin.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
-import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.convert.Convert;
+import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
@@ -484,21 +484,18 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
   }
 
   @Override
-  public void updateDaySalary(String ids,Integer state) {
+  public void updateDaySalary(String ids, Integer state) {
     Assert.notNull(ids, "请选择需要修改日工资的账户！");
-      String[] id = ids.split(",");
-      for (String memberId: id) {
-          Member member = this.getById(memberId);
-          if (member != null && SysUserEnums.UserType.DL_FORMAL_TYPE.value()
-                  .equalsIgnoreCase(member.getUserType())) {
-              MemberInfo memberInfo = new MemberInfo();
-              memberInfo.setMemberId(Convert.toLong(memberId));
-              memberInfo.setSalaryFlag(state);
-              memberInfoService.updateById(memberInfo);
-          }
+    String[] id = ids.split(",");
+    for (String memberId : id) {
+      Member member = this.getById(memberId);
+      if (member != null
+          && SysUserEnums.UserType.DL_FORMAL_TYPE.value().equalsIgnoreCase(member.getUserType())) {
+        MemberInfo memberInfo = new MemberInfo();
+        memberInfo.setMemberId(Convert.toLong(memberId));
+        memberInfo.setSalaryFlag(state);
+        memberInfoService.updateById(memberInfo);
       }
-
-
+    }
   }
-
 }

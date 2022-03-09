@@ -14,7 +14,6 @@ import com.gameplat.admin.convert.MemberWithdrawConvert;
 import com.gameplat.admin.enums.BlacklistConstant.BizBlacklistType;
 import com.gameplat.admin.enums.CashEnum;
 import com.gameplat.admin.enums.ProxyPayStatusEnum;
-import com.gameplat.admin.enums.SysUserEnums;
 import com.gameplat.admin.enums.WithdrawStatus;
 import com.gameplat.admin.mapper.MemberWithdrawMapper;
 import com.gameplat.admin.model.bean.*;
@@ -54,120 +53,100 @@ import java.util.*;
 @Service
 @Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)
 public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper, MemberWithdraw>
-        implements MemberWithdrawService {
+    implements MemberWithdrawService {
 
-    @Autowired
-    private MemberWithdrawConvert userWithdrawConvert;
+    @Autowired private MemberWithdrawConvert userWithdrawConvert;
 
-    @Autowired(required = false)
-    private MemberWithdrawMapper memberWithdrawMapper;
+    @Autowired private MemberWithdrawMapper memberWithdrawMapper;
 
-    @Autowired
-    private MemberWithdrawHistoryService memberWithdrawHistoryService;
+    @Autowired private MemberWithdrawHistoryService memberWithdrawHistoryService;
 
-    @Autowired
-    private MemberService memberService;
+    @Autowired private MemberService memberService;
 
-    @Autowired
-    private SysUserService sysUserService;
+    @Autowired private SysUserService sysUserService;
 
-    @Autowired
-    private LimitInfoService limitInfoService;
+    @Autowired private LimitInfoService limitInfoService;
 
-    @Autowired
-    private PpInterfaceService ppInterfaceService;
+    @Autowired private PpInterfaceService ppInterfaceService;
 
-    @Autowired
-    private PpMerchantService ppMerchantService;
+    @Autowired private PpMerchantService ppMerchantService;
 
-    @Autowired
-    private MemberInfoService memberInfoService;
+    @Autowired private MemberInfoService memberInfoService;
 
-    @Autowired
-    private MemberBillService memberBillService;
+    @Autowired private MemberBillService memberBillService;
 
-    @Autowired
-    private ValidWithdrawService validWithdrawService;
+    @Autowired private ValidWithdrawService validWithdrawService;
 
-    @Autowired
-    private RechargeOrderService rechargeOrderService;
+    @Autowired private RechargeOrderService rechargeOrderService;
 
-    @Autowired
-    private BizBlacklistFacade bizBlacklistFacade;
+    @Autowired private BizBlacklistFacade bizBlacklistFacade;
 
-    @Autowired
-    private ConfigService configService;
+    @Autowired private ConfigService configService;
+
+    @Autowired private MemberRwReportService memberRwReportService;
 
     @Override
     public PageExt<MemberWithdrawVO, SummaryVO> findPage(
-            Page<MemberWithdraw> page, MemberWithdrawQueryDTO dto) {
+        Page<MemberWithdraw> page, MemberWithdrawQueryDTO dto) {
         LambdaQueryWrapper<MemberWithdraw> query = Wrappers.lambdaQuery();
         query
-                .in(
-                        ObjectUtils.isNotNull(dto.getBankNameList()),
-                        MemberWithdraw::getBankName,
-                        dto.getBankNameList())
-                .eq(
-                        ObjectUtils.isNotEmpty(dto.getSuperName()),
-                        MemberWithdraw::getSuperName,
-                        dto.getSuperName())
-                .eq(
-                        ObjectUtils.isNotEmpty(dto.getBankCard()),
-                        MemberWithdraw::getBankCard,
-                        dto.getBankCard())
-                .eq(ObjectUtils.isNotEmpty(dto.getAccount()), MemberWithdraw::getAccount, dto.getAccount())
-                .ge(
-                        ObjectUtils.isNotEmpty(dto.getCashMoneyFrom()),
-                        MemberWithdraw::getCashMoney,
-                        dto.getCashMoneyFrom())
-                .le(
-                        ObjectUtils.isNotEmpty(dto.getCashMoneyFromTo()),
-                        MemberWithdraw::getCashMoney,
-                        dto.getCashMoneyFromTo())
-                /*.eq(
-                    ObjectUtils.isNotEmpty(dto.getMemberType()),
-                    MemberWithdraw::getMemberType,
-                    dto.getMemberType())*/
-                .in(ObjectUtils.isNotEmpty(dto.getMemberType())
-                                && dto.getMemberType().equalsIgnoreCase(SysUserEnums.UserType.WITH_FORMAL_TYPE.value()),
-                        MemberWithdraw::getMemberType,
-                        SysUserEnums.UserType.RECH_FORMAL_TYPE_QUERY.value().split(","))
-                .eq(ObjectUtils.isNotEmpty(dto.getMemberType())
-                                && dto.getMemberType().equalsIgnoreCase(SysUserEnums.UserType.WITH_TEST_TYPE.value()),
-                        MemberWithdraw::getMemberType, dto.getMemberType())
-
-                .eq(
-                        ObjectUtils.isNotEmpty(dto.getCashOrderNo()),
-                        MemberWithdraw::getCashOrderNo,
-                        dto.getCashOrderNo())
-                .eq(
-                        ObjectUtils.isNotEmpty(dto.getOperatorAccount()),
-                        MemberWithdraw::getOperatorAccount,
-                        dto.getOperatorAccount())
-                .ge(
-                        ObjectUtils.isNotNull(dto.getCreateTimeFrom()),
-                        MemberWithdraw::getCreateTime,
-                        dto.getCreateTimeFrom())
-                .le(
-                        ObjectUtils.isNotNull(dto.getCreateTimeTo()),
-                        MemberWithdraw::getCreateTime,
-                        dto.getCreateTimeTo())
-                .in(
-                        ObjectUtils.isNotNull(dto.getMemberLevelList()),
-                        MemberWithdraw::getMemberLevel,
-                        dto.getMemberLevelList());
+            .in(
+                ObjectUtils.isNotNull(dto.getBankNameList()),
+                MemberWithdraw::getBankName,
+                dto.getBankNameList())
+            .eq(
+                ObjectUtils.isNotEmpty(dto.getSuperName()),
+                MemberWithdraw::getSuperName,
+                dto.getSuperName())
+            .eq(
+                ObjectUtils.isNotEmpty(dto.getBankCard()),
+                MemberWithdraw::getBankCard,
+                dto.getBankCard())
+            .eq(ObjectUtils.isNotEmpty(dto.getAccount()), MemberWithdraw::getAccount, dto.getAccount())
+            .ge(
+                ObjectUtils.isNotEmpty(dto.getCashMoneyFrom()),
+                MemberWithdraw::getCashMoney,
+                dto.getCashMoneyFrom())
+            .le(
+                ObjectUtils.isNotEmpty(dto.getCashMoneyFromTo()),
+                MemberWithdraw::getCashMoney,
+                dto.getCashMoneyFromTo())
+            .eq(
+                ObjectUtils.isNotEmpty(dto.getMemberType()),
+                MemberWithdraw::getMemberType,
+                dto.getMemberType())
+            .eq(
+                ObjectUtils.isNotEmpty(dto.getCashOrderNo()),
+                MemberWithdraw::getCashOrderNo,
+                dto.getCashOrderNo())
+            .eq(
+                ObjectUtils.isNotEmpty(dto.getOperatorAccount()),
+                MemberWithdraw::getOperatorAccount,
+                dto.getOperatorAccount())
+            .ge(
+                ObjectUtils.isNotNull(dto.getCreateTimeFrom()),
+                MemberWithdraw::getCreateTime,
+                dto.getCreateTimeFrom())
+            .le(
+                ObjectUtils.isNotNull(dto.getCreateTimeTo()),
+                MemberWithdraw::getCreateTime,
+                dto.getCreateTimeTo())
+            .in(
+                ObjectUtils.isNotNull(dto.getMemberLevelList()),
+                MemberWithdraw::getMemberLevel,
+                dto.getMemberLevelList());
         if (ObjectUtils.isNotNull(dto.getRechargeStatusList())
-                && dto.getRechargeStatusList().size() > 0) {
+            && dto.getRechargeStatusList().size() > 0) {
             query
-                    .eq(dto.getRechargeStatusList().contains(3L), MemberWithdraw::getWithdrawType, WithdrawTypeConstant.BANK)
-                    .eq(dto.getRechargeStatusList().contains(5L), MemberWithdraw::getWithdrawType, WithdrawTypeConstant.DIRECT)
-                    .notIn(
-                            dto.getRechargeStatusList().contains(4L),
-                            MemberWithdraw::getWithdrawType,
-                            WithdrawTypeConstant.BANK,
-                            WithdrawTypeConstant.MANUAL,
-                            WithdrawTypeConstant.DIRECT)
-                    .gt(dto.getRechargeStatusList().contains(6L), MemberWithdraw::getCounterFee, 0);
+                .eq(dto.getRechargeStatusList().contains(3L), MemberWithdraw::getWithdrawType,WithdrawTypeConstant.BANK)
+                .eq(dto.getRechargeStatusList().contains(5L), MemberWithdraw::getWithdrawType, WithdrawTypeConstant.DIRECT)
+                .notIn(
+                    dto.getRechargeStatusList().contains(4L),
+                    MemberWithdraw::getWithdrawType,
+                    WithdrawTypeConstant.BANK,
+                    WithdrawTypeConstant.MANUAL,
+                    WithdrawTypeConstant.DIRECT)
+                .gt(dto.getRechargeStatusList().contains(6L), MemberWithdraw::getCounterFee, 0);
         }
         if (ObjectUtils.isNotNull(dto.getCashStatusList())) {
             query.in(MemberWithdraw::getCashStatus, dto.getCashStatusList());
@@ -175,12 +154,12 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
             query.le(MemberWithdraw::getCashStatus, WithdrawStatus.HANDLED.getValue());
         }
         query.orderBy(
-                ObjectUtils.isNotEmpty(dto.getOrder()),
-                dto.getOrder().equals("ASC"),
-                MemberWithdraw::getCreateTime);
+            ObjectUtils.isNotEmpty(dto.getOrder()),
+            dto.getOrder().equals("ASC"),
+            MemberWithdraw::getCreateTime);
         IPage<MemberWithdrawVO> data = this.page(page, query).convert(userWithdrawConvert::toVo);
         // 统计受理订单总金额、未受理订单总金额
-        SummaryVO summaryVO = amountSum(dto);
+        SummaryVO summaryVO = amountSum();
         return new PageExt<MemberWithdrawVO, SummaryVO>(data, summaryVO);
     }
 
@@ -193,16 +172,16 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
         BigDecimal approveMoney = memberWithdraw.getCashMoney().subtract(afterCounterFee);
         BigDecimal approveCurrencyCount = BigDecimal.ZERO;
         if (Objects.nonNull(memberWithdraw.getWithdrawType())
-                && !memberWithdraw.getWithdrawType().equals(WithdrawTypeConstant.BANK_CURRENCY)
-                && !memberWithdraw.getWithdrawType().equals(WithdrawTypeConstant.DIRECT_CURRENCY)) {
+            && !memberWithdraw.getWithdrawType().equals(WithdrawTypeConstant.BANK_CURRENCY)
+            && !memberWithdraw.getWithdrawType().equals(WithdrawTypeConstant.DIRECT_CURRENCY)) {
             approveCurrencyCount = approveMoney.divide(memberWithdraw.getCurrencyRate());
         }
         LambdaUpdateWrapper<MemberWithdraw> update = Wrappers.lambdaUpdate();
         update
-                .set(MemberWithdraw::getCounterFee, afterCounterFee)
-                .set(MemberWithdraw::getApproveMoney, approveMoney)
-                .set(MemberWithdraw::getApproveCurrencyCount, approveCurrencyCount)
-                .eq(MemberWithdraw::getId, id);
+            .set(MemberWithdraw::getCounterFee, afterCounterFee)
+            .set(MemberWithdraw::getApproveMoney, approveMoney)
+            .set(MemberWithdraw::getApproveCurrencyCount, approveCurrencyCount)
+            .eq(MemberWithdraw::getId, id);
         if (!this.update(new MemberWithdraw(), update)) {
             log.error("更新提现订单手续费：id=" + id + ",调整后手续费afterCounterFee=" + afterCounterFee);
             throw new ServiceException("订单已处理");
@@ -221,13 +200,13 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
 
     @Override
     public void modify(
-            Long id,
-            Integer cashStatus,
-            Integer curStatus,
-            boolean isDirect,
-            String approveReason,
-            UserCredential userCredential,
-            UserEquipment userEquipment) throws Exception {
+        Long id,
+        Integer cashStatus,
+        Integer curStatus,
+        boolean isDirect,
+        String approveReason,
+        UserCredential userCredential,
+        UserEquipment userEquipment) throws Exception {
         if (cashStatus.equals(curStatus) || null == id || null == cashStatus || null == curStatus) {
             throw new ServiceException("错误的参数.");
         }
@@ -243,9 +222,9 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
         }
 
         boolean isFinishedOrder =
-                (WithdrawStatus.SUCCESS.getValue() == curStatus
-                        || WithdrawStatus.CANCELLED.getValue() == curStatus
-                        || WithdrawStatus.REFUSE.getValue() == curStatus);
+            (WithdrawStatus.SUCCESS.getValue() == curStatus
+                || WithdrawStatus.CANCELLED.getValue() == curStatus
+                || WithdrawStatus.REFUSE.getValue() == curStatus);
         if (isFinishedOrder) {
             throw new ServiceException("出款订单已完成,请确认再试");
         }
@@ -263,65 +242,68 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
         }
         /** 校验子账号当天受理会员取款审核额度 */
         if (null != userCredential.getUsername()
-                && StringUtils.equals(UserTypes.SUBUSER.value(), userCredential.getUserType())
-                && WithdrawStatus.SUCCESS.getValue() == cashStatus) {
+            && StringUtils.equals(UserTypes.SUBUSER.value(), userCredential.getUserType())
+            && WithdrawStatus.SUCCESS.getValue() == cashStatus) {
             SysUser sysUser = null;
             if (null != userCredential) {
                 sysUser = sysUserService.getByUsername(userCredential.getUsername());
             }
             AdminLimitInfo adminLimitInfo = JsonUtils.parse(sysUser.getLimitInfo(), AdminLimitInfo.class);
             checkZzhWithdrawAmountAudit(
-                    adminLimitInfo,
-                    memberWithdraw.getCashMode(),
-                    memberWithdraw.getCashMoney(),
-                    userCredential.getUsername());
+                adminLimitInfo,
+                memberWithdraw.getCashMode(),
+                memberWithdraw.getCashMoney(),
+                userCredential.getUsername());
         }
 
         if (isDirect) {
             approveReason = approveReason != null ? approveReason + "(免提直充)" : "免提直充";
         }
+        // 设置会员层级
+        memberWithdraw.setMemberLevel(member.getUserLevel());
         memberWithdraw.setCashStatus(cashStatus);
-        if (cashStatus == WithdrawStatus.HANDLED.getValue()) {
-            memberWithdraw.setAcceptAccount(userCredential.getUsername());
-            memberWithdraw.setAcceptTime(new Date());
-        }
         memberWithdraw.setApproveReason(approveReason);
         memberWithdraw.setOperatorAccount(userCredential.getUsername());
         memberWithdraw.setOperatorTime(new Date());
         // 修改订单状态
         updateWithdraw(memberWithdraw, origCashStatus);
         boolean toFinishCurrentOrder =
-                (WithdrawStatus.SUCCESS.getValue() == cashStatus
-                        || WithdrawStatus.CANCELLED.getValue() == cashStatus
-                        || WithdrawStatus.REFUSE.getValue() == cashStatus);
+            (WithdrawStatus.SUCCESS.getValue() == cashStatus
+                || WithdrawStatus.CANCELLED.getValue() == cashStatus
+                || WithdrawStatus.REFUSE.getValue() == cashStatus);
         if (WithdrawStatus.HANDLED.getValue() == cashStatus) {
             log.info("提现订单受理中 ，订单号为：{}", memberWithdraw.getCashOrderNo());
         } else if (WithdrawStatus.UNHANDLED.getValue() == cashStatus) {
             log.info("放弃受理提现订单,订单号为：{}", memberWithdraw.getCashOrderNo());
         } else if (Objects.equals(
-                ProxyPayStatusEnum.PAY_PROGRESS.getCode(), memberWithdraw.getProxyPayStatus())) {
+            ProxyPayStatusEnum.PAY_PROGRESS.getCode(), memberWithdraw.getProxyPayStatus())) {
             log.info("提现订单 第三方出款中 ，订单号为：{}", memberWithdraw.getCashOrderNo());
         } else if (toFinishCurrentOrder) {
             if (WithdrawStatus.SUCCESS.getValue() == cashStatus) {
+                // 添加會員出入款的報表記錄,如果是推广用户，则不计入报表
+                if (!UserTypes.PROMOTION.value().equals(member.getUserType())) {
+                    memberRwReportService
+                        .addWithdraw(member,memberInfo.getTotalWithdrawTimes(),memberWithdraw);
+                }
                 // 扣除会员余额
                 memberInfoService.updateBalance(member.getId(), memberWithdraw.getCashMoney().negate());
                 // 删除出款验证打码量记录的数据
                 validWithdrawService.remove(memberWithdraw.getMemberId(), memberWithdraw.getCreateTime());
                 // 免提直充
                 if (isDirect) {
-                    this.directCharge(memberWithdraw, userCredential, userEquipment);
+                    this.directCharge(memberWithdraw, userCredential,userEquipment);
                 }
 
             } else if (WithdrawStatus.CANCELLED.getValue() == cashStatus) { // 取消出款操作
                 // 释放会员提现金额
                 memberInfoService.updateBalance(member.getId(), memberWithdraw.getCashMoney());
                 String billContent =
-                        String.format(
-                                "管理员于%s向用户%s提现失败退回%.3f元,账户余额变更为:%.3f元",
-                                DateUtil.getNowTime(),
-                                member.getAccount(),
-                                memberWithdraw.getCashMoney(),
-                                (memberInfo.getBalance().add(memberWithdraw.getCashMoney())));
+                    String.format(
+                        "管理员于%s向用户%s提现失败退回%.3f元,账户余额变更为:%.3f元",
+                        DateUtil.getNowTime(),
+                        member.getAccount(),
+                        memberWithdraw.getCashMoney(),
+                        (memberInfo.getBalance().add(memberWithdraw.getCashMoney())));
                 MemberBill bill = new MemberBill();
                 bill.setBalance(memberInfo.getBalance());
                 bill.setOrderNo(memberWithdraw.getCashOrderNo());
@@ -332,12 +314,12 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
                 memberBillService.save(member, bill);
             } else if (WithdrawStatus.REFUSE.getValue() == cashStatus) {
                 String content =
-                        String.format(
-                                "您于%s提交的取现订单被没收，订单号为%s，金额：%s",
-                                DateUtil.getDateToString(
-                                        memberWithdraw.getCreateTime(), DateUtil.YYYY_MM_DD_HH_MM_SS),
-                                memberWithdraw.getCashOrderNo(),
-                                memberWithdraw.getCashMoney());
+                    String.format(
+                        "您于%s提交的取现订单被没收，订单号为%s，金额：%s",
+                        DateUtil.getDateToString(
+                            memberWithdraw.getCreateTime(), DateUtil.YYYY_MM_DD_HH_MM_SS),
+                        memberWithdraw.getCashOrderNo(),
+                        memberWithdraw.getCashMoney());
                 MemberBill bill = new MemberBill();
                 bill.setBalance(memberInfo.getBalance());
                 bill.setOrderNo(memberWithdraw.getCashOrderNo());
@@ -352,9 +334,7 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
         }
     }
 
-    /**
-     * 过滤不符合规则的第三方出款商户
-     */
+    /** 过滤不符合规则的第三方出款商户 */
     @Override
     public List<PpMerchant> queryProxyMerchant(Long id) {
         // 根据体现记录查询用户的层级和出款金额
@@ -365,7 +345,7 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
 
         // 获取所有的可用代付商户
         List<PpMerchant> merchantList =
-                ppMerchantService.queryAllMerchant(SwitchStatusEnum.ENABLED.getValue());
+            ppMerchantService.queryAllMerchant(SwitchStatusEnum.ENABLED.getValue());
         if (CollectionUtils.isEmpty(merchantList)) {
             throw new ServiceException("没有可用的代付商户");
         }
@@ -384,12 +364,12 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
 
     @Override
     public void save(
-            BigDecimal cashMoney,
-            String cashReason,
-            Integer handPoints,
-            UserCredential userCredential,
-            Long memberId)
-            throws Exception {
+        BigDecimal cashMoney,
+        String cashReason,
+        Integer handPoints,
+        UserCredential userCredential,
+        Long memberId)
+        throws Exception {
         Member member = memberService.getById(memberId); // 更新金额，从数据库中重新获取
         MemberInfo memberInfo = memberInfoService.getById(memberId); // 更新金额，从数据库中重新获取
         // 校验用户状态
@@ -408,12 +388,12 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
         SysUser sysUser = sysUserService.getByUsername(userCredential.getUsername());
         AdminLimitInfo adminLimitInfo = JsonUtils.parse(sysUser.getLimitInfo(), AdminLimitInfo.class);
         if (null != adminLimitInfo
-                && StringUtils.equals(UserTypes.SUBUSER.value(), userCredential.getUserType())) {
+            && StringUtils.equals(UserTypes.SUBUSER.value(), userCredential.getUserType())) {
             checkZzhWithdrawAmountAudit(
-                    adminLimitInfo,
-                    CashEnum.CASH_MODE_HAND.getValue(),
-                    cashMoney,
-                    userCredential.getUsername());
+                adminLimitInfo,
+                CashEnum.CASH_MODE_HAND.getValue(),
+                cashMoney,
+                userCredential.getUsername());
         }
 
         // 下面开始添加后台出款记录
@@ -447,22 +427,28 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
         // 添加取现历史记录
         insertWithdrawHistory(memberWithdraw);
 
+        // 添加會員出入款的報表記錄,如果是推广用户，则不计入报表
+        if (!UserTypes.PROMOTION.value().equals(member.getUserType())) {
+            memberRwReportService
+                .addWithdraw(member,memberInfo.getTotalWithdrawTimes(),memberWithdraw);
+        }
+
         // 修改用户金额信息、扣除用户出款金额
         memberInfoService.updateBalanceWithWithdraw(memberId, memberWithdraw.getCashMoney());
 
         // 添加用户账户金额的变更记录
         String content =
-                "管理员"
-                        + sysUser.getUserName()
-                        + "于"
-                        + DateUtil.getNowTime()
-                        + "向用户"
-                        + member.getAccount()
-                        + "成功通过后台转出"
-                        + String.format("%.3f", cashMoney)
-                        + "元,账户余额变更为:"
-                        + String.format("%.3f", (memberInfo.getBalance().subtract(cashMoney)))
-                        + "元";
+            "管理员"
+                + sysUser.getUserName()
+                + "于"
+                + DateUtil.getNowTime()
+                + "向用户"
+                + member.getAccount()
+                + "成功通过后台转出"
+                + String.format("%.3f", cashMoney)
+                + "元,账户余额变更为:"
+                + String.format("%.3f", (memberInfo.getBalance().subtract(cashMoney)))
+                + "元";
         MemberBill bill = new MemberBill();
         bill.setBalance(memberInfo.getBalance());
         bill.setOrderNo(memberWithdraw.getCashOrderNo());
@@ -487,32 +473,32 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
      * @throws Exception
      */
     public void checkZzhWithdrawAmountAudit(
-            AdminLimitInfo adminLimitInfo, Integer cashMode, BigDecimal cashMoney, String userName) {
+        AdminLimitInfo adminLimitInfo, Integer cashMode, BigDecimal cashMoney, String userName) {
         if (cashMode == CashEnum.CASH_MODE_USER.getValue()) {
             if (adminLimitInfo.getMaxWithdrawAmount().compareTo(BigDecimal.ZERO) > 0
-                    && cashMoney.compareTo(adminLimitInfo.getMaxWithdrawAmount()) > 0) {
+                && cashMoney.compareTo(adminLimitInfo.getMaxWithdrawAmount()) > 0) {
                 StringBuffer buffer =
-                        new StringBuffer(userName)
-                                .append("单笔出款受限。受理会员取款额度为：")
-                                .append(adminLimitInfo.getMaxWithdrawAmount())
-                                .append("元。 超过额度")
-                                .append(
-                                        MoneyUtils.toYuanStr(cashMoney.subtract(adminLimitInfo.getMaxWithdrawAmount())))
-                                .append("元");
+                    new StringBuffer(userName)
+                        .append("单笔出款受限。受理会员取款额度为：")
+                        .append(adminLimitInfo.getMaxWithdrawAmount())
+                        .append("元。 超过额度")
+                        .append(
+                            MoneyUtils.toYuanStr(cashMoney.subtract(adminLimitInfo.getMaxWithdrawAmount())))
+                        .append("元");
                 throw new ServiceException(buffer.toString());
             }
         } else if (cashMode == CashEnum.CASH_MODE_HAND.getValue()) {
             if (adminLimitInfo.getMaxManualWithdrawAmount().compareTo(BigDecimal.ZERO) > 0
-                    && cashMoney.compareTo(adminLimitInfo.getMaxManualWithdrawAmount()) > 0) {
+                && cashMoney.compareTo(adminLimitInfo.getMaxManualWithdrawAmount()) > 0) {
                 StringBuffer buffer =
-                        new StringBuffer(userName)
-                                .append("单笔人工出款受限。受理人工取款额度为")
-                                .append(adminLimitInfo.getMaxManualWithdrawAmount())
-                                .append("元。 超过额度")
-                                .append(
-                                        MoneyUtils.toYuanStr(
-                                                cashMoney.subtract(adminLimitInfo.getMaxManualWithdrawAmount())))
-                                .append("元");
+                    new StringBuffer(userName)
+                        .append("单笔人工出款受限。受理人工取款额度为")
+                        .append(adminLimitInfo.getMaxManualWithdrawAmount())
+                        .append("元。 超过额度")
+                        .append(
+                            MoneyUtils.toYuanStr(
+                                cashMoney.subtract(adminLimitInfo.getMaxManualWithdrawAmount())))
+                        .append("元");
                 throw new ServiceException(buffer.toString());
             }
         }
@@ -521,40 +507,36 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
     private void updateWithdraw(MemberWithdraw memberWithdraw, Integer origCashStatus) {
         LambdaUpdateWrapper<MemberWithdraw> update = Wrappers.lambdaUpdate();
         update
-                .set(MemberWithdraw::getCashStatus, memberWithdraw.getCashStatus())
-                .set(MemberWithdraw::getAcceptAccount, memberWithdraw.getAcceptAccount())
-                .set(MemberWithdraw::getAcceptTime, memberWithdraw.getAcceptTime())
-                .set(MemberWithdraw::getApproveReason, memberWithdraw.getCashReason())
-                .set(MemberWithdraw::getOperatorAccount, memberWithdraw.getOperatorAccount())
-                .set(MemberWithdraw::getOperatorTime, memberWithdraw.getOperatorTime())
-                .eq(MemberWithdraw::getId, memberWithdraw.getId())
-                .eq(MemberWithdraw::getCashStatus, origCashStatus);
+            .set(MemberWithdraw::getCashStatus, memberWithdraw.getCashStatus())
+            .set(MemberWithdraw::getApproveReason, memberWithdraw.getCashReason())
+            .set(MemberWithdraw::getOperatorAccount, memberWithdraw.getOperatorAccount())
+            .set(MemberWithdraw::getOperatorTime, memberWithdraw.getOperatorTime())
+            .eq(MemberWithdraw::getId, memberWithdraw.getId())
+            .eq(MemberWithdraw::getCashStatus, origCashStatus);
         if (!this.update(update)) {
             log.error(
-                    "修改提现订单异常：memberWithdraw="
-                            + memberWithdraw.toString()
-                            + ",origCashStatus="
-                            + origCashStatus);
+                "修改提现订单异常：memberWithdraw="
+                    + memberWithdraw.toString()
+                    + ",origCashStatus="
+                    + origCashStatus);
             throw new ServiceException("订单已处理");
         }
     }
 
-    /**
-     * 开启出入款订单是否允许其他账户操作配置 校验非超管账号是否原受理人
-     */
+    /** 开启出入款订单是否允许其他账户操作配置 校验非超管账号是否原受理人 */
     private void crossAccountCheck(UserCredential userCredential, MemberWithdraw memberWithdraw)
-            throws ServiceException {
+        throws ServiceException {
         if (userCredential != null
-                && StringUtils.isNotEmpty(userCredential.getUsername())
-                && null != memberWithdraw) {
+            && StringUtils.isNotEmpty(userCredential.getUsername())
+            && null != memberWithdraw) {
             MemberRechargeLimit limitInfo = limitInfoService.getRechargeLimit();
             boolean toCheck =
-                    BooleanEnum.NO.match(limitInfo.getIsHandledAllowOthersOperate())
-                            && !userCredential.isSuperAdmin();
+                BooleanEnum.NO.match(limitInfo.getIsHandledAllowOthersOperate())
+                    && !userCredential.isSuperAdmin();
             if (toCheck) {
                 if (!Objects.equals(WithdrawStatus.UNHANDLED.getValue(), memberWithdraw.getCashStatus())
-                        && !StringUtils.equalsIgnoreCase(
-                        userCredential.getUsername(), memberWithdraw.getOperatorAccount())) {
+                    && !StringUtils.equalsIgnoreCase(
+                    userCredential.getUsername(), memberWithdraw.getOperatorAccount())) {
                     throw new ServiceException("您无权操作此订单:" + memberWithdraw.getCashOrderNo());
                 }
             }
@@ -562,37 +544,37 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
     }
 
     private static boolean verifyPpMerchant(
-            MemberWithdraw memberWithdraw, PpMerchant ppMerchant, PpInterface ppInterface) {
+        MemberWithdraw memberWithdraw, PpMerchant ppMerchant, PpInterface ppInterface) {
         ProxyPayMerBean proxyPayMerBean = ProxyPayMerBean.conver2Bean(ppMerchant.getMerLimits());
         if (memberWithdraw.getCashMoney().compareTo(proxyPayMerBean.getMinLimitCash()) < 0
-                || memberWithdraw.getCashMoney().compareTo(proxyPayMerBean.getMaxLimitCash()) > 0) {
+            || memberWithdraw.getCashMoney().compareTo(proxyPayMerBean.getMaxLimitCash()) > 0) {
             log.info("用户出款金额超出商户出款金额范围，过滤此商户，商户名称为：" + ppMerchant.getName());
             return true;
         }
 
         if (StringUtils.isNotEmpty(proxyPayMerBean.getUserLever())) {
             if (!StringUtils.contains(
-                    "," + proxyPayMerBean.getUserLever() + ",",
-                    String.format("%s" + memberWithdraw.getMemberLevel() + "%s", ",", ","))) {
+                "," + proxyPayMerBean.getUserLever() + ",",
+                String.format("%s" + memberWithdraw.getMemberLevel() + "%s", ",", ","))) {
                 log.info("用户层级不在此代付商户设置的层级中，过滤此商户，商户名称为：" + ppMerchant.getName());
                 return true;
             }
         }
 
         Map<String, String> banksMap =
-                JSONObject.parseObject(
-                        JSONObject.parseObject(ppInterface.getLimtInfo()).getString("banks"), Map.class);
+            JSONObject.parseObject(
+                JSONObject.parseObject(ppInterface.getLimtInfo()).getString("banks"), Map.class);
         /** 模糊匹配银行名称 */
         boolean isBankName = true;
         for (Map.Entry<String, String> entry : banksMap.entrySet()) {
             if (StringUtils.contains(entry.getValue(), memberWithdraw.getBankName())
-                    || StringUtils.contains(memberWithdraw.getBankName(), entry.getValue())) {
+                || StringUtils.contains(memberWithdraw.getBankName(), entry.getValue())) {
                 isBankName = false;
                 break;
             }
 
             if (StringUtils.contains(entry.getValue(), "邮政")
-                    && StringUtils.contains(memberWithdraw.getBankName(), "邮政")) {
+                && StringUtils.contains(memberWithdraw.getBankName(), "邮政")) {
                 isBankName = false;
                 break;
             }
@@ -604,11 +586,9 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
         return false;
     }
 
-    /**
-     * 检查用户，封装用户信息
-     */
+    /** 检查用户，封装用户信息 */
     private void checkUserInfo(Member member, MemberInfo memberInfo, boolean checkUserState)
-            throws Exception {
+        throws Exception {
         // 查询用户是否存在
         if (member == null) {
             throw new ServiceException("用户信息不存在！");
@@ -628,18 +608,10 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
         }
     }
 
-    private SummaryVO amountSum(MemberWithdrawQueryDTO dto) {
+    private SummaryVO amountSum() {
         LambdaQueryWrapper<MemberWithdraw> queryHandle = Wrappers.lambdaQuery();
         SummaryVO summaryVO = new SummaryVO();
         queryHandle.eq(MemberWithdraw::getCashStatus, WithdrawStatus.HANDLED.getValue());
-
-        queryHandle.in(ObjectUtils.isNotEmpty(dto.getMemberType())
-                && dto.getMemberType().equalsIgnoreCase(SysUserEnums.UserType.WITH_FORMAL_TYPE.value()),
-        MemberWithdraw::getMemberType,
-        SysUserEnums.UserType.RECH_FORMAL_TYPE_QUERY.value().split(","));
-        queryHandle.eq(ObjectUtils.isNotEmpty(dto.getMemberType())
-                        && dto.getMemberType().equalsIgnoreCase(SysUserEnums.UserType.WITH_TEST_TYPE.value()),
-                MemberWithdraw::getMemberType, dto.getMemberType());
         summaryVO.setAllHandledSum(memberWithdrawMapper.summaryMemberWithdraw(queryHandle));
 
         LambdaQueryWrapper<MemberWithdraw> queryUnHandle = Wrappers.lambdaQuery();
@@ -655,7 +627,7 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
      * @param userCredential
      * @throws Exception
      */
-    public void directCharge(MemberWithdraw memberWithdraw, UserCredential userCredential, UserEquipment userEquipment) throws Exception {
+    public void directCharge(MemberWithdraw memberWithdraw, UserCredential userCredential,UserEquipment userEquipment) throws Exception {
         String configValue = configService.getValue(DictDataEnum.DIRECT_CHARGE);
         Optional.ofNullable(configValue).orElseThrow(() -> new ServiceException("免提直充配置异常，请检查配置是否正确。"));
         DirectCharge directCharge = JSON.parseObject(configValue, DirectCharge.class);
@@ -672,9 +644,9 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
         Integer discountType = 8080; // 固定值
         BigDecimal normalDml = BigDecimal.ZERO; // 常态打码量
         String auditRemarks =
-                StringUtil.isBlank(directCharge.getAuditRemarks())
-                        ? "免提直充，出款订单号：" + memberWithdraw.getCashOrderNo()
-                        : directCharge.getAuditRemarks(); // 审核备注
+            StringUtil.isBlank(directCharge.getAuditRemarks())
+                ? "免提直充，出款订单号：" + memberWithdraw.getCashOrderNo()
+                : directCharge.getAuditRemarks(); // 审核备注
 
         if (!StringUtil.isBlank(levels)) {
             String[] levelArr = levels.split(",");
@@ -682,59 +654,59 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
             if (contains) {
                 if (pointFlag == 1) {
                     discountAmount =
-                            (approveMoney.multiply(discountPercentage))
-                                    .divide(new BigDecimal(100), 2, BigDecimal.ROUND_HALF_UP);
+                        (approveMoney.multiply(discountPercentage))
+                            .divide(new BigDecimal(100), 2, BigDecimal.ROUND_HALF_UP);
                 }
             }
         }
 
         if (dmlFlag == 1) {
             normalDml =
-                    new BigDecimal(normalDmlMultiple)
-                            .multiply(approveMoney)
-                            .setScale(2, BigDecimal.ROUND_HALF_UP);
+                new BigDecimal(normalDmlMultiple)
+                    .multiply(approveMoney)
+                    .setScale(2, BigDecimal.ROUND_HALF_UP);
             discountDml =
-                    discountAmount
-                            .multiply(new BigDecimal(discountDmlMultiple))
-                            .setScale(2, BigDecimal.ROUND_HALF_UP);
+                discountAmount
+                    .multiply(new BigDecimal(discountDmlMultiple))
+                    .setScale(2, BigDecimal.ROUND_HALF_UP);
         }
 
         ManualRechargeOrderBo manualRechargeOrderBo =
-                Builder.of(ManualRechargeOrderBo::new)
-                        .with(ManualRechargeOrderBo::setDiscountAmount, discountAmount)
-                        .with(ManualRechargeOrderBo::setAuditRemarks, auditRemarks)
-                        .with(ManualRechargeOrderBo::setPointFlag, pointFlag)
-                        .with(ManualRechargeOrderBo::setDmlFlag, dmlFlag)
-                        .with(ManualRechargeOrderBo::setSkipAuditing, skipAuditing)
-                        .with(ManualRechargeOrderBo::setAccount, memberWithdraw.getAccount())
-                        .with(ManualRechargeOrderBo::setMemberId, memberWithdraw.getMemberId())
-                        .with(ManualRechargeOrderBo::setAmount, approveMoney)
-                        .with(ManualRechargeOrderBo::setNormalDml, normalDml)
-                        .with(ManualRechargeOrderBo::setDiscountDml, discountDml)
-                        .with(ManualRechargeOrderBo::setDiscountType, discountType)
-                        .with(ManualRechargeOrderBo::setRemarks, directCharge.getRemarks())
-                        .build();
-        rechargeOrderService.manual(manualRechargeOrderBo, userCredential, userEquipment);
+            Builder.of(ManualRechargeOrderBo::new)
+                .with(ManualRechargeOrderBo::setDiscountAmount, discountAmount)
+                .with(ManualRechargeOrderBo::setAuditRemarks, auditRemarks)
+                .with(ManualRechargeOrderBo::setPointFlag, pointFlag)
+                .with(ManualRechargeOrderBo::setDmlFlag, dmlFlag)
+                .with(ManualRechargeOrderBo::setSkipAuditing, skipAuditing)
+                .with(ManualRechargeOrderBo::setAccount, memberWithdraw.getAccount())
+                .with(ManualRechargeOrderBo::setMemberId, memberWithdraw.getMemberId())
+                .with(ManualRechargeOrderBo::setAmount, approveMoney)
+                .with(ManualRechargeOrderBo::setNormalDml, normalDml)
+                .with(ManualRechargeOrderBo::setDiscountDml, discountDml)
+                .with(ManualRechargeOrderBo::setDiscountType, discountType)
+                .with(ManualRechargeOrderBo::setRemarks, directCharge.getRemarks())
+                .build();
+        rechargeOrderService.manual(manualRechargeOrderBo, userCredential,userEquipment);
         log.info(
-                "\n免提直充配置:{},\n充值信息： 会员账号：{}，入款金额：{}，优惠金额：{}，常态打码量：{},优惠打码量：{},备注：{},层级：{}",
-                directCharge.toString(),
-                manualRechargeOrderBo.getAccount(),
-                manualRechargeOrderBo.getAmount(),
-                manualRechargeOrderBo.getDiscountAmount(),
-                manualRechargeOrderBo.getNormalDml(),
-                manualRechargeOrderBo.getDiscountDml(),
-                manualRechargeOrderBo.getAuditRemarks(),
-                directCharge.getLevels());
+            "\n免提直充配置:{},\n充值信息： 会员账号：{}，入款金额：{}，优惠金额：{}，常态打码量：{},优惠打码量：{},备注：{},层级：{}",
+            directCharge.toString(),
+            manualRechargeOrderBo.getAccount(),
+            manualRechargeOrderBo.getAmount(),
+            manualRechargeOrderBo.getDiscountAmount(),
+            manualRechargeOrderBo.getNormalDml(),
+            manualRechargeOrderBo.getDiscountDml(),
+            manualRechargeOrderBo.getAuditRemarks(),
+            directCharge.getLevels());
 
         // 如果是直接入款则添加成长值
         if (skipAuditing) {
             // 判断是否在充值成长值黑名单
             if (bizBlacklistFacade.isUserInBlacklist(
-                    memberWithdraw.getMemberId(), BizBlacklistType.RECHARGE_GROWTH)) {
+                memberWithdraw.getMemberId(), BizBlacklistType.RECHARGE_GROWTH)) {
                 log.info(
-                        "免提直充出款单号：cashOrderNo={}，会员账号：account={}不添加成长值，原因：该会员位于'充值成长值'黑名单！",
-                        memberWithdraw.getCashOrderNo(),
-                        memberWithdraw.getAccount());
+                    "免提直充出款单号：cashOrderNo={}，会员账号：account={}不添加成长值，原因：该会员位于'充值成长值'黑名单！",
+                    memberWithdraw.getCashOrderNo(),
+                    memberWithdraw.getAccount());
                 return;
             }
         }

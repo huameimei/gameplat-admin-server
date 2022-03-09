@@ -338,7 +338,7 @@ public class SpreadLinkInfoServiceImpl extends ServiceImpl<SpreadLinkInfoMapper,
           linkMinRebate = new BigDecimal("0").setScale(2, BigDecimal.ROUND_HALF_UP);
         } else {
           linkMinRebate =
-              BigDecimal.valueOf(linkMinRebateObj.getRebate())
+                  linkMinRebateObj.getRebate()
                   .setScale(2, BigDecimal.ROUND_HALF_UP);
         }
 
@@ -410,7 +410,6 @@ public class SpreadLinkInfoServiceImpl extends ServiceImpl<SpreadLinkInfoMapper,
         .last("LIMIT 1")
         .oneOpt()
         .map(SpreadLinkInfo::getRebate)
-        .map(BigDecimal::new)
         .orElse(BigDecimal.ZERO);
   }
 }

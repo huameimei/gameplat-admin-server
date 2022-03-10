@@ -122,4 +122,7 @@ public interface DataReportMapper extends BaseMapper<GameRechDataReportVO> {
      * @return Map
      */
     BigDecimal findRedDataReport(GameRWDataReportDto dto);
+
+
+    List<Map<String , Object>> findProxyData(GameRWDataReportDto dto);
 }

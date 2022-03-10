@@ -41,19 +41,7 @@ public class DataReportController {
   @GetMapping("findRechReport")
   public GameRechDataReportVO findRechReport(GameRWDataReportDto dto) {
     log.info("查询数据统计充值入参：{}", JSON.toJSONString(dto));
-    if (StringUtils.isEmpty(dto.getStartTime())) {
-      String startTime = DateUtils.format(new Date());
-      dto.setStartTime(startTime);
-    }
-    if (StringUtils.isEmpty(dto.getEndTime())) {
-      String endTime = DateUtils.format(new Date());
-      dto.setEndTime(endTime);
-    }
-    if (StringUtils.isNotEmpty(dto.getSuperAccount())) {
-      if (dto.getFlag() == ONE) {
-        dto.setSuperAccount(this.getAccountSuperPath(dto.getSuperAccount()));
-      }
-    }
+    editGameRWDataReportDto(dto);
     return dataReportService.findRechReport(dto);
   }
 
@@ -61,23 +49,7 @@ public class DataReportController {
   @GetMapping("findWithReport")
   public GameWithDataReportVO findWithReport(GameRWDataReportDto dto) {
     log.info("查询数据统计提现入参：{}", JSON.toJSONString(dto));
-    if (StringUtils.isEmpty(dto.getStartTime())) {
-      String startTime = DateUtils.format(new Date());
-      dto.setStartTime(startTime);
-    }
-    if (StringUtils.isEmpty(dto.getEndTime())) {
-      String endTime = DateUtils.format(new Date());
-      dto.setEndTime(endTime);
-    }
-    if (StringUtils.isNotEmpty(dto.getSuperAccount())) {
-      if (dto.getFlag() == ONE) {
-        Member byAccount =
-            memberService
-                .getByAccount(dto.getSuperAccount())
-                .orElseThrow(() -> new ServiceException("代理账号不存在"));
-        dto.setSuperAccount(byAccount.getSuperPath());
-      }
-    }
+    editGameRWDataReportDto(dto);
     return dataReportService.findWithReport(dto);
   }
 
@@ -85,19 +57,7 @@ public class DataReportController {
   @GetMapping("findGameDataReport")
   public GameDataReportVO findGameDataReport(GameRWDataReportDto dto) {
     log.info("查询数据统计游戏入参：{}", JSON.toJSONString(dto));
-    if (StringUtils.isEmpty(dto.getStartTime())) {
-      String startTime = DateUtils.format(new Date());
-      dto.setStartTime(startTime);
-    }
-    if (StringUtils.isEmpty(dto.getEndTime())) {
-      String endTime = DateUtils.format(new Date());
-      dto.setEndTime(endTime);
-    }
-    if (StringUtils.isNotEmpty(dto.getSuperAccount())) {
-      if (dto.getFlag() == ONE) {
-        dto.setSuperAccount(this.getAccountSuperPath(dto.getSuperAccount()));
-      }
-    }
+    editGameRWDataReportDto(dto);
     return dataReportService.findGameReport(dto);
   }
 
@@ -106,25 +66,7 @@ public class DataReportController {
   public GameAccountDataReportVo findAccountDataReport(
       Page<AccountReportVo> page, GameRWDataReportDto dto) {
     log.info("查询数据统注册入参：{}", JSON.toJSONString(dto));
-    if (StringUtils.isEmpty(dto.getStartTime())) {
-      String startTime = DateUtils.format(new Date());
-      startTime += " 00:00:00";
-      dto.setStartTime(startTime);
-    } else {
-      dto.setStartTime(dto.getStartTime() + " 00:00:00");
-    }
-    if (StringUtils.isEmpty(dto.getEndTime())) {
-      String endTime = DateUtils.format(new Date());
-      endTime += " 23:59:59";
-      dto.setEndTime(endTime);
-    } else {
-      dto.setEndTime(dto.getEndTime() + " 23:59:59");
-    }
-    if (StringUtils.isNotEmpty(dto.getSuperAccount())) {
-      if (dto.getFlag() == ONE) {
-        dto.setSuperAccount(this.getAccountSuperPath(dto.getSuperAccount()));
-      }
-    }
+    editGameRWDataReportSecondDto(dto);
 
     return dataReportService.findMemberReport(page, dto);
   }
@@ -134,19 +76,7 @@ public class DataReportController {
   @GetMapping("findDividendtDataReport")
   public GameDividendDataVo findDividendtDataReport(GameRWDataReportDto dto) {
     log.info("查询数据统计红利入参：{}", JSON.toJSONString(dto));
-    if (StringUtils.isEmpty(dto.getStartTime())) {
-      String startTime = DateUtils.format(new Date());
-      dto.setStartTime(startTime);
-    }
-    if (StringUtils.isEmpty(dto.getEndTime())) {
-      String endTime = DateUtils.format(new Date());
-      dto.setEndTime(endTime);
-    }
-    if (StringUtils.isNotEmpty(dto.getSuperAccount())) {
-      if (dto.getFlag() == ONE) {
-        dto.setSuperAccount(this.getAccountSuperPath(dto.getSuperAccount()));
-      }
-    }
+    editGameRWDataReportDto(dto);
     return dataReportService.findDividendtDataReport(dto);
   }
 
@@ -155,19 +85,7 @@ public class DataReportController {
   public PageDtoVO<AccountReportVo> findAccountReport(
       Page<AccountReportVo> page, GameRWDataReportDto dto) {
     log.info("查询数据统计红利入参：{}", JSON.toJSONString(dto));
-    if (StringUtils.isEmpty(dto.getStartTime())) {
-      String startTime = DateUtils.format(new Date());
-      dto.setStartTime(startTime);
-    }
-    if (StringUtils.isEmpty(dto.getEndTime())) {
-      String endTime = DateUtils.format(new Date());
-      dto.setEndTime(endTime);
-    }
-    if (StringUtils.isNotEmpty(dto.getSuperAccount())) {
-      if (dto.getFlag() == ONE) {
-        dto.setSuperAccount(this.getAccountSuperPath(dto.getSuperAccount()));
-      }
-    }
+    editGameRWDataReportDto(dto);
     return dataReportService.findAccountReport(page, dto);
   }
 
@@ -175,6 +93,30 @@ public class DataReportController {
   @GetMapping("findThreeRech")
   public List<ThreeRechReportVo> findThreeRech(GameRWDataReportDto dto) {
     log.info("查询数据统计红利入参：{}", JSON.toJSONString(dto));
+    editGameRWDataReportSecondDto(dto);
+    return dataReportService.findThreeRech(dto);
+  }
+
+
+
+  @ApiOperation(value = "代理总计")
+  @GetMapping("findProxyData")
+  public GameProxyDataVo findProxyData(GameRWDataReportDto dto) {
+    log.info("查询数据统计红利入参：{}", JSON.toJSONString(dto));
+    editGameRWDataReportSecondDto(dto);
+    return dataReportService.findProxyData(dto);
+  }
+
+  private String getAccountSuperPath(String account) {
+    return memberService.getSupperPath(account).orElseThrow(() -> new ServiceException("代理账号不存在"));
+  }
+
+
+  /**
+   * 时分秒
+   * @param dto
+   */
+  public void editGameRWDataReportSecondDto(GameRWDataReportDto dto) {
     if (StringUtils.isEmpty(dto.getStartTime())) {
       String startTime = DateUtils.format(new Date());
       startTime += " 00:00:00";
@@ -194,10 +136,26 @@ public class DataReportController {
         dto.setSuperAccount(this.getAccountSuperPath(dto.getSuperAccount()));
       }
     }
-    return dataReportService.findThreeRech(dto);
   }
 
-  private String getAccountSuperPath(String account) {
-    return memberService.getSupperPath(account).orElseThrow(() -> new ServiceException("代理账号不存在"));
+
+  /**
+   * 日期
+   * @param dto
+   */
+  public void editGameRWDataReportDto(GameRWDataReportDto dto) {
+    if (StringUtils.isEmpty(dto.getStartTime())) {
+      String startTime = DateUtils.format(new Date());
+      dto.setStartTime(startTime);
+    }
+    if (StringUtils.isEmpty(dto.getEndTime())) {
+      String endTime = DateUtils.format(new Date());
+      dto.setEndTime(endTime);
+    }
+    if (StringUtils.isNotEmpty(dto.getSuperAccount())) {
+      if (dto.getFlag() == ONE) {
+        dto.setSuperAccount(this.getAccountSuperPath(dto.getSuperAccount()));
+      }
+    }
   }
 }

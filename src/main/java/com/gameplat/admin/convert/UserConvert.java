@@ -1,6 +1,7 @@
 package com.gameplat.admin.convert;
 
 import com.gameplat.admin.model.dto.OperUserDTO;
+import com.gameplat.admin.model.dto.UserInfoDTO;
 import com.gameplat.admin.model.dto.UserResetPasswordDTO;
 import com.gameplat.admin.model.vo.ProfileVO;
 import com.gameplat.admin.model.vo.UserInfoVo;
@@ -33,4 +34,6 @@ public interface UserConvert {
   SysUser toEntity(UserResetPasswordDTO dto);
 
   ProfileVO toProFileVo(SysUser entity);
+
+  SysUser toEntity(UserInfoDTO dto);
 }

@@ -11,10 +11,10 @@ import lombok.Data;
 public class UserInfoDTO {
 
   /** 昵称 */
-  private String nickname;
+  private String nickName;
 
   /** 电话 */
   private String phone;
 
-  private UserSettingDTO settings;
+  private String settings;
 }

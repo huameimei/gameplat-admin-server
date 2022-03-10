@@ -7,7 +7,6 @@ import com.gameplat.admin.mapper.SysMenuMapper;
 import com.gameplat.admin.model.dto.ChangePasswordDTO;
 import com.gameplat.admin.model.dto.UserInfoDTO;
 import com.gameplat.admin.model.vo.ProfileVO;
-import com.gameplat.base.common.json.JsonUtils;
 import com.gameplat.common.enums.BooleanEnum;
 import com.gameplat.common.lang.Assert;
 import com.gameplat.model.entity.sys.SysUser;
@@ -49,13 +48,8 @@ public class UserCenterService {
 
   @SentinelResource(value = "update")
   public void update(UserInfoDTO dto) {
-    String username = SecurityUserHolder.getUsername();
-    SysUser user = Assert.notNull(userService.getByUsername(username), "未找到用户信息");
-
-    user.setSettings(JsonUtils.toJson(dto.getSettings()));
-    user.setNickName(dto.getNickname());
-    user.setPhone(dto.getPhone());
-
+    SysUser user = userConvert.toEntity(dto);
+    user.setUserId(SecurityUserHolder.getUserId());
     Assert.isTrue(userService.updateById(user), "更新用户信息失败!");
   }
 

@@ -3,6 +3,7 @@ package com.gameplat.admin.model.vo;
 import lombok.Data;
 import org.dozer.Mapping;
 
+import java.io.Serializable;
 import java.util.Date;
 
 /**
@@ -11,7 +12,7 @@ import java.util.Date;
  * @author three
  */
 @Data
-public class RoleVo {
+public class RoleVo implements Serializable {
 
   @Mapping(value = "roleId")
   private Long id;
@@ -34,7 +35,10 @@ public class RoleVo {
   private Integer status;
 
   private Long[] menuIds;
+
   private Date createTime;
+
   private Date updateTime;
+
   private String remark;
 }

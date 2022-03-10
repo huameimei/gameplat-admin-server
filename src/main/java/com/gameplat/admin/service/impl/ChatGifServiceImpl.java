@@ -121,10 +121,8 @@ public class ChatGifServiceImpl extends ServiceImpl<ChatGifMapper, ChatGif>
       throw new ServiceException("不允许相同图片");
     }
     // 上传成功，返回图片地址
-    String url =
-        fileStorageProvider.upload(
-            file.getInputStream(), file.getContentType(), file.getOriginalFilename());
-    return url;
+    return fileStorageProvider.upload(
+        file.getInputStream(), file.getContentType(), file.getOriginalFilename());
   }
 
   /** 删 */

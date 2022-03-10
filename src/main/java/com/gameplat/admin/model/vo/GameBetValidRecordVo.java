@@ -63,15 +63,15 @@ public class GameBetValidRecordVo implements Serializable {
 
   /** 投注金额 */
   @Field(type = FieldType.Double, store = true)
-  private String betAmount;
+  private BigDecimal betAmount;
 
   /** 有效投注额 */
   @Field(type = FieldType.Double, store = true)
-  private String validAmount;
+  private BigDecimal validAmount;
 
   /** 输赢金额 */
   @Field(type = FieldType.Double, store = true)
-  private String winAmount;
+  private BigDecimal winAmount;
 
   /** 投注内容 */
   private String betContent;

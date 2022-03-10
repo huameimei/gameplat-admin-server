@@ -400,4 +400,81 @@
             </if>
     </select>
 
+
+
+    <select id="findProxyData" resultType="java.util.HashMap">
+        SELECT
+            'a' type,
+            ifnull( sum( divide_amount ), 0 ) amount,
+            count( DISTINCT account ) num
+        FROM
+            divide_summary
+        WHERE
+            STATUS = 2
+            AND create_time BETWEEN '2021-02-01 00:00:00'
+            AND '2022-04-01 00:00:00'
+            <if test="account != null and account != ''" >
+                and account = #{account}
+            </if>
+            <if test="superAccount != null and superAccount != null">
+                <choose>
+                    <when test="flag != null and flag == 1">
+                        AND parent_name = #{superAccount}
+                    </when>
+                    <otherwise>
+                        AND agent_path like concat('%',#{superAccount},'%')
+                    </otherwise>
+                </choose>
+            </if>
+
+             UNION ALL
+        SELECT
+            'b' type,
+            ifnull( sum( salary_amount ), 0 ) amount,
+            count( DISTINCT account ) num
+        FROM
+            salary_grant
+        WHERE
+            grant_status = 2
+            AND create_time BETWEEN '2021-02-01 00:00:00'
+            AND '2022-04-01 00:00:00'
+            <if test="account != null and account != ''" >
+                and account = #{account}
+            </if>
+            <if test="superAccount != null and superAccount != null">
+                <choose>
+                    <when test="flag != null and flag == 1">
+                        AND parent_name = #{superAccount}
+                    </when>
+                    <otherwise>
+                        AND super_path like concat('%',#{superAccount},'%')
+                    </otherwise>
+                </choose>
+            </if>
+        UNION ALL
+        SELECT
+            'c' type,
+            ifnull( sum( back_water_amount ), 0 ) amount,
+            count( DISTINCT user_name ) num
+        FROM
+            lottery_rebate_report
+        WHERE
+            STATUS = 1
+            AND create_time BETWEEN '2021-02-01 00:00:00'
+            AND '2022-04-01 00:00:00'
+            <if test="account != null and account != ''" >
+                and user_name = #{account}
+            </if>
+            <if test="superAccount != null and superAccount != null">
+                <choose>
+                    <when test="flag != null and flag == 1">
+                        AND parent_name = #{superAccount}
+                    </when>
+                    <otherwise>
+                        AND agent_path like concat('%',#{superAccount},'%')
+                    </otherwise>
+                </choose>
+            </if>
+    </select>
+
 </mapper>

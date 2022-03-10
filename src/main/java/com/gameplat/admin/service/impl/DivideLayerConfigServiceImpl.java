@@ -10,7 +10,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.gameplat.admin.constant.NumberConstant;
+import com.gameplat.common.constant.NumberConstant;
 import com.gameplat.admin.constant.SystemConstant;
 import com.gameplat.admin.mapper.DivideLayerConfigMapper;
 import com.gameplat.admin.mapper.GameKindMapper;

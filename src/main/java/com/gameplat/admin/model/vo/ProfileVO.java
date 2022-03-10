@@ -39,4 +39,11 @@ public class ProfileVO {
   private String limitInfo;
 
   private String userType;
+
+
+  /** 最后登录ip */
+  private String loginIp;
+
+  /**最后登录时间 */
+  private Date loginDate;
 }

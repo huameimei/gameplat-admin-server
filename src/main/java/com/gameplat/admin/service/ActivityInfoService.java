@@ -8,6 +8,7 @@ import com.gameplat.admin.model.dto.ActivityInfoQueryDTO;
 import com.gameplat.admin.model.dto.ActivityInfoUpdateDTO;
 import com.gameplat.admin.model.dto.ActivityInfoUpdateSortDTO;
 import com.gameplat.admin.model.vo.ActivityInfoVO;
+import com.gameplat.admin.model.vo.ActivityLobbyVO;
 import com.gameplat.model.entity.activity.ActivityInfo;
 
 import java.util.List;
@@ -105,4 +106,11 @@ public interface ActivityInfoService extends IService<ActivityInfo> {
    * @param activityInfoUpdateSortDTO
    */
   void updateSort(ActivityInfoUpdateSortDTO activityInfoUpdateSortDTO);
+
+  /**
+   * 查询未绑定的活动大厅
+   *
+   * @return
+   */
+  List<ActivityLobbyVO> findUnboundLobbyList();
 }

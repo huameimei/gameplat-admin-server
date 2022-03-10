@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapp
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.convert.ActivityInfoConvert;
+import com.gameplat.admin.convert.ActivityLobbyConvert;
 import com.gameplat.admin.enums.SysBannerInfoEnum;
 import com.gameplat.admin.mapper.ActivityInfoMapper;
 import com.gameplat.admin.model.dto.ActivityInfoAddDTO;
@@ -13,8 +14,10 @@ import com.gameplat.admin.model.dto.ActivityInfoQueryDTO;
 import com.gameplat.admin.model.dto.ActivityInfoUpdateDTO;
 import com.gameplat.admin.model.dto.ActivityInfoUpdateSortDTO;
 import com.gameplat.admin.model.vo.ActivityInfoVO;
+import com.gameplat.admin.model.vo.ActivityLobbyVO;
 import com.gameplat.admin.service.*;
 import com.gameplat.base.common.exception.ServiceException;
+import com.gameplat.base.common.util.StringUtils;
 import com.gameplat.common.enums.BooleanEnum;
 import com.gameplat.common.enums.DictDataEnum;
 import com.gameplat.model.entity.activity.ActivityInfo;
@@ -44,6 +47,8 @@ public class ActivityInfoServiceImpl extends ServiceImpl<ActivityInfoMapper, Act
     implements ActivityInfoService {
 
   @Autowired private ActivityInfoConvert activityInfoConvert;
+
+  @Autowired private ActivityLobbyConvert activityLobbyConvert;
 
   @Autowired private SysBannerInfoService sysBannerInfoService;
 
@@ -87,6 +92,10 @@ public class ActivityInfoServiceImpl extends ServiceImpl<ActivityInfoMapper, Act
                 && activityInfoQueryDTO.getActivityLobbyId() != 0,
             ActivityInfo::getActivityLobbyId,
             activityInfoQueryDTO.getActivityLobbyId())
+        .eq(
+            StringUtils.isNotBlank(activityInfoQueryDTO.getCreateBy()),
+            ActivityInfo::getCreateBy,
+            activityInfoQueryDTO.getCreateBy())
         // 按排序sort正序排列
         .orderByAsc(Lists.newArrayList(ActivityInfo::getSort))
         // 按照时间倒序排列
@@ -250,5 +259,28 @@ public class ActivityInfoServiceImpl extends ServiceImpl<ActivityInfoMapper, Act
     if (!result) {
       throw new ServiceException("更新活动失败");
     }
+  }
+
+  @Override
+  public List<ActivityLobbyVO> findUnboundLobbyList() {
+    List<ActivityLobby> activityLobbyList =
+        activityLobbyService
+            .lambdaQuery()
+            .eq(ActivityLobby::getStatus, BooleanEnum.YES.value())
+            .orderByDesc(Lists.newArrayList(ActivityLobby::getCreateTime, ActivityLobby::getId))
+            .list();
+    List<ActivityLobbyVO> lobbyList = new ArrayList<>();
+    if (CollectionUtils.isNotEmpty(activityLobbyList)) {
+      for (ActivityLobby activityLobby : activityLobbyList) {
+        // 查询是否已被绑定活动发布记录
+        Long count =
+            this.lambdaQuery().eq(ActivityInfo::getActivityLobbyId, activityLobby.getId()).count();
+        if (count > 0) {
+          continue;
+        }
+        lobbyList.add(activityLobbyConvert.toVo(activityLobby));
+      }
+    }
+    return lobbyList;
   }
 }

@@ -18,20 +18,12 @@ import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.common.enums.GamePlatformEnum;
 import com.gameplat.common.enums.TransferTypesEnum;
 import com.gameplat.common.game.GameBizBean;
-import com.gameplat.common.game.LiveGameResult;
+import com.gameplat.common.game.GameResult;
 import com.gameplat.common.game.api.GameApi;
 import com.gameplat.elasticsearch.page.PageResponse;
 import com.gameplat.elasticsearch.service.IBaseElasticsearchService;
 import com.gameplat.model.entity.game.GameBetRecord;
 import com.gameplat.model.entity.game.LiveBetRecord;
-import java.io.IOException;
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-import javax.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
@@ -57,6 +49,15 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 @Slf4j
 @Service
 @Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)
@@ -81,7 +82,7 @@ public class GameBetRecordInfoServiceImpl implements GameBetRecordInfoService {
   @Transactional(propagation = Propagation.NOT_SUPPORTED)
   public GameApi getGameApi(String platformCode) {
     GameApi api = applicationContext
-        .getBean(platformCode.toLowerCase() + GameApi.Suffix, GameApi.class);
+        .getBean(platformCode.toLowerCase() + GameApi.SUFFIX, GameApi.class);
     TransferTypesEnum tt = TransferTypesEnum.get(platformCode);
     // 1代表是否额度转换
     if (tt == null || tt.getType() != 1) {
@@ -156,13 +157,13 @@ public class GameBetRecordInfoServiceImpl implements GameBetRecordInfoService {
   }
 
   @Override
-  public LiveGameResult getGameResult(GameBetRecordQueryDTO dto) throws Exception {
+  public GameResult getGameResult(GameBetRecordQueryDTO dto) throws Exception {
     // TODO 直接连游戏查询结果
     GameApi gameApi = getGameApi(dto.getPlatformCode());
     GameBizBean gameBizBean = new GameBizBean();
     gameBizBean.setOrderNo(dto.getBillNo());
     gameBizBean.setConfig(gameConfigService.queryGameConfigInfoByPlatCode(dto.getPlatformCode()));
-    LiveGameResult liveGameResult = gameApi.getGameResult(gameBizBean);
+    GameResult liveGameResult = gameApi.getGameResult(gameBizBean);
     if (StringUtils.isBlank(liveGameResult.getData())) {
       throw new ServiceException(GamePlatformEnum.getName(dto.getPlatformCode()) + "暂不支持查看游戏结果");
     }

@@ -30,6 +30,7 @@ public class SysSmsAreaServiceImpl extends ServiceImpl<SysSmsAreaMapper, SysSmsA
     return this.lambdaQuery()
         .eq(ObjectUtils.isNotEmpty(queryDTO.getCode()), SysSmsArea::getCode, queryDTO.getCode())
         .eq(ObjectUtils.isNotEmpty(queryDTO.getName()), SysSmsArea::getName, queryDTO.getName())
+        .orderByDesc(SysSmsArea::getCreateTime)
         .page(page)
         .convert(areaConvert::toVo);
   }

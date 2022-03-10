@@ -1,10 +1,8 @@
 package com.gameplat.admin.controller.open.member;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.gameplat.admin.model.dto.MemberLoanQueryDTO;
 import com.gameplat.admin.model.vo.LoanVO;
-import com.gameplat.admin.model.vo.MemberLoanVO;
 import com.gameplat.admin.service.MemberLoanService;
 import com.gameplat.model.entity.member.MemberLoan;
 import io.swagger.annotations.Api;

@@ -11,6 +11,7 @@ import com.gameplat.admin.mapper.MemberLoanMapper;
 import com.gameplat.admin.model.dto.MemberLoanQueryDTO;
 import com.gameplat.admin.model.dto.MemberQueryDTO;
 import com.gameplat.admin.model.vo.LoanVO;
+import com.gameplat.admin.model.vo.MemberLoanSumVO;
 import com.gameplat.admin.model.vo.MemberLoanVO;
 import com.gameplat.admin.model.vo.MemberVO;
 import com.gameplat.admin.service.*;
@@ -41,14 +42,19 @@ public class MemberLoanServiceImpl extends ServiceImpl<MemberLoanMapper, MemberL
 
     @Autowired
     private MemberLoanConvert memberLoanConvert;
+
     @Autowired
     private MemberService memberService;
+
     @Autowired
     private MemberInfoService memberInfoService;
+
     @Autowired
     private MemberGrowthLevelService memberGrowthLevelService;
+
     @Autowired
     private MemberBillService memberBillService;
+
     @Autowired
     private MessageInfoService messageInfoService;
 
@@ -57,22 +63,26 @@ public class MemberLoanServiceImpl extends ServiceImpl<MemberLoanMapper, MemberL
      */
     @Override
     public LoanVO page(PageDTO<MemberLoan> page, MemberLoanQueryDTO dto) {
-
         //获取符合资格的会员
         List<MemberGrowthLevel> memberGrowthLevelList = memberGrowthLevelService.lambdaQuery()
                 .gt(MemberGrowthLevel::getLoanMoney, 0.00)
                 .list();
+
         List<MemberVO> memberList = new ArrayList<>();
+
         for (MemberGrowthLevel memberGrowthLevel : memberGrowthLevelList) {
             List<MemberVO> memberVoList = memberService.queryList(new MemberQueryDTO() {{
                 setVipLevel(memberGrowthLevel.getLevel());
             }});
+
             for (MemberVO memberVO : memberVoList) {
                 memberList.add(memberVO);
             }
+
             for (MemberVO memberVO : memberList) {
                 //已经有数据就不添加
                 MemberLoan memberLoan = this.lambdaQuery().eq(MemberLoan::getMemberId, memberVO.getId()).one();
+
                 if (ObjectUtil.isNull(memberLoan)) {
                     MemberLoan saveMemberLoan = new MemberLoan()
                             .setMemberId(memberVO.getId())
@@ -90,6 +100,7 @@ public class MemberLoanServiceImpl extends ServiceImpl<MemberLoanMapper, MemberL
                 }
             }
         }
+
         IPage<MemberLoanVO> pageList = this.lambdaQuery()
                 .eq(ObjectUtil.isNotNull(dto.getAccount()), MemberLoan::getAccount, dto.getAccount())
                 .eq(ObjectUtil.isNotNull(dto.getVipLevel()), MemberLoan::getVipLevel, dto.getVipLevel())
@@ -101,20 +112,24 @@ public class MemberLoanServiceImpl extends ServiceImpl<MemberLoanMapper, MemberL
                 .page(page)
                 .convert(memberLoanConvert::toVo);
 
-        LoanVO loanVO = new LoanVO();
-        loanVO.setMemberLoanVO(pageList);
-
         BigDecimal subtotal = new BigDecimal(0.00);
         for (MemberLoanVO record : pageList.getRecords()) {
             subtotal = subtotal.add(record.getOverdraftMoney());
         }
-        loanVO.setSubtotal(subtotal);
 
         BigDecimal total = new BigDecimal(0.00);
         for (MemberLoan memberLoan : this.lambdaQuery().list()) {
             total = total.add(memberLoan.getOverdraftMoney());
         }
-        loanVO.setTotal(total);
+
+        MemberLoanSumVO sum = new MemberLoanSumVO();
+        sum.setSubtotal(subtotal);
+        sum.setTotal(total);
+
+        LoanVO loanVO = new LoanVO();
+        loanVO.setPage(pageList);
+        loanVO.setMemberLoanSumVO(sum);
+
         return loanVO;
     }
 
@@ -160,11 +175,11 @@ public class MemberLoanServiceImpl extends ServiceImpl<MemberLoanMapper, MemberL
             if (ObjectUtil.isNull(memberLoan)) {
                 throw new ServiceException("此账号暂无法使用借呗功能");
             }
-            if (memberLoan.getLoanStatus() == 1) {
-                throw new ServiceException("此账号暂无欠款");
-            } else if (memberLoan.getLoanStatus() == 2) {
-                throw new ServiceException("此账号欠款已回收");
-            }
+//            if (memberLoan.getLoanStatus() == 1) {
+//                throw new ServiceException("此账号暂无欠款");
+//            } else if (memberLoan.getLoanStatus() == 2) {
+//                throw new ServiceException("此账号欠款已回收");
+//            }
             //欠款金额
             BigDecimal overdraftMoney = memberLoan.getOverdraftMoney();
             MemberInfo memberInfo = memberInfoService.lambdaQuery()
@@ -178,7 +193,7 @@ public class MemberLoanServiceImpl extends ServiceImpl<MemberLoanMapper, MemberL
             }
             this.updateById(new MemberLoan() {{
                 setId(id);
-                setLoanStatus(3);
+                setLoanStatus(2);
                 setOverdraftMoney(new BigDecimal(0.00));
                 setMemberBalance(newBalance);
             }});

@@ -249,7 +249,7 @@ public class DivideLayerConfigServiceImpl
         JSONUtil.toBean(ownerLayerConfig.getDivideConfig(), Map.class);
 
     Map<String, JSONObject> parentLayerConfigMap = new HashMap<>();
-    if (member.getAgentLevel() > 0) {
+    if (member.getAgentLevel() > 1) {
       DivideLayerConfig parentLayerConfig = layerConfigMapper.getByUserName(member.getParentName());
       if (BeanUtil.isEmpty(parentLayerConfig)
           || StrUtil.isBlank(parentLayerConfig.getDivideConfig())) {

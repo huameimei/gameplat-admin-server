@@ -57,7 +57,7 @@
                         and dl.user_name = #{dto.userName}
                     </when>
                     <otherwise>
-                        and m.agent_level = 1
+                        and (m.agent_level = 1 or m.agent_level = 0)
                     </otherwise>
                 </choose>
             </otherwise>

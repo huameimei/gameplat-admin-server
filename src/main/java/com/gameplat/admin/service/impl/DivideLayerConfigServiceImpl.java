@@ -10,6 +10,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.gameplat.admin.constant.NumberConstant;
 import com.gameplat.admin.constant.SystemConstant;
 import com.gameplat.admin.mapper.DivideLayerConfigMapper;
 import com.gameplat.admin.mapper.GameKindMapper;
@@ -249,7 +250,7 @@ public class DivideLayerConfigServiceImpl
         JSONUtil.toBean(ownerLayerConfig.getDivideConfig(), Map.class);
 
     Map<String, JSONObject> parentLayerConfigMap = new HashMap<>();
-    if (member.getAgentLevel() > 1) {
+    if (member.getAgentLevel() > NumberConstant.ONE) {
       DivideLayerConfig parentLayerConfig = layerConfigMapper.getByUserName(member.getParentName());
       if (BeanUtil.isEmpty(parentLayerConfig)
           || StrUtil.isBlank(parentLayerConfig.getDivideConfig())) {
@@ -285,7 +286,7 @@ public class DivideLayerConfigServiceImpl
         }
         if (dictData.getDictValue().equalsIgnoreCase(voMap.getValue().getStr("liveGameCode"))) {
           // 填充最大可编辑的分红点数值
-          if (member.getAgentLevel() == 0) {
+          if (member.getAgentLevel() == NumberConstant.ZERO) {
             voMap.getValue().put("maxRatio", new BigDecimal("100"));
           } else {
             // 如果不是顶级代理 则可调整的最大值就是他直属上级被直属上级的直属上级所分配的分红比例 即 他直属上级的divideRatio值
@@ -296,17 +297,17 @@ public class DivideLayerConfigServiceImpl
 
           // 填充最小可编辑的分红点数值
           BigDecimal min = BigDecimal.ZERO;
-          if (childCount > 0) {
+          if (childCount > NumberConstant.ZERO) {
             // 最小值就是 它分配给所有直接下级的分红比例的最大值  无直属下级分红时  就是0
             BigDecimal childMaxDivideRatio =
                 layerConfigMapper.getChildMaxDivideRatio(userName, voMap.getKey());
-            min = childMaxDivideRatio.compareTo(min) > 0 ? childMaxDivideRatio : min;
+            min = childMaxDivideRatio.compareTo(min) > NumberConstant.ZERO ? childMaxDivideRatio : min;
           }
-          if (linkCount > 0) {
+          if (linkCount > NumberConstant.ZERO) {
             // 最小值就是 绑定此代理的推广链接的默认分红配置的分红比例最大值
             BigDecimal promotionMaxDivideRatio =
                 spreadLinkInfoMapper.getlinkMaxDivideRatio(userName, voMap.getKey());
-            min = promotionMaxDivideRatio.compareTo(min) > 0 ? promotionMaxDivideRatio : min;
+            min = promotionMaxDivideRatio.compareTo(min) > NumberConstant.ZERO ? promotionMaxDivideRatio : min;
           }
           voMap.getValue().put("minRatio", min);
           voMap
@@ -366,12 +367,12 @@ public class DivideLayerConfigServiceImpl
             .getAgentByAccount(userName)
             .orElseThrow(() -> new ServiceException("代理账号不存在!"));
     Long count = this.lambdaQuery().eq(DivideLayerConfig::getUserName, userName).count();
-    Assert.isTrue(count <= 0, "不能重复添加！");
+    Assert.isTrue(count <= NumberConstant.ZERO, "不能重复添加！");
     DivideLayerConfig saveObj =
         DivideLayerConfig.builder().userId(member.getId()).userName(member.getAccount()).build();
 
     Map<String, GameDivideVo> saveMap = new HashMap<>();
-    if (member.getAgentLevel() > 1) {
+    if (member.getAgentLevel() > NumberConstant.ONE) {
       Assert.isTrue(StrUtil.isNotBlank(member.getSuperPath()), "代理路径为空！");
       // 顶级上级名称
       String realSuperName = this.getRealSuperName(member.getSuperPath(), member.getAgentLevel());
@@ -452,7 +453,7 @@ public class DivideLayerConfigServiceImpl
             .orElseThrow(() -> new ServiceException("代理账号不存在!"));
 
     Map<String, JSONObject> parentDivideMap = new HashMap<>();
-    if (member.getAgentLevel() > 1) {
+    if (member.getAgentLevel() > NumberConstant.ONE) {
       DivideLayerConfig parentLayerConfig = layerConfigMapper.getByUserName(member.getParentName());
       if (BeanUtil.isEmpty(parentLayerConfig)
           || StrUtil.isBlank(parentLayerConfig.getDivideConfig())) {
@@ -464,7 +465,7 @@ public class DivideLayerConfigServiceImpl
         this.getTeamLayerDivideConfig(divideConfigDTO.getUserName());
     List<SpreadLinkInfoVo> allSpreadLinkInfo = this.getTeamLinkInfo(divideConfigDTO.getUserName());
     for (Map.Entry<String, JSONObject> ownerMap : saveMap.entrySet()) {
-      if (member.getAgentLevel() > 1 && BeanUtil.isNotEmpty(parentDivideMap)) {
+      if (member.getAgentLevel() > NumberConstant.ONE && BeanUtil.isNotEmpty(parentDivideMap)) {
         ownerMap
             .getValue()
             .put(
@@ -563,7 +564,7 @@ public class DivideLayerConfigServiceImpl
             .build();
     int i = layerConfigMapper.updateById(editObj);
 
-    Assert.isTrue(i > 0, "编辑失败！");
+    Assert.isTrue(i > NumberConstant.ZERO, "编辑失败！");
   }
 
   /**
@@ -573,7 +574,7 @@ public class DivideLayerConfigServiceImpl
    * @return
    */
   public String getRealSuperPath(String oldSuperPath, Integer userLevel) {
-    if (userLevel > 1) {
+    if (userLevel > NumberConstant.ONE) {
       oldSuperPath =
           oldSuperPath.replace("/".concat(SystemConstant.DEFAULT_WEB_ROOT).concat("/"), "");
       oldSuperPath =
@@ -594,10 +595,10 @@ public class DivideLayerConfigServiceImpl
   public String getRealSuperName(String superPath, Integer userLevel) {
     superPath = getRealSuperPath(superPath, userLevel);
     if (superPath.startsWith("/")) {
-      superPath = superPath.substring(1);
+      superPath = superPath.substring(NumberConstant.ONE);
     }
     if (superPath.endsWith("/")) {
-      superPath = superPath.substring(0, superPath.length() - 1);
+      superPath = superPath.substring(NumberConstant.ZERO, superPath.length() - NumberConstant.ONE);
     }
     return superPath.split("/")[0];
   }

@@ -30,4 +30,6 @@ public interface DataReportService {
 
     List<ThreeRechReportVo> findThreeRech(GameRWDataReportDto dto);
 
+    GameProxyDataVo findProxyData(GameRWDataReportDto dto);
+
 }

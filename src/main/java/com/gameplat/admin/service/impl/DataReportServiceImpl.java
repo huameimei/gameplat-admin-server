@@ -1,11 +1,9 @@
 package com.gameplat.admin.service.impl;
 
-import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.date.DateUtil;
 import com.alibaba.fastjson.JSON;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.mapper.DataReportMapper;
@@ -14,9 +12,6 @@ import com.gameplat.admin.model.vo.*;
 import com.gameplat.admin.service.DataReportService;
 import com.gameplat.admin.service.RechargeOrderService;
 import com.gameplat.base.common.util.StringUtils;
-import com.gameplat.common.enums.RechargeStatus;
-import com.gameplat.common.enums.WithdrawStatus;
-import com.gameplat.model.entity.recharge.RechargeOrder;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -68,6 +63,16 @@ public class DataReportServiceImpl extends ServiceImpl<DataReportMapper, GameRec
     private final String birthdayGift = "3";
 
     private final String monthlyRed = "4";
+
+
+    //代理总计 divide_type 代理分红,  salary_type 代理日工资  water_type 代理返点
+    private final String divide_type = "a";
+
+    private final String salary_type = "b";
+
+    private final String water_type = "c";
+
+
 
     @Autowired
     RechargeOrderService rechargeOrderService;
@@ -257,4 +262,31 @@ public class DataReportServiceImpl extends ServiceImpl<DataReportMapper, GameRec
         return  Optional.ofNullable(rechargeOrderService.findThreeRechReport(dto)).orElse(new ArrayList<>());
     }
 
+
+    @Override
+    public GameProxyDataVo findProxyData(GameRWDataReportDto dto) {
+        GameProxyDataVo gameProxyDataVo = new GameProxyDataVo();
+        //计算代理数据
+        List<Map<String, Object>> proxyData = dataReportMapper.findProxyData(dto);
+        log.info("计算代理数据:{}",proxyData.size());
+        proxyData.stream().forEach(a ->{
+            if (ObjectUtils.isNotEmpty(a.get("type")) && divide_type.equalsIgnoreCase(a.get("type").toString())) {
+                gameProxyDataVo.setDivideAmount(Convert.toBigDecimal(a.get("amount")));
+                gameProxyDataVo.setDivideNum(Convert.toInt(a.get("num")));
+                return;
+            }
+            if (ObjectUtils.isNotEmpty(a.get("type")) && salary_type.equalsIgnoreCase(a.get("type").toString())) {
+                gameProxyDataVo.setSalaryGrant(Convert.toBigDecimal(a.get("amount")));
+                gameProxyDataVo.setSalaryNum(Convert.toInt(a.get("num")));
+                return;
+            }
+
+            if (ObjectUtils.isNotEmpty(a.get("type")) && water_type.equalsIgnoreCase(a.get("type").toString())) {
+                gameProxyDataVo.setProxyWaterAmount(Convert.toBigDecimal(a.get("amount")));
+                gameProxyDataVo.setProxyWaterNum(Convert.toInt(a.get("num")));
+                return;
+            }
+        });
+        return gameProxyDataVo;
+    }
 }

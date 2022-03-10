@@ -19,6 +19,7 @@ import com.gameplat.common.enums.SwitchStatusEnum;
 import com.gameplat.common.enums.UserTypes;
 import com.gameplat.common.model.bean.limit.MemberRechargeLimit;
 import com.gameplat.model.entity.member.Member;
+import com.gameplat.model.entity.member.MemberInfo;
 import com.gameplat.model.entity.member.MemberWithdraw;
 import com.gameplat.model.entity.member.MemberWithdrawHistory;
 import com.gameplat.model.entity.pay.PpInterface;
@@ -58,6 +59,10 @@ public class ProxyPayServiceImpl implements ProxyPayService {
 
   @Autowired private PaymentCenterFeign paymentCenterFeign;
 
+  @Autowired private ValidWithdrawService validWithdrawService;
+
+  @Autowired private MemberRwReportService memberRwReportService;
+
   @Override
   public void proxyPay(
       Long id,
@@ -70,6 +75,17 @@ public class ProxyPayServiceImpl implements ProxyPayService {
     if (null == memberWithdraw) {
       throw new ServiceException("不存在的记录");
     }
+
+    Member member = memberService.getById(memberWithdraw.getMemberId());
+    if (member == null) {
+      throw new ServiceException("用户不存在");
+    }
+
+    MemberInfo memberInfo = memberInfoService.getById(memberWithdraw.getMemberId());
+    if (memberInfo == null) {
+      throw new ServiceException("用户扩展信息不存在");
+    }
+
     // 校验已受理出款是否允许其他人操作
     crossAccountCheck(userCredential, memberWithdraw);
 
@@ -122,7 +138,7 @@ public class ProxyPayServiceImpl implements ProxyPayService {
     memberWithdraw.setApproveReason(ppMerchant.getName() + "代付出款");
     memberWithdraw.setOperatorTime(new Date());
     memberWithdraw.setOperatorAccount(userCredential.getUsername());
-    updateProxyWithdrawStatus(memberWithdraw, WithdrawStatus.SUCCESS.getValue());
+    updateProxyWithdrawStatus(memberWithdraw, WithdrawStatus.SUCCESS.getValue(),member,memberInfo);
 
     /** 请求第三方代付接口 */
     log.info("进入第三方出入款中心出款订单号: {}", memberWithdraw.getCashOrderNo());
@@ -427,7 +443,8 @@ public class ProxyPayServiceImpl implements ProxyPayService {
    *
    * @param memberWithdraw
    */
-  public void updateProxyWithdrawStatus(MemberWithdraw memberWithdraw, Integer cashStatus)
+  public void updateProxyWithdrawStatus(MemberWithdraw memberWithdraw, Integer cashStatus,Member member,
+      MemberInfo memberInfo)
       throws Exception {
     // 修改订单状态
     LambdaUpdateWrapper<MemberWithdraw> updateMemberWithdraw = Wrappers.lambdaUpdate();
@@ -452,13 +469,19 @@ public class ProxyPayServiceImpl implements ProxyPayService {
               + memberWithdraw.getCashStatus());
       throw new ServiceException("订单已处理");
     }
+
+    if (!UserTypes.PROMOTION.value().equals(member.getUserType())) {
+      memberRwReportService
+          .addWithdraw(member,memberInfo.getTotalWithdrawTimes(),memberWithdraw);
+    }
+
     // 更新会员信息表
     memberInfoService.updateBalanceWithWithdraw(
         memberWithdraw.getMemberId(), memberWithdraw.getCashMoney());
 
     // 删除出款验证打码量记录的数据
-    //    validWithdrawService.remove(userWithdraw.getUserId(), userWithdraw.getAddTime());
-    //
+    validWithdrawService.remove(memberWithdraw.getMemberId(), memberWithdraw.getCreateTime());
+
     // 添加取现历史记录
     memberWithdraw.setCashStatus(cashStatus);
     MemberWithdrawHistory memberWithdrawHistory = new MemberWithdrawHistory();

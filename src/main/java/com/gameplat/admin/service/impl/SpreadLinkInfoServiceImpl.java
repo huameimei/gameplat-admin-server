@@ -338,7 +338,7 @@ public class SpreadLinkInfoServiceImpl extends ServiceImpl<SpreadLinkInfoMapper,
           linkMinRebate = new BigDecimal("0").setScale(2, BigDecimal.ROUND_HALF_UP);
         } else {
           linkMinRebate =
-              BigDecimal.valueOf(linkMinRebateObj.getRebate())
+                  linkMinRebateObj.getRebate()
                   .setScale(2, BigDecimal.ROUND_HALF_UP);
         }
 
@@ -399,5 +399,17 @@ public class SpreadLinkInfoServiceImpl extends ServiceImpl<SpreadLinkInfoMapper,
           .eq(SpreadLinkInfo::getId, linkId)
           .update(new SpreadLinkInfo());
     }
+  }
+
+  @Override
+  public BigDecimal getMaxSpreadLinkRebate(String account) {
+    return this.lambdaQuery()
+        .select(SpreadLinkInfo::getRebate)
+        .eq(SpreadLinkInfo::getAgentAccount, account)
+        .orderByDesc(SpreadLinkInfo::getRebate)
+        .last("LIMIT 1")
+        .oneOpt()
+        .map(SpreadLinkInfo::getRebate)
+        .orElse(BigDecimal.ZERO);
   }
 }

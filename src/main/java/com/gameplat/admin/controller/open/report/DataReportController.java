@@ -20,11 +20,8 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.Date;
 import java.util.List;
 
-
 /**
- * @Author kb
- * @Date 2022/3/2 21:48
- * @Version 1.0
+ * @Author kb @Date 2022/3/2 21:48 @Version 1.0
  */
 @Slf4j
 @Api(tags = "数据统计")
@@ -32,205 +29,133 @@ import java.util.List;
 @RequestMapping("/api/admin/report/data")
 public class DataReportController {
 
+  @Autowired(required = false)
+  private DataReportService dataReportService;
 
-    @Autowired(required = false)
-    private DataReportService dataReportService;
+  @Autowired private MemberService memberService;
 
-    @Autowired
-    private MemberService memberService;
+  // 代理下的会员
+  private final int ONE = 0;
 
-    //代理下的会员
-    private final int ONE = 0;
+  @ApiOperation("充值数据统计")
+  @GetMapping("findRechReport")
+  public GameRechDataReportVO findRechReport(GameRWDataReportDto dto) {
+    log.info("查询数据统计充值入参：{}", JSON.toJSONString(dto));
+    editGameRWDataReportDto(dto);
+    return dataReportService.findRechReport(dto);
+  }
 
-    @ApiOperation("充值数据统计")
-    @GetMapping("findRechReport")
-    public GameRechDataReportVO findRechReport(GameRWDataReportDto dto) {
-        log.info("查询数据统计充值入参：{}", JSON.toJSONString(dto));
-        if (StringUtils.isEmpty(dto.getStartTime())) {
-            String startTime = DateUtils.format(new Date());
-            dto.setStartTime(startTime);
-        }
-        if (StringUtils.isEmpty(dto.getEndTime())) {
-            String endTime = DateUtils.format(new Date());
-            dto.setEndTime(endTime);
-        }
-        if (StringUtils.isNotEmpty(dto.getSuperAccount())) {
-            if (dto.getFlag() == ONE) {
-                Member byAccount = memberService.getForAccount(dto.getSuperAccount());
-                if (byAccount == null) {
-                    throw new ServiceException("代理账号不存在");
-                }
-                dto.setSuperAccount(byAccount.getSuperPath());
-            }
-        }
-        return dataReportService.findRechReport(dto);
+  @ApiOperation("提现数据统计")
+  @GetMapping("findWithReport")
+  public GameWithDataReportVO findWithReport(GameRWDataReportDto dto) {
+    log.info("查询数据统计提现入参：{}", JSON.toJSONString(dto));
+    editGameRWDataReportDto(dto);
+    return dataReportService.findWithReport(dto);
+  }
+
+  @ApiOperation("游戏数据统计")
+  @GetMapping("findGameDataReport")
+  public GameDataReportVO findGameDataReport(GameRWDataReportDto dto) {
+    log.info("查询数据统计游戏入参：{}", JSON.toJSONString(dto));
+    editGameRWDataReportDto(dto);
+    return dataReportService.findGameReport(dto);
+  }
+
+  @ApiOperation("会员数据统计")
+  @GetMapping("findAccountDataReport")
+  public GameAccountDataReportVo findAccountDataReport(
+      Page<AccountReportVo> page, GameRWDataReportDto dto) {
+    log.info("查询数据统注册入参：{}", JSON.toJSONString(dto));
+    editGameRWDataReportSecondDto(dto);
+
+    return dataReportService.findMemberReport(page, dto);
+  }
+
+  /** 红利 = 充值优惠 + 彩金 + VIP红利 + 活动红利 + 聊天室红包 VIP红利 = 周俸禄 + 月俸禄 + 升级奖励 + 生日礼金 + 每月红包 活动红利 = 活动彩金 */
+  @ApiOperation("红利数据统计")
+  @GetMapping("findDividendtDataReport")
+  public GameDividendDataVo findDividendtDataReport(GameRWDataReportDto dto) {
+    log.info("查询数据统计红利入参：{}", JSON.toJSONString(dto));
+    editGameRWDataReportDto(dto);
+    return dataReportService.findDividendtDataReport(dto);
+  }
+
+  @ApiOperation("查询会员金额")
+  @GetMapping("findAccountReport")
+  public PageDtoVO<AccountReportVo> findAccountReport(
+      Page<AccountReportVo> page, GameRWDataReportDto dto) {
+    log.info("查询数据统计红利入参：{}", JSON.toJSONString(dto));
+    editGameRWDataReportDto(dto);
+    return dataReportService.findAccountReport(page, dto);
+  }
+
+  @ApiOperation("根据第三方查询第三方充值金额")
+  @GetMapping("findThreeRech")
+  public List<ThreeRechReportVo> findThreeRech(GameRWDataReportDto dto) {
+    log.info("查询数据统计红利入参：{}", JSON.toJSONString(dto));
+    editGameRWDataReportSecondDto(dto);
+    return dataReportService.findThreeRech(dto);
+  }
+
+
+
+  @ApiOperation(value = "代理总计")
+  @GetMapping("findProxyData")
+  public GameProxyDataVo findProxyData(GameRWDataReportDto dto) {
+    log.info("查询数据统计红利入参：{}", JSON.toJSONString(dto));
+    editGameRWDataReportSecondDto(dto);
+    return dataReportService.findProxyData(dto);
+  }
+
+  private String getAccountSuperPath(String account) {
+    return memberService.getSupperPath(account).orElseThrow(() -> new ServiceException("代理账号不存在"));
+  }
+
+
+  /**
+   * 时分秒
+   * @param dto
+   */
+  public void editGameRWDataReportSecondDto(GameRWDataReportDto dto) {
+    if (StringUtils.isEmpty(dto.getStartTime())) {
+      String startTime = DateUtils.format(new Date());
+      startTime += " 00:00:00";
+      dto.setStartTime(startTime);
+    } else {
+      dto.setStartTime(dto.getStartTime() + " 00:00:00");
     }
-
-
-    @ApiOperation("提现数据统计")
-    @GetMapping("findWithReport")
-    public GameWithDataReportVO findWithReport(GameRWDataReportDto dto) {
-        log.info("查询数据统计提现入参：{}", JSON.toJSONString(dto));
-        if (StringUtils.isEmpty(dto.getStartTime())) {
-            String startTime = DateUtils.format(new Date());
-            dto.setStartTime(startTime);
-        }
-        if (StringUtils.isEmpty(dto.getEndTime())) {
-            String endTime = DateUtils.format(new Date());
-            dto.setEndTime(endTime);
-        }
-        if (StringUtils.isNotEmpty(dto.getSuperAccount())) {
-            if (dto.getFlag() == ONE) {
-                Member byAccount = memberService.getForAccount(dto.getSuperAccount());
-                if (byAccount == null) {
-                    throw new ServiceException("代理账号不存在");
-                }
-                dto.setSuperAccount(byAccount.getSuperPath());
-            }
-        }
-        return dataReportService.findWithReport(dto);
+    if (StringUtils.isEmpty(dto.getEndTime())) {
+      String endTime = DateUtils.format(new Date());
+      endTime += " 23:59:59";
+      dto.setEndTime(endTime);
+    } else {
+      dto.setEndTime(dto.getEndTime() + " 23:59:59");
     }
-
-    @ApiOperation("游戏数据统计")
-    @GetMapping("findGameDataReport")
-    public GameDataReportVO findGameDataReport(GameRWDataReportDto dto) {
-        log.info("查询数据统计游戏入参：{}", JSON.toJSONString(dto));
-        if (StringUtils.isEmpty(dto.getStartTime())) {
-            String startTime = DateUtils.format(new Date());
-            dto.setStartTime(startTime);
-        }
-        if (StringUtils.isEmpty(dto.getEndTime())) {
-            String endTime = DateUtils.format(new Date());
-            dto.setEndTime(endTime);
-        }
-        if (StringUtils.isNotEmpty(dto.getSuperAccount())) {
-            if (dto.getFlag() == ONE) {
-                Member byAccount = memberService.getForAccount(dto.getSuperAccount());
-                if (byAccount == null) {
-                    throw new ServiceException("代理账号不存在");
-                }
-                dto.setSuperAccount(byAccount.getSuperPath());
-            }
-        }
-        return dataReportService.findGameReport(dto);
+    if (StringUtils.isNotEmpty(dto.getSuperAccount())) {
+      if (dto.getFlag() == ONE) {
+        dto.setSuperAccount(this.getAccountSuperPath(dto.getSuperAccount()));
+      }
     }
+  }
 
 
-    @ApiOperation("会员数据统计")
-    @GetMapping("findAccountDataReport")
-    public GameAccountDataReportVo findAccountDataReport(Page<AccountReportVo> page, GameRWDataReportDto dto) {
-        log.info("查询数据统注册入参：{}", JSON.toJSONString(dto));
-        if (StringUtils.isEmpty(dto.getStartTime())) {
-            String startTime = DateUtils.format(new Date());
-            startTime += " 00:00:00";
-            dto.setStartTime(startTime);
-        } else {
-            dto.setStartTime(dto.getStartTime() + " 00:00:00");
-        }
-        if (StringUtils.isEmpty(dto.getEndTime())) {
-            String endTime = DateUtils.format(new Date());
-            endTime += " 23:59:59";
-            dto.setEndTime(endTime);
-        } else {
-            dto.setEndTime(dto.getEndTime() + " 23:59:59");
-        }
-        if (StringUtils.isNotEmpty(dto.getSuperAccount())) {
-            if (dto.getFlag() == ONE) {
-                Member byAccount = memberService.getForAccount(dto.getSuperAccount());
-                if (byAccount == null) {
-                    throw new ServiceException("代理账号不存在");
-                }
-                dto.setSuperAccount(byAccount.getSuperPath());
-            }
-        }
-
-        return dataReportService.findMemberReport(page, dto);
+  /**
+   * 日期
+   * @param dto
+   */
+  public void editGameRWDataReportDto(GameRWDataReportDto dto) {
+    if (StringUtils.isEmpty(dto.getStartTime())) {
+      String startTime = DateUtils.format(new Date());
+      dto.setStartTime(startTime);
     }
-
-    /**
-     * 红利 = 充值优惠 + 彩金 + VIP红利 + 活动红利 + 聊天室红包
-     * VIP红利  = 周俸禄 + 月俸禄 + 升级奖励 + 生日礼金 + 每月红包
-     * 活动红利 = 活动彩金
-     */
-    @ApiOperation("红利数据统计")
-    @GetMapping("findDividendtDataReport")
-    public GameDividendDataVo findDividendtDataReport(GameRWDataReportDto dto) {
-        log.info("查询数据统计红利入参：{}", JSON.toJSONString(dto));
-        if (StringUtils.isEmpty(dto.getStartTime())) {
-            String startTime = DateUtils.format(new Date());
-            dto.setStartTime(startTime);
-        }
-        if (StringUtils.isEmpty(dto.getEndTime())) {
-            String endTime = DateUtils.format(new Date());
-            dto.setEndTime(endTime);
-        }
-        if (StringUtils.isNotEmpty(dto.getSuperAccount())) {
-            if (dto.getFlag() == ONE) {
-                Member byAccount = memberService.getForAccount(dto.getSuperAccount());
-                if (byAccount == null) {
-                    throw new ServiceException("代理账号不存在");
-                }
-                dto.setSuperAccount(byAccount.getSuperPath());
-            }
-        }
-        return dataReportService.findDividendtDataReport(dto);
+    if (StringUtils.isEmpty(dto.getEndTime())) {
+      String endTime = DateUtils.format(new Date());
+      dto.setEndTime(endTime);
     }
-
-
-    @ApiOperation("查询会员金额")
-    @GetMapping("findAccountReport")
-    public PageDtoVO<AccountReportVo>  findAccountReport (Page<AccountReportVo> page,GameRWDataReportDto dto) {
-        log.info("查询数据统计红利入参：{}", JSON.toJSONString(dto));
-        if (StringUtils.isEmpty(dto.getStartTime())) {
-            String startTime = DateUtils.format(new Date());
-            dto.setStartTime(startTime);
-        }
-        if (StringUtils.isEmpty(dto.getEndTime())) {
-            String endTime = DateUtils.format(new Date());
-            dto.setEndTime(endTime);
-        }
-        if (StringUtils.isNotEmpty(dto.getSuperAccount())) {
-            if (dto.getFlag() == ONE) {
-                Member byAccount = memberService.getForAccount(dto.getSuperAccount());
-                if (byAccount == null) {
-                    throw new ServiceException("代理账号不存在");
-                }
-                dto.setSuperAccount(byAccount.getSuperPath());
-            }
-        }
-       return dataReportService.findAccountReport(page,dto);
+    if (StringUtils.isNotEmpty(dto.getSuperAccount())) {
+      if (dto.getFlag() == ONE) {
+        dto.setSuperAccount(this.getAccountSuperPath(dto.getSuperAccount()));
+      }
     }
-
-
-
-    @ApiOperation("根据第三方查询第三方充值金额")
-    @GetMapping("findThreeRech")
-    public List<ThreeRechReportVo>  findThreeRech(GameRWDataReportDto dto) {
-        log.info("查询数据统计红利入参：{}", JSON.toJSONString(dto));
-        if (StringUtils.isEmpty(dto.getStartTime())) {
-            String startTime = DateUtils.format(new Date());
-            startTime += " 00:00:00";
-            dto.setStartTime(startTime);
-        } else {
-            dto.setStartTime(dto.getStartTime() + " 00:00:00");
-        }
-        if (StringUtils.isEmpty(dto.getEndTime())) {
-            String endTime = DateUtils.format(new Date());
-            endTime += " 23:59:59";
-            dto.setEndTime(endTime);
-        } else {
-            dto.setEndTime(dto.getEndTime() + " 23:59:59");
-        }
-        if (StringUtils.isNotEmpty(dto.getSuperAccount())) {
-            if (dto.getFlag() == ONE) {
-                Member byAccount = memberService.getForAccount(dto.getSuperAccount());
-                if (byAccount == null) {
-                    throw new ServiceException("代理账号不存在");
-                }
-                dto.setSuperAccount(byAccount.getSuperPath());
-            }
-        }
-        return dataReportService.findThreeRech(dto);
-    }
-
+  }
 }

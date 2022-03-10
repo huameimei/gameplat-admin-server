@@ -1,6 +1,5 @@
 package com.gameplat.admin.service;
 
-import cn.hutool.json.JSONArray;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
@@ -10,9 +9,9 @@ import com.gameplat.admin.model.vo.MemberLevelVO;
 import com.gameplat.admin.model.vo.MemberVO;
 import com.gameplat.admin.model.vo.MessageDistributeVO;
 import com.gameplat.model.entity.member.Member;
-import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -21,7 +20,6 @@ import java.util.Optional;
  * @author three
  */
 public interface MemberService extends IService<Member> {
-  Member getForAccount(String account);
 
   IPage<MemberVO> queryPage(Page<Member> page, MemberQueryDTO dto);
 
@@ -36,6 +34,8 @@ public interface MemberService extends IService<Member> {
   Optional<Member> getByAccount(String account);
 
   Optional<Member> getAgentByAccount(String account);
+
+  Optional<String> getSupperPath(String account);
 
   List<Member> getByParentName(String parentName);
 
@@ -76,7 +76,7 @@ public interface MemberService extends IService<Member> {
   /**
    * 查询代理线的会员列表
    *
-   * @param agentAccount
+   * @param agentAccount String
    * @return List
    */
   List<Member> getListByAgentAccount(String agentAccount);
@@ -87,35 +87,61 @@ public interface MemberService extends IService<Member> {
 
   Member getMemberAndFillGameAccount(String account);
 
-  void updateTableIndex(Long memberId, int tableIndex);
-
   /**
    * 获取当前最高等级
-   * @return
+   *
+   * @return Integer
    */
   Integer getMaxLevel();
 
   /**
    * 获取开启了工资的代理
-   * @param list
-   * @return
+   *
+   * @param list List
+   * @return List
    */
   List<Member> getOpenSalaryAgent(List<Integer> list);
 
-    /**
-     * 根据多个会员账号批量查询会员信息
-     * @param accountList
-     * @return
-     */
+  /**
+   * 根据多个会员账号批量查询会员信息
+   *
+   * @param accountList List
+   * @return List
+   */
   List<Member> getListByAccountList(List<String> accountList);
 
+  /**
+   * 获取各个充值层级下会员数量和锁定会员数量
+   *
+   * @return List
+   */
   List<MemberLevelVO> getUserLevelAccountNum();
 
   Integer getUserLevelTotalAccountNum(Integer userLevel);
 
+  /**
+   * 获取代理线下的会员账号信息
+   *
+   * @param memberQueryDTO MemberQueryDTO
+   * @return List
+   */
   List<Member> getMemberListByAgentAccount(MemberQueryDTO memberQueryDTO);
 
-    JSONArray getRebateForAdd(String agentAccount);
+  /**
+   * 添加账号或添加下级时 彩票投注返点下拉
+   *
+   * @param agentAccount String
+   * @return JSONArray
+   */
+  List<Map<String, String>> getRebateForAdd(String agentAccount);
 
-    JSONArray getRebateForEdit(String agentAccount);
+  /**
+   * 编辑用户时 彩票投注返点数据集
+   *
+   * @param agentAccount String
+   * @return JSONArray
+   */
+  List<Map<String, String>> getRebateForEdit(String agentAccount);
+
+  void updateDaySalary(String ids,Integer state);
 }

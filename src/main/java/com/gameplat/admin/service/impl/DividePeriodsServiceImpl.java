@@ -13,6 +13,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.constant.MemberServiceKeyConstant;
+import com.gameplat.common.constant.NumberConstant;
 import com.gameplat.admin.constant.SystemConstant;
 import com.gameplat.admin.constant.TrueFalse;
 import com.gameplat.admin.convert.DivideDetailConvert;
@@ -30,6 +31,7 @@ import com.gameplat.admin.model.vo.DividePeriodsVO;
 import com.gameplat.admin.model.vo.FissionConfigLevelVo;
 import com.gameplat.admin.model.vo.GameDivideVo;
 import com.gameplat.admin.service.*;
+import com.gameplat.base.common.enums.EnableEnum;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.snowflake.IdGeneratorSnowflake;
 import com.gameplat.common.enums.MemberEnums;
@@ -114,7 +116,7 @@ public class DividePeriodsServiceImpl extends ServiceImpl<DividePeriodsMapper, D
         saveObj.setEndDate(DateUtil.parse(saveObj.getEndDate()).toDateStr());
         RecommendConfig recommendConfig = recommendConfigService.getRecommendConfig();
         Integer divideModel = recommendConfig.getDivideModel();
-        divideModel = ObjectUtil.defaultIfNull(divideModel, 3);
+        divideModel = ObjectUtil.defaultIfNull(divideModel, DivideStatusEnum.DIVIDE_MODEL_LAYER);
         saveObj.setDivideType(divideModel);
         Assert.isTrue(this.save(saveObj), "添加失败！");
     }
@@ -147,7 +149,7 @@ public class DividePeriodsServiceImpl extends ServiceImpl<DividePeriodsMapper, D
         String[] idArr = ids.split(",");
         for (String id : idArr) {
             DividePeriods dividePeriods = dividePeriodsMapper.selectById(id);
-            if (dividePeriods.getGrantStatus() == 2) {
+            if (dividePeriods.getGrantStatus() == DivideStatusEnum.PERIODS_SETTLE_STATUS_SETTLEED.getValue()) {
                 throw new ServiceException("已派发不能删除！");
             }
             QueryWrapper<DivideDetail> deleteDetailWrapper = new QueryWrapper();
@@ -182,7 +184,8 @@ public class DividePeriodsServiceImpl extends ServiceImpl<DividePeriodsMapper, D
 
             Assert.isTrue(
                     this.lambdaUpdate()
-                            .set(DividePeriods::getSettleStatus, 2)
+                            .set(DividePeriods::getSettleStatus,
+                                    DivideStatusEnum.PERIODS_SETTLE_STATUS_SETTLEED.getValue())
                             .eq(DividePeriods::getId, dto.getId())
                             .update(new DividePeriods()),
                     "修改期数结算状态失败！");
@@ -232,7 +235,7 @@ public class DividePeriodsServiceImpl extends ServiceImpl<DividePeriodsMapper, D
                     .build();
             DividePeriods editPo = periodsConvert.toEntity(editDto);
             int i = dividePeriodsMapper.updateById(editPo);
-            Assert.isTrue(i > 0,"派发失败！");
+            Assert.isTrue(i > NumberConstant.ZERO,"派发失败！");
         } catch (Exception e) {
             throw new ServiceException("期数派发失败！");
         } finally {
@@ -277,7 +280,7 @@ public class DividePeriodsServiceImpl extends ServiceImpl<DividePeriodsMapper, D
                     .build();
             DividePeriods editPo = periodsConvert.toEntity(editDto);
             int i = dividePeriodsMapper.updateById(editPo);
-            Assert.isTrue(i > 0,"期数回收失败！");
+            Assert.isTrue(i > NumberConstant.ZERO,"期数回收失败！");
         } catch (Exception e) {
             throw new ServiceException("期数回收失败!");
         } finally {
@@ -291,7 +294,7 @@ public class DividePeriodsServiceImpl extends ServiceImpl<DividePeriodsMapper, D
     //    @Async
     public void settleOther(Long periodsId) {
         DividePeriods periods = this.getById(periodsId);
-        if (BeanUtil.isEmpty(periods) || periods.getGrantStatus() == 2) {
+        if (BeanUtil.isEmpty(periods) || periods.getGrantStatus() == DivideStatusEnum.PERIODS_GRANT_STATUS_GRANTED.getValue()) {
             return;
         }
         // 删除分红详情
@@ -359,7 +362,7 @@ public class DividePeriodsServiceImpl extends ServiceImpl<DividePeriodsMapper, D
                 if (userType.equalsIgnoreCase(UserTypes.MEMBER.value())) {
                     if (userPaths.endsWith("/" + account)) {
                         int j = userPaths.lastIndexOf("/" + account);
-                        userPaths = j >= 0 ? userPaths.substring(0, j) : userPaths;
+                        userPaths = j >= NumberConstant.ZERO ? userPaths.substring(NumberConstant.ZERO, j) : userPaths;
                     }
                 }
                 if (StrUtil.isBlank(userPaths)) {
@@ -377,13 +380,13 @@ public class DividePeriodsServiceImpl extends ServiceImpl<DividePeriodsMapper, D
                         userPaths.startsWith(SystemConstant.DEFAULT_TEST_ROOT + "/")
                                 ? userPaths.replaceFirst(SystemConstant.DEFAULT_TEST_ROOT + "/", "")
                                 : userPaths;
-                if (divideModel == 1) { // 固定模式
+                if (divideModel == DivideStatusEnum.DIVIDE_MODEL_FIX) { // 固定模式
                     detailList.addAll(
                             fixSettle(periodsId, userPaths, gameReportVO, accountBlacks, userLevelBlacks));
-                } else if (divideModel == 2) { // 裂变
+                } else if (divideModel == DivideStatusEnum.DIVIDE_MODEL_FISSION) { // 裂变
                     detailList.addAll(
                             fissionSettle(periodsId, userPaths, gameReportVO, accountBlacks, userLevelBlacks));
-                } else if (divideModel == 3) { // 层层代
+                } else if (divideModel == DivideStatusEnum.DIVIDE_MODEL_LAYER) { // 层层代
                     detailList.addAll(
                             layerSettle(periodsId, userPaths, gameReportVO, accountBlacks, userLevelBlacks));
                 }
@@ -437,8 +440,8 @@ public class DividePeriodsServiceImpl extends ServiceImpl<DividePeriodsMapper, D
         if (BeanUtil.isEmpty(configByFirstCode)) {
             return new ArrayList<>();
         }
-        if (configByFirstCode.getAmountRatio().compareTo(BigDecimal.ZERO) <= 0
-                || configByFirstCode.getDivideRatio().compareTo(BigDecimal.ZERO) <= 0) {
+        if (configByFirstCode.getAmountRatio().compareTo(BigDecimal.ZERO) <= NumberConstant.ZERO
+                || configByFirstCode.getDivideRatio().compareTo(BigDecimal.ZERO) <= NumberConstant.ZERO) {
             return new ArrayList<>();
         }
         Integer settleType = configByFirstCode.getSettleType();
@@ -496,7 +499,7 @@ public class DividePeriodsServiceImpl extends ServiceImpl<DividePeriodsMapper, D
             saveDetailDto.setDivideRatio(pow); // 代理分红比例
             // 分红基数金额
             BigDecimal baseAmount =
-                    settleType == 1 ? gameReportVO.getWinAmount().negate() : gameReportVO.getValidAmount();
+                    settleType == NumberConstant.ONE ? gameReportVO.getWinAmount().negate() : gameReportVO.getValidAmount();
             // 分红金额
             saveDetailDto.setDivideAmount(baseAmount.multiply(amountRatio).multiply(pow));
             // 分红公式
@@ -511,7 +514,7 @@ public class DividePeriodsServiceImpl extends ServiceImpl<DividePeriodsMapper, D
             // 添加分红详情
             DivideDetail detail = detailConvert.toEntity(saveDetailDto);
             int insertCount = detailMapper.insert(detail);
-            if (insertCount > 0) {
+            if (insertCount > NumberConstant.ZERO) {
                 returnList.add(saveDetailDto);
             }
         }
@@ -551,7 +554,7 @@ public class DividePeriodsServiceImpl extends ServiceImpl<DividePeriodsMapper, D
         if (BeanUtil.isEmpty(fissionConfig)) {
             return new ArrayList<>();
         }
-        if (fissionConfig.getAmountRatio().compareTo(BigDecimal.ZERO) <= 0) {
+        if (fissionConfig.getAmountRatio().compareTo(BigDecimal.ZERO) <= NumberConstant.ZERO) {
             return new ArrayList<>();
         }
         DivideFissionConfig tmpFissionConfig =
@@ -567,7 +570,7 @@ public class DividePeriodsServiceImpl extends ServiceImpl<DividePeriodsMapper, D
         }
         BigDecimal outRecycleConfig = tmpFissionConfig.getRecycleOutConfig();
         if (CollectionUtil.isEmpty(fissionConfigLevelVos)
-                && outRecycleConfig.compareTo(BigDecimal.ZERO) <= 0) {
+                && outRecycleConfig.compareTo(BigDecimal.ZERO) <= NumberConstant.ZERO) {
             return new ArrayList<>();
         }
 
@@ -601,7 +604,7 @@ public class DividePeriodsServiceImpl extends ServiceImpl<DividePeriodsMapper, D
 
             Integer curLevelNum = currentMember.getAgentLevel(); // 享分红代理
             Integer subLevelNum = userLevelNum - curLevelNum; // 等级差
-            if (subLevelNum <= 0) {
+            if (subLevelNum <= NumberConstant.ZERO) {
                 continue;
             }
 
@@ -612,13 +615,13 @@ public class DividePeriodsServiceImpl extends ServiceImpl<DividePeriodsMapper, D
                 // 当前代理的
                 List<FissionConfigLevelVo> tmpLevelVo = levelDivideRatioMap.get(subLevelNum);
                 if (CollectionUtil.isEmpty(tmpLevelVo)) {
-                    if (outRecycleConfig.compareTo(BigDecimal.ZERO) <= 0) {
+                    if (outRecycleConfig.compareTo(BigDecimal.ZERO) <= NumberConstant.ZERO) {
                         continue;
                     }
                     divideLevelRatio = outRecycleConfig.divide(new BigDecimal("100"));
                 } else {
                     FissionConfigLevelVo fissionConfigLevelVo = tmpLevelVo.get(0);
-                    if (fissionConfigLevelVo.getLevelDivideRatio().compareTo(BigDecimal.ZERO) <= 0) {
+                    if (fissionConfigLevelVo.getLevelDivideRatio().compareTo(BigDecimal.ZERO) <= NumberConstant.ZERO) {
                         continue;
                     }
                     divideLevelRatio =
@@ -626,7 +629,7 @@ public class DividePeriodsServiceImpl extends ServiceImpl<DividePeriodsMapper, D
                 }
             }
 
-            if (divideLevelRatio.compareTo(BigDecimal.ZERO) <= 0) {
+            if (divideLevelRatio.compareTo(BigDecimal.ZERO) <= NumberConstant.ZERO) {
                 continue;
             }
 
@@ -654,7 +657,7 @@ public class DividePeriodsServiceImpl extends ServiceImpl<DividePeriodsMapper, D
                             .build();
 
             BigDecimal baseAmount =
-                    settleType == 1 ? gameReportVO.getWinAmount().negate() : gameReportVO.getValidAmount();
+                    settleType == NumberConstant.ONE ? gameReportVO.getWinAmount().negate() : gameReportVO.getValidAmount();
 
             // 分红金额
             saveDetailDto.setDivideAmount(baseAmount.multiply(amountRatio).multiply(divideLevelRatio));
@@ -671,7 +674,7 @@ public class DividePeriodsServiceImpl extends ServiceImpl<DividePeriodsMapper, D
             // 添加分红详情
             DivideDetail detail = detailConvert.toEntity(saveDetailDto);
             int insertCount = detailMapper.insert(detail);
-            if (insertCount > 0) {
+            if (insertCount > NumberConstant.ZERO) {
                 returnList.add(saveDetailDto);
             }
         }
@@ -720,7 +723,7 @@ public class DividePeriodsServiceImpl extends ServiceImpl<DividePeriodsMapper, D
                     return new ArrayList<>();
                 }
             }
-            Integer settleType = 0;
+            Integer settleType = NumberConstant.ZERO;
             BigDecimal amountRatio = BigDecimal.ZERO;
             BigDecimal divideRatio = BigDecimal.ZERO;
             GameDivideVo gameDivideVo = new GameDivideVo();
@@ -731,7 +734,7 @@ public class DividePeriodsServiceImpl extends ServiceImpl<DividePeriodsMapper, D
                 if (BeanUtil.isEmpty(gameDivideVo)) {
                     continue;
                 }
-                if (gameDivideVo.getDivideRatio().compareTo(BigDecimal.ZERO) <= 0) {
+                if (gameDivideVo.getDivideRatio().compareTo(BigDecimal.ZERO) <= NumberConstant.ZERO) {
                     continue;
                 }
                 divideRatio = gameDivideVo.getDivideRatio().divide(new BigDecimal("100"));
@@ -741,13 +744,13 @@ public class DividePeriodsServiceImpl extends ServiceImpl<DividePeriodsMapper, D
                 if (BeanUtil.isEmpty(gameDivideVo)) {
                     continue;
                 }
-                if (gameDivideVo.getParentDivideRatio().compareTo(BigDecimal.ZERO) <= 0) {
+                if (gameDivideVo.getParentDivideRatio().compareTo(BigDecimal.ZERO) <= NumberConstant.ZERO) {
                     continue;
                 }
                 divideRatio = gameDivideVo.getParentDivideRatio().divide(new BigDecimal("100"));
             }
 
-            if (gameDivideVo.getAmountRatio().compareTo(BigDecimal.ZERO) <= 0) {
+            if (gameDivideVo.getAmountRatio().compareTo(BigDecimal.ZERO) <= NumberConstant.ZERO) {
                 continue;
             }
             amountRatio = gameDivideVo.getAmountRatio().divide(new BigDecimal("100"));
@@ -778,7 +781,7 @@ public class DividePeriodsServiceImpl extends ServiceImpl<DividePeriodsMapper, D
                             .build();
             // 基础金额
             BigDecimal baseAmount =
-                    settleType == 1 ? gameReportVO.getWinAmount().negate() : gameReportVO.getValidAmount();
+                    settleType == NumberConstant.ONE ? gameReportVO.getWinAmount().negate() : gameReportVO.getValidAmount();
             // 分红金额
             saveDetailDto.setDivideAmount(baseAmount.multiply(amountRatio).multiply(divideRatio));
             // 分红公式
@@ -793,7 +796,7 @@ public class DividePeriodsServiceImpl extends ServiceImpl<DividePeriodsMapper, D
             // 添加分红详情
             DivideDetail detail = detailConvert.toEntity(saveDetailDto);
             int insertCount = detailMapper.insert(detail);
-            if (insertCount > 0) {
+            if (insertCount > NumberConstant.ZERO) {
                 returnList.add(saveDetailDto);
             }
         }
@@ -813,7 +816,7 @@ public class DividePeriodsServiceImpl extends ServiceImpl<DividePeriodsMapper, D
                     .build();
             DivideSummary editObj = summaryConvert.toEntity(editDto);
             int i = summaryMapper.updateById(editObj);
-            if (i < 1) {
+            if (i < NumberConstant.ONE) {
                 continue;
             }
             if (summary.getAccount().equalsIgnoreCase(SystemConstant.DEFAULT_WEB_ROOT) ||
@@ -822,7 +825,7 @@ public class DividePeriodsServiceImpl extends ServiceImpl<DividePeriodsMapper, D
                 continue;
             }
             // 如果 真实分红金额 小于等于0 不用发生账变 资金变动
-            if (summary.getRealDivideAmount().compareTo(BigDecimal.ZERO) <= 0) {
+            if (summary.getRealDivideAmount().compareTo(BigDecimal.ZERO) <= NumberConstant.ZERO) {
                 continue;
             }
 
@@ -860,7 +863,7 @@ public class DividePeriodsServiceImpl extends ServiceImpl<DividePeriodsMapper, D
                     .build();
             DivideSummary editObj = summaryConvert.toEntity(editDto);
             int i = summaryMapper.updateById(editObj);
-            if (i < 1) {
+            if (i < NumberConstant.ONE) {
                 continue;
             }
             if (summary.getAccount().equalsIgnoreCase(SystemConstant.DEFAULT_WEB_ROOT) ||
@@ -869,7 +872,7 @@ public class DividePeriodsServiceImpl extends ServiceImpl<DividePeriodsMapper, D
                 continue;
             }
             // 如果 真实分红金额 小于等于0 不用发生账变 资金变动
-            if (summary.getRealDivideAmount().compareTo(BigDecimal.ZERO) <= 0) {
+            if (summary.getRealDivideAmount().compareTo(BigDecimal.ZERO) <= NumberConstant.ZERO) {
                 continue;
             }
             // 校验会员账户状态
@@ -927,7 +930,7 @@ public class DividePeriodsServiceImpl extends ServiceImpl<DividePeriodsMapper, D
             memberBillService.save(memberBill);
             // 计算变更后余额
             BigDecimal newBalance = memberInfo.getBalance().add(summary.getRealDivideAmount());
-            if (newBalance.compareTo(BigDecimal.ZERO) <= 0) {
+            if (newBalance.compareTo(BigDecimal.ZERO) <= NumberConstant.ZERO) {
                 return;
             }
             MemberInfo entity = MemberInfo.builder()
@@ -959,8 +962,8 @@ public class DividePeriodsServiceImpl extends ServiceImpl<DividePeriodsMapper, D
         message.setPopsCount(PushMessageEnum.PopCount.POP_COUNT_DEF.getValue());
         message.setPushRange(PushMessageEnum.UserRange.SOME_MEMBERS.getValue());
         message.setLinkAccount(member.getAccount());
-        message.setType(1);
-        message.setStatus(1);
+        message.setType(NumberConstant.ONE);
+        message.setStatus(NumberConstant.ONE);
         message.setCreateBy(userCredential.getUsername());
         messageMapper.saveReturnId(message);
 
@@ -971,7 +974,7 @@ public class DividePeriodsServiceImpl extends ServiceImpl<DividePeriodsMapper, D
         messageDistribute.setRechargeLevel(member.getUserLevel());
         messageDistribute.setVipLevel(
                 memberInfoService.getById(member.getId()).getVipLevel());
-        messageDistribute.setReadStatus(0);
+        messageDistribute.setReadStatus(NumberConstant.ZERO);
         messageDistribute.setCreateBy(userCredential.getUsername());
         messageDistributeService.save(messageDistribute);
     }
@@ -1022,7 +1025,7 @@ public class DividePeriodsServiceImpl extends ServiceImpl<DividePeriodsMapper, D
 
         // 计算变更后余额
         BigDecimal newBalance = memberInfo.getBalance().add(summary.getRealDivideAmount().negate());
-        if (newBalance.compareTo(BigDecimal.ZERO) < 0) {
+        if (newBalance.compareTo(BigDecimal.ZERO) < NumberConstant.ZERO) {
             return;
         }
         MemberInfo entity = MemberInfo.builder()
@@ -1071,7 +1074,7 @@ public class DividePeriodsServiceImpl extends ServiceImpl<DividePeriodsMapper, D
             summaryDto.setValidAmount(sumValidAmount);
             summaryDto.setWinAmount(sumWinAmount);
             // 如果开启了  负数分红金额累计至下一期则 需要取到上一期的真实分红金额
-            if (isGrand == 1) {
+            if (isGrand == EnableEnum.ENABLED.code()) {
                 // 上期累计金额  如果上期的汇总分红金额为负数则填充
                 // 获取此用户上期分红汇总
                 DivideSummary lastSummary = summaryMapper.getByUserName(divideDetail.getProxyName());
@@ -1085,7 +1088,7 @@ public class DividePeriodsServiceImpl extends ServiceImpl<DividePeriodsMapper, D
                     summaryDto.setLastPeriodsAmount(lastRealDivideAmount);
                     summaryDto.setDivideAmount(sumDivideAmount);
                     // 如果是正数
-                    if (lastRealDivideAmount.compareTo(BigDecimal.ZERO) >= 0) {
+                    if (lastRealDivideAmount.compareTo(BigDecimal.ZERO) >= NumberConstant.ZERO) {
                         summaryDto.setRealDivideAmount(sumDivideAmount);
                     } else {
                         summaryDto.setRealDivideAmount(sumDivideAmount.add(summaryDto.getLastPeriodsAmount()));
@@ -1098,7 +1101,7 @@ public class DividePeriodsServiceImpl extends ServiceImpl<DividePeriodsMapper, D
             }
             DivideSummary divideSummary = summaryConvert.toEntity(summaryDto);
             int insertSummaryCount = summaryMapper.insert(divideSummary);
-            if (insertSummaryCount < 1) {
+            if (insertSummaryCount < NumberConstant.ONE) {
                 log.info(divideSummary.getAccount() + "保存分红汇总失败！");
             }
         }

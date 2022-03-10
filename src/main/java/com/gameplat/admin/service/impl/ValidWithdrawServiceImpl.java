@@ -302,91 +302,63 @@ public class ValidWithdrawServiceImpl extends ServiceImpl<ValidWithdrawMapper, V
     @Override
     public void countAccountValidWithdraw(String username) {
         List<ValidAccoutWithdrawVo> validWithdraw = validWithdrawMapper.findAccountValidWithdraw(username);
-        ////过滤会员是否存在打码
-        List<ValidAccoutWithdrawVo> accountValidWithdraw  = validWithdraw.stream().filter(a -> StringUtils.isNotEmpty(a.getGameKind()) && StringUtils.isNotEmpty(a.getPlatformCode())).collect(Collectors.toList());
-        if (StringUtils.isEmpty(accountValidWithdraw)) {
+        if (StringUtils.isNotEmpty(validWithdraw)) {
             return;
         }
-        List<GameBetValidRecordVo> list = new ArrayList<>();
-        List<GameBetValidRecordVo> finalList = list;
         String indexName = ContextConstant.ES_INDEX.BET_RECORD_ + tenantConfig.getTenantCode();
-        accountValidWithdraw.forEach(a ->{
-            if (StringUtils.isEmpty(a.getGameKind()) || StringUtils.isEmpty(a.getPlatformCode())) {
-                return;
-            }
-            GameVaildBetRecordQueryDTO dto = new GameVaildBetRecordQueryDTO(){{
-                setAccount(a.getAccount());
-                setBeginTime(a.getCreateTime());
-                setEndTime(a.getEndTime());
-                setPlatformCode(a.getPlatformCode());
-                setState("1");
-                setGameKind(a.getGameKind());
-            }};
-            dto.setAccount(a.getAccount());
+        validWithdraw.forEach(a -> {
+            GameVaildBetRecordQueryDTO dto =
+                    new GameVaildBetRecordQueryDTO() {
+                        {
+                            setAccount(a.getAccount());
+                            setBeginTime(a.getCreateTime());
+                            setEndTime(a.getEndTime());
+                            setState("1");
+
+                        }
+                    };
             QueryBuilder builder = GameBetRecordSearchBuilder.buildBetRecordSearch(dto);
             // todo betTime
-            SortBuilder<FieldSortBuilder> sortBuilder = SortBuilders.fieldSort("betTime.keyword").order(SortOrder.DESC);
-            PageResponse<GameBetValidRecordVo> result = baseElasticsearchService.search(builder, indexName, GameBetValidRecordVo.class,
-                     0,  9999, sortBuilder);
+            SortBuilder<FieldSortBuilder> sortBuilder =
+                    SortBuilders.fieldSort("betTime.keyword").order(SortOrder.DESC);
+            PageResponse<GameBetValidRecordVo> result =
+                    baseElasticsearchService.search(
+                            builder, indexName, GameBetValidRecordVo.class, 0, 9999, sortBuilder);
             if (StringUtils.isNotEmpty(result.getList())) {
-                result.getList().forEach(b ->{
-
-                    b.setValidId(a.getId());
-                    b.setGameName(a.getGameName());
-                    finalList.add(b);
+                ValidAccoutWithdrawVo validAccoutWithdrawVo = new ValidAccoutWithdrawVo();
+                validAccoutWithdrawVo.setId(a.getId());
+                //会员一笔打码量的投注记录
+                List<GameBetValidRecordVo> gameBetValidRecordVoList = result.getList();
+                //总有效投注额
+                BigDecimal vaildAmount = gameBetValidRecordVoList.stream().map(GameBetValidRecordVo::getValidAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
+                log.info("每笔总投注记录:{}", vaildAmount);
+                validAccoutWithdrawVo.setVaildAmount(vaildAmount);
+                //根据游戏类型进行分类
+                Map<String, List<GameBetValidRecordVo>> map = gameBetValidRecordVoList.stream().collect(Collectors.groupingBy(GameBetValidRecordVo::getGameKind));
+                //初始化投注内容
+                //初始化投注内容
+                List<Object> vailList = new ArrayList();
+                map.keySet().forEach(b -> {
+                    JSONObject jsonObject = new JSONObject();
+                    List<GameBetValidRecordVo> list = map.get(b);
+                    // 添加一个游戏的详情（gameKind,gameName,betAmount）
+                    // 根据游戏类型进行分组
+                    BigDecimal betAmount = list.stream().map(GameBetValidRecordVo::getValidAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
+                    String gameName = list.get(0).getGameName();
+                    jsonObject.put("vaildBetAmount", betAmount);
+                    jsonObject.put("gameKind", b);
+                    jsonObject.put("gameName", gameName);
+                    vailList.add(jsonObject);
                 });
+                validAccoutWithdrawVo.setBetContext(JSONArray.toJSONString(vailList));
+
+                validWithdrawMapper.updateByBetId(validAccoutWithdrawVo);
+
             }
         });
-    List<GameBetValidRecordVo> listAll =
-        finalList.stream()
-            .filter(a -> Convert.toBigDecimal(a.getValidAmount()).compareTo(BigDecimal.ZERO) != 0)
-            .collect(Collectors.toList());
-    if (StringUtils.isEmpty(listAll)) {
-      return;
     }
-    // 按照打码量id进行分组
-    Map<Long, List<GameBetValidRecordVo>> map =
-        listAll.stream().collect(Collectors.groupingBy(GameBetValidRecordVo::getValidId));
 
-    map.keySet()
-        .forEach(
-            a -> {
-              List<Object> vailList = new ArrayList();
-              //
-              ValidAccoutWithdrawVo validAccoutWithdrawVo = new ValidAccoutWithdrawVo();
-              // 每笔总投注记录
-              BigDecimal add =
-                  map.get(a).stream()
-                      .map(GameBetValidRecordVo::getVailbetAmount)
-                      .reduce(BigDecimal.ZERO, BigDecimal::add);
-              log.info("每笔总投注记录:{}", add);
-              validAccoutWithdrawVo.setVaildAmount(add);
-              validAccoutWithdrawVo.setId(a);
-              // 添加一个游戏的详情（gameKind,gameName,betAmount）
 
-              // 根据游戏类型进行分组
-              Map<String, List<GameBetValidRecordVo>> gameBetAmount =
-                  map.get(a).stream()
-                      .collect(Collectors.groupingBy(GameBetValidRecordVo::getGameKind));
-              gameBetAmount
-                  .keySet()
-                  .forEach(
-                      b -> {
-                        JSONObject jsonObject = new JSONObject();
-                        BigDecimal vaildBetAmount =
-                            gameBetAmount.get(b).stream()
-                                .map(GameBetValidRecordVo::getVailbetAmount)
-                                .reduce(BigDecimal.ZERO, BigDecimal::add);
-                        String gameName = gameBetAmount.get(b).get(0).getGameName();
-                        jsonObject.put("vaildBetAmount", vaildBetAmount);
-                        jsonObject.put("gameKind", b);
-                        jsonObject.put("gameName", gameName);
-                        vailList.add(jsonObject);
-                      });
-              validAccoutWithdrawVo.setBetContext(JSONArray.toJSONString(vailList));
-              validWithdrawMapper.updateByBetId(validAccoutWithdrawVo);
-            });
-  }
 
   @Override
   public void updateValidWithdraw(ValidWithdrawDto dto) {

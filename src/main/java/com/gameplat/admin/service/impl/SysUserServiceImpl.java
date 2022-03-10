@@ -92,7 +92,8 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
             ObjectUtils.isNotEmpty(userDTO.getBeginTime()),
             SysUser::getCreateTime,
             userDTO.getBeginTime(),
-            userDTO.getEndTime());
+            userDTO.getEndTime())
+        .orderByDesc(SysUser::getCreateTime);
 
     return userMapper.selectUserList(page, queryWrapper).convert(userConvert::toUserVo);
   }

@@ -10,6 +10,7 @@ public class SysUserEnums {
     /** 子账号 */
     SUB_USER("SUB_USER"),
 
+
     /**充值会员、代理 */
     RECH_FORMAL_TYPE("M"),
 
@@ -23,7 +24,10 @@ public class SysUserEnums {
     WITH_FORMAL_TYPE("HY"),
 
     /** 提现推广 */
-    WITH_TEST_TYPE("VHY");
+    WITH_TEST_TYPE("VHY"),
+
+
+    DL_FORMAL_TYPE("A"),;
 
 
 

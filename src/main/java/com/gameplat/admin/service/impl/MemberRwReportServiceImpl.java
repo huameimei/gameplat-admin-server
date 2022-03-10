@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.mapper.MemberRwReportMapper;
 import com.gameplat.admin.service.MemberRwReportService;
 import com.gameplat.base.common.util.DateUtil;
+import com.gameplat.base.common.util.StringUtils;
 import com.gameplat.common.enums.CashEnum;
 import com.gameplat.common.enums.RechargeMode;
 import com.gameplat.common.enums.TrueFalse;
@@ -15,6 +16,7 @@ import com.gameplat.model.entity.recharge.RechargeOrder;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.Optional;
+import jodd.util.StringUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -35,12 +37,12 @@ public class MemberRwReportServiceImpl extends ServiceImpl<MemberRwReportMapper,
     BigDecimal amount = rechargeOrder.getPayAmount();
     if (rechargeOrder.getPointFlag() == TrueFalse.TRUE.getValue()
         && BigDecimal.ZERO.compareTo(amount) < 0) {
+      if (null != rechargeOrder.getCurrencyCount()) {
+        report.setVirtualRechargeMoney(amount);
+        report.setVirtualRechargeNumber(rechargeOrder.getCurrencyCount());
+      }
       // 计算积分且充值金额大于 0 累加充值次数
       if (rechargeOrder.getMode() == RechargeMode.TRANSFER.getValue()) {
-        if (null != rechargeOrder.getCurrencyCount()) {
-          report.setVirtualRechargeMoney(amount);
-          report.setVirtualRechargeNumber(rechargeOrder.getCurrencyCount());
-        }
         report.setBankCount(report.getBankCount() + 1);
         report.setBankMoney(report.getBankMoney().add(amount));
       } else if (rechargeOrder.getMode() == RechargeMode.ONLINE_PAY.getValue()) {
@@ -49,9 +51,19 @@ public class MemberRwReportServiceImpl extends ServiceImpl<MemberRwReportMapper,
       } else if (rechargeOrder.getMode() == RechargeMode.MANUAL.getValue()) {
         report.setHandRechCount(report.getHandRechCount() + 1);
         report.setHandRechMoney(report.getHandRechMoney().add(amount));
+      } else if (rechargeOrder.getMode() == RechargeMode.TRANSFER_VIP.getValue()) {
+        report.setVipCount(report.getVipCount() + 1);
+        report.setVipMoney(report.getVipMoney().add(amount));
       }
       // 计算首充
       if (rechargeCount == 0) {
+        String firstRechMark = "首次充值";
+        if (StringUtil.isNotBlank(rechargeOrder.getRemarks()) && !rechargeOrder.getRemarks()
+            .contains(firstRechMark)) {
+          rechargeOrder.setRemarks(rechargeOrder.getRemarks() + " [" + firstRechMark + "]");
+        } else {
+          rechargeOrder.setRemarks(firstRechMark);
+        }
         report.setFirstRechType(rechargeOrder.getMode());
         report.setFirstRechMoney(report.getFirstRechMoney().add(amount));
       }
@@ -76,30 +88,44 @@ public class MemberRwReportServiceImpl extends ServiceImpl<MemberRwReportMapper,
   public void addWithdraw(Member member, Integer withdrawCount, MemberWithdraw memberWithdraw)
       throws Exception {
     MemberRwReport report = getOrCreateReportUserRw(member, memberWithdraw.getOperatorTime());
-    // 计算异常金额
-    if (memberWithdraw.getPointFlag() == TrueFalse.FALSE.getValue()) {
-      report.setExceptionWithdrawAmount(report.getExceptionWithdrawAmount().add(memberWithdraw.getCashMoney()));
-    } else {
+    if (memberWithdraw.getPointFlag() == TrueFalse.TRUE.getValue()) {
       if (memberWithdraw.getCashMode() == CashEnum.CASH_MODE_HAND.getValue()) {
         report.setHandWithdrawCount(report.getHandWithdrawCount() + 1);
-        report.setHandWithdrawMoney(report.getHandWithdrawMoney().add(memberWithdraw.getCashMoney()));
-      } else if (memberWithdraw.getCashMode() == CashEnum.CASH_MODE_USER.getValue()) {
+        report
+            .setHandWithdrawMoney(report.getHandWithdrawMoney().add(memberWithdraw.getCashMoney()));
+      }else if (memberWithdraw.getCashMode() == CashEnum.CASH_MODE_USER.getValue()) {
         report.setWithdrawCount(report.getWithdrawCount() + 1);
         report.setWithdrawMoney(report.getWithdrawMoney().add(memberWithdraw.getCashMoney()));
+      }else if (memberWithdraw.getCashMode() == CashEnum.CASH_MODE_THIRD.getValue()) {
+        report.setThirdWithdrawCount(report.getWithdrawCount() + 1);
+        report.setThirdWithdrawMoney(report.getThirdWithdrawMoney().add(memberWithdraw.getCashMoney()));
       }
       // 计算首提
-      if (memberWithdraw.getPointFlag() == TrueFalse.TRUE.getValue() && withdrawCount == 0) {
+      if (withdrawCount == 0) {
+        String firstWithdrawMark = "首次出款";
+        if (StringUtil.isNotBlank(memberWithdraw.getCashReason()) && !memberWithdraw.getCashReason()
+            .contains(firstWithdrawMark)) {
+          memberWithdraw
+              .setCashReason(memberWithdraw.getCashReason() + " [" + firstWithdrawMark + "]");
+        } else {
+          memberWithdraw.setCashReason(firstWithdrawMark);
+        }
         report.setFirstWithdrawType(memberWithdraw.getCashMode());
-        report.setFirstWithdrawMoney(report.getFirstWithdrawMoney().add(memberWithdraw.getCashMoney()));
+        report.setFirstWithdrawMoney(
+            report.getFirstWithdrawMoney().add(memberWithdraw.getCashMoney()));
       }
+    } else {
+      // 计算异常金额
+      report.setExceptionWithdrawAmount(
+          report.getExceptionWithdrawAmount().add(memberWithdraw.getCashMoney()));
     }
     this.saveOrUpdate(report);
   }
 
   private MemberRwReport getOrCreateReportUserRw(Member member, Date date) throws Exception {
     MemberRwReport report = this.queryByMemberAndDate(member.getId(), date);
-    if (null == report) {// 新建记录 初始化
-      report = new MemberRwReport();
+    // 新建记录 初始化
+    if (null == report.getId()) {
       report.setMemberId(member.getId());
       report.setAccount(member.getAccount());
       report.setMemberId(member.getId());
@@ -111,7 +137,7 @@ public class MemberRwReportServiceImpl extends ServiceImpl<MemberRwReportMapper,
       report.setWithdrawMoney(BigDecimal.ZERO);
       report.setHandWithdrawCount(0);
       report.setHandWithdrawMoney(BigDecimal.ZERO);
-      report.setFirstRechType(null);
+      report.setFirstWithdrawType(null);
       report.setFirstWithdrawMoney(BigDecimal.ZERO);
       report.setCounterFee(BigDecimal.ZERO);
 
@@ -125,7 +151,8 @@ public class MemberRwReportServiceImpl extends ServiceImpl<MemberRwReportMapper,
       report.setFirstRechMoney(BigDecimal.ZERO);
       report.setRechDiscount(BigDecimal.ZERO);
       report.setOtherDiscount(BigDecimal.ZERO);
-
+      report.setVipCount(0);
+      report.setVipMoney(BigDecimal.ZERO);
       report.setExceptionWithdrawAmount(BigDecimal.ZERO);
       report.setExceptionRechargeAmount(BigDecimal.ZERO);
 
@@ -136,7 +163,8 @@ public class MemberRwReportServiceImpl extends ServiceImpl<MemberRwReportMapper,
       report.setVirtualWithdrawMoney(BigDecimal.ZERO);
       report.setVirtualWithdrawNumber(BigDecimal.ZERO);
 
-      String[] superPaths = UserDlUtil.getDlAccount(member.getSuperPath());
+      String[] superPaths = UserDlUtil.getDlAccount(StringUtils.isEmpty(member.getSuperPath()) ? "/webRoot/"+report.getAccount(): member.getSuperPath());
+      //String[] superPaths = UserDlUtil.getDlAccount(member.getSuperPath());
       report.setDgdAccount(superPaths[0]);
       report.setGdAccount(superPaths[1]);
       report.setZdlAccount(superPaths[2]);

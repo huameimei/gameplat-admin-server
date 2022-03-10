@@ -1,11 +1,9 @@
 package com.gameplat.admin.model.vo;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.io.Serializable;
-import java.math.BigDecimal;
 
 /**
  * @author lily
@@ -15,11 +13,8 @@ import java.math.BigDecimal;
 @Data
 public class LoanVO implements Serializable {
 
-    private IPage<MemberLoanVO> memberLoanVO;
+    private IPage<MemberLoanVO> page;
 
-    @ApiModelProperty("欠款金额小计")
-    private BigDecimal subtotal;
+    private MemberLoanSumVO memberLoanSumVO;
 
-    @ApiModelProperty("欠款金额总计")
-    private BigDecimal total;
 }

@@ -12,6 +12,7 @@ import com.gameplat.admin.model.vo.SpreadConfigVO;
 import com.gameplat.model.entity.spread.SpreadLinkInfo;
 
 import javax.servlet.http.HttpServletResponse;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -32,7 +33,7 @@ public interface SpreadLinkInfoService extends IService<SpreadLinkInfo> {
   /**
    * 增加推广码时间
    *
-   * @param id
+   * @param id Long
    */
   void changeReleaseTime(Long id);
 
@@ -41,14 +42,14 @@ public interface SpreadLinkInfoService extends IService<SpreadLinkInfo> {
   /**
    * 批量关闭状态
    *
-   * @param ids
+   * @param ids List
    */
   void batchDisableStatus(List<Long> ids);
 
   /**
    * 批量删除
    *
-   * @param ids
+   * @param ids List
    */
   void batchDeleteByIds(List<Long> ids);
 
@@ -58,18 +59,22 @@ public interface SpreadLinkInfoService extends IService<SpreadLinkInfo> {
   /**
    * 校验推广码
    *
-   * @param code
+   * @param code String
    */
   void checkCode(String code);
 
   /**
    * 根据用户名获取返点等级下拉
    *
-   * @param account
-   * @return
+   * @param account String
+   * @param statisMax Boolean
+   * @param statisMin Boolean
+   * @return JSONArray
    */
   JSONArray getSpreadLinkRebate(String account, Boolean statisMax, Boolean statisMin);
 
   void saveOrEditDivideConfig(
       Long linkId, String agentAccount, Map<String, List<GameDivideVo>> paramOwnerConfigMap);
+
+  BigDecimal getMaxSpreadLinkRebate(String account);
 }

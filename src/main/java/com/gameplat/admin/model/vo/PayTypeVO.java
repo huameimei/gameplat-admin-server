@@ -16,7 +16,7 @@ public class PayTypeVO extends Model<PayTypeVO> {
 
   private String transferEnabled;
 
-  private String url;
+  private String iconUrl;
 
   private String onlinePayEnabled;
 

@@ -286,7 +286,7 @@ public class DivideLayerConfigServiceImpl
         }
         if (dictData.getDictValue().equalsIgnoreCase(voMap.getValue().getStr("liveGameCode"))) {
           // 填充最大可编辑的分红点数值
-          if (member.getAgentLevel() == NumberConstant.ZERO) {
+          if (member.getAgentLevel() <= NumberConstant.ONE) {
             voMap.getValue().put("maxRatio", new BigDecimal("100"));
           } else {
             // 如果不是顶级代理 则可调整的最大值就是他直属上级被直属上级的直属上级所分配的分红比例 即 他直属上级的divideRatio值

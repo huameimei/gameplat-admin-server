@@ -50,8 +50,6 @@ public class ActivityDistributeWayService
 
   @Autowired private ValidWithdrawService validWithdrawService;
 
-  @Autowired private FinancialService financialService;
-
   @Autowired private MessageInfoService messageInfoService;
 
   @Autowired private MemberBillService memberBillService;

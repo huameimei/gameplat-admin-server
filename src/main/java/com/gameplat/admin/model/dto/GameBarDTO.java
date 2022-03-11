@@ -15,7 +15,6 @@ public class GameBarDTO implements Serializable {
     @TableId(type = IdType.AUTO)
     private Long id;
 
-
     /**
      * 导航code
      */
@@ -47,6 +46,11 @@ public class GameBarDTO implements Serializable {
      * 排序
      */
     private Integer sort;
+
+    /**
+     * 是否展示此游戏 0 否  1 是
+     */
+    private Integer isShow;
 
     /**
      * PC 图片

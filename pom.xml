@@ -213,6 +213,24 @@
             <artifactId>totp-spring-boot-starter</artifactId>
             <version>1.7.1</version>
         </dependency>
+
+        <dependency>
+            <groupId>org.jxls</groupId>
+            <artifactId>jxls-poi</artifactId>
+            <version>1.0.9</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.jxls</groupId>
+                    <artifactId>jxls</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>net.sf.jxls</groupId>
+            <artifactId>jxls-core</artifactId>
+            <version>1.0.5</version>
+        </dependency>
     </dependencies>
 
     <profiles>
@@ -263,6 +281,7 @@
                     <include>**/*.json</include>
                     <include>**/*.xml</include>
                     <include>**/*.txt</include>
+                    <include>**/*.xlsx</include>
                 </includes>
             </resource>
         </resources>
@@ -295,7 +314,28 @@
                     </annotationProcessorPaths>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <configuration>
+                    <encoding>${project.build.sourceEncoding}</encoding>
+                    <useDefaultDelimiters>false</useDefaultDelimiters>
+                    <delimiters>
+                        <delimiter>@</delimiter>
+                        <delimiter>${*}</delimiter>
+                        <delimiter>$[*]</delimiter>
+                    </delimiters>
+
+                    <!-- 过滤后缀不需要转码的文件后缀名.crt/.p8 -->
+                    <nonFilteredFileExtensions>
+                        <nonFilteredFileExtension>xlsx</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>xls</nonFilteredFileExtension>
+                    </nonFilteredFileExtensions>
+
+                </configuration>
+            </plugin>
         </plugins>
+
     </build>
 
     <repositories>

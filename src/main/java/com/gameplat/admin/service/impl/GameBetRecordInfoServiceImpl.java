@@ -85,7 +85,7 @@ public class GameBetRecordInfoServiceImpl implements GameBetRecordInfoService {
     TransferTypesEnum tt = TransferTypesEnum.get(platformCode);
     // 1代表是否额度转换
     if (tt == null || tt.getType() != 1) {
-      throw new ServiceException("游戏未接入");
+      throw new ServiceException("statisticsTime");
     }
     return api;
   }

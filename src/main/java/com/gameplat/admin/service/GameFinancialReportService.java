@@ -27,5 +27,4 @@ public interface GameFinancialReportService extends IService<GameFinancialReport
 
     void exportGameFinancialReport(String statisticsTime, HttpServletResponse response);
 
-    List<GameFinancialReport> masterPullReport(String statisticsTime);
 }

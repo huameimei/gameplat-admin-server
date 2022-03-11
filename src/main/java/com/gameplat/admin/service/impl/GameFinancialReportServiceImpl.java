@@ -188,11 +188,6 @@ public class GameFinancialReportServiceImpl extends ServiceImpl<GameFinancialRep
 
     }
 
-    @Override
-    public List<GameFinancialReport> masterPullReport(String statisticsTime) {
-        return statisticsGameReportList(statisticsTime);
-    }
-
     /**
      * 统计三方游戏的财务报表数据
      *
@@ -215,58 +210,11 @@ public class GameFinancialReportServiceImpl extends ServiceImpl<GameFinancialRep
         if (CollectionUtil.isNotEmpty(gameFinancialReportList)) {
             allGameFinancialReportList.addAll(gameFinancialReportList);
         }
-        // 统计KG新彩票的财务报表数据 以彩种划分
-        List<GameFinancialReport> KgNlFinancialReportList = initKgNlFinancialReport(startTime, endTime, tenant);
-        if (CollectionUtil.isNotEmpty(KgNlFinancialReportList)) {
-            allGameFinancialReportList.addAll(KgNlFinancialReportList);
-        }
 
         return allGameFinancialReportList;
     }
 
-    /**
-     * 统计KG新彩票的财务报表数据 以彩种划分（未写完）
-     *
-     * @param startTime 统计开始时间
-     * @param endTime   统计结束
-     * @param tenant    租户标识
-     * @return
-     */
-    public List<GameFinancialReport> initKgNlFinancialReport(String startTime, String endTime, String tenant) {
-//        startTime = startTime + " 00:00:00";
-//        endTime = endTime + " 23:59:59";
-//        GameBetRecordQueryDTO dto = new GameBetRecordQueryDTO();
-//        dto.setTimeType(TimeTypeEnum.SETTLE_TIME.getValue());
-//        dto.setBeginTime(startTime);
-//        dto.setEndTime(endTime);
-//        QueryBuilder builder = GameBetRecordSearchBuilder.buildBetRecordSearch(dto);
-//        String indexName = ContextConstant.ES_INDEX.BET_RECORD_ + tenant;
-//
-//        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
-//        SumAggregationBuilder validAmountSumBuilder = AggregationBuilders.sum("validAmountSum").field("validAmount");
-//        SumAggregationBuilder winAmountSumBuilder = AggregationBuilders.sum("winAmountSum").field("winAmount");
-//        searchSourceBuilder.aggregation(validAmountSumBuilder).aggregation(winAmountSumBuilder);
-//        searchSourceBuilder.query(builder);
-//
-//        SearchRequest searchRequest = new SearchRequest(indexName);
-//        searchRequest.source(searchSourceBuilder);
-//        RequestOptions.Builder optionsBuilder = RequestOptions.DEFAULT.toBuilder();
-//        optionsBuilder.setHttpAsyncResponseConsumerFactory(
-//                new HttpAsyncResponseConsumerFactory.HeapBufferedResponseConsumerFactory(31457280));
-//
-//        SearchResponse searchResponse = null;
-//        try {
-//            searchResponse = restHighLevelClient.search(searchRequest, optionsBuilder.build());
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//        Map<String, Aggregation> aggregationMap = searchResponse.getAggregations().getAsMap();
-//        double betAmount = ((ParsedSum) aggregationMap.get("betAmountSum")).getValue();
-//        double validAmount = ((ParsedSum) aggregationMap.get("validAmountSum")).getValue();
-//        double winAmount = ((ParsedSum) aggregationMap.get("winAmountSum")).getValue();
 
-        return null;
-    }
 
     /**
      * 对KG新彩票的三个彩种做特殊处理

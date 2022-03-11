@@ -36,7 +36,7 @@ public class TpInterfaceServiceImpl extends ServiceImpl<TpInterfaceMapper, TpInt
 
   @Override
   public List<TpInterfaceVO> queryAll() {
-    return this.lambdaQuery().select(TpInterface::getId,TpInterface::getCode,TpInterface::getName)
+    return this.lambdaQuery().select(TpInterface::getId,TpInterface::getCode,TpInterface::getName,TpInterface::getParameters)
             .list().stream().map(tpInterfaceConvert::toVo).collect(Collectors.toList());
   }
 

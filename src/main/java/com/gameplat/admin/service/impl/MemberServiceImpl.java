@@ -289,7 +289,7 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
   }
 
   public void preAddCheck(MemberAddDTO dto) {
-    Assert.isTrue(this.isExist(dto.getAccount()), "用户名已存在!");
+    Assert.isTrue(!this.isExist(dto.getAccount()), "用户名已存在!");
   }
 
   /**

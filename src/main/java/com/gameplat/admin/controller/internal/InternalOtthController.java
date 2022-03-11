@@ -18,7 +18,7 @@ import java.util.List;
  * @date 2022/2/16
  */
 @Slf4j
-@Api(tags = "聊天室侧滑菜单管理")
+@Api(tags = "彩票聊天室内部接口")
 @RestController
 @RequestMapping("/api/internal/admin/chat")
 public class InternalOtthController {

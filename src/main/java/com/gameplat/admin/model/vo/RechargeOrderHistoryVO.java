@@ -54,6 +54,11 @@ public class RechargeOrderHistoryVO {
 
   private String remarks;
 
+  private String   acceptAccount;
+
+  private Date acceptTime;
+
+
   private String auditorAccount;
 
   private Date auditTime;
@@ -70,6 +75,8 @@ public class RechargeOrderHistoryVO {
 
   private String payType;
 
+  private Long currencyRate;
+
   private String currencyCount;
 
   private Long memberId;
@@ -77,4 +84,6 @@ public class RechargeOrderHistoryVO {
   private Integer memberLevel;
 
   private Integer pointFlag;
+
+
 }

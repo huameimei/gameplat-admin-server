@@ -52,6 +52,7 @@
                t1.agent_level,
                t1.super_path,
                t1.user_type,
+               t1.parent_id,
                t1.parent_name,
                t1.status,
                t1.remark,
@@ -69,7 +70,7 @@
                t1.create_time,
                t1.real_name,
                t1.lower_num,
-               t2.vip_level,
+               t2.vip_level vipLevel,
                t2.vip_growth,
                t2.last_login_ip,
                t2.last_login_time,
@@ -407,8 +408,11 @@
                     or t1.account = #{agentAccount}
                 </if>
             </if>
-            <if test="levelList != null and levelList.size > 0">
-                and find_in_set(t1.user_level, #{levelList})
+            <if test="levelList != null and levelList.size() > 0">
+                and t1.user_level in
+                <foreach collection="levelList" item="level" open="(" close=")" separator="," index="index">
+                    #{level}
+                </foreach>
             </if>
             <if test="rechTimesFrom != null">
                 and t2.total_rech_times <![CDATA[>= ]]> #{rechTimesFrom}

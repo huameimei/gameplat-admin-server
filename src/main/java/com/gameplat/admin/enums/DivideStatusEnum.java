@@ -43,26 +43,26 @@ public enum DivideStatusEnum {
   SALARY_GRANT_STATUS_RECYCLE(3, "已回收"),
   ;
 
-  public static final Integer DIVIDE_MODEL_FIX = 1;
-  public static final Integer DIVIDE_MODEL_FISSION = 2;
-  public static final Integer DIVIDE_MODEL_LAYER = 3;
+  public static final int DIVIDE_MODEL_FIX = 1;
+  public static final int DIVIDE_MODEL_FISSION = 2;
+  public static final int DIVIDE_MODEL_LAYER = 3;
 
 
-  private Integer value;
+  private int value;
   private String name;
 
-  DivideStatusEnum(Integer value, String name) {
+  DivideStatusEnum(int value, String name) {
     this.value = value;
     this.name = name;
   }
 
   public static DivideStatusEnum get(int status) throws ServerException {
-    return Arrays.stream(DivideStatusEnum.values()).filter(e -> e.getValue().equals(status))
+    return Arrays.stream(DivideStatusEnum.values()).filter(e -> e.getValue() == status)
         .findFirst()
         .orElseThrow(() -> new ServerException("错误的状态:" + status));
   }
 
-  public Integer getValue() {
+  public int getValue() {
     return value;
   }
 

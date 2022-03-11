@@ -41,6 +41,11 @@
         <result property="otherDescTh" column="other_desc_th"/>
         <result property="otherDescIn" column="other_desc_in"/>
         <result property="otherDescVi" column="other_desc_vi"/>
+        <result property="isMemberLoan" column="is_member_loan"/>
+        <result property="isLoanMoney" column="is_loan_money"/>
+        <result property="dayLendLimit" column="day_lend_limit"/>
+        <result property="dayReturnLimit" column="day_return_limit"/>
+        <result property="lowerMoney" column="lower_money"/>
     </resultMap>
 
 
@@ -74,6 +79,11 @@
         update_by,
         update_time,
         remark,
+        is_member_loan,
+        is_loan_money,
+        day_lend_limit,
+        day_return_limit,
+        lower_money,
         (
             case #{language}
                 when 'zh-CN' then growth_desc
@@ -101,6 +111,8 @@
     <update id="updateGrowthConfig">
         update member_growth_config
         <set>
+            <if test="isMemberLoan != null">is_member_loan = #{isMemberLoan},</if>
+            <if test="isLoanMoney != null">is_loan_money = #{isLoanMoney},</if>
             <if test="isEnableVip != null">is_enable_vip = #{isEnableVip},</if>
             <if test="isEnableRecharge != null">is_enable_recharge = #{isEnableRecharge},</if>
             <if test="isEnableSign != null">is_enable_sign = #{isEnableSign},</if>
@@ -120,6 +132,9 @@
             <if test="receiveLimitCycle != null">receive_limit_cycle = #{receiveLimitCycle},</if>
             <if test="bindBankGrowth != null">bind_bank_growth = #{bindBankGrowth},</if>
             <if test="perfectUserInfoGrowth != null">perfect_user_info_growth = #{perfectUserInfoGrowth},</if>
+            <if test="dayLendLimit != null">day_lend_limit = #{dayLendLimit},</if>
+            <if test="dayReturnLimit != null">day_return_limit = #{dayReturnLimit},</if>
+            <if test="lowerMoney != null">lower_money = #{lowerMoney},</if>
             <if test="perfectUserInfoField != null and perfectUserInfoField != ''">perfect_user_info_field =
                 #{perfectUserInfoField},
             </if>

@@ -2,36 +2,22 @@ package com.gameplat.admin.service.impl;
 
 import cn.hutool.core.util.ObjectUtil;
 import com.gameplat.admin.model.dto.OperGameTransferRecordDTO;
-import com.gameplat.admin.service.GameAdminService;
-import com.gameplat.admin.service.GameAmountControlService;
-import com.gameplat.admin.service.GameConfigService;
-import com.gameplat.admin.service.GameTransferInfoService;
-import com.gameplat.admin.service.GameTransferRecordService;
-import com.gameplat.admin.service.MemberBillService;
-import com.gameplat.admin.service.MemberInfoService;
-import com.gameplat.admin.service.MemberService;
+import com.gameplat.admin.service.*;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.DateUtil;
-import com.gameplat.common.enums.GameAmountControlTypeEnum;
-import com.gameplat.common.enums.GamePlatformEnum;
-import com.gameplat.common.enums.GameTransferStatus;
-import com.gameplat.common.enums.TranTypes;
-import com.gameplat.common.enums.TransferTypesEnum;
+import com.gameplat.common.enums.*;
 import com.gameplat.common.game.GameBizBean;
 import com.gameplat.common.game.TransferResource;
 import com.gameplat.common.game.api.GameApi;
-import com.gameplat.common.game.exception.LiveException;
-import com.gameplat.common.game.exception.LiveNoRollbackTransferException;
-import com.gameplat.common.game.exception.LiveRollbackException;
+import com.gameplat.common.game.exception.GameException;
+import com.gameplat.common.game.exception.GameNoRollbackTransferException;
+import com.gameplat.common.game.exception.GameRollbackException;
 import com.gameplat.common.util.CNYUtils;
 import com.gameplat.model.entity.game.GameAmountControl;
 import com.gameplat.model.entity.game.GameTransferRecord;
 import com.gameplat.model.entity.member.Member;
 import com.gameplat.model.entity.member.MemberBill;
 import com.gameplat.model.entity.member.MemberInfo;
-import java.math.BigDecimal;
-import java.util.Date;
-import javax.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -40,6 +26,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+
+import javax.annotation.Resource;
+import java.math.BigDecimal;
+import java.util.Date;
 
 @Slf4j
 @Service
@@ -66,7 +56,7 @@ public class GameAdminServiceImpl implements GameAdminService {
   @Transactional(propagation = Propagation.NOT_SUPPORTED)
   public GameApi getGameApi(String liveCode) {
     GameApi api =
-        applicationContext.getBean(liveCode.toLowerCase() + GameApi.Suffix, GameApi.class);
+        applicationContext.getBean(liveCode.toLowerCase() + GameApi.SUFFIX, GameApi.class);
     TransferTypesEnum tt = TransferTypesEnum.get(liveCode);
     // 1代表是否额度转换
     if (tt == null || tt.getType() != 1) {
@@ -366,7 +356,7 @@ public class GameAdminServiceImpl implements GameAdminService {
       //8. 增加转出额度数据
       gameAmountControl.setUseAmount(gameAmountControl.getUseAmount().add(amount.abs()));
       gameAmountControlService.updateById(gameAmountControl);
-    } catch (LiveException | LiveRollbackException ex) {
+    } catch (GameException | GameRollbackException ex) {
       boolean bool = gameApi.queryOrderStatus(gameBizBean);
       if (bool) {
         remark =
@@ -382,7 +372,7 @@ public class GameAdminServiceImpl implements GameAdminService {
                 + CNYUtils.formatYuanAsYuan(balance);
         status = GameTransferStatus.SUCCESS.getValue();
       } else {
-        if (ex instanceof LiveNoRollbackTransferException) {
+        if (ex instanceof GameNoRollbackTransferException) {
           remark += "系统转出成功，" + GamePlatformEnum.getName(transferOut) + "转入失败";
         } else {
           remark = GamePlatformEnum.getName(transferOut) + "转入失败,系统转出金额退回";
@@ -470,7 +460,7 @@ public class GameAdminServiceImpl implements GameAdminService {
         }
       } catch (Exception ex) {
         boolean b = false;
-        if (ex instanceof LiveException) {
+        if (ex instanceof GameException) {
           // 查询订单是否成功
           b = gameApi.queryOrderStatus(gameBizBean);
         }

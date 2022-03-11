@@ -1,7 +1,9 @@
 package com.gameplat.admin.service.impl;
 
+import cn.hutool.core.bean.BeanUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
@@ -15,16 +17,18 @@ import com.gameplat.admin.convert.RechargeOrderConvert;
 import com.gameplat.admin.enums.BlacklistConstant.BizBlacklistType;
 import com.gameplat.admin.enums.MemberEnums.Type;
 import com.gameplat.admin.enums.RechargeStatus;
+import com.gameplat.admin.enums.SysUserEnums;
 import com.gameplat.admin.mapper.RechargeOrderHistoryMapper;
 import com.gameplat.admin.mapper.RechargeOrderMapper;
 import com.gameplat.admin.model.bean.*;
+import com.gameplat.admin.model.dto.GameRWDataReportDto;
 import com.gameplat.admin.model.dto.MemberActivationDTO;
 import com.gameplat.admin.model.dto.RechargeOrderQueryDTO;
 import com.gameplat.admin.model.vo.MemberActivationVO;
 import com.gameplat.admin.model.vo.RechargeOrderVO;
 import com.gameplat.admin.model.vo.SummaryVO;
+import com.gameplat.admin.model.vo.ThreeRechReportVo;
 import com.gameplat.admin.service.*;
-import com.gameplat.admin.service.impl.BizBlacklistFacade;
 import com.gameplat.admin.util.MoneyUtils;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.json.JsonUtils;
@@ -73,9 +77,9 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
 
   @Autowired private RechargeOrderConvert rechargeOrderConvert;
 
-  @Autowired private RechargeOrderMapper rechargeOrderMapper;
+  @Autowired(required = false) private RechargeOrderMapper rechargeOrderMapper;
 
-  @Autowired private RechargeOrderHistoryMapper rechargeOrderHistoryMapper;
+  @Autowired(required = false) private RechargeOrderHistoryMapper rechargeOrderHistoryMapper;
 
   @Autowired private LimitInfoService limitInfoService;
 
@@ -100,6 +104,11 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
   @Autowired private MemberBillService memberBillService;
 
   @Autowired private ValidWithdrawService validWithdrawService;
+
+  @Autowired private MemberRwReportService memberRwReportService;
+
+
+
 
   @Override
   public PageExt<RechargeOrderVO, SummaryVO> findPage(
@@ -129,10 +138,12 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
             dto.getAmountFrom())
         .le(ObjectUtils.isNotEmpty(dto.getAmountTo()), RechargeOrder::getAmount, dto.getAmountTo())
         .eq(ObjectUtils.isNotEmpty(dto.getAccount()), RechargeOrder::getAccount, dto.getAccount())
-        .eq(
-            ObjectUtils.isNotEmpty(dto.getMemberType()),
+        .in(
+            ObjectUtils.isNotEmpty(dto.getMemberType()) && dto.getMemberType().equalsIgnoreCase(SysUserEnums.UserType.RECH_FORMAL_TYPE.value()),
             RechargeOrder::getMemberType,
-            dto.getMemberType())
+                SysUserEnums.UserType.RECH_FORMAL_TYPE_QUERY.value().split(","))
+         .eq(ObjectUtils.isNotEmpty(dto.getMemberType()) && dto.getMemberType().equalsIgnoreCase(SysUserEnums.UserType.RECH_TEST_TYPE.value()),
+                 RechargeOrder::getMemberType,dto.getMemberType())
         .eq(ObjectUtils.isNotEmpty(dto.getOrderNo()), RechargeOrder::getOrderNo, dto.getOrderNo())
         .eq(
             ObjectUtils.isNotEmpty(dto.getSuperAccount()),
@@ -177,19 +188,15 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
       discountRechargeFlag = null;
     }
     UserCredential userCredential = SecurityUserHolder.getCredential();
-    LambdaUpdateWrapper<RechargeOrder> update = Wrappers.lambdaUpdate();
-    update
-        .set(ObjectUtils.isNotEmpty(discountType), RechargeOrder::getDiscountType, discountType)
-        .set(
-            ObjectUtils.isNotEmpty(discountAmount),
-            RechargeOrder::getDiscountAmount,
-            discountAmount)
-        .set(ObjectUtils.isNotEmpty(discountDml), RechargeOrder::getDiscountDml, discountDml)
-        .set(RechargeOrder::getDiscountRechargeFlag, discountRechargeFlag)
-        .set(RechargeOrder::getAuditorAccount, userCredential.getUsername())
-        .set(RechargeOrder::getAuditTime, new Date())
-        .eq(RechargeOrder::getId, id);
-    this.update(new RechargeOrder(), update);
+    RechargeOrder rechargeOrder = this.getById(id);
+    rechargeOrder.setAuditorAccount(userCredential.getUsername());
+    rechargeOrder.setAuditTime(new Date());
+    rechargeOrder.setDiscountType(discountType);
+    rechargeOrder.setDiscountAmount(discountAmount);
+    rechargeOrder.setDiscountDml(discountDml);
+    rechargeOrder.setTotalAmount(rechargeOrder.getPayAmount().add(discountAmount));
+    rechargeOrder.setDiscountRechargeFlag(discountRechargeFlag);
+    this.updateById(rechargeOrder);
   }
 
   @Override
@@ -267,6 +274,11 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
     }
     rechargeOrder.setStatus(RechargeStatus.SUCCESS.getValue());
     updateRechargeOrder(rechargeOrder);
+    // 更新充提报表
+    //过滤 推广账号 充值
+    if (!UserTypes.PROMOTION.value().equals(member.getUserType())) {
+      memberRwReportService.addRecharge(member, memberInfo.getTotalRechTimes(), rechargeOrder);
+    }
 
     if (rechargeOrder.getDmlFlag() == TrueFalse.TRUE.getValue()) {
       // 计算打码量
@@ -311,6 +323,8 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
     LambdaUpdateWrapper<RechargeOrder> update = Wrappers.lambdaUpdate();
     update
         .set(RechargeOrder::getStatus, newStatus)
+        .set(RechargeOrder::getAcceptAccount, auditorAccount)
+        .set(RechargeOrder::getAcceptTime,new Date())
         .set(RechargeOrder::getAuditorAccount, auditorAccount)
         .set(RechargeOrder::getAuditTime, new Date())
         .eq(RechargeOrder::getId, id)
@@ -705,12 +719,19 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
     }
   }
 
+
+
   private SummaryVO amountSum(RechargeOrderQueryDTO dto) {
     LambdaQueryWrapper<RechargeOrder> queryHandle = Wrappers.lambdaQuery();
     SummaryVO summaryVO = new SummaryVO();
     queryHandle
         .eq(RechargeOrder::getStatus, RechargeStatus.HANDLED.getValue())
         .in(ObjectUtils.isNotNull(dto.getModeList()), RechargeOrder::getMode, dto.getModeList())
+        .in(ObjectUtils.isNotEmpty(dto.getMemberType()) && dto.getMemberType().equalsIgnoreCase(SysUserEnums.UserType.RECH_FORMAL_TYPE.value()),
+                RechargeOrder::getMemberType,
+                SysUserEnums.UserType.RECH_FORMAL_TYPE_QUERY.value().split(","))
+        .eq(ObjectUtils.isNotEmpty(dto.getMemberType()) && dto.getMemberType().equalsIgnoreCase(SysUserEnums.UserType.RECH_TEST_TYPE.value()),
+                RechargeOrder::getMemberType,dto.getMemberType())
         .in(
             ObjectUtils.isNotNull(dto.getMemberLevelList()),
             RechargeOrder::getMemberLevel,
@@ -794,5 +815,32 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
   public List<JSONObject> getSpreadReport(
       List<SpreadUnion> list, String startTime, String endTime) {
     return rechargeOrderMapper.getSpreadReport(list, startTime, endTime);
+  }
+
+
+  @Override
+  public List<ThreeRechReportVo> findThreeRechReport(GameRWDataReportDto dto){
+      List<RechargeOrder> list =  rechargeOrderMapper.selectList(this.builderMemberTodayQuery(dto));
+      return BeanUtil.copyToList(list, ThreeRechReportVo.class);
+  }
+
+  private final int ONE = 1;
+
+  private final int ZOO = 0;
+
+  /**
+   * 查询在线支付
+   */
+  private QueryWrapper<RechargeOrder> builderMemberTodayQuery(GameRWDataReportDto dto) {
+      QueryWrapper<RechargeOrder> queryWrapper = new QueryWrapper<>();
+      return queryWrapper.select("tp_interface_code,tp_interface_name,sum(amount) as amount")
+              .eq("status", com.gameplat.common.enums.RechargeStatus.SUCCESS.getValue())
+              .between("audit_time", dto.getStartTime(), dto.getEndTime())
+              .eq("mode", com.gameplat.common.enums.RechargeStatus.HANDLED.getValue())
+              .eq(StringUtils.isNotEmpty(dto.getAccount()),"account", dto.getAccount())
+              .eq(StringUtils.isNotEmpty(dto.getSuperAccount()) && ONE == dto.getFlag(),"super_account", dto.getSuperAccount())
+              .eq(StringUtils.isNotEmpty(dto.getSuperAccount()) && ZOO == dto.getFlag(),"super_path", dto.getSuperAccount())
+              .groupBy("tp_interface_code");
+
   }
 }

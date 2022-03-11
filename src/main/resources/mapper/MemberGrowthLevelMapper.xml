@@ -14,7 +14,6 @@
         <result property="monthWage" column="month_wage"/>
         <result property="birthGiftMoney" column="birth_gift_money"/>
         <result property="redEnvelope" column="red_envelope"/>
-        <result property="creditMoney" column="credit_money"/>
         <result property="createTime" column="create_time"/>
         <result property="updateTime" column="update_time"/>
         <result property="createBy" column="create_by"/>
@@ -28,6 +27,10 @@
         <result property="mobileUnreachVipImage" column="mobile_unreach_vip_image"/>
         <result property="webReachVipImage" column="web_reach_vip_image"/>
         <result property="webUnreachVipImage" column="web_unreach_vip_image"/>
+        <result property="coinRatio" column="coin_ratio"/>
+        <result property="maxCoin" column="max_coin"/>
+        <result property="dailyMaxCoin" column="daily_max_coin"/>
+        <result property="loanMoney" column="loan_money"/>
     </resultMap>
 
     <sql id="base_column">
@@ -41,7 +44,6 @@
         month_wage,
         birth_gift_money,
         red_envelope,
-        credit_money,
         create_by,
         create_time,
         update_by,
@@ -54,7 +56,11 @@
         mobile_reach_vip_image,
         mobile_unreach_vip_image,
         web_reach_vip_image,
-        web_unreach_vip_image
+        web_unreach_vip_image,
+        coin_ratio,
+        max_coin,
+        daily_max_coin,
+        loan_money
     </sql>
 
     <select id="findList" resultMap="memberGrowthLevelResult">
@@ -82,8 +88,9 @@
                     <if test="item.monthWage != null">month_wage = #{item.monthWage},</if>
                     <if test="item.birthGiftMoney != null">birth_gift_money = #{item.birthGiftMoney},</if>
                     <if test="item.redEnvelope != null">red_envelope = #{item.redEnvelope},</if>
-<!--                    <if test="item.creditMoney != null">credit_money = #{item.creditMoney},</if>-->
                     <if test="item.updateBy != null and item.updateBy != ''">update_by = #{item.updateBy},</if>
+                    <if test="item.dailyMaxCoin != null">daily_max_coin = #{item.dailyMaxCoin},</if>
+                    <if test="item.loanMoney != null and item.loanMoney != ''">loan_money = #{item.loanMoney},</if>
 <!--                    <if test="item.mobileVipImage != null and item.mobileVipImage != ''">mobile_vip_image = #{item.mobileVipImage},</if>-->
 <!--                    <if test="item.webVipImage != null and item.webVipImage != ''">web_vip_image = #{item.webVipImage},</if>-->
 <!--                    <if test="item.mobileReachBackImage != null and item.mobileReachBackImage != ''">mobile_reach_back_image = #{item.mobileReachBackImage},</if>-->

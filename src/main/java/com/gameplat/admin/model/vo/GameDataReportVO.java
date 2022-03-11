@@ -32,6 +32,13 @@ public class GameDataReportVO implements Serializable {
     @ApiModelProperty(value = "返水总金额")
     private BigDecimal allWaterAmount;
 
+
+
+    //以公司为维度取相反数
+    public BigDecimal getAllWinAmount() {
+        return this.allWinAmount.negate();
+    }
+
     public GameDataReportVO() {
         this.allWinAmount = BigDecimal.ZERO;
         this.allWaterAmount = BigDecimal.ZERO;

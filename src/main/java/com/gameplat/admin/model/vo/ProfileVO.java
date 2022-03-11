@@ -29,7 +29,7 @@ public class ProfileVO {
   private List<String> permis;
 
   /** 用户个性设置 */
-  private String setting;
+  private String settings;
 
   /** 创建时间 */
   private Date createTime;
@@ -39,4 +39,11 @@ public class ProfileVO {
   private String limitInfo;
 
   private String userType;
+
+
+  /** 最后登录ip */
+  private String loginIp;
+
+  /**最后登录时间 */
+  private Date loginDate;
 }

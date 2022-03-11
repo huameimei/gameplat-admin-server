@@ -1,5 +1,6 @@
 package com.gameplat.admin.model.vo;
 
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -54,6 +55,11 @@ public class RechargeOrderVO {
 
   private String remarks;
 
+  private String   acceptAccount;
+
+  private Date acceptTime;
+
+
   private String auditorAccount;
 
   private Date auditTime;
@@ -75,4 +81,8 @@ public class RechargeOrderVO {
   private Long memberId;
 
   private Integer pointFlag;
+
+  private BigDecimal currencyRate;
+
+  private BigDecimal currencyCount;
 }

@@ -62,6 +62,7 @@ public class LimitInfoServiceImpl extends ServiceImpl<LimitInfoMapper, LimitInfo
   @Override
   public <T> Optional<T> getLimitInfo(LimitEnums limit, Class<T> t) {
     return lambdaQuery()
+        .select(LimitInfo::getValue)
         .eq(LimitInfo::getName, limit.getName())
         .oneOpt()
         .map(LimitInfo::getValue)

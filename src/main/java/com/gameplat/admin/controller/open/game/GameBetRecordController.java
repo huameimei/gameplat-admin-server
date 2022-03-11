@@ -5,7 +5,7 @@ import com.gameplat.admin.model.dto.GameBetRecordQueryDTO;
 import com.gameplat.admin.model.vo.GameBetRecordVO;
 import com.gameplat.admin.model.vo.PageDtoVO;
 import com.gameplat.admin.service.GameBetRecordInfoService;
-import com.gameplat.common.game.LiveGameResult;
+import com.gameplat.common.game.GameResult;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,7 +28,7 @@ public class GameBetRecordController {
   }
 
   @GetMapping(value = "/getGameResult")
-  public LiveGameResult getGameResult(GameBetRecordQueryDTO dto, HttpServletResponse response)
+  public GameResult getGameResult(GameBetRecordQueryDTO dto, HttpServletResponse response)
       throws Exception {
     return gameBetRecordInfoService.getGameResult(dto);
   }

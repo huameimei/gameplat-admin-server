@@ -22,6 +22,7 @@ import com.gameplat.admin.model.dto.*;
 import com.gameplat.admin.model.vo.GrowthScaleVO;
 import com.gameplat.admin.model.vo.MemberGrowthLevelVO;
 import com.gameplat.admin.model.vo.MemberGrowthRecordVO;
+import com.gameplat.admin.model.vo.MemberVO;
 import com.gameplat.admin.service.*;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.common.enums.BooleanEnum;
@@ -85,6 +86,8 @@ public class MemberGrowthRecordServiceImpl
   @Autowired private MemberBillService memberBillService;
 
   @Autowired private MessageInfoConvert messageInfoConvert;
+
+  @Autowired private MemberLoanService memberLoanService;
 
   public static final String kindName =
       "{\"en-US\": \"platform\", \"in-ID\": \"peron\", \"th-TH\": \"แพลตฟอร์ม\", \"vi-VN\": \"nền tảng\", \"zh-CN\": \"平台\"}";
@@ -272,6 +275,22 @@ public class MemberGrowthRecordServiceImpl
     }
     // 成长值变动后重新计算新的等级
     Integer afterLevel = this.dealUpLevel(memberGrowthRecord.getCurrentGrowth(), growthConfig);
+    MemberVO memberVo = memberService.queryList(new MemberQueryDTO() {{
+      setId(memberId);
+    }}).get(0);
+    //更新借呗表额度
+    BigDecimal loanMoney = growthLevelService.lambdaQuery()
+            .eq(MemberGrowthLevel::getLevel, afterLevel)
+            .one()
+            .getLoanMoney();
+    int money = loanMoney.compareTo(BigDecimal.ZERO);
+    if(money == 1){
+      memberLoanService.editOrUpdate(new MemberLoan(){{
+        setLoanMoney(loanMoney);
+        setMemberId(memberId);
+        setAccount(memberVo.getAccount());
+      }});
+    }
     memberGrowthRecord.setCurrentLevel(afterLevel);
     // todo 5.记录成长值变动记录  重新更新 会员成长值汇总
     Long tempGrowth = changeFinalGrowth;
@@ -295,12 +314,14 @@ public class MemberGrowthRecordServiceImpl
       MemberInfo memberInfo = new MemberInfo();
       memberInfo.setMemberId(memberId);
       memberInfo.setVipLevel(afterLevel);
+      memberInfo.setVipGrowth(oldGrowth + memberGrowthRecord.getCurrentGrowth());
       memberInfoService.updateById(memberInfo);
     } else {
       // VIP变动更新会员vip
       MemberInfo memberInfo = new MemberInfo();
       memberInfo.setMemberId(memberId);
       memberInfo.setVipLevel(afterLevel);
+      memberInfo.setVipGrowth(oldGrowth + memberGrowthRecord.getCurrentGrowth());
       memberInfoService.updateById(memberInfo);
     }
   }

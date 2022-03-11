@@ -44,4 +44,8 @@ public class UserDTO {
   /** 最近登录ip */
   @ApiModelProperty(value = "最近登录ip")
   private String loginIp;
+
+  /** 角色Id */
+  @ApiModelProperty(value = "角色Id")
+  private Long roleId;
 }

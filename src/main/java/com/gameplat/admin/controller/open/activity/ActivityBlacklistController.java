@@ -47,7 +47,7 @@ public class ActivityBlacklistController {
     @ApiImplicitParam(name = "current", value = "分页参数：当前页", defaultValue = "1"),
     @ApiImplicitParam(name = "size", value = "每页条数"),
   })
-  public IPage<ActivityBlacklistVO> list(
+  public IPage<ActivityBlacklist> list(
       @ApiIgnore PageDTO<ActivityBlacklist> page,
       ActivityBlacklistQueryDTO activityBlacklistQueryDTO) {
     return activityBlacklistService.list(page, activityBlacklistQueryDTO);

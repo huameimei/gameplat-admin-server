@@ -226,7 +226,7 @@ public class MessageInfoServiceImpl extends ServiceImpl<MessageMapper, Message>
       memberQueryDTO.setAccount(messageDistributeQueryDTO.getUserAccount());
     }
     if (ObjectUtil.isNotNull(messageDistributeQueryDTO.getVipLevel())) {
-      memberQueryDTO.setLevel(messageDistributeQueryDTO.getVipLevel());
+      memberQueryDTO.setVipLevel(messageDistributeQueryDTO.getVipLevel());
     }
     if (ObjectUtil.isNotNull(messageDistributeQueryDTO.getRechargeLevel())) {
       memberQueryDTO.setUserLevel(messageDistributeQueryDTO.getRechargeLevel());
@@ -279,7 +279,7 @@ public class MessageInfoServiceImpl extends ServiceImpl<MessageMapper, Message>
     if (messageDistributeQueryDTO.getPushRange().equals(5)) {
       memberQueryDTO.setUserType("M");
       memberQueryDTO.setStatus(1);
-      memberQueryDTO.setLevel(Integer.parseInt(messageDistributeQueryDTO.getLinkAccount()));
+      memberQueryDTO.setVipLevel(Integer.parseInt(messageDistributeQueryDTO.getLinkAccount()));
       IPage<MessageDistributeVO> messageDistributePage =
           readStatus(page, memberQueryDTO, messageDistributeQueryDTO);
       return messageDistributePage;

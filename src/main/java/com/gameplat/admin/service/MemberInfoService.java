@@ -2,6 +2,7 @@ package com.gameplat.admin.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.gameplat.model.entity.member.MemberInfo;
+import org.apache.ibatis.annotations.Param;
 
 import java.math.BigDecimal;
 
@@ -33,4 +34,18 @@ public interface MemberInfoService extends IService<MemberInfo> {
    * @param amount 扣除传负数，增加传正数
    */
   void updateBalance(Long memberId, BigDecimal amount);
+
+  /**
+   * 获取用户彩票投注返点
+   * @param account
+   * @return
+   */
+  BigDecimal findUserRebate(String account);
+
+  /**
+   * 获取用户下级最大投注返点
+   * @param agentAccount
+   * @return
+   */
+  BigDecimal findUserLowerMaxRebate(String agentAccount);
 }

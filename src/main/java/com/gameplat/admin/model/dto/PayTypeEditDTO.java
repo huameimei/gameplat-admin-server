@@ -25,5 +25,5 @@ public class PayTypeEditDTO implements Serializable {
 
   private Integer sort;
 
-  private String url;
+  private String iconUrl;
 }

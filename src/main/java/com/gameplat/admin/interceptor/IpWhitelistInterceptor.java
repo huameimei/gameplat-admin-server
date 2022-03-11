@@ -1,21 +1,20 @@
 package com.gameplat.admin.interceptor;
 
+import cn.hutool.core.collection.CollUtil;
+import com.gameplat.admin.enums.AuthIpEnum;
 import com.gameplat.admin.service.CommonService;
 import com.gameplat.admin.service.SysAuthIpService;
-import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.IPUtils;
-import com.gameplat.base.common.util.StringUtils;
 import com.gameplat.common.enums.BooleanEnum;
 import com.gameplat.common.lang.Assert;
 import com.gameplat.common.model.bean.limit.AdminLoginLimit;
+import com.gameplat.model.entity.sys.SysAuthIp;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.Set;
-
-import static com.gameplat.base.common.enums.ResultCode.FORBIDDEN;
+import java.util.List;
 
 /**
  * IP白名单拦截器
@@ -43,10 +42,17 @@ public class IpWhitelistInterceptor extends HandlerInterceptorAdapter {
    * @param ip IP
    */
   private void checkIpWhiteList(int ipWhiteListSwitch, String ip) {
-    Set<String> authIps = authIpService.getAllList();
     if (BooleanEnum.YES.match(ipWhiteListSwitch)) {
-      String message = StringUtils.format("当前IP：{}访问被拒绝，如有疑问请联系管理员!", ip);
-      Assert.isTrue(authIps.contains(ip), () -> new ServiceException(FORBIDDEN, message));
+      Assert.isTrue(this.isAllowed(ip), "当前IP：{}访问被拒绝，如有疑问请联系管理员!", ip);
     }
+  }
+
+  private boolean isAllowed(String ip) {
+    List<SysAuthIp> authIps = authIpService.getAll();
+    return CollUtil.isNotEmpty(authIps)
+        && authIps.stream()
+            .filter(e -> e.getIpType().contains(AuthIpEnum.Type.ADMIN.value()))
+            .map(SysAuthIp::getAllowIp)
+            .anyMatch(ip::equals);
   }
 }

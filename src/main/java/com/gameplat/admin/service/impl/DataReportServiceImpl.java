@@ -1,16 +1,16 @@
 package com.gameplat.admin.service.impl;
 
 import cn.hutool.core.convert.Convert;
-import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import com.alibaba.fastjson.JSON;
+import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.mapper.DataReportMapper;
 import com.gameplat.admin.model.dto.GameRWDataReportDto;
 import com.gameplat.admin.model.vo.*;
 import com.gameplat.admin.service.DataReportService;
-import com.gameplat.base.common.util.DateUtils;
+import com.gameplat.admin.service.RechargeOrderService;
 import com.gameplat.base.common.util.StringUtils;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,10 +19,7 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -68,6 +65,19 @@ public class DataReportServiceImpl extends ServiceImpl<DataReportMapper, GameRec
     private final String monthlyRed = "4";
 
 
+    //代理总计 divide_type 代理分红,  salary_type 代理日工资  water_type 代理返点
+    private final String divide_type = "a";
+
+    private final String salary_type = "b";
+
+    private final String water_type = "c";
+
+
+
+    @Autowired
+    RechargeOrderService rechargeOrderService;
+
+
     @Autowired(required = false)
     private DataReportMapper dataReportMapper;
 
@@ -78,7 +88,7 @@ public class DataReportServiceImpl extends ServiceImpl<DataReportMapper, GameRec
         log.info("查询充值数据：{}", JSON.toJSONString(rechReport));
         List<Map<String, Object>> rechReportNum = dataReportMapper.findRechReportNums(dto);
         rechReportNum.stream().forEach(a -> {
-           if (bank_count.equalsIgnoreCase(Convert.toStr(a.get("rechCode")))) {
+               if (bank_count.equalsIgnoreCase(Convert.toStr(a.get("rechCode")))) {
                rechReport.setBankCount(Convert.toInt(a.get("rechNum")));
                return;
            }
@@ -243,5 +253,40 @@ public class DataReportServiceImpl extends ServiceImpl<DataReportMapper, GameRec
         map.put("allBalance", allBalance);
         pageDtoVO.setOtherData(map);
         return pageDtoVO;
+    }
+
+
+
+    @Override
+    public List<ThreeRechReportVo> findThreeRech(GameRWDataReportDto dto){
+        return  Optional.ofNullable(rechargeOrderService.findThreeRechReport(dto)).orElse(new ArrayList<>());
+    }
+
+
+    @Override
+    public GameProxyDataVo findProxyData(GameRWDataReportDto dto) {
+        GameProxyDataVo gameProxyDataVo = new GameProxyDataVo();
+        //计算代理数据
+        List<Map<String, Object>> proxyData = dataReportMapper.findProxyData(dto);
+        log.info("计算代理数据:{}",proxyData.size());
+        proxyData.stream().forEach(a ->{
+            if (ObjectUtils.isNotEmpty(a.get("type")) && divide_type.equalsIgnoreCase(a.get("type").toString())) {
+                gameProxyDataVo.setDivideAmount(Convert.toBigDecimal(a.get("amount")));
+                gameProxyDataVo.setDivideNum(Convert.toInt(a.get("num")));
+                return;
+            }
+            if (ObjectUtils.isNotEmpty(a.get("type")) && salary_type.equalsIgnoreCase(a.get("type").toString())) {
+                gameProxyDataVo.setSalaryGrant(Convert.toBigDecimal(a.get("amount")));
+                gameProxyDataVo.setSalaryNum(Convert.toInt(a.get("num")));
+                return;
+            }
+
+            if (ObjectUtils.isNotEmpty(a.get("type")) && water_type.equalsIgnoreCase(a.get("type").toString())) {
+                gameProxyDataVo.setProxyWaterAmount(Convert.toBigDecimal(a.get("amount")));
+                gameProxyDataVo.setProxyWaterNum(Convert.toInt(a.get("num")));
+                return;
+            }
+        });
+        return gameProxyDataVo;
     }
 }

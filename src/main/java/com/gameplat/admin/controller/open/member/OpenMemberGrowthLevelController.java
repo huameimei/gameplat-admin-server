@@ -1,15 +1,11 @@
 package com.gameplat.admin.controller.open.member;
 
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
-import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.gameplat.admin.enums.LanguageEnum;
 import com.gameplat.admin.model.dto.MemberGrowthConfigEditDto;
-import com.gameplat.admin.model.dto.MemberGrowthLevelEditDto;
 import com.gameplat.admin.model.vo.MemberConfigLevelVO;
-import com.gameplat.admin.model.vo.MemberGrowthConfigVO;
 import com.gameplat.admin.model.vo.MemberGrowthLevelVO;
 import com.gameplat.admin.service.MemberGrowthConfigService;
 import com.gameplat.admin.service.MemberGrowthLevelService;
@@ -46,28 +42,7 @@ public class OpenMemberGrowthLevelController {
   @PreAuthorize("hasAuthority('member:growthLevel:config')")
   public MemberConfigLevelVO getLevelConfig(
       @ApiParam(name = "language", value = "语言") @RequestParam(required = false) String language) {
-    try {
-      if (StrUtil.isBlank(language)) {
-        language = LanguageEnum.app_zh_CN.getCode();
-      }
-      // 经验值描述
-      MemberGrowthConfigVO config = configService.findOneConfig(language);
-      // 最高等级
-      Integer limitLevel = config.getLimitLevel();
-      if (limitLevel == null) {
-        limitLevel = 50;
-      }
-      // 用户成长等级配置
-      List<MemberGrowthLevelVO> levels = levelService.findList(limitLevel, language);
-      return new MemberConfigLevelVO() {
-        {
-          setConfigVO(config);
-          setLevelVO(levels);
-        }
-      };
-    } catch (Exception e) {
-      throw new ServiceException("获取成长等级和配置失败:" + e);
-    }
+    return levelService.getLevelConfig(language);
   }
 
   @ApiOperation(value = "修改VIP配置")
@@ -91,12 +66,7 @@ public class OpenMemberGrowthLevelController {
   @PreAuthorize("hasAuthority('member:growthLevel:updateLevel')")
   @PutMapping("/updateLevel")
   public void batchUpdateLevel(@RequestBody JSONObject obj) {
-    String language = obj.get("language").toString();
-    language = StrUtil.isBlank(language) ? "zh-CN" : language;
-    Object levels = obj.get("levels");
-    JSONArray jsonArray = JSONUtil.parseArray(levels);
-    List<MemberGrowthLevelEditDto> list = jsonArray.toList(MemberGrowthLevelEditDto.class);
-    levelService.batchUpdateLevel(list, language);
+    levelService.batchUpdateLevel(obj);
   }
 
   @ApiOperation(value = "VIP等级列表")
@@ -104,21 +74,6 @@ public class OpenMemberGrowthLevelController {
   @PreAuthorize("hasAuthority('member:growthLevel:config')")
   public List<MemberGrowthLevelVO> vipList(
       @ApiParam(name = "language", value = "语言") @RequestParam(required = false) String language) {
-    try {
-      if (StrUtil.isBlank(language)) {
-        language = LanguageEnum.app_zh_CN.getCode();
-      }
-      // 经验值描述
-      MemberGrowthConfigVO config = configService.findOneConfig(language);
-      // 最高等级
-      Integer limitLevel = config.getLimitLevel();
-      if (limitLevel == null) {
-        limitLevel = 50;
-      }
-      // 用户成长等级配置
-      return levelService.findList(limitLevel, language);
-    } catch (Exception e) {
-      throw new ServiceException("获取VIP等级列表失败:" + e);
-    }
+    return levelService.vipList(language);
   }
 }

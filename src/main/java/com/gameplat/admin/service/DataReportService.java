@@ -4,6 +4,8 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.gameplat.admin.model.dto.GameRWDataReportDto;
 import com.gameplat.admin.model.vo.*;
 
+import java.util.List;
+
 
 /**
  * @Author kb
@@ -24,4 +26,10 @@ public interface DataReportService {
     GameDividendDataVo findDividendtDataReport(GameRWDataReportDto dto);
 
     PageDtoVO<AccountReportVo>  findAccountReport (Page<AccountReportVo> page,GameRWDataReportDto dto);
+
+
+    List<ThreeRechReportVo> findThreeRech(GameRWDataReportDto dto);
+
+    GameProxyDataVo findProxyData(GameRWDataReportDto dto);
+
 }

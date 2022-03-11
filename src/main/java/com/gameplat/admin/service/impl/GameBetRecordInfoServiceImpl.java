@@ -1,5 +1,6 @@
 package com.gameplat.admin.service.impl;
 
+import cn.hutool.core.convert.Convert;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.gameplat.admin.config.TenantConfig;
@@ -17,7 +18,7 @@ import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.common.enums.GamePlatformEnum;
 import com.gameplat.common.enums.TransferTypesEnum;
 import com.gameplat.common.game.GameBizBean;
-import com.gameplat.common.game.LiveGameResult;
+import com.gameplat.common.game.GameResult;
 import com.gameplat.common.game.api.GameApi;
 import com.gameplat.elasticsearch.page.PageResponse;
 import com.gameplat.elasticsearch.service.IBaseElasticsearchService;
@@ -79,9 +80,10 @@ public class GameBetRecordInfoServiceImpl implements GameBetRecordInfoService {
     private RestHighLevelClient restHighLevelClient;
 
   @Transactional(propagation = Propagation.NOT_SUPPORTED)
-  public GameApi getGameApi(String liveCode) {
-    GameApi api = applicationContext.getBean(liveCode + GameApi.Suffix, GameApi.class);
-    TransferTypesEnum tt = TransferTypesEnum.get(liveCode);
+  public GameApi getGameApi(String platformCode) {
+    GameApi api = applicationContext
+        .getBean(platformCode.toLowerCase() + GameApi.SUFFIX, GameApi.class);
+    TransferTypesEnum tt = TransferTypesEnum.get(platformCode);
     // 1代表是否额度转换
     if (tt == null || tt.getType() != 1) {
       throw new ServiceException("游戏未接入");
@@ -122,9 +124,9 @@ public class GameBetRecordInfoServiceImpl implements GameBetRecordInfoService {
         try {
            SearchResponse searchResponse =  restHighLevelClient.search(searchRequest,optionsBuilder.build());
             Map<String, Aggregation> aggregationMap = searchResponse.getAggregations().getAsMap();
-            double betAmount = ((ParsedSum) aggregationMap.get("betAmountSum")).getValue();
-            double validAmount = ((ParsedSum) aggregationMap.get("validAmountSum")).getValue();
-            double winAmount = ((ParsedSum) aggregationMap.get("winAmountSum")).getValue();
+            BigDecimal betAmount = Convert.toBigDecimal(((ParsedSum)aggregationMap.get("betAmountSum")).getValue()).setScale(2,BigDecimal.ROUND_DOWN);
+            BigDecimal validAmount = Convert.toBigDecimal(( (ParsedSum) aggregationMap.get("validAmountSum")).getValue()).setScale(2,BigDecimal.ROUND_DOWN);
+            BigDecimal winAmount = Convert.toBigDecimal(( (ParsedSum)aggregationMap.get("winAmountSum")).getValue()).setScale(2,BigDecimal.ROUND_DOWN);
             otherData.put("betAmount",betAmount);
             otherData.put("validAmount",validAmount);
             otherData.put("winAmount",winAmount);
@@ -155,13 +157,13 @@ public class GameBetRecordInfoServiceImpl implements GameBetRecordInfoService {
   }
 
   @Override
-  public LiveGameResult getGameResult(GameBetRecordQueryDTO dto) throws Exception {
+  public GameResult getGameResult(GameBetRecordQueryDTO dto) throws Exception {
     // TODO 直接连游戏查询结果
     GameApi gameApi = getGameApi(dto.getPlatformCode());
     GameBizBean gameBizBean = new GameBizBean();
     gameBizBean.setOrderNo(dto.getBillNo());
     gameBizBean.setConfig(gameConfigService.queryGameConfigInfoByPlatCode(dto.getPlatformCode()));
-    LiveGameResult liveGameResult = gameApi.getGameResult(gameBizBean);
+    GameResult liveGameResult = gameApi.getGameResult(gameBizBean);
     if (StringUtils.isBlank(liveGameResult.getData())) {
       throw new ServiceException(GamePlatformEnum.getName(dto.getPlatformCode()) + "暂不支持查看游戏结果");
     }

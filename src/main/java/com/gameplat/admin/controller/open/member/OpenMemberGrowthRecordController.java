@@ -47,19 +47,14 @@ public class OpenMemberGrowthRecordController {
   @PreAuthorize("hasAuthority('member:growthRecord:editGrowth')")
   public void editMemberGrowth(@RequestBody MemberGrowthChangeDto dto, HttpServletRequest request) {
     log.info("单个会员成长值变动：MemberGrowthRecord={}", dto);
-    try {
-      if (dto == null || dto.getChangeGrowth() == null || dto.getType() == null) {
-        throw new ServiceException("参数不全！");
-      }
-      if (dto.getChangeGrowth() == 0) {
-        throw new ServiceException("扣除/添加成长值不能为0！");
-      }
-      memberGrowthRecordService.editMemberGrowth(dto, request);
-    } catch (Exception e) {
-      log.error(e.getMessage());
-      log.info("异常原因:", e);
-      throw new ServiceException("成长值变动失败！");
+    if (dto == null || dto.getChangeGrowth() == null) {
+      throw new ServiceException("参数不全！");
     }
+    if (dto.getChangeGrowth() == 0) {
+      throw new ServiceException("扣除/添加成长值不能为0！");
+    }
+    dto.setType(3);
+    memberGrowthRecordService.editMemberGrowth(dto, request);
   }
 
   @GetMapping("/getBar")

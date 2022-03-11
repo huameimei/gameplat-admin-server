@@ -27,6 +27,7 @@ public class MemberQueryCondition {
   public QueryWrapper<Member> builderQueryWrapper(MemberQueryDTO dto) {
     QueryWrapper<Member> query = Wrappers.query();
     query
+        .eq(ObjectUtils.isNotEmpty(dto.getId()), "t1.id", dto.getId())
         .eq(ObjectUtils.isNotEmpty(dto.getNickname()), "t1.nickname", dto.getNickname())
         .eq(ObjectUtils.isNotNull(dto.getUserType()), "t1.user_type", dto.getUserType())
         .eq(ObjectUtils.isNotEmpty(dto.getParentName()), "t1.parent_name", dto.getParentName())
@@ -35,8 +36,8 @@ public class MemberQueryCondition {
         .eq(ObjectUtils.isNotEmpty(dto.getQq()), "t1.qq", dto.getQq())
         .eq(ObjectUtils.isNotEmpty(dto.getUserLevel()), "t1.user_level", dto.getUserLevel())
         .eq(ObjectUtils.isNotEmpty(dto.getAgentLevel()), "t1.agent_level", dto.getAgentLevel())
-        .eq(ObjectUtils.isNotEmpty(dto.getLevel()), "t2.level", dto.getLevel())
-        .in(ObjectUtils.isNotEmpty(dto.getLevels()), "t2.level", dto.getLevels())
+        .eq(ObjectUtils.isNotEmpty(dto.getVipLevel()), "t2.vip_level", dto.getVipLevel())
+        .in(ObjectUtils.isNotEmpty(dto.getLevels()), "t2.vip_level", dto.getLevels())
         .eq(
             ObjectUtils.isNotEmpty(dto.getInvitationCode()),
             "t2.invitation_code",
@@ -130,7 +131,9 @@ public class MemberQueryCondition {
         // 未首提
         .eq(Boolean.TRUE.equals(dto.getNoFirstWithdraw()), "t2.total_withdraw_times", 0)
         // 未二次充值
-        .lt(Boolean.TRUE.equals(dto.getNotTwiceRech()), "t2.total_rech_times", 2);
+        .lt(Boolean.TRUE.equals(dto.getNotTwiceRech()), "t2.total_rech_times", 2)
+        // 按创建时间默认降序
+        .orderByDesc("t1.create_time");
 
     return query;
   }

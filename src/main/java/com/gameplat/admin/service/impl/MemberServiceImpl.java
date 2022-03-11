@@ -1,10 +1,14 @@
 package com.gameplat.admin.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.convert.Convert;
+import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.RandomUtil;
+import cn.hutool.core.util.StrUtil;
 import com.alicp.jetcache.anno.CacheInvalidate;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.component.MemberQueryCondition;
@@ -12,6 +16,7 @@ import com.gameplat.admin.config.TenantConfig;
 import com.gameplat.admin.constant.SystemConstant;
 import com.gameplat.admin.convert.MemberConvert;
 import com.gameplat.admin.enums.MemberEnums;
+import com.gameplat.admin.enums.SysUserEnums;
 import com.gameplat.admin.mapper.MemberMapper;
 import com.gameplat.admin.model.dto.*;
 import com.gameplat.admin.model.vo.MemberInfoVO;
@@ -24,7 +29,6 @@ import com.gameplat.base.common.util.StringUtils;
 import com.gameplat.common.constant.CachedKeys;
 import com.gameplat.common.enums.TransferTypesEnum;
 import com.gameplat.common.lang.Assert;
-import com.gameplat.common.util.TableIndexUtils;
 import com.gameplat.model.entity.game.GameTransferInfo;
 import com.gameplat.model.entity.member.Member;
 import com.gameplat.model.entity.member.MemberInfo;
@@ -33,9 +37,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -60,10 +65,7 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
 
   @Autowired private GameTransferInfoService gameTransferInfoService;
 
-  @Override
-  public Member getForAccount(String account) {
-    return this.lambdaQuery().eq(Member::getAccount, account).one();
-  }
+  @Autowired private SpreadLinkInfoService spreadLinkInfoService;
 
   @Override
   public IPage<MemberVO> queryPage(Page<Member> page, MemberQueryDTO dto) {
@@ -97,6 +99,8 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
 
   @Override
   public void add(MemberAddDTO dto) {
+    this.preAddCheck(dto);
+
     Member member = memberConvert.toEntity(dto);
     member.setRegisterSource(MemberEnums.RegisterSource.BACKEND.value());
     member.setPassword(passwordService.encode(member.getPassword(), dto.getAccount()));
@@ -106,8 +110,6 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
 
     // 保存会员和会员详情
     Assert.isTrue(this.save(member), "新增会员失败!");
-    // 更新会员分表下标
-    this.updateTableIndex(member.getId(), TableIndexUtils.getTableIndex(member.getId()));
 
     MemberInfo memberInfo =
         MemberInfo.builder().memberId(member.getId()).rebate(dto.getRebate()).build();
@@ -163,6 +165,15 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
         .eq(Member::getAccount, account)
         .eq(Member::getUserType, MemberEnums.Type.AGENT.value())
         .oneOpt();
+  }
+
+  @Override
+  public Optional<String> getSupperPath(String account) {
+    return this.lambdaQuery()
+        .select(Member::getSuperPath)
+        .eq(Member::getAccount, account)
+        .oneOpt()
+        .map(Member::getSuperPath);
   }
 
   @Override
@@ -277,6 +288,20 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
     this.updateRemark(Collections.singletonList(memberId), remark);
   }
 
+  public void preAddCheck(MemberAddDTO dto) {
+    Assert.isTrue(this.isExist(dto.getAccount()), "用户名已存在!");
+  }
+
+  /**
+   * 检查用户名是否存在
+   *
+   * @param account String
+   * @return boolean
+   */
+  private boolean isExist(String account) {
+    return this.lambdaQuery().eq(Member::getAccount, account).exists();
+  }
+
   /**
    * 设置在线状态
    *
@@ -366,56 +391,111 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
   }
 
   @Override
-  public void updateTableIndex(Long memberId, int tableIndex) {
-    lambdaUpdate().set(Member::getTableIndex, tableIndex).eq(Member::getId, memberId).update();
-  }
-
-  @Override
   public Integer getMaxLevel() {
     return memberMapper.getMaxLevel();
   }
 
   /**
    * 获取开启了工资的代理
-   * @param list
-   * @return
+   *
+   * @param list List
+   * @return List
    */
   @Override
   public List<Member> getOpenSalaryAgent(List<Integer> list) {
     return memberMapper.getOpenSalaryAgent(list);
   }
 
-    @Override
-    public List<Member> getListByAccountList(List<String> accountList) {
-        return Optional.ofNullable(accountList)
-                .filter(CollectionUtil::isNotEmpty)
-                .map(e -> this.lambdaQuery().in(Member::getAccount, e).list())
-                .orElse(null);
+  @Override
+  public List<Member> getListByAccountList(List<String> accountList) {
+    return Optional.ofNullable(accountList)
+        .filter(CollectionUtil::isNotEmpty)
+        .map(e -> this.lambdaQuery().in(Member::getAccount, e).list())
+        .orElse(null);
+  }
+
+  @Override
+  public List<MemberLevelVO> getUserLevelAccountNum() {
+    return memberMapper.getUserLevelAccountNum();
+  }
+
+  @Override
+  public Integer getUserLevelTotalAccountNum(Integer userLevel) {
+    return memberMapper.getUserLevelTotalAccountNum(userLevel);
+  }
+
+  @Override
+  public List<Member> getMemberListByAgentAccount(MemberQueryDTO memberQueryDTO) {
+    return memberMapper.getMemberListByAgentAccount(memberQueryDTO);
+  }
+
+  @Override
+  public List<Map<String, String>> getRebateForAdd(String agentAccount) {
+    BigDecimal max = new BigDecimal("9").setScale(2, RoundingMode.HALF_UP);
+    BigDecimal min = new BigDecimal("0").setScale(2, RoundingMode.HALF_UP);
+    if (StrUtil.isNotBlank(agentAccount)) {
+      BigDecimal userRebate = memberInfoService.findUserRebate(agentAccount);
+      max = ObjectUtils.isNull(userRebate) ? max : userRebate.setScale(2, RoundingMode.HALF_UP);
     }
 
-    /**
-     * 获取各个充值层级下会员数量和锁定会员数量
-     *
-     * @return
-     */
-    @Override
-    public List<MemberLevelVO> getUserLevelAccountNum() {
-        return memberMapper.getUserLevelAccountNum();
+    return this.getLotteryRebates(max, min);
+  }
+
+  @Override
+  public List<Map<String, String>> getRebateForEdit(String agentAccount) {
+    BigDecimal min = new BigDecimal("0");
+    BigDecimal max = new BigDecimal("9");
+    if (StrUtil.isBlank(agentAccount)) {
+      return this.getLotteryRebates(max, min);
     }
 
-    @Override
-    public Integer getUserLevelTotalAccountNum(Integer userLevel) {
-        return memberMapper.getUserLevelTotalAccountNum(userLevel);
+    // 获取上级代理的返点
+    Member member = getByAccount(agentAccount).orElseThrow(() -> new ServiceException("代理账号不存在!"));
+    max = Optional.ofNullable(memberInfoService.findUserRebate(member.getParentName())).orElse(max);
+
+    // 获取直属下级的最大返点等级
+    min = Optional.ofNullable(memberInfoService.findUserLowerMaxRebate(agentAccount)).orElse(min);
+
+    // 再获取此账号推广码的最大返点等级
+    BigDecimal linkMaxRebate = spreadLinkInfoService.getMaxSpreadLinkRebate(agentAccount);
+    min = NumberUtil.max(min, linkMaxRebate);
+    return this.getLotteryRebates(max, min);
+  }
+
+  private List<Map<String, String>> getLotteryRebates(BigDecimal max, BigDecimal min) {
+    int base = 1800;
+    BigDecimal rebate = max, value;
+    String text;
+    DecimalFormat format = new DecimalFormat("0.00#");
+
+    List<Map<String, String>> rebates = new ArrayList<>();
+    while (rebate.compareTo(min) >= 0) {
+      Map<String, String> map = new HashMap<>();
+      value = rebate;
+      int baseData = base + value.multiply(BigDecimal.valueOf(20L)).intValue();
+      text = rebate.toString().concat("% ---- ").concat(Integer.toString(baseData));
+      map.put("value", format.format(value));
+      map.put("text", text);
+      rebates.add(map);
+      rebate = rebate.subtract(BigDecimal.valueOf(0.1)).setScale(2, RoundingMode.HALF_UP);
     }
 
-    /**
-     * 获取代理线下的会员账号信息
-     *
-     * @param memberQueryDTO MemberQueryDTO
-     * @return List
-     */
-    @Override
-    public List<Member> getMemberListByAgentAccount(MemberQueryDTO memberQueryDTO) {
-        return memberMapper.getMemberListByAgentAccount(memberQueryDTO);
+    return rebates;
+  }
+
+  @Override
+  public void updateDaySalary(String ids, Integer state) {
+    Assert.notNull(ids, "请选择需要修改日工资的账户！");
+    String[] id = ids.split(",");
+    for (String memberId : id) {
+      Member member = this.getById(memberId);
+      if (member != null
+          && SysUserEnums.UserType.DL_FORMAL_TYPE.value().equalsIgnoreCase(member.getUserType())) {
+        MemberInfo memberInfo = new MemberInfo();
+        memberInfo.setMemberId(Convert.toLong(memberId));
+        memberInfo.setSalaryFlag(state);
+        memberInfoService.updateById(memberInfo);
+      }
     }
+  }
 }

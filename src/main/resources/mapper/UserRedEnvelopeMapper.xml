@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gameplat.admin.mapper.UserRedEnvelopMapper">
+
+    <!-- 会员领取红包记录列表 -->
+    <select id="recordList" resultType="com.gameplat.admin.model.vo.UserRedEnvelopeVO"
+            parameterType="com.gameplat.admin.model.dto.UserRedEnvelopeDTO">
+        SELECT
+        ure.id id,
+        ure.user_id userId,
+        ure.user_name userName,
+        ure.source_id sourceId,
+        ure.status status,
+        ure.status_time statusTime,
+        ure.remark remark,
+        rec.amount amount,
+        rec.multiple multiple,
+        rec.receive_method receiveMethod
+        FROM user_red_envelope ure
+        INNER JOIN red_envelope_config rec ON ure.red_envelope_id = rec.id
+    </select>
+</mapper>

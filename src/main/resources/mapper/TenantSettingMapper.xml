@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gameplat.admin.mapper.TenantSettingMapper">
+
+    <resultMap type="com.gameplat.model.entity.setting.TenantSetting" id="sysTenantSettingResult">
+        <result property="id" column="id"/>
+        <result property="settingType" column="setting_type"/>
+        <result property="settingCode" column="setting_code"/>
+        <result property="settingValue" column="setting_value"/>
+        <result property="settingDesc" column="setting_desc"/>
+        <result property="display" column="display"/>
+        <result property="sort" column="sort"/>
+        <result property="filePath" column="file_path"/>
+        <result property="picturePath" column="picture_path"/>
+        <result property="isIndex" column="is_index"/>
+        <result property="settingLabel" column="setting_label"/>
+        <result property="extend1" column="extend_1"/>
+        <result property="extend2" column="extend_2"/>
+        <result property="extend3" column="extend_3"/>
+        <result property="extend4" column="extend_4"/>
+        <result property="extend5" column="extend_5"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+
+    <!--查询租户导航栏列表-->
+    <select id="getTenantNavList" parameterType="com.gameplat.web.model.vo.TenantSettingVO" resultMap="sysTenantSettingResult">
+        select `id`,
+        `setting_type`,
+        `setting_code`,
+        `setting_label`,
+        JSON_UNQUOTE(json_extract(setting_value, concat('$.',concat('"',concat(#{tenantSetting.country},'"'))))) as setting_value,
+        `setting_desc`,
+        `display`,
+        `sort`,
+        `file_path`,
+        `picture_path`,
+        `is_index`,
+        `extend_1`,
+        `extend_2`,
+        `extend_3`,
+        `extend_4`,
+        `extend_5`,
+        `create_by`,
+        `create_time`,
+        `update_by`,
+        `update_time`
+        from tenant_setting
+        <where>
+            and display = 1
+            <if test='tenantSetting.settingType != null and tenantSetting.settingType != ""'>
+                and setting_type = #{tenantSetting.settingType}
+            </if>
+            <if test='tenantSetting.extend4 != null and tenantSetting.extend4 != ""'>
+                and extend_4 = #{tenantSetting.extend4}
+            </if>
+            <if test='tenantSetting.tenant != null and tenantSetting.tenant != ""'>
+                and tenant = #{tenantSetting.tenant}
+            </if>
+        </where>
+        order by sort ASC
+    </select>
+
+    <!--查询广场导航栏列表-->
+    <select id="getSquareNavList" parameterType="string" resultMap="sysTenantSettingResult">
+        select `id`,
+        `setting_type`,
+        `setting_code`,
+        `setting_label`,
+        JSON_UNQUOTE(json_extract(setting_value, concat('$.',concat('"',concat(#{lang},'"'))))) as setting_value,
+        `setting_desc`,
+        `display`,
+        `sort`,
+        `file_path`,
+        `picture_path`,
+        `is_index`,
+        `extend_1`,
+        `extend_2`,
+        `extend_3`,
+        `extend_4`,
+        `extend_5`,
+        `create_by`,
+        `create_time`,
+        `update_by`,
+        `update_time`
+        from tenant_setting
+        <where>
+            and display = 1
+            and setting_type = 'square_navigation'
+        </where>
+        order by sort ASC
+    </select>
+
+    <!--初使化租户对应主题的导航栏-->
+    <insert id="initTenantNavigation" parameterType="int">
+        insert into tenant_setting(setting_type, setting_code, setting_label, setting_value, setting_desc, display, sort, file_path, picture_path, is_index, extend_1, extend_2, extend_3, extend_4, extend_5, create_time)
+        select setting_type, setting_code, setting_label, setting_value, setting_desc, display, sort, file_path, picture_path, is_index, extend_1, extend_2, extend_3, #{theme}, extend_5, create_time from tenant_setting t
+        where t.setting_type = #{settingType} and t.extend_4 = 'template'
+          and not exists(select null from tenant_setting where setting_type = t.setting_type and setting_code = t.setting_code and extend_4 = t.extend_4)
+    </insert>
+
+</mapper>

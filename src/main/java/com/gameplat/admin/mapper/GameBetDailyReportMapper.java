@@ -25,7 +25,7 @@ public interface GameBetDailyReportMapper extends BaseMapper<GameBetDailyReport>
   Map<String, Object> querySumReport(GameBetDailyReportQueryDTO dto);
 
   List<GameMemberDayReportVO> findByStatTimeBetweenAndValidBetAmountGtZero(
-      @Param("liveRebatePeriod") GameRebatePeriod liveRebatePeriod,
+      @Param("gameRebatePeriod") GameRebatePeriod gameRebatePeriod,
       @Param("startDate") String startDate,
       @Param("endDate") String endDate);
 

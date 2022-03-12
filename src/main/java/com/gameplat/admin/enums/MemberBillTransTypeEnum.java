@@ -104,10 +104,10 @@ public enum MemberBillTransTypeEnum {
     WRITE_OFF_PAYOUT(32,"冲销派奖"),
 
     /** 额度转入 */
-    LIVE_IN(33,"额度转入"),
+    GAME_IN(33,"额度转入"),
 
     /** 额度转出 */
-    LIVE_OUT(34,"额度转出"),
+    GAME_OUT(34,"额度转出"),
 
     /** 体育下注 */
     SPORT_BET(35,"体育下注"),
@@ -124,11 +124,11 @@ public enum MemberBillTransTypeEnum {
     /** 取消订单 */
     SPORT_CANCEL_ORDER(39,"取消订单"),
 
-    /** 真人返点 */
-    LIVE_REBATE(40,"真人返点"),
+    /** 游戏返点 */
+    GAME_REBATE(40,"游戏返点"),
 
-    /** 真人返点回收 */
-    LIVE_ROLLBACK(41,"真人返点回收"),
+    /** 游戏返点回收 */
+    GAME_ROLLBACK(41,"游戏返点回收"),
 
     /** 棋牌支出 */
     LUCKY_OUT(42,"棋牌支出"),

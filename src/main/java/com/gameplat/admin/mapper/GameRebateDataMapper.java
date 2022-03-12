@@ -13,13 +13,5 @@ public interface GameRebateDataMapper extends BaseMapper<GameRebateData> {
 
   List<GameRebateData> queryBetRecordList(GameRebateDataQueryDTO dto);
 
-  int getDayCount(
-      @Param("statTime") String statTime, @Param("gamePlatform") GamePlatform gamePlatform);
-
-  int saveDayReport(
-      @Param("statTime") String statTime,
-      @Param("gamePlatform") GamePlatform gamePlatform,
-      @Param("statTimeType") String statTimeType);
-
   List<GameReportVO> queryGameReport(GameRebateDataQueryDTO dto);
 }

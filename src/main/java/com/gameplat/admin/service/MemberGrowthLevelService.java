@@ -11,6 +11,7 @@ import io.swagger.annotations.ApiParam;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 /**
@@ -27,7 +28,7 @@ public interface MemberGrowthLevelService extends IService<MemberGrowthLevel> {
   MemberGrowthLevel getLevel(Integer level);
 
   /** 批量修改VIP等级 */
-  void batchUpdateLevel(List<MemberGrowthLevelEditDto> list, String language);
+  void batchUpdateLevel(List<MemberGrowthLevelEditDto> list, String language, HttpServletRequest request);
 
   /** 修改logo */
   void updateLogo(GrowthLevelLogoEditDTO dto);
@@ -36,7 +37,7 @@ public interface MemberGrowthLevelService extends IService<MemberGrowthLevel> {
   MemberConfigLevelVO getLevelConfig(String language);
 
   /** 后台批量修改VIP等级 */
-  void batchUpdateLevel(JSONObject obj);
+  void batchUpdateLevel(JSONObject obj, HttpServletRequest request);
 
   /** VIP等级列表 */
   List<MemberGrowthLevelVO> vipList(String language);

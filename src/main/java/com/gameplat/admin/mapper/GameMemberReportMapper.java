@@ -89,8 +89,17 @@ public interface GameMemberReportMapper extends BaseMapper<MemberDayReport> {
                                          @Param("startDate") String startDate,
                                          @Param("endDate") String endDate);
 
-  Page<MemberDayReportVo> agentReport(
+  Page<MemberDayReportVo> pageList(
           PageDTO<MemberDayReport> page,
+          @Param("agentName") String agentName,
+          @Param("startDate") String startDate,
+          @Param("endDate") String endDate,
+          @Param("isIncludeProxy") boolean isIncludeProxy,
+          @Param("limitRecharge") BigDecimal limitRecharge,
+          @Param("limitValidAmount") BigDecimal limitValidAmount
+  );
+
+  List<MemberDayReportVo> agentReport(
           @Param("agentName") String agentName,
           @Param("startDate") String startDate,
           @Param("endDate") String endDate,

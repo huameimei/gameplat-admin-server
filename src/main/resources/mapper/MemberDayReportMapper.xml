@@ -821,6 +821,57 @@
     </select>
 
     <!--代理报表-->
+    <select id="pageList" resultType="com.gameplat.admin.model.vo.MemberDayReportVo">
+        SELECT
+        parent_name AS parentName,
+        ifnull( sum( IF ( first_recharge_amount > 0, 1, 0 ) ), 0 ) AS firstRechargeNum,
+        ifnull( sum( IF ( withdraw_amount > 0, 1, 0 ) ), 0 ) AS withdrawNum,
+        ifnull( sum( IF ( recharge_amount > 0, 1, 0 ) ), 0 ) AS rechargeNum,
+        ifnull( sum( IF ( bet_amount > 0, 1, 0 ) ), 0 ) AS betNum,
+        ifnull( sum( ifnull( first_recharge_amount, 0 ) ), 0 ) AS firstRechargeAmount,
+        ifnull( sum( ifnull( recharge_amount, 0 ) ), 0 ) AS rechargeAmount,
+        ifnull( sum( ifnull( withdraw_amount, 0 ) ), 0 ) AS withdrawAmount,
+        ifnull( sum( ifnull( bet_amount, 0 ) ), 0 ) AS betAmount,
+        ifnull( sum( ifnull( valid_amount, 0 )), 0) AS validAmount,
+        ifnull( sum( ifnull( win_amount, 0 ) ), 0) * -1 AS winAmount,
+        ifnull( sum( ifnull( pay_out_amount, 0 ) ), 0 ) AS payOutAmount,
+        ifnull( sum( ifnull( bonus, 0 ) ), 0 ) AS bonusAmount,
+        ifnull( sum( IF ( bonus > 0, 1, 0 ) ), 0 ) AS bonusNum,
+        ifnull( sum( ifnull( water_amount, 0 ) ), 0 ) AS waterAmount,
+        ifnull(sum( ifnull( win_amount, 0 ) ) * -1 - sum( ifnull( bonus, 0 )) - sum( ifnull( water_amount, 0 )), 0) AS companyIncome,
+        ifnull(sum(if((ifnull( recharge_amount, 0 ) >= #{limitRecharge} and ifnull( valid_amount, 0 ) >= #{limitValidAmount}), 1, 0)), 0) as memberNum
+        FROM
+        (
+        SELECT
+        parent_id as parent_id,
+        parent_name as parent_name,
+        sum( ifnull( first_recharge_amount, 0 ) ) AS first_recharge_amount,
+        sum( ifnull( recharge_amount, 0 ) ) AS recharge_amount,
+        sum( ifnull( withdraw_amount, 0 ) ) AS withdraw_amount,
+        sum( ifnull( bet_amount, 0 ) ) AS bet_amount,
+        sum( ifnull( valid_amount, 0 ) ) AS valid_amount,
+        sum( ifnull( win_amount, 0 ) ) AS win_amount,
+        sum( ifnull( bet_amount, 0 ) ) + sum( ifnull( win_amount, 0 ) ) AS pay_out_amount,
+        sum(
+        ifnull( discount_amount, 0 ) + ifnull( jackpot_amount, 0 ) + ifnull( vip_reword_amount, 0 ) + ifnull( activity_amount, 0 ) + ifnull( chat_amount, 0 )
+        ) AS bonus,
+        sum( ifnull( water_amount, 0 ) ) AS water_amount
+        FROM
+        member_day_report
+        <where>
+            <if test="agentName != null and agentName != ''">
+                and parent_name = #{agentName}
+            </if>
+            <if test="startDate != null and startDate != ''">
+                and count_date between #{startDate} and #{endDate}
+            </if>
+        </where>
+        GROUP BY user_name
+        ) AS member
+        GROUP BY parent_name
+    </select>
+
+    <!--代理报表-->
     <select id="agentReport" resultType="com.gameplat.admin.model.vo.MemberDayReportVo">
         SELECT
         parent_name AS parentName,

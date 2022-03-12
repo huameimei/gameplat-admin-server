@@ -14,6 +14,7 @@ import com.gameplat.admin.service.ActivityBlacklistService;
 import com.gameplat.admin.service.MemberService;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.ip.IpAddressParser;
+import com.gameplat.base.common.util.DateUtil;
 import com.gameplat.base.common.util.StringUtils;
 import com.gameplat.model.entity.activity.ActivityBlacklist;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -77,6 +78,7 @@ public class ActivityBlacklistServiceImpl
     }
     ActivityBlacklist activityBlacklist =
         activityBlacklistConvert.toEntity(activityBlacklistAddDTO);
+    activityBlacklist.setCreateTime(DateUtil.getNowTime());
     return this.save(activityBlacklist);
   }
 

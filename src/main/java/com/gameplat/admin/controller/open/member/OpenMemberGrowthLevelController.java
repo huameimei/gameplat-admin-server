@@ -20,6 +20,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 /**
@@ -65,8 +66,8 @@ public class OpenMemberGrowthLevelController {
   @ApiOperation(value = "后台批量修改VIP等级")
   @PreAuthorize("hasAuthority('member:growthLevel:updateLevel')")
   @PutMapping("/updateLevel")
-  public void batchUpdateLevel(@RequestBody JSONObject obj) {
-    levelService.batchUpdateLevel(obj);
+  public void batchUpdateLevel(@RequestBody JSONObject obj, HttpServletRequest request) {
+    levelService.batchUpdateLevel(obj, request);
   }
 
   @ApiOperation(value = "VIP等级列表")

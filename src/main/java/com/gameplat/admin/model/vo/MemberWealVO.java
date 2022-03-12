@@ -57,7 +57,7 @@ public class MemberWealVO implements Serializable {
   @ApiModelProperty(value = "总的派发金额")
   private BigDecimal totalPayMoney;
 
-  @ApiModelProperty(value = "描述")
+  @ApiModelProperty(value = "福利备注")
   private String remark;
 
   @ApiModelProperty(value = "创建人")
@@ -73,4 +73,7 @@ public class MemberWealVO implements Serializable {
   @ApiModelProperty(value = "更新时间")
   @JsonSerialize(using = Date2LongSerializerUtils.class)
   private Date updateTime;
+
+  @ApiModelProperty(value = "福利描述")
+  private String depict;
 }

@@ -1,12 +1,12 @@
 package com.gameplat.admin.controller.open.setting;
 
+import com.alibaba.nacos.common.utils.CollectionUtils;
 import com.gameplat.admin.constant.Constants;
 import com.gameplat.admin.model.vo.TenantSettingVO;
 import com.gameplat.admin.service.TenantSettingService;
 import com.gameplat.base.common.web.Result;
 import com.gameplat.model.entity.setting.TenantSetting;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;

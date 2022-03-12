@@ -54,6 +54,7 @@ public class GameBlacklistServiceImpl extends ServiceImpl<GameBlacklistMapper, G
           .eq(GameBlacklist::getTarget, dto.getUserLevel())
           .eq(GameBlacklist::getTargetType, BizBlacklistTargetType.USER_LEVEL.getValue());
     }
+    queryWrapper.orderByDesc(GameBlacklist::getCreateTime);
     return gameBlacklistMapper.selectPage(page, queryWrapper);
   }
 

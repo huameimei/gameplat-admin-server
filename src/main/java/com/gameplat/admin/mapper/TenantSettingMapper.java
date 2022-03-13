@@ -25,7 +25,7 @@ public interface TenantSettingMapper extends BaseMapper<TenantSetting> {
     /**
      * 查询配置信息
      */
-    List<TenantSetting> getBackendAppNavigationList(@Param("tenantSetting") TenantSettingVO tenantSettingVO);
+    List<TenantSetting> getBackendAppNavigationList(TenantSettingVO tenantSettingVO);
 
     /**
      * 插入配置信息

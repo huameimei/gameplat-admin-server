@@ -77,16 +77,16 @@
         `update_time`
         from tenant_setting
         <where>
-            <if test='sysTenantSetting.settingType != null and sysTenantSetting.settingType != ""'>
+            <if test='tenantSetting.settingType != null and tenantSetting.settingType != ""'>
             and setting_type = #{sysTenantSetting.settingType}
             </if>
-            <if test='sysTenantSetting.tenant != null and sysTenantSetting.tenant != ""'>
+            <if test='tenantSetting.tenant != null and tenantSetting.tenant != ""'>
             and tenant = #{sysTenantSetting.tenant}
             </if>
-            <if test='sysTenantSetting.extend4 != null and sysTenantSetting.extend4 != ""'>
+            <if test='tenantSetting.extend4 != null and tenantSetting.extend4 != ""'>
             and extend_4 = #{sysTenantSetting.extend4}
             </if>
-            <if test="sysTenantSetting.display != null ">
+            <if test="tenantSetting.display != null ">
             and display = #{sysTenantSetting.display}
             </if>
         </where>

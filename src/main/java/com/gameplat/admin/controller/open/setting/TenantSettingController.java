@@ -78,7 +78,6 @@ public class TenantSettingController {
      */
     @RequestMapping("/getStartImagePage")
     public IPage<TenantSetting> getStartImagePage(PageDTO<TenantSetting> page, TenantSetting tenantSetting){
-
         tenantSetting.setSettingType(TenantSettingEnum.START_UP_IMAGE.getCode());
         return tenantSettingService.getStartImagePage(page,tenantSetting);
     }
@@ -87,39 +86,41 @@ public class TenantSettingController {
      * 启动图配置新增/修改
      */
     @RequestMapping("/insertStartImagePage")
-    public void insertStartImagePage(@RequestBody TenantSetting tenantSetting){
+    public Result insertStartImagePage(@RequestBody TenantSetting tenantSetting){
         tenantSetting.setSettingType(TenantSettingEnum.START_UP_IMAGE.getCode());
         UserCredential user = SecurityUserHolder.getCredential();
         if (user != null) {
             tenantSetting.setCreateBy(user.getUsername());
         }
         tenantSettingService.insertStartImagePage(tenantSetting);
+       return Result.succeed();
     }
 
     /**
      * 启动图配置删除
      */
     @RequestMapping("/deleteStartImagePage")
-    public void deleteStartImagePage(@RequestParam(value = "id", required = true) int id){
+    public Result deleteStartImagePage(@RequestParam(value = "id", required = true) int id){
         TenantSetting tenantSetting = new TenantSetting();
         tenantSetting.setSettingType(TenantSettingEnum.START_UP_IMAGE.getCode());
         tenantSetting.setId(id);
         tenantSettingService.deleteStartImagePage(tenantSetting);
+        return Result.succeed();
     }
 
     /**
      * 获取租户设置信息
      */
     @RequestMapping("/getTenantSettings")
-    public List<TenantSetting> getTenantSettings(TenantSettingVO tenantSettingVO) {
+    public Result<Object> getTenantSettings(TenantSettingVO tenantSettingVO) {
         // 查询租户主题
         if (Constants.TEMPLATE_CONFIG_THEME.equals(tenantSettingVO.getSettingType())) {
             TenantSetting setting = new TenantSetting();
             setting.setSettingType(Constants.TEMPLATE_CONFIG_THEME);
-            setting.setDisplay(1);
-            return tenantSettingService.getTenantSetting(tenantSettingVO);
+            setting.setDisplay(Constants.YES);
+            return Result.succeedData(tenantSettingService.getTenantSetting(tenantSettingVO));
         }
-        return tenantSettingService.getAppNavigation(tenantSettingVO);
+        return Result.succeedData(tenantSettingService.getAppNavigation(tenantSettingVO));
     }
 
     /**
@@ -127,7 +128,7 @@ public class TenantSettingController {
      */
     @RequestMapping("/updateDisplayAndSort")
     @CacheEvict(cacheNames = Constants.TENANT_NAVIGATION_LIST, allEntries = true)
-    public void updateDisplayAndSort(@RequestBody TenantSettingVO tenantSettingVO) {
+    public Result updateDisplayAndSort(@RequestBody TenantSettingVO tenantSettingVO) {
         UserCredential user = SecurityUserHolder.getCredential();
         if (user != null) {
             tenantSettingVO.setUpdateBy(user.getUsername());
@@ -143,6 +144,7 @@ public class TenantSettingController {
             throw new ServiceException("id不允许为空");
         }
         tenantSettingService.updateAppNavigation(tenantSettingVO);
+        return Result.succeed();
     }
 
     /**
@@ -150,7 +152,8 @@ public class TenantSettingController {
      */
     @RequestMapping("/updateBatchTenantSort")
     @CacheEvict(cacheNames = Constants.TENANT_NAVIGATION_LIST, allEntries = true)
-    public void updateBatchTenantSetting(@RequestBody List<TenantSetting> tenantSettings) {
+    public Result updateBatchTenantSetting(@RequestBody List<TenantSetting> tenantSettings) {
         tenantSettingService.updateBatchTenantSetting(tenantSettings);
+        return Result.succeed();
     }
 }

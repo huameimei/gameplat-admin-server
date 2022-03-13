@@ -25,14 +25,6 @@ public interface TenantFloatTypeService extends IService<TenantFloatType> {
    */
   void insertSysFloat(TenantFloatSetting tenantFloatSetting);
 
-  /**
-   * 删除游戏浮窗类型信息
-   *
-   * @param id 游戏浮窗类型ID
-   * @return 结果
-   */
-  void deleteSysFloatById(Integer id);
-
   void updateFloat(TenantFloatSetting tenantFloatSetting);
 
   void updateBatch(List<TenantFloatSetting> tenantFloatSettings);

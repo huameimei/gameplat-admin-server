@@ -212,6 +212,18 @@ public class TenantSettingServiceImpl extends ServiceImpl<TenantSettingMapper, T
     }
 
     /**
+     * 删除游戏浮窗类型信息
+     *
+     * @param id
+     *            游戏浮窗类型ID
+     * @return 结果
+     */
+    @Override
+    public void deleteSysFloatById(Integer id) {
+        this.removeById(id);
+    }
+
+    /**
      * 从当前访问线程中获取租户数据源标识设
      * @return
      */

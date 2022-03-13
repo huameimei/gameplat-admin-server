@@ -59,18 +59,6 @@ public class TenantFloatTypeServiceImpl extends ServiceImpl<TenantFloatTypeMappe
   }
 
   /**
-   * 删除游戏浮窗类型信息
-   *
-   * @param id
-   *            游戏浮窗类型ID
-   * @return 结果
-   */
-  @Override
-  public void deleteSysFloatById(Integer id) {
-    this.removeById(id);
-  }
-
-  /**
    * 修改游戏浮窗类型
    *
    * @param tenantFloatSetting

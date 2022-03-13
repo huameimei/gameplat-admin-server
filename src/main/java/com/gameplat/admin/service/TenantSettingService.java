@@ -82,4 +82,12 @@ public interface TenantSettingService extends IService<TenantSetting> {
      * @param tenantSettings
      */
     void updateBatchTenantSetting(List<TenantSetting> tenantSettings);
+
+    /**
+     * 删除游戏浮窗类型信息
+     *
+     * @param id 游戏浮窗类型ID
+     * @return 结果
+     */
+    void deleteSysFloatById(Integer id);
 }

@@ -45,10 +45,18 @@ public class TenantFloatTypeVo implements Serializable {
      */
     private Integer whetherOpen;
 
+    /** 是否可以拖拽(0否/1是) */
+    private Integer canDrag;
+
     /**
      * 是否可以关闭(0否/1是)
      */
     private Integer canClose;
+
+    /** 跳转地址 */
+    private String jumpUrl;
+    /** 图片地址 */
+    private String iconPath;
 
     /**
      * 浮窗名字

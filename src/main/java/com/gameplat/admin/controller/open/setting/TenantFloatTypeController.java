@@ -42,16 +42,6 @@ public class TenantFloatTypeController {
     }
 
     /**
-     * 删除游戏浮窗类型
-     */
-    // @PreAuthorize("@ss.hasPermi('kg:type:remove')")
-    @DeleteMapping("/delById")
-    @CacheEvict(cacheNames = "TENANT_FLOAT_LIST",allEntries = true)
-    public void remove(Integer id) {
-        tenantFloatTypeService.deleteSysFloatById(id);
-    }
-
-    /**
      * 编辑游戏浮窗
      */
     // @PreAuthorize("@ss.hasPermi('kg:type:remove')")

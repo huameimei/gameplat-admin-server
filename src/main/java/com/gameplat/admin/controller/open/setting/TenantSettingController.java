@@ -16,10 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -155,5 +152,15 @@ public class TenantSettingController {
     public Result updateBatchTenantSetting(@RequestBody List<TenantSetting> tenantSettings) {
         tenantSettingService.updateBatchTenantSetting(tenantSettings);
         return Result.succeed();
+    }
+
+    /**
+     * 删除游戏浮窗类型
+     */
+    // @PreAuthorize("@ss.hasPermi('kg:type:remove')")
+    @DeleteMapping("/delById")
+    @CacheEvict(cacheNames = "TENANT_FLOAT_LIST",allEntries = true)
+    public void remove(Integer id) {
+        tenantSettingService.deleteSysFloatById(id);
     }
 }

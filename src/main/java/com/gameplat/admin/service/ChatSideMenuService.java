@@ -110,8 +110,8 @@ public class ChatSideMenuService {
   /** 修改侧边栏 */
   public void edit(String config) {
     List<ChatSideMenuVO> settingMenuList = JSON.parseArray(config, ChatSideMenuVO.class);
-    settingMenuList =
-        settingMenuList.stream().filter(x -> x.getOpen() == 1).collect(Collectors.toList());
+//    settingMenuList =
+//        settingMenuList.stream().filter(x -> x.getOpen() == 1).collect(Collectors.toList());
     String initDoc =
         dictDataService
             .getDictData(

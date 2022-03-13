@@ -4,7 +4,6 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.gameplat.admin.model.dto.ActivityBlacklistAddDTO;
 import com.gameplat.admin.model.dto.ActivityBlacklistQueryDTO;
-import com.gameplat.admin.model.vo.ActivityBlacklistVO;
 import com.gameplat.admin.service.ActivityBlacklistService;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.StringUtils;
@@ -45,7 +44,7 @@ public class ActivityBlacklistController {
   @PreAuthorize("hasAuthority('activity:blacklist:page')")
   @ApiImplicitParams({
     @ApiImplicitParam(name = "current", value = "分页参数：当前页", defaultValue = "1"),
-    @ApiImplicitParam(name = "size", value = "每页条数"),
+    @ApiImplicitParam(name = "size", value = "每页条数")
   })
   public IPage<ActivityBlacklist> list(
       @ApiIgnore PageDTO<ActivityBlacklist> page,

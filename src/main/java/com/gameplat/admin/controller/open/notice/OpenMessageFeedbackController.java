@@ -35,7 +35,7 @@ public class OpenMessageFeedbackController {
   @GetMapping("/list")
   @ApiImplicitParams({
     @ApiImplicitParam(name = "current", value = "分页参数：当前页", defaultValue = "1"),
-    @ApiImplicitParam(name = "size", value = "每页条数"),
+    @ApiImplicitParam(name = "size", value = "每页条数")
   })
   @PreAuthorize("hasAuthority('notice:feedback:list')")
   public IPage<MessageFeedbackVO> getList(

@@ -39,13 +39,6 @@ public class TenantSettingServiceImpl extends ServiceImpl<TenantSettingMapper, T
     @Resource
     private TenantSettingMapper tenantSettingMapper;
 
-    /**app导航栏类型*/
-    private static final String APP = "app_navigation";
-    /**h5导航栏类型*/
-    private static final String H5 = "h5_navigation";
-    /**广场导航栏类型*/
-    private static final String SQUARE = "square_navigation";
-
     @Override
     public List<TenantSetting> getTenantSetting(TenantSettingVO query) {
         LambdaQueryChainWrapper<TenantSetting> lambdaQuery = this.lambdaQuery();
@@ -138,32 +131,32 @@ public class TenantSettingServiceImpl extends ServiceImpl<TenantSettingMapper, T
     }
 
     @Override
-    public List<TenantSetting> getAppNavigation(TenantSetting tenantSetting) {
-        if (tenantSetting.getSettingType().equals("template_config_theme")) {
+    public List<TenantSetting> getAppNavigation(TenantSettingVO tenantSettingVO) {
+        if (tenantSettingVO.getSettingType().equals(Constants.TEMPLATE_CONFIG_THEME)) {
             // 查询主题模板只取租户开启的主题
-            tenantSetting.setDisplay(1);
-        } else if (tenantSetting.getSettingType().equals("h5_navigation") || tenantSetting.getSettingType().equals("app_navigation")) {
+            tenantSettingVO.setDisplay(1);
+        } else if (tenantSettingVO.getSettingType().equals(Constants.SETTING_H5_NAVIGATION) || tenantSettingVO.getSettingType().equals(Constants.SETTING_APP_NAVIGATION)) {
             // 如果没传主题，传默认模板
-            if (StringUtils.isBlank(tenantSetting.getExtend4())) {
-                tenantSetting.setTenant("default");
+            if (StringUtils.isBlank(tenantSettingVO.getExtend4())) {
+                tenantSettingVO.setTenant("default");
             }
         }
-        List<TenantSetting> list = tenantSettingMapper.getBackendAppNavigationList(tenantSetting);
+        List<TenantSetting> list = tenantSettingMapper.getBackendAppNavigationList(tenantSettingVO);
         if (list.isEmpty()) {
             // 如果查询为空，读取模板数据并插入返回
             LambdaQueryWrapper<TenantSetting> queryWrapper = new LambdaQueryWrapper<TenantSetting>();
             queryWrapper.eq(TenantSetting::getTenant,"default");
-            queryWrapper.eq(TenantSetting::getSettingType,tenantSetting.getSettingType());
+            queryWrapper.eq(TenantSetting::getSettingType,tenantSettingVO.getSettingType());
 
             list = this.list(queryWrapper);
             list.forEach(x -> {
-                x.setExtend4(tenantSetting.getExtend4());
+                x.setExtend4(tenantSettingVO.getExtend4());
                 x.setTenant(getDBSuffix());
             });
             if (!list.isEmpty()) {
                 this.saveBatch(list);
             }
-            list = tenantSettingMapper.getBackendAppNavigationList(tenantSetting);
+            list = tenantSettingMapper.getBackendAppNavigationList(tenantSettingVO);
         }
         return list;
     }
@@ -172,16 +165,16 @@ public class TenantSettingServiceImpl extends ServiceImpl<TenantSettingMapper, T
     @Override
     public void updateAppNavigation(TenantSettingVO tenantSetting) {
         // 查询游戏必要code
-        if (APP.equals(tenantSetting.getSettingType()) || H5.equals(tenantSetting.getSettingType())) {
+        if (Constants.SETTING_APP_NAVIGATION.equals(tenantSetting.getSettingType()) || Constants.SETTING_H5_NAVIGATION.equals(tenantSetting.getSettingType())) {
             if (StringUtils.isNotBlank(tenantSetting.getExtend2())) {
                 GameListOneVO gameList = tenantSettingMapper.getGameList(tenantSetting.getExtend2());
                 tenantSetting.setExtend3(JSON.toJSONString(gameList));
             }
         }
         // 广场导航栏选择一个首页后，其他选择的首页自动置为0
-        else if (SQUARE.equals(tenantSetting.getSettingType()) && tenantSetting.getIsIndex() == 1) {
+        else if (Constants.SETTING_SQUARE_NAVIGATION.equals(tenantSetting.getSettingType()) && tenantSetting.getIsIndex() == 1) {
             TenantSetting tenantSetting1 = new TenantSetting();
-            tenantSetting1.setSettingType(SQUARE);
+            tenantSetting1.setSettingType(Constants.SETTING_SQUARE_NAVIGATION);
             tenantSetting1.setIsIndex(0);
             tenantSettingMapper.updateIndex(tenantSetting1);
         }

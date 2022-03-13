@@ -49,7 +49,7 @@
           and not exists(select null from tenant_setting where setting_type = t.setting_type and setting_code = t.setting_code and extend_4 = t.extend_4)
     </insert>
 
-    <select id="getBackendAppNavigationList" parameterType="com.gameplat.model.entity.setting.TenantSetting"
+    <select id="getBackendAppNavigationList" parameterType="com.gameplat.admin.model.vo.TenantSettingVO"
             resultMap="sysTenantSetting1Result">
         select `id`,
         `setting_type`,

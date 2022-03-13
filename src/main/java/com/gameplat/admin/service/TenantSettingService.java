@@ -65,10 +65,10 @@ public interface TenantSettingService extends IService<TenantSetting> {
 
     /**
      * 获取租户设置信息
-     * @param tenantSetting
+     * @param tenantSettingVO
      * @return
      */
-    List<TenantSetting> getAppNavigation(TenantSetting tenantSetting);
+    List<TenantSetting> getAppNavigation(TenantSettingVO tenantSettingVO);
 
     /**
      * 修改显示与排序

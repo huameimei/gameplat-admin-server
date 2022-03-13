@@ -2,6 +2,7 @@ package com.gameplat.admin.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.gameplat.admin.model.vo.GameListOneVO;
+import com.gameplat.admin.model.vo.TenantSettingVO;
 import com.gameplat.model.entity.setting.TenantSetting;
 import feign.Param;
 
@@ -24,7 +25,7 @@ public interface TenantSettingMapper extends BaseMapper<TenantSetting> {
     /**
      * 查询配置信息
      */
-    List<TenantSetting> getBackendAppNavigationList(@Param("tenantSetting") TenantSetting tenantSetting);
+    List<TenantSetting> getBackendAppNavigationList(@Param("tenantSetting") TenantSettingVO tenantSettingVO);
 
     /**
      * 插入配置信息

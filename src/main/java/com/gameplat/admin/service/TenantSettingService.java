@@ -31,33 +31,42 @@ public interface TenantSettingService extends IService<TenantSetting> {
     /**
      * 为租户初使化对应主题的导航栏
      * @param theme
+     * @param settingType
      * @return
      */
     int initTenantNavigation(String theme, String settingType);
 
     /**
      * 启动图配置列表
-     * page list
+     * @param page
+     * @param tenantSetting
+     * @return
      */
     IPage<TenantSetting> getStartImagePage(IPage<TenantSetting> page, TenantSetting tenantSetting);
 
     /**
      * 启动图配置新增/修改
+     * @param tenantSetting
      */
     void insertStartImagePage(TenantSetting tenantSetting);
 
     /**
      * 启动图配置删除
+     * @param tenantSetting
      */
     void deleteStartImagePage(TenantSetting tenantSetting);
 
     /**
      * 查询租户主题
+     * @param setting
+     * @return
      */
     List<TenantSetting> getTenantSetting(TenantSetting setting);
 
     /**
      * 获取租户设置信息
+     * @param tenantSetting
+     * @return
      */
     List<TenantSetting> getAppNavigation(TenantSetting tenantSetting);
 
@@ -70,6 +79,7 @@ public interface TenantSettingService extends IService<TenantSetting> {
 
     /**
      * 批量修改排序
+     * @param tenantSettings
      */
     void updateBatchTenantSetting(List<TenantSetting> tenantSettings);
 }

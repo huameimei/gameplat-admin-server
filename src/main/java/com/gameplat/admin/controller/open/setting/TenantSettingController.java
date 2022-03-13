@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
+
 /**
  * @author martin
  * @date 2022/3/10
@@ -112,9 +113,9 @@ public class TenantSettingController {
     @RequestMapping("/getTenantSettings")
     public List<TenantSetting> getTenantSettings(TenantSettingVO tenantSettingVO) {
         // 查询租户主题
-        if ("template_config_theme".equals(tenantSettingVO.getSettingType())) {
+        if (Constants.TEMPLATE_CONFIG_THEME.equals(tenantSettingVO.getSettingType())) {
             TenantSetting setting = new TenantSetting();
-            setting.setSettingType("template_config_theme");
+            setting.setSettingType(Constants.TEMPLATE_CONFIG_THEME);
             setting.setDisplay(1);
             return tenantSettingService.getTenantSetting(tenantSettingVO);
         }
@@ -125,7 +126,7 @@ public class TenantSettingController {
      * 修改显示与排序
      */
     @RequestMapping("/updateDisplayAndSort")
-    @CacheEvict(cacheNames = "TENANT_NAVIGATION_LIST", allEntries = true)
+    @CacheEvict(cacheNames = Constants.TENANT_NAVIGATION_LIST, allEntries = true)
     public void updateDisplayAndSort(@RequestBody TenantSettingVO tenantSettingVO) {
         UserCredential user = SecurityUserHolder.getCredential();
         if (user != null) {
@@ -148,7 +149,7 @@ public class TenantSettingController {
      * 批量修改排序
      */
     @RequestMapping("/updateBatchTenantSort")
-    @CacheEvict(cacheNames = "TENANT_NAVIGATION_LIST", allEntries = true)
+    @CacheEvict(cacheNames = Constants.TENANT_NAVIGATION_LIST, allEntries = true)
     public void updateBatchTenantSetting(@RequestBody List<TenantSetting> tenantSettings) {
         tenantSettingService.updateBatchTenantSetting(tenantSettings);
     }

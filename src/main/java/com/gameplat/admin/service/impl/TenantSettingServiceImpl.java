@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
@@ -36,14 +37,14 @@ import java.util.Objects;
 @Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)
 public class TenantSettingServiceImpl extends ServiceImpl<TenantSettingMapper, TenantSetting> implements TenantSettingService {
 
-    @Autowired
+    @Resource
     private TenantSettingMapper tenantSettingMapper;
 
-    // app导航栏类型
+    /**app导航栏类型*/
     private static final String APP = "app_navigation";
-    // h5导航栏类型
+    /**h5导航栏类型*/
     private static final String H5 = "h5_navigation";
-    // 广场导航栏类型
+    /**广场导航栏类型*/
     private static final String SQUARE = "square_navigation";
 
     @Override
@@ -93,8 +94,8 @@ public class TenantSettingServiceImpl extends ServiceImpl<TenantSettingMapper, T
     @Override
     public void insertStartImagePage(TenantSetting tenantSetting) {
         LambdaQueryWrapper<TenantSetting> queryWrapper = new LambdaQueryWrapper<TenantSetting>();
-        queryWrapper.eq(TenantSetting::getSettingType,tenantSetting.getSettingType());
-        queryWrapper.eq(TenantSetting::getDisplay,1);
+        queryWrapper.eq(TenantSetting::getSettingType, tenantSetting.getSettingType());
+        queryWrapper.eq(TenantSetting::getDisplay, 1);
         List<TenantSetting> list = this.list(queryWrapper);
         if (null == tenantSetting.getId()) {
             if (null != tenantSetting.getDisplay() && 1 == tenantSetting.getDisplay()) {
@@ -168,7 +169,7 @@ public class TenantSettingServiceImpl extends ServiceImpl<TenantSettingMapper, T
         return list;
     }
 
-    @Transactional
+    @Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)
     @Override
     public void updateAppNavigation(TenantSettingVO tenantSetting) {
         // 查询游戏必要code
@@ -185,7 +186,7 @@ public class TenantSettingServiceImpl extends ServiceImpl<TenantSettingMapper, T
             tenantSetting1.setIsIndex(0);
             tenantSettingMapper.updateIndex(tenantSetting1);
         }
-        HashMap<Object, Object> map = new HashMap<>();
+        HashMap<Object, Object> map = new HashMap<>(8);
         map.put("en-US", tenantSetting.getEnUs());
         map.put("in-ID", tenantSetting.getInId());
         map.put("th-TH", tenantSetting.getThTh());
@@ -193,10 +194,11 @@ public class TenantSettingServiceImpl extends ServiceImpl<TenantSettingMapper, T
         map.put("zh-CN", tenantSetting.getZhCn());
         tenantSetting.setSettingValue(JSON.toJSONString(map));
         this.updateById(tenantSetting);
+        //todo 刷新缓存
         //flushTenantSetting(tenantSetting);
     }
 
-    @Transactional
+    @Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)
     @Override
     public void updateBatchTenantSetting(List<TenantSetting> tenantSettings) {
         if (tenantSettings == null || tenantSettings.isEmpty()) {
@@ -206,6 +208,7 @@ public class TenantSettingServiceImpl extends ServiceImpl<TenantSettingMapper, T
         queryWrapper.eq(TenantSetting::getId,tenantSettings.get(0).getId());
         TenantSetting sysTenantSetting = this.getOne(queryWrapper);
         this.updateBatchById(tenantSettings);
+        //todo 刷新缓存
         //kgRedisService.flushTenantSetting(sysTenantSetting);
     }
 

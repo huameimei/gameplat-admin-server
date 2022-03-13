@@ -14,7 +14,6 @@
         <uri>/api/admin/spread/management/**</uri>
         <uri>/api/admin/report/game/financial/masterPullReport</uri>
         <uri>/api/admin/report/game/financial/exportReport</uri>
-<!--        <uri>/api/admin/operator/diffusion/spreadConfig/**</uri>-->
         <uri>/websocket/**</uri>
         <uri>/api/internal/**</uri>
     </uri-list>

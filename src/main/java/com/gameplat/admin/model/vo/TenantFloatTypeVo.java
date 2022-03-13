@@ -70,7 +70,7 @@ public class TenantFloatTypeVo implements Serializable {
      */
     private Date updateTime;
 
-    //private List<TenantFloatSettingVo> settingList;
+    private List<TenantFloatSettingVo> settingList;
 
     private List<String> showPositionList;
 }

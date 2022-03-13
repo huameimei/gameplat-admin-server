@@ -1,5 +1,7 @@
+package com.gameplat.admin.controller.open.setting;
 
 import com.alibaba.fastjson.JSON;
+import com.gameplat.admin.model.vo.TenantFloatTypeVo;
 import com.gameplat.admin.service.TenantFloatTypeService;
 import com.gameplat.model.entity.setting.TenantFloatSetting;
 import com.gameplat.model.entity.setting.TenantFloatType;
@@ -22,13 +24,13 @@ public class TenantFloatTypeController {
     @Autowired
     private TenantFloatTypeService tenantFloatTypeService;
 
-/*    *//**
+     /**
      * 查询游戏浮窗类型列表
-     *//*
+     */
     @GetMapping("/query")
     public List<TenantFloatTypeVo> list(TenantFloatTypeVo tenantFloatTypeVo) {
         return tenantFloatTypeService.selectSysFloatTypeList(tenantFloatTypeVo);
-    }*/
+    }
 
     /**
      * 新增游戏浮窗

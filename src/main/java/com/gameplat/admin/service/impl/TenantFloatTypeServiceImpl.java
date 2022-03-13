@@ -1,7 +1,10 @@
 package com.gameplat.admin.service.impl;
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.mapper.TenantFloatTypeMapper;
+import com.gameplat.admin.model.vo.TenantFloatTypeVo;
 import com.gameplat.admin.service.TenantFloatTypeService;
 import com.gameplat.model.entity.setting.TenantFloatSetting;
 import com.gameplat.model.entity.setting.TenantFloatType;
@@ -9,6 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import java.util.List;
 
@@ -26,7 +31,7 @@ public class TenantFloatTypeServiceImpl extends ServiceImpl<TenantFloatTypeMappe
    *            游戏浮窗类型
    * @return 游戏浮窗类型
    */
-  /*@Override
+  @Override
   public List<TenantFloatTypeVo> selectSysFloatTypeList(TenantFloatTypeVo tenantFloatTypeVo) {
     List<TenantFloatTypeVo> result = tenantFloatTypeMapper.selectSysFloatTypeList(tenantFloatTypeVo);
     if(!CollectionUtils.isEmpty(result)){
@@ -39,7 +44,7 @@ public class TenantFloatTypeServiceImpl extends ServiceImpl<TenantFloatTypeMappe
       }
     }
     return result;
-  }*/
+  }
 
   /**
    * 新增游戏浮窗

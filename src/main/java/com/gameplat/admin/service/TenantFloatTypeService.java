@@ -1,6 +1,7 @@
 package com.gameplat.admin.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.gameplat.admin.model.vo.TenantFloatTypeVo;
 import com.gameplat.model.entity.setting.TenantFloatSetting;
 import com.gameplat.model.entity.setting.TenantFloatType;
 
@@ -14,7 +15,7 @@ public interface TenantFloatTypeService extends IService<TenantFloatType> {
    * @param tenantFloatTypeVo 游戏浮窗类型
    * @return 游戏浮窗类型集合
    */
-  //List<TenantFloatTypeVo> selectSysFloatTypeList(TenantFloatTypeVo tenantFloatTypeVo);
+  List<TenantFloatTypeVo> selectSysFloatTypeList(TenantFloatTypeVo tenantFloatTypeVo);
 
   /**
    * 新增游戏浮窗类型

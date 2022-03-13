@@ -1,6 +1,7 @@
 package com.gameplat.admin.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.gameplat.admin.model.vo.TenantFloatTypeVo;
 import com.gameplat.model.entity.setting.TenantFloatSetting;
 import com.gameplat.model.entity.setting.TenantFloatType;
 
@@ -13,7 +14,7 @@ public interface TenantFloatTypeMapper extends BaseMapper<TenantFloatType> {
      * @param tenantFloatTypeVo 游戏浮窗类型
      * @return 游戏浮窗类型集合
      */
-    //List<TenantFloatTypeVo> selectSysFloatTypeList(TenantFloatTypeVo tenantFloatTypeVo);
+    List<TenantFloatTypeVo> selectSysFloatTypeList(TenantFloatTypeVo tenantFloatTypeVo);
 
     /**
      * 新增游戏浮窗

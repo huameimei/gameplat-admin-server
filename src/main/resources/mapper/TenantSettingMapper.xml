@@ -25,6 +25,22 @@
         <result property="updateTime" column="update_time"/>
     </resultMap>
 
+    <resultMap type="com.gameplat.admin.model.vo.TenantSettingVO" id="sysTenantSetting1Result" extends="sysTenantSettingResult">
+        <result property="zhCn" column="zhCn"/>
+        <result property="inId" column="inId"/>
+        <result property="enUs" column="enUs"/>
+        <result property="viVn" column="viVn"/>
+        <result property="thTh" column="thTh"/>
+    </resultMap>
+
+    <resultMap id="gameListOneCollection" type="com.gameplat.admin.model.vo.GameListOneVO">
+        <result property="liveCode" column="liveCode"/>
+        <result property="walletCode" column="walletCode"/>
+        <result property="gameCode" column="gameCode"/>
+        <result property="firstCode" column="firstCode"/>
+        <result property="trial" column="trial"/>
+    </resultMap>
+
     <!--初使化租户对应主题的导航栏-->
     <insert id="initTenantNavigation" parameterType="int">
         insert into tenant_setting(setting_type, setting_code, setting_label, setting_value, setting_desc, display, sort, file_path, picture_path, is_index, extend_1, extend_2, extend_3, extend_4, extend_5, create_time)
@@ -32,5 +48,69 @@
         where t.setting_type = #{settingType} and t.extend_4 = 'template'
           and not exists(select null from tenant_setting where setting_type = t.setting_type and setting_code = t.setting_code and extend_4 = t.extend_4)
     </insert>
+
+    <select id="getBackendAppNavigationList" parameterType="com.gameplat.model.entity.setting.TenantSetting"
+            resultMap="sysTenantSetting1Result">
+        select `id`,
+        `setting_type`,
+        `setting_code`,
+        `setting_label`,
+        JSON_UNQUOTE(json_extract(setting_value, '$."zh-CN"')) as zhCn,
+        JSON_UNQUOTE(json_extract(setting_value, '$."en-US"')) as enUs,
+        JSON_UNQUOTE(json_extract(setting_value, '$."th-TH"')) as thTh,
+        JSON_UNQUOTE(json_extract(setting_value, '$."vi-VN"')) as viVn,
+        JSON_UNQUOTE(json_extract(setting_value, '$."in-ID"')) as inId,
+        `setting_desc`,
+        `display`,
+        `sort`,
+        `file_path`,
+        `picture_path`,
+        `is_index`,
+        `extend_1`,
+        `extend_2`,
+        `extend_3`,
+        `extend_4`,
+        `extend_5`,
+        `create_by`,
+        `create_time`,
+        `update_by`,
+        `update_time`
+        from tenant_setting
+        <where>
+            <if test='sysTenantSetting.settingType != null and sysTenantSetting.settingType != ""'>
+            and setting_type = #{sysTenantSetting.settingType}
+            </if>
+            <if test='sysTenantSetting.tenant != null and sysTenantSetting.tenant != ""'>
+            and tenant = #{sysTenantSetting.tenant}
+            </if>
+            <if test='sysTenantSetting.extend4 != null and sysTenantSetting.extend4 != ""'>
+            and extend_4 = #{sysTenantSetting.extend4}
+            </if>
+            <if test="sysTenantSetting.display != null ">
+            and display = #{sysTenantSetting.display}
+            </if>
+        </where>
+        order by sort ASC
+    </select>
+
+    <select id="getGameList" resultMap="gameListOneCollection">
+        select glo.code        as firstCode,
+               gp.code         as liveCode,
+               glo.wallet_code as walletCode,
+               glo.game_code   as gameCode,
+               glo.trial       as trial
+        from game_level_one as glo left join game_plat as gp on glo.plat_id = gp.id
+            and glo.is_show = 1
+            and glo.tepl_is_show = 1
+        WHERE glo.code = #{oneCode}
+    </select>
+
+    <update id="updateIndex">
+        update tenant_setting
+        <set>
+            <if test="isIndex != null">is_index = #{isIndex},</if>
+        </set>
+        where setting_type = #{settingType}
+    </update>
 
 </mapper>

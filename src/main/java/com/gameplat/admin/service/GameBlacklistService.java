@@ -20,5 +20,5 @@ public interface GameBlacklistService extends IService<GameBlacklist> {
 
   void delete(Long id);
 
-  List<GameBlacklist> selectGameBlackList(GameBlacklist example);
+  List<GameBlacklist> selectGameBlackList(GameBlacklist black);
 }

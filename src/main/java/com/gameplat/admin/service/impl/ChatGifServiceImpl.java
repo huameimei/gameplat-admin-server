@@ -70,7 +70,7 @@ public class ChatGifServiceImpl extends ServiceImpl<ChatGifMapper, ChatGif>
     try {
       FileUtils.copyInputStreamToFile(file.getInputStream(), file1);
     } catch (IOException e) {
-      log.info("异常原因{}", e);
+      log.info("异常原因", e);
     }
     // 会在本地产生临时文件，用完后需要删除
     if (file1.exists()) {
@@ -85,7 +85,7 @@ public class ChatGifServiceImpl extends ServiceImpl<ChatGifMapper, ChatGif>
         chatGif.setWidth(bufferedImage.getWidth());
       }
     } catch (IOException e) {
-      log.info("异常原因{}", e);
+      log.info("异常原因", e);
       throw new ServiceException("此图片已破损");
     }
     chatGif.setName(name);

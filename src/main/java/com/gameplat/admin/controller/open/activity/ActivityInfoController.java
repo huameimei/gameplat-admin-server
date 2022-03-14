@@ -84,19 +84,23 @@ public class ActivityInfoController {
     return activityInfoService.detail(id);
   }
 
-    /**
-     * 新增活动
-     *
-     * @param activityInfoAddDTO
-     */
-    @ApiOperation(value = "新增活动")
-    @PostMapping("/add")
-    @PreAuthorize("hasAuthority('activity:info:add')")
-    public void add(
-            @RequestBody ActivityInfoAddDTO activityInfoAddDTO) {
-        checkActivityInfo(activityInfoAddDTO.getValidStatus(), activityInfoAddDTO.getEndTime(), activityInfoAddDTO.getBeginTime(), activityInfoAddDTO.getActivityLobbyId(), activityInfoAddDTO.getId());
-        activityInfoService.add(activityInfoAddDTO, LocaleContextHolder.getLocale().toLanguageTag());
-    }
+  /**
+   * 新增活动
+   *
+   * @param activityInfoAddDTO
+   */
+  @ApiOperation(value = "新增活动")
+  @PostMapping("/add")
+  @PreAuthorize("hasAuthority('activity:info:add')")
+  public void add(@RequestBody ActivityInfoAddDTO activityInfoAddDTO) {
+    checkActivityInfo(
+        activityInfoAddDTO.getValidStatus(),
+        activityInfoAddDTO.getEndTime(),
+        activityInfoAddDTO.getBeginTime(),
+        activityInfoAddDTO.getActivityLobbyId(),
+        activityInfoAddDTO.getId());
+    activityInfoService.add(activityInfoAddDTO, LocaleContextHolder.getLocale().toLanguageTag());
+  }
 
   /**
    * 检查活动是否满足条件
@@ -115,24 +119,29 @@ public class ActivityInfoController {
         throw new ServiceException("活动结束时间不能小于活动开始时间");
       }
     }
-    if (StringUtils.isNotNull(activityLobbyId)) {
+    if (StringUtils.isNotNull(activityLobbyId) && StringUtils.isNull(id)) {
       activityInfoService.checkActivityLobbyId(activityLobbyId, id);
     }
   }
 
-    /**
-     * 编辑活动
-     *
-     * @param activityInfoUpdateDTO
-     */
-    @ApiOperation(value = "编辑活动")
-    @PostMapping("/update")
-    @PreAuthorize("hasAuthority('activity:info:update')")
-    public void update(
-            @RequestBody ActivityInfoUpdateDTO activityInfoUpdateDTO) {
-        checkActivityInfo(activityInfoUpdateDTO.getValidStatus(), activityInfoUpdateDTO.getEndTime(), activityInfoUpdateDTO.getBeginTime(), activityInfoUpdateDTO.getActivityLobbyId(), activityInfoUpdateDTO.getId());
-        activityInfoService.update(activityInfoUpdateDTO, LocaleContextHolder.getLocale().toLanguageTag());
-    }
+  /**
+   * 编辑活动
+   *
+   * @param activityInfoUpdateDTO
+   */
+  @ApiOperation(value = "编辑活动")
+  @PostMapping("/update")
+  @PreAuthorize("hasAuthority('activity:info:update')")
+  public void update(@RequestBody ActivityInfoUpdateDTO activityInfoUpdateDTO) {
+    checkActivityInfo(
+        activityInfoUpdateDTO.getValidStatus(),
+        activityInfoUpdateDTO.getEndTime(),
+        activityInfoUpdateDTO.getBeginTime(),
+        activityInfoUpdateDTO.getActivityLobbyId(),
+        activityInfoUpdateDTO.getId());
+    activityInfoService.update(
+        activityInfoUpdateDTO, LocaleContextHolder.getLocale().toLanguageTag());
+  }
 
   /**
    * 修改活动排序

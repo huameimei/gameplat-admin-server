@@ -9,6 +9,7 @@ import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapp
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.constant.Constants;
 import com.gameplat.admin.mapper.TenantSettingMapper;
+import com.gameplat.admin.model.vo.GameKindVO;
 import com.gameplat.admin.model.vo.GameListOneVO;
 import com.gameplat.admin.model.vo.TenantSettingVO;
 import com.gameplat.admin.service.TenantSettingService;
@@ -167,7 +168,7 @@ public class TenantSettingServiceImpl extends ServiceImpl<TenantSettingMapper, T
         // 查询游戏必要code
         if (Constants.SETTING_APP_NAVIGATION.equals(tenantSetting.getSettingType()) || Constants.SETTING_H5_NAVIGATION.equals(tenantSetting.getSettingType())) {
             if (StringUtils.isNotBlank(tenantSetting.getExtend2())) {
-                GameListOneVO gameList = tenantSettingMapper.getGameList(tenantSetting.getExtend2());
+                GameKindVO gameList = tenantSettingMapper.getGameList(tenantSetting.getExtend2());
                 tenantSetting.setExtend3(JSON.toJSONString(gameList));
             }
         }

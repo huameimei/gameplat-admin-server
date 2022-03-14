@@ -126,10 +126,10 @@ public class TenantSettingController {
     @RequestMapping("/updateDisplayAndSort")
     @CacheEvict(cacheNames = Constants.TENANT_NAVIGATION_LIST, allEntries = true)
     public Result updateDisplayAndSort(@RequestBody TenantSettingVO tenantSettingVO) {
-        UserCredential user = SecurityUserHolder.getCredential();
+      /*  UserCredential user = SecurityUserHolder.getCredential();
         if (user != null) {
             tenantSettingVO.setUpdateBy(user.getUsername());
-        }
+        }*/
         if (StringUtils.isBlank(tenantSettingVO.getSettingType())) {
             throw new ServiceException("导航栏类型不允许为空");
         }
@@ -157,10 +157,10 @@ public class TenantSettingController {
     /**
      * 删除游戏浮窗类型
      */
-    // @PreAuthorize("@ss.hasPermi('kg:type:remove')")
     @DeleteMapping("/delById")
-    @CacheEvict(cacheNames = "TENANT_FLOAT_LIST",allEntries = true)
-    public void remove(Integer id) {
+    @CacheEvict(cacheNames = Constants.TENANT_FLOAT_LIST,allEntries = true)
+    public Result remove(Integer id) {
         tenantSettingService.deleteSysFloatById(id);
+        return Result.succeed();
     }
 }

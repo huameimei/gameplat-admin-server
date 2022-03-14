@@ -19,8 +19,8 @@ public enum MemberBillTransTypeEnum {
     /** 彩票派彩 */
     FC_BILL(4,"彩票派彩"),
 
-    /** 后台转出 */
-    TRANSFER_OUT(5,"后台转出"),
+    /** 人工提现 */
+    TRANSFER_OUT(5,"人工提现"),
 
     /** 用户提款 */
     WITHDRAW(6, "用户提款"),
@@ -37,8 +37,8 @@ public enum MemberBillTransTypeEnum {
     /** 返佣(分红) */
     BROKERAGE(10,"返佣(分红)"),
 
-    /** 后台转入 */
-    TRANSFER_IN(11, "后台转入"),
+    /** 人工充值 */
+    TRANSFER_IN(11, "人工充值"),
 
     /** 借呗放款 */
     LOAN_PAY(12,"借呗放款"),

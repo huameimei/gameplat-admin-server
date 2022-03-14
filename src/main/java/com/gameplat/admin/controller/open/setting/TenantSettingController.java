@@ -126,10 +126,10 @@ public class TenantSettingController {
     @RequestMapping("/updateDisplayAndSort")
     @CacheEvict(cacheNames = Constants.TENANT_NAVIGATION_LIST, allEntries = true)
     public Result updateDisplayAndSort(@RequestBody TenantSettingVO tenantSettingVO) {
-      /*  UserCredential user = SecurityUserHolder.getCredential();
+        UserCredential user = SecurityUserHolder.getCredential();
         if (user != null) {
             tenantSettingVO.setUpdateBy(user.getUsername());
-        }*/
+        }
         if (StringUtils.isBlank(tenantSettingVO.getSettingType())) {
             throw new ServiceException("导航栏类型不允许为空");
         }

@@ -10,7 +10,6 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.constant.Constants;
 import com.gameplat.admin.mapper.TenantSettingMapper;
 import com.gameplat.admin.model.vo.GameKindVO;
-import com.gameplat.admin.model.vo.GameListOneVO;
 import com.gameplat.admin.model.vo.TenantSettingVO;
 import com.gameplat.admin.service.TenantSettingService;
 import com.gameplat.base.common.context.DyDataSourceContextHolder;

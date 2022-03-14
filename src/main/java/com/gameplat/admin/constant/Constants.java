@@ -22,6 +22,16 @@ public interface Constants {
     String START_UP_IMAGE = "start_up_image";//启动图
     String PERSONAL_CENTER = "personal_center";//个人中心
 
+    /**
+     * 导航栏列表
+     */
+    String TENANT_NAVIGATION_LIST = "TENANT_NAVIGATION_LIST";
+
+    /**
+     * 浮窗列表
+     */
+    String TENANT_FLOAT_LIST = "TENANT_FLOAT_LIST";
+
 
     /**
      * 数据字典Type

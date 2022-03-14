@@ -444,7 +444,7 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
                 + DateUtil.getNowTime()
                 + "向用户"
                 + member.getAccount()
-                + "成功通过后台转出"
+                + "成功通过人工提现"
                 + String.format("%.3f", cashMoney)
                 + "元,账户余额变更为:"
                 + String.format("%.3f", (memberInfo.getBalance().subtract(cashMoney)))

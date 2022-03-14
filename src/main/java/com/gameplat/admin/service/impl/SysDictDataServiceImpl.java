@@ -145,6 +145,18 @@ public class SysDictDataServiceImpl extends ServiceImpl<SysDictDataMapper, SysDi
   }
 
   @Override
+  @SentinelResource(value = "insertBank")
+  public void insertBank(OperDictDataDTO dto) {
+    if (this.lambdaQuery().eq(SysDictData::getDictValue, dto.getDictValue()).exists()) {
+      throw new ServiceException("银行标识已存在，请勿重复添加");
+    }
+
+    if (!this.save(dictDataConvert.toEntity(dto))) {
+      throw new ServiceException("添加失败!");
+    }
+  }
+
+  @Override
   @SentinelResource(value = "updateDictData")
   @CacheInvalidate(name = CachedKeys.DICT_DATA_CACHE, key = "#dto.dictType + ':' + #dto.dictLabel")
   public void updateDictData(OperDictDataDTO dto) {

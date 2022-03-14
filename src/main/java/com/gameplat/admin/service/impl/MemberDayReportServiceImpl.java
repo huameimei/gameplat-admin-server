@@ -14,7 +14,7 @@ import com.gameplat.admin.model.vo.MemberDayReportVo;
 import com.gameplat.admin.model.vo.PageDtoVO;
 import com.gameplat.admin.service.MemberDayReportService;
 import com.gameplat.admin.service.RecommendConfigService;
-import com.gameplat.admin.util.JxlsExcelUtil;
+import com.gameplat.admin.util.JxlsExcelUtils;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.UUIDUtils;
 import com.gameplat.common.util.ZipUtils;
@@ -233,7 +233,7 @@ public class MemberDayReportServiceImpl extends ServiceImpl<MemberDayReportMappe
                 e1.printStackTrace();
             }
             try {
-                JxlsExcelUtil.downLoadExcel(map, AGENT_REPORT_REMAKE, fo);
+                JxlsExcelUtils.downLoadExcel(map, AGENT_REPORT_REMAKE, fo);
             } catch (InvalidFormatException e1) {
                 e1.printStackTrace();
             } catch (IOException e1) {

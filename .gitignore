@@ -41,3 +41,4 @@ localData/doc/*
 *.idx
 .DS_Store
 logs
+.gradle/*

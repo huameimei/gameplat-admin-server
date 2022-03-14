@@ -227,9 +227,9 @@ public class ActivityQualificationServiceImpl
           ad.setActivityType(1);
           ad.setActivityName(activityQualification.getActivityName());
           ad.setUserId(activityQualification.getUserId());
-          ad.setStatus(1);
+          ad.setStatus(BooleanEnum.YES.value());
           //                ad.setDisabled(1);
-          ad.setDeleteFlag(1);
+          ad.setDeleteFlag(BooleanEnum.YES.value());
           ad.setDiscountsMoney(NumberUtil.toBigDecimal(activityQualification.getMaxMoney()));
           ad.setQualificationActivityId(activityQualification.getQualificationActivityId());
           ad.setStatisItem(activityQualification.getStatisItem());

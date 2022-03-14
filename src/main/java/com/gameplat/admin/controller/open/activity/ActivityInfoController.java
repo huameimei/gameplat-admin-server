@@ -86,17 +86,22 @@ public class ActivityInfoController {
     return activityInfoService.detail(id);
   }
 
+  /**
+   * 新增活动
+   *
+   * @param activityInfoAddDTO
+   */
   @ApiOperation(value = "新增活动")
   @PostMapping("/add")
   @PreAuthorize("hasAuthority('activity:info:add')")
-  public void add(@RequestBody ActivityInfoAddDTO dto) {
+  public void add(@RequestBody ActivityInfoAddDTO activityInfoAddDTO) {
     checkActivityInfo(
-        dto.getValidStatus(),
-        dto.getEndTime(),
-        dto.getBeginTime(),
-        dto.getActivityLobbyId(),
-        dto.getId());
-    activityInfoService.add(dto);
+        activityInfoAddDTO.getValidStatus(),
+        activityInfoAddDTO.getEndTime(),
+        activityInfoAddDTO.getBeginTime(),
+        activityInfoAddDTO.getActivityLobbyId(),
+        activityInfoAddDTO.getId());
+    activityInfoService.add(activityInfoAddDTO, LocaleContextHolder.getLocale().toLanguageTag());
   }
 
   /**
@@ -104,17 +109,36 @@ public class ActivityInfoController {
    *
    * @param dto ActivityInfoUpdateDTO
    */
+  private void checkActivityInfo(
+      Integer validStatus, String endTime, String beginTime, Long activityLobbyId, Long id) {
+    if (validStatus == ActivityInfoEnum.ValidStatus.TIME_LIMIT.value()) {
+      if (DateUtil.strToDate(endTime, "yyyy-MM-dd")
+          .before(DateUtil.strToDate(beginTime, "yyyy-MM-dd"))) {
+        throw new ServiceException("活动结束时间不能小于活动开始时间");
+      }
+    }
+    if (StringUtils.isNotNull(activityLobbyId) && StringUtils.isNull(id)) {
+      activityInfoService.checkActivityLobbyId(activityLobbyId, id);
+    }
+  }
+
+  /**
+   * 编辑活动
+   *
+   * @param activityInfoUpdateDTO
+   */
   @ApiOperation(value = "编辑活动")
   @PostMapping("/update")
   @PreAuthorize("hasAuthority('activity:info:update')")
-  public void update(@RequestBody ActivityInfoUpdateDTO dto) {
+  public void update(@RequestBody ActivityInfoUpdateDTO activityInfoUpdateDTO) {
     checkActivityInfo(
-        dto.getValidStatus(),
-        dto.getEndTime(),
-        dto.getBeginTime(),
-        dto.getActivityLobbyId(),
-        dto.getId());
-    activityInfoService.update(dto);
+        activityInfoUpdateDTO.getValidStatus(),
+        activityInfoUpdateDTO.getEndTime(),
+        activityInfoUpdateDTO.getBeginTime(),
+        activityInfoUpdateDTO.getActivityLobbyId(),
+        activityInfoUpdateDTO.getId());
+    activityInfoService.update(
+        activityInfoUpdateDTO, LocaleContextHolder.getLocale().toLanguageTag());
   }
 
   /**

@@ -10,6 +10,7 @@ import com.gameplat.admin.model.dto.ActivityLobbyUpdateStatusDTO;
 import com.gameplat.admin.model.vo.ActivityLobbyVO;
 import com.gameplat.admin.model.vo.CodeDataVO;
 import com.gameplat.admin.model.vo.GameKindVO;
+import com.gameplat.admin.service.ActivityInfoService;
 import com.gameplat.admin.service.ActivityLobbyService;
 import com.gameplat.admin.service.GameKindService;
 import com.gameplat.admin.service.SysDictDataService;
@@ -48,6 +49,8 @@ public class ActivityLobbyController {
   @Autowired private SysDictDataService sysDictDataService;
 
   @Autowired private GameKindService gameKindService;
+
+  @Autowired private ActivityInfoService activityInfoService;
 
   /** 活动大厅列表 */
   @ApiOperation(value = "活动大厅列表")
@@ -140,7 +143,7 @@ public class ActivityLobbyController {
   @GetMapping("/findUnboundLobbyList")
   @PreAuthorize("hasAuthority('activity:lobby:list')")
   public List<ActivityLobbyVO> findUnboundLobbyList() {
-    return activityLobbyService.findUnboundLobbyList();
+    return activityInfoService.findUnboundLobbyList();
   }
 
   /** 游戏类型列表 */

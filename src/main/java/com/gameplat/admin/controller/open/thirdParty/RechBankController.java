@@ -35,7 +35,7 @@ public class RechBankController {
   @PreAuthorize("hasAuthority('thirdParty:rechBank:add')")
   @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.WITHDRAW, desc = "'新增银行id=' + #dictData.id")
   public void save(@Validated(Groups.INSERT.class) @RequestBody OperDictDataDTO dictData) {
-    dictDataService.insertDictData(dictData);
+    dictDataService.insertBank(dictData);
   }
 
   @PutMapping("/edit")

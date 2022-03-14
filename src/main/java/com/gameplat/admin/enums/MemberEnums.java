@@ -41,13 +41,13 @@ public class MemberEnums {
   public enum Status {
 
     /** 已禁用 */
-    DISABLED(0),
+    DISABLED(-1),
 
     /** 启用 */
     ENABlED(1),
 
     /** 冻结 */
-    FROZEN(-1);
+    FROZEN(0);
 
     private final int value;
 

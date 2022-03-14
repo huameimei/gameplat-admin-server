@@ -105,10 +105,10 @@ public class PayAccountServiceImpl extends ServiceImpl<PayAccountMapper, PayAcco
   }
 
   @Override
-  public List<String> queryOwners() {
+  public List<String> queryAccounts() {
     QueryWrapper<PayAccount> query = Wrappers.query();
-    query.select("distinct owner");
-    return this.list(query).stream().map(PayAccount::getOwner).collect(Collectors.toList());
+    query.select("distinct account");
+    return this.list(query).stream().map(PayAccount::getAccount).collect(Collectors.toList());
   }
 
   private void conver2LimitInfo(PayAccountVO vo) {

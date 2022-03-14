@@ -48,8 +48,7 @@ public class OpenMemberWealRewordController {
   @PutMapping(value = "/exportReword", produces = "application/vnd.ms-excel")
   @ApiOperation(value = "导出VIP福利记录列表")
   @PreAuthorize("hasAuthority('member:wealReword:export')")
-  public void exportWealReword(
-      @RequestBody MemberWealRewordDTO queryDTO, HttpServletResponse response) {
+  public void exportWealReword(MemberWealRewordDTO queryDTO, HttpServletResponse response) {
     List<MemberWealReword> list = rewordService.findList(queryDTO);
     List<MemberWealRewordVO> newList = BeanUtil.copyToList(list, MemberWealRewordVO.class);
     ExportParams exportParams = new ExportParams("VIP福利记录列表", "VIP福利记录列表");

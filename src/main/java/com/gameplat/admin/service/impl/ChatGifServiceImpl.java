@@ -32,6 +32,7 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.sql.SQLOutput;
 import java.util.Map;
 
 /**
@@ -70,7 +71,7 @@ public class ChatGifServiceImpl extends ServiceImpl<ChatGifMapper, ChatGif>
     try {
       FileUtils.copyInputStreamToFile(file.getInputStream(), file1);
     } catch (IOException e) {
-      log.info("异常原因{}", e);
+      log.info("异常原因", e);
     }
     // 会在本地产生临时文件，用完后需要删除
     if (file1.exists()) {
@@ -85,7 +86,7 @@ public class ChatGifServiceImpl extends ServiceImpl<ChatGifMapper, ChatGif>
         chatGif.setWidth(bufferedImage.getWidth());
       }
     } catch (IOException e) {
-      log.info("异常原因{}", e);
+      log.info("异常原因", e);
       throw new ServiceException("此图片已破损");
     }
     chatGif.setName(name);
@@ -121,10 +122,8 @@ public class ChatGifServiceImpl extends ServiceImpl<ChatGifMapper, ChatGif>
       throw new ServiceException("不允许相同图片");
     }
     // 上传成功，返回图片地址
-    String url =
-        fileStorageProvider.upload(
-            file.getInputStream(), file.getContentType(), file.getOriginalFilename());
-    return url;
+    return fileStorageProvider.upload(
+        file.getInputStream(), file.getContentType(), file.getOriginalFilename());
   }
 
   /** 删 */

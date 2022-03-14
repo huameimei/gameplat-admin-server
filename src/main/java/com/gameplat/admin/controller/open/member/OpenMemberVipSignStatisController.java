@@ -2,6 +2,7 @@ package com.gameplat.admin.controller.open.member;
 
 import cn.afterturn.easypoi.excel.ExcelExportUtil;
 import cn.afterturn.easypoi.excel.entity.ExportParams;
+import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.gameplat.admin.model.dto.MemberVipSignHistoryDTO;
@@ -56,11 +57,12 @@ public class OpenMemberVipSignStatisController {
   @PreAuthorize("hasAuthority('member:sign:export')")
   public void exportSign(MemberVipSignStatisDTO queryDTO, HttpServletResponse response) {
     List<MemberVipSignStatis> list = signStatisService.findSignList(queryDTO);
+    List<MemberVipSignStatisVO> newList = BeanUtil.copyToList(list, MemberVipSignStatisVO.class);
     ExportParams exportParams = new ExportParams("VIP签到记录", "VIP签到记录");
     response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename = myExcel.xls");
 
     try (Workbook workbook =
-        ExcelExportUtil.exportExcel(exportParams, MemberVipSignStatisVO.class, list)) {
+        ExcelExportUtil.exportExcel(exportParams, MemberVipSignStatisVO.class, newList)) {
       workbook.write(response.getOutputStream());
     }
   }

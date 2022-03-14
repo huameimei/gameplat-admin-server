@@ -99,4 +99,6 @@ public interface SysUserService extends IService<SysUser> {
    * @param secret String
    */
   void bindSecret(Long id, String secret);
+
+  void disableAccount(String account);
 }

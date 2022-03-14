@@ -4,6 +4,7 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.convert.MemberGrowthLevelConvert;
@@ -23,6 +24,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
@@ -52,6 +54,8 @@ public class MemberGrowthLevelServiceImpl
   @Autowired private MemberGrowthConfigService configService;
 
   @Autowired private MemberLoanService memberLoanService;
+
+  @Autowired private MemberService memberService;
 
   public static final String kindName =
       "{\"en-US\": \"platform\", \"in-ID\": \"peron\", \"th-TH\": \"แพลตฟอร์ม\", \"vi-VN\": \"nền tảng\", \"zh-CN\": \"平台\"}";
@@ -87,7 +91,7 @@ public class MemberGrowthLevelServiceImpl
 
   /** 批量修改VIP等级 */
   @Override
-  public void batchUpdateLevel(List<MemberGrowthLevelEditDto> list, String language) {
+  public void batchUpdateLevel(List<MemberGrowthLevelEditDto> list, String language, HttpServletRequest request) {
     list.stream()
         .forEach(
             item -> {
@@ -121,7 +125,7 @@ public class MemberGrowthLevelServiceImpl
                 .one()
                 .getLoanMoney();
         int money = loanMoney.compareTo(BigDecimal.ZERO);
-        if(money == 1){
+        if(money == 1 && list.get(0).getLevel() != 0){
           memberLoanService.editOrUpdate(new MemberLoan(){{
             setLoanMoney(loanMoney);
             setMemberId(userRecord.getUserId());
@@ -130,6 +134,8 @@ public class MemberGrowthLevelServiceImpl
         }
         // 如果等级有所变化，就添加一条变动记录
         if (!newLevel.equals(userRecord.getCurrentLevel())) {
+          LambdaUpdateWrapper<MemberInfo> wrapper = new LambdaUpdateWrapper<>();
+
           MemberGrowthRecord record = new MemberGrowthRecord();
           record.setUserId(userRecord.getUserId());
           record.setUserName(userRecord.getUserName());
@@ -148,21 +154,34 @@ public class MemberGrowthLevelServiceImpl
             record.setCurrentGrowth(currentGrowth);
             record.setChangeGrowth(currentGrowth - userRecord.getCurrentGrowth());
           } else if ((newLevel > userRecord.getCurrentLevel())) {
+            //修改余额
+            BigDecimal upReward = new BigDecimal(0.0000);
+            //下级
+            Integer lastLevel = userRecord.getCurrentLevel();
+            for (Integer i = 0; i < newLevel - userRecord.getCurrentLevel(); i++) {
+              lastLevel = lastLevel + 1;
+              upReward = upReward.add(this.lambdaQuery().eq(MemberGrowthLevel::getLevel, lastLevel).one().getUpReward());
+            }
             record.setCurrentGrowth(userRecord.getCurrentGrowth());
             record.setChangeGrowth(0L);
+
+            wrapper.set(MemberInfo::getBalance, memberInfoService.lambdaQuery().eq(MemberInfo::getMemberId, userRecord.getUserId()).one().getBalance().add(upReward));
+
+            Member member = memberService.getById(userRecord.getUserId());
+            //处理升级
+            memberGrowthRecordService.dealPayUpReword(userRecord.getCurrentLevel(), newLevel, growthConfig, member, request);
           }
           record.setCreateBy(GlobalContextHolder.getContext().getUsername());
           record.setCreateTime(new Date());
           record.setRemark("VIP等级晋级下级所需成长值变动");
           if (!memberGrowthRecordService.save(record)) {
             throw new ServiceException("操作失败！");
-          }
-          ;
-          MemberInfo member = new MemberInfo();
-          member.setMemberId(userRecord.getUserId());
-          member.setVipLevel(newLevel);
-          member.setVipGrowth(currentGrowth);
-          memberInfoService.updateById(member);
+          };
+
+          wrapper.set(MemberInfo::getVipLevel, newLevel)
+                 .set(MemberInfo::getVipGrowth, currentGrowth)
+                 .eq(MemberInfo::getMemberId, userRecord.getUserId());
+          memberInfoService.update(wrapper);
         }
       }
     }
@@ -204,13 +223,13 @@ public class MemberGrowthLevelServiceImpl
 
   /** 后台批量修改VIP等级 */
   @Override
-  public void batchUpdateLevel(JSONObject obj) {
+  public void batchUpdateLevel(JSONObject obj, HttpServletRequest request) {
     String language = obj.get("language").toString();
     language = StrUtil.isBlank(language) ? "zh-CN" : language;
     Object levels = obj.get("levels");
     JSONArray jsonArray = JSONUtil.parseArray(levels);
     List<MemberGrowthLevelEditDto> list = jsonArray.toList(MemberGrowthLevelEditDto.class);
-    this.batchUpdateLevel(list, language);
+    this.batchUpdateLevel(list, language, request);
   }
 
   /** VIP等级列表 */

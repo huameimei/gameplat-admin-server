@@ -14,7 +14,7 @@ public interface GameRebateDataService extends IService<GameRebateData> {
 
   PageDtoVO<GameRebateData> queryPageData(Page<GameRebateData> page, GameRebateDataQueryDTO dto);
 
-  void saveRebateReport(String statTime, GamePlatform gamePlatform);
+  void saveRebateDayReport(String statTime, GamePlatform gamePlatform);
 
   List<GameReportVO> queryGameReport(GameRebateDataQueryDTO dto);
 }

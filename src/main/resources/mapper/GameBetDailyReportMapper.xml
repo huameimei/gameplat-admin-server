@@ -86,10 +86,10 @@
     t.`account`,
     t.`real_name`,
     t.`user_paths`,
-    t.`game_code`,
+    t.`platform_code`,
     t.`stat_time`,
     t.`game_kind`,
-    t.`first_kind`,
+    t.`game_type`,
     SUM(t.`valid_amount`) AS `valid_amount`,
     u.user_level as userLevel
     FROM game_bet_daily_report t
@@ -103,7 +103,7 @@
         AND stat_time BETWEEN #{startDate} AND #{endDate}
       </otherwise>
     </choose>
-    GROUP BY t.`member_id`, t.`game_code`, t.`game_kind`
+    GROUP BY t.`member_id`, t.`platform_code`, t.`game_kind`
   </select>
 
 

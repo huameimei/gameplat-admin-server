@@ -27,14 +27,12 @@ import com.gameplat.model.entity.sys.SysBannerInfo;
 import com.google.common.collect.Lists;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 活动业务类
@@ -58,13 +56,6 @@ public class ActivityInfoServiceImpl extends ServiceImpl<ActivityInfoMapper, Act
 
   @Autowired private ConfigService configService;
 
-  /**
-   * 列表查询
-   *
-   * @param page
-   * @param activityInfoQueryDTO
-   * @return
-   */
   @Override
   public IPage<ActivityInfoVO> list(
       PageDTO<ActivityInfo> page, ActivityInfoQueryDTO activityInfoQueryDTO) {
@@ -122,17 +113,14 @@ public class ActivityInfoServiceImpl extends ServiceImpl<ActivityInfoMapper, Act
 
   @Override
   public ActivityInfoVO detail(Long id) {
-    ActivityInfo activityInfo = this.getById(id);
-    if (activityInfo == null) {
-      throw new ServiceException("该活动不存在");
-    }
-    ActivityInfoVO activityInfoVO = activityInfoConvert.toVo(activityInfo);
-    return activityInfoVO;
+    return Optional.ofNullable(this.getById(id))
+        .map(activityInfoConvert::toVo)
+        .orElseThrow(() -> new ServiceException("该活动不存在"));
   }
 
   @Override
-  public void add(ActivityInfoAddDTO activityInfoAddDTO, String country) {
-    ActivityInfo activityInfo = activityInfoConvert.toEntity(activityInfoAddDTO);
+  public void add(ActivityInfoAddDTO dto) {
+    ActivityInfo activityInfo = activityInfoConvert.toEntity(dto);
     if (this.saveActivityInfo(activityInfo)) {
       if (null != activityInfo.getId() && activityInfo.getId() > 0) {
         // 保存活动显示的图片
@@ -140,7 +128,7 @@ public class ActivityInfoServiceImpl extends ServiceImpl<ActivityInfoMapper, Act
         banner.setBannerType(configService.getValueInteger(DictDataEnum.ACTIVITY));
         banner.setChildType(activityInfo.getId());
         banner.setChildName(activityInfo.getTitle());
-        banner.setLanguage(country);
+        banner.setLanguage(LocaleContextHolder.getLocale().getLanguage());
         banner.setStatus(SysBannerInfoEnum.Status.VALID.getValue());
 
         List<SysBannerInfo> bannerList = sysBannerInfoService.getByBanner(banner);
@@ -191,7 +179,7 @@ public class ActivityInfoServiceImpl extends ServiceImpl<ActivityInfoMapper, Act
     }
 
     List<ActivityType> activityTypeList = activityTypeService.findByTypeIdList(activityTypeIdList);
-    Map<Long, ActivityType> activityTypeMap = new HashMap<>();
+    Map<Long, ActivityType> activityTypeMap = new HashMap<>(activityTypeList.size());
     if (CollectionUtils.isNotEmpty(activityTypeList)) {
       for (ActivityType activityType : activityTypeList) {
         activityTypeMap.put(activityType.getId(), activityType);
@@ -227,8 +215,9 @@ public class ActivityInfoServiceImpl extends ServiceImpl<ActivityInfoMapper, Act
   }
 
   @Override
-  public void update(ActivityInfoUpdateDTO activityInfoUpdateDTO, String language) {
-    ActivityInfo activityInfo = activityInfoConvert.toEntity(activityInfoUpdateDTO);
+  public void update(ActivityInfoUpdateDTO dto) {
+    ActivityInfo activityInfo = activityInfoConvert.toEntity(dto);
+    activityInfo.setLanguage(LocaleContextHolder.getLocale().getLanguage());
     if (!this.saveActivityInfo(activityInfo)) {
       throw new ServiceException("修改组合活动失败！");
     }

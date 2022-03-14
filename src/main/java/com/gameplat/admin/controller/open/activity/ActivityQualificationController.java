@@ -8,8 +8,6 @@ import com.gameplat.admin.service.ActivityQualificationService;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.model.entity.activity.ActivityQualification;
 import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
@@ -43,10 +41,6 @@ public class ActivityQualificationController {
   @ApiOperation(value = "活动资格列表")
   @GetMapping("/list")
   @PreAuthorize("hasAuthority('activity:qualification:page')")
-  @ApiImplicitParams({
-    @ApiImplicitParam(name = "current", value = "分页参数：当前页", defaultValue = "1"),
-    @ApiImplicitParam(name = "size", value = "每页条数"),
-  })
   public IPage<ActivityQualificationVO> list(
       @ApiIgnore PageDTO<ActivityQualification> page,
       ActivityQualificationQueryDTO activityQualificationQueryDTO) {

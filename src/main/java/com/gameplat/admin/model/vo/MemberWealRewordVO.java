@@ -56,4 +56,7 @@ public class MemberWealRewordVO implements Serializable {
       width = 20)
   @JsonSerialize(using = Date2LongSerializerUtils.class)
   private Date createTime;
+
+  @ApiModelProperty(value = "备注")
+  private String remark;
 }

@@ -34,6 +34,8 @@ public interface SysDictDataService extends IService<SysDictData> {
 
   void insertDictData(OperDictDataDTO operDictDataDTO);
 
+  void insertBank(OperDictDataDTO dto);
+
   void updateDictData(OperDictDataDTO operDictDataDTO);
 
   void deleteDictDataByIds(List<Long> ids);

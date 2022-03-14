@@ -1,4 +1,4 @@
-package com.gameplat.admin.event;
+package com.gameplat.admin.event.listener;
 
 import com.gameplat.admin.cache.AdminCache;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +19,6 @@ public class AuthenticationSuccessEventListener
 
   @Override
   public void onApplicationEvent(AuthenticationSuccessEvent event) {
-    // 清空密码错误次数
     String username = event.getAuthentication().getName();
     adminCache.cleanErrorPasswordCount(username);
   }

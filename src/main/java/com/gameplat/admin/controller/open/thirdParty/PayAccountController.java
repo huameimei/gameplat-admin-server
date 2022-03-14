@@ -73,9 +73,9 @@ public class PayAccountController {
     return payAccountService.getById(id);
   }
 
-  @GetMapping("/queryOwners")
-  @PreAuthorize("hasAuthority('thirdParty:payAccount:queryOwners')")
-  public List<String> queryOwners() {
-    return payAccountService.queryOwners();
+  @GetMapping("/queryAccounts")
+  @PreAuthorize("hasAuthority('thirdParty:payAccount:queryAccounts')")
+  public List<String> queryAccounts() {
+    return payAccountService.queryAccounts();
   }
 }

@@ -7,18 +7,17 @@ import com.gameplat.admin.model.dto.ActivityDistributeQueryDTO;
 import com.gameplat.admin.model.vo.ActivityDistributeStatisticsVO;
 import com.gameplat.admin.model.vo.ActivityDistributeVO;
 import com.gameplat.admin.service.ActivityDistributeService;
-import com.gameplat.base.common.exception.ServiceException;
-import com.gameplat.base.common.util.StringUtils;
 import com.gameplat.model.entity.activity.ActivityDistribute;
 import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
+
+import javax.validation.constraints.NotEmpty;
 
 /**
  * 活动分发管理
@@ -26,6 +25,7 @@ import springfox.documentation.annotations.ApiIgnore;
  * @author kenvin
  */
 @Slf4j
+@Validated
 @RestController
 @RequestMapping("/api/admin/activity/distribute")
 @Api(tags = "活动分发管理")

@@ -21,7 +21,7 @@ public class RechargeOrderQueryDTO implements Serializable {
 
   private String orderNo;
 
-  private List<String> payAccountOwnerList;
+  private List<String> payAccountList;
 
   private Long tpMerchantId;
 

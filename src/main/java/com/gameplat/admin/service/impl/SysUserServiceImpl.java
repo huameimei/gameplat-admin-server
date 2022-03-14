@@ -5,10 +5,10 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
-import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.cache.AdminCache;
+import com.gameplat.admin.convert.RoleConvert;
 import com.gameplat.admin.convert.UserConvert;
 import com.gameplat.admin.mapper.SysRoleMapper;
 import com.gameplat.admin.mapper.SysUserMapper;
@@ -41,6 +41,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)
@@ -60,6 +61,8 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
   @Autowired private UserConvert userConvert;
 
   @Autowired private PasswordService passwordService;
+
+  @Autowired private RoleConvert roleConvert;
 
   @Override
   public SysUser getByUsername(String username) {
@@ -85,7 +88,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
             ObjectUtils.isNotNull(userDTO.getUserType()),
             SysUser::getUserType,
             userDTO.getUserType())
-        .eq(ObjectUtils.isNotNull(userDTO.getRoleId()),SysUser::getRoleId,userDTO.getRoleId())
+        .eq(ObjectUtils.isNotNull(userDTO.getRoleId()), SysUser::getRoleId, userDTO.getRoleId())
         .eq(ObjectUtils.isNotNull(userDTO.getStatus()), SysUser::getStatus, userDTO.getStatus())
         .eq(ObjectUtils.isNotEmpty(userDTO.getPhone()), SysUser::getPhone, userDTO.getPhone())
         .between(
@@ -164,20 +167,12 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
   @Override
   @SentinelResource(value = "getRoleList")
   public List<RoleVo> getRoleList() {
-    List<RoleVo> list = new ArrayList<>();
     LambdaQueryWrapper<SysRole> queryWrapper = Wrappers.lambdaQuery();
     queryWrapper.eq(SysRole::getStatus, EnableEnum.ENABLED.code());
-    roleMapper
-        .selectList(queryWrapper)
-        .forEach(
-            item -> {
-              RoleVo roleVo = new RoleVo();
-              roleVo.setId(item.getRoleId());
-              roleVo.setRoleName(item.getRoleName());
-              roleVo.setRemark(item.getRemark());
-              list.add(roleVo);
-            });
-    return list;
+
+    return roleMapper.selectList(queryWrapper).stream()
+        .map(roleConvert::toVo)
+        .collect(Collectors.toList());
   }
 
   @Override
@@ -189,16 +184,13 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
     String newPassword = passwordService.decrypt(dto.getPassword());
     user.setPassword(passwordService.encode(newPassword));
     user.setChangeFlag(
-        loginLimit.getResetPwdSwitch() == TrueFalse.TRUE.getValue()
+        EnableEnum.isEnabled(loginLimit.getResetPwdSwitch())
             ? TrueFalse.TRUE.getValue()
             : TrueFalse.FALSE.getValue());
 
-    if (this.updateById(user)) {
-      // 重置用户密码错误次数
-      adminCache.cleanErrorPasswordCount(user.getUserName());
-    } else {
-      throw new ServiceException("更新用户信息失败!");
-    }
+    Assert.isTrue(this.updateById(user), "更新用户信息失败!");
+    // 重置用户密码错误次数
+    adminCache.cleanErrorPasswordCount(user.getUserName());
   }
 
   @Override
@@ -233,6 +225,17 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
     Assert.isTrue(
         this.lambdaUpdate().set(SysUser::getSafeCode, secret).eq(SysUser::getUserId, id).update(),
         "绑定失败!");
+  }
+
+  @Override
+  public void disableAccount(String account) {
+    SysUser user = this.getByUsername(account);
+    if (EnableEnum.isEnabled(user.getStatus())) {
+      this.lambdaUpdate()
+          .set(SysUser::getStatus, EnableEnum.DISABLED.code())
+          .eq(SysUser::getUserId, user.getUserId())
+          .update(new SysUser());
+    }
   }
 
   /**

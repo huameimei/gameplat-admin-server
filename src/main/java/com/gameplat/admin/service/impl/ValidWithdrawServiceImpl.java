@@ -4,6 +4,8 @@ import cn.hutool.core.convert.Convert;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.config.TenantConfig;
@@ -370,4 +372,13 @@ public class ValidWithdrawServiceImpl extends ServiceImpl<ValidWithdrawMapper, V
   public void delValidWithdraw(String member) throws Exception {
     this.deleteByUserName(member, 0);
   }
+
+    @Override
+    public void rollGameRebateDml(String remark) {
+        LambdaUpdateWrapper<ValidWithdraw> updateWrapper = Wrappers.lambdaUpdate();
+        updateWrapper.eq(ValidWithdraw::getRemark,remark)
+                .set(ValidWithdraw::getDiscountMoney,0)
+                .set(ValidWithdraw::getDiscountDml,0);
+        validWithdrawMapper.update(null,updateWrapper);
+    }
 }

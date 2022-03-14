@@ -24,4 +24,6 @@ public interface MemberWealRewordService extends IService<MemberWealReword> {
 
   /** 修改VIP福利记录 */
   void updateWealRecord(MemberWealReword entity);
+
+  void updateRemark(Long id, String remark);
 }

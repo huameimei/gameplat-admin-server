@@ -29,7 +29,6 @@ import com.gameplat.common.enums.BooleanEnum;
 import com.gameplat.model.entity.ValidWithdraw;
 import com.gameplat.model.entity.member.*;
 import com.gameplat.model.entity.message.Message;
-import com.gameplat.model.entity.message.MessageDistribute;
 import com.gameplat.redis.redisson.DistributedLocker;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -314,14 +313,14 @@ public class MemberGrowthRecordServiceImpl
       MemberInfo memberInfo = new MemberInfo();
       memberInfo.setMemberId(memberId);
       memberInfo.setVipLevel(afterLevel);
-      memberInfo.setVipGrowth(oldGrowth + memberGrowthRecord.getCurrentGrowth());
+      memberInfo.setVipGrowth(oldGrowth + changeFinalGrowth);
       memberInfoService.updateById(memberInfo);
     } else {
       // VIP变动更新会员vip
       MemberInfo memberInfo = new MemberInfo();
       memberInfo.setMemberId(memberId);
       memberInfo.setVipLevel(afterLevel);
-      memberInfo.setVipGrowth(oldGrowth + memberGrowthRecord.getCurrentGrowth());
+      memberInfo.setVipGrowth(oldGrowth + changeFinalGrowth);
       memberInfoService.updateById(memberInfo);
     }
   }
@@ -508,15 +507,15 @@ public class MemberGrowthRecordServiceImpl
     message.setCreateBy("System");
     messageMapper.saveReturnId(message);
 
-    MessageDistribute messageDistribute = new MessageDistribute();
-    messageDistribute.setMessageId(message.getId());
-    messageDistribute.setUserId(member.getId());
-    messageDistribute.setUserAccount(member.getAccount());
-    messageDistribute.setRechargeLevel(member.getUserLevel());
-    messageDistribute.setVipLevel(memberInfoService.getById(member.getId()).getVipLevel());
-    messageDistribute.setReadStatus(0);
-    messageDistribute.setCreateBy("System");
-    messageDistributeService.save(messageDistribute);
+//    MessageDistribute messageDistribute = new MessageDistribute();
+//    messageDistribute.setMessageId(message.getId());
+//    messageDistribute.setUserId(member.getId());
+//    messageDistribute.setUserAccount(member.getAccount());
+//    messageDistribute.setRechargeLevel(member.getUserLevel());
+//    messageDistribute.setVipLevel(memberInfoService.getById(member.getId()).getVipLevel());
+//    messageDistribute.setReadStatus(0);
+//    messageDistribute.setCreateBy("System");
+//    messageDistributeService.save(messageDistribute);
     log.info("发送消息成功");
   }
 

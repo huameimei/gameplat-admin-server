@@ -58,6 +58,12 @@ public class WebMvcConfig extends WebMvcConfigurationAdapter {
     return new SecurityValidationInterceptor();
   }
 
+  @Bean
+  public ForceChangePasswordInterceptor forceChangePasswordInterceptor() {
+    log.info("----初始化强制修改密码拦截器----");
+    return new ForceChangePasswordInterceptor();
+  }
+
   @Override
   public void addInterceptors(InterceptorRegistry registry) {
     registry

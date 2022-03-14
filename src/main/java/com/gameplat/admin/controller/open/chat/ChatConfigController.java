@@ -18,10 +18,7 @@ import org.apache.http.message.BasicHeader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 
@@ -59,7 +56,7 @@ public class ChatConfigController {
   @ApiOperation(value = "修改彩票下注分享配置")
   @PutMapping("/editLottPushBet")
   @PreAuthorize("hasAuthority('chat:config:getLottPushBet')")
-  public void editLottPushBet(ChatPushCPBet chatPushCPBet) {
+  public void editLottPushBet(@RequestBody ChatPushCPBet chatPushCPBet) {
     // 获取额度转换配置
     JSONObject json = otthService.getLottConfig();
 
@@ -104,7 +101,7 @@ public class ChatConfigController {
   @ApiOperation(value = "修改彩票中奖推送配置")
   @PutMapping("/editPushLotteryWin")
   @PreAuthorize("hasAuthority('chat:config:editPushLotteryWin')")
-  public void editPushLotteryWin(PushLotteryWin pushLotteryWin) {
+  public void editPushLotteryWin(@RequestBody PushLotteryWin pushLotteryWin) {
     // 获取额度转换配置
     JSONObject json = otthService.getLottConfig();
 
@@ -146,7 +143,7 @@ public class ChatConfigController {
   @ApiOperation(value = "修改聊天室浮窗配置")
   @PutMapping("/updateChatConfig")
   @PreAuthorize("hasAuthority('chat:config:updateChatConfig')")
-  public void updateChatConfig(ChatConfig chatConfig) {
+  public void updateChatConfig(@RequestBody ChatConfig chatConfig) {
     // 获取额度转换配置
     JSONObject json = otthService.getLottConfig();
     String host = json.getString("host");

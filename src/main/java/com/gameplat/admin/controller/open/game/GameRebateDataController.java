@@ -33,8 +33,7 @@ public class GameRebateDataController {
   }
 
   /**
-   * 真人重新生成日报表
-   *
+   * 游戏重新生成交收日报表
    * @param statTime
    * @param gameCode
    */
@@ -44,7 +43,7 @@ public class GameRebateDataController {
     GamePlatform gamePlatform =
         list.stream().filter(item -> item.getCode().equals(gameCode)).findAny().orElse(null);
     Assert.notNull(gamePlatform, "游戏类型不存在！");
-    gameRebateDataService.saveRebateReport(statTime, gamePlatform);
+    gameRebateDataService.saveRebateDayReport(statTime, gamePlatform);
   }
 
   @GetMapping(value = "/queryReport")

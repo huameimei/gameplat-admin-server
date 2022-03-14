@@ -17,6 +17,8 @@ import com.gameplat.common.enums.BooleanEnum;
 import com.gameplat.common.enums.DictDataEnum;
 import com.gameplat.model.entity.activity.ActivityType;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
@@ -82,8 +84,7 @@ public class ActivityTypeController {
     @ApiOperation(value = "新增活动板块")
     @PostMapping("/add")
     @PreAuthorize("hasAuthority('activity:type:add')")
-    public void add(
-            @Validated @RequestBody ActivityTypeAddDTO activityTypeAddDTO) {
+    public void add(@Validated @RequestBody ActivityTypeAddDTO activityTypeAddDTO) {
         activityTypeAddDTO.setLanguage(LocaleContextHolder.getLocale().toLanguageTag());
         if (activityTypeAddDTO.getFloatStatus() != null && activityTypeAddDTO.getFloatStatus() != 0) {
             if (StringUtils.isBlank(activityTypeAddDTO.getFloatLogo())) {
@@ -95,8 +96,6 @@ public class ActivityTypeController {
         }
         activityTypeService.add(activityTypeAddDTO);
     }
-    activityTypeService.add(dto);
-  }
 
     /**
      * 更新活动板块
@@ -120,8 +119,6 @@ public class ActivityTypeController {
         }
         activityTypeService.update(activityTypeUpdateDTO);
     }
-    activityTypeService.update(dto);
-  }
 
     /**
      * 删除活动板块

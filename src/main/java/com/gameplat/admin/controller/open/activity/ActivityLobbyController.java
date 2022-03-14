@@ -20,8 +20,6 @@ import com.gameplat.common.enums.DictTypeEnum;
 import com.gameplat.model.entity.activity.ActivityLobby;
 import com.gameplat.model.entity.sys.SysDictData;
 import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
@@ -55,35 +53,31 @@ public class ActivityLobbyController {
   @ApiOperation(value = "活动大厅列表")
   @GetMapping("/list")
   @PreAuthorize("hasAuthority('activity:lobby:page')")
-  @ApiImplicitParams({
-    @ApiImplicitParam(name = "current", value = "分页参数：当前页", defaultValue = "1"),
-    @ApiImplicitParam(name = "size", value = "每页条数"),
-  })
   public IPage<ActivityLobbyVO> list(
-      @ApiIgnore PageDTO<ActivityLobby> page, ActivityLobbyQueryDTO activityLobbyQueryDTO) {
-    return activityLobbyService.findActivityLobbyList(page, activityLobbyQueryDTO);
+      @ApiIgnore PageDTO<ActivityLobby> page, ActivityLobbyQueryDTO dto) {
+    return activityLobbyService.findActivityLobbyList(page, dto);
   }
 
   /**
    * 新增活动大厅
    *
-   * @param activityLobbyAddDTO
+   * @param dto ActivityLobbyAddDTO
    */
   @ApiOperation(value = "新增活动大厅")
   @PostMapping("/add")
   @PreAuthorize("hasAuthority('activity:lobby:add')")
-  public void add(@Validated @RequestBody ActivityLobbyAddDTO activityLobbyAddDTO) {
-    if (StringUtils.isNull(activityLobbyAddDTO.getStatisDate())) {
+  public void add(@Validated @RequestBody ActivityLobbyAddDTO dto) {
+    if (StringUtils.isNull(dto.getStatisDate())) {
       throw new ServiceException("请选择统计日期");
     }
-    if (activityLobbyAddDTO.getApplyWay() == ActivityInfoEnum.ApplyWayEnum.AUTOMATIC.value()
-        && activityLobbyAddDTO.getNextDayApply() == ActivityInfoEnum.NextDayApply.NO.value()) {
+    if (dto.getApplyWay() == ActivityInfoEnum.ApplyWayEnum.AUTOMATIC.value()
+        && dto.getNextDayApply() == ActivityInfoEnum.NextDayApply.NO.value()) {
       throw new ServiceException("自动申请的活动必须勾选隔天申请");
     }
-    if (activityLobbyAddDTO.getEndTime().before(activityLobbyAddDTO.getStartTime())) {
+    if (dto.getEndTime().before(dto.getStartTime())) {
       throw new ServiceException("活动结束时间不能小于活动开始时间");
     }
-    activityLobbyService.add(activityLobbyAddDTO);
+    activityLobbyService.add(dto);
   }
 
   /**
@@ -177,7 +171,6 @@ public class ActivityLobbyController {
   @ApiOperation(value = "游戏列表")
   @GetMapping("/gameList")
   @PreAuthorize("hasAuthority('activity:lobby:gameKindList')")
-  @ApiImplicitParam(name = "gameTypeCode", value = "游戏类型")
   public List<GameKindVO> getGameKindInBanner(String gameTypeCode) {
     return gameKindService.getGameKindInBanner(gameTypeCode);
   }

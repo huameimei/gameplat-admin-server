@@ -34,38 +34,15 @@ public class AuthenticationServiceImpl implements AuthenticationService {
   @Override
   public UserToken login(AdminLoginDTO dto, HttpServletRequest request) {
     String username = dto.getAccount();
-    String password = "";
-    try {
-      password = passwordService.decrypt(dto.getPassword());
-    }catch (Exception e) {
-      log.info("密码错误：{}",e);
-      throw new ServiceException("用户名密码错误!");
-    }
-    UserCredential credential = null;
-    try {
-      boolean authenticated = twoFactorAuthenticationService.isEnabled();
-      credential =
-              tokenAuthenticationManager.authenticate(username, password, request, !authenticated);
-    } catch (Exception e) {
-      log.info("密码错误：{}",e);
-      throw new ServiceException("用户名密码错误!");
-    }
+    String password = passwordService.decrypt(dto.getPassword());
+    boolean authenticated = twoFactorAuthenticationService.isEnabled();
 
+    UserCredential credential =
+        tokenAuthenticationManager.authenticate(username, password, request, !authenticated);
 
-    // 更新用户登录信息
-    this.updateLoginUserInfo(credential);
+    this.loginAfter(credential);
 
-    return UserToken.builder()
-        .account(username)
-        .nickName(credential.getNickname())
-        .accessToken(credential.getAccessToken())
-        .refreshToken(credential.getRefreshToken())
-        .tokenExpireIn(credential.getTokenExpireIn())
-        .clientType(credential.getClientType())
-        .deviceType(credential.getDeviceType())
-        .accessLogToken(permissionService.getAccessLogToken())
-        .isEnable2FA(credential.isEnable2FA())
-        .build();
+    return this.createLoginSuccessToken(credential);
   }
 
   @Override
@@ -104,6 +81,24 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         .refreshToken(credential.getRefreshToken())
         .accessToken(credential.getAccessToken())
         .tokenExpireIn(credential.getTokenExpireIn())
+        .build();
+  }
+
+  private void loginAfter(UserCredential credential) {
+    this.updateLoginUserInfo(credential);
+  }
+
+  private UserToken createLoginSuccessToken(UserCredential credential) {
+    return UserToken.builder()
+        .account(credential.getUsername())
+        .nickName(credential.getNickname())
+        .accessToken(credential.getAccessToken())
+        .refreshToken(credential.getRefreshToken())
+        .tokenExpireIn(credential.getTokenExpireIn())
+        .clientType(credential.getClientType())
+        .deviceType(credential.getDeviceType())
+        .accessLogToken(permissionService.getAccessLogToken())
+        .isEnable2FA(credential.isEnable2FA())
         .build();
   }
 

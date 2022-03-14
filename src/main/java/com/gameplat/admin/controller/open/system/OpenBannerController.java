@@ -10,8 +10,6 @@ import com.gameplat.admin.service.SysBannerInfoService;
 import com.gameplat.common.lang.Assert;
 import com.gameplat.model.entity.sys.SysBannerInfo;
 import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,27 +32,18 @@ public class OpenBannerController {
 
   @Autowired private SysBannerInfoService sysBannerInfoService;
 
-    /**
-     * banner列表
-     *
-     * @param page
-     * @param language
-     * @return
-     */
-    @ApiOperation(value = "banner列表")
-    @GetMapping("/list")
-    @PreAuthorize("hasAuthority('system:banner:page')")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "current", value = "分页参数：当前页", defaultValue = "1"),
-            @ApiImplicitParam(name = "size", value = "每页条数"),
-            @ApiImplicitParam(name = "language", value = "语种"),
-            @ApiImplicitParam(name = "type", value = "banner大类，1 体育banner配置，2 彩票banner配置")
-    })
-    public IPage<SysBannerInfoVO> list(
-            @ApiIgnore PageDTO<SysBannerInfo> page,
-            @RequestParam(defaultValue = "zh-CN") String language, Integer type) {
-        return sysBannerInfoService.list(page, LocaleContextHolder.getLocale().toLanguageTag(), type);
-    }
+  /**
+   * banner列表
+   *
+   * @param page
+   * @return
+   */
+  @ApiOperation(value = "banner列表")
+  @GetMapping("/list")
+  @PreAuthorize("hasAuthority('system:banner:page')")
+  public IPage<SysBannerInfoVO> list(@ApiIgnore PageDTO<SysBannerInfo> page, Integer type) {
+    return sysBannerInfoService.list(page, LocaleContextHolder.getLocale().toLanguageTag(), type);
+  }
 
   /**
    * 新增banner

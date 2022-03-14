@@ -39,7 +39,7 @@ public class OpenMessageInfoController {
   @PreAuthorize("hasAuthority('operator:message:page')")
   @ApiImplicitParams({
     @ApiImplicitParam(name = "current", value = "分页参数：当前页", defaultValue = "1"),
-    @ApiImplicitParam(name = "size", value = "每页条数"),
+    @ApiImplicitParam(name = "size", value = "每页条数")
   })
   public IPage<MessageInfoVO> page(
       @ApiIgnore PageDTO<Message> page, MessageInfoQueryDTO messageInfoQueryDTO) {
@@ -70,10 +70,6 @@ public class OpenMessageInfoController {
   @ApiOperation(value = "查看推送目标会员")
   @GetMapping("/distribute/page")
   @PreAuthorize("hasAuthority('operator:message:distributePage')")
-  @ApiImplicitParams({
-    @ApiImplicitParam(name = "current", value = "分页参数：当前页", defaultValue = "1"),
-    @ApiImplicitParam(name = "size", value = "每页条数"),
-  })
   public IPage<MessageDistributeVO> distributePage(
       Page<Member> page, MessageDistributeQueryDTO messageDistributeQueryDTO) {
     return messageInfoService.findMessageDistributeList(page, messageDistributeQueryDTO);

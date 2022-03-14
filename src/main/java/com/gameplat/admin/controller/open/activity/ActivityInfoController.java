@@ -52,8 +52,8 @@ public class ActivityInfoController {
   /**
    * 活动列表
    *
-   * @param page
-   * @param activityInfoQueryDTO
+   * @param page PageDTO
+   * @param dto ActivityInfoQueryDTO
    * @return
    */
   @ApiOperation(value = "活动列表")
@@ -61,11 +61,11 @@ public class ActivityInfoController {
   @PreAuthorize("hasAuthority('activity:info:page')")
   @ApiImplicitParams({
     @ApiImplicitParam(name = "current", value = "分页参数：当前页", defaultValue = "1"),
-    @ApiImplicitParam(name = "size", value = "每页条数"),
+    @ApiImplicitParam(name = "size", value = "每页条数")
   })
   public IPage<ActivityInfoVO> list(
-      @ApiIgnore PageDTO<ActivityInfo> page, ActivityInfoQueryDTO activityInfoQueryDTO) {
-    return activityInfoService.list(page, activityInfoQueryDTO);
+      @ApiIgnore PageDTO<ActivityInfo> page, ActivityInfoQueryDTO dto) {
+    return activityInfoService.list(page, dto);
   }
 
   /**
@@ -84,19 +84,18 @@ public class ActivityInfoController {
     return activityInfoService.detail(id);
   }
 
-    /**
-     * 新增活动
-     *
-     * @param activityInfoAddDTO
-     */
-    @ApiOperation(value = "新增活动")
-    @PostMapping("/add")
-    @PreAuthorize("hasAuthority('activity:info:add')")
-    public void add(
-            @RequestBody ActivityInfoAddDTO activityInfoAddDTO) {
-        checkActivityInfo(activityInfoAddDTO.getValidStatus(), activityInfoAddDTO.getEndTime(), activityInfoAddDTO.getBeginTime(), activityInfoAddDTO.getActivityLobbyId(), activityInfoAddDTO.getId());
-        activityInfoService.add(activityInfoAddDTO, LocaleContextHolder.getLocale().getLanguage());
-    }
+  @ApiOperation(value = "新增活动")
+  @PostMapping("/add")
+  @PreAuthorize("hasAuthority('activity:info:add')")
+  public void add(@RequestBody ActivityInfoAddDTO activityInfoAddDTO) {
+    checkActivityInfo(
+        activityInfoAddDTO.getValidStatus(),
+        activityInfoAddDTO.getEndTime(),
+        activityInfoAddDTO.getBeginTime(),
+        activityInfoAddDTO.getActivityLobbyId(),
+        activityInfoAddDTO.getId());
+    activityInfoService.add(activityInfoAddDTO, LocaleContextHolder.getLocale().getLanguage());
+  }
 
   /**
    * 检查活动是否满足条件
@@ -120,19 +119,24 @@ public class ActivityInfoController {
     }
   }
 
-    /**
-     * 编辑活动
-     *
-     * @param activityInfoUpdateDTO
-     */
-    @ApiOperation(value = "编辑活动")
-    @PostMapping("/update")
-    @PreAuthorize("hasAuthority('activity:info:update')")
-    public void update(
-            @RequestBody ActivityInfoUpdateDTO activityInfoUpdateDTO) {
-        checkActivityInfo(activityInfoUpdateDTO.getValidStatus(), activityInfoUpdateDTO.getEndTime(), activityInfoUpdateDTO.getBeginTime(), activityInfoUpdateDTO.getActivityLobbyId(), activityInfoUpdateDTO.getId());
-        activityInfoService.update(activityInfoUpdateDTO, LocaleContextHolder.getLocale().getLanguage());
-    }
+  /**
+   * 编辑活动
+   *
+   * @param activityInfoUpdateDTO
+   */
+  @ApiOperation(value = "编辑活动")
+  @PostMapping("/update")
+  @PreAuthorize("hasAuthority('activity:info:update')")
+  public void update(@RequestBody ActivityInfoUpdateDTO activityInfoUpdateDTO) {
+    checkActivityInfo(
+        activityInfoUpdateDTO.getValidStatus(),
+        activityInfoUpdateDTO.getEndTime(),
+        activityInfoUpdateDTO.getBeginTime(),
+        activityInfoUpdateDTO.getActivityLobbyId(),
+        activityInfoUpdateDTO.getId());
+    activityInfoService.update(
+        activityInfoUpdateDTO, LocaleContextHolder.getLocale().getLanguage());
+  }
 
   /**
    * 修改活动排序

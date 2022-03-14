@@ -194,9 +194,7 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
 
   @Override
   public void updateContact(MemberContactUpdateDTO dto) {
-    if (!this.updateById(memberConvert.toEntity(dto))) {
-      throw new ServiceException("更新会员联系方式失败!");
-    }
+    Assert.isTrue(this.updateById(memberConvert.toEntity(dto)), "更新会员联系方式失败!");
   }
 
   @Override

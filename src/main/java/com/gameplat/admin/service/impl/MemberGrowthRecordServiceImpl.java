@@ -97,6 +97,7 @@ public class MemberGrowthRecordServiceImpl
 
     IPage<MemberGrowthRecordVO> result =
         this.lambdaQuery()
+            .ne(MemberGrowthRecord::getType, 6)
             .like(
                 ObjectUtils.isNotEmpty(dto.getUserName()),
                 MemberGrowthRecord::getUserName,

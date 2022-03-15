@@ -149,8 +149,13 @@ public class MemberGrowthLevelServiceImpl
 
           Long currentGrowth = userRecord.getCurrentGrowth();
           if (newLevel < userRecord.getCurrentLevel()) {
-            currentGrowth =
-                this.lambdaQuery().eq(MemberGrowthLevel::getLevel, newLevel - 1).one().getGrowth();
+            if(newLevel == 0){
+              currentGrowth =
+                      this.lambdaQuery().eq(MemberGrowthLevel::getLevel, 0).one().getGrowth();
+            }else {
+              currentGrowth =
+                      this.lambdaQuery().eq(MemberGrowthLevel::getLevel, newLevel - 1).one().getGrowth();
+            }
             record.setCurrentGrowth(currentGrowth);
             record.setChangeGrowth(currentGrowth - userRecord.getCurrentGrowth());
           } else if ((newLevel > userRecord.getCurrentLevel())) {

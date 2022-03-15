@@ -1,7 +1,6 @@
 package com.gameplat.admin.controller.open.game;
 
 import cn.hutool.core.bean.BeanUtil;
-import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.gameplat.admin.model.dto.GameBetDailyReportQueryDTO;
 import com.gameplat.admin.model.dto.GameBetRecordQueryDTO;
@@ -20,13 +19,16 @@ import com.gameplat.base.common.util.StringUtils;
 import com.gameplat.model.entity.game.GameBetDailyReport;
 import com.gameplat.model.entity.game.GamePlatform;
 import io.swagger.annotations.ApiOperation;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
-
-import javax.validation.Valid;
 import java.util.Date;
 import java.util.List;
+import javax.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
 @RestController
@@ -34,8 +36,8 @@ import java.util.List;
 public class GameBetDailyReportController {
 
   @Autowired private GameBetDailyReportService gameBetDailyReportService;
-
   @Autowired private GamePlatformService gamePlatformService;
+  @Autowired private GameBetRecordInfoService gameBetRecordInfoService;
 
   @GetMapping(value = "/queryPage")
   public PageDtoVO<GameBetDailyReport> queryPage(
@@ -43,23 +45,15 @@ public class GameBetDailyReportController {
     return gameBetDailyReportService.queryPage(page, dto);
   }
 
-  /**
-   * 游戏平台维度数据统计
-   * @param dto
-   * @return
-   */
+  // TODO 导出真人投注日报表
+
+  /** 游戏平台维度数据统计 */
   @GetMapping(value = "/queryGamePlatformReport")
   public List<GameReportVO> queryGamePlatformReport(GameBetDailyReportQueryDTO dto) {
     return gameBetDailyReportService.queryGamePlatformReport(dto);
   }
 
-
-  // TODO 导出真人投注日报表
-
-
-  /**
-   * 游戏重新生成日报表
-   */
+  /** 游戏重新生成日报表 */
   @PostMapping(value = "/resetDayReport")
   public void resetDayReport(@RequestBody OperGameMemberDayReportDTO dto) {
     List<GamePlatform> list = gamePlatformService.list();
@@ -97,21 +91,21 @@ public class GameBetDailyReportController {
       String endTime = DateUtil.getDateToString(new Date());
       dto.setEndTime(endTime);
     }
-    if (StringUtils.isNotEmpty(dto.getLiveGameSuperType())) {
+    if (StringUtils.isNotEmpty(dto.getGameType())) {
       StringBuilder sb = new StringBuilder();
       sb.append("(");
-      String[] split = dto.getLiveGameSuperType().split(",");
+      String[] split = dto.getGameType().split(",");
       for (int i = 0; i < split.length; i++) {
         sb.append("'" + split[i] + "'").append(",");
       }
       sb.deleteCharAt(sb.toString().length() - 1);
       sb.append(")");
       String str = sb.toString();
-      dto.setLiveGameSuperType(str);
+      dto.setGameType(str);
     }
 
     if (StringUtils.isNotEmpty(dto.getPlatformCode())) {
-      dto.setLiveGameSuperType("");
+      dto.setGameType("");
       StringBuilder sb = new StringBuilder();
       sb.append("(");
       String[] split = dto.getPlatformCode().split(",");
@@ -127,16 +121,13 @@ public class GameBetDailyReportController {
     return gameBetDailyReportService.querybetReportList(page, dto);
   }
 
-
-  @Autowired
-  private GameBetRecordInfoService gameBetRecordInfoService;
-
   @ApiOperation(value = "获取会员投注记录")
   @GetMapping("findUserGameBetRecord")
-  public PageDtoVO<GameBetRecordVO> findUserGameBetRecord(Page<GameBetRecordVO> page, @Valid UserGameBetRecordDto dto) {
+  public PageDtoVO<GameBetRecordVO> findUserGameBetRecord(
+      Page<GameBetRecordVO> page, @Valid UserGameBetRecordDto dto) {
     GameBetRecordQueryDTO gameBetRecordQueryDTO = new GameBetRecordQueryDTO();
-    BeanUtil.copyProperties(dto,gameBetRecordQueryDTO);
+    BeanUtil.copyProperties(dto, gameBetRecordQueryDTO);
     gameBetRecordQueryDTO.setTimeType(1);
-    return gameBetRecordInfoService.queryPageBetRecord(page,gameBetRecordQueryDTO);
+    return gameBetRecordInfoService.queryPageBetRecord(page, gameBetRecordQueryDTO);
   }
 }

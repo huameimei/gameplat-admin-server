@@ -6,10 +6,10 @@ import com.gameplat.admin.model.vo.GameBalanceVO;
 import com.gameplat.admin.service.GameAdminService;
 import com.gameplat.admin.service.GamePlatformService;
 import com.gameplat.admin.service.MemberService;
-import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.StringUtils;
 import com.gameplat.common.constant.ServiceName;
 import com.gameplat.common.enums.TransferTypesEnum;
+import com.gameplat.common.lang.Assert;
 import com.gameplat.log.annotation.Log;
 import com.gameplat.log.enums.LogType;
 import com.gameplat.model.entity.game.GamePlatform;
@@ -50,9 +50,7 @@ public class GameAdminController {
     GameBalanceVO gameBalanceVO = new GameBalanceVO();
     gameBalanceVO.setPlatformCode(dto.getPlatform().get("platformCode"));
     Member member = memberService.getMemberAndFillGameAccount(dto.getAccount());
-    if (member == null) {
-      throw new ServiceException("会员账号不存在");
-    }
+    Assert.isNull(member, "会员账号不存在");
     gameBalanceVO.setBalance(
         gameAdminService.getBalance(dto.getPlatform().get("platformCode"), member));
     return gameBalanceVO;
@@ -65,9 +63,7 @@ public class GameAdminController {
     try {
       redisService.getStringOps().setEx(key, "game_transfer", 3, TimeUnit.MINUTES);
       Member member = memberService.getMemberAndFillGameAccount(record.getAccount());
-      if (member == null) {
-        throw new ServiceException("会员账号不存在");
-      }
+      Assert.isNull(member, "会员账号不存在");
       gameAdminService.transferOut(record.getPlatformCode(), record.getAmount(), member, false);
     } finally {
       redisService.getKeyOps().delete(key);
@@ -79,9 +75,7 @@ public class GameAdminController {
   public Map<String, String> recyclingAmount(@RequestBody GameBalanceQueryDTO dto) {
     Map<String, String> map = new HashMap();
     Member member = memberService.getMemberAndFillGameAccount(dto.getAccount());
-    if (member == null) {
-      throw new ServiceException("会员账号不存在");
-    }
+    Assert.isNull(member, "会员账号不存在");
     dto.getPlatform()
         .forEach(
             (key, value) -> {
@@ -105,13 +99,14 @@ public class GameAdminController {
 
   /** 没收真人余额 */
   @RequestMapping(value = "/confiscated", method = RequestMethod.POST)
-  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.ADMIN, desc = "'没收会员游戏金额，id='+#memberInfo.id")
+  @Log(
+      module = ServiceName.ADMIN_SERVICE,
+      type = LogType.ADMIN,
+      desc = "'没收会员游戏金额，id='+#memberInfo.id")
   public Map<String, String> confiscated(@RequestBody GameBalanceQueryDTO dto) throws Exception {
     Map<String, String> map = new HashMap();
     Member member = memberService.getMemberAndFillGameAccount(dto.getAccount());
-    if (member == null) {
-      throw new ServiceException("会员账号不存在");
-    }
+    Assert.isNull(member, "会员账号不存在");
     dto.getPlatform()
         .forEach(
             (key, value) -> {
@@ -134,13 +129,14 @@ public class GameAdminController {
 
   /** 查询所有真人游戏平台余额 */
   @GetMapping(value = "/selectGameAllBalance")
-  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.ADMIN, desc = "'查询会员游戏金额，id='+#memberInfo.id")
+  @Log(
+      module = ServiceName.ADMIN_SERVICE,
+      type = LogType.ADMIN,
+      desc = "'查询会员游戏金额，id='+#memberInfo.id")
   public Map<String, BigDecimal> selectGameAllBalance(MemberInfo memberInfo) {
     Member member = memberService.getById(memberInfo.getMemberId());
     Member memberAccount = memberService.getMemberAndFillGameAccount(member.getAccount());
-    if (memberAccount == null) {
-      throw new ServiceException("会员账号不存在");
-    }
+    Assert.isNull(memberAccount, "会员账号不存在");
     Map<String, BigDecimal> map = new HashMap<>();
     List<GamePlatform> gamePlatformList = gamePlatformService.queryByTransfer();
     if (!CollectionUtils.isEmpty(gamePlatformList)) {
@@ -163,7 +159,10 @@ public class GameAdminController {
 
   /** 回收金额 */
   @PostMapping(value = "/recyclingAmountByAccount")
-  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.ADMIN, desc = "'回收会员游戏金额，account='+#dto.account")
+  @Log(
+      module = ServiceName.ADMIN_SERVICE,
+      type = LogType.ADMIN,
+      desc = "'回收会员游戏金额，account='+#dto.account")
   public Map<String, Object> recyclingAmountByAccount(@RequestBody GameBalanceQueryDTO dto) {
     Map<String, Object> map = new HashMap();
     if (null == dto.getPlatform() || null == dto.getPlatform().get("platformCode")) {

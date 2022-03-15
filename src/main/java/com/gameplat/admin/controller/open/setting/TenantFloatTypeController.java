@@ -38,7 +38,7 @@ public class TenantFloatTypeController {
      * 新增游戏浮窗
      */
     @PutMapping("/insert")
-    @ApiOperation("游戏浮窗查询")
+    @ApiOperation("游戏浮窗新增")
     @CacheEvict(cacheNames = "TENANT_FLOAT_LIST",allEntries = true)
     public void add(@RequestBody TenantFloatSetting tenantFloatSetting) {
         tenantFloatTypeService.insertSysFloat(tenantFloatSetting);

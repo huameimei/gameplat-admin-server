@@ -150,8 +150,7 @@ public class MemberGrowthLevelServiceImpl
           Long currentGrowth = userRecord.getCurrentGrowth();
           if (newLevel < userRecord.getCurrentLevel()) {
             if(newLevel == 0){
-              currentGrowth =
-                      this.lambdaQuery().eq(MemberGrowthLevel::getLevel, 0).one().getGrowth();
+              currentGrowth = 0L;
             }else {
               currentGrowth =
                       this.lambdaQuery().eq(MemberGrowthLevel::getLevel, newLevel - 1).one().getGrowth();

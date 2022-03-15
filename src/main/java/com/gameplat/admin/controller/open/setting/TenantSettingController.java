@@ -7,9 +7,11 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.gameplat.admin.constant.Constants;
 import com.gameplat.admin.enums.TenantSettingEnum;
 import com.gameplat.admin.model.vo.TenantSettingVO;
+import com.gameplat.admin.service.SysTenantSettingService;
 import com.gameplat.admin.service.TenantSettingService;
 import com.gameplat.base.common.web.Result;
 import com.gameplat.model.entity.setting.TenantSetting;
+import com.gameplat.model.entity.sys.SysTenantSetting;
 import com.gameplat.security.SecurityUserHolder;
 import com.gameplat.security.context.UserCredential;
 import io.swagger.annotations.ApiOperation;
@@ -19,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Resource;
 import java.util.List;
 
 
@@ -34,6 +37,9 @@ public class TenantSettingController {
 
     @Autowired
     private TenantSettingService tenantSettingService;
+
+    @Resource
+    private SysTenantSettingService sysTenantSettingService;
 
     /**
      * 获取租户主题列表
@@ -171,6 +177,21 @@ public class TenantSettingController {
     @CacheEvict(cacheNames = Constants.TENANT_FLOAT_LIST,allEntries = true)
     public Result remove(Integer id) {
         tenantSettingService.deleteSysFloatById(id);
+        return Result.succeed();
+    }
+
+    /**
+     * 广场的开关开启/关闭
+     */
+    @RequestMapping("/updateSquareSwitch")
+    @CacheEvict(cacheNames = Constants.TENANT_SQUARE_SWITCH,allEntries = true)
+    public Result updateSquareSwitch(SysTenantSetting sysTenantSetting) {
+        sysTenantSetting.setSettingType(Constants.SYSTEM_SETTING);
+        sysTenantSetting.setSettingCode(Constants.SQUARE_SWITCH);
+        if (org.apache.commons.lang3.StringUtils.isEmpty(sysTenantSetting.getSettingValue())) {
+            return Result.failed("修改值不允许为空...");
+        }
+        sysTenantSettingService.updateTenantSettingValue(sysTenantSetting);
         return Result.succeed();
     }
 }

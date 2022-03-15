@@ -6,11 +6,14 @@ import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.mapper.SysTenantSettingMapper;
 import com.gameplat.admin.service.SysTenantSettingService;
+import com.gameplat.model.entity.game.GameKind;
 import com.gameplat.model.entity.sys.SysTenantSetting;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Date;
 
 /**
  * @author lily
@@ -40,6 +43,16 @@ public class SysTenantSettingServiceImpl
   @Override
   public SysTenantSetting getSportConfig() {
     return this.lambdaQuery().eq(SysTenantSetting::getSettingType, "sport_config").one();
+  }
+
+  @Override
+  public void updateTenantSettingValue(SysTenantSetting sysTenantSetting) {
+    LambdaUpdateWrapper<SysTenantSetting> updateWrapper = new LambdaUpdateWrapper<>();
+    updateWrapper.eq(SysTenantSetting::getSettingType, sysTenantSetting.getSettingType())
+            .eq(SysTenantSetting::getSettingCode, sysTenantSetting.getSettingCode())
+            .set(SysTenantSetting::getSettingValue,sysTenantSetting.getSettingValue())
+            .set(SysTenantSetting::getUpdateTime, new Date());
+     update(updateWrapper);
   }
 
   @Override

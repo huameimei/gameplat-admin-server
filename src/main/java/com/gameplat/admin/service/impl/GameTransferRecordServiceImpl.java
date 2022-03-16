@@ -16,15 +16,15 @@ import com.gameplat.admin.service.GameTransferRecordService;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.model.entity.game.GameTransferRecord;
 import com.google.common.collect.Lists;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
 
 @Slf4j
 @Service
@@ -106,5 +106,13 @@ public class GameTransferRecordServiceImpl
         StringUtils.isNotBlank(dto.getPlatformCode()), "platform_code", dto.getPlatformCode());
     queryWrapper.eq(StringUtils.isNotBlank(dto.getAccount()), "account", dto.getAccount());
     return gameTransferRecordMapper.selectCount(queryWrapper) > 0;
+  }
+
+  @Override
+  public List<GameTransferRecord> findPlatformCodeList(Long memberId) {
+    QueryWrapper<GameTransferRecord> queryWrapper = Wrappers.query();
+    queryWrapper.select("distinct platform_code");
+    queryWrapper.eq("member_id", memberId);
+    return gameTransferRecordMapper.selectList(queryWrapper);
   }
 }

@@ -89,10 +89,10 @@ public class GameBetRecordInfoServiceImpl implements GameBetRecordInfoService {
     public PageDtoVO<GameBetRecordVO> queryPageBetRecord(Page<GameBetRecordVO> page, GameBetRecordQueryDTO dto) {
         QueryBuilder builder = GameBetRecordSearchBuilder.buildBetRecordSearch(dto);
         SortBuilder<FieldSortBuilder> sortBuilder = SortBuilders.fieldSort(convertTimeType(dto.getTimeType())+ ".keyword").order(SortOrder.DESC);
-
         String indexName = ContextConstant.ES_INDEX.BET_RECORD_ + tenantConfig.getTenantCode();
+        //调用封装的分页 页码不用减1
         PageResponse<GameBetRecord> result = baseElasticsearchService.search(builder, indexName, GameBetRecord.class,
-                (int) page.getCurrent() - 1, (int) page.getSize(), sortBuilder);
+                (int) page.getCurrent(), (int) page.getSize(), sortBuilder);
 
     List<GameBetRecordVO> betRecordList = new ArrayList<>();
     if (CollectionUtils.isNotEmpty(result.getList())) {
@@ -100,6 +100,9 @@ public class GameBetRecordInfoServiceImpl implements GameBetRecordInfoService {
     }
     Page<GameBetRecordVO> resultPage = new Page<>();
     resultPage.setRecords(betRecordList);
+    resultPage.setTotal(result.getTotal());
+    resultPage.setCurrent(result.getPageNum());
+    resultPage.setSize(result.getPageSize());
 
         Map<String, Object> otherData = new HashMap<>(8);
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
@@ -156,12 +159,14 @@ public class GameBetRecordInfoServiceImpl implements GameBetRecordInfoService {
     GameApi gameApi = getGameApi(dto.getPlatformCode());
     GameBizBean gameBizBean = new GameBizBean();
     gameBizBean.setOrderNo(dto.getBillNo());
+    gameBizBean.setGameType(dto.getGameType());
+    gameBizBean.setPlatformCode(dto.getPlatformCode());
     gameBizBean.setConfig(gameConfigService.queryGameConfigInfoByPlatCode(dto.getPlatformCode()));
-    GameResult liveGameResult = gameApi.getGameResult(gameBizBean);
-    if (StringUtils.isBlank(liveGameResult.getData())) {
+    GameResult gameResult = gameApi.getGameResult(gameBizBean);
+    if (StringUtils.isBlank(gameResult.getData())) {
       throw new ServiceException(GamePlatformEnum.getName(dto.getPlatformCode()) + "暂不支持查看游戏结果");
     }
-    return liveGameResult;
+    return gameResult;
   }
 
   @Override

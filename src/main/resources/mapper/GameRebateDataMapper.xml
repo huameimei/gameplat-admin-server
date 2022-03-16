@@ -22,33 +22,6 @@
     <result property="name" column="name"/>
   </resultMap>
 
-
-  <select id="queryBetRecordList" resultMap="liveRebateDataVO">
-    SELECT tb.name,ta.account,ta.platform_code,ta.bet_amount,ta.valid_amount,ta.win_amount,ta.stat_time
-    from live_rebate_data ta
-    LEFT JOIN game_kind tb
-    on ta.platform_code = tb.platform_code and ta.game_kind = tb.code
-    WHERE 1 = 1
-    <if test="account != null">
-      AND ta.account = #{account}
-    </if>
-    and ta.user_paths LIKE contat(#{user_paths},'%')
-    AND ta.platform_code IN
-    <foreach collection="liveCodeList" item="item" open="(" separator="," close=")">
-      #{item}
-    </foreach>
-    AND ta.game_kind IN
-    <foreach collection="gameKindList" item="item" open="(" separator="," close=")">
-      #{item}
-    </foreach>
-    <if test="betStartDate != null">
-      AND ta.stat_time &gt;= STR_TO_DATE(#{betStartDate}, '%Y-%m-%d')
-    </if>
-    <if test="betEndDate != null">
-      AND ta.stat_time &lt;= STR_TO_DATE(#{betEndDate}, '%Y-%m-%d')
-    </if>
-  </select>
-
   <select id="queryGameReport" resultType="com.gameplat.admin.model.vo.GameReportVO"
     parameterType="com.gameplat.admin.model.dto.GameRebateDataQueryDTO">
     SELECT s1.betAmount,
@@ -69,18 +42,18 @@
     dr.platform_code
     FROM
     game_rebate_data dr where 1=1
-    <if test="betStartDate != null">
+    <if test="beginTime != null">
       <![CDATA[
-         and dr.stat_time >= #{betStartDate}
+         and dr.stat_time >= #{beginTime}
        ]]>
     </if>
-    <if test="betEndDate != null">
+    <if test="endTime != null">
       <![CDATA[
-         and dr.stat_time <= #{betEndDate}
+         and dr.stat_time <= #{endTime}
        ]]>
     </if>
-    <if test="user_paths != null and user_paths != ''">
-      and dr.user_paths like #{user_paths}
+    <if test="userPaths != null and userPaths != ''">
+      and dr.user_paths like #{userPaths}
     </if>
     <if test="account != null and account != ''">
       and dr.account like #{account}
@@ -88,21 +61,21 @@
     GROUP BY dr.platform_code) s1 left Join (
     SELECT
     sum(rr.real_rebate_money) rebateMoney,
-    rr.game_code
+    rr.platform_code
     FROM
     game_rebate_report rr where 1=1
-    <if test="betStartDate != null">
+    <if test="beginTime != null">
       <![CDATA[
-         and rr.stat_time >= #{betStartDate}
+         and rr.stat_time >= #{beginTime}
       ]]>
     </if>
-    <if test="betEndDate != null">
+    <if test="endTime != null">
       <![CDATA[
-         and rr.stat_time <= #{betEndDate}
+         and rr.stat_time <= #{endTime}
       ]]>
     </if>
-    <if test="user_paths != null and user_paths != ''">
-      and rr.user_paths like #{user_paths}
+    <if test="userPaths != null and userPaths != ''">
+      and rr.user_paths like #{userPaths}
     </if>
     <if test="account != null and account != ''">
       and rr.account like #{account}

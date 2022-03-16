@@ -98,5 +98,4 @@ public class GameKindServiceImpl extends ServiceImpl<GameKindMapper, GameKind>
         return gameKindMapper.getByCode(code);
     }
 
-
 }

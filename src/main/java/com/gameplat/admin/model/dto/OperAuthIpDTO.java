@@ -30,10 +30,10 @@ public class OperAuthIpDTO {
   @NotEmpty(
       message = "IP地址不能为空",
       groups = {Groups.INSERT.class, Groups.UPDATE.class})
-//  @Pattern(
-//      regexp = Patterns.REGEX_IP_ADDRESS,
-//      groups = {Groups.INSERT.class, Groups.UPDATE.class},
-//      message = "IP地址格式不正确")
+  @Pattern(
+      regexp = Patterns.REGEX_IP_ADDRESS,
+      groups = {Groups.INSERT.class, Groups.UPDATE.class},
+      message = "IP地址格式不正确")
   private String ip;
 
   private String remark;

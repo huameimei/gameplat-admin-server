@@ -23,4 +23,6 @@ public interface GameAdminService {
       throws Exception;
 
   void confiscated(String transferIn, BigDecimal amount, Member member) throws Exception;
+
+  void reclaimLiveAmount(String username);
 }

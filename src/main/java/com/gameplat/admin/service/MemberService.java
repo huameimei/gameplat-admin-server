@@ -4,10 +4,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.gameplat.admin.model.dto.*;
-import com.gameplat.admin.model.vo.MemberInfoVO;
-import com.gameplat.admin.model.vo.MemberLevelVO;
-import com.gameplat.admin.model.vo.MemberVO;
-import com.gameplat.admin.model.vo.MessageDistributeVO;
+import com.gameplat.admin.model.vo.*;
 import com.gameplat.model.entity.member.Member;
 
 import java.util.List;
@@ -24,6 +21,8 @@ public interface MemberService extends IService<Member> {
   IPage<MemberVO> queryPage(Page<Member> page, MemberQueryDTO dto);
 
   IPage<MessageDistributeVO> pageMessageDistribute(Page<Member> page, MemberQueryDTO dto);
+
+  IPage<MemberBalanceVO> findTGMemberBalance(Page<Member> page, MemberQueryDTO dto);
 
   List<MemberVO> queryList(MemberQueryDTO dto);
 
@@ -144,4 +143,11 @@ public interface MemberService extends IService<Member> {
   List<Map<String, String>> getRebateForEdit(String agentAccount);
 
   void updateDaySalary(String ids,Integer state);
+
+  /**
+   * 清除推广会员余额
+   * @param dto
+   */
+  void updateTGClearMember(CleanAccountDTO dto);
+
 }

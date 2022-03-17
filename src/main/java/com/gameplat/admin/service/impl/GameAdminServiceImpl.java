@@ -1,7 +1,11 @@
 package com.gameplat.admin.service.impl;
 
+import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.ObjectUtil;
+import com.gameplat.admin.model.dto.GameBizDTO;
 import com.gameplat.admin.model.dto.OperGameTransferRecordDTO;
+import com.gameplat.admin.model.vo.GameRecycleVO;
 import com.gameplat.admin.service.*;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.DateUtil;
@@ -14,12 +18,19 @@ import com.gameplat.common.game.exception.GameNoRollbackTransferException;
 import com.gameplat.common.game.exception.GameRollbackException;
 import com.gameplat.common.util.CNYUtils;
 import com.gameplat.model.entity.game.GameAmountControl;
+import com.gameplat.model.entity.game.GameKind;
+import com.gameplat.model.entity.game.GamePlatform;
 import com.gameplat.model.entity.game.GameTransferRecord;
 import com.gameplat.model.entity.member.Member;
 import com.gameplat.model.entity.member.MemberBill;
 import com.gameplat.model.entity.member.MemberInfo;
 import com.gameplat.model.entity.message.Message;
+import com.gameplat.redis.api.RedisService;
+import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.scheduling.annotation.Async;
@@ -27,10 +38,18 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-
+import org.springframework.util.StopWatch;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -434,7 +453,7 @@ public class GameAdminServiceImpl implements GameAdminService {
     BigDecimal balance = gameApi.getBalance(gameBizBean);
     // 自动转动实际上回收的是在第三方游戏的所有余额
     if (transferType) {
-      amount = balance;
+      amount = amount.add(balance);
       if(balance.compareTo(BigDecimal.ZERO) < 0) {
         log.info(transferIn + "真人余额不足,不能转出" + balance);
         return;
@@ -548,4 +567,135 @@ public class GameAdminServiceImpl implements GameAdminService {
       log.error("真人插入数据:订单号=" + transferRecord.getOrderNo(), e);
     }
   }
+
+  @Resource private RedisService redisService;
+
+  @Resource private GamePlatformService gamePlatformService;
+
+  /**
+   * 一键回收余额
+   * @param username 用户名
+   */
+  @Override
+  public void reclaimLiveAmount(String username) {
+    Member member = memberService.getByAccount(username).orElseThrow(()-> new ServiceException("用户不存在！"));
+    List<GameTransferRecord> recordList =
+            gameTransferRecordService.findPlatformCodeList(member.getId());
+    List<String> platformList = new ArrayList<>();
+    recordList.forEach(item -> platformList.add(item.getPlatformCode()));
+    List<com.gameplat.model.entity.game.GamePlatform> gamePlatformList = gamePlatformService.list();
+    // 仅获取当前会员玩过得游戏
+    List<com.gameplat.model.entity.game.GamePlatform> playedPlatformList =
+            gamePlatformList.stream()
+                    .filter(item -> platformList.contains(item.getCode()))
+                    .collect(Collectors.toList());
+    if (CollectionUtils.isEmpty(playedPlatformList)) {
+      return;
+    }
+    String key = "user_game_balance_" + member.getId();
+    try {
+      redisService.getStringOps().setEx(key, "user_game_balance", 300, TimeUnit.SECONDS);
+    } catch (Exception e) {
+      log.error("{}一键回收游戏平台额度操作频繁", username);
+      throw new ServiceException("一键回收游戏平台额度操作频繁");
+    }
+    List<GameRecycleVO> resultList = new ArrayList<>();
+    try {
+      StopWatch stopwatch = new StopWatch();
+      stopwatch.start();
+      // 每10个切分成一个list去请求
+      List<List<com.gameplat.model.entity.game.GamePlatform>> allList = Lists.partition(playedPlatformList, 10);
+      for (List<com.gameplat.model.entity.game.GamePlatform> partList : allList) {
+        int size = partList.size();
+        CompletableFuture<GameRecycleVO>[] arrays = new CompletableFuture[size];
+        for (int i = 0; i < size; i++) {
+          GamePlatform item = partList.get(i);
+          CompletableFuture<GameRecycleVO> completableFuture =
+                  CompletableFuture.supplyAsync(
+                          () -> {
+                            GameBizDTO gameBizDTO = new GameBizDTO();
+                            gameBizDTO.setPlatformCode(item.getCode());
+                            gameBizDTO.setAmount(null);
+                            gameBizDTO.setIsWeb(false);
+                            gameBizDTO.setTransferType(true);
+                            gameBizDTO.setTransferIn(item.getCode());
+                            gameBizDTO.setGameAccount(member.getGameAccount());
+
+                            GameRecycleVO gameRecycleVO = new GameRecycleVO();
+                            // 获取真人信息
+                            gameRecycleVO.setPlatfromCode(item.getCode());
+                            gameRecycleVO.setPlatformName(item.getName());
+                            gameRecycleVO.setStatus(0); // 默认成功
+                            // 查看是否在维护
+                            String fixMsg = checkTransferMainTime(gameBizDTO.getPlatformCode());
+                            if (StringUtils.isNotEmpty(fixMsg)) {
+                              gameRecycleVO.setErrorMsg(fixMsg + "转账通道维护中");
+                              gameRecycleVO.setStatus(1);
+                              return gameRecycleVO;
+                            }
+                            try {
+                              transferIn(item.getCode(),Convert.toBigDecimal(0), member,false,true);
+                            } catch (Exception e) {
+                              log.error("回收失败：{}", e.getMessage());
+                              gameRecycleVO.setStatus(1);
+                              gameRecycleVO.setErrorMsg(e.getMessage());
+                            }
+                            return gameRecycleVO;
+                          });
+          arrays[i] = completableFuture;
+        }
+        // 等待10次异步请求结果
+        CompletableFuture.allOf(arrays).join();
+        Arrays.stream(arrays)
+                .forEach(
+                        item -> {
+                          try {
+                            resultList.add(item.get());
+                          } catch (InterruptedException | ExecutionException e) {
+                            e.printStackTrace();
+                          }
+                        });
+      }
+      stopwatch.stop();
+    } finally {
+      redisService.getKeyOps().delete(key);
+    }
+  }
+
+
+  @Autowired
+  private GameKindService gameKindService;
+
+
+  /**
+   * 检查真人转账时间
+   *
+   * @param platformCode
+   */
+  private String checkTransferMainTime(String platformCode) {
+    Date newDate = new Date();
+    GamePlatform gamePlatform = gamePlatformService.queryByCode(platformCode);
+    List<GameKind> gameKindList = gameKindService.queryGameKindListByPlatformCode(platformCode);
+    if (ObjectUtil.isNull(gamePlatform) || CollectionUtil.isEmpty(gameKindList)) {
+      return null;
+    }
+    AtomicBoolean isFix = new AtomicBoolean(false);
+    String fixMsg = "通道正在维护中,请耐心等待！";
+    gameKindList.forEach(
+            gameKind -> {
+              // 如果维护时间有开始和结束
+              if (gamePlatform.getCode().equals(gameKind.getPlatformCode())) {
+                Date maintenanceTimeStart = gameKind.getMaintenanceTimeStart();
+                Date maintenanceTimeEnd = gameKind.getMaintenanceTimeEnd();
+                if (ObjectUtils.isNotEmpty(maintenanceTimeStart)
+                        && ObjectUtils.isNotEmpty(maintenanceTimeEnd)
+                        && DateUtil.dateCompareByYmdhms(
+                        newDate, maintenanceTimeStart, maintenanceTimeEnd)) {
+                  isFix.set(true);
+                }
+              }
+            });
+    return isFix.get() ? fixMsg : null;
+  }
+
 }

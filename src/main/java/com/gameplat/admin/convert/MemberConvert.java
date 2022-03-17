@@ -3,6 +3,7 @@ package com.gameplat.admin.convert;
 import com.gameplat.admin.model.dto.MemberAddDTO;
 import com.gameplat.admin.model.dto.MemberContactUpdateDTO;
 import com.gameplat.admin.model.dto.MemberEditDTO;
+import com.gameplat.admin.model.vo.MemberBalanceVO;
 import com.gameplat.admin.model.vo.MemberVO;
 import com.gameplat.admin.model.vo.MessageDistributeVO;
 import com.gameplat.model.entity.member.Member;
@@ -27,4 +28,6 @@ public interface MemberConvert {
     @Mapping(source = "userLevel", target = "rechargeLevel")
   })
   MessageDistributeVO toVo(MemberVO vo);
+
+  MemberBalanceVO toBalanceVo(MemberVO vo);
 }

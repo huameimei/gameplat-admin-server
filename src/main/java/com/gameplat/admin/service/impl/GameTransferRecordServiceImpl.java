@@ -21,8 +21,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -106,5 +106,13 @@ public class GameTransferRecordServiceImpl
         StringUtils.isNotBlank(dto.getPlatformCode()), "platform_code", dto.getPlatformCode());
     queryWrapper.eq(StringUtils.isNotBlank(dto.getAccount()), "account", dto.getAccount());
     return gameTransferRecordMapper.selectCount(queryWrapper) > 0;
+  }
+
+  @Override
+  public List<GameTransferRecord> findPlatformCodeList(Long memberId) {
+    QueryWrapper<GameTransferRecord> queryWrapper = Wrappers.query();
+    queryWrapper.select("distinct platform_code");
+    queryWrapper.eq("member_id", memberId);
+    return gameTransferRecordMapper.selectList(queryWrapper);
   }
 }

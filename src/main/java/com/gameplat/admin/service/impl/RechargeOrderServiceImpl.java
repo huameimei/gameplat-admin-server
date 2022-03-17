@@ -109,6 +109,18 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
 
 
 
+  /**充值会员、代理 */
+  private final String RECH_FORMAL_TYPE = "M";
+
+  /**查询会员类型 */
+  private final String RECH_FORMAL_TYPE_QUERY = "M,A";
+
+  /**充值推广 */
+  private final String RECH_TEST_TYPE = "P";
+
+
+
+
 
   @Override
   public PageExt<RechargeOrderVO, SummaryVO> findPage(
@@ -139,10 +151,10 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
         .le(ObjectUtils.isNotEmpty(dto.getAmountTo()), RechargeOrder::getAmount, dto.getAmountTo())
         .eq(ObjectUtils.isNotEmpty(dto.getAccount()), RechargeOrder::getAccount, dto.getAccount())
         .in(
-            ObjectUtils.isNotEmpty(dto.getMemberType()) && dto.getMemberType().equalsIgnoreCase(SysUserEnums.UserType.RECH_FORMAL_TYPE.value()),
+            ObjectUtils.isNotEmpty(dto.getMemberType()) && dto.getMemberType().equalsIgnoreCase(RECH_FORMAL_TYPE),
             RechargeOrder::getMemberType,
-                SysUserEnums.UserType.RECH_FORMAL_TYPE_QUERY.value().split(","))
-         .eq(ObjectUtils.isNotEmpty(dto.getMemberType()) && dto.getMemberType().equalsIgnoreCase(SysUserEnums.UserType.RECH_TEST_TYPE.value()),
+                RECH_FORMAL_TYPE_QUERY.split(","))
+         .eq(ObjectUtils.isNotEmpty(dto.getMemberType()) && dto.getMemberType().equalsIgnoreCase(RECH_TEST_TYPE),
                  RechargeOrder::getMemberType,dto.getMemberType())
         .eq(ObjectUtils.isNotEmpty(dto.getOrderNo()), RechargeOrder::getOrderNo, dto.getOrderNo())
         .eq(
@@ -727,10 +739,10 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
     queryHandle
         .eq(RechargeOrder::getStatus, RechargeStatus.HANDLED.getValue())
         .in(ObjectUtils.isNotNull(dto.getModeList()), RechargeOrder::getMode, dto.getModeList())
-        .in(ObjectUtils.isNotEmpty(dto.getMemberType()) && dto.getMemberType().equalsIgnoreCase(SysUserEnums.UserType.RECH_FORMAL_TYPE.value()),
+        .in(ObjectUtils.isNotEmpty(dto.getMemberType()) && dto.getMemberType().equalsIgnoreCase(RECH_FORMAL_TYPE),
                 RechargeOrder::getMemberType,
-                SysUserEnums.UserType.RECH_FORMAL_TYPE_QUERY.value().split(","))
-        .eq(ObjectUtils.isNotEmpty(dto.getMemberType()) && dto.getMemberType().equalsIgnoreCase(SysUserEnums.UserType.RECH_TEST_TYPE.value()),
+                RECH_FORMAL_TYPE_QUERY.split(","))
+        .eq(ObjectUtils.isNotEmpty(dto.getMemberType()) && dto.getMemberType().equalsIgnoreCase(RECH_TEST_TYPE),
                 RechargeOrder::getMemberType,dto.getMemberType())
         .in(
             ObjectUtils.isNotNull(dto.getMemberLevelList()),

@@ -4,26 +4,26 @@
 <mapper namespace="com.gameplat.admin.mapper.GameRebateDataMapper">
 
   <resultMap id="liveRebateDataVO" type="com.gameplat.admin.model.vo.GameRebateDataVO">
-    <result property="id" column="id"/>
-    <result property="memberId" column="member_id"/>
-    <result property="account" column="account"/>
-    <result property="realName" column="real_name"/>
-    <result property="userPaths" column="user_paths"/>
-    <result property="platformCode" column="platform_code"/>
-    <result property="gameKind" column="game_kind"/>
-    <result property="statTime" column="stat_time"/>
-    <result property="createTime" column="create_time"/>
-    <result property="betAmount" column="bet_amount"/>
-    <result property="validAmount" column="valid_amount"/>
-    <result property="winAmount" column="win_amount"/>
-    <result property="betCount" column="bet_count"/>
-    <result property="winCount" column="win_count"/>
-    <result property="gameType" column="game_type"/>
-    <result property="name" column="name"/>
+    <result column="id" property="id"/>
+    <result column="member_id" property="memberId"/>
+    <result column="account" property="account"/>
+    <result column="real_name" property="realName"/>
+    <result column="user_paths" property="userPaths"/>
+    <result column="platform_code" property="platformCode"/>
+    <result column="game_kind" property="gameKind"/>
+    <result column="stat_time" property="statTime"/>
+    <result column="create_time" property="createTime"/>
+    <result column="bet_amount" property="betAmount"/>
+    <result column="valid_amount" property="validAmount"/>
+    <result column="win_amount" property="winAmount"/>
+    <result column="bet_count" property="betCount"/>
+    <result column="win_count" property="winCount"/>
+    <result column="game_type" property="gameType"/>
+    <result column="name" property="name"/>
   </resultMap>
 
-  <select id="queryGameReport" resultType="com.gameplat.admin.model.vo.GameReportVO"
-    parameterType="com.gameplat.admin.model.dto.GameRebateDataQueryDTO">
+  <select id="queryGameReport" parameterType="com.gameplat.admin.model.dto.GameRebateDataQueryDTO"
+    resultType="com.gameplat.admin.model.vo.GameReportVO">
     SELECT s1.betAmount,
     s1.validAmount,
     s1.gameCount,
@@ -41,15 +41,15 @@
     count(DISTINCT dr.account) userNumber,
     dr.platform_code
     FROM
-    game_rebate_data dr where 1=1
+    game_bet_daily_report dr where 1=1
     <if test="beginTime != null">
       <![CDATA[
-         and dr.stat_time >= #{beginTime}
+         and dr.stat_time >= STR_TO_DATE(#{beginTime},'%Y-%m-%d')
        ]]>
     </if>
     <if test="endTime != null">
       <![CDATA[
-         and dr.stat_time <= #{endTime}
+         and dr.stat_time <= STR_TO_DATE(#{endTime},'%Y-%m-%d')
        ]]>
     </if>
     <if test="userPaths != null and userPaths != ''">
@@ -66,12 +66,12 @@
     game_rebate_report rr where 1=1
     <if test="beginTime != null">
       <![CDATA[
-         and rr.stat_time >= #{beginTime}
+         and rr.stat_time >=  STR_TO_DATE(#{beginTime},'%Y-%m-%d')
       ]]>
     </if>
     <if test="endTime != null">
       <![CDATA[
-         and rr.stat_time <= #{endTime}
+         and rr.stat_time <= STR_TO_DATE(#{endTime},'%Y-%m-%d')
       ]]>
     </if>
     <if test="userPaths != null and userPaths != ''">

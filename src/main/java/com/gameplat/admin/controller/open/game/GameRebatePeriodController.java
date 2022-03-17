@@ -100,7 +100,7 @@ public class GameRebatePeriodController {
   @PostMapping(value = "batchAccept")
   public void accept(@RequestBody OperGameRebatePeriodDTO dto) {
     GameRebatePeriod rebatePeriod = gameRebatePeriodService.getById(dto.getId());
-    Assert.isNull(rebatePeriod, "游戏返水期号不存在");
+    Assert.notNull(rebatePeriod, "游戏返水期号不存在");
     if (rebatePeriod.getStatus() != GameRebatePeriodStatus.SETTLED.getValue()) {
       throw new ServiceException("期号状态不是结算状态,不能进入派发操作");
     }

@@ -36,4 +36,10 @@ public class MemberWealRewordDTO implements Serializable {
 
   @ApiModelProperty("vip等级")
   private Integer vipLevel;
+
+  @ApiModelProperty(value = "代理账号")
+  private String superAccount;
+
+  @ApiModelProperty(value = "是否只查询直属下级 0否1是")
+  private String flag;
 }

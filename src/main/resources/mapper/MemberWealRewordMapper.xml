@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gameplat.admin.mapper.MemberWealRewordMapper">
+
+    <select id="findMemberWealData" resultType="com.gameplat.admin.model.vo.MemberWealRewordVO">
+        select
+        user_name userName,
+        ifnull(sum(reword_amount),0) rewordAmount,
+        `type`
+        from
+        member_weal_reword
+        where
+        draw_time between #{startTime} and #{endTime}
+        <if test="userName != null and userName != ''" >
+            and user_name = #{userName}
+        </if>
+        <if test="status != null" >
+            and status = #{status}
+        </if>
+        GROUP BY `type`
+    </select>
+
+    <select id="findMemberWealRewordTotal" resultType="com.gameplat.admin.model.vo.TotalMemberWealRewordVO">
+        select
+        ifnull(sum(reword_amount),0) totalUpRewardAmount
+        from
+        member_weal_reword
+        where
+        draw_time between #{startTime} and #{endTime}
+        and status = 2 and `type` = 0
+        <if test="userName != null and userName != ''" >
+            and user_name = #{userName}
+        </if>
+        <if test="superAccount != null and superAccount != null">
+            <choose>
+                <when test="flag != null and flag == 1">
+                    AND parent_name = #{superAccount}
+                </when>
+                <otherwise>
+                    AND agent_path like concat('%',#{superAccount},'%')
+                </otherwise>
+            </choose>
+        </if>
+        UNION ALL
+        select
+        ifnull(sum(reword_amount),0) totalWeekWageAmount
+        from
+        member_weal_reword
+        where
+        draw_time between #{startTime} and #{endTime}
+        and status = 2 and `type` = 1
+        <if test="userName != null and userName != ''" >
+            and user_name = #{userName}
+        </if>
+        <if test="superAccount != null and superAccount != null">
+            <choose>
+                <when test="flag != null and flag == 1">
+                    AND parent_name = #{superAccount}
+                </when>
+                <otherwise>
+                    AND agent_path like concat('%',#{superAccount},'%')
+                </otherwise>
+            </choose>
+        </if>
+        UNION ALL
+        select
+        ifnull(sum(reword_amount),0) totalMonthWageAmount
+        from
+        member_weal_reword
+        where
+        draw_time between #{startTime} and #{endTime}
+        and status = 2 and `type` = 2
+        <if test="userName != null and userName != ''" >
+            and user_name = #{userName}
+        </if>
+        <if test="superAccount != null and superAccount != null">
+            <choose>
+                <when test="flag != null and flag == 1">
+                    AND parent_name = #{superAccount}
+                </when>
+                <otherwise>
+                    AND agent_path like concat('%',#{superAccount},'%')
+                </otherwise>
+            </choose>
+        </if>
+        UNION ALL
+        select
+        ifnull(sum(reword_amount),0) totalBirthGiftMoneyAmount
+        from
+        member_weal_reword
+        where
+        draw_time between #{startTime} and #{endTime}
+        and status = 2 and `type` = 3
+        <if test="userName != null and userName != ''" >
+            and user_name = #{userName}
+        </if>
+        <if test="superAccount != null and superAccount != null">
+            <choose>
+                <when test="flag != null and flag == 1">
+                    AND parent_name = #{superAccount}
+                </when>
+                <otherwise>
+                    AND agent_path like concat('%',#{superAccount},'%')
+                </otherwise>
+            </choose>
+        </if>
+        UNION ALL
+        select
+        ifnull(sum(reword_amount),0) totalMonthRedEnvelopeAmount
+        from
+        member_weal_reword
+        where
+        draw_time between #{startTime} and #{endTime}
+        and status = 2 and `type` = 4
+        <if test="userName != null and userName != ''" >
+            and user_name = #{userName}
+        </if>
+        <if test="superAccount != null and superAccount != null">
+            <choose>
+                <when test="flag != null and flag == 1">
+                    AND parent_name = #{superAccount}
+                </when>
+                <otherwise>
+                    AND agent_path like concat('%',#{superAccount},'%')
+                </otherwise>
+            </choose>
+        </if>
+    </select>
+
+</mapper>

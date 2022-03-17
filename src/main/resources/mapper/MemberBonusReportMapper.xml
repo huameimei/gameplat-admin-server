@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gameplat.admin.mapper.MemberBonusReportMapper">
+
+    <select id="findMemberBonusReportPage" resultType="com.gameplat.admin.model.vo.MemberBonusReportVO">
+        select
+        user_name userName,
+        ifnull(sum(discount_amount + jackpot_amount),0) rechargeDiscountsAmount,
+        ifnull(sum(vip_reword_amount),0) vipRewordAmount,
+        ifnull(sum(activity_amount),0) activityBonusAmount,
+        ifnull(sum(chat_amount),0) chatRedEnvelopeAmount
+        from
+        member_day_report
+        where
+        count_date between #{startTime} and #{endTime}
+        <if test="dto.userName != null and dto.userName != ''" >
+            and user_name = #{dto.userName}
+        </if>
+        <if test="dto.superAccount != null and dto.superAccount != null">
+            <choose>
+                <when test="dto.flag != null and dto.flag == 1">
+                    AND parent_name = #{dto.superAccount}
+                </when>
+                <otherwise>
+                    AND agent_path like concat('%',#{dto.superAccount},'%')
+                </otherwise>
+            </choose>
+        </if>
+        GROUP BY user_name
+    </select>
+
+    <select id="findMemberBonusReportTotal" resultType="com.gameplat.admin.model.vo.TotalMemberBonusReportVO">
+        select
+        ifnull(sum(discount_amount + jackpot_amount),0) totalRechargeDiscountsAmount,
+        ifnull(sum(activity_amount),0) totalActivityBonusAmount,
+        ifnull(sum(chat_amount),0) totalChatRedEnvelopeAmount
+        from
+        member_day_report
+        where
+        count_date between #{startTime} and #{endTime}
+        <if test="userName != null and userName != ''" >
+            and user_name = #{userName}
+        </if>
+        <if test="superAccount != null and superAccount != null">
+            <choose>
+                <when test="flag != null and flag == 1">
+                    AND parent_name = #{superAccount}
+                </when>
+                <otherwise>
+                    AND agent_path like concat('%',#{superAccount},'%')
+                </otherwise>
+            </choose>
+        </if>
+    </select>
+
+    <select id="findMemberBonusReportList" resultType="com.gameplat.admin.model.vo.MemberBonusReportVO">
+        select
+        user_name userName,
+        ifnull(sum(discount_amount + jackpot_amount),0) rechargeDiscountsAmount,
+        ifnull(sum(vip_reword_amount),0) vipRewordAmount,
+        ifnull(sum(activity_amount),0) activityBonusAmount,
+        ifnull(sum(chat_amount),0) chatRedEnvelopeAmount
+        from
+        member_day_report
+        where
+        count_date between #{startTime} and #{endTime}
+        <if test="userName != null and userName != ''" >
+            and user_name = #{userName}
+        </if>
+        <if test="superAccount != null and superAccount != null">
+            <choose>
+                <when test="flag != null and flag == 1">
+                    AND parent_name = #{superAccount}
+                </when>
+                <otherwise>
+                    AND agent_path like concat('%',#{superAccount},'%')
+                </otherwise>
+            </choose>
+        </if>
+        GROUP BY user_name
+    </select>
+
+</mapper>

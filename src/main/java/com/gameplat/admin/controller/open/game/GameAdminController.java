@@ -63,7 +63,7 @@ public class GameAdminController {
     GameBalanceVO gameBalanceVO = new GameBalanceVO();
     gameBalanceVO.setPlatformCode(dto.getPlatform().get("platformCode"));
     Member member = memberService.getMemberAndFillGameAccount(dto.getAccount());
-    Assert.isNull(member, "会员账号不存在");
+    Assert.notNull(member, "会员账号不存在");
     gameBalanceVO.setBalance(
         gameAdminService.getBalance(dto.getPlatform().get("platformCode"), member));
     return gameBalanceVO;
@@ -76,7 +76,7 @@ public class GameAdminController {
     try {
       redisService.getStringOps().setEx(key, "game_transfer", 3, TimeUnit.MINUTES);
       Member member = memberService.getMemberAndFillGameAccount(record.getAccount());
-      Assert.isNull(member, "会员账号不存在");
+      Assert.notNull(member, "会员账号不存在");
       gameAdminService.transferOut(record.getPlatformCode(), record.getAmount(), member, false);
     } finally {
       redisService.getKeyOps().delete(key);
@@ -119,7 +119,7 @@ public class GameAdminController {
   public Map<String, String> confiscated(@RequestBody GameBalanceQueryDTO dto) throws Exception {
     Map<String, String> map = new HashMap();
     Member member = memberService.getMemberAndFillGameAccount(dto.getAccount());
-    Assert.isNull(member, "会员账号不存在");
+    Assert.notNull(member, "会员账号不存在");
     dto.getPlatform()
         .forEach(
             (key, value) -> {
@@ -149,7 +149,7 @@ public class GameAdminController {
   public Map<String, BigDecimal> selectGameAllBalance(MemberInfo memberInfo) {
     Member member = memberService.getById(memberInfo.getMemberId());
     Member memberAccount = memberService.getMemberAndFillGameAccount(member.getAccount());
-    Assert.isNull(memberAccount, "会员账号不存在");
+    Assert.notNull(memberAccount, "会员账号不存在");
     Map<String, BigDecimal> map = new HashMap<>();
     List<GamePlatform> gamePlatformList = gamePlatformService.queryByTransfer();
     if (!CollectionUtils.isEmpty(gamePlatformList)) {

@@ -241,6 +241,7 @@ public class MemberController {
 
   //返回推广会员
   @GetMapping("findTGMemberBalance")
+  @ApiOperation("返回推广会员")
   public IPage<MemberBalanceVO> findTGMemberBalance(PageDTO<Member> page, MemberQueryDTO dto) {
       dto.setUserType("P");
       return memberService.findTGMemberBalance(page, dto);
@@ -251,8 +252,10 @@ public class MemberController {
    *
    * @param dto 推广会员账号
   */
+  @ApiOperation("清除推广会员余额")
   @PostMapping("findTGMemberBalance")
   @PreAuthorize("hasAuthority('system:TGMember:clear')")
+  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.MEMBER, desc = "清除推广会员#{dto.userNames}余额")
   public void updateTGClearMember(@RequestBody CleanAccountDTO dto) {
       Assert.notNull(dto.getIsCleanAll(), "是否清理全部不能为空！");
       Assert.notNull(dto.getUserType(), "会员类型不能为空！");

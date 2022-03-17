@@ -17,5 +17,5 @@ public interface GameTransferRecordService extends IService<GameTransferRecord> 
 
   boolean findTransferRecordCount(GameTransferRecord dto);
 
-  List<GameTransferRecord> findPlatformCodeList(Long memberId);
+  List<GameTransferRecord> findPlatformCodeList(Long id);
 }

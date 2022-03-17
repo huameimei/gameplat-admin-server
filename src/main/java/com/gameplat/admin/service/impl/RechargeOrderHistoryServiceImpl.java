@@ -8,13 +8,11 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.convert.RechargeOrderHistoryConvert;
-import com.gameplat.admin.enums.SysUserEnums;
 import com.gameplat.admin.mapper.RechargeOrderHistoryMapper;
 import com.gameplat.admin.model.dto.RechargeOrderHistoryQueryDTO;
 import com.gameplat.admin.model.vo.RechargeHistorySummaryVO;
 import com.gameplat.admin.model.vo.RechargeOrderHistoryVO;
 import com.gameplat.admin.service.RechargeOrderHistoryService;
-import com.gameplat.model.entity.recharge.RechargeOrder;
 import com.gameplat.model.entity.recharge.RechargeOrderHistory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -30,6 +28,16 @@ public class RechargeOrderHistoryServiceImpl
   @Autowired private RechargeOrderHistoryConvert rechargeOrderHistoryConvert;
 
   @Autowired(required = false) private RechargeOrderHistoryMapper rechargeOrderHistoryMapper;
+
+
+
+  private final String RECH_TEST_TYPE = "P";
+
+  private final String RECH_FORMAL_TYPE_QUERY = "M,A";
+
+
+  /**充值会员、代理 */
+  private final String RECH_FORMAL_TYPE = "M";
 
   @Override
   public IPage<RechargeOrderHistoryVO> findPage(
@@ -94,10 +102,10 @@ public class RechargeOrderHistoryServiceImpl
             ObjectUtils.isNotEmpty(dto.getMemberType()),
             RechargeOrderHistory::getMemberType,
             dto.getMemberType())*/
-            .in(ObjectUtils.isNotEmpty(dto.getMemberType()) && dto.getMemberType().equalsIgnoreCase(SysUserEnums.UserType.RECH_FORMAL_TYPE.value()),
+            .in(ObjectUtils.isNotEmpty(dto.getMemberType()) && dto.getMemberType().equalsIgnoreCase(RECH_FORMAL_TYPE),
                     RechargeOrderHistory::getMemberType,
-                    SysUserEnums.UserType.RECH_FORMAL_TYPE_QUERY.value().split(","))
-            .eq(ObjectUtils.isNotEmpty(dto.getMemberType()) && dto.getMemberType().equalsIgnoreCase(SysUserEnums.UserType.RECH_TEST_TYPE.value()),
+                    RECH_FORMAL_TYPE_QUERY.split(","))
+            .eq(ObjectUtils.isNotEmpty(dto.getMemberType()) && dto.getMemberType().equalsIgnoreCase(RECH_TEST_TYPE),
                     RechargeOrderHistory::getMemberType,dto.getMemberType())
 
 

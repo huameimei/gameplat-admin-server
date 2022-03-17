@@ -1,8 +1,8 @@
 package com.gameplat.admin.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.gameplat.admin.model.dto.CleanAccountDTO;
 import com.gameplat.model.entity.member.MemberInfo;
-import org.apache.ibatis.annotations.Param;
 
 import java.math.BigDecimal;
 
@@ -48,4 +48,6 @@ public interface MemberInfoService extends IService<MemberInfo> {
    * @return
    */
   BigDecimal findUserLowerMaxRebate(String agentAccount);
+
+  int updateClearGTMember(CleanAccountDTO dto);
 }

@@ -18,7 +18,7 @@ import com.gameplat.admin.model.vo.GameReportExportVO;
 import com.gameplat.admin.model.vo.PageDtoVO;
 import com.gameplat.admin.model.vo.TotalGameFinancialReportVO;
 import com.gameplat.admin.service.GameFinancialReportService;
-import com.gameplat.admin.util.JxlsExcelUtil;
+import com.gameplat.admin.util.JxlsExcelUtils;
 import com.gameplat.base.common.util.DateUtils;
 import com.gameplat.base.common.util.StringUtils;
 import com.gameplat.base.common.util.UUIDUtils;
@@ -165,7 +165,7 @@ public class GameFinancialReportServiceImpl extends ServiceImpl<GameFinancialRep
                 e1.printStackTrace();
             }
             try {
-                JxlsExcelUtil.downLoadExcel(map, GAME_FINANCIAL_REPORT, fo);
+                JxlsExcelUtils.downLoadExcel(map, GAME_FINANCIAL_REPORT, fo);
             } catch (InvalidFormatException | IOException e1) {
                 e1.printStackTrace();
             } finally {

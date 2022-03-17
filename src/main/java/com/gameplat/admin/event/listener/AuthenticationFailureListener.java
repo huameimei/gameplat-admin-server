@@ -1,9 +1,7 @@
-package com.gameplat.admin.event;
+package com.gameplat.admin.event.listener;
 
 import com.gameplat.admin.cache.AdminCache;
-import com.gameplat.admin.service.LimitInfoService;
 import com.gameplat.base.common.util.StringUtils;
-import com.gameplat.common.model.bean.limit.AdminLoginLimit;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.security.authentication.event.AuthenticationFailureBadCredentialsEvent;
@@ -20,8 +18,6 @@ public class AuthenticationFailureListener
 
   @Autowired private AdminCache adminCache;
 
-  @Autowired private LimitInfoService limitInfoService;
-
   @Override
   public void onApplicationEvent(AuthenticationFailureBadCredentialsEvent event) {
     String username = event.getAuthentication().getName();
@@ -29,11 +25,6 @@ public class AuthenticationFailureListener
       return;
     }
 
-    AdminLoginLimit limit = limitInfoService.getAdminLimit();
-    int errorCount = adminCache.getErrorPasswordCount(username);
-    if (errorCount < limit.getPwdErrorCount()) {
-      // 更新密码错误次数
-      adminCache.updateErrorPasswordCount(username, 1);
-    }
+    adminCache.updateErrorPasswordCount(username);
   }
 }

@@ -13,7 +13,7 @@ public interface GameTransferRecordService extends IService<GameTransferRecord> 
   PageDtoVO<GameTransferRecord> queryGameTransferRecord(
       Page<GameTransferRecord> page, GameTransferRecordQueryDTO dto);
 
-  void fillOrders(OperGameTransferRecordDTO liveTransferRecord);
+  void fillOrders(OperGameTransferRecordDTO gameTransferRecord);
 
   boolean findTransferRecordCount(GameTransferRecord dto);
 

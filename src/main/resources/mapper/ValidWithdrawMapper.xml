@@ -209,7 +209,7 @@
             (a.rech_money + a.discount_money) rechMoney
         FROM valid_withdraw AS a
         WHERE a.STATUS = 0
-          AND a.member_id = #{memberId}
+          AND a.account = #{account}
         ORDER BY a.id ASC
     </select>
 

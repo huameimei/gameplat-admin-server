@@ -19,8 +19,23 @@ public interface Constants {
     String SYSTEM_SETTING = "system_setting";
     String SPORT_CONFIG_TYPE = "sport_config";
     String SPORT_CONFIG_CODE = "sportConfig";
-    String START_UP_IMAGE = "start_up_image";//启动图
-    String PERSONAL_CENTER = "personal_center";//个人中心
+    /**启动图*/
+    String START_UP_IMAGE = "start_up_image";
+    /**个人中心*/
+    String PERSONAL_CENTER = "personal_center";
+    /**广场开关*/
+    String TENANT_SQUARE_SWITCH = "tenant_square_switch";
+    String SQUARE_SWITCH = "square_switch";
+
+    /**
+     * 导航栏列表
+     */
+    String TENANT_NAVIGATION_LIST = "TENANT_NAVIGATION_LIST";
+
+    /**
+     * 浮窗列表
+     */
+    String TENANT_FLOAT_LIST = "TENANT_FLOAT_LIST";
 
 
     /**

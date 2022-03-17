@@ -8,8 +8,6 @@ import com.gameplat.admin.service.ActivityQualificationService;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.model.entity.activity.ActivityQualification;
 import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
@@ -31,91 +29,88 @@ import java.util.Map;
 @Api(tags = "活动资格管理")
 public class ActivityQualificationController {
 
-  @Autowired private ActivityQualificationService activityQualificationService;
+    @Autowired
+    private ActivityQualificationService activityQualificationService;
 
-  /**
-   * 活动资格列表
-   *
-   * @param page
-   * @param activityQualificationQueryDTO
-   * @return
-   */
-  @ApiOperation(value = "活动资格列表")
-  @GetMapping("/list")
-  @PreAuthorize("hasAuthority('activity:qualification:page')")
-  @ApiImplicitParams({
-    @ApiImplicitParam(name = "current", value = "分页参数：当前页", defaultValue = "1"),
-    @ApiImplicitParam(name = "size", value = "每页条数"),
-  })
-  public IPage<ActivityQualificationVO> list(
-      @ApiIgnore PageDTO<ActivityQualification> page,
-      ActivityQualificationQueryDTO activityQualificationQueryDTO) {
-    return activityQualificationService.list(page, activityQualificationQueryDTO);
-  }
-
-  /**
-   * 新增活动资格
-   *
-   * @param activityQualificationAddDTO
-   */
-  @ApiOperation(value = "新增活动资格")
-  @PostMapping("/add")
-  @PreAuthorize("hasAuthority('activity:qualification:add')")
-  public void add(@RequestBody ActivityQualificationAddDTO activityQualificationAddDTO) {
-    activityQualificationService.add(activityQualificationAddDTO);
-  }
-
-  /**
-   * 批量审核活动资格
-   *
-   * @param activityQualificationAuditStatusDTO
-   */
-  @ApiOperation(value = "批量审核活动资格")
-  @PutMapping("/auditStatus")
-  @PreAuthorize("hasAuthority('activity:qualification:auditStatus')")
-  public void auditStatus(
-      @RequestBody ActivityQualificationAuditStatusDTO activityQualificationAuditStatusDTO) {
-    if (CollectionUtils.isEmpty(activityQualificationAuditStatusDTO.getIdList())) {
-      throw new ServiceException("id不能为空");
+    /**
+     * 活动资格列表
+     *
+     * @param page
+     * @param activityQualificationQueryDTO
+     * @return
+     */
+    @ApiOperation(value = "活动资格列表")
+    @GetMapping("/list")
+    @PreAuthorize("hasAuthority('activity:qualification:page')")
+    public IPage<ActivityQualificationVO> list(
+            @ApiIgnore PageDTO<ActivityQualification> page,
+            ActivityQualificationQueryDTO activityQualificationQueryDTO) {
+        return activityQualificationService.list(page, activityQualificationQueryDTO);
     }
-    activityQualificationService.auditStatus(activityQualificationAuditStatusDTO);
-  }
 
-  /**
-   * 更新活动资格状态
-   *
-   * @param activityQualificationUpdateStatusDTO
-   */
-  @ApiOperation(value = "更新活动资格状态")
-  @PutMapping("/updateQualificationStatus")
-  @PreAuthorize("hasAuthority('activity:qualification:updateQualificationStatus')")
-  public void updateQualificationStatus(
-      @RequestBody ActivityQualificationUpdateStatusDTO activityQualificationUpdateStatusDTO) {
-    activityQualificationService.updateQualificationStatus(activityQualificationUpdateStatusDTO);
-  }
+    /**
+     * 新增活动资格
+     *
+     * @param activityQualificationAddDTO
+     */
+    @ApiOperation(value = "新增活动资格")
+    @PostMapping("/add")
+    @PreAuthorize("hasAuthority('activity:qualification:add')")
+    public void add(@RequestBody ActivityQualificationAddDTO activityQualificationAddDTO) {
+        activityQualificationService.add(activityQualificationAddDTO);
+    }
 
-  /**
-   * 删除活动资格
-   *
-   * @param ids
-   */
-  @ApiOperation(value = "删除活动资格")
-  @DeleteMapping("/delete")
-  @PreAuthorize("hasAuthority('activity:qualification:remove')")
-  public void delete(@RequestBody String ids) {
-    activityQualificationService.delete(ids);
-  }
+    /**
+     * 批量审核活动资格
+     *
+     * @param activityQualificationAuditStatusDTO
+     */
+    @ApiOperation(value = "批量审核活动资格")
+    @PutMapping("/auditStatus")
+    @PreAuthorize("hasAuthority('activity:qualification:auditStatus')")
+    public void auditStatus(
+            @RequestBody ActivityQualificationAuditStatusDTO activityQualificationAuditStatusDTO) {
+        if (CollectionUtils.isEmpty(activityQualificationAuditStatusDTO.getIdList())) {
+            throw new ServiceException("id不能为空");
+        }
+        activityQualificationService.auditStatus(activityQualificationAuditStatusDTO);
+    }
 
-  /**
-   * 资格检测
-   *
-   * @param activityQualificationCheckDTO
-   */
-  @ApiOperation(value = "资格检测")
-  @PutMapping("/checkQualification")
-  @PreAuthorize("hasAuthority('activity:qualification:checkQualification')")
-  public Map<String, Object> checkQualification(
-      @RequestBody ActivityQualificationCheckDTO activityQualificationCheckDTO) {
-    return activityQualificationService.checkQualification(activityQualificationCheckDTO);
-  }
+    /**
+     * 更新活动资格状态
+     *
+     * @param activityQualificationUpdateStatusDTO
+     */
+    @ApiOperation(value = "更新活动资格状态")
+    @PutMapping("/updateQualificationStatus")
+    @PreAuthorize("hasAuthority('activity:qualification:updateQualificationStatus')")
+    public void updateQualificationStatus(
+            @RequestBody ActivityQualificationUpdateStatusDTO activityQualificationUpdateStatusDTO) {
+        activityQualificationService.updateQualificationStatus(activityQualificationUpdateStatusDTO);
+    }
+
+    /**
+     * 删除活动资格
+     *
+     * @param ids
+     */
+    @ApiOperation(value = "删除活动资格")
+    @DeleteMapping("/delete")
+    @PreAuthorize("hasAuthority('activity:qualification:remove')")
+    public void delete(@RequestBody String ids) {
+        activityQualificationService.delete(ids);
+    }
+
+    /**
+     * 资格检测
+     *
+     * @param activityQualificationCheckDTO
+     */
+    @ApiOperation(value = "资格检测")
+    @PutMapping("/checkQualification")
+    @PreAuthorize("hasAuthority('activity:qualification:checkQualification')")
+    public Map<String, Object> checkQualification(
+            @RequestBody ActivityQualificationCheckDTO activityQualificationCheckDTO) {
+        return activityQualificationService.checkQualification(activityQualificationCheckDTO);
+    }
 }

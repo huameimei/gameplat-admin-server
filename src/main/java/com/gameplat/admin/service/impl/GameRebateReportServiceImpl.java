@@ -11,7 +11,6 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.enums.BlacklistConstant;
 import com.gameplat.admin.enums.GameRebateReportStatus;
-import com.gameplat.admin.enums.MemberBillTransTypeEnum;
 import com.gameplat.admin.mapper.GameBetDailyReportMapper;
 import com.gameplat.admin.mapper.GameRebateConfigMapper;
 import com.gameplat.admin.mapper.GameRebateDetailMapper;
@@ -26,9 +25,7 @@ import com.gameplat.base.common.json.JsonUtils;
 import com.gameplat.common.enums.GameBlacklistTypeEnum;
 import com.gameplat.common.enums.TranTypes;
 import com.gameplat.model.entity.game.*;
-import com.gameplat.model.entity.member.Member;
 import com.gameplat.model.entity.member.MemberBill;
-import com.gameplat.model.entity.member.MemberInfo;
 import com.gameplat.model.entity.recharge.RechargeOrder;
 import com.gameplat.redis.api.RedisService;
 import lombok.extern.slf4j.Slf4j;
@@ -174,9 +171,9 @@ public class GameRebateReportServiceImpl
     }
 
     // 游戏返水黑名单
-    GameBlacklist example = new GameBlacklist();
-    example.setBlackType(GameBlacklistTypeEnum.GAME_REBATE.code());
-    List<GameBlacklist> gameBlacklists = gameBlacklistService.selectGameBlackList(example);
+    GameBlacklist black = new GameBlacklist();
+    black.setBlackType(GameBlacklistTypeEnum.GAME_REBATE.code());
+    List<GameBlacklist> gameBlacklists = gameBlacklistService.selectGameBlackList(black);
 
     // 真人日报表
     String startDate = DateUtil.formatDate(gameRebatePeriod.getBeginDate());

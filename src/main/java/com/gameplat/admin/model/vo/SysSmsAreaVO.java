@@ -37,4 +37,7 @@ public class SysSmsAreaVO implements Serializable {
   /** 更新时间 */
   @ApiModelProperty("更新时间")
   private Date updateTime;
+
+  /** 是否是默认 */
+  private Integer isDefault;
 }

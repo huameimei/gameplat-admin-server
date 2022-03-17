@@ -20,4 +20,6 @@ public interface SysSmsAreaService extends IService<SysSmsArea> {
   void deleteAreaById(Long id);
 
   void changeStatus(Long id, Integer status);
+
+  void setDefaultStatus(Long id, Integer status);
 }

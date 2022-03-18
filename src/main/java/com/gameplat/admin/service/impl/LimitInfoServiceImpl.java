@@ -7,6 +7,7 @@ import com.gameplat.admin.model.dto.LimitInfoDTO;
 import com.gameplat.admin.service.LimitInfoService;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.json.JsonUtils;
+import com.gameplat.common.constant.CachedKeys;
 import com.gameplat.common.enums.LimitEnums;
 import com.gameplat.common.lang.Assert;
 import com.gameplat.common.model.bean.limit.AdminLoginLimit;
@@ -14,6 +15,8 @@ import com.gameplat.common.model.bean.limit.MemberRechargeLimit;
 import com.gameplat.model.entity.limit.LimitInfo;
 import com.gameplat.security.SecurityUserHolder;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,6 +30,9 @@ import java.util.Optional;
 @Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)
 public class LimitInfoServiceImpl extends ServiceImpl<LimitInfoMapper, LimitInfo>
     implements LimitInfoService {
+
+  @Autowired
+  private RedisTemplate<String, Object> redisTemplate;
 
   @Override
   public void insertLimitInfo(LimitInfoDTO limitInfoDTO) {
@@ -52,6 +58,7 @@ public class LimitInfoServiceImpl extends ServiceImpl<LimitInfoMapper, LimitInfo
       limit.setValueClass(LimitEnums.getClass(limitInfoDTO.getName()).getName());
       Assert.isTrue(this.save(limit), "添加失败!");
     }
+    redisTemplate.boundHashOps(CachedKeys.LOGIN_LIMIT).put(limitInfoDTO.getName(), info);
   }
 
   @Override

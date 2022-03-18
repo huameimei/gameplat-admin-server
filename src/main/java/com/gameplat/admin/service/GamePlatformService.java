@@ -16,4 +16,6 @@ public interface GamePlatformService extends IService<GamePlatform> {
   void updateGamePlatform(OperGamePlatformDTO operGamePlatformDTO);
 
   List<GamePlatform> queryByTransfer();
+
+  GamePlatform queryByCode(String platformCode);
 }

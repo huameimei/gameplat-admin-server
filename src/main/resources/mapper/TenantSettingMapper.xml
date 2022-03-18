@@ -33,12 +33,13 @@
         <result property="thTh" column="thTh"/>
     </resultMap>
 
-    <resultMap id="gameListOneCollection" type="com.gameplat.admin.model.vo.GameListOneVO">
-        <result property="liveCode" column="liveCode"/>
-        <result property="walletCode" column="walletCode"/>
-        <result property="gameCode" column="gameCode"/>
-        <result property="firstCode" column="firstCode"/>
-        <result property="trial" column="trial"/>
+    <resultMap id="gameListOneCollection" type="com.gameplat.admin.model.vo.GameKindVO">
+        <result property="code" column="code"/>
+        <result property="platformCode" column="platformCode"/>
+        <result property="demoEnable" column="demoEnable"/>
+        <result property="enable" column="enable"/>
+        <result property="gameType" column="gameType"/>
+        <result property="enable" column="enable"/>
     </resultMap>
 
     <!--初使化租户对应主题的导航栏-->
@@ -94,15 +95,12 @@
     </select>
 
     <select id="getGameList" resultMap="gameListOneCollection">
-        select glo.code        as firstCode,
-               gp.code         as liveCode,
-               glo.wallet_code as walletCode,
-               glo.game_code   as gameCode,
-               glo.trial       as trial
-        from game_level_one as glo left join game_plat as gp on glo.plat_id = gp.id
-            and glo.is_show = 1
-            and glo.tepl_is_show = 1
-        WHERE glo.code = #{oneCode}
+        select gk.code            as code,
+               gk.game_type       as gameType,
+               gk.platform_code   as platfromCode,
+               gk.demo_enable     as demoEnable
+        from game_kind as gk
+        WHERE  gk.enable = 1 and gk.code = #{oneCode}
     </select>
 
     <update id="updateIndex">

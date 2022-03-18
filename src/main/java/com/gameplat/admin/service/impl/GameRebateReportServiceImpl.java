@@ -19,15 +19,36 @@ import com.gameplat.admin.model.dto.GameRebateReportQueryDTO;
 import com.gameplat.admin.model.vo.GameMemberDayReportVO;
 import com.gameplat.admin.model.vo.MemberInfoVO;
 import com.gameplat.admin.model.vo.PageDtoVO;
-import com.gameplat.admin.service.*;
+import com.gameplat.admin.service.GameBlacklistService;
+import com.gameplat.admin.service.GameRebateReportService;
+import com.gameplat.admin.service.MemberBillService;
+import com.gameplat.admin.service.MemberInfoService;
+import com.gameplat.admin.service.MemberService;
+import com.gameplat.admin.service.ValidWithdrawService;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.json.JsonUtils;
 import com.gameplat.common.enums.GameBlacklistTypeEnum;
 import com.gameplat.common.enums.TranTypes;
-import com.gameplat.model.entity.game.*;
+import com.gameplat.model.entity.game.GameBlacklist;
+import com.gameplat.model.entity.game.GameRebateConfig;
+import com.gameplat.model.entity.game.GameRebateDetail;
+import com.gameplat.model.entity.game.GameRebatePeriod;
+import com.gameplat.model.entity.game.GameRebateReport;
 import com.gameplat.model.entity.member.MemberBill;
 import com.gameplat.model.entity.recharge.RechargeOrder;
 import com.gameplat.redis.api.RedisService;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
@@ -35,11 +56,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.util.*;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -105,20 +121,18 @@ public class GameRebateReportServiceImpl
     query.eq("account", account).eq("period_name", periodName);
     GameRebateDetail gameRebateDetail = gameRebateDetailMapper.selectOne(query);
     verifyAndUpdate(
-            gameRebateDetail.getMemberId(),
-            gameRebateDetail.getPeriodId(),
+        gameRebateDetail.getMemberId(),
+        gameRebateDetail.getPeriodId(),
         GameRebateReportStatus.REJECTED.getValue(),
         remark);
   }
 
-  /**
-   * 游戏返水数据修改
-   */
+  /** 游戏返水数据修改 */
   @Override
   public void modify(Long id, BigDecimal realRebateMoney, String remark) {
     String key = "modify_game_rebate_" + id;
     try {
-      redisService.getStringOps().set(key,1);
+      redisService.getStringOps().set(key, 1);
       GameRebateDetail gameRebateDetail = gameRebateDetailMapper.selectById(id);
       if (gameRebateDetail == null) {
         throw new ServiceException("返点记录不存在");
@@ -127,7 +141,7 @@ public class GameRebateReportServiceImpl
       gameRebateDetail.setRealRebateMoney(realRebateMoney);
       gameRebateDetail.setRemark(remark);
       gameRebateDetailMapper.updateById(gameRebateDetail);
-    }finally {
+    } finally {
       redisService.getKeyOps().delete(key);
     }
   }
@@ -160,7 +174,7 @@ public class GameRebateReportServiceImpl
       List<String> levelsLists =
           Arrays.stream(levels).filter(StringUtils::isEmpty).collect(Collectors.toList());
       List<String> list = memberService.findAccountByUserLevelIn(levelsLists);
-      //转小写比较
+      // 转小写比较
       list.forEach(item -> memberList.add(item.toLowerCase()));
     }
 
@@ -175,7 +189,7 @@ public class GameRebateReportServiceImpl
     black.setBlackType(GameBlacklistTypeEnum.GAME_REBATE.code());
     List<GameBlacklist> gameBlacklists = gameBlacklistService.selectGameBlackList(black);
 
-    // 真人日报表
+    // 游戏日报表
     String startDate = DateUtil.formatDate(gameRebatePeriod.getBeginDate());
     String endDate = DateUtil.formatDate(gameRebatePeriod.getEndDate());
     List<GameMemberDayReportVO> list =
@@ -225,7 +239,7 @@ public class GameRebateReportServiceImpl
               if (rebate.isPresent() && rebate.get().compareTo(BigDecimal.ZERO) > 0) {
                 try {
                   GameRebateReport gameRebateReport =
-                          formatGameRebateReport(gameRebatePeriod, dr, rebate.get());
+                      formatGameRebateReport(gameRebatePeriod, dr, rebate.get());
                   resultList.add(gameRebateReport);
                 } catch (Exception e) {
                   log.error("结算异常: " + JSONUtil.toJsonStr(dr));
@@ -319,9 +333,10 @@ public class GameRebateReportServiceImpl
   }
 
   @Override
-  public void accept(Long periodId, Long memberId, BigDecimal realRebateMoney, String remark) throws Exception {
+  public void accept(Long periodId, Long memberId, BigDecimal realRebateMoney, String remark)
+      throws Exception {
     verifyAndUpdate(memberId, periodId, GameRebateReportStatus.ACCEPTED.getValue(), remark);
-    MemberInfoVO  member = memberService.getInfo(memberId);
+    MemberInfoVO member = memberService.getInfo(memberId);
     // 添加打码量
     RechargeOrder rechargeOrder = new RechargeOrder();
     rechargeOrder.setMemberId(memberId);
@@ -343,13 +358,17 @@ public class GameRebateReportServiceImpl
     memberBill.setBalance(member.getBalance());
     memberBill.setRemark(remark);
     memberBill.setContent(
-            String.format("游戏返点派发：用户 %s 于 %s 收到返点金额 %.3f 元，最新余额 %.3f 元。", member.getAccount(),
-                    DateUtil.now(), realRebateMoney, member.getBalance().add(realRebateMoney)));
+        String.format(
+            "游戏返点派发：用户 %s 于 %s 收到返点金额 %.3f 元，最新余额 %.3f 元。",
+            member.getAccount(),
+            DateUtil.now(),
+            realRebateMoney,
+            member.getBalance().add(realRebateMoney)));
     memberBill.setOperator("system");
     memberBillService.save(memberBill);
 
     // 修改账户余额
-    memberInfoService.updateBalanceWithRecharge(member.getId(), realRebateMoney,realRebateMoney);
+    memberInfoService.updateBalanceWithRecharge(member.getId(), realRebateMoney, realRebateMoney);
   }
 
   @Override
@@ -403,7 +422,7 @@ public class GameRebateReportServiceImpl
       Long memberId, Long periodId, String periodName, BigDecimal realRebateMoney, String remark) {
 
     rollBackAndUpdate(memberId, periodId, GameRebateReportStatus.ROLLBACKED.getValue(), remark);
-    MemberInfoVO  member = memberService.getInfo(memberId);
+    MemberInfoVO member = memberService.getInfo(memberId);
     // 批量修改打码量--游戏返水优惠打码量设为0
     validWithdrawService.rollGameRebateDml(remark);
     // 写账变
@@ -416,8 +435,13 @@ public class GameRebateReportServiceImpl
     memberBill.setBalance(member.getBalance());
     memberBill.setRemark(remark);
     memberBill.setContent(
-            String.format("游戏返点回收：用户 %s 于 %s 回收 %s 返点金额 %.3f 元，最新余额 %.3f 元。", member.getAccount(),
-                    DateUtil.now(), periodName, realRebateMoney, member.getBalance().subtract(realRebateMoney)));
+        String.format(
+            "游戏返点回收：用户 %s 于 %s 回收 %s 返点金额 %.3f 元，最新余额 %.3f 元。",
+            member.getAccount(),
+            DateUtil.now(),
+            periodName,
+            realRebateMoney,
+            member.getBalance().subtract(realRebateMoney)));
     memberBill.setOperator("system");
     memberBillService.save(memberBill);
 

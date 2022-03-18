@@ -32,13 +32,6 @@ public class ActivityBlacklistController {
 
   @Autowired private ActivityBlacklistService activityBlacklistService;
 
-  /**
-   * 活动黑名单列表
-   *
-   * @param page
-   * @param activityBlacklistQueryDTO
-   * @return
-   */
   @ApiOperation(value = "活动黑名单列表")
   @GetMapping("/list")
   @PreAuthorize("hasAuthority('activity:blacklist:page')")
@@ -47,28 +40,17 @@ public class ActivityBlacklistController {
     @ApiImplicitParam(name = "size", value = "每页条数")
   })
   public IPage<ActivityBlacklist> list(
-      @ApiIgnore PageDTO<ActivityBlacklist> page,
-      ActivityBlacklistQueryDTO activityBlacklistQueryDTO) {
-    return activityBlacklistService.list(page, activityBlacklistQueryDTO);
+      @ApiIgnore PageDTO<ActivityBlacklist> page, ActivityBlacklistQueryDTO dto) {
+    return activityBlacklistService.list(page, dto);
   }
 
-  /**
-   * 新增活动黑名单
-   *
-   * @param activityBlacklistAddDTO
-   */
   @ApiOperation(value = "新增活动黑名单")
   @PostMapping("/add")
   @PreAuthorize("hasAuthority('activity:blacklist:add')")
-  public void add(@Validated @RequestBody ActivityBlacklistAddDTO activityBlacklistAddDTO) {
-    activityBlacklistService.add(activityBlacklistAddDTO);
+  public void add(@Validated @RequestBody ActivityBlacklistAddDTO dto) {
+    activityBlacklistService.add(dto);
   }
 
-  /**
-   * 删除活动黑名单
-   *
-   * @param ids
-   */
   @ApiOperation(value = "删除活动黑名单")
   @DeleteMapping("/delete")
   @PreAuthorize("hasAuthority('activity:blacklist:remove')")

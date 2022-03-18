@@ -55,4 +55,11 @@ public class OpenAreaController {
   public void changeStatus(@PathVariable Long id, @PathVariable Integer status) {
     areaService.changeStatus(id, status);
   }
+
+
+  @ApiOperation("设置默认区号")
+  @PutMapping("/setDefaultStatus/{id}/{status}")
+  public void setDefaultStatus(@PathVariable Long id, @PathVariable Integer status) {
+    areaService.setDefaultStatus(id, status);
+  }
 }

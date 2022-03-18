@@ -10,6 +10,7 @@ import com.gameplat.admin.model.dto.ActivityLobbyUpdateStatusDTO;
 import com.gameplat.admin.model.vo.ActivityLobbyVO;
 import com.gameplat.admin.model.vo.CodeDataVO;
 import com.gameplat.admin.model.vo.GameKindVO;
+import com.gameplat.admin.service.ActivityInfoService;
 import com.gameplat.admin.service.ActivityLobbyService;
 import com.gameplat.admin.service.GameKindService;
 import com.gameplat.admin.service.SysDictDataService;
@@ -43,135 +44,149 @@ import java.util.List;
 @RequestMapping("/api/admin/activity/lobby")
 public class ActivityLobbyController {
 
-  @Autowired private ActivityLobbyService activityLobbyService;
+    @Autowired
+    private ActivityLobbyService activityLobbyService;
 
-  @Autowired private SysDictDataService sysDictDataService;
+    @Autowired
+    private SysDictDataService sysDictDataService;
 
-  @Autowired private GameKindService gameKindService;
+    @Autowired
+    private GameKindService gameKindService;
 
-  /** 活动大厅列表 */
-  @ApiOperation(value = "活动大厅列表")
-  @GetMapping("/list")
-  @PreAuthorize("hasAuthority('activity:lobby:page')")
-  public IPage<ActivityLobbyVO> list(
-      @ApiIgnore PageDTO<ActivityLobby> page, ActivityLobbyQueryDTO dto) {
-    return activityLobbyService.findActivityLobbyList(page, dto);
-  }
+    @Autowired
+    private ActivityInfoService activityInfoService;
 
-  /**
-   * 新增活动大厅
-   *
-   * @param dto ActivityLobbyAddDTO
-   */
-  @ApiOperation(value = "新增活动大厅")
-  @PostMapping("/add")
-  @PreAuthorize("hasAuthority('activity:lobby:add')")
-  public void add(@Validated @RequestBody ActivityLobbyAddDTO dto) {
-    if (StringUtils.isNull(dto.getStatisDate())) {
-      throw new ServiceException("请选择统计日期");
-    }
-    if (dto.getApplyWay() == ActivityInfoEnum.ApplyWayEnum.AUTOMATIC.value()
-        && dto.getNextDayApply() == ActivityInfoEnum.NextDayApply.NO.value()) {
-      throw new ServiceException("自动申请的活动必须勾选隔天申请");
-    }
-    if (dto.getEndTime().before(dto.getStartTime())) {
-      throw new ServiceException("活动结束时间不能小于活动开始时间");
-    }
-    activityLobbyService.add(dto);
-  }
-
-  /**
-   * 修改活动大厅
-   *
-   * @param activityLobbyUpdateDTO
-   */
-  @ApiOperation(value = "修改活动大厅")
-  @PutMapping("/update")
-  @PreAuthorize("hasAuthority('activity:lobby:update')")
-  public void update(@RequestBody ActivityLobbyUpdateDTO activityLobbyUpdateDTO) {
-    if (activityLobbyUpdateDTO.getId() == null || activityLobbyUpdateDTO.getId() == 0) {
-      throw new ServiceException("id不能为空");
-    }
-    if (StringUtils.isNull(activityLobbyUpdateDTO.getStatisDate())) {
-      throw new ServiceException("请选择统计日期");
-    }
-    if (activityLobbyUpdateDTO.getApplyWay() == ActivityInfoEnum.ApplyWayEnum.AUTOMATIC.value()
-        && activityLobbyUpdateDTO.getNextDayApply() == ActivityInfoEnum.NextDayApply.NO.value()) {
-      throw new ServiceException("自动申请的活动必须勾选隔天申请");
-    }
-    if (activityLobbyUpdateDTO.getEndTime().before(activityLobbyUpdateDTO.getStartTime())) {
-      throw new ServiceException("活动结束时间不能小于活动开始时间");
-    }
-    activityLobbyService.update(activityLobbyUpdateDTO);
-  }
-
-  /**
-   * 删除活动大厅
-   *
-   * @param ids
-   */
-  @ApiOperation(value = "删除活动大厅")
-  @DeleteMapping("/delete")
-  @PreAuthorize("hasAuthority('activity:lobby:remove')")
-  public void remove(@RequestBody String ids) {
-    if (StringUtils.isBlank(ids)) {
-      throw new ServiceException("ids不能为空");
-    }
-    activityLobbyService.remove(ids);
-  }
-
-  /**
-   * 更新状态
-   *
-   * @param activityLobbyUpdateStatusDTO
-   */
-  @ApiOperation(value = "更新活动大厅状态")
-  @PutMapping("/updateStatus")
-  @PreAuthorize("hasAuthority('activity:lobby:updateStatus')")
-  public void updateStatus(@RequestBody ActivityLobbyUpdateStatusDTO activityLobbyUpdateStatusDTO) {
-    if (activityLobbyUpdateStatusDTO.getId() == null || activityLobbyUpdateStatusDTO.getId() == 0) {
-      throw new ServiceException("id不能为空");
-    }
-    activityLobbyService.updateStatus(activityLobbyUpdateStatusDTO);
-  }
-
-  /** 查询未绑定的活动大厅列表 */
-  @ApiOperation(value = "查询未绑定的活动大厅列表")
-  @GetMapping("/findUnboundLobbyList")
-  @PreAuthorize("hasAuthority('activity:lobby:list')")
-  public List<ActivityLobbyVO> findUnboundLobbyList() {
-    return activityLobbyService.findUnboundLobbyList();
-  }
-
-  /** 游戏类型列表 */
-  @ApiOperation(value = "游戏类型列表")
-  @GetMapping("/gameTypeList")
-  @PreAuthorize("hasAuthority('activity:lobby:gameTypeList')")
-  public List<CodeDataVO> gameTypeList() {
-    SysDictData dictData = new SysDictData();
-    dictData.setDictType(DictTypeEnum.LIVE_GAME_TYPE.getValue());
-    dictData.setStatus(EnableEnum.ENABLED.code());
-    List<SysDictData> dictList = sysDictDataService.getDictList(dictData);
-    if (CollectionUtils.isEmpty(dictList)) {
-      throw new ServiceException("游戏类型列表没有配置");
+    /**
+     * 活动大厅列表
+     */
+    @ApiOperation(value = "活动大厅列表")
+    @GetMapping("/list")
+    @PreAuthorize("hasAuthority('activity:lobby:page')")
+    public IPage<ActivityLobbyVO> list(
+            @ApiIgnore PageDTO<ActivityLobby> page, ActivityLobbyQueryDTO dto) {
+        return activityLobbyService.findActivityLobbyList(page, dto);
     }
 
-    List<CodeDataVO> list = new ArrayList<>();
-    CodeDataVO codeDataVO;
-    for (SysDictData data : dictList) {
-      codeDataVO = new CodeDataVO();
-      codeDataVO.setCode(data.getDictValue());
-      codeDataVO.setName(data.getDictLabel());
-      list.add(codeDataVO);
+    /**
+     * 新增活动大厅
+     *
+     * @param dto ActivityLobbyAddDTO
+     */
+    @ApiOperation(value = "新增活动大厅")
+    @PostMapping("/add")
+    @PreAuthorize("hasAuthority('activity:lobby:add')")
+    public void add(@Validated @RequestBody ActivityLobbyAddDTO dto) {
+        if (StringUtils.isNull(dto.getStatisDate())) {
+            throw new ServiceException("请选择统计日期");
+        }
+        if (dto.getApplyWay() == ActivityInfoEnum.ApplyWayEnum.AUTOMATIC.value()
+                && dto.getNextDayApply() == ActivityInfoEnum.NextDayApply.NO.value()) {
+            throw new ServiceException("自动申请的活动必须勾选隔天申请");
+        }
+        if (dto.getEndTime().before(dto.getStartTime())) {
+            throw new ServiceException("活动结束时间不能小于活动开始时间");
+        }
+        activityLobbyService.add(dto);
     }
-    return list;
-  }
 
-  /** 游戏类型列表 */
-  @ApiOperation(value = "游戏列表")
-  @GetMapping("/gameList")
-  @PreAuthorize("hasAuthority('activity:lobby:gameKindList')")
-  public List<GameKindVO> getGameKindInBanner(String gameTypeCode) {
-    return gameKindService.getGameKindInBanner(gameTypeCode);
-  }
+    /**
+     * 修改活动大厅
+     *
+     * @param activityLobbyUpdateDTO
+     */
+    @ApiOperation(value = "修改活动大厅")
+    @PutMapping("/update")
+    @PreAuthorize("hasAuthority('activity:lobby:update')")
+    public void update(@RequestBody ActivityLobbyUpdateDTO activityLobbyUpdateDTO) {
+        if (activityLobbyUpdateDTO.getId() == null || activityLobbyUpdateDTO.getId() == 0) {
+            throw new ServiceException("id不能为空");
+        }
+        if (StringUtils.isNull(activityLobbyUpdateDTO.getStatisDate())) {
+            throw new ServiceException("请选择统计日期");
+        }
+        if (activityLobbyUpdateDTO.getApplyWay() == ActivityInfoEnum.ApplyWayEnum.AUTOMATIC.value()
+                && activityLobbyUpdateDTO.getNextDayApply() == ActivityInfoEnum.NextDayApply.NO.value()) {
+            throw new ServiceException("自动申请的活动必须勾选隔天申请");
+        }
+        if (activityLobbyUpdateDTO.getEndTime().before(activityLobbyUpdateDTO.getStartTime())) {
+            throw new ServiceException("活动结束时间不能小于活动开始时间");
+        }
+        activityLobbyService.update(activityLobbyUpdateDTO);
+    }
+
+    /**
+     * 删除活动大厅
+     *
+     * @param ids
+     */
+    @ApiOperation(value = "删除活动大厅")
+    @DeleteMapping("/delete")
+    @PreAuthorize("hasAuthority('activity:lobby:remove')")
+    public void remove(@RequestBody String ids) {
+        if (StringUtils.isBlank(ids)) {
+            throw new ServiceException("ids不能为空");
+        }
+        activityLobbyService.remove(ids);
+    }
+
+    /**
+     * 更新状态
+     *
+     * @param activityLobbyUpdateStatusDTO
+     */
+    @ApiOperation(value = "更新活动大厅状态")
+    @PutMapping("/updateStatus")
+    @PreAuthorize("hasAuthority('activity:lobby:updateStatus')")
+    public void updateStatus(@RequestBody ActivityLobbyUpdateStatusDTO activityLobbyUpdateStatusDTO) {
+        if (activityLobbyUpdateStatusDTO.getId() == null || activityLobbyUpdateStatusDTO.getId() == 0) {
+            throw new ServiceException("id不能为空");
+        }
+        activityLobbyService.updateStatus(activityLobbyUpdateStatusDTO);
+    }
+
+    /**
+     * 查询未绑定的活动大厅列表
+     */
+    @ApiOperation(value = "查询未绑定的活动大厅列表")
+    @GetMapping("/findUnboundLobbyList")
+    @PreAuthorize("hasAuthority('activity:lobby:list')")
+    public List<ActivityLobbyVO> findUnboundLobbyList() {
+        return activityInfoService.findUnboundLobbyList();
+    }
+
+    /**
+     * 游戏类型列表
+     */
+    @ApiOperation(value = "游戏类型列表")
+    @GetMapping("/gameTypeList")
+    @PreAuthorize("hasAuthority('activity:lobby:gameTypeList')")
+    public List<CodeDataVO> gameTypeList() {
+        SysDictData dictData = new SysDictData();
+        dictData.setDictType(DictTypeEnum.LIVE_GAME_TYPE.getValue());
+        dictData.setStatus(EnableEnum.ENABLED.code());
+        List<SysDictData> dictList = sysDictDataService.getDictList(dictData);
+        if (CollectionUtils.isEmpty(dictList)) {
+            throw new ServiceException("游戏类型列表没有配置");
+        }
+
+        List<CodeDataVO> list = new ArrayList<>();
+        CodeDataVO codeDataVO;
+        for (SysDictData data : dictList) {
+            codeDataVO = new CodeDataVO();
+            codeDataVO.setCode(data.getDictValue());
+            codeDataVO.setName(data.getDictLabel());
+            list.add(codeDataVO);
+        }
+        return list;
+    }
+
+    /**
+     * 游戏类型列表
+     */
+    @ApiOperation(value = "游戏列表")
+    @GetMapping("/gameList")
+    @PreAuthorize("hasAuthority('activity:lobby:gameKindList')")
+    public List<GameKindVO> getGameKindInBanner(String gameTypeCode) {
+        return gameKindService.getGameKindInBanner(gameTypeCode);
+    }
 }

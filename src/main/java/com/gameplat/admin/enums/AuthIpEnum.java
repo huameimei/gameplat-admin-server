@@ -1,5 +1,7 @@
 package com.gameplat.admin.enums;
 
+import java.util.Objects;
+
 /** IP枚举 */
 public class AuthIpEnum {
 
@@ -32,7 +34,7 @@ public class AuthIpEnum {
     }
 
     public boolean match(String value) {
-      return this.value == value;
+      return Objects.equals(this.value, value);
     }
   }
 }

@@ -25,8 +25,8 @@ public class GameBetRecordSearchBuilder {
     if (StringUtils.isNotEmpty(dto.getGameKind())) {
       builder.must(QueryBuilders.matchQuery("gameKind", dto.getGameKind()));
     }
-    if (StringUtils.isNotEmpty(dto.getLiveGameSuperType())) {
-      builder.must(QueryBuilders.matchQuery("gameType", dto.getLiveGameSuperType()));
+    if (StringUtils.isNotEmpty(dto.getGameType())) {
+      builder.must(QueryBuilders.matchQuery("gameType", dto.getGameType()));
     }
     if (null != dto.getTimeType() && StringUtils.isNotBlank(dto.getBeginTime())) {
       String keyword = "betTime.keyword";

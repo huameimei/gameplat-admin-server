@@ -75,7 +75,7 @@ public class OpenCommonController {
     return commonService.getConfig();
   }
 
-  @GetMapping("/file/upload")
+  @PostMapping("/file/upload")
   public Map<String, String> fileUpload(@RequestPart MultipartFile file) throws IOException {
     FileConfig fileConfig =
         configService.getDefaultConfig(DictTypeEnum.FILE_CONFIG, FileConfig.class);

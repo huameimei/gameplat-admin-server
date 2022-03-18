@@ -2,20 +2,25 @@ package com.gameplat.admin.controller.open.member;
 
 import cn.afterturn.easypoi.excel.ExcelExportUtil;
 import cn.afterturn.easypoi.excel.entity.ExportParams;
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.http.Header;
 import cn.hutool.http.useragent.UserAgent;
 import cn.hutool.http.useragent.UserAgentUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.gameplat.admin.model.dto.*;
+import com.gameplat.admin.model.vo.MemberBalanceVO;
 import com.gameplat.admin.model.vo.MemberInfoVO;
 import com.gameplat.admin.model.vo.MemberVO;
+import com.gameplat.admin.service.GameAdminService;
 import com.gameplat.admin.service.MemberService;
 import com.gameplat.admin.service.MemberTransformService;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.ip.IpAddressParser;
+import com.gameplat.base.common.util.BeanUtils;
 import com.gameplat.base.common.util.ServletUtils;
 import com.gameplat.common.constant.ServiceName;
+import com.gameplat.common.lang.Assert;
 import com.gameplat.log.annotation.Log;
 import com.gameplat.log.enums.LogType;
 import com.gameplat.model.entity.member.Member;
@@ -42,6 +47,9 @@ public class MemberController {
   @Autowired private MemberService memberService;
 
   @Autowired private MemberTransformService memberTransformService;
+
+  @Autowired(required = false)
+  private GameAdminService gameAdminService;
 
   @ApiOperation(value = "会员列表")
   @GetMapping("/list")
@@ -214,6 +222,48 @@ public class MemberController {
   public void updateDaySalary(@RequestParam(required = true) String ids,
                               @RequestParam(required = true) Integer state) {
     memberService.updateDaySalary(ids,state);
+  }
+
+
+
+
+  /**
+   * 人工扣款查询会员
+   * @param account 用户名
+   */
+  @GetMapping("findMemberBalance")
+  public MemberBalanceVO findMemberBalance(@RequestParam(value = "account",required = true) String account) {
+    //额度回收
+    gameAdminService.reclaimLiveAmount(account);
+    return BeanUtils.map(memberService.getMemberInfo(account),MemberBalanceVO.class);
+  }
+
+
+  //返回推广会员
+  @GetMapping("findTGMemberBalance")
+  @ApiOperation("返回推广会员")
+  public IPage<MemberBalanceVO> findTGMemberBalance(PageDTO<Member> page, MemberQueryDTO dto) {
+      dto.setUserType("P");
+      return memberService.findTGMemberBalance(page, dto);
+  }
+
+
+  /**
+   *
+   * @param dto 推广会员账号
+  */
+  @ApiOperation("清除推广会员余额")
+  @PostMapping("findTGMemberBalance")
+  @PreAuthorize("hasAuthority('system:TGMember:clear')")
+  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.MEMBER, desc = "清除推广会员#{dto.userNames}余额")
+  public void updateTGClearMember(@RequestBody CleanAccountDTO dto) {
+      Assert.notNull(dto.getIsCleanAll(), "是否清理全部不能为空！");
+      Assert.notNull(dto.getUserType(), "会员类型不能为空！");
+      //如果不是清理全部
+      if (ObjectUtil.equals(dto.getIsCleanAll(),0)) {
+          Assert.notNull(dto.getUserNames(), "会员不能为空！");
+      }
+      memberService.updateTGClearMember(dto);
   }
 
 }

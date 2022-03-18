@@ -26,7 +26,15 @@ public class MemberWealRewordVO implements Serializable {
   private String userName;
 
   @ApiModelProperty("当前等级")
-  @Excel(name = "当前等级", suffix = "VIP", height = 20, width = 30, isImportField = "true_st")
+  @Excel(name = "当前等级",
+          height = 20,
+          width = 30,
+          isImportField = "true_st",
+          replace = {"VIP0_0", "VIP1_1", "VIP2_2", "VIP3_3", "VIP4_4", "VIP5_5", "VIP6_6",
+                     "VIP7_7", "VIP8_8", "VIP9_9", "VIP10_10", "VIP11_11", "VIP12_12", "VIP13_13",
+                     "VIP14_14", "VIP15_15", "VIP16_16", "VIP17_17", "VIP18_18", "VIP19_19", "VIP20_20",
+                     "VIP21_21", "VIP22_22", "VIP23_23", "VIP24_24", "VIP25_25", "VIP26_26", "VIP27_27",
+                     "VIP28_28", "VIP29_29", "VIP30_30", "VIP31_31", "VIP32_32", "VIP33_33", "VIP34_34"})
   private Integer currentLevel;
 
   @ApiModelProperty("派发金额")

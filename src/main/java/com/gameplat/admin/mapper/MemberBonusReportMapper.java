@@ -23,4 +23,6 @@ public interface MemberBonusReportMapper extends BaseMapper<MemberBonusReportVO>
   TotalMemberBonusReportVO findMemberBonusReportTotal(MemberBonusReportQueryDTO dto);
 
   List<MemberBonusReportVO> findMemberBonusReportList(MemberBonusReportQueryDTO dto);
+
+  Integer findMemberBonusReportCount(MemberBonusReportQueryDTO dto);
 }

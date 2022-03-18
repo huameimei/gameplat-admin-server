@@ -428,7 +428,7 @@ public class MemberWealServiceImpl extends ServiceImpl<MemberWealMapper, MemberW
                 memberWealReword.setParentName(member.getParentName());
                 memberWealReword.setAgentPath(member.getSuperPath());
                 // 0 升级奖励  1：周俸禄  2：月俸禄  3：生日礼金  4：每月红包
-                memberWealReword.setType(type + 1);
+                memberWealReword.setType(type);
                 memberWealReword.setSerialNumber(serialNumber);
                 // 自动派发
                 if (BooleanEnum.YES.match(growthConfig.getIsAutoPayReword())) {

@@ -140,7 +140,7 @@ public class RechargeOrderController {
 
   @PostMapping("/manual")
   @PreAuthorize("hasAuthority('finance:rechargeOrder:manual')")
-  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.RECHARGE, desc = "'人工入款memberId：' + #manualRechargeOrderBo.memberId")
+  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.RECHARGE, desc = "'人工入款account：' + #manualRechargeOrderBo.account")
   public void manual(ManualRechargeOrderBo manualRechargeOrderBo, HttpServletRequest request)
       throws Exception {
     UserCredential userCredential = SecurityUserHolder.getCredential();

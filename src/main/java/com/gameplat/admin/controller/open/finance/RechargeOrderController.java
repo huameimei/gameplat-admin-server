@@ -3,6 +3,7 @@ package com.gameplat.admin.controller.open.finance;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.gameplat.admin.model.bean.ManualRechargeOrderBo;
 import com.gameplat.admin.model.bean.PageExt;
+import com.gameplat.admin.model.dto.ManualRechargeOrderDto;
 import com.gameplat.admin.model.dto.RechargeOrderQueryDTO;
 import com.gameplat.admin.model.vo.RechargeOrderVO;
 import com.gameplat.admin.model.vo.SummaryVO;
@@ -18,10 +19,8 @@ import com.gameplat.security.context.UserCredential;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
 import java.util.List;
@@ -148,4 +147,29 @@ public class RechargeOrderController {
     UserEquipment clientInfo = UserEquipment.create(request);
     rechargeOrderService.manual(manualRechargeOrderBo, userCredential, clientInfo);
   }
+
+
+  /**
+   * 人工批量充值（文件上传 username）
+   */
+  @PostMapping("/fileUserNameRech")
+  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.RECHARGE, desc = "'人工入款批量充值")
+  public void fileUserNameRech(ManualRechargeOrderDto dto, @RequestPart(value = "file",required = false) MultipartFile file, HttpServletRequest request) throws Exception {
+    log.info("根据用户名进行批量充值操作人：{}", SecurityUserHolder.getCredential().getUsername());
+    rechargeOrderService.fileUserNameRech(dto,file,request,SecurityUserHolder.getCredential());
+  }
+
+
+  /**
+   * 人工批量充值（文件上传）
+   */
+  @PostMapping("/fileRech")
+  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.RECHARGE, desc = "'人工入款文件批量充值")
+  public void fileRech(@RequestPart(value = "file",required = false) MultipartFile file,@RequestParam("discountType") Integer discountType, HttpServletRequest request) throws Exception {
+    log.info("根据上传文件进行批量充值操作人：{}", SecurityUserHolder.getCredential().getUsername());
+    rechargeOrderService.fileRech(file,discountType,request,SecurityUserHolder.getCredential());
+  }
+
+
+
 }

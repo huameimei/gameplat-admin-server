@@ -8,6 +8,10 @@ import java.math.BigDecimal;
 public class MemberBalanceVO implements Serializable {
 
 
+
+  /** 会员id */
+  private long id;
+
   /** 会员账号 */
   private String account;
 
@@ -35,6 +39,13 @@ public class MemberBalanceVO implements Serializable {
    * 上级代理
    */
   private String parentName;
+
+  /**
+   * 代理路径
+   */
+  private String superPath;
+
+  private long parentId;
 
 
 }

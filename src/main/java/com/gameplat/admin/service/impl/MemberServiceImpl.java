@@ -91,7 +91,6 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
   public IPage<MemberBalanceVO> findTGMemberBalance(Page<Member> page, MemberQueryDTO dto) {
     return memberMapper
             .queryPage(page, memberQueryCondition.builderQueryWrapper(dto))
-            .convert(this::setOnlineStatus)
             .convert(memberConvert::toBalanceVo);
   }
 
@@ -523,7 +522,8 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
       String[] userNames = dto.getUserNames().split(",");
       List<String> userNameList = Lists.newArrayList(userNames);
       dto.setUserNameList(userNameList);
-      memberList = this.lambdaQuery().in(Member::getAccount,dto.getUserNames().split(",")).list();
+      if (ObjectUtil.equals(dto.getUserType(),4))
+      memberList = this.lambdaQuery().in(Member::getAccount,dto.getUserNames().split(",")).eq(Member::getUserType,dto.getUserType()).list();
       if (StringUtils.isEmpty(memberList) || memberList.size() != userNames.length) {
         throw new ServiceException("未找到账号信息");
       }
@@ -547,5 +547,11 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
     });
     memberInfoService.updateClearGTMember(dto);
     log.info("批量清理账号余额结束，操作人：{}，参数：{}", SecurityUserHolder.getUsername(), dto);
+  }
+
+  @Override
+  public MemberBalanceVO findMemberVip(String username, String level, String vipGrade) {
+    return memberMapper.findMemberVip(username,level,vipGrade);
+
   }
 }

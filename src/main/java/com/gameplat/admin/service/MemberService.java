@@ -150,4 +150,9 @@ public interface MemberService extends IService<Member> {
    */
   void updateTGClearMember(CleanAccountDTO dto);
 
+  /**
+   * 根据会员账号 层级  vip 等级去查询会员
+   */
+  MemberBalanceVO findMemberVip(String username,String level,String vipGrade);
+
 }

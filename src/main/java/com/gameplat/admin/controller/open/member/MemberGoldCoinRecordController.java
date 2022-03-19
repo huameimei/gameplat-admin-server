@@ -48,7 +48,7 @@ public class MemberGoldCoinRecordController {
     @ApiOperation(value = "后台添加VIP金币明细")
     @PreAuthorize("hasAuthority('member:coin:add')")
     public void add(Long memberId, Integer amount){
-        memberGoldCoinRecordService.add(memberId, amount);
+        memberGoldCoinRecordService.addGoldCoin(memberId, amount);
     }
 
     @GetMapping("/goldCoinDescList")

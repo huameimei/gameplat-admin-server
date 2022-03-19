@@ -14,4 +14,6 @@ public interface MemberGoldCoinRecordService extends IService<MemberGoldCoinReco
 
     /** 增 */
     void add(Long memberId, Integer amount);
+
+    void addGoldCoin(Long memberId, Integer amount);
 }

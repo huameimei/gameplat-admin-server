@@ -4,7 +4,6 @@ import cn.hutool.core.util.NumberUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.constant.MemberServiceKeyConstant;
 import com.gameplat.admin.enums.ActivityDistributeEnum;
-import com.gameplat.admin.enums.MemberBillTransTypeEnum;
 import com.gameplat.admin.enums.MemberWealRewordEnums;
 import com.gameplat.admin.enums.PushMessageEnum;
 import com.gameplat.admin.mapper.ActivityDistributeMapper;
@@ -13,6 +12,7 @@ import com.gameplat.admin.model.vo.MemberInfoVO;
 import com.gameplat.admin.service.*;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.common.enums.BooleanEnum;
+import com.gameplat.common.enums.TranTypes;
 import com.gameplat.model.entity.ValidWithdraw;
 import com.gameplat.model.entity.activity.ActivityDistribute;
 import com.gameplat.model.entity.activity.ActivityQualification;
@@ -133,7 +133,7 @@ public class ActivityDistributeWayService
       memberBill.setMemberId(activityDistribute.getUserId());
       memberBill.setAccount(memberInfoVO.getAccount());
       memberBill.setMemberPath(memberInfoVO.getSuperPath());
-      memberBill.setTranType(MemberBillTransTypeEnum.PROMOTION_BONUS.getCode());
+      memberBill.setTranType(TranTypes.PROMOTION_BONUS.getValue());
       memberBill.setOrderNo(sourceId);
       memberBill.setAmount(
           activityDistribute.getDiscountsMoney().setScale(2, RoundingMode.HALF_UP));

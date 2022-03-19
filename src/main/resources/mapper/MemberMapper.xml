@@ -395,17 +395,17 @@
         FROM member t1
         LEFT JOIN member_info t2 ON t1.id = t2.member_id
         <where>
-            <if test="agentAccount != null and agentAccount != ''">
+            <if test="parentName != null and parentName != ''">
                 <choose>
                     <when test="subordinateOnly != null and subordinateOnly == true">
-                        and t1.parent_name = #{agentAccount}
+                        and t1.parent_name = #{parentName}
                     </when>
                     <otherwise>
-                        and t1.super_path LIKE concat('%', #{agentAccount},'%')
+                        and t1.super_path LIKE concat('%', #{parentName},'%')
                     </otherwise>
                 </choose>
                 <if test="itself != null and itself == 1">
-                    or t1.account = #{agentAccount}
+                    or t1.account = #{parentName}
                 </if>
             </if>
             <if test="levelList != null and levelList.size() > 0">
@@ -432,7 +432,7 @@
             <if test="lastRechTimeTo != null">
                 and t2.last_rech_time <![CDATA[>= ]]> #{lastRechTimeTo}
             </if>
-            <if test="userType != null">
+            <if test="userType != null and userType != ''">
                 and t1.user_type = #{userType}
             </if>
         </where>

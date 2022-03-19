@@ -216,7 +216,7 @@ public class MemberLevelServiceImpl extends ServiceImpl<MemberLevelMapper, Membe
   }
 
   @Override
-  @CacheInvalidate(name = CachedKeys.MEMBER_LEVEL_CACHE, key = "'all'")
+  // @CacheInvalidate(name = CachedKeys.MEMBER_LEVEL_CACHE, key = "'all'")
   public void allocateByFile(Integer levelValue, List<MemberLevelFileDTO> list) {
     if (CollectionUtil.isEmpty(list)) {
       throw new ServiceException("上传文件不能为空！");

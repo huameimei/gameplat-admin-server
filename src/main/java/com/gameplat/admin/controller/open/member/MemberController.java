@@ -239,7 +239,13 @@ public class MemberController {
   }
 
 
-  //返回推广会员
+
+  /**
+   * 返回推广会员
+   * @param page
+   * @param dto
+   * @return
+   */
   @GetMapping("findTGMemberBalance")
   @ApiOperation("返回推广会员")
   public IPage<MemberBalanceVO> findTGMemberBalance(PageDTO<Member> page, MemberQueryDTO dto) {

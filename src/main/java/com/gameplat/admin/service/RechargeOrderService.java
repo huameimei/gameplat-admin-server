@@ -7,6 +7,7 @@ import com.gameplat.admin.model.bean.ActivityStatisticItem;
 import com.gameplat.admin.model.bean.ManualRechargeOrderBo;
 import com.gameplat.admin.model.bean.PageExt;
 import com.gameplat.admin.model.dto.GameRWDataReportDto;
+import com.gameplat.admin.model.dto.ManualRechargeOrderDto;
 import com.gameplat.admin.model.dto.MemberActivationDTO;
 import com.gameplat.admin.model.dto.RechargeOrderQueryDTO;
 import com.gameplat.admin.model.vo.MemberActivationVO;
@@ -17,7 +18,10 @@ import com.gameplat.common.model.bean.UserEquipment;
 import com.gameplat.model.entity.recharge.RechargeOrder;
 import com.gameplat.model.entity.spread.SpreadUnion;
 import com.gameplat.security.context.UserCredential;
+import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
@@ -68,4 +72,9 @@ public interface RechargeOrderService extends IService<RechargeOrder> {
   List<JSONObject> getSpreadReport(List<SpreadUnion> list, String startTime, String endTime);
 
   List<ThreeRechReportVo> findThreeRechReport(GameRWDataReportDto dto);
+
+
+  void fileUserNameRech(ManualRechargeOrderDto dto, MultipartFile file, HttpServletRequest request,UserCredential credential) throws Exception;
+
+  void fileRech(MultipartFile file, Integer discountType,HttpServletRequest request,UserCredential credential) throws Exception;
 }

@@ -91,4 +91,6 @@ public interface MemberMapper extends BaseMapper<Member> {
 
   /** 获取代理线下的会员账号信息 */
   List<Member> getMemberListByAgentAccount(MemberQueryDTO memberQueryDTO);
+
+  MemberBalanceVO findMemberVip(@Param("username") String username,@Param("userlevel") String userlevel,@Param("vipGrade") String vipGrade);
 }

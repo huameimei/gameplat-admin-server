@@ -190,7 +190,8 @@ public class MemberGrowthRecordServiceImpl
       memberGrowthRecord.setCurrentLevel(0);
     }
     // 当前成长值
-    Long oldGrowth = memberGrowthRecord.getCurrentGrowth();
+    Long oldGrowth = memberInfoService.lambdaQuery().eq(MemberInfo::getMemberId, dto.getUserId()).one().getVipGrowth();
+//    Long oldGrowth = memberGrowthRecord.getCurrentGrowth();
     // 最终变动成长值  由于类型不同  可能最终变成的成长值倍数也不同
     Long changeFinalGrowth = 0L;
     MemberGrowthRecord saveRecord = new MemberGrowthRecord();
@@ -346,15 +347,17 @@ public class MemberGrowthRecordServiceImpl
     Long growth = growthLevel.getGrowth();
     Long currentGrowth = 0L;
     // 当前成长值
-    MemberGrowthRecord growthRecord =
-        this.getOne(
-            new QueryWrapper<MemberGrowthRecord>()
-                .select(
-                    "user_id userId", "current_growth currentGrowth", "max(create_time) createTime")
-                .eq("user_id", memberId));
-    if (!BeanUtil.isEmpty(growthRecord)) {
-      currentGrowth = growthRecord.getCurrentGrowth();
-    }
+    MemberInfo memberInfo = memberInfoService.lambdaQuery().eq(MemberInfo::getMemberId, memberId).one();
+    currentGrowth = memberInfo.getVipGrowth();
+//    MemberGrowthRecord growthRecord =
+//        this.getOne(
+//            new QueryWrapper<MemberGrowthRecord>()
+//                .select(
+//                    "user_id userId", "current_growth currentGrowth", "max(create_time) createTime")
+//                .eq("user_id", memberId));
+//    if (!BeanUtil.isEmpty(growthRecord)) {
+//      currentGrowth = growthRecord.getCurrentGrowth();
+//    }
 
     Long finalCurrentGrowth = currentGrowth;
     return new GrowthScaleVO() {

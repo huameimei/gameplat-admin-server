@@ -86,8 +86,9 @@ public class ValidWithdrawServiceImpl extends ServiceImpl<ValidWithdrawMapper, V
     validWithdraw.setDiscountDml(rechargeOrder.getDiscountDml());
     validWithdraw.setMormDml(rechargeOrder.getNormalDml());
     validWithdraw.setRemark(rechargeOrder.getRemarks());
+    validWithdraw.setCreateTime(new Date());
     deleteByUserId(rechargeOrder.getMemberId(), 1);
-    updateTypeByUserId(rechargeOrder.getMemberId());
+    updateTypeByUserId(rechargeOrder.getMemberId(),validWithdraw.getCreateTime());
     this.save(validWithdraw);
   }
 
@@ -119,12 +120,13 @@ public class ValidWithdrawServiceImpl extends ServiceImpl<ValidWithdrawMapper, V
     this.remove(query);
   }
 
-  public void updateTypeByUserId(Long memberId) throws Exception {
+  public void updateTypeByUserId(Long memberId,Date createTime) throws Exception {
     this.lambdaUpdate()
         .set(ValidWithdraw::getType, 1)
+        .set(ValidWithdraw::getEndTime, createTime)
         .eq(ValidWithdraw::getMemberId, memberId)
         .eq(ValidWithdraw::getType, 0)
-        .update();
+        .update(new ValidWithdraw());
   }
 
   @Override
@@ -138,6 +140,7 @@ public class ValidWithdrawServiceImpl extends ServiceImpl<ValidWithdrawMapper, V
     if (save > 0) {
       if (validWithdraw1 != null) {
         validWithdraw1.setUpdateTime(new Date());
+        validWithdraw1.setEndTime(validWithdraw.getCreateTime());
         validWithdrawMapper.updateByUserId(validWithdraw1);
       }
     }

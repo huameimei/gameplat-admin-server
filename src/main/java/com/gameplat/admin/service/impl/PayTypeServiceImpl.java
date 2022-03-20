@@ -103,7 +103,8 @@ public class PayTypeServiceImpl extends ServiceImpl<PayTypeMapper, PayType>
   @Override
   public IPage<PayType> queryPage(Page<PayType> page) {
     LambdaQueryWrapper<PayType> query = Wrappers.lambdaQuery();
-    query.orderByAsc(PayType::getSort);
+    query.orderByAsc(PayType::getSort)
+    .orderByDesc(PayType::getCreateTime);
     return this.page(page, query);
   }
 

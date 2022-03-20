@@ -1,5 +1,6 @@
 package com.gameplat.admin.controller.open.member;
 
+import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
@@ -15,9 +16,13 @@ import com.gameplat.model.entity.member.MemberGrowthConfig;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * @author lily
@@ -47,8 +52,33 @@ public class MemberGoldCoinRecordController {
     @PostMapping("/add")
     @ApiOperation(value = "后台添加VIP金币明细")
     @PreAuthorize("hasAuthority('member:coin:add')")
-    public void add(Long memberId, Integer amount){
-        memberGoldCoinRecordService.addGoldCoin(memberId, amount);
+    public void add(String account, Integer amount){
+        log.info("系统增加金币：" + account + ",金币数：" + amount);
+        if (amount == null) {
+            throw new ServiceException("增加金币数量不能为空");
+        }
+        if (StringUtils.isBlank(account) ) {
+            throw new ServiceException("玩家不能为空");
+        }
+        String[] accountArray = Convert.toStrArray(account);
+        memberGoldCoinRecordService.addGoldCoin(accountArray, amount);
+    }
+
+    @ApiOperation("上传excel修改会员金币数量")
+    @PostMapping(value = "/importAddGoldCoin")
+    @PreAuthorize("hasAuthority('member:coin:import')")
+    public void importAddGoldCoin(@RequestPart(value = "file",required = false) MultipartFile file) {
+        if (file ==null ) {
+            throw new ServiceException("导入文件不能为空");
+        }
+        try {
+            memberGoldCoinRecordService.importAddGoldCoin(file);
+        }catch (Exception e){
+            e.printStackTrace();
+            log.info("批量上传异常：{}",e);
+            throw new ServiceException("批量导入玩家增加金币失败！");
+        }
+
     }
 
     @GetMapping("/goldCoinDescList")

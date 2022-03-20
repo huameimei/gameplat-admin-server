@@ -6,6 +6,10 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.gameplat.model.entity.member.MemberGoldCoinRecord;
 import com.gameplat.admin.model.dto.MemberGoldCoinRecordQueryDTO;
 import com.gameplat.admin.model.vo.MemberGoldCoinRecordVO;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 public interface MemberGoldCoinRecordService extends IService<MemberGoldCoinRecord> {
 
@@ -15,5 +19,7 @@ public interface MemberGoldCoinRecordService extends IService<MemberGoldCoinReco
     /** 增 */
     void add(Long memberId, Integer amount);
 
-    void addGoldCoin(Long memberId, Integer amount);
+    void addGoldCoin(String[] account, Integer amount);
+
+    void importAddGoldCoin(MultipartFile file) throws IOException;
 }

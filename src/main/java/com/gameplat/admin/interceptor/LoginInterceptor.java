@@ -2,6 +2,8 @@ package com.gameplat.admin.interceptor;
 
 import com.gameplat.admin.cache.AdminCache;
 import com.gameplat.admin.service.CommonService;
+import com.gameplat.admin.service.SysUserService;
+import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.common.compent.captcha.CaptchaStrategyContext;
 import com.gameplat.common.enums.BooleanEnum;
 import com.gameplat.common.lang.Assert;
@@ -26,6 +28,8 @@ public class LoginInterceptor extends HandlerInterceptorAdapter {
   @Autowired private CaptchaStrategyContext captchaStrategyContext;
 
   @Autowired private AdminCache adminCache;
+
+  @Autowired private SysUserService userService;
 
   @Override
   public boolean preHandle(
@@ -62,6 +66,9 @@ public class LoginInterceptor extends HandlerInterceptorAdapter {
    */
   private void checkPasswordErrorCount(int pwdErrorCount, String account) {
     int errorCount = adminCache.getErrorPasswordCount(account);
-    Assert.isTrue(errorCount < pwdErrorCount, "密码错误次数过多，如需解除限制，请联系管理员!");
+    if (errorCount >= pwdErrorCount) {
+      userService.disableAccount(account);
+      throw new ServiceException("密码错误次数过多，如需解除限制，请联系管理员!");
+    }
   }
 }

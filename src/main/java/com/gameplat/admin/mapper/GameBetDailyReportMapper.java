@@ -1,10 +1,10 @@
 package com.gameplat.admin.mapper;
 
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.gameplat.admin.model.bean.ActivityStatisticItem;
 import com.gameplat.admin.model.dto.GameBetDailyReportQueryDTO;
 import com.gameplat.admin.model.vo.*;
+import com.gameplat.datasource.mapper.ExtBaseMapper;
 import com.gameplat.model.entity.game.GameBetDailyReport;
 import com.gameplat.model.entity.game.GameRebatePeriod;
 import org.apache.ibatis.annotations.Param;
@@ -12,7 +12,7 @@ import org.apache.ibatis.annotations.Param;
 import java.util.List;
 import java.util.Map;
 
-public interface GameBetDailyReportMapper extends BaseMapper<GameBetDailyReport> {
+public interface GameBetDailyReportMapper extends ExtBaseMapper<GameBetDailyReport> {
 
   int getDayCount(@Param("statTime") String statTime, @Param("tableName") String tableName);
 
@@ -25,7 +25,7 @@ public interface GameBetDailyReportMapper extends BaseMapper<GameBetDailyReport>
   Map<String, Object> querySumReport(GameBetDailyReportQueryDTO dto);
 
   List<GameMemberDayReportVO> findByStatTimeBetweenAndValidBetAmountGtZero(
-      @Param("liveRebatePeriod") GameRebatePeriod liveRebatePeriod,
+      @Param("gameRebatePeriod") GameRebatePeriod gameRebatePeriod,
       @Param("startDate") String startDate,
       @Param("endDate") String endDate);
 

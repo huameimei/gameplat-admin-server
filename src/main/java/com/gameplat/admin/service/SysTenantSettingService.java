@@ -12,4 +12,11 @@ public interface SysTenantSettingService extends IService<SysTenantSetting> {
 
   /** 查询配置信息 */
   SysTenantSetting getSportConfig();
+
+  /**
+   * 修改租户设置的值
+   * @param sysTenantSetting
+   * @return
+   */
+  void updateTenantSettingValue(SysTenantSetting sysTenantSetting);
 }

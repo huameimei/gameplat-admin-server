@@ -22,8 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/admin/game/gameType")
 public class GameTypeController {
 
-  @Autowired
-  private GameTypeService gameTypeService;
+  @Autowired private GameTypeService gameTypeService;
 
   @GetMapping("/list")
   @PreAuthorize("hasAuthority('game:gameType:list')")

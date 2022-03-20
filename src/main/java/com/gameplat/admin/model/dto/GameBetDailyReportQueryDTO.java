@@ -9,13 +9,9 @@ import java.util.List;
 @Data
 public class GameBetDailyReportQueryDTO implements Serializable {
 
-  private String liveGameSuperType;
+  private String gameType;
 
   private String platformCode;
-
-  private String liveGameKind;
-
-  private String liveGameKindList;
 
   /** 会员账号 */
   private String account;

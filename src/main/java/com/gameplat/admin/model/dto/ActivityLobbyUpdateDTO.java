@@ -31,12 +31,12 @@ public class ActivityLobbyUpdateDTO implements Serializable {
 
   @NotBlank(message = "开始时间不能为空")
   @ApiModelProperty(value = "开始时间")
-  @JsonFormat(pattern = DateUtil.YYYY_MM_DD_HH_MM_SS)
+  @JsonFormat(pattern = DateUtil.YYYY_MM_DD)
   private Date startTime;
 
   @NotBlank(message = "结束时间不能为空")
   @ApiModelProperty(value = "结束时间")
-  @JsonFormat(pattern = DateUtil.YYYY_MM_DD_HH_MM_SS)
+  @JsonFormat(pattern = DateUtil.YYYY_MM_DD)
   private Date endTime;
 
   @NotNull(message = "活动板块必选")

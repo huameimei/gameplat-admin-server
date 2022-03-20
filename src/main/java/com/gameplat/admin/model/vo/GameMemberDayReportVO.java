@@ -1,10 +1,9 @@
 package com.gameplat.admin.model.vo;
 
-import lombok.Data;
-
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
+import lombok.Data;
 
 @Data
 public class GameMemberDayReportVO implements Serializable {
@@ -36,7 +35,7 @@ public class GameMemberDayReportVO implements Serializable {
   private String gameType;
 
   /** 年月日 */
-  private Date statTime;
+  private String statTime;
 
   /** 添加时间 */
   private Date createTime;
@@ -46,7 +45,6 @@ public class GameMemberDayReportVO implements Serializable {
 
   /** 有效投注额 */
   private BigDecimal validAmount;
-
 
   /** 中奖金额 */
   private Double winAmount;

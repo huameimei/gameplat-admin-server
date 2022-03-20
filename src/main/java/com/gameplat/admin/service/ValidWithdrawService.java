@@ -27,4 +27,10 @@ public interface ValidWithdrawService extends IService<ValidWithdraw> {
   void updateValidWithdraw(ValidWithdrawDto dto);
 
   void delValidWithdraw(String member) throws Exception;
+
+  /**
+   * 回收游戏返水，清除对应打码量
+   * @param remark
+   */
+  void rollGameRebateDml(String remark);
 }

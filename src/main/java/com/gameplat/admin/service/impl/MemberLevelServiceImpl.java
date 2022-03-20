@@ -1,9 +1,7 @@
 package com.gameplat.admin.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
-import cn.hutool.core.map.MapUtil;
 import com.alicp.jetcache.anno.CacheInvalidate;
-import com.alicp.jetcache.anno.Cached;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.convert.MemberLevelConvert;
 import com.gameplat.admin.enums.MemberLevelEnums;
@@ -14,6 +12,7 @@ import com.gameplat.admin.service.MemberLevelService;
 import com.gameplat.admin.service.MemberService;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.common.constant.CachedKeys;
+import com.gameplat.common.enums.DefaultEnums;
 import com.gameplat.model.entity.member.Member;
 import com.gameplat.model.entity.member.MemberInfo;
 import com.gameplat.model.entity.member.MemberLevel;
@@ -40,27 +39,33 @@ public class MemberLevelServiceImpl extends ServiceImpl<MemberLevelMapper, Membe
   @Autowired private MemberLevelMapper memberLevelMapper;
 
   @Override
-//  @Cached(name = CachedKeys.MEMBER_LEVEL_CACHE, key = "'all'", expire = 3600)
+  //  @Cached(name = CachedKeys.MEMBER_LEVEL_CACHE, key = "'all'", expire = 3600)
   public List<MemberLevelVO> getList() {
-      List<MemberLevelVO> memberLevelVOList = this.list().stream().map(memberLevelConvert::toVo).collect(Collectors.toList());
-      // 如果有层级值配置
-      if (CollectionUtil.isNotEmpty(memberLevelVOList)) {
-          // 查询会员表所有层级下的会员数量和锁定会员数量
-          List<MemberLevelVO> userLevelAccountNumList = memberService.getUserLevelAccountNum();
-          Map<Integer, List<MemberLevelVO>> map = userLevelAccountNumList.stream().collect(Collectors.groupingBy(MemberLevelVO::getLevelValue));
-          // 匹配对应的层级数据并赋值
-          memberLevelVOList.forEach(memberLevelVO -> {
-              if (map.get(memberLevelVO.getLevelValue()) != null) {
-                  memberLevelVO.setMemberNum(map.get(memberLevelVO.getLevelValue()).get(0).getMemberNum());
-                  memberLevelVO.setMemberLockNum(map.get(memberLevelVO.getLevelValue()).get(0).getMemberLockNum());
-              } else {
-                  memberLevelVO.setMemberNum(0);
-                  memberLevelVO.setMemberLockNum(0);
-              }
+    List<MemberLevelVO> memberLevelVOList =
+        this.list().stream().map(memberLevelConvert::toVo).collect(Collectors.toList());
+    // 如果有层级值配置
+    if (CollectionUtil.isNotEmpty(memberLevelVOList)) {
+      // 查询会员表所有层级下的会员数量和锁定会员数量
+      List<MemberLevelVO> userLevelAccountNumList = memberService.getUserLevelAccountNum();
+      Map<Integer, List<MemberLevelVO>> map =
+          userLevelAccountNumList.stream()
+              .collect(Collectors.groupingBy(MemberLevelVO::getLevelValue));
+      // 匹配对应的层级数据并赋值
+      memberLevelVOList.forEach(
+          memberLevelVO -> {
+            if (map.get(memberLevelVO.getLevelValue()) != null) {
+              memberLevelVO.setMemberNum(
+                  map.get(memberLevelVO.getLevelValue()).get(0).getMemberNum());
+              memberLevelVO.setMemberLockNum(
+                  map.get(memberLevelVO.getLevelValue()).get(0).getMemberLockNum());
+            } else {
+              memberLevelVO.setMemberNum(0);
+              memberLevelVO.setMemberLockNum(0);
+            }
           });
-      }
+    }
 
-      return memberLevelVOList;
+    return memberLevelVOList;
   }
 
   @Override
@@ -112,15 +117,32 @@ public class MemberLevelServiceImpl extends ServiceImpl<MemberLevelMapper, Membe
   @Override
   @CacheInvalidate(name = CachedKeys.MEMBER_LEVEL_CACHE, key = "'all'")
   public void lock(Long id) {
+    this.lockOrUnlockMember(id, DefaultEnums.YES);
     this.lambdaUpdate()
         .eq(MemberLevel::getId, id)
         .set(MemberLevel::getLocked, MemberLevelEnums.Locked.Y.value())
         .update();
   }
 
+  void lockOrUnlockMember(Long levelId, DefaultEnums status) {
+    // 锁定/解锁层级时，将该层级下所有会员的层级锁定状态改为yes/no
+    MemberLevel byId = getById(levelId);
+    List<String> userLevels = new ArrayList<>();
+    userLevels.add(String.valueOf(byId.getLevelValue()));
+    List<String> accountByUserLevelIn = memberService.findAccountByUserLevelIn(userLevels);
+    if (CollectionUtil.isNotEmpty(accountByUserLevelIn)) {
+      memberService
+          .lambdaUpdate()
+          .set(Member::getLevelLockFlag, status.value())
+          .in(Member::getAccount, accountByUserLevelIn)
+          .update();
+    }
+  }
+
   @Override
   @CacheInvalidate(name = CachedKeys.MEMBER_LEVEL_CACHE, key = "'all'")
   public void unlock(Long id) {
+    this.lockOrUnlockMember(id, DefaultEnums.NO);
     this.lambdaUpdate()
         .eq(MemberLevel::getId, id)
         .set(MemberLevel::getLocked, MemberLevelEnums.Locked.N.value())
@@ -163,105 +185,111 @@ public class MemberLevelServiceImpl extends ServiceImpl<MemberLevelMapper, Membe
         .update();
   }
 
-    @Override
-    @CacheInvalidate(name = CachedKeys.MEMBER_LEVEL_CACHE, key = "'all'")
-    public void batchAllocate(List<MemberLevelAllocateDTO> dtos) {
-        List<MemberLevel> memberLevels = this.getEnabledLevels();
-        dtos.forEach(dto -> this.allocateLevel(memberLevels, dto));
+  @Override
+  @CacheInvalidate(name = CachedKeys.MEMBER_LEVEL_CACHE, key = "'all'")
+  public void batchAllocate(List<MemberLevelAllocateDTO> dtos) {
+    List<MemberLevel> memberLevels = this.getEnabledLevels();
+    dtos.forEach(dto -> this.allocateLevel(memberLevels, dto));
+  }
+
+  @Override
+  @CacheInvalidate(name = CachedKeys.MEMBER_LEVEL_CACHE, key = "'all'")
+  public void allocateByUserNames(MemberLevelAllocateByUserNameDTO dto) {
+    String[] userNameArray = dto.getUserNames().split(",");
+    List<String> accountList = Arrays.asList(userNameArray);
+    allocateAccountIsExist(accountList);
+    List<Member> memberList = memberService.getListByAccountList(accountList);
+    // 过滤层级无变化的会员
+    memberList.removeIf(member -> member.getUserLevel().equals(dto.getLevelValue()));
+
+    if (CollectionUtil.isNotEmpty(memberList)) {
+      memberList.forEach(
+          member -> {
+            member.setUserLevel(dto.getLevelValue());
+            // 手动调整的会员默认是未锁定状态
+            member.setLevelLockFlag(MemberLevelEnums.Locked.N.name());
+          });
+
+      // 批量更新会员层级
+      memberService.updateBatchById(memberList);
+    }
+  }
+
+  @Override
+  // @CacheInvalidate(name = CachedKeys.MEMBER_LEVEL_CACHE, key = "'all'")
+  public void allocateByFile(Integer levelValue, List<MemberLevelFileDTO> list) {
+    if (CollectionUtil.isEmpty(list)) {
+      throw new ServiceException("上传文件不能为空！");
+    }
+    List<String> accountList =
+        list.stream().map(MemberLevelFileDTO::getAccount).collect(Collectors.toList());
+    allocateAccountIsExist(accountList);
+    List<Member> memberList = memberService.getListByAccountList(accountList);
+    if (CollectionUtil.isNotEmpty(memberList)) {
+      // 过滤层级无变化的会员
+      memberList.removeIf(member -> member.getUserLevel().equals(levelValue));
+      memberList.forEach(
+          member -> {
+            member.setUserLevel(levelValue);
+            // 手动调整的会员默认是未锁定状态
+            member.setLevelLockFlag(MemberLevelEnums.Locked.N.name());
+          });
+
+      // 批量更新会员层级
+      memberService.updateBatchById(memberList);
+    }
+  }
+
+  @Override
+  @CacheInvalidate(name = CachedKeys.MEMBER_LEVEL_CACHE, key = "'all'")
+  public void allocateByCondition(MemberLevelAllocateByConditionDTO dto) {
+    // 代理账号集合
+    List<String> parentNameList = Arrays.asList(dto.getParentNames().split(","));
+    allocateAccountIsExist(parentNameList);
+    // 筛选层级集合
+    List<String> levelList = null;
+    if (StringUtils.isNotEmpty(dto.getLevelValues())) {
+      levelList = Arrays.asList(dto.getLevelValues().split(","));
     }
 
-    @Override
-    @CacheInvalidate(name = CachedKeys.MEMBER_LEVEL_CACHE, key = "'all'")
-    public void allocateByUserNames(MemberLevelAllocateByUserNameDTO dto) {
-        String[] userNameArray = dto.getUserNames().split(",");
-        List<String> accountList = Arrays.asList(userNameArray);
-        allocateAccountIsExist(accountList);
-        List<Member> memberList = memberService.getListByAccountList(accountList);
-        // 过滤层级无变化的会员
-        memberList.removeIf(member -> member.getUserLevel().equals(dto.getLevelValue()));
-
-        if (CollectionUtil.isNotEmpty(memberList)) {
-            memberList.forEach(member -> {
-                member.setUserLevel(dto.getLevelValue());
-                // 手动调整的会员默认是未锁定状态
-                member.setLevelLockFlag(MemberLevelEnums.Locked.N.name());
-            });
-
-            // 批量更新会员层级
-            memberService.updateBatchById(memberList);
-        }
-    }
-
-    @Override
-    @CacheInvalidate(name = CachedKeys.MEMBER_LEVEL_CACHE, key = "'all'")
-    public void allocateByFile(Integer levelValue, List<MemberLevelFileDTO> list) {
-        if (CollectionUtil.isEmpty(list)) {
-            throw new ServiceException("上传文件不能为空！");
-        }
-        List<String> accountList = list.stream().map(MemberLevelFileDTO::getAccount).collect(Collectors.toList());
-        allocateAccountIsExist(accountList);
-        List<Member> memberList = memberService.getListByAccountList(accountList);
-        if (CollectionUtil.isNotEmpty(memberList)) {
-            // 过滤层级无变化的会员
-            memberList.removeIf(member -> member.getUserLevel().equals(levelValue));
-            memberList.forEach(member -> {
-                member.setUserLevel(levelValue);
-                // 手动调整的会员默认是未锁定状态
-                member.setLevelLockFlag(MemberLevelEnums.Locked.N.name());
-            });
-
-            // 批量更新会员层级
-            memberService.updateBatchById(memberList);
-        }
-    }
-
-    @Override
-    @CacheInvalidate(name = CachedKeys.MEMBER_LEVEL_CACHE, key = "'all'")
-    public void allocateByCondition(MemberLevelAllocateByConditionDTO dto) {
-        //代理账号集合
-        List<String> parentNameList = Arrays.asList(dto.getParentNames().split(","));
-        allocateAccountIsExist(parentNameList);
-        //筛选层级集合
-        List<String> levelList = null;
-        if(StringUtils.isNotEmpty(dto.getLevelValues())){
-            levelList = Arrays.asList(dto.getLevelValues().split(","));
-        }
-
-        //输入的代理账号下所有的下级会员
-        List<Member> allMemberList = Collections.synchronizedList(new ArrayList<>());
-        List<String> finalLevelList = levelList;
-        parentNameList.parallelStream().forEach(parentName -> {
-            MemberQueryDTO memberQueryDTO = new MemberQueryDTO();
-            memberQueryDTO.setParentName(parentName);
-            memberQueryDTO.setLevelList(finalLevelList);
-            memberQueryDTO.setRechTimesFrom(dto.getMinRechargeNum());
-            memberQueryDTO.setRechTimesTo(dto.getMaxRechargeNum());
-            memberQueryDTO.setRechAmountFrom(dto.getMinRechargeAmount());
-            memberQueryDTO.setRechAmountTo(dto.getMaxRechargeAmount());
-            memberQueryDTO.setLastRechTimeFrom(dto.getLastRechargeTime());
-            memberQueryDTO.setUserType(dto.getUserType());
-            memberQueryDTO.setSubordinateOnly(dto.getSubordinateOnly());
-            memberQueryDTO.setItself(dto.getItself());
-            List<Member> memberList = memberService.getMemberListByAgentAccount(memberQueryDTO);
-            if (CollectionUtil.isNotEmpty(memberList)) {
+    // 输入的代理账号下所有的下级会员
+    List<Member> allMemberList = Collections.synchronizedList(new ArrayList<>());
+    List<String> finalLevelList = levelList;
+    parentNameList.parallelStream()
+        .forEach(
+            parentName -> {
+              MemberQueryDTO memberQueryDTO = new MemberQueryDTO();
+              memberQueryDTO.setParentName(parentName);
+              memberQueryDTO.setLevelList(finalLevelList);
+              memberQueryDTO.setRechTimesFrom(dto.getMinRechargeNum());
+              memberQueryDTO.setRechTimesTo(dto.getMaxRechargeNum());
+              memberQueryDTO.setRechAmountFrom(dto.getMinRechargeAmount());
+              memberQueryDTO.setRechAmountTo(dto.getMaxRechargeAmount());
+              memberQueryDTO.setLastRechTimeFrom(dto.getLastRechargeTime());
+              memberQueryDTO.setUserType(dto.getUserType());
+              memberQueryDTO.setSubordinateOnly(dto.getSubordinateOnly());
+              memberQueryDTO.setItself(dto.getItself());
+              List<Member> memberList = memberService.getMemberListByAgentAccount(memberQueryDTO);
+              if (CollectionUtil.isNotEmpty(memberList)) {
                 allMemberList.addAll(memberList);
-            }
-        });
-
-        if (CollectionUtil.isNotEmpty(allMemberList)) {
-            allMemberList.removeIf(member -> member.getUserLevel().equals(dto.getLevelValue()));
-            allMemberList.forEach(member -> {
-                member.setUserLevel(dto.getLevelValue());
-                // 手动调整的会员默认是未锁定状态
-                member.setLevelLockFlag(MemberLevelEnums.Locked.N.name());
+              }
             });
 
-            // 批量更新会员层级
-            memberService.updateBatchById(allMemberList);
-        }
-    }
+    if (CollectionUtil.isNotEmpty(allMemberList)) {
+      allMemberList.removeIf(member -> member.getUserLevel().equals(dto.getLevelValue()));
+      allMemberList.forEach(
+          member -> {
+            member.setUserLevel(dto.getLevelValue());
+            // 手动调整的会员默认是未锁定状态
+            member.setLevelLockFlag(MemberLevelEnums.Locked.N.name());
+          });
 
-    /**
+      // 批量更新会员层级
+      memberService.updateBatchById(allMemberList);
+    }
+  }
+
+  /**
    * 分配层级
    *
    * @param levelList List
@@ -319,7 +347,7 @@ public class MemberLevelServiceImpl extends ServiceImpl<MemberLevelMapper, Membe
    * @param members List
    */
   private void updateLevelMemberNum(Integer oldLevel, List<Member> members) {
-      return;
+    return;
     /*Map<Integer, Integer> map = new HashMap<>(members.size());
     members.stream()
         .map(Member::getUserLevel)
@@ -336,15 +364,17 @@ public class MemberLevelServiceImpl extends ServiceImpl<MemberLevelMapper, Membe
     }*/
   }
 
-  private List<Member> builderMembersForUpdate(List<MemberLevel> levels, List<MemberInfo> memberInfos) {
-      return memberInfos.stream().filter(m -> m != null)
-              .map(
-                      memberInfo ->
-                              Member.builder()
-                                      .id(memberInfo.getMemberId())
-                                      .userLevel(this.getMatchedLevel(levels, memberInfo))
-                                      .build())
-              .collect(Collectors.toList());
+  private List<Member> builderMembersForUpdate(
+      List<MemberLevel> levels, List<MemberInfo> memberInfos) {
+    return memberInfos.stream()
+        .filter(m -> m != null)
+        .map(
+            memberInfo ->
+                Member.builder()
+                    .id(memberInfo.getMemberId())
+                    .userLevel(this.getMatchedLevel(levels, memberInfo))
+                    .build())
+        .collect(Collectors.toList());
   }
 
   private List<MemberLevel> getEnabledLevels() {
@@ -375,22 +405,23 @@ public class MemberLevelServiceImpl extends ServiceImpl<MemberLevelMapper, Membe
         && memberInfo.getTotalRechTimes() >= level.getTotalRechTimes();
   }
 
-    /**
-     * 校验输入的会员(代理)是否存在
-     *
-     * @param accountList List
-     */
-    private void allocateAccountIsExist(List<String> accountList) {
-        List<String> nonentityAccount = new ArrayList<>();
-        accountList.forEach(account -> {
-            Member member = memberService.getByAccount(account).orElse(null);
-            if (member == null) {
-                nonentityAccount.add(account);
-            }
+  /**
+   * 校验输入的会员(代理)是否存在
+   *
+   * @param accountList List
+   */
+  private void allocateAccountIsExist(List<String> accountList) {
+    List<String> nonentityAccount = new ArrayList<>();
+    accountList.forEach(
+        account -> {
+          Member member = memberService.getByAccount(account).orElse(null);
+          if (member == null) {
+            nonentityAccount.add(account);
+          }
         });
 
-        if (CollectionUtil.isNotEmpty(nonentityAccount)) {
-            throw new ServiceException("你有输入不存在的账号，不存在的账号：" + nonentityAccount.toString());
-        }
+    if (CollectionUtil.isNotEmpty(nonentityAccount)) {
+      throw new ServiceException("你有输入不存在的账号，不存在的账号：" + nonentityAccount.toString());
     }
+  }
 }

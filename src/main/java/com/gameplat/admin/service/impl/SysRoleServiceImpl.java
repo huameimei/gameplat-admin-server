@@ -91,7 +91,7 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole>
   public IPage<RoleVo> selectRoleList(PageDTO<SysRole> page, RoleDTO dto) {
     QueryWrapper<SysRole> queryWrapper = new QueryWrapper<>();
     queryWrapper
-            .eq(ObjectUtils.isNotEmpty(dto.getRoleName()), "r.role_name", dto.getRoleName())
+            .like(ObjectUtils.isNotEmpty(dto.getRoleName()), "r.role_name", dto.getRoleName())
             .eq(ObjectUtils.isNotNull(dto.getStatus()), "r.status", dto.getStatus())
             .like(ObjectUtils.isNotEmpty(dto.getRoleKey()), "r.role_key", dto.getRoleKey());
 

@@ -12,7 +12,6 @@ import com.gameplat.admin.constant.MemberServiceKeyConstant;
 import com.gameplat.admin.convert.MemberWealConvert;
 import com.gameplat.admin.convert.MessageInfoConvert;
 import com.gameplat.admin.enums.LanguageEnum;
-import com.gameplat.admin.enums.MemberBillTransTypeEnum;
 import com.gameplat.admin.enums.PushMessageEnum;
 import com.gameplat.admin.mapper.*;
 import com.gameplat.admin.model.dto.*;
@@ -23,6 +22,7 @@ import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.IPUtils;
 import com.gameplat.base.common.util.RandomUtil;
 import com.gameplat.common.enums.BooleanEnum;
+import com.gameplat.common.enums.TranTypes;
 import com.gameplat.model.entity.ValidWithdraw;
 import com.gameplat.model.entity.member.*;
 import com.gameplat.model.entity.message.Message;
@@ -396,19 +396,19 @@ public class MemberWealServiceImpl extends ServiceImpl<MemberWealMapper, MemberW
                 String content = "";
                 // 周俸禄
                 if (type == 0) {
-                  sourceType = MemberBillTransTypeEnum.WEEK_WEAL.getCode();
+                  sourceType = TranTypes.WEEK_WEAL.getValue();
                   content = "本周俸禄奖励已派发 金额:" + item.getRewordAmount() + "，请领取";
                   // 月俸禄
                 } else if (type == 1) {
-                  sourceType = MemberBillTransTypeEnum.MONTH_WEAL.getCode();
+                  sourceType = TranTypes.MONTH_WEAL.getValue();
                   content = "本月俸禄奖励已派发 金额:" + item.getRewordAmount() + "，请领取";
                   // 生日礼金
                 } else if (type == 2) {
-                  sourceType = MemberBillTransTypeEnum.BIRTH_WEAL.getCode();
+                  sourceType = TranTypes.BIRTH_WEAL.getValue();
                   content = "您的生日礼金奖励已派发 金额:" + item.getRewordAmount() + "，请领取";
                   // 每月红包
                 } else if (type == 3) {
-                  sourceType = MemberBillTransTypeEnum.RED_ENVELOPE_WEAL.getCode();
+                  sourceType = TranTypes.RED_ENVELOPE_WEAL.getValue();
                   content = "当月红包奖励已派发 金额:" + item.getRewordAmount() + "，请领取";
                 }
                 // 查询会员信息
@@ -428,7 +428,7 @@ public class MemberWealServiceImpl extends ServiceImpl<MemberWealMapper, MemberW
                 memberWealReword.setParentName(member.getParentName());
                 memberWealReword.setAgentPath(member.getSuperPath());
                 // 0 升级奖励  1：周俸禄  2：月俸禄  3：生日礼金  4：每月红包
-                memberWealReword.setType(type + 1);
+                memberWealReword.setType(type);
                 memberWealReword.setSerialNumber(serialNumber);
                 // 自动派发
                 if (BooleanEnum.YES.match(growthConfig.getIsAutoPayReword())) {
@@ -564,24 +564,24 @@ public class MemberWealServiceImpl extends ServiceImpl<MemberWealMapper, MemberW
     Integer type = memberWeal.getType();
     Integer sourceType =
         type == 0
-            ? MemberBillTransTypeEnum.WEEK_WEAL_RECYCLE.getCode()
+            ? TranTypes.WEEK_WEAL_RECYCLE.getValue()
             : type == 1
-                ? MemberBillTransTypeEnum.MONTH_WEAL_RECYCLE.getCode()
+                ? TranTypes.MONTH_WEAL_RECYCLE.getValue()
                 : type == 2
-                    ? MemberBillTransTypeEnum.BIRTH_WEAL_RECYCLE.getCode()
+                    ? TranTypes.BIRTH_WEAL_RECYCLE.getValue()
                     : type == 3
-                        ? MemberBillTransTypeEnum.RED_ENVELOPE_WEAL_RECYCLE.getCode()
-                        : MemberBillTransTypeEnum.WEEK_WEAL_RECYCLE.getCode();
+                        ? TranTypes.RED_ENVELOPE_WEAL_RECYCLE.getValue()
+                        : TranTypes.WEEK_WEAL_RECYCLE.getValue();
     String remark =
         type == 0
-            ? MemberBillTransTypeEnum.WEEK_WEAL_RECYCLE.getDetail()
+            ? TranTypes.WEEK_WEAL_RECYCLE.getDesc()
             : type == 1
-                ? MemberBillTransTypeEnum.MONTH_WEAL_RECYCLE.getDetail()
+                ? TranTypes.MONTH_WEAL_RECYCLE.getDesc()
                 : type == 2
-                    ? MemberBillTransTypeEnum.BIRTH_WEAL_RECYCLE.getDetail()
+                    ? TranTypes.BIRTH_WEAL_RECYCLE.getDesc()
                     : type == 3
-                        ? MemberBillTransTypeEnum.RED_ENVELOPE_WEAL_RECYCLE.getDetail()
-                        : MemberBillTransTypeEnum.WEEK_WEAL_RECYCLE.getDetail();
+                        ? TranTypes.RED_ENVELOPE_WEAL_RECYCLE.getDesc()
+                        : TranTypes.WEEK_WEAL_RECYCLE.getDesc();
     // 流水号
     String serialNumber = memberWeal.getSerialNumber();
     List<MemberWealReword> rewordList =

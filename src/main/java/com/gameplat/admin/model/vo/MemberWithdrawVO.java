@@ -62,4 +62,7 @@ public class MemberWithdrawVO {
   private String acceptAccount;
 
   private Date acceptTime;
+
+  // 是否是银行卡黑名单(0-否 1-是)
+  private Integer isBankBlacklist;
 }

@@ -36,8 +36,11 @@ public class MemberWealAddDTO implements Serializable {
   @ApiModelProperty(value = "最低有效投注金额")
   private BigDecimal minBetAmount;
 
-  @ApiModelProperty(value = "备注")
+  @ApiModelProperty(value = "福利备注")
   private String remark;
+
+  @ApiModelProperty(value = "福利描述")
+  private String depict;
 
   @ApiModelProperty(value = "0:未结算  1：未派发   2：已派发  3：已回收")
   private Integer status;

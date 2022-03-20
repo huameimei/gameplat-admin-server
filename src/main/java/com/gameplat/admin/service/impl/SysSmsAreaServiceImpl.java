@@ -58,4 +58,12 @@ public class SysSmsAreaServiceImpl extends ServiceImpl<SysSmsAreaMapper, SysSmsA
     area.setStatus(status);
     Assert.isTrue(this.updateById(area), "修改状态失败");
   }
+
+  @Override
+  public void setDefaultStatus(Long id, Integer status) {
+    SysSmsArea area = Assert.notNull(this.getById(id), "区号不存在");
+    this.lambdaUpdate().set(SysSmsArea::getIsDefault,0).eq(SysSmsArea::getIsDefault,1).update();
+    area.setIsDefault(status);
+    Assert.isTrue(this.updateById(area), "修改状态失败");
+  }
 }

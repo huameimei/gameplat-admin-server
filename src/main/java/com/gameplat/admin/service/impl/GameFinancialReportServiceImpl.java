@@ -184,7 +184,7 @@ public class GameFinancialReportServiceImpl extends ServiceImpl<GameFinancialRep
                 e1.printStackTrace();
             }
             try {
-                JxlsExcelUtil.downLoadExcel(map, GAME_FINANCIAL_REPORT, fo);
+                JxlsExcelUtils.downLoadExcel(map, GAME_FINANCIAL_REPORT, fo);
             } catch (InvalidFormatException | IOException e1) {
                 e1.printStackTrace();
             } finally {

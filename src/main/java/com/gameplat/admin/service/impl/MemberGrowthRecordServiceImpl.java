@@ -3,7 +3,6 @@ package com.gameplat.admin.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.date.DateTime;
 import com.alibaba.fastjson.JSONObject;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
@@ -14,7 +13,6 @@ import com.gameplat.admin.convert.MemberGrowthRecordConvert;
 import com.gameplat.admin.convert.MessageInfoConvert;
 import com.gameplat.admin.enums.GrowthChangeEnum;
 import com.gameplat.admin.enums.LanguageEnum;
-import com.gameplat.admin.enums.MemberBillTransTypeEnum;
 import com.gameplat.admin.enums.PushMessageEnum;
 import com.gameplat.admin.mapper.MemberGrowthRecordMapper;
 import com.gameplat.admin.mapper.MessageMapper;
@@ -26,10 +24,10 @@ import com.gameplat.admin.model.vo.MemberVO;
 import com.gameplat.admin.service.*;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.common.enums.BooleanEnum;
+import com.gameplat.common.enums.TranTypes;
 import com.gameplat.model.entity.ValidWithdraw;
 import com.gameplat.model.entity.member.*;
 import com.gameplat.model.entity.message.Message;
-import com.gameplat.model.entity.message.MessageDistribute;
 import com.gameplat.redis.redisson.DistributedLocker;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -98,6 +96,7 @@ public class MemberGrowthRecordServiceImpl
 
     IPage<MemberGrowthRecordVO> result =
         this.lambdaQuery()
+            .ne(MemberGrowthRecord::getType, 6)
             .like(
                 ObjectUtils.isNotEmpty(dto.getUserName()),
                 MemberGrowthRecord::getUserName,
@@ -190,7 +189,8 @@ public class MemberGrowthRecordServiceImpl
       memberGrowthRecord.setCurrentLevel(0);
     }
     // 当前成长值
-    Long oldGrowth = memberGrowthRecord.getCurrentGrowth();
+    Long oldGrowth = memberInfoService.lambdaQuery().eq(MemberInfo::getMemberId, dto.getUserId()).one().getVipGrowth();
+//    Long oldGrowth = memberGrowthRecord.getCurrentGrowth();
     // 最终变动成长值  由于类型不同  可能最终变成的成长值倍数也不同
     Long changeFinalGrowth = 0L;
     MemberGrowthRecord saveRecord = new MemberGrowthRecord();
@@ -314,14 +314,14 @@ public class MemberGrowthRecordServiceImpl
       MemberInfo memberInfo = new MemberInfo();
       memberInfo.setMemberId(memberId);
       memberInfo.setVipLevel(afterLevel);
-      memberInfo.setVipGrowth(oldGrowth + memberGrowthRecord.getCurrentGrowth());
+      memberInfo.setVipGrowth(oldGrowth + changeFinalGrowth);
       memberInfoService.updateById(memberInfo);
     } else {
       // VIP变动更新会员vip
       MemberInfo memberInfo = new MemberInfo();
       memberInfo.setMemberId(memberId);
       memberInfo.setVipLevel(afterLevel);
-      memberInfo.setVipGrowth(oldGrowth + memberGrowthRecord.getCurrentGrowth());
+      memberInfo.setVipGrowth(oldGrowth + changeFinalGrowth);
       memberInfoService.updateById(memberInfo);
     }
   }
@@ -346,15 +346,17 @@ public class MemberGrowthRecordServiceImpl
     Long growth = growthLevel.getGrowth();
     Long currentGrowth = 0L;
     // 当前成长值
-    MemberGrowthRecord growthRecord =
-        this.getOne(
-            new QueryWrapper<MemberGrowthRecord>()
-                .select(
-                    "user_id userId", "current_growth currentGrowth", "max(create_time) createTime")
-                .eq("user_id", memberId));
-    if (!BeanUtil.isEmpty(growthRecord)) {
-      currentGrowth = growthRecord.getCurrentGrowth();
-    }
+    MemberInfo memberInfo = memberInfoService.lambdaQuery().eq(MemberInfo::getMemberId, memberId).one();
+    currentGrowth = memberInfo.getVipGrowth();
+//    MemberGrowthRecord growthRecord =
+//        this.getOne(
+//            new QueryWrapper<MemberGrowthRecord>()
+//                .select(
+//                    "user_id userId", "current_growth currentGrowth", "max(create_time) createTime")
+//                .eq("user_id", memberId));
+//    if (!BeanUtil.isEmpty(growthRecord)) {
+//      currentGrowth = growthRecord.getCurrentGrowth();
+//    }
 
     Long finalCurrentGrowth = currentGrowth;
     return new GrowthScaleVO() {
@@ -461,7 +463,7 @@ public class MemberGrowthRecordServiceImpl
             memberBill.setMemberId(member.getId());
             memberBill.setAccount(member.getAccount());
             memberBill.setMemberPath(member.getSuperPath());
-            memberBill.setTranType(MemberBillTransTypeEnum.UPGRADE_REWARD.getCode());
+            memberBill.setTranType(TranTypes.UPGRADE_REWARD.getValue());
             memberBill.setOrderNo(sourceId);
             memberBill.setAmount(rewordAmount);
             memberBill.setBalance(memberInfoService.getById(member.getId()).getBalance());
@@ -508,15 +510,15 @@ public class MemberGrowthRecordServiceImpl
     message.setCreateBy("System");
     messageMapper.saveReturnId(message);
 
-    MessageDistribute messageDistribute = new MessageDistribute();
-    messageDistribute.setMessageId(message.getId());
-    messageDistribute.setUserId(member.getId());
-    messageDistribute.setUserAccount(member.getAccount());
-    messageDistribute.setRechargeLevel(member.getUserLevel());
-    messageDistribute.setVipLevel(memberInfoService.getById(member.getId()).getVipLevel());
-    messageDistribute.setReadStatus(0);
-    messageDistribute.setCreateBy("System");
-    messageDistributeService.save(messageDistribute);
+//    MessageDistribute messageDistribute = new MessageDistribute();
+//    messageDistribute.setMessageId(message.getId());
+//    messageDistribute.setUserId(member.getId());
+//    messageDistribute.setUserAccount(member.getAccount());
+//    messageDistribute.setRechargeLevel(member.getUserLevel());
+//    messageDistribute.setVipLevel(memberInfoService.getById(member.getId()).getVipLevel());
+//    messageDistribute.setReadStatus(0);
+//    messageDistribute.setCreateBy("System");
+//    messageDistributeService.save(messageDistribute);
     log.info("发送消息成功");
   }
 

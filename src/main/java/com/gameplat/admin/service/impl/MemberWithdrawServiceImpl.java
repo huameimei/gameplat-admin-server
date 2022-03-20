@@ -172,8 +172,8 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
         BigDecimal approveMoney = memberWithdraw.getCashMoney().subtract(afterCounterFee);
         BigDecimal approveCurrencyCount = BigDecimal.ZERO;
         if (Objects.nonNull(memberWithdraw.getWithdrawType())
-            && !memberWithdraw.getWithdrawType().equals(WithdrawTypeConstant.BANK_CURRENCY)
-            && !memberWithdraw.getWithdrawType().equals(WithdrawTypeConstant.DIRECT_CURRENCY)) {
+            && !memberWithdraw.getWithdrawType().equals(WithdrawTypeConstant.BANK)
+            && !memberWithdraw.getWithdrawType().equals(WithdrawTypeConstant.DIRECT)) {
             approveCurrencyCount = approveMoney.divide(memberWithdraw.getCurrencyRate());
         }
         LambdaUpdateWrapper<MemberWithdraw> update = Wrappers.lambdaUpdate();
@@ -444,7 +444,7 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
                 + DateUtil.getNowTime()
                 + "向用户"
                 + member.getAccount()
-                + "成功通过后台转出"
+                + "成功通过人工提现"
                 + String.format("%.3f", cashMoney)
                 + "元,账户余额变更为:"
                 + String.format("%.3f", (memberInfo.getBalance().subtract(cashMoney)))

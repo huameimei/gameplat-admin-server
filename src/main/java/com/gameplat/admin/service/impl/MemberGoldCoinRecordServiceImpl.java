@@ -1,6 +1,7 @@
 package com.gameplat.admin.service.impl;
 
 import cn.hutool.core.util.ObjectUtil;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -52,6 +53,19 @@ public class MemberGoldCoinRecordServiceImpl extends ServiceImpl<MemberGoldCoinR
                 .convert(memberGoldCoinRecordConvert::toVo);
     }
 
+    @Override
+    public void addGoldCoin(Long memberId, Integer amount){
+        MemberInfo memberInfo = memberInfoService.lambdaQuery().eq(MemberInfo::getMemberId, memberId).one();
+        if(null == memberInfo){
+            throw new ServiceException("此账号不存在！");
+        }
+        add(memberId, amount);
+        LambdaUpdateWrapper<MemberInfo> wrapper = new LambdaUpdateWrapper<>();
+        wrapper.set(MemberInfo::getGoldCoin, amount + memberInfo.getGoldCoin())
+                .eq(MemberInfo::getMemberId, memberId);
+        memberInfoService.update(wrapper);
+    }
+
     /** 增 */
     @Override
     public void add(Long memberId, Integer amount) {
@@ -71,7 +85,8 @@ public class MemberGoldCoinRecordServiceImpl extends ServiceImpl<MemberGoldCoinR
         this.save( MemberGoldCoinRecord.builder()
                                         .memberId(memberId.longValue())
                                         .account(member.getAccount())
-                                        .sourceType(3).amount(amount)
+                                        .sourceType(3)
+                                        .amount(amount)
                                         .beforeBalance(member.getGoldCoin())
                                         .afterBalance(member.getGoldCoin() + amount)
                                         .remark(remark)

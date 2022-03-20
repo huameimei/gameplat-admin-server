@@ -136,8 +136,8 @@
     <if test="dto.account != null and dto.account != ''">
       and account = #{dto.account}
     </if>
-    <if test="dto.liveGameSuperType!=null and dto.liveGameSuperType!=''">
-      and game_type in ${dto.liveGameSuperType}
+    <if test="dto.gameType!=null and dto.gameType!=''">
+      and game_type in ${dto.gameType}
     </if>
     <if test="dto.platformCode!=null and dto.platformCode!=''">
       and platform_code in ${dto.platformCode}
@@ -266,11 +266,11 @@
   <!-- 插入投注日报表 -->
   <insert id="insertGameBetDailyReport">
     INSERT INTO game_bet_daily_report
-    (member_id,account,real_name,user_paths,platform_code,game_kind,game_type,bet_amount,
+    (member_id,account,real_name,super_id,super_account,user_paths,platform_code,game_kind,game_type,bet_amount,
     valid_amount,win_amount,bet_count,win_count,stat_time,create_time
     ) VALUES
     <foreach collection="list" item="item" index="index" separator=",">
-      ( #{item.memberId}, #{item.account},#{item.realName},#{item.userPaths},
+      ( #{item.memberId}, #{item.account},#{item.realName},#{item.superId},#{item.superAccount},#{item.userPaths},
       #{item.platformCode},#{item.gameKind},#{item.gameType},#{item.betAmount},
       #{item.validAmount},#{item.winAmount},#{item.betCount},
       #{item.winCount},#{item.statTime},sysdate()

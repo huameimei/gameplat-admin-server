@@ -88,7 +88,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
             ObjectUtils.isNotNull(userDTO.getUserType()),
             SysUser::getUserType,
             userDTO.getUserType())
-        .eq(ObjectUtils.isNotNull(userDTO.getRoleId()),SysUser::getRoleId,userDTO.getRoleId())
+        .eq(ObjectUtils.isNotNull(userDTO.getRoleId()), SysUser::getRoleId, userDTO.getRoleId())
         .eq(ObjectUtils.isNotNull(userDTO.getStatus()), SysUser::getStatus, userDTO.getStatus())
         .eq(ObjectUtils.isNotEmpty(userDTO.getPhone()), SysUser::getPhone, userDTO.getPhone())
         .between(
@@ -225,6 +225,17 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
     Assert.isTrue(
         this.lambdaUpdate().set(SysUser::getSafeCode, secret).eq(SysUser::getUserId, id).update(),
         "绑定失败!");
+  }
+
+  @Override
+  public void disableAccount(String account) {
+    SysUser user = this.getByUsername(account);
+    if (EnableEnum.isEnabled(user.getStatus())) {
+      this.lambdaUpdate()
+          .set(SysUser::getStatus, EnableEnum.DISABLED.code())
+          .eq(SysUser::getUserId, user.getUserId())
+          .update(new SysUser());
+    }
   }
 
   /**

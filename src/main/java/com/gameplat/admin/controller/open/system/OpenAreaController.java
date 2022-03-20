@@ -9,8 +9,6 @@ import com.gameplat.admin.model.vo.SysSmsAreaVO;
 import com.gameplat.admin.service.SysSmsAreaService;
 import com.gameplat.model.entity.sys.SysSmsArea;
 import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,10 +27,6 @@ public class OpenAreaController {
 
   @ApiOperation("列表查询")
   @GetMapping("/list")
-  @ApiImplicitParams({
-    @ApiImplicitParam(name = "current", value = "分页参数：当前页", defaultValue = "1"),
-    @ApiImplicitParam(name = "size", value = "每页条数"),
-  })
   public IPage<SysSmsAreaVO> findSmsAreaList(
       @ApiIgnore PageDTO<SysSmsArea> page, SmsAreaQueryDTO queryDTO) {
     return areaService.findSmsAreaList(page, queryDTO);
@@ -60,5 +54,12 @@ public class OpenAreaController {
   @PutMapping("/changeStatus/{id}/{status}")
   public void changeStatus(@PathVariable Long id, @PathVariable Integer status) {
     areaService.changeStatus(id, status);
+  }
+
+
+  @ApiOperation("设置默认区号")
+  @PutMapping("/setDefaultStatus/{id}/{status}")
+  public void setDefaultStatus(@PathVariable Long id, @PathVariable Integer status) {
+    areaService.setDefaultStatus(id, status);
   }
 }

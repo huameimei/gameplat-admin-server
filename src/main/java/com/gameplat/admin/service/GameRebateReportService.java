@@ -13,7 +13,7 @@ import java.util.List;
 
 public interface GameRebateReportService extends IService<GameRebateReport> {
 
-  void accept(Long periodId, Long memberId, BigDecimal realRebateMoney, String remark);
+  void accept(Long periodId, Long memberId, BigDecimal realRebateMoney, String remark) throws Exception;
 
   void deleteByPeriodId(Long periodId);
 

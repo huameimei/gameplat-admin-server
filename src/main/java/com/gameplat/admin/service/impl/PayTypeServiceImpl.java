@@ -1,5 +1,6 @@
 package com.gameplat.admin.service.impl;
 
+import com.alicp.jetcache.anno.Cached;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -15,6 +16,7 @@ import com.gameplat.admin.model.vo.PayTypeVO;
 import com.gameplat.admin.service.PayTypeService;
 import com.gameplat.base.common.enums.EnableEnum;
 import com.gameplat.base.common.exception.ServiceException;
+import com.gameplat.common.constant.CachedKeys;
 import com.gameplat.model.entity.pay.PayType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -44,6 +46,7 @@ public class PayTypeServiceImpl extends ServiceImpl<PayTypeMapper, PayType>
   }
 
   @Override
+  @Cached(name = CachedKeys.PAY_TYPE, expire = 1800)
   public void save(PayTypeAddDTO dto) throws ServiceException {
     LambdaQueryWrapper<PayType> query = Wrappers.lambdaQuery();
     query.eq(PayType::getCode, dto.getCode());
@@ -57,6 +60,7 @@ public class PayTypeServiceImpl extends ServiceImpl<PayTypeMapper, PayType>
   }
 
   @Override
+  @Cached(name = CachedKeys.PAY_TYPE, expire = 1800)
   public void update(PayTypeEditDTO dto) {
     PayType payType;
     if (1 == dto.getIsSysCode()) {
@@ -76,6 +80,7 @@ public class PayTypeServiceImpl extends ServiceImpl<PayTypeMapper, PayType>
   }
 
   @Override
+  @Cached(name = CachedKeys.PAY_TYPE, expire = 1800)
   public void updateStatus(Long id, Integer status) {
     if (null == status) {
       throw new ServiceException("状态不能为空!");
@@ -86,6 +91,7 @@ public class PayTypeServiceImpl extends ServiceImpl<PayTypeMapper, PayType>
   }
 
   @Override
+  @Cached(name = CachedKeys.PAY_TYPE, expire = 1800)
   public void delete(Long id) {
     PayType payType = payTypeMapper.selectById(id);
     if (1 == payType.getIsSysCode()) {

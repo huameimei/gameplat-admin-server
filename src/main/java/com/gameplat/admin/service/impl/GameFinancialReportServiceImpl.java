@@ -11,26 +11,42 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.config.TenantConfig;
 import com.gameplat.admin.convert.GameFinancialReportConvert;
+import com.gameplat.admin.enums.TimeTypeEnum;
 import com.gameplat.admin.mapper.GameFinancialReportMapper;
+import com.gameplat.admin.model.bean.GameBetRecordSearchBuilder;
+import com.gameplat.admin.model.dto.GameBetRecordQueryDTO;
 import com.gameplat.admin.model.dto.GameFinancialReportQueryDTO;
-import com.gameplat.admin.model.vo.GameFinancialReportVO;
-import com.gameplat.admin.model.vo.GameReportExportVO;
-import com.gameplat.admin.model.vo.PageDtoVO;
-import com.gameplat.admin.model.vo.TotalGameFinancialReportVO;
+import com.gameplat.admin.model.vo.*;
 import com.gameplat.admin.service.GameFinancialReportService;
-import com.gameplat.admin.util.JxlsExcelUtils;
+import com.gameplat.admin.util.JxlsExcelUtil;
+import com.gameplat.base.common.constant.ContextConstant;
+import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.DateUtils;
 import com.gameplat.base.common.util.StringUtils;
 import com.gameplat.base.common.util.UUIDUtils;
 import com.gameplat.common.util.ZipUtils;
 import com.gameplat.model.entity.report.GameFinancialReport;
+import io.netty.util.internal.StringUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
+import org.elasticsearch.action.search.SearchRequest;
+import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.client.HttpAsyncResponseConsumerFactory;
+import org.elasticsearch.client.RequestOptions;
+import org.elasticsearch.client.RestHighLevelClient;
+import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.search.aggregations.AggregationBuilders;
+import org.elasticsearch.search.aggregations.bucket.terms.Terms;
+import org.elasticsearch.search.aggregations.bucket.terms.TermsAggregationBuilder;
+import org.elasticsearch.search.aggregations.metrics.ParsedSum;
+import org.elasticsearch.search.aggregations.metrics.SumAggregationBuilder;
+import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.math.BigDecimal;
@@ -57,6 +73,9 @@ public class GameFinancialReportServiceImpl extends ServiceImpl<GameFinancialRep
 
     @Autowired
     private GameFinancialReportConvert gameFinancialReportConvert;
+
+    @Resource
+    private RestHighLevelClient restHighLevelClient;
 
     /**
      * 财务报表模板
@@ -205,16 +224,148 @@ public class GameFinancialReportServiceImpl extends ServiceImpl<GameFinancialRep
 
         List<GameFinancialReport> allGameFinancialReportList = new ArrayList<>();
 
-        // 统计所有游戏的财务报表数据
+        // 初始化全部游戏的财务报表（无游戏数据）
         List<GameFinancialReport> gameFinancialReportList = gameFinancialReportMapper.initGameFinancialReport(statisticsTime, startTime, endTime, tenant);
-        if (CollectionUtil.isNotEmpty(gameFinancialReportList)) {
-            allGameFinancialReportList.addAll(gameFinancialReportList);
+        if (CollectionUtil.isEmpty(gameFinancialReportList)) {
+            throw new ServiceException("游戏已全部下架");
         }
 
+        // 获取游戏的有效投注额和输赢金额
+        Map<String, List<GameDataVO>> gameDataMap = initGameData(startTime, endTime, tenant);
+
+        // 获取游戏的累计输赢金额
+        Map<String, List<GameDataVO>> gameAccumulateDataMap = initGameAccumulateData(endTime, tenant);
+
+        // 组装数据
+        if (StringUtils.isNotNull(gameDataMap) && StringUtils.isNotNull(gameAccumulateDataMap)) {
+            gameFinancialReportList.parallelStream().forEach(gameFinancialReport -> {
+                List<GameDataVO> gameDataVO = gameDataMap.get(gameFinancialReport.getGameKind());
+                List<GameDataVO> gameAccumulateDataVO = gameAccumulateDataMap.get(gameFinancialReport.getGameKind());
+                // 如果有对应的游戏数据则填充，没有则是0
+                if (StringUtils.isNotEmpty(gameDataVO)) {
+                    gameFinancialReport.setValidAmount(gameDataVO.get(0).getValidAmount());
+                    gameFinancialReport.setWinAmount(gameDataVO.get(0).getWinAmount());
+                }
+
+                if (StringUtils.isNotEmpty(gameAccumulateDataVO)) {
+                    gameFinancialReport.setAccumulateWinAmount(gameAccumulateDataVO.get(0).getAccumulateWinAmount());
+                }
+            });
+        }
+
+        allGameFinancialReportList.addAll(gameFinancialReportList);
         return allGameFinancialReportList;
     }
 
+    public Map<String, List<GameDataVO>> initGameData(String startTime, String endTime, String tenant) {
+        startTime = startTime + " 00:00:00";
+        endTime = endTime + " 23:59:59";
+        GameBetRecordQueryDTO dto = new GameBetRecordQueryDTO();
+        dto.setTimeType(TimeTypeEnum.STAT_TIME.getValue());
+        dto.setBeginTime(startTime);
+        dto.setEndTime(endTime);
+        QueryBuilder builder = GameBetRecordSearchBuilder.buildBetRecordSearch(dto);
 
+        String indexName = ContextConstant.ES_INDEX.BET_RECORD_ + tenant;
+        SearchRequest searchRequest = new SearchRequest(indexName);
+
+        TermsAggregationBuilder groupTerms =
+                AggregationBuilders.terms("gameKindGroup").field("gameKind.keyword");
+
+        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+        SumAggregationBuilder validAmountSumBuilder = AggregationBuilders.sum("validAmount").field("validAmount");
+        SumAggregationBuilder winAmountSumBuilder = AggregationBuilders.sum("winAmount").field("winAmount");
+
+        groupTerms.subAggregation(validAmountSumBuilder);
+        groupTerms.subAggregation(winAmountSumBuilder);
+
+        searchSourceBuilder.size(0);
+        searchSourceBuilder.aggregation(groupTerms);
+        searchSourceBuilder.query(builder);
+
+        searchRequest.source(searchSourceBuilder);
+
+        RequestOptions.Builder optionsBuilder = RequestOptions.DEFAULT.toBuilder();
+        optionsBuilder.setHttpAsyncResponseConsumerFactory(
+                new HttpAsyncResponseConsumerFactory.HeapBufferedResponseConsumerFactory(31457280));
+
+        SearchResponse searchResponse = null;
+        try {
+            searchResponse = restHighLevelClient.search(searchRequest, optionsBuilder.build());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        Terms terms = searchResponse.getAggregations().get("gameKindGroup");
+        if (StringUtils.isNull(terms)) {
+            return null;
+        }
+        List<GameDataVO> gameDataList = new ArrayList<>();
+        for (Terms.Bucket bucket : terms.getBuckets()) {
+            Object gameKind = bucket.getKey();
+            GameDataVO gameDataVO = new GameDataVO();
+            gameDataVO.setGameKind(gameKind.toString());
+            double validAmount = ((ParsedSum) bucket.getAggregations().get("validAmount")).getValue();
+            double winAmount = ((ParsedSum) bucket.getAggregations().get("winAmount")).getValue() * -1;
+            gameDataVO.setValidAmount(BigDecimal.valueOf(validAmount).setScale(2, BigDecimal.ROUND_DOWN));
+            gameDataVO.setWinAmount(BigDecimal.valueOf(winAmount).setScale(2, BigDecimal.ROUND_DOWN));
+            gameDataList.add(gameDataVO);
+        }
+
+        return gameDataList.stream().collect(Collectors.groupingBy(GameDataVO::getGameKind));
+    }
+
+    public Map<String, List<GameDataVO>> initGameAccumulateData(String endTime, String tenant) {
+        endTime = endTime + " 23:59:59";
+        GameBetRecordQueryDTO dto = new GameBetRecordQueryDTO();
+        dto.setTimeType(TimeTypeEnum.STAT_TIME.getValue());
+        dto.setEndTime(endTime);
+        QueryBuilder builder = GameBetRecordSearchBuilder.buildBetRecordSearch(dto);
+
+        String indexName = ContextConstant.ES_INDEX.BET_RECORD_ + tenant;
+        SearchRequest searchRequest = new SearchRequest(indexName);
+
+        TermsAggregationBuilder groupTerms =
+                AggregationBuilders.terms("gameKindGroup").field("gameKind.keyword");
+
+        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+        SumAggregationBuilder winAmountSumBuilder = AggregationBuilders.sum("winAmount").field("winAmount");
+
+        groupTerms.subAggregation(winAmountSumBuilder);
+
+        searchSourceBuilder.size(0);
+        searchSourceBuilder.aggregation(groupTerms);
+        searchSourceBuilder.query(builder);
+
+        searchRequest.source(searchSourceBuilder);
+
+        RequestOptions.Builder optionsBuilder = RequestOptions.DEFAULT.toBuilder();
+        optionsBuilder.setHttpAsyncResponseConsumerFactory(
+                new HttpAsyncResponseConsumerFactory.HeapBufferedResponseConsumerFactory(31457280));
+
+        SearchResponse searchResponse = null;
+        try {
+            searchResponse = restHighLevelClient.search(searchRequest, optionsBuilder.build());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        Terms terms = searchResponse.getAggregations().get("gameKindGroup");
+        if (StringUtils.isNull(terms)) {
+            return null;
+        }
+        List<GameDataVO> gameAccumulateDataList = new ArrayList<>();
+        for (Terms.Bucket bucket : terms.getBuckets()) {
+            Object gameKind = bucket.getKey();
+            GameDataVO gameDataVO = new GameDataVO();
+            gameDataVO.setGameKind(gameKind.toString());
+            double accumulateWinAmount = ((ParsedSum) bucket.getAggregations().get("winAmount")).getValue() * -1;
+            gameDataVO.setAccumulateWinAmount(BigDecimal.valueOf(accumulateWinAmount).setScale(2, BigDecimal.ROUND_DOWN));
+            gameAccumulateDataList.add(gameDataVO);
+        }
+
+        return gameAccumulateDataList.stream().collect(Collectors.groupingBy(GameDataVO::getGameKind));
+    }
 
     /**
      * 对KG新彩票的三个彩种做特殊处理

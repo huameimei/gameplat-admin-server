@@ -64,7 +64,7 @@ public class DiscountTypeServiceImpl extends ServiceImpl<DiscountTypeMapper, Dis
 
   @Override
   public IPage<DiscountType> findDiscountTypePage(Page<DiscountType> page) {
-    return this.lambdaQuery().orderByAsc(DiscountType::getSort).page(page);
+    return this.lambdaQuery().orderByAsc(DiscountType::getSort).orderByDesc(DiscountType::getCreateTime).page(page);
   }
 
   @Override

@@ -24,8 +24,9 @@ import java.math.BigDecimal;
 import java.util.List;
 
 /**
+ * 会员福利派发详情
+ *
  * @author lily
- * @description 会员福利派发详情
  * @date 2021/11/25
  */
 @Service

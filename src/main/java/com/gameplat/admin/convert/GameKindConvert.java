@@ -7,6 +7,7 @@ import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")
 public interface GameKindConvert {
+
   GameKind toEntity(OperGameKindDTO dto);
 
   GameKindVO toVo(GameKind gameKind);

@@ -4,7 +4,6 @@ import java.util.Arrays;
 
 /** 后台出款模式 */
 public enum OprateMode {
-
   OPRATE_MANUAL(1, "人工出款"),
 
   OPRATE_ATUO(2, "第三方出款"),
@@ -22,6 +21,13 @@ public enum OprateMode {
     this.desc = desc;
   }
 
+  public static OprateMode get(Integer value) {
+    return Arrays.stream(OprateMode.values())
+        .filter(bl -> bl.value().equals(value))
+        .findFirst()
+        .orElse(null);
+  }
+
   public Integer value() {
     return value;
   }
@@ -32,12 +38,5 @@ public enum OprateMode {
 
   public boolean match(Integer value) {
     return this.value.equals(value);
-  }
-
-  public static OprateMode get(Integer value) {
-    return Arrays.stream(OprateMode.values())
-        .filter(bl -> bl.value().equals(value))
-        .findFirst()
-        .orElse(null);
   }
 }

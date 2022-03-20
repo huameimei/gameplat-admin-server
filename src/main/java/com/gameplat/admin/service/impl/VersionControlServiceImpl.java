@@ -28,7 +28,6 @@ public class VersionControlServiceImpl extends ServiceImpl<VersionControlMapper,
 
   @Autowired private VersionControlConvert convert;
 
-  /** 获取发版信息列表 */
   @Override
   @SentinelResource(value = "getSysPackageInfo")
   public IPage<VersionControl> getSysPackageInfo(
@@ -40,7 +39,6 @@ public class VersionControlServiceImpl extends ServiceImpl<VersionControlMapper,
         .page(page);
   }
 
-  /** 创建新的发版信息 */
   @Override
   @SentinelResource(value = "createSysPackageInfo")
   public boolean createSysPackageInfo(VersionControlDTO dto) {
@@ -49,7 +47,6 @@ public class VersionControlServiceImpl extends ServiceImpl<VersionControlMapper,
     return this.save(convert.toEntity(dto));
   }
 
-  /** 编辑发版信息 */
   @Override
   @SentinelResource(value = "editSysPackageInfo")
   public int editSysPackageInfo(VersionControlDTO dto) {
@@ -90,7 +87,6 @@ public class VersionControlServiceImpl extends ServiceImpl<VersionControlMapper,
     return sysPackageInfoMapper.update(null, update);
   }
 
-  /** 删除发版信息 */
   @Override
   @SentinelResource(value = "removeSysPackageInfo")
   public boolean removeSysPackageInfo(Integer id) {

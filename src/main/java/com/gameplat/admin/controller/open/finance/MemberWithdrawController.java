@@ -32,17 +32,30 @@ public class MemberWithdrawController {
 
   @PostMapping("/modifyCashStatus")
   @PreAuthorize("hasAuthority('finance:memberWithdraw:modifyCashStatus')")
-  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.WITHDRAW, desc = "'修改提款订单状态为:' + #cashStatus")
-  public void modifyCashStatus(Long id, Integer cashStatus, Integer curStatus, boolean isDirect,
-      String approveReason,HttpServletRequest request) throws Exception{
+  @Log(
+      module = ServiceName.ADMIN_SERVICE,
+      type = LogType.WITHDRAW,
+      desc = "'修改提款订单状态为:' + #cashStatus")
+  public void modifyCashStatus(
+      Long id,
+      Integer cashStatus,
+      Integer curStatus,
+      boolean isDirect,
+      String approveReason,
+      HttpServletRequest request)
+      throws Exception {
     UserCredential userCredential = SecurityUserHolder.getCredential();
     UserEquipment clientInfo = UserEquipment.create(request);
-    userWithdrawService.modify(id, cashStatus, curStatus, isDirect, approveReason, userCredential,clientInfo);
+    userWithdrawService.modify(
+        id, cashStatus, curStatus, isDirect, approveReason, userCredential, clientInfo);
   }
 
   @PostMapping("/editDiscount")
   @PreAuthorize("hasAuthority('finance:memberWithdraw:editDiscount')")
-  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.WITHDRAW, desc = "'修改手续费为:' + #afterCounterFee")
+  @Log(
+      module = ServiceName.ADMIN_SERVICE,
+      type = LogType.WITHDRAW,
+      desc = "'修改手续费为:' + #afterCounterFee")
   public void updateDiscount(Long id, BigDecimal afterCounterFee) {
     userWithdrawService.updateCounterFee(id, afterCounterFee);
   }
@@ -57,7 +70,7 @@ public class MemberWithdrawController {
   @PostMapping("/page")
   @PreAuthorize("hasAuthority('finance:memberWithdraw:page')")
   public PageExt<MemberWithdrawVO, SummaryVO> queryPage(
-          Page<MemberWithdraw> page, MemberWithdrawQueryDTO dto) {
+      Page<MemberWithdraw> page, MemberWithdrawQueryDTO dto) {
     return userWithdrawService.findPage(page, dto);
   }
 
@@ -69,7 +82,10 @@ public class MemberWithdrawController {
 
   @PostMapping("/save")
   @PreAuthorize("hasAuthority('finance:memberWithdraw:save')")
-  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.WITHDRAW, desc = "'人工出款memberId =' + #memberId")
+  @Log(
+      module = ServiceName.ADMIN_SERVICE,
+      type = LogType.WITHDRAW,
+      desc = "'人工出款memberId =' + #memberId")
   public void save(BigDecimal cashMoney, String cashReason, Integer handPoints, Long memberId)
       throws Exception {
     UserCredential userCredential = SecurityUserHolder.getCredential();

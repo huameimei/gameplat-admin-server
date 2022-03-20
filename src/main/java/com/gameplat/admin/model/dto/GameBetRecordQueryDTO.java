@@ -40,5 +40,4 @@ public class GameBetRecordQueryDTO implements Serializable {
   private String gameKindList;
 
   private String gameType;
-
 }

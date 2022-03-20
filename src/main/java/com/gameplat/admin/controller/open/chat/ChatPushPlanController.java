@@ -26,7 +26,6 @@ public class ChatPushPlanController {
 
   @Autowired private ChatPushPlanService chatPushPlanService;
 
-  /** 分页列表 */
   @ApiOperation(value = "分页列表")
   @GetMapping("/page")
   @PreAuthorize("hasAuthority('chat:pushPlan:page')")

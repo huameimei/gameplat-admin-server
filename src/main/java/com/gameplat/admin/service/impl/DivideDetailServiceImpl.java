@@ -17,27 +17,32 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-@SuppressWarnings("all")
 public class DivideDetailServiceImpl extends ServiceImpl<DivideDetailMapper, DivideDetail>
     implements DivideDetailService {
 
   @Autowired private DivideDetailMapper divideDetailMapper;
+
   @Autowired private DivideDetailConvert divideDetailConvert;
+
   @Autowired private GameKindService gameKindService;
 
   @Override
   public IPage<DivideDetailVO> queryPage(PageDTO<DivideDetail> page, DivideDetailQueryDTO dto) {
-    QueryWrapper<DivideDetail> queryWrapper = new QueryWrapper();
+    QueryWrapper<DivideDetail> queryWrapper = new QueryWrapper<>();
     queryWrapper
         .eq(ObjectUtils.isNotNull(dto.getId()), "id", dto.getId())
         .eq(ObjectUtils.isNotNull(dto.getPeriodsId()), "periods_id", dto.getPeriodsId())
         .eq(ObjectUtils.isNotNull(dto.getProxyId()), "proxy_id", dto.getProxyId())
         .orderByDesc("create_time");
-    IPage<DivideDetailVO> pageResult = divideDetailMapper.selectPage(page, queryWrapper).convert(divideDetailConvert::toVo);
+
+    IPage<DivideDetailVO> pageResult =
+        divideDetailMapper.selectPage(page, queryWrapper).convert(divideDetailConvert::toVo);
+
     for (DivideDetailVO vo : pageResult.getRecords()) {
       GameKindVO byCode = gameKindService.getByCode(vo.getCode());
       vo.setName(byCode.getName());
     }
+
     return pageResult;
   }
 }

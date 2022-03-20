@@ -27,7 +27,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)
@@ -64,8 +63,7 @@ public class MemberBillServiceImpl extends ServiceImpl<MemberBillMapper, MemberB
             dto.getOrderNo(),
             dto.getTranTypes(),
             dto.getBeginTime(),
-            dto.getEndTime()
-        );
+            dto.getEndTime());
     return pageList;
   }
 

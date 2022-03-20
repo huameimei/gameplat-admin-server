@@ -30,7 +30,8 @@ public interface ValidWithdrawService extends IService<ValidWithdraw> {
 
   /**
    * 回收游戏返水，清除对应打码量
-   * @param remark
+   *
+   * @param remark String
    */
   void rollGameRebateDml(String remark);
 }

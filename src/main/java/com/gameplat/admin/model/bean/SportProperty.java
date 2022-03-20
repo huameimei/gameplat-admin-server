@@ -9,12 +9,12 @@ import org.springframework.context.annotation.Configuration;
 @ConfigurationProperties(prefix = "sport")
 public class SportProperty {
 
-    //请求主域名
-    private String domain;
+  // 请求主域名
+  private String domain;
 
-    //直播域名列表
-    private String liveDomainList;
+  // 直播域名列表
+  private String liveDomainList;
 
-    //直播数据统计
-    private String LiveDomainTraffic;
+  // 直播数据统计
+  private String LiveDomainTraffic;
 }

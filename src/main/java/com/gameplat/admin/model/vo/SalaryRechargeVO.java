@@ -12,11 +12,11 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 @NoArgsConstructor
 public class SalaryRechargeVO {
-    private String account;
-    private String superAccount;
-    private String gameKind;
-    private String gameType;
-    private BigDecimal rechargeAmount;
-    private BigDecimal validAmount;
-    private BigDecimal winAmount;
+  private String account;
+  private String superAccount;
+  private String gameKind;
+  private String gameType;
+  private BigDecimal rechargeAmount;
+  private BigDecimal validAmount;
+  private BigDecimal winAmount;
 }

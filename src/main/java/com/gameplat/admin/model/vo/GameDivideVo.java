@@ -8,14 +8,13 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 
-/**
- * @Description : 每个一级游戏编码对应的分红对象 @Author : cc @Date : 2021/12/23
- */
+/** 每个一级游戏编码对应的分红对象 @Author : cc @Date : 2021/12/23 */
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class GameDivideVo {
+
   @ApiModelProperty(value = "游戏大类")
   private String liveGameName;
 

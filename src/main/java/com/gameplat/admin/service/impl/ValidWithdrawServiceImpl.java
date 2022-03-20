@@ -28,14 +28,6 @@ import com.gameplat.elasticsearch.page.PageResponse;
 import com.gameplat.elasticsearch.service.IBaseElasticsearchService;
 import com.gameplat.model.entity.ValidWithdraw;
 import com.gameplat.model.entity.recharge.RechargeOrder;
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
-import javax.annotation.Resource;
 import lombok.extern.log4j.Log4j2;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.search.sort.FieldSortBuilder;
@@ -47,6 +39,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
+
+import javax.annotation.Resource;
+import java.math.BigDecimal;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Log4j2
 @Service
@@ -86,9 +83,8 @@ public class ValidWithdrawServiceImpl extends ServiceImpl<ValidWithdrawMapper, V
     validWithdraw.setDiscountDml(rechargeOrder.getDiscountDml());
     validWithdraw.setMormDml(rechargeOrder.getNormalDml());
     validWithdraw.setRemark(rechargeOrder.getRemarks());
-    validWithdraw.setCreateTime(new Date());
     deleteByUserId(rechargeOrder.getMemberId(), 1);
-    updateTypeByUserId(rechargeOrder.getMemberId(),validWithdraw.getCreateTime());
+    updateTypeByUserId(rechargeOrder.getMemberId());
     this.save(validWithdraw);
   }
 
@@ -120,13 +116,12 @@ public class ValidWithdrawServiceImpl extends ServiceImpl<ValidWithdrawMapper, V
     this.remove(query);
   }
 
-  public void updateTypeByUserId(Long memberId,Date createTime) throws Exception {
+  public void updateTypeByUserId(Long memberId) throws Exception {
     this.lambdaUpdate()
         .set(ValidWithdraw::getType, 1)
-        .set(ValidWithdraw::getEndTime, createTime)
         .eq(ValidWithdraw::getMemberId, memberId)
         .eq(ValidWithdraw::getType, 0)
-        .update(new ValidWithdraw());
+        .update();
   }
 
   @Override
@@ -140,7 +135,6 @@ public class ValidWithdrawServiceImpl extends ServiceImpl<ValidWithdrawMapper, V
     if (save > 0) {
       if (validWithdraw1 != null) {
         validWithdraw1.setUpdateTime(new Date());
-        validWithdraw1.setEndTime(validWithdraw.getCreateTime());
         validWithdrawMapper.updateByUserId(validWithdraw1);
       }
     }
@@ -224,10 +218,10 @@ public class ValidWithdrawServiceImpl extends ServiceImpl<ValidWithdrawMapper, V
   }
 
   /**
-   * @param username
-   * @param validWithdraws
+   * @param username String
+   * @param validWithdraws List
    * @param relaxQuota 放宽额度
-   * @return
+   * @return ValidateDmlBeanVo
    */
   private ValidateDmlBeanVo validateValidWithdraws(
       String username, List<ValidWithdraw> validWithdraws, BigDecimal relaxQuota) {
@@ -250,13 +244,13 @@ public class ValidWithdrawServiceImpl extends ServiceImpl<ValidWithdrawMapper, V
     }
     validateDmlBean.setUsername(username);
     // 常态打码量
-    BigDecimal requireDML =
+    BigDecimal requireDml =
         validWithdraws.stream()
             .map(ValidWithdraw::getDmlClaim)
             .reduce(BigDecimal.ZERO, BigDecimal::add);
-    log.info("总共要求打码量：{}", requireDML);
+    log.info("总共要求打码量：{}", requireDml);
     // 要求打码量
-    validateDmlBean.setRequireDML(requireDML);
+    validateDmlBean.setRequireDML(requireDml);
     // 放宽额度
     validateDmlBean.setRelaxQuota(relaxQuota);
 
@@ -279,9 +273,9 @@ public class ValidWithdrawServiceImpl extends ServiceImpl<ValidWithdrawMapper, V
     // 需要扣除金额
     // validateDmlBean.setSumAllDeduct(sumAllDeduct);
     validateDmlBean.setYetWithdraw(BigDecimal.ZERO);
-    List<ValidWithdrawVO> validWithdrawVOS =
+    List<ValidWithdrawVO> validWithdrawVo =
         BeanUtils.mapList(validWithdraws, ValidWithdrawVO.class);
-    validateDmlBean.setRows(validWithdrawVOS);
+    validateDmlBean.setRows(validWithdrawVo);
     return validateDmlBean;
   }
 

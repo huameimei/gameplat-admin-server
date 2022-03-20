@@ -147,6 +147,6 @@ public class MemberVO implements Serializable {
   @ApiModelProperty(value = "当前会员成长值")
   private Integer growth;
 
-  @ApiModelProperty(value = "玩家金币数" )
+  @ApiModelProperty(value = "玩家金币数")
   private Integer goldCoin;
 }

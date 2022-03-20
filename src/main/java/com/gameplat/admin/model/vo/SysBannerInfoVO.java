@@ -84,7 +84,6 @@ public class SysBannerInfoVO implements Serializable {
   @ApiModelProperty("跳转地址")
   private String jumpUrl;
 
-
   @ApiModelProperty("相关游戏配置")
   private String gameConfig;
 }

@@ -2,10 +2,11 @@ package com.gameplat.admin.model.bean.router;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.Data;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import lombok.Data;
 
 /**
  * 构建 Vue路由
@@ -21,9 +22,7 @@ public class VueRouter<T> implements Serializable {
   /** 菜单ID */
   private Long menuId;
 
-  /**
-   * 父id
-   */
+  /** 父id */
   private Long parentId;
 
   /** 父标题 */

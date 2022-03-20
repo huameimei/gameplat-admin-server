@@ -6,7 +6,7 @@ import com.gameplat.admin.model.vo.GameBetRecordVO;
 import com.gameplat.admin.model.vo.PageDtoVO;
 import com.gameplat.admin.service.GameBetRecordInfoService;
 import com.gameplat.common.game.GameResult;
-import javax.servlet.http.HttpServletResponse;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,15 +20,16 @@ public class GameBetRecordController {
 
   @Autowired private GameBetRecordInfoService gameBetRecordInfoService;
 
+  @SneakyThrows
   @GetMapping(value = "/queryPage")
-  public PageDtoVO<GameBetRecordVO> queryPage(Page<GameBetRecordVO> page, GameBetRecordQueryDTO dto)
-      throws Exception {
+  public PageDtoVO<GameBetRecordVO> queryPage(
+      Page<GameBetRecordVO> page, GameBetRecordQueryDTO dto) {
     return gameBetRecordInfoService.queryPageBetRecord(page, dto);
   }
 
+  @SneakyThrows
   @GetMapping(value = "/getGameResult")
-  public GameResult getGameResult(GameBetRecordQueryDTO dto, HttpServletResponse response)
-      throws Exception {
+  public GameResult getGameResult(GameBetRecordQueryDTO dto) {
     return gameBetRecordInfoService.getGameResult(dto);
   }
 }

@@ -23,6 +23,7 @@ import com.gameplat.base.common.util.IPUtils;
 import com.gameplat.base.common.util.RandomUtil;
 import com.gameplat.common.enums.BooleanEnum;
 import com.gameplat.common.enums.TranTypes;
+import com.gameplat.common.lang.Assert;
 import com.gameplat.model.entity.ValidWithdraw;
 import com.gameplat.model.entity.member.*;
 import com.gameplat.model.entity.message.Message;
@@ -48,11 +49,13 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+import static com.gameplat.common.enums.TranTypes.*;
 import static java.util.stream.Collectors.toList;
 
 /**
+ * 福利发放业务处理
+ *
  * @author lily
- * @description 福利发放业务处理
  * @date 2021/11/22
  */
 @Service
@@ -62,7 +65,7 @@ public class MemberWealServiceImpl extends ServiceImpl<MemberWealMapper, MemberW
     implements MemberWealService {
   @Autowired private MemberWealConvert wealConvert;
 
-  @Autowired private MemberWealMapper mapper;
+  @Autowired private MemberWealMapper memberWealMapper;
 
   @Autowired private MemberGrowthRecordMapper memberGrowthRecordMapper;
 
@@ -98,7 +101,6 @@ public class MemberWealServiceImpl extends ServiceImpl<MemberWealMapper, MemberW
 
   @Autowired private MessageInfoConvert messageInfoConvert;
 
-  /** 获取等级俸禄达标会员 */
   @Override
   public IPage<MemberWealVO> findMemberWealList(IPage<MemberWeal> page, MemberWealDTO queryDTO) {
     return this.lambdaQuery()
@@ -121,7 +123,6 @@ public class MemberWealServiceImpl extends ServiceImpl<MemberWealMapper, MemberW
         .convert(wealConvert::toVo);
   }
 
-  /** 添加 */
   @Override
   public void addMemberWeal(MemberWealAddDTO dto) {
     if (StringUtils.isBlank(dto.getName())) {
@@ -141,43 +142,31 @@ public class MemberWealServiceImpl extends ServiceImpl<MemberWealMapper, MemberW
     }
     dto.setStatus(0);
 
-    MemberWeal memberWeal = wealConvert.toEntity(dto);
-
-    if (!this.save(memberWeal)) {
-      throw new ServiceException("新增失败！");
-    }
+    Assert.isTrue(this.save(wealConvert.toEntity(dto)), "新增失败!");
   }
 
-  /** 修改福利 */
   @Override
   public void updateMemberWeal(MemberWealEditDTO dto) {
     if (ObjectUtils.isEmpty(dto.getId())) {
       throw new ServiceException("id不能为空!");
     }
-    MemberWeal weal = wealConvert.toEntity(dto);
-    if (!this.updateById(weal)) {
-      throw new ServiceException("编辑失败!");
-    }
+    Assert.isTrue(this.updateById(wealConvert.toEntity(dto)), "编辑失败!");
   }
 
-  /** 删除福利 */
   @Override
   public void deleteMemberWeal(Long id) {
     if (ObjectUtils.isEmpty(id)) {
       throw new ServiceException("id不能为空!");
     }
-    if (!this.removeById(id)) {
-      throw new ServiceException("删除失败！");
-    }
+    Assert.isTrue(this.removeById(id), "删除失败!");
   }
 
-  /** 结算 */
   @Override
   public void settleWeal(Long id) {
     if (ObjectUtils.isEmpty(id)) {
       throw new ServiceException("id不能为空!");
     }
-    MemberWeal memberWeal = mapper.selectById(id);
+    MemberWeal memberWeal = memberWealMapper.selectById(id);
     if (memberWeal == null) {
       throw new ServiceException("该福利不存在!");
     }
@@ -227,7 +216,7 @@ public class MemberWealServiceImpl extends ServiceImpl<MemberWealMapper, MemberW
     if (type == 2) {
       // 生日礼金
       // 过滤每个会员的生日是否在周期内
-      if (intersectionList != null && intersectionList.size() > 0) {
+      if (CollectionUtil.isNotEmpty(intersectionList)) {
         List<Member> users = memberMapper.findByUserNameList(intersectionList);
         intersectionList =
             users.stream()
@@ -305,6 +294,8 @@ public class MemberWealServiceImpl extends ServiceImpl<MemberWealMapper, MemberW
       memberWeal.setTotalUserCount(totalUserCount);
       memberWeal.setTotalPayMoney(totalPayMoney);
     }
+
+    // fixme 无用代码及时删除
     List<MemberWealDetail> memberWealDetailList =
         wealDetailService.findSatisfyMember(
             new MemberWealDetail() {
@@ -315,7 +306,7 @@ public class MemberWealServiceImpl extends ServiceImpl<MemberWealMapper, MemberW
 
     // 修改了福利信息时，要重新结算，所以应该先删除
     wealDetailService.removeWealDetail(id);
-    if (list != null && list.size() > 0) {
+    if (CollectionUtil.isNotEmpty(list)) {
       wealDetailService.batchSave(list);
     }
     memberWeal.setSettleTime(new Date());
@@ -345,7 +336,7 @@ public class MemberWealServiceImpl extends ServiceImpl<MemberWealMapper, MemberW
       List<MemberWealDetail> list = wealDetailService.findSatisfyMember(memberWealDetail);
       String serialNumber = IdWorker.getIdStr();
       // 根据福利id查询该福利
-      MemberWeal memberWeal = mapper.selectById(wealId);
+      MemberWeal memberWeal = memberWealMapper.selectById(wealId);
       if (memberWeal == null) {
         throw new ServiceException("该福利不存在!");
       }
@@ -395,19 +386,19 @@ public class MemberWealServiceImpl extends ServiceImpl<MemberWealMapper, MemberW
                 }
                 String content = "";
                 // 周俸禄
-                if (type == 1) {
-                  sourceType = TranTypes.WEEK_WEAL.getValue();
+                if (WEEK_WEAL.match(type)) {
+                  sourceType = WEEK_WEAL.getValue();
                   content = "本周俸禄奖励已派发 金额:" + item.getRewordAmount() + "，请领取";
                   // 月俸禄
-                } else if (type == 2) {
+                } else if (MONTH_WEAL.match(type)) {
                   sourceType = TranTypes.MONTH_WEAL.getValue();
                   content = "本月俸禄奖励已派发 金额:" + item.getRewordAmount() + "，请领取";
                   // 生日礼金
-                } else if (type == 3) {
+                } else if (BIRTH_WEAL.match(type)) {
                   sourceType = TranTypes.BIRTH_WEAL.getValue();
                   content = "您的生日礼金奖励已派发 金额:" + item.getRewordAmount() + "，请领取";
                   // 每月红包
-                } else if (type == 4) {
+                } else if (RED_ENVELOPE_WEAL.match(type)) {
                   sourceType = TranTypes.RED_ENVELOPE_WEAL.getValue();
                   content = "当月红包奖励已派发 金额:" + item.getRewordAmount() + "，请领取";
                 }
@@ -559,29 +550,9 @@ public class MemberWealServiceImpl extends ServiceImpl<MemberWealMapper, MemberW
   public void recycleWeal(Long wealId, HttpServletRequest request) {
     // 通过流水号去回收福利奖励-->未领取的直接回收掉但不扣钱  已完成的直接扣钱回收
     // 根据福利id查询该福利
-    MemberWeal memberWeal = mapper.selectById(wealId);
+    MemberWeal memberWeal = memberWealMapper.selectById(wealId);
     // 福利类型
-    Integer type = memberWeal.getType();
-    Integer sourceType =
-        type == 0
-            ? TranTypes.WEEK_WEAL_RECYCLE.getValue()
-            : type == 1
-                ? TranTypes.MONTH_WEAL_RECYCLE.getValue()
-                : type == 2
-                    ? TranTypes.BIRTH_WEAL_RECYCLE.getValue()
-                    : type == 3
-                        ? TranTypes.RED_ENVELOPE_WEAL_RECYCLE.getValue()
-                        : TranTypes.WEEK_WEAL_RECYCLE.getValue();
-    String remark =
-        type == 0
-            ? TranTypes.WEEK_WEAL_RECYCLE.getDesc()
-            : type == 1
-                ? TranTypes.MONTH_WEAL_RECYCLE.getDesc()
-                : type == 2
-                    ? TranTypes.BIRTH_WEAL_RECYCLE.getDesc()
-                    : type == 3
-                        ? TranTypes.RED_ENVELOPE_WEAL_RECYCLE.getDesc()
-                        : TranTypes.WEEK_WEAL_RECYCLE.getDesc();
+    TranTypes tranType = this.getWealType(memberWeal.getType());
     // 流水号
     String serialNumber = memberWeal.getSerialNumber();
     List<MemberWealReword> rewordList =
@@ -594,15 +565,17 @@ public class MemberWealServiceImpl extends ServiceImpl<MemberWealMapper, MemberW
     // 登录ip
     String ipAddress = IPUtils.getIpAddress(request);
     if (CollectionUtil.isNotEmpty(rewordList)) {
-      // 过滤已派发成功状态的数据
-      Integer pageSize = 7000; // 每次7000条执行
-      Integer size = rewordList.size();
+      // 过滤已派发成功状态的数据, 每次7000条执行
+      int pageSize = 7000;
+      int size = rewordList.size();
       log.info("需要回收的会员记录数:" + size);
-      Integer part = size / pageSize;
+
+      int part = size / pageSize;
       for (int j = 1; j <= part + 1; j++) {
-        Integer fromIndex = (j - 1) * pageSize;
-        Integer toIndex = j * pageSize;
-        if (size < toIndex) { // 不需要分页
+        int fromIndex = (j - 1) * pageSize;
+        int toIndex = j * pageSize;
+        if (size < toIndex) {
+          // 不需要分页
           toIndex = size;
         }
         log.info("当前fromIndex和toIndex：（{}），（{}）", fromIndex, toIndex);
@@ -612,7 +585,8 @@ public class MemberWealServiceImpl extends ServiceImpl<MemberWealMapper, MemberW
           log.info("福利回收{},第{}批开始执行,条数:{}", wealId, j, pageList.size());
           for (MemberWealReword reword : pageList) {
             try {
-              if (reword.getStatus() == 2) { // 已完成
+              // 已完成
+              if (reword.getStatus() == 2) {
                 // 查询会员信息
                 Member member = memberMapper.selectById(reword.getUserId());
                 // 派发金额
@@ -632,12 +606,12 @@ public class MemberWealServiceImpl extends ServiceImpl<MemberWealMapper, MemberW
                   memberBill.setMemberId(member.getId());
                   memberBill.setAccount(member.getAccount());
                   memberBill.setMemberPath(member.getSuperPath());
-                  memberBill.setTranType(sourceType);
+                  memberBill.setTranType(tranType.getValue());
                   memberBill.setOrderNo(RandomUtil.generateNumber(22));
                   memberBill.setAmount(negate.negate());
                   memberBill.setBalance(memberInfoService.getById(member.getId()).getBalance());
-                  memberBill.setRemark(remark);
-                  memberBill.setContent(remark);
+                  memberBill.setRemark(tranType.getDesc());
+                  memberBill.setContent(tranType.getDesc());
                   memberBill.setOperator("system");
                   memberBillService.save(memberBill);
                 } catch (Exception e) {
@@ -657,9 +631,7 @@ public class MemberWealServiceImpl extends ServiceImpl<MemberWealMapper, MemberW
               // 修改福利奖励
               wealRewordService.updateWealRecord(reword);
             } catch (Exception e) {
-              continue;
-            } finally {
-              continue;
+              e.printStackTrace();
             }
           }
           // 本批次执行完 睡眠下
@@ -684,6 +656,21 @@ public class MemberWealServiceImpl extends ServiceImpl<MemberWealMapper, MemberW
     if (!this.updateById(memberWeal)) {
       throw new ServiceException("操作失败");
     }
-    ;
+  }
+
+  private TranTypes getWealType(Integer type) {
+    if (MONTH_WEAL_RECYCLE.match(type)) {
+      return MONTH_WEAL_RECYCLE;
+    }
+
+    if (BIRTH_WEAL_RECYCLE.match(type)) {
+      return BIRTH_WEAL_RECYCLE;
+    }
+
+    if (RED_ENVELOPE_WEAL_RECYCLE.match(type)) {
+      return RED_ENVELOPE_WEAL_RECYCLE;
+    }
+
+    return WEEK_WEAL_RECYCLE;
   }
 }

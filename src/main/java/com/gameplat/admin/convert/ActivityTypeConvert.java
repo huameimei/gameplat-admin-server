@@ -14,12 +14,6 @@ import org.mapstruct.Mapper;
 @Mapper(componentModel = "spring")
 public interface ActivityTypeConvert {
 
-  /**
-   * 将Entity转换成VO
-   *
-   * @param entity ActivityType
-   * @return
-   */
   ActivityTypeVO toVo(ActivityType entity);
 
   ActivityType toEntity(ActivityTypeAddDTO dto);

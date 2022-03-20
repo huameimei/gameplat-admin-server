@@ -13,8 +13,7 @@ import java.io.Serializable;
 @Data
 public class LoanVO implements Serializable {
 
-    private IPage<MemberLoanVO> page;
+  private IPage<MemberLoanVO> page;
 
-    private MemberLoanSumVO memberLoanSumVO;
-
+  private MemberLoanSumVO memberLoanSumVO;
 }

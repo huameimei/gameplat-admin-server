@@ -9,8 +9,13 @@ import java.util.Map;
 
 public interface ProxyPayService {
 
-  void proxyPay(Long id, Long ppMerchantId, String asyncCallbackUrl,
-      String sysPath, UserCredential userCredential) throws Exception;
+  void proxyPay(
+      Long id,
+      Long ppMerchantId,
+      String asyncCallbackUrl,
+      String sysPath,
+      UserCredential userCredential)
+      throws Exception;
 
   ReturnMessage queryProxyOrder(Long id, Long ppMerchantId) throws Exception;
 
@@ -19,7 +24,8 @@ public interface ProxyPayService {
       String url,
       String method,
       List<NameValuePair> headers,
-      String ipAddress, Map<String, String> callbackParameters, String requestBody)
+      String ipAddress,
+      Map<String, String> callbackParameters,
+      String requestBody)
       throws Exception;
-
 }

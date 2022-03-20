@@ -1,9 +1,11 @@
 package com.gameplat.admin.model.vo;
 
+import com.gameplat.model.entity.sys.SysDictData;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -15,17 +17,17 @@ import java.util.List;
 public class MessageDictDataVO implements Serializable {
 
   @ApiModelProperty(value = "推送范围")
-  private List UserRange;
+  private List<SysDictData> userRange = new ArrayList<>();
 
   @ApiModelProperty(value = "弹出界面")
-  private List Location;
+  private List<SysDictData> location = new ArrayList<>();
 
   @ApiModelProperty(value = "弹出次数")
-  private List PopCount;
+  private List<SysDictData> popCount = new ArrayList<>();
 
   @ApiModelProperty(value = "消息类别")
-  private List MessageCate;
+  private List<SysDictData> messageCate = new ArrayList<>();
 
   @ApiModelProperty(value = "消息展示类型")
-  private List messageShowType;
+  private List<SysDictData> messageShowType = new ArrayList<>();
 }

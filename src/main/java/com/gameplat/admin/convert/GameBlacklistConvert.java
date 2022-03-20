@@ -7,5 +7,5 @@ import org.mapstruct.Mapper;
 @Mapper(componentModel = "spring")
 public interface GameBlacklistConvert {
 
-  GameBlacklist toEntity(OperGameBlacklistDTO operLiveBlacklistDTO);
+  GameBlacklist toEntity(OperGameBlacklistDTO dto);
 }

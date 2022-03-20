@@ -4,6 +4,7 @@ import cn.hutool.core.date.DateUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.gameplat.admin.enums.MemberEnums;
 import com.gameplat.admin.model.dto.MemberQueryDTO;
 import com.gameplat.model.entity.member.Member;
 import org.springframework.stereotype.Component;
@@ -35,7 +36,11 @@ public class MemberQueryCondition {
         .eq(ObjectUtils.isNotEmpty(dto.getPhone()), "t1.phone", dto.getPhone())
         .eq(ObjectUtils.isNotEmpty(dto.getQq()), "t1.qq", dto.getQq())
         .eq(ObjectUtils.isNotEmpty(dto.getUserLevel()), "t1.user_level", dto.getUserLevel())
-        .eq(ObjectUtils.isNotEmpty(dto.getAgentLevel()), "t1.agent_level", dto.getAgentLevel())
+        .func(
+            ObjectUtils.isNotEmpty(dto.getAgentLevel()),
+            q ->
+                q.eq("t1.agent_level", dto.getAgentLevel())
+                    .eq("t1.user_type", MemberEnums.Type.AGENT.value()))
         .eq(ObjectUtils.isNotEmpty(dto.getVipLevel()), "t2.vip_level", dto.getVipLevel())
         .in(ObjectUtils.isNotEmpty(dto.getLevels()), "t2.vip_level", dto.getLevels())
         .eq(

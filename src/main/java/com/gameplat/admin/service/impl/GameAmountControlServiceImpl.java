@@ -19,18 +19,21 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)
-public class GameAmountControlServiceImpl extends ServiceImpl<GameAmountControlMapper, GameAmountControl>
+public class GameAmountControlServiceImpl
+    extends ServiceImpl<GameAmountControlMapper, GameAmountControl>
     implements GameAmountControlService {
 
   private final GameAmountControlConvert gameAmountControlConvert;
 
   @Override
   public List<GameAmountControlVO> selectGameAmountList() {
-    return this.lambdaQuery().list().stream().map(gameAmountControlConvert::toVo).collect(Collectors.toList());
+    return this.lambdaQuery().list().stream()
+        .map(gameAmountControlConvert::toVo)
+        .collect(Collectors.toList());
   }
 
   @Override
   public GameAmountControl findInfoByType(Integer type) {
-    return this.lambdaQuery().eq(GameAmountControl::getType,type).one();
+    return this.lambdaQuery().eq(GameAmountControl::getType, type).one();
   }
 }

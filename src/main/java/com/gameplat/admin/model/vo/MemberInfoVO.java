@@ -110,6 +110,6 @@ public class MemberInfoVO implements Serializable {
 
   private Integer tableIndex;
 
-  @ApiModelProperty(value = "玩家金币数" )
+  @ApiModelProperty(value = "玩家金币数")
   private Integer goldCoin;
 }

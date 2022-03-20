@@ -26,21 +26,22 @@ import javax.servlet.http.HttpServletRequest;
  * @description 用户成长值记录
  * @date 2021/11/23
  */
-@Api(tags = "VIP成长记录")
 @Slf4j
+@Api(tags = "VIP成长记录")
 @RestController
 @RequestMapping("/api/admin/member/growthRecord")
 public class OpenMemberGrowthRecordController {
 
   @Autowired private MemberGrowthRecordService memberGrowthRecordService;
 
-    @GetMapping("/list")
-    @ApiOperation(value = "查询成长值记录列表")
-    @PreAuthorize("hasAuthority('member:growthRecord:list')")
-    public IPage<MemberGrowthRecordVO> listWealGrowthRecord(PageDTO<MemberGrowthRecord> page, MemberGrowthRecordDTO dto) {
-        dto.setLanguage(LocaleContextHolder.getLocale().toLanguageTag());
-        return memberGrowthRecordService.findRecordList(page, dto);
-    }
+  @GetMapping("/list")
+  @ApiOperation(value = "查询成长值记录列表")
+  @PreAuthorize("hasAuthority('member:growthRecord:list')")
+  public IPage<MemberGrowthRecordVO> listWealGrowthRecord(
+      PageDTO<MemberGrowthRecord> page, MemberGrowthRecordDTO dto) {
+    dto.setLanguage(LocaleContextHolder.getLocale().toLanguageTag());
+    return memberGrowthRecordService.findRecordList(page, dto);
+  }
 
   @PutMapping("/editGrowth")
   @ApiOperation(value = "修改单个会员成长值")

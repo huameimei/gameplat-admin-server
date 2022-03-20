@@ -4,12 +4,15 @@ import cn.hutool.core.convert.Convert;
 import com.alibaba.fastjson.JSONObject;
 import com.gameplat.admin.model.dto.LiveDomainParamDTO;
 import com.gameplat.admin.service.ILiveDomainService;
+import com.gameplat.base.common.web.Result;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
-import com.gameplat.base.common.web.Result;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * @author aBen
@@ -21,20 +24,22 @@ import com.gameplat.base.common.web.Result;
 @RequestMapping("/api/admin/sport/live")
 public class LiveDomainTrafficController {
 
-  @Autowired
-  private ILiveDomainService liveDomainService;
+  @Autowired private ILiveDomainService liveDomainService;
 
   @ApiOperation(value = "直播域名查询")
   @GetMapping("/getLiveDomainList")
-  public Result<Object> getLiveDomainList(LiveDomainParamDTO param , @RequestHeader(value = "country", required = false, defaultValue = "zh-CN") String country) {
+  public Result<Object> getLiveDomainList(
+      LiveDomainParamDTO param,
+      @RequestHeader(value = "country", required = false, defaultValue = "zh-CN") String country) {
     param.setCountry(country);
-    return  Result.succeedData(liveDomainService.getLiveDomainList(param));
+    return Result.succeedData(liveDomainService.getLiveDomainList(param));
   }
-
 
   @ApiOperation(value = "直播流量查询")
   @GetMapping("/getLiveDomainTrafficData")
-  public Result<Object> getLiveDomainTrafficData(LiveDomainParamDTO param , @RequestHeader(value = "country", required = false, defaultValue = "zh-CN") String country) {
+  public Result<Object> getLiveDomainTrafficData(
+      LiveDomainParamDTO param,
+      @RequestHeader(value = "country", required = false, defaultValue = "zh-CN") String country) {
     param.setCountry(country);
     String code = Convert.toStr(liveDomainService.getLiveDomainTrafficData(param));
     if (StringUtils.isNotBlank(code)) {

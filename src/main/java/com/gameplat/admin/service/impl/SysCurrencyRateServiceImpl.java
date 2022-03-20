@@ -8,8 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
+ * 货币比例
+ *
  * @author lily
- * @description 货币比例
  * @date 2021/11/27
  */
 @Service

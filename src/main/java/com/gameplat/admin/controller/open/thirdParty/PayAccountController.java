@@ -41,7 +41,10 @@ public class PayAccountController {
 
   @PostMapping("/addVip")
   @PreAuthorize("hasAuthority('thirdParty:payAccount:add')")
-  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.RECHARGE, desc = "'新增VIP收款值账户id=' + #dto.id")
+  @Log(
+      module = ServiceName.ADMIN_SERVICE,
+      type = LogType.RECHARGE,
+      desc = "'新增VIP收款值账户id=' + #dto.id")
   public void addVip(@RequestBody PayAccountAddDTO dto) {
     dto.setType(PayAccountTypeEnum.VIP_ACCOUNT.getValue());
     payAccountService.save(dto);

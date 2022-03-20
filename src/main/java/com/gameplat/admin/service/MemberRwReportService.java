@@ -8,9 +8,7 @@ import com.gameplat.model.entity.recharge.RechargeOrder;
 
 public interface MemberRwReportService extends IService<MemberRwReport> {
 
-  void addRecharge(Member member, Integer rechargeCount, RechargeOrder rechargeOrder) throws Exception;
+  void addRecharge(Member member, Integer rechargeCount, RechargeOrder rechargeOrder);
 
-  void addWithdraw(Member member, Integer withdrawCount, MemberWithdraw memberWithdraw)
-      throws Exception;
-
+  void addWithdraw(Member member, Integer withdrawCount, MemberWithdraw memberWithdraw);
 }

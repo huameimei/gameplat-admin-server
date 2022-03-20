@@ -14,7 +14,6 @@ import java.util.List;
 
 /**
  * @author gray
- * @description
  * @date 2022/2/16
  */
 @Slf4j
@@ -22,36 +21,30 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/internal/admin/chat")
 public class InternalOtthController {
-    @Autowired
-    private OtthService otthService;
-    @Autowired
-    private ChatPushPlanService chatPushPlanService;
 
-    /**
-     * 分享彩票下注
-     */
-    @RequestMapping(value = "/cpbet", method = RequestMethod.POST)
-    public void cpbet(@RequestBody List<PushCPBetMessageReq> req, HttpServletRequest request) {
-        otthService.cpbet(req, request);
-    }
+  @Autowired private OtthService otthService;
 
-    /**
-     * 中奖推送接口
-     */
-    @PostMapping("/pushLotteryWin")
-    public void pushLotteryWin(
-            @RequestBody List<PushLottWinVo> lottWinVos, HttpServletRequest request) {
-        otthService.pushLotteryWin(lottWinVos, request);
-    }
+  @Autowired private ChatPushPlanService chatPushPlanService;
 
-    /**
-     * 给游戏调用的更新游戏状态
-     */
-    @PostMapping("updateGameStatus")
-    public void updateGameStuats(String gameId, int gameStatus) {
-        // 游戏维护更新自定义中奖推送
-        chatPushPlanService.updatePushPlan(gameId, gameStatus);
-        // 更新房间管理
-        otthService.updateGameStuats(gameId, gameStatus);
-    }
+  /** 分享彩票下注 */
+  @RequestMapping(value = "/cpbet", method = RequestMethod.POST)
+  public void cpbet(@RequestBody List<PushCPBetMessageReq> req, HttpServletRequest request) {
+    otthService.cpbet(req, request);
+  }
+
+  /** 中奖推送接口 */
+  @PostMapping("/pushLotteryWin")
+  public void pushLotteryWin(
+      @RequestBody List<PushLottWinVo> lottWinVos, HttpServletRequest request) {
+    otthService.pushLotteryWin(lottWinVos, request);
+  }
+
+  /** 给游戏调用的更新游戏状态 */
+  @PostMapping("updateGameStatus")
+  public void updateGameStuats(String gameId, int gameStatus) {
+    // 游戏维护更新自定义中奖推送
+    chatPushPlanService.updatePushPlan(gameId, gameStatus);
+    // 更新房间管理
+    otthService.updateGameStuats(gameId, gameStatus);
+  }
 }

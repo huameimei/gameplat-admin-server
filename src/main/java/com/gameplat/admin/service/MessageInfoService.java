@@ -24,46 +24,45 @@ public interface MessageInfoService extends IService<Message> {
   /**
    * 获取数据字典数据
    *
-   * @return
+   * @return MessageDictDataVO
    */
   MessageDictDataVO getDictData();
 
   /**
    * 分页查询
    *
-   * @param page
-   * @param messageInfoQueryDTO
-   * @return
+   * @param page IPage
+   * @param dto PageDTO
+   * @return MessageInfoQueryDTO
    */
-  IPage<MessageInfoVO> findMessageList(
-      PageDTO<Message> page, MessageInfoQueryDTO messageInfoQueryDTO);
+  IPage<MessageInfoVO> findMessageList(PageDTO<Message> page, MessageInfoQueryDTO dto);
 
   /**
    * 新增个人消息
    *
-   * @param messageInfoAddDTO
+   * @param dto MessageInfoAddDTO
    */
-  void insertMessage(MessageInfoAddDTO messageInfoAddDTO);
+  void insertMessage(MessageInfoAddDTO dto);
 
   /**
    * 批量删除消息
    *
-   * @param ids
+   * @param ids String
    */
   void deleteBatchMessage(String ids);
 
   /**
    * 修改个人消息
    *
-   * @param messageInfoEditDTO
+   * @param dto MessageInfoEditDTO
    */
-  void editMessage(MessageInfoEditDTO messageInfoEditDTO);
+  void editMessage(MessageInfoEditDTO dto);
 
   /**
    * 查询分发用户列表
    *
-   * @return
+   * @return IPage
    */
   IPage<MessageDistributeVO> findMessageDistributeList(
-      Page<Member> page, MessageDistributeQueryDTO messageDistributeQueryDTO);
+      Page<Member> page, MessageDistributeQueryDTO dto);
 }

@@ -4,7 +4,6 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.gameplat.admin.model.dto.MessageFeedbackAddDTO;
 import com.gameplat.admin.model.dto.MessageFeedbackQueryDTO;
-import com.gameplat.admin.model.dto.MessageFeedbackUpdateDTO;
 import com.gameplat.admin.model.vo.MessageFeedbackVO;
 import com.gameplat.admin.service.MessageFeedbackService;
 import com.gameplat.model.entity.message.MessageFeedback;
@@ -54,13 +53,7 @@ public class OpenMessageFeedbackController {
   @PutMapping("/read")
   @PreAuthorize("hasAuthority('notice:feedback:read')")
   public void updateMessage(Long id) {
-    messageFeedbackService.updateMessage(
-        new MessageFeedbackUpdateDTO() {
-          {
-            setIsRead(1);
-            setId(id);
-          }
-        });
+    messageFeedbackService.updateMessage(id);
   }
 
   @ApiOperation(value = "新增意见反馈")

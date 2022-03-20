@@ -34,7 +34,7 @@ public interface RechargeOrderMapper extends BaseMapper<RechargeOrder> {
    * @param map
    * @return
    */
-  List<ActivityStatisticItem> findRechargeInfo(Map map);
+  List<ActivityStatisticItem> findRechargeInfo(Map<String, Object> map);
 
   /**
    * 统计用户充值记录
@@ -42,7 +42,7 @@ public interface RechargeOrderMapper extends BaseMapper<RechargeOrder> {
    * @param map
    * @return
    */
-  List<ActivityStatisticItem> findRechargeDateList(Map map);
+  List<ActivityStatisticItem> findRechargeDateList(Map<String, Object> map);
 
   /**
    * 统计首充金额
@@ -50,7 +50,7 @@ public interface RechargeOrderMapper extends BaseMapper<RechargeOrder> {
    * @param map
    * @return
    */
-  List<ActivityStatisticItem> findFirstRechargeAmount(Map map);
+  List<ActivityStatisticItem> findFirstRechargeAmount(Map<String, Object> map);
 
   /** 根据会员和最后修改时间获取充值次数、充值金额、充值优惠、其它优惠 */
   MemberActivationVO getRechargeInfoByNameAndUpdateTime(MemberActivationDTO memberActivationDTO);
@@ -61,8 +61,9 @@ public interface RechargeOrderMapper extends BaseMapper<RechargeOrder> {
       @Param("startTime") String startTime,
       @Param("endTime") String endTime);
 
-  List<SalaryRechargeVO> getRechargeForSalary(@Param("startDate") String startDate,
-                                              @Param("endDate") String endDate,
-                                              @Param("agentName") String agentName,
-                                              @Param("isInclude") Integer isInclude);
+  List<SalaryRechargeVO> getRechargeForSalary(
+      @Param("startDate") String startDate,
+      @Param("endDate") String endDate,
+      @Param("agentName") String agentName,
+      @Param("isInclude") Integer isInclude);
 }

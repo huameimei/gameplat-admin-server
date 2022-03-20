@@ -39,7 +39,10 @@ public class TpMerchantController {
 
   @PostMapping("/add")
   @PreAuthorize("hasAuthority('thirdParty:tpMerchants:add')")
-  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.RECHARGE, desc = "'新增入款商户name=' + #dto.name")
+  @Log(
+      module = ServiceName.ADMIN_SERVICE,
+      type = LogType.RECHARGE,
+      desc = "'新增入款商户name=' + #dto.name")
   public void add(@RequestBody TpMerchantAddDTO dto) {
     tpMerchantService.save(dto);
   }

@@ -1,9 +1,7 @@
 package com.gameplat.admin.controller.open.member;
 
-import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONObject;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
-import com.gameplat.admin.enums.LanguageEnum;
 import com.gameplat.admin.model.dto.MemberGrowthConfigEditDto;
 import com.gameplat.admin.model.vo.MemberConfigLevelVO;
 import com.gameplat.admin.model.vo.MemberGrowthLevelVO;
@@ -16,6 +14,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -28,8 +27,8 @@ import java.util.List;
  * @description 用户成长等级
  * @date 2021/11/20
  */
-@Api(tags = "VIP等级配置")
 @Slf4j
+@Api(tags = "VIP等级配置")
 @RestController
 @RequestMapping("/api/admin/member/growthLevel")
 public class OpenMemberGrowthLevelController {
@@ -41,26 +40,22 @@ public class OpenMemberGrowthLevelController {
   @ApiOperation(value = "VIP配置和VIP等级列表/查询logo配置列表")
   @GetMapping("/config")
   @PreAuthorize("hasAuthority('member:growthLevel:config')")
-  public MemberConfigLevelVO getLevelConfig(
-      @ApiParam(name = "language", value = "语言") @RequestParam(required = false) String language) {
-    return levelService.getLevelConfig(language);
+  public MemberConfigLevelVO getLevelConfig() {
+    return levelService.getLevelConfig();
   }
 
   @ApiOperation(value = "修改VIP配置")
-  @PreAuthorize("hasAuthority('member:growthLevel:edit')")
   @PutMapping("/update")
-  public void update(
-      @ApiParam(name = "修改VIP配置入参", value = "传入json格式", required = true) @Validated @RequestBody
-          MemberGrowthConfigEditDto configEditDto) {
-
-    if (ObjectUtils.isEmpty(configEditDto.getId())) {
+  @PreAuthorize("hasAuthority('member:growthLevel:edit')")
+  @ApiParam(name = "修改VIP配置入参", value = "传入json格式", required = true)
+  public void update(@Validated @RequestBody MemberGrowthConfigEditDto dto) {
+    if (ObjectUtils.isEmpty(dto.getId())) {
       throw new ServiceException(" 编号不能为空");
     }
-    configEditDto.setUpdateBy(GlobalContextHolder.getContext().getUsername());
-    if (StrUtil.isBlank(configEditDto.getLanguage())) {
-      configEditDto.setLanguage(LanguageEnum.app_zh_CN.getCode());
-    }
-    configService.updateGrowthConfig(configEditDto);
+
+    dto.setUpdateBy(GlobalContextHolder.getContext().getUsername());
+    dto.setLanguage(LocaleContextHolder.getLocale().getLanguage());
+    configService.updateGrowthConfig(dto);
   }
 
   @ApiOperation(value = "后台批量修改VIP等级")
@@ -73,8 +68,7 @@ public class OpenMemberGrowthLevelController {
   @ApiOperation(value = "VIP等级列表")
   @GetMapping("/vipList")
   @PreAuthorize("hasAuthority('member:growthLevel:config')")
-  public List<MemberGrowthLevelVO> vipList(
-      @ApiParam(name = "language", value = "语言") @RequestParam(required = false) String language) {
-    return levelService.vipList(language);
+  public List<MemberGrowthLevelVO> vipList() {
+    return levelService.vipList();
   }
 }

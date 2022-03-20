@@ -47,30 +47,21 @@ import java.util.stream.Collectors;
 @Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)
 public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> implements MemberService {
 
-  @Autowired(required = false) private MemberMapper memberMapper;
-
-  @Autowired private MemberConvert memberConvert;
-
-  @Autowired private MemberInfoService memberInfoService;
-
-  @Autowired private MemberQueryCondition memberQueryCondition;
-
-  @Autowired private PasswordService passwordService;
-
-  @Autowired private MemberRemarkService memberRemarkService;
-
-  @Autowired private OnlineUserService onlineUserService;
-
-  @Autowired private TenantConfig tenantConfig;
-
-  @Autowired private GameTransferInfoService gameTransferInfoService;
-
-  @Autowired private SpreadLinkInfoService spreadLinkInfoService;
-
-
-
   private final String DL_FORMAL_TYPE = "A";
 
+  @Autowired(required = false)
+  private MemberMapper memberMapper;
+
+  @Autowired private MemberConvert memberConvert;
+  @Autowired private MemberInfoService memberInfoService;
+  @Autowired private MemberQueryCondition memberQueryCondition;
+  @Autowired private PasswordService passwordService;
+  @Autowired private MemberRemarkService memberRemarkService;
+  @Autowired private OnlineUserService onlineUserService;
+  @Autowired private TenantConfig tenantConfig;
+  @Autowired private GameTransferInfoService gameTransferInfoService;
+  @Autowired private SpreadLinkInfoService spreadLinkInfoService;
+  @Autowired private GameAdminService gameAdminService;
 
   @Override
   public IPage<MemberVO> queryPage(Page<Member> page, MemberQueryDTO dto) {
@@ -90,10 +81,10 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
   @Override
   public IPage<MemberBalanceVO> findTGMemberBalance(Page<Member> page, MemberQueryDTO dto) {
     return memberMapper
-            .queryPage(page, memberQueryCondition.builderQueryWrapper(dto))
-            .convert(memberConvert::toBalanceVo);
+        .queryPage(page, memberQueryCondition.builderQueryWrapper(dto))
+        .convert(this::setOnlineStatus)
+        .convert(memberConvert::toBalanceVo);
   }
-
 
   @Override
   public List<MemberVO> queryList(MemberQueryDTO dto) {
@@ -383,13 +374,15 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
     Member member = this.getByAccount(account).orElseThrow(() -> new ServiceException("会员信息不存在!"));
     if (StringUtils.isBlank(member.getGameAccount())) {
       Assert.notNull(tenantConfig.getTenantCode(), "平台编码未配置，请联系客服");
+      StringBuilder gameAccount =
+          new StringBuilder(tenantConfig.getTenantCode()).append(member.getId());
+
       // 固定13位
-      StringBuffer gameAccount =
-          new StringBuffer(tenantConfig.getTenantCode()).append(member.getId());
       String suffix = RandomUtil.randomString(13 - gameAccount.length());
       member.setGameAccount(gameAccount.append(suffix).toString());
       Assert.isTrue(this.updateById(member), "添加会员游戏账号信息!");
     }
+
     // 会员余额存在哪个游戏中
     if (ObjectUtil.isNull(gameTransferInfoService.getInfoByMemberId(member.getId()))) {
       GameTransferInfo gameTransferInfo = new GameTransferInfo();
@@ -500,8 +493,7 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
     String[] id = ids.split(",");
     for (String memberId : id) {
       Member member = this.getById(memberId);
-      if (member != null
-          && DL_FORMAL_TYPE.equalsIgnoreCase(member.getUserType())) {
+      if (member != null && DL_FORMAL_TYPE.equalsIgnoreCase(member.getUserType())) {
         MemberInfo memberInfo = new MemberInfo();
         memberInfo.setMemberId(Convert.toLong(memberId));
         memberInfo.setSalaryFlag(state);
@@ -510,48 +502,47 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
     }
   }
 
-  @Autowired
-  private GameAdminService gameAdminService;
-
   @Override
   public void updateTGClearMember(CleanAccountDTO dto) {
     log.info("批量清理账号余额开始，操作人：{}，参数：{}", SecurityUserHolder.getUsername(), dto);
     List<Member> memberList = null;
-    if (ObjectUtil.equals(dto.getIsCleanAll(),0)) {
-      //清除选中的推广会员
+    if (ObjectUtil.equals(dto.getIsCleanAll(), 0)) {
+      // 清除选中的推广会员
       String[] userNames = dto.getUserNames().split(",");
       List<String> userNameList = Lists.newArrayList(userNames);
       dto.setUserNameList(userNameList);
-      if (ObjectUtil.equals(dto.getUserType(),4))
-      memberList = this.lambdaQuery().in(Member::getAccount,dto.getUserNames().split(",")).eq(Member::getUserType,dto.getUserType()).list();
+      memberList = this.lambdaQuery().in(Member::getAccount, dto.getUserNames().split(",")).list();
       if (StringUtils.isEmpty(memberList) || memberList.size() != userNames.length) {
         throw new ServiceException("未找到账号信息");
       }
-      //过滤是否存在非推广会员
-      Member member = memberList.stream().filter(a ->MemberEnums.Type.MEMBER.value().equalsIgnoreCase(a.getUserType()) || MemberEnums.Type.AGENT.value().equalsIgnoreCase(a.getUserType())).findAny().orElse(new Member());
+      // 过滤是否存在非推广会员
+      Member member =
+          memberList.stream()
+              .filter(
+                  a ->
+                      MemberEnums.Type.MEMBER.value().equalsIgnoreCase(a.getUserType())
+                          || MemberEnums.Type.AGENT.value().equalsIgnoreCase(a.getUserType()))
+              .findAny()
+              .orElse(new Member());
       if (MemberEnums.Type.MEMBER.value().equalsIgnoreCase(member.getUserType())) {
         throw new ServiceException("你选的账号中含有正式会员!");
       }
       if (MemberEnums.Type.AGENT.value().equalsIgnoreCase(member.getUserType())) {
         throw new ServiceException("你选的账号中含有代理会员!");
       }
-    } else if (ObjectUtil.equals(dto.getIsCleanAll(),1)){
-      memberList = this.lambdaQuery().eq(Member::getUserType,"P").list();
-      Assert.notNull(memberList,"没有当前类型的会员账号");
+    } else if (ObjectUtil.equals(dto.getIsCleanAll(), 1)) {
+      memberList = this.lambdaQuery().eq(Member::getUserType, "P").list();
+      Assert.notNull(memberList, "没有当前类型的会员账号");
     } else {
       throw new ServiceException("isCleanAll是错误的传参数据");
     }
-    //额度回收
-    memberList.parallelStream().forEach(a -> {
-      gameAdminService.reclaimLiveAmount(a.getAccount());
-    });
+    // 额度回收
+    memberList.parallelStream()
+        .forEach(
+            a -> {
+              gameAdminService.reclaimLiveAmount(a.getAccount());
+            });
     memberInfoService.updateClearGTMember(dto);
     log.info("批量清理账号余额结束，操作人：{}，参数：{}", SecurityUserHolder.getUsername(), dto);
-  }
-
-  @Override
-  public MemberBalanceVO findMemberVip(String username, String level, String vipGrade) {
-    return memberMapper.findMemberVip(username,level,vipGrade);
-
   }
 }

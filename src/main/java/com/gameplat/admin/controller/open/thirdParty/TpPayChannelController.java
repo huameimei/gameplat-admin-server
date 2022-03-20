@@ -30,7 +30,10 @@ public class TpPayChannelController {
 
   @PostMapping("/add")
   @PreAuthorize("hasAuthority('thirdParty:tpPayChannels:add')")
-  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.RECHARGE, desc = "'新增支付通道name=' + #dto.name")
+  @Log(
+      module = ServiceName.ADMIN_SERVICE,
+      type = LogType.RECHARGE,
+      desc = "'新增支付通道name=' + #dto.name")
   public void add(@RequestBody TpPayChannelAddDTO dto) {
     tpPayChannelService.save(dto);
   }

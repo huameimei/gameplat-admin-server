@@ -15,6 +15,7 @@ public interface SysTenantSettingService extends IService<SysTenantSetting> {
 
   /**
    * 修改租户设置的值
+   *
    * @param sysTenantSetting
    * @return
    */

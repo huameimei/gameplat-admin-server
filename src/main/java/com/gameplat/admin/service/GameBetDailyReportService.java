@@ -15,13 +15,14 @@ import java.util.Map;
 
 public interface GameBetDailyReportService extends IService<GameBetDailyReport> {
 
-  PageDtoVO queryPage(Page<GameBetDailyReport> page, GameBetDailyReportQueryDTO dto);
+  PageDtoVO<GameBetDailyReport> queryPage(
+      Page<GameBetDailyReport> page, GameBetDailyReportQueryDTO dto);
 
   void saveGameBetDailyReport(String statTime, GamePlatform gamePlatform);
 
   List<GameReportVO> queryReportList(GameBetDailyReportQueryDTO dto);
 
-  PageDtoVO<GameBetReportVO> querybetReportList(
+  PageDtoVO<GameBetReportVO> queryBetReportList(
       Page<GameBetDailyReportQueryDTO> page, GameBetDailyReportQueryDTO dto);
 
   /**

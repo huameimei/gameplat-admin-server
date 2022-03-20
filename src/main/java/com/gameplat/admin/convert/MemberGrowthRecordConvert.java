@@ -6,5 +6,5 @@ import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")
 public interface MemberGrowthRecordConvert {
-    MemberGrowthRecordVO toVo (MemberGrowthRecord record);
+  MemberGrowthRecordVO toVo(MemberGrowthRecord record);
 }

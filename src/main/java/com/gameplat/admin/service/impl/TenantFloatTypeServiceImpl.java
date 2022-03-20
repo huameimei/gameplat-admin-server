@@ -24,21 +24,16 @@ public class TenantFloatTypeServiceImpl extends ServiceImpl<TenantFloatTypeMappe
 
   @Autowired private TenantFloatTypeMapper tenantFloatTypeMapper;
 
-  /**
-   * 查询游戏浮窗类型列表
-   *
-   * @param tenantFloatTypeVo
-   *            游戏浮窗类型
-   * @return 游戏浮窗类型
-   */
   @Override
   public List<TenantFloatTypeVo> selectSysFloatTypeList(TenantFloatTypeVo tenantFloatTypeVo) {
-    List<TenantFloatTypeVo> result = tenantFloatTypeMapper.selectSysFloatTypeList(tenantFloatTypeVo);
-    if(!CollectionUtils.isEmpty(result)){
+    List<TenantFloatTypeVo> result =
+        tenantFloatTypeMapper.selectSysFloatTypeList(tenantFloatTypeVo);
+    if (!CollectionUtils.isEmpty(result)) {
       for (TenantFloatTypeVo type : result) {
-        if(null != type && !StringUtils.isEmpty(type.getShowPosition())){
+        if (null != type && !StringUtils.isEmpty(type.getShowPosition())) {
           JSONArray typeArray = JSONArray.parseArray(type.getShowPosition());
-          List<String> showPositionList = JSONObject.parseArray(typeArray.toJSONString(), String.class);
+          List<String> showPositionList =
+              JSONObject.parseArray(typeArray.toJSONString(), String.class);
           type.setShowPositionList(showPositionList);
         }
       }
@@ -46,25 +41,11 @@ public class TenantFloatTypeServiceImpl extends ServiceImpl<TenantFloatTypeMappe
     return result;
   }
 
-  /**
-   * 新增游戏浮窗
-   *
-   * @param tenantFloatSetting
-   *            游戏浮窗类型
-   * @return 结果
-   */
   @Override
   public void insertSysFloat(TenantFloatSetting tenantFloatSetting) {
     tenantFloatTypeMapper.insertSysFloatSetting(tenantFloatSetting);
   }
 
-  /**
-   * 修改游戏浮窗类型
-   *
-   * @param tenantFloatSetting
-   *            游戏浮窗类型
-   * @return 结果
-   */
   @Override
   public void updateFloat(TenantFloatSetting tenantFloatSetting) {
     tenantFloatTypeMapper.updateSysFloat(tenantFloatSetting);

@@ -4,5 +4,5 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.gameplat.model.entity.proxy.SalaryConfig;
 
 public interface SalaryConfigMapper extends BaseMapper<SalaryConfig> {
-    SalaryConfig getConfig(Integer agentLevel, String kindCode);
+  SalaryConfig getConfig(Integer agentLevel, String kindCode);
 }

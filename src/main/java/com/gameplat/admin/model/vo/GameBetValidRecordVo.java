@@ -83,11 +83,12 @@ public class GameBetValidRecordVo implements Serializable {
       pattern = "yyyy-MM-dd HH:mm:ss||epoch_second")
   private Date betTime;
 
-    /**
-     * 下注美东时间
-     */
-    @Field(type = FieldType.Date, format = DateFormat.custom, pattern = "yyyy-MM-dd HH:mm:ss||epoch_second")
-    private Date amesTime;
+  /** 下注美东时间 */
+  @Field(
+      type = FieldType.Date,
+      format = DateFormat.custom,
+      pattern = "yyyy-MM-dd HH:mm:ss||epoch_second")
+  private Date amesTime;
 
   /** 结算时间 */
   @Field(
@@ -117,35 +118,36 @@ public class GameBetValidRecordVo implements Serializable {
       pattern = "yyyy-MM-dd HH:mm:ss||epoch_second")
   private Date updateTime;
 
-    public static QueryBuilder buildBetRecordSearch(GameBetRecordQueryDTO dto) {
-        BoolQueryBuilder builder = QueryBuilders.boolQuery();
-        if (StringUtils.isNotBlank(dto.getAccount())) {
-            builder.must(QueryBuilders.termQuery("account", dto.getAccount()));
-        }
-        if (StringUtils.isNotEmpty(dto.getBillNo())) {
-            builder.must(QueryBuilders.matchQuery("billNo", dto.getBillNo()));
-        }
-        if (null != dto.getTimeType() && StringUtils.isNotBlank(dto.getBeginTime())) {
-            String keyword = "betTime.keyword";
-            if (TimeTypeEnum.BET_TIME.getValue() == dto.getTimeType()) {
-                keyword = "betTime.keyword";
-            }
-            if (TimeTypeEnum.THIRD_TIME.getValue() == dto.getTimeType()) {
-                keyword = "amesTime.keyword";
-            }
-            if (TimeTypeEnum.SETTLE_TIME.getValue() == dto.getTimeType()) {
-                keyword = "settleTime.keyword";
-            }
-            if (TimeTypeEnum.STAT_TIME.getValue() == dto.getTimeType()) {
-                keyword = "statTime.keyword";
-            }
-            builder.must(QueryBuilders.rangeQuery(keyword)
-                    .from(dto.getBeginTime())
-                    .to(dto.getEndTime() == null ? "now" : dto.getBeginTime())
-                    .format(DateUtils.DATE_TIME_PATTERN));
-        }
-        return builder;
+  public static QueryBuilder buildBetRecordSearch(GameBetRecordQueryDTO dto) {
+    BoolQueryBuilder builder = QueryBuilders.boolQuery();
+    if (StringUtils.isNotBlank(dto.getAccount())) {
+      builder.must(QueryBuilders.termQuery("account", dto.getAccount()));
     }
+    if (StringUtils.isNotEmpty(dto.getBillNo())) {
+      builder.must(QueryBuilders.matchQuery("billNo", dto.getBillNo()));
+    }
+    if (null != dto.getTimeType() && StringUtils.isNotBlank(dto.getBeginTime())) {
+      String keyword = "betTime.keyword";
+      if (TimeTypeEnum.BET_TIME.getValue() == dto.getTimeType()) {
+        keyword = "betTime.keyword";
+      }
+      if (TimeTypeEnum.THIRD_TIME.getValue() == dto.getTimeType()) {
+        keyword = "amesTime.keyword";
+      }
+      if (TimeTypeEnum.SETTLE_TIME.getValue() == dto.getTimeType()) {
+        keyword = "settleTime.keyword";
+      }
+      if (TimeTypeEnum.STAT_TIME.getValue() == dto.getTimeType()) {
+        keyword = "statTime.keyword";
+      }
+      builder.must(
+          QueryBuilders.rangeQuery(keyword)
+              .from(dto.getBeginTime())
+              .to(dto.getEndTime() == null ? "now" : dto.getBeginTime())
+              .format(DateUtils.DATE_TIME_PATTERN));
+    }
+    return builder;
+  }
 
   public BigDecimal getVailbetAmount() {
     return Convert.toBigDecimal(validAmount);

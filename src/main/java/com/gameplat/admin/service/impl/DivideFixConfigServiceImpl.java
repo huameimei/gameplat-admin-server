@@ -33,7 +33,6 @@ import java.util.stream.Collectors;
 
 @Service
 @Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)
-@SuppressWarnings("all")
 public class DivideFixConfigServiceImpl extends ServiceImpl<DivideFixConfigMapper, DivideFixConfig>
     implements DivideFixConfigService {
 
@@ -47,12 +46,6 @@ public class DivideFixConfigServiceImpl extends ServiceImpl<DivideFixConfigMappe
 
   @Autowired private GameKindMapper gameKindMapper;
 
-  /**
-   * 添加固定比例分红模式
-   *
-   * @param userName
-   * @param lang
-   */
   @Override
   public void add(String userName, String lang) {
     Assert.isTrue(StrUtil.isNotBlank(userName), "用户名参数缺失！");
@@ -67,18 +60,11 @@ public class DivideFixConfigServiceImpl extends ServiceImpl<DivideFixConfigMappe
         DivideFixConfig.builder()
             .userId(member.getId())
             .userName(member.getAccount())
-            .divideConfig(recommendConfigService.initDivideConfig(lang))
+            .divideConfig(recommendConfigService.initDivideConfig())
             .build();
     Assert.isTrue(this.save(saveObj), "添加失败！");
   }
 
-  /**
-   * 编辑固定分红比例前获取
-   *
-   * @param userName
-   * @param s
-   * @return
-   */
   @Override
   public Map<String, Object> getFixConfigForEdit(String userName, String s) {
     Assert.isTrue(StrUtil.isNotBlank(userName), "用户名参数缺失！");

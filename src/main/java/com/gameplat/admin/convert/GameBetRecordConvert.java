@@ -12,11 +12,5 @@ import org.mapstruct.Mapper;
 @Mapper(componentModel = "spring")
 public interface GameBetRecordConvert {
 
-  /**
-   * 转换为VO
-   *
-   * @param betRecord GameBetRecord
-   * @return GameBetRecordVO
-   */
   GameBetRecordVO toVo(GameBetRecord betRecord);
 }

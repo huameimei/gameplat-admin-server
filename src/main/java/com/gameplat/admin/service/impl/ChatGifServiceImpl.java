@@ -2,7 +2,6 @@ package com.gameplat.admin.service.impl;
 
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.crypto.SecureUtil;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -21,6 +20,7 @@ import com.gameplat.common.compent.oss.config.FileConfig;
 import com.gameplat.common.enums.DictTypeEnum;
 import com.gameplat.common.util.FileUtils;
 import com.gameplat.model.entity.chart.ChatGif;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -32,12 +32,11 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.sql.SQLOutput;
-import java.util.Map;
 
 /**
+ * 聊天室Gif管理
+ *
  * @author lily
- * @description 聊天室Gif管理
  * @date 2022/2/13
  */
 @Service
@@ -52,7 +51,6 @@ public class ChatGifServiceImpl extends ServiceImpl<ChatGifMapper, ChatGif>
 
   @Autowired private FileStorageStrategyContext fileStorageStrategyContext;
 
-  /** 分页列表 */
   @Override
   public IPage<ChatGifVO> page(PageDTO<ChatGif> page, String name) {
     return this.lambdaQuery()
@@ -62,9 +60,9 @@ public class ChatGifServiceImpl extends ServiceImpl<ChatGifMapper, ChatGif>
         .convert(chatGifConvert::toVo);
   }
 
-  /** 增 */
   @Override
-  public void add(MultipartFile file, String name) throws Exception {
+  @SneakyThrows
+  public void add(MultipartFile file, String name) {
     ChatGif chatGif = new ChatGif();
     String url = upload(file, chatGif);
     File file1 = new File(file.getOriginalFilename());
@@ -118,7 +116,7 @@ public class ChatGifServiceImpl extends ServiceImpl<ChatGifMapper, ChatGif>
     }
 
     String md5 = SecureUtil.md5(file.getInputStream());
-    if (findMD5(md5) > 0) {
+    if (this.findMd5(md5) > 0) {
       throw new ServiceException("不允许相同图片");
     }
     // 上传成功，返回图片地址
@@ -126,7 +124,6 @@ public class ChatGifServiceImpl extends ServiceImpl<ChatGifMapper, ChatGif>
         file.getInputStream(), file.getContentType(), file.getOriginalFilename());
   }
 
-  /** 删 */
   @Override
   public void remove(Integer id) {
     ChatGif chatGif = this.getById(id);
@@ -142,17 +139,13 @@ public class ChatGifServiceImpl extends ServiceImpl<ChatGifMapper, ChatGif>
     super.removeById(id);
   }
 
-  /** 改 */
   @Override
   public void edit(ChatGifEditDTO dto) {
     this.updateById(chatGifConvert.toEntity(dto));
   }
 
   @Override
-  public int findMD5(String md5) {
-    QueryWrapper<ChatGif> queryWrapper = new QueryWrapper<>();
-    queryWrapper.select("count(*) as count").eq("md5", md5);
-    Map<String, Object> map = this.getMap(queryWrapper);
-    return Integer.parseInt(map.get("count").toString());
+  public long findMd5(String md5) {
+    return this.lambdaQuery().eq(ChatGif::getMd5, md5).count();
   }
 }

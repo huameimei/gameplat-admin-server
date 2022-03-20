@@ -95,7 +95,6 @@ public class OpenMemberWealController {
     return memberWealDetailService.findWealDetailList(page, dto);
   }
 
-  /** 删除详情中的用户 */
   @DeleteMapping("/delete")
   @ApiOperation(value = "删除会员俸禄")
   @PreAuthorize("hasAuthority('member:weal:remove')")

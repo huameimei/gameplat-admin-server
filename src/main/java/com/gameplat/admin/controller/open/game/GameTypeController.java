@@ -7,16 +7,13 @@ import com.gameplat.admin.model.dto.OperGameTypeDTO;
 import com.gameplat.admin.model.vo.GameTypeVO;
 import com.gameplat.admin.service.GameTypeService;
 import com.gameplat.model.entity.game.GameType;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/admin/game/gameType")

@@ -10,20 +10,19 @@ import com.gameplat.admin.model.vo.ChatNoticeVO;
 import com.gameplat.model.entity.chart.ChatNotice;
 
 /**
- * @Author lily
- * @Date 2022/2/09
- **/
+ * @author lily
+ */
 public interface ChatNoticeService extends IService<ChatNotice> {
 
-    /** 分页查询 */
-    IPage<ChatNoticeVO> page(PageDTO<ChatNotice> page, ChatNoticeQueryDTO dto);
+  /** 分页查询 */
+  IPage<ChatNoticeVO> page(PageDTO<ChatNotice> page, ChatNoticeQueryDTO dto);
 
-    /** 增 */
-    void add(ChatNoticeAddDTO dto);
+  /** 增 */
+  void add(ChatNoticeAddDTO dto);
 
-    /** 删 */
-    void remove(Long id);
+  /** 删 */
+  void remove(Long id);
 
-    /** 改 */
-    void edit(ChatNoticeEditDTO dto);
+  /** 改 */
+  void edit(ChatNoticeEditDTO dto);
 }

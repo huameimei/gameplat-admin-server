@@ -46,25 +46,18 @@ import static java.util.Arrays.asList;
 public class ChatLeaderBoardServiceImpl extends ServiceImpl<ChatLeaderBoardMapper, ChatLeaderBoard>
     implements ChatLeaderBoardService {
 
-  private static final String lottUrl = "/api-manage/chatRoom/getAccountWinAndLoses";
-
-  @Autowired private GameConfigService gameConfigService;
-
-  @Autowired private ChatSideMenuService chatSideMenuService;
-
-  @Autowired private ChatLeaderBoardMapper chatLeaderBoardMapper;
-
-  @Autowired private RedisTemplate<String, Object> redisTemplate;
-
-  @Autowired private MemberService memberService;
-
-  @Autowired private TenantDomainService tenantDomainService;
-
   /** 聊天室彩票下注推送配置 */
   public static final String CHAT_PUSH_CP_BET = "CHAT_PUSH_CP_BET";
-
   /** 聊天室排行榜 */
   public static final String CHAT_LEADER_BOARD = "CHAT_LEADER_BOARD";
+
+  private static final String LOTT_URL = "/api-manage/chatRoom/getAccountWinAndLoses";
+  @Autowired private GameConfigService gameConfigService;
+  @Autowired private ChatSideMenuService chatSideMenuService;
+  @Autowired private ChatLeaderBoardMapper chatLeaderBoardMapper;
+  @Autowired private RedisTemplate<String, Object> redisTemplate;
+  @Autowired private MemberService memberService;
+  @Autowired private TenantDomainService tenantDomainService;
 
   /** 创建聊天室排行榜 */
   @Override
@@ -223,7 +216,7 @@ public class ChatLeaderBoardServiceImpl extends ServiceImpl<ChatLeaderBoardMappe
     String host = json.getString("host");
     String platform = json.getString("platform");
     String proxy = json.getString("proxy");
-    String url = host + "/" + lottUrl;
+    String url = host + "/" + LOTT_URL;
     String cpWin = null;
     try {
       HashMap<String, String> map = new HashMap<>();

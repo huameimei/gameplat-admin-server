@@ -1,6 +1,5 @@
 package com.gameplat.admin.interceptor;
 
-import com.gameplat.admin.enums.LanguageEnum;
 import com.gameplat.admin.model.vo.MemberGrowthConfigVO;
 import com.gameplat.admin.service.MemberGrowthConfigService;
 import com.gameplat.base.common.enums.EnableEnum;
@@ -24,8 +23,7 @@ public class VipInterceptor extends HandlerInterceptorAdapter {
   @Override
   public boolean preHandle(
       HttpServletRequest request, HttpServletResponse response, Object handler) {
-    MemberGrowthConfigVO isVip =
-        memberGrowthConfigService.findOneConfig(LanguageEnum.app_zh_CN.getCode());
+    MemberGrowthConfigVO isVip = memberGrowthConfigService.findOneConfig();
     Assert.state(EnableEnum.isEnabled(isVip.getIsEnableVip()), "未开启VIP功能");
 
     return true;

@@ -5,7 +5,6 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.gameplat.admin.model.dto.ActivityBlacklistAddDTO;
 import com.gameplat.admin.model.dto.ActivityBlacklistQueryDTO;
-import com.gameplat.admin.model.vo.ActivityBlacklistVO;
 import com.gameplat.model.entity.activity.ActivityBlacklist;
 
 /**
@@ -14,15 +13,15 @@ import com.gameplat.model.entity.activity.ActivityBlacklist;
  * @author kenvin
  */
 public interface ActivityBlacklistService extends IService<ActivityBlacklist> {
+
   /**
    * 活动黑名单列表
    *
-   * @param page
-   * @param activityBlacklistQueryDTO
-   * @return
+   * @param page PageDTO
+   * @param dto ActivityBlacklistQueryDTO
+   * @return IPage
    */
-  IPage<ActivityBlacklist> list(
-      PageDTO<ActivityBlacklist> page, ActivityBlacklistQueryDTO activityBlacklistQueryDTO);
+  IPage<ActivityBlacklist> list(PageDTO<ActivityBlacklist> page, ActivityBlacklistQueryDTO dto);
 
   /**
    * 新增活动黑名单

@@ -23,29 +23,28 @@ import java.util.List;
 @RequestMapping("/api/admin/system/sysmessage")
 public class OperMessageController {
 
-    @Autowired
-    private SysMessageService sysMessageService;
+  @Autowired private SysMessageService sysMessageService;
 
-    /**
-     * 分页列表
-     *
-     * @param page
-     * @param dto
-     * @return
-     */
-    @GetMapping("/list")
-    public IPage<SysMessage> list(PageDTO<SysMessage> page, SysMessageDTO dto) {
-        return sysMessageService.pageList(page, dto);
-    }
+  /**
+   * 分页列表
+   *
+   * @param page PageDTO
+   * @param dto SysMessageDTO
+   * @return IPage
+   */
+  @GetMapping("/list")
+  public IPage<SysMessage> list(PageDTO<SysMessage> page, SysMessageDTO dto) {
+    return sysMessageService.pageList(page, dto);
+  }
 
-    /**
-     * 最新系统消息
-     *
-     * @param dto
-     * @return
-     */
-    @GetMapping("/lastList")
-    public List<SysMessage> lastList(SysMessageDTO dto) {
-        return sysMessageService.lastList(dto);
-    }
+  /**
+   * 最新系统消息
+   *
+   * @param dto SysMessageDTO
+   * @return List<SysMessage>
+   */
+  @GetMapping("/lastList")
+  public List<SysMessage> lastList(SysMessageDTO dto) {
+    return sysMessageService.lastList(dto);
+  }
 }

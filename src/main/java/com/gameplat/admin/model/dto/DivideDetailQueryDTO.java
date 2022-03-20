@@ -4,7 +4,7 @@ import lombok.Data;
 
 @Data
 public class DivideDetailQueryDTO {
-    private Long id;
-    private Long periodsId;
-    private Long proxyId;
+  private Long id;
+  private Long periodsId;
+  private Long proxyId;
 }

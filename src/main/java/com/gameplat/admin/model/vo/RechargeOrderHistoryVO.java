@@ -54,10 +54,9 @@ public class RechargeOrderHistoryVO {
 
   private String remarks;
 
-  private String   acceptAccount;
+  private String acceptAccount;
 
   private Date acceptTime;
-
 
   private String auditorAccount;
 
@@ -84,6 +83,4 @@ public class RechargeOrderHistoryVO {
   private Integer memberLevel;
 
   private Integer pointFlag;
-
-
 }

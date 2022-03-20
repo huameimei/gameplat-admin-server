@@ -23,8 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class DiscountTypeServiceImpl extends ServiceImpl<DiscountTypeMapper, DiscountType>
     implements DiscountTypeService {
 
-  @Autowired
-  private DiscountTypeConvert discountTypeConvert;
+  @Autowired private DiscountTypeConvert discountTypeConvert;
 
   @Override
   public void update(DiscountTypeEditDTO dto) {

@@ -32,15 +32,11 @@ import java.util.HashMap;
 @RequestMapping("/api/admin/chat/config")
 public class ChatConfigController {
 
-  @Autowired private SysDictDataService dictDataService;
-
-  @Autowired private OtthService otthService;
-
-  @Autowired private RedisTemplate<String, Object> redisTemplate;
-
   private static final String lottUrl = "/api-manage/chatRoom/updateChatRoomStatus";
-
   private static final String DICT_DATA_CACHE = "dict:data:";
+  @Autowired private SysDictDataService dictDataService;
+  @Autowired private OtthService otthService;
+  @Autowired private RedisTemplate<String, Object> redisTemplate;
 
   @ApiOperation(value = "查看彩票下注分享配置")
   @GetMapping("/getLottPushBet")
@@ -56,7 +52,7 @@ public class ChatConfigController {
   @ApiOperation(value = "修改彩票下注分享配置")
   @PutMapping("/editLottPushBet")
   @PreAuthorize("hasAuthority('chat:config:getLottPushBet')")
-  public void editLottPushBet(@RequestBody ChatPushCPBet chatPushCPBet) {
+  public void editLottPushBet(@RequestBody ChatPushCPBet chatPushCpBet) {
     // 获取额度转换配置
     JSONObject json = otthService.getLottConfig();
 
@@ -66,10 +62,10 @@ public class ChatConfigController {
     String url = host + "/" + lottUrl;
     try {
       HashMap<String, String> map = new HashMap<>();
-      map.put("autoShare", String.valueOf(chatPushCPBet.getAutoShare()));
-      map.put("share", String.valueOf(chatPushCPBet.getIsOpen()));
-      map.put("betMoneyLimit", String.valueOf(chatPushCPBet.getTotalMoney()));
-      map.put("lottCodes", String.valueOf(chatPushCPBet.getVipEnterLevels()));
+      map.put("autoShare", String.valueOf(chatPushCpBet.getAutoShare()));
+      map.put("share", String.valueOf(chatPushCpBet.getIsOpen()));
+      map.put("betMoneyLimit", String.valueOf(chatPushCpBet.getTotalMoney()));
+      map.put("lottCodes", String.valueOf(chatPushCpBet.getVipEnterLevels()));
       Header[] header = getHeader(platform + ":" + proxy);
       HttpClientUtils.doPost(url, map, header);
     } catch (Exception e) {
@@ -82,7 +78,7 @@ public class ChatConfigController {
           {
             setDictType(ChatConfigEnum.CHAT_PUSH_CP_BET.getType().getValue());
             setDictLabel(ChatConfigEnum.CHAT_PUSH_CP_BET.getLabel());
-            setDictValue(JSON.toJSONString(chatPushCPBet));
+            setDictValue(JSON.toJSONString(chatPushCpBet));
           }
         });
   }

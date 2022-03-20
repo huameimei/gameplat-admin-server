@@ -5,7 +5,7 @@ import com.gameplat.model.entity.member.MemberVipSignHistory;
 import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")
-public interface MemberVipSignHistoryConvert{
+public interface MemberVipSignHistoryConvert {
 
-    MemberVipSignHistoryVO toVo(MemberVipSignHistory entity);
+  MemberVipSignHistoryVO toVo(MemberVipSignHistory entity);
 }

@@ -25,19 +25,15 @@ public class RechargeOrderHistoryServiceImpl
     extends ServiceImpl<RechargeOrderHistoryMapper, RechargeOrderHistory>
     implements RechargeOrderHistoryService {
 
+  private final String RECH_TEST_TYPE = "P";
+  private final String RECH_FORMAL_TYPE_QUERY = "M,A";
+  /** 充值会员、代理 */
+  private final String RECH_FORMAL_TYPE = "M";
+
   @Autowired private RechargeOrderHistoryConvert rechargeOrderHistoryConvert;
 
-  @Autowired(required = false) private RechargeOrderHistoryMapper rechargeOrderHistoryMapper;
-
-
-
-  private final String RECH_TEST_TYPE = "P";
-
-  private final String RECH_FORMAL_TYPE_QUERY = "M,A";
-
-
-  /**充值会员、代理 */
-  private final String RECH_FORMAL_TYPE = "M";
+  @Autowired(required = false)
+  private RechargeOrderHistoryMapper rechargeOrderHistoryMapper;
 
   @Override
   public IPage<RechargeOrderHistoryVO> findPage(
@@ -45,8 +41,8 @@ public class RechargeOrderHistoryServiceImpl
     LambdaQueryWrapper<RechargeOrderHistory> query = buildSql(dto);
     query.orderBy(
         ObjectUtils.isNotEmpty(dto.getOrder()),
-        ObjectUtils.isEmpty(dto.getOrder()) ? false : dto.getOrder().equals("ASC"),
-        dto.getOrderBy().equals("createTime")
+        !ObjectUtils.isEmpty(dto.getOrder()) && "ASC".equals(dto.getOrder()),
+        "createTime".equals(dto.getOrderBy())
             ? RechargeOrderHistory::getCreateTime
             : RechargeOrderHistory::getAuditTime);
     return this.page(page, query).convert(rechargeOrderHistoryConvert::toVo);
@@ -99,16 +95,19 @@ public class RechargeOrderHistoryServiceImpl
             RechargeOrderHistory::getAmount,
             dto.getAmountTo())
         /*.eq(
-            ObjectUtils.isNotEmpty(dto.getMemberType()),
+        ObjectUtils.isNotEmpty(dto.getMemberType()),
+        RechargeOrderHistory::getMemberType,
+        dto.getMemberType())*/
+        .in(
+            ObjectUtils.isNotEmpty(dto.getMemberType())
+                && dto.getMemberType().equalsIgnoreCase(RECH_FORMAL_TYPE),
             RechargeOrderHistory::getMemberType,
-            dto.getMemberType())*/
-            .in(ObjectUtils.isNotEmpty(dto.getMemberType()) && dto.getMemberType().equalsIgnoreCase(RECH_FORMAL_TYPE),
-                    RechargeOrderHistory::getMemberType,
-                    RECH_FORMAL_TYPE_QUERY.split(","))
-            .eq(ObjectUtils.isNotEmpty(dto.getMemberType()) && dto.getMemberType().equalsIgnoreCase(RECH_TEST_TYPE),
-                    RechargeOrderHistory::getMemberType,dto.getMemberType())
-
-
+            RECH_FORMAL_TYPE_QUERY.split(","))
+        .eq(
+            ObjectUtils.isNotEmpty(dto.getMemberType())
+                && dto.getMemberType().equalsIgnoreCase(RECH_TEST_TYPE),
+            RechargeOrderHistory::getMemberType,
+            dto.getMemberType())
         .in(
             ObjectUtils.isNotNull(dto.getMemberLevelList()),
             RechargeOrderHistory::getMemberLevel,

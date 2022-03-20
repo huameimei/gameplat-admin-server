@@ -24,16 +24,18 @@ import org.springframework.transaction.annotation.Transactional;
 public class GameTypeServiceImpl extends ServiceImpl<GameTypeMapper, GameType>
     implements GameTypeService {
 
-  @Autowired
-  private GameTypeConvert gameTypeConvert;
+  @Autowired private GameTypeConvert gameTypeConvert;
 
   @Override
   public IPage<GameTypeVO> selectGameTypeList(PageDTO<GameType> page, GameTypeQueryDTO dto) {
     return this.lambdaQuery()
-        .eq(ObjectUtils.isNotEmpty(dto.getGameTypeCode()), GameType::getGameTypeCode,
+        .eq(
+            ObjectUtils.isNotEmpty(dto.getGameTypeCode()),
+            GameType::getGameTypeCode,
             dto.getGameTypeCode())
         .eq(ObjectUtils.isNotEmpty(dto.getStatus()), GameType::getStatus, dto.getStatus())
-        .page(page).convert(gameTypeConvert::toVo);
+        .page(page)
+        .convert(gameTypeConvert::toVo);
   }
 
   @Override

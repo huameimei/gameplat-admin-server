@@ -12,54 +12,49 @@ public interface RecommendConfigService extends IService<RecommendConfig> {
   /**
    * 获取代理配置
    *
-   * @return
+   * @return RecommendConfig
    */
   RecommendConfig getRecommendConfig();
 
   /**
    * 获取层层代分红配置
    *
-   * @param lang
-   * @return
+   * @return Map
    */
-  Map<String, List<GameDivideVo>> getDefaultLayerDivideConfig(String lang);
+  Map<String, List<GameDivideVo>> getDefaultLayerDivideConfig();
 
   /**
    * 初始化层层代或固定比例分红模式配置预设
    *
-   * @param lang
-   * @return
+   * @return String
    */
-  String initDivideConfig(String lang);
+  String initDivideConfig();
 
   /**
    * 初始化裂变配置
    *
-   * @param lang
-   * @return
+   * @return String
    */
-  String initFissionDivideConfig(String lang);
+  String initFissionDivideConfig();
 
   /**
    * 获取固定模式配置
    *
-   * @param lang
-   * @return
+   * @return Map
    */
-  Map<String, List<GameDivideVo>> getDefaultFixDivideConfig(String lang);
+  Map<String, List<GameDivideVo>> getDefaultFixDivideConfig();
 
   /**
    * 获取列表模式配置
    *
-   * @param lang
-   * @return
+   * @return Map
    */
-  Map<String, Object> getDefaultFissionDivideConfig(String lang);
+  Map<String, Object> getDefaultFissionDivideConfig();
 
   /**
    * 编辑代理配置
    *
-   * @param recommendConfigDto
+   * @param dto RecommendConfigDto
    */
-  void edit(RecommendConfigDto recommendConfigDto);
+  void edit(RecommendConfigDto dto);
 }

@@ -51,210 +51,199 @@ import java.util.stream.Collectors;
 @Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)
 public class IpAnalysisServiceImpl implements IpAnalysisService {
 
-    @Autowired
-    private RechargeOrderHistoryMapper rechargeOrderHistoryMapper;
+  private static final String TOKEN_PREFIX = "token:web:";
+  private static final String INDEX = "login-log_";
+  @Autowired private RechargeOrderHistoryMapper rechargeOrderHistoryMapper;
+  @Autowired private MemberWithdrawHistoryMapper memberWithdrawHistoryMapper;
+  @Autowired private MemberMapper memberMapper;
+  @Autowired private RedisTemplate<String, Object> redisTemplate;
+  @Autowired private RestHighLevelClient restHighLevelClient;
 
-    @Autowired
-    private MemberWithdrawHistoryMapper memberWithdrawHistoryMapper;
+  @Value("${syslog.tenant}")
+  private String tenant;
 
-    @Autowired
-    private MemberMapper memberMapper;
+  public static QueryBuilder buildSearch(IpAnalysisDTO dto) {
+    BoolQueryBuilder builder = QueryBuilders.boolQuery();
+    if (StringUtils.isNotBlank(dto.getAccount())) {
+      builder.must(QueryBuilders.termQuery("username.keyword", dto.getAccount()));
+    }
+    if (ObjectUtils.isNotNull(dto.getLoginIp())) {
+      builder.must(QueryBuilders.matchQuery("ipAddress", dto.getLoginIp()));
+    }
+    if (ObjectUtils.isNotNull(dto.getBeginTime()) && ObjectUtils.isNotNull(dto.getEndTime())) {
+      builder.must(
+          QueryBuilders.rangeQuery("createTime").from(dto.getBeginTime()).to(dto.getEndTime()));
+    }
+    return builder;
+  }
 
-    @Autowired
-    private RedisTemplate<String, Object> redisTemplate;
-
-    @Autowired
-    private RestHighLevelClient restHighLevelClient;
-
-    private static final String TOKEN_PREFIX = "token:web:";
-
-    @Value("${syslog.tenant}")
-    private String tenant;
-
-    private static final String INDEX = "login-log_";
-
-    /**
-     * ip分析
-     */
-    @Override
-    public IPage<IpAnalysisVO> page(PageDTO<IpAnalysisVO> page, IpAnalysisDTO dto) {
-        IPage<IpAnalysisVO> pagelist = new PageDTO<>();
-        List<IpAnalysisVO> list = new ArrayList<>();
-        if (Objects.equals(dto.getType(), null)) {
-            throw new ServiceException("分析类型不能为空");
-        }
-        if (IpAnalysisEnum.REGISTER.getCode().equals(dto.getType())) {
-            // 注册
-            pagelist = memberMapper.page(page, dto);
-            list = pagelist.getRecords();
-        } else if (IpAnalysisEnum.LOGIN.getCode().equals(dto.getType())) {
-            // 登录
-            list = aggregationSearchDoc(page, dto);
-            pagelist.setRecords(list);
-            pagelist.setTotal(list.size());
-            if (ObjectUtils.isNull(page.getSize())) {
-                pagelist.setSize(10);
-            } else {
-                pagelist.setSize(page.getSize());
-            }
-            if (ObjectUtils.isNull(page.getCurrent())) {
-                pagelist.setCurrent(1);
-            } else {
-                pagelist.setCurrent(page.getCurrent());
-            }
-            pagelist.setPages(
-                    page.getTotal() % page.getSize() == 0
-                            ? page.getTotal() / page.getSize()
-                            : page.getTotal() / page.getSize() + 1);
-        } else if (IpAnalysisEnum.RECHARGE.getCode().equals(dto.getType())) {
-            // 充值
-            pagelist = rechargeOrderHistoryMapper.page(page, dto);
-            list = pagelist.getRecords();
-        } else if (IpAnalysisEnum.WITHDRAW.getCode().equals(dto.getType())) {
-            pagelist = memberWithdrawHistoryMapper.page(page, dto);
-            list = pagelist.getRecords();
-        }
-        // 判断会员是否在线
-
-        if (CollectionUtils.isNotEmpty(list)) {
-            for (int i = 0; i < list.size(); i++) {
-                IpAnalysisVO ipAnalysis = list.get(i);
-                if (redisTemplate.hasKey(TOKEN_PREFIX + ipAnalysis.getAccount())) {
-                    UserCredential userCredential =
-                            (UserCredential)
-                                    redisTemplate.opsForValue().get(TOKEN_PREFIX + ipAnalysis.getAccount());
-                    ipAnalysis.setUuid(userCredential.getUuid());
-                    ipAnalysis.setOffline(1);
-                    pagelist.getRecords().set(i, ipAnalysis);
-                } else {
-                    ipAnalysis.setOffline(0);
-                    pagelist.getRecords().set(i, ipAnalysis);
-                }
-            }
-        }
-        if (ObjectUtils.isNotEmpty(dto.getOnline())) {
-            list =
-                    pagelist.getRecords().stream()
-                            .filter(x -> x.getOffline().equals(dto.getOnline()))
-                            .collect(Collectors.toList());
-        }
-        Integer total = list.size();
-        Long size = page.getSize();
-        Long pages = total % size == 0 ? total / size : total / size + 1;
+  /** ip分析 */
+  @Override
+  public IPage<IpAnalysisVO> page(PageDTO<IpAnalysisVO> page, IpAnalysisDTO dto) {
+    IPage<IpAnalysisVO> pagelist = new PageDTO<>();
+    List<IpAnalysisVO> list = new ArrayList<>();
+    if (Objects.equals(dto.getType(), null)) {
+      throw new ServiceException("分析类型不能为空");
+    }
+    if (IpAnalysisEnum.REGISTER.getCode().equals(dto.getType())) {
+      // 注册
+      pagelist = memberMapper.page(page, dto);
+      list = pagelist.getRecords();
+    } else if (IpAnalysisEnum.LOGIN.getCode().equals(dto.getType())) {
+      // 登录
+      list = aggregationSearchDoc(page, dto);
+      pagelist.setRecords(list);
+      pagelist.setTotal(list.size());
+      if (ObjectUtils.isNull(page.getSize())) {
+        pagelist.setSize(10);
+      } else {
+        pagelist.setSize(page.getSize());
+      }
+      if (ObjectUtils.isNull(page.getCurrent())) {
+        pagelist.setCurrent(1);
+      } else {
         pagelist.setCurrent(page.getCurrent());
-        pagelist.setSize(size);
-        pagelist.setTotal(total);
-        pagelist.setPages(pages);
-        pagelist.setRecords(list);
-        return pagelist;
+      }
+      pagelist.setPages(
+          page.getTotal() % page.getSize() == 0
+              ? page.getTotal() / page.getSize()
+              : page.getTotal() / page.getSize() + 1);
+    } else if (IpAnalysisEnum.RECHARGE.getCode().equals(dto.getType())) {
+      // 充值
+      pagelist = rechargeOrderHistoryMapper.page(page, dto);
+      list = pagelist.getRecords();
+    } else if (IpAnalysisEnum.WITHDRAW.getCode().equals(dto.getType())) {
+      pagelist = memberWithdrawHistoryMapper.page(page, dto);
+      list = pagelist.getRecords();
+    }
+    // 判断会员是否在线
+
+    if (CollectionUtils.isNotEmpty(list)) {
+      for (int i = 0; i < list.size(); i++) {
+        IpAnalysisVO ipAnalysis = list.get(i);
+        if (redisTemplate.hasKey(TOKEN_PREFIX + ipAnalysis.getAccount())) {
+          UserCredential userCredential =
+              (UserCredential)
+                  redisTemplate.opsForValue().get(TOKEN_PREFIX + ipAnalysis.getAccount());
+          ipAnalysis.setUuid(userCredential.getUuid());
+          ipAnalysis.setOffline(1);
+          pagelist.getRecords().set(i, ipAnalysis);
+        } else {
+          ipAnalysis.setOffline(0);
+          pagelist.getRecords().set(i, ipAnalysis);
+        }
+      }
+    }
+    if (ObjectUtils.isNotEmpty(dto.getOnline())) {
+      list =
+          pagelist.getRecords().stream()
+              .filter(x -> x.getOffline().equals(dto.getOnline()))
+              .collect(Collectors.toList());
+    }
+    Integer total = list.size();
+    Long size = page.getSize();
+    Long pages = total % size == 0 ? total / size : total / size + 1;
+    pagelist.setCurrent(page.getCurrent());
+    pagelist.setSize(size);
+    pagelist.setTotal(total);
+    pagelist.setPages(pages);
+    pagelist.setRecords(list);
+    return pagelist;
+  }
+
+  // es聚合查询
+  public List<IpAnalysisVO> aggregationSearchDoc(PageDTO<IpAnalysisVO> page, IpAnalysisDTO dto) {
+    SearchSourceBuilder searchSourceBuilder =
+        new SearchSourceBuilder().query(IpAnalysisServiceImpl.buildSearch(dto));
+    TermsAggregationBuilder username =
+        AggregationBuilders.terms("username").field("username.keyword").size((int) page.getSize());
+    TermsAggregationBuilder ipAddress =
+        AggregationBuilders.terms("ipAddress")
+            .field("ipAddress.keyword")
+            .size((int) page.getSize());
+
+    BucketSortPipelineAggregationBuilder bucketSort =
+        new BucketSortPipelineAggregationBuilder("bucket_sort", null)
+            .from(((int) page.getCurrent() - 1) * (int) page.getSize())
+            .size((int) page.getSize());
+
+    ipAddress.subAggregation(bucketSort);
+    username.subAggregation(ipAddress);
+
+    searchSourceBuilder.aggregation(username);
+    SearchRequest searchRequest = new SearchRequest(INDEX + tenant);
+    Log.info("查询索引为:{}, INDEX + tenant");
+
+    searchSourceBuilder.sort(SortBuilders.fieldSort("createTime.keyword").order(SortOrder.DESC));
+    searchRequest.source(searchSourceBuilder);
+
+    RequestOptions.Builder optionsBuilder = RequestOptions.DEFAULT.toBuilder();
+    optionsBuilder.setHttpAsyncResponseConsumerFactory(
+        new HttpAsyncResponseConsumerFactory.HeapBufferedResponseConsumerFactory(31457280));
+    List<IpAnalysisVO> list = new ArrayList<>();
+    Set<String> ips = new HashSet<>();
+    try {
+      log.info("搜索条件：\n" + dto + "\n=====ip统计搜索DSL：\n" + searchSourceBuilder);
+      SearchResponse search = restHighLevelClient.search(searchRequest, optionsBuilder.build());
+      Terms terms = search.getAggregations().get("username");
+      for (Terms.Bucket bucket : terms.getBuckets()) {
+        String account = bucket.getKeyAsString();
+        Terms terms2 = bucket.getAggregations().get("ipAddress");
+        for (Terms.Bucket bucket2 : terms2.getBuckets()) {
+          String ip = bucket2.getKeyAsString();
+          long docCount = bucket2.getDocCount();
+          ips.add(ip);
+          IpAnalysisVO vo = new IpAnalysisVO();
+          vo.setAccount(account);
+          vo.setIpAddress(ip);
+          vo.setIpCount((int) docCount);
+          list.add(vo);
+        }
+      }
+
+    } catch (Exception e) {
+      log.error("ip分析查询异常", e);
     }
 
-    public static QueryBuilder buildSearch(IpAnalysisDTO dto) {
-        BoolQueryBuilder builder = QueryBuilders.boolQuery();
-        if (StringUtils.isNotBlank(dto.getAccount())) {
-            builder.must(QueryBuilders.termQuery("username.keyword", dto.getAccount()));
-        }
-        if (ObjectUtils.isNotNull(dto.getLoginIp())) {
-            builder.must(QueryBuilders.matchQuery("ipAddress", dto.getLoginIp()));
-        }
-        if (ObjectUtils.isNotNull(dto.getBeginTime()) && ObjectUtils.isNotNull(dto.getEndTime())) {
-            builder.must(
-                    QueryBuilders.rangeQuery("createTime").from(dto.getBeginTime()).to(dto.getEndTime()));
-        }
-        return builder;
+    Map<String, Integer> ipMap = aggregationSearchDoc(ips);
+    list.forEach(l -> l.setIpCount(ipMap.get(l.getIpAddress())));
+    if (list.size() > 0) {
+      int size = Math.min(list.size(), 10);
+      list = list.subList(0, size);
     }
+    return list;
+  }
 
-    // es聚合查询
-    public List<IpAnalysisVO> aggregationSearchDoc(PageDTO<IpAnalysisVO> page, IpAnalysisDTO dto) {
-        SearchSourceBuilder searchSourceBuilder =
-                new SearchSourceBuilder().query(IpAnalysisServiceImpl.buildSearch(dto));
-        TermsAggregationBuilder username =
-                AggregationBuilders.terms("username").field("username.keyword").size((int) page.getSize());
-        TermsAggregationBuilder ipAddress =
-                AggregationBuilders.terms("ipAddress").field("ipAddress.keyword").size((int) page.getSize());
-
-        BucketSortPipelineAggregationBuilder bucketSort =
-                new BucketSortPipelineAggregationBuilder("bucket_sort", null)
-                        .from(((int) page.getCurrent() - 1) * (int) page.getSize())
-                        .size((int) page.getSize());
-
-        ipAddress.subAggregation(bucketSort);
-        username.subAggregation(ipAddress);
-
-        searchSourceBuilder.aggregation(username);
-        SearchRequest searchRequest = new SearchRequest(INDEX + tenant);
-        Log.info("查询索引为:{}, INDEX + tenant");
-
-        searchSourceBuilder.sort(SortBuilders.fieldSort("createTime.keyword").order(SortOrder.DESC));
-        searchRequest.source(searchSourceBuilder);
-
-        RequestOptions.Builder optionsBuilder = RequestOptions.DEFAULT.toBuilder();
-        optionsBuilder.setHttpAsyncResponseConsumerFactory(
-                new HttpAsyncResponseConsumerFactory.HeapBufferedResponseConsumerFactory(31457280));
-        List<IpAnalysisVO> list = new ArrayList<>();
-        Set<String> ips = new HashSet<>();
-        try {
-            log.info("搜索条件：\n" + dto + "\n=====ip统计搜索DSL：\n" + searchSourceBuilder);
-            SearchResponse search = restHighLevelClient.search(searchRequest, optionsBuilder.build());
-            Terms terms = search.getAggregations().get("username");
-            for (Terms.Bucket bucket : terms.getBuckets()) {
-                String account = bucket.getKeyAsString();
-                Terms terms2 = bucket.getAggregations().get("ipAddress");
-                for (Terms.Bucket bucket2 : terms2.getBuckets()) {
-                    String ip = bucket2.getKeyAsString();
-                    long docCount = bucket2.getDocCount();
-                    ips.add(ip);
-                    IpAnalysisVO vo = new IpAnalysisVO();
-                    vo.setAccount(account);
-                    vo.setIpAddress(ip);
-                    vo.setIpCount((int) docCount);
-                    list.add(vo);
-                }
-            }
-
-        } catch (Exception e) {
-            log.error("ip分析查询异常", e);
-        }
-
-        Map<String, Integer> ipMap = aggregationSearchDoc(ips);
-        list.forEach(l -> l.setIpCount(ipMap.get(l.getIpAddress())));
-        if (list.size() > 0) {
-            int size = Math.min(list.size(), 10);
-            list = list.subList(0, size);
-        }
-        return list;
+  public Map<String, Integer> aggregationSearchDoc(Set<String> ips) {
+    Map<String, Integer> map = new HashMap<>();
+    if (ips == null || ips.isEmpty()) {
+      return map;
     }
+    SearchSourceBuilder searchSourceBuilder =
+        new SearchSourceBuilder().query(QueryBuilders.termsQuery("ipAddress", ips));
+    TermsAggregationBuilder ipCount =
+        AggregationBuilders.terms("ipCount").field("ipAddress.keyword");
+    searchSourceBuilder.aggregation(ipCount);
+    SearchRequest searchRequest = new SearchRequest(INDEX + tenant);
+    searchSourceBuilder.size(0);
+    searchRequest.source(searchSourceBuilder);
 
-    public Map<String, Integer> aggregationSearchDoc(Set<String> ips) {
-        Map<String, Integer> map = new HashMap<>();
-        if (ips == null || ips.isEmpty()) {
-            return map;
-        }
-        SearchSourceBuilder searchSourceBuilder =
-                new SearchSourceBuilder().query(QueryBuilders.termsQuery("ipAddress", ips));
-        TermsAggregationBuilder ipCount =
-                AggregationBuilders.terms("ipCount").field("ipAddress.keyword");
-        searchSourceBuilder.aggregation(ipCount);
-        SearchRequest searchRequest = new SearchRequest(INDEX + tenant);
-        searchSourceBuilder.size(0);
-        searchRequest.source(searchSourceBuilder);
+    RequestOptions.Builder optionsBuilder = RequestOptions.DEFAULT.toBuilder();
+    optionsBuilder.setHttpAsyncResponseConsumerFactory(
+        new HttpAsyncResponseConsumerFactory.HeapBufferedResponseConsumerFactory(31457280));
+    try {
+      log.info("=====ip分析分页统计DSL：\n" + searchSourceBuilder);
+      SearchResponse search = restHighLevelClient.search(searchRequest, optionsBuilder.build());
+      Terms terms = search.getAggregations().get("ipCount");
+      for (Terms.Bucket bucket : terms.getBuckets()) {
+        String ip = bucket.getKeyAsString();
+        long docCount = bucket.getDocCount();
+        map.put(ip, (int) docCount);
+      }
 
-        RequestOptions.Builder optionsBuilder = RequestOptions.DEFAULT.toBuilder();
-        optionsBuilder.setHttpAsyncResponseConsumerFactory(
-                new HttpAsyncResponseConsumerFactory.HeapBufferedResponseConsumerFactory(31457280));
-        try {
-            log.info("=====ip分析分页统计DSL：\n" + searchSourceBuilder);
-            SearchResponse search = restHighLevelClient.search(searchRequest, optionsBuilder.build());
-            Terms terms = search.getAggregations().get("ipCount");
-            for (Terms.Bucket bucket : terms.getBuckets()) {
-                String ip = bucket.getKeyAsString();
-                long docCount = bucket.getDocCount();
-                map.put(ip, (int) docCount);
-            }
-
-        } catch (Exception e) {
-            log.error("ip分析分页统计异常", e);
-        }
-        return map;
+    } catch (Exception e) {
+      log.error("ip分析分页统计异常", e);
     }
+    return map;
+  }
 }

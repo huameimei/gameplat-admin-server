@@ -24,6 +24,7 @@ import java.util.Date;
  *
  * @author three
  */
+@Deprecated
 @Service
 @Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)
 public class SysEmailServiceImpl extends ServiceImpl<SysEmailMapper, SysEmail>

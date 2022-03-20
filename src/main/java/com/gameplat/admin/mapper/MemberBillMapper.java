@@ -19,11 +19,7 @@ public interface MemberBillMapper extends BaseMapper<MemberBill> {
       String endTime);
 
   List<MemberBillVO> findy(
-      String account,
-      String orderNo,
-      List<Integer> tranTypes,
-      String beginTime,
-      String endTime);
+      String account, String orderNo, List<Integer> tranTypes, String beginTime, String endTime);
 
   MemberBill findBill(String orderNo, int tranTypes);
 }

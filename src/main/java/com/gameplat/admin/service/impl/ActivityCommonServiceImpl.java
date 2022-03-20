@@ -62,11 +62,6 @@ public class ActivityCommonServiceImpl implements ActivityCommonService {
 
   @Resource private GameBetRecordInfoService liveBetRecordService;
 
-  /**
-   * 组装审核备注信息
-   *
-   * @return
-   */
   @Override
   public String getAuditRemark(
       ActivityLobby activityLobby,
@@ -78,66 +73,75 @@ public class ActivityCommonServiceImpl implements ActivityCommonService {
     String gameType = activityLobby.getGameType();
     StringBuilder sb = new StringBuilder();
     Integer applyWay = activityLobby.getApplyWay();
-    if (applyWay == ActivityInfoEnum.ApplyWayEnum.MANUAL.value()) {
+    if (ActivityInfoEnum.ApplyWay.MANUAL.match(applyWay)) {
       sb.append("申请方式:手动,");
     }
-    if (applyWay == ActivityInfoEnum.ApplyWayEnum.AUTOMATIC.value()) {
+    if (ActivityInfoEnum.ApplyWay.AUTOMATIC.match(applyWay)) {
       sb.append("申请方式:自动,");
     }
     Integer auditWay = activityLobby.getAuditWay();
-    if (auditWay == ActivityInfoEnum.AuditWayEnum.MANUAL.value()) {
+    if (ActivityInfoEnum.AuditWay.MANUAL.match(auditWay)) {
       sb.append("审核方式:手动,");
     }
-    if (auditWay == ActivityInfoEnum.AuditWayEnum.AUTOMATIC.value()) {
+    if (ActivityInfoEnum.AuditWay.AUTOMATIC.match(auditWay)) {
       sb.append("审核方式:自动,");
     }
+
     if (StringUtils.isNotEmpty(statisticValue)) {
       // 充值活动
       if (activityLobby.getType() == 1) {
-        if (statisItem == 1) {
-          sb.append("累计充值金额:").append(statisticValue);
-        }
-        if (statisItem == 2) {
-          sb.append("累计充值天数:").append(statisticValue);
-        }
-        if (statisItem == 3) {
-          sb.append("连续充值天数:").append(statisticValue);
-        }
-        if (statisItem == 4) {
-          sb.append("单日首充金额:").append(statisticValue);
-        }
-        if (statisItem == 5) {
-          sb.append("首充金额:").append(statisticValue);
+        switch (statisItem) {
+          case 1:
+            sb.append("累计充值金额:").append(statisticValue);
+            break;
+          case 2:
+            sb.append("累计充值天数:").append(statisticValue);
+            break;
+          case 3:
+            sb.append("连续充值天数:").append(statisticValue);
+            break;
+          case 4:
+            sb.append("单日首充金额:").append(statisticValue);
+            break;
+          case 5:
+            sb.append("首充金额:").append(statisticValue);
+            break;
+          default:
+            break;
         }
       }
       // 游戏活动
       else if (activityLobby.getType() == 2) {
-        if (statisItem == 6) {
-          sb.append("累计")
-              .append(GameTypeEnum.getName(gameType))
-              .append("打码金额:")
-              .append(statisticValue);
-        }
-        if (statisItem == 7) {
-          sb.append("累计")
-              .append(GameTypeEnum.getName(gameType))
-              .append("打码天数:")
-              .append(statisticValue);
-        }
-        if (statisItem == 8) {
-          sb.append("连续")
-              .append(GameTypeEnum.getName(gameType))
-              .append("打码天数:")
-              .append(statisticValue);
-        }
-        if (statisItem == 9) {
-          sb.append("单日")
-              .append(GameTypeEnum.getName(gameType))
-              .append("亏损金额:")
-              .append(statisticValue);
-        }
-        if (statisItem == 10) {
-          sb.append("指定比赛打码金额:").append(statisticValue);
+        switch (statisItem) {
+          case 6:
+            sb.append("累计")
+                .append(GameTypeEnum.getName(gameType))
+                .append("打码金额:")
+                .append(statisticValue);
+            break;
+          case 7:
+            sb.append("累计")
+                .append(GameTypeEnum.getName(gameType))
+                .append("打码天数:")
+                .append(statisticValue);
+            break;
+          case 8:
+            sb.append("连续")
+                .append(GameTypeEnum.getName(gameType))
+                .append("打码天数:")
+                .append(statisticValue);
+            break;
+          case 9:
+            sb.append("单日")
+                .append(GameTypeEnum.getName(gameType))
+                .append("亏损金额:")
+                .append(statisticValue);
+            break;
+          case 10:
+            sb.append("指定比赛打码金额:").append(statisticValue);
+            break;
+          default:
+            break;
         }
       }
     }
@@ -222,10 +226,10 @@ public class ActivityCommonServiceImpl implements ActivityCommonService {
   /**
    * 检测日期
    *
-   * @param activityLobby
-   * @param countDate
-   * @param b
-   * @return
+   * @param activityLobby ActivityLobby
+   * @param countDate Date
+   * @param b boolean
+   * @return ActivityLobby
    */
   private ActivityLobby checkActivityDate(ActivityLobby activityLobby, Date countDate, boolean b) {
     Integer date = activityLobby.getStatisDate();
@@ -351,9 +355,9 @@ public class ActivityCommonServiceImpl implements ActivityCommonService {
     }
 
     // 获取统计的时间(时间段)
-    Map map = getStatisticalDate(activityLobby, countDate);
-    String statisticalStartTime = (String) map.get("startTime");
-    String statisticalEndTime = (String) map.get("endTime");
+    Map<String, String> map = getStatisticalDate(activityLobby, countDate);
+    String statisticalStartTime = map.get("startTime");
+    String statisticalEndTime = map.get("endTime");
 
     Integer statisItem = activityLobby.getStatisItem();
     List<ActivityQualification> manageList = null;
@@ -478,6 +482,8 @@ public class ActivityCommonServiceImpl implements ActivityCommonService {
                 flagCheck,
                 countDate);
         break;
+      default:
+        break;
     }
 
     return manageList;
@@ -493,7 +499,7 @@ public class ActivityCommonServiceImpl implements ActivityCommonService {
       Integer flagCheck,
       Date countDate) {
     String errorMsg = null;
-    Map map = new HashMap();
+    Map<String, Object> map = new HashMap<>();
     if (memberInfo != null) {
       map.put("userNameList", Lists.newArrayList(memberInfo.getAccount()));
     }
@@ -551,16 +557,16 @@ public class ActivityCommonServiceImpl implements ActivityCommonService {
   /**
    * 单日游戏亏损金额
    *
-   * @param memberActivityLobby
-   * @param discounts
-   * @param memberInfo
-   * @param startTime
-   * @param endTime
-   * @param flagCheck
-   * @param countDate
-   * @return
+   * @param memberActivityLobby ActivityLobby
+   * @param discounts List
+   * @param memberInfo MemberInfoVO
+   * @param startTime String
+   * @param endTime String
+   * @param flagCheck Integer
+   * @param countDate Date
+   * @return List
    */
-  public List<ActivityQualification> dealGameWinAmount(
+  private List<ActivityQualification> dealGameWinAmount(
       ActivityLobby memberActivityLobby,
       List<ActivityLobbyDiscount> discounts,
       MemberInfoVO memberInfo,
@@ -569,13 +575,14 @@ public class ActivityCommonServiceImpl implements ActivityCommonService {
       Integer flagCheck,
       Date countDate) {
     String errorMsg = null;
-    Map map = new HashMap<>();
+    Map<String, Object> map = new HashMap<>();
     if (memberInfo == null) {
       map.put("userNameList", Lists.newArrayList(memberInfo.getAccount()));
     }
     map.put("startTime", startTime);
     map.put("endTime", endTime);
     map.put("sportGameList", memberActivityLobby.getGameList());
+
     List<ActivityStatisticItem> memberGameReportInfoList =
         liveMemberDayReportService.getGameReportInfo(map);
     if (StringUtils.isEmpty(memberGameReportInfoList)) {
@@ -641,16 +648,16 @@ public class ActivityCommonServiceImpl implements ActivityCommonService {
   /**
    * 连续游戏打码天数
    *
-   * @param memberActivityLobby
-   * @param discounts
-   * @param memberInfo
-   * @param startTime
-   * @param endTime
-   * @param flagCheck
-   * @param countDate
-   * @return
+   * @param memberActivityLobby ActivityLobby
+   * @param discounts List
+   * @param memberInfo MemberInfoVO
+   * @param startTime String
+   * @param endTime String
+   * @param flagCheck Integer
+   * @param countDate Date
+   * @return List
    */
-  public List<ActivityQualification> dealContinuousGameDmDays(
+  private List<ActivityQualification> dealContinuousGameDmDays(
       ActivityLobby memberActivityLobby,
       List<ActivityLobbyDiscount> discounts,
       MemberInfoVO memberInfo,
@@ -659,15 +666,17 @@ public class ActivityCommonServiceImpl implements ActivityCommonService {
       Integer flagCheck,
       Date countDate) {
     String errorMsg = null;
-    Map map = new HashMap<>();
+    Map<String, Object> map = new HashMap<>();
     if (memberInfo != null) {
       map.put("userNameList", Lists.newArrayList(memberInfo.getAccount()));
     }
     map.put("startTime", startTime);
     map.put("endTime", endTime);
+
     map.put("sportGameList", memberActivityLobby.getGameList());
     map.put("sportValidAmount", memberActivityLobby.getSportValidAmount());
     map.put("statisItem", memberActivityLobby.getStatisItem());
+
     List<ActivityStatisticItem> memberGameReportInfoList =
         liveMemberDayReportService.getGameReportInfo(map);
     if (StringUtils.isEmpty(memberGameReportInfoList)) {
@@ -727,14 +736,14 @@ public class ActivityCommonServiceImpl implements ActivityCommonService {
    *
    * @param memberActivityLobby 活动
    * @param discounts 优惠
-   * @param memberInfo
-   * @param startTime
-   * @param endTime
-   * @param flagCheck
-   * @param countDate
-   * @return
+   * @param memberInfo ActivityLobby
+   * @param startTime List
+   * @param endTime MemberInfoVO
+   * @param flagCheck String
+   * @param countDate String
+   * @return List
    */
-  public List<ActivityQualification> dealCumulativeGameDmDays(
+  private List<ActivityQualification> dealCumulativeGameDmDays(
       ActivityLobby memberActivityLobby,
       List<ActivityLobbyDiscount> discounts,
       MemberInfoVO memberInfo,
@@ -743,14 +752,16 @@ public class ActivityCommonServiceImpl implements ActivityCommonService {
       Integer flagCheck,
       Date countDate) {
     String errorMsg = null;
-    Map map = new HashMap<>();
+    Map<String, Object> map = new HashMap<>();
     if (memberInfo != null) {
       map.put("userNameList", Lists.newArrayList(memberInfo.getAccount()));
     }
     map.put("startTime", startTime);
     map.put("endTime", endTime);
+
     map.put("sportGameList", memberActivityLobby.getGameList());
     map.put("sportValidAmount", memberActivityLobby.getSportValidAmount());
+
     List<ActivityStatisticItem> memberGameReportInfoList =
         liveMemberDayReportService.getGameReportInfo(map);
     if (StringUtils.isEmpty(memberGameReportInfoList)) {
@@ -808,14 +819,14 @@ public class ActivityCommonServiceImpl implements ActivityCommonService {
    *
    * @param memberActivityLobby 活动
    * @param discounts 优惠
-   * @param memberInfo
-   * @param startTime
-   * @param endTime
-   * @param flagCheck
-   * @param countDate
-   * @return
+   * @param memberInfo ActivityLobby
+   * @param startTime List
+   * @param endTime String
+   * @param flagCheck Integer
+   * @param countDate Integer
+   * @return List
    */
-  public List<ActivityQualification> dealCumulativeGameDml(
+  private List<ActivityQualification> dealCumulativeGameDml(
       ActivityLobby memberActivityLobby,
       List<ActivityLobbyDiscount> discounts,
       MemberInfoVO memberInfo,
@@ -824,13 +835,14 @@ public class ActivityCommonServiceImpl implements ActivityCommonService {
       Integer flagCheck,
       Date countDate) {
     String errorMsg = null;
-    Map map = new HashMap<>();
+    Map<String, Object> map = new HashMap<>();
     if (memberInfo != null) {
       map.put("userNameList", Lists.newArrayList(memberInfo.getAccount()));
     }
     map.put("startTime", startTime);
     map.put("endTime", endTime);
     map.put("sportGameList", memberActivityLobby.getGameList());
+
     List<ActivityStatisticItem> memberGameReportInfoList =
         liveMemberDayReportService.getGameReportInfo(map);
     if (StringUtils.isEmpty(memberGameReportInfoList)) {
@@ -884,17 +896,17 @@ public class ActivityCommonServiceImpl implements ActivityCommonService {
   /**
    * 检查有效金额
    *
-   * @param validAmount
-   * @param discounts
-   * @param satisfyDiscounts
-   * @param memberActivityLobby
-   * @param statisticUserInfo
-   * @param startTime
-   * @param endTime
-   * @param countDate
-   * @return
+   * @param validAmount BigDecimal
+   * @param discounts List
+   * @param satisfyDiscounts List
+   * @param memberActivityLobby ActivityLobby
+   * @param statisticUserInfo ActivityStatisticItem
+   * @param startTime String
+   * @param endTime String
+   * @param countDate Date
+   * @return ActivityQualification
    */
-  public ActivityQualification judgeValidAmount(
+  private ActivityQualification judgeValidAmount(
       BigDecimal validAmount,
       List<ActivityLobbyDiscount> discounts,
       List<ActivityLobbyDiscount> satisfyDiscounts,
@@ -912,52 +924,41 @@ public class ActivityCommonServiceImpl implements ActivityCommonService {
                         validAmount, Convert.toBigDecimal(discount.getTargetValue())))
             .findFirst()
             .orElse(null);
-    if (StringUtils.isNotNull(lobbyDiscount)) {
-      String auditRemark =
-          getAuditRemark(memberActivityLobby, validAmount.toString(), null, startTime, endTime);
-      satisfyDiscounts.add(lobbyDiscount);
-      // 如果活动选择了多重彩金，则递归调用此方法
-      if (memberActivityLobby.getMultipleHandsel() == 1) {
-        discounts.remove(lobbyDiscount);
-        // 如果活动优惠列表的长度为0，则停止递归
-        if (discounts.size() > 0) {
-          judgeValidAmount(
-              validAmount,
-              discounts,
-              satisfyDiscounts,
-              memberActivityLobby,
-              statisticUserInfo,
-              startTime,
-              endTime,
-              countDate);
-        }
-      }
-      ActivityQualification manage =
-          assembleQualificationManage(
-              memberActivityLobby,
-              statisticUserInfo,
-              satisfyDiscounts,
-              auditRemark,
-              countDate,
-              startTime,
-              endTime);
-      return manage;
+    if (null == lobbyDiscount) {
+      return null;
     }
-    return null;
+
+    String auditRemark =
+        getAuditRemark(memberActivityLobby, validAmount.toString(), null, startTime, endTime);
+    satisfyDiscounts.add(lobbyDiscount);
+    // 如果活动选择了多重彩金，则递归调用此方法
+    if (memberActivityLobby.getMultipleHandsel() == 1) {
+      discounts.remove(lobbyDiscount);
+      // 如果活动优惠列表的长度为0，则停止递归
+      if (discounts.size() > 0) {
+        judgeValidAmount(
+            validAmount,
+            discounts,
+            satisfyDiscounts,
+            memberActivityLobby,
+            statisticUserInfo,
+            startTime,
+            endTime,
+            countDate);
+      }
+    }
+
+    return assembleQualificationManage(
+        memberActivityLobby,
+        statisticUserInfo,
+        satisfyDiscounts,
+        auditRemark,
+        countDate,
+        startTime,
+        endTime);
   }
 
-  /**
-   * 首充金额
-   *
-   * @param memberActivityLobby 活动
-   * @param discounts 优惠
-   * @param memberInfo
-   * @param startTime
-   * @param endTime
-   * @param flagCheck
-   * @param countDate
-   * @return
-   */
+  /** 首充金额 */
   public List<ActivityQualification> dealFirstPay(
       ActivityLobby memberActivityLobby,
       List<ActivityLobbyDiscount> discounts,
@@ -968,7 +969,7 @@ public class ActivityCommonServiceImpl implements ActivityCommonService {
       Date countDate) {
     String errorMsg = null;
     // 查询统计周期内的会员游戏日报表汇总数据(打码量)
-    Map map = new HashMap<>();
+    Map<String, Object> map = new HashMap<>();
     if (memberInfo != null) {
       map.put("userNameList", Lists.newArrayList(memberInfo.getAccount()));
     }
@@ -1061,19 +1062,8 @@ public class ActivityCommonServiceImpl implements ActivityCommonService {
     return qualificationManageList;
   }
 
-  /**
-   * 单日首充金额
-   *
-   * @param memberActivityLobby
-   * @param discounts
-   * @param memberInfo
-   * @param startTime
-   * @param endTime
-   * @param flagCheck
-   * @param countDate
-   * @return
-   */
-  public List<ActivityQualification> dealFirstPayDay(
+  /** 单日首充金额 */
+  private List<ActivityQualification> dealFirstPayDay(
       ActivityLobby memberActivityLobby,
       List<ActivityLobbyDiscount> discounts,
       MemberInfoVO memberInfo,
@@ -1083,7 +1073,7 @@ public class ActivityCommonServiceImpl implements ActivityCommonService {
       Date countDate) {
     String errorMsg = null;
     // 查询统计周期内的会员游戏日报表汇总数据(打码量)
-    Map map = new HashMap<>();
+    Map<String, Object> map = new HashMap<>();
     if (memberInfo != null) {
       map.put("userNameList", Lists.newArrayList(memberInfo.getAccount()));
     }
@@ -1157,19 +1147,8 @@ public class ActivityCommonServiceImpl implements ActivityCommonService {
     return qualificationManageList;
   }
 
-  /**
-   * 连续充值天数
-   *
-   * @param memberActivityLobby
-   * @param discounts
-   * @param memberInfo
-   * @param startTime
-   * @param endTime
-   * @param flagCheck
-   * @param countDate
-   * @return
-   */
-  public List<ActivityQualification> dealContinuousDays(
+  /** 连续充值天数 */
+  private List<ActivityQualification> dealContinuousDays(
       ActivityLobby memberActivityLobby,
       List<ActivityLobbyDiscount> discounts,
       MemberInfoVO memberInfo,
@@ -1179,7 +1158,7 @@ public class ActivityCommonServiceImpl implements ActivityCommonService {
       Date countDate) {
     String errorMsg = null;
     // 查询统计周期内的会员游戏日报表汇总数据(打码量)
-    Map map = new HashMap<>(1);
+    Map<String, Object> map = new HashMap<>(1);
     if (memberInfo != null) {
       map.put("userNameList", Lists.newArrayList(memberInfo.getAccount()));
     }
@@ -1187,6 +1166,7 @@ public class ActivityCommonServiceImpl implements ActivityCommonService {
     map.put("endTime", endTime);
     map.put("payType", memberActivityLobby.getPayType());
     map.put("rechargeValidAmount", memberActivityLobby.getRechargeValidAmount());
+
     List<ActivityStatisticItem> statisticUserInfoList =
         rechargeOrderService.findRechargeDateList(map);
     if (StringUtils.isEmpty(statisticUserInfoList)) {
@@ -1259,8 +1239,8 @@ public class ActivityCommonServiceImpl implements ActivityCommonService {
   /**
    * 获取最大连续时间天数
    *
-   * @param vos
-   * @return
+   * @param vos List
+   * @return int
    */
   public int getMaxPayDay(List<Date> vos) {
     int count = 1;
@@ -1297,7 +1277,7 @@ public class ActivityCommonServiceImpl implements ActivityCommonService {
       Date countDate) {
     String errorMsg = null;
     // 查询统计周期内的会员游戏日报表汇总数据(打码量)
-    Map map = new HashMap<>(1);
+    Map<String, Object> map = new HashMap<>(1);
     if (memberInfo != null) {
       List<String> accountList = new ArrayList<>();
       accountList.add(memberInfo.getAccount());
@@ -1374,20 +1354,7 @@ public class ActivityCommonServiceImpl implements ActivityCommonService {
     return qualificationManageList;
   }
 
-  /**
-   * 判断天数
-   *
-   * @param days
-   * @param validAmount
-   * @param discounts
-   * @param satisfyDiscounts
-   * @param memberActivityLobby
-   * @param statisticUserInfo
-   * @param startTime
-   * @param endTime
-   * @param countDate
-   * @return
-   */
+  /** 判断天数 */
   public ActivityQualification judgeDays(
       Integer days,
       BigDecimal validAmount,
@@ -1429,16 +1396,14 @@ public class ActivityCommonServiceImpl implements ActivityCommonService {
               countDate);
         }
       }
-      ActivityQualification manage =
-          assembleQualificationManage(
-              memberActivityLobby,
-              statisticUserInfo,
-              satisfyDiscounts,
-              auditRemark,
-              countDate,
-              startTime,
-              endTime);
-      return manage;
+      return assembleQualificationManage(
+          memberActivityLobby,
+          statisticUserInfo,
+          satisfyDiscounts,
+          auditRemark,
+          countDate,
+          startTime,
+          endTime);
     }
     return null;
   }
@@ -1458,7 +1423,7 @@ public class ActivityCommonServiceImpl implements ActivityCommonService {
       Integer flagCheck,
       Date countDate) {
     // 查询统计周期内的会员游戏日报表汇总数据(打码量)
-    Map map = new HashMap<>();
+    Map<String, Object> map = new HashMap<>();
     if (memberInfo != null) {
       List<String> accountList = new ArrayList<>();
       accountList.add(memberInfo.getAccount());
@@ -1538,11 +1503,12 @@ public class ActivityCommonServiceImpl implements ActivityCommonService {
   /**
    * 获取统计的时间(时间段)
    *
-   * @param memberActivityLobby
-   * @param countDate
-   * @return
+   * @param memberActivityLobby ActivityLobby
+   * @param countDate Date
+   * @return Map
    */
-  public Map getStatisticalDate(ActivityLobby memberActivityLobby, Date countDate) {
+  private Map<String, String> getStatisticalDate(
+      ActivityLobby memberActivityLobby, Date countDate) {
     String startTime = "";
     String endTime = "";
     Integer statisDate = memberActivityLobby.getStatisDate();
@@ -1626,7 +1592,7 @@ public class ActivityCommonServiceImpl implements ActivityCommonService {
     //            map.put("endTime", endTime + " 23:59:59");
     //        }
 
-    Map map = new HashMap();
+    Map<String, String> map = new HashMap<>();
     map.put("startTime", startTime + " 00:00:00");
     if (memberActivityLobby.getNextDayApply() == 1) {
       map.put("endTime", endTime + " 23:59:59");
@@ -1679,16 +1645,15 @@ public class ActivityCommonServiceImpl implements ActivityCommonService {
               countDate);
         }
       }
-      ActivityQualification manage =
-          assembleQualificationManage(
-              activityLobby,
-              statisticUserInfo,
-              satisfyDiscounts,
-              auditRemark,
-              countDate,
-              startTime,
-              endTime);
-      return manage;
+
+      return assembleQualificationManage(
+          activityLobby,
+          statisticUserInfo,
+          satisfyDiscounts,
+          auditRemark,
+          countDate,
+          startTime,
+          endTime);
     }
     return null;
   }
@@ -1696,14 +1661,14 @@ public class ActivityCommonServiceImpl implements ActivityCommonService {
   /**
    * 组装优惠数据
    *
-   * @param activityLobby
-   * @param userInfo
-   * @param satisfyDiscounts
-   * @param auditRemark
-   * @param countDate
-   * @param startTime
-   * @param endTime
-   * @return
+   * @param activityLobby ActivityLobby
+   * @param userInfo ActivityStatisticItem
+   * @param satisfyDiscounts List
+   * @param auditRemark String
+   * @param countDate Date
+   * @param startTime String
+   * @param endTime String
+   * @return ActivityQualification
    */
   private ActivityQualification assembleQualificationManage(
       ActivityLobby activityLobby,
@@ -1720,36 +1685,45 @@ public class ActivityCommonServiceImpl implements ActivityCommonService {
     if (StringUtils.isNotNull(userInfo.getUserId())) {
       manage.setUserId(userInfo.getUserId());
     }
+
     manage.setUsername(userInfo.getUserName());
     manage.setAuditRemark(auditRemark);
     manage.setStatus(1);
+
     manage.setActivityStartTime(activityLobby.getStartTime());
     manage.setActivityEndTime(activityLobby.getEndTime());
     manage.setDeleteFlag(1);
+
     manage.setApplyTime(countDate);
     manage.setCreateTime(countDate);
+
     if (activityLobby.getApplyWay() == 1) {
       manage.setCreateBy(userInfo.getUserName());
     } else if (activityLobby.getApplyWay() == 2) {
       manage.setCreateBy("system");
     }
+
     manage.setDrawNum(1);
     manage.setEmployNum(0);
     manage.setQualificationStatus(1);
+
     manage.setStatisItem(activityLobby.getStatisItem());
     manage.setMaxMoney(
         satisfyDiscounts.stream().mapToInt(ActivityLobbyDiscount::getPresenterValue).sum());
     manage.setWithdrawDml(
         satisfyDiscounts.stream().mapToInt(ActivityLobbyDiscount::getWithdrawDml).sum());
+
     manage.setQualificationActivityId(RandomUtil.generateOrderCode());
     manage.setSoleIdentifier(IdempotentKeyUtils.md5(DateUtil.formatDate(countDate)));
     manage.setStatisStartTime(DateUtil.parse(startTime, "yyyy-MM-dd HH:mm:ss"));
+
     manage.setStatisEndTime(DateUtil.parse(endTime, "yyyy-MM-dd HH:mm:ss"));
     // 根据目标值对活动优惠列表倒叙排列
     satisfyDiscounts.sort(Comparator.comparingInt(ActivityLobbyDiscount::getTargetValue));
     manage.setAwardDetail(
         JSON.parseArray(JSONObject.toJSONString(satisfyDiscounts)).toJSONString());
     manage.setGetWay(activityLobby.getGetWay());
+
     return manage;
   }
 }

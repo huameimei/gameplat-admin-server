@@ -161,15 +161,29 @@ public class TenantSettingController {
     tenantSettingService.deleteSysFloatById(id);
   }
 
-  /** 广场的开关开启/关闭 */
-  @RequestMapping("/updateSquareSwitch")
-  @CacheEvict(cacheNames = Constants.TENANT_SQUARE_SWITCH, allEntries = true)
-  public void updateSquareSwitch(SysTenantSetting sysTenantSetting) {
-    sysTenantSetting.setSettingType(Constants.SYSTEM_SETTING);
-    sysTenantSetting.setSettingCode(Constants.SQUARE_SWITCH);
-    if (org.apache.commons.lang3.StringUtils.isEmpty(sysTenantSetting.getSettingValue())) {
-      throw new ServiceException("修改值不允许为空...");
+    /**
+     * 广场的开关开启/关闭
+     */
+    @RequestMapping("/updateSquareSwitch")
+    @CacheEvict(cacheNames = Constants.TENANT_SQUARE_SWITCH,allEntries = true)
+    public Result updateSquareSwitch(SysTenantSetting sysTenantSetting) {
+        sysTenantSetting.setSettingType(Constants.SYSTEM_SETTING);
+        sysTenantSetting.setSettingCode(Constants.SQUARE_SWITCH);
+        if (org.apache.commons.lang3.StringUtils.isEmpty(sysTenantSetting.getSettingValue())) {
+            return Result.failed("修改值不允许为空...");
+        }
+        sysTenantSettingService.updateTenantSettingValue(sysTenantSetting);
+        return Result.succeed();
     }
-    sysTenantSettingService.updateTenantSettingValue(sysTenantSetting);
-  }
+
+    /**
+     * 获取广场的开关
+     */
+    @RequestMapping("/getSquareSwitch")
+    public Result getSquareSwitch(TenantSettingVO sysTenantSetting) {
+        sysTenantSetting.setSettingType(Constants.SYSTEM_SETTING);
+        sysTenantSetting.setSettingCode(Constants.SQUARE_SWITCH);
+        List<TenantSetting> list = tenantSettingService.getTenantSetting(sysTenantSetting);
+        return Result.succeed(CollectionUtils.isNotEmpty(list) ? list.get(0) : null);
+    }
 }

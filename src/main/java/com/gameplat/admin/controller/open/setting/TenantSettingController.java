@@ -194,4 +194,15 @@ public class TenantSettingController {
         sysTenantSettingService.updateTenantSettingValue(sysTenantSetting);
         return Result.succeed();
     }
+
+    /**
+     * 获取广场的开关
+     */
+    @RequestMapping("/getSquareSwitch")
+    public Result getSquareSwitch(TenantSettingVO sysTenantSetting) {
+        sysTenantSetting.setSettingType(Constants.SYSTEM_SETTING);
+        sysTenantSetting.setSettingCode(Constants.SQUARE_SWITCH);
+        List<TenantSetting> list = tenantSettingService.getTenantSetting(sysTenantSetting);
+        return Result.succeed(CollectionUtils.isNotEmpty(list) ? list.get(0) : null);
+    }
 }

@@ -116,7 +116,7 @@ public class ActivityInfoServiceImpl extends ServiceImpl<ActivityInfoMapper, Act
         banner.setBannerType(configService.getValueInteger(DictDataEnum.ACTIVITY));
         banner.setChildType(activityInfo.getId());
         banner.setChildName(activityInfo.getTitle());
-        banner.setLanguage(LocaleContextHolder.getLocale().getLanguage());
+        banner.setLanguage(LocaleContextHolder.getLocale().toLanguageTag());
         banner.setStatus(SysBannerInfoEnum.Status.VALID.getValue());
 
         List<SysBannerInfo> bannerList = sysBannerInfoService.getByBanner(banner);
@@ -204,7 +204,7 @@ public class ActivityInfoServiceImpl extends ServiceImpl<ActivityInfoMapper, Act
   @Override
   public void update(ActivityInfoUpdateDTO dto) {
     ActivityInfo activityInfo = activityInfoConvert.toEntity(dto);
-    activityInfo.setLanguage(LocaleContextHolder.getLocale().getLanguage());
+    activityInfo.setLanguage(LocaleContextHolder.getLocale().toLanguageTag());
     if (!this.saveActivityInfo(activityInfo)) {
       throw new ServiceException("修改组合活动失败！");
     }

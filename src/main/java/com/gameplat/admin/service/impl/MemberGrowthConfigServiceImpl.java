@@ -30,13 +30,13 @@ public class MemberGrowthConfigServiceImpl
 
   @Override
   public MemberGrowthConfigVO findOneConfig() {
-    String language = LocaleContextHolder.getLocale().getLanguage();
+    String language = LocaleContextHolder.getLocale().toLanguageTag();
     return configConvert.toVo(configMapper.findOneConfig(language));
   }
 
   @Override
   public MemberGrowthConfig getOneConfig() {
-    String language = LocaleContextHolder.getLocale().getLanguage();
+    String language = LocaleContextHolder.getLocale().toLanguageTag();
     return configMapper.findOneConfig(language);
   }
 
@@ -57,19 +57,19 @@ public class MemberGrowthConfigServiceImpl
       dto.setGoldCoinDesc(jsonObject.toJSONString());
     }
 
-    dto.setLanguage(LocaleContextHolder.getLocale().getLanguage());
+    dto.setLanguage(LocaleContextHolder.getLocale().toLanguageTag());
     configMapper.updateGrowthConfig(dto);
   }
 
   @Override
   public MemberGrowthConfig getGoldCoinDesc() {
-    String language = LocaleContextHolder.getLocale().getLanguage();
+    String language = LocaleContextHolder.getLocale().toLanguageTag();
     return configMapper.getGoldCoinDesc(language);
   }
 
   @Override
   public void updateGoldCoinDesc(GoldCoinDescUpdateDTO dto) {
-    String language = LocaleContextHolder.getLocale().getLanguage();
+    String language = LocaleContextHolder.getLocale().toLanguageTag();
     MemberGrowthConfig memberGrowthConfig =
         this.lambdaQuery().eq(MemberGrowthConfig::getId, dto.getId()).one();
     if (ObjectUtil.isNull(memberGrowthConfig)) {

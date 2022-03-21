@@ -56,7 +56,7 @@ public class MemberGrowthLevelServiceImpl
   @Override
   public List<MemberGrowthLevelVO> findList(Integer limitLevel) {
     List<MemberGrowthLevel> list =
-        levelMapper.findList(limitLevel + 1, LocaleContextHolder.getLocale().getLanguage());
+        levelMapper.findList(limitLevel + 1, LocaleContextHolder.getLocale().toLanguageTag());
     List<MemberGrowthLevelVO> voList = new ArrayList<>();
     for (MemberGrowthLevel level : list) {
       MemberGrowthLevelVO memberGrowthLevelVO = levelConvert.toVo(level);
@@ -67,7 +67,7 @@ public class MemberGrowthLevelServiceImpl
 
   @Override
   public List<MemberGrowthLevel> getList(Integer limitLevel) {
-    return levelMapper.findList(limitLevel + 1, LocaleContextHolder.getLocale().getLanguage());
+    return levelMapper.findList(limitLevel + 1, LocaleContextHolder.getLocale().toLanguageTag());
   }
 
   @Override
@@ -78,7 +78,7 @@ public class MemberGrowthLevelServiceImpl
   /** 批量修改VIP等级 */
   @Override
   public void batchUpdateLevel(List<MemberGrowthLevelEditDto> list, HttpServletRequest request) {
-    String language = LocaleContextHolder.getLocale().getLanguage();
+    String language = LocaleContextHolder.getLocale().toLanguageTag();
     list.forEach(
         item -> {
           String oldName =
@@ -90,7 +90,7 @@ public class MemberGrowthLevelServiceImpl
                   .one()
                   .getLevelName();
           JSONObject jsonObject = JSONUtil.parseObj(oldName);
-          jsonObject.putOnce(language, item.getLevelName());
+          jsonObject.put(language, item.getLevelName());
           item.setLevelName(jsonObject.toString());
         });
     int count = levelMapper.batchUpdateLevel(list);

@@ -54,7 +54,7 @@ public class OpenMemberGrowthLevelController {
     }
 
     dto.setUpdateBy(GlobalContextHolder.getContext().getUsername());
-    dto.setLanguage(LocaleContextHolder.getLocale().getLanguage());
+    dto.setLanguage(LocaleContextHolder.getLocale().toLanguageTag());
     configService.updateGrowthConfig(dto);
   }
 

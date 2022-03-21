@@ -17,9 +17,28 @@ import com.gameplat.admin.constant.SystemConstant;
 import com.gameplat.admin.convert.MemberConvert;
 import com.gameplat.admin.enums.MemberEnums;
 import com.gameplat.admin.mapper.MemberMapper;
-import com.gameplat.admin.model.dto.*;
-import com.gameplat.admin.model.vo.*;
-import com.gameplat.admin.service.*;
+import com.gameplat.admin.model.dto.CleanAccountDTO;
+import com.gameplat.admin.model.dto.MemberAddDTO;
+import com.gameplat.admin.model.dto.MemberContactCleanDTO;
+import com.gameplat.admin.model.dto.MemberContactUpdateDTO;
+import com.gameplat.admin.model.dto.MemberEditDTO;
+import com.gameplat.admin.model.dto.MemberPwdUpdateDTO;
+import com.gameplat.admin.model.dto.MemberQueryDTO;
+import com.gameplat.admin.model.dto.MemberResetRealNameDTO;
+import com.gameplat.admin.model.dto.MemberWithdrawPwdUpdateDTO;
+import com.gameplat.admin.model.vo.MemberBalanceVO;
+import com.gameplat.admin.model.vo.MemberInfoVO;
+import com.gameplat.admin.model.vo.MemberLevelVO;
+import com.gameplat.admin.model.vo.MemberVO;
+import com.gameplat.admin.model.vo.MessageDistributeVO;
+import com.gameplat.admin.service.GameAdminService;
+import com.gameplat.admin.service.GameTransferInfoService;
+import com.gameplat.admin.service.MemberInfoService;
+import com.gameplat.admin.service.MemberRemarkService;
+import com.gameplat.admin.service.MemberService;
+import com.gameplat.admin.service.OnlineUserService;
+import com.gameplat.admin.service.PasswordService;
+import com.gameplat.admin.service.SpreadLinkInfoService;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.StringUtils;
 import com.gameplat.common.constant.CachedKeys;
@@ -30,17 +49,21 @@ import com.gameplat.model.entity.member.Member;
 import com.gameplat.model.entity.member.MemberInfo;
 import com.gameplat.security.SecurityUserHolder;
 import com.google.common.collect.Lists;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.text.DecimalFormat;
-import java.util.*;
-import java.util.stream.Collectors;
 
 @Log4j2
 @Service
@@ -82,7 +105,6 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
   public IPage<MemberBalanceVO> findTGMemberBalance(Page<Member> page, MemberQueryDTO dto) {
     return memberMapper
         .queryPage(page, memberQueryCondition.builderQueryWrapper(dto))
-        .convert(this::setOnlineStatus)
         .convert(memberConvert::toBalanceVo);
   }
 
@@ -382,15 +404,13 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
     Member member = this.getByAccount(account).orElseThrow(() -> new ServiceException("会员信息不存在!"));
     if (StringUtils.isBlank(member.getGameAccount())) {
       Assert.notNull(tenantConfig.getTenantCode(), "平台编码未配置，请联系客服");
-      StringBuilder gameAccount =
-          new StringBuilder(tenantConfig.getTenantCode()).append(member.getId());
-
       // 固定13位
+      StringBuffer gameAccount =
+          new StringBuffer(tenantConfig.getTenantCode()).append(member.getId());
       String suffix = RandomUtil.randomString(13 - gameAccount.length());
       member.setGameAccount(gameAccount.append(suffix).toString());
       Assert.isTrue(this.updateById(member), "添加会员游戏账号信息!");
     }
-
     // 会员余额存在哪个游戏中
     if (ObjectUtil.isNull(gameTransferInfoService.getInfoByMemberId(member.getId()))) {
       GameTransferInfo gameTransferInfo = new GameTransferInfo();
@@ -519,7 +539,12 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
       String[] userNames = dto.getUserNames().split(",");
       List<String> userNameList = Lists.newArrayList(userNames);
       dto.setUserNameList(userNameList);
-      memberList = this.lambdaQuery().in(Member::getAccount, dto.getUserNames().split(",")).list();
+      if (ObjectUtil.equals(dto.getUserType(), 4))
+        memberList =
+            this.lambdaQuery()
+                .in(Member::getAccount, dto.getUserNames().split(","))
+                .eq(Member::getUserType, dto.getUserType())
+                .list();
       if (StringUtils.isEmpty(memberList) || memberList.size() != userNames.length) {
         throw new ServiceException("未找到账号信息");
       }
@@ -548,9 +573,14 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
     memberList.parallelStream()
         .forEach(
             a -> {
-              gameAdminService.reclaimLiveAmount(a.getAccount());
+              gameAdminService.recyclingAmountByAccount(a.getAccount());
             });
     memberInfoService.updateClearGTMember(dto);
     log.info("批量清理账号余额结束，操作人：{}，参数：{}", SecurityUserHolder.getUsername(), dto);
   }
+
+  /*  @Override
+  public MemberBalanceVO findMemberVip(String username, String level, String vipGrade) {
+    return memberMapper.findMemberVip(username, level, vipGrade);
+  }*/
 }

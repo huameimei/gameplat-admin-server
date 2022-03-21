@@ -116,14 +116,22 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
     Assert.isTrue(this.save(member), "新增会员失败!");
 
     MemberInfo memberInfo =
-        MemberInfo.builder().memberId(member.getId()).rebate(dto.getRebate()).build();
+        MemberInfo.builder()
+            .memberId(member.getId())
+            .rebate(dto.getRebate())
+            .salaryFlag(dto.getSalaryFlag())
+            .build();
     Assert.isTrue(memberInfoService.save(memberInfo), "新增会员失败!");
   }
 
   @Override
   public void update(MemberEditDTO dto) {
     MemberInfo memberInfo =
-        MemberInfo.builder().memberId(dto.getId()).rebate(dto.getRebate()).build();
+        MemberInfo.builder()
+            .memberId(dto.getId())
+            .rebate(dto.getRebate())
+            .salaryFlag(dto.getSalaryFlag())
+            .build();
 
     // 更新会员信息和会员详情
     Assert.isTrue(

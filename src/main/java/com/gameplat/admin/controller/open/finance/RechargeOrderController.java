@@ -21,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
@@ -69,7 +70,7 @@ public class RechargeOrderController {
   @PostMapping("/batchHandle")
   @PreAuthorize("hasAuthority('finance:rechargeOrder:handle')")
   @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.RECHARGE, desc = "'批量受理订单：' + #ids")
-  public void batchHandle(List<Long> ids) {
+  public void batchHandle(@RequestParam List<Long> ids) {
     if (null == ids || ids.size() == 0) {
       throw new ServiceException("ids不能为空");
     }
@@ -82,7 +83,7 @@ public class RechargeOrderController {
   @PostMapping("/batchUnHandle")
   @PreAuthorize("hasAuthority('finance:rechargeOrder:unHandle')")
   @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.RECHARGE, desc = "'批量取消受理订单：' + #ids")
-  public void batchUnHandle(List<Long> ids) {
+  public void batchUnHandle(@RequestParam List<Long> ids) {
     if (null == ids || ids.size() == 0) {
       throw new ServiceException("ids不能为空");
     }
@@ -95,7 +96,7 @@ public class RechargeOrderController {
   @PostMapping("/batchAccept")
   @PreAuthorize("hasAuthority('finance:rechargeOrder:accept')")
   @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.RECHARGE, desc = "'批量入款订单：' + #ids")
-  public void batchAccept(List<Long> ids) throws Exception {
+  public void batchAccept(@RequestParam List<Long> ids) throws Exception {
     if (null == ids || ids.size() == 0) {
       throw new ServiceException("ids不能为空");
     }
@@ -108,7 +109,7 @@ public class RechargeOrderController {
   @PostMapping("/batchCancel")
   @PreAuthorize("hasAuthority('finance:rechargeOrder:cancel')")
   @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.RECHARGE, desc = "'批量取消订单：' + #ids")
-  public void batchCancel(List<Long> ids) {
+  public void batchCancel(@RequestParam List<Long> ids) {
     if (null == ids || ids.size() == 0) {
       throw new ServiceException("ids不能为空");
     }

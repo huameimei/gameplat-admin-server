@@ -37,44 +37,26 @@ import java.util.List;
 @Slf4j
 @Service
 @Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)
-public class MemberGoldCoinRecordServiceImpl
-    extends ServiceImpl<MemberGoldCoinRecordMapper, MemberGoldCoinRecord>
-    implements MemberGoldCoinRecordService {
+public class MemberGoldCoinRecordServiceImpl extends ServiceImpl<MemberGoldCoinRecordMapper, MemberGoldCoinRecord> implements MemberGoldCoinRecordService {
 
-  @Autowired private MemberGoldCoinRecordConvert memberGoldCoinRecordConvert;
+    @Autowired
+    private MemberGoldCoinRecordConvert memberGoldCoinRecordConvert;
+    @Autowired
+    private MemberService memberService;
+    @Autowired
+    private MemberInfoService memberInfoService;
 
-  @Autowired private MemberService memberService;
-
-  @Autowired private MemberInfoService memberInfoService;
-
-  @Override
-  public IPage<MemberGoldCoinRecordVO> page(
-      PageDTO<MemberGoldCoinRecord> page, MemberGoldCoinRecordQueryDTO dto) {
-    return this.lambdaQuery()
-        .eq(
-            ObjectUtil.isNotEmpty(dto.getAccount()),
-            MemberGoldCoinRecord::getAccount,
-            dto.getAccount())
-        .eq(
-            ObjectUtil.isNotEmpty(dto.getSourceType()),
-            MemberGoldCoinRecord::getSourceType,
-            dto.getSourceType())
-        .ge(
-            ObjectUtil.isNotEmpty(dto.getStartTime()),
-            MemberGoldCoinRecord::getCreateTime,
-            dto.getStartTime())
-        .le(
-            ObjectUtil.isNotEmpty(dto.getEndTime()),
-            MemberGoldCoinRecord::getCreateTime,
-            dto.getEndTime())
-        .page(page)
-        .convert(memberGoldCoinRecordConvert::toVo);
-  }
-
-  @Override
-  public void addGoldCoin(String[] accountArray, Integer amount) {
-    if (accountArray.length > 30) {
-      throw new ServiceException("超出处理限定数");
+    /** 分页查 */
+    @Override
+    public IPage<MemberGoldCoinRecordVO> page(PageDTO<MemberGoldCoinRecord> page, MemberGoldCoinRecordQueryDTO dto) {
+        return this.lambdaQuery()
+                .eq(ObjectUtil.isNotEmpty(dto.getAccount()), MemberGoldCoinRecord::getAccount, dto.getAccount())
+                .eq(ObjectUtil.isNotEmpty(dto.getSourceType()), MemberGoldCoinRecord::getSourceType, dto.getSourceType())
+                .ge(ObjectUtil.isNotEmpty(dto.getStartTime()), MemberGoldCoinRecord::getCreateTime, dto.getStartTime())
+                .le(ObjectUtil.isNotEmpty(dto.getEndTime()), MemberGoldCoinRecord::getCreateTime, dto.getEndTime())
+                .orderByDesc(MemberGoldCoinRecord::getCreateTime)
+                .page(page)
+                .convert(memberGoldCoinRecordConvert::toVo);
     }
     for (String account : accountArray) {
       Member member =

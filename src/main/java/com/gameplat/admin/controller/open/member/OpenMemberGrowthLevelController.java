@@ -7,8 +7,8 @@ import com.gameplat.admin.model.vo.MemberConfigLevelVO;
 import com.gameplat.admin.model.vo.MemberGrowthLevelVO;
 import com.gameplat.admin.service.MemberGrowthConfigService;
 import com.gameplat.admin.service.MemberGrowthLevelService;
-import com.gameplat.base.common.context.GlobalContextHolder;
 import com.gameplat.base.common.exception.ServiceException;
+import com.gameplat.security.SecurityUserHolder;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -23,8 +23,9 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 /**
+ * 用户成长等级
+ *
  * @author lily
- * @description 用户成长等级
  * @date 2021/11/20
  */
 @Slf4j
@@ -53,7 +54,7 @@ public class OpenMemberGrowthLevelController {
       throw new ServiceException(" 编号不能为空");
     }
 
-    dto.setUpdateBy(GlobalContextHolder.getContext().getUsername());
+    dto.setUpdateBy(SecurityUserHolder.getUsername());
     dto.setLanguage(LocaleContextHolder.getLocale().toLanguageTag());
     configService.updateGrowthConfig(dto);
   }

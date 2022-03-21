@@ -107,7 +107,7 @@ public class DivideFissionConfigServiceImpl
         if (dictData.getDictValue().equalsIgnoreCase(voMap.getValue().getStr("liveGameCode"))) {
           List<GameKind> tmpLevelOneList = levelOneMap.get(voMap.getValue().getStr("code"));
           if (CollectionUtil.isNotEmpty(tmpLevelOneList)) {
-            voMap.getValue().putOnce("name", tmpLevelOneList.get(0).getName());
+            voMap.getValue().set("name", tmpLevelOneList.get(0).getName());
           }
           divideLevelOneList.add(JSONUtil.toBean(voMap.getValue(), FissionDivideConfigVo.class));
         }

@@ -94,21 +94,21 @@ public class DivideLayerConfigServiceImpl
       List<GameDivideVo> divideLevelOneList = new ArrayList<>();
       for (Map.Entry<String, JSONObject> voMap : ownerLayerConfigMap.entrySet()) {
         if (dictData.getDictValue().equalsIgnoreCase(voMap.getValue().getStr("liveGameCode"))) {
-          voMap.getValue().putOnce("minRatio", BigDecimal.ZERO);
+          voMap.getValue().set("minRatio", BigDecimal.ZERO);
           voMap
               .getValue()
-              .putOnce(
+              .set(
                   "maxRatio", ownerLayerConfigMap.get(voMap.getKey()).getBigDecimal("divideRatio"));
           voMap
               .getValue()
-              .putOnce(
+              .set(
                   "parentDivideRatio",
                   ownerLayerConfigMap.get(voMap.getKey()).getBigDecimal("divideRatio"));
-          voMap.getValue().putOnce("divideRatio", BigDecimal.ZERO);
+          voMap.getValue().set("divideRatio", BigDecimal.ZERO);
 
           List<GameKind> tmpLevelOneList = levelOneMap.get(voMap.getValue().getStr("code"));
           if (CollectionUtil.isNotEmpty(tmpLevelOneList)) {
-            voMap.getValue().putOnce("name", tmpLevelOneList.get(0).getName());
+            voMap.getValue().set("name", tmpLevelOneList.get(0).getName());
           }
 
           divideLevelOneList.add(JSONUtil.toBean(voMap.getValue(), GameDivideVo.class));
@@ -158,22 +158,21 @@ public class DivideLayerConfigServiceImpl
             JSONUtil.toBean(spreadLinkInfo.getDivideConfig(), Map.class);
         for (Map.Entry<String, JSONObject> voMap : linkDivideConfigMap.entrySet()) {
           if (dictData.getDictValue().equalsIgnoreCase(voMap.getValue().getStr("liveGameCode"))) {
-            voMap.getValue().putOnce("minRatio", BigDecimal.ZERO);
+            voMap.getValue().set("minRatio", BigDecimal.ZERO);
             voMap
                 .getValue()
-                .putOnce(
-                    "maxRatio", ownerConfigMap.get(voMap.getKey()).getBigDecimal("divideRatio"));
+                .set("maxRatio", ownerConfigMap.get(voMap.getKey()).getBigDecimal("divideRatio"));
 
             List<GameKind> tmpLevelOneList = levelOneMap.get(voMap.getValue().getStr("code"));
             if (CollectionUtil.isNotEmpty(tmpLevelOneList)) {
-              voMap.getValue().putOnce("name", tmpLevelOneList.get(0).getName());
+              voMap.getValue().set("name", tmpLevelOneList.get(0).getName());
             }
             voMap
                 .getValue()
-                .putOnce("settleType", ownerConfigMap.get(voMap.getKey()).getInt("settleType"));
+                .set("settleType", ownerConfigMap.get(voMap.getKey()).getInt("settleType"));
             voMap
                 .getValue()
-                .putOnce(
+                .set(
                     "amountRatio", ownerConfigMap.get(voMap.getKey()).getBigDecimal("amountRatio"));
             divideLevelOneList.add(JSONUtil.toBean(voMap.getValue(), GameDivideVo.class));
           }
@@ -182,16 +181,16 @@ public class DivideLayerConfigServiceImpl
         // 将分红配置变成一个map
         for (Map.Entry<String, JSONObject> voMap : ownerConfigMap.entrySet()) {
           if (dictData.getDictValue().equalsIgnoreCase(voMap.getValue().getStr("liveGameCode"))) {
-            voMap.getValue().putOnce("minRatio", BigDecimal.ZERO);
-            voMap.getValue().putOnce("maxRatio", voMap.getValue().getBigDecimal("divideRatio"));
+            voMap.getValue().set("minRatio", BigDecimal.ZERO);
+            voMap.getValue().set("maxRatio", voMap.getValue().getBigDecimal("divideRatio"));
             voMap
                 .getValue()
-                .putOnce("parentDivideRatio", voMap.getValue().getBigDecimal("divideRatio"));
-            voMap.getValue().putOnce("divideRatio", BigDecimal.ZERO);
+                .set("parentDivideRatio", voMap.getValue().getBigDecimal("divideRatio"));
+            voMap.getValue().set("divideRatio", BigDecimal.ZERO);
 
             List<GameKind> tmpLevelOneList = levelOneMap.get(voMap.getValue().getStr("code"));
             if (CollectionUtil.isNotEmpty(tmpLevelOneList)) {
-              voMap.getValue().putOnce("name", tmpLevelOneList.get(0).getName());
+              voMap.getValue().set("name", tmpLevelOneList.get(0).getName());
             }
 
             divideLevelOneList.add(JSONUtil.toBean(voMap.getValue(), GameDivideVo.class));
@@ -258,12 +257,12 @@ public class DivideLayerConfigServiceImpl
         if (dictData.getDictValue().equalsIgnoreCase(voMap.getValue().getStr("liveGameCode"))) {
           // 填充最大可编辑的分红点数值
           if (member.getAgentLevel() <= NumberConstant.ONE) {
-            voMap.getValue().putOnce("maxRatio", new BigDecimal("100"));
+            voMap.getValue().set("maxRatio", new BigDecimal("100"));
           } else {
             // 如果不是顶级代理 则可调整的最大值就是他直属上级被直属上级的直属上级所分配的分红比例 即 他直属上级的divideRatio值
             BigDecimal maxRatio =
                 parentLayerConfigMap.get(voMap.getKey()).getBigDecimal("divideRatio");
-            voMap.getValue().putOnce("maxRatio", maxRatio);
+            voMap.getValue().set("maxRatio", maxRatio);
           }
 
           // 填充最小可编辑的分红点数值
@@ -286,21 +285,21 @@ public class DivideLayerConfigServiceImpl
                     ? promotionMaxDivideRatio
                     : min;
           }
-          voMap.getValue().putOnce("minRatio", min);
+          voMap.getValue().set("minRatio", min);
           voMap
               .getValue()
-              .putOnce(
+              .set(
                   "divideRatio",
                   ownerLayerConfigMap.get(voMap.getKey()).getBigDecimal("divideRatio"));
           voMap
               .getValue()
-              .putOnce(
+              .set(
                   "parentDivideRatio",
                   ownerLayerConfigMap.get(voMap.getKey()).getBigDecimal("parentDivideRatio"));
 
           List<GameKind> tmpLevelOneList = levelOneMap.get(voMap.getValue().getStr("code"));
           if (CollectionUtil.isNotEmpty(tmpLevelOneList)) {
-            voMap.getValue().putOnce("name", tmpLevelOneList.get(0).getName());
+            voMap.getValue().set("name", tmpLevelOneList.get(0).getName());
           }
 
           divideLevelOneList.add(JSONUtil.toBean(voMap.getValue(), GameDivideVo.class));
@@ -434,7 +433,7 @@ public class DivideLayerConfigServiceImpl
       if (member.getAgentLevel() > NumberConstant.ONE && BeanUtil.isNotEmpty(parentDivideMap)) {
         ownerMap
             .getValue()
-            .putOnce(
+            .set(
                 "parentDivideRatio",
                 parentDivideMap
                     .get(ownerMap.getKey())
@@ -447,15 +446,15 @@ public class DivideLayerConfigServiceImpl
           JSONObject jsonObject = childMap.get(ownerMap.getKey());
           try {
             // fixme 不推荐使用JSONObject
-            jsonObject.putOnce("liveGameName", ownerMap.getValue().getStr("liveGameName"));
-            jsonObject.putOnce("liveGameCode", ownerMap.getValue().getStr("liveGameCode"));
-            jsonObject.putOnce("code", ownerMap.getValue().getStr("code"));
-            jsonObject.putOnce("name", ownerMap.getValue().getStr("name"));
-            jsonObject.putOnce("settleType", ownerMap.getValue().getInt("settleType"));
-            jsonObject.putOnce("amountRatio", ownerMap.getValue().getBigDecimal("amountRatio"));
+            jsonObject.set("liveGameName", ownerMap.getValue().getStr("liveGameName"));
+            jsonObject.set("liveGameCode", ownerMap.getValue().getStr("liveGameCode"));
+            jsonObject.set("code", ownerMap.getValue().getStr("code"));
+            jsonObject.set("name", ownerMap.getValue().getStr("name"));
+            jsonObject.set("settleType", ownerMap.getValue().getInt("settleType"));
+            jsonObject.set("amountRatio", ownerMap.getValue().getBigDecimal("amountRatio"));
             // 如果是直属下级
             if (childVo.getParentName().equals(member.getAccount())) {
-              jsonObject.putOnce(
+              jsonObject.set(
                   "parentDivideRatio",
                   ownerMap
                       .getValue()
@@ -479,13 +478,13 @@ public class DivideLayerConfigServiceImpl
           JSONObject jsonObject = childMap.get(ownerMap.getKey());
           try {
             // fixme 不推荐使用JSONObject
-            jsonObject.putOnce("liveGameName", ownerMap.getValue().getStr("liveGameName"));
-            jsonObject.putOnce("liveGameCode", ownerMap.getValue().getStr("liveGameCode"));
-            jsonObject.putOnce("code", ownerMap.getValue().getStr("code"));
-            jsonObject.putOnce("name", ownerMap.getValue().getStr("name"));
-            jsonObject.putOnce("settleType", ownerMap.getValue().getInt("settleType"));
-            jsonObject.putOnce("amountRatio", ownerMap.getValue().getBigDecimal("amountRatio"));
-            jsonObject.putOnce(
+            jsonObject.set("liveGameName", ownerMap.getValue().getStr("liveGameName"));
+            jsonObject.set("liveGameCode", ownerMap.getValue().getStr("liveGameCode"));
+            jsonObject.set("code", ownerMap.getValue().getStr("code"));
+            jsonObject.set("name", ownerMap.getValue().getStr("name"));
+            jsonObject.set("settleType", ownerMap.getValue().getInt("settleType"));
+            jsonObject.set("amountRatio", ownerMap.getValue().getBigDecimal("amountRatio"));
+            jsonObject.set(
                 "parentDivideRatio",
                 ownerMap
                     .getValue()

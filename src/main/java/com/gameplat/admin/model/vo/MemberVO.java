@@ -149,4 +149,6 @@ public class MemberVO implements Serializable {
 
   @ApiModelProperty(value = "玩家金币数")
   private Integer goldCoin;
+
+  private Integer salaryFlag;
 }

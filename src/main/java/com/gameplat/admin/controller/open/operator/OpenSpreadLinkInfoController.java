@@ -101,17 +101,14 @@ public class OpenSpreadLinkInfoController {
   public List<String> getAgentDomain(@RequestParam String agentAccount) {
     List<SpreadLinkInfo> spreadList = spreadLinkInfoService.getSpreadList(agentAccount);
     List<String> listStr = new ArrayList<>();
-    spreadList.forEach(
-        x -> {
-          listStr.add(x.getExternalUrl());
-        });
+    spreadList.forEach(x -> listStr.add(x.getExternalUrl()));
     return listStr;
   }
 
   /**
    * 添加推广码链接时 获取返点等级下拉框可选数据
    *
-   * @return
+   * @return JSONArray
    */
   @GetMapping("/getLinkRebateOptionsForAdd")
   public JSONArray getLinkRebateOptionsForAdd(@RequestParam(required = false) String agentAccount) {
@@ -120,7 +117,7 @@ public class OpenSpreadLinkInfoController {
   /**
    * 编辑推广码链接时 获取返点等级下拉框可选数据
    *
-   * @return
+   * @return JSONArray
    */
   @GetMapping("/getLinkRebateOptionsForEdit")
   public JSONArray getLinkRebateOptionsForEdit(

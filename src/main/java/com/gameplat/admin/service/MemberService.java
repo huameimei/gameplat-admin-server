@@ -142,17 +142,12 @@ public interface MemberService extends IService<Member> {
    */
   List<Map<String, String>> getRebateForEdit(String agentAccount);
 
-  void updateDaySalary(String ids,Integer state);
+  void updateDaySalary(String ids, Integer state);
 
   /**
    * 清除推广会员余额
+   *
    * @param dto
    */
   void updateTGClearMember(CleanAccountDTO dto);
-
-  /**
-   * 根据会员账号 层级  vip 等级去查询会员
-   */
-  MemberBalanceVO findMemberVip(String username,String level,String vipGrade);
-
 }

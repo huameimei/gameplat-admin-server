@@ -9,10 +9,12 @@ import org.springframework.web.client.RestTemplate;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 
 @Slf4j
@@ -23,7 +25,7 @@ public class RoutingDelegate {
       HttpServletRequest request, HttpServletResponse response, String routeUrl, String prefix) {
     try {
       String redirectUrl = createRedirectUrl(request, routeUrl, prefix);
-      RequestEntity requestEntity = createRequestEntity(request, redirectUrl);
+      RequestEntity<?> requestEntity = createRequestEntity(request, redirectUrl);
       return route(requestEntity);
     } catch (Exception e) {
       log.error("redirect error");
@@ -36,10 +38,9 @@ public class RoutingDelegate {
     try {
       String redirectUrl = createRedirectUrl(request, routeUrl, prefix);
       redirectUrl = redirectUrl.split("\\?")[0];
-      RequestEntity requestEntity = createRequestEntity(request, addHeaders, redirectUrl);
-      return route(requestEntity);
+      return route(createRequestEntity(request, addHeaders, redirectUrl));
     } catch (Exception e) {
-      log.error("redirect error");
+      log.error("redirect error", e);
       return new ResponseEntity<>("REDIRECT ERROR", HttpStatus.INSUFFICIENT_STORAGE);
     }
   }
@@ -51,26 +52,26 @@ public class RoutingDelegate {
         + (queryString != null ? "?" + queryString : "");
   }
 
-  private RequestEntity createRequestEntity(HttpServletRequest request, String url)
-      throws URISyntaxException, IOException {
+  private RequestEntity<?> createRequestEntity(HttpServletRequest request, String url)
+      throws URISyntaxException {
     String method = request.getMethod();
     HttpMethod httpMethod = HttpMethod.resolve(method);
     MultiValueMap<String, String> headers = parseRequestHeader(request, null);
     MultiValueMap<String, String> body = parseRequestParams(request);
-    return new RequestEntity(body, headers, httpMethod, new URI(url));
+    return new RequestEntity<>(body, headers, httpMethod, new URI(url));
   }
 
-  private RequestEntity createRequestEntity(
+  private RequestEntity<?> createRequestEntity(
       HttpServletRequest request, Map<String, String> addHeaders, String url)
-      throws URISyntaxException, IOException {
+      throws URISyntaxException {
     String method = request.getMethod();
     HttpMethod httpMethod = HttpMethod.resolve(method);
     MultiValueMap<String, String> headers = parseRequestHeader(request, addHeaders);
     MultiValueMap<String, String> body = parseRequestParams(request);
-    return new RequestEntity(body, headers, httpMethod, new URI(url));
+    return new RequestEntity<>(body, headers, httpMethod, new URI(url));
   }
 
-  private ResponseEntity<String> route(RequestEntity requestEntity) {
+  private ResponseEntity<String> route(RequestEntity<?> requestEntity) {
     RestTemplate restTemplate = new RestTemplate();
     return restTemplate.exchange(requestEntity, String.class);
   }
@@ -78,8 +79,7 @@ public class RoutingDelegate {
   public MultiValueMap<String, String> parseRequestParams(HttpServletRequest request) {
     MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
     Map<String, String[]> map = request.getParameterMap();
-    for (Iterator<Entry<String, String[]>> itr = map.entrySet().iterator(); itr.hasNext(); ) {
-      Entry<String, String[]> entry = itr.next();
+    for (Entry<String, String[]> entry : map.entrySet()) {
       String key = entry.getKey();
       String[] value = entry.getValue();
       params.put(key, Arrays.asList(value));

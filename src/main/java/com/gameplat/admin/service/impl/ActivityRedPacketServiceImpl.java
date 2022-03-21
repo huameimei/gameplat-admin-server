@@ -62,9 +62,8 @@ public class ActivityRedPacketServiceImpl
   }
 
   @Override
-  public void add(ActivityRedPacketAddDTO activityRedPacketAddDTO) {
-    ActivityRedPacket activityRedPacket =
-        activityRedPacketConvert.toEntity(activityRedPacketAddDTO);
+  public void add(ActivityRedPacketAddDTO dto) {
+    ActivityRedPacket activityRedPacket = activityRedPacketConvert.toEntity(dto);
     this.save(activityRedPacket);
   }
 

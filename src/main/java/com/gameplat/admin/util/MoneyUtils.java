@@ -3,6 +3,7 @@ package com.gameplat.admin.util;
 import org.apache.commons.lang3.math.NumberUtils;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.NumberFormat;
 
 public class MoneyUtils {
@@ -56,25 +57,24 @@ public class MoneyUtils {
   }
 
   /**
-   * @param scale
-   * @param money
-   * @return
+   * @param scale int
+   * @param money BigDecimal
+   * @return BigDecimal
    */
   public static BigDecimal fix(int scale, BigDecimal money) {
     return money != null
-        ? new BigDecimal(String.valueOf(money))
-            .setScale(Math.max(scale, 0), BigDecimal.ROUND_HALF_UP)
+        ? new BigDecimal(String.valueOf(money)).setScale(Math.max(scale, 0), RoundingMode.HALF_UP)
         : BigDecimal.ZERO;
   }
 
   /*** 向下取整
-   * @param scale
-   * @param money
-   * @return
+   * @param scale int
+   * @param money BigDecimal
+   * @return BigDecimal
    */
   public static BigDecimal fixDown(int scale, BigDecimal money) {
     return money != null
-        ? new BigDecimal(String.valueOf(money)).setScale(Math.max(scale, 0), BigDecimal.ROUND_DOWN)
+        ? new BigDecimal(String.valueOf(money)).setScale(Math.max(scale, 0), RoundingMode.DOWN)
         : BigDecimal.ZERO;
   }
 }

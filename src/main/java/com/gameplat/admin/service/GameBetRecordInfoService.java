@@ -6,13 +6,14 @@ import com.gameplat.admin.model.dto.GameBetRecordQueryDTO;
 import com.gameplat.admin.model.vo.GameBetRecordVO;
 import com.gameplat.admin.model.vo.PageDtoVO;
 import com.gameplat.common.game.GameResult;
+
 import java.util.List;
 import java.util.Map;
 
 public interface GameBetRecordInfoService {
 
-  PageDtoVO<GameBetRecordVO> queryPageBetRecord(Page<GameBetRecordVO> page,
-      GameBetRecordQueryDTO dto);
+  PageDtoVO<GameBetRecordVO> queryPageBetRecord(
+      Page<GameBetRecordVO> page, GameBetRecordQueryDTO dto);
 
   GameResult getGameResult(GameBetRecordQueryDTO dto) throws Exception;
 

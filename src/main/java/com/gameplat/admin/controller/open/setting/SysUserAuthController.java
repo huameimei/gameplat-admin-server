@@ -12,36 +12,29 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 
-/**
- * @Author kb
- * @Date 2022/3/12 17:12
- * @Version 1.0
- */
 @Api("用户认证设置")
 @Slf4j
 @RestController
 @RequestMapping("/api/admin/userAuth")
 public class SysUserAuthController {
 
+  @Autowired(required = false)
+  private SysUserAuthService sysUserAuthService;
 
-    @Autowired(required = false)
-    private SysUserAuthService sysUserAuthService;
+  @ApiOperation("保存用户认证")
+  @PostMapping("edit")
+  @PreAuthorize("hasAuthority('system:userAuth:edit')")
+  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.ADMIN, desc = "设置认证信息")
+  public void save(@RequestBody SysUserAuthDto dto) {
+    sysUserAuthService.save(dto);
+  }
 
-    @ApiOperation("保存用户认证")
-    @PostMapping("edit")
-    @PreAuthorize("hasAuthority('system:userAuth:edit')")
-    @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.ADMIN, desc = "设置认证信息")
-    public void save(@RequestBody SysUserAuthDto dto) {
-        sysUserAuthService.save(dto);
-    }
-
-
-    @ApiOperation("保存用户认证")
-    @GetMapping("lsit")
-    public List<SysUserAuthVo> lsit() {
-        return sysUserAuthService.findAuth();
-    }
-
+  @ApiOperation("保存用户认证")
+  @GetMapping("lsit")
+  public List<SysUserAuthVo> lsit() {
+    return sysUserAuthService.findAuth();
+  }
 }

@@ -14,71 +14,67 @@ import java.util.Map;
  * 参加活动资格查询
  *
  * @author kenvin <br>
- *     @Description 业务实现层
  */
 public interface ActivityQualificationService extends IService<ActivityQualification> {
 
   /**
    * 根据条件查询资格列表
    *
-   * @param activityQualification
-   * @return
+   * @param entity ActivityQualification
+   * @return List
    */
-  List<ActivityQualification> findQualificationList(ActivityQualification activityQualification);
+  List<ActivityQualification> findQualificationList(ActivityQualification entity);
 
   /**
    * 查询活动资格列表
    *
-   * @param page
-   * @param activityQualificationQueryDTO
-   * @return
+   * @param page PageDTO
+   * @param dto ActivityQualificationQueryDTO
+   * @return IPage
    */
   IPage<ActivityQualificationVO> list(
-      PageDTO<ActivityQualification> page,
-      ActivityQualificationQueryDTO activityQualificationQueryDTO);
+      PageDTO<ActivityQualification> page, ActivityQualificationQueryDTO dto);
 
   /**
    * 新增活动资格
    *
-   * @param activityQualificationAddDTO
+   * @param dto ActivityQualificationAddDTO
    */
-  void add(ActivityQualificationAddDTO activityQualificationAddDTO);
+  void add(ActivityQualificationAddDTO dto);
 
   /**
    * 审核活动资格
    *
-   * @param activityQualificationAuditStatusDTO
+   * @param dto ActivityQualificationAuditStatusDTO
    */
-  void auditStatus(ActivityQualificationAuditStatusDTO activityQualificationAuditStatusDTO);
+  void auditStatus(ActivityQualificationAuditStatusDTO dto);
 
   /**
    * 更新状态
    *
-   * @param activityQualificationUpdateStatusDTO
+   * @param dto ActivityQualificationUpdateStatusDTO
    */
-  void updateQualificationStatus(
-      ActivityQualificationUpdateStatusDTO activityQualificationUpdateStatusDTO);
+  void updateQualificationStatus(ActivityQualificationUpdateStatusDTO dto);
 
   /**
    * 更新活动资格状态
    *
-   * @param activityQualification
+   * @param activityQualification ActivityQualification
    */
   void updateQualificationStatus(ActivityQualification activityQualification);
 
   /**
    * 删除活动资格
    *
-   * @param ids
+   * @param ids String
    */
   void delete(String ids);
 
   /**
    * 资格检测
    *
-   * @param activityQualificationCheckDTO
-   * @return
+   * @param dto ActivityQualificationCheckDTO
+   * @return Map
    */
-  Map<String, Object> checkQualification(
-      ActivityQualificationCheckDTO activityQualificationCheckDTO);
+  Map<String, Object> checkQualification(ActivityQualificationCheckDTO dto);
 }

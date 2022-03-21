@@ -25,6 +25,7 @@ public class RechargeConfigServiceImpl extends ServiceImpl<RechargeConfigMapper,
             .eq(RechargeConfig::getPayType, rechargeConfig.getPayType())
             .eq(RechargeConfig::getMemberLevel, rechargeConfig.getMemberLevel())
             .one();
+
     if (rechargeConfig.getId() == null && uniqueRechargeConfig != null) {
       throw new ServiceException("该支付类型的充值配置已存在,请刷新页面");
     }

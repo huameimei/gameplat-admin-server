@@ -12,19 +12,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
+ * 中心通知业务处理层
+ *
  * @author lily
- * @description 中心通知业务处理层
  * @date 2021/11/18
  */
 @Service
 public class CentralMessageServiceImpl extends ServiceImpl<CentralMessageMapper, CentralMessage>
     implements CentralMessageService {
 
-  @Autowired private CentralMessageConvert centralMessageConvert;
+  @Autowired private CentralMessageConvert convert;
 
   @Override
   public IPage<CentralMessageVO> selectCentralMessageList(IPage<CentralMessage> page) {
     LambdaQueryChainWrapper<CentralMessage> queryChainWrapper = this.lambdaQuery();
-    return queryChainWrapper.page(page).convert(centralMessageConvert::toVo);
+    return queryChainWrapper.page(page).convert(convert::toVo);
   }
 }

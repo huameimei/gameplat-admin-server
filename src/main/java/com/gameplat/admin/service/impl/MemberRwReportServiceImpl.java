@@ -13,26 +13,22 @@ import com.gameplat.model.entity.member.Member;
 import com.gameplat.model.entity.member.MemberRwReport;
 import com.gameplat.model.entity.member.MemberWithdraw;
 import com.gameplat.model.entity.recharge.RechargeOrder;
-import java.math.BigDecimal;
-import java.util.Date;
-import java.util.Optional;
 import jodd.util.StringUtil;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.math.BigDecimal;
+import java.util.Date;
+import java.util.Optional;
 
 @Service
 @Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)
 public class MemberRwReportServiceImpl extends ServiceImpl<MemberRwReportMapper, MemberRwReport>
     implements MemberRwReportService {
 
-  @Autowired
-  private MemberRwReportMapper memberRwReportMapper;
-
   @Override
-  public void addRecharge(Member member, Integer rechargeCount, RechargeOrder rechargeOrder)
-      throws Exception {
+  public void addRecharge(Member member, Integer rechargeCount, RechargeOrder rechargeOrder) {
     MemberRwReport report = getOrCreateReportUserRw(member, rechargeOrder.getAuditTime());
     BigDecimal amount = rechargeOrder.getPayAmount();
     if (rechargeOrder.getPointFlag() == TrueFalse.TRUE.getValue()
@@ -58,8 +54,8 @@ public class MemberRwReportServiceImpl extends ServiceImpl<MemberRwReportMapper,
       // 计算首充
       if (rechargeCount == 0) {
         String firstRechMark = "首次充值";
-        if (StringUtil.isNotBlank(rechargeOrder.getRemarks()) && !rechargeOrder.getRemarks()
-            .contains(firstRechMark)) {
+        if (StringUtil.isNotBlank(rechargeOrder.getRemarks())
+            && !rechargeOrder.getRemarks().contains(firstRechMark)) {
           rechargeOrder.setRemarks(rechargeOrder.getRemarks() + " [" + firstRechMark + "]");
         } else {
           rechargeOrder.setRemarks(firstRechMark);
@@ -85,28 +81,28 @@ public class MemberRwReportServiceImpl extends ServiceImpl<MemberRwReportMapper,
   }
 
   @Override
-  public void addWithdraw(Member member, Integer withdrawCount, MemberWithdraw memberWithdraw)
-      throws Exception {
+  public void addWithdraw(Member member, Integer withdrawCount, MemberWithdraw memberWithdraw) {
     MemberRwReport report = getOrCreateReportUserRw(member, memberWithdraw.getOperatorTime());
     if (memberWithdraw.getPointFlag() == TrueFalse.TRUE.getValue()) {
       if (memberWithdraw.getCashMode() == CashEnum.CASH_MODE_HAND.getValue()) {
         report.setHandWithdrawCount(report.getHandWithdrawCount() + 1);
-        report
-            .setHandWithdrawMoney(report.getHandWithdrawMoney().add(memberWithdraw.getCashMoney()));
-      }else if (memberWithdraw.getCashMode() == CashEnum.CASH_MODE_USER.getValue()) {
+        report.setHandWithdrawMoney(
+            report.getHandWithdrawMoney().add(memberWithdraw.getCashMoney()));
+      } else if (memberWithdraw.getCashMode() == CashEnum.CASH_MODE_USER.getValue()) {
         report.setWithdrawCount(report.getWithdrawCount() + 1);
         report.setWithdrawMoney(report.getWithdrawMoney().add(memberWithdraw.getCashMoney()));
-      }else if (memberWithdraw.getCashMode() == CashEnum.CASH_MODE_THIRD.getValue()) {
+      } else if (memberWithdraw.getCashMode() == CashEnum.CASH_MODE_THIRD.getValue()) {
         report.setThirdWithdrawCount(report.getWithdrawCount() + 1);
-        report.setThirdWithdrawMoney(report.getThirdWithdrawMoney().add(memberWithdraw.getCashMoney()));
+        report.setThirdWithdrawMoney(
+            report.getThirdWithdrawMoney().add(memberWithdraw.getCashMoney()));
       }
       // 计算首提
       if (withdrawCount == 0) {
         String firstWithdrawMark = "首次出款";
-        if (StringUtil.isNotBlank(memberWithdraw.getCashReason()) && !memberWithdraw.getCashReason()
-            .contains(firstWithdrawMark)) {
-          memberWithdraw
-              .setCashReason(memberWithdraw.getCashReason() + " [" + firstWithdrawMark + "]");
+        if (StringUtil.isNotBlank(memberWithdraw.getCashReason())
+            && !memberWithdraw.getCashReason().contains(firstWithdrawMark)) {
+          memberWithdraw.setCashReason(
+              memberWithdraw.getCashReason() + " [" + firstWithdrawMark + "]");
         } else {
           memberWithdraw.setCashReason(firstWithdrawMark);
         }
@@ -122,7 +118,7 @@ public class MemberRwReportServiceImpl extends ServiceImpl<MemberRwReportMapper,
     this.saveOrUpdate(report);
   }
 
-  private MemberRwReport getOrCreateReportUserRw(Member member, Date date) throws Exception {
+  private MemberRwReport getOrCreateReportUserRw(Member member, Date date) {
     MemberRwReport report = this.queryByMemberAndDate(member.getId(), date);
     // 新建记录 初始化
     if (null == report.getId()) {
@@ -163,8 +159,12 @@ public class MemberRwReportServiceImpl extends ServiceImpl<MemberRwReportMapper,
       report.setVirtualWithdrawMoney(BigDecimal.ZERO);
       report.setVirtualWithdrawNumber(BigDecimal.ZERO);
 
-      String[] superPaths = UserDlUtil.getDlAccount(StringUtils.isEmpty(member.getSuperPath()) ? "/webRoot/"+report.getAccount(): member.getSuperPath());
-      //String[] superPaths = UserDlUtil.getDlAccount(member.getSuperPath());
+      String[] superPaths =
+          UserDlUtil.getDlAccount(
+              StringUtils.isEmpty(member.getSuperPath())
+                  ? "/webRoot/" + report.getAccount()
+                  : member.getSuperPath());
+      // String[] superPaths = UserDlUtil.getDlAccount(member.getSuperPath());
       report.setDgdAccount(superPaths[0]);
       report.setGdAccount(superPaths[1]);
       report.setZdlAccount(superPaths[2]);
@@ -174,8 +174,11 @@ public class MemberRwReportServiceImpl extends ServiceImpl<MemberRwReportMapper,
   }
 
   public MemberRwReport queryByMemberAndDate(Long memberId, Date statTime) {
-    return Optional.ofNullable(this.lambdaQuery().eq(MemberRwReport::getMemberId, memberId)
-        .eq(MemberRwReport::getStatTime, DateUtil.dateToYMD(statTime)).one()).orElse(new MemberRwReport());
+    return Optional.ofNullable(
+            this.lambdaQuery()
+                .eq(MemberRwReport::getMemberId, memberId)
+                .eq(MemberRwReport::getStatTime, DateUtil.dateToYMD(statTime))
+                .one())
+        .orElse(new MemberRwReport());
   }
-
 }

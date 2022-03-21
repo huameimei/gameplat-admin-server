@@ -10,6 +10,7 @@ import com.gameplat.common.enums.LimitEnums;
 import com.gameplat.common.model.bean.limit.MemberWithdrawLimit;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -43,9 +44,10 @@ public class ValidWithdrawController {
     validWithdrawService.updateValidWithdraw(dto);
   }
 
+  @SneakyThrows
   @ApiOperation(value = "清除会员打码量记录")
   @DeleteMapping("/delValidWithdraw")
-  public void delValidWithdraw(@RequestParam("member") String member) throws Exception {
+  public void delValidWithdraw(@RequestParam("member") String member) {
     if (StringUtils.isEmpty(member)) {
       throw new ServiceException("会员账号不能空！");
     }

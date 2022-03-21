@@ -34,7 +34,6 @@ public class ChatPushPlanServiceImpl extends ServiceImpl<ChatPushPlanMapper, Cha
 
   @Autowired private ChatPushPlanConvert chatPushPlanConvert;
 
-  /** 游戏维护更新自定义中奖推送 */
   @Override
   public void updatePushPlan(String gameId, int gameStatus) {
     Integer state = null;
@@ -42,7 +41,6 @@ public class ChatPushPlanServiceImpl extends ServiceImpl<ChatPushPlanMapper, Cha
     if (gameStatus != 1) {
       state = 0;
     }
-    ChatPushPlan chatPushPlan = new ChatPushPlan();
     LambdaUpdateWrapper<ChatPushPlan> updateWrapper = new LambdaUpdateWrapper<>();
     updateWrapper
         .set(ObjectUtil.isNotEmpty(gameStatus), ChatPushPlan::getGameStatus, gameStatus)
@@ -51,7 +49,6 @@ public class ChatPushPlanServiceImpl extends ServiceImpl<ChatPushPlanMapper, Cha
     update(updateWrapper);
   }
 
-  /** 自定义中奖推送分页列表 */
   @Override
   public IPage<ChatPushPlanVO> page(PageDTO<ChatPushPlan> page, ChatPushPlanQueryDTO dto) {
     return this.lambdaQuery()
@@ -63,13 +60,11 @@ public class ChatPushPlanServiceImpl extends ServiceImpl<ChatPushPlanMapper, Cha
         .convert(chatPushPlanConvert::toVo);
   }
 
-  /** 根据id查询 */
   @Override
   public ChatPushPlan one(ChatPushPlan dto) {
     return this.lambdaQuery().eq(ChatPushPlan::getId, dto.getId()).one();
   }
 
-  /** 新增自定义中奖推送 */
   @Override
   public void add(ChatPushPlanAddOrEditDTO dto) {
     if (dto.getMinWinMoney() > dto.getMaxWinMoney()) {
@@ -82,7 +77,6 @@ public class ChatPushPlanServiceImpl extends ServiceImpl<ChatPushPlanMapper, Cha
     save(chatPushPlanConvert.toEntity(dto));
   }
 
-  /** 编辑自定义中奖推送 */
   @Override
   public void edit(ChatPushPlanAddOrEditDTO dto) {
     if (StringUtils.isEmpty(dto.getId())) {
@@ -105,7 +99,6 @@ public class ChatPushPlanServiceImpl extends ServiceImpl<ChatPushPlanMapper, Cha
     updateById(chatPushPlanConvert.toEntity(dto));
   }
 
-  /** 根据Id删除中奖推送 */
   @Override
   public void remove(Long id) {
     if (StringUtils.isEmpty(id)) {

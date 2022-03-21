@@ -12,19 +12,19 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 public class SalaryPeriodsVO {
-    private Long id;
-    private String startDate;
-    private String endDate;
-    private Integer status;
-    private String gameType;
-    private String gameTypeName;
-    private String[] gameCheckList;
-    private String agentLevel;
-    private String agentLevelLebel;
-    private int[] agentCheckList;
-    private Date createTime;
-    private String createBy;
-    private String updateBy;
-    private Date updateTime;
-    private String remark;
+  private Long id;
+  private String startDate;
+  private String endDate;
+  private Integer status;
+  private String gameType;
+  private String gameTypeName;
+  private String[] gameCheckList;
+  private String agentLevel;
+  private String agentLevelLebel;
+  private int[] agentCheckList;
+  private Date createTime;
+  private String createBy;
+  private String updateBy;
+  private Date updateTime;
+  private String remark;
 }

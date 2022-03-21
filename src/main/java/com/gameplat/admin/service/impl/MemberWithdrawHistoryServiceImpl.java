@@ -28,22 +28,17 @@ public class MemberWithdrawHistoryServiceImpl
     extends ServiceImpl<MemberWithdrawHistoryMapper, MemberWithdrawHistory>
     implements MemberWithdrawHistoryService {
 
-  @Autowired private MemberWithdrawHistoryConvert userWithdrawHistoryConvert;
-
-  @Autowired(required = false) private MemberWithdrawHistoryMapper memberWithdrawHistoryMapper;
-
-
-
-  /**提现会员、代理 */
+  /** 提现会员、代理 */
   private final String WITH_FORMAL_TYPE = "HY";
-
   /** 提现推广 */
   private final String WITH_TEST_TYPE = "VHY";
-
-
-
-  /**查询会员类型 */
+  /** 查询会员类型 */
   private final String RECH_FORMAL_TYPE_QUERY = "M,A";
+
+  @Autowired private MemberWithdrawHistoryConvert userWithdrawHistoryConvert;
+
+  @Autowired(required = false)
+  private MemberWithdrawHistoryMapper memberWithdrawHistoryMapper;
 
   @Override
   public IPage<MemberWithdrawHistoryVO> findPage(
@@ -51,10 +46,11 @@ public class MemberWithdrawHistoryServiceImpl
     LambdaQueryWrapper<MemberWithdrawHistory> query = buildSql(dto);
     query.orderBy(
         ObjectUtils.isNotEmpty(dto.getOrder()),
-        ObjectUtils.isEmpty(dto.getOrder()) ? false : dto.getOrder().equals("ASC"),
-        dto.getOrderBy().equals("createTime")
+        !ObjectUtils.isEmpty(dto.getOrder()) && "ASC".equals(dto.getOrder()),
+        "createTime".equals(dto.getOrderBy())
             ? MemberWithdrawHistory::getCreateTime
             : MemberWithdrawHistory::getOperatorTime);
+
     return this.page(page, query).convert(userWithdrawHistoryConvert::toVo);
   }
 
@@ -100,17 +96,20 @@ public class MemberWithdrawHistoryServiceImpl
             ObjectUtils.isNotEmpty(dto.getCashMoneyFromTo()),
             MemberWithdrawHistory::getCashMoney,
             dto.getCashMoneyFromTo())
-       /* .eq(
-            ObjectUtils.isNotEmpty(dto.getMemberType()),
+        /* .eq(
+        ObjectUtils.isNotEmpty(dto.getMemberType()),
+        MemberWithdrawHistory::getMemberType,
+        dto.getMemberType())*/
+        .in(
+            ObjectUtils.isNotEmpty(dto.getMemberType())
+                && dto.getMemberType().equalsIgnoreCase(WITH_FORMAL_TYPE),
             MemberWithdrawHistory::getMemberType,
-            dto.getMemberType())*/
-        .in(ObjectUtils.isNotEmpty(dto.getMemberType())
-                        && dto.getMemberType().equalsIgnoreCase(WITH_FORMAL_TYPE),
-                MemberWithdrawHistory::getMemberType,
-                RECH_FORMAL_TYPE_QUERY.split(","))
-        .eq(ObjectUtils.isNotEmpty(dto.getMemberType())
-                        && dto.getMemberType().equalsIgnoreCase(WITH_TEST_TYPE),
-                MemberWithdrawHistory::getMemberType, dto.getMemberType())
+            RECH_FORMAL_TYPE_QUERY.split(","))
+        .eq(
+            ObjectUtils.isNotEmpty(dto.getMemberType())
+                && dto.getMemberType().equalsIgnoreCase(WITH_TEST_TYPE),
+            MemberWithdrawHistory::getMemberType,
+            dto.getMemberType())
         .eq(
             ObjectUtils.isNotEmpty(dto.getCashOrderNo()),
             MemberWithdrawHistory::getCashOrderNo,

@@ -28,200 +28,215 @@ import java.util.Objects;
 
 /**
  * @author martin
- * @description
  * @date 2022/3/10
  */
 @Service
 @Slf4j
 @Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)
-public class TenantSettingServiceImpl extends ServiceImpl<TenantSettingMapper, TenantSetting> implements TenantSettingService {
+public class TenantSettingServiceImpl extends ServiceImpl<TenantSettingMapper, TenantSetting>
+    implements TenantSettingService {
 
-    @Resource
-    private TenantSettingMapper tenantSettingMapper;
+  @Resource private TenantSettingMapper tenantSettingMapper;
 
-    @Override
-    public List<TenantSetting> getTenantSetting(TenantSettingVO query) {
-        LambdaQueryChainWrapper<TenantSetting> lambdaQuery = this.lambdaQuery();
-        if (StringUtils.isNotEmpty(query.getSettingType())) {
-            lambdaQuery.eq(TenantSetting::getSettingType, query.getSettingType());
+  /**
+   * 从当前访问线程中获取租户数据源标识设
+   *
+   * @return String
+   */
+  public static String getDBSuffix() {
+    StrategyContext strategy = DyDataSourceContextHolder.getStrategyContext();
+    return strategy == null ? null : strategy.getDbSuffix();
+  }
+
+  @Override
+  public List<TenantSetting> getTenantSetting(TenantSettingVO query) {
+    LambdaQueryChainWrapper<TenantSetting> lambdaQuery = this.lambdaQuery();
+    if (StringUtils.isNotEmpty(query.getSettingType())) {
+      lambdaQuery.eq(TenantSetting::getSettingType, query.getSettingType());
+    }
+    if (StringUtils.isNotEmpty(query.getSettingCode())) {
+      lambdaQuery.eq(TenantSetting::getSettingCode, query.getSettingCode());
+    }
+    if (Objects.nonNull(query.getDisplay())) {
+      lambdaQuery.eq(TenantSetting::getDisplay, query.getDisplay());
+    }
+    if (StringUtils.isNotEmpty(query.getExtend4())) {
+      lambdaQuery.eq(TenantSetting::getExtend4, query.getExtend4());
+    }
+    lambdaQuery.orderByAsc(TenantSetting::getSort);
+    return lambdaQuery.list();
+  }
+
+  @Override
+  public boolean isExistTenantTheme(String theme) {
+    return CollectionUtils.isNotEmpty(
+        this.lambdaQuery()
+            .eq(TenantSetting::getSettingType, Constants.TEMPLATE_CONFIG_THEME)
+            .eq(TenantSetting::getSettingCode, theme)
+            .list());
+  }
+
+  @Override
+  public int initTenantNavigation(String theme, String settingType) {
+    return this.getBaseMapper().initTenantNavigation(theme, settingType);
+  }
+
+  @Override
+  public IPage<TenantSetting> getStartImagePage(
+      IPage<TenantSetting> page, TenantSetting tenantSetting) {
+    LambdaQueryWrapper<TenantSetting> queryWrapper = new LambdaQueryWrapper<TenantSetting>();
+    queryWrapper.eq(null != tenantSetting.getId(), TenantSetting::getId, tenantSetting.getId());
+    queryWrapper.eq(
+        null != tenantSetting.getDisplay(), TenantSetting::getDisplay, tenantSetting.getDisplay());
+    queryWrapper.eq(
+        StringUtils.isNotBlank(tenantSetting.getSettingType()),
+        TenantSetting::getSettingType,
+        tenantSetting.getSettingType());
+    queryWrapper.eq(
+        StringUtils.isNotBlank(tenantSetting.getSettingCode()),
+        TenantSetting::getSettingCode,
+        tenantSetting.getSettingCode());
+    queryWrapper.eq(
+        StringUtils.isNotBlank(tenantSetting.getSettingValue()),
+        TenantSetting::getSettingValue,
+        tenantSetting.getSettingValue());
+    queryWrapper.eq(
+        StringUtils.isNotBlank(tenantSetting.getSettingLabel()),
+        TenantSetting::getSettingLabel,
+        tenantSetting.getSettingLabel());
+    return this.page(page, queryWrapper);
+  }
+
+  @Override
+  public void insertStartImagePage(TenantSetting tenantSetting) {
+    LambdaQueryWrapper<TenantSetting> queryWrapper = new LambdaQueryWrapper<TenantSetting>();
+    queryWrapper.eq(TenantSetting::getSettingType, tenantSetting.getSettingType());
+    queryWrapper.eq(TenantSetting::getDisplay, 1);
+    List<TenantSetting> list = this.list(queryWrapper);
+    if (null == tenantSetting.getId()) {
+      if (null != tenantSetting.getDisplay() && 1 == tenantSetting.getDisplay()) {
+        if (!CollectionUtils.isEmpty(list) && list.size() > 2) {
+          throw new ServiceException("开启的图片/视频已达上线 (最多开启三个)");
         }
-        if (StringUtils.isNotEmpty(query.getSettingCode())) {
-            lambdaQuery.eq(TenantSetting::getSettingCode, query.getSettingCode());
+      }
+      // 新增
+      this.save(tenantSetting);
+    } else {
+      boolean flag = true;
+      if (!CollectionUtils.isEmpty(list)
+          && list.size() > 2
+          && null != tenantSetting.getDisplay()
+          && 1 == tenantSetting.getDisplay()) {
+        for (TenantSetting e : list) {
+          if (tenantSetting.getId().equals(e.getId())) {
+            flag = false;
+            break;
+          }
         }
-        if (Objects.nonNull(query.getDisplay())) {
-            lambdaQuery.eq(TenantSetting::getDisplay, query.getDisplay());
+        if (flag) {
+          throw new ServiceException("开启的图片/视频已达上线 (最多开启三个)");
         }
-        if (StringUtils.isNotEmpty(query.getExtend4())) {
-            lambdaQuery.eq(TenantSetting::getExtend4, query.getExtend4());
-        }
-        lambdaQuery.orderByAsc(TenantSetting::getSort);
-        return lambdaQuery.list();
+      }
+      this.updateById(tenantSetting);
     }
+  }
 
-    @Override
-    public boolean isExistTenantTheme(String theme) {
-        List<TenantSetting> list = this.lambdaQuery().
-                eq(TenantSetting::getSettingType, Constants.TEMPLATE_CONFIG_THEME).
-                eq(TenantSetting::getSettingCode, theme).list();
-        return CollectionUtils.isNotEmpty(list) ? true : false;
+  @Override
+  public void deleteStartImagePage(TenantSetting tenantSetting) {
+    LambdaQueryWrapper<TenantSetting> queryWrapper = new LambdaQueryWrapper<TenantSetting>();
+    queryWrapper.eq(TenantSetting::getId, tenantSetting.getId());
+    queryWrapper.eq(TenantSetting::getSettingType, tenantSetting.getSettingType());
+    this.removeById(queryWrapper);
+  }
+
+  @Override
+  public List<TenantSetting> getTenantSetting(TenantSetting tenantSetting) {
+    LambdaQueryWrapper<TenantSetting> queryWrapper = new LambdaQueryWrapper<TenantSetting>();
+    queryWrapper.eq(TenantSetting::getDisplay, tenantSetting.getDisplay());
+    queryWrapper.eq(TenantSetting::getSettingType, tenantSetting.getSettingType());
+    return this.list(queryWrapper);
+  }
+
+  @Override
+  public List<TenantSetting> getAppNavigation(TenantSettingVO vo) {
+    if (vo.getSettingType().equals(Constants.TEMPLATE_CONFIG_THEME)) {
+      // 查询主题模板只取租户开启的主题
+      vo.setDisplay(1);
+    } else if (vo.getSettingType().equals(Constants.SETTING_H5_NAVIGATION)
+        || vo.getSettingType().equals(Constants.SETTING_APP_NAVIGATION)) {
+      // 如果没传主题，传默认模板
+      if (StringUtils.isBlank(vo.getExtend4())) {
+        vo.setTenant("default");
+      }
     }
+    List<TenantSetting> list = tenantSettingMapper.getBackendAppNavigationList(vo);
+    if (list.isEmpty()) {
+      // 如果查询为空，读取模板数据并插入返回
+      LambdaQueryWrapper<TenantSetting> queryWrapper = new LambdaQueryWrapper<TenantSetting>();
+      queryWrapper.eq(TenantSetting::getTenant, "default");
+      queryWrapper.eq(TenantSetting::getSettingType, vo.getSettingType());
 
-    @Override
-    public int initTenantNavigation(String theme, String settingType) {
-        return this.getBaseMapper().initTenantNavigation(theme, settingType);
+      list = this.list(queryWrapper);
+      list.forEach(
+          x -> {
+            x.setExtend4(vo.getExtend4());
+            x.setTenant(getDBSuffix());
+          });
+      if (!list.isEmpty()) {
+        this.saveBatch(list);
+      }
+      list = tenantSettingMapper.getBackendAppNavigationList(vo);
     }
+    return list;
+  }
 
-    @Override
-    public IPage<TenantSetting> getStartImagePage(IPage<TenantSetting> page, TenantSetting tenantSetting) {
-        LambdaQueryWrapper<TenantSetting> queryWrapper = new LambdaQueryWrapper<TenantSetting>();
-        queryWrapper.eq(null != tenantSetting.getId(),TenantSetting::getId,tenantSetting.getId());
-        queryWrapper.eq(null != tenantSetting.getDisplay(),TenantSetting::getDisplay,tenantSetting.getDisplay());
-        queryWrapper.eq(StringUtils.isNotBlank(tenantSetting.getSettingType()),TenantSetting::getSettingType,tenantSetting.getSettingType());
-        queryWrapper.eq(StringUtils.isNotBlank(tenantSetting.getSettingCode()),TenantSetting::getSettingCode,tenantSetting.getSettingCode());
-        queryWrapper.eq(StringUtils.isNotBlank(tenantSetting.getSettingValue()),TenantSetting::getSettingValue,tenantSetting.getSettingValue());
-        queryWrapper.eq(StringUtils.isNotBlank(tenantSetting.getSettingLabel()),TenantSetting::getSettingLabel,tenantSetting.getSettingLabel());
-        return this.page(page,queryWrapper);
+  @Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)
+  @Override
+  public void updateAppNavigation(TenantSettingVO vo) {
+    // 查询游戏必要code
+    if (Constants.SETTING_APP_NAVIGATION.equals(vo.getSettingType())
+        || Constants.SETTING_H5_NAVIGATION.equals(vo.getSettingType())) {
+      if (StringUtils.isNotBlank(vo.getExtend2())) {
+        GameKindVO gameList = tenantSettingMapper.getGameList(vo.getExtend2());
+        vo.setExtend3(JSON.toJSONString(gameList));
+      }
     }
-
-    @Override
-    public void insertStartImagePage(TenantSetting tenantSetting) {
-        LambdaQueryWrapper<TenantSetting> queryWrapper = new LambdaQueryWrapper<TenantSetting>();
-        queryWrapper.eq(TenantSetting::getSettingType, tenantSetting.getSettingType());
-        queryWrapper.eq(TenantSetting::getDisplay, 1);
-        List<TenantSetting> list = this.list(queryWrapper);
-        if (null == tenantSetting.getId()) {
-            if (null != tenantSetting.getDisplay() && 1 == tenantSetting.getDisplay()) {
-                if (!CollectionUtils.isEmpty(list) && list.size() > 2) {
-                    throw new ServiceException("开启的图片/视频已达上线 (最多开启三个)");
-                }
-            }
-            // 新增
-            this.save(tenantSetting);
-        } else {
-            Boolean flag = true;
-            if (!CollectionUtils.isEmpty(list) && list.size() > 2 && null != tenantSetting.getDisplay() && 1 == tenantSetting.getDisplay()) {
-                for (TenantSetting e : list) {
-                    if (tenantSetting.getId().equals(e.getId())) {
-                        flag = false;
-                        break;
-                    }
-                }
-                if (flag) {
-                    throw new ServiceException("开启的图片/视频已达上线 (最多开启三个)");
-                }
-            }
-            this.updateById(tenantSetting);
-        }
+    // 广场导航栏选择一个首页后，其他选择的首页自动置为0
+    else if (Constants.SETTING_SQUARE_NAVIGATION.equals(vo.getSettingType())
+        && vo.getIsIndex() == 1) {
+      TenantSetting tenantSetting1 = new TenantSetting();
+      tenantSetting1.setSettingType(Constants.SETTING_SQUARE_NAVIGATION);
+      tenantSetting1.setIsIndex(0);
+      tenantSettingMapper.updateIndex(tenantSetting1);
     }
+    HashMap<Object, Object> map = new HashMap<>(8);
+    map.put("en-US", vo.getEnUs());
+    map.put("in-ID", vo.getInId());
+    map.put("th-TH", vo.getThTh());
+    map.put("vi-VN", vo.getViVn());
+    map.put("zh-CN", vo.getZhCn());
+    vo.setSettingValue(JSON.toJSONString(map));
+    this.updateById(vo);
+    // todo 刷新缓存
+    // flushTenantSetting(tenantSetting);
+  }
 
-    @Override
-    public void deleteStartImagePage(TenantSetting tenantSetting) {
-        LambdaQueryWrapper<TenantSetting> queryWrapper = new LambdaQueryWrapper<TenantSetting>();
-        queryWrapper.eq(TenantSetting::getId,tenantSetting.getId());
-        queryWrapper.eq(TenantSetting::getSettingType,tenantSetting.getSettingType());
-        this.removeById(queryWrapper);
+  @Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)
+  @Override
+  public void updateBatchTenantSetting(List<TenantSetting> tenantSettings) {
+    if (tenantSettings == null || tenantSettings.isEmpty()) {
+      throw new ServiceException("数据错误");
     }
+    LambdaQueryWrapper<TenantSetting> queryWrapper = new LambdaQueryWrapper<TenantSetting>();
+    queryWrapper.eq(TenantSetting::getId, tenantSettings.get(0).getId());
+    TenantSetting sysTenantSetting = this.getOne(queryWrapper);
+    this.updateBatchById(tenantSettings);
+    // todo 刷新缓存
+    // kgRedisService.flushTenantSetting(sysTenantSetting);
+  }
 
-    @Override
-    public List<TenantSetting> getTenantSetting(TenantSetting tenantSetting) {
-        LambdaQueryWrapper<TenantSetting> queryWrapper = new LambdaQueryWrapper<TenantSetting>();
-        queryWrapper.eq(TenantSetting::getDisplay,tenantSetting.getDisplay());
-        queryWrapper.eq(TenantSetting::getSettingType,tenantSetting.getSettingType());
-        return this.list(queryWrapper);
-    }
-
-    @Override
-    public List<TenantSetting> getAppNavigation(TenantSettingVO tenantSettingVO) {
-        if (tenantSettingVO.getSettingType().equals(Constants.TEMPLATE_CONFIG_THEME)) {
-            // 查询主题模板只取租户开启的主题
-            tenantSettingVO.setDisplay(1);
-        } else if (tenantSettingVO.getSettingType().equals(Constants.SETTING_H5_NAVIGATION) || tenantSettingVO.getSettingType().equals(Constants.SETTING_APP_NAVIGATION)) {
-            // 如果没传主题，传默认模板
-            if (StringUtils.isBlank(tenantSettingVO.getExtend4())) {
-                tenantSettingVO.setTenant("default");
-            }
-        }
-        List<TenantSetting> list = tenantSettingMapper.getBackendAppNavigationList(tenantSettingVO);
-        if (list.isEmpty()) {
-            // 如果查询为空，读取模板数据并插入返回
-            LambdaQueryWrapper<TenantSetting> queryWrapper = new LambdaQueryWrapper<TenantSetting>();
-            queryWrapper.eq(TenantSetting::getTenant,"default");
-            queryWrapper.eq(TenantSetting::getSettingType,tenantSettingVO.getSettingType());
-
-            list = this.list(queryWrapper);
-            list.forEach(x -> {
-                x.setExtend4(tenantSettingVO.getExtend4());
-                x.setTenant(getDBSuffix());
-            });
-            if (!list.isEmpty()) {
-                this.saveBatch(list);
-            }
-            list = tenantSettingMapper.getBackendAppNavigationList(tenantSettingVO);
-        }
-        return list;
-    }
-
-    @Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)
-    @Override
-    public void updateAppNavigation(TenantSettingVO tenantSetting) {
-        // 查询游戏必要code
-        if (Constants.SETTING_APP_NAVIGATION.equals(tenantSetting.getSettingType()) || Constants.SETTING_H5_NAVIGATION.equals(tenantSetting.getSettingType())) {
-            if (StringUtils.isNotBlank(tenantSetting.getExtend2())) {
-                GameKindVO gameList = tenantSettingMapper.getGameList(tenantSetting.getExtend2());
-                tenantSetting.setExtend3(JSON.toJSONString(gameList));
-            }
-        }
-        // 广场导航栏选择一个首页后，其他选择的首页自动置为0
-        else if (Constants.SETTING_SQUARE_NAVIGATION.equals(tenantSetting.getSettingType()) && tenantSetting.getIsIndex() == 1) {
-            TenantSetting tenantSetting1 = new TenantSetting();
-            tenantSetting1.setSettingType(Constants.SETTING_SQUARE_NAVIGATION);
-            tenantSetting1.setIsIndex(0);
-            tenantSettingMapper.updateIndex(tenantSetting1);
-        }
-        HashMap<Object, Object> map = new HashMap<>(8);
-        map.put("en-US", tenantSetting.getEnUs());
-        map.put("in-ID", tenantSetting.getInId());
-        map.put("th-TH", tenantSetting.getThTh());
-        map.put("vi-VN", tenantSetting.getViVn());
-        map.put("zh-CN", tenantSetting.getZhCn());
-        tenantSetting.setSettingValue(JSON.toJSONString(map));
-        this.updateById(tenantSetting);
-        //todo 刷新缓存
-        //flushTenantSetting(tenantSetting);
-    }
-
-    @Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)
-    @Override
-    public void updateBatchTenantSetting(List<TenantSetting> tenantSettings) {
-        if (tenantSettings == null || tenantSettings.isEmpty()) {
-            throw new ServiceException("数据错误");
-        }
-        LambdaQueryWrapper<TenantSetting> queryWrapper = new LambdaQueryWrapper<TenantSetting>();
-        queryWrapper.eq(TenantSetting::getId,tenantSettings.get(0).getId());
-        TenantSetting sysTenantSetting = this.getOne(queryWrapper);
-        this.updateBatchById(tenantSettings);
-        //todo 刷新缓存
-        //kgRedisService.flushTenantSetting(sysTenantSetting);
-    }
-
-    /**
-     * 删除游戏浮窗类型信息
-     *
-     * @param id
-     *            游戏浮窗类型ID
-     * @return 结果
-     */
-    @Override
-    public void deleteSysFloatById(Integer id) {
-        this.removeById(id);
-    }
-
-    /**
-     * 从当前访问线程中获取租户数据源标识设
-     * @return
-     */
-    public static String getDBSuffix() {
-        StrategyContext strategy = DyDataSourceContextHolder.getStrategyContext();
-        return strategy == null ? null : strategy.getDbSuffix();
-    }
+  @Override
+  public void deleteSysFloatById(Integer id) {
+    this.removeById(id);
+  }
 }

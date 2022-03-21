@@ -14,16 +14,14 @@ import java.util.List;
  */
 public interface SysMessageService extends IService<SysMessage> {
 
-    /**
-     * page list
-     */
-    IPage<SysMessage> pageList(IPage<SysMessage> page, SysMessageDTO dto);
+  /** page list */
+  IPage<SysMessage> pageList(IPage<SysMessage> page, SysMessageDTO dto);
 
-    /**
-     * 最近的系统消息
-     *
-     * @param dto
-     * @return
-     */
-    List<SysMessage> lastList(SysMessageDTO dto);
+  /**
+   * 最近的系统消息
+   *
+   * @param dto
+   * @return
+   */
+  List<SysMessage> lastList(SysMessageDTO dto);
 }

@@ -11,8 +11,9 @@ import com.gameplat.model.entity.member.MemberWeal;
 import javax.servlet.http.HttpServletRequest;
 
 /**
+ * 福利发放
+ *
  * @author lily
- * @description 福利发放
  * @date 2021/11/20
  */
 public interface MemberWealService extends IService<MemberWeal> {

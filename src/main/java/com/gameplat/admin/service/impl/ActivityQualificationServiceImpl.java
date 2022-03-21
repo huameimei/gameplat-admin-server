@@ -85,34 +85,29 @@ public class ActivityQualificationServiceImpl
 
   @Override
   public IPage<ActivityQualificationVO> list(
-      PageDTO<ActivityQualification> page,
-      ActivityQualificationQueryDTO activityQualificationQueryDTO) {
+      PageDTO<ActivityQualification> page, ActivityQualificationQueryDTO dto) {
     LambdaQueryChainWrapper<ActivityQualification> queryChainWrapper = this.lambdaQuery();
     queryChainWrapper
         .eq(
-            activityQualificationQueryDTO.getActivityId() != null
-                && activityQualificationQueryDTO.getActivityId() != 0,
+            dto.getActivityId() != null && dto.getActivityId() != 0,
             ActivityQualification::getActivityId,
-            activityQualificationQueryDTO.getActivityId())
+            dto.getActivityId())
         .like(
-            StringUtils.isNotBlank(activityQualificationQueryDTO.getUsername()),
+            StringUtils.isNotBlank(dto.getUsername()),
             ActivityQualification::getUsername,
-            activityQualificationQueryDTO.getUsername())
+            dto.getUsername())
+        .eq(dto.getStatus() != null, ActivityQualification::getStatus, dto.getStatus())
         .eq(
-            activityQualificationQueryDTO.getStatus() != null,
-            ActivityQualification::getStatus,
-            activityQualificationQueryDTO.getStatus())
-        .eq(
-            activityQualificationQueryDTO.getQualificationStatus() != null,
+            dto.getQualificationStatus() != null,
             ActivityQualification::getQualificationStatus,
-            activityQualificationQueryDTO.getQualificationStatus());
+            dto.getQualificationStatus());
     return queryChainWrapper.page(page).convert(activityQualificationConvert::toVo);
   }
 
   @Override
-  public void add(ActivityQualificationAddDTO activityQualificationAddDTO) {
-    Integer type = activityQualificationAddDTO.getType();
-    String username = activityQualificationAddDTO.getUsername();
+  public void add(ActivityQualificationAddDTO dto) {
+    Integer type = dto.getType();
+    String username = dto.getUsername();
     if (type == null) {
       throw new ServiceException("活动类型不能为空");
     }
@@ -133,8 +128,7 @@ public class ActivityQualificationServiceImpl
       }
       // 1 活动大厅  2 红包雨
       if (type == 1) {
-        List<ActivityLobbyDTO> activityLobbyList =
-            activityQualificationAddDTO.getActivityLobbyList();
+        List<ActivityLobbyDTO> activityLobbyList = dto.getActivityLobbyList();
         if (CollectionUtils.isEmpty(activityLobbyList)) {
           throw new ServiceException("活动大厅数据不能为空");
         }
@@ -183,11 +177,9 @@ public class ActivityQualificationServiceImpl
   }
 
   @Override
-  public void auditStatus(ActivityQualificationAuditStatusDTO activityQualificationAuditStatusDTO) {
+  public void auditStatus(ActivityQualificationAuditStatusDTO dto) {
     List<ActivityQualification> qualificationManageStatusList =
-        this.lambdaQuery()
-            .in(ActivityQualification::getId, activityQualificationAuditStatusDTO.getIdList())
-            .list();
+        this.lambdaQuery().in(ActivityQualification::getId, dto.getIdList()).list();
     if (CollectionUtils.isEmpty(qualificationManageStatusList)) {
       throw new ServiceException("您审核资格不存在！");
     }
@@ -251,23 +243,19 @@ public class ActivityQualificationServiceImpl
   }
 
   @Override
-  public void updateQualificationStatus(
-      ActivityQualificationUpdateStatusDTO activityQualificationUpdateStatusDTO) {
-    if (activityQualificationUpdateStatusDTO.getId() == null
-        || activityQualificationUpdateStatusDTO.getId() == 0) {
+  public void updateQualificationStatus(ActivityQualificationUpdateStatusDTO dto) {
+    if (dto.getId() == null || dto.getId() == 0) {
       throw new ServiceException("资格id不能为空");
     }
-    ActivityQualification activityQualification =
-        this.getById(activityQualificationUpdateStatusDTO.getId());
+    ActivityQualification activityQualification = this.getById(dto.getId());
     if (activityQualification == null) {
       throw new ServiceException("该活动资格不存在");
     }
     if (activityQualification.getStatus() == 2) {
       throw new ServiceException("审核通过的记录不能修改活动资格状态");
     }
-    if (activityQualificationUpdateStatusDTO.getQualificationStatus() != null) {
-      activityQualification.setQualificationStatus(
-          activityQualificationUpdateStatusDTO.getQualificationStatus());
+    if (dto.getQualificationStatus() != null) {
+      activityQualification.setQualificationStatus(dto.getQualificationStatus());
     }
     if (!this.updateById(activityQualification)) {
       throw new ServiceException("修改活动资格状态失败！");
@@ -309,12 +297,11 @@ public class ActivityQualificationServiceImpl
   }
 
   @Override
-  public Map<String, Object> checkQualification(
-      ActivityQualificationCheckDTO activityQualificationCheckDTO) {
+  public Map<String, Object> checkQualification(ActivityQualificationCheckDTO dto) {
     MemberInfoVO memberInfo = null;
     Map<String, Object> retMap = new HashMap<>(3);
     try {
-      memberInfo = memberService.getMemberInfo(activityQualificationCheckDTO.getUsername());
+      memberInfo = memberService.getMemberInfo(dto.getUsername());
       if (memberInfo == null) {
         throw new ServiceException("账号不存在,请输入真实有效的账号");
       }
@@ -325,15 +312,12 @@ public class ActivityQualificationServiceImpl
       retMap.put("message", e.getMessage());
       return retMap;
     }
-    Date countDate =
-        DateUtil.strToDate(activityQualificationCheckDTO.getCountDate(), "yyyy-MM-dd HH:mm:ss");
+    Date countDate = DateUtil.strToDate(dto.getCountDate(), "yyyy-MM-dd HH:mm:ss");
     ActivityLobby activityLobby = null;
     List<ActivityQualification> manageList;
     try {
       // 活动检测
-      activityLobby =
-          activityCommonService.activityDetection(
-              activityQualificationCheckDTO.getActivityId(), countDate, 3);
+      activityLobby = activityCommonService.activityDetection(dto.getActivityId(), countDate, 3);
     } catch (ServiceException e) {
       retMap.put("step", 2);
       retMap.put("success", false);

@@ -16,7 +16,6 @@ public interface GameBetDailyReportMapper extends ExtBaseMapper<GameBetDailyRepo
 
   int getDayCount(@Param("statTime") String statTime, @Param("tableName") String tableName);
 
-
   List<GameReportVO> queryReportList(GameBetDailyReportQueryDTO dto);
 
   Page<GameBetReportVO> querybetReportList(
@@ -44,24 +43,26 @@ public interface GameBetDailyReportMapper extends ExtBaseMapper<GameBetDailyRepo
 
   /**
    * 分组获取会员游戏报表--分红统计
+   *
    * @param startDate
    * @param endDate
    * @return
    */
-  List<DivideGameReportVO> findReportForDivide(@Param("startDate") String startDate,
-                                               @Param("endDate") String endDate,
-                                               @Param("isIncludeAgent") Integer isIncludeAgent);
+  List<DivideGameReportVO> findReportForDivide(
+      @Param("startDate") String startDate,
+      @Param("endDate") String endDate,
+      @Param("isIncludeAgent") Integer isIncludeAgent);
 
   /**
    * 分组获取会员游戏报表--工资统计
+   *
    * @param startDate
    * @param endDate
    * @return
    */
-  List<SalaryRechargeVO> findReportForSalary(@Param("startDate") String startDate,
-                                             @Param("endDate") String endDate,
-                                             @Param("agentName") String agentName,
-                                             @Param("isInclude") Integer isInclude);
-
-
+  List<SalaryRechargeVO> findReportForSalary(
+      @Param("startDate") String startDate,
+      @Param("endDate") String endDate,
+      @Param("agentName") String agentName,
+      @Param("isInclude") Integer isInclude);
 }

@@ -73,8 +73,10 @@ public class GameBlacklistServiceImpl extends ServiceImpl<GameBlacklistMapper, G
   public void save(OperGameBlacklistDTO dto) {
     if (StringUtils.isEmpty(dto.getTarget())) {
       // 会员
-      String msg = Objects.equals(dto.getTargetType(), BizBlacklistTargetType.USER.getValue()) ?
-              "请选择要加入黑名单的会员" : "请选择要加入黑名单的会员层级";
+      String msg =
+          Objects.equals(dto.getTargetType(), BizBlacklistTargetType.USER.getValue())
+              ? "请选择要加入黑名单的会员"
+              : "请选择要加入黑名单的会员层级";
       throw new ServiceException(msg);
     }
     GameBlacklist exists =

@@ -22,50 +22,50 @@ public interface ActivityLobbyService extends IService<ActivityLobby> {
   /**
    * 查询活动大厅列表
    *
-   * @param page
-   * @param activityLobbyQueryDTO
-   * @return
+   * @param page PageDTO
+   * @param dto ActivityLobbyQueryDTO
+   * @return IPage
    */
   IPage<ActivityLobbyVO> findActivityLobbyList(
-      PageDTO<ActivityLobby> page, ActivityLobbyQueryDTO activityLobbyQueryDTO);
+      PageDTO<ActivityLobby> page, ActivityLobbyQueryDTO dto);
 
   /**
    * 新增活动大厅
    *
-   * @param activityLobbyAddDTO
+   * @param dto ActivityLobbyAddDTO
    */
-  void add(ActivityLobbyAddDTO activityLobbyAddDTO);
+  void add(ActivityLobbyAddDTO dto);
 
   /**
    * 更新活动大厅
    *
-   * @param activityLobbyUpdateDTO
+   * @param dto ActivityLobbyUpdateDTO
    */
-  void update(ActivityLobbyUpdateDTO activityLobbyUpdateDTO);
+  void update(ActivityLobbyUpdateDTO dto);
 
   /**
    * 删除一个或者多个数据
    *
-   * @param ids
+   * @param ids String
    */
   void remove(String ids);
 
   /**
    * 根据id删除活动大厅
    *
-   * @param ids
+   * @param ids String
    */
   void deleteActivityLobby(String ids);
 
   /**
-   * @param activityLobbyUpdateStatusDTO
+   * @param dto ActivityLobbyUpdateStatusDTO
    */
-  void updateStatus(ActivityLobbyUpdateStatusDTO activityLobbyUpdateStatusDTO);
+  void updateStatus(ActivityLobbyUpdateStatusDTO dto);
 
   /**
    * 查询未绑定的大厅活动列表
    *
-   * @return
+   * @return List
    */
   List<ActivityLobbyVO> findUnboundLobbyList();
 }

@@ -63,7 +63,7 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
 
   @Override
   @Retryable(value = Exception.class, backoff = @Backoff(delay = 300L, multiplier = 1.5))
-  public void updateBalanceWithRecharge(Long memberId, BigDecimal amount,BigDecimal totalAmount) {
+  public void updateBalanceWithRecharge(Long memberId, BigDecimal amount, BigDecimal totalAmount) {
     if (BigDecimal.ZERO.compareTo(amount) > 0) {
       throw new ServiceException("金额不正确，金额必须大于等于0");
     }

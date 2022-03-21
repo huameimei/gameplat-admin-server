@@ -1,17 +1,19 @@
 package com.gameplat.admin.model.vo;
 
-import lombok.Data;
-
 import java.io.Serializable;
+import java.math.BigDecimal;
+import lombok.Data;
 
 @Data
 public class GameRecycleVO implements Serializable {
-  private String platfromCode;
+  private String platformCode;
 
   /** 0 : 成功 1 : 失败 */
-  private int status;
+  private Integer status;
 
   private String platformName;
+
+  private BigDecimal balance;
 
   private String errorMsg;
 }

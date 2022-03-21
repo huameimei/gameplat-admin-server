@@ -28,14 +28,6 @@ import com.gameplat.elasticsearch.page.PageResponse;
 import com.gameplat.elasticsearch.service.IBaseElasticsearchService;
 import com.gameplat.model.entity.ValidWithdraw;
 import com.gameplat.model.entity.recharge.RechargeOrder;
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
-import javax.annotation.Resource;
 import lombok.extern.log4j.Log4j2;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.search.sort.FieldSortBuilder;
@@ -47,6 +39,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
+
+import javax.annotation.Resource;
+import java.math.BigDecimal;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Log4j2
 @Service
@@ -221,10 +218,10 @@ public class ValidWithdrawServiceImpl extends ServiceImpl<ValidWithdrawMapper, V
   }
 
   /**
-   * @param username
-   * @param validWithdraws
+   * @param username String
+   * @param validWithdraws List
    * @param relaxQuota 放宽额度
-   * @return
+   * @return ValidateDmlBeanVo
    */
   private ValidateDmlBeanVo validateValidWithdraws(
       String username, List<ValidWithdraw> validWithdraws, BigDecimal relaxQuota) {
@@ -247,13 +244,13 @@ public class ValidWithdrawServiceImpl extends ServiceImpl<ValidWithdrawMapper, V
     }
     validateDmlBean.setUsername(username);
     // 常态打码量
-    BigDecimal requireDML =
+    BigDecimal requireDml =
         validWithdraws.stream()
             .map(ValidWithdraw::getDmlClaim)
             .reduce(BigDecimal.ZERO, BigDecimal::add);
-    log.info("总共要求打码量：{}", requireDML);
+    log.info("总共要求打码量：{}", requireDml);
     // 要求打码量
-    validateDmlBean.setRequireDML(requireDML);
+    validateDmlBean.setRequireDML(requireDml);
     // 放宽额度
     validateDmlBean.setRelaxQuota(relaxQuota);
 
@@ -276,9 +273,9 @@ public class ValidWithdrawServiceImpl extends ServiceImpl<ValidWithdrawMapper, V
     // 需要扣除金额
     // validateDmlBean.setSumAllDeduct(sumAllDeduct);
     validateDmlBean.setYetWithdraw(BigDecimal.ZERO);
-    List<ValidWithdrawVO> validWithdrawVOS =
+    List<ValidWithdrawVO> validWithdrawVo =
         BeanUtils.mapList(validWithdraws, ValidWithdrawVO.class);
-    validateDmlBean.setRows(validWithdrawVOS);
+    validateDmlBean.setRows(validWithdrawVo);
     return validateDmlBean;
   }
 

@@ -8,10 +8,10 @@ import java.util.List;
 @Data
 public class MemberQueryDTO implements Serializable {
 
-  private Long id;
   /** 会员账号 */
   public String account;
 
+  private Long id;
   /** 多账号 */
   private List<String> accountList;
 
@@ -153,7 +153,7 @@ public class MemberQueryDTO implements Serializable {
 
   private String parentName;
 
-  /**是否包含代理自己 */
+  /** 是否包含代理自己 */
   private Boolean itself;
 
   /** 会员当前等级 */

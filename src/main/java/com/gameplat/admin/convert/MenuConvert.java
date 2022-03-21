@@ -6,7 +6,6 @@ import com.gameplat.admin.model.vo.MenuVo;
 import com.gameplat.model.entity.sys.SysMenu;
 import org.mapstruct.Mapper;
 
-
 @Mapper(componentModel = "spring")
 public interface MenuConvert {
 

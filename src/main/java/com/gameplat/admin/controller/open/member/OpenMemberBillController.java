@@ -25,23 +25,24 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
 /**
+ * 现金流水
+ *
  * @author lily
- * @description 现金流水
  * @date 2021/12/2
  */
-@Api(tags = "现金流水API")
+@Api(tags = "现金流水")
 @Slf4j
 @RestController
 @RequestMapping("/api/admin/funds/cash")
-public class OpenMemberBillContorller {
+public class OpenMemberBillController {
 
   @Autowired private MemberBillService memberBillService;
 
   @ApiOperation(value = "现金流水")
   @GetMapping("/pageList")
   @PreAuthorize("hasAuthority('funds:cash:list')")
-  public IPage<MemberBillVO> findMemberBillList(PageDTO<MemberBill> page, MemberBillDTO dto) {
-    return memberBillService.findMemberBilllistPage(page, dto);
+  public IPage<MemberBillVO> queryPage(PageDTO<MemberBill> page, MemberBillDTO dto) {
+    return memberBillService.queryPage(page, dto);
   }
 
   @SneakyThrows
@@ -49,10 +50,9 @@ public class OpenMemberBillContorller {
   @ApiOperation(value = "导出现金流水列表")
   @PreAuthorize("hasAuthority('funds:cash:export')")
   public void exportSign(MemberBillDTO dto, HttpServletResponse response) {
-    List<MemberBillVO> list = memberBillService.findMemberBillList(dto);
+    List<MemberBillVO> list = memberBillService.queryList(dto);
     ExportParams exportParams = new ExportParams("现金流水列表", "现金流水列表");
     response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename = myExcel.xls");
-
     try (Workbook workbook = ExcelExportUtil.exportExcel(exportParams, MemberBillVO.class, list)) {
       workbook.write(response.getOutputStream());
     }

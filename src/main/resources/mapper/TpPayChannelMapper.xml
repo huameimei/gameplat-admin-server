@@ -68,7 +68,7 @@
         LEFT JOIN tp_pay_type t ON t.tp_interface_code = i.code AND t.code = c.tp_pay_type
         LEFT JOIN pay_type p ON t.pay_type = p.code
         <include refid="where"/>
-        ORDER BY c.sort ASC
+        ORDER BY c.sort ASC, c.create_time desc
     </select>
 
 </mapper>

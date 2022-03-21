@@ -13,11 +13,11 @@ public interface ActivityLobbyConvert {
 
   ActivityLobbyVO toVo(ActivityLobby activityLobby);
 
-  ActivityLobby toEntity(ActivityLobbyAddDTO activityLobbyAddDTO);
+  ActivityLobby toEntity(ActivityLobbyAddDTO dto);
 
-  ActivityLobby toEntity(ActivityLobbyDTO activityLobbyDTO);
+  ActivityLobby toEntity(ActivityLobbyDTO dto);
 
-  ActivityLobby toEntity(ActivityLobbyUpdateDTO activityLobbyUpdateDTO);
+  ActivityLobby toEntity(ActivityLobbyUpdateDTO dto);
 
-  ActivityLobby toEntity(ActivityLobbyUpdateStatusDTO activityLobbyUpdateStatusDTO);
+  ActivityLobby toEntity(ActivityLobbyUpdateStatusDTO dto);
 }

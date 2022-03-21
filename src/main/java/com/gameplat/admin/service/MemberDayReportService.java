@@ -8,15 +8,13 @@ import com.gameplat.admin.model.vo.PageDtoVO;
 import com.gameplat.model.entity.member.MemberDayReport;
 
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 
 /**
- * @Description : 会员日报表
- * @Author : cc
- * @Date : 2022/3/11
+ * @Description : 会员日报表 @Author : cc @Date : 2022/3/11
  */
 public interface MemberDayReportService extends IService<MemberDayReport> {
-    PageDtoVO<MemberDayReportVo> agentReportList(PageDTO<MemberDayReport> page, AgentReportQueryDTO dto);
+  PageDtoVO<MemberDayReportVo> agentReportList(
+      PageDTO<MemberDayReport> page, AgentReportQueryDTO dto);
 
-    void exportAgentReport(AgentReportQueryDTO dto, HttpServletResponse response);
+  void exportAgentReport(AgentReportQueryDTO dto, HttpServletResponse response);
 }

@@ -116,56 +116,11 @@
         g.code game_kind,
         g.platform_code,
         g.game_type,
-        ROUND(IFNULL( c.valid_amount, 0 ), 2) valid_amount,
-        ROUND(IFNULL( c.win_amount, 0 ), 2) win_amount,
-        ROUND(IFNULL( c.accumulate_win_amount, 0 ), 2) accumulate_win_amount,
         #{startTime} start_time,
         #{endTime} end_time
         FROM game_kind g
-        LEFT JOIN
-        (
-        SELECT
-        a.valid_amount,
-        a.win_amount,
-        a.platform_code,
-        a.game_type,
-        a.game_kind,
-        b.accumulate_win_amount
-        FROM
-        (
-        SELECT
-        sum(valid_amount) valid_amount,
-        sum(win_amount) win_amount,
-        platform_code,
-        game_kind,
-        game_type
-        FROM game_bet_daily_report
-        <where>
-            <if test="startTime != null and startTime != ''">
-                and stat_time <![CDATA[>=]]> #{startTime}
-            </if>
-            <if test="endTime != null and endTime != ''">
-                and stat_time <![CDATA[<=]]> #{endTime}
-            </if>
-        </where>
-        GROUP BY game_kind
-        ) a
-        LEFT JOIN (
-        SELECT
-        sum(win_amount) accumulate_win_amount,
-        game_kind
-        FROM game_bet_daily_report
-        <where>
-            <if test="endTime != null and endTime != ''">
-                and stat_time <![CDATA[<=]]> #{endTime}
-            </if>
-        </where>
-        GROUP BY game_kind
-        ) b on a.game_kind = b.game_kind
-        ) c on g.code = c.game_kind
+        where
+        status in (1,2)
     </select>
-
-
-
 
 </mapper>

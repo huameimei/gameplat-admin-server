@@ -13,12 +13,12 @@ public interface ActivityCommonService {
   /**
    * 获取审核说明信息
    *
-   * @param activityLobby
-   * @param statisticValue
-   * @param validAmount
-   * @param startTime
-   * @param endTime
-   * @return
+   * @param activityLobby ActivityLobby
+   * @param statisticValue String
+   * @param validAmount String
+   * @param startTime String
+   * @param endTime String
+   * @return String
    */
   String getAuditRemark(
       ActivityLobby activityLobby,
@@ -30,37 +30,37 @@ public interface ActivityCommonService {
   /**
    * 用户信息检测
    *
-   * @param memberInfo
-   * @param flagCheck
+   * @param memberInfo MemberInfoVO
+   * @param flagCheck int
    */
   void userDetection(MemberInfoVO memberInfo, int flagCheck);
 
   /**
    * 活动信息检测
    *
-   * @param activityId
-   * @param countDate
-   * @param flagCheck
-   * @return
+   * @param activityId Long
+   * @param countDate Date
+   * @param flagCheck int
+   * @return ActivityLobby
    */
   ActivityLobby activityDetection(Long activityId, Date countDate, int flagCheck);
 
   /**
    * 黑名单信息检测
    *
-   * @param activityLobby
-   * @param memberInfo
-   * @param i
+   * @param activityLobby ActivityLobby
+   * @param memberInfo MemberInfoVO
+   * @param i int
    */
   void blacklistDetection(ActivityLobby activityLobby, MemberInfoVO memberInfo, int i);
 
   /**
    * 活动资格检测
    *
-   * @param activityLobby
-   * @param memberInfo
-   * @param countDate
-   * @param i
+   * @param activityLobby ActivityLobby
+   * @param memberInfo MemberInfoVO
+   * @param countDate Date
+   * @param i int
    */
   void qualificationDetection(
       ActivityLobby activityLobby, MemberInfoVO memberInfo, Date countDate, int i);
@@ -68,11 +68,11 @@ public interface ActivityCommonService {
   /**
    * 活动规则检测
    *
-   * @param activityLobby
-   * @param countDate
-   * @param memberInfo
-   * @param i
-   * @return
+   * @param activityLobby ActivityLobby
+   * @param countDate Date
+   * @param memberInfo MemberInfoVO
+   * @param i int
+   * @return List
    */
   List<ActivityQualification> activityRuleDetection(
       ActivityLobby activityLobby, Date countDate, MemberInfoVO memberInfo, int i);

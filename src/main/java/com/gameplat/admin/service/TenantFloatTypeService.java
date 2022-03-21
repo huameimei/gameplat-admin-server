@@ -21,7 +21,6 @@ public interface TenantFloatTypeService extends IService<TenantFloatType> {
    * 新增游戏浮窗类型
    *
    * @param tenantFloatSetting 游戏浮窗类型
-   * @return 结果
    */
   void insertSysFloat(TenantFloatSetting tenantFloatSetting);
 

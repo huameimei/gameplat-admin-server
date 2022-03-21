@@ -7,7 +7,7 @@ import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")
 public interface SalaryPeriodsConvert {
-    SalaryPeriodsVO toVo(SalaryPeriods entity);
+  SalaryPeriodsVO toVo(SalaryPeriods entity);
 
-    SalaryPeriods toEntity(SalaryPeriodsDTO salaryPeriodsDTO);
+  SalaryPeriods toEntity(SalaryPeriodsDTO salaryPeriodsDTO);
 }

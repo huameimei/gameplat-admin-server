@@ -5,7 +5,6 @@ import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.convert.MemberGrowthStatisConvert;
-import com.gameplat.admin.enums.LanguageEnum;
 import com.gameplat.admin.mapper.MemberGrowthStatisMapper;
 import com.gameplat.admin.model.bean.ActivityMemberInfo;
 import com.gameplat.admin.model.dto.MemberGrowthStatisDTO;
@@ -89,8 +88,7 @@ public class MemberGrowthStatisServiceImpl
     if (limitLevel == null) {
       limitLevel = 50;
     }
-    List<MemberGrowthLevelVO> levels =
-        growthLevelService.findList(limitLevel + 1, LanguageEnum.app_zh_CN.getCode());
+    List<MemberGrowthLevelVO> levels = growthLevelService.findList(limitLevel + 1);
     MemberGrowthLevelVO maxGrowthLevel = levels.get(levels.size() - 1);
     // 如果比最大等级所需升级成长值还要大  则直接返回最大等级
     if (afterGrowth >= maxGrowthLevel.getGrowth()) {

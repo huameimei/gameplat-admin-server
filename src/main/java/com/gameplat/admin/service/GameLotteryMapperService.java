@@ -8,5 +8,5 @@ import java.util.List;
 
 public interface GameLotteryMapperService extends IService<GameLottery> {
 
-  List<GameLotteryVo> findGameLotteryType(int code);
+  List<GameLotteryVo> findGameLotteryType(Integer code);
 }

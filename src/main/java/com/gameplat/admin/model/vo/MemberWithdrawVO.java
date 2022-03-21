@@ -1,6 +1,5 @@
 package com.gameplat.admin.model.vo;
 
-import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -62,7 +61,4 @@ public class MemberWithdrawVO {
   private String acceptAccount;
 
   private Date acceptTime;
-
-  // 是否是银行卡黑名单(0-否 1-是)
-  private Integer isBankBlacklist;
 }

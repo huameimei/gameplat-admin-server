@@ -10,7 +10,7 @@ import com.gameplat.model.entity.proxy.SalaryGrant;
 import java.math.BigDecimal;
 
 public interface SalaryGrantService extends IService<SalaryGrant> {
-    IPage<SalaryGrantVO> queryPage(PageDTO<SalaryGrant> page, SalaryGrantDTO dto);
+  IPage<SalaryGrantVO> queryPage(PageDTO<SalaryGrant> page, SalaryGrantDTO dto);
 
-    void change(Long id, BigDecimal salaryAmount);
+  void change(Long id, BigDecimal salaryAmount);
 }

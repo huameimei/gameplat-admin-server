@@ -3,48 +3,46 @@ package com.gameplat.admin.controller.open.finance;
 import com.gameplat.admin.model.bean.NameValuePair;
 import com.gameplat.admin.service.ProxyPayService;
 import com.gameplat.base.common.util.IPUtils;
+import lombok.SneakyThrows;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.*;
 import java.util.stream.Stream;
 
-@Controller
+@RestController
 @RequestMapping("/api/admin/finance/asyncCallback")
 public class WithdrawAsyncCallbackController {
 
   @Autowired private ProxyPayService proxyPayService;
 
+  @SneakyThrows
   @RequestMapping("/onlineProxyPayAsyncCallback/{cashOrderNo}")
-  @ResponseBody
   public void onlineProxyPayAsyncCallback(
       @PathVariable String cashOrderNo,
       @RequestBody(required = false) String requestBody,
       HttpServletRequest request,
-      HttpServletResponse response)
-      throws Exception {
-    String url = request.getRequestURI();
-    // 获取请求头数据
+      HttpServletResponse response) {
     List<NameValuePair> headers = getHeaders(request);
-    // 获取请求数据
     Map<String, String> requestParameters = getRequestParameterMap(request);
-    String msg =
+
+    String result =
         proxyPayService.proxyPayAsyncCallback(
             cashOrderNo,
-            url,
+            request.getRequestURI(),
             request.getMethod(),
             headers,
             IPUtils.getIpAddress(request),
             requestParameters,
             requestBody);
-    response.getWriter().print(msg);
+
+    response.getWriter().print(result);
   }
 
   /** 获取请求头数据 */

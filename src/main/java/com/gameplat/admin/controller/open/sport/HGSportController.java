@@ -21,73 +21,73 @@ public class HGSportController {
 
   @ApiOperation(value = "HG注单列表")
   @GetMapping("/queryHGBetOrder")
-  public Object queryHGBetOrder(HGSportDTO dto) {
+  public Object queryHgBetOrder(HGSportDTO dto) {
     return hgSportService.queryHGBetOrder(dto);
   }
 
   @ApiOperation(value = "HG用户投注限制列表")
   @GetMapping("/queryHGBetLimitList")
-  public Object queryHGBetLimitList(HGSportDTO dto) {
+  public Object queryHgBetLimitList(HGSportDTO dto) {
     return hgSportService.queryHGBetLimitList(dto);
   }
 
   @ApiOperation(value = "HG联赛列表")
   @GetMapping("/queryHGSportLeague")
-  public Object queryHGSportLeague(HGSportDTO dto) {
+  public Object queryHgSportLeague(HGSportDTO dto) {
     return hgSportService.queryHGSportLeague(dto);
   }
 
   @ApiOperation(value = "HG赛果列表")
   @GetMapping("/queryHGSportResult")
-  public Object queryHGSportResult(HGSportDTO dto) {
+  public Object queryHgSportResult(HGSportDTO dto) {
     return hgSportService.queryHGSportResult(dto);
   }
 
   @ApiOperation(value = "HG即时注单详情")
   @GetMapping("/queryHGCurBetOrder")
-  public Object queryHGCurBetOrder(HGSportDTO dto) {
+  public Object queryHgCurBetOrder(HGSportDTO dto) {
     return hgSportService.queryHGCurBetOrder(dto);
   }
 
   @ApiOperation(value = "HG注单子列表")
   @GetMapping("/queryHGBetsDetail")
-  public Object queryHGBetsDetail(HGSportDTO dto) {
+  public Object queryHgBetsDetail(HGSportDTO dto) {
     return hgSportService.queryHGBetsDetail(dto);
   }
 
   @ApiOperation(value = "HG投注设置列表")
   @GetMapping("/queryHGBetConfigs")
-  public Object queryHGBetConfigs(HGSportDTO dto) {
+  public Object queryHgBetConfigs(HGSportDTO dto) {
     return hgSportService.queryHGBetConfigs(dto);
   }
 
   @ApiOperation(value = "HG没有赛果的比赛列表")
   @GetMapping("/queryHGEntryResult")
-  public Object queryHGEntryResult(HGSportDTO dto) {
+  public Object queryHgEntryResult(HGSportDTO dto) {
     return hgSportService.queryHGEntryResult(dto);
   }
 
   @ApiOperation(value = "HG单个用户限额列表")
   @GetMapping("/queryHGUserLimit")
-  public Object queryHGUserLimit(HGSportDTO dto) {
+  public Object queryHgUserLimit(HGSportDTO dto) {
     return hgSportService.queryHGUserLimit(dto);
   }
 
   @ApiOperation(value = "HG公告列表")
   @GetMapping("/queryHGSportMessage")
-  public Object queryHGSportMessage(HGSportDTO dto) {
+  public Object queryHgSportMessage(HGSportDTO dto) {
     return hgSportService.queryHGSportMessage(dto);
   }
 
   @ApiOperation(value = "HG赛事变更列表")
   @GetMapping("/queryHGChangeNotice")
-  public Object queryHGChangeNotice(HGSportDTO dto) {
+  public Object queryHgChangeNotice(HGSportDTO dto) {
     return hgSportService.queryHGChangeNotice(dto);
   }
 
   @ApiOperation(value = "手动结算-注单详情")
   @GetMapping("/queryHGHandOrdersDetail")
-  public Object queryHGHandOrdersDetail(HGSportDTO dto) {
+  public Object queryHgHandOrdersDetail(HGSportDTO dto) {
     return hgSportService.queryHGHandOrdersDetail(dto);
   }
 
@@ -201,7 +201,7 @@ public class HGSportController {
 
   @ApiOperation(value = "参数查询（指定key）")
   @GetMapping("/queryHGConfigGetOne")
-  public Object queryHGConfigGetOne(HGSportDTO dto) {
+  public Object queryHgConfigGetOne(HGSportDTO dto) {
     return hgSportService.queryHGConfigGetOne(dto);
   }
 }

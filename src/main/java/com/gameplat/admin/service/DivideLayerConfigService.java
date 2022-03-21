@@ -11,7 +11,9 @@ import com.gameplat.model.entity.proxy.DivideLayerConfig;
 import java.util.Map;
 
 /**
- * @Description : 层层代分红模式配置 @Author : cc @Date : 2022/2/22
+ * 层层代分红模式配置
+ *
+ * @author : cc @Date : 2022/2/22
  */
 public interface DivideLayerConfigService extends IService<DivideLayerConfig> {
 
@@ -29,7 +31,7 @@ public interface DivideLayerConfigService extends IService<DivideLayerConfig> {
 
   Map<String, Object> getLayerConfigForLinkEdit(Long id, String lang);
 
-    String getRealSuperName(String superPath, Integer userLevel);
+  String getRealSuperName(String superPath, Integer userLevel);
 
-    GameDivideVo getConfigByGameCode(String userName, String code);
+  GameDivideVo getConfigByGameCode(String userName, String code);
 }

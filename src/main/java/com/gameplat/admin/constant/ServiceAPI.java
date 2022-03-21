@@ -1,6 +1,5 @@
 package com.gameplat.admin.constant;
 
-
 public interface ServiceAPI {
 
   /** 外部接口访问前缀 */

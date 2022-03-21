@@ -26,13 +26,15 @@ public enum RechargeMode {
   }
 
   public static Integer getTranType(int value) {
-    Optional<RechargeMode> optional = Stream.of(RechargeMode.values())
-        .filter(rm -> rm.getValue() == value).findFirst();
+    Optional<RechargeMode> optional =
+        Stream.of(RechargeMode.values()).filter(rm -> rm.getValue() == value).findFirst();
     return optional.isPresent() ? optional.get().getTranType() : null;
   }
 
   public static RechargeMode get(int value) throws ServerException {
-    return Arrays.stream(RechargeMode.values()).filter(e -> e.getValue() == value).findFirst()
+    return Arrays.stream(RechargeMode.values())
+        .filter(e -> e.getValue() == value)
+        .findFirst()
         .orElseThrow(() -> new ServerException("错误的Recharge Mode:" + value));
   }
 
@@ -47,5 +49,4 @@ public enum RechargeMode {
   public int getTranType() {
     return tranType;
   }
-
 }

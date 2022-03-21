@@ -7,5 +7,5 @@ import org.mapstruct.Mapper;
 @Mapper(componentModel = "spring")
 public interface GameFinancialReportConvert {
 
-    TotalGameFinancialReportVO toTotalVO(GameFinancialReport gameFinancialReport);
+  TotalGameFinancialReportVO toTotalVO(GameFinancialReport gameFinancialReport);
 }

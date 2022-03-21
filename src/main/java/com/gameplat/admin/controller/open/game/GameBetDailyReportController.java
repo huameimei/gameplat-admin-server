@@ -18,25 +18,26 @@ import com.gameplat.base.common.util.DateUtil;
 import com.gameplat.base.common.util.StringUtils;
 import com.gameplat.model.entity.game.GameBetDailyReport;
 import com.gameplat.model.entity.game.GamePlatform;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import java.util.Date;
-import java.util.List;
-import javax.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
+import java.util.Date;
+import java.util.List;
 
 @Slf4j
+@Api("游戏日报表")
 @RestController
 @RequestMapping("/api/admin/game/gameBetDailyReport")
 public class GameBetDailyReportController {
 
   @Autowired private GameBetDailyReportService gameBetDailyReportService;
+
   @Autowired private GamePlatformService gamePlatformService;
+
   @Autowired private GameBetRecordInfoService gameBetRecordInfoService;
 
   @GetMapping(value = "/queryPage")
@@ -65,7 +66,7 @@ public class GameBetDailyReportController {
     gameBetDailyReportService.saveGameBetDailyReport(dto.getStatTime(), gamePlatform);
   }
 
-  /** 查询真人数据统计 */
+  @ApiOperation("查询真人数据统计")
   @GetMapping(value = "/queryReport")
   public List<GameReportVO> queryReport(GameBetDailyReportQueryDTO dto) {
     if (StringUtils.isBlank(dto.getBeginTime())) {
@@ -79,7 +80,7 @@ public class GameBetDailyReportController {
     return gameBetDailyReportService.queryReportList(dto);
   }
 
-  /** 查询投注日报表记录 */
+  @ApiOperation("查询投注日报表记录")
   @GetMapping(value = "/queryBetReport")
   public PageDtoVO<GameBetReportVO> queryBetReport(
       Page<GameBetDailyReportQueryDTO> page, GameBetDailyReportQueryDTO dto) {
@@ -109,8 +110,8 @@ public class GameBetDailyReportController {
       StringBuilder sb = new StringBuilder();
       sb.append("(");
       String[] split = dto.getPlatformCode().split(",");
-      for (int i = 0; i < split.length; i++) {
-        sb.append("'" + split[i] + "'").append(",");
+      for (String s : split) {
+        sb.append("'").append(s).append("'").append(",");
       }
       sb.deleteCharAt(sb.toString().length() - 1);
       sb.append(")");
@@ -118,7 +119,7 @@ public class GameBetDailyReportController {
       dto.setPlatformCode(str);
     }
 
-    return gameBetDailyReportService.querybetReportList(page, dto);
+    return gameBetDailyReportService.queryBetReportList(page, dto);
   }
 
   @ApiOperation(value = "获取会员投注记录")

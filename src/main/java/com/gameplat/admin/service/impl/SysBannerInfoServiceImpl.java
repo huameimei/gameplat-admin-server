@@ -69,15 +69,10 @@ public class SysBannerInfoServiceImpl extends ServiceImpl<SysBannerInfoMapper, S
     }
   }
 
-  /**
-   * 校验banner信息
-   *
-   * @param sysBannerInfo
-   */
+  /** 校验banner信息 */
   private void validBannerInfo(SysBannerInfo sysBannerInfo) {
     if (sysBannerInfo.getType() == SysBannerInfoEnum.Type.SPORT.getValue()) {
       // 校验选择不同类型的数据判断
-      // 活动优惠
       if (sysBannerInfo
           .getBannerType()
           .equals(configService.getValueInteger(DictDataEnum.ACTIVITY))) {

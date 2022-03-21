@@ -57,36 +57,24 @@ public class ActivityInfoServiceImpl extends ServiceImpl<ActivityInfoMapper, Act
   @Autowired private ConfigService configService;
 
   @Override
-  public IPage<ActivityInfoVO> list(
-      PageDTO<ActivityInfo> page, ActivityInfoQueryDTO activityInfoQueryDTO) {
+  public IPage<ActivityInfoVO> list(PageDTO<ActivityInfo> page, ActivityInfoQueryDTO dto) {
     LambdaQueryChainWrapper<ActivityInfo> queryWrapper = this.lambdaQuery();
     queryWrapper
+        .eq(dto.getType() != null && dto.getType() != 0, ActivityInfo::getType, dto.getType())
         .eq(
-            activityInfoQueryDTO.getType() != null && activityInfoQueryDTO.getType() != 0,
-            ActivityInfo::getType,
-            activityInfoQueryDTO.getType())
-        .eq(
-            activityInfoQueryDTO.getApplyType() != null && activityInfoQueryDTO.getApplyType() != 0,
+            dto.getApplyType() != null && dto.getApplyType() != 0,
             ActivityInfo::getApplyType,
-            activityInfoQueryDTO.getApplyType())
+            dto.getApplyType())
         .eq(
-            activityInfoQueryDTO.getValidStatus() != null
-                && activityInfoQueryDTO.getValidStatus() != 0,
+            dto.getValidStatus() != null && dto.getValidStatus() != 0,
             ActivityInfo::getValidStatus,
-            activityInfoQueryDTO.getValidStatus())
+            dto.getValidStatus())
+        .eq(dto.getStatus() != null, ActivityInfo::getStatus, dto.getStatus())
         .eq(
-            activityInfoQueryDTO.getStatus() != null,
-            ActivityInfo::getStatus,
-            activityInfoQueryDTO.getStatus())
-        .eq(
-            activityInfoQueryDTO.getActivityLobbyId() != null
-                && activityInfoQueryDTO.getActivityLobbyId() != 0,
+            dto.getActivityLobbyId() != null && dto.getActivityLobbyId() != 0,
             ActivityInfo::getActivityLobbyId,
-            activityInfoQueryDTO.getActivityLobbyId())
-        .eq(
-            StringUtils.isNotBlank(activityInfoQueryDTO.getCreateBy()),
-            ActivityInfo::getCreateBy,
-            activityInfoQueryDTO.getCreateBy())
+            dto.getActivityLobbyId())
+        .eq(StringUtils.isNotBlank(dto.getCreateBy()), ActivityInfo::getCreateBy, dto.getCreateBy())
         // 按排序sort正序排列
         .orderByAsc(Lists.newArrayList(ActivityInfo::getSort))
         // 按照时间倒序排列
@@ -149,8 +137,7 @@ public class ActivityInfoServiceImpl extends ServiceImpl<ActivityInfoMapper, Act
   @Override
   public void checkActivityLobbyId(Long activityLobbyId, Long id) {
     LambdaQueryChainWrapper<ActivityInfo> queryWrapper = this.lambdaQuery();
-    queryWrapper.eq(ActivityInfo::getActivityLobbyId, activityLobbyId)
-            .eq(ActivityInfo::getId, id);
+    queryWrapper.eq(ActivityInfo::getActivityLobbyId, activityLobbyId).eq(ActivityInfo::getId, id);
     Long count = queryWrapper.count();
     if (count > 0) {
       throw new ServiceException("您绑定的活动大厅已经绑定其他活动,请选择其他活动大厅绑定此活动发布");

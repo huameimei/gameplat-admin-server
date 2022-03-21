@@ -23,7 +23,10 @@ public class MemberWithdrawLimitController {
 
   @DeleteMapping("/remove/{timesForWithdrawal}")
   @PreAuthorize("hasAuthority('thirdParty:memberWithdrawLimit:remove')")
-  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.WITHDRAW, desc = "'删除提现次数限制:' + #timesForWithdrawal")
+  @Log(
+      module = ServiceName.ADMIN_SERVICE,
+      type = LogType.WITHDRAW,
+      desc = "'删除提现次数限制:' + #timesForWithdrawal")
   public void remove(@PathVariable Integer timesForWithdrawal) {
     dictDataService.delete(
         DictTypeEnum.USER_WITHDRAW_LIMIT.getValue(),
@@ -35,8 +38,7 @@ public class MemberWithdrawLimitController {
   @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.WITHDRAW, desc = "新增或修改提现次数限制")
   public void addOrEdit(@RequestBody UserWithdrawLimitInfo limitInfo) {
     String dictType = DictTypeEnum.USER_WITHDRAW_LIMIT.getValue();
-    String dictLabel =
-        DictDataEnum.WITHDRAW_LIMIT.getLabel() + limitInfo.getTimesForWithdrawal();
+    String dictLabel = DictDataEnum.WITHDRAW_LIMIT.getLabel() + limitInfo.getTimesForWithdrawal();
     dictDataService.addOrUpdateUserWithdrawLimit(dictType, dictLabel, limitInfo);
   }
 

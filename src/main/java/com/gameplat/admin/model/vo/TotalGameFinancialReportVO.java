@@ -14,12 +14,12 @@ import java.math.BigDecimal;
 @Data
 public class TotalGameFinancialReportVO implements Serializable {
 
-    @ApiModelProperty(value = "有效投注额")
-    private BigDecimal validAmount;
+  @ApiModelProperty(value = "有效投注额")
+  private BigDecimal validAmount;
 
-    @ApiModelProperty(value = "输赢金额")
-    private BigDecimal winAmount;
+  @ApiModelProperty(value = "输赢金额")
+  private BigDecimal winAmount;
 
-    @ApiModelProperty(value = "累计输赢金额")
-    private BigDecimal accumulateWinAmount;
+  @ApiModelProperty(value = "累计输赢金额")
+  private BigDecimal accumulateWinAmount;
 }

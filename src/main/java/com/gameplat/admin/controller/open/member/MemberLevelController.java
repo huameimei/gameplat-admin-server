@@ -84,7 +84,8 @@ public class MemberLevelController {
 
   @ApiOperation(value = "根据上传文件分层")
   @PostMapping("/allocateByFile")
-  public void allocateByFile(@RequestParam("levelValue") Integer levelValue, @RequestPart MultipartFile file)
+  public void allocateByFile(
+      @RequestParam("levelValue") Integer levelValue, @RequestPart MultipartFile file)
       throws IOException {
     List<MemberLevelFileDTO> list =
         EasyExcelUtil.readExcel(file.getInputStream(), MemberLevelFileDTO.class);

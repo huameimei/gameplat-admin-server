@@ -71,6 +71,7 @@ public class SysDictDataServiceImpl extends ServiceImpl<SysDictDataMapper, SysDi
             SysDictData::getStatus,
             dictData.getStatus())
         .orderByAsc(SysDictData::getDictSort)
+        .orderByDesc(SysDictData::getCreateTime)
         .page(page)
         .convert(dictDataConvert::toVo);
   }
@@ -224,9 +225,7 @@ public class SysDictDataServiceImpl extends ServiceImpl<SysDictDataMapper, SysDi
 
   @Override
   @CacheInvalidateContainer(
-          value = {
-                  @CacheInvalidate(name = CachedKeys.DICT_DATA_CACHE, key = "#dictParamDTO.dictType")
-          })
+      value = {@CacheInvalidate(name = CachedKeys.DICT_DATA_CACHE, key = "#dictParamDTO.dictType")})
   public void batchUpdateDictData(DictParamDTO dictParamDTO) {
     List<SysDictData> list = new ArrayList<>();
 
@@ -238,21 +237,21 @@ public class SysDictDataServiceImpl extends ServiceImpl<SysDictDataMapper, SysDi
       sysDictData.setDictValue(entry.getValue().toString());
       list.add(sysDictData);
     }
-    for (SysDictData sysDictData :list){
+    for (SysDictData sysDictData : list) {
       if (this.lambdaQuery()
-              .eq(SysDictData::getDictType, sysDictData.getDictType())
-              .eq(SysDictData::getDictLabel, sysDictData.getDictLabel())
-              .exists()) {
+          .eq(SysDictData::getDictType, sysDictData.getDictType())
+          .eq(SysDictData::getDictLabel, sysDictData.getDictLabel())
+          .exists()) {
         this.lambdaUpdate()
-                .set(SysDictData::getDictValue, sysDictData.getDictValue())
-                .eq(SysDictData::getDictType, sysDictData.getDictType())
-                .eq(SysDictData::getDictLabel, sysDictData.getDictLabel())
-                .update();
+            .set(SysDictData::getDictValue, sysDictData.getDictValue())
+            .eq(SysDictData::getDictType, sysDictData.getDictType())
+            .eq(SysDictData::getDictLabel, sysDictData.getDictLabel())
+            .update();
       } else {
         OperDictDataDTO operDictDataDTO = new OperDictDataDTO();
         operDictDataDTO.setDictLabel(sysDictData.getDictLabel());
         operDictDataDTO.setDictType(sysDictData.getDictType());
-        operDictDataDTO.setDictValue( sysDictData.getDictValue());
+        operDictDataDTO.setDictValue(sysDictData.getDictValue());
         SysDictData dictData = dictDataConvert.toEntity(operDictDataDTO);
         this.save(dictData);
       }
@@ -324,18 +323,19 @@ public class SysDictDataServiceImpl extends ServiceImpl<SysDictDataMapper, SysDi
 
   @Override
   public JSONObject getData(String dictType) {
-    List<SysDictData> queryResult =  this.lambdaQuery()
-            .eq(SysDictData::getDictType,dictType)
+    List<SysDictData> queryResult =
+        this.lambdaQuery()
+            .eq(SysDictData::getDictType, dictType)
             .eq(SysDictData::getStatus, 1)
             .list();
     JSONObject json = new JSONObject();
     JSONArray objects = JSONUtil.parseArray(queryResult);
-    for (Object o: objects) {
+    for (Object o : objects) {
       String str = JSON.toJSONString(o);
-      JSONObject parse =JSONObject.parseObject(str);
+      JSONObject parse = JSONObject.parseObject(str);
       String key = parse.getString("dictLabel");
       String value = parse.getString("dictValue");
-      json.put(key,value);
+      json.put(key, value);
     }
     return json;
   }

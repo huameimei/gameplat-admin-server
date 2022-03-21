@@ -15,5 +15,5 @@ public interface ActivityBlacklistConvert {
 
   ActivityBlacklistVO toVo(ActivityBlacklist activityBlacklist);
 
-  ActivityBlacklist toEntity(ActivityBlacklistAddDTO activityBlacklistAddDTO);
+  ActivityBlacklist toEntity(ActivityBlacklistAddDTO dto);
 }

@@ -8,12 +8,15 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.gameplat.admin.model.dto.IpAnalysisDTO;
 import com.gameplat.admin.model.dto.MemberQueryDTO;
-import com.gameplat.admin.model.vo.*;
+import com.gameplat.admin.model.vo.IpAnalysisVO;
+import com.gameplat.admin.model.vo.MemberInfoVO;
+import com.gameplat.admin.model.vo.MemberLevelVO;
+import com.gameplat.admin.model.vo.MemberVO;
+import com.gameplat.admin.model.vo.SpreadUnionVO;
 import com.gameplat.model.entity.member.Member;
+import java.util.List;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
-
-import java.util.List;
 
 public interface MemberMapper extends BaseMapper<Member> {
 
@@ -28,14 +31,11 @@ public interface MemberMapper extends BaseMapper<Member> {
    *
    * @param member Member
    */
-  void batchUpdateSuperPath(Member member);
-
-  /**
-   * 批量修改代理路径(不包含本身)
-   *
-   * @param member Member
-   */
-  void batchUpdateSuperPathExcludeSelf(Member member);
+  void batchUpdateSuperPathAndAgentLevel(
+      @Param("account") String account,
+      @Param("originSuperPath") String originSuperPath,
+      @Param("superPath") String superPath,
+      @Param("agentLevel") Integer agentLevel);
 
   /**
    * 更新下级人数
@@ -56,10 +56,10 @@ public interface MemberMapper extends BaseMapper<Member> {
   /**
    * 查询代理线的会员
    *
-   * @param agentAccout
-   * @return
+   * @param agentAccount
+   * @return List
    */
-  List<Member> getListByAgentAccout(String agentAccout);
+  List<Member> getListByAgentAccout(String agentAccount);
 
   /** 根据用户名查生日信息 */
   List<Member> findByUserNameList(List<String> userNames);
@@ -76,21 +76,22 @@ public interface MemberMapper extends BaseMapper<Member> {
   IPage<IpAnalysisVO> page(PageDTO<IpAnalysisVO> page, @Param("dto") IpAnalysisDTO dto);
 
   /** 获取代理下的所有用户 */
-  List<Member> getAgentMember(@Param("list")List<SpreadUnionVO> list, @Param("startTime")String startTime, @Param("endTime")String endTime);
+  List<Member> getAgentMember(
+      @Param("list") List<SpreadUnionVO> list,
+      @Param("startTime") String startTime,
+      @Param("endTime") String endTime);
 
-    @Select("select max(agent_level) from member")
-    Integer getMaxLevel();
+  @Select("select max(agent_level) from member")
+  Integer getMaxLevel();
 
   List<Member> getOpenSalaryAgent(@Param("list") List<Integer> list);
 
   /** 获取各个充值层级下会员数量和锁定会员数量 */
   List<MemberLevelVO> getUserLevelAccountNum();
 
-    /** 获取某个充值层级下会员数量总数 */
+  /** 获取某个充值层级下会员数量总数 */
   Integer getUserLevelTotalAccountNum(@Param("userLevel") Integer userLevel);
 
   /** 获取代理线下的会员账号信息 */
   List<Member> getMemberListByAgentAccount(MemberQueryDTO memberQueryDTO);
-
-  MemberBalanceVO findMemberVip(@Param("username") String username,@Param("userlevel") String userlevel,@Param("vipGrade") String vipGrade);
 }

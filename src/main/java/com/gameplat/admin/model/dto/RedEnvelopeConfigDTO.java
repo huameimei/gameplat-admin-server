@@ -2,23 +2,17 @@ package com.gameplat.admin.model.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.gameplat.common.group.Groups;
-import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.util.Date;
 
-/**
- * 红包配置
- */
+/** 红包配置 */
 @Data
 public class RedEnvelopeConfigDTO {
 
-  /**
-   * 主键id
-   */
+  /** 主键id */
   private Long id;
 
   /** 红包名称 */
@@ -47,13 +41,13 @@ public class RedEnvelopeConfigDTO {
   /** 充值要求 */
   private BigDecimal rechargeAmount;
 
-  /** 打码要求*/
+  /** 打码要求 */
   private BigDecimal chipRequire;
 
   /** 红包状态 0 禁用 1 启用 2 过期 */
   private Integer state;
 
-  /** 领取方式 1 手动领取  2 自动到账 */
+  /** 领取方式 1 手动领取 2 自动到账 */
   private Integer receiveMethod;
 
   /** 红包图片地址 */
@@ -65,15 +59,9 @@ public class RedEnvelopeConfigDTO {
   /** 备注信息 */
   private String remark;
 
-  /**
-   * 创建人
-   */
+  /** 创建人 */
   private String createBy;
 
-  /**
-   * 更新人
-   */
+  /** 更新人 */
   private String updateBy;
-
-
 }

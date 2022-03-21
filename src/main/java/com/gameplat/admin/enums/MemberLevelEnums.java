@@ -21,12 +21,12 @@ public class MemberLevelEnums {
       this.value = value;
     }
 
-    public int value() {
-      return this.value;
-    }
-
     public static boolean isLocked(int value) {
       return Y.value == value;
+    }
+
+    public int value() {
+      return this.value;
     }
 
     public boolean match(int value) {

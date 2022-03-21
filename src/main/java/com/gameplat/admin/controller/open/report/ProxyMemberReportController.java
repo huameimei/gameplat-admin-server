@@ -20,28 +20,28 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.servlet.http.HttpServletResponse;
 
 /**
- * @Description : 代理报表
- * @Author : cc
- * @Date : 2022/3/10
+ * 代理报表
+ *
+ * @author cc
  */
 @Slf4j
 @Api(tags = "代理报表")
 @RestController
 @RequestMapping("/api/admin/proxy/report")
 public class ProxyMemberReportController {
-    @Autowired
-    private MemberDayReportService memberDayReportService;
 
-    @GetMapping("/list")
-    public PageDtoVO<MemberDayReportVo> list(PageDTO<MemberDayReport> page, AgentReportQueryDTO dto) {
-        return memberDayReportService.agentReportList(page, dto);
-    }
+  @Autowired private MemberDayReportService memberDayReportService;
 
-    @GetMapping("/export")
-    @ApiOperation("导出财务报表")
-    @PreAuthorize("hasAuthority('agent:report:export')")
-    @Log(module = ServiceName.ADMIN_SERVICE, desc = "代理报表导出")
-    public void list(AgentReportQueryDTO dto,HttpServletResponse response) {
-        memberDayReportService.exportAgentReport(dto, response);
-    }
+  @GetMapping("/list")
+  public PageDtoVO<MemberDayReportVo> list(PageDTO<MemberDayReport> page, AgentReportQueryDTO dto) {
+    return memberDayReportService.agentReportList(page, dto);
+  }
+
+  @GetMapping("/export")
+  @ApiOperation("导出财务报表")
+  @PreAuthorize("hasAuthority('agent:report:export')")
+  @Log(module = ServiceName.ADMIN_SERVICE, desc = "代理报表导出")
+  public void list(AgentReportQueryDTO dto, HttpServletResponse response) {
+    memberDayReportService.exportAgentReport(dto, response);
+  }
 }

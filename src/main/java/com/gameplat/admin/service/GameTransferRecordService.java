@@ -6,6 +6,7 @@ import com.gameplat.admin.model.dto.GameTransferRecordQueryDTO;
 import com.gameplat.admin.model.dto.OperGameTransferRecordDTO;
 import com.gameplat.admin.model.vo.PageDtoVO;
 import com.gameplat.model.entity.game.GameTransferRecord;
+
 import java.util.List;
 
 public interface GameTransferRecordService extends IService<GameTransferRecord> {

@@ -16,6 +16,10 @@ import java.util.List;
  * @Description : 层层代分红模式配置 @Author : cc @Date : 2022/2/22
  */
 public interface DivideLayerConfigMapper extends BaseMapper<DivideLayerConfig> {
+  String countSql =
+      "select count(1) from divide_layer_config as dl inner join member as m on dl.user_name = m.account";
+  String countSqlWhere = " where m.super_path like concat('%/',#{userName},'/%')";
+
   IPage<DivideLayerConfigVo> pageList(
       PageDTO<DivideLayerConfig> page, @Param("dto") DivideConfigDTO divideConfigDTO);
 
@@ -23,10 +27,6 @@ public interface DivideLayerConfigMapper extends BaseMapper<DivideLayerConfig> {
   DivideLayerConfig getByUserName(@Param("userName") String userName);
 
   List<DivideLayerConfigVo> getTeamList(@Param("userName") String userName);
-
-  String countSql =
-      "select count(1) from divide_layer_config as dl inner join member as m on dl.user_name = m.account";
-  String countSqlWhere = " where m.super_path like concat('%/',#{userName},'/%')";
 
   @Select(countSql + countSqlWhere)
   Integer countTeam(@Param("userName") String userName);

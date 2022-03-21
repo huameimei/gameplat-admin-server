@@ -13,6 +13,7 @@ import com.gameplat.admin.service.MemberTransformService;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.json.JsonUtils;
 import com.gameplat.base.common.util.StringUtils;
+import com.gameplat.common.lang.Assert;
 import com.gameplat.model.entity.member.Member;
 import com.gameplat.model.entity.member.MemberBackup;
 import lombok.extern.slf4j.Slf4j;
@@ -39,10 +40,7 @@ public class MemberTransformServiceImpl implements MemberTransformService {
 
   @Override
   public void transform(MemberTransformDTO dto) {
-    // 获取需转移的会员信息
     Member source = memberService.getById(dto.getId());
-
-    // 根据账号获取代理信息
     Member target =
         memberService
             .getAgentByAccount(dto.getAgentAccount())
@@ -109,7 +107,6 @@ public class MemberTransformServiceImpl implements MemberTransformService {
             .account(source.getAccount())
             .agentLevel(source.getAgentLevel())
             .superPath(target.getSuperPath())
-            .superAgentLevel(target.getAgentLevel())
             .build();
 
     // 流水号不为空时备份
@@ -117,69 +114,42 @@ public class MemberTransformServiceImpl implements MemberTransformService {
       this.addBackup(serialNo, source, target.getAccount(), excludeSelf);
     }
 
+    // 仅转移直属下级，更新原直属下级的直接上级
     if (Boolean.TRUE.equals(excludeSelf)) {
-      // 更新原直属下级的直接上级
       this.updateDirectSuper(source.getAccount(), target);
     } else {
       // 转移全部时，只需更新当前会员的直属上级
       source.setParentId(target.getId());
       source.setParentName(target.getAccount());
-      if (!source.updateById()) {
-        throw new ServiceException("更新会员信息失败!");
-      }
+      Assert.isTrue(source.updateById(), "更新会员信息失败!");
     }
 
-    // 更新代理路径
-    this.batchUpdateSuperPath(updateMember, excludeSelf);
+    // 更新代理路径和代理等级
+    String newSuperPath = target.getSuperPath().concat(source.getAccount()).concat("/");
+    int agentLevel = source.getAgentLevel() - target.getAgentLevel();
+    memberMapper.batchUpdateSuperPathAndAgentLevel(
+        excludeSelf ? source.getAccount() : null, source.getSuperPath(), newSuperPath, agentLevel);
 
     // 更新下级人数
     this.batchUpdateLowerNum(source, target.getSuperPath(), excludeSelf);
   }
 
-  private void batchUpdateSuperPath(Member update, Boolean excludeSelf) {
-    if (Boolean.TRUE.equals(excludeSelf)) {
-      // 仅更新下级代理路径
-      memberMapper.batchUpdateSuperPathExcludeSelf(update);
-    } else {
-      // 更新全部
-      memberMapper.batchUpdateSuperPath(update);
-    }
-  }
-
   private void preCheck(Member source, Member target, Boolean excludeSelf) {
-    if (null == source) {
-      throw new ServiceException("会员信息不存在！");
-    }
+    Assert.notNull(source, "会员信息不存在！");
+    Assert.isFalse(SystemConstant.DEFAULT_WEB_ROOT.equals(source.getAccount()), "不能转移系统保留账号！");
+    Assert.isFalse(SystemConstant.DEFAULT_WAP_ROOT.equals(source.getAccount()), "不能转移系统保留账号！");
+    Assert.isFalse(SystemConstant.DEFAULT_TEST_ROOT.equals(source.getAccount()), "不能转移系统保留账号！");
 
-    if (StringUtils.equals(source.getAccount(), target.getAccount())) {
-      throw new ServiceException("不能自己转移自己！");
-    }
+    Assert.isFalse(StringUtils.equals(source.getAccount(), target.getAccount()), "不能自己转移自己！");
+    Assert.isFalse(
+        Boolean.FALSE.equals(excludeSelf)
+            && StringUtils.equals(source.getParentName(), target.getAccount()),
+        "已是目标代理，不允许重复转移");
 
-    if (Boolean.FALSE.equals(excludeSelf)
-        && StringUtils.equals(source.getParentName(), target.getAccount())) {
-      throw new ServiceException("已是目标代理，不允许重复转移！");
-    }
-
-    if (SystemConstant.DEFAULT_WEB_ROOT.equals(source.getAccount())) {
-      throw new ServiceException("不能转移系统保留账号！");
-    }
-
-    if (SystemConstant.DEFAULT_WAP_ROOT.equals(source.getAccount())) {
-      throw new ServiceException("不能转移系统保留账号！");
-    }
-
-    if (SystemConstant.DEFAULT_TEST_ROOT.equals(source.getAccount())) {
-      throw new ServiceException("不能转移系统保留账号！");
-    }
-
-    if (target.getSuperPath().startsWith(source.getSuperPath())) {
-      throw new ServiceException("不能转移到自己的下级代理线下！");
-    }
+    Assert.isFalse(target.getSuperPath().startsWith(source.getSuperPath()), "不能转移到自己的下级代理线下！");
 
     // 不包含自身时检查是否存在下级
-    if (Boolean.TRUE.equals(excludeSelf) && source.getLowerNum() == 0) {
-      throw new ServiceException("当前会员没有可转移的下级");
-    }
+    Assert.isFalse(Boolean.TRUE.equals(excludeSelf) && source.getLowerNum() == 0, "当前会员没有可转移的下级！");
   }
 
   /**

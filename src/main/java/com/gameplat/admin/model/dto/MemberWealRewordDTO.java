@@ -4,6 +4,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * @Description : VIP福利记录入参 @Author : lily @Date : 2021/11/23
@@ -36,4 +37,13 @@ public class MemberWealRewordDTO implements Serializable {
 
   @ApiModelProperty("vip等级")
   private Integer vipLevel;
+
+  @ApiModelProperty(value = "代理账号")
+  private String superAccount;
+
+  @ApiModelProperty(value = "是否只查询直属下级 0否1是")
+  private String flag;
+
+  @ApiModelProperty("用户账号集合")
+  private List<String> userNameList;
 }

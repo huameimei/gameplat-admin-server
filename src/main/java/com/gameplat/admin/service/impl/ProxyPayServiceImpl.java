@@ -63,6 +63,49 @@ public class ProxyPayServiceImpl implements ProxyPayService {
 
   @Autowired private MemberRwReportService memberRwReportService;
 
+  private static boolean verifyPpMerchant(
+      MemberWithdraw memberWithdraw, PpMerchant ppMerchant, PpInterface ppInterface) {
+    ProxyPayMerBean proxyPayMerBean = ProxyPayMerBean.conver2Bean(ppMerchant.getMerLimits());
+    if (memberWithdraw.getCashMoney().compareTo(proxyPayMerBean.getMinLimitCash()) < 0
+        || memberWithdraw.getCashMoney().compareTo(proxyPayMerBean.getMaxLimitCash()) > 0) {
+      log.info("用户出款金额超出商户出款金额范围，过滤此商户，商户名称为：" + ppMerchant.getName());
+      return true;
+    }
+
+    if (StringUtils.isNotEmpty(proxyPayMerBean.getUserLever())) {
+      if (!StringUtils.contains(
+          "," + proxyPayMerBean.getUserLever() + ",",
+          String.format("%s" + memberWithdraw.getMemberLevel() + "%s", ",", ","))) {
+        log.info("用户层级不在此代付商户设置的层级中，过滤此商户，商户名称为：" + ppMerchant.getName());
+        return true;
+      }
+    }
+
+    Map<String, String> banksMap =
+        JSONObject.parseObject(
+            JSONObject.parseObject(ppInterface.getLimtInfo()).getString("banks"), Map.class);
+    /** 模糊匹配银行名称 */
+    boolean isBankName = true;
+    for (Map.Entry<String, String> entry : banksMap.entrySet()) {
+      if (StringUtils.contains(entry.getValue(), memberWithdraw.getBankName())
+          || StringUtils.contains(memberWithdraw.getBankName(), entry.getValue())) {
+        isBankName = false;
+        break;
+      }
+
+      if (StringUtils.contains(entry.getValue(), "邮政")
+          && StringUtils.contains(memberWithdraw.getBankName(), "邮政")) {
+        isBankName = false;
+        break;
+      }
+    }
+    if (isBankName) {
+      log.info("代付商户不支持用户银行卡出款，过滤此商户，商户名称为：" + ppMerchant.getName());
+      return true;
+    }
+    return false;
+  }
+
   @Override
   public void proxyPay(
       Long id,
@@ -138,7 +181,8 @@ public class ProxyPayServiceImpl implements ProxyPayService {
     memberWithdraw.setApproveReason(ppMerchant.getName() + "代付出款");
     memberWithdraw.setOperatorTime(new Date());
     memberWithdraw.setOperatorAccount(userCredential.getUsername());
-    updateProxyWithdrawStatus(memberWithdraw, WithdrawStatus.SUCCESS.getValue(),member,memberInfo);
+    updateProxyWithdrawStatus(
+        memberWithdraw, WithdrawStatus.SUCCESS.getValue(), member, memberInfo);
 
     /** 请求第三方代付接口 */
     log.info("进入第三方出入款中心出款订单号: {}", memberWithdraw.getCashOrderNo());
@@ -294,49 +338,6 @@ public class ProxyPayServiceImpl implements ProxyPayService {
     }
   }
 
-  private static boolean verifyPpMerchant(
-      MemberWithdraw memberWithdraw, PpMerchant ppMerchant, PpInterface ppInterface) {
-    ProxyPayMerBean proxyPayMerBean = ProxyPayMerBean.conver2Bean(ppMerchant.getMerLimits());
-    if (memberWithdraw.getCashMoney().compareTo(proxyPayMerBean.getMinLimitCash()) < 0
-        || memberWithdraw.getCashMoney().compareTo(proxyPayMerBean.getMaxLimitCash()) > 0) {
-      log.info("用户出款金额超出商户出款金额范围，过滤此商户，商户名称为：" + ppMerchant.getName());
-      return true;
-    }
-
-    if (StringUtils.isNotEmpty(proxyPayMerBean.getUserLever())) {
-      if (!StringUtils.contains(
-          "," + proxyPayMerBean.getUserLever() + ",",
-          String.format("%s" + memberWithdraw.getMemberLevel() + "%s", ",", ","))) {
-        log.info("用户层级不在此代付商户设置的层级中，过滤此商户，商户名称为：" + ppMerchant.getName());
-        return true;
-      }
-    }
-
-    Map<String, String> banksMap =
-        JSONObject.parseObject(
-            JSONObject.parseObject(ppInterface.getLimtInfo()).getString("banks"), Map.class);
-    /** 模糊匹配银行名称 */
-    boolean isBankName = true;
-    for (Map.Entry<String, String> entry : banksMap.entrySet()) {
-      if (StringUtils.contains(entry.getValue(), memberWithdraw.getBankName())
-          || StringUtils.contains(memberWithdraw.getBankName(), entry.getValue())) {
-        isBankName = false;
-        break;
-      }
-
-      if (StringUtils.contains(entry.getValue(), "邮政")
-          && StringUtils.contains(memberWithdraw.getBankName(), "邮政")) {
-        isBankName = false;
-        break;
-      }
-    }
-    if (isBankName) {
-      log.info("代付商户不支持用户银行卡出款，过滤此商户，商户名称为：" + ppMerchant.getName());
-      return true;
-    }
-    return false;
-  }
-
   /**
    * 检验子账号出款受理额度
    *
@@ -443,8 +444,8 @@ public class ProxyPayServiceImpl implements ProxyPayService {
    *
    * @param memberWithdraw
    */
-  public void updateProxyWithdrawStatus(MemberWithdraw memberWithdraw, Integer cashStatus,Member member,
-      MemberInfo memberInfo)
+  public void updateProxyWithdrawStatus(
+      MemberWithdraw memberWithdraw, Integer cashStatus, Member member, MemberInfo memberInfo)
       throws Exception {
     // 修改订单状态
     LambdaUpdateWrapper<MemberWithdraw> updateMemberWithdraw = Wrappers.lambdaUpdate();
@@ -471,8 +472,7 @@ public class ProxyPayServiceImpl implements ProxyPayService {
     }
 
     if (!UserTypes.PROMOTION.value().equals(member.getUserType())) {
-      memberRwReportService
-          .addWithdraw(member,memberInfo.getTotalWithdrawTimes(),memberWithdraw);
+      memberRwReportService.addWithdraw(member, memberInfo.getTotalWithdrawTimes(), memberWithdraw);
     }
 
     // 更新会员信息表

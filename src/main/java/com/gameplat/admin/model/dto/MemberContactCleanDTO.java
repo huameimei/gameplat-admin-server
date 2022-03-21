@@ -18,8 +18,10 @@ public class MemberContactCleanDTO implements Serializable {
 
   @Min(value = 1, message = "至少包含一种联系方式")
   List<String> fields;
+
   @Length(max = 255, message = "开始时间不能为空")
   private String startTime;
+
   @NotEmpty(message = "结束时间不能为空")
   private String endTime;
 }

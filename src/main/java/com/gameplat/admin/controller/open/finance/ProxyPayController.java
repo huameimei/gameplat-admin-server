@@ -8,6 +8,7 @@ import com.gameplat.log.annotation.Log;
 import com.gameplat.log.enums.LogType;
 import com.gameplat.security.SecurityUserHolder;
 import com.gameplat.security.context.UserCredential;
+import lombok.SneakyThrows;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -24,21 +25,24 @@ public class ProxyPayController {
 
   @Autowired private ProxyPayService proxyPayService;
 
+  @SneakyThrows
   @PostMapping("/relProxyPay")
   @PreAuthorize("hasAuthority('finance:memberWithdraw:relProxyPay')")
-  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.WITHDRAW, desc = "'第三方代付出款商户:'#ppMerchantId")
+  @Log(
+      module = ServiceName.ADMIN_SERVICE,
+      type = LogType.WITHDRAW,
+      desc = "'第三方代付出款商户:'#ppMerchantId")
   public void proxyPay(
       @NotNull(message = "{NoNull}") Long id,
       @NotNull(message = "{NoNull}") Long ppMerchantId,
-      HttpServletRequest request)
-      throws Exception {
+      HttpServletRequest request) {
     String sysPath = request.getSession().getServletContext().getRealPath("");
     String urL = ServletUtils.getRequestDomain(request);
     String scheme = request.getHeader("X-Forwarded-Scheme");
     UserCredential userCredential = SecurityUserHolder.getCredential();
 
     String realUrl;
-    if (StringUtils.isNotBlank(scheme) && scheme.equals("https")) {
+    if (StringUtils.isNotBlank(scheme) && "https".equals(scheme)) {
       realUrl = urL.replace("http:", "https:");
     } else {
       realUrl = urL;

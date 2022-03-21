@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface SysUserAuthService {
 
-    void save(SysUserAuthDto dto);
+  void save(SysUserAuthDto dto);
 
-    List<SysUserAuthVo> findAuth();
+  List<SysUserAuthVo> findAuth();
 }

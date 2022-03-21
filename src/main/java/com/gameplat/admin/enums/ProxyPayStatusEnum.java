@@ -22,14 +22,6 @@ public enum ProxyPayStatusEnum {
     this.name = name;
   }
 
-  public int getCode() {
-    return code;
-  }
-
-  public String getName() {
-    return name;
-  }
-
   public static ProxyPayStatusEnum get(int code) {
     return Arrays.stream(ProxyPayStatusEnum.values())
         .filter(em -> (em.getCode() == code))
@@ -39,5 +31,13 @@ public enum ProxyPayStatusEnum {
 
   public static String getName(int code) {
     return ProxyPayStatusEnum.get(code).getName();
+  }
+
+  public int getCode() {
+    return code;
+  }
+
+  public String getName() {
+    return name;
   }
 }

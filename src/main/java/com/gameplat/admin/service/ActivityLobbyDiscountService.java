@@ -16,30 +16,30 @@ public interface ActivityLobbyDiscountService extends IService<ActivityLobbyDisc
   /**
    * 通过大厅id查询优惠信息列表
    *
-   * @param activityLobbyId
-   * @return
+   * @param id Long
+   * @return List
    */
-  List<ActivityLobbyDiscountVO> listByActivityLobbyId(Long activityLobbyId);
+  List<ActivityLobbyDiscountVO> listByActivityLobbyId(Long id);
 
   /**
    * 批量更新
    *
-   * @param activityLobbyDiscountList
+   * @param activityLobbyDiscountList List
    */
   void updateBatchLobbyDiscount(List<ActivityLobbyDiscount> activityLobbyDiscountList);
 
   /**
    * 批量保存
    *
-   * @param activityLobbyDiscountList
-   * @return
+   * @param activityLobbyDiscountList List
+   * @return boolean
    */
   boolean saveBatchLobbyDiscount(List<ActivityLobbyDiscount> activityLobbyDiscountList);
 
   /**
    * 批量删除
    *
-   * @param deleteList
+   * @param deleteList List
    */
   void deleteBatchLobbyDiscount(List<ActivityLobbyDiscount> deleteList);
 }

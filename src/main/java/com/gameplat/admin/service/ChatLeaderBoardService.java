@@ -6,7 +6,6 @@ import com.gameplat.model.entity.chart.ChatLeaderBoard;
 
 /**
  * @author lily
- * @description
  * @date 2022/2/16
  */
 public interface ChatLeaderBoardService extends IService<ChatLeaderBoard> {

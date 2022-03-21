@@ -16,8 +16,9 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
+ * 红包领取记录
+ *
  * @author lily
- * @description 红包领取记录
  * @date 2022/2/15
  */
 @Service

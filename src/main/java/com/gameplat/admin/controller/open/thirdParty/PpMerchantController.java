@@ -38,7 +38,10 @@ public class PpMerchantController {
 
   @PostMapping("/add")
   @PreAuthorize("hasAuthority('thirdParty:ppMerchants:add')")
-  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.WITHDRAW, desc = "'新增出款商户name=' + #dto.name")
+  @Log(
+      module = ServiceName.ADMIN_SERVICE,
+      type = LogType.WITHDRAW,
+      desc = "'新增出款商户name=' + #dto.name")
   public void add(@RequestBody PpMerchantAddDTO dto) {
     ppMerchantService.save(dto);
   }

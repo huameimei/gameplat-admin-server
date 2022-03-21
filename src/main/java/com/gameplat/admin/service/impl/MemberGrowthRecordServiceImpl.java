@@ -42,10 +42,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.MessageFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -61,6 +58,8 @@ public class MemberGrowthRecordServiceImpl
     extends ServiceImpl<MemberGrowthRecordMapper, MemberGrowthRecord>
     implements MemberGrowthRecordService {
 
+  public static final String kindName =
+          "{\"en-US\": \"platform\", \"in-ID\": \"peron\", \"th-TH\": \"แพลตฟอร์ม\", \"vi-VN\": \"nền tảng\", \"zh-CN\": \"平台\"}";
   @Autowired private MemberGrowthRecordConvert recordConvert;
 
   @Autowired private MemberGrowthRecordMapper memberGrowthRecordMapper;
@@ -93,11 +92,7 @@ public class MemberGrowthRecordServiceImpl
 
   @Autowired private MemberGoldCoinRecordService memberGoldCoinRecordService;
 
-  @Autowired
-  private RedisTemplate<String, Object> redisTemplate;
-
-  public static final String kindName =
-      "{\"en-US\": \"platform\", \"in-ID\": \"peron\", \"th-TH\": \"แพลตฟอร์ม\", \"vi-VN\": \"nền tảng\", \"zh-CN\": \"平台\"}";
+  @Autowired private RedisTemplate<String, Object> redisTemplate;
 
   @Override
   public IPage<MemberGrowthRecordVO> findRecordList(
@@ -138,20 +133,17 @@ public class MemberGrowthRecordServiceImpl
   @Override
   public Integer dealUpLevel(Long afterGrowth, MemberGrowthConfig memberGrowthConfig) {
     // todo 1.先获取所有成长值等级
-    Integer limitLevel = memberGrowthConfig.getLimitLevel();
-    if (limitLevel == null) {
-      limitLevel = 50;
-    }
-    List<MemberGrowthLevelVO> levels =
-        growthLevelService.findList(limitLevel + 1, LanguageEnum.app_zh_CN.getCode());
+    Integer limitLevel = Optional.ofNullable(memberGrowthConfig.getLimitLevel()).orElse(50);
+    List<MemberGrowthLevelVO> levels = growthLevelService.findList(limitLevel);
     MemberGrowthLevelVO maxGrowthLevel = levels.get(levels.size() - 1);
     // 如果比最大等级所需升级成长值还要大  则直接返回最大等级
     if (afterGrowth >= maxGrowthLevel.getGrowth()) {
       return maxGrowthLevel.getLevel();
     }
-    for (int i = 0; i < levels.size(); i++) {
-      if (afterGrowth < levels.get(i).getGrowth()) {
-        return levels.get(i).getLevel();
+
+    for (MemberGrowthLevelVO level : levels) {
+      if (afterGrowth < level.getGrowth()) {
+        return level.getLevel();
       }
     }
     throw new ServiceException("计算成长等级失败！");
@@ -167,8 +159,7 @@ public class MemberGrowthRecordServiceImpl
   public void editMemberGrowth(MemberGrowthChangeDto dto, HttpServletRequest request) {
     // 判断是否开启了VIP
     // todo 2.获取成长值配置
-    MemberGrowthConfig growthConfig =
-        memberGrowthConfigService.getOneConfig(LanguageEnum.app_zh_CN.getCode());
+    MemberGrowthConfig growthConfig = memberGrowthConfigService.getOneConfig();
     if (growthConfig.getIsEnableVip() == 0) {
       throw new ServiceException("未开启VIP功能");
     }
@@ -463,7 +454,7 @@ public class MemberGrowthRecordServiceImpl
         limitLevel = 50;
       }
       List<MemberGrowthLevel> levels =
-          growthLevelService.getList(limitLevel + 1, LanguageEnum.app_zh_CN.getCode());
+          growthLevelService.getList(limitLevel);
       Map<Integer, MemberGrowthLevel> levelMap =
           levels.stream()
               .collect(

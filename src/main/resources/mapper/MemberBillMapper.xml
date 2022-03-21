@@ -20,28 +20,9 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        id, member_id, account, member_path, tran_type, order_no, amount, balance, remark, content, operator, create_time
+        id
+        , member_id, account, member_path, tran_type, order_no, amount, balance, remark, content, operator, create_time
     </sql>
-
-    <select id="findy" resultType="com.gameplat.admin.model.vo.MemberBillVO">
-        SELECT <include refid="Base_Column_List"/> FROM member_bill
-        WHERE 1 = 1
-        <if test="account != null">and account = #{account}</if>
-        <if test="orderNo != null and orderNo !=''">and order_no = #{orderNo}</if>
-        <if test="tranTypes != null and tranTypes.size()>0">and tran_type in
-            <foreach item="item" index="index" collection="tranTypes" open="(" separator="," close=")">
-                #{item}
-            </foreach>
-        </if>
-        <if test="beginTime != null and beginTime != ''">and date_format(create_time,'%y%m%d') <![CDATA[ >= ]]>
-            date_format(#{beginTime},'%y%m%d')
-        </if>
-        <if test="endTime != null and endTime != ''">and date_format(create_time,'%y%m%d') <![CDATA[ <= ]]>
-            date_format(#{endTime},'%y%m%d')
-        </if>
-        ORDER BY create_time DESC,id DESC
-    </select>
-
 
     <select id="findBill" resultMap="BaseResultMap">
         select

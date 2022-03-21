@@ -15,9 +15,9 @@ public interface MemberBillService extends IService<MemberBill> {
 
   void save(Member member, MemberBill memberBill) throws Exception;
 
-  IPage<MemberBillVO> findMemberBilllistPage(PageDTO<MemberBill> page, MemberBillDTO dto);
+  IPage<MemberBillVO> queryPage(PageDTO<MemberBill> page, MemberBillDTO dto);
 
-  List<MemberBillVO> findMemberBillList(MemberBillDTO dto);
+  List<MemberBillVO> queryList(MemberBillDTO dto);
 
   MemberBill queryLiveBill(Long id, String orderNo, int transType);
 

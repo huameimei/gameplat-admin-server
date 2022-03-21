@@ -1,9 +1,8 @@
 package com.gameplat.admin.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
-import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.convert.MemberBillConvert;
@@ -22,11 +21,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)
@@ -53,53 +49,15 @@ public class MemberBillServiceImpl extends ServiceImpl<MemberBillMapper, MemberB
   }
 
   @Override
-  public IPage<MemberBillVO> findMemberBilllistPage(PageDTO<MemberBill> page, MemberBillDTO dto) {
-    QueryWrapper<Member> memberQuery = Wrappers.query();
-    memberQuery.eq(true, "account", dto.getAccount());
-    IPage<MemberBillVO> pageList =
-        memberBillMapper.findy(
-            page,
-            dto.getAccount(),
-            dto.getOrderNo(),
-            dto.getTranTypes(),
-            dto.getBeginTime(),
-            dto.getEndTime());
-    return pageList;
+  public IPage<MemberBillVO> queryPage(PageDTO<MemberBill> page, MemberBillDTO dto) {
+    return this.builderQuery(dto).page(page).convert(memberBillConvert::toVo);
   }
 
   @Override
-  public List<MemberBillVO> findMemberBillList(MemberBillDTO dto) {
-
-    if (ObjectUtils.isEmpty(dto.getBeginTime()) || ObjectUtils.isEmpty(dto.getEndTime())) {
-      throw new ServiceException("查询账变记录需选择时间段！");
-    }
-    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-    Date nowDate = null;
-    Date beginTime = null;
-    Date endTime = null;
-    try {
-      nowDate = sdf.parse(sdf.format(new Date()));
-      beginTime = sdf.parse(dto.getBeginTime());
-      endTime = sdf.parse(dto.getEndTime());
-    } catch (ParseException e) {
-      e.printStackTrace();
-    }
-
-    // 今天
-    if (beginTime.compareTo(nowDate) == 0 && endTime.compareTo(nowDate) == 0) {
-      dto.setBeginTime(dto.getBeginTime() + " 00:00:00");
-      dto.setEndTime(dto.getEndTime() + " 23:59:59");
-    } else if (ObjectUtils.isEmpty(dto.getAccount())) {
-      throw new ServiceException("查询【非当日】账变记录需提供【会员帐号】！");
-    }
-    QueryWrapper<Member> memberQuery = Wrappers.query();
-    memberQuery.eq(true, "account", dto.getAccount());
-    return memberBillMapper.findy(
-        dto.getAccount(),
-        dto.getOrderNo(),
-        dto.getTranTypes(),
-        dto.getBeginTime(),
-        dto.getEndTime());
+  public List<MemberBillVO> queryList(MemberBillDTO dto) {
+    return this.builderQuery(dto).list().stream()
+        .map(e -> memberBillConvert.toVo(e))
+        .collect(Collectors.toList());
   }
 
   @Override
@@ -121,69 +79,15 @@ public class MemberBillServiceImpl extends ServiceImpl<MemberBillMapper, MemberB
     return memberBill;
   }
 
-  public List<MemberBillVO> getList(MemberBillDTO dto) {
-    if (ObjectUtils.isEmpty(dto.getBeginTime()) || ObjectUtils.isEmpty(dto.getEndTime())) {
-      throw new ServiceException("查询账变记录需选择时间段！");
-    }
-    List<MemberBillVO> voList = new ArrayList<>();
-    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-    Date nowDate = null;
-    Date beginTime = null;
-    Date endTime = null;
-    try {
-      nowDate = sdf.parse(sdf.format(new Date()));
-      beginTime = sdf.parse(dto.getBeginTime());
-      endTime = sdf.parse(dto.getEndTime());
-    } catch (ParseException e) {
-      e.printStackTrace();
-    }
-    // 今天
-    if (beginTime.compareTo(nowDate) == 0 && endTime.compareTo(nowDate) == 0) {
-      dto.setBeginTime(dto.getBeginTime() + " 00:00:00");
-      dto.setEndTime(dto.getEndTime() + " 23:59:59");
-      List<MemberBill> list =
-          this.lambdaQuery()
-              .eq(
-                  ObjectUtils.isNotEmpty(dto.getAccount()),
-                  MemberBill::getAccount,
-                  dto.getAccount())
-              .eq(
-                  ObjectUtils.isNotEmpty(dto.getOrderNo()),
-                  MemberBill::getOrderNo,
-                  dto.getOrderNo())
-              .ge(
-                  ObjectUtils.isNotEmpty(dto.getBeginTime()),
-                  MemberBill::getCreateTime,
-                  dto.getBeginTime())
-              .le(
-                  ObjectUtils.isNotEmpty(dto.getEndTime()),
-                  MemberBill::getCreateTime,
-                  dto.getEndTime())
-              .in(
-                  ObjectUtils.isNotEmpty(dto.getTranTypes()),
-                  MemberBill::getTranType,
-                  dto.getTranTypes())
-              .orderByDesc(MemberBill::getCreateTime)
-              .orderByDesc(MemberBill::getId)
-              .list();
-
-      for (int i = 0; i < list.size(); i++) {
-        voList.add(memberBillConvert.toVo(list.get(i)));
-      }
-      return voList;
-      // 历史
-    } else {
-      if (ObjectUtils.isEmpty(dto.getAccount())) {
-        throw new ServiceException("查询【非当日】账变记录需提供【会员帐号】！");
-      }
-      voList =
-          memberBillMapper.findy(
-              dto.getAccount(),
-              dto.getOrderNo(),
-              dto.getTranTypes(),
-              dto.getBeginTime(),
-              dto.getEndTime());
-      return voList;
-    }
+  private LambdaQueryChainWrapper<MemberBill> builderQuery(MemberBillDTO dto) {
+    return this.lambdaQuery()
+        .eq(ObjectUtils.isNotEmpty(dto.getAccount()), MemberBill::getAccount, dto.getAccount())
+        .eq(ObjectUtils.isNotEmpty(dto.getOrderNo()), MemberBill::getOrderNo, dto.getOrderNo())
+        .in(ObjectUtils.isNotEmpty(dto.getTranTypes()), MemberBill::getTranType, dto.getTranTypes())
+        .between(
+            ObjectUtils.isNotEmpty(dto.getBeginTime()),
+            MemberBill::getCreateTime,
+            dto.getBeginTime(),
+            dto.getEndTime());
   }
 }

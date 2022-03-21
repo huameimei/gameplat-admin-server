@@ -1,8 +1,7 @@
 package com.gameplat.admin.model.dto;
 
-import lombok.Data;
-
 import java.io.Serializable;
+import lombok.Data;
 
 @Data
 public class OperGameDTO implements Serializable {
@@ -21,7 +20,7 @@ public class OperGameDTO implements Serializable {
 
   private Integer isH5;
 
-  private Integer isFlash;
+  private Integer isPc;
 
   private Integer sort;
 

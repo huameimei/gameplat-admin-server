@@ -89,7 +89,12 @@ public class OtthController {
       HttpServletResponse response,
       PageDTO<?> page)
       throws Exception {
-    return otthService.otthProxyHttpGet(getApiUrl(url), request, response, page);
+    try {
+      return otthService.otthProxyHttpGet(getApiUrl(url), request, response, page);
+    } catch (Exception e) {
+      log.error(" 聊天室聊接口异常 {}",e);
+      throw e;
+    }
   }
 
   @ApiOperation(value = "获取彩票游戏类型")

@@ -58,6 +58,7 @@ public class MemberGoldCoinRecordServiceImpl extends ServiceImpl<MemberGoldCoinR
                 .eq(ObjectUtil.isNotEmpty(dto.getSourceType()), MemberGoldCoinRecord::getSourceType, dto.getSourceType())
                 .ge(ObjectUtil.isNotEmpty(dto.getStartTime()), MemberGoldCoinRecord::getCreateTime, dto.getStartTime())
                 .le(ObjectUtil.isNotEmpty(dto.getEndTime()), MemberGoldCoinRecord::getCreateTime, dto.getEndTime())
+                .orderByDesc(MemberGoldCoinRecord::getCreateTime)
                 .page(page)
                 .convert(memberGoldCoinRecordConvert::toVo);
     }

@@ -8,27 +8,18 @@ import com.gameplat.model.entity.recharge.RedEnvelopeConfig;
 
 import java.util.List;
 
-
 /** 红包配置信息 */
 public interface RedEnvelopeConfigService extends IService<RedEnvelopeConfig> {
 
-    /**
-     * 新增红包配置
-     */
-    boolean redAdd(RedEnvelopeConfigDTO dto);
+  /** 新增红包配置 */
+  boolean redAdd(RedEnvelopeConfigDTO dto);
 
-    /**
-     * 红包配置列表
-     */
-    IPage<RedEnvelopeConfig> redList(PageDTO<RedEnvelopeConfig> page, RedEnvelopeConfigDTO dto);
+  /** 红包配置列表 */
+  IPage<RedEnvelopeConfig> redList(PageDTO<RedEnvelopeConfig> page, RedEnvelopeConfigDTO dto);
 
-    /**
-     * 红包配置信息修改
-     */
-    boolean redEdit(RedEnvelopeConfigDTO dto);
+  /** 红包配置信息修改 */
+  boolean redEdit(RedEnvelopeConfigDTO dto);
 
-    /**
-     * 红包配置信息删除
-     */
-    boolean redDelete(List<Integer> ids);
+  /** 红包配置信息删除 */
+  boolean redDelete(List<Integer> ids);
 }

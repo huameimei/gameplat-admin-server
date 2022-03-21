@@ -21,7 +21,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author lily
- * @description
  * @date 2022/2/9
  */
 @Slf4j
@@ -32,7 +31,6 @@ public class ChatNoticeServiceImpl extends ServiceImpl<ChatNoticeMapper, ChatNot
 
   @Autowired private ChatNoticeConvert chatNoticeConvert;
 
-  /** 分页查询 */
   @Override
   public IPage<ChatNoticeVO> page(PageDTO<ChatNotice> page, ChatNoticeQueryDTO dto) {
     return this.lambdaQuery()
@@ -46,20 +44,17 @@ public class ChatNoticeServiceImpl extends ServiceImpl<ChatNoticeMapper, ChatNot
         .convert(chatNoticeConvert::toVo);
   }
 
-  /** 增 */
   @Override
   public void add(ChatNoticeAddDTO dto) {
     this.save(chatNoticeConvert.toEntity(dto));
   }
 
-  /** 删 */
   @Override
   public void remove(Long id) {
     Assert.notNull(id, "id不存在");
     this.removeById(id);
   }
 
-  /** 改 */
   @Override
   public void edit(ChatNoticeEditDTO dto) {
     Assert.notNull(dto.getId(), "id不存在");

@@ -4,7 +4,6 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.io.Serializable;
-import java.util.Date;
 
 /**
  * @author lily
@@ -14,24 +13,24 @@ import java.util.Date;
 @Data
 public class MemberLoanQueryDTO implements Serializable {
 
-    @ApiModelProperty("会员账号")
-    private String account;
+  @ApiModelProperty("会员账号")
+  private String account;
 
-    @ApiModelProperty("VIP等级")
-    private Integer vipLevel;
+  @ApiModelProperty("VIP等级")
+  private Integer vipLevel;
 
-    @ApiModelProperty("欠款金额区间")
-    private Double minOverdraftMoney;
+  @ApiModelProperty("欠款金额区间")
+  private Double minOverdraftMoney;
 
-    @ApiModelProperty("欠款金额区间")
-    private Double maxOverdraftMoney;
+  @ApiModelProperty("欠款金额区间")
+  private Double maxOverdraftMoney;
 
-    @ApiModelProperty("借款时间区间")
-    private String beginLoanTime;
+  @ApiModelProperty("借款时间区间")
+  private String beginLoanTime;
 
-    @ApiModelProperty("借款时间区间")
-    private String endLoanTime;
+  @ApiModelProperty("借款时间区间")
+  private String endLoanTime;
 
-    @ApiModelProperty("借款状态  0:成功  1:失败  2:已回收")
-    private Integer loanStatus;
+  @ApiModelProperty("借款状态  0:成功  1:失败  2:已回收")
+  private Integer loanStatus;
 }

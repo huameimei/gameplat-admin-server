@@ -14,8 +14,9 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
+ * 红包记录
+ *
  * @author lily
- * @description 红包记录
  * @date 2022/2/15
  */
 @Service
@@ -25,7 +26,6 @@ public class ChatRedEnvelopeRecordServiceImpl
     extends ServiceImpl<ChatRedEnvelopeRecordMapper, ChatRedEnvelopeRecord>
     implements ChatRedEnvelopeRecordService {
 
-  /** 红包领取记录 */
   @Override
   public IPage<ChatRedEnvelopeRecord> page(
       PageDTO<ChatRedEnvelopeRecord> page, ChatRedEnvelopeRecordQueryDTO dto) {

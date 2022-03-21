@@ -13,39 +13,39 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 public class SalaryConfigDTO {
-    private Long id;
+  private Long id;
 
-    private Integer settleSort;
+  private Integer settleSort;
 
-    private Integer agentLevel;
+  private Integer agentLevel;
 
-    private String gameType;
+  private String gameType;
 
-    private BigDecimal winAmountLimit;
+  private BigDecimal winAmountLimit;
 
-    private Integer validUserLimit;
+  private Integer validUserLimit;
 
-    private BigDecimal validAmountLimit;
+  private BigDecimal validAmountLimit;
 
-    private BigDecimal rechargeAmountLimit;
+  private BigDecimal rechargeAmountLimit;
 
-    private Integer isDirect;
+  private Integer isDirect;
 
-    private Boolean isDirectBol;
+  private Boolean isDirectBol;
 
-    private Integer type;
+  private Integer type;
 
-    private BigDecimal amount;
+  private BigDecimal amount;
 
-    private BigDecimal amountLimit;
+  private BigDecimal amountLimit;
 
-    private Date createTime;
+  private Date createTime;
 
-    private String createBy;
+  private String createBy;
 
-    private String updateBy;
+  private String updateBy;
 
-    private Date updateTime;
+  private Date updateTime;
 
-    private String remark;
+  private String remark;
 }

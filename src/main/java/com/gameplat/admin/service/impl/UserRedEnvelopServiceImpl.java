@@ -17,21 +17,14 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserRedEnvelopServiceImpl extends ServiceImpl<UserRedEnvelopMapper, UserRedEnvelope>
     implements UserRedEnvelopeService {
 
-  @Autowired
-  private UserRedEnvelopMapper mapper;
+  @Autowired private UserRedEnvelopMapper mapper;
 
-  /**
-   * 红包记录列表
-   */
   @Override
   public IPage<UserRedEnvelopeVO> recordList(UserRedEnvelopeDTO dto) {
     mapper.recordList(dto);
     return null;
   }
 
-  /**
-   * 红包回收
-   */
   @Override
   public Object redRecycle(UserRedEnvelopeDTO dto) {
     return null;

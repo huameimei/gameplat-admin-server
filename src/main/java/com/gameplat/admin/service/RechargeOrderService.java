@@ -7,7 +7,6 @@ import com.gameplat.admin.model.bean.ActivityStatisticItem;
 import com.gameplat.admin.model.bean.ManualRechargeOrderBo;
 import com.gameplat.admin.model.bean.PageExt;
 import com.gameplat.admin.model.dto.GameRWDataReportDto;
-import com.gameplat.admin.model.dto.ManualRechargeOrderDto;
 import com.gameplat.admin.model.dto.MemberActivationDTO;
 import com.gameplat.admin.model.dto.RechargeOrderQueryDTO;
 import com.gameplat.admin.model.vo.MemberActivationVO;
@@ -18,10 +17,7 @@ import com.gameplat.common.model.bean.UserEquipment;
 import com.gameplat.model.entity.recharge.RechargeOrder;
 import com.gameplat.model.entity.spread.SpreadUnion;
 import com.gameplat.security.context.UserCredential;
-import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
@@ -45,25 +41,27 @@ public interface RechargeOrderService extends IService<RechargeOrder> {
 
   void updateStatus(Long id, Integer curStatus, Integer newStatus, String auditorAccount);
 
-    void manual(ManualRechargeOrderBo manualRechargeOrderBo, UserCredential userCredential,
-        UserEquipment userEquipment)
-            throws Exception;
+  void manual(
+      ManualRechargeOrderBo manualRechargeOrderBo,
+      UserCredential userCredential,
+      UserEquipment userEquipment)
+      throws Exception;
 
   /**
    * 查询每天充值的金额
    *
-   * @param map
-   * @return
+   * @param map Map
+   * @return List
    */
-  List<ActivityStatisticItem> findRechargeDateList(Map map);
+  List<ActivityStatisticItem> findRechargeDateList(Map<String, Object> map);
 
   /**
    * 查询所有首次充值的金额
    *
-   * @param map
-   * @return
+   * @param map Map
+   * @return List
    */
-  List<ActivityStatisticItem> findAllFirstRechargeAmount(Map map);
+  List<ActivityStatisticItem> findAllFirstRechargeAmount(Map<String, Object> map);
 
   /** 根据会员和最后修改时间获取充值次数、充值金额、充值优惠、其它优惠 */
   MemberActivationVO getRechargeInfoByNameAndUpdateTime(MemberActivationDTO memberActivationDTO);
@@ -72,9 +70,4 @@ public interface RechargeOrderService extends IService<RechargeOrder> {
   List<JSONObject> getSpreadReport(List<SpreadUnion> list, String startTime, String endTime);
 
   List<ThreeRechReportVo> findThreeRechReport(GameRWDataReportDto dto);
-
-
-  void fileUserNameRech(ManualRechargeOrderDto dto, MultipartFile file, HttpServletRequest request,UserCredential credential) throws Exception;
-
-  void fileRech(MultipartFile file, Integer discountType,HttpServletRequest request,UserCredential credential) throws Exception;
 }

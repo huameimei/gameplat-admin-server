@@ -97,16 +97,18 @@ public class PayTypeServiceImpl extends ServiceImpl<PayTypeMapper, PayType>
   @Override
   public IPage<PayType> queryPage(Page<PayType> page) {
     LambdaQueryWrapper<PayType> query = Wrappers.lambdaQuery();
-    query.orderByAsc(PayType::getSort);
+    query.orderByAsc(PayType::getSort)
+    .orderByDesc(PayType::getCreateTime);
     return this.page(page, query);
   }
 
   @Override
   public List<PayTypeVO> queryEnableVirtual() {
     LambdaQueryWrapper<PayType> query = Wrappers.lambdaQuery();
-    query.eq(PayType::getStatus, EnableEnum.ENABLED.code()).
-        eq(PayType::getBankFlag, 2).
-        orderByAsc(PayType::getSort);
+    query
+        .eq(PayType::getStatus, EnableEnum.ENABLED.code())
+        .eq(PayType::getBankFlag, 2)
+        .orderByAsc(PayType::getSort);
     return this.list(query).stream().map(e -> payTypeConvert.toVo(e)).collect(Collectors.toList());
   }
 }

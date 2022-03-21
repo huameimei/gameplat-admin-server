@@ -11,6 +11,7 @@ import com.gameplat.admin.model.dto.SpreadUnionPackageDTO;
 import com.gameplat.admin.model.vo.SpreadUnionPackageVO;
 import com.gameplat.admin.service.SpreadUnionPackageService;
 import com.gameplat.base.common.exception.ServiceException;
+import com.gameplat.common.lang.Assert;
 import com.gameplat.model.entity.spread.SpreadUnionPackage;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -118,11 +119,6 @@ public class SpreadUnionPackageServiceImpl
   public void removeByUnionId(List<Long> unionId) {
     LambdaQueryWrapper<SpreadUnionPackage> query = Wrappers.lambdaQuery();
     query.in(SpreadUnionPackage::getUnionId, unionId);
-    try {
-      this.remove(query);
-    } catch (Exception e) {
-      log.error("联盟包删除失败,异常信息 {}", e);
-      throw new ServiceException("删除失败");
-    }
+    Assert.isTrue(this.remove(query), "删除失败");
   }
 }

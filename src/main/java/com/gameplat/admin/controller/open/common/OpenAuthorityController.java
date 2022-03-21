@@ -47,20 +47,21 @@ public class OpenAuthorityController {
     return authenticationService.login(dto, request);
   }
 
-  /** 账号登出 */
+  @ApiOperation("账号登出")
   @PostMapping("/logout")
   @LoginLog(isLogout = true, module = ServiceName.ADMIN_SERVICE, desc = "账号登出系统")
   public void logout() {
     authenticationService.logout();
   }
 
-  /** 刷新token */
+  @ApiOperation("刷新TOKEN")
   @PostMapping("/refreshToken")
   @Log(module = ServiceName.ADMIN_SERVICE, desc = "刷新token")
   public RefreshToken refreshToken(@RequestParam String refreshToken) {
     return authenticationService.refreshToken(refreshToken);
   }
 
+  @ApiOperation("两步认证")
   @PostMapping("/verify2fa")
   @PreAuthorize("hasRole('ROLE_2FA_VERIFICATION_USER')")
   public RefreshToken verifyCode(
@@ -69,18 +70,14 @@ public class OpenAuthorityController {
     return authenticationService.verify2Fa(credential, code);
   }
 
-  /** 获取谷歌认证码 */
   @SneakyThrows
+  @ApiOperation("获取谷歌认证码")
   @GetMapping(value = "/authCode")
   public GoogleAuthCodeVO getAuthCode(@AuthenticationPrincipal UserCredential credential) {
     return twoFactorAuthenticationService.create2Fa(credential.getUsername());
   }
 
-  /**
-   * 为用户绑定谷歌密钥
-   *
-   * @param dto GoogleAuthDTO
-   */
+  @ApiOperation("绑定谷歌密钥")
   @PostMapping("/bindSecret")
   public void bindSecret(@Validated GoogleAuthDTO dto) {
     twoFactorAuthenticationService.bindSecret(dto);

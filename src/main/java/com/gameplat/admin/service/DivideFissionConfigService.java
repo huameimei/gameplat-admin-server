@@ -8,9 +8,12 @@ import com.gameplat.model.entity.proxy.DivideFissionConfig;
 import java.util.Map;
 
 /**
- * @Description : 裂变分红模式配置 @Author : cc @Date : 2022/2/22
+ * 裂变分红模式配置
+ *
+ * @author cc
  */
 public interface DivideFissionConfigService extends IService<DivideFissionConfig> {
+
   void add(String userName, String s);
 
   Map<String, Object> getFissionConfigForEdit(String userName, String s);
@@ -19,7 +22,7 @@ public interface DivideFissionConfigService extends IService<DivideFissionConfig
 
   void remove(String ids);
 
-    GameDivideVo getConfigByFirstCode(String superName, String code);
+  GameDivideVo getConfigByFirstCode(String superName, String code);
 
-    DivideFissionConfig getByAccount(String account);
+  DivideFissionConfig getByAccount(String account);
 }

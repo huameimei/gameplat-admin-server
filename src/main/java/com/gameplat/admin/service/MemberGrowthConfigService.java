@@ -9,16 +9,18 @@ import com.gameplat.model.entity.member.MemberGrowthConfig;
 public interface MemberGrowthConfigService extends IService<MemberGrowthConfig> {
 
   /** 只查询一条 */
-  MemberGrowthConfigVO findOneConfig(String language);
+  MemberGrowthConfigVO findOneConfig();
 
-  MemberGrowthConfig getOneConfig(String language);
+  MemberGrowthConfig getOneConfig();
 
   /** 修改成长值配置 */
-  void updateGrowthConfig(MemberGrowthConfigEditDto configEditDto);
+  void updateGrowthConfig(MemberGrowthConfigEditDto dto);
 
   /** 后台获取金币说明配置 */
-  MemberGrowthConfig getGoldCoinDesc(String language);
+  MemberGrowthConfig getGoldCoinDesc();
 
   /** 后台修改金币说明配置 */
   void updateGoldCoinDesc(GoldCoinDescUpdateDTO dto);
+
+  Integer getLimitLevel();
 }

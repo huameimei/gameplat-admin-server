@@ -31,9 +31,9 @@ public class MemberReportController {
   /**
    * 充提报表
    *
-   * @param page
-   * @param dto
-   * @return
+   * @param page pageQueryDepositReport
+   * @param dto Page
+   * @return PageDtoVO
    */
   @GetMapping(value = "pageQueryDepositReport")
   public PageDtoVO<MemberRWReportVo> pageQueryDepositReport(

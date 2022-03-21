@@ -36,7 +36,6 @@ import java.util.stream.Collectors;
 
 @Service
 @Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)
-@SuppressWarnings("all")
 public class DivideFissionConfigServiceImpl
     extends ServiceImpl<DivideFissionConfigMapper, DivideFissionConfig>
     implements DivideFissionConfigService {
@@ -51,12 +50,6 @@ public class DivideFissionConfigServiceImpl
 
   @Autowired private GameKindMapper gameKindMapper;
 
-  /**
-   * 添加裂变分红配置
-   *
-   * @param userName
-   * @param lang
-   */
   @Override
   public void add(String userName, String lang) {
     Assert.isTrue(StrUtil.isNotBlank(userName), "用户名参数缺失！");
@@ -71,20 +64,13 @@ public class DivideFissionConfigServiceImpl
         DivideFissionConfig.builder()
             .userId(member.getId())
             .userName(member.getAccount())
-            .divideConfig(recommendConfigService.initFissionDivideConfig(lang))
+            .divideConfig(recommendConfigService.initFissionDivideConfig())
             .recycleConfig(new JSONArray().toString())
             .recycleOutConfig(BigDecimal.ZERO)
             .build();
     Assert.isTrue(this.save(saveObj), "添加失败！");
   }
 
-  /**
-   * 编辑裂变分红前获取
-   *
-   * @param userName
-   * @param lang
-   * @return
-   */
   @Override
   public Map<String, Object> getFissionConfigForEdit(String userName, String lang) {
     Assert.isTrue(StrUtil.isNotBlank(userName), "用户名参数缺失！");
@@ -121,7 +107,7 @@ public class DivideFissionConfigServiceImpl
         if (dictData.getDictValue().equalsIgnoreCase(voMap.getValue().getStr("liveGameCode"))) {
           List<GameKind> tmpLevelOneList = levelOneMap.get(voMap.getValue().getStr("code"));
           if (CollectionUtil.isNotEmpty(tmpLevelOneList)) {
-            voMap.getValue().put("name", tmpLevelOneList.get(0).getName());
+            voMap.getValue().putOnce("name", tmpLevelOneList.get(0).getName());
           }
           divideLevelOneList.add(JSONUtil.toBean(voMap.getValue(), FissionDivideConfigVo.class));
         }
@@ -135,7 +121,7 @@ public class DivideFissionConfigServiceImpl
           JSONUtil.toList(JSONUtil.parseArray(fissionRecycleConfig), FissionConfigLevelVo.class);
     }
 
-    Map<String, Object> returnMap = new HashMap<>();
+    Map<String, Object> returnMap = new HashMap<>(3);
     returnMap.put("divideConfigMap", tmpMap);
     returnMap.put("recycleConfig", fissionConfigLevelVos);
     returnMap.put(
@@ -146,12 +132,6 @@ public class DivideFissionConfigServiceImpl
     return returnMap;
   }
 
-  /**
-   * 编辑裂变
-   *
-   * @param divideConfigDTO
-   * @param lang
-   */
   @Override
   public void edit(DivideConfigDTO divideConfigDTO, String lang) {
     Assert.isTrue(divideConfigDTO.getId() != null, "主键参数丢失！");
@@ -175,7 +155,7 @@ public class DivideFissionConfigServiceImpl
     Map<String, List<FissionDivideConfigVo>> ownerFissionConfigMap =
         divideConfigDTO.getOwnerFissionConfigMap();
     if (CollectionUtil.isNotEmpty(ownerFissionConfigMap)) {
-      Map<String, JSONObject> saveMap = new HashMap<>();
+      Map<String, JSONObject> saveMap = new HashMap<>(ownerFissionConfigMap.size());
       for (Map.Entry<String, List<FissionDivideConfigVo>> map : ownerFissionConfigMap.entrySet()) {
         List<FissionDivideConfigVo> value = map.getValue();
         for (FissionDivideConfigVo vo : value) {
@@ -198,11 +178,6 @@ public class DivideFissionConfigServiceImpl
     Assert.isTrue(this.updateById(editObj), "编辑失败！");
   }
 
-  /**
-   * 删除裂变
-   *
-   * @param ids
-   */
   @Override
   public void remove(String ids) {
     String[] idArr = ids.split(",");

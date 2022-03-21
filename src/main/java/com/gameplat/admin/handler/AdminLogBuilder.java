@@ -8,6 +8,7 @@ import com.gameplat.common.enums.SubjectEnum;
 import com.gameplat.common.enums.UserTypes;
 import com.gameplat.log.handler.LogBuilder;
 import com.gameplat.security.SecurityUserHolder;
+import com.gameplat.security.context.UserCredential;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 
@@ -22,16 +23,17 @@ public class AdminLogBuilder implements LogBuilder {
 
   @Override
   public SysLog build() throws Exception {
-
     UserTypes userTypes = SecurityUserHolder.isSuperAdmin() ? UserTypes.ADMIN : UserTypes.SUBUSER;
-
     String tenant = DyDataSourceContextHolder.getTenant();
     tenant = StringUtils.isEmpty(tenant) ? dbSuffix : tenant;
+    UserCredential credential = SecurityUserHolder.getCredential();
+
     return SysLog.builder()
         .dbSuffix(tenant)
         .userType(userTypes.key())
-            .registerTime(DateUtils.get0ZoneDate(SecurityUserHolder.getCredential().getRegisterTime(),DateUtils.DATE_TIME_PATTERN))
-        .username(SecurityUserHolder.getUsername())
+        .registerTime(
+            DateUtils.get0ZoneDate(credential.getRegisterTime(), DateUtils.DATE_TIME_PATTERN))
+        .username(credential.getUsername())
         .subject(SubjectEnum.ADMIN.getKey())
         .build();
   }
@@ -39,7 +41,7 @@ public class AdminLogBuilder implements LogBuilder {
   /**
    * 获取租户标识
    *
-   * @return
+   * @return String
    */
   public String getDbSuffix() {
     return dbSuffix;

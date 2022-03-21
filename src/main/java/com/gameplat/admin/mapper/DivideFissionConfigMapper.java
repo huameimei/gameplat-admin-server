@@ -12,6 +12,5 @@ public interface DivideFissionConfigMapper extends BaseMapper<DivideFissionConfi
   @Select("select * from divide_fission_config where user_name = #{userName}")
   DivideFissionConfig getByUserName(@Param("userName") String userName);
 
-    String getConfigByGameCode(@Param("superName") String superName,
-                               @Param("code") String code);
+  String getConfigByGameCode(@Param("superName") String superName, @Param("code") String code);
 }

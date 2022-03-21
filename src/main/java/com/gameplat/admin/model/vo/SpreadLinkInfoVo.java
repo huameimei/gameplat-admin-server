@@ -45,6 +45,7 @@ public class SpreadLinkInfoVo {
   private BigDecimal discountAmount;
   /** 状态 */
   private Integer status;
+
   private Integer isOpenDividePreset;
   private String divideConfig;
   private String createBy;
@@ -54,6 +55,7 @@ public class SpreadLinkInfoVo {
   private String updateBy;
   /** 更新时间 */
   private Date updateTime;
+
   private String remark;
   private String defaultDevideConfig;
   private String superPath;

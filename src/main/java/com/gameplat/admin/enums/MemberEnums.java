@@ -92,6 +92,10 @@ public class MemberEnums {
       this.desc = desc;
     }
 
+    public static boolean matchPromotion(String value) {
+      return PROMOTION.value.equals(value);
+    }
+
     public String value() {
       return this.value;
     }
@@ -106,10 +110,6 @@ public class MemberEnums {
 
     public boolean match(String value, Type type) {
       return type.value.equals(value);
-    }
-
-    public static boolean matchPromotion(String value) {
-      return PROMOTION.value.equals(value);
     }
   }
 }

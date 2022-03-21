@@ -14,15 +14,9 @@ import org.mapstruct.Mapper;
 @Mapper(componentModel = "spring")
 public interface ActivityRedPacketConvert {
 
-  ActivityRedPacket toEntity(ActivityRedPacketAddDTO activityRedPacketDTO);
+  ActivityRedPacket toEntity(ActivityRedPacketAddDTO dto);
 
-  ActivityRedPacket toEntity(ActivityRedPacketUpdateDTO activityRedPacketUpdateDTO);
+  ActivityRedPacket toEntity(ActivityRedPacketUpdateDTO dto);
 
-  /**
-   * 将Entity转换成VO
-   *
-   * @param activityRedPacket
-   * @return
-   */
   ActivityRedPacketVO toVo(ActivityRedPacket activityRedPacket);
 }

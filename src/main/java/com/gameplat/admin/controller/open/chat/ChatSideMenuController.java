@@ -11,8 +11,9 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 /**
+ * 聊天室侧滑菜单管理
+ *
  * @author lily
- * @description 聊天室侧滑菜单管理
  * @date 2022/2/15
  */
 @Api(tags = "聊天室侧滑菜单管理")

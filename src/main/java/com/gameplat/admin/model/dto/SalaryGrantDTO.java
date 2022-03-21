@@ -13,47 +13,47 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 public class SalaryGrantDTO {
-    private Long id;
+  private Long id;
 
-    private Long periodsId;
+  private Long periodsId;
 
-    private Long userId;
+  private Long userId;
 
-    private String account;
+  private String account;
 
-    private String userType;
+  private String userType;
 
-    private Integer agentLevel;
+  private Integer agentLevel;
 
-    private Long parentId;
+  private Long parentId;
 
-    private String parentName;
+  private String parentName;
 
-    private String superPath;
+  private String superPath;
 
-    private String gameType;
+  private String gameType;
 
-    private BigDecimal rechargeAmount;
+  private BigDecimal rechargeAmount;
 
-    private BigDecimal winAmount;
+  private BigDecimal winAmount;
 
-    private BigDecimal validAmount;
+  private BigDecimal validAmount;
 
-    private Integer validUserNum;
+  private Integer validUserNum;
 
-    private BigDecimal salaryAmount;
+  private BigDecimal salaryAmount;
 
-    private Integer reachStatus;
+  private Integer reachStatus;
 
-    private Integer grantStatus;
+  private Integer grantStatus;
 
-    private Date createTime;
+  private Date createTime;
 
-    private String createBy;
+  private String createBy;
 
-    private String updateBy;
+  private String updateBy;
 
-    private Date updateTime;
+  private Date updateTime;
 
-    private String remark;
+  private String remark;
 }

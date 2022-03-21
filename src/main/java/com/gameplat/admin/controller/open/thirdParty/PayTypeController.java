@@ -37,7 +37,10 @@ public class PayTypeController {
 
   @PostMapping("/add")
   @PreAuthorize("hasAuthority('thirdParty:payTypes:add')")
-  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.RECHARGE, desc = "'新增支付方式code=' + #dto.code")
+  @Log(
+      module = ServiceName.ADMIN_SERVICE,
+      type = LogType.RECHARGE,
+      desc = "'新增支付方式code=' + #dto.code")
   public void add(@RequestBody PayTypeAddDTO dto) {
     payTypeService.save(dto);
   }
@@ -67,5 +70,4 @@ public class PayTypeController {
   public List<PayTypeVO> queryEnableVirtual() {
     return payTypeService.queryEnableVirtual();
   }
-
 }

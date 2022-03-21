@@ -8,13 +8,13 @@ import com.gameplat.admin.model.vo.SalaryConfigVO;
 import com.gameplat.model.entity.proxy.SalaryConfig;
 
 public interface SalaryConfigService extends IService<SalaryConfig> {
-    IPage<SalaryConfigVO> queryPage(PageDTO<SalaryConfig> page, SalaryConfigDTO dto);
+  IPage<SalaryConfigVO> queryPage(PageDTO<SalaryConfig> page, SalaryConfigDTO dto);
 
-    Integer getMaxLevel();
+  Integer getMaxLevel();
 
-    void add(SalaryConfigDTO dto);
+  void add(SalaryConfigDTO dto);
 
-    void edit(SalaryConfigDTO dto);
+  void edit(SalaryConfigDTO dto);
 
-    void delete(String ids);
+  void delete(String ids);
 }

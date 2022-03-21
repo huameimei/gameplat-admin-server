@@ -34,14 +34,6 @@ public enum SpreadTypes {
     this.value = value;
   }
 
-  public Integer getCode() {
-    return this.code;
-  }
-
-  public String getValue() {
-    return this.value;
-  }
-
   public static SpreadTypes getValue(Integer code) {
     for (SpreadTypes types : values()) {
       if (types.getCode().equals(code)) {
@@ -61,5 +53,13 @@ public enum SpreadTypes {
               return map;
             })
         .collect(Collectors.toList());
+  }
+
+  public Integer getCode() {
+    return this.code;
+  }
+
+  public String getValue() {
+    return this.value;
   }
 }

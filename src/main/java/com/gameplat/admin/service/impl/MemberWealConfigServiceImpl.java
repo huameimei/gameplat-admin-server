@@ -8,17 +8,18 @@ import com.gameplat.admin.mapper.MemberWealConfigMapper;
 import com.gameplat.admin.model.dto.MemberWealConfigAddDTO;
 import com.gameplat.admin.model.dto.MemberWealConfigEditDTO;
 import com.gameplat.admin.service.MemberWealConfigService;
-import com.gameplat.base.common.util.StringUtils;
 import com.gameplat.model.entity.member.MemberWealConfig;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
+ * 会员权益
+ *
  * @author lily
- * @description 会员权益
  * @date 2022/1/15
  */
 @Slf4j
@@ -46,10 +47,8 @@ public class MemberWealConfigServiceImpl
   }
 
   @Override
-  public IPage<MemberWealConfig> page(PageDTO<MemberWealConfig> page, String language) {
-    if (StringUtils.isEmpty(language)) {
-      language = "zh-cn";
-    }
+  public IPage<MemberWealConfig> page(PageDTO<MemberWealConfig> page) {
+    String language = LocaleContextHolder.getLocale().getLanguage();
     return this.lambdaQuery().eq(MemberWealConfig::getLanguage, language).page(page);
   }
 }

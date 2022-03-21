@@ -11,14 +11,15 @@ import com.gameplat.admin.model.vo.LotteryCodeVo;
 import com.gameplat.admin.model.vo.PushLottWinVo;
 import com.gameplat.admin.service.*;
 import com.gameplat.base.common.enums.EnableEnum;
-import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.json.JsonUtils;
 import com.google.common.base.Joiner;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -39,43 +40,27 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/admin/chat")
 public class OtthController {
 
+  public static final String API_PLAT_UPDATE = "api_plat_update";
+  private static final String ROOM_MEMBER_BATCHADD_URL = "api_room_batchAddMember";
+  private static final String API_ROOM_UPDATE = "api_room_update";
   @Autowired private OtthService otthService;
-
   @Autowired private TenantDomainService tenantDomainService;
-
   @Autowired private ChatLeaderBoardService chatLeaderBoardService;
-
   @Autowired private SysTenantSettingService sysTenantSettingService;
-
   @Autowired private ChatPushPlanService chatPushPlanService;
-
   @Autowired private TenantConfig tenantConfig;
 
-  private static final String ROOM_MEMBER_BATCHADD_URL = "api_room_batchAddMember";
-
-  public static final String API_PLAT_UPDATE = "api_plat_update";
-
-  private static final String API_ROOM_UPDATE = "api_room_update";
-
-  /** 聊天室排行榜热任务 */
-  @GetMapping(
-      value = "/chatLeaderBoardTask",
-      produces = {"application/json;charset=UTF-8"})
-  public void get(HttpServletRequest request, HttpServletResponse response)
-      throws ServiceException {
+  @ApiOperation(value = "聊天室排行榜热任务")
+  @GetMapping(value = "/chatLeaderBoardTask", produces = MediaType.APPLICATION_JSON_VALUE)
+  public void get() {
     chatLeaderBoardService.creatLeaderBoard(null);
   }
 
+  @SneakyThrows
   @ApiOperation(value = "平台聊天室限制配置/聊天室成员管理/关键词管理/聊天室房间管理/角色管理/聊天室自定义消息管理")
-  @PostMapping(
-      value = "/{url}",
-      produces = {"application/json;charset=UTF-8"})
+  @PostMapping(value = "/{url}", produces = MediaType.APPLICATION_JSON_VALUE)
   public String post(
-      @PathVariable String url,
-      @RequestBody String body,
-      HttpServletRequest request,
-      HttpServletResponse response)
-      throws Exception {
+      @PathVariable String url, @RequestBody String body, HttpServletRequest request) {
     String apiUrl = getApiUrl(url);
     // 获取当前租户标识
     String dbSuffix = tenantConfig.getTenantCode();
@@ -97,60 +82,51 @@ public class OtthController {
   }
 
   @ApiOperation(value = "平台聊天室限制配置/聊天室成员管理/关键词管理/聊天室房间管理/角色管理/聊天室自定义消息管理")
-  @GetMapping(
-      value = "/{url}",
-      produces = {"application/json;charset=UTF-8"})
+  @GetMapping(value = "/{url}", produces = MediaType.APPLICATION_JSON_VALUE)
   public Object get(
       @PathVariable String url,
       HttpServletRequest request,
       HttpServletResponse response,
-      PageDTO page)
+      PageDTO<?> page)
       throws Exception {
-    String apiUrl = getApiUrl(url);
-    return otthService.otthProxyHttpGet(apiUrl, request, response, page);
+    return otthService.otthProxyHttpGet(getApiUrl(url), request, response, page);
   }
 
   @ApiOperation(value = "获取彩票游戏类型")
-  @GetMapping(
-      value = "/getLottTypeList",
-      produces = {"application/json;charset=UTF-8"})
+  @GetMapping(value = "/getLottTypeList", produces = MediaType.APPLICATION_JSON_VALUE)
   public List<LotteryCodeVo> getLottTypeList() throws Exception {
     return otthService.getLottTypeList();
   }
 
-  /** 中奖推送接口 */
+  @ApiOperation(value = "中奖推送接口")
   @PostMapping("/pushLotteryWin")
   public void pushLotteryWin(
       @RequestBody List<PushLottWinVo> lottWinVos, HttpServletRequest request) {
     otthService.pushLotteryWin(lottWinVos, request);
   }
 
-  /** 分享彩票下注 */
+  @ApiOperation(value = "分享彩票下注")
   @RequestMapping(value = "/cpbet", method = RequestMethod.POST)
   public void cpbet(@RequestBody List<PushCPBetMessageReq> req, HttpServletRequest request) {
     otthService.cpbet(req, request);
   }
 
-  /** 修改平台聊天室开关 */
+  @ApiOperation(value = "修改平台聊天室开关")
   private void updateChatEnable(String body) {
     JSONObject json = JSONObject.parseObject(body);
     Integer chatOpen = json.getInteger("chatOpen");
-    String cpChatEnable = null;
-    if (EnableEnum.DISABLED.code() == chatOpen) {
-      cpChatEnable = "off";
-    } else {
-      cpChatEnable = "on";
-    }
+    String cpChatEnable = EnableEnum.DISABLED.match(chatOpen) ? "off" : "on";
     sysTenantSettingService.updateChatEnable(cpChatEnable);
   }
 
-  /** 查找聊天室会员 */
+  @SneakyThrows
+  @ApiOperation(value = "查找聊天室会员")
   @RequestMapping(value = "/getChatUser", method = RequestMethod.GET)
-  public ChatUserVO getChatUser(String account) throws Exception {
+  public ChatUserVO getChatUser(String account) {
     return otthService.getChatUser(account);
   }
 
-  /** 给游戏调用的更新游戏状态 */
+  @ApiOperation(value = "给游戏调用的更新游戏状态")
   @PostMapping("updateGameStatus")
   public void updateGameStuats(String gameId, int gameStatus) {
     // 游戏维护更新自定义中奖推送

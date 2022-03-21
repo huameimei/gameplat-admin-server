@@ -10,11 +10,14 @@ public class SysUserEnums {
     /** 子账号 */
     SUB_USER("SUB_USER");
 
-
     private final String value;
 
     UserType(String value) {
       this.value = value;
+    }
+
+    public static boolean isAdmin(String value) {
+      return ADMIN.value.equals(value);
     }
 
     public boolean match(String value) {
@@ -23,10 +26,6 @@ public class SysUserEnums {
 
     public String value() {
       return value;
-    }
-
-    public static boolean isAdmin(String value) {
-      return ADMIN.value.equals(value);
     }
   }
 

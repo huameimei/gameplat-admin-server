@@ -1,8 +1,5 @@
 package com.gameplat.admin.enums;
 
-import java.util.Optional;
-import java.util.stream.Stream;
-
 /**
  * 密码错误次数限制方式
  *
@@ -35,12 +32,5 @@ public enum ErrorPasswordLimit {
 
   public boolean match(Integer key) {
     return this.key.equals(key);
-  }
-
-  public static Optional<ErrorPasswordLimit> matches(String key) {
-    return Optional.ofNullable(key)
-        .flatMap(
-            v ->
-                Stream.of(ErrorPasswordLimit.values()).filter(e -> e.getKey().equals(v)).findAny());
   }
 }

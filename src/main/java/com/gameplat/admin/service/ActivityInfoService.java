@@ -23,11 +23,11 @@ public interface ActivityInfoService extends IService<ActivityInfo> {
   /**
    * 列表查询
    *
-   * @param page
-   * @param activityInfoQueryDTO
-   * @return
+   * @param page PageDTO
+   * @param dto ActivityInfoQueryDTO
+   * @return IPage
    */
-  IPage<ActivityInfoVO> list(PageDTO<ActivityInfo> page, ActivityInfoQueryDTO activityInfoQueryDTO);
+  IPage<ActivityInfoVO> list(PageDTO<ActivityInfo> page, ActivityInfoQueryDTO dto);
 
   /**
    * 查询活动详情

@@ -7,6 +7,7 @@ import com.gameplat.admin.model.dto.GameKindQueryDTO;
 import com.gameplat.admin.model.dto.OperGameKindDTO;
 import com.gameplat.admin.model.vo.GameKindVO;
 import com.gameplat.model.entity.game.GameKind;
+
 import java.util.List;
 
 public interface GameKindService extends IService<GameKind> {

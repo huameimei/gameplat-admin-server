@@ -55,17 +55,11 @@ public class ActivityLobbyServiceImpl extends ServiceImpl<ActivityLobbyMapper, A
 
   @Override
   public IPage<ActivityLobbyVO> findActivityLobbyList(
-      PageDTO<ActivityLobby> page, ActivityLobbyQueryDTO activityLobbyQueryDTO) {
+      PageDTO<ActivityLobby> page, ActivityLobbyQueryDTO dto) {
     LambdaQueryChainWrapper<ActivityLobby> queryWrapper = this.lambdaQuery();
     queryWrapper
-        .like(
-            StringUtils.isNotBlank(activityLobbyQueryDTO.getTitle()),
-            ActivityLobby::getTitle,
-            activityLobbyQueryDTO.getTitle())
-        .eq(
-            activityLobbyQueryDTO.getStatus() != null,
-            ActivityLobby::getStatus,
-            activityLobbyQueryDTO.getStatus())
+        .like(StringUtils.isNotBlank(dto.getTitle()), ActivityLobby::getTitle, dto.getTitle())
+        .eq(dto.getStatus() != null, ActivityLobby::getStatus, dto.getStatus())
         .orderByDesc(Lists.newArrayList(ActivityLobby::getCreateTime, ActivityLobby::getId));
 
     IPage<ActivityLobbyVO> activityLobbyVOIPage =
@@ -82,79 +76,73 @@ public class ActivityLobbyServiceImpl extends ServiceImpl<ActivityLobbyMapper, A
 
   @Override
   @Transactional(rollbackFor = Throwable.class)
-  public void add(ActivityLobbyAddDTO activityLobbyAddDTO) {
-    ActivityLobby activityLobby = activityLobbyConvert.toEntity(activityLobbyAddDTO);
+  public void add(ActivityLobbyAddDTO dto) {
+    ActivityLobby activityLobby = activityLobbyConvert.toEntity(dto);
 
     // 指定比赛
-    if (activityLobbyAddDTO.getStatisItem()
+    if (dto.getStatisItem()
         == ActivityInfoEnum.StatisItem.CUMULATIVE_SPORTS_RECHARGE_AMOUNT.getValue()) {
-      if (StringUtils.isNull(activityLobbyAddDTO.getMatchId())) {
+      if (StringUtils.isNull(dto.getMatchId())) {
         throw new ServiceException("指定比赛不能为空");
       }
-      String matchTimeStr =
-          DateUtil.dateToStr(activityLobbyAddDTO.getMatchTime(), DateUtil.YYYYMMDD);
-      String startTimeStr =
-          DateUtil.dateToStr(activityLobbyAddDTO.getStartTime(), DateUtil.YYYYMMDD);
-      String endTimeStr = DateUtil.dateToStr(activityLobbyAddDTO.getEndTime(), DateUtil.YYYYMMDD);
+      String matchTimeStr = DateUtil.dateToStr(dto.getMatchTime(), DateUtil.YYYYMMDD);
+      String startTimeStr = DateUtil.dateToStr(dto.getStartTime(), DateUtil.YYYYMMDD);
+      String endTimeStr = DateUtil.dateToStr(dto.getEndTime(), DateUtil.YYYYMMDD);
       if (!matchTimeStr.equals(startTimeStr) || !matchTimeStr.equals(endTimeStr)) {
         throw new ServiceException("活动开始和结束时间必须和指定比赛的比赛时间是同一天");
       }
-      if (activityLobbyAddDTO.getNextDayApply() == null
-          || activityLobbyAddDTO.getNextDayApply() != ActivityInfoEnum.NextDayApply.YES.value()) {
+      if (dto.getNextDayApply() == null
+          || dto.getNextDayApply() != ActivityInfoEnum.NextDayApply.YES.value()) {
         throw new ServiceException("指定比赛必须选择隔天申请");
       }
     }
 
     List<String> applyDateList = new ArrayList<>();
     // 计算活动的参与日期集合
-    Integer detailDate = activityLobbyAddDTO.getDetailDate();
+    Integer detailDate = dto.getDetailDate();
     String startTime;
     String endTime;
     // 隔天申请（0 否，1 是）
-    if (activityLobbyAddDTO.getNextDayApply() == ActivityInfoEnum.NextDayApply.YES.value()) {
+    if (dto.getNextDayApply() == ActivityInfoEnum.NextDayApply.YES.value()) {
       detailDate = detailDate + 1;
       if (detailDate == 7) {
         detailDate = 0;
       }
       startTime =
           DateUtil.dateToStr(
-              cn.hutool.core.date.DateUtil.date(activityLobbyAddDTO.getStartTime())
+              cn.hutool.core.date.DateUtil.date(dto.getStartTime())
                   .offset(DateField.DAY_OF_YEAR, 1),
               "yyyy-MM-dd");
       endTime =
           DateUtil.dateToStr(
-              cn.hutool.core.date.DateUtil.date(activityLobbyAddDTO.getEndTime())
-                  .offset(DateField.DAY_OF_YEAR, 1),
+              cn.hutool.core.date.DateUtil.date(dto.getEndTime()).offset(DateField.DAY_OF_YEAR, 1),
               "yyyy-MM-dd");
     } else {
-      startTime = DateUtil.dateToStr(activityLobbyAddDTO.getStartTime(), DateUtil.YYYY_MM_DD);
-      endTime = DateUtil.dateToStr(activityLobbyAddDTO.getEndTime(), DateUtil.YYYY_MM_DD);
+      startTime = DateUtil.dateToStr(dto.getStartTime(), DateUtil.YYYY_MM_DD);
+      endTime = DateUtil.dateToStr(dto.getEndTime(), DateUtil.YYYY_MM_DD);
     }
 
-    if (activityLobbyAddDTO.getStatisDate()
+    if (dto.getStatisDate()
         == ActivityInfoEnum.StatisItem.CUMULATIVE_RECHARGE_AMOUNT.getValue()) { // 1 每日
       applyDateList.add("每天");
     }
     // 如果统计周期是每周，需要判断活动的结束时间是不是周日
-    else if (activityLobbyAddDTO.getStatisDate()
+    else if (dto.getStatisDate()
         == ActivityInfoEnum.StatisItem.CUMULATIVE_RECHARGE_DAYS.getValue()) { // 2 每周
-      if (DateUtil2.getWeekNumOfDate(activityLobbyAddDTO.getEndTime()) != 7) {
+      if (DateUtil2.getWeekNumOfDate(dto.getEndTime()) != 7) {
         throw new ServiceException("统计日期选择每周，活动的结束日期应该为某周的星期天");
       }
       applyDateList = DateUtil2.getDayOfWeekWithinDateInterval(startTime, endTime, detailDate);
     }
     // 如果统计周期是每月，需要判断活动的结束时间是不是某月的最后一天
-    else if (activityLobbyAddDTO.getStatisDate()
+    else if (dto.getStatisDate()
         == ActivityInfoEnum.StatisItem.CONTINUOUS_RECHARGE_DAYS.getValue()) { // 3 每月
       if (!DateUtil2.isSameDate(
-          cn.hutool.core.date.DateUtil.endOfMonth(activityLobbyAddDTO.getEndTime()),
-          activityLobbyAddDTO.getEndTime())) {
+          cn.hutool.core.date.DateUtil.endOfMonth(dto.getEndTime()), dto.getEndTime())) {
         throw new ServiceException("统计日期选择每月，活动的结束日期应该为某月的最后一天");
       }
-      List<Date> endDates =
-          DateUtil2.findEndDates(
-              activityLobbyAddDTO.getStartTime(), activityLobbyAddDTO.getEndTime());
-      if (activityLobbyAddDTO.getNextDayApply() == ActivityInfoEnum.NextDayApply.YES.value()) {
+      List<Date> endDates = DateUtil2.findEndDates(dto.getStartTime(), dto.getEndTime());
+      if (dto.getNextDayApply() == ActivityInfoEnum.NextDayApply.YES.value()) {
         for (Date date : endDates) {
           applyDateList.add(
               DateUtil.dateToStr(
@@ -168,40 +156,32 @@ public class ActivityLobbyServiceImpl extends ServiceImpl<ActivityLobbyMapper, A
       }
     }
     // 如果统计周期是每周X，需要判断活动的结束时间是不是每周X
-    else if (activityLobbyAddDTO.getStatisDate()
+    else if (dto.getStatisDate()
         == ActivityInfoEnum.StatisItem.SINGLE_DAY_DEPOSIT_AMOUNT.getValue()) { // 4 每周X
-      if (DateTime.of(activityLobbyAddDTO.getEndTime()).dayOfWeek()
-          != activityLobbyAddDTO.getDetailDate()) {
+      if (DateTime.of(dto.getEndTime()).dayOfWeek() != dto.getDetailDate()) {
         throw new ServiceException(
             "统计日期选择"
-                + ActivityInfoEnum.DetailDateEnum.getWeek(activityLobbyAddDTO.getDetailDate())
+                + ActivityInfoEnum.DetailDateEnum.getWeek(dto.getDetailDate())
                 + ",活动的结束日期应该为"
-                + ActivityInfoEnum.DetailDateEnum.getWeek(activityLobbyAddDTO.getDetailDate()));
+                + ActivityInfoEnum.DetailDateEnum.getWeek(dto.getDetailDate()));
       }
       applyDateList = DateUtil2.getDayOfWeekWithinDateInterval(startTime, endTime, detailDate);
     }
     // 如果统计周期是每月X，需要判断活动的结束时间是不是每月X
-    else if (activityLobbyAddDTO.getStatisDate()
+    else if (dto.getStatisDate()
         == ActivityInfoEnum.StatisItem.FIRST_DEPOSIT_AMOUNT.getValue()) { // 5 每月X日
-      if (Integer.parseInt(String.format("%td", activityLobbyAddDTO.getEndTime()))
-          != activityLobbyAddDTO.getDetailDate()) {
+      if (Integer.parseInt(String.format("%td", dto.getEndTime())) != dto.getDetailDate()) {
         throw new ServiceException(
-            "统计日期选择每月"
-                + activityLobbyAddDTO.getDetailDate()
-                + "号"
-                + ",活动的结束日期那天应该为"
-                + activityLobbyAddDTO.getDetailDate()
-                + "号");
+            "统计日期选择每月" + dto.getDetailDate() + "号" + ",活动的结束日期那天应该为" + dto.getDetailDate() + "号");
       }
-      List<Date> dates =
-          DateUtil.findDates(activityLobbyAddDTO.getStartTime(), activityLobbyAddDTO.getEndTime());
+      List<Date> dates = DateUtil.findDates(dto.getStartTime(), dto.getEndTime());
       for (Date date : dates) {
         String day = String.format("%td", date);
-        if (Integer.parseInt(day) == activityLobbyAddDTO.getDetailDate()) {
+        if (Integer.parseInt(day) == dto.getDetailDate()) {
           applyDateList.add(DateUtil.dateToStr(date, DateUtil.YYYY_MM_DD));
         }
       }
-      if (activityLobbyAddDTO.getNextDayApply() == ActivityInfoEnum.NextDayApply.YES.value()) {
+      if (dto.getNextDayApply() == ActivityInfoEnum.NextDayApply.YES.value()) {
         List<String> copyDateList = new ArrayList<>();
         copyDateList.addAll(applyDateList);
         applyDateList.clear();
@@ -223,7 +203,7 @@ public class ActivityLobbyServiceImpl extends ServiceImpl<ActivityLobbyMapper, A
 
     // 优惠打折列表
     List<ActivityLobbyDiscount> activityLobbyDiscounts =
-        BeanUtils.mapList(activityLobbyAddDTO.getLobbyDiscountList(), ActivityLobbyDiscount.class);
+        BeanUtils.mapList(dto.getLobbyDiscountList(), ActivityLobbyDiscount.class);
 
     List<Integer> targetValueList =
         activityLobbyDiscounts.stream()
@@ -243,13 +223,10 @@ public class ActivityLobbyServiceImpl extends ServiceImpl<ActivityLobbyMapper, A
       throw new ServiceException("奖励赠送列表中,设定的赠送金额不能重复");
     }
 
-    if (activityLobbyAddDTO.getStatisItem()
-            == ActivityInfoEnum.StatisItem.CUMULATIVE_RECHARGE_DAYS.getValue()
-        || activityLobbyAddDTO.getStatisItem()
-            == ActivityInfoEnum.StatisItem.CONTINUOUS_RECHARGE_DAYS.getValue()
-        || activityLobbyAddDTO.getStatisItem()
-            == ActivityInfoEnum.StatisItem.CUMULATIVE_GAME_DML_DAYS.getValue()
-        || activityLobbyAddDTO.getStatisItem()
+    if (dto.getStatisItem() == ActivityInfoEnum.StatisItem.CUMULATIVE_RECHARGE_DAYS.getValue()
+        || dto.getStatisItem() == ActivityInfoEnum.StatisItem.CONTINUOUS_RECHARGE_DAYS.getValue()
+        || dto.getStatisItem() == ActivityInfoEnum.StatisItem.CUMULATIVE_GAME_DML_DAYS.getValue()
+        || dto.getStatisItem()
             == ActivityInfoEnum.StatisItem.CONSECUTIVE_GAME_DML_DAYS.getValue()) {
       for (ActivityLobbyDiscount activityLobbyDiscount : activityLobbyDiscounts) {
         if (activityLobbyDiscount.getTargetValue() < 2) {
@@ -276,9 +253,9 @@ public class ActivityLobbyServiceImpl extends ServiceImpl<ActivityLobbyMapper, A
 
   @Override
   @Transactional(rollbackFor = Throwable.class)
-  public void update(ActivityLobbyUpdateDTO activityLobbyUpdateDTO) {
+  public void update(ActivityLobbyUpdateDTO dto) {
     // 根据id查询活动大厅
-    ActivityLobby activityLobbyOrigin = this.getById(activityLobbyUpdateDTO.getId());
+    ActivityLobby activityLobbyOrigin = this.getById(dto.getId());
     if (activityLobbyOrigin == null) {
       throw new ServiceException("该活动大厅不存在！");
     }
@@ -297,73 +274,64 @@ public class ActivityLobbyServiceImpl extends ServiceImpl<ActivityLobbyMapper, A
     }
 
     // 指定比赛
-    if (activityLobbyUpdateDTO.getStatisItem()
+    if (dto.getStatisItem()
         == ActivityInfoEnum.StatisItem.CUMULATIVE_SPORTS_RECHARGE_AMOUNT.getValue()) {
-      if (StringUtils.isNull(activityLobbyUpdateDTO.getMatchId())) {
+      if (StringUtils.isNull(dto.getMatchId())) {
         throw new ServiceException("指定比赛不能为空");
       }
-      if (!DateUtil2.isSameDate(
-              activityLobbyUpdateDTO.getMatchTime(), activityLobbyUpdateDTO.getStartTime())
-          && !DateUtil2.isSameDate(
-              activityLobbyUpdateDTO.getMatchTime(), activityLobbyUpdateDTO.getEndTime())) {
+      if (!DateUtil2.isSameDate(dto.getMatchTime(), dto.getStartTime())
+          && !DateUtil2.isSameDate(dto.getMatchTime(), dto.getEndTime())) {
         throw new ServiceException("活动开始和结束时间必须和指定比赛的比赛时间是同一天");
       }
-      if (activityLobbyUpdateDTO.getNextDayApply() == null
-          || activityLobbyUpdateDTO.getNextDayApply()
-              != ActivityInfoEnum.NextDayApply.YES.value()) {
+      if (dto.getNextDayApply() == null
+          || dto.getNextDayApply() != ActivityInfoEnum.NextDayApply.YES.value()) {
         throw new ServiceException("指定比赛必须选择隔天申请");
       }
     }
 
     List<String> applyDateList = new ArrayList<>();
     // 计算活动的参与日期集合
-    Integer detailDate = activityLobbyUpdateDTO.getDetailDate();
+    Integer detailDate = dto.getDetailDate();
     String startTime;
     String endTime;
-    if (activityLobbyUpdateDTO.getNextDayApply() == ActivityInfoEnum.NextDayApply.YES.value()) {
+    if (dto.getNextDayApply() == ActivityInfoEnum.NextDayApply.YES.value()) {
       detailDate = detailDate + 1;
       if (detailDate == 7) {
         detailDate = 0;
       }
       startTime =
           DateUtil.dateToStr(
-              cn.hutool.core.date.DateUtil.date(activityLobbyUpdateDTO.getStartTime())
+              cn.hutool.core.date.DateUtil.date(dto.getStartTime())
                   .offset(DateField.DAY_OF_YEAR, 1),
               DateUtil.YYYY_MM_DD);
       endTime =
           DateUtil.dateToStr(
-              cn.hutool.core.date.DateUtil.date(activityLobbyUpdateDTO.getEndTime())
-                  .offset(DateField.DAY_OF_YEAR, 1),
+              cn.hutool.core.date.DateUtil.date(dto.getEndTime()).offset(DateField.DAY_OF_YEAR, 1),
               DateUtil.YYYY_MM_DD);
     } else {
-      startTime = DateUtil.dateToStr(activityLobbyUpdateDTO.getStartTime(), DateUtil.YYYY_MM_DD);
-      endTime = DateUtil.dateToStr(activityLobbyUpdateDTO.getEndTime(), DateUtil.YYYY_MM_DD);
+      startTime = DateUtil.dateToStr(dto.getStartTime(), DateUtil.YYYY_MM_DD);
+      endTime = DateUtil.dateToStr(dto.getEndTime(), DateUtil.YYYY_MM_DD);
     }
 
-    if (activityLobbyUpdateDTO.getStatisDate() == ActivityInfoEnum.StatisDate.DAILY.getValue()) {
+    if (dto.getStatisDate() == ActivityInfoEnum.StatisDate.DAILY.getValue()) {
       applyDateList.add("每天");
     }
     // 如果统计周期是每周，需要判断活动的结束时间是不是周日
-    else if (activityLobbyUpdateDTO.getStatisDate()
-        == ActivityInfoEnum.StatisDate.WEEKLY.getValue()) {
-      if (DateUtil2.getWeekNumOfDate(activityLobbyUpdateDTO.getEndTime()) != 7) {
+    else if (dto.getStatisDate() == ActivityInfoEnum.StatisDate.WEEKLY.getValue()) {
+      if (DateUtil2.getWeekNumOfDate(dto.getEndTime()) != 7) {
         throw new ServiceException("统计日期选择每周，活动的结束日期应该为某周的星期天");
       }
 
       applyDateList = DateUtil2.getDayOfWeekWithinDateInterval(startTime, endTime, detailDate);
     }
     // 如果统计周期是每月，需要判断活动的结束时间是不是某月的最后一天
-    else if (activityLobbyUpdateDTO.getStatisDate()
-        == ActivityInfoEnum.StatisDate.PER_MONTH.getValue()) {
+    else if (dto.getStatisDate() == ActivityInfoEnum.StatisDate.PER_MONTH.getValue()) {
       if (!DateUtil2.isSameDate(
-          cn.hutool.core.date.DateUtil.endOfMonth(activityLobbyUpdateDTO.getEndTime()),
-          activityLobbyUpdateDTO.getEndTime())) {
+          cn.hutool.core.date.DateUtil.endOfMonth(dto.getEndTime()), dto.getEndTime())) {
         throw new ServiceException("统计日期选择每月，活动的结束日期应该为某月的最后一天");
       }
-      List<Date> endDates =
-          DateUtil2.findEndDates(
-              activityLobbyUpdateDTO.getStartTime(), activityLobbyUpdateDTO.getEndTime());
-      if (activityLobbyUpdateDTO.getNextDayApply() == ActivityInfoEnum.NextDayApply.YES.value()) {
+      List<Date> endDates = DateUtil2.findEndDates(dto.getStartTime(), dto.getEndTime());
+      if (dto.getNextDayApply() == ActivityInfoEnum.NextDayApply.YES.value()) {
         for (Date date : endDates) {
           applyDateList.add(
               DateUtil.dateToStr(
@@ -377,43 +345,31 @@ public class ActivityLobbyServiceImpl extends ServiceImpl<ActivityLobbyMapper, A
       }
     }
     // 如果统计周期是每周X，需要判断活动的结束时间是不是每周X
-    else if (activityLobbyUpdateDTO.getStatisDate()
-        == ActivityInfoEnum.StatisDate.SPECIFY_DAY_WEEK.getValue()) {
-      if (DateTime.of(activityLobbyUpdateDTO.getEndTime()).dayOfWeek()
-          == activityLobbyUpdateDTO.getDetailDate().intValue()) {
+    else if (dto.getStatisDate() == ActivityInfoEnum.StatisDate.SPECIFY_DAY_WEEK.getValue()) {
+      if (DateTime.of(dto.getEndTime()).dayOfWeek() == dto.getDetailDate()) {
         throw new ServiceException(
             "统计日期选择"
-                + ActivityInfoEnum.DetailDateEnum.getWeek(activityLobbyUpdateDTO.getDetailDate())
+                + ActivityInfoEnum.DetailDateEnum.getWeek(dto.getDetailDate())
                 + ",活动的结束日期应该为"
-                + ActivityInfoEnum.DetailDateEnum.getWeek(activityLobbyUpdateDTO.getDetailDate()));
+                + ActivityInfoEnum.DetailDateEnum.getWeek(dto.getDetailDate()));
       }
       applyDateList = DateUtil2.getDayOfWeekWithinDateInterval(startTime, endTime, detailDate);
     }
     // 如果统计周期是每月X，需要判断活动的结束时间是不是每月X
-    else if (activityLobbyUpdateDTO.getStatisDate()
-        == ActivityInfoEnum.StatisDate.DAY_OF_THE_MONTH.getValue()) {
-      if (Integer.parseInt(String.format("%td", activityLobbyUpdateDTO.getEndTime()))
-          != activityLobbyUpdateDTO.getDetailDate()) {
+    else if (dto.getStatisDate() == ActivityInfoEnum.StatisDate.DAY_OF_THE_MONTH.getValue()) {
+      if (Integer.parseInt(String.format("%td", dto.getEndTime())) != dto.getDetailDate()) {
         throw new ServiceException(
-            "统计日期选择每月"
-                + activityLobbyUpdateDTO.getDetailDate()
-                + "号"
-                + ",活动的结束日期那天应该为"
-                + activityLobbyUpdateDTO.getDetailDate()
-                + "号");
+            "统计日期选择每月" + dto.getDetailDate() + "号" + ",活动的结束日期那天应该为" + dto.getDetailDate() + "号");
       }
-      List<Date> dates =
-          DateUtil.findDates(
-              activityLobbyUpdateDTO.getStartTime(), activityLobbyUpdateDTO.getEndTime());
+      List<Date> dates = DateUtil.findDates(dto.getStartTime(), dto.getEndTime());
       for (Date date : dates) {
         String day = String.format("%td", date);
-        if (Integer.parseInt(day) == activityLobbyUpdateDTO.getDetailDate()) {
+        if (Integer.parseInt(day) == dto.getDetailDate()) {
           applyDateList.add(DateUtil.dateToStr(date, DateUtil.YYYY_MM_DD));
         }
       }
-      if (activityLobbyUpdateDTO.getNextDayApply() == ActivityInfoEnum.NextDayApply.YES.value()) {
-        List<String> copyDateList = new ArrayList<>();
-        copyDateList.addAll(applyDateList);
+      if (dto.getNextDayApply() == ActivityInfoEnum.NextDayApply.YES.value()) {
+        List<String> copyDateList = new ArrayList<>(applyDateList);
         applyDateList.clear();
         for (String applyDate : copyDateList) {
           applyDate =
@@ -439,8 +395,7 @@ public class ActivityLobbyServiceImpl extends ServiceImpl<ActivityLobbyMapper, A
     List<ActivityLobbyDiscount> allList = new ArrayList<>();
     Set<Long> hasIdSet = new HashSet<>();
 
-    List<ActivityLobbyDiscountDTO> lobbyDiscountList =
-        activityLobbyUpdateDTO.getLobbyDiscountList();
+    List<ActivityLobbyDiscountDTO> lobbyDiscountList = dto.getLobbyDiscountList();
     // 遍历大厅优惠信息，完善优惠信息，有id就修改，没有id就新增
     for (ActivityLobbyDiscountDTO lobbyDiscountDTO : lobbyDiscountList) {
       ActivityLobbyDiscount activityLobbyDiscount =
@@ -459,7 +414,7 @@ public class ActivityLobbyServiceImpl extends ServiceImpl<ActivityLobbyMapper, A
     List<ActivityLobbyDiscount> deleteList = new ArrayList<>();
     // 查询历史折扣列表
     List<ActivityLobbyDiscountVO> activityLobbyDiscounts =
-        activityLobbyDiscountService.listByActivityLobbyId(activityLobbyUpdateDTO.getId());
+        activityLobbyDiscountService.listByActivityLobbyId(dto.getId());
     if (CollectionUtils.isNotEmpty(activityLobbyDiscounts)) {
       for (ActivityLobbyDiscountVO activityLobbyDiscountVO : activityLobbyDiscounts) {
         if (!hasIdSet.contains(activityLobbyDiscountVO.getLobbyDiscountId())) {
@@ -493,13 +448,10 @@ public class ActivityLobbyServiceImpl extends ServiceImpl<ActivityLobbyMapper, A
       }
     }
 
-    if (activityLobbyUpdateDTO.getStatisItem()
-            == ActivityInfoEnum.StatisItem.CUMULATIVE_RECHARGE_DAYS.getValue()
-        || activityLobbyUpdateDTO.getStatisItem()
-            == ActivityInfoEnum.StatisItem.CONTINUOUS_RECHARGE_DAYS.getValue()
-        || activityLobbyUpdateDTO.getStatisItem()
-            == ActivityInfoEnum.StatisItem.CUMULATIVE_GAME_DML_DAYS.getValue()
-        || activityLobbyUpdateDTO.getStatisItem()
+    if (dto.getStatisItem() == ActivityInfoEnum.StatisItem.CUMULATIVE_RECHARGE_DAYS.getValue()
+        || dto.getStatisItem() == ActivityInfoEnum.StatisItem.CONTINUOUS_RECHARGE_DAYS.getValue()
+        || dto.getStatisItem() == ActivityInfoEnum.StatisItem.CUMULATIVE_GAME_DML_DAYS.getValue()
+        || dto.getStatisItem()
             == ActivityInfoEnum.StatisItem.CONSECUTIVE_GAME_DML_DAYS.getValue()) {
       for (ActivityLobbyDiscountDTO activityLobbyDiscountDTO : lobbyDiscountList) {
         if (activityLobbyDiscountDTO.getTargetValue() < 2) {
@@ -508,8 +460,8 @@ public class ActivityLobbyServiceImpl extends ServiceImpl<ActivityLobbyMapper, A
       }
     }
 
-    activityLobbyUpdateDTO.setApplyDateList(String.join(",", applyDateList));
-    ActivityLobby activityLobby = activityLobbyConvert.toEntity(activityLobbyUpdateDTO);
+    dto.setApplyDateList(String.join(",", applyDateList));
+    ActivityLobby activityLobby = activityLobbyConvert.toEntity(dto);
     if (!this.updateById(activityLobby)) {
       throw new ServiceException("修改失败！");
     }
@@ -572,12 +524,12 @@ public class ActivityLobbyServiceImpl extends ServiceImpl<ActivityLobbyMapper, A
   }
 
   @Override
-  public void updateStatus(ActivityLobbyUpdateStatusDTO activityLobbyUpdateStatusDTO) {
-    ActivityLobby activityLobby = this.getById(activityLobbyUpdateStatusDTO.getId());
+  public void updateStatus(ActivityLobbyUpdateStatusDTO dto) {
+    ActivityLobby activityLobby = this.getById(dto.getId());
     if (activityLobby == null) {
       throw new ServiceException("活动大厅不存在，请重试！");
     }
-    ActivityLobby activityLobby2 = activityLobbyConvert.toEntity(activityLobbyUpdateStatusDTO);
+    ActivityLobby activityLobby2 = activityLobbyConvert.toEntity(dto);
     this.updateById(activityLobby2);
   }
 

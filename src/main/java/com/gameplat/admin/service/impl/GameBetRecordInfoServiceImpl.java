@@ -59,8 +59,7 @@ import java.util.Map;
 @Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)
 public class GameBetRecordInfoServiceImpl implements GameBetRecordInfoService {
 
-  @Autowired
-  private ApplicationContext applicationContext;
+  @Autowired private ApplicationContext applicationContext;
 
   @Autowired private IBaseElasticsearchService baseElasticsearchService;
 
@@ -70,13 +69,12 @@ public class GameBetRecordInfoServiceImpl implements GameBetRecordInfoService {
 
   @Autowired private TenantConfig tenantConfig;
 
-    @Resource
-    private RestHighLevelClient restHighLevelClient;
+  @Resource private RestHighLevelClient restHighLevelClient;
 
   @Transactional(propagation = Propagation.NOT_SUPPORTED)
   public GameApi getGameApi(String platformCode) {
-    GameApi api = applicationContext
-        .getBean(platformCode.toLowerCase() + GameApi.SUFFIX, GameApi.class);
+    GameApi api =
+        applicationContext.getBean(platformCode.toLowerCase() + GameApi.SUFFIX, GameApi.class);
     TransferTypesEnum tt = TransferTypesEnum.get(platformCode);
     // 1代表是否额度转换
     if (tt == null || tt.getType() != 1) {
@@ -85,14 +83,23 @@ public class GameBetRecordInfoServiceImpl implements GameBetRecordInfoService {
     return api;
   }
 
-    @Override
-    public PageDtoVO<GameBetRecordVO> queryPageBetRecord(Page<GameBetRecordVO> page, GameBetRecordQueryDTO dto) {
-        QueryBuilder builder = GameBetRecordSearchBuilder.buildBetRecordSearch(dto);
-        SortBuilder<FieldSortBuilder> sortBuilder = SortBuilders.fieldSort(convertTimeType(dto.getTimeType())+ ".keyword").order(SortOrder.DESC);
-        String indexName = ContextConstant.ES_INDEX.BET_RECORD_ + tenantConfig.getTenantCode();
-        //调用封装的分页 页码不用减1
-        PageResponse<GameBetRecord> result = baseElasticsearchService.search(builder, indexName, GameBetRecord.class,
-                (int) page.getCurrent(), (int) page.getSize(), sortBuilder);
+  @Override
+  public PageDtoVO<GameBetRecordVO> queryPageBetRecord(
+      Page<GameBetRecordVO> page, GameBetRecordQueryDTO dto) {
+    QueryBuilder builder = GameBetRecordSearchBuilder.buildBetRecordSearch(dto);
+    SortBuilder<FieldSortBuilder> sortBuilder =
+        SortBuilders.fieldSort(convertTimeType(dto.getTimeType()) + ".keyword")
+            .order(SortOrder.DESC);
+    String indexName = ContextConstant.ES_INDEX.BET_RECORD_ + tenantConfig.getTenantCode();
+    // 调用封装的分页 页码不用减1
+    PageResponse<GameBetRecord> result =
+        baseElasticsearchService.search(
+            builder,
+            indexName,
+            GameBetRecord.class,
+            (int) page.getCurrent(),
+            (int) page.getSize(),
+            sortBuilder);
 
     List<GameBetRecordVO> betRecordList = new ArrayList<>();
     if (CollectionUtils.isNotEmpty(result.getList())) {
@@ -104,32 +111,45 @@ public class GameBetRecordInfoServiceImpl implements GameBetRecordInfoService {
     resultPage.setCurrent(result.getPageNum());
     resultPage.setSize(result.getPageSize());
 
-        Map<String, Object> otherData = new HashMap<>(8);
-        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
-        SumAggregationBuilder betAmountSumBuilder = AggregationBuilders.sum("betAmountSum").field("betAmount");
-        SumAggregationBuilder validAmountSumBuilder = AggregationBuilders.sum("validAmountSum").field("validAmount");
-        SumAggregationBuilder winAmountSumBuilder = AggregationBuilders.sum("winAmountSum").field("winAmount");
-        searchSourceBuilder.aggregation(betAmountSumBuilder).aggregation(validAmountSumBuilder).aggregation(winAmountSumBuilder);
-        searchSourceBuilder.query(builder);
-        searchSourceBuilder.sort(sortBuilder);
+    Map<String, Object> otherData = new HashMap<>(8);
+    SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+    SumAggregationBuilder betAmountSumBuilder =
+        AggregationBuilders.sum("betAmountSum").field("betAmount");
+    SumAggregationBuilder validAmountSumBuilder =
+        AggregationBuilders.sum("validAmountSum").field("validAmount");
+    SumAggregationBuilder winAmountSumBuilder =
+        AggregationBuilders.sum("winAmountSum").field("winAmount");
+    searchSourceBuilder
+        .aggregation(betAmountSumBuilder)
+        .aggregation(validAmountSumBuilder)
+        .aggregation(winAmountSumBuilder);
+    searchSourceBuilder.query(builder);
+    searchSourceBuilder.sort(sortBuilder);
 
-        SearchRequest searchRequest = new SearchRequest(indexName);
-        searchRequest.source(searchSourceBuilder);
-        RequestOptions.Builder optionsBuilder = RequestOptions.DEFAULT.toBuilder();
-        optionsBuilder.setHttpAsyncResponseConsumerFactory(
-            new HttpAsyncResponseConsumerFactory.HeapBufferedResponseConsumerFactory(31457280));
-        try {
-           SearchResponse searchResponse =  restHighLevelClient.search(searchRequest,optionsBuilder.build());
-            Map<String, Aggregation> aggregationMap = searchResponse.getAggregations().getAsMap();
-            BigDecimal betAmount = Convert.toBigDecimal(((ParsedSum)aggregationMap.get("betAmountSum")).getValue()).setScale(2,BigDecimal.ROUND_DOWN);
-            BigDecimal validAmount = Convert.toBigDecimal(( (ParsedSum) aggregationMap.get("validAmountSum")).getValue()).setScale(2,BigDecimal.ROUND_DOWN);
-            BigDecimal winAmount = Convert.toBigDecimal(( (ParsedSum)aggregationMap.get("winAmountSum")).getValue()).setScale(2,BigDecimal.ROUND_DOWN);
-            otherData.put("betAmount",betAmount);
-            otherData.put("validAmount",validAmount);
-            otherData.put("winAmount",winAmount);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    SearchRequest searchRequest = new SearchRequest(indexName);
+    searchRequest.source(searchSourceBuilder);
+    RequestOptions.Builder optionsBuilder = RequestOptions.DEFAULT.toBuilder();
+    optionsBuilder.setHttpAsyncResponseConsumerFactory(
+        new HttpAsyncResponseConsumerFactory.HeapBufferedResponseConsumerFactory(31457280));
+    try {
+      SearchResponse searchResponse =
+          restHighLevelClient.search(searchRequest, optionsBuilder.build());
+      Map<String, Aggregation> aggregationMap = searchResponse.getAggregations().getAsMap();
+      BigDecimal betAmount =
+          Convert.toBigDecimal(((ParsedSum) aggregationMap.get("betAmountSum")).getValue())
+              .setScale(2, BigDecimal.ROUND_DOWN);
+      BigDecimal validAmount =
+          Convert.toBigDecimal(((ParsedSum) aggregationMap.get("validAmountSum")).getValue())
+              .setScale(2, BigDecimal.ROUND_DOWN);
+      BigDecimal winAmount =
+          Convert.toBigDecimal(((ParsedSum) aggregationMap.get("winAmountSum")).getValue())
+              .setScale(2, BigDecimal.ROUND_DOWN);
+      otherData.put("betAmount", betAmount);
+      otherData.put("validAmount", validAmount);
+      otherData.put("winAmount", winAmount);
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
 
     PageDtoVO<GameBetRecordVO> pageDtoVO = new PageDtoVO<>();
     pageDtoVO.setPage(resultPage);
@@ -171,7 +191,6 @@ public class GameBetRecordInfoServiceImpl implements GameBetRecordInfoService {
 
   @Override
   public List<ActivityStatisticItem> xjAssignMatchDml(Map map) {
-    List<ActivityStatisticItem> activityStatisticItemVOList = new ArrayList<>();
-    return activityStatisticItemVOList;
+    return new ArrayList<>();
   }
 }

@@ -12,8 +12,8 @@ public interface ActivityPrizeService extends IService<ActivityPrize> {
   /**
    * 查询奖品信息
    *
-   * @param memberActivityPrizeBean
-   * @return
+   * @param memberActivityPrizeBean MemberActivityPrizeVO
+   * @return List
    */
   List<MemberActivityPrizeVO> findActivityPrizeList(MemberActivityPrizeVO memberActivityPrizeBean);
 }

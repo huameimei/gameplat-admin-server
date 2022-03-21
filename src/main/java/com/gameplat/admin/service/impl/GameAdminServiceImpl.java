@@ -39,6 +39,7 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StopWatch;
+
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -72,8 +73,10 @@ public class GameAdminServiceImpl implements GameAdminService {
 
   @Autowired private MessageInfoService messageInfoService;
 
-  @Resource
-  private GameAmountControlService gameAmountControlService;
+  @Resource private GameAmountControlService gameAmountControlService;
+  @Resource private RedisService redisService;
+  @Resource private GamePlatformService gamePlatformService;
+  @Autowired private GameKindService gameKindService;
 
   @Transactional(propagation = Propagation.NOT_SUPPORTED)
   public GameApi getGameApi(String platformCode) {
@@ -106,7 +109,9 @@ public class GameAdminServiceImpl implements GameAdminService {
      */
     Message message = new Message();
     message.setTitle("没收玩家游戏平台余额");
-    message.setContent(String.format("此次操作为,没收玩家在%s游戏平台的所有余额,没收金额为%s",GamePlatformEnum.getName(transferIn),amount));
+    message.setContent(
+        String.format(
+            "此次操作为,没收玩家在%s游戏平台的所有余额,没收金额为%s", GamePlatformEnum.getName(transferIn), amount));
     message.setCategory(4);
     message.setPushRange(2);
     message.setLinkAccount(member.getAccount());
@@ -312,15 +317,21 @@ public class GameAdminServiceImpl implements GameAdminService {
     if (transferType) {
       // 自动转换 直接amount就是会员余额
       amount = memberInfo.getBalance();
-      if(amount.compareTo(BigDecimal.ZERO) > 0 ){
-        log.info("余额为"+amount);
+      if (amount.compareTo(BigDecimal.ZERO) > 0) {
+        log.info("余额为" + amount);
         return;
       }
     }
     // 转换成功需要增加游戏使用额度
-    GameAmountControl gameAmountControl = gameAmountControlService.findInfoByType(
-        GameAmountControlTypeEnum.checkGameAmountControlType(transferOut));
-    if (ObjectUtil.isNotNull(gameAmountControl) && gameAmountControl.getUseAmount().add(amount.abs()).compareTo(gameAmountControl.getAmount()) >= 0){
+    GameAmountControl gameAmountControl =
+        gameAmountControlService.findInfoByType(
+            GameAmountControlTypeEnum.checkGameAmountControlType(transferOut));
+    if (ObjectUtil.isNotNull(gameAmountControl)
+        && gameAmountControl
+                .getUseAmount()
+                .add(amount.abs())
+                .compareTo(gameAmountControl.getAmount())
+            >= 0) {
       throw new ServiceException("转入金额已经超过剩余可用额度，请联系客服");
     }
     // 转出平台余额小于转账余额则抛出错误信息
@@ -383,7 +394,7 @@ public class GameAdminServiceImpl implements GameAdminService {
       status = GameTransferStatus.SUCCESS.getValue();
       // 7. 添加额度转换记录
       gameTransferInfoService.update(memberInfo.getMemberId(), transferOut, orderNo);
-      //8. 增加转出额度数据
+      // 8. 增加转出额度数据
       gameAmountControl.setUseAmount(gameAmountControl.getUseAmount().add(amount.abs()));
       gameAmountControlService.updateById(gameAmountControl);
     } catch (GameException | GameRollbackException ex) {
@@ -454,7 +465,7 @@ public class GameAdminServiceImpl implements GameAdminService {
     // 自动转动实际上回收的是在第三方游戏的所有余额
     if (transferType) {
       amount = amount.add(balance);
-      if(balance.compareTo(BigDecimal.ZERO) < 0) {
+      if (balance.compareTo(BigDecimal.ZERO) < 0) {
         log.info(transferIn + "真人余额不足,不能转出" + balance);
         return;
       }
@@ -568,27 +579,25 @@ public class GameAdminServiceImpl implements GameAdminService {
     }
   }
 
-  @Resource private RedisService redisService;
-
-  @Resource private GamePlatformService gamePlatformService;
-
   /**
    * 一键回收余额
+   *
    * @param username 用户名
    */
   @Override
   public void reclaimLiveAmount(String username) {
-    Member member = memberService.getByAccount(username).orElseThrow(()-> new ServiceException("用户不存在！"));
+    Member member =
+        memberService.getByAccount(username).orElseThrow(() -> new ServiceException("用户不存在！"));
     List<GameTransferRecord> recordList =
-            gameTransferRecordService.findPlatformCodeList(member.getId());
+        gameTransferRecordService.findPlatformCodeList(member.getId());
     List<String> platformList = new ArrayList<>();
     recordList.forEach(item -> platformList.add(item.getPlatformCode()));
     List<com.gameplat.model.entity.game.GamePlatform> gamePlatformList = gamePlatformService.list();
     // 仅获取当前会员玩过得游戏
     List<com.gameplat.model.entity.game.GamePlatform> playedPlatformList =
-            gamePlatformList.stream()
-                    .filter(item -> platformList.contains(item.getCode()))
-                    .collect(Collectors.toList());
+        gamePlatformList.stream()
+            .filter(item -> platformList.contains(item.getCode()))
+            .collect(Collectors.toList());
     if (CollectionUtils.isEmpty(playedPlatformList)) {
       return;
     }
@@ -604,68 +613,64 @@ public class GameAdminServiceImpl implements GameAdminService {
       StopWatch stopwatch = new StopWatch();
       stopwatch.start();
       // 每10个切分成一个list去请求
-      List<List<com.gameplat.model.entity.game.GamePlatform>> allList = Lists.partition(playedPlatformList, 10);
+      List<List<com.gameplat.model.entity.game.GamePlatform>> allList =
+          Lists.partition(playedPlatformList, 10);
       for (List<com.gameplat.model.entity.game.GamePlatform> partList : allList) {
         int size = partList.size();
         CompletableFuture<GameRecycleVO>[] arrays = new CompletableFuture[size];
         for (int i = 0; i < size; i++) {
           GamePlatform item = partList.get(i);
           CompletableFuture<GameRecycleVO> completableFuture =
-                  CompletableFuture.supplyAsync(
-                          () -> {
-                            GameBizDTO gameBizDTO = new GameBizDTO();
-                            gameBizDTO.setPlatformCode(item.getCode());
-                            gameBizDTO.setAmount(null);
-                            gameBizDTO.setIsWeb(false);
-                            gameBizDTO.setTransferType(true);
-                            gameBizDTO.setTransferIn(item.getCode());
-                            gameBizDTO.setGameAccount(member.getGameAccount());
+              CompletableFuture.supplyAsync(
+                  () -> {
+                    GameBizDTO gameBizDTO = new GameBizDTO();
+                    gameBizDTO.setPlatformCode(item.getCode());
+                    gameBizDTO.setAmount(null);
+                    gameBizDTO.setIsWeb(false);
+                    gameBizDTO.setTransferType(true);
+                    gameBizDTO.setTransferIn(item.getCode());
+                    gameBizDTO.setGameAccount(member.getGameAccount());
 
-                            GameRecycleVO gameRecycleVO = new GameRecycleVO();
-                            // 获取真人信息
-                            gameRecycleVO.setPlatfromCode(item.getCode());
-                            gameRecycleVO.setPlatformName(item.getName());
-                            gameRecycleVO.setStatus(0); // 默认成功
-                            // 查看是否在维护
-                            String fixMsg = checkTransferMainTime(gameBizDTO.getPlatformCode());
-                            if (StringUtils.isNotEmpty(fixMsg)) {
-                              gameRecycleVO.setErrorMsg(fixMsg + "转账通道维护中");
-                              gameRecycleVO.setStatus(1);
-                              return gameRecycleVO;
-                            }
-                            try {
-                              transferIn(item.getCode(),Convert.toBigDecimal(0), member,false,true);
-                            } catch (Exception e) {
-                              log.error("回收失败：{}", e.getMessage());
-                              gameRecycleVO.setStatus(1);
-                              gameRecycleVO.setErrorMsg(e.getMessage());
-                            }
-                            return gameRecycleVO;
-                          });
+                    GameRecycleVO gameRecycleVO = new GameRecycleVO();
+                    // 获取真人信息
+                    gameRecycleVO.setPlatfromCode(item.getCode());
+                    gameRecycleVO.setPlatformName(item.getName());
+                    gameRecycleVO.setStatus(0); // 默认成功
+                    // 查看是否在维护
+                    String fixMsg = checkTransferMainTime(gameBizDTO.getPlatformCode());
+                    if (StringUtils.isNotEmpty(fixMsg)) {
+                      gameRecycleVO.setErrorMsg(fixMsg + "转账通道维护中");
+                      gameRecycleVO.setStatus(1);
+                      return gameRecycleVO;
+                    }
+                    try {
+                      transferIn(item.getCode(), Convert.toBigDecimal(0), member, false, true);
+                    } catch (Exception e) {
+                      log.error("回收失败：{}", e.getMessage());
+                      gameRecycleVO.setStatus(1);
+                      gameRecycleVO.setErrorMsg(e.getMessage());
+                    }
+                    return gameRecycleVO;
+                  });
           arrays[i] = completableFuture;
         }
         // 等待10次异步请求结果
         CompletableFuture.allOf(arrays).join();
         Arrays.stream(arrays)
-                .forEach(
-                        item -> {
-                          try {
-                            resultList.add(item.get());
-                          } catch (InterruptedException | ExecutionException e) {
-                            e.printStackTrace();
-                          }
-                        });
+            .forEach(
+                item -> {
+                  try {
+                    resultList.add(item.get());
+                  } catch (InterruptedException | ExecutionException e) {
+                    e.printStackTrace();
+                  }
+                });
       }
       stopwatch.stop();
     } finally {
       redisService.getKeyOps().delete(key);
     }
   }
-
-
-  @Autowired
-  private GameKindService gameKindService;
-
 
   /**
    * 检查真人转账时间
@@ -682,20 +687,19 @@ public class GameAdminServiceImpl implements GameAdminService {
     AtomicBoolean isFix = new AtomicBoolean(false);
     String fixMsg = "通道正在维护中,请耐心等待！";
     gameKindList.forEach(
-            gameKind -> {
-              // 如果维护时间有开始和结束
-              if (gamePlatform.getCode().equals(gameKind.getPlatformCode())) {
-                Date maintenanceTimeStart = gameKind.getMaintenanceTimeStart();
-                Date maintenanceTimeEnd = gameKind.getMaintenanceTimeEnd();
-                if (ObjectUtils.isNotEmpty(maintenanceTimeStart)
-                        && ObjectUtils.isNotEmpty(maintenanceTimeEnd)
-                        && DateUtil.dateCompareByYmdhms(
-                        newDate, maintenanceTimeStart, maintenanceTimeEnd)) {
-                  isFix.set(true);
-                }
-              }
-            });
+        gameKind -> {
+          // 如果维护时间有开始和结束
+          if (gamePlatform.getCode().equals(gameKind.getPlatformCode())) {
+            Date maintenanceTimeStart = gameKind.getMaintenanceTimeStart();
+            Date maintenanceTimeEnd = gameKind.getMaintenanceTimeEnd();
+            if (ObjectUtils.isNotEmpty(maintenanceTimeStart)
+                && ObjectUtils.isNotEmpty(maintenanceTimeEnd)
+                && DateUtil.dateCompareByYmdhms(
+                    newDate, maintenanceTimeStart, maintenanceTimeEnd)) {
+              isFix.set(true);
+            }
+          }
+        });
     return isFix.get() ? fixMsg : null;
   }
-
 }

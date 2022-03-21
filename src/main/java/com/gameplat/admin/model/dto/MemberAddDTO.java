@@ -73,6 +73,9 @@ public class MemberAddDTO implements Serializable {
   @Length(min = 4, max = 20, message = "上级长度必须是{min}～{max}个字符")
   private String parentName;
 
+  @Range(min = 0, max = 1, message = "只能为0或1 开启或关闭")
+  private Integer salaryFlag;
+
   private String registerIp;
 
   private String registerHost;

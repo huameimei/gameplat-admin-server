@@ -7,11 +7,9 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.convert.SpreadUnionConvert;
 import com.gameplat.admin.mapper.GameMemberReportMapper;
-import com.gameplat.admin.mapper.MemberMapper;
 import com.gameplat.admin.mapper.SpreadUnionMapper;
 import com.gameplat.admin.model.dto.SpreadUnionDTO;
 import com.gameplat.admin.model.vo.SpreadUnionVO;
-import com.gameplat.admin.service.MemberBackupService;
 import com.gameplat.admin.service.SpreadLinkInfoService;
 import com.gameplat.admin.service.SpreadUnionService;
 import com.gameplat.base.common.exception.ServiceException;
@@ -21,6 +19,7 @@ import com.gameplat.model.entity.spread.SpreadUnion;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
@@ -31,9 +30,9 @@ import java.util.stream.Collectors;
 /** 联运设置实现 */
 @Slf4j
 @Service
+@Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)
 public class SpreadUnionServiceImpl extends ServiceImpl<SpreadUnionMapper, SpreadUnion>
-        implements SpreadUnionService {
-
+    implements SpreadUnionService {
 
   @Autowired private SpreadUnionConvert spreadUnionConvert;
 
@@ -41,12 +40,11 @@ public class SpreadUnionServiceImpl extends ServiceImpl<SpreadUnionMapper, Sprea
 
   @Autowired private GameMemberReportMapper reportMapper;
 
-  /** 创建联运设置 */
   @Override
   @SentinelResource(value = "creatUnion")
   public void creatUnion(SpreadUnionDTO spreadUnionDTO) {
     List<SpreadLinkInfo> spreadList =
-            spreadLinkInfoService.getSpreadList(spreadUnionDTO.getAgentAccount());
+        spreadLinkInfoService.getSpreadList(spreadUnionDTO.getAgentAccount());
     if (spreadList.size() == 0) {
       throw new ServiceException("未获取到您需要绑定的代理信息");
     }
@@ -56,51 +54,48 @@ public class SpreadUnionServiceImpl extends ServiceImpl<SpreadUnionMapper, Sprea
     }
   }
 
-  /** 获取联运列表 检索条件 联盟名称，代理账号，渠道类型 */
   @Override
   @SentinelResource(value = "getUnion")
   public IPage<SpreadUnionVO> getUnion(PageDTO<SpreadUnion> page, SpreadUnionDTO spreadUnionDTO) {
     return this.lambdaQuery()
-            .eq(
-                    spreadUnionDTO.getUnionName() != null,
-                    SpreadUnion::getUnionName,
-                    spreadUnionDTO.getUnionName())
-            .eq(
-                    spreadUnionDTO.getAgentAccount() != null,
-                    SpreadUnion::getAgentAccount,
-                    spreadUnionDTO.getAgentAccount())
-            .eq(
-                    spreadUnionDTO.getChannel() != null,
-                    SpreadUnion::getChannel,
-                    spreadUnionDTO.getChannel())
-            .orderByDesc(SpreadUnion::getId)
-            .page(page)
-            .convert(spreadUnionConvert::toSpreadUnionVO);
+        .eq(
+            spreadUnionDTO.getUnionName() != null,
+            SpreadUnion::getUnionName,
+            spreadUnionDTO.getUnionName())
+        .eq(
+            spreadUnionDTO.getAgentAccount() != null,
+            SpreadUnion::getAgentAccount,
+            spreadUnionDTO.getAgentAccount())
+        .eq(
+            spreadUnionDTO.getChannel() != null,
+            SpreadUnion::getChannel,
+            spreadUnionDTO.getChannel())
+        .orderByDesc(SpreadUnion::getId)
+        .page(page)
+        .convert(spreadUnionConvert::toSpreadUnionVO);
   }
 
-  /** 修改联盟设置 */
   @Override
   @SentinelResource(value = "editUnion")
   public void editUnion(SpreadUnionDTO spreadUnionDTO) {
     List<SpreadLinkInfo> spreadList =
-            spreadLinkInfoService.getSpreadList(spreadUnionDTO.getAgentAccount());
+        spreadLinkInfoService.getSpreadList(spreadUnionDTO.getAgentAccount());
     if (spreadList.size() == 0) {
       log.info("查询代理相关信息 参数 {}，返回结果：{}", spreadUnionDTO.getAgentAccount(), spreadList);
       throw new ServiceException("未获取到您需要绑定的代理信息");
     }
 
     if (!this.lambdaUpdate()
-            .set(SpreadUnion::getUnionName, spreadUnionDTO.getUnionName())
-            .set(SpreadUnion::getAgentAccount, spreadUnionDTO.getAgentAccount())
-            .set(SpreadUnion::getChannel, spreadUnionDTO.getChannel())
-            .eq(SpreadUnion::getId, spreadUnionDTO.getId())
-            .update()) {
+        .set(SpreadUnion::getUnionName, spreadUnionDTO.getUnionName())
+        .set(SpreadUnion::getAgentAccount, spreadUnionDTO.getAgentAccount())
+        .set(SpreadUnion::getChannel, spreadUnionDTO.getChannel())
+        .eq(SpreadUnion::getId, spreadUnionDTO.getId())
+        .update()) {
       log.error("修改联盟设置失败,传入的参数  spreadUnionDTO：{}", spreadUnionDTO);
       throw new ServiceException("修改失败,请联系管理员");
     }
   }
 
-  /** 删除联盟设置 */
   @Override
   @Transactional
   public void removeUnion(List<Long> id) {
@@ -109,9 +104,6 @@ public class SpreadUnionServiceImpl extends ServiceImpl<SpreadUnionMapper, Sprea
     }
   }
 
-  /**
-   * 获取联盟报表
-   */
   @Override
   @SentinelResource(value = "getUnionReportList")
   public Object getUnionReportList(SpreadUnionDTO dto) {
@@ -119,17 +111,23 @@ public class SpreadUnionServiceImpl extends ServiceImpl<SpreadUnionMapper, Sprea
       throw new RuntimeException("请确认需要查询的时间段范围");
     }
     List<SpreadUnionVO> list =
-            this.lambdaQuery()
-                    .eq(StringUtils.isNotEmpty(dto.getAgentAccount()),SpreadUnion::getAgentAccount, dto.getAgentAccount())
-                    .like(StringUtils.isNotEmpty(dto.getUnionName()),SpreadUnion::getUnionName, dto.getUnionName())
-                    .between(SpreadUnion::getCreateTime,dto.getStartTime(),dto.getEndTime())
-                    .list()
-                    .stream()
-                    .map(spreadUnionConvert::toSpreadUnionVO)
-                    .collect(Collectors.toList());
+        this.lambdaQuery()
+            .eq(
+                StringUtils.isNotEmpty(dto.getAgentAccount()),
+                SpreadUnion::getAgentAccount,
+                dto.getAgentAccount())
+            .like(
+                StringUtils.isNotEmpty(dto.getUnionName()),
+                SpreadUnion::getUnionName,
+                dto.getUnionName())
+            .between(SpreadUnion::getCreateTime, dto.getStartTime(), dto.getEndTime())
+            .list()
+            .stream()
+            .map(spreadUnionConvert::toSpreadUnionVO)
+            .collect(Collectors.toList());
     if (list != null && list.size() > 0) {
       List<JSONObject> spreadReport =
-              reportMapper.getSpreadReport(list, dto.getStartTime(), dto.getEndTime());
+          reportMapper.getSpreadReport(list, dto.getStartTime(), dto.getEndTime());
       for (SpreadUnionVO x : list) {
         String agentPat = "/" + x.getAgentAccount() + "[\\s\\S]*";
         BigDecimal reAmount = new BigDecimal("0");
@@ -157,11 +155,6 @@ public class SpreadUnionServiceImpl extends ServiceImpl<SpreadUnionMapper, Sprea
     return list;
   }
 
-  /**
-   * 联运详情
-   *
-   * @return
-   */
   @Override
   @SentinelResource(value = "unionReportInfo")
   public List<JSONObject> unionReportInfo(String account, String startTime, String endTime) {

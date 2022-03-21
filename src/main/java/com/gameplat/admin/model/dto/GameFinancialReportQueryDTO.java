@@ -13,13 +13,12 @@ import java.io.Serializable;
 @Data
 public class GameFinancialReportQueryDTO implements Serializable {
 
-    @ApiModelProperty(value = "统计月份")
-    private String statisticsTime;
+  @ApiModelProperty(value = "统计月份")
+  private String statisticsTime;
 
-    @ApiModelProperty(value = "游戏大类编码")
-    private String gameType;
+  @ApiModelProperty(value = "游戏大类编码")
+  private String gameType;
 
-    @ApiModelProperty(value = "游戏平台编码")
-    private String platformCode;
-
+  @ApiModelProperty(value = "游戏平台编码")
+  private String platformCode;
 }

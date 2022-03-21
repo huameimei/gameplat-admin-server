@@ -58,8 +58,7 @@ public class GamePlatformServiceImpl extends ServiceImpl<GamePlatformMapper, Gam
   @Override
   public GamePlatform queryByCode(String platformCode) {
     return this.lambdaQuery()
-            .eq(StringUtils.isNotBlank(platformCode), GamePlatform::getCode, platformCode)
-            .one();
+        .eq(StringUtils.isNotBlank(platformCode), GamePlatform::getCode, platformCode)
+        .one();
   }
-
 }

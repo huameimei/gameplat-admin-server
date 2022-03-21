@@ -13,12 +13,9 @@ import java.io.Serializable;
 @Data
 public class GoldCoinDescUpdateDTO implements Serializable {
 
-    @ApiModelProperty("id")
-    private Integer id;
+  @ApiModelProperty("id")
+  private Integer id;
 
-    @ApiModelProperty("语言")
-    private String language;
-
-    @ApiModelProperty("金币描述")
-    private String goldCoinDesc;
+  @ApiModelProperty("金币描述")
+  private String goldCoinDesc;
 }

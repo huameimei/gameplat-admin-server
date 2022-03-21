@@ -22,28 +22,23 @@ import java.util.List;
 @Service
 @Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)
 public class SysMessageServiceImpl extends ServiceImpl<SysMessageMapper, SysMessage>
-        implements SysMessageService {
+    implements SysMessageService {
 
+  @Override
+  public IPage<SysMessage> pageList(IPage<SysMessage> page, SysMessageDTO dto) {
+    return this.lambdaQuery()
+        .eq(SysMessage::getStatus, EnableEnum.ENABLED.code())
+        .ge(
+            ObjectUtils.isNotEmpty(dto.getBeginTime()),
+            SysMessage::getCreateTime,
+            dto.getBeginTime())
+        .le(ObjectUtils.isNotEmpty(dto.getEndTime()), SysMessage::getCreateTime, dto.getEndTime())
+        .orderByDesc(SysMessage::getCreateTime)
+        .page(page);
+  }
 
-    @Override
-    public IPage<SysMessage> pageList(IPage<SysMessage> page, SysMessageDTO dto) {
-        return this.lambdaQuery()
-                .eq(SysMessage::getStatus, EnableEnum.ENABLED.code())
-                .ge(
-                        ObjectUtils.isNotEmpty(dto.getBeginTime()),
-                        SysMessage::getCreateTime,
-                        dto.getBeginTime())
-                .le(
-                        ObjectUtils.isNotEmpty(dto.getEndTime()),
-                        SysMessage::getCreateTime,
-                        dto.getEndTime())
-                .orderByDesc(SysMessage::getCreateTime)
-                .page(page);
-    }
-
-    @Override
-    public List<SysMessage> lastList(SysMessageDTO dto) {
-        return this.lambdaQuery().apply(true, "TO_DAYS(NOW())-TO_DAYS(create_time) <=3").list();
-    }
-
+  @Override
+  public List<SysMessage> lastList(SysMessageDTO dto) {
+    return this.lambdaQuery().apply(true, "TO_DAYS(NOW())-TO_DAYS(create_time) <=3").list();
+  }
 }

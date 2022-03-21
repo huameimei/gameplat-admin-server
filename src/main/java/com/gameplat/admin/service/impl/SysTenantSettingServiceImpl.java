@@ -6,7 +6,6 @@ import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.mapper.SysTenantSettingMapper;
 import com.gameplat.admin.service.SysTenantSettingService;
-import com.gameplat.model.entity.game.GameKind;
 import com.gameplat.model.entity.sys.SysTenantSetting;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -29,7 +28,6 @@ public class SysTenantSettingServiceImpl
 
   @Override
   public void updateChatEnable(String cpChatEnable) {
-    // 查询配置信息
     SysTenantSetting sportConfig = getSportConfig();
     JSONObject json = JSONObject.parseObject(sportConfig.getSettingValue());
     json.remove("cpChatEnable");
@@ -39,7 +37,6 @@ public class SysTenantSettingServiceImpl
     updateSportConfig(sportConfig);
   }
 
-  /** 查询配置信息 */
   @Override
   public SysTenantSetting getSportConfig() {
     return this.lambdaQuery().eq(SysTenantSetting::getSettingType, "sport_config").one();
@@ -48,11 +45,12 @@ public class SysTenantSettingServiceImpl
   @Override
   public void updateTenantSettingValue(SysTenantSetting sysTenantSetting) {
     LambdaUpdateWrapper<SysTenantSetting> updateWrapper = new LambdaUpdateWrapper<>();
-    updateWrapper.eq(SysTenantSetting::getSettingType, sysTenantSetting.getSettingType())
-            .eq(SysTenantSetting::getSettingCode, sysTenantSetting.getSettingCode())
-            .set(SysTenantSetting::getSettingValue,sysTenantSetting.getSettingValue())
-            .set(SysTenantSetting::getUpdateTime, new Date());
-     update(updateWrapper);
+    updateWrapper
+        .eq(SysTenantSetting::getSettingType, sysTenantSetting.getSettingType())
+        .eq(SysTenantSetting::getSettingCode, sysTenantSetting.getSettingCode())
+        .set(SysTenantSetting::getSettingValue, sysTenantSetting.getSettingValue())
+        .set(SysTenantSetting::getUpdateTime, new Date());
+    update(updateWrapper);
   }
 
   @Override

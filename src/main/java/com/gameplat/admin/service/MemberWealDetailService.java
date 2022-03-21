@@ -6,7 +6,6 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.gameplat.admin.model.dto.MemberWealDetailDTO;
 import com.gameplat.admin.model.vo.MemberWealDetailVO;
 import com.gameplat.model.entity.member.MemberWealDetail;
-import org.apache.ibatis.annotations.Param;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -18,7 +17,7 @@ public interface MemberWealDetailService extends IService<MemberWealDetail> {
 
   void removeWealDetail(Long wealId);
 
-  int batchSave(@Param("list") List<MemberWealDetail> list);
+  int batchSave(List<MemberWealDetail> list);
 
   List<MemberWealDetail> findSatisfyMember(MemberWealDetail wealDetail);
 

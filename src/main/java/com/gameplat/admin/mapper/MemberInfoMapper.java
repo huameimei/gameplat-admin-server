@@ -37,5 +37,4 @@ public interface MemberInfoMapper extends BaseMapper<MemberInfo> {
   BigDecimal findUserLowerMaxRebate(@Param("account") String account);
 
   int updateClearGTMember(CleanAccountDTO dto);
-
 }

@@ -13,16 +13,11 @@ public class GameReportVO implements Serializable {
   /** 平台 */
   private String platformName;
 
-  /**
-   * 游戏大类
-   */
+  /** 游戏大类 */
   private String gameTypeCode;
 
-  /**
-   * 游戏大类名称
-   */
+  /** 游戏大类名称 */
   private String gameTypeName;
-
 
   /** 投注金额 */
   private BigDecimal betAmount;

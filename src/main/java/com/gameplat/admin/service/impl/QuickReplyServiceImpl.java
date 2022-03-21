@@ -14,6 +14,8 @@ import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.model.entity.QuickReply;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Objects;
@@ -24,6 +26,7 @@ import java.util.Objects;
  * @author three
  */
 @Service
+@Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)
 public class QuickReplyServiceImpl extends ServiceImpl<QuickReplyMapper, QuickReply>
     implements QuickReplyService {
 

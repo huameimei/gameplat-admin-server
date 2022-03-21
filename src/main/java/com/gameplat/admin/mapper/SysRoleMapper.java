@@ -30,8 +30,8 @@ public interface SysRoleMapper extends BaseMapper<SysRole> {
   /**
    * 根据Id查找角色
    *
-   * @param roleId
-   * @return
+   * @param roleId Long
+   * @return SysRole
    */
   SysRole selectRoleById(Long roleId);
 

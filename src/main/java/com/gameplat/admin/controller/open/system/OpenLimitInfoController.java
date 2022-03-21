@@ -18,8 +18,8 @@ public class OpenLimitInfoController {
   /** 添加/修改配置项 */
   @PutMapping(value = "/add")
   @PreAuthorize("hasAuthority('system:limit:add')")
-  public void save(@RequestBody LimitInfoDTO limitInfoDTO) {
-    limitInfoService.insertLimitInfo(limitInfoDTO);
+  public void save(@RequestBody LimitInfoDTO dto) {
+    limitInfoService.insertLimitInfo(dto);
   }
 
   /** 根据名称获取配置 */

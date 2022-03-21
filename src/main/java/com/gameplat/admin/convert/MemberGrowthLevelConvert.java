@@ -10,10 +10,9 @@ import org.mapstruct.Mapper;
  * @description
  * @date 2021/11/20
  */
-
 @Mapper(componentModel = "spring")
 public interface MemberGrowthLevelConvert {
-    MemberGrowthLevelVO toVo(MemberGrowthLevel level);
+  MemberGrowthLevelVO toVo(MemberGrowthLevel level);
 
-    MemberGrowthLevel toEntity(GrowthLevelLogoEditDTO dto);
+  MemberGrowthLevel toEntity(GrowthLevelLogoEditDTO dto);
 }

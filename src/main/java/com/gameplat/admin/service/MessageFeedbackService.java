@@ -5,7 +5,6 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.gameplat.admin.model.dto.MessageFeedbackAddDTO;
 import com.gameplat.admin.model.dto.MessageFeedbackQueryDTO;
-import com.gameplat.admin.model.dto.MessageFeedbackUpdateDTO;
 import com.gameplat.admin.model.vo.MessageFeedbackVO;
 import com.gameplat.model.entity.message.MessageFeedback;
 
@@ -15,7 +14,7 @@ public interface MessageFeedbackService extends IService<MessageFeedback> {
   void insertMessage(MessageFeedbackAddDTO dto);
 
   /** 读反馈 */
-  void updateMessage(MessageFeedbackUpdateDTO dto);
+  void updateMessage(Long id);
 
   /** 删除反馈 */
   void removeMessage(Long id);

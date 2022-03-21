@@ -17,9 +17,9 @@ public interface ActivityRedPacketService extends IService<ActivityRedPacket> {
   /**
    * 查询红包雨列表
    *
-   * @param page
-   * @param dto
-   * @return
+   * @param page PageDTO
+   * @param dto ActivityRedPacketQueryDTO
+   * @return IPage
    */
   IPage<ActivityRedPacketVO> redPacketList(
       PageDTO<ActivityRedPacket> page, ActivityRedPacketQueryDTO dto);
@@ -27,57 +27,57 @@ public interface ActivityRedPacketService extends IService<ActivityRedPacket> {
   /**
    * 新增红包雨配置
    *
-   * @param activityRedPacketAddDTO
+   * @param dto ActivityRedPacketAddDTO
    */
-  void add(ActivityRedPacketAddDTO activityRedPacketAddDTO);
+  void add(ActivityRedPacketAddDTO dto);
 
   /**
    * 编辑红包雨配置
    *
-   * @param dto
+   * @param dto ActivityRedPacketUpdateDTO
    */
   void edit(ActivityRedPacketUpdateDTO dto);
 
   /**
    * 更新红包雨状态
    *
-   * @param packetId
+   * @param packetId Long
    */
   void updateStatus(Long packetId);
 
   /**
    * 批量删除
    *
-   * @param ids
+   * @param ids String
    */
   void delete(String ids);
 
   /**
    * 查询优惠列表
    *
-   * @param dto
-   * @return
+   * @param dto ActivityRedPacketDiscountDTO
+   * @return Object
    */
   Object discountList(ActivityRedPacketDiscountDTO dto);
 
   /**
    * 获取红包配置
    *
-   * @return
+   * @return ActivityRedPacketConfigVO
    */
   ActivityRedPacketConfigVO getConfig();
 
   /**
    * 更新活动配置
    *
-   * @param dto
+   * @param dto ActivityRedPacketConfigDTO
    */
   void updateConfig(ActivityRedPacketConfigDTO dto);
 
   /**
    * 获取转盘奖品配置
    *
-   * @return
+   * @return List
    */
   List<ActivityTurntablePrizeConfigVO> getTurntablePrizeConfig();
 

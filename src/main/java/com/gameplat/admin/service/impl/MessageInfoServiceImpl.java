@@ -63,71 +63,49 @@ public class MessageInfoServiceImpl extends ServiceImpl<MessageMapper, Message>
     types.add("MESSAGE_CATEGORY");
     types.add("MESSAGE_SHOW_TYPE");
     List<SysDictData> dictDataByTypes = sysDictDataService.getDictDataByTypes(types);
+
     MessageDictDataVO vo = new MessageDictDataVO();
-    List userRange = new ArrayList();
-    List location = new ArrayList();
-    List popCount = new ArrayList();
-    List messageCate = new ArrayList();
-    List messageShowType = new ArrayList();
-    for (SysDictData dictDataByType : dictDataByTypes) {
-      if ("MESSAGE_MEMBER_RANGE".equals(dictDataByType.getDictType())) {
-        userRange.add(dictDataByType);
+    for (SysDictData dictData : dictDataByTypes) {
+      if ("MESSAGE_MEMBER_RANGE".equals(dictData.getDictType())) {
+        vo.getUserRange().add(dictData);
       }
-      if ("MESSAGE_LOCATION".equals(dictDataByType.getDictType())) {
-        location.add(dictDataByType);
+      if ("MESSAGE_LOCATION".equals(dictData.getDictType())) {
+        vo.getLocation().add(dictData);
       }
-      if ("MESSAGE_POP_COUNT".equals(dictDataByType.getDictType())) {
-        popCount.add(dictDataByType);
+      if ("MESSAGE_POP_COUNT".equals(dictData.getDictType())) {
+        vo.getPopCount().add(dictData);
       }
-      if ("MESSAGE_CATEGORY".equals(dictDataByType.getDictType())) {
-        messageCate.add(dictDataByType);
+      if ("MESSAGE_CATEGORY".equals(dictData.getDictType())) {
+        vo.getMessageCate().add(dictData);
       }
-      if ("MESSAGE_SHOW_TYPE".equals(dictDataByType.getDictType())) {
-        messageShowType.add(dictDataByType);
+      if ("MESSAGE_SHOW_TYPE".equals(dictData.getDictType())) {
+        vo.getMessageShowType().add(dictData);
       }
     }
-    vo.setUserRange(userRange);
-    vo.setLocation(location);
-    vo.setPopCount(popCount);
-    vo.setMessageCate(messageCate);
-    vo.setMessageShowType(messageShowType);
     return vo;
   }
 
   @Override
-  public IPage<MessageInfoVO> findMessageList(
-      PageDTO<Message> page, MessageInfoQueryDTO messageInfoQueryDTO) {
+  public IPage<MessageInfoVO> findMessageList(PageDTO<Message> page, MessageInfoQueryDTO dto) {
     LambdaQueryChainWrapper<Message> queryChainWrapper = this.lambdaQuery();
     queryChainWrapper
-        .in(ObjectUtil.isNull(messageInfoQueryDTO.getType()), Message::getType, 2, 3)
-        .eq(
-            ObjectUtil.isNotEmpty(messageInfoQueryDTO.getType()),
-            Message::getType,
-            messageInfoQueryDTO.getType())
-        .eq(
-            StringUtils.isNotBlank(messageInfoQueryDTO.getTitle()),
-            Message::getTitle,
-            messageInfoQueryDTO.getTitle())
-        .eq(
-            StringUtils.isNotBlank(messageInfoQueryDTO.getContent()),
-            Message::getContent,
-            messageInfoQueryDTO.getContent())
-        .eq(
-            StringUtils.isNotBlank(messageInfoQueryDTO.getLanguage()),
-            Message::getLanguage,
-            messageInfoQueryDTO.getLanguage())
+        .in(ObjectUtil.isNull(dto.getType()), Message::getType, 2, 3)
+        .eq(ObjectUtil.isNotEmpty(dto.getType()), Message::getType, dto.getType())
+        .eq(StringUtils.isNotBlank(dto.getTitle()), Message::getTitle, dto.getTitle())
+        .eq(StringUtils.isNotBlank(dto.getContent()), Message::getContent, dto.getContent())
+        .eq(StringUtils.isNotBlank(dto.getLanguage()), Message::getLanguage, dto.getLanguage())
         .ge(
-            ObjectUtil.isNotEmpty(messageInfoQueryDTO.getBeginTime()),
+            ObjectUtil.isNotEmpty(dto.getBeginTime()),
             Message::getCreateTime,
-            messageInfoQueryDTO.getBeginTime() + " " + "00:00:00")
+            dto.getBeginTime() + " " + "00:00:00")
         .le(
-            ObjectUtil.isNotEmpty(messageInfoQueryDTO.getEndTime()),
+            ObjectUtil.isNotEmpty(dto.getEndTime()),
             Message::getCreateTime,
-            messageInfoQueryDTO.getEndTime() + " " + "23:59:59");
+            dto.getEndTime() + " " + "23:59:59");
 
-    if (messageInfoQueryDTO.getStatus() != null) {
+    if (dto.getStatus() != null) {
       // 消息状态--无效
-      if (messageInfoQueryDTO.getStatus() == BooleanEnum.NO.value()) {
+      if (dto.getStatus() == BooleanEnum.NO.value()) {
         queryChainWrapper.and(
             wrapper ->
                 wrapper
@@ -135,7 +113,7 @@ public class MessageInfoServiceImpl extends ServiceImpl<MessageMapper, Message>
                     .or()
                     .lt(Message::getEndTime, new Date()));
         // 消息状态--有效
-      } else if (messageInfoQueryDTO.getStatus() == BooleanEnum.YES.value()) {
+      } else if (dto.getStatus() == BooleanEnum.YES.value()) {
         String currentTime = DateUtil.now();
         queryChainWrapper.and(
             wrapper ->
@@ -168,8 +146,8 @@ public class MessageInfoServiceImpl extends ServiceImpl<MessageMapper, Message>
   }
 
   @Override
-  public void insertMessage(MessageInfoAddDTO messageInfoAddDTO) {
-    Message messageInfo = messageInfoConvert.toEntity(messageInfoAddDTO);
+  public void insertMessage(MessageInfoAddDTO dto) {
+    Message messageInfo = messageInfoConvert.toEntity(dto);
     messageInfo.setStatus(BooleanEnum.YES.value());
     this.save(messageInfo);
   }
@@ -183,78 +161,71 @@ public class MessageInfoServiceImpl extends ServiceImpl<MessageMapper, Message>
   }
 
   @Override
-  public void editMessage(MessageInfoEditDTO messageInfoEditDTO) {
-    if (messageInfoEditDTO.getId() == null || messageInfoEditDTO.getId() == 0) {
+  public void editMessage(MessageInfoEditDTO dto) {
+    if (dto.getId() == null || dto.getId() == 0) {
       throw new ServiceException("id不能为空");
     }
 
-    if (messageInfoEditDTO.getShowType() == PushMessageEnum.MessageShowType.PIC_POPUP.value()
-        && (StringUtils.isBlank(messageInfoEditDTO.getAppImage())
-            || StringUtils.isBlank(messageInfoEditDTO.getPcImage()))) {
+    if (dto.getShowType() == PushMessageEnum.MessageShowType.PIC_POPUP.value()
+        && (StringUtils.isBlank(dto.getAppImage()) || StringUtils.isBlank(dto.getPcImage()))) {
       throw new ServiceException("选择消息类型为图片弹窗，web端和移动端图片不能为空");
     }
 
     MessageInfoAddDTO messageInfoAddDTO = new MessageInfoAddDTO();
-    BeanUtils.copyBeanProp(messageInfoAddDTO, messageInfoEditDTO);
+    BeanUtils.copyBeanProp(messageInfoAddDTO, dto);
     validMessageInfo(messageInfoAddDTO);
 
-    Message messageInfo = messageInfoConvert.toEntity(messageInfoEditDTO);
+    Message messageInfo = messageInfoConvert.toEntity(dto);
     this.updateById(messageInfo);
   }
 
   /**
    * 验证传入的数据
    *
-   * @param messageInfoAddDTO
+   * @param dto MessageInfoAddDTO
    */
-  private void validMessageInfo(MessageInfoAddDTO messageInfoAddDTO) {
-    if (messageInfoAddDTO.getShowType() == PushMessageEnum.MessageShowType.PIC_POPUP.value()
-        && (StringUtils.isBlank(messageInfoAddDTO.getAppImage())
-            || StringUtils.isBlank(messageInfoAddDTO.getPcImage()))) {
+  private void validMessageInfo(MessageInfoAddDTO dto) {
+    if (dto.getShowType() == PushMessageEnum.MessageShowType.PIC_POPUP.value()
+        && (StringUtils.isBlank(dto.getAppImage()) || StringUtils.isBlank(dto.getPcImage()))) {
       throw new ServiceException("选择消息类型为图片弹窗，web端和移动端图片不能为空");
     }
   }
 
   @Override
   public IPage<MessageDistributeVO> findMessageDistributeList(
-      Page<Member> page, MessageDistributeQueryDTO messageDistributeQueryDTO) {
-    if (ObjectUtil.isNull(messageDistributeQueryDTO.getPushRange())) {
+      Page<Member> page, MessageDistributeQueryDTO dto) {
+    if (ObjectUtil.isNull(dto.getPushRange())) {
       throw new ServiceException("推送范围不能为空");
     }
     MemberQueryDTO memberQueryDTO = new MemberQueryDTO();
-    if (ObjectUtil.isNotNull(messageDistributeQueryDTO.getUserAccount())) {
-      memberQueryDTO.setAccount(messageDistributeQueryDTO.getUserAccount());
+    if (ObjectUtil.isNotNull(dto.getUserAccount())) {
+      memberQueryDTO.setAccount(dto.getUserAccount());
     }
-    if (ObjectUtil.isNotNull(messageDistributeQueryDTO.getVipLevel())) {
-      memberQueryDTO.setVipLevel(messageDistributeQueryDTO.getVipLevel());
+    if (ObjectUtil.isNotNull(dto.getVipLevel())) {
+      memberQueryDTO.setVipLevel(dto.getVipLevel());
     }
-    if (ObjectUtil.isNotNull(messageDistributeQueryDTO.getRechargeLevel())) {
-      memberQueryDTO.setUserLevel(messageDistributeQueryDTO.getRechargeLevel());
+    if (ObjectUtil.isNotNull(dto.getRechargeLevel())) {
+      memberQueryDTO.setUserLevel(dto.getRechargeLevel());
     }
     // 全部会员
-    if (messageDistributeQueryDTO.getPushRange().equals(1)) {
+    if (dto.getPushRange().equals(1)) {
       memberQueryDTO.setUserType("M");
       memberQueryDTO.setStatus(1);
-      IPage<MessageDistributeVO> messageDistributePage =
-          readStatus(page, memberQueryDTO, messageDistributeQueryDTO);
-      return messageDistributePage;
+      return readStatus(page, memberQueryDTO, dto);
     }
     // 部分会员
-    if (messageDistributeQueryDTO.getPushRange().equals(2)) {
-      memberQueryDTO.setAccount(messageDistributeQueryDTO.getLinkAccount());
-      IPage<MessageDistributeVO> messageDistributePage =
-          readStatus(page, memberQueryDTO, messageDistributeQueryDTO);
-      return messageDistributePage;
+    if (dto.getPushRange().equals(2)) {
+      memberQueryDTO.setAccount(dto.getLinkAccount());
+      return readStatus(page, memberQueryDTO, dto);
     }
     // 在线会员
-    if (messageDistributeQueryDTO.getPushRange().equals(3)) {
+    if (dto.getPushRange().equals(3)) {
       memberQueryDTO.setUserType("M");
       memberQueryDTO.setStatus(1);
-      IPage<MessageDistributeVO> messageDistributePage =
-          readStatus(page, memberQueryDTO, messageDistributeQueryDTO);
+      IPage<MessageDistributeVO> messageDistributePage = readStatus(page, memberQueryDTO, dto);
       List<MessageDistributeVO> collect =
           messageDistributePage.getRecords().stream()
-              .filter(m -> m.getOnline())
+              .filter(MessageDistributeVO::getOnline)
               .collect(Collectors.toList());
       long total = (int) collect.size();
       long size = page.getSize();
@@ -267,63 +238,58 @@ public class MessageInfoServiceImpl extends ServiceImpl<MessageMapper, Message>
       return messageDistributePage;
     }
     // 充值层级
-    if (messageDistributeQueryDTO.getPushRange().equals(4)) {
+    if (dto.getPushRange().equals(4)) {
       memberQueryDTO.setUserType("M");
       memberQueryDTO.setStatus(1);
-      memberQueryDTO.setUserLevel(Integer.parseInt(messageDistributeQueryDTO.getLinkAccount()));
-      IPage<MessageDistributeVO> messageDistributePage =
-          readStatus(page, memberQueryDTO, messageDistributeQueryDTO);
-      return messageDistributePage;
+      memberQueryDTO.setUserLevel(Integer.parseInt(dto.getLinkAccount()));
+      return readStatus(page, memberQueryDTO, dto);
     }
     // VIP等级
-    if (messageDistributeQueryDTO.getPushRange().equals(5)) {
+    if (dto.getPushRange().equals(5)) {
       memberQueryDTO.setUserType("M");
       memberQueryDTO.setStatus(1);
-      memberQueryDTO.setVipLevel(Integer.parseInt(messageDistributeQueryDTO.getLinkAccount()));
-      IPage<MessageDistributeVO> messageDistributePage =
-          readStatus(page, memberQueryDTO, messageDistributeQueryDTO);
-      return messageDistributePage;
+      memberQueryDTO.setVipLevel(Integer.parseInt(dto.getLinkAccount()));
+      return readStatus(page, memberQueryDTO, dto);
     }
     // 代理线
-    if (messageDistributeQueryDTO.getPushRange().equals(6)) {
+    if (dto.getPushRange().equals(6)) {
       memberQueryDTO.setUserType("M");
       memberQueryDTO.setStatus(1);
-      memberQueryDTO.setParentName(messageDistributeQueryDTO.getLinkAccount());
-      IPage<MessageDistributeVO> messageDistributePage =
-          readStatus(page, memberQueryDTO, messageDistributeQueryDTO);
-      return messageDistributePage;
+      memberQueryDTO.setParentName(dto.getLinkAccount());
+      return readStatus(page, memberQueryDTO, dto);
     } else {
       throw new ServiceException("请选择正确的推送范围");
     }
   }
 
   public IPage<MessageDistributeVO> readStatus(
-      Page<Member> page, MemberQueryDTO dto, MessageDistributeQueryDTO messageDistributeQueryDTO) {
+      Page<Member> page, MemberQueryDTO dto, MessageDistributeQueryDTO queryDTO) {
     // 会员信息
     IPage<MessageDistributeVO> memberPage = memberService.pageMessageDistribute(page, dto);
-
     List<MessageDistributeVO> records = memberPage.getRecords();
-    for (int i = 0; i < records.size(); i++) {
-      records.get(i).setMessageId(messageDistributeQueryDTO.getMessageId());
+    for (MessageDistributeVO record : records) {
+      record.setMessageId(queryDTO.getMessageId());
       MessageDistribute messageDistribute =
           messageDistributeService
               .lambdaQuery()
-              .eq(MessageDistribute::getMessageId, messageDistributeQueryDTO.getMessageId())
-              .eq(MessageDistribute::getUserAccount, records.get(i).getUserAccount())
+              .eq(MessageDistribute::getMessageId, queryDTO.getMessageId())
+              .eq(MessageDistribute::getUserAccount, record.getUserAccount())
               .one();
       if (ObjectUtil.isNull(messageDistribute)) {
-        records.get(i).setReadStatus(0);
+        record.setReadStatus(0);
       } else {
-        records.get(i).setReadStatus(1);
+        record.setReadStatus(1);
       }
     }
+
     memberPage.setRecords(records);
-    if (ObjectUtil.isNotNull(messageDistributeQueryDTO.getRead())) {
+    if (ObjectUtil.isNotNull(queryDTO.getRead())) {
       List<MessageDistributeVO> collect =
           memberPage.getRecords().stream()
-              .filter(n -> n.getReadStatus().equals(messageDistributeQueryDTO.getRead()))
+              .filter(n -> n.getReadStatus().equals(queryDTO.getRead()))
               .collect(Collectors.toList());
-      long total = (int) collect.size();
+
+      long total = collect.size();
       long size = page.getSize();
       long pages = total % size == 0 ? total / size : (total / size) + 1;
       memberPage.setCurrent(page.getCurrent());

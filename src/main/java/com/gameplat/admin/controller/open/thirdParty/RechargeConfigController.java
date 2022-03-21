@@ -28,7 +28,10 @@ public class RechargeConfigController {
 
   @PostMapping("/add")
   @PreAuthorize("hasAuthority('thirdParty:rechargeConfig:add')")
-  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.RECHARGE, desc = "'新增充值限制payType=' + #rechargeConfig.payType")
+  @Log(
+      module = ServiceName.ADMIN_SERVICE,
+      type = LogType.RECHARGE,
+      desc = "'新增充值限制payType=' + #rechargeConfig.payType")
   public void add(RechargeConfig rechargeConfig) {
     rechargeConfigService.add(rechargeConfig);
   }

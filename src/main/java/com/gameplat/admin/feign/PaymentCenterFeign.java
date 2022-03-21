@@ -23,7 +23,7 @@ public interface PaymentCenterFeign {
   ReturnMessage onlineQueryProxyPay(
       @RequestBody ProxyDispatchContext context,
       @PathVariable("code") String code,
-      @PathVariable("name")  String name);
+      @PathVariable("name") String name);
 
   @PostMapping("/api/internal/proxyPay/asyncCallbackProxyPay/{code}/{name}")
   ProxyPayBackResult asyncCallbackProxyPay(

@@ -18,14 +18,6 @@ public enum RiskControllerTypeEnum {
     this.name = name;
   }
 
-  public Integer getType() {
-    return type;
-  }
-
-  public String getName() {
-    return name;
-  }
-
   public static RiskControllerTypeEnum get(Integer type) {
     return Arrays.stream(RiskControllerTypeEnum.values())
         .filter(em -> (em.getType().equals(type)))
@@ -35,5 +27,13 @@ public enum RiskControllerTypeEnum {
 
   public static String getName(int code) {
     return RiskControllerTypeEnum.get(code).getName();
+  }
+
+  public Integer getType() {
+    return type;
+  }
+
+  public String getName() {
+    return name;
   }
 }

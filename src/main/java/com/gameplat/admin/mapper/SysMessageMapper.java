@@ -8,5 +8,4 @@ import com.gameplat.model.entity.sys.SysMessage;
  *
  * @author gray
  */
-public interface SysMessageMapper extends BaseMapper<SysMessage> {
-}
+public interface SysMessageMapper extends BaseMapper<SysMessage> {}

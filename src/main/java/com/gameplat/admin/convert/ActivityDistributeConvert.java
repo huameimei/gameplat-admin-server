@@ -8,7 +8,7 @@ import org.mapstruct.Mapper;
 @Mapper(componentModel = "spring")
 public interface ActivityDistributeConvert {
 
-  ActivityDistribute toEntity(ActivityDistributeDTO activityDistributeDTO);
+  ActivityDistribute toEntity(ActivityDistributeDTO dto);
 
   ActivityDistributeVO toVo(ActivityDistribute activityDistribute);
 }

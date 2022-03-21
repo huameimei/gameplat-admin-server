@@ -6,7 +6,6 @@ import com.gameplat.admin.mapper.GameLotteryMapper;
 import com.gameplat.admin.model.vo.GameLotteryVo;
 import com.gameplat.admin.service.GameLotteryMapperService;
 import com.gameplat.model.entity.game.GameLottery;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -16,19 +15,16 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor
 @Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)
-public class GameLotteryMapperServiceImpl
-    extends ServiceImpl<GameLotteryMapper, GameLottery>
+public class GameLotteryMapperServiceImpl extends ServiceImpl<GameLotteryMapper, GameLottery>
     implements GameLotteryMapperService {
 
-    @Autowired(required = false)
-    private GameLotteryConvert gameLotteryConvert;
-
+  @Autowired private GameLotteryConvert gameLotteryConvert;
 
   @Override
-  public List<GameLotteryVo> findGameLotteryType(int code) {
-     return this.lambdaQuery().eq(GameLottery::getLotteryType,code)
-              .list().stream().map(gameLotteryConvert::toVo).collect(Collectors.toList());
+  public List<GameLotteryVo> findGameLotteryType(Integer code) {
+    return this.lambdaQuery().eq(GameLottery::getLotteryType, code).list().stream()
+        .map(gameLotteryConvert::toVo)
+        .collect(Collectors.toList());
   }
 }

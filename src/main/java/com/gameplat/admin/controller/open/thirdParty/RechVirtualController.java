@@ -31,7 +31,10 @@ public class RechVirtualController {
 
   @PutMapping("/edit")
   @PreAuthorize("hasAuthority('thirdParty:rechVirtual:edit')")
-  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.RECHARGE, desc = "'修改虚拟币id=' + #dictData.id")
+  @Log(
+      module = ServiceName.ADMIN_SERVICE,
+      type = LogType.RECHARGE,
+      desc = "'修改虚拟币id=' + #dictData.id")
   public void update(@RequestBody OperDictDataDTO dictData) {
     if (StringUtils.isNull(dictData.getId())) {
       throw new ServiceException("主键不正确");
@@ -45,7 +48,10 @@ public class RechVirtualController {
 
   @PutMapping("/add")
   @PreAuthorize("hasAuthority('thirdParty:rechVirtual:add')")
-  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.RECHARGE, desc = "'新增虚拟币id=' + #dictData.id")
+  @Log(
+      module = ServiceName.ADMIN_SERVICE,
+      type = LogType.RECHARGE,
+      desc = "'新增虚拟币id=' + #dictData.id")
   public void add(@RequestBody OperDictDataDTO dictData) {
     if (StringUtils.isBlank(dictData.getDictValue())) {
       throw new ServiceException("值不能为空");

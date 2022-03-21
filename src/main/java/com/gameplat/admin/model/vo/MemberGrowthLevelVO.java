@@ -90,15 +90,15 @@ public class MemberGrowthLevelVO {
   @ApiModelProperty("WEB端未达成VIP图片")
   private String webUnreachVipImage;
 
-    @ApiModelProperty("金币成长值比例")
-    private BigDecimal coinRatio;
+  @ApiModelProperty("金币成长值比例")
+  private BigDecimal coinRatio;
 
-    @ApiModelProperty("金币最大获取数")
-    private Integer maxCoin;
+  @ApiModelProperty("金币最大获取数")
+  private Integer maxCoin;
 
-    @ApiModelProperty("每日金币上限")
-    private Integer dailyMaxCoin;
+  @ApiModelProperty("每日金币上限")
+  private Integer dailyMaxCoin;
 
-    @ApiModelProperty("借呗额度")
-    private BigDecimal loanMoney;
+  @ApiModelProperty("借呗额度")
+  private BigDecimal loanMoney;
 }

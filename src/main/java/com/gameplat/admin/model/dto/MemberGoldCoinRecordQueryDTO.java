@@ -15,18 +15,18 @@ import java.io.Serializable;
 @AssertTrue
 public class MemberGoldCoinRecordQueryDTO implements Serializable {
 
-    @ApiModelProperty(value = "订单号")
-    private Long memberId;
+  @ApiModelProperty(value = "订单号")
+  private Long memberId;
 
-    @ApiModelProperty(value = "玩家名字")
-    private String account;
+  @ApiModelProperty(value = "玩家名字")
+  private String account;
 
-    @ApiModelProperty(value = "来源类型（待定）1 获取成长值、2 爆料扣款")
-    private Integer sourceType;
+  @ApiModelProperty(value = "来源类型（待定）1 获取成长值、2 爆料扣款")
+  private Integer sourceType;
 
-    @ApiModelProperty(value = "开始时间")
-    private String startTime;
+  @ApiModelProperty(value = "开始时间")
+  private String startTime;
 
-    @ApiModelProperty(value = "结束时间")
-    private String endTime;
+  @ApiModelProperty(value = "结束时间")
+  private String endTime;
 }

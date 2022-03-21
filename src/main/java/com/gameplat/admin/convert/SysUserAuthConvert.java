@@ -6,16 +6,12 @@ import com.gameplat.model.entity.sys.SysUserAuth;
 import org.mapstruct.Mapper;
 
 /**
- * @Author kb
- * @Date 2022/3/12 17:23
- * @Version 1.0
+ * @Author kb @Date 2022/3/12 17:23 @Version 1.0
  */
 @Mapper(componentModel = "spring")
 public interface SysUserAuthConvert {
 
-    SysUserAuth toEntity(SysUserAuthDto dto);
+  SysUserAuth toEntity(SysUserAuthDto dto);
 
-
-    SysUserAuthVo toVo(SysUserAuth entity);
+  SysUserAuthVo toVo(SysUserAuth entity);
 }
-

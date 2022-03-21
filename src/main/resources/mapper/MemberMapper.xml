@@ -38,7 +38,8 @@
                t2.total_rech_times,
                t2.total_withdraw_amount,
                t2.total_withdraw_times,
-               t2.gold_coin goldCoin
+               t2.gold_coin goldCoin,
+               t2.salary_flag salaryFlag
         FROM member t1
                  LEFT JOIN member_info t2 ON t1.id = t2.member_id
             ${ew.customSqlSegment}
@@ -127,27 +128,21 @@
                t2.total_rech_times,
                t2.total_withdraw_amount,
                t2.total_withdraw_times,
-               t2.gold_coin goldCoin
+               t2.gold_coin goldCoin,
+               t2.salary_flag salaryFlag
         FROM member t1
                  LEFT JOIN member_info t2 ON t1.id = t2.member_id
         WHERE t1.id = #{id}
     </select>
 
-    <sql id="batchUpdateSuperPathSql">
+    <select id="batchUpdateSuperPathAndAgentLevel">
         UPDATE member
-        SET super_path  = CONCAT(#{superPath}, account, "/"),
-            agent_level = agent_level + ((#{superAgentLevel} - #{agentLevel}) + 1)
-    </sql>
-
-    <!-- 仅转移下级-->
-    <select id="batchUpdateSuperPathExcludeSelf" parameterType="com.gameplat.model.entity.member.Member">
-        <include refid="batchUpdateSuperPathSql"/>
-        WHERE parent_name = #{account}
-    </select>
-
-    <select id="batchUpdateSuperPath" parameterType="com.gameplat.model.entity.member.Member">
-        <include refid="batchUpdateSuperPathSql"/>
-        WHERE parent_name = #{account} OR account = #{account}
+        SET super_path = REPLACE(super_path, #{originSuperPath}, #{superPath}),
+        agent_level = (agent_level - #{agentLevel})
+        WHERE super_path LIKE CONCAT(#{originSuperPath}, '%')
+        <if test="null != account and '' != account">
+            AND account != #{account}
+        </if>
     </select>
 
     <update id="updateLowerNumByAccount">
@@ -395,17 +390,17 @@
         FROM member t1
         LEFT JOIN member_info t2 ON t1.id = t2.member_id
         <where>
-            <if test="parentName != null and parentName != ''">
+            <if test="agentAccount != null and agentAccount != ''">
                 <choose>
                     <when test="subordinateOnly != null and subordinateOnly == true">
-                        and t1.parent_name = #{parentName}
+                        and t1.parent_name = #{agentAccount}
                     </when>
                     <otherwise>
-                        and t1.super_path LIKE concat('%', #{parentName},'%')
+                        and t1.super_path LIKE concat('%', #{agentAccount},'%')
                     </otherwise>
                 </choose>
                 <if test="itself != null and itself == 1">
-                    or t1.account = #{parentName}
+                    or t1.account = #{agentAccount}
                 </if>
             </if>
             <if test="levelList != null and levelList.size() > 0">
@@ -432,38 +427,12 @@
             <if test="lastRechTimeTo != null">
                 and t2.last_rech_time <![CDATA[>= ]]> #{lastRechTimeTo}
             </if>
-            <if test="userType != null and userType != ''">
+            <if test="userType != null">
                 and t1.user_type = #{userType}
             </if>
         </where>
     </select>
 
 
-    <select id="findMemberVip" resultType="com.gameplat.admin.model.vo.MemberBalanceVO">
-        SELECT
-            m.id id,
-            m.account account,
-            m.nickname nickname,
-            m.real_name realName,
-            m.user_level userLevel,
-            m.user_type userType,
-            fo.balance balance,
-            fo.vip_level vipLevel,
-            m.parent_name parentName,
-            m.super_path superPath,
-            m.parent_id  parentId
-        FROM
-            member m
-            INNER JOIN member_info fo
-            on m.id = fo.member_id
-            <if test="vipGrade != null and vipGrade != ''">
-                AND fo.vip_level = #{vipGrade}
-            </if>
-        WHERE
-            m.account = #{username}
-        <if test="userlevel != null and userlevel != ''">
-            AND user_level = #{userlevel}
-        </if>
-    </select>
 
 </mapper>

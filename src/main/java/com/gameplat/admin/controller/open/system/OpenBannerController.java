@@ -32,12 +32,6 @@ public class OpenBannerController {
 
   @Autowired private SysBannerInfoService sysBannerInfoService;
 
-  /**
-   * banner列表
-   *
-   * @param page
-   * @return
-   */
   @ApiOperation(value = "banner列表")
   @GetMapping("/list")
   @PreAuthorize("hasAuthority('system:banner:page')")
@@ -45,35 +39,20 @@ public class OpenBannerController {
     return sysBannerInfoService.list(page, LocaleContextHolder.getLocale().toLanguageTag(), type);
   }
 
-  /**
-   * 新增banner
-   *
-   * @param sysBannerInfoAddDTO
-   */
   @ApiOperation(value = "新增banner")
   @PostMapping("/add")
   @PreAuthorize("hasAuthority('system:banner:add')")
-  public void add(@Validated @RequestBody SysBannerInfoAddDTO sysBannerInfoAddDTO) {
-    sysBannerInfoService.add(sysBannerInfoAddDTO);
+  public void add(@Validated @RequestBody SysBannerInfoAddDTO dto) {
+    sysBannerInfoService.add(dto);
   }
 
-  /**
-   * 编辑banner
-   *
-   * @param sysBannerInfoEditDTO
-   */
   @ApiOperation(value = "编辑banner")
   @PutMapping("/edit")
   @PreAuthorize("hasAuthority('system:banner:edit')")
-  public void edit(@Validated @RequestBody SysBannerInfoEditDTO sysBannerInfoEditDTO) {
-    sysBannerInfoService.edit(sysBannerInfoEditDTO);
+  public void edit(@Validated @RequestBody SysBannerInfoEditDTO dto) {
+    sysBannerInfoService.edit(dto);
   }
 
-  /**
-   * 删除banner
-   *
-   * @param ids
-   */
   @ApiOperation(value = "删除banner")
   @DeleteMapping("/delete")
   @PreAuthorize("hasAuthority('system:banner:remove')")
@@ -82,11 +61,6 @@ public class OpenBannerController {
     sysBannerInfoService.delete(ids);
   }
 
-  /**
-   * 修改banner状态
-   *
-   * @param dto
-   */
   @ApiOperation(value = "修改banner状态")
   @PutMapping("/updateStatus")
   @PreAuthorize("hasAuthority('system:banner:edit')")

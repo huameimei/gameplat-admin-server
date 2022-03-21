@@ -2,13 +2,14 @@ package com.gameplat.admin.mapper;
 
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
-import com.gameplat.admin.model.dto.*;
+import com.gameplat.admin.model.dto.DepositReportDto;
+import com.gameplat.admin.model.dto.MemberDayReportDto;
+import com.gameplat.admin.model.dto.MemberReportDto;
+import com.gameplat.admin.model.dto.MemberbetAnalysisdto;
 import com.gameplat.admin.model.vo.*;
 import com.gameplat.model.entity.member.MemberDayReport;
-import com.gameplat.model.entity.proxy.DivideLayerConfig;
 import org.apache.ibatis.annotations.Param;
 
 import java.math.BigDecimal;
@@ -70,45 +71,47 @@ public interface GameMemberReportMapper extends BaseMapper<MemberDayReport> {
 
   /**
    * 获取代理报表汇总
+   *
    * @param agentName
    * @param startDate
    * @param endDate
-   * @param isIncludeProxy  0 不包含代理本身 为空或为1 包含代理
+   * @param isIncludeProxy 0 不包含代理本身 为空或为1 包含代理
    * @return
    */
-  MemberDayReportVo agentReportSummary(@Param("agentName") String agentName,
-                                       @Param("startDate") String startDate,
-                                       @Param("endDate") String endDate,
-                                       @Param("isIncludeProxy") boolean isIncludeProxy,
-                                       @Param("limitRecharge") BigDecimal limitRecharge,
-                                       @Param("limitValidAmount") BigDecimal limitValidAmount);
+  MemberDayReportVo agentReportSummary(
+      @Param("agentName") String agentName,
+      @Param("startDate") String startDate,
+      @Param("endDate") String endDate,
+      @Param("isIncludeProxy") boolean isIncludeProxy,
+      @Param("limitRecharge") BigDecimal limitRecharge,
+      @Param("limitValidAmount") BigDecimal limitValidAmount);
 
   MemberDayReportVo getTotalMemberAndProxy(@Param("agentName") String agentName);
 
-  MemberDayReportVo getMemberAndProxySum(@Param("agentName") String agentName,
-                                         @Param("startDate") String startDate,
-                                         @Param("endDate") String endDate);
+  MemberDayReportVo getMemberAndProxySum(
+      @Param("agentName") String agentName,
+      @Param("startDate") String startDate,
+      @Param("endDate") String endDate);
 
   Page<MemberDayReportVo> pageList(
-          PageDTO<MemberDayReport> page,
-          @Param("agentName") String agentName,
-          @Param("startDate") String startDate,
-          @Param("endDate") String endDate,
-          @Param("isIncludeProxy") boolean isIncludeProxy,
-          @Param("limitRecharge") BigDecimal limitRecharge,
-          @Param("limitValidAmount") BigDecimal limitValidAmount
-  );
+      PageDTO<MemberDayReport> page,
+      @Param("agentName") String agentName,
+      @Param("startDate") String startDate,
+      @Param("endDate") String endDate,
+      @Param("isIncludeProxy") boolean isIncludeProxy,
+      @Param("limitRecharge") BigDecimal limitRecharge,
+      @Param("limitValidAmount") BigDecimal limitValidAmount);
 
   List<MemberDayReportVo> agentReport(
-          @Param("agentName") String agentName,
-          @Param("startDate") String startDate,
-          @Param("endDate") String endDate,
-          @Param("isIncludeProxy") boolean isIncludeProxy,
-          @Param("limitRecharge") BigDecimal limitRecharge,
-          @Param("limitValidAmount") BigDecimal limitValidAmount
-  );
+      @Param("agentName") String agentName,
+      @Param("startDate") String startDate,
+      @Param("endDate") String endDate,
+      @Param("isIncludeProxy") boolean isIncludeProxy,
+      @Param("limitRecharge") BigDecimal limitRecharge,
+      @Param("limitValidAmount") BigDecimal limitValidAmount);
 
-  List<MemberDayReportVo> getMemberAndProxy(@Param("agentName") String agentName,
-                                            @Param("startDate") String startDate,
-                                            @Param("endDate") String endDate);
+  List<MemberDayReportVo> getMemberAndProxy(
+      @Param("agentName") String agentName,
+      @Param("startDate") String startDate,
+      @Param("endDate") String endDate);
 }

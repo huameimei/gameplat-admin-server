@@ -59,4 +59,7 @@ public class MemberEditDTO implements Serializable {
 
   @Length(max = 255, message = "会员备注不能超过255个字符")
   private String remark;
+
+  @Range(min = 0, max = 1, message = "只能为0或1 开启或关闭")
+  private Integer salaryFlag;
 }

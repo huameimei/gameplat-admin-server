@@ -35,6 +35,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -80,10 +81,16 @@ public class ProxyPayServiceImpl implements ProxyPayService {
         return true;
       }
     }
-
-    Map<String, String> banksMap =
-        JSONObject.parseObject(
-            JSONObject.parseObject(ppInterface.getLimtInfo()).getString("banks"), Map.class);
+    Map<String, String> banksMap = JSONObject.parseArray(ppInterface.getLimtInfo()).stream().filter(Objects::nonNull).collect(Collectors.toMap(
+            o -> {
+              JSONObject o1 = (JSONObject) o;
+              return o1.getString("code");
+            },
+            o -> {
+              JSONObject o1 = (JSONObject) o;
+              return o1.getString("name");
+            }
+    ));
     /** 模糊匹配银行名称 */
     boolean isBankName = true;
     for (Map.Entry<String, String> entry : banksMap.entrySet()) {
@@ -405,9 +412,16 @@ public class ProxyPayServiceImpl implements ProxyPayService {
 
     String bankCode = "";
     String bankName = memberWithdraw.getBankName();
-    Map<String, String> banksMap =
-        JSONObject.parseObject(
-            JSONObject.parseObject(ppinterface.getLimtInfo()).getString("banks"), Map.class);
+    Map<String, String> banksMap = JSONObject.parseArray(ppinterface.getLimtInfo()).stream().filter(Objects::nonNull).collect(Collectors.toMap(
+            o -> {
+              JSONObject o1 = (JSONObject) o;
+              return o1.getString("code");
+            },
+            o -> {
+              JSONObject o1 = (JSONObject) o;
+              return o1.getString("name");
+            }
+    ));
     for (Map.Entry<String, String> entry : banksMap.entrySet()) {
       if (StringUtils.contains(entry.getValue(), bankName)
           || StringUtils.contains(bankName, entry.getValue())) {

@@ -21,12 +21,13 @@ public class TenantDomainServiceImpl extends ServiceImpl<TenantDomainMapper, Ten
 
   @Override
   public String getChatDomain() {
-    return this.lambdaQuery()
-        .eq(TenantDomain::getDomainType, "chat_api_domain")
-        .oneOpt()
-        .map(TenantDomain::getDomain)
-        .filter(domain -> domain.endsWith("/"))
-        .map(domain -> domain.substring(0, domain.length() - 1))
-        .orElse("");
+    TenantDomain tenantDomain =
+            lambdaQuery().eq(TenantDomain::getDomainType, "chat_api_domain").one();
+    String chatDomain = tenantDomain.getDomain();
+    if (chatDomain.endsWith("/")) {
+      return chatDomain.substring(0, chatDomain.length() - 1);
+    } else {
+      return chatDomain;
+    }
   }
 }

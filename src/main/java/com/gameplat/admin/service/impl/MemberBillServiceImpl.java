@@ -56,7 +56,7 @@ public class MemberBillServiceImpl extends ServiceImpl<MemberBillMapper, MemberB
   @Override
   public List<MemberBillVO> queryList(MemberBillDTO dto) {
     return this.builderQuery(dto).list().stream()
-        .map(e -> memberBillConvert.toVo(e))
+        .map(memberBillConvert::toVo)
         .collect(Collectors.toList());
   }
 

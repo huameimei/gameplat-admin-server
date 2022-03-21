@@ -1,11 +1,10 @@
 package com.gameplat.admin.config;
 
+import java.util.concurrent.Executor;
+import java.util.concurrent.ThreadPoolExecutor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
-
-import java.util.concurrent.Executor;
-import java.util.concurrent.ThreadPoolExecutor;
 
 /**
  * 线程池配置
@@ -34,6 +33,21 @@ public class ThreadPoolConfig {
     taskExecutor.setQueueCapacity(QUEUE_CAPACITY);
     taskExecutor.setKeepAliveSeconds(KEEP_ALIVE_TIME);
     taskExecutor.setThreadNamePrefix("default-task-executor-");
+
+    taskExecutor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
+    taskExecutor.initialize();
+    return taskExecutor;
+  }
+
+  @Bean("asyncGameExecutor")
+  public Executor asyncGameExecutor() {
+    ThreadPoolTaskExecutor taskExecutor = new ThreadPoolTaskExecutor();
+    taskExecutor.setCorePoolSize(CORE_POOL_SIZE);
+    taskExecutor.setMaxPoolSize(MAX_POOL_SIZE);
+
+    taskExecutor.setQueueCapacity(QUEUE_CAPACITY);
+    taskExecutor.setKeepAliveSeconds(KEEP_ALIVE_TIME);
+    taskExecutor.setThreadNamePrefix("game-task-executor-");
 
     taskExecutor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
     taskExecutor.initialize();

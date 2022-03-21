@@ -3,76 +3,64 @@ package com.gameplat.admin.controller.open.game;
 import com.gameplat.admin.model.dto.GameBalanceQueryDTO;
 import com.gameplat.admin.model.dto.OperGameTransferRecordDTO;
 import com.gameplat.admin.model.vo.GameBalanceVO;
+import com.gameplat.admin.model.vo.GameConfiscatedVO;
 import com.gameplat.admin.model.vo.GameRecycleVO;
 import com.gameplat.admin.service.GameAdminService;
-import com.gameplat.admin.service.GamePlatformService;
-import com.gameplat.admin.service.GameTransferRecordService;
 import com.gameplat.admin.service.MemberService;
-import com.gameplat.base.common.util.StringUtils;
-import com.gameplat.base.common.web.Result;
 import com.gameplat.common.constant.ServiceName;
+import com.gameplat.common.enums.ResultStatusEnum;
 import com.gameplat.common.enums.TransferTypesEnum;
 import com.gameplat.common.lang.Assert;
 import com.gameplat.log.annotation.Log;
 import com.gameplat.log.enums.LogType;
-import com.gameplat.model.entity.game.GamePlatform;
-import com.gameplat.model.entity.game.GameTransferRecord;
 import com.gameplat.model.entity.member.Member;
-import com.gameplat.model.entity.member.MemberInfo;
 import com.gameplat.redis.api.RedisService;
-import com.google.common.collect.Lists;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import lombok.SneakyThrows;
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.util.CollectionUtils;
-import org.springframework.util.StopWatch;
-import org.springframework.web.bind.annotation.*;
-
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
-@Api("游戏相关")
 @RestController
 @RequestMapping("/api/admin/game")
 public class GameAdminController {
-
   @Autowired private GameAdminService gameAdminService;
-
   @Autowired private MemberService memberService;
-
   @Autowired private RedisService redisService;
 
-  @Autowired private GamePlatformService gamePlatformService;
-
-  @Autowired private GameTransferRecordService gameTransferRecordService;
-
-  /** 查询单个真人平台余额 */
-  @SneakyThrows
+  /** 查询单个游戏平台余额 */
   @GetMapping(value = "/selectGameBalance")
-  public GameBalanceVO selectGameBalance(GameBalanceQueryDTO dto) {
+  public GameBalanceVO selectGameBalance(GameBalanceQueryDTO dto) throws Exception {
     GameBalanceVO gameBalanceVO = new GameBalanceVO();
-    gameBalanceVO.setPlatformCode(dto.getPlatform().get("platformCode"));
+    Assert.notEmpty(dto.getAccount(), "会员账号不能为空");
+    Assert.notEmpty(dto.getPlatformCode(), "游戏平台编码不能为空");
     Member member = memberService.getMemberAndFillGameAccount(dto.getAccount());
     Assert.notNull(member, "会员账号不存在");
-    gameBalanceVO.setBalance(
-        gameAdminService.getBalance(dto.getPlatform().get("platformCode"), member));
+
+    gameBalanceVO.setPlatformCode(dto.getPlatformCode());
+    gameBalanceVO.setStatus(ResultStatusEnum.SUCCESS.getValue());
+    try {
+      BigDecimal amount = gameAdminService.getBalance(dto.getPlatformCode(), member);
+      gameBalanceVO.setBalance(amount);
+    } catch (Exception e) {
+      log.error("查询失败：{}", e.getMessage());
+      gameBalanceVO.setStatus(ResultStatusEnum.FAILED.getValue());
+      gameBalanceVO.setErrorMsg("游戏余额查询失败");
+    }
+
     return gameBalanceVO;
   }
 
-  @SneakyThrows
-  @ApiOperation("转账到真人")
+  /** 转账到游戏 */
   @PostMapping(value = "/transferToGame")
-  public void transferToGame(@RequestBody OperGameTransferRecordDTO record) {
+  public void transferToGame(@RequestBody OperGameTransferRecordDTO record) throws Exception {
     String key = "self_" + record.getPlatformCode() + '_' + record.getAccount();
     try {
       redisService.getStringOps().setEx(key, "game_transfer", 3, TimeUnit.MINUTES);
@@ -83,231 +71,95 @@ public class GameAdminController {
       redisService.getKeyOps().delete(key);
     }
   }
-
-  @ApiOperation("回收金额")
+  /** 回收单个游戏金额 */
   @PostMapping(value = "/recyclingAmount")
-  public Map<String, String> recyclingAmount(@RequestBody GameBalanceQueryDTO dto) {
-    Map<String, String> map = new HashMap<>();
+  @Log(
+      module = ServiceName.ADMIN_SERVICE,
+      type = LogType.ADMIN,
+      desc = "'回收会员游戏金额，账号='+#dto.account")
+  public GameRecycleVO recyclingAmount(@RequestBody GameBalanceQueryDTO dto) {
+    GameRecycleVO gameRecycleVO = new GameRecycleVO();
+    Assert.notEmpty(dto.getAccount(), "会员账号不能为空");
+    Assert.notEmpty(dto.getPlatformCode(), "游戏平台编码不能为空");
     Member member = memberService.getMemberAndFillGameAccount(dto.getAccount());
-    Assert.isNull(member, "会员账号不存在");
-    dto.getPlatform()
-        .forEach(
-            (key, value) -> {
-              try {
-                if (StringUtils.isNotBlank(value)
-                    && new BigDecimal(value).compareTo(BigDecimal.ZERO) > 0) {
-                  gameAdminService.transfer(
-                      key, TransferTypesEnum.SELF.getCode(), new BigDecimal(value), member, false);
-                  dto.getPlatform().put(key, (int) Double.parseDouble(value) + "");
-                } else {
-                  dto.getPlatform().put(key, "0");
-                  map.put(key, "金额必须大于零");
-                }
-              } catch (Exception e) {
-                log.info(e.getMessage());
-                map.put(key, e.getMessage());
-              }
-            });
-    return map;
+    Assert.notNull(member, "会员账号不存在，请重新检查");
+    gameRecycleVO.setPlatformCode(dto.getPlatformCode());
+    gameRecycleVO.setStatus(ResultStatusEnum.SUCCESS.getValue());
+    try {
+      BigDecimal amount = gameAdminService.getBalance(dto.getPlatformCode(), member);
+      gameRecycleVO.setBalance(amount);
+      if (amount.compareTo(BigDecimal.ZERO) > 0) {
+        gameAdminService.transfer(
+            dto.getPlatformCode(), TransferTypesEnum.SELF.getCode(), amount, member, false);
+      } else {
+        gameRecycleVO.setStatus(ResultStatusEnum.WARNING.getValue());
+        gameRecycleVO.setErrorMsg(dto.getPlatformCode() + "游戏余额不足，忽略操作");
+        log.info("回收玩家{}在{}平台的余额，余额为{}，跳过处理。", member.getAccount(), dto.getPlatformCode(), amount);
+      }
+    } catch (Exception e) {
+      log.error("回收失败：{}", e.getMessage());
+      gameRecycleVO.setStatus(ResultStatusEnum.FAILED.getValue());
+      gameRecycleVO.setErrorMsg("游戏余额回收失败");
+    }
+    return gameRecycleVO;
   }
 
-  @ApiOperation("没收")
+  /** 没收游戏余额 */
   @RequestMapping(value = "/confiscated", method = RequestMethod.POST)
   @Log(
       module = ServiceName.ADMIN_SERVICE,
       type = LogType.ADMIN,
-      desc = "'没收会员游戏金额，id='+#memberInfo.id")
-  public Map<String, String> confiscated(@RequestBody GameBalanceQueryDTO dto) throws Exception {
-    Map<String, String> map = new HashMap<>();
+      desc = "'没收会员游戏金额，账号='+#dto.account")
+  public GameConfiscatedVO confiscated(@RequestBody GameBalanceQueryDTO dto) {
+    GameConfiscatedVO gameConfiscatedVO = new GameConfiscatedVO();
+    Assert.notEmpty(dto.getAccount(), "会员账号不能为空");
+    Assert.notEmpty(dto.getPlatformCode(), "游戏平台编码不能为空");
     Member member = memberService.getMemberAndFillGameAccount(dto.getAccount());
-    Assert.notNull(member, "会员账号不存在");
-    dto.getPlatform()
-        .forEach(
-            (key, value) -> {
-              try {
-                if (StringUtils.isNotBlank(value)
-                    && new BigDecimal(value).compareTo(BigDecimal.ZERO) > 0) {
-                  gameAdminService.confiscated(key, new BigDecimal(value), member);
-                } else {
-                  map.put(key, "金额必须大于零");
-                  dto.getPlatform().put(key, "0");
-                }
-              } catch (Exception e) {
-                log.info(e.getMessage());
-                e.printStackTrace();
-                map.put(key, e.getMessage());
-              }
-            });
-    return map;
+    Assert.notNull(member, "会员账号不存在，请重新检查");
+    gameConfiscatedVO.setPlatformName(dto.getPlatformCode());
+    gameConfiscatedVO.setStatus(ResultStatusEnum.SUCCESS.getValue());
+    try {
+      // 先获取游戏余额
+      BigDecimal amount = gameAdminService.getBalance(dto.getPlatformCode(), member);
+      gameConfiscatedVO.setBalance(amount);
+      if (amount.compareTo(BigDecimal.ZERO) > 0) {
+        gameAdminService.confiscated(dto.getPlatformCode(), member, amount);
+      } else {
+        gameConfiscatedVO.setErrorMsg(dto.getPlatformCode() + "游戏余额不足，忽略操作");
+        gameConfiscatedVO.setStatus(ResultStatusEnum.WARNING.getValue());
+        log.info("没收玩家{}在{}平台的余额，余额为{}，跳过处理。", member.getAccount(), dto.getPlatformCode(), amount);
+      }
+    } catch (Exception e) {
+      log.info(e.getMessage());
+      gameConfiscatedVO.setErrorMsg("没收会员游戏金额失败");
+      gameConfiscatedVO.setStatus(ResultStatusEnum.FAILED.getValue());
+    }
+    return gameConfiscatedVO;
   }
 
-  @ApiOperation("查询游戏平台余额")
-  @GetMapping(value = "/selectGameAllBalance")
+  /** 没收所有游戏平台余额 */
+  @PostMapping(value = "/confiscatedGameByAccount")
   @Log(
       module = ServiceName.ADMIN_SERVICE,
       type = LogType.ADMIN,
-      desc = "'查询会员游戏金额，id='+#memberInfo.id")
-  public Map<String, BigDecimal> selectGameAllBalance(MemberInfo memberInfo) {
-    Member member = memberService.getById(memberInfo.getMemberId());
-    Member memberAccount = memberService.getMemberAndFillGameAccount(member.getAccount());
-    Assert.notNull(memberAccount, "会员账号不存在");
-    Map<String, BigDecimal> map = new HashMap<>();
-    List<GamePlatform> gamePlatformList = gamePlatformService.queryByTransfer();
-    if (!CollectionUtils.isEmpty(gamePlatformList)) {
-      gamePlatformList.stream()
-          .parallel()
-          .forEach(
-              gamePlatform -> {
-                try {
-                  map.put(
-                      gamePlatform.getCode(),
-                      gameAdminService.getBalance(gamePlatform.getCode(), memberAccount));
-                } catch (Exception e) {
-                  log.info(gamePlatform.getCode() + "游戏查询异常：", e);
-                  map.put(gamePlatform.getCode(), BigDecimal.ZERO);
-                }
-              });
-    }
-    return map;
+      desc = "'没收会员游戏金额，账号='+#dto.account")
+  public List<GameConfiscatedVO> confiscatedGameByAccount(@RequestBody GameBalanceQueryDTO dto) {
+    return gameAdminService.confiscatedGameByAccount(dto.getAccount());
   }
 
-  @ApiOperation("回收金额")
+  /** 查询所有平台余额 一键查询 */
+  @PostMapping(value = "/selectGameBalanceByAccount")
+  public List<GameBalanceVO> selectGameBalanceByAccount(@RequestBody GameBalanceQueryDTO dto) {
+    return gameAdminService.selectGameBalanceByAccount(dto.getAccount());
+  }
+
+  /** 一键回收 */
   @PostMapping(value = "/recyclingAmountByAccount")
   @Log(
       module = ServiceName.ADMIN_SERVICE,
       type = LogType.ADMIN,
       desc = "'回收会员游戏金额，account='+#dto.account")
-  public Map<String, Object> recyclingAmountByAccount(@RequestBody GameBalanceQueryDTO dto) {
-    Map<String, Object> map = new HashMap<>();
-    if (null == dto.getPlatform() || null == dto.getPlatform().get("platformCode")) {
-      map.put("errorCode", "真人类型不正确");
-      return map;
-    }
-    if (StringUtils.isBlank(dto.getAccount())) {
-      map.put("errorCode", "会员账号不能为空");
-      return map;
-    }
-    Member member = memberService.getMemberAndFillGameAccount(dto.getAccount());
-    if (null == member) {
-      map.put("errorCode", "会员账号不存在，请重新检查");
-      return map;
-    }
-    String platformCode = dto.getPlatform().get("platformCode");
-    try {
-      BigDecimal money = gameAdminService.getBalance(platformCode, member);
-      if (null != money && money.compareTo(BigDecimal.ONE) > 0) {
-        BigDecimal transferMoney = new BigDecimal((int) Double.parseDouble(money.toString()));
-        gameAdminService.transfer(
-            platformCode, TransferTypesEnum.SELF.getCode(), transferMoney, member, false);
-        map.put("balance", transferMoney);
-        log.info("真人额度回收 => 会员账号：{}，真人类型：{}，金额：{}", dto.getAccount(), platformCode, transferMoney);
-      } else {
-        map.put("errorCode", "回收金额必须大于0");
-        return map;
-      }
-    } catch (Exception e) {
-      e.printStackTrace();
-      map.put("errorCode", "获取真人信息错误，请联系客服查看");
-    }
-    return map;
-  }
-
-  @ApiOperation("查询单个游戏平台余额")
-  @PostMapping(value = "/selectGameBalanceByAccount")
-  public Map<String, Object> selectGameBalanceByAccount(@RequestBody GameBalanceQueryDTO dto) {
-    Map<String, Object> map = new HashMap<>();
-    if (null == dto.getPlatform() || null == dto.getPlatform().get("platformCode")) {
-      map.put("errorCode", "真人类型不正确");
-      return map;
-    }
-    if (StringUtils.isBlank(dto.getAccount())) {
-      map.put("errorCode", "会员账号不能为空");
-      return map;
-    }
-    Member member = memberService.getMemberAndFillGameAccount(dto.getAccount());
-    if (null == member) {
-      map.put("errorCode", "会员账号不存在，请重新检查");
-      return map;
-    }
-    try {
-      map.put("platformCode", dto.getPlatform().get("platformCode"));
-      map.put(
-          "balance", gameAdminService.getBalance(dto.getPlatform().get("platformCode"), member));
-    } catch (Exception e) {
-      e.printStackTrace();
-      map.put("errorCode", "获取真人信息错误，请联系客服查看");
-    }
-    return map;
-  }
-
-  @PostMapping(value = "/reclaimLiveAmountAsync")
-  public Result<List<GameRecycleVO>> reclaimLiveAmountAsync(@RequestBody GameBalanceQueryDTO dto) {
-    Member member = memberService.getMemberAndFillGameAccount(dto.getAccount());
-    List<GameTransferRecord> recordList =
-        gameTransferRecordService.findPlatformCodeList(member.getId());
-    List<String> platformList = new ArrayList<>();
-    recordList.forEach(item -> platformList.add(item.getPlatformCode()));
-    List<GamePlatform> gamePlatformList = gamePlatformService.list();
-    // 仅获取当前会员玩过得游戏
-    List<GamePlatform> playedPlatformList =
-        gamePlatformList.stream()
-            .filter(item -> platformList.contains(item.getCode()))
-            .collect(Collectors.toList());
-    if (org.apache.commons.collections.CollectionUtils.isEmpty(playedPlatformList)) {
-      return Result.failed("游戏平台额度转换通道维护中");
-    }
-    String key = "user_game_balance_" + member.getId();
-    try {
-      redisService.getStringOps().setEx(key, "user_game_balance", 300, TimeUnit.SECONDS);
-    } catch (Exception e) {
-      log.error("{}一键回收游戏平台额度操作频繁", dto.getAccount());
-      return Result.failed("一键回收游戏平台额度操作频繁");
-    }
-    List<GameRecycleVO> resultList = new ArrayList<>();
-    try {
-      StopWatch stopwatch = new StopWatch();
-      stopwatch.start();
-      // 每10个切分成一个list去请求
-      List<List<GamePlatform>> allList = Lists.partition(playedPlatformList, 10);
-      List<CompletableFuture<GameRecycleVO>> taskList;
-
-      for (List<GamePlatform> partList : allList) {
-        taskList = new ArrayList<>();
-        for (GamePlatform item : partList) {
-          CompletableFuture<GameRecycleVO> completableFuture =
-              CompletableFuture.supplyAsync(
-                  () -> {
-                    GameRecycleVO vo = new GameRecycleVO();
-                    vo.setPlatfromCode(item.getCode());
-                    vo.setPlatformName(item.getName());
-                    vo.setStatus(0);
-                    try {
-                      gameAdminService.transferIn(item.getCode(), null, member, false, true);
-                    } catch (Exception e) {
-                      vo.setStatus(1);
-                      vo.setErrorMsg(e.getMessage());
-                      log.error("回收失败：{}", e.getMessage());
-                    }
-                    return vo;
-                  });
-          taskList.add(completableFuture);
-        }
-
-        // 等待10次异步请求结果
-        CompletableFuture.allOf(taskList.toArray(new CompletableFuture[0])).join();
-        taskList.forEach(
-            item -> {
-              try {
-                resultList.add(item.get());
-              } catch (InterruptedException | ExecutionException e) {
-                e.printStackTrace();
-              }
-            });
-      }
-      stopwatch.stop();
-    } finally {
-      redisService.getKeyOps().delete(key);
-    }
-    return Result.succeedData(resultList);
+  public List<GameRecycleVO> reclaimLiveAmountAsync(@RequestBody GameBalanceQueryDTO dto) {
+    return gameAdminService.recyclingAmountByAccount(dto.getAccount());
   }
 }

@@ -5,7 +5,7 @@ import java.math.BigDecimal;
 import lombok.Data;
 
 @Data
-public class GameRecycleVO implements Serializable {
+public class GameConfiscatedVO implements Serializable {
   private String platformCode;
 
   /** 0 : 成功 1 : 失败 */

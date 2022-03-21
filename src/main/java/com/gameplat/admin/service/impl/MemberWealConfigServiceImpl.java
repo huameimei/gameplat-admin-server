@@ -48,7 +48,7 @@ public class MemberWealConfigServiceImpl
 
   @Override
   public IPage<MemberWealConfig> page(PageDTO<MemberWealConfig> page) {
-    String language = LocaleContextHolder.getLocale().getLanguage();
+    String language = LocaleContextHolder.getLocale().toLanguageTag();
     return this.lambdaQuery().eq(MemberWealConfig::getLanguage, language).page(page);
   }
 }

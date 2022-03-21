@@ -117,7 +117,7 @@ public class ActivityTypeController {
       throw new ServiceException("活动板块类型配置信息不存在");
     }
 
-    String language = LocaleContextHolder.getLocale().getLanguage();
+    String language = LocaleContextHolder.getLocale().toLanguageTag();
     JSONObject jsonObject = JSONObject.parseObject(activityTypeConfig);
     JSONArray jsonArray = jsonObject.getJSONArray(language);
     if (CollectionUtils.isEmpty(jsonArray)) {

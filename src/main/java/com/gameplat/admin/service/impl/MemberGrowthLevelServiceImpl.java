@@ -56,7 +56,7 @@ public class MemberGrowthLevelServiceImpl
   @Override
   public List<MemberGrowthLevelVO> findList(Integer limitLevel) {
     List<MemberGrowthLevel> list =
-        levelMapper.findList(limitLevel + 1, LocaleContextHolder.getLocale().getLanguage());
+        levelMapper.findList(limitLevel + 1, LocaleContextHolder.getLocale().toLanguageTag());
     List<MemberGrowthLevelVO> voList = new ArrayList<>();
     for (MemberGrowthLevel level : list) {
       MemberGrowthLevelVO memberGrowthLevelVO = levelConvert.toVo(level);
@@ -67,7 +67,7 @@ public class MemberGrowthLevelServiceImpl
 
   @Override
   public List<MemberGrowthLevel> getList(Integer limitLevel) {
-    return levelMapper.findList(limitLevel + 1, LocaleContextHolder.getLocale().getLanguage());
+    return levelMapper.findList(limitLevel + 1, LocaleContextHolder.getLocale().toLanguageTag());
   }
 
   @Override

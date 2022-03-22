@@ -77,6 +77,7 @@ public class MemberBillServiceImpl extends ServiceImpl<MemberBillMapper, MemberB
             ObjectUtils.isNotEmpty(dto.getBeginTime()),
             MemberBill::getCreateTime,
             dto.getBeginTime(),
-            dto.getEndTime());
+            dto.getEndTime())
+        .orderByDesc(MemberBill::getCreateTime);
   }
 }

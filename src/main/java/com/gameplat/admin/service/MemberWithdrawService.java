@@ -28,7 +28,6 @@ public interface MemberWithdrawService extends IService<MemberWithdraw> {
       Integer cashStatus,
       Integer curStatus,
       boolean isDirect,
-      String approveReason,
       UserCredential userCredential,
       UserEquipment userEquipment)
       throws Exception;

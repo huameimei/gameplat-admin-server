@@ -12,6 +12,7 @@ import com.gameplat.admin.mapper.PayTypeMapper;
 import com.gameplat.admin.model.dto.PayTypeAddDTO;
 import com.gameplat.admin.model.dto.PayTypeEditDTO;
 import com.gameplat.admin.model.vo.PayTypeVO;
+import com.gameplat.admin.service.PayAccountService;
 import com.gameplat.admin.service.PayTypeService;
 import com.gameplat.base.common.enums.EnableEnum;
 import com.gameplat.base.common.exception.ServiceException;
@@ -33,6 +34,7 @@ public class PayTypeServiceImpl extends ServiceImpl<PayTypeMapper, PayType>
 
   @Autowired private PayTypeMapper payTypeMapper;
 
+  @Autowired private PayAccountService payAccountService;
   @Override
   public List<PayTypeVO> queryList(String name) {
     return this.lambdaQuery()
@@ -92,6 +94,7 @@ public class PayTypeServiceImpl extends ServiceImpl<PayTypeMapper, PayType>
       throw new ServiceException("系统支付编码无法删除!");
     }
     this.removeById(id);
+    payAccountService.deleteByPayType(payType.getCode());
   }
 
   @Override

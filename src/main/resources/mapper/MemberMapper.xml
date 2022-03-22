@@ -229,7 +229,7 @@
     </select>
 
     <select id="findByUserNameList" resultType="com.gameplat.model.entity.member.Member">
-        select * from member t where t.nickname in
+        select * from member t where t.account in
         <foreach item="userName" collection="userNames" open="(" separator="," close=")">
             #{userName}
         </foreach>

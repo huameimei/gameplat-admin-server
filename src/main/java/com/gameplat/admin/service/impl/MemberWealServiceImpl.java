@@ -101,6 +101,8 @@ public class MemberWealServiceImpl extends ServiceImpl<MemberWealMapper, MemberW
 
   @Autowired private MessageInfoConvert messageInfoConvert;
 
+  @Autowired private MemberService memberService;
+
   @Override
   public IPage<MemberWealVO> findMemberWealList(IPage<MemberWeal> page, MemberWealDTO queryDTO) {
     return this.lambdaQuery()
@@ -235,7 +237,7 @@ public class MemberWealServiceImpl extends ServiceImpl<MemberWealMapper, MemberW
                                             DateUtil.format(memberWeal.getEndDate(), "MM-dd"),
                                             "MM-dd"))
                                 <= 0)
-                .map(Member::getNickname)
+                .map(Member::getAccount)
                 .filter(intersectionList::contains)
                 .collect(toList());
       }
@@ -282,7 +284,7 @@ public class MemberWealServiceImpl extends ServiceImpl<MemberWealMapper, MemberW
         MemberWealDetail model = new MemberWealDetail();
         model.setWealId(id);
         model.setUserId(memberWealDetail.getUserId());
-        model.setUserName(memberWealDetail.getUserName());
+        model.setUserName(memberService.getById(memberWealDetail.getUserId()).getAccount());
         model.setLevel(memberWealDetail.getLevel());
         model.setRewordAmount(memberWealDetail.getRewordAmount());
         model.setStatus(1);

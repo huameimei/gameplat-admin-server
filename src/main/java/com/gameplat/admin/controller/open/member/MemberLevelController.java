@@ -3,9 +3,15 @@ package com.gameplat.admin.controller.open.member;
 import com.gameplat.admin.model.dto.*;
 import com.gameplat.admin.model.vo.MemberLevelVO;
 import com.gameplat.admin.service.MemberLevelService;
+import com.gameplat.admin.service.RechargeConfigService;
 import com.gameplat.base.common.util.EasyExcelUtil;
+import com.gameplat.common.constant.ServiceName;
+import com.gameplat.log.annotation.Log;
+import com.gameplat.log.enums.LogType;
+import com.gameplat.model.entity.recharge.RechargeConfig;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -20,6 +26,8 @@ import java.util.List;
 public class MemberLevelController {
 
   @Autowired private MemberLevelService memberLevelService;
+
+  @Autowired private RechargeConfigService rechargeConfigService;
 
   @GetMapping("/list")
   public List<MemberLevelVO> getList() {
@@ -97,4 +105,21 @@ public class MemberLevelController {
   public void allocateByCondition(@Valid @RequestBody MemberLevelAllocateByConditionDTO dto) {
     memberLevelService.allocateByCondition(dto);
   }
+
+  @GetMapping("/queryAll")
+  @PreAuthorize("hasAuthority('member:level:queryAll')")
+  public List<RechargeConfig> queryAll(Integer memberLevel) {
+    return rechargeConfigService.queryAll(memberLevel);
+  }
+
+  @PostMapping("/add")
+  @PreAuthorize("hasAuthority('member:level:add')")
+  @Log(
+      module = ServiceName.ADMIN_SERVICE,
+      type = LogType.MEMBER,
+      desc = "'新增充值层级限制payType=' + #rechargeConfig.payType")
+  public void add(RechargeConfig rechargeConfig) {
+    rechargeConfigService.add(rechargeConfig);
+  }
+
 }

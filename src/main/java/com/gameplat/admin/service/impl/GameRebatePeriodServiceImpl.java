@@ -118,11 +118,11 @@ public class GameRebatePeriodServiceImpl
       throw new ServiceException("期数配置不存在");
     }
     // 先修改结算状态
-    GameRebatePeriod period = new GameRebatePeriod();
-    period.setStatus(GameRebatePeriodStatus.SETTLED.getValue());
     LambdaUpdateWrapper<GameRebatePeriod> wrapper = Wrappers.lambdaUpdate();
-    wrapper.eq(GameRebatePeriod::getId, periodId);
-    if (!this.update(period, wrapper)) {
+    wrapper
+        .eq(GameRebatePeriod::getId, periodId)
+        .set(GameRebatePeriod::getStatus, GameRebatePeriodStatus.SETTLED.getValue());
+    if (!this.update(wrapper)) {
       throw new ServiceException("更新真人期数配置失败！");
     }
     // 按平台生成返水报表

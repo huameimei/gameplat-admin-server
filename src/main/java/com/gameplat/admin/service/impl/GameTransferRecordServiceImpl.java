@@ -14,18 +14,18 @@ import com.gameplat.admin.model.dto.OperGameTransferRecordDTO;
 import com.gameplat.admin.model.vo.PageDtoVO;
 import com.gameplat.admin.service.GameTransferRecordService;
 import com.gameplat.base.common.exception.ServiceException;
+import com.gameplat.common.enums.GameTransferStatus;
 import com.gameplat.model.entity.game.GameTransferRecord;
 import com.google.common.collect.Lists;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 
 @Slf4j
 @Service
@@ -83,19 +83,19 @@ public class GameTransferRecordServiceImpl
   }
 
   @Override
-  public void fillOrders(OperGameTransferRecordDTO liveTransferRecord) {
+  public void fillOrders(OperGameTransferRecordDTO dto) {
     UpdateWrapper<GameTransferRecord> updateWrapper = new UpdateWrapper();
-    updateWrapper.set(
-        ObjectUtils.isNotNull(liveTransferRecord.getStatus()),
+    updateWrapper.set(ObjectUtils.isNotNull(dto.getStatus()), "status", dto.getStatus());
+    updateWrapper.set(StringUtils.isNotBlank(dto.getRemark()), "remark", dto.getRemark());
+    updateWrapper.in(
         "status",
-        liveTransferRecord.getStatus());
-    updateWrapper.set(
-        StringUtils.isNotBlank(liveTransferRecord.getRemark()),
-        "remark",
-        liveTransferRecord.getRemark());
-    updateWrapper.in("status", Lists.newArrayList(1, 2, 5));
-    updateWrapper.eq("id", liveTransferRecord.getId());
-    if (gameTransferRecordMapper.update(null, updateWrapper) < 0) {
+        Lists.newArrayList(
+            GameTransferStatus.OUT.getValue(),
+            GameTransferStatus.IN.getValue(),
+            GameTransferStatus.IN_GAME_FAIL.getValue()));
+    GameTransferRecord transferRecord = new GameTransferRecord();
+    transferRecord.setId(dto.getId());
+    if (gameTransferRecordMapper.update(transferRecord, updateWrapper) < 0) {
       throw new ServiceException("额度转换记录更新失败");
     }
   }

@@ -1,6 +1,11 @@
 package com.gameplat.admin.controller.open.member;
 
-import com.gameplat.admin.model.dto.*;
+import com.gameplat.admin.model.dto.MemberLevelAddDTO;
+import com.gameplat.admin.model.dto.MemberLevelAllocateByConditionDTO;
+import com.gameplat.admin.model.dto.MemberLevelAllocateByUserNameDTO;
+import com.gameplat.admin.model.dto.MemberLevelAllocateDTO;
+import com.gameplat.admin.model.dto.MemberLevelEditDTO;
+import com.gameplat.admin.model.dto.MemberLevelFileDTO;
 import com.gameplat.admin.model.vo.MemberLevelVO;
 import com.gameplat.admin.service.MemberLevelService;
 import com.gameplat.admin.service.RechargeConfigService;
@@ -10,15 +15,23 @@ import com.gameplat.log.annotation.Log;
 import com.gameplat.log.enums.LogType;
 import com.gameplat.model.entity.recharge.RechargeConfig;
 import io.swagger.annotations.ApiOperation;
+import java.io.IOException;
+import java.util.List;
+import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-
-import javax.validation.Valid;
-import java.io.IOException;
-import java.util.List;
 
 @Validated
 @RestController
@@ -112,7 +125,7 @@ public class MemberLevelController {
     return rechargeConfigService.queryAll(memberLevel);
   }
 
-  @PostMapping("/add")
+  @PostMapping("/saveRechargeConfig")
   @PreAuthorize("hasAuthority('member:level:add')")
   @Log(
       module = ServiceName.ADMIN_SERVICE,
@@ -121,5 +134,4 @@ public class MemberLevelController {
   public void add(RechargeConfig rechargeConfig) {
     rechargeConfigService.add(rechargeConfig);
   }
-
 }

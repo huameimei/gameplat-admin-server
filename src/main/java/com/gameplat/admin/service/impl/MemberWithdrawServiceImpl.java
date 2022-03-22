@@ -253,7 +253,6 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
       Integer cashStatus,
       Integer curStatus,
       boolean isDirect,
-      String approveReason,
       UserCredential userCredential,
       UserEquipment userEquipment)
       throws Exception {
@@ -305,9 +304,9 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
           memberWithdraw.getCashMoney(),
           userCredential.getUsername());
     }
-
+    String approveReason = null;
     if (isDirect) {
-      approveReason = approveReason != null ? approveReason + "(免提直充)" : "免提直充";
+      approveReason = "免提直充";
     }
     // 设置会员层级
     memberWithdraw.setMemberLevel(member.getUserLevel());

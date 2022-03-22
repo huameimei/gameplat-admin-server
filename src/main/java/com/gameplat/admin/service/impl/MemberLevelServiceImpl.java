@@ -12,6 +12,7 @@ import com.gameplat.admin.service.MemberLevelService;
 import com.gameplat.admin.service.MemberService;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.common.constant.CachedKeys;
+import com.gameplat.common.enums.DefaultEnums;
 import com.gameplat.model.entity.member.Member;
 import com.gameplat.model.entity.member.MemberInfo;
 import com.gameplat.model.entity.member.MemberLevel;
@@ -113,6 +114,7 @@ public class MemberLevelServiceImpl extends ServiceImpl<MemberLevelMapper, Membe
   @Override
   @CacheInvalidate(name = CachedKeys.MEMBER_LEVEL_CACHE, key = "'all'")
   public void lock(Long id) {
+    this.lockOrUnlockMember(id, DefaultEnums.YES);
     this.lambdaUpdate()
         .eq(MemberLevel::getId, id)
         .set(MemberLevel::getLocked, MemberLevelEnums.Locked.Y.value())
@@ -122,10 +124,26 @@ public class MemberLevelServiceImpl extends ServiceImpl<MemberLevelMapper, Membe
   @Override
   @CacheInvalidate(name = CachedKeys.MEMBER_LEVEL_CACHE, key = "'all'")
   public void unlock(Long id) {
+    this.lockOrUnlockMember(id, DefaultEnums.NO);
     this.lambdaUpdate()
         .eq(MemberLevel::getId, id)
         .set(MemberLevel::getLocked, MemberLevelEnums.Locked.N.value())
         .update();
+  }
+
+  void lockOrUnlockMember(Long levelId, DefaultEnums status) {
+    // 锁定/解锁层级时，将该层级下所有会员的层级锁定状态改为yes/no
+    MemberLevel byId = getById(levelId);
+    List<String> userLevels = new ArrayList<>();
+    userLevels.add(String.valueOf(byId.getLevelValue()));
+    List<String> accountByUserLevelIn = memberService.findAccountByUserLevelIn(userLevels);
+    if (CollectionUtil.isNotEmpty(accountByUserLevelIn)) {
+      memberService
+          .lambdaUpdate()
+          .set(Member::getLevelLockFlag, status.value())
+          .in(Member::getAccount, accountByUserLevelIn)
+          .update();
+    }
   }
 
   @Override

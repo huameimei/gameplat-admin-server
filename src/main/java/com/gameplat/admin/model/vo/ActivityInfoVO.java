@@ -129,7 +129,7 @@ public class ActivityInfoVO implements Serializable {
 
   /** 是否弹窗默认0 不弹 1弹窗 */
   @ApiModelProperty("是否弹窗默认0 不弹 1弹窗")
-  private Integer isPopup;
+  private Boolean isPopup;
 
   /** 移动端弹窗图片 */
   @ApiModelProperty("移动端弹窗图片")

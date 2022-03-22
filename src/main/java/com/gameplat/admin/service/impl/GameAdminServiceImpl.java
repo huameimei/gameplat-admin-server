@@ -724,7 +724,7 @@ public class GameAdminServiceImpl implements GameAdminService {
                     gameBalanceVO.setStatus(ResultStatusEnum.SUCCESS.getValue());
                     if (item.getTransfer() != null
                         && item.getTransfer().equals(TrueFalse.FALSE.getValue())) {
-                      gameBalanceVO.setErrorMsg(item.getName() + "查询余额通道正在维护中,请耐心等到");
+                      gameBalanceVO.setErrorMsg(item.getName() + "查询余额通道正在维护中,请耐心等待");
                       gameBalanceVO.setBalance(BigDecimal.ZERO);
                       gameBalanceVO.setStatus(ResultStatusEnum.FAILED.getValue());
                       return gameBalanceVO;
@@ -799,7 +799,7 @@ public class GameAdminServiceImpl implements GameAdminService {
 
                     if (item.getTransfer() != null
                         && item.getTransfer().equals(TrueFalse.FALSE.getValue())) {
-                      gameConfiscatedVO.setErrorMsg(item.getName() + "查询余额通道正在维护中,请耐心等到");
+                      gameConfiscatedVO.setErrorMsg(item.getName() + "查询余额通道正在维护中,请耐心等待");
                       gameConfiscatedVO.setStatus(ResultStatusEnum.FAILED.getValue());
                       return gameConfiscatedVO;
                     }

@@ -39,9 +39,9 @@ public class MessageFeedbackServiceImpl extends ServiceImpl<MessageFeedbackMappe
 
   @Override
   public void insertMessage(MessageFeedbackAddDTO dto) {
-    MessageFeedback messageFeedback = messageFeedbackConvert.toEntity(dto);
     //回复信件
     dto.setType(2);
+    MessageFeedback messageFeedback = messageFeedbackConvert.toEntity(dto);
     this.save(messageFeedback);
 
     MessageInfoAddDTO addDTO = new MessageInfoAddDTO();

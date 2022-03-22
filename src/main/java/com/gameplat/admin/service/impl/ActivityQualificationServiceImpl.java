@@ -97,6 +97,7 @@ public class ActivityQualificationServiceImpl
             ActivityQualification::getUsername,
             dto.getUsername())
         .eq(dto.getStatus() != null, ActivityQualification::getStatus, dto.getStatus())
+        .eq(ActivityQualification::getDeleteFlag, BooleanEnum.YES.value())//添加是否删除的查询标识
         .eq(
             dto.getQualificationStatus() != null,
             ActivityQualification::getQualificationStatus,

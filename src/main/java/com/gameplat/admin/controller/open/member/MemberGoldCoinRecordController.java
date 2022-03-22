@@ -20,6 +20,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+
 
 /**
  * @author lily
@@ -63,17 +65,17 @@ public class MemberGoldCoinRecordController {
     @ApiOperation("上传excel修改会员金币数量")
     @PostMapping(value = "/importAddGoldCoin")
     @PreAuthorize("hasAuthority('member:coin:import')")
-    public void importAddGoldCoin(@RequestPart(value = "file",required = false) MultipartFile file) {
+    public void importAddGoldCoin(@RequestPart(value = "file",required = false) MultipartFile file) throws IOException {
         if (file ==null ) {
             throw new ServiceException("导入文件不能为空");
         }
-        try {
+//        try {
             memberGoldCoinRecordService.importAddGoldCoin(file);
-        }catch (Exception e){
-            e.printStackTrace();
-            log.info("批量上传异常：{}",e);
-            throw new ServiceException("批量导入玩家增加金币失败！");
-        }
+//        }catch (Exception e){
+//            e.printStackTrace();
+//            log.info("批量上传异常：{}",e);
+//            throw new ServiceException("批量导入玩家增加金币失败！");
+//        }
 
     }
 

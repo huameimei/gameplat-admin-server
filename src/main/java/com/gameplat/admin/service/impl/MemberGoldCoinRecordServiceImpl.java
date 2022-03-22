@@ -20,7 +20,6 @@ import com.gameplat.model.entity.member.Member;
 import com.gameplat.model.entity.member.MemberGoldCoinRecord;
 import com.gameplat.model.entity.member.MemberInfo;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -74,7 +73,6 @@ public class MemberGoldCoinRecordServiceImpl
   public void importAddGoldCoin(MultipartFile file) throws IOException {
     List<MemberGoldImportVO> list =
         EasyExcelUtil.readExcel(file.getInputStream(), MemberGoldImportVO.class);
-    List<MemberGoldCoinRecord> memberGoldCoinRecordList = new ArrayList<>();
     for (int i = 0; i < list.size(); i++) {
       try {
         MemberGoldImportVO importVo = list.get(i);
@@ -84,7 +82,6 @@ public class MemberGoldCoinRecordServiceImpl
             memberService
                 .getByAccount(account)
                 .orElseThrow(() -> new ServiceException("账号：" + account + "不存在"));
-
         MemberInfo memberInfo = memberInfoService.getById(member.getId());
         int memberGoldCoin = memberInfo.getGoldCoin();
         if (memberGoldCoin + amount < 0) {
@@ -102,7 +99,7 @@ public class MemberGoldCoinRecordServiceImpl
                 .afterBalance(memberGoldCoin + amount)
                 .remark(remark)
                 .build();
-        memberGoldCoinRecordList.add(userGoldCoinRecord);
+        this.save(userGoldCoinRecord);
 
         // 更新会员详情表
         LambdaUpdateWrapper<MemberInfo> wrapper = new LambdaUpdateWrapper<>();
@@ -113,11 +110,7 @@ public class MemberGoldCoinRecordServiceImpl
 
       } catch (Exception e) {
         log.info("第" + (i + 2) + "行数据有误；");
-        throw new ServiceException("请检查第" + (i + 2) + "行数据");
-      }
-
-      if (memberGoldCoinRecordList.size() > 0) {
-        this.saveBatch(memberGoldCoinRecordList);
+        throw new ServiceException("请检查第" + (i + 2) + "行数据,账号可能不存在！");
       }
     }
   }

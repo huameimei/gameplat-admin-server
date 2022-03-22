@@ -29,7 +29,7 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequestMapping("/api/admin/account/subUser")
-public class OpenSubUserController {
+public class OpenSysUserController {
 
   @Autowired private SysUserService userService;
 

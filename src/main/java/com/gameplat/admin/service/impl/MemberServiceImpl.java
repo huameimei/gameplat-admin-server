@@ -15,33 +15,14 @@ import com.gameplat.admin.component.MemberQueryCondition;
 import com.gameplat.admin.config.TenantConfig;
 import com.gameplat.admin.constant.SystemConstant;
 import com.gameplat.admin.convert.MemberConvert;
-import com.gameplat.admin.enums.MemberEnums;
 import com.gameplat.admin.mapper.MemberMapper;
-import com.gameplat.admin.model.dto.CleanAccountDTO;
-import com.gameplat.admin.model.dto.MemberAddDTO;
-import com.gameplat.admin.model.dto.MemberContactCleanDTO;
-import com.gameplat.admin.model.dto.MemberContactUpdateDTO;
-import com.gameplat.admin.model.dto.MemberEditDTO;
-import com.gameplat.admin.model.dto.MemberPwdUpdateDTO;
-import com.gameplat.admin.model.dto.MemberQueryDTO;
-import com.gameplat.admin.model.dto.MemberResetRealNameDTO;
-import com.gameplat.admin.model.dto.MemberWithdrawPwdUpdateDTO;
-import com.gameplat.admin.model.vo.MemberBalanceVO;
-import com.gameplat.admin.model.vo.MemberInfoVO;
-import com.gameplat.admin.model.vo.MemberLevelVO;
-import com.gameplat.admin.model.vo.MemberVO;
-import com.gameplat.admin.model.vo.MessageDistributeVO;
-import com.gameplat.admin.service.GameAdminService;
-import com.gameplat.admin.service.GameTransferInfoService;
-import com.gameplat.admin.service.MemberInfoService;
-import com.gameplat.admin.service.MemberRemarkService;
-import com.gameplat.admin.service.MemberService;
-import com.gameplat.admin.service.OnlineUserService;
-import com.gameplat.admin.service.PasswordService;
-import com.gameplat.admin.service.SpreadLinkInfoService;
+import com.gameplat.admin.model.dto.*;
+import com.gameplat.admin.model.vo.*;
+import com.gameplat.admin.service.*;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.StringUtils;
 import com.gameplat.common.constant.CachedKeys;
+import com.gameplat.common.enums.MemberEnums;
 import com.gameplat.common.enums.TransferTypesEnum;
 import com.gameplat.common.lang.Assert;
 import com.gameplat.model.entity.game.GameTransferInfo;
@@ -49,21 +30,17 @@ import com.gameplat.model.entity.member.Member;
 import com.gameplat.model.entity.member.MemberInfo;
 import com.gameplat.security.SecurityUserHolder;
 import com.google.common.collect.Lists;
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Log4j2
 @Service
@@ -128,7 +105,8 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
     this.preAddCheck(dto);
 
     Member member = memberConvert.toEntity(dto);
-    member.setRegisterSource(MemberEnums.RegisterSource.BACKEND.value());
+    member.setRegisterType(MemberEnums.RegisterType.ADMIN_ADD.value());
+    member.setRegisterSource(MemberEnums.RegisterSource.WEB.value());
     member.setPassword(passwordService.encode(member.getPassword(), dto.getAccount()));
 
     // 设置上级

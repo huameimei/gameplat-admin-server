@@ -15,7 +15,6 @@ import com.gameplat.admin.constant.RechargeMode;
 import com.gameplat.admin.constant.TrueFalse;
 import com.gameplat.admin.convert.RechargeOrderConvert;
 import com.gameplat.admin.enums.BlacklistConstant.BizBlacklistType;
-import com.gameplat.admin.enums.MemberEnums.Type;
 import com.gameplat.admin.enums.RechargeStatus;
 import com.gameplat.admin.mapper.RechargeOrderHistoryMapper;
 import com.gameplat.admin.mapper.RechargeOrderMapper;
@@ -436,7 +435,7 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
           member.getStatus());
       throw new ServiceException(String.format("会员账号已冻结:%s", member.getAccount()));
     }
-    if (Type.TEST.match(member.getUserType())) {
+    if (MemberEnums.Type.TEST.match(member.getUserType())) {
       throw new ServiceException("试玩会员无法充值。");
     }
   }

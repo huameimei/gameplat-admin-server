@@ -4,8 +4,8 @@ import cn.hutool.core.date.DateUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
-import com.gameplat.admin.enums.MemberEnums;
 import com.gameplat.admin.model.dto.MemberQueryDTO;
+import com.gameplat.common.enums.MemberEnums;
 import com.gameplat.model.entity.member.Member;
 import org.springframework.stereotype.Component;
 

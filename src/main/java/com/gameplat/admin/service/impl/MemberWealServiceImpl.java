@@ -463,7 +463,7 @@ public class MemberWealServiceImpl extends ServiceImpl<MemberWealMapper, MemberW
                                     memberBill.setTranType(sourceType);
                                     memberBill.setOrderNo(sourceId);
                                     memberBill.setAmount(item.getRewordAmount());
-                                    memberBill.setBalance(currentBalance);
+                                    memberBill.setBalance(beforeBalance);
                                     memberBill.setRemark(content);
                                     memberBill.setContent(content);
                                     memberBill.setOperator("system");

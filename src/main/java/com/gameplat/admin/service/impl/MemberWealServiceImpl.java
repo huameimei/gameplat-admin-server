@@ -389,19 +389,19 @@ public class MemberWealServiceImpl extends ServiceImpl<MemberWealMapper, MemberW
                                 }
                                 String content = "";
                                 // 周俸禄
-                                if (WEEK_WEAL.match(type)) {
+                                if (1 == type) {
                                     sourceType = WEEK_WEAL.getValue();
                                     content = "本周俸禄奖励已派发 金额:" + item.getRewordAmount() + "，请领取";
                                     // 月俸禄
-                                } else if (MONTH_WEAL.match(type)) {
+                                } else if (2 == type) {
                                     sourceType = TranTypes.MONTH_WEAL.getValue();
                                     content = "本月俸禄奖励已派发 金额:" + item.getRewordAmount() + "，请领取";
                                     // 生日礼金
-                                } else if (BIRTH_WEAL.match(type)) {
+                                } else if (3 == type) {
                                     sourceType = TranTypes.BIRTH_WEAL.getValue();
                                     content = "您的生日礼金奖励已派发 金额:" + item.getRewordAmount() + "，请领取";
                                     // 每月红包
-                                } else if (RED_ENVELOPE_WEAL.match(type)) {
+                                } else if (4 == type) {
                                     sourceType = TranTypes.RED_ENVELOPE_WEAL.getValue();
                                     content = "当月红包奖励已派发 金额:" + item.getRewordAmount() + "，请领取";
                                 }
@@ -428,14 +428,14 @@ public class MemberWealServiceImpl extends ServiceImpl<MemberWealMapper, MemberW
                                 if (BooleanEnum.YES.match(growthConfig.getIsAutoPayReword())) {
 
                                     //当前余额
-                                    BigDecimal currentBalance = memberInfoService.lambdaQuery()
+                                    BigDecimal beforeBalance = memberInfoService.lambdaQuery()
                                             .eq(MemberInfo::getMemberId, item.getUserId())
                                             .one()
                                             .getBalance();
 
                                     //更新会员余额
                                     LambdaUpdateWrapper<MemberInfo> wrapper = new LambdaUpdateWrapper<>();
-                                    wrapper.set(MemberInfo::getBalance, currentBalance.add(item.getRewordAmount()))
+                                    wrapper.set(MemberInfo::getBalance, beforeBalance.add(item.getRewordAmount()))
                                             .eq(MemberInfo::getMemberId, item.getUserId());
                                     memberInfoService.update(wrapper);
 
@@ -463,7 +463,7 @@ public class MemberWealServiceImpl extends ServiceImpl<MemberWealMapper, MemberW
                                     memberBill.setTranType(sourceType);
                                     memberBill.setOrderNo(sourceId);
                                     memberBill.setAmount(item.getRewordAmount());
-                                    memberBill.setBalance(currentBalance);
+                                    memberBill.setBalance(beforeBalance);
                                     memberBill.setRemark(content);
                                     memberBill.setContent(content);
                                     memberBill.setOperator("system");

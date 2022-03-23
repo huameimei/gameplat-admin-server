@@ -111,4 +111,34 @@
         where setting_type = #{settingType}
     </update>
 
+    <!--插入配置信息-->
+    <insert id="insetGameList" parameterType="java.util.List">
+        INSERT INTO tenant_setting (
+        `tenant`, `setting_type`, `setting_code`, `setting_label`, `setting_value`, `setting_desc`, `display`,
+        `sort`, `file_path`, `picture_path`, `is_index`, `extend_1`, `extend_2`, `extend_3`, `extend_4`,`extend_5`,
+        `update_time`
+        ) values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (
+            #{item.tenant},
+            #{item.settingType},
+            #{item.settingCode},
+            #{item.settingLabel},
+            #{item.settingValue},
+            #{item.settingDesc},
+            #{item.display},
+            #{item.sort},
+            #{item.filePath},
+            #{item.picturePath},
+            #{item.isIndex},
+            #{item.extend1},
+            #{item.extend2},
+            #{item.extend3},
+            #{item.extend4},
+            #{item.extend5},
+            sysdate()
+            )
+        </foreach>
+    </insert>
+
 </mapper>

@@ -213,7 +213,7 @@ public class ActivityInfoEnum {
     }
 
     public boolean match(int value) {
-      return value == value;
+      return this.value == value;
     }
   }
 

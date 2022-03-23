@@ -147,6 +147,9 @@ public class ActivityQualificationServiceImpl
           qm.setAuditRemark(auditRemark);
           qm.setActivityId(activityLobbyDTO.getId());
           qm.setActivityName(activityLobbyDTO.getTitle());
+          if(activityLobbyDTO.getType() == null){
+            throw new ServiceException("活动不能为空");
+          }
           qm.setActivityType(activityLobbyDTO.getType());
           qm.setUserId(memberInfo.getId());
           qm.setUsername(username1);

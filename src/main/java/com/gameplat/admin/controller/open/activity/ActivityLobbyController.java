@@ -119,7 +119,7 @@ public class ActivityLobbyController {
 
   @ApiOperation(value = "查询未绑定的活动大厅列表")
   @GetMapping("/findUnboundLobbyList")
-  @PreAuthorize("hasAuthority('activity:lobby:list')")
+  @PreAuthorize("hasAuthority('activity:lobby:findUnboundLobbyList')")
   public List<ActivityLobbyVO> findUnboundLobbyList() {
     return activityInfoService.findUnboundLobbyList();
   }
@@ -149,7 +149,7 @@ public class ActivityLobbyController {
 
   @ApiOperation(value = "游戏列表")
   @GetMapping("/gameList")
-  @PreAuthorize("hasAuthority('activity:lobby:gameKindList')")
+  @PreAuthorize("hasAuthority('activity:lobby:gameList')")
   public List<GameKindVO> getGameKindInBanner(String gameTypeCode) {
     return gameKindService.getGameKindInBanner(gameTypeCode);
   }

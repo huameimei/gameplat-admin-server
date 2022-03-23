@@ -342,6 +342,8 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
         }
 
       } else if (WithdrawStatus.CANCELLED.getValue() == cashStatus) { // 取消出款操作
+        // 释放会员提现冻结金额
+        memberInfoService.updateFreeze(member.getId(), memberWithdraw.getCashMoney().negate());
         // 释放会员提现金额
         memberInfoService.updateBalance(member.getId(), memberWithdraw.getCashMoney());
         String billContent =

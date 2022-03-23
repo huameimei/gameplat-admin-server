@@ -117,6 +117,25 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
   }
 
   @Override
+  @Retryable(value = Exception.class, backoff = @Backoff(delay = 500L, multiplier = 1.5))
+  public void updateFreeze(Long memberId, BigDecimal amount) {
+    MemberInfo memberInfo = this.getById(memberId);
+
+    // 计算变更后冻结余额并判断冻结余额是否充足
+    BigDecimal currentFreeze = memberInfo.getFreeze();
+    BigDecimal newFreeze = this.getNewBalance(currentFreeze, amount);
+
+    if (!this.updateById(
+        MemberInfo.builder()
+            .memberId(memberId)
+            .freeze(newFreeze)
+            .build())) {
+      log.error("更新会员:{}冻结余额失败，当前冻结余额：{}，更新冻结金额：{}", memberId, currentFreeze, amount);
+      throw new ServiceException("更新会员冻结余额失败!");
+    }
+  }
+
+  @Override
   public BigDecimal findUserRebate(String account) {
     return memberInfoMapper.findUserRebate(account);
   }

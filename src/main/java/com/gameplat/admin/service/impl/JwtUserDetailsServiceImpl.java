@@ -35,7 +35,7 @@ public class JwtUserDetailsServiceImpl implements UserDetailsService {
         Optional.ofNullable(userService.getByUsername(username))
             .orElseThrow(() -> new UsernameNotFoundException("用户名不存在或密码错误!"));
 
-    // 判断用户是否被锁定了
+    // 判断用户是否被禁用了
     if (SysUserEnums.Status.DISABLED.match(user.getStatus())) {
       throw new LockedException("账号已被禁用，如有疑问请联系管理员");
     }

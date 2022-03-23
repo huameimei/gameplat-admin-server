@@ -183,7 +183,7 @@ public class TenantSettingServiceImpl extends ServiceImpl<TenantSettingMapper, T
             x.setTenant(getDBSuffix());
           });
       if (!list.isEmpty()) {
-        this.saveBatch(list);
+        tenantSettingMapper.insetGameList(list);
       }
       list = tenantSettingMapper.getBackendAppNavigationList(vo);
     }

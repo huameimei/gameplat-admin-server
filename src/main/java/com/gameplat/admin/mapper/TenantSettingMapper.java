@@ -35,4 +35,9 @@ public interface TenantSettingMapper extends BaseMapper<TenantSetting> {
   GameKindVO getGameList(@Param("oneCode") String oneCode);
 
   void updateIndex(TenantSetting tenantSetting1);
+
+  /**
+   * 插入配置信息
+   */
+  void insetGameList(List<TenantSetting> sysTenantSettings);
 }

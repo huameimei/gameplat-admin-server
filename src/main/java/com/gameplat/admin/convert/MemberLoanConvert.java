@@ -12,6 +12,5 @@ import org.mapstruct.Mapper;
 @Mapper(componentModel = "spring")
 public interface MemberLoanConvert {
 
-    MemberLoanVO toVo(MemberLoan entity);
-
+  MemberLoanVO toVo(MemberLoan entity);
 }

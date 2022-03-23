@@ -1,5 +1,6 @@
 package com.gameplat.admin.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -21,8 +22,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 /**
+ * vip福利记录业务处理层
+ *
  * @author lily
- * @description vip福利记录业务处理层
  * @date 2021/11/23
  */
 @Service
@@ -112,6 +114,17 @@ public class MemberWealRewordServiceImpl
     if (!this.updateById(entity)) {
       throw new ServiceException("修改福利记录失败");
     }
+  }
+
+  @Override
+  public void updateRemark(Long id, String remark) {
+    MemberWealReword memberWealReword = this.lambdaQuery().eq(MemberWealReword::getId, id).one();
+    if (ObjectUtils.isNull(memberWealReword)) {
+      throw new ServiceException("此记录不存在");
+    }
+    LambdaUpdateWrapper<MemberWealReword> wrapper = new LambdaUpdateWrapper<>();
+    wrapper.set(MemberWealReword::getRemark, remark).eq(MemberWealReword::getId, id);
+    this.update(wrapper);
   }
 
   @Override

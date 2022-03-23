@@ -15,11 +15,13 @@ import com.gameplat.log.enums.LogType;
 import com.gameplat.model.entity.recharge.RechargeOrder;
 import com.gameplat.security.SecurityUserHolder;
 import com.gameplat.security.context.UserCredential;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
@@ -68,7 +70,7 @@ public class RechargeOrderController {
   @PostMapping("/batchHandle")
   @PreAuthorize("hasAuthority('finance:rechargeOrder:handle')")
   @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.RECHARGE, desc = "'批量受理订单：' + #ids")
-  public void batchHandle(List<Long> ids) {
+  public void batchHandle(@RequestParam List<Long> ids) {
     if (null == ids || ids.size() == 0) {
       throw new ServiceException("ids不能为空");
     }
@@ -81,7 +83,7 @@ public class RechargeOrderController {
   @PostMapping("/batchUnHandle")
   @PreAuthorize("hasAuthority('finance:rechargeOrder:unHandle')")
   @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.RECHARGE, desc = "'批量取消受理订单：' + #ids")
-  public void batchUnHandle(List<Long> ids) {
+  public void batchUnHandle(@RequestParam List<Long> ids) {
     if (null == ids || ids.size() == 0) {
       throw new ServiceException("ids不能为空");
     }
@@ -94,7 +96,7 @@ public class RechargeOrderController {
   @PostMapping("/batchAccept")
   @PreAuthorize("hasAuthority('finance:rechargeOrder:accept')")
   @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.RECHARGE, desc = "'批量入款订单：' + #ids")
-  public void batchAccept(List<Long> ids) throws Exception {
+  public void batchAccept(@RequestParam List<Long> ids) throws Exception {
     if (null == ids || ids.size() == 0) {
       throw new ServiceException("ids不能为空");
     }
@@ -107,7 +109,7 @@ public class RechargeOrderController {
   @PostMapping("/batchCancel")
   @PreAuthorize("hasAuthority('finance:rechargeOrder:cancel')")
   @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.RECHARGE, desc = "'批量取消订单：' + #ids")
-  public void batchCancel(List<Long> ids) {
+  public void batchCancel(@RequestParam List<Long> ids) {
     if (null == ids || ids.size() == 0) {
       throw new ServiceException("ids不能为空");
     }
@@ -119,7 +121,10 @@ public class RechargeOrderController {
 
   @PostMapping("/editDiscount")
   @PreAuthorize("hasAuthority('finance:rechargeOrder:editDiscount')")
-  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.RECHARGE, desc = "'修改优惠金额为：' + #discountAmount")
+  @Log(
+      module = ServiceName.ADMIN_SERVICE,
+      type = LogType.RECHARGE,
+      desc = "'修改优惠金额为：' + #discountAmount")
   public void updateDiscount(
       Long id, Integer discountType, BigDecimal discountAmount, BigDecimal discountDml) {
     rechargeOrderService.updateDiscount(id, discountType, discountAmount, discountDml);
@@ -127,23 +132,29 @@ public class RechargeOrderController {
 
   @PostMapping("/editRemarks")
   @PreAuthorize("hasAuthority('finance:rechargeOrder:editRemarks')")
-  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.RECHARGE, desc = "'修改备注：' + #auditRemarks")
+  @Log(
+      module = ServiceName.ADMIN_SERVICE,
+      type = LogType.RECHARGE,
+      desc = "'修改备注：' + #auditRemarks")
   public void updateRemarks(Long id, String auditRemarks) {
     rechargeOrderService.updateRemarks(id, auditRemarks);
   }
 
   @PostMapping("/page")
   @PreAuthorize("hasAuthority('finance:rechargeOrder:page')")
-  public PageExt<RechargeOrderVO, SummaryVO> queryPage(Page<RechargeOrder> page,
-      RechargeOrderQueryDTO dto) {
+  public PageExt<RechargeOrderVO, SummaryVO> queryPage(
+      Page<RechargeOrder> page, RechargeOrderQueryDTO dto) {
     return rechargeOrderService.findPage(page, dto);
   }
 
+  @SneakyThrows
   @PostMapping("/manual")
   @PreAuthorize("hasAuthority('finance:rechargeOrder:manual')")
-  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.RECHARGE, desc = "'人工入款memberId：' + #manualRechargeOrderBo.memberId")
-  public void manual(ManualRechargeOrderBo manualRechargeOrderBo, HttpServletRequest request)
-      throws Exception {
+  @Log(
+      module = ServiceName.ADMIN_SERVICE,
+      type = LogType.RECHARGE,
+      desc = "'人工入款memberId：' + #manualRechargeOrderBo.memberId")
+  public void manual(ManualRechargeOrderBo manualRechargeOrderBo, HttpServletRequest request) {
     UserCredential userCredential = SecurityUserHolder.getCredential();
     UserEquipment clientInfo = UserEquipment.create(request);
     rechargeOrderService.manual(manualRechargeOrderBo, userCredential, clientInfo);

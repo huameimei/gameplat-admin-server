@@ -1,6 +1,7 @@
 package com.gameplat.admin.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.gameplat.admin.model.dto.CleanAccountDTO;
 import com.gameplat.admin.model.dto.QueryIpStatReportDTO;
 import com.gameplat.admin.model.vo.IpStatisticsVO;
 import com.gameplat.model.entity.member.MemberInfo;
@@ -34,4 +35,6 @@ public interface MemberInfoMapper extends BaseMapper<MemberInfo> {
   @Select(
       "select ifnull(max(mi.rebate),0) from member_info as mi inner join member as m on mi.member_id = m.id where m.parent_name = #{account}")
   BigDecimal findUserLowerMaxRebate(@Param("account") String account);
+
+  int updateClearGTMember(CleanAccountDTO dto);
 }

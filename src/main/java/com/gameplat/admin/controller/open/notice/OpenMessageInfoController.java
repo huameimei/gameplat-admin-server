@@ -39,25 +39,24 @@ public class OpenMessageInfoController {
   @PreAuthorize("hasAuthority('operator:message:page')")
   @ApiImplicitParams({
     @ApiImplicitParam(name = "current", value = "分页参数：当前页", defaultValue = "1"),
-    @ApiImplicitParam(name = "size", value = "每页条数"),
+    @ApiImplicitParam(name = "size", value = "每页条数")
   })
-  public IPage<MessageInfoVO> page(
-      @ApiIgnore PageDTO<Message> page, MessageInfoQueryDTO messageInfoQueryDTO) {
-    return messageInfoService.findMessageList(page, messageInfoQueryDTO);
+  public IPage<MessageInfoVO> page(@ApiIgnore PageDTO<Message> page, MessageInfoQueryDTO dto) {
+    return messageInfoService.findMessageList(page, dto);
   }
 
   @ApiOperation(value = "新增消息")
   @PostMapping("/save")
   @PreAuthorize("hasAuthority('operator:message:save')")
-  public void save(@Validated MessageInfoAddDTO messageInfoAddDTO) {
-    messageInfoService.insertMessage(messageInfoAddDTO);
+  public void save(@Validated MessageInfoAddDTO dto) {
+    messageInfoService.insertMessage(dto);
   }
 
   @ApiOperation(value = "编辑消息")
   @PostMapping("/edit")
   @PreAuthorize("hasAuthority('operator:message:edit')")
-  public void edit(@Validated MessageInfoEditDTO messageInfoEditDTO) {
-    messageInfoService.editMessage(messageInfoEditDTO);
+  public void edit(@Validated MessageInfoEditDTO dto) {
+    messageInfoService.editMessage(dto);
   }
 
   @ApiOperation(value = "删除消息")
@@ -70,12 +69,8 @@ public class OpenMessageInfoController {
   @ApiOperation(value = "查看推送目标会员")
   @GetMapping("/distribute/page")
   @PreAuthorize("hasAuthority('operator:message:distributePage')")
-  @ApiImplicitParams({
-    @ApiImplicitParam(name = "current", value = "分页参数：当前页", defaultValue = "1"),
-    @ApiImplicitParam(name = "size", value = "每页条数"),
-  })
   public IPage<MessageDistributeVO> distributePage(
-      Page<Member> page, MessageDistributeQueryDTO messageDistributeQueryDTO) {
-    return messageInfoService.findMessageDistributeList(page, messageDistributeQueryDTO);
+      Page<Member> page, MessageDistributeQueryDTO dto) {
+    return messageInfoService.findMessageDistributeList(page, dto);
   }
 }

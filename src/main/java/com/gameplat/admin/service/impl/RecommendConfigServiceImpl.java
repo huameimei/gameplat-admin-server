@@ -35,17 +35,10 @@ import java.util.stream.Collectors;
 public class RecommendConfigServiceImpl extends ServiceImpl<RecommendConfigMapper, RecommendConfig>
     implements RecommendConfigService {
 
-  @Autowired private RecommendConfigMapper recommendConfigMapper;
-
   @Autowired private SysDictDataMapper sysDictDataMapper;
 
   @Autowired private GameKindMapper gameKindMapper;
 
-  /**
-   * 获取代理配置
-   *
-   * @return
-   */
   @Override
   public RecommendConfig getRecommendConfig() {
     return this.lambdaQuery()
@@ -55,14 +48,8 @@ public class RecommendConfigServiceImpl extends ServiceImpl<RecommendConfigMappe
         .orElseThrow(() -> new ServiceException("代理限制信息不存在!"));
   }
 
-  /**
-   * 获取层层代分红模式配置预设
-   *
-   * @param lang
-   * @return
-   */
   @Override
-  public Map<String, List<GameDivideVo>> getDefaultLayerDivideConfig(String lang) {
+  public Map<String, List<GameDivideVo>> getDefaultLayerDivideConfig() {
     Map<String, List<GameDivideVo>> tmpMap = new TreeMap<>();
     List<SysDictData> liveGameTypeList = sysDictDataMapper.findDataByType("LIVE_GAME_TYPE", "1");
     if (CollectionUtil.isEmpty(liveGameTypeList)) {
@@ -74,7 +61,7 @@ public class RecommendConfigServiceImpl extends ServiceImpl<RecommendConfigMappe
     String layerPresetValue = recommendConfig.getLayerPresetValue();
     if (StrUtil.isBlank(layerPresetValue)) {
       // 初始化
-      layerPresetValue = this.initDivideConfig(lang);
+      layerPresetValue = this.initDivideConfig();
     }
     Map<String, JSONObject> ownerConfigMap = JSONUtil.toBean(layerPresetValue, Map.class);
     liveGameTypeList.forEach(
@@ -94,14 +81,8 @@ public class RecommendConfigServiceImpl extends ServiceImpl<RecommendConfigMappe
     return tmpMap;
   }
 
-  /**
-   * 获取固定模式初始预设值
-   *
-   * @param lang
-   * @return
-   */
   @Override
-  public Map<String, List<GameDivideVo>> getDefaultFixDivideConfig(String lang) {
+  public Map<String, List<GameDivideVo>> getDefaultFixDivideConfig() {
     Map<String, List<GameDivideVo>> tmpMap = new TreeMap<>();
     List<SysDictData> liveGameTypeList = sysDictDataMapper.findDataByType("LIVE_GAME_TYPE", "1");
     if (CollectionUtil.isEmpty(liveGameTypeList)) {
@@ -113,7 +94,7 @@ public class RecommendConfigServiceImpl extends ServiceImpl<RecommendConfigMappe
     String fixPresetValue = recommendConfig.getFixPresetValue();
     if (StrUtil.isBlank(fixPresetValue)) {
       // 初始化
-      fixPresetValue = this.initDivideConfig(lang);
+      fixPresetValue = this.initDivideConfig();
     }
     Map<String, JSONObject> ownerFixConfigMap = JSONUtil.toBean(fixPresetValue, Map.class);
     liveGameTypeList.forEach(
@@ -132,14 +113,8 @@ public class RecommendConfigServiceImpl extends ServiceImpl<RecommendConfigMappe
     return tmpMap;
   }
 
-  /**
-   * 获取列表模式配置
-   *
-   * @param lang
-   * @return
-   */
   @Override
-  public Map<String, Object> getDefaultFissionDivideConfig(String lang) {
+  public Map<String, Object> getDefaultFissionDivideConfig() {
     Map<String, List<FissionDivideConfigVo>> tmpMap = new TreeMap<>();
     List<SysDictData> liveGameTypeList = sysDictDataMapper.findDataByType("LIVE_GAME_TYPE", "1");
     if (CollectionUtil.isEmpty(liveGameTypeList)) {
@@ -151,7 +126,7 @@ public class RecommendConfigServiceImpl extends ServiceImpl<RecommendConfigMappe
     String fissionPresetValue = recommendConfig.getFissionPresetValue();
     if (StrUtil.isBlank(fissionPresetValue)) {
       // 初始化
-      fissionPresetValue = this.initFissionDivideConfig(lang);
+      fissionPresetValue = this.initFissionDivideConfig();
     }
     Map<String, JSONObject> ownerFissionConfigMap = JSONUtil.toBean(fissionPresetValue, Map.class);
     liveGameTypeList.forEach(
@@ -184,21 +159,15 @@ public class RecommendConfigServiceImpl extends ServiceImpl<RecommendConfigMappe
     return returnMap;
   }
 
-  /**
-   * 编辑代理配置
-   *
-   * @param recommendConfigDto
-   */
   @Override
-  public void edit(RecommendConfigDto recommendConfigDto) {
+  public void edit(RecommendConfigDto dto) {
     RecommendConfig recommendConfig = new RecommendConfig();
-    BeanUtil.copyProperties(recommendConfigDto, recommendConfig);
+    BeanUtil.copyProperties(dto, recommendConfig);
 
     // 判断如果开启了固定比例模式预设并且分红模式为固定比例分红模式
-    if (recommendConfigDto.getFixDevideIsPreset() == EnableEnum.ENABLED.code()
-        && recommendConfigDto.getDivideModel() == 1) {
+    if (dto.getFixDevideIsPreset() == EnableEnum.ENABLED.code() && dto.getDivideModel() == 1) {
       // 固定比例模式
-      Map<String, List<GameDivideVo>> ownerFixConfigMap = recommendConfigDto.getOwnerFixConfigMap();
+      Map<String, List<GameDivideVo>> ownerFixConfigMap = dto.getOwnerFixConfigMap();
       if (CollectionUtil.isNotEmpty(ownerFixConfigMap)) {
         Map<String, JSONObject> saveMap = new HashMap<>();
         for (Map.Entry<String, List<GameDivideVo>> map : ownerFixConfigMap.entrySet()) {
@@ -214,11 +183,10 @@ public class RecommendConfigServiceImpl extends ServiceImpl<RecommendConfigMappe
     }
 
     // 判断如果开启了裂变模式预设并且分红模式为裂变分红模式
-    if (recommendConfigDto.getFissionDevideIsPreset() == EnableEnum.ENABLED.code()
-        && recommendConfigDto.getDivideModel() == 2) {
+    if (dto.getFissionDevideIsPreset() == EnableEnum.ENABLED.code() && dto.getDivideModel() == 2) {
       // 裂变模式
       Map<String, List<FissionDivideConfigVo>> ownerFissionConfigMap =
-          recommendConfigDto.getOwnerFissionConfigMap();
+          dto.getOwnerFissionConfigMap();
       if (CollectionUtil.isNotEmpty(ownerFissionConfigMap)) {
         Map<String, JSONObject> saveMap = new HashMap<>();
         for (Map.Entry<String, List<FissionDivideConfigVo>> map :
@@ -233,18 +201,16 @@ public class RecommendConfigServiceImpl extends ServiceImpl<RecommendConfigMappe
         }
       }
 
-      List<FissionDivideLevelVo> fissionConfigLevelVos =
-          recommendConfigDto.getFissionConfigLevelVos();
+      List<FissionDivideLevelVo> fissionConfigLevelVos = dto.getFissionConfigLevelVos();
       if (CollectionUtil.isNotEmpty(fissionConfigLevelVos)) {
         recommendConfig.setRecyclePresetValue(JSONUtil.toJsonStr(fissionConfigLevelVos));
       }
     }
 
     // 判断如果开启了层层代模式预设并且分红模式为层层代分红模式
-    if (recommendConfigDto.getLayerDivideIsPreset() == EnableEnum.ENABLED.code()
-        && recommendConfigDto.getDivideModel() == 3) {
+    if (dto.getLayerDivideIsPreset() == EnableEnum.ENABLED.code() && dto.getDivideModel() == 3) {
       // 层层代模式
-      Map<String, List<GameDivideVo>> ownerConfigMap = recommendConfigDto.getOwnerConfigMap();
+      Map<String, List<GameDivideVo>> ownerConfigMap = dto.getOwnerConfigMap();
       if (CollectionUtil.isNotEmpty(ownerConfigMap)) {
         Map<String, JSONObject> saveMap = new HashMap<>();
         for (Map.Entry<String, List<GameDivideVo>> map : ownerConfigMap.entrySet()) {
@@ -262,14 +228,8 @@ public class RecommendConfigServiceImpl extends ServiceImpl<RecommendConfigMappe
     Assert.isTrue(this.updateById(recommendConfig), "修改代理配置失败！");
   }
 
-  /**
-   * 初始化层层代分红模式配置预设
-   *
-   * @param lang
-   * @return
-   */
   @Override
-  public String initDivideConfig(String lang) {
+  public String initDivideConfig() {
     List<SysDictData> liveGameTypeList = sysDictDataMapper.findDataByType("LIVE_GAME_TYPE", "1");
     if (CollectionUtil.isEmpty(liveGameTypeList)) {
       log.error("游戏大类字典数据为空！");
@@ -303,14 +263,8 @@ public class RecommendConfigServiceImpl extends ServiceImpl<RecommendConfigMappe
     return JSONUtil.toJsonStr(saveMap);
   }
 
-  /**
-   * 初始化层层代分红模式配置预设
-   *
-   * @param lang
-   * @return
-   */
   @Override
-  public String initFissionDivideConfig(String lang) {
+  public String initFissionDivideConfig() {
     List<SysDictData> liveGameTypeList = sysDictDataMapper.findDataByType("LIVE_GAME_TYPE", "1");
     if (CollectionUtil.isEmpty(liveGameTypeList)) {
       log.error("游戏大类字典数据为空！");

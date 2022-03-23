@@ -61,7 +61,7 @@
     handle_tip,create_by,create_time,update_by,update_time,email_address,type_subscript,url
     FROM pay_account
     <include refid="where"/>
-    ORDER BY sort ASC
+    ORDER BY sort asc ,create_time desc
   </select>
 
 </mapper>

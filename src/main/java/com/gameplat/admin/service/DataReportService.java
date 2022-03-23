@@ -6,30 +6,24 @@ import com.gameplat.admin.model.vo.*;
 
 import java.util.List;
 
-
 /**
- * @Author kb
- * @Date 2022/3/2 21:49
- * @Version 1.0
+ * @author kb @Date 2022/3/2 21:49 @Version 1.0
  */
 public interface DataReportService {
 
-    GameRechDataReportVO findRechReport(GameRWDataReportDto dto);
+  GameRechDataReportVO findRechReport(GameRWDataReportDto dto);
 
+  GameWithDataReportVO findWithReport(GameRWDataReportDto dto);
 
-    GameWithDataReportVO findWithReport(GameRWDataReportDto dto);
+  GameDataReportVO findGameReport(GameRWDataReportDto dto);
 
-    GameDataReportVO findGameReport(GameRWDataReportDto dto);
+  GameAccountDataReportVo findMemberReport(Page<AccountReportVo> page, GameRWDataReportDto dto);
 
-    GameAccountDataReportVo findMemberReport(Page<AccountReportVo> page, GameRWDataReportDto dto);
+  GameDividendDataVo findDividendtDataReport(GameRWDataReportDto dto);
 
-    GameDividendDataVo findDividendtDataReport(GameRWDataReportDto dto);
+  PageDtoVO<AccountReportVo> findAccountReport(Page<AccountReportVo> page, GameRWDataReportDto dto);
 
-    PageDtoVO<AccountReportVo>  findAccountReport (Page<AccountReportVo> page,GameRWDataReportDto dto);
+  List<ThreeRechReportVo> findThreeRech(GameRWDataReportDto dto);
 
-
-    List<ThreeRechReportVo> findThreeRech(GameRWDataReportDto dto);
-
-    GameProxyDataVo findProxyData(GameRWDataReportDto dto);
-
+  GameProxyDataVo findProxyData(GameRWDataReportDto dto);
 }

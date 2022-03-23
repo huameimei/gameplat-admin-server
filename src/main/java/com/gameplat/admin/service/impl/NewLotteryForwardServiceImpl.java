@@ -50,13 +50,16 @@ public class NewLotteryForwardServiceImpl implements NewLotteryForwardService {
     Object object =
         routingDelegate.redirect(
             request, headers, lotteryConfig.getServerHost(), "/api/admin/lottery");
-    cn.hutool.json.JSONObject jsonObject = JSONUtil.parseObj(JSONUtil.toJsonStr(object));
-    cn.hutool.json.JSONObject bodyObject = JSONUtil.parseObj(jsonObject.getStr("body"));
+    String result = JSONUtil.toJsonStr(object);
+    com.alibaba.fastjson.JSONObject jsonObject1 =
+        com.alibaba.fastjson.JSONObject.parseObject(result);
+    String body = jsonObject1.getString("body");
+    com.alibaba.fastjson.JSONObject bodyObject = com.alibaba.fastjson.JSONObject.parseObject(body);
     log.info("彩票服务转发请求响应数据：{}", JSONUtil.toJsonStr(object));
-    if (bodyObject.getInt("code") == HttpStatus.HTTP_OK) {
-      return Result.succeedData(bodyObject.getObj("data"));
+    if (bodyObject.getInteger("code") == HttpStatus.HTTP_OK) {
+      return Result.succeedData(bodyObject.get("data"));
     } else {
-      return Result.failed(bodyObject.getStr("msg"));
+      return Result.failed(bodyObject.getString("msg"));
     }
   }
 }

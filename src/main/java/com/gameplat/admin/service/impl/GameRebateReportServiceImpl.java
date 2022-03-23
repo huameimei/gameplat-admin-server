@@ -17,13 +17,39 @@ import com.gameplat.admin.mapper.GameRebateDetailMapper;
 import com.gameplat.admin.mapper.GameRebateReportMapper;
 import com.gameplat.admin.model.dto.GameRebateReportQueryDTO;
 import com.gameplat.admin.model.vo.GameMemberDayReportVO;
+import com.gameplat.admin.model.vo.MemberInfoVO;
 import com.gameplat.admin.model.vo.PageDtoVO;
 import com.gameplat.admin.service.GameBlacklistService;
 import com.gameplat.admin.service.GameRebateReportService;
+import com.gameplat.admin.service.MemberBillService;
+import com.gameplat.admin.service.MemberInfoService;
 import com.gameplat.admin.service.MemberService;
+import com.gameplat.admin.service.ValidWithdrawService;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.json.JsonUtils;
-import com.gameplat.model.entity.game.*;
+import com.gameplat.common.enums.GameBlacklistTypeEnum;
+import com.gameplat.common.enums.TranTypes;
+import com.gameplat.model.entity.game.GameBlacklist;
+import com.gameplat.model.entity.game.GameRebateConfig;
+import com.gameplat.model.entity.game.GameRebateDetail;
+import com.gameplat.model.entity.game.GameRebatePeriod;
+import com.gameplat.model.entity.game.GameRebateReport;
+import com.gameplat.model.entity.member.MemberBill;
+import com.gameplat.model.entity.recharge.RechargeOrder;
+import com.gameplat.redis.api.RedisService;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
@@ -31,11 +57,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.util.*;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -48,11 +69,19 @@ public class GameRebateReportServiceImpl
 
   @Autowired private MemberService memberService;
 
+  @Autowired private MemberBillService memberBillService;
+
+  @Autowired private MemberInfoService memberInfoService;
+
+  @Autowired private ValidWithdrawService validWithdrawService;
+
   @Autowired private GameBlacklistService gameBlacklistService;
 
   @Autowired private GameRebateDetailMapper gameRebateDetailMapper;
 
   @Autowired private GameBetDailyReportMapper gameBetDailyReportMapper;
+
+  @Autowired private RedisService redisService;
 
   @Override
   public PageDtoVO<GameRebateDetail> queryPage(
@@ -91,32 +120,31 @@ public class GameRebateReportServiceImpl
   public void reject(String account, String periodName, String remark) {
     QueryWrapper<GameRebateDetail> query = Wrappers.query();
     query.eq("account", account).eq("period_name", periodName);
-    GameRebateDetail liveRebateDetail = gameRebateDetailMapper.selectOne(query);
+    GameRebateDetail gameRebateDetail = gameRebateDetailMapper.selectOne(query);
     verifyAndUpdate(
-        liveRebateDetail.getMemberId(),
-        liveRebateDetail.getPeriodId(),
+        gameRebateDetail.getMemberId(),
+        gameRebateDetail.getPeriodId(),
         GameRebateReportStatus.REJECTED.getValue(),
         remark);
   }
 
-  /**
-   * 真人返水数据修改
-   *
-   * @param id
-   * @param realRebateMoney
-   * @param remark
-   */
+  /** 游戏返水数据修改 */
   @Override
   public void modify(Long id, BigDecimal realRebateMoney, String remark) {
-    //  TODO 是否需要加锁处理
-    GameRebateDetail liveRebateDetail = gameRebateDetailMapper.selectById(id);
-    if (liveRebateDetail == null) {
-      throw new ServiceException("返点记录不存在");
+    String key = "modify_game_rebate_" + id;
+    try {
+      redisService.getStringOps().set(key, 1);
+      GameRebateDetail gameRebateDetail = gameRebateDetailMapper.selectById(id);
+      if (gameRebateDetail == null) {
+        throw new ServiceException("返点记录不存在");
+      }
+      gameRebateDetail.setId(id);
+      gameRebateDetail.setRealRebateMoney(realRebateMoney);
+      gameRebateDetail.setRemark(remark);
+      gameRebateDetailMapper.updateById(gameRebateDetail);
+    } finally {
+      redisService.getKeyOps().delete(key);
     }
-    liveRebateDetail.setId(id);
-    liveRebateDetail.setRealRebateMoney(realRebateMoney);
-    liveRebateDetail.setRemark(remark);
-    gameRebateDetailMapper.updateById(liveRebateDetail);
   }
 
   @Override
@@ -135,9 +163,9 @@ public class GameRebateReportServiceImpl
 
   @Override
   public void createForGameRebatePeriod(GameRebatePeriod gameRebatePeriod) {
-    log.info("生成" + gameRebatePeriod.getName() + "真人返水");
-    List<GameRebateConfig> liveConfigList = gameRebateConfigMapper.selectList(new QueryWrapper<>());
-    Map<String, List<BigDecimal[]>> map = convertToGameKindMap(liveConfigList);
+    log.info("生成" + gameRebatePeriod.getName() + "游戏返水");
+    List<GameRebateConfig> gameConfigList = gameRebateConfigMapper.selectList(new QueryWrapper<>());
+    Map<String, List<BigDecimal[]>> map = convertToGameKindMap(gameConfigList);
     log.info("----------返水配置----------");
     log.info(JSONUtil.toJsonStr(map));
     // 锁定层级会员
@@ -145,8 +173,9 @@ public class GameRebateReportServiceImpl
     if (StringUtils.isNotBlank(gameRebatePeriod.getBlackLevels())) {
       String[] levels = gameRebatePeriod.getBlackLevels().split(",");
       List<String> levelsLists =
-          Arrays.stream(levels).filter(StringUtils::isEmpty).collect(Collectors.toList());
+          Arrays.stream(levels).filter(StringUtils::isNotEmpty).collect(Collectors.toList());
       List<String> list = memberService.findAccountByUserLevelIn(levelsLists);
+      // 转小写比较
       list.forEach(item -> memberList.add(item.toLowerCase()));
     }
 
@@ -156,12 +185,12 @@ public class GameRebateReportServiceImpl
       Arrays.stream(accounts).forEach(item -> memberList.add(item.toLowerCase()));
     }
 
-    // 真人返水黑名单
-    GameBlacklist example = new GameBlacklist();
-    example.setBlackType(String.valueOf(3));
-    List<GameBlacklist> liveBlacklists = gameBlacklistService.selectGameBlackList(example);
+    // 游戏返水黑名单
+    GameBlacklist black = new GameBlacklist();
+    black.setBlackType(GameBlacklistTypeEnum.GAME_REBATE.code());
+    List<GameBlacklist> gameBlacklists = gameBlacklistService.selectGameBlackList(black);
 
-    // 真人日报表
+    // 游戏日报表
     String startDate = DateUtil.formatDate(gameRebatePeriod.getBeginDate());
     String endDate = DateUtil.formatDate(gameRebatePeriod.getEndDate());
     List<GameMemberDayReportVO> list =
@@ -173,20 +202,20 @@ public class GameRebateReportServiceImpl
         .filter(v -> !memberList.contains(v.getAccount().toLowerCase()))
         .filter(
             v -> {
-              for (GameBlacklist liveBlack : liveBlacklists) {
+              for (GameBlacklist gameBlack : gameBlacklists) {
                 if (Objects.equals(
                         BlacklistConstant.BizBlacklistTargetType.USER.getValue(),
-                        liveBlack.getTargetType())
-                    && v.getAccount().equalsIgnoreCase(liveBlack.getTarget())
-                    && ("," + liveBlack.getLiveCategory())
+                        gameBlack.getTargetType())
+                    && v.getAccount().equalsIgnoreCase(gameBlack.getTarget())
+                    && ("," + gameBlack.getLiveCategory())
                         .contains("," + v.getPlatformCode() + ",")) {
                   return false;
                 }
                 if (Objects.equals(
                         BlacklistConstant.BizBlacklistTargetType.USER_LEVEL.getValue(),
-                        liveBlack.getTargetType())
-                    && v.getUserLevel().equalsIgnoreCase(liveBlack.getTarget())
-                    && ("," + liveBlack.getLiveCategory())
+                        gameBlack.getTargetType())
+                    && v.getUserLevel().equalsIgnoreCase(gameBlack.getTarget())
+                    && ("," + gameBlack.getLiveCategory())
                         .contains("," + v.getPlatformCode() + ",")) {
                   return false;
                 }
@@ -210,9 +239,9 @@ public class GameRebateReportServiceImpl
                       .findFirst();
               if (rebate.isPresent() && rebate.get().compareTo(BigDecimal.ZERO) > 0) {
                 try {
-                  GameRebateReport liveRebateReport =
-                      formatLiveRebateReport(gameRebatePeriod, dr, rebate.get());
-                  resultList.add(liveRebateReport);
+                  GameRebateReport gameRebateReport =
+                      formatGameRebateReport(gameRebatePeriod, dr, rebate.get());
+                  resultList.add(gameRebateReport);
                 } catch (Exception e) {
                   log.error("结算异常: " + JSONUtil.toJsonStr(dr));
                   throw new RuntimeException("结算异常", e);
@@ -231,12 +260,12 @@ public class GameRebateReportServiceImpl
     }
   }
 
-  private GameRebateReport formatLiveRebateReport(
+  private GameRebateReport formatGameRebateReport(
       GameRebatePeriod period, GameMemberDayReportVO memberDayReport, BigDecimal rebate) {
     GameRebateReport gameRebateReport = new GameRebateReport();
     BeanUtils.copyProperties(memberDayReport, gameRebateReport);
     gameRebateReport.setId(null);
-    gameRebateReport.setRemark(period.getName() + "-真人返水");
+    gameRebateReport.setRemark(period.getName() + "-游戏返水");
     gameRebateReport.setPeriodId(period.getId());
     gameRebateReport.setPeriodName(period.getName());
     gameRebateReport.setBeginDate(period.getBeginDate());
@@ -247,8 +276,6 @@ public class GameRebateReportServiceImpl
             memberDayReport.getValidAmount().multiply(rebate), 100, 4, RoundingMode.HALF_EVEN);
     gameRebateReport.setRebateMoney(rebateMoney);
     gameRebateReport.setRealRebateMoney(rebateMoney);
-    //        liveRebateReport.setValidAmount(liveUserDayReport.getValidAmount());
-    //        liveRebateReport.setStatTime(DateUtil.dateToYMD(liveUserDayReport.getStatTime()));
     log.info("----------用戶返水----------");
     log.info(JSONUtil.toJsonStr(gameRebateReport));
     return gameRebateReport;
@@ -258,9 +285,9 @@ public class GameRebateReportServiceImpl
    * 转化返水配置为Map<String, List<Double[]>>结构 key: ${游戏类型}与${游戏子类型}拼接 value: 按照[${投注额阈值},
    * ${返水比率}]组成的以${投注额阈值}降序排序的列表
    */
-  private Map<String, List<BigDecimal[]>> convertToGameKindMap(List<GameRebateConfig> liveRebates) {
+  private Map<String, List<BigDecimal[]>> convertToGameKindMap(List<GameRebateConfig> gameRebates) {
     Map<String, List<BigDecimal[]>> map = new HashMap<>();
-    liveRebates.forEach(
+    gameRebates.forEach(
         lr -> {
           log.info("lr:", lr);
           log.info(lr.getJson());
@@ -307,15 +334,42 @@ public class GameRebateReportServiceImpl
   }
 
   @Override
+  @SneakyThrows
   public void accept(Long periodId, Long memberId, BigDecimal realRebateMoney, String remark) {
     verifyAndUpdate(memberId, periodId, GameRebateReportStatus.ACCEPTED.getValue(), remark);
+    MemberInfoVO member = memberService.getInfo(memberId);
+    // 添加打码量
+    RechargeOrder rechargeOrder = new RechargeOrder();
+    rechargeOrder.setMemberId(memberId);
+    rechargeOrder.setAmount(BigDecimal.ZERO);
+    rechargeOrder.setNormalDml(BigDecimal.ZERO);
+    rechargeOrder.setDiscountAmount(realRebateMoney);
+    rechargeOrder.setDiscountDml(realRebateMoney);
+    rechargeOrder.setRemarks(remark);
+    rechargeOrder.setAccount(member.getAccount());
+    validWithdrawService.addRechargeOrder(rechargeOrder);
 
-    // TODO 添加打码量
+    // 写账变
+    MemberBill memberBill = new MemberBill();
+    memberBill.setMemberId(member.getId());
+    memberBill.setAccount(member.getAccount());
+    memberBill.setMemberPath(member.getSuperPath());
+    memberBill.setTranType(TranTypes.GAME_REBATE.getValue());
+    memberBill.setAmount(realRebateMoney);
+    memberBill.setBalance(member.getBalance());
+    memberBill.setRemark(remark);
+    memberBill.setContent(
+        String.format(
+            "游戏返点派发：用户 %s 于 %s 收到返点金额 %.3f 元，最新余额 %.3f 元。",
+            member.getAccount(),
+            DateUtil.now(),
+            realRebateMoney,
+            member.getBalance().add(realRebateMoney)));
+    memberBill.setOperator("system");
+    memberBillService.save(memberBill);
 
-    // TODO 写账变
-
-    // TODO 修改账户余额
-
+    // 修改账户余额
+    memberInfoService.updateBalanceWithRecharge(member.getId(), realRebateMoney, realRebateMoney);
   }
 
   @Override
@@ -330,21 +384,21 @@ public class GameRebateReportServiceImpl
     query
         .eq(ObjectUtils.isNotEmpty(memberId), GameRebateDetail::getMemberId, memberId)
         .eq(ObjectUtils.isNotEmpty(periodId), GameRebateDetail::getPeriodId, periodId);
-    GameRebateDetail liveRebateDetail = gameRebateDetailMapper.selectOne(query);
+    GameRebateDetail gameRebateDetail = gameRebateDetailMapper.selectOne(query);
 
-    if (liveRebateDetail.getStatus() == null) {
+    if (gameRebateDetail.getStatus() == null) {
       throw new ServiceException("返点记录状态异常");
     }
-    if (liveRebateDetail.getStatus() != GameRebateReportStatus.UNACCEPTED.getValue()) {
+    if (gameRebateDetail.getStatus() != GameRebateReportStatus.UNACCEPTED.getValue()) {
       throw new ServiceException("返点记录已处理");
     }
-    if (liveRebateDetail.getMemberId() == null) {
+    if (gameRebateDetail.getMemberId() == null) {
       throw new ServiceException("会员不存在");
     }
-    liveRebateDetail.setStatus(status);
-    liveRebateDetail.setRealRebateMoney(liveRebateDetail.getRealRebateMoney());
-    liveRebateDetail.setRemark(remark);
-    gameRebateDetailMapper.update(liveRebateDetail, query);
+    gameRebateDetail.setStatus(status);
+    gameRebateDetail.setRealRebateMoney(gameRebateDetail.getRealRebateMoney());
+    gameRebateDetail.setRemark(remark);
+    gameRebateDetailMapper.update(gameRebateDetail, query);
   }
 
   private void rollBackAndUpdate(Long memberId, Long periodId, Integer status, String remark) {
@@ -369,18 +423,30 @@ public class GameRebateReportServiceImpl
       Long memberId, Long periodId, String periodName, BigDecimal realRebateMoney, String remark) {
 
     rollBackAndUpdate(memberId, periodId, GameRebateReportStatus.ROLLBACKED.getValue(), remark);
+    MemberInfoVO member = memberService.getInfo(memberId);
+    // 批量修改打码量--游戏返水优惠打码量设为0
+    validWithdrawService.rollGameRebateDml(remark);
+    // 写账变
+    MemberBill memberBill = new MemberBill();
+    memberBill.setMemberId(member.getId());
+    memberBill.setAccount(member.getAccount());
+    memberBill.setMemberPath(member.getSuperPath());
+    memberBill.setTranType(TranTypes.GAME_ROLLBACK.getValue());
+    memberBill.setAmount(realRebateMoney.negate());
+    memberBill.setBalance(member.getBalance());
+    memberBill.setRemark(remark);
+    memberBill.setContent(
+        String.format(
+            "游戏返点回收：用户 %s 于 %s 回收 %s 返点金额 %.3f 元，最新余额 %.3f 元。",
+            member.getAccount(),
+            DateUtil.now(),
+            periodName,
+            realRebateMoney,
+            member.getBalance().subtract(realRebateMoney)));
+    memberBill.setOperator("system");
+    memberBillService.save(memberBill);
 
-    // TODO 批量修改打码量--真人返水优惠打码量设为0
-    // validWithdrawService.rollLiveRebateDML(remark);
-    // TODO  写账变
-    // userBillService.saveSysBannerInfo(userId, TranTypes.LIVE_ROLLBACK.getValue(),
-    // -realRebateMoney, "",
-    //   rollBackUserBillContent(userId, periodName, realRebateMoney), admin.getAccount());
-
-    // TODO 修改账户余额
-    /*UserMoneyBean userMoneyBean = new UserMoneyBean(userId);
     // 修改账户余额
-    userMoneyBean.setMoney(-realRebateMoney);
-    userService.updateMoney(userMoneyBean);*/
+    memberInfoService.updateBalanceWithWithdraw(member.getId(), realRebateMoney);
   }
 }

@@ -23,8 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class DiscountTypeServiceImpl extends ServiceImpl<DiscountTypeMapper, DiscountType>
     implements DiscountTypeService {
 
-  @Autowired
-  private DiscountTypeConvert discountTypeConvert;
+  @Autowired private DiscountTypeConvert discountTypeConvert;
 
   @Override
   public void update(DiscountTypeEditDTO dto) {
@@ -64,7 +63,7 @@ public class DiscountTypeServiceImpl extends ServiceImpl<DiscountTypeMapper, Dis
 
   @Override
   public IPage<DiscountType> findDiscountTypePage(Page<DiscountType> page) {
-    return this.lambdaQuery().orderByAsc(DiscountType::getSort).page(page);
+    return this.lambdaQuery().orderByAsc(DiscountType::getSort).orderByDesc(DiscountType::getCreateTime).page(page);
   }
 
   @Override

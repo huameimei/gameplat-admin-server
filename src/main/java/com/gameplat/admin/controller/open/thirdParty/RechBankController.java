@@ -33,14 +33,20 @@ public class RechBankController {
 
   @PostMapping("/add")
   @PreAuthorize("hasAuthority('thirdParty:rechBank:add')")
-  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.WITHDRAW, desc = "'新增银行id=' + #dictData.id")
+  @Log(
+      module = ServiceName.ADMIN_SERVICE,
+      type = LogType.WITHDRAW,
+      desc = "'新增银行id=' + #dictData.id")
   public void save(@Validated(Groups.INSERT.class) @RequestBody OperDictDataDTO dictData) {
-    dictDataService.insertDictData(dictData);
+    dictDataService.insertBank(dictData);
   }
 
   @PutMapping("/edit")
   @PreAuthorize("hasAuthority('thirdParty:rechBank:edit')")
-  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.WITHDRAW, desc = "'修改银行id=' + #dictData.id")
+  @Log(
+      module = ServiceName.ADMIN_SERVICE,
+      type = LogType.WITHDRAW,
+      desc = "'修改银行id=' + #dictData.id")
   public void update(@Validated(Groups.UPDATE.class) @RequestBody OperDictDataDTO dictData) {
     dictDataService.updateDictData(dictData);
   }
@@ -54,8 +60,8 @@ public class RechBankController {
 
   @GetMapping("/list")
   @PreAuthorize("hasAuthority('thirdParty:rechBank:list')")
-  public IPage<DictDataVo> list(PageDTO<SysDictData> page, SysDictDataDTO dictData) {
-    return dictDataService.selectDictDataList(page, dictData);
+  public IPage<DictDataVo> list(PageDTO<SysDictData> page, SysDictDataDTO dto) {
+    return dictDataService.selectDictDataList(page, dto);
   }
 
   @GetMapping("/getAllBank")

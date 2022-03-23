@@ -7,50 +7,41 @@ package com.gameplat.admin.enums;
  */
 public class SysBannerInfoEnum {
 
-    /**
-     * 状态
-     */
-    public enum Status {
-        VALID(1, "有效"),
-        INVALID(0, "无效"),
-        ;
+  /** 状态 */
+  public enum Status {
+    VALID(1, "有效"),
+    INVALID(0, "无效"),
+    ;
 
-        private int value;
-        private String desc;
+    private int value;
+    private String desc;
 
-        Status(int value, String desc) {
-            this.value = value;
-            this.desc = desc;
-        }
-
-        public int getValue() {
-            return this.value;
-        }
-
-
+    Status(int value, String desc) {
+      this.value = value;
+      this.desc = desc;
     }
 
-    /**
-     * banner类型
-     */
-    public enum Type {
-        SPORT(1, "体育"),
-        LOTTERY(2, "彩票"),
-        ;
+    public int getValue() {
+      return this.value;
+    }
+  }
 
-        private int value;
-        private String desc;
+  /** banner类型 */
+  public enum Type {
+    SPORT(1, "体育"),
+    LOTTERY(2, "彩票"),
+    ;
 
-        Type(int value, String desc) {
-            this.value = value;
-            this.desc = desc;
-        }
+    private int value;
+    private String desc;
 
-        public int getValue() {
-            return this.value;
-        }
-
-
+    Type(int value, String desc) {
+      this.value = value;
+      this.desc = desc;
     }
 
+    public int getValue() {
+      return this.value;
+    }
+  }
 }

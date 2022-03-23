@@ -1,6 +1,5 @@
 package com.gameplat.admin.model.vo;
 
-import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.math.BigDecimal;

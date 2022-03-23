@@ -1,7 +1,6 @@
 package com.gameplat.admin.service.impl;
 
 import cn.hutool.core.util.ObjectUtil;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -9,13 +8,13 @@ import com.gameplat.admin.convert.MessageFeedbackConvert;
 import com.gameplat.admin.mapper.MessageFeedbackMapper;
 import com.gameplat.admin.model.dto.MessageFeedbackAddDTO;
 import com.gameplat.admin.model.dto.MessageFeedbackQueryDTO;
-import com.gameplat.admin.model.dto.MessageFeedbackUpdateDTO;
 import com.gameplat.admin.model.dto.MessageInfoAddDTO;
 import com.gameplat.admin.model.vo.MessageFeedbackVO;
 import com.gameplat.admin.service.MessageFeedbackService;
 import com.gameplat.admin.service.MessageInfoService;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.StringUtils;
+import com.gameplat.common.lang.Assert;
 import com.gameplat.model.entity.message.MessageFeedback;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,32 +39,37 @@ public class MessageFeedbackServiceImpl extends ServiceImpl<MessageFeedbackMappe
 
   @Override
   public void insertMessage(MessageFeedbackAddDTO dto) {
+    //回复信件
+    dto.setType(2);
     MessageFeedback messageFeedback = messageFeedbackConvert.toEntity(dto);
     this.save(messageFeedback);
 
-    MessageInfoAddDTO messageInfoAddDTO = new MessageInfoAddDTO();
+    MessageInfoAddDTO addDTO = new MessageInfoAddDTO();
     if (StringUtils.isNotBlank(dto.getTitle())) {
-      messageInfoAddDTO.setTitle(dto.getTitle());
+      addDTO.setTitle(dto.getTitle());
     }
-    messageInfoAddDTO.setContent(dto.getContent());
-    messageInfoAddDTO.setCategory(4);
-    messageInfoAddDTO.setPushRange(2);
-    messageInfoAddDTO.setLinkAccount(dto.getUsername());
-    messageInfoAddDTO.setStatus(1);
-    messageInfoAddDTO.setFeedbackType(dto.getLetterType());
-    messageInfoAddDTO.setType(4);
+
+    addDTO.setContent(dto.getContent());
+    addDTO.setCategory(4);
+    addDTO.setPushRange(2);
+    addDTO.setLinkAccount(dto.getUsername());
+    addDTO.setStatus(1);
+    addDTO.setFeedbackType(dto.getLetterType());
+    addDTO.setType(4);
     if (StringUtils.isNotBlank(dto.getImgUrl())) {
-      messageInfoAddDTO.setFeedbackImage(dto.getImgUrl());
+      addDTO.setFeedbackImage(dto.getImgUrl());
     }
-    messageInfoService.insertMessage(messageInfoAddDTO);
+    messageInfoService.insertMessage(addDTO);
   }
 
   @Override
-  public void updateMessage(MessageFeedbackUpdateDTO dto) {
-    dto.setIsRead(1);
-    this.update(
-        messageFeedbackConvert.toEntity(dto),
-        new LambdaQueryWrapper<MessageFeedback>().eq(MessageFeedback::getId, dto.getId()));
+  public void updateMessage(Long id) {
+    Assert.isTrue(
+        this.lambdaUpdate()
+            .set(MessageFeedback::getIsRead, 1)
+            .eq(MessageFeedback::getId, id)
+            .update(new MessageFeedback()),
+        "已读失败!");
   }
 
   @Override

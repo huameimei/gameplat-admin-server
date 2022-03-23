@@ -8,12 +8,12 @@ import com.gameplat.admin.enums.ActivityInfoEnum;
 import com.gameplat.admin.mapper.ActivityBlacklistMapper;
 import com.gameplat.admin.model.dto.ActivityBlacklistAddDTO;
 import com.gameplat.admin.model.dto.ActivityBlacklistQueryDTO;
-import com.gameplat.admin.model.vo.ActivityBlacklistVO;
 import com.gameplat.admin.model.vo.MemberInfoVO;
 import com.gameplat.admin.service.ActivityBlacklistService;
 import com.gameplat.admin.service.MemberService;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.ip.IpAddressParser;
+import com.gameplat.base.common.util.DateUtil;
 import com.gameplat.base.common.util.StringUtils;
 import com.gameplat.model.entity.activity.ActivityBlacklist;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,42 +41,38 @@ public class ActivityBlacklistServiceImpl
 
   @Override
   public IPage<ActivityBlacklist> list(
-      PageDTO<ActivityBlacklist> page, ActivityBlacklistQueryDTO activityBlacklistQueryDTO) {
+      PageDTO<ActivityBlacklist> page, ActivityBlacklistQueryDTO dto) {
     return this.lambdaQuery()
         .like(
-            StringUtils.isNotBlank(activityBlacklistQueryDTO.getLimitedContent()),
+            StringUtils.isNotBlank(dto.getLimitedContent()),
             ActivityBlacklist::getLimitedContent,
-            activityBlacklistQueryDTO.getLimitedContent())
+            dto.getLimitedContent())
         .eq(
-            activityBlacklistQueryDTO.getLimitedType() != null
-                && activityBlacklistQueryDTO.getLimitedType() != 0,
+            dto.getLimitedType() != null && dto.getLimitedType() != 0,
             ActivityBlacklist::getLimitedType,
-            activityBlacklistQueryDTO.getLimitedType())
+            dto.getLimitedType())
         .eq(
-            activityBlacklistQueryDTO.getActivityId() != null
-                && activityBlacklistQueryDTO.getActivityId() != 0,
+            dto.getActivityId() != null && dto.getActivityId() != 0,
             ActivityBlacklist::getActivityId,
-            activityBlacklistQueryDTO.getActivityId())
+            dto.getActivityId())
         .page(page);
   }
 
   @Override
-  public boolean add(ActivityBlacklistAddDTO activityBlacklistAddDTO) {
-    if (activityBlacklistAddDTO.getLimitedType()
-        == ActivityInfoEnum.ActivityBlacklistEnum.MEMBER.value()) {
-      MemberInfoVO memberInfo =
-          memberService.getMemberInfo(activityBlacklistAddDTO.getLimitedContent());
+  public boolean add(ActivityBlacklistAddDTO dto) {
+    if (ActivityInfoEnum.BlackList.MEMBER.match(dto.getLimitedType())) {
+      MemberInfoVO memberInfo = memberService.getMemberInfo(dto.getLimitedContent());
       if (StringUtils.isNull(memberInfo)) {
         throw new ServiceException("限制内容框中输入的会员账号不存在");
       }
-    } else if (activityBlacklistAddDTO.getLimitedType()
-        == ActivityInfoEnum.ActivityBlacklistEnum.IP.value()) {
-      if (!IpAddressParser.inputIsIpAddress(activityBlacklistAddDTO.getLimitedContent())) {
+    } else if (ActivityInfoEnum.BlackList.IP.match(dto.getLimitedType())) {
+      if (!IpAddressParser.inputIsIpAddress(dto.getLimitedContent())) {
         throw new ServiceException("限制内容框中输入的IP地址无效");
       }
     }
-    ActivityBlacklist activityBlacklist =
-        activityBlacklistConvert.toEntity(activityBlacklistAddDTO);
+
+    ActivityBlacklist activityBlacklist = activityBlacklistConvert.toEntity(dto);
+    activityBlacklist.setCreateTime(DateUtil.getNowTime());
     return this.save(activityBlacklist);
   }
 

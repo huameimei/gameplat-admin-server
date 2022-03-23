@@ -26,7 +26,6 @@ public class MemberVipSignStatisServiceImpl
 
   @Autowired private MemberVipSignStatisConvert signStatisConvert;
 
-  /** 查询VIP会员签到记录列表 */
   @Override
   public IPage<MemberVipSignStatisVO> findSignListPage(
       IPage<MemberVipSignStatis> page, MemberVipSignStatisDTO queryDTO) {
@@ -48,7 +47,6 @@ public class MemberVipSignStatisServiceImpl
         .convert(signStatisConvert::toVo);
   }
 
-  /** 导出签名 */
   @Override
   public List<MemberVipSignStatis> findSignList(MemberVipSignStatisDTO queryDTO) {
     return this.lambdaQuery()

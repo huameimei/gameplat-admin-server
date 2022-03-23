@@ -15,19 +15,19 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 /**
+ * VIP轮播图配置
+ *
  * @author lily
- * @description VIP轮播图配置
  * @date 2022/1/14
  */
-@Api(tags = "VIP权益配置")
 @Slf4j
+@Api(tags = "VIP权益配置")
 @RestController
 @RequestMapping("/api/admin/member/wealConfig")
 public class MemberWealConfigController {
 
   @Autowired private MemberWealConfigService memberWealConfigService;
 
-  /** 增 */
   @PostMapping("/add")
   @ApiOperation(value = "新增权益配置")
   @PreAuthorize("hasAuthority('member:wealConfig:add')")
@@ -35,7 +35,6 @@ public class MemberWealConfigController {
     memberWealConfigService.addWealConfig(dto);
   }
 
-  /** 删 */
   @ApiOperation(value = "删除权益配置")
   @DeleteMapping("/remove/{id}")
   @PreAuthorize("hasAuthority('member:wealConfig:remove')")
@@ -43,7 +42,6 @@ public class MemberWealConfigController {
     memberWealConfigService.removeWealConfig(id);
   }
 
-  /** 改 */
   @PutMapping("/edit")
   @ApiOperation(value = "修改权益配置")
   @PreAuthorize("hasAuthority('member:wealConfig:edit')")
@@ -51,11 +49,10 @@ public class MemberWealConfigController {
     memberWealConfigService.updateWealConfig(dto);
   }
 
-  /** 改 */
   @GetMapping("/page")
   @ApiOperation(value = "查询权益列表")
   @PreAuthorize("hasAuthority('member:wealConfig:page')")
-  public IPage<MemberWealConfig> page(PageDTO<MemberWealConfig> page, String language) {
-    return memberWealConfigService.page(page, language);
+  public IPage<MemberWealConfig> page(PageDTO<MemberWealConfig> page) {
+    return memberWealConfigService.page(page);
   }
 }

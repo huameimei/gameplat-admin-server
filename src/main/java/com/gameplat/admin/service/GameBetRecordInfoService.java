@@ -12,9 +12,10 @@ import java.util.Map;
 
 public interface GameBetRecordInfoService {
 
-    PageDtoVO<GameBetRecordVO> queryPageBetRecord(Page<GameBetRecordVO> page, GameBetRecordQueryDTO dto);
+  PageDtoVO<GameBetRecordVO> queryPageBetRecord(
+      Page<GameBetRecordVO> page, GameBetRecordQueryDTO dto);
 
-    GameResult getGameResult(GameBetRecordQueryDTO dto) throws Exception;
+  GameResult getGameResult(GameBetRecordQueryDTO dto) throws Exception;
 
-    List<ActivityStatisticItem> xjAssignMatchDml(Map map);
+  List<ActivityStatisticItem> xjAssignMatchDml(Map map);
 }

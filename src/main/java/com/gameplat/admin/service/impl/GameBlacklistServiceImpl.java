@@ -54,6 +54,7 @@ public class GameBlacklistServiceImpl extends ServiceImpl<GameBlacklistMapper, G
           .eq(GameBlacklist::getTarget, dto.getUserLevel())
           .eq(GameBlacklist::getTargetType, BizBlacklistTargetType.USER_LEVEL.getValue());
     }
+    queryWrapper.orderByDesc(GameBlacklist::getCreateTime);
     return gameBlacklistMapper.selectPage(page, queryWrapper);
   }
 
@@ -64,7 +65,7 @@ public class GameBlacklistServiceImpl extends ServiceImpl<GameBlacklistMapper, G
     liveBlacklist.setUpdateTime(new Date());
     liveBlacklist.setLiveCategory("," + dto.getLiveCategory() + ",");
     if (!this.updateById(liveBlacklist)) {
-      throw new ServiceException("更新真人黑名单失败!");
+      throw new ServiceException("更新游戏黑名单失败!");
     }
   }
 
@@ -72,8 +73,10 @@ public class GameBlacklistServiceImpl extends ServiceImpl<GameBlacklistMapper, G
   public void save(OperGameBlacklistDTO dto) {
     if (StringUtils.isEmpty(dto.getTarget())) {
       // 会员
-      String msg = Objects.equals(dto.getTargetType(), BizBlacklistTargetType.USER.getValue()) ?
-              "请选择要加入黑名单的会员" : "请选择要加入黑名单的会员层级";
+      String msg =
+          Objects.equals(dto.getTargetType(), BizBlacklistTargetType.USER.getValue())
+              ? "请选择要加入黑名单的会员"
+              : "请选择要加入黑名单的会员层级";
       throw new ServiceException(msg);
     }
     GameBlacklist exists =
@@ -100,7 +103,7 @@ public class GameBlacklistServiceImpl extends ServiceImpl<GameBlacklistMapper, G
       liveCategorys.addAll(Arrays.asList(dto.getLiveCategory().split(",")));
       update.setLiveCategory("," + StringUtils.join(liveCategorys, ",") + ",");
       if (!this.updateById(update)) {
-        throw new ServiceException("更新真人黑名单失败!");
+        throw new ServiceException("更新游戏黑名单失败!");
       }
     } else {
       GameBlacklist create = gameBlacklistConvert.toEntity(dto);
@@ -110,7 +113,7 @@ public class GameBlacklistServiceImpl extends ServiceImpl<GameBlacklistMapper, G
       create.setUpdateTime(now);
       create.setUpdateBy(username);
       if (!this.save(create)) {
-        throw new ServiceException("添加真人黑名单失败!");
+        throw new ServiceException("添加游戏黑名单失败!");
       }
     }
   }
@@ -118,7 +121,7 @@ public class GameBlacklistServiceImpl extends ServiceImpl<GameBlacklistMapper, G
   @Override
   public void delete(Long id) {
     if (!this.removeById(id)) {
-      throw new ServiceException("删除真人黑名单失败!");
+      throw new ServiceException("删除游戏黑名单失败!");
     }
   }
 

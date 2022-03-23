@@ -25,5 +25,5 @@ public interface PayAccountService extends IService<PayAccount> {
 
   IPage<PayAccountVO> findPayAccountPage(Page<PayAccount> page, PayAccountQueryDTO dto);
 
-  List<String> queryOwners();
+  List<String> queryAccounts();
 }

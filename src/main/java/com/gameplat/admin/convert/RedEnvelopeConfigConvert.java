@@ -7,5 +7,5 @@ import org.mapstruct.Mapper;
 @Mapper(componentModel = "spring")
 public interface RedEnvelopeConfigConvert {
 
-    RedEnvelopeConfig dtoToEntity(RedEnvelopeConfigDTO dto);
+  RedEnvelopeConfig dtoToEntity(RedEnvelopeConfigDTO dto);
 }

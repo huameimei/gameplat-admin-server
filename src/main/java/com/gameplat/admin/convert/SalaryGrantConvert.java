@@ -7,7 +7,7 @@ import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")
 public interface SalaryGrantConvert {
-    SalaryGrantVO toVo(SalaryGrant entity);
+  SalaryGrantVO toVo(SalaryGrant entity);
 
-    SalaryGrant toEntity(SalaryGrantDTO salaryGrantDTO);
+  SalaryGrant toEntity(SalaryGrantDTO salaryGrantDTO);
 }

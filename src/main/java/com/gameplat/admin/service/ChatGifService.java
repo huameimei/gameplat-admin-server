@@ -14,17 +14,13 @@ public interface ChatGifService extends IService<ChatGif> {
   /** 分页列表 */
   IPage<ChatGifVO> page(PageDTO<ChatGif> page, String name);
 
-  /** 增 */
   void add(MultipartFile file, String name) throws Exception;
 
-  /** 增 */
   String upload(MultipartFile file, ChatGif chatGif) throws Exception;
 
-  /** 删 */
   void remove(@PathVariable Integer id);
 
-  /** 改 */
   void edit(ChatGifEditDTO dto);
 
-  int findMD5(String md5);
+  long findMd5(String md5);
 }

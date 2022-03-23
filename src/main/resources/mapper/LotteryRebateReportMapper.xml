@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gameplat.admin.mapper.LotteryRebateReportMapper">
+
+    <resultMap type="com.gameplat.model.entity.report.LotteryRebateReport" id="finalResultMap">
+        <result property="id" column="id"/>
+        <result property="countDate" column="count_date"/>
+        <result property="userName" column="user_name"/>
+        <result property="userLevel" column="user_level"/>
+        <result property="parentName" column="parent_name"/>
+        <result property="agentPath" column="agent_path"/>
+        <result property="betUserName" column="bet_user_name"/>
+        <result property="betRate" column="bet_rate"/>
+        <result property="childBetRate" column="child_bet_rate"/>
+        <result property="betAmount" column="bet_amount"/>
+        <result property="winAmount" column="win_amount"/>
+        <result property="validAmount" column="valid_amount"/>
+        <result property="orderNum" column="order_num"/>
+        <result property="status" column="status"/>
+        <result property="backWaterAmount" column="back_water_amount"/>
+        <result property="backWaterFormula" column="back_water_formula"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="remark" column="remark"/>
+    </resultMap>
+
+    <select id="pageList" resultMap="finalResultMap">
+        select
+        count_date,
+        user_name,
+        user_level,
+        parent_name,
+        agent_path,
+        bet_user_name,
+        bet_rate,
+        child_bet_rate,
+        bet_amount,
+        win_amount,
+        valid_amount,
+        order_num,
+        status,
+        back_water_amount,
+        back_water_formula,
+        create_by,
+        create_time,
+        update_by,
+        update_time,
+        remark
+        from lottery_rebate_report
+        <where>
+            1 = 1
+            <if test="dto.countDate != null and dto.countDate != ''">
+                and count_date = #{dto.countDate}
+            </if>
+            <if test="dto.userName != null and dto.userName != ''">
+                and user_name = #{dto.userName}
+            </if>
+            <if test="dto.betUserName != null and dto.betUserName != ''">
+                and bet_user_name = #{dto.betUserName}
+            </if>
+            <if test="dto.status != null and dto.status != -1">
+                and `status` = #{dto.status}
+            </if>
+            <if test="dto.userNameList != null and dto.userNameList.size() > 0">
+                and user_name in
+                <foreach collection="dto.userNameList" index="index" item="item" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="dto.beginTime != null and dto.beginTime != ''">
+                and date_format(count_date,'%y%m%d') <![CDATA[>= ]]> date_format(#{dto.beginTime},'%y%m%d')
+            </if>
+            <if test="dto.endTime != null and dto.endTime != ''">
+                and date_format(count_date,'%y%m%d') <![CDATA[<= ]]> date_format(#{dto.endTime},'%y%m%d')
+            </if>
+        </where>
+    </select>
+
+    <select id="sumForList" resultType="com.gameplat.admin.model.vo.LotteryRebateReportVO">
+        select
+        ROUND(ifnull(sum(valid_amount),0),2) as validAmount,
+        ROUND(ifnull(sum(back_water_amount),0),2) as backWaterAmount
+        from lottery_rebate_report
+        <where>
+            1 = 1
+            <if test="countDate != null and countDate != ''">
+                and count_date = #{countDate}
+            </if>
+            <if test="userName != null and userName != ''">
+                and user_name = #{userName}
+            </if>
+            <if test="beginTime != null and beginTime != ''">
+                and date_format(count_date,'%y%m%d') <![CDATA[>= ]]> date_format(#{beginTime},'%y%m%d')
+            </if>
+            <if test="endTime != null and endTime != ''">
+                and date_format(count_date,'%y%m%d') <![CDATA[<= ]]> date_format(#{endTime},'%y%m%d')
+            </if>
+        </where>
+    </select>
+</mapper>

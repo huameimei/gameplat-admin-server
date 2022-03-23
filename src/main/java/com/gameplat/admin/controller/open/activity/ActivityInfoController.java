@@ -26,9 +26,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.util.CollectionUtils;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
+import javax.validation.constraints.NotEmpty;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -40,9 +42,10 @@ import java.util.List;
  * @author kenvin
  */
 @Slf4j
+@Api(tags = "活动发布管理")
+@Validated
 @RestController
 @RequestMapping("/api/admin/activity/info")
-@Api(tags = "活动发布管理")
 public class ActivityInfoController {
 
   @Autowired private ActivityInfoService activityInfoService;
@@ -52,27 +55,27 @@ public class ActivityInfoController {
   /**
    * 活动列表
    *
-   * @param page
-   * @param activityInfoQueryDTO
-   * @return
+   * @param page PageDTO
+   * @param dto ActivityInfoQueryDTO
+   * @return IPage
    */
   @ApiOperation(value = "活动列表")
   @GetMapping("/list")
   @PreAuthorize("hasAuthority('activity:info:page')")
   @ApiImplicitParams({
     @ApiImplicitParam(name = "current", value = "分页参数：当前页", defaultValue = "1"),
-    @ApiImplicitParam(name = "size", value = "每页条数"),
+    @ApiImplicitParam(name = "size", value = "每页条数")
   })
   public IPage<ActivityInfoVO> list(
-      @ApiIgnore PageDTO<ActivityInfo> page, ActivityInfoQueryDTO activityInfoQueryDTO) {
-    return activityInfoService.list(page, activityInfoQueryDTO);
+      @ApiIgnore PageDTO<ActivityInfo> page, ActivityInfoQueryDTO dto) {
+    return activityInfoService.list(page, dto);
   }
 
   /**
    * 活动详情
    *
-   * @param id
-   * @return
+   * @param id Long
+   * @return ActivityInfoVO
    */
   @ApiOperation(value = "活动详情")
   @GetMapping("/detail")
@@ -84,22 +87,27 @@ public class ActivityInfoController {
     return activityInfoService.detail(id);
   }
 
-    /**
-     * 新增活动
-     *
-     * @param activityInfoAddDTO
-     */
-    @ApiOperation(value = "新增活动")
-    @PostMapping("/add")
-    @PreAuthorize("hasAuthority('activity:info:add')")
-    public void add(
-            @RequestBody ActivityInfoAddDTO activityInfoAddDTO) {
-        checkActivityInfo(activityInfoAddDTO.getValidStatus(), activityInfoAddDTO.getEndTime(), activityInfoAddDTO.getBeginTime(), activityInfoAddDTO.getActivityLobbyId(), activityInfoAddDTO.getId());
-        activityInfoService.add(activityInfoAddDTO, LocaleContextHolder.getLocale().getLanguage());
-    }
+  /**
+   * 新增活动
+   *
+   * @param activityInfoAddDTO
+   */
+  @ApiOperation(value = "新增活动")
+  @PostMapping("/add")
+  @PreAuthorize("hasAuthority('activity:info:add')")
+  public void add(@RequestBody ActivityInfoAddDTO activityInfoAddDTO) {
+    checkActivityInfo(
+        activityInfoAddDTO.getValidStatus(),
+        activityInfoAddDTO.getEndTime(),
+        activityInfoAddDTO.getBeginTime(),
+        activityInfoAddDTO.getActivityLobbyId(),
+        activityInfoAddDTO.getId());
+    activityInfoAddDTO.setLanguage(LocaleContextHolder.getLocale().toLanguageTag());
+    activityInfoService.add(activityInfoAddDTO);
+  }
 
   /**
-   * 检查活动是否满足条件
+   * 活动验证
    *
    * @param validStatus
    * @param endTime
@@ -115,62 +123,58 @@ public class ActivityInfoController {
         throw new ServiceException("活动结束时间不能小于活动开始时间");
       }
     }
-    if (StringUtils.isNotNull(activityLobbyId)) {
+    if (StringUtils.isNotNull(activityLobbyId) && StringUtils.isNull(id)) {
       activityInfoService.checkActivityLobbyId(activityLobbyId, id);
     }
   }
 
-    /**
-     * 编辑活动
-     *
-     * @param activityInfoUpdateDTO
-     */
-    @ApiOperation(value = "编辑活动")
-    @PostMapping("/update")
-    @PreAuthorize("hasAuthority('activity:info:update')")
-    public void update(
-            @RequestBody ActivityInfoUpdateDTO activityInfoUpdateDTO) {
-        checkActivityInfo(activityInfoUpdateDTO.getValidStatus(), activityInfoUpdateDTO.getEndTime(), activityInfoUpdateDTO.getBeginTime(), activityInfoUpdateDTO.getActivityLobbyId(), activityInfoUpdateDTO.getId());
-        activityInfoService.update(activityInfoUpdateDTO, LocaleContextHolder.getLocale().getLanguage());
-    }
+  /**
+   * 编辑活动
+   *
+   * @param activityInfoUpdateDTO
+   */
+  @ApiOperation(value = "编辑活动")
+  @PostMapping("/update")
+  @PreAuthorize("hasAuthority('activity:info:update')")
+  public void update(@RequestBody ActivityInfoUpdateDTO activityInfoUpdateDTO) {
+    checkActivityInfo(
+        activityInfoUpdateDTO.getValidStatus(),
+        activityInfoUpdateDTO.getEndTime(),
+        activityInfoUpdateDTO.getBeginTime(),
+        activityInfoUpdateDTO.getActivityLobbyId(),
+        activityInfoUpdateDTO.getId());
+    activityInfoUpdateDTO.setLanguage(LocaleContextHolder.getLocale().toLanguageTag());
+    activityInfoService.update(activityInfoUpdateDTO);
+  }
 
   /**
    * 修改活动排序
    *
-   * @param activityInfoUpdateSortDTO
+   * @param dto ActivityInfoUpdateSortDTO
    */
   @ApiOperation(value = "修改活动排序")
   @PostMapping("/updateSort")
   @PreAuthorize("hasAuthority('activity:info:updateSort')")
-  public void updateSort(@RequestBody ActivityInfoUpdateSortDTO activityInfoUpdateSortDTO) {
-    if (activityInfoUpdateSortDTO.getId() == null || activityInfoUpdateSortDTO.getId() == 0) {
-      throw new ServiceException("活动id不能为空");
-    }
-    if (activityInfoUpdateSortDTO.getSort() == null) {
-      throw new ServiceException("活动排序sort不能为空");
-    }
-    activityInfoService.updateSort(activityInfoUpdateSortDTO);
+  public void updateSort(@Validated @RequestBody ActivityInfoUpdateSortDTO dto) {
+    activityInfoService.updateSort(dto);
   }
 
   /**
    * 删除活动
    *
-   * @param ids
+   * @param ids String
    */
   @ApiOperation(value = "删除活动")
   @DeleteMapping("/delete")
   @PreAuthorize("hasAuthority('activity:info:remove')")
-  public void delete(@RequestBody String ids) {
-    if (StringUtils.isBlank(ids)) {
-      throw new ServiceException("ids不能为空");
-    }
+  public void delete(@RequestBody @NotEmpty(message = "缺少参数") String ids) {
     activityInfoService.delete(ids);
   }
 
   /**
    * 获取全部活动
    *
-   * @return
+   * @return List
    */
   @ApiOperation(value = "获取全部活动")
   @GetMapping("/getAllActivity")
@@ -196,7 +200,7 @@ public class ActivityInfoController {
                 result.add(o);
               }
             } catch (ParseException e) {
-              log.info("获取关联了活动规则的全部活动信息,时间转换报错，原因{}", e);
+              log.info("获取关联了活动规则的全部活动信息,时间转换报错，原因{}", e.getMessage());
             }
           }
         });
@@ -206,7 +210,7 @@ public class ActivityInfoController {
   /**
    * 活动排序值列表
    *
-   * @return
+   * @return List
    */
   @ApiOperation(value = "活动排序值列表")
   @GetMapping("/sortList")

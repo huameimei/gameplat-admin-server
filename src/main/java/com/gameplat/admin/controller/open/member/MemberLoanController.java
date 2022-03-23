@@ -26,21 +26,19 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/admin/member/loan")
 public class MemberLoanController {
 
-    @Autowired
-    private MemberLoanService memberLoanService;
+  @Autowired private MemberLoanService memberLoanService;
 
-    /** 查 */
-    @GetMapping("/page")
-    @ApiOperation(value = "查")
-    @PreAuthorize("hasAuthority('member:loan:page')")
-    public LoanVO page(PageDTO<MemberLoan> page, MemberLoanQueryDTO dto){
-        return memberLoanService.page(page, dto);
-    }
+  @GetMapping("/page")
+  @ApiOperation(value = "查")
+  @PreAuthorize("hasAuthority('member:loan:page')")
+  public LoanVO page(PageDTO<MemberLoan> page, MemberLoanQueryDTO dto) {
+    return memberLoanService.page(page, dto);
+  }
 
-    @PutMapping("/recycle")
-    @ApiOperation(value = "欠款回收")
-    @PreAuthorize("hasAuthority('member:loan:recycle')")
-    public void recycle(String idList){
-        memberLoanService.recycle(idList);
-    }
+  @PutMapping("/recycle")
+  @ApiOperation(value = "欠款回收")
+  @PreAuthorize("hasAuthority('member:loan:recycle')")
+  public void recycle(String idList) {
+    memberLoanService.recycle(idList);
+  }
 }

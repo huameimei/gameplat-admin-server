@@ -15,23 +15,22 @@ import com.gameplat.admin.component.MemberQueryCondition;
 import com.gameplat.admin.config.TenantConfig;
 import com.gameplat.admin.constant.SystemConstant;
 import com.gameplat.admin.convert.MemberConvert;
-import com.gameplat.admin.enums.MemberEnums;
-import com.gameplat.admin.enums.SysUserEnums;
 import com.gameplat.admin.mapper.MemberMapper;
 import com.gameplat.admin.model.dto.*;
-import com.gameplat.admin.model.vo.MemberInfoVO;
-import com.gameplat.admin.model.vo.MemberLevelVO;
-import com.gameplat.admin.model.vo.MemberVO;
-import com.gameplat.admin.model.vo.MessageDistributeVO;
+import com.gameplat.admin.model.vo.*;
 import com.gameplat.admin.service.*;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.StringUtils;
 import com.gameplat.common.constant.CachedKeys;
+import com.gameplat.common.enums.MemberEnums;
 import com.gameplat.common.enums.TransferTypesEnum;
 import com.gameplat.common.lang.Assert;
 import com.gameplat.model.entity.game.GameTransferInfo;
 import com.gameplat.model.entity.member.Member;
 import com.gameplat.model.entity.member.MemberInfo;
+import com.gameplat.security.SecurityUserHolder;
+import com.google.common.collect.Lists;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -43,29 +42,26 @@ import java.text.DecimalFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Log4j2
 @Service
 @Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)
 public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> implements MemberService {
 
-  @Autowired private MemberMapper memberMapper;
+  private final String DL_FORMAL_TYPE = "A";
+
+  @Autowired(required = false)
+  private MemberMapper memberMapper;
 
   @Autowired private MemberConvert memberConvert;
-
   @Autowired private MemberInfoService memberInfoService;
-
   @Autowired private MemberQueryCondition memberQueryCondition;
-
   @Autowired private PasswordService passwordService;
-
   @Autowired private MemberRemarkService memberRemarkService;
-
   @Autowired private OnlineUserService onlineUserService;
-
   @Autowired private TenantConfig tenantConfig;
-
   @Autowired private GameTransferInfoService gameTransferInfoService;
-
   @Autowired private SpreadLinkInfoService spreadLinkInfoService;
+  @Autowired private GameAdminService gameAdminService;
 
   @Override
   public IPage<MemberVO> queryPage(Page<Member> page, MemberQueryDTO dto) {
@@ -80,6 +76,13 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
         .queryPage(page, memberQueryCondition.builderQueryWrapper(dto))
         .convert(this::setOnlineStatus)
         .convert(memberConvert::toVo);
+  }
+
+  @Override
+  public IPage<MemberBalanceVO> findTGMemberBalance(Page<Member> page, MemberQueryDTO dto) {
+    return memberMapper
+        .queryPage(page, memberQueryCondition.builderQueryWrapper(dto))
+        .convert(memberConvert::toBalanceVo);
   }
 
   @Override
@@ -102,7 +105,8 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
     this.preAddCheck(dto);
 
     Member member = memberConvert.toEntity(dto);
-    member.setRegisterSource(MemberEnums.RegisterSource.BACKEND.value());
+    member.setRegisterType(MemberEnums.RegisterType.ADMIN_ADD.value());
+    member.setRegisterSource(MemberEnums.RegisterSource.WEB.value());
     member.setPassword(passwordService.encode(member.getPassword(), dto.getAccount()));
 
     // 设置上级
@@ -112,14 +116,22 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
     Assert.isTrue(this.save(member), "新增会员失败!");
 
     MemberInfo memberInfo =
-        MemberInfo.builder().memberId(member.getId()).rebate(dto.getRebate()).build();
+        MemberInfo.builder()
+            .memberId(member.getId())
+            .rebate(dto.getRebate())
+            .salaryFlag(dto.getSalaryFlag())
+            .build();
     Assert.isTrue(memberInfoService.save(memberInfo), "新增会员失败!");
   }
 
   @Override
   public void update(MemberEditDTO dto) {
     MemberInfo memberInfo =
-        MemberInfo.builder().memberId(dto.getId()).rebate(dto.getRebate()).build();
+        MemberInfo.builder()
+            .memberId(dto.getId())
+            .rebate(dto.getRebate())
+            .salaryFlag(dto.getSalaryFlag())
+            .build();
 
     // 更新会员信息和会员详情
     Assert.isTrue(
@@ -194,9 +206,7 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
 
   @Override
   public void updateContact(MemberContactUpdateDTO dto) {
-    if (!this.updateById(memberConvert.toEntity(dto))) {
-      throw new ServiceException("更新会员联系方式失败!");
-    }
+    Assert.isTrue(this.updateById(memberConvert.toEntity(dto)), "更新会员联系方式失败!");
   }
 
   @Override
@@ -289,7 +299,7 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
   }
 
   public void preAddCheck(MemberAddDTO dto) {
-    Assert.isTrue(this.isExist(dto.getAccount()), "用户名已存在!");
+    Assert.isTrue(!this.isExist(dto.getAccount()), "用户名已存在!");
   }
 
   /**
@@ -489,8 +499,7 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
     String[] id = ids.split(",");
     for (String memberId : id) {
       Member member = this.getById(memberId);
-      if (member != null
-          && SysUserEnums.UserType.DL_FORMAL_TYPE.value().equalsIgnoreCase(member.getUserType())) {
+      if (member != null && DL_FORMAL_TYPE.equalsIgnoreCase(member.getUserType())) {
         MemberInfo memberInfo = new MemberInfo();
         memberInfo.setMemberId(Convert.toLong(memberId));
         memberInfo.setSalaryFlag(state);
@@ -498,4 +507,58 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
       }
     }
   }
+
+  @Override
+  public void updateTGClearMember(CleanAccountDTO dto) {
+    log.info("批量清理账号余额开始，操作人：{}，参数：{}", SecurityUserHolder.getUsername(), dto);
+    List<Member> memberList = null;
+    if (ObjectUtil.equals(dto.getIsCleanAll(), 0)) {
+      // 清除选中的推广会员
+      String[] userNames = dto.getUserNames().split(",");
+      List<String> userNameList = Lists.newArrayList(userNames);
+      dto.setUserNameList(userNameList);
+      if (ObjectUtil.equals(dto.getUserType(), 4))
+        memberList =
+            this.lambdaQuery()
+                .in(Member::getAccount, dto.getUserNames().split(","))
+                .eq(Member::getUserType, dto.getUserType())
+                .list();
+      if (StringUtils.isEmpty(memberList) || memberList.size() != userNames.length) {
+        throw new ServiceException("未找到账号信息");
+      }
+      // 过滤是否存在非推广会员
+      Member member =
+          memberList.stream()
+              .filter(
+                  a ->
+                      MemberEnums.Type.MEMBER.value().equalsIgnoreCase(a.getUserType())
+                          || MemberEnums.Type.AGENT.value().equalsIgnoreCase(a.getUserType()))
+              .findAny()
+              .orElse(new Member());
+      if (MemberEnums.Type.MEMBER.value().equalsIgnoreCase(member.getUserType())) {
+        throw new ServiceException("你选的账号中含有正式会员!");
+      }
+      if (MemberEnums.Type.AGENT.value().equalsIgnoreCase(member.getUserType())) {
+        throw new ServiceException("你选的账号中含有代理会员!");
+      }
+    } else if (ObjectUtil.equals(dto.getIsCleanAll(), 1)) {
+      memberList = this.lambdaQuery().eq(Member::getUserType, "P").list();
+      Assert.notNull(memberList, "没有当前类型的会员账号");
+    } else {
+      throw new ServiceException("isCleanAll是错误的传参数据");
+    }
+    // 额度回收
+    memberList.parallelStream()
+        .forEach(
+            a -> {
+              gameAdminService.recyclingAmountByAccount(a.getAccount());
+            });
+    memberInfoService.updateClearGTMember(dto);
+    log.info("批量清理账号余额结束，操作人：{}，参数：{}", SecurityUserHolder.getUsername(), dto);
+  }
+
+  /*  @Override
+  public MemberBalanceVO findMemberVip(String username, String level, String vipGrade) {
+    return memberMapper.findMemberVip(username, level, vipGrade);
+  }*/
 }

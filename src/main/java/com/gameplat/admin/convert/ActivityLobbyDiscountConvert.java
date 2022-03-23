@@ -10,7 +10,7 @@ public interface ActivityLobbyDiscountConvert {
 
   ActivityLobbyDiscountVO toVO(ActivityLobbyDiscount activityLobbyDiscount);
 
-  ActivityLobbyDiscount toEntity(ActivityLobbyDiscountDTO lobbyDiscountDTO);
+  ActivityLobbyDiscount toEntity(ActivityLobbyDiscountDTO dto);
 
-  ActivityLobbyDiscount toEntity(ActivityLobbyDiscountVO activityLobbyDiscountVO);
+  ActivityLobbyDiscount toEntity(ActivityLobbyDiscountVO vo);
 }

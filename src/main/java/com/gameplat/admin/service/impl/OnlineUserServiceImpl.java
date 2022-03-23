@@ -174,7 +174,7 @@ public class OnlineUserServiceImpl implements OnlineUserService {
     } else {
       // 查询会员信息
       MemberInfoVO memberInfo = memberService.getInfo(credential.getUserId());
-      if(ObjectUtil.isNotNull(memberInfo)){
+      if (ObjectUtil.isNotNull(memberInfo)) {
         onlineUser.setParentName(memberInfo.getParentName());
         onlineUser.setRealName(memberInfo.getRealName());
         onlineUser.setBalance(memberInfo.getBalance());

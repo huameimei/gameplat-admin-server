@@ -19,5 +19,5 @@ public interface MemberWealConfigService extends IService<MemberWealConfig> {
   void updateWealConfig(MemberWealConfigEditDTO dto);
 
   /** 查 */
-  IPage<MemberWealConfig> page(PageDTO<MemberWealConfig> page, String language);
+  IPage<MemberWealConfig> page(PageDTO<MemberWealConfig> page);
 }

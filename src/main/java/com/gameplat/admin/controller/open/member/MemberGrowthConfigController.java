@@ -1,7 +1,5 @@
 package com.gameplat.admin.controller.open.member;
 
-import cn.hutool.core.util.StrUtil;
-import com.gameplat.admin.enums.LanguageEnum;
 import com.gameplat.admin.model.dto.MemberGrowthConfigEditDto;
 import com.gameplat.admin.model.vo.MemberGrowthConfigVO;
 import com.gameplat.admin.service.MemberGrowthConfigService;
@@ -10,7 +8,6 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -31,23 +28,18 @@ public class MemberGrowthConfigController {
 
   @Autowired private MemberGrowthConfigService memberGrowthConfigService;
 
-    @ApiOperation(value = "查询")
-    @GetMapping("/get")
-    @PreAuthorize("hasAuthority('member:growthConfig:get')")
-    public MemberGrowthConfigVO getOne(){
-        return memberGrowthConfigService.findOneConfig(LocaleContextHolder.getLocale().toLanguageTag());
-    }
+  @ApiOperation(value = "查询")
+  @GetMapping("/get")
+  @PreAuthorize("hasAuthority('member:growthConfig:get')")
+  public MemberGrowthConfigVO getOne() {
+    return memberGrowthConfigService.findOneConfig();
+  }
 
   @ApiOperation(value = "修改")
-  @PreAuthorize("hasAuthority('member:growthConfig:edit')")
   @PutMapping("/edit")
-  public void update(
-      @ApiParam(name = "修改VIP配置入参", value = "传入json格式", required = true) @Validated
-          MemberGrowthConfigEditDto configEditDto) {
-        configEditDto.setLanguage(LocaleContextHolder.getLocale().toLanguageTag());
-    if (StrUtil.isBlank(configEditDto.getLanguage())) {
-      configEditDto.setLanguage(LanguageEnum.app_zh_CN.getCode());
-    }
-    memberGrowthConfigService.updateGrowthConfig(configEditDto);
+  @PreAuthorize("hasAuthority('member:growthConfig:edit')")
+  @ApiParam(name = "修改VIP配置入参", value = "传入json格式", required = true)
+  public void update(@Validated MemberGrowthConfigEditDto dto) {
+    memberGrowthConfigService.updateGrowthConfig(dto);
   }
 }

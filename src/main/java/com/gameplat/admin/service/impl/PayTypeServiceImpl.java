@@ -12,6 +12,7 @@ import com.gameplat.admin.mapper.PayTypeMapper;
 import com.gameplat.admin.model.dto.PayTypeAddDTO;
 import com.gameplat.admin.model.dto.PayTypeEditDTO;
 import com.gameplat.admin.model.vo.PayTypeVO;
+import com.gameplat.admin.service.PayAccountService;
 import com.gameplat.admin.service.PayTypeService;
 import com.gameplat.base.common.enums.EnableEnum;
 import com.gameplat.base.common.exception.ServiceException;
@@ -33,6 +34,7 @@ public class PayTypeServiceImpl extends ServiceImpl<PayTypeMapper, PayType>
 
   @Autowired private PayTypeMapper payTypeMapper;
 
+  @Autowired private PayAccountService payAccountService;
   @Override
   public List<PayTypeVO> queryList(String name) {
     return this.lambdaQuery()
@@ -92,21 +94,24 @@ public class PayTypeServiceImpl extends ServiceImpl<PayTypeMapper, PayType>
       throw new ServiceException("系统支付编码无法删除!");
     }
     this.removeById(id);
+    payAccountService.deleteByPayType(payType.getCode());
   }
 
   @Override
   public IPage<PayType> queryPage(Page<PayType> page) {
     LambdaQueryWrapper<PayType> query = Wrappers.lambdaQuery();
-    query.orderByAsc(PayType::getSort);
+    query.orderByAsc(PayType::getSort)
+    .orderByDesc(PayType::getCreateTime);
     return this.page(page, query);
   }
 
   @Override
   public List<PayTypeVO> queryEnableVirtual() {
     LambdaQueryWrapper<PayType> query = Wrappers.lambdaQuery();
-    query.eq(PayType::getStatus, EnableEnum.ENABLED.code()).
-        eq(PayType::getBankFlag, 2).
-        orderByAsc(PayType::getSort);
+    query
+        .eq(PayType::getStatus, EnableEnum.ENABLED.code())
+        .eq(PayType::getBankFlag, 2)
+        .orderByAsc(PayType::getSort);
     return this.list(query).stream().map(e -> payTypeConvert.toVo(e)).collect(Collectors.toList());
   }
 }

@@ -41,25 +41,27 @@ public interface RechargeOrderService extends IService<RechargeOrder> {
 
   void updateStatus(Long id, Integer curStatus, Integer newStatus, String auditorAccount);
 
-    void manual(ManualRechargeOrderBo manualRechargeOrderBo, UserCredential userCredential,
-        UserEquipment userEquipment)
-            throws Exception;
+  void manual(
+      ManualRechargeOrderBo manualRechargeOrderBo,
+      UserCredential userCredential,
+      UserEquipment userEquipment)
+      throws Exception;
 
   /**
    * 查询每天充值的金额
    *
-   * @param map
-   * @return
+   * @param map Map
+   * @return List
    */
-  List<ActivityStatisticItem> findRechargeDateList(Map map);
+  List<ActivityStatisticItem> findRechargeDateList(Map<String, Object> map);
 
   /**
    * 查询所有首次充值的金额
    *
-   * @param map
-   * @return
+   * @param map Map
+   * @return List
    */
-  List<ActivityStatisticItem> findAllFirstRechargeAmount(Map map);
+  List<ActivityStatisticItem> findAllFirstRechargeAmount(Map<String, Object> map);
 
   /** 根据会员和最后修改时间获取充值次数、充值金额、充值优惠、其它优惠 */
   MemberActivationVO getRechargeInfoByNameAndUpdateTime(MemberActivationDTO memberActivationDTO);

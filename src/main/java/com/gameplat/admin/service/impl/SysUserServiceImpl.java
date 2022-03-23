@@ -26,6 +26,7 @@ import com.gameplat.base.common.enums.EnableEnum;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.json.JsonUtils;
 import com.gameplat.base.common.util.StringUtils;
+import com.gameplat.common.enums.BooleanEnum;
 import com.gameplat.common.enums.TrueFalse;
 import com.gameplat.common.enums.UserTypes;
 import com.gameplat.common.lang.Assert;
@@ -88,7 +89,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
             ObjectUtils.isNotNull(userDTO.getUserType()),
             SysUser::getUserType,
             userDTO.getUserType())
-        .eq(ObjectUtils.isNotNull(userDTO.getRoleId()),SysUser::getRoleId,userDTO.getRoleId())
+        .eq(ObjectUtils.isNotNull(userDTO.getRoleId()), SysUser::getRoleId, userDTO.getRoleId())
         .eq(ObjectUtils.isNotNull(userDTO.getStatus()), SysUser::getStatus, userDTO.getStatus())
         .eq(ObjectUtils.isNotEmpty(userDTO.getPhone()), SysUser::getPhone, userDTO.getPhone())
         .between(
@@ -156,8 +157,9 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
   @Override
   @SentinelResource(value = "deleteUserById")
   public void deleteUserById(Long id) {
-    Assert.isTrue(1 == id, "不允许删除超级管理员用户!");
     Assert.isFalse(id.equals(SecurityUserHolder.getUserId()), "不允许操作自己账号");
+    SysUser user = this.getById(id);
+    Assert.isTrue(BooleanEnum.YES.match(user.getIsAllowDelete()), "系统内置账号，不允许删除!");
 
     // 删除用户角色表
     userRoleMapper.deleteUserRole(new Long[] {id});
@@ -225,6 +227,17 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
     Assert.isTrue(
         this.lambdaUpdate().set(SysUser::getSafeCode, secret).eq(SysUser::getUserId, id).update(),
         "绑定失败!");
+  }
+
+  @Override
+  public void disableAccount(String account) {
+    SysUser user = this.getByUsername(account);
+    if (EnableEnum.isEnabled(user.getStatus())) {
+      this.lambdaUpdate()
+          .set(SysUser::getStatus, EnableEnum.DISABLED.code())
+          .eq(SysUser::getUserId, user.getUserId())
+          .update(new SysUser());
+    }
   }
 
   /**

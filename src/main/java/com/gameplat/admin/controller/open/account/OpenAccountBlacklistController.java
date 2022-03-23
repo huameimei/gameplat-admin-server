@@ -13,7 +13,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 
 @Slf4j
 @RestController
@@ -47,9 +46,8 @@ public class OpenAccountBlacklistController {
     accountBlacklistService.update(dto);
   }
 
-  /** 新增会员ip黑名单信息 */
   @GetMapping("/getAccountBlackTypeList")
-  public List<Map> getGameEnums() {
+  public List<Object> getGameEnums() {
     return UserBlackGames.getEnum();
   }
 }

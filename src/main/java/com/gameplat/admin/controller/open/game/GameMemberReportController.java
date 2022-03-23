@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.Date;
 
 /**
- * @Author kb @Date 2022/2/8 18:26 @Version 1.0
+ * @author kb @Date 2022/2/8 18:26 @Version 1.0
  */
 @Slf4j
 @RestController

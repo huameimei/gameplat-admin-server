@@ -51,7 +51,7 @@ public class BizBlacklistServiceImpl extends ServiceImpl<BizBlacklistMapper, Biz
     if (ObjectUtils.isNotEmpty(dto.getUserLevel())) {
       queryWrapper
           .eq(BizBlacklist::getTarget, dto.getUserLevel())
-          .eq(BizBlacklist::getTargetType, BizBlacklistTargetType.USER.getValue());
+          .eq(BizBlacklist::getTargetType, BizBlacklistTargetType.USER_LEVEL.getValue());
     }
     if (ObjectUtils.isNotEmpty(dto.getStatus())) {
       queryWrapper.eq(BizBlacklist::getStatus, dto.getStatus());

@@ -294,9 +294,10 @@ public class SpreadLinkInfoServiceImpl extends ServiceImpl<SpreadLinkInfoMapper,
     if (!code.matches(reg)) {
       throw new ServiceException("推广码必须由4-20位数字或字母组成！");
     }
-    boolean exists =
-        this.lambdaQuery().eq(ObjectUtils.isNotEmpty(code), SpreadLinkInfo::getCode, code).exists();
-    if (exists == true) {
+
+    if (this.lambdaQuery()
+        .eq(ObjectUtils.isNotEmpty(code), SpreadLinkInfo::getCode, code)
+        .exists()) {
       throw new ServiceException("推广码已被使用！");
     }
   }
@@ -337,9 +338,7 @@ public class SpreadLinkInfoServiceImpl extends ServiceImpl<SpreadLinkInfoMapper,
         if (BeanUtil.isEmpty(linkMinRebateObj)) {
           linkMinRebate = new BigDecimal("0").setScale(2, BigDecimal.ROUND_HALF_UP);
         } else {
-          linkMinRebate =
-                  linkMinRebateObj.getRebate()
-                  .setScale(2, BigDecimal.ROUND_HALF_UP);
+          linkMinRebate = linkMinRebateObj.getRebate().setScale(2, BigDecimal.ROUND_HALF_UP);
         }
 
         min = min.compareTo(linkMinRebate) >= 0 ? min : linkMinRebate;
@@ -350,14 +349,14 @@ public class SpreadLinkInfoServiceImpl extends ServiceImpl<SpreadLinkInfoMapper,
 
     JSONArray jsonArray = new JSONArray();
     BigDecimal rebate = max;
-    Integer base = 1800;
+    int base = 1800;
     BigDecimal value = BigDecimal.ZERO;
     String text = "";
     while (rebate.compareTo(min) >= 0) {
       JSONObject jsonObject = new JSONObject();
       value = rebate;
-      Integer baseData = base + value.multiply(BigDecimal.valueOf(20L)).intValue();
-      text = rebate.toString().concat("% ---- ").concat(baseData.toString());
+      int baseData = base + value.multiply(BigDecimal.valueOf(20L)).intValue();
+      text = rebate.toString().concat("% ---- ").concat(Integer.toString(baseData));
       jsonObject.set("value", value);
       jsonObject.set("text", text);
       jsonArray.add(jsonObject);

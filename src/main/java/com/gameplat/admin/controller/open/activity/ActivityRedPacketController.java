@@ -28,11 +28,6 @@ public class ActivityRedPacketController {
 
   @Autowired private ActivityRedPacketService activityRedPacketService;
 
-  /**
-   * 获取红包配置
-   *
-   * @return
-   */
   @ApiOperation(value = "获取红包配置")
   @GetMapping("/getConfig")
   @PreAuthorize("hasAuthority('activity:redpacket:getConfig')")
@@ -40,23 +35,13 @@ public class ActivityRedPacketController {
     return activityRedPacketService.getConfig();
   }
 
-  /**
-   * 更新红包配置
-   *
-   * @return
-   */
   @ApiOperation(value = "更新红包配置")
   @PutMapping("/updateConfig")
   @PreAuthorize("hasAuthority('activity:redpacket:updateConfig')")
-  public void updateConfig(@RequestBody ActivityRedPacketConfigDTO activityRedPacketConfigDTO) {
-    activityRedPacketService.updateConfig(activityRedPacketConfigDTO);
+  public void updateConfig(@RequestBody ActivityRedPacketConfigDTO dto) {
+    activityRedPacketService.updateConfig(dto);
   }
 
-  /**
-   * 获取转盘奖品配置
-   *
-   * @return
-   */
   @ApiOperation(value = "获取转盘奖品配置")
   @GetMapping("/getTurntablePrizeConfig")
   @PreAuthorize("hasAuthority('activity:redpacket:getTurntablePrizeConfig')")
@@ -64,19 +49,13 @@ public class ActivityRedPacketController {
     return activityRedPacketService.getTurntablePrizeConfig();
   }
 
-  /**
-   * 更新转盘奖品配置
-   *
-   * @return
-   */
   @ApiOperation(value = "更新转盘奖品配置")
   @PutMapping("/updateTurntablePrizeConfig")
   @PreAuthorize("hasAuthority('activity:redpacket:updateTurntablePrizeConfig')")
-  public void updateTurntablePrizeConfig(
-      @RequestBody ActivityTurntablePrizeConfigDTO activityTurntablePrizeConfigDTO) {
-    if (activityTurntablePrizeConfigDTO.getPrizeId() == null) {
+  public void updateTurntablePrizeConfig(@RequestBody ActivityTurntablePrizeConfigDTO dto) {
+    if (dto.getPrizeId() == null) {
       throw new ServiceException("奖品ID不能为空");
     }
-    activityRedPacketService.updateTurntablePrizeConfig(activityTurntablePrizeConfigDTO);
+    activityRedPacketService.updateTurntablePrizeConfig(dto);
   }
 }

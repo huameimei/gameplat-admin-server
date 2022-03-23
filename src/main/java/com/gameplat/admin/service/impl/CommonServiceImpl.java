@@ -55,14 +55,8 @@ public class CommonServiceImpl implements CommonService {
   @Override
   @SentinelResource(value = "getConfig")
   public ConfigVO getConfig() {
-    return ConfigVO.builder()
-        .loginConfig(this.getLoginLimit())
-        .languages(this.getLanguages())
-        .build();
-  }
-
-  /** 获取平台语言配置 */
-  private List<Language> getLanguages() {
-    return configService.get(DictDataEnum.LANGUAGE, new TypeReference<List<Language>>() {});
+    List<Language> languages =
+        configService.get(DictDataEnum.LANGUAGE, new TypeReference<List<Language>>() {});
+    return ConfigVO.builder().loginConfig(this.getLoginLimit()).languages(languages).build();
   }
 }

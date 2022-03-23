@@ -35,8 +35,8 @@ public class OpenSystemConfigController {
 
   @GetMapping("/listAll")
   @PreAuthorize("hasAuthority('system:dict:view')")
-  public JSONObject listAll(SysDictDataDTO dictDataDTO) {
-    SysDictData sysDictData = dictDataConvert.toEntity(dictDataDTO);
+  public JSONObject listAll(SysDictDataDTO dto) {
+    SysDictData sysDictData = dictDataConvert.toEntity(dto);
     List<SysDictData> list = dictDataService.getDictList(sysDictData);
 
     JSONObject json = new JSONObject();
@@ -55,8 +55,8 @@ public class OpenSystemConfigController {
 
   @ApiOperation(value = "编辑、新增代理联系方式地址")
   @PutMapping("/agent/edit")
-  public void updateAgentContact(@RequestBody AgentContacaDTO agentContacaDTO) {
-    systemConfigService.updateAgentContaca(agentContacaDTO);
+  public void updateAgentContact(@RequestBody AgentContacaDTO dto) {
+    systemConfigService.updateAgentContaca(dto);
   }
 
   @ApiOperation(value = "删除代理联系方式地址")

@@ -24,7 +24,7 @@ public class OperVersionController {
   @Autowired private SysVersionService versionService;
 
   @GetMapping("/list")
-  public IPage<SysVersion> list(PageDTO<SysVersion> page, VersionDTO versionDTO) {
-    return versionService.selectVersionList(page, versionDTO);
+  public IPage<SysVersion> list(PageDTO<SysVersion> page, VersionDTO dto) {
+    return versionService.selectVersionList(page, dto);
   }
 }

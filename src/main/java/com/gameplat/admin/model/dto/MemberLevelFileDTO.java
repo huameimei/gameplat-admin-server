@@ -13,6 +13,6 @@ import java.io.Serializable;
 @Data
 public class MemberLevelFileDTO implements Serializable {
 
-    @ApiModelProperty(value = "会员账号")
-    private String account;
+  @ApiModelProperty(value = "会员账号")
+  private String account;
 }

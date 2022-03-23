@@ -20,8 +20,9 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
+ * 聊天室紅包管理
+ *
  * @author lily
- * @description 聊天室紅包管理
  * @date 2022/2/14
  */
 @Service
@@ -32,7 +33,6 @@ public class ChatRedEnvelopeServiceImpl extends ServiceImpl<ChatRedEnvelopeMappe
 
   @Autowired private ChatRedEnvelopeConvert chatRedEnvelopeConvert;
 
-  /** 分页列表 */
   @Override
   public IPage<ChatRedEnvelopeVO> page(PageDTO<ChatRedEnvelope> page, ChatRedEnvelopeQueryDTO dto) {
     return lambdaQuery()
@@ -43,7 +43,6 @@ public class ChatRedEnvelopeServiceImpl extends ServiceImpl<ChatRedEnvelopeMappe
         .convert(chatRedEnvelopeConvert::toVo);
   }
 
-  /** 增 */
   @Override
   public void add(ChatRedEnvelopeAddDTO dto) {
     if (dto.getStartTime() < System.currentTimeMillis()) {
@@ -52,13 +51,11 @@ public class ChatRedEnvelopeServiceImpl extends ServiceImpl<ChatRedEnvelopeMappe
     save(chatRedEnvelopeConvert.toEntity(dto));
   }
 
-  /** 删 */
   @Override
   public void remove(Integer id) {
     removeById(id);
   }
 
-  /** 启用禁用 */
   @Override
   public void update(ChatRedEnvelopeEditDTO dto) {
     updateById(

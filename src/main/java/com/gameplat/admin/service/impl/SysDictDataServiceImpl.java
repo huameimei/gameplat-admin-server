@@ -1,6 +1,10 @@
 package com.gameplat.admin.service.impl;
 
+import cn.hutool.json.JSONArray;
+import cn.hutool.json.JSONUtil;
 import com.alibaba.csp.sentinel.annotation.SentinelResource;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.alicp.jetcache.anno.CacheInvalidate;
 import com.alicp.jetcache.anno.CacheInvalidateContainer;
 import com.alicp.jetcache.anno.Cached;
@@ -13,6 +17,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.convert.DictDataConvert;
 import com.gameplat.admin.mapper.SysDictDataMapper;
 import com.gameplat.admin.model.bean.UserWithdrawLimitInfo;
+import com.gameplat.admin.model.dto.DictParamDTO;
 import com.gameplat.admin.model.dto.OperDictDataDTO;
 import com.gameplat.admin.model.dto.SysDictDataDTO;
 import com.gameplat.admin.model.vo.DictDataVo;
@@ -29,7 +34,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 字典数据 服务实现层
@@ -41,7 +48,8 @@ import java.util.List;
 public class SysDictDataServiceImpl extends ServiceImpl<SysDictDataMapper, SysDictData>
     implements SysDictDataService {
 
-  @Autowired private DictDataConvert dictDataConvert;
+  @Autowired
+  private DictDataConvert dictDataConvert;
 
   @Override
   @SentinelResource(value = "selectDictDataList")
@@ -64,6 +72,7 @@ public class SysDictDataServiceImpl extends ServiceImpl<SysDictDataMapper, SysDi
             SysDictData::getStatus,
             dictData.getStatus())
         .orderByAsc(SysDictData::getDictSort)
+        .orderByDesc(SysDictData::getCreateTime)
         .page(page)
         .convert(dictDataConvert::toVo);
   }
@@ -135,8 +144,22 @@ public class SysDictDataServiceImpl extends ServiceImpl<SysDictDataMapper, SysDi
   @Override
   @SentinelResource(value = "insertDictData")
   public void insertDictData(OperDictDataDTO dto) {
-    if (this.lambdaQuery().eq(SysDictData::getDictLabel, dto.getDictLabel()).exists()) {
+    if (this.lambdaQuery()
+        .eq(ObjectUtils.isNotNull(dto.getDictType()), SysDictData::getDictType, dto.getDictType())
+        .eq(SysDictData::getDictLabel, dto.getDictLabel()).exists()) {
       throw new ServiceException("字典标签已存在，请勿重复添加");
+    }
+
+    if (!this.save(dictDataConvert.toEntity(dto))) {
+      throw new ServiceException("添加失败!");
+    }
+  }
+
+  @Override
+  @SentinelResource(value = "insertBank")
+  public void insertBank(OperDictDataDTO dto) {
+    if (this.lambdaQuery().eq(SysDictData::getDictValue, dto.getDictValue()).exists()) {
+      throw new ServiceException("银行标识已存在，请勿重复添加");
     }
 
     if (!this.save(dictDataConvert.toEntity(dto))) {
@@ -179,8 +202,8 @@ public class SysDictDataServiceImpl extends ServiceImpl<SysDictDataMapper, SysDi
   @SentinelResource(value = "addOrUpdateUserWithdrawLimit")
   @CacheInvalidateContainer(
       value = {
-        @CacheInvalidate(name = CachedKeys.DICT_DATA_CACHE, key = "#dictType"),
-        @CacheInvalidate(name = CachedKeys.DICT_DATA_CACHE, key = "#dictType + ':' + #dictLabel")
+          @CacheInvalidate(name = CachedKeys.DICT_DATA_CACHE, key = "#dictType"),
+          @CacheInvalidate(name = CachedKeys.DICT_DATA_CACHE, key = "#dictType + ':' + #dictLabel")
       })
   public void addOrUpdateUserWithdrawLimit(
       String dictType, String dictLabel, UserWithdrawLimitInfo limitInfo) {
@@ -204,11 +227,46 @@ public class SysDictDataServiceImpl extends ServiceImpl<SysDictDataMapper, SysDi
   }
 
   @Override
+  @CacheInvalidateContainer(
+      value = {@CacheInvalidate(name = CachedKeys.DICT_DATA_CACHE, key = "#dictParamDTO.dictType")})
+  public void batchUpdateDictData(DictParamDTO dictParamDTO) {
+    List<SysDictData> list = new ArrayList<>();
+
+    // json遍历
+    for (Map.Entry<String, Object> entry : dictParamDTO.getJsonData().entrySet()) {
+      SysDictData sysDictData = new SysDictData();
+      sysDictData.setDictType(dictParamDTO.getDictType());
+      sysDictData.setDictLabel(entry.getKey());
+      sysDictData.setDictValue(entry.getValue().toString());
+      list.add(sysDictData);
+    }
+    for (SysDictData sysDictData : list) {
+      if (this.lambdaQuery()
+          .eq(SysDictData::getDictType, sysDictData.getDictType())
+          .eq(SysDictData::getDictLabel, sysDictData.getDictLabel())
+          .exists()) {
+        this.lambdaUpdate()
+            .set(SysDictData::getDictValue, sysDictData.getDictValue())
+            .eq(SysDictData::getDictType, sysDictData.getDictType())
+            .eq(SysDictData::getDictLabel, sysDictData.getDictLabel())
+            .update();
+      } else {
+        OperDictDataDTO operDictDataDTO = new OperDictDataDTO();
+        operDictDataDTO.setDictLabel(sysDictData.getDictLabel());
+        operDictDataDTO.setDictType(sysDictData.getDictType());
+        operDictDataDTO.setDictValue(sysDictData.getDictValue());
+        SysDictData dictData = dictDataConvert.toEntity(operDictDataDTO);
+        this.save(dictData);
+      }
+    }
+  }
+
+  @Override
   @SentinelResource(value = "deleteByDictLabel")
   @CacheInvalidateContainer(
       value = {
-        @CacheInvalidate(name = CachedKeys.DICT_DATA_CACHE, key = "#dictType"),
-        @CacheInvalidate(name = CachedKeys.DICT_DATA_CACHE, key = "#dictType + ':' + #dictLabel")
+          @CacheInvalidate(name = CachedKeys.DICT_DATA_CACHE, key = "#dictType"),
+          @CacheInvalidate(name = CachedKeys.DICT_DATA_CACHE, key = "#dictType + ':' + #dictLabel")
       })
   public void delete(String dictType, String dictLabel) {
     if (!this.lambdaUpdate()
@@ -251,10 +309,10 @@ public class SysDictDataServiceImpl extends ServiceImpl<SysDictDataMapper, SysDi
 
   @CacheInvalidateContainer(
       value = {
-        @CacheInvalidate(name = CachedKeys.DICT_DATA_CACHE, key = "#data.dictType"),
-        @CacheInvalidate(
-            name = CachedKeys.DICT_DATA_CACHE,
-            key = "#data.dictType + ':' + #data.dictLabel")
+          @CacheInvalidate(name = CachedKeys.DICT_DATA_CACHE, key = "#data.dictType"),
+          @CacheInvalidate(
+              name = CachedKeys.DICT_DATA_CACHE,
+              key = "#data.dictType + ':' + #data.dictLabel")
       })
   @Override
   public void updateByTypeAndLabel(SysDictData data) {
@@ -264,5 +322,24 @@ public class SysDictDataServiceImpl extends ServiceImpl<SysDictDataMapper, SysDi
         .eq(SysDictData::getDictType, data.getDictType())
         .set(SysDictData::getDictValue, data.getDictValue());
     update(updateWrapper);
+  }
+
+  @Override
+  public JSONObject getData(String dictType) {
+    List<SysDictData> queryResult =
+        this.lambdaQuery()
+            .eq(SysDictData::getDictType, dictType)
+            .eq(SysDictData::getStatus, 1)
+            .list();
+    JSONObject json = new JSONObject();
+    JSONArray objects = JSONUtil.parseArray(queryResult);
+    for (Object o : objects) {
+      String str = JSON.toJSONString(o);
+      JSONObject parse = JSONObject.parseObject(str);
+      String key = parse.getString("dictLabel");
+      String value = parse.getString("dictValue");
+      json.put(key, value);
+    }
+    return json;
   }
 }

@@ -31,30 +31,22 @@ public class GameKindController {
 
   @PutMapping("/edit")
   @PreAuthorize("hasAuthority('game:gameKind:edit')")
-  public void updateGameKind(@RequestBody OperGameKindDTO operGameKindDTO) {
-    gameKindService.updateGameKind(operGameKindDTO);
+  public void updateGameKind(@RequestBody OperGameKindDTO dto) {
+    gameKindService.updateGameKind(dto);
   }
 
   @PutMapping("/updateEnable")
-  public void updateEnable(@RequestBody OperGameKindDTO operGameKindDTO) {
-    try {
-      gameKindService.updateEnable(operGameKindDTO);
-    } catch (Exception e) {
-      throw new ServiceException("更新所有真人子游戏失败！");
-    }
+  public void updateEnable(@RequestBody OperGameKindDTO dto) {
+    gameKindService.updateEnable(dto);
   }
 
   @PutMapping("/updateDemoEnable")
-  public void updateDemoEnable(@RequestBody OperGameKindDTO operGameKindDTO) {
-    if (operGameKindDTO.getDemoEnable() != GameDemoEnableEnum.ENABLE.getCode()
-        && operGameKindDTO.getDemoEnable() != GameDemoEnableEnum.DISABLE.getCode()) {
+  public void updateDemoEnable(@RequestBody OperGameKindDTO dto) {
+    if (dto.getDemoEnable() != GameDemoEnableEnum.ENABLE.getCode()
+        && dto.getDemoEnable() != GameDemoEnableEnum.DISABLE.getCode()) {
       throw new ServiceException("参数错误");
     }
-    try {
-      gameKindService.updateDemoEnable(operGameKindDTO);
-    } catch (Exception e) {
-      throw new ServiceException("所有免费真人子游戏（支持试玩的）！");
-    }
+    gameKindService.updateDemoEnable(dto);
   }
 
   @GetMapping(value = "/queryGameKindList")

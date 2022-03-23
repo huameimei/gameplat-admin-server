@@ -24,19 +24,18 @@ import java.util.List;
  * @description Logo配置
  * @date 2022/2/5
  */
-
-@Api(tags = "Logo配置")
 @Slf4j
+@Api(tags = "Logo配置")
 @RestController
 @RequestMapping("/api/admin/member/logo")
 public class LogoConfigController {
 
-    @Autowired private MemberGrowthLevelService memberGrowthLevelService;
+  @Autowired private MemberGrowthLevelService memberGrowthLevelService;
 
-    @ApiOperation(value = "logo配置列表")
-    @GetMapping("/list")
-    @PreAuthorize("hasAuthority('member:logo:list')")
-    public List<LogoConfigVO> list(){
+  @ApiOperation(value = "logo配置列表")
+  @GetMapping("/list")
+  @PreAuthorize("hasAuthority('member:logo:list')")
+  public List<LogoConfigVO> list() {
     List<MemberGrowthLevel> list =
         memberGrowthLevelService
             .lambdaQuery()
@@ -55,19 +54,19 @@ public class LogoConfigController {
                 MemberGrowthLevel::getUpdateTime)
             .list();
 
-        List<LogoConfigVO> voList = new ArrayList<>();
-        for (MemberGrowthLevel growthLevel : list) {
-            LogoConfigVO logoConfigVO = new LogoConfigVO();
-            BeanUtils.copyBeanProp(logoConfigVO, growthLevel);
-            voList.add(logoConfigVO);
-        }
-        return voList;
+    List<LogoConfigVO> voList = new ArrayList<>();
+    for (MemberGrowthLevel growthLevel : list) {
+      LogoConfigVO logoConfigVO = new LogoConfigVO();
+      BeanUtils.copyBeanProp(logoConfigVO, growthLevel);
+      voList.add(logoConfigVO);
     }
+    return voList;
+  }
 
-    @ApiOperation(value = "修改logo配置")
-    @PutMapping("/edit")
-    @PreAuthorize("hasAuthority('member:logo:edit')")
-    public void edit(@Validated GrowthLevelLogoEditDTO dto) {
-        memberGrowthLevelService.updateLogo(dto);
-    }
+  @ApiOperation(value = "修改logo配置")
+  @PutMapping("/edit")
+  @PreAuthorize("hasAuthority('member:logo:edit')")
+  public void edit(@Validated GrowthLevelLogoEditDTO dto) {
+    memberGrowthLevelService.updateLogo(dto);
+  }
 }

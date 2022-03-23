@@ -17,6 +17,7 @@ import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
@@ -26,6 +27,7 @@ import springfox.documentation.annotations.ApiIgnore;
  * @author kenvin
  */
 @Slf4j
+@Validated
 @RestController
 @RequestMapping("/api/admin/activity/distribute")
 @Api(tags = "活动分发管理")
@@ -33,13 +35,6 @@ public class ActivityDistributeController {
 
   @Autowired private ActivityDistributeService activityDistributeService;
 
-  /**
-   * 活动分发列表
-   *
-   * @param page
-   * @param activityDistributeQueryDTO
-   * @return
-   */
   @ApiOperation(value = "活动分发列表")
   @GetMapping("/list")
   @PreAuthorize("hasAuthority('activity:distribute:page')")
@@ -53,11 +48,6 @@ public class ActivityDistributeController {
     return activityDistributeService.list(page, activityDistributeQueryDTO);
   }
 
-  /**
-   * 修改结算状态
-   *
-   * @param ids
-   */
   @ApiOperation(value = "修改结算状态")
   @PutMapping("/updateStatus")
   @PreAuthorize("hasAuthority('activity:distribute:updateStatus')")
@@ -65,11 +55,6 @@ public class ActivityDistributeController {
     activityDistributeService.updateStatus(ids);
   }
 
-  /**
-   * 删除分发
-   *
-   * @param ids
-   */
   @ApiOperation(value = "删除分发")
   @DeleteMapping("/delete")
   @PreAuthorize("hasAuthority('activity:distribute:remove')")

@@ -2,6 +2,7 @@ package com.gameplat.admin.service.impl;
 
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -18,17 +19,18 @@ import com.gameplat.admin.model.vo.GameRebatePeriodVO;
 import com.gameplat.admin.service.GameRebateDetailService;
 import com.gameplat.admin.service.GameRebatePeriodService;
 import com.gameplat.admin.service.GameRebateReportService;
+import com.gameplat.admin.service.MemberService;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.DateUtils;
 import com.gameplat.base.common.util.StringUtils;
 import com.gameplat.model.entity.game.GameRebatePeriod;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Date;
-import java.util.List;
 
 @Service
 @Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)
@@ -43,6 +45,8 @@ public class GameRebatePeriodServiceImpl
   @Autowired private GameRebateReportService gameRebateReportService;
 
   @Autowired private GameRebateDetailService gameRebateDetailService;
+
+  @Autowired private MemberService memberService;
 
   @Override
   public IPage<GameRebatePeriodVO> queryGameRebatePeriod(
@@ -114,11 +118,11 @@ public class GameRebatePeriodServiceImpl
       throw new ServiceException("期数配置不存在");
     }
     // 先修改结算状态
-    GameRebatePeriod period = new GameRebatePeriod();
-    period.setStatus(GameRebatePeriodStatus.SETTLED.getValue());
     LambdaUpdateWrapper<GameRebatePeriod> wrapper = Wrappers.lambdaUpdate();
-    wrapper.eq(GameRebatePeriod::getId, periodId);
-    if (!this.update(period, wrapper)) {
+    wrapper
+        .eq(GameRebatePeriod::getId, periodId)
+        .set(GameRebatePeriod::getStatus, GameRebatePeriodStatus.SETTLED.getValue());
+    if (!this.update(wrapper)) {
       throw new ServiceException("更新真人期数配置失败！");
     }
     // 按平台生成返水报表
@@ -130,6 +134,17 @@ public class GameRebatePeriodServiceImpl
   }
 
   private void prePersist(GameRebatePeriod gameRebatePeriod) {
+    if (StringUtils.isNotEmpty(gameRebatePeriod.getBlackAccounts())) {
+      String[] accountArray = gameRebatePeriod.getBlackAccounts().split(StrUtil.COMMA);
+      Arrays.stream(accountArray)
+          .filter(StringUtils::isNotEmpty)
+          .forEach(
+              account -> {
+                memberService
+                    .getByAccount(account)
+                    .orElseThrow(() -> new ServiceException("会员" + account + "账号信息不存在！"));
+              });
+    }
     Date beginDate = DateUtil.beginOfDay(gameRebatePeriod.getBeginDate());
     Date endDate = DateUtil.beginOfDay(gameRebatePeriod.getEndDate());
     if (beginDate.getTime() > endDate.getTime()) {

@@ -29,11 +29,11 @@ public class ActivityLobbyDTO implements Serializable {
   @ApiModelProperty(value = "标题")
   private String title;
 
-  @JsonFormat(pattern = DateUtil.YYYY_MM_DD_HH_MM_SS)
+  @JsonFormat(pattern = DateUtil.YYYY_MM_DD)
   @ApiModelProperty(value = "开始时间")
   private Date startTime;
 
-  @JsonFormat(pattern = DateUtil.YYYY_MM_DD_HH_MM_SS)
+  @JsonFormat(pattern = DateUtil.YYYY_MM_DD)
   @ApiModelProperty(value = "结束时间")
   private Date endTime;
 

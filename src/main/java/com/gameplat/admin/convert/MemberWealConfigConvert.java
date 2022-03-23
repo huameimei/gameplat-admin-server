@@ -9,9 +9,9 @@ import org.mapstruct.Mapper;
 @Mapper(componentModel = "spring")
 public interface MemberWealConfigConvert {
 
-    MemberWealConfigVO toVo(MemberWealConfig entity);
+  MemberWealConfigVO toVo(MemberWealConfig entity);
 
-    MemberWealConfig toEntity(MemberWealConfigAddDTO dto);
+  MemberWealConfig toEntity(MemberWealConfigAddDTO dto);
 
-    MemberWealConfig toEntity(MemberWealConfigEditDTO dto);
+  MemberWealConfig toEntity(MemberWealConfigEditDTO dto);
 }

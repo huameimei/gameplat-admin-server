@@ -9,6 +9,7 @@ import org.apache.ibatis.annotations.Select;
  *
  * @author three
  */
+@Deprecated
 public interface SysEmailMapper extends BaseMapper<SysEmail> {
 
   /** 清空 */

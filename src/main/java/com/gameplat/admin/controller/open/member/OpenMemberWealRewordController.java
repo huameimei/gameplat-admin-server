@@ -2,6 +2,7 @@ package com.gameplat.admin.controller.open.member;
 
 import cn.afterturn.easypoi.excel.ExcelExportUtil;
 import cn.afterturn.easypoi.excel.entity.ExportParams;
+import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.gameplat.admin.model.dto.MemberWealRewordDTO;
@@ -16,7 +17,10 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
@@ -37,18 +41,24 @@ public class OpenMemberWealRewordController {
     return rewordService.findWealRewordList(page, dto);
   }
 
+  @PutMapping("/updateRemark")
+  @ApiOperation(value = "修改vip福利记录备注")
+  public void updateRemark(Long id, String remark) {
+    rewordService.updateRemark(id, remark);
+  }
+
   @SneakyThrows
-  @PutMapping(value = "/exportReword", produces = "application/vnd.ms-excel")
   @ApiOperation(value = "导出VIP福利记录列表")
+  @PutMapping(value = "/exportReword", produces = "application/vnd.ms-excel")
   @PreAuthorize("hasAuthority('member:wealReword:export')")
-  public void exportWealReword(
-      @RequestBody MemberWealRewordDTO queryDTO, HttpServletResponse response) {
+  public void exportWealReword(MemberWealRewordDTO queryDTO, HttpServletResponse response) {
     List<MemberWealReword> list = rewordService.findList(queryDTO);
+    List<MemberWealRewordVO> newList = BeanUtil.copyToList(list, MemberWealRewordVO.class);
     ExportParams exportParams = new ExportParams("VIP福利记录列表", "VIP福利记录列表");
     response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename = vipWealReword.xls");
 
     try (Workbook workbook =
-        ExcelExportUtil.exportExcel(exportParams, MemberWealRewordVO.class, list)) {
+        ExcelExportUtil.exportExcel(exportParams, MemberWealRewordVO.class, newList)) {
       workbook.write(response.getOutputStream());
     }
   }

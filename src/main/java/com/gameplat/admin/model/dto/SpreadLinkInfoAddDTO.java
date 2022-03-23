@@ -33,5 +33,6 @@ public class SpreadLinkInfoAddDTO {
   private Integer effectiveDays;
   /** 注册送彩金 */
   private BigDecimal discountAmount;
+
   private Integer isOpenDividePreset;
 }

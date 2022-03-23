@@ -10,6 +10,7 @@
         <result column="rech_money" property="rechMoney"/>
         <result column="discount_money" property="discountMoney"/>
         <result column="type" property="type"/>
+        <result column="end_time" property="endTime"/>
         <result column="create_time" property="createTime"/>
         <result column="update_time" property="updateTime"/>
         <result column="morm_dml" property="mormDml"/>
@@ -166,6 +167,9 @@
             <if test="updateTime != null">
                 update_time = #{updateTime},
             </if>
+            <if test="endTime != null">
+                end_time = #{endTime},
+            </if>
             <if test="remark != null">
                 remark = #{remark},
             </if>
@@ -209,7 +213,7 @@
             (a.rech_money + a.discount_money) rechMoney
         FROM valid_withdraw AS a
         WHERE a.STATUS = 0
-          AND a.member_id = #{memberId}
+          AND a.account = #{account}
         ORDER BY a.id ASC
     </select>
 

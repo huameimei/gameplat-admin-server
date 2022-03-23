@@ -7,5 +7,5 @@ import org.mapstruct.Mapper;
 @Mapper(componentModel = "spring")
 public interface MemberVipSignStatisConvert {
 
-    MemberVipSignStatisVO toVo (MemberVipSignStatis entity);
+  MemberVipSignStatisVO toVo(MemberVipSignStatis entity);
 }

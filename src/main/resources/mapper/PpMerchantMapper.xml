@@ -40,7 +40,7 @@
     FROM pp_merchant m
     LEFT JOIN pp_interface i ON m.pp_interface_code = i.code
     <include refid="where"/>
-    ORDER BY m.sort DESC
+    ORDER BY m.sort asc, m.create_time desc
   </select>
 
 </mapper>

@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.gameplat.admin.model.dto.MemberQueryDTO;
+import com.gameplat.common.enums.MemberEnums;
 import com.gameplat.model.entity.member.Member;
 import org.springframework.stereotype.Component;
 
@@ -35,7 +36,11 @@ public class MemberQueryCondition {
         .eq(ObjectUtils.isNotEmpty(dto.getPhone()), "t1.phone", dto.getPhone())
         .eq(ObjectUtils.isNotEmpty(dto.getQq()), "t1.qq", dto.getQq())
         .eq(ObjectUtils.isNotEmpty(dto.getUserLevel()), "t1.user_level", dto.getUserLevel())
-        .eq(ObjectUtils.isNotEmpty(dto.getAgentLevel()), "t1.agent_level", dto.getAgentLevel())
+        .func(
+            ObjectUtils.isNotEmpty(dto.getAgentLevel()),
+            q ->
+                q.eq("t1.agent_level", dto.getAgentLevel())
+                    .eq("t1.user_type", MemberEnums.Type.AGENT.value()))
         .eq(ObjectUtils.isNotEmpty(dto.getVipLevel()), "t2.vip_level", dto.getVipLevel())
         .in(ObjectUtils.isNotEmpty(dto.getLevels()), "t2.vip_level", dto.getLevels())
         .eq(
@@ -77,7 +82,7 @@ public class MemberQueryCondition {
         // 最近多少天未登陆
         .func(
             ObjectUtils.isNotNull(dto.getDayOfNotLogin()),
-            q -> this.builderDayOfNotLoginQuery(query, dto))
+            q -> this.builderDayOfNotLoginQuery(q, dto))
         // 累计充值次数范围
         .ge(
             ObjectUtils.isNotEmpty(dto.getRechTimesFrom()),
@@ -163,10 +168,12 @@ public class MemberQueryCondition {
    * @param dto MemberQueryDTO
    */
   private void builderDayOfNotRechQuery(QueryWrapper<Member> queryWrapper, MemberQueryDTO dto) {
-    queryWrapper
-        .isNull("t2.last_rech_time")
-        .or()
-        .le("t2.last_rech_time", this.getDateDiff(dto.getDayOfNoRecha()));
+    queryWrapper.and(
+        query ->
+            query
+                .isNull("t2.last_rech_time")
+                .or()
+                .le("t2.last_rech_time", this.getDateDiff(dto.getDayOfNoRecha())));
   }
 
   /**
@@ -176,10 +183,12 @@ public class MemberQueryCondition {
    * @param dto MemberQueryDTO
    */
   private void builderDayOfNotLoginQuery(QueryWrapper<Member> queryWrapper, MemberQueryDTO dto) {
-    queryWrapper
-        .isNull("t2.last_login_time")
-        .or()
-        .le("t2.last_login_time", this.getDateDiff(dto.getDayOfNotLogin()));
+    queryWrapper.and(
+        query ->
+            query
+                .isNull("t2.last_login_time")
+                .or()
+                .le("t2.last_login_time", this.getDateDiff(dto.getDayOfNotLogin())));
   }
 
   /**

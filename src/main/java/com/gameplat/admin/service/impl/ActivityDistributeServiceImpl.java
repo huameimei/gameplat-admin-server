@@ -90,37 +90,32 @@ public class ActivityDistributeServiceImpl
 
   @Override
   public PageExt<IPage<ActivityDistributeVO>, ActivityDistributeStatisticsVO> list(
-      PageDTO<ActivityDistribute> page, ActivityDistributeQueryDTO activityDistributeQueryDTO) {
+      PageDTO<ActivityDistribute> page, ActivityDistributeQueryDTO dto) {
     LambdaQueryChainWrapper<ActivityDistribute> lambdaQuery = this.lambdaQuery();
     lambdaQuery
         // 未删除
         .eq(ActivityDistribute::getDeleteFlag, BooleanEnum.YES.value())
         .like(
-            StringUtils.isNotBlank(activityDistributeQueryDTO.getUsername()),
+            StringUtils.isNotBlank(dto.getUsername()),
             ActivityDistribute::getUsername,
-            activityDistributeQueryDTO.getUsername())
+            dto.getUsername())
         .eq(
-            activityDistributeQueryDTO.getActivityId() != null
-                && activityDistributeQueryDTO.getActivityId() != 0,
+            dto.getActivityId() != null && dto.getActivityId() != 0,
             ActivityDistribute::getActivityId,
-            activityDistributeQueryDTO.getActivityId())
+            dto.getActivityId())
+        .eq(dto.getStatus() != null, ActivityDistribute::getStatus, dto.getStatus())
         .eq(
-            activityDistributeQueryDTO.getStatus() != null,
-            ActivityDistribute::getStatus,
-            activityDistributeQueryDTO.getStatus())
-        .eq(
-            activityDistributeQueryDTO.getGetWay() != null
-                && activityDistributeQueryDTO.getGetWay() != 0,
+            dto.getGetWay() != null && dto.getGetWay() != 0,
             ActivityDistribute::getGetWay,
-            activityDistributeQueryDTO.getGetWay())
+            dto.getGetWay())
         .ge(
-            StringUtils.isNotBlank(activityDistributeQueryDTO.getApplyStartTime()),
+            StringUtils.isNotBlank(dto.getApplyStartTime()),
             ActivityDistribute::getApplyTime,
-            activityDistributeQueryDTO.getApplyStartTime())
+            dto.getApplyStartTime())
         .le(
-            StringUtils.isNotBlank(activityDistributeQueryDTO.getApplyEndTime()),
+            StringUtils.isNotBlank(dto.getApplyEndTime()),
             ActivityDistribute::getApplyTime,
-            activityDistributeQueryDTO.getApplyEndTime());
+            dto.getApplyEndTime());
 
     IPage<ActivityDistributeVO> iPage =
         lambdaQuery.page(page).convert(activityDistributeConvert::toVo);

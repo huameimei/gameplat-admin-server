@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapp
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.convert.ActivityInfoConvert;
+import com.gameplat.admin.convert.ActivityLobbyConvert;
 import com.gameplat.admin.enums.SysBannerInfoEnum;
 import com.gameplat.admin.mapper.ActivityInfoMapper;
 import com.gameplat.admin.model.dto.ActivityInfoAddDTO;
@@ -13,8 +14,10 @@ import com.gameplat.admin.model.dto.ActivityInfoQueryDTO;
 import com.gameplat.admin.model.dto.ActivityInfoUpdateDTO;
 import com.gameplat.admin.model.dto.ActivityInfoUpdateSortDTO;
 import com.gameplat.admin.model.vo.ActivityInfoVO;
+import com.gameplat.admin.model.vo.ActivityLobbyVO;
 import com.gameplat.admin.service.*;
 import com.gameplat.base.common.exception.ServiceException;
+import com.gameplat.base.common.util.StringUtils;
 import com.gameplat.common.enums.BooleanEnum;
 import com.gameplat.common.enums.DictDataEnum;
 import com.gameplat.model.entity.activity.ActivityInfo;
@@ -24,14 +27,12 @@ import com.gameplat.model.entity.sys.SysBannerInfo;
 import com.google.common.collect.Lists;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 活动业务类
@@ -45,6 +46,8 @@ public class ActivityInfoServiceImpl extends ServiceImpl<ActivityInfoMapper, Act
 
   @Autowired private ActivityInfoConvert activityInfoConvert;
 
+  @Autowired private ActivityLobbyConvert activityLobbyConvert;
+
   @Autowired private SysBannerInfoService sysBannerInfoService;
 
   @Autowired private ActivityTypeService activityTypeService;
@@ -53,40 +56,25 @@ public class ActivityInfoServiceImpl extends ServiceImpl<ActivityInfoMapper, Act
 
   @Autowired private ConfigService configService;
 
-  /**
-   * 列表查询
-   *
-   * @param page
-   * @param activityInfoQueryDTO
-   * @return
-   */
   @Override
-  public IPage<ActivityInfoVO> list(
-      PageDTO<ActivityInfo> page, ActivityInfoQueryDTO activityInfoQueryDTO) {
+  public IPage<ActivityInfoVO> list(PageDTO<ActivityInfo> page, ActivityInfoQueryDTO dto) {
     LambdaQueryChainWrapper<ActivityInfo> queryWrapper = this.lambdaQuery();
     queryWrapper
+        .eq(dto.getType() != null && dto.getType() != 0, ActivityInfo::getType, dto.getType())
         .eq(
-            activityInfoQueryDTO.getType() != null && activityInfoQueryDTO.getType() != 0,
-            ActivityInfo::getType,
-            activityInfoQueryDTO.getType())
-        .eq(
-            activityInfoQueryDTO.getApplyType() != null && activityInfoQueryDTO.getApplyType() != 0,
+            dto.getApplyType() != null && dto.getApplyType() != 0,
             ActivityInfo::getApplyType,
-            activityInfoQueryDTO.getApplyType())
+            dto.getApplyType())
         .eq(
-            activityInfoQueryDTO.getValidStatus() != null
-                && activityInfoQueryDTO.getValidStatus() != 0,
+            dto.getValidStatus() != null && dto.getValidStatus() != 0,
             ActivityInfo::getValidStatus,
-            activityInfoQueryDTO.getValidStatus())
+            dto.getValidStatus())
+        .eq(dto.getStatus() != null, ActivityInfo::getStatus, dto.getStatus())
         .eq(
-            activityInfoQueryDTO.getStatus() != null,
-            ActivityInfo::getStatus,
-            activityInfoQueryDTO.getStatus())
-        .eq(
-            activityInfoQueryDTO.getActivityLobbyId() != null
-                && activityInfoQueryDTO.getActivityLobbyId() != 0,
+            dto.getActivityLobbyId() != null && dto.getActivityLobbyId() != 0,
             ActivityInfo::getActivityLobbyId,
-            activityInfoQueryDTO.getActivityLobbyId())
+            dto.getActivityLobbyId())
+        .eq(StringUtils.isNotBlank(dto.getCreateBy()), ActivityInfo::getCreateBy, dto.getCreateBy())
         // 按排序sort正序排列
         .orderByAsc(Lists.newArrayList(ActivityInfo::getSort))
         // 按照时间倒序排列
@@ -113,17 +101,14 @@ public class ActivityInfoServiceImpl extends ServiceImpl<ActivityInfoMapper, Act
 
   @Override
   public ActivityInfoVO detail(Long id) {
-    ActivityInfo activityInfo = this.getById(id);
-    if (activityInfo == null) {
-      throw new ServiceException("该活动不存在");
-    }
-    ActivityInfoVO activityInfoVO = activityInfoConvert.toVo(activityInfo);
-    return activityInfoVO;
+    return Optional.ofNullable(this.getById(id))
+        .map(activityInfoConvert::toVo)
+        .orElseThrow(() -> new ServiceException("该活动不存在"));
   }
 
   @Override
-  public void add(ActivityInfoAddDTO activityInfoAddDTO, String country) {
-    ActivityInfo activityInfo = activityInfoConvert.toEntity(activityInfoAddDTO);
+  public void add(ActivityInfoAddDTO dto) {
+    ActivityInfo activityInfo = activityInfoConvert.toEntity(dto);
     if (this.saveActivityInfo(activityInfo)) {
       if (null != activityInfo.getId() && activityInfo.getId() > 0) {
         // 保存活动显示的图片
@@ -131,7 +116,7 @@ public class ActivityInfoServiceImpl extends ServiceImpl<ActivityInfoMapper, Act
         banner.setBannerType(configService.getValueInteger(DictDataEnum.ACTIVITY));
         banner.setChildType(activityInfo.getId());
         banner.setChildName(activityInfo.getTitle());
-        banner.setLanguage(country);
+        banner.setLanguage(LocaleContextHolder.getLocale().toLanguageTag());
         banner.setStatus(SysBannerInfoEnum.Status.VALID.getValue());
 
         List<SysBannerInfo> bannerList = sysBannerInfoService.getByBanner(banner);
@@ -181,7 +166,7 @@ public class ActivityInfoServiceImpl extends ServiceImpl<ActivityInfoMapper, Act
     }
 
     List<ActivityType> activityTypeList = activityTypeService.findByTypeIdList(activityTypeIdList);
-    Map<Long, ActivityType> activityTypeMap = new HashMap<>();
+    Map<Long, ActivityType> activityTypeMap = new HashMap<>(activityTypeList.size());
     if (CollectionUtils.isNotEmpty(activityTypeList)) {
       for (ActivityType activityType : activityTypeList) {
         activityTypeMap.put(activityType.getId(), activityType);
@@ -217,8 +202,9 @@ public class ActivityInfoServiceImpl extends ServiceImpl<ActivityInfoMapper, Act
   }
 
   @Override
-  public void update(ActivityInfoUpdateDTO activityInfoUpdateDTO, String language) {
-    ActivityInfo activityInfo = activityInfoConvert.toEntity(activityInfoUpdateDTO);
+  public void update(ActivityInfoUpdateDTO dto) {
+    ActivityInfo activityInfo = activityInfoConvert.toEntity(dto);
+    activityInfo.setLanguage(LocaleContextHolder.getLocale().toLanguageTag());
     if (!this.saveActivityInfo(activityInfo)) {
       throw new ServiceException("修改组合活动失败！");
     }
@@ -250,5 +236,28 @@ public class ActivityInfoServiceImpl extends ServiceImpl<ActivityInfoMapper, Act
     if (!result) {
       throw new ServiceException("更新活动失败");
     }
+  }
+
+  @Override
+  public List<ActivityLobbyVO> findUnboundLobbyList() {
+    List<ActivityLobby> activityLobbyList =
+        activityLobbyService
+            .lambdaQuery()
+            .eq(ActivityLobby::getStatus, BooleanEnum.YES.value())
+            .orderByDesc(Lists.newArrayList(ActivityLobby::getCreateTime, ActivityLobby::getId))
+            .list();
+    List<ActivityLobbyVO> lobbyList = new ArrayList<>();
+    if (CollectionUtils.isNotEmpty(activityLobbyList)) {
+      for (ActivityLobby activityLobby : activityLobbyList) {
+        // 查询是否已被绑定活动发布记录
+        Long count =
+            this.lambdaQuery().eq(ActivityInfo::getActivityLobbyId, activityLobby.getId()).count();
+        if (count > 0) {
+          continue;
+        }
+        lobbyList.add(activityLobbyConvert.toVo(activityLobby));
+      }
+    }
+    return lobbyList;
   }
 }

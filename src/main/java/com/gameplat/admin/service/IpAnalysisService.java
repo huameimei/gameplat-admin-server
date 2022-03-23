@@ -7,6 +7,6 @@ import com.gameplat.admin.model.vo.IpAnalysisVO;
 
 public interface IpAnalysisService {
 
-    /** ip分析 */
-    IPage<IpAnalysisVO> page(PageDTO<IpAnalysisVO> page, IpAnalysisDTO dto);
+  /** ip分析 */
+  IPage<IpAnalysisVO> page(PageDTO<IpAnalysisVO> page, IpAnalysisDTO dto);
 }

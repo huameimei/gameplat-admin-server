@@ -11,5 +11,4 @@ public interface MemberWithdrawHistoryConvert {
   MemberWithdrawHistoryVO toVo(MemberWithdrawHistory entity);
 
   MemberWithdrawHistory toEntity(MemberWithdrawHistoryQueryDTO dto);
-
 }

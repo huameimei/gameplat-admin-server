@@ -76,7 +76,7 @@ public class PpMerchantServiceImpl extends ServiceImpl<PpMerchantMapper, PpMerch
           });
     }
     dto.setParameters(JsonUtils.toJson(oriMerchantParameters));
-    this.conver2PpMerchant(dto);
+    this.convert2PpMerchant(dto);
     if (!this.updateById(ppMerchantConvert.toEntity(dto))) {
       throw new ServiceException("商户信息更新失败!");
     }
@@ -84,7 +84,7 @@ public class PpMerchantServiceImpl extends ServiceImpl<PpMerchantMapper, PpMerch
 
   @Override
   public void save(PpMerchantAddDTO dto) {
-    this.conver2PpMerchant(dto);
+    this.convert2PpMerchant(dto);
     if (!this.save(ppMerchantConvert.toEntity(dto))) {
       throw new ServiceException("接口添加失败!");
     }
@@ -99,7 +99,7 @@ public class PpMerchantServiceImpl extends ServiceImpl<PpMerchantMapper, PpMerch
   public PpMerchantVO getPpMerchantById(Long id) {
     PpMerchantVO ppMerchantVO = ppMerchantConvert.toVo(this.getById(id));
     // 设置限制信息
-    this.conver2MerVo(ppMerchantVO);
+    this.convert2MerVo(ppMerchantVO);
     if (null == ppMerchantVO) {
       throw new ServiceException("商户不存在!");
     }
@@ -151,7 +151,7 @@ public class PpMerchantServiceImpl extends ServiceImpl<PpMerchantMapper, PpMerch
     return this.list(query);
   }
 
-  private PpMerchantAddDTO conver2PpMerchant(PpMerchantAddDTO ppMerchantAddDTO) {
+  private PpMerchantAddDTO convert2PpMerchant(PpMerchantAddDTO ppMerchantAddDTO) {
     ProxyPayMerBean merBean =
         new ProxyPayMerBean(
             ppMerchantAddDTO.getMaxLimitCash(),
@@ -161,7 +161,7 @@ public class PpMerchantServiceImpl extends ServiceImpl<PpMerchantMapper, PpMerch
     return ppMerchantAddDTO;
   }
 
-  private PpMerchantEditDTO conver2PpMerchant(PpMerchantEditDTO ppMerchantEditDTO) {
+  private PpMerchantEditDTO convert2PpMerchant(PpMerchantEditDTO ppMerchantEditDTO) {
     ProxyPayMerBean merBean =
         new ProxyPayMerBean(
             ppMerchantEditDTO.getMaxLimitCash(),
@@ -171,7 +171,7 @@ public class PpMerchantServiceImpl extends ServiceImpl<PpMerchantMapper, PpMerch
     return ppMerchantEditDTO;
   }
 
-  public PpMerchantVO conver2MerVo(PpMerchantVO vo) {
+  public PpMerchantVO convert2MerVo(PpMerchantVO vo) {
     ProxyPayMerBean merBean = ProxyPayMerBean.conver2Bean(vo.getMerLimits());
     vo.setMaxLimitCash(merBean.getMaxLimitCash());
     vo.setMinLimitCash(merBean.getMinLimitCash());

@@ -7,9 +7,7 @@ import com.gameplat.model.entity.proxy.DivideFixConfig;
 
 import java.util.Map;
 
-/**
- * @Description : 固定比例分红模式配置 @Author : cc @Date : 2022/2/22
- */
+/** 固定比例分红模式配置 @Author : cc @Date : 2022/2/22 */
 public interface DivideFixConfigService extends IService<DivideFixConfig> {
   void add(String userName, String lang);
 

@@ -5,6 +5,4 @@ import com.gameplat.model.entity.recharge.RedEnvelopeConfig;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface RedEnvelopConfigMapper extends BaseMapper<RedEnvelopeConfig> {
-
-}
+public interface RedEnvelopConfigMapper extends BaseMapper<RedEnvelopeConfig> {}

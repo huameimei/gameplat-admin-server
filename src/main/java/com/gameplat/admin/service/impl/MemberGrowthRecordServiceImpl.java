@@ -3,7 +3,7 @@ package com.gameplat.admin.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.date.DateTime;
 import com.alibaba.fastjson.JSONObject;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
@@ -14,7 +14,6 @@ import com.gameplat.admin.convert.MemberGrowthRecordConvert;
 import com.gameplat.admin.convert.MessageInfoConvert;
 import com.gameplat.admin.enums.GrowthChangeEnum;
 import com.gameplat.admin.enums.LanguageEnum;
-import com.gameplat.admin.enums.MemberBillTransTypeEnum;
 import com.gameplat.admin.enums.PushMessageEnum;
 import com.gameplat.admin.mapper.MemberGrowthRecordMapper;
 import com.gameplat.admin.mapper.MessageMapper;
@@ -25,14 +24,16 @@ import com.gameplat.admin.model.vo.MemberGrowthRecordVO;
 import com.gameplat.admin.model.vo.MemberVO;
 import com.gameplat.admin.service.*;
 import com.gameplat.base.common.exception.ServiceException;
+import com.gameplat.base.common.util.RandomUtil;
 import com.gameplat.common.enums.BooleanEnum;
+import com.gameplat.common.enums.TranTypes;
 import com.gameplat.model.entity.ValidWithdraw;
 import com.gameplat.model.entity.member.*;
 import com.gameplat.model.entity.message.Message;
-import com.gameplat.model.entity.message.MessageDistribute;
 import com.gameplat.redis.redisson.DistributedLocker;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,9 +42,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.MessageFormat;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -59,6 +58,8 @@ public class MemberGrowthRecordServiceImpl
     extends ServiceImpl<MemberGrowthRecordMapper, MemberGrowthRecord>
     implements MemberGrowthRecordService {
 
+  public static final String kindName =
+          "{\"en-US\": \"platform\", \"in-ID\": \"peron\", \"th-TH\": \"แพลตฟอร์ม\", \"vi-VN\": \"nền tảng\", \"zh-CN\": \"平台\"}";
   @Autowired private MemberGrowthRecordConvert recordConvert;
 
   @Autowired private MemberGrowthRecordMapper memberGrowthRecordMapper;
@@ -89,8 +90,9 @@ public class MemberGrowthRecordServiceImpl
 
   @Autowired private MemberLoanService memberLoanService;
 
-  public static final String kindName =
-      "{\"en-US\": \"platform\", \"in-ID\": \"peron\", \"th-TH\": \"แพลตฟอร์ม\", \"vi-VN\": \"nền tảng\", \"zh-CN\": \"平台\"}";
+  @Autowired private MemberGoldCoinRecordService memberGoldCoinRecordService;
+
+  @Autowired private RedisTemplate<String, Object> redisTemplate;
 
   @Override
   public IPage<MemberGrowthRecordVO> findRecordList(
@@ -98,6 +100,7 @@ public class MemberGrowthRecordServiceImpl
 
     IPage<MemberGrowthRecordVO> result =
         this.lambdaQuery()
+            .ne(MemberGrowthRecord::getType, 6)
             .like(
                 ObjectUtils.isNotEmpty(dto.getUserName()),
                 MemberGrowthRecord::getUserName,
@@ -130,20 +133,17 @@ public class MemberGrowthRecordServiceImpl
   @Override
   public Integer dealUpLevel(Long afterGrowth, MemberGrowthConfig memberGrowthConfig) {
     // todo 1.先获取所有成长值等级
-    Integer limitLevel = memberGrowthConfig.getLimitLevel();
-    if (limitLevel == null) {
-      limitLevel = 50;
-    }
-    List<MemberGrowthLevelVO> levels =
-        growthLevelService.findList(limitLevel + 1, LanguageEnum.app_zh_CN.getCode());
+    Integer limitLevel = Optional.ofNullable(memberGrowthConfig.getLimitLevel()).orElse(50);
+    List<MemberGrowthLevelVO> levels = growthLevelService.findList(limitLevel);
     MemberGrowthLevelVO maxGrowthLevel = levels.get(levels.size() - 1);
     // 如果比最大等级所需升级成长值还要大  则直接返回最大等级
     if (afterGrowth >= maxGrowthLevel.getGrowth()) {
       return maxGrowthLevel.getLevel();
     }
-    for (int i = 0; i < levels.size(); i++) {
-      if (afterGrowth < levels.get(i).getGrowth()) {
-        return levels.get(i).getLevel();
+
+    for (MemberGrowthLevelVO level : levels) {
+      if (afterGrowth < level.getGrowth()) {
+        return level.getLevel();
       }
     }
     throw new ServiceException("计算成长等级失败！");
@@ -159,14 +159,14 @@ public class MemberGrowthRecordServiceImpl
   public void editMemberGrowth(MemberGrowthChangeDto dto, HttpServletRequest request) {
     // 判断是否开启了VIP
     // todo 2.获取成长值配置
-    MemberGrowthConfig growthConfig =
-        memberGrowthConfigService.getOneConfig(LanguageEnum.app_zh_CN.getCode());
+    MemberGrowthConfig growthConfig = memberGrowthConfigService.getOneConfig();
     if (growthConfig.getIsEnableVip() == 0) {
       throw new ServiceException("未开启VIP功能");
     }
     // 会员id
     Long memberId = dto.getUserId();
     Member member = memberService.getById(memberId);
+    MemberInfo memberInfo = memberInfoService.lambdaQuery().eq(MemberInfo::getMemberId, memberId).one();
     if (BeanUtil.isEmpty(member)) {
       log.info("VIP 成长值变动 会员不存在");
       throw new ServiceException("用户不存在！");
@@ -190,10 +190,15 @@ public class MemberGrowthRecordServiceImpl
       memberGrowthRecord.setCurrentLevel(0);
     }
     // 当前成长值
-    Long oldGrowth = memberGrowthRecord.getCurrentGrowth();
+    Long oldGrowth = memberInfoService.lambdaQuery().eq(MemberInfo::getMemberId, dto.getUserId()).one().getVipGrowth();
+//    Long oldGrowth = memberGrowthRecord.getCurrentGrowth();
     // 最终变动成长值  由于类型不同  可能最终变成的成长值倍数也不同
     Long changeFinalGrowth = 0L;
+
     MemberGrowthRecord saveRecord = new MemberGrowthRecord();
+
+    MemberGoldCoinRecord saveGoldCoinRecord = new MemberGoldCoinRecord();
+
     // todo 3.按变动类型执行不同逻辑
     if (type == GrowthChangeEnum.recharge.getCode()) {
       // 充值
@@ -205,6 +210,8 @@ public class MemberGrowthRecordServiceImpl
         saveRecord.setKindName(kindName);
         saveRecord.setKindCode("plat");
         saveRecord.setChangeMult(growthConfig.getRechageRate());
+
+        saveGoldCoinRecord.setRemark(member.getAccount() + "充值赠送金币,操作成长值：" + changeFinalGrowth+",操作实时兑换比例：" + growthConfig.getCoinRate());
       } else {
         return;
       }
@@ -225,6 +232,9 @@ public class MemberGrowthRecordServiceImpl
         saveRecord.setKindCode("plat");
         saveRecord.setChangeMult(new BigDecimal("1"));
         saveRecord.setRemark(dto.getRemark());
+
+        //金币记录备注
+        saveGoldCoinRecord.setRemark(member.getAccount() + "签到赠送金币,操作成长值："+ changeFinalGrowth + ",操作实时兑换比例：" + growthConfig.getCoinRate());
       } else {
         return;
       }
@@ -238,6 +248,9 @@ public class MemberGrowthRecordServiceImpl
         saveRecord.setKindCode(dto.getKindCode());
         saveRecord.setChangeMult(
             growthConfig.getDamaRate().multiply(dto.getChangeMult()).setScale(2));
+
+        //金币记录备注
+        saveGoldCoinRecord.setRemark(member.getAccount() + "打码量赠送金币,操作成长值：" + changeFinalGrowth + ",操作实时兑换比例：" + growthConfig.getCoinRate());
       } else {
         return;
       }
@@ -251,6 +264,8 @@ public class MemberGrowthRecordServiceImpl
         saveRecord.setRemark(dto.getRemark());
       }
 
+      //金币记录备注
+      saveGoldCoinRecord.setRemark(member.getAccount() + "后台修改成长值赠送金币,操作成长值：" + changeFinalGrowth + ",操作实时兑换比例：" + growthConfig.getCoinRate());
     } else if (type == GrowthChangeEnum.finishInfo.getCode()) {
       // 完善资料
     } else if (type == GrowthChangeEnum.bindBankCard.getCode()) {
@@ -263,8 +278,62 @@ public class MemberGrowthRecordServiceImpl
               .size()
           == 0) {
         changeFinalGrowth = growthConfig.getBindBankGrowth();
+
+        //金币记录备注
+        saveGoldCoinRecord.setRemark(member.getAccount() + "绑定过银行卡赠送金币,操作成长值：" + changeFinalGrowth + ",操作实时兑换比例：" + growthConfig.getCoinRate());
       }
     }
+    //当前等级对应金币上限
+    MemberGrowthLevel memberGrowthLevel = growthLevelService.getLevel(memberInfo.getVipLevel());
+    Integer changeGoldCoin = 0;
+    if(changeFinalGrowth > 0){
+      //成长值兑换的金币数量
+      changeGoldCoin = growthConfig.getCoinRate().multiply(BigDecimal.valueOf(changeFinalGrowth)).intValue();
+    }
+    saveGoldCoinRecord.setMemberId(memberId);
+    saveGoldCoinRecord.setAccount(member.getAccount());
+    saveGoldCoinRecord.setSourceType(1);
+    saveGoldCoinRecord.setOrderNo(RandomUtil.generateNumber(11));
+    String userDailtKey = new StringBuilder().append("TENANT_USER_DAILY_COIN").append(":").append(member.getAccount()).toString();
+    //玩家每日领取的金币
+    Integer dailyCoin = (Integer) redisTemplate.opsForValue().get(userDailtKey);
+    //每日最大领取金币
+    Integer dailyMaxCoin = memberGrowthLevel.getDailyMaxCoin();
+    if (dailyCoin == null && dailyMaxCoin != null && dailyMaxCoin != 0 && changeGoldCoin > 0){
+      if (changeGoldCoin > dailyMaxCoin){
+        changeGoldCoin = dailyMaxCoin;
+        saveGoldCoinRecord.setAmount(changeGoldCoin);
+        saveGoldCoinRecord.setBeforeBalance(memberInfo.getGoldCoin());
+        saveGoldCoinRecord.setAfterBalance(changeGoldCoin + memberInfo.getGoldCoin());
+        memberGoldCoinRecordService.save(saveGoldCoinRecord);
+        redisTemplate.opsForValue().set(userDailtKey, changeGoldCoin, getNowToNextDaySeconds().intValue(), TimeUnit.SECONDS);
+      } else {
+        saveGoldCoinRecord.setAmount(changeGoldCoin);
+        saveGoldCoinRecord.setBeforeBalance(memberInfo.getGoldCoin());
+        saveGoldCoinRecord.setAfterBalance(changeGoldCoin + memberInfo.getGoldCoin());
+        memberGoldCoinRecordService.save(saveGoldCoinRecord);
+        redisTemplate.opsForValue().set(userDailtKey, changeGoldCoin, getNowToNextDaySeconds().intValue(), TimeUnit.SECONDS);
+      }
+    } else if (dailyCoin != null && dailyCoin < dailyMaxCoin && changeGoldCoin > 0){
+      if (changeGoldCoin + dailyCoin > dailyMaxCoin){
+        changeGoldCoin = dailyMaxCoin - dailyCoin;
+        saveGoldCoinRecord.setAmount(changeGoldCoin);
+        saveGoldCoinRecord.setBeforeBalance(memberInfo.getGoldCoin());
+        saveGoldCoinRecord.setAfterBalance(changeGoldCoin + memberInfo.getGoldCoin());
+        memberGoldCoinRecordService.save(saveGoldCoinRecord);
+        redisTemplate.opsForValue().set(userDailtKey, dailyMaxCoin, getNowToNextDaySeconds().intValue(), TimeUnit.SECONDS);
+      }else {
+        saveGoldCoinRecord.setAmount(changeGoldCoin);
+        saveGoldCoinRecord.setBeforeBalance(memberInfo.getGoldCoin());
+        saveGoldCoinRecord.setAfterBalance(changeGoldCoin + memberInfo.getGoldCoin());
+        memberGoldCoinRecordService.save(saveGoldCoinRecord);
+        redisTemplate.opsForValue().set(userDailtKey, (dailyCoin+changeGoldCoin), getNowToNextDaySeconds().intValue(), TimeUnit.SECONDS);
+      }
+    }else {
+      //如果玩家到达日常领取上限就设置改变金币为0，防止更新用户表添加金币
+      changeGoldCoin =0;
+    }
+
     // 设置最新总成长值
     memberGrowthRecord.setCurrentGrowth(memberGrowthRecord.getCurrentGrowth() + changeFinalGrowth);
     // 当前的会员等级
@@ -308,21 +377,22 @@ public class MemberGrowthRecordServiceImpl
       throw new ServiceException("服务器繁忙，请稍后再试");
     }
     // todo 6.传入变动前和变动后的等级 处理发放升级奖励
+    LambdaUpdateWrapper<MemberInfo> wrapper = new LambdaUpdateWrapper<>();
     if (beforeLevel.compareTo(afterLevel) < 0) {
       this.dealPayUpReword(beforeLevel, afterLevel, growthConfig, member, request);
       // VIP变动更新会员vip
-      MemberInfo memberInfo = new MemberInfo();
-      memberInfo.setMemberId(memberId);
-      memberInfo.setVipLevel(afterLevel);
-      memberInfo.setVipGrowth(oldGrowth + memberGrowthRecord.getCurrentGrowth());
-      memberInfoService.updateById(memberInfo);
+      wrapper.set(MemberInfo::getVipLevel, afterLevel)
+              .set(MemberInfo::getVipGrowth, oldGrowth + changeFinalGrowth)
+              .set(MemberInfo::getGoldCoin, memberInfo.getGoldCoin() + changeGoldCoin)
+              .eq(MemberInfo::getMemberId, memberId);
+      memberInfoService.update(wrapper);
     } else {
       // VIP变动更新会员vip
-      MemberInfo memberInfo = new MemberInfo();
-      memberInfo.setMemberId(memberId);
-      memberInfo.setVipLevel(afterLevel);
-      memberInfo.setVipGrowth(oldGrowth + memberGrowthRecord.getCurrentGrowth());
-      memberInfoService.updateById(memberInfo);
+      wrapper.set(MemberInfo::getVipLevel, afterLevel)
+              .set(MemberInfo::getVipGrowth, oldGrowth + changeFinalGrowth)
+              .set(MemberInfo::getGoldCoin, memberInfo.getGoldCoin() + changeGoldCoin)
+              .eq(MemberInfo::getMemberId, memberId);
+      memberInfoService.update(wrapper);
     }
   }
 
@@ -346,15 +416,8 @@ public class MemberGrowthRecordServiceImpl
     Long growth = growthLevel.getGrowth();
     Long currentGrowth = 0L;
     // 当前成长值
-    MemberGrowthRecord growthRecord =
-        this.getOne(
-            new QueryWrapper<MemberGrowthRecord>()
-                .select(
-                    "user_id userId", "current_growth currentGrowth", "max(create_time) createTime")
-                .eq("user_id", memberId));
-    if (!BeanUtil.isEmpty(growthRecord)) {
-      currentGrowth = growthRecord.getCurrentGrowth();
-    }
+    MemberInfo memberInfo = memberInfoService.lambdaQuery().eq(MemberInfo::getMemberId, memberId).one();
+    currentGrowth = memberInfo.getVipGrowth();
 
     Long finalCurrentGrowth = currentGrowth;
     return new GrowthScaleVO() {
@@ -391,7 +454,7 @@ public class MemberGrowthRecordServiceImpl
         limitLevel = 50;
       }
       List<MemberGrowthLevel> levels =
-          growthLevelService.getList(limitLevel + 1, LanguageEnum.app_zh_CN.getCode());
+          growthLevelService.getList(limitLevel);
       Map<Integer, MemberGrowthLevel> levelMap =
           levels.stream()
               .collect(
@@ -461,7 +524,7 @@ public class MemberGrowthRecordServiceImpl
             memberBill.setMemberId(member.getId());
             memberBill.setAccount(member.getAccount());
             memberBill.setMemberPath(member.getSuperPath());
-            memberBill.setTranType(MemberBillTransTypeEnum.UPGRADE_REWARD.getCode());
+            memberBill.setTranType(TranTypes.UPGRADE_REWARD.getValue());
             memberBill.setOrderNo(sourceId);
             memberBill.setAmount(rewordAmount);
             memberBill.setBalance(memberInfoService.getById(member.getId()).getBalance());
@@ -508,15 +571,6 @@ public class MemberGrowthRecordServiceImpl
     message.setCreateBy("System");
     messageMapper.saveReturnId(message);
 
-    MessageDistribute messageDistribute = new MessageDistribute();
-    messageDistribute.setMessageId(message.getId());
-    messageDistribute.setUserId(member.getId());
-    messageDistribute.setUserAccount(member.getAccount());
-    messageDistribute.setRechargeLevel(member.getUserLevel());
-    messageDistribute.setVipLevel(memberInfoService.getById(member.getId()).getVipLevel());
-    messageDistribute.setReadStatus(0);
-    messageDistribute.setCreateBy("System");
-    messageDistributeService.save(messageDistribute);
     log.info("发送消息成功");
   }
 
@@ -525,5 +579,16 @@ public class MemberGrowthRecordServiceImpl
         .eq(MemberGrowthRecord::getUserId, dto.getUserId())
         .orderByDesc(MemberGrowthRecord::getCreateTime)
         .list();
+  }
+
+  //获取到第二天的秒数
+  public Long getNowToNextDaySeconds() {
+    Calendar cal = Calendar.getInstance();
+    cal.add(Calendar.DAY_OF_YEAR, 1);
+    cal.set(Calendar.HOUR_OF_DAY, 0);
+    cal.set(Calendar.SECOND, 0);
+    cal.set(Calendar.MINUTE, 0);
+    cal.set(Calendar.MILLISECOND, 0);
+    return (cal.getTimeInMillis() - System.currentTimeMillis()) / 1000;
   }
 }

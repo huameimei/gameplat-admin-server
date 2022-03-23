@@ -8,12 +8,19 @@ import com.gameplat.admin.enums.CashEnum;
 import com.gameplat.admin.enums.ProxyPayStatusEnum;
 import com.gameplat.admin.enums.WithdrawStatus;
 import com.gameplat.admin.feign.PaymentCenterFeign;
-import com.gameplat.admin.model.bean.*;
+import com.gameplat.admin.model.bean.AdminLimitInfo;
+import com.gameplat.admin.model.bean.ProxyPayMerBean;
+import com.gameplat.admin.model.bean.ReturnMessage;
 import com.gameplat.admin.service.*;
 import com.gameplat.admin.util.MoneyUtils;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.json.JsonUtils;
 import com.gameplat.base.common.util.StringUtils;
+import com.gameplat.base.common.web.Result;
+import com.gameplat.basepay.pay.bean.NameValuePair;
+import com.gameplat.basepay.proxypay.thirdparty.ProxyCallbackContext;
+import com.gameplat.basepay.proxypay.thirdparty.ProxyDispatchContext;
+import com.gameplat.basepay.proxypay.thirdparty.ProxyPayBackResult;
 import com.gameplat.common.enums.BooleanEnum;
 import com.gameplat.common.enums.SwitchStatusEnum;
 import com.gameplat.common.enums.UserTypes;
@@ -35,33 +42,95 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
 @Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)
 public class ProxyPayServiceImpl implements ProxyPayService {
 
-  @Autowired private MemberWithdrawService memberWithdrawService;
+  @Autowired
+  private MemberWithdrawService memberWithdrawService;
 
-  @Autowired private MemberWithdrawHistoryService memberWithdrawHistoryService;
+  @Autowired
+  private MemberWithdrawHistoryService memberWithdrawHistoryService;
 
-  @Autowired private MemberService memberService;
+  @Autowired
+  private MemberService memberService;
 
-  @Autowired private SysUserService sysUserService;
+  @Autowired
+  private SysUserService sysUserService;
 
-  @Autowired private LimitInfoService limitInfoService;
+  @Autowired
+  private LimitInfoService limitInfoService;
 
-  @Autowired private PpInterfaceService ppInterfaceService;
+  @Autowired
+  private PpInterfaceService ppInterfaceService;
 
-  @Autowired private PpMerchantService ppMerchantService;
+  @Autowired
+  private PpMerchantService ppMerchantService;
 
-  @Autowired private MemberInfoService memberInfoService;
+  @Autowired
+  private MemberInfoService memberInfoService;
 
-  @Autowired private PaymentCenterFeign paymentCenterFeign;
+  @Autowired
+  private PaymentCenterFeign paymentCenterFeign;
 
-  @Autowired private ValidWithdrawService validWithdrawService;
+  @Autowired
+  private ValidWithdrawService validWithdrawService;
 
-  @Autowired private MemberRwReportService memberRwReportService;
+  @Autowired
+  private MemberRwReportService memberRwReportService;
+
+  private static boolean verifyPpMerchant(
+      MemberWithdraw memberWithdraw, PpMerchant ppMerchant, PpInterface ppInterface) {
+    ProxyPayMerBean proxyPayMerBean = ProxyPayMerBean.conver2Bean(ppMerchant.getMerLimits());
+    if (memberWithdraw.getCashMoney().compareTo(proxyPayMerBean.getMinLimitCash()) < 0
+        || memberWithdraw.getCashMoney().compareTo(proxyPayMerBean.getMaxLimitCash()) > 0) {
+      log.info("用户出款金额超出商户出款金额范围，过滤此商户，商户名称为：" + ppMerchant.getName());
+      return true;
+    }
+
+    if (StringUtils.isNotEmpty(proxyPayMerBean.getUserLever())) {
+      if (!StringUtils.contains(
+          "," + proxyPayMerBean.getUserLever() + ",",
+          String.format("%s" + memberWithdraw.getMemberLevel() + "%s", ",", ","))) {
+        log.info("用户层级不在此代付商户设置的层级中，过滤此商户，商户名称为：" + ppMerchant.getName());
+        return true;
+      }
+    }
+    Map<String, String> banksMap = JSONObject.parseArray(ppInterface.getLimtInfo()).stream()
+        .filter(Objects::nonNull).collect(Collectors.toMap(
+            o -> {
+              JSONObject o1 = (JSONObject) o;
+              return o1.getString("code");
+            },
+            o -> {
+              JSONObject o1 = (JSONObject) o;
+              return o1.getString("name");
+            }
+        ));
+    /** 模糊匹配银行名称 */
+    boolean isBankName = true;
+    for (Map.Entry<String, String> entry : banksMap.entrySet()) {
+      if (StringUtils.contains(entry.getValue(), memberWithdraw.getBankName())
+          || StringUtils.contains(memberWithdraw.getBankName(), entry.getValue())) {
+        isBankName = false;
+        break;
+      }
+
+      if (StringUtils.contains(entry.getValue(), "邮政")
+          && StringUtils.contains(memberWithdraw.getBankName(), "邮政")) {
+        isBankName = false;
+        break;
+      }
+    }
+    if (isBankName) {
+      log.info("代付商户不支持用户银行卡出款，过滤此商户，商户名称为：" + ppMerchant.getName());
+      return true;
+    }
+    return false;
+  }
 
   @Override
   public void proxyPay(
@@ -126,7 +195,9 @@ public class ProxyPayServiceImpl implements ProxyPayService {
     // 设置银行编码,名称
     context.setBankCode(getProxyPayBankCode(memberWithdraw, ppMerchant, ppInterface));
     context.setBankName(memberWithdraw.getBankName());
-
+    // 设置设置虚拟币汇率、数量
+    context.setCurrencyRate(memberWithdraw.getCurrencyRate());
+    context.setCurrencyCount(memberWithdraw.getCurrencyCount());
     // 设置第三方商户参数
     context.setMerchantParameters(JSONObject.parseObject(ppMerchant.getParameters(), Map.class));
 
@@ -138,16 +209,27 @@ public class ProxyPayServiceImpl implements ProxyPayService {
     memberWithdraw.setApproveReason(ppMerchant.getName() + "代付出款");
     memberWithdraw.setOperatorTime(new Date());
     memberWithdraw.setOperatorAccount(userCredential.getUsername());
-    updateProxyWithdrawStatus(memberWithdraw, WithdrawStatus.SUCCESS.getValue(),member,memberInfo);
+    updateProxyWithdrawStatus(
+        memberWithdraw, WithdrawStatus.SUCCESS.getValue(), member, memberInfo);
 
     /** 请求第三方代付接口 */
     log.info("进入第三方出入款中心出款订单号: {}", memberWithdraw.getCashOrderNo());
-    String resultStr =
+    Result<ProxyPayBackResult> resultStr =
         paymentCenterFeign.onlineProxyPay(
             context, memberWithdraw.getPpInterface(), memberWithdraw.getPpInterfaceName());
-    if (!ProxyPayStatusEnum.PAY_SUCCESS.getName().equals(resultStr)) {
-      throw new ServiceException("请求代付返回结果提示:" + resultStr + "！！！请立即联系第三方核实再出款！！！");
+    if (!resultStr.isSucceed() || 200 != resultStr.getCode()) {
+      throw new ServiceException("请求代付返回结果提示:" + resultStr.getMessage() + "！！！请立即联系第三方核实再出款！！！");
     }
+    /** 设置虚拟货币真实出款汇率、数量 */
+    if (null != resultStr.getData() && null != resultStr.getData().getApproveCurrencyRate()
+        || null != resultStr.getData().getApproveCurrencyCount()) {
+      memberWithdrawService.lambdaUpdate()
+          .set(MemberWithdraw::getApproveCurrencyRate, resultStr.getData().getApproveCurrencyRate())
+          .set(MemberWithdraw::getApproveCurrencyCount,
+              resultStr.getData().getApproveCurrencyCount())
+          .eq(MemberWithdraw::getId, memberWithdraw.getId()).update();
+    }
+    memberWithdrawService.updateById(memberWithdraw);
     /** 不需要异步通知，直接将状态改成第三方出款完成 */
     if (0 != ppInterface.getAsynNotifyStatus()) {
       updateStatus(
@@ -187,11 +269,12 @@ public class ProxyPayServiceImpl implements ProxyPayService {
     context.setBankName(memberWithdraw.getBankName());
     /** 请求第三方代付接口 */
     log.info("进入第三方出入款中心查询订单号: {}", memberWithdraw.getCashOrderNo());
-    ReturnMessage a =
-        paymentCenterFeign.onlineQueryProxyPay(
-            context, ppInterface.getCode(), ppInterface.getName());
-    return paymentCenterFeign.onlineQueryProxyPay(
+    Result<ReturnMessage> resultStr = paymentCenterFeign.onlineQueryProxyPay(
         context, ppInterface.getCode(), ppInterface.getName());
+    if (!resultStr.isSucceed() || 200 != resultStr.getCode()) {
+      throw new ServiceException("查询第三方代付异常:" + resultStr.getMessage() + "！！！请立即联系第三方核实再出款！！！");
+    }
+    return resultStr.getData();
   }
 
   @Override
@@ -218,9 +301,12 @@ public class ProxyPayServiceImpl implements ProxyPayService {
     proxyCallbackContext.setIp(ipAddress);
     proxyCallbackContext.setCallbackParameters(callbackParameters);
     proxyCallbackContext.setRequestBody(requestBody);
-    ProxyPayBackResult result =
+    Result<ProxyPayBackResult> result =
         paymentCenterFeign.asyncCallbackProxyPay(
             proxyCallbackContext, beanName, memberWithdraw.getPpInterfaceName());
+    if (!result.isSucceed() || 200 != result.getCode()) {
+      throw new ServiceException("第三方代付异步回调异常:" + result.getMessage() + "！！！请立即联系第三方核实再出款！！！");
+    }
     if (memberWithdraw.getCashStatus() == WithdrawStatus.CANCELLED.getValue()
         || memberWithdraw.getCashStatus() == WithdrawStatus.REFUSE.getValue()
         || memberWithdraw.getCashStatus() == WithdrawStatus.SUCCESS.getValue()
@@ -230,8 +316,8 @@ public class ProxyPayServiceImpl implements ProxyPayService {
           "第三方出款订单"
               + memberWithdraw.getCashOrderNo()
               + "已经被处理了,响应第三方需要的信息:"
-              + result.getResponseMsg());
-      return result.getResponseMsg();
+              + result.getData().getResponseMsg());
+      return result.getData().getResponseMsg();
     }
 
     Member info = memberService.getById(memberWithdraw.getMemberId());
@@ -240,13 +326,13 @@ public class ProxyPayServiceImpl implements ProxyPayService {
     }
 
     int orignCashStatus = memberWithdraw.getCashStatus();
-    if (!result.isSuccess()) {
+    if (!result.getData().isSuccess()) {
       /** 第三方出款失败，将代付状态改变 */
       memberWithdraw.setApproveReason("第三方出款失败");
       memberWithdraw.setProxyPayDesc("第三方出款失败");
       updateStatus(memberWithdraw, orignCashStatus, ProxyPayStatusEnum.PAY_FAIL.getCode());
-      log.info("第三方出款订单 ：{} ！出款失败信息： {}", memberWithdraw.getCashOrderNo(), result.getMessge());
-      return result.getResponseMsg();
+      log.info("第三方出款订单 ：{} ！出款失败信息： {}", memberWithdraw.getCashOrderNo(), result.getMessage());
+      return result.getData().getResponseMsg();
     }
 
     /** 第三方出款成功 */
@@ -262,10 +348,12 @@ public class ProxyPayServiceImpl implements ProxyPayService {
     PpMerchant ppMerchant = ppMerchantService.getById(memberWithdraw.getPpMerchantId());
     updatePpMerchant(ppMerchant, memberWithdraw.getCashMoney());
     log.info("第三方出款成功,出款商户为:{} ,出款订单信息为：{}", memberWithdraw.getPpMerchantName(), memberWithdraw);
-    return result.getResponseMsg();
+    return result.getData().getResponseMsg();
   }
 
-  /** 开启出入款订单是否允许其他账户操作配置 校验非超管账号是否原受理人 */
+  /**
+   * 开启出入款订单是否允许其他账户操作配置 校验非超管账号是否原受理人
+   */
   private void crossAccountCheck(UserCredential userCredential, MemberWithdraw memberWithdraw)
       throws ServiceException {
     if (userCredential != null
@@ -278,7 +366,7 @@ public class ProxyPayServiceImpl implements ProxyPayService {
       if (toCheck) {
         if (!Objects.equals(WithdrawStatus.UNHANDLED.getValue(), memberWithdraw.getCashStatus())
             && !StringUtils.equalsIgnoreCase(
-                userCredential.getUsername(), memberWithdraw.getOperatorAccount())) {
+            userCredential.getUsername(), memberWithdraw.getOperatorAccount())) {
           throw new ServiceException("您无权操作此订单:" + memberWithdraw.getCashOrderNo());
         }
       }
@@ -292,49 +380,6 @@ public class ProxyPayServiceImpl implements ProxyPayService {
     if (ppInterface.getStatus() != SwitchStatusEnum.ENABLED.getValue()) {
       throw new ServiceException("第三方代付接口已关闭。");
     }
-  }
-
-  private static boolean verifyPpMerchant(
-      MemberWithdraw memberWithdraw, PpMerchant ppMerchant, PpInterface ppInterface) {
-    ProxyPayMerBean proxyPayMerBean = ProxyPayMerBean.conver2Bean(ppMerchant.getMerLimits());
-    if (memberWithdraw.getCashMoney().compareTo(proxyPayMerBean.getMinLimitCash()) < 0
-        || memberWithdraw.getCashMoney().compareTo(proxyPayMerBean.getMaxLimitCash()) > 0) {
-      log.info("用户出款金额超出商户出款金额范围，过滤此商户，商户名称为：" + ppMerchant.getName());
-      return true;
-    }
-
-    if (StringUtils.isNotEmpty(proxyPayMerBean.getUserLever())) {
-      if (!StringUtils.contains(
-          "," + proxyPayMerBean.getUserLever() + ",",
-          String.format("%s" + memberWithdraw.getMemberLevel() + "%s", ",", ","))) {
-        log.info("用户层级不在此代付商户设置的层级中，过滤此商户，商户名称为：" + ppMerchant.getName());
-        return true;
-      }
-    }
-
-    Map<String, String> banksMap =
-        JSONObject.parseObject(
-            JSONObject.parseObject(ppInterface.getLimtInfo()).getString("banks"), Map.class);
-    /** 模糊匹配银行名称 */
-    boolean isBankName = true;
-    for (Map.Entry<String, String> entry : banksMap.entrySet()) {
-      if (StringUtils.contains(entry.getValue(), memberWithdraw.getBankName())
-          || StringUtils.contains(memberWithdraw.getBankName(), entry.getValue())) {
-        isBankName = false;
-        break;
-      }
-
-      if (StringUtils.contains(entry.getValue(), "邮政")
-          && StringUtils.contains(memberWithdraw.getBankName(), "邮政")) {
-        isBankName = false;
-        break;
-      }
-    }
-    if (isBankName) {
-      log.info("代付商户不支持用户银行卡出款，过滤此商户，商户名称为：" + ppMerchant.getName());
-      return true;
-    }
-    return false;
   }
 
   /**
@@ -404,9 +449,17 @@ public class ProxyPayServiceImpl implements ProxyPayService {
 
     String bankCode = "";
     String bankName = memberWithdraw.getBankName();
-    Map<String, String> banksMap =
-        JSONObject.parseObject(
-            JSONObject.parseObject(ppinterface.getLimtInfo()).getString("banks"), Map.class);
+    Map<String, String> banksMap = JSONObject.parseArray(ppinterface.getLimtInfo()).stream()
+        .filter(Objects::nonNull).collect(Collectors.toMap(
+            o -> {
+              JSONObject o1 = (JSONObject) o;
+              return o1.getString("code");
+            },
+            o -> {
+              JSONObject o1 = (JSONObject) o;
+              return o1.getString("name");
+            }
+        ));
     for (Map.Entry<String, String> entry : banksMap.entrySet()) {
       if (StringUtils.contains(entry.getValue(), bankName)
           || StringUtils.contains(bankName, entry.getValue())) {
@@ -443,8 +496,8 @@ public class ProxyPayServiceImpl implements ProxyPayService {
    *
    * @param memberWithdraw
    */
-  public void updateProxyWithdrawStatus(MemberWithdraw memberWithdraw, Integer cashStatus,Member member,
-      MemberInfo memberInfo)
+  public void updateProxyWithdrawStatus(
+      MemberWithdraw memberWithdraw, Integer cashStatus, Member member, MemberInfo memberInfo)
       throws Exception {
     // 修改订单状态
     LambdaUpdateWrapper<MemberWithdraw> updateMemberWithdraw = Wrappers.lambdaUpdate();
@@ -471,13 +524,8 @@ public class ProxyPayServiceImpl implements ProxyPayService {
     }
 
     if (!UserTypes.PROMOTION.value().equals(member.getUserType())) {
-      memberRwReportService
-          .addWithdraw(member,memberInfo.getTotalWithdrawTimes(),memberWithdraw);
+      memberRwReportService.addWithdraw(member, memberInfo.getTotalWithdrawTimes(), memberWithdraw);
     }
-
-    // 更新会员信息表
-    memberInfoService.updateBalanceWithWithdraw(
-        memberWithdraw.getMemberId(), memberWithdraw.getCashMoney());
 
     // 删除出款验证打码量记录的数据
     validWithdrawService.remove(memberWithdraw.getMemberId(), memberWithdraw.getCreateTime());

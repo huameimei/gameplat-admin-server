@@ -37,8 +37,7 @@ public class GameBetRecordQueryDTO implements Serializable {
 
   private String superAccount;
 
-    private String gameKindList;
+  private String gameKindList;
 
-  private String liveGameSuperType;
-
+  private String gameType;
 }

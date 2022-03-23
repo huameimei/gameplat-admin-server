@@ -1,6 +1,5 @@
 package com.gameplat.admin.util;
 
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -13,8 +12,8 @@ public class DateUtil2 extends com.gameplat.base.common.util.DateUtil {
   /**
    * 获取当前时间星期
    *
-   * @param dt
-   * @return
+   * @param dt Date
+   * @return int
    */
   public static int getWeekNumOfDate(Date dt) {
     int[] weekDays = {7, 1, 2, 3, 4, 5, 6};
@@ -60,13 +59,11 @@ public class DateUtil2 extends com.gameplat.base.common.util.DateUtil {
   }
 
   /**
-   * @param @param date1
-   * @param @param date2
-   * @param @return 参数
+   * 是否是同一天
+   *
+   * @param date1 Date
+   * @param date2 Date
    * @return boolean 返回类型
-   * @throws @Description: (是否是同一天)
-   * @author huangjian
-   * @date 2017年12月12日 下午12:04:14
    */
   public static boolean isSameDate(Date date1, Date date2) {
     Calendar cal1 = Calendar.getInstance();
@@ -77,18 +74,15 @@ public class DateUtil2 extends com.gameplat.base.common.util.DateUtil {
 
     boolean isSameYear = cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR);
     boolean isSameMonth = isSameYear && cal1.get(Calendar.MONTH) == cal2.get(Calendar.MONTH);
-    boolean isSameDate =
-        isSameMonth && cal1.get(Calendar.DAY_OF_MONTH) == cal2.get(Calendar.DAY_OF_MONTH);
-
-    return isSameDate;
+    return isSameMonth && cal1.get(Calendar.DAY_OF_MONTH) == cal2.get(Calendar.DAY_OF_MONTH);
   }
 
   /**
    * 获取时间段内每月的最后一天
    *
-   * @param dBegin
-   * @param dEnd
-   * @return
+   * @param dBegin Date
+   * @param dEnd Date
+   * @return List
    */
   public static List<Date> findEndDates(Date dBegin, Date dEnd) {
     //        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
@@ -102,14 +96,14 @@ public class DateUtil2 extends com.gameplat.base.common.util.DateUtil {
     calEnd.setTime(dEnd);
     // 测试此日期是否在指定日期之后
 
-    Calendar calBegin_1 = (Calendar) calBegin.clone();
+    Calendar calBegin1 = (Calendar) calBegin.clone();
     // 把月底提出来
-    calBegin_1.add(Calendar.MONDAY, 1);
-    calBegin_1.set(Calendar.DAY_OF_MONTH, 0);
+    calBegin1.add(Calendar.MONTH, 1);
+    calBegin1.set(Calendar.DAY_OF_MONTH, 0);
 
     boolean endMouth = false;
     while (dEnd.after(calBegin.getTime())) {
-      if (calBegin_1.equals(calBegin) || endMouth) {
+      if (calBegin1.equals(calBegin) || endMouth) {
         // 保存最后一天
         lDate.add(calBegin.getTime());
 
@@ -118,7 +112,7 @@ public class DateUtil2 extends com.gameplat.base.common.util.DateUtil {
         //                calBegin.set(Calendar.DAY_OF_MONTH,1);
         //                lDate.add(simpleDateFormat.format(calBegin.getTime()));
         //
-        calBegin.add(Calendar.MONDAY, 1);
+        calBegin.add(Calendar.MONTH, 1);
         calBegin.set(Calendar.DAY_OF_MONTH, 0);
         //
         endMouth = true;
@@ -136,21 +130,18 @@ public class DateUtil2 extends com.gameplat.base.common.util.DateUtil {
    * 被比较的时间是否大于当前时间
    *
    * @param compareDate 被比较的时间
-   * @return
-   * @throws ParseException
+   * @return boolean
    */
   public static boolean compareCurrentDate(Date compareDate) {
     Date now = new Date();
-    boolean greaterThan = now.getTime() < compareDate.getTime();
-    return greaterThan;
+    return now.getTime() < compareDate.getTime();
   }
 
   /**
    * 被比较的时间是否大于当前时间
    *
    * @param compareDate 被比较的时间
-   * @return
-   * @throws ParseException
+   * @return boolean
    */
   public static boolean compareCurrentDateLess(Date compareDate) {
     Date now = new Date();

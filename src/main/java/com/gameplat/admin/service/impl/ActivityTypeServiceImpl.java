@@ -19,6 +19,7 @@ import com.gameplat.model.entity.activity.ActivityInfo;
 import com.gameplat.model.entity.activity.ActivityType;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -49,29 +50,24 @@ public class ActivityTypeServiceImpl extends ServiceImpl<ActivityTypeMapper, Act
   }
 
   @Override
-  public IPage<ActivityTypeVO> list(
-      PageDTO<ActivityType> page, ActivityTypeQueryDTO activityTypeQueryDTO) {
+  public IPage<ActivityTypeVO> list(PageDTO<ActivityType> page, ActivityTypeQueryDTO dto) {
     LambdaQueryChainWrapper<ActivityType> queryChainWrapper = this.lambdaQuery();
     queryChainWrapper
-        .eq(ActivityType::getLanguage, activityTypeQueryDTO.getLanguage())
-        .eq(
-            activityTypeQueryDTO.getTypeStatus() != null,
-            ActivityType::getTypeStatus,
-            activityTypeQueryDTO.getTypeStatus());
+        .eq(ActivityType::getLanguage, dto.getLanguage())
+        .eq(dto.getTypeStatus() != null, ActivityType::getTypeStatus, dto.getTypeStatus());
 
     return queryChainWrapper.page(page).convert(activityTypeConvert::toVo);
   }
 
   @Override
-  public void add(ActivityTypeAddDTO activityTypeAddDTO) {
+  public void add(ActivityTypeAddDTO dto) {
     // 查询是否已经添加
     ActivityType activityType =
-        this.getByTypeNameAndLanguage(
-            activityTypeAddDTO.getTypeName(), activityTypeAddDTO.getLanguage(), null);
+        this.getByTypeNameAndLanguage(dto.getTypeName(), dto.getLanguage(), null);
     if (activityType != null) {
       throw new ServiceException("活动类型名字或者活动类型已存在");
     }
-    ActivityType activityType1 = activityTypeConvert.toEntity(activityTypeAddDTO);
+    ActivityType activityType1 = activityTypeConvert.toEntity(dto);
     if (activityType1.getTypeStatus() == null) {
       activityType1.setTypeStatus(BooleanEnum.YES.value());
     }
@@ -79,17 +75,14 @@ public class ActivityTypeServiceImpl extends ServiceImpl<ActivityTypeMapper, Act
   }
 
   @Override
-  public void update(ActivityTypeUpdateDTO activityTypeUpdateDTO) {
+  public void update(ActivityTypeUpdateDTO dto) {
     // 查询是否已经添加
     ActivityType activityType =
-        this.getByTypeNameAndLanguage(
-            activityTypeUpdateDTO.getTypeName(),
-            activityTypeUpdateDTO.getLanguage(),
-            activityTypeUpdateDTO.getId());
+        this.getByTypeNameAndLanguage(dto.getTypeName(), dto.getLanguage(), dto.getId());
     if (activityType != null) {
       throw new ServiceException("活动类型名字或者活动类型已存在");
     }
-    ActivityType activityType1 = activityTypeConvert.toEntity(activityTypeUpdateDTO);
+    ActivityType activityType1 = activityTypeConvert.toEntity(dto);
     if (activityType1.getTypeStatus() == null) {
       activityType1.setTypeStatus(BooleanEnum.YES.value());
     }
@@ -130,8 +123,14 @@ public class ActivityTypeServiceImpl extends ServiceImpl<ActivityTypeMapper, Act
   }
 
   @Override
-  public List<ActivityTypeVO> listAll(String language) {
-    List<ActivityType> list = this.lambdaQuery().eq(ActivityType::getLanguage, language).list();
+  public List<ActivityTypeVO> listAll() {
+    String language = LocaleContextHolder.getLocale().toLanguageTag();
+    List<ActivityType> list =
+        this.lambdaQuery()
+            .eq(ActivityType::getTypeStatus, BooleanEnum.YES.value())
+            .eq(ActivityType::getLanguage, language)
+            .list();
+
     List<ActivityTypeVO> activityTypeVOList = new ArrayList<>();
     if (CollectionUtils.isNotEmpty(list)) {
       for (ActivityType type : list) {
@@ -144,9 +143,9 @@ public class ActivityTypeServiceImpl extends ServiceImpl<ActivityTypeMapper, Act
   /**
    * 查询是否已经存在
    *
-   * @param typeName
-   * @param language
-   * @return
+   * @param typeName String
+   * @param language String
+   * @return Long
    */
   private ActivityType getByTypeNameAndLanguage(String typeName, String language, Long id) {
     return this.lambdaQuery()

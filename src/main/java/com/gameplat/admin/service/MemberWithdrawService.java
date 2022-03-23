@@ -17,7 +17,7 @@ import java.util.List;
 public interface MemberWithdrawService extends IService<MemberWithdraw> {
 
   PageExt<MemberWithdrawVO, SummaryVO> findPage(
-          Page<MemberWithdraw> page, MemberWithdrawQueryDTO dto);
+      Page<MemberWithdraw> page, MemberWithdrawQueryDTO dto);
 
   void updateCounterFee(Long id, BigDecimal afterCounterFee);
 
@@ -28,8 +28,9 @@ public interface MemberWithdrawService extends IService<MemberWithdraw> {
       Integer cashStatus,
       Integer curStatus,
       boolean isDirect,
-      String approveReason,
-      UserCredential userCredential, UserEquipment userEquipment) throws Exception;
+      UserCredential userCredential,
+      UserEquipment userEquipment)
+      throws Exception;
 
   List<PpMerchant> queryProxyMerchant(Long id);
 

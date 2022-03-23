@@ -2,6 +2,7 @@ package com.gameplat.admin.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.mapper.MemberInfoMapper;
+import com.gameplat.admin.model.dto.CleanAccountDTO;
 import com.gameplat.admin.service.MemberInfoService;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.model.entity.member.MemberInfo;
@@ -22,7 +23,7 @@ import java.util.Date;
 public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberInfo>
     implements MemberInfoService {
 
-  @Autowired
+  @Autowired(required = false)
   private MemberInfoMapper memberInfoMapper;
 
   @Override
@@ -62,7 +63,7 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
 
   @Override
   @Retryable(value = Exception.class, backoff = @Backoff(delay = 300L, multiplier = 1.5))
-  public void updateBalanceWithRecharge(Long memberId, BigDecimal amount,BigDecimal totalAmount) {
+  public void updateBalanceWithRecharge(Long memberId, BigDecimal amount, BigDecimal totalAmount) {
     if (BigDecimal.ZERO.compareTo(amount) > 0) {
       throw new ServiceException("金额不正确，金额必须大于等于0");
     }
@@ -133,5 +134,10 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
     }
 
     return newBalance;
+  }
+
+  @Override
+  public int updateClearGTMember(CleanAccountDTO dto) {
+    return memberInfoMapper.updateClearGTMember(dto);
   }
 }

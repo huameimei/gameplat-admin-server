@@ -8,12 +8,18 @@ import com.gameplat.admin.enums.CashEnum;
 import com.gameplat.admin.enums.ProxyPayStatusEnum;
 import com.gameplat.admin.enums.WithdrawStatus;
 import com.gameplat.admin.feign.PaymentCenterFeign;
-import com.gameplat.admin.model.bean.*;
+import com.gameplat.admin.model.bean.AdminLimitInfo;
+import com.gameplat.admin.model.bean.ProxyPayMerBean;
+import com.gameplat.admin.model.bean.ReturnMessage;
 import com.gameplat.admin.service.*;
 import com.gameplat.admin.util.MoneyUtils;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.json.JsonUtils;
 import com.gameplat.base.common.util.StringUtils;
+import com.gameplat.basepay.pay.bean.NameValuePair;
+import com.gameplat.basepay.proxypay.thirdparty.ProxyCallbackContext;
+import com.gameplat.basepay.proxypay.thirdparty.ProxyDispatchContext;
+import com.gameplat.basepay.proxypay.thirdparty.ProxyPayBackResult;
 import com.gameplat.common.enums.BooleanEnum;
 import com.gameplat.common.enums.SwitchStatusEnum;
 import com.gameplat.common.enums.UserTypes;
@@ -296,7 +302,7 @@ public class ProxyPayServiceImpl implements ProxyPayService {
       memberWithdraw.setApproveReason("第三方出款失败");
       memberWithdraw.setProxyPayDesc("第三方出款失败");
       updateStatus(memberWithdraw, orignCashStatus, ProxyPayStatusEnum.PAY_FAIL.getCode());
-      log.info("第三方出款订单 ：{} ！出款失败信息： {}", memberWithdraw.getCashOrderNo(), result.getMessge());
+      log.info("第三方出款订单 ：{} ！出款失败信息： {}", memberWithdraw.getCashOrderNo(), result.getMessage());
       return result.getResponseMsg();
     }
 

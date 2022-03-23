@@ -1,7 +1,7 @@
 package com.gameplat.admin.service;
 
-import com.gameplat.admin.model.bean.NameValuePair;
 import com.gameplat.admin.model.bean.ReturnMessage;
+import com.gameplat.basepay.pay.bean.NameValuePair;
 import com.gameplat.security.context.UserCredential;
 
 import java.util.List;

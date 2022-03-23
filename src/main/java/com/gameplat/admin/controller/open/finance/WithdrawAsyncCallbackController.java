@@ -1,8 +1,8 @@
 package com.gameplat.admin.controller.open.finance;
 
-import com.gameplat.admin.model.bean.NameValuePair;
 import com.gameplat.admin.service.ProxyPayService;
 import com.gameplat.base.common.util.IPUtils;
+import com.gameplat.basepay.pay.bean.NameValuePair;
 import lombok.SneakyThrows;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;

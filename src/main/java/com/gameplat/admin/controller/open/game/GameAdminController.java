@@ -16,6 +16,7 @@ import com.gameplat.log.enums.LogType;
 import com.gameplat.model.entity.member.Member;
 import com.gameplat.redis.api.RedisService;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import lombok.extern.slf4j.Slf4j;
@@ -47,7 +48,8 @@ public class GameAdminController {
     gameBalanceVO.setPlatformCode(dto.getPlatformCode());
     gameBalanceVO.setStatus(ResultStatusEnum.SUCCESS.getValue());
     try {
-      BigDecimal amount = gameAdminService.getBalance(dto.getPlatformCode(), member);
+      BigDecimal amount =
+          gameAdminService.getBalance(dto.getPlatformCode(), member).setScale(2, RoundingMode.DOWN);
       gameBalanceVO.setBalance(amount);
     } catch (Exception e) {
       log.error("查询失败：{}", e.getMessage());
@@ -86,7 +88,8 @@ public class GameAdminController {
     gameRecycleVO.setPlatformCode(dto.getPlatformCode());
     gameRecycleVO.setStatus(ResultStatusEnum.SUCCESS.getValue());
     try {
-      BigDecimal amount = gameAdminService.getBalance(dto.getPlatformCode(), member);
+      BigDecimal amount =
+          gameAdminService.getBalance(dto.getPlatformCode(), member).setScale(2, RoundingMode.DOWN);
       gameRecycleVO.setBalance(amount);
       if (amount.compareTo(BigDecimal.ZERO) > 0) {
         gameAdminService.transfer(
@@ -120,7 +123,8 @@ public class GameAdminController {
     gameConfiscatedVO.setStatus(ResultStatusEnum.SUCCESS.getValue());
     try {
       // 先获取游戏余额
-      BigDecimal amount = gameAdminService.getBalance(dto.getPlatformCode(), member);
+      BigDecimal amount =
+          gameAdminService.getBalance(dto.getPlatformCode(), member).setScale(2, RoundingMode.DOWN);
       gameConfiscatedVO.setBalance(amount);
       if (amount.compareTo(BigDecimal.ZERO) > 0) {
         gameAdminService.confiscated(dto.getPlatformCode(), member, amount);

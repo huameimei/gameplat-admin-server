@@ -42,6 +42,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -232,7 +233,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
   @Override
   public void disableAccount(String account) {
     SysUser user = this.getByUsername(account);
-    if (EnableEnum.isEnabled(user.getStatus())) {
+    if (Objects.nonNull(user) && EnableEnum.isEnabled(user.getStatus())) {
       this.lambdaUpdate()
           .set(SysUser::getStatus, EnableEnum.DISABLED.code())
           .eq(SysUser::getUserId, user.getUserId())

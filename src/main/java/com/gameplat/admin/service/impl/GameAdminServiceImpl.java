@@ -45,6 +45,7 @@ import com.gameplat.model.entity.message.Message;
 import com.gameplat.redis.api.RedisService;
 import com.google.common.collect.Lists;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -632,7 +633,8 @@ public class GameAdminServiceImpl implements GameAdminService {
                     gameRecycleVO.setPlatformName(item.getName());
                     gameRecycleVO.setStatus(ResultStatusEnum.SUCCESS.getValue()); // 默认成功
                     try {
-                      BigDecimal amount = this.getBalance(item.getCode(), member);
+                      BigDecimal amount =
+                          this.getBalance(item.getCode(), member).setScale(2, RoundingMode.DOWN);
                       gameRecycleVO.setBalance(amount);
                       if (amount.compareTo(BigDecimal.ZERO) > 0) {
                         this.transfer(
@@ -730,7 +732,8 @@ public class GameAdminServiceImpl implements GameAdminService {
                       return gameBalanceVO;
                     }
                     try {
-                      gameBalanceVO.setBalance(this.getBalance(item.getCode(), member));
+                      gameBalanceVO.setBalance(
+                          this.getBalance(item.getCode(), member).setScale(2, RoundingMode.DOWN));
                     } catch (Exception e) {
                       log.error("查询余额错误：{}", e.getMessage());
                       gameBalanceVO.setBalance(BigDecimal.ZERO);
@@ -805,7 +808,8 @@ public class GameAdminServiceImpl implements GameAdminService {
                     }
                     try {
                       // 先获取游戏余额
-                      BigDecimal amount = this.getBalance(item.getCode(), member);
+                      BigDecimal amount =
+                          this.getBalance(item.getCode(), member).setScale(2, RoundingMode.DOWN);
                       if (amount.compareTo(BigDecimal.ZERO) > 0) {
                         this.confiscated(item.getCode(), member, amount);
                       } else {

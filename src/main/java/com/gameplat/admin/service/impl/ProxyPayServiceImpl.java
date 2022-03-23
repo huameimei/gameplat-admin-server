@@ -489,10 +489,6 @@ public class ProxyPayServiceImpl implements ProxyPayService {
       memberRwReportService.addWithdraw(member, memberInfo.getTotalWithdrawTimes(), memberWithdraw);
     }
 
-    // 更新会员信息表
-    memberInfoService.updateBalanceWithWithdraw(
-        memberWithdraw.getMemberId(), memberWithdraw.getCashMoney());
-
     // 删除出款验证打码量记录的数据
     validWithdrawService.remove(memberWithdraw.getMemberId(), memberWithdraw.getCreateTime());
 

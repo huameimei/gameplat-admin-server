@@ -150,7 +150,6 @@ public class SystemConfigServiceImpl implements SystemConfigService {
   }
 
   @Override
-  @CacheInvalidate(name = CachedKeys.DICT_DATA_CACHE, key = "#dto.dictType")
   public void configDataEdit(OperSystemConfigDTO dto) {
     JSONObject json = dto.getJsonData();
     // json遍历

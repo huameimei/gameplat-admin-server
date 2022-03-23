@@ -5,6 +5,8 @@ import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.toolkit.Constants;
 import com.gameplat.admin.model.bean.ActivityStatisticItem;
+import com.gameplat.admin.model.bean.PayLeaderboard;
+import com.gameplat.admin.model.bean.PayLeaderboardParam;
 import com.gameplat.admin.model.dto.MemberActivationDTO;
 import com.gameplat.admin.model.vo.MemberActivationVO;
 import com.gameplat.admin.model.vo.SalaryRechargeVO;
@@ -66,4 +68,6 @@ public interface RechargeOrderMapper extends BaseMapper<RechargeOrder> {
       @Param("endDate") String endDate,
       @Param("agentName") String agentName,
       @Param("isInclude") Integer isInclude);
+
+  List<PayLeaderboard> getLeaderboard(PayLeaderboardParam payLeaderboardParam);
 }

@@ -221,8 +221,8 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
     BigDecimal approveMoney = memberWithdraw.getCashMoney().subtract(afterCounterFee);
     BigDecimal approveCurrencyCount = BigDecimal.ZERO;
     if (Objects.nonNull(memberWithdraw.getWithdrawType())
-        && !memberWithdraw.getWithdrawType().equals(WithdrawTypeConstant.BANK_CURRENCY)
-        && !memberWithdraw.getWithdrawType().equals(WithdrawTypeConstant.DIRECT_CURRENCY)) {
+        && !memberWithdraw.getWithdrawType().equals(WithdrawTypeConstant.BANK)
+        && !memberWithdraw.getWithdrawType().equals(WithdrawTypeConstant.DIRECT)) {
       approveCurrencyCount = approveMoney.divide(memberWithdraw.getCurrencyRate());
     }
     LambdaUpdateWrapper<MemberWithdraw> update = Wrappers.lambdaUpdate();
@@ -253,7 +253,6 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
       Integer cashStatus,
       Integer curStatus,
       boolean isDirect,
-      String approveReason,
       UserCredential userCredential,
       UserEquipment userEquipment)
       throws Exception {
@@ -305,9 +304,9 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
           memberWithdraw.getCashMoney(),
           userCredential.getUsername());
     }
-
+    String approveReason = null;
     if (isDirect) {
-      approveReason = approveReason != null ? approveReason + "(免提直充)" : "免提直充";
+      approveReason = "免提直充";
     }
     // 设置会员层级
     memberWithdraw.setMemberLevel(member.getUserLevel());
@@ -335,8 +334,6 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
           memberRwReportService.addWithdraw(
               member, memberInfo.getTotalWithdrawTimes(), memberWithdraw);
         }
-        // 扣除会员余额
-        memberInfoService.updateBalance(member.getId(), memberWithdraw.getCashMoney().negate());
         // 删除出款验证打码量记录的数据
         validWithdrawService.remove(memberWithdraw.getMemberId(), memberWithdraw.getCreateTime());
         // 免提直充

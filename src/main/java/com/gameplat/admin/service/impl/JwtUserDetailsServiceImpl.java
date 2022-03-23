@@ -9,6 +9,7 @@ import com.gameplat.model.entity.sys.SysUser;
 import com.gameplat.security.context.UserCredential;
 import com.gameplat.security.util.SecurityUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.LockedException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -33,6 +34,11 @@ public class JwtUserDetailsServiceImpl implements UserDetailsService {
     SysUser user =
         Optional.ofNullable(userService.getByUsername(username))
             .orElseThrow(() -> new UsernameNotFoundException("用户名不存在或密码错误!"));
+
+    // 判断用户是否被锁定了
+    if (SysUserEnums.Status.DISABLED.match(user.getStatus())) {
+      throw new LockedException("账号已被禁用，如有疑问请联系管理员");
+    }
 
     Set<String> roles = roleService.getRolesByUserId(user.getUserId());
     Set<String> permissions = menuService.getPermissionsByUserId(user.getUserId());

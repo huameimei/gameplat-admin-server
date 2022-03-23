@@ -306,6 +306,7 @@ public class OtthServiceImpl implements OtthService {
     httpClient.setPara(params);
     httpClient.addHead("plat_code", dbSuffix);
     httpClient.addHead("Cookie", request.getHeader("Cookie"));
+    log.info(" 转发聊天室接口 {} - {}", apiUrl, params);
     HttpRespBean respBean = httpClient.execute();
     return handleResponse(respBean, response);
   }

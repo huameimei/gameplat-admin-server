@@ -17,6 +17,7 @@ import com.gameplat.admin.model.vo.TpMerchantPayTypeVO;
 import com.gameplat.admin.model.vo.TpMerchantVO;
 import com.gameplat.admin.service.TpInterfaceService;
 import com.gameplat.admin.service.TpMerchantService;
+import com.gameplat.admin.service.TpPayChannelService;
 import com.gameplat.admin.service.TpPayTypeService;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.json.JsonUtils;
@@ -46,6 +47,7 @@ public class TpMerchantServiceImpl extends ServiceImpl<TpMerchantMapper, TpMerch
 
   @Autowired private TpInterfaceService tpInterfaceService;
 
+  @Autowired private TpPayChannelService tpPayChannelService;
   @Override
   public void update(TpMerchantEditDTO dto) {
     TpMerchant tpMerchant = this.getById(dto.getId());
@@ -96,7 +98,7 @@ public class TpMerchantServiceImpl extends ServiceImpl<TpMerchantMapper, TpMerch
   @Override
   public void delete(Long id) {
     this.removeById(id);
-    //    tpPayChannelService.deleteByMerchantId(id);
+    tpPayChannelService.deleteByMerchantId(id);
   }
 
   @Override

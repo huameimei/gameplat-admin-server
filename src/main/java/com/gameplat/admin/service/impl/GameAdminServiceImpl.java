@@ -189,7 +189,7 @@ public class GameAdminServiceImpl implements GameAdminService {
         gameTransferRecord.setStatus(GameTransferStatus.SUCCESS.getValue());
         gameTransferRecord.setRemark(record.getRemark() + "，已审核，游戏平台已转入。");
         gameTransferRecordService.fillOrders(gameTransferRecord);
-        // 真人转出成功，平台未转入
+        // 游戏转出成功，平台未转入
       } else if (status == GameTransferStatus.IN.getValue()
           || status == GameTransferStatus.IN_GAME_FAIL.getValue()) {
         // 更新状态
@@ -198,15 +198,13 @@ public class GameAdminServiceImpl implements GameAdminService {
         gameTransferRecordService.fillOrders(gameTransferRecord);
         // 查账变记录是否有此定单
         MemberBill memberBill =
-            memberBillService.queryLiveBill(
+            memberBillService.queryGameMemberBill(
                 member.getId(), gameTransferRecord.getOrderNo(), TranTypes.GAME_IN.getValue());
         if (memberBill == null) {
           memberBill = new MemberBill();
           // 转入系统
           MemberInfo memberInfo = memberInfoService.getById(member.getId());
-          if (memberInfo == null) {
-            throw new ServiceException("请查询会员余额是否存在");
-          }
+          Assert.notNull(memberInfo, "请查询会员余额是否存在");
           // 平台入款操作
           memberInfoService.updateBalanceWithRecharge(
               member.getId(), record.getAmount(), record.getAmount());
@@ -235,9 +233,7 @@ public class GameAdminServiceImpl implements GameAdminService {
       }
     } else {
       MemberInfo memberInfo = memberInfoService.getById(member.getId());
-      if (memberInfo == null) {
-        throw new ServiceException("请查询会员余额是否存在");
-      }
+      Assert.notNull(memberInfo, "请查询会员余额是否存在");
       // 平台转出成功，补真人
       if (status == GameTransferStatus.OUT.getValue()) {
         gameTransferRecord.setStatus(GameTransferStatus.SUCCESS.getValue());
@@ -728,7 +724,7 @@ public class GameAdminServiceImpl implements GameAdminService {
                     gameBalanceVO.setStatus(ResultStatusEnum.SUCCESS.getValue());
                     if (item.getTransfer() != null
                         && item.getTransfer().equals(TrueFalse.FALSE.getValue())) {
-                      gameBalanceVO.setErrorMsg(item.getName() + "查询余额通道正在维护中,请耐心等到");
+                      gameBalanceVO.setErrorMsg(item.getName() + "查询余额通道正在维护中,请耐心等待");
                       gameBalanceVO.setBalance(BigDecimal.ZERO);
                       gameBalanceVO.setStatus(ResultStatusEnum.FAILED.getValue());
                       return gameBalanceVO;
@@ -803,7 +799,7 @@ public class GameAdminServiceImpl implements GameAdminService {
 
                     if (item.getTransfer() != null
                         && item.getTransfer().equals(TrueFalse.FALSE.getValue())) {
-                      gameConfiscatedVO.setErrorMsg(item.getName() + "查询余额通道正在维护中,请耐心等到");
+                      gameConfiscatedVO.setErrorMsg(item.getName() + "查询余额通道正在维护中,请耐心等待");
                       gameConfiscatedVO.setStatus(ResultStatusEnum.FAILED.getValue());
                       return gameConfiscatedVO;
                     }

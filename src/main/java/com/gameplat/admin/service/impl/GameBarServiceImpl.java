@@ -3,13 +3,16 @@ package com.gameplat.admin.service.impl;
 import cn.hutool.core.lang.Assert;
 import com.alibaba.csp.sentinel.annotation.SentinelResource;
 import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.convert.GameBarConvert;
 import com.gameplat.admin.mapper.GameBarMapper;
 import com.gameplat.admin.model.dto.GameBarDTO;
 import com.gameplat.admin.model.vo.GameBarVO;
 import com.gameplat.admin.service.GameBarService;
+import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.model.entity.game.GameBar;
 import com.gameplat.security.SecurityUserHolder;
 import com.gameplat.security.context.UserCredential;
@@ -75,6 +78,7 @@ public class GameBarServiceImpl extends ServiceImpl<GameBarMapper, GameBar> impl
       dto.setUpdateBy(credential.getUsername());
       boolean update = this.lambdaUpdate()
               .set(ObjectUtils.isNotEmpty(dto.getName()), GameBar::getName, dto.getName())
+              .set(ObjectUtils.isNotEmpty(dto.getCode()), GameBar::getCode, dto.getCode())
               .set(ObjectUtils.isNotEmpty(dto.getPcImg()), GameBar::getPcImg, dto.getPcImg())
               .set(ObjectUtils.isNotEmpty(dto.getIsShow()), GameBar::getIsShow, dto.getIsShow())
               .set(ObjectUtils.isNotEmpty(dto.getSort()), GameBar::getSort, dto.getSort())
@@ -84,9 +88,28 @@ public class GameBarServiceImpl extends ServiceImpl<GameBarMapper, GameBar> impl
               .set(GameBar::getUpdateTime, new Date())
               .eq(GameBar::getId, dto.getId())
               .update();
+      log.info("修改游戏导航{}",update);
     }catch (Exception e){
       log.error("编辑游戏导航异常{0}",e);
       Assert.isFalse(true,"编辑游戏导航异常");
     }
   }
+
+
+  /**
+   * 清除热门中的游戏
+   */
+  @Override
+  @SentinelResource(value = "editGameBar", fallback = "sentineFallBack")
+  public void deleteGameBar(GameBarDTO dto) {
+    LambdaQueryWrapper<GameBar> query = Wrappers.lambdaQuery();
+    query.eq(GameBar::getId, dto.getId()).eq(GameBar::getCode, "hotGame");
+    GameBar gameBar = mapper.selectOne(query);
+    if (gameBar == null){
+      throw new ServiceException("异常的操作");
+    }
+    this.remove(query);
+  }
+
+
 }

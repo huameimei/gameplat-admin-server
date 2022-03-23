@@ -34,4 +34,14 @@ public class GameBarController {
     public void editGameBar(@RequestBody GameBarDTO dto) {
         service.editGameBar(dto);
     }
+
+
+    /**
+     * 将游戏从热门导航中移除
+     */
+    @PostMapping("/delete")
+    @PreAuthorize("hasAuthority('game:bar:delete')")
+    public void deleteGameBar(@RequestBody GameBarDTO dto) {
+        service.deleteGameBar(dto);
+    }
 }

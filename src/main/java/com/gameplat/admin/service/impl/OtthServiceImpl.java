@@ -134,6 +134,11 @@ public class OtthServiceImpl implements OtthService {
     return gameConfigService.queryGameConfigInfoByPlatCode(TransferTypesEnum.KGNL.getCode());
   }
 
+  public String getLottTenantCode() {
+    return getLottConfig()
+            .getString("proxy");
+  }
+
   /** 获取头信息 */
   private Header[] getHeader(String tenant) {
     return new Header[] {
@@ -230,6 +235,10 @@ public class OtthServiceImpl implements OtthService {
   @SneakyThrows
   public String otthProxyHttpPost(
       String apiUrl, String body, HttpServletRequest request, String proxy) {
+
+    //修改，从gameconfig获取租户标识
+    proxy = getLottTenantCode();
+
     Header[] header =
         new Header[] {
           new BasicHeader("Content-Type", "application/json"), new BasicHeader("plat_code", proxy)
@@ -269,7 +278,7 @@ public class OtthServiceImpl implements OtthService {
             sysLog.setIpDesc(getAddressByIpThird(ipaddress));
             sysLog.setDesc(content);
             sysLog.setPath(apiUrl);
-            sysLog.setDbSuffix(proxy);
+            sysLog.setDbSuffix(getLottTenantCode());
             sysLog.setCreateTime(DateUtils.get0ZoneDate(new Date(), DateUtils.DATE_TIME_PATTERN));
             sysLog.setDoTime((System.currentTimeMillis() - start) + "");
             // 保存操作日志
@@ -292,7 +301,8 @@ public class OtthServiceImpl implements OtthService {
   @Override
   public Object otthProxyHttpGet(
       String apiUrl, HttpServletRequest request, HttpServletResponse response, PageDTO page) {
-    String dbSuffix = tenantConfig.getTenantCode();
+
+    String dbSuffix = getLottTenantCode();
     Enumeration<String> names = request.getParameterNames();
     Map<String, String> params = new HashMap<>();
     while (names.hasMoreElements()) {
@@ -570,6 +580,8 @@ public class OtthServiceImpl implements OtthService {
     }
     ;
   }
+
+
 
   @Override
   public ChatUserVO getChatUser(String account) {

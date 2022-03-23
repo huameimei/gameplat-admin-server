@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gameplat.admin.mapper.AgentDivideMapper">
+    <!--检查方案是否在被使用-->
+    <select id="checkPlanUsed" resultType="int">
+        select count(1) from member_info where divide_type = #{divideType} and plan_id = #{planId}
+    </select>
+
+    <!--检查方案是否被使用-->
+    <select id="agentPlanCheck" resultType="int">
+        select count(1)
+        from member as m inner join member_info as mi on m.id = mi.member_id
+        where m.user_type = 'A'
+        and m.account != 'webRoot'
+        and m.account != 'wapRoot'
+        and m.account != 'testRoot'
+        and mi.divide_type = 1
+        and mi.plan_id = #{planId}
+    </select>
+
+    <!--代理账号列表-->
+    <select id="queryPage" resultType="com.gameplat.admin.model.vo.AgentPlanVO">
+        select
+        m.id as agentId,
+        m.account as agentName,
+        m.agent_level as levelNum,
+        m.parent_id as parentId,
+        m.parent_name as parentName,
+        m.super_path as agentPath,
+        rslp.plan_id as planId,
+        rslp.plan_name as planName,
+        m.update_time as updateTime,
+        m.update_by as updateBy,
+        m.remark
+        from member as m
+        inner join member_info as mi on m.id = mi.member_id
+        left join rebate_same_level_plan as rslp on mi.plan_id = rslp.plan_id
+        <where>
+            m.user_type = 'A'
+            and m.account != 'webRoot'
+            and m.account != 'wapRoot'
+            and m.account != 'testRoot'
+            <if test="agentName != null and agentName != ''">
+                and m.account = #{agentName}
+            </if>
+            <choose>
+                <when test="divideType == 0">
+                    and m.agent_level = 1 and mi.divide_type = 0
+                </when>
+                <when test="divideType == 1">
+                    and mi.divide_type = 1
+                </when>
+            </choose>
+        </where>
+    </select>
+
+    <!--代理线绑定分红方案-->
+    <update id="bindAgentLineDivide">
+        update member_info set
+        divide_type = #{divideType}, plan_id = #{planId}
+        where member_id in
+        <foreach collection="memberIds" open="(" item="mid" index="i" separator="," close=")">
+            #{mid}
+        </foreach>
+    </update>
+
+    <select id="getSuperProxyName" resultType="string" parameterType="long">
+        select account from member
+        where agent_level = 1
+        and id in
+        <foreach collection="superProxyIds" open="(" separator="," close=")" item="sid" index="i">
+            #{sid}
+        </foreach>
+    </select>
+
+    <select id="getLowerIds" resultType="long" parameterType="String">
+        select id from member
+        where 1 = 1
+        and super_path REGEXP
+        <foreach collection="superProxyNames" index="i" item="name" open="'" separator="|" close="'">
+            concat('/',${name},'/')
+        </foreach>
+    </select>
+
+    <!--代理绑定分红方案-->
+    <update id="bindAgentDivide">
+        update member_info set
+        divide_type = #{divideType}, plan_id = #{planId}
+        where member_id = #{agentId}
+    </update>
+
+    <!--代理佣金报表-->
+    <select id="agentRebateReport" resultType="com.gameplat.model.entity.proxy.RebateReport">
+        select
+        m.id as agentId,
+        m.account as agentName,
+        m.enabled as accountStatus,
+        m.agent_level as levelNum,
+        m.parent_id as parentId,
+        m.parent_name as parentName,
+        m.super_path as agentPath,
+        -- srs.sub_member as subMember,
+        -- srs.sub_agent as subAgent,
+        mi.divide_type as divideType,
+        mi.plan_id as planId,
+        rslp.plan_name as planName
+        from member as m
+        inner join member_info as mi on m.id = mi.member_id
+        left join rebate_same_level_plan as rslp on mi.plan_id = rslp.plan_id
+        <where>
+            m.user_type = 'A'
+            and m.account != 'webRoot'
+            and m.account != 'wapRoot'
+            and m.account != 'testRoot'
+            and mi.divide_type = 1
+            <if test="agentName != null and agentName != ''">
+                and m.account = #{agentName}
+            </if>
+        </where>
+    </select>
+</mapper>

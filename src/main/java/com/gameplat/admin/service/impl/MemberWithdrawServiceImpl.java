@@ -334,8 +334,6 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
           memberRwReportService.addWithdraw(
               member, memberInfo.getTotalWithdrawTimes(), memberWithdraw);
         }
-        // 扣除会员余额
-        memberInfoService.updateBalance(member.getId(), memberWithdraw.getCashMoney().negate());
         // 删除出款验证打码量记录的数据
         validWithdrawService.remove(memberWithdraw.getMemberId(), memberWithdraw.getCreateTime());
         // 免提直充

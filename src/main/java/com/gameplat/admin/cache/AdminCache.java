@@ -31,7 +31,7 @@ public class AdminCache {
    * @return int
    */
   public int getErrorPasswordCount(String account) {
-    Integer count = redisTemplate.opsForValue().get(CachedKeys.ADMIN_PWD_ERROR_COUNT + account);
+    Integer count = redisTemplate.opsForValue().get(this.getPwdErrorCountKey(account));
     return Optional.ofNullable(count).orElse(0);
   }
 
@@ -43,12 +43,16 @@ public class AdminCache {
     }
 
     // 更新密码错误次数
-    String key = CachedKeys.ADMIN_PWD_ERROR_COUNT + account;
+    String key = this.getPwdErrorCountKey(account);
     redisTemplate.opsForValue().increment(key);
     redisTemplate.expire(key, 1, TimeUnit.DAYS);
   }
 
   public void cleanErrorPasswordCount(String account) {
-    redisTemplate.delete(CachedKeys.ADMIN_PWD_ERROR_COUNT + account);
+    redisTemplate.delete(this.getPwdErrorCountKey(account));
+  }
+
+  private String getPwdErrorCountKey(String account) {
+    return String.format(CachedKeys.ADMIN_PWD_ERROR_COUNT, account);
   }
 }

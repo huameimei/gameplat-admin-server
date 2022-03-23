@@ -20,7 +20,7 @@ import java.util.List;
  */
 @Slf4j
 @RestController
-@RequestMapping("/api/open/float")
+@RequestMapping("/api/admin/open/float")
 public class TenantFloatTypeController {
   @Autowired private TenantFloatTypeService tenantFloatTypeService;
 

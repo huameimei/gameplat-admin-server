@@ -70,4 +70,6 @@ public interface RechargeOrderService extends IService<RechargeOrder> {
   List<JSONObject> getSpreadReport(List<SpreadUnion> list, String startTime, String endTime);
 
   List<ThreeRechReportVo> findThreeRechReport(GameRWDataReportDto dto);
+
+  Integer getUntreatedRechargeCount();
 }

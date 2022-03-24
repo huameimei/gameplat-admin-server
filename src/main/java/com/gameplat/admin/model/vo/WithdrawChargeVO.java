@@ -16,5 +16,5 @@ public class WithdrawChargeVO implements Serializable {
 
     private Integer rechargeCount;
 
-    private Integer withdrawCounts;
+//    private Integer withdrawCounts;
 }

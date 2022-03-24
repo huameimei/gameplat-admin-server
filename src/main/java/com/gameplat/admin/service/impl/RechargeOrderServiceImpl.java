@@ -362,7 +362,7 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
   public List<ActivityStatisticItem> findRechargeDateList(Map<String, Object> map) {
     List<ActivityStatisticItem> rechargeDateList = rechargeOrderMapper.findRechargeDateList(map);
     if (CollectionUtils.isNotEmpty(rechargeDateList)) {
-      // 将逗号分隔的日期String转成List<Date>
+      // 将逗号分隔的日期String转成List<Date>R
       for (ActivityStatisticItem rechargeDate : rechargeDateList) {
         if (StringUtils.isNotEmpty(rechargeDate.getRechargeTimes())) {
           List<String> dateList = Arrays.asList(rechargeDate.getRechargeTimes().split(","));
@@ -821,6 +821,11 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
   public List<ThreeRechReportVo> findThreeRechReport(GameRWDataReportDto dto) {
     List<RechargeOrder> list = rechargeOrderMapper.selectList(this.builderMemberTodayQuery(dto));
     return BeanUtil.copyToList(list, ThreeRechReportVo.class);
+  }
+
+  @Override
+  public Integer getUntreatedRechargeCount() {
+    return rechargeOrderMapper.getUntreatedRechargeCount();
   }
 
   /** 查询在线支付 */

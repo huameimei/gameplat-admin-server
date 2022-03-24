@@ -29,8 +29,9 @@
         when 3 then d.red_envelope
         else 0 end
         ) rewordAmount
-        from (select max(id), user_id, user_name, create_time, current_level from member_growth_record GROUP BY user_id)
-        c
+        from (select id, user_id, user_name, create_time, current_level
+              from member_growth_record where id in (select max(id) from member_growth_record GROUP BY user_id)
+        ) c
         LEFT JOIN member_growth_level d ON c.current_level= d.`level`
         <where>
             <if test="type != null and type == 0">

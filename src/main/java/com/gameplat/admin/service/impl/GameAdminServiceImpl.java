@@ -604,7 +604,7 @@ public class GameAdminServiceImpl implements GameAdminService {
     Assert.notNull(member, "会员账号不存在，请重新检查");
     List<GamePlatform> playedPlatformList = getGamePlatformList(member);
     if (CollectionUtils.isEmpty(playedPlatformList)) {
-      throw new ServiceException("游戏平台额度转换通道维护中");
+      new ArrayList<>();
     }
     String key = "user_game_balance_" + member.getId();
     try {

@@ -15,5 +15,5 @@ public interface RechargeConfigService extends IService<RechargeConfig> {
    *
    * @return List
    */
-  List<RechargeConfig> queryAll(Integer memberLevel);
+  List<RechargeConfig> queryAll(Integer memberLevel, Integer mode, String payCode);
 }

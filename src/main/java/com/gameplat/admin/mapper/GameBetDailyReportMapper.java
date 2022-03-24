@@ -65,4 +65,9 @@ public interface GameBetDailyReportMapper extends ExtBaseMapper<GameBetDailyRepo
       @Param("endDate") String endDate,
       @Param("agentName") String agentName,
       @Param("isInclude") Integer isInclude);
+
+  List<String> getSatisfyBetAccount(
+          @Param("minBetAmount") String minBetAmount,
+          @Param("startTime") String startTime,
+          @Param("endTime") String endTime);
 }

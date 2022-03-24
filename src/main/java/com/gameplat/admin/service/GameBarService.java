@@ -22,5 +22,11 @@ public interface GameBarService extends IService<GameBar> {
     /**
      * 修改导航栏配置
      */
-    void deleteGameBar(GameBarDTO dto);
+    void deleteGameBar(Long id);
+
+
+    /**
+     * 修改导航栏配置
+     */
+    void setHot(Long id);
 }

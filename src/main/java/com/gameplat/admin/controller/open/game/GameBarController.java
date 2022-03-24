@@ -41,7 +41,16 @@ public class GameBarController {
      */
     @PostMapping("/delete")
     @PreAuthorize("hasAuthority('game:bar:delete')")
-    public void deleteGameBar(@RequestBody GameBarDTO dto) {
-        service.deleteGameBar(dto);
+    public void deleteGameBar(@RequestParam Long id) {
+        service.deleteGameBar(id);
+    }
+
+    /**
+     * 将游戏设置为热门
+     */
+    @GetMapping("setHot")
+    @PreAuthorize("hasAuthority('game:bar:setHot')")
+    public void setHot(@RequestParam Long id) {
+        service.setHot(id);
     }
 }

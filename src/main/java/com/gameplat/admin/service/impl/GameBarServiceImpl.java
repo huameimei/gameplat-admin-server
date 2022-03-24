@@ -2,7 +2,6 @@ package com.gameplat.admin.service.impl;
 
 import cn.hutool.core.lang.Assert;
 import com.alibaba.csp.sentinel.annotation.SentinelResource;
-import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -37,6 +36,8 @@ public class GameBarServiceImpl extends ServiceImpl<GameBarMapper, GameBar> impl
   @Autowired private GameBarMapper mapper;
 
   private static final Integer BAR_TYPE = 0; //0 顶级导航
+
+  public static final String  HOT_GAME = "hotGame"; //热门导航
 
   /**
    * 获取游戏导航列表
@@ -101,14 +102,29 @@ public class GameBarServiceImpl extends ServiceImpl<GameBarMapper, GameBar> impl
    */
   @Override
   @SentinelResource(value = "editGameBar", fallback = "sentineFallBack")
-  public void deleteGameBar(GameBarDTO dto) {
+  public void deleteGameBar(Long id) {
     LambdaQueryWrapper<GameBar> query = Wrappers.lambdaQuery();
-    query.eq(GameBar::getId, dto.getId()).eq(GameBar::getCode, "hotGame");
+    query.eq(GameBar::getId, id).eq(GameBar::getCode, HOT_GAME);
     GameBar gameBar = mapper.selectOne(query);
     if (gameBar == null){
       throw new ServiceException("异常的操作");
     }
     this.remove(query);
+  }
+
+
+  /**
+   * 将某个游戏设置为热门游戏
+   */
+  @Override
+  public void setHot(Long id) {
+    GameBar one = this.lambdaQuery().eq(GameBar::getId, id).one();
+    if (one != null){
+      one.setCode(HOT_GAME);
+      this.save(one);
+    }else{
+      throw new ServiceException("异常的操作");
+    }
   }
 
 

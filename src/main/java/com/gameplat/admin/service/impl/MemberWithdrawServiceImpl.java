@@ -340,7 +340,8 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
         if (isDirect) {
           this.directCharge(memberWithdraw, userCredential, userEquipment);
         }
-
+        // 移除会员提现冻结金额
+        memberInfoService.updateFreeze(member.getId(), memberWithdraw.getCashMoney().negate());
       } else if (WithdrawStatus.CANCELLED.getValue() == cashStatus) { // 取消出款操作
         // 释放会员提现冻结金额
         memberInfoService.updateFreeze(member.getId(), memberWithdraw.getCashMoney().negate());
@@ -377,6 +378,8 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
         bill.setContent(content);
         bill.setOperator(userCredential.getUsername());
         memberBillService.save(member, bill);
+        // 移除会员提现冻结金额
+        memberInfoService.updateFreeze(member.getId(), memberWithdraw.getCashMoney().negate());
       }
       // 新增出款记录
       insertWithdrawHistory(memberWithdraw);

@@ -113,9 +113,7 @@ public class TenantSettingController {
   public Result<Object> getTenantSettings(TenantSettingVO tenantSettingVO) {
     // 查询租户主题
     if (Constants.TEMPLATE_CONFIG_THEME.equals(tenantSettingVO.getSettingType())) {
-      TenantSetting setting = new TenantSetting();
-      setting.setSettingType(Constants.TEMPLATE_CONFIG_THEME);
-      setting.setDisplay(EnableEnum.ENABLED.code());
+      tenantSettingVO.setDisplay(EnableEnum.ENABLED.code());
       return Result.succeedData(tenantSettingService.getTenantSetting(tenantSettingVO));
     }
     return Result.succeedData(tenantSettingService.getAppNavigation(tenantSettingVO));

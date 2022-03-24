@@ -57,7 +57,7 @@ public class DiscountTypeController {
   }
 
   @GetMapping("/queryAll")
-  @PreAuthorize("hasAuthority('thirdParty:discountType:queryAll')")
+//  @PreAuthorize("hasAuthority('thirdParty:discountType:queryAll')")
   public List<DiscountType> queryList() {
     return discountTypeService
         .lambdaQuery()

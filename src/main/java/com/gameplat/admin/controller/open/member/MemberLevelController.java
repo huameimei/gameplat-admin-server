@@ -126,7 +126,7 @@ public class MemberLevelController {
   @GetMapping("/queryAll")
 //  @PreAuthorize("hasAuthority('member:level:queryAll')")
   public List<RechargeConfig> queryAll(Integer memberLevel) {
-    return rechargeConfigService.queryAll(memberLevel);
+    return rechargeConfigService.queryAll(memberLevel, null, null);
   }
 
   @PostMapping("/saveRechargeConfig")

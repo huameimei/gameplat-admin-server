@@ -22,8 +22,8 @@ public class RechargeConfigController {
 
   @GetMapping("/queryAll")
   @PreAuthorize("hasAuthority('thirdParty:rechargeConfig:queryAll')")
-  public List<RechargeConfig> queryAll(Integer memberLevel) {
-    return rechargeConfigService.queryAll(memberLevel);
+  public List<RechargeConfig> queryAll(Integer mode, String payCode) {
+    return rechargeConfigService.queryAll(-99, mode, payCode);
   }
 
   @PostMapping("/add")

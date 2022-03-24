@@ -64,6 +64,7 @@
             <if test="createBy != null">
                 create_by,
             </if>
+            create_time
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="title != null">
@@ -121,8 +122,9 @@
                 #{remarks},
             </if>
             <if test="createBy != null">
-                #{createBy}
+                #{createBy},
             </if>
+            now()
         </trim>
     </insert>
 

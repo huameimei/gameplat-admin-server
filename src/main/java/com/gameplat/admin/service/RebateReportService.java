@@ -3,12 +3,14 @@ package com.gameplat.admin.service;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
+import com.baomidou.mybatisplus.extension.service.IService;
 import com.gameplat.admin.model.dto.RebateReportDTO;
 import com.gameplat.admin.model.vo.*;
+import com.gameplat.model.entity.proxy.RebateReport;
 
 import java.util.List;
 
-public interface RebateReportService {
+public interface RebateReportService extends IService<RebateReport> {
   IPage<RebateReportVO> queryPage(PageDTO<AgentPlanVO> page, RebateReportDTO rebateReportDTO);
 
   List<RebateReportVO> getRebateReport(RebateReportDTO rebateReportDTO);
@@ -85,4 +87,12 @@ public interface RebateReportService {
    * @param countDate
    */
   int batchReviewOrSettlement(Integer currentStatus, String countDate);
+
+  /**
+   * 更新实际佣金
+   *
+   * @param reportId
+   * @return
+   */
+  int updateActualCommission(Long reportId);
 }

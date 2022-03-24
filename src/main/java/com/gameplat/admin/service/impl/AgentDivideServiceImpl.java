@@ -53,8 +53,11 @@ public class AgentDivideServiceImpl implements AgentDivideService {
     // 根据familyIds 查找出所有 对应代理线的所有id
     Set<Long> set = Convert.toSet(Long.class, familyIds);
     Set<String> superProxyNames = agentDivideMapper.getSuperProxyName(set);
-    Set<Long> lowerIds = agentDivideMapper.getLowerIds(superProxyNames);
-    int result = agentDivideMapper.bindAgentLineDivide(divideType, planId, lowerIds);
+    int result = 0;
+    for (String agentName : superProxyNames) {
+      Set<Long> lowerIds = agentDivideMapper.getProxyLowerIds(agentName);
+      result += agentDivideMapper.bindAgentLineDivide(divideType, planId, lowerIds);
+    }
     if (result == 0) {
       throw new ServiceException("代理线绑定佣金方案失败");
     }

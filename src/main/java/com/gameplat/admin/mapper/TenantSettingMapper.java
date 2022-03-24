@@ -59,4 +59,11 @@ public interface TenantSettingMapper extends BaseMapper<TenantSetting> {
    * @return
    */
   int updateListSortConfig(TenantSetting tenantSetting);
+
+  /**
+   * 多条件查询租户设置列表
+   * @param tenantSetting
+   * @return
+   */
+  List<TenantSetting> getTenantSetting(TenantSetting tenantSetting);
 }

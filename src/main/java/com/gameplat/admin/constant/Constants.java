@@ -29,6 +29,11 @@ public interface Constants {
   /** 导航栏列表 */
   String TENANT_NAVIGATION_LIST = "TENANT_NAVIGATION_LIST";
 
+  /**场景六排序列表*/
+  String LIST_SORT_CODE = "LIST_SORT_CODE";
+
+  String LIST_SORT_DESC = "体育配置场景6排序开关列表";
+
   /**
    * 租户原体育场景6排序开关设置
    */

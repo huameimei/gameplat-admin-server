@@ -190,4 +190,30 @@
         where setting_type = 'sport_config' and setting_code = 'listSort'
     </update>
 
+    <!--多条件查询租户设置列表-->
+    <select id="getTenantSetting" parameterType="com.gameplat.model.entity.setting.TenantSetting" resultMap="sysTenantSettingResult">
+        select * from tenant_setting
+        <where>
+            <if test='settingType != null and settingType != ""'>
+                and setting_type = #{settingType}
+            </if>
+            <if test='settingCode != null and settingCode != ""'>
+                and setting_code = #{settingCode}
+            </if>
+            <if test='tenant != null and tenant != ""'>
+                and tenant = #{tenant}
+            </if>
+            <if test='extend4 != null and extend4 != ""'>
+                and extend_4 = #{extend4}
+            </if>
+            <if test="display != null">
+                and display = #{display}
+            </if>
+            <if test="id != null">
+                and id = #{id}
+            </if>
+        </where>
+        order by sort ASC
+    </select>
+
 </mapper>

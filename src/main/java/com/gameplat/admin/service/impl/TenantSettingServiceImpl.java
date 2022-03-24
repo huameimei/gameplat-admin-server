@@ -277,6 +277,23 @@ public class TenantSettingServiceImpl extends ServiceImpl<TenantSettingMapper, T
             String json = sportConfig.getSettingValue();
             sportConfigValueVO = JSON.parseObject(json, SportConfigValueVO.class);
         }
+        Integer scene = sportConfigValueVO.getScene();
+        if (scene != null && scene == 6) {
+            TenantSetting tenantSetting;
+            List<TenantSetting> listSortConfigs = tenantSettingMapper.getTenantSetting(new TenantSetting() {{
+                setSettingType(Constants.SPORT_CONFIG_TYPE);
+                setSettingCode(Constants.LIST_SORT_CODE);
+            }});
+            if (listSortConfigs.isEmpty()) {
+                tenantSetting = initListSortConfig();
+            } else {
+                tenantSetting = listSortConfigs.get(0);
+            }
+            String valueJson = tenantSetting.getSettingValue();
+            List<ListSortConfigVO> list = JSON.parseArray(valueJson, ListSortConfigVO.class);
+            list.sort(Comparator.comparingInt(ListSortConfigVO::getSort));
+            sportConfigValueVO.setListSortConfigs(list);
+        }
         return sportConfigValueVO;
     }
 
@@ -358,5 +375,33 @@ public class TenantSettingServiceImpl extends ServiceImpl<TenantSettingMapper, T
             log.info("体育插入球头配置接口报错，{}, 异常{}", sportConfigValueVo, ex);
         }
         return 0;
+    }
+
+    /**
+     * 初始化开关与排序列表数据
+     */
+    private TenantSetting initListSortConfig() {
+        ArrayList<ListSortConfigVO> list = new ArrayList<>();
+        list.add(new ListSortConfigVO(1, "导航", true,"备注:导航","navigation"));
+        list.add(new ListSortConfigVO(2, "banner", true,"备注:banner","banner"));
+        list.add(new ListSortConfigVO(3, "游戏列表", true,"备注:游戏列表","gameList"));
+        list.add(new ListSortConfigVO(4, "彩系列表", true,"备注:彩系列表", "lotteryList"));
+        list.add(new ListSortConfigVO(5, "中奖记录", true,"备注:中奖记录", "winList"));
+
+        String settingValue = JSONObject.toJSONString(list);
+        TenantSetting tenantSetting = new TenantSetting();
+        tenantSetting.setSettingValue(settingValue);
+        tenantSetting.setSettingType(Constants.SPORT_CONFIG_TYPE);
+        tenantSetting.setSettingCode(Constants.LIST_SORT_CODE);
+        tenantSetting.setSettingLabel(Constants.LIST_SORT_DESC);
+        UserCredential userCredential = SecurityUserHolder.getCredential();
+        if (userCredential != null) {
+            tenantSetting.setCreateBy(userCredential.getUsername());
+        }
+        int i = tenantSettingMapper.initSportConfig(tenantSetting);
+        if (i != 1) {
+            throw new ServiceException("初始化数据异常");
+        }
+        return tenantSetting;
     }
 }

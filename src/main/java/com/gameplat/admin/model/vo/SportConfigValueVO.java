@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 /**
  * 体育设置对象 sport_setting_value
  * @author james
@@ -43,4 +45,7 @@ public class SportConfigValueVO {
     private String sportBallNavigation;
     @ApiModelProperty(value = "体育联赛导航")
     private String sportLeagueNavigation;
+
+    @ApiModelProperty("开关与排序表")
+    private List<ListSortConfigVO> listSortConfigs;
 }

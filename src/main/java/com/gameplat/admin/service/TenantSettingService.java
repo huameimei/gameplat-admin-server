@@ -2,9 +2,9 @@ package com.gameplat.admin.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.gameplat.admin.model.vo.SportConfigValueVO;
 import com.gameplat.admin.model.vo.TenantSettingVO;
 import com.gameplat.model.entity.setting.TenantSetting;
-import com.gameplat.model.entity.sys.SysTenantSetting;
 
 import java.util.List;
 
@@ -106,4 +106,7 @@ public interface TenantSettingService extends IService<TenantSetting> {
    * @return
    */
   void updateTenantSettingValue(TenantSettingVO tenantSetting);
+
+  /**获取体育配置*/
+  SportConfigValueVO getSportConfig();
 }

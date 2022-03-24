@@ -39,5 +39,17 @@ public interface TenantSettingMapper extends BaseMapper<TenantSetting> {
   /**
    * 插入配置信息
    */
-  void insetGameList(List<TenantSetting> sysTenantSettings);
+  void insetGameList(List<TenantSetting> tenantSettings);
+
+  /**
+   * 查询配置信息
+   */
+  TenantSetting getSportConfig();
+
+  /**
+   * 初始化体育配置
+   * @param tenantSetting
+   * @return
+   */
+  int initSportConfig(TenantSetting tenantSetting);
 }

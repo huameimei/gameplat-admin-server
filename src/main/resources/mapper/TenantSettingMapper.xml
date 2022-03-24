@@ -141,4 +141,45 @@
         </foreach>
     </insert>
 
+    <insert id="initSportConfig" parameterType="com.gameplat.model.entity.setting.TenantSetting">
+        INSERT INTO `sys_tenant_setting`(`tenant`,
+                                         `setting_type`,
+                                         `setting_code`,
+                                         `setting_value`,
+                                         `setting_label`,
+                                         `create_by`,
+                                         `create_time`)
+        VALUES ('default',
+                #{settingType},
+                #{settingCode},
+                #{settingValue},
+                #{settingLabel},
+                #{createBy},
+                SYSDATE())
+    </insert>
+
+    <!--查询体育配置-->
+    <select id="getSportConfig" parameterType="com.gameplat.model.entity.setting.TenantSetting"
+            resultMap="sysTenantSettingResult">
+        select `id`,
+               `setting_type`,
+               `setting_code`,
+               `setting_label`,
+               `setting_desc`,
+               `setting_value`,
+               `display`,
+               `sort`,
+               `file_path`,
+               `picture_path`,
+               `is_index`,
+               `extend_1`,
+               `extend_2`,
+               `create_by`,
+               `create_time`,
+               `update_by`,
+               `update_time`
+        from sys_tenant_setting
+        where setting_type = 'sport_config' limit 1;
+    </select>
+
 </mapper>

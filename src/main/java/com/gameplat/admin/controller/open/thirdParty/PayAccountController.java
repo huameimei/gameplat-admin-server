@@ -77,7 +77,7 @@ public class PayAccountController {
   }
 
   @GetMapping("/queryAccounts")
-  @PreAuthorize("hasAuthority('thirdParty:payAccount:queryAccounts')")
+//  @PreAuthorize("hasAuthority('thirdParty:payAccount:queryAccounts')")
   public List<String> queryAccounts() {
     return payAccountService.queryAccounts();
   }

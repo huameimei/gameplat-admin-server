@@ -444,4 +444,11 @@ public class GameBetDailyReportServiceImpl
     }
     return gameBetDailyReportMapper.queryGamePlatformReport(dto);
   }
+
+  //获取达到有效投注金额的会员账号
+  @Override
+  public List<String> getSatisfyBetAccount(String minBetAmount, String startTime, String endTime) {
+
+    return gameBetDailyReportMapper.getSatisfyBetAccount(minBetAmount, startTime, endTime);
+  }
 }

@@ -27,10 +27,8 @@ import com.gameplat.common.lang.Assert;
 import com.gameplat.model.entity.ValidWithdraw;
 import com.gameplat.model.entity.member.*;
 import com.gameplat.model.entity.message.Message;
-import com.gameplat.redis.redisson.DistributedLocker;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -109,6 +107,9 @@ public class MemberWealServiceImpl extends ServiceImpl<MemberWealMapper, MemberW
 
     @Autowired
     private MemberService memberService;
+
+    @Autowired
+    private GameBetDailyReportService gameBetDailyReportService;
 
     @Override
     public IPage<MemberWealVO> findMemberWealList(IPage<MemberWeal> page, MemberWealDTO queryDTO) {
@@ -205,15 +206,14 @@ public class MemberWealServiceImpl extends ServiceImpl<MemberWealMapper, MemberW
                     memberSalaryInfoList.stream().map(MemberWealDetail::getUserName).collect(toList());
         }
 
-        // 获取达到有效投注金额的会员账号
+        // 获取达到有效投注金额的会员账号(游戏日报表)
         List<String> betAccountList = new ArrayList<>();
         if (memberWeal.getMinBetAmount() != null
                 && memberWeal.getMinBetAmount().compareTo(new BigDecimal("0")) > 0) {
-            betAccountList =
-                    dayReportMapper.getSatisfyBetAccount(
-                            String.valueOf(memberWeal.getMinBetAmount()),
-                            formatter.format(memberWeal.getStartDate()),
-                            formatter.format(memberWeal.getEndDate()));
+            betAccountList = gameBetDailyReportService.getSatisfyBetAccount(
+                    String.valueOf(memberWeal.getMinBetAmount()),
+                    formatter.format(memberWeal.getStartDate()),
+                    formatter.format(memberWeal.getEndDate()));
         } else {
             betAccountList =
                     memberSalaryInfoList.stream().map(MemberWealDetail::getUserName).collect(toList());
@@ -299,6 +299,7 @@ public class MemberWealServiceImpl extends ServiceImpl<MemberWealMapper, MemberW
                 model.setRewordAmount(memberWealDetail.getRewordAmount());
                 model.setStatus(1);
                 model.setCreateBy(GlobalContextHolder.getContext().getUsername());
+                model.setCreateTime(DateUtil.date());
                 list.add(model);
                 totalUserCount++;
                 totalPayMoney = totalPayMoney.add(memberWealDetail.getRewordAmount());
@@ -306,15 +307,6 @@ public class MemberWealServiceImpl extends ServiceImpl<MemberWealMapper, MemberW
             memberWeal.setTotalUserCount(totalUserCount);
             memberWeal.setTotalPayMoney(totalPayMoney);
         }
-
-        // fixme 无用代码及时删除
-        List<MemberWealDetail> memberWealDetailList =
-                wealDetailService.findSatisfyMember(
-                        new MemberWealDetail() {
-                            {
-                                setWealId(id);
-                            }
-                        });
 
         // 修改了福利信息时，要重新结算，所以应该先删除
         wealDetailService.removeWealDetail(id);

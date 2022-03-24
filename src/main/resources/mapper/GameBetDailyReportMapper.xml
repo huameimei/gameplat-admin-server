@@ -389,5 +389,21 @@
         GROUP BY r.account,r.super_account,r.game_kind,r.game_type
     </select>
 
+    <select id="getSatisfyBetAccount" resultType="java.lang.String">
+        select t.account from
+        (select member_id as memberId, account, sum(valid_amount) as validAmount from game_bet_daily_report
+        <where>
+            <if test="startTime != null and startTime != ''">
+                AND stat_time &gt;= #{startTime}
+            </if>
+            <if test="endTime != null and endTime != ''">
+                AND stat_time &lt;= #{endTime}
+            </if>
+        </where>
+        GROUP BY member_id
+        ) t
+        where validAmount >= #{minBetAmount}
+    </select>
+
 
 </mapper>

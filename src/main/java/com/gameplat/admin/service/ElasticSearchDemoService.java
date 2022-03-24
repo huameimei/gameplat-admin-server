@@ -3,6 +3,7 @@ package com.gameplat.admin.service;
 import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSON;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.gameplat.admin.model.dto.MessageDistributeDTO;
 import com.gameplat.admin.model.dto.MessageFeedbackAddDTO;
 import com.gameplat.admin.model.vo.MessageFeedbackVO;
 import com.gameplat.base.common.exception.ServiceException;
@@ -65,7 +66,7 @@ public class ElasticSearchDemoService {
   }
 
   /** 添加数据 */
-  public void saves(String index, MessageFeedbackAddDTO dto) {
+  public void saves(String index, MessageDistributeDTO dto) {
     try {
       IndexRequest indexRequest = new IndexRequest(index, "_doc", String.valueOf(dto.getId()));
       indexRequest.source(new ObjectMapper().writeValueAsString(dto), XContentType.JSON);

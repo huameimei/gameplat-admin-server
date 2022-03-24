@@ -7,7 +7,9 @@ import com.gameplat.admin.model.dto.MemberLevelAllocateDTO;
 import com.gameplat.admin.model.dto.MemberLevelEditDTO;
 import com.gameplat.admin.model.dto.MemberLevelFileDTO;
 import com.gameplat.admin.model.vo.MemberLevelVO;
+import com.gameplat.admin.model.vo.PayTypeVO;
 import com.gameplat.admin.service.MemberLevelService;
+import com.gameplat.admin.service.PayTypeService;
 import com.gameplat.admin.service.RechargeConfigService;
 import com.gameplat.base.common.util.EasyExcelUtil;
 import com.gameplat.common.constant.ServiceName;
@@ -41,6 +43,8 @@ public class MemberLevelController {
   @Autowired private MemberLevelService memberLevelService;
 
   @Autowired private RechargeConfigService rechargeConfigService;
+
+  @Autowired private PayTypeService payTypeService;
 
   @GetMapping("/list")
   public List<MemberLevelVO> getList() {
@@ -120,13 +124,13 @@ public class MemberLevelController {
   }
 
   @GetMapping("/queryAll")
-  @PreAuthorize("hasAuthority('member:level:queryAll')")
+//  @PreAuthorize("hasAuthority('member:level:queryAll')")
   public List<RechargeConfig> queryAll(Integer memberLevel) {
     return rechargeConfigService.queryAll(memberLevel);
   }
 
   @PostMapping("/saveRechargeConfig")
-  @PreAuthorize("hasAuthority('member:level:add')")
+  @PreAuthorize("hasAuthority('member:level:saveRechargeConfig')")
   @Log(
       module = ServiceName.ADMIN_SERVICE,
       type = LogType.MEMBER,
@@ -134,4 +138,11 @@ public class MemberLevelController {
   public void add(RechargeConfig rechargeConfig) {
     rechargeConfigService.add(rechargeConfig);
   }
+
+  @PostMapping("/list")
+//  @PreAuthorize("hasAuthority('thirdParty:payTypes:list')")
+  public List<PayTypeVO> findPayTypes(String name) {
+    return payTypeService.queryList(name);
+  }
+
 }

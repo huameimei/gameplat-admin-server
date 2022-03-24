@@ -46,7 +46,7 @@ public class MemberGrowthStatisServiceImpl
     return this.lambdaQuery()
         .like(
             ObjectUtils.isNotEmpty(dto.getUserName()),
-            MemberGrowthStatis::getUserName,
+            MemberGrowthStatis::getAccount,
             dto.getUserName())
         .ge(
             ObjectUtils.isNotEmpty(dto.getStartTime()),
@@ -66,7 +66,7 @@ public class MemberGrowthStatisServiceImpl
     return this.lambdaQuery()
         .like(
             ObjectUtils.isNotEmpty(dto.getUserName()),
-            MemberGrowthStatis::getUserName,
+            MemberGrowthStatis::getAccount,
             dto.getUserName())
         .ge(
             ObjectUtils.isNotEmpty(dto.getStartTime()),

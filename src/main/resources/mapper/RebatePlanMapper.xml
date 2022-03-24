@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gameplat.admin.mapper.RebatePlanMapper">
+
+    <sql id="sqlResult">
+        plan_id as planId,
+        plan_name as planName,
+        default_flag as defaultFlag,
+        lower_commission as lowerCommission,
+        sub_commission as subCommission,
+        turnover_commission as turnoverCommission,
+        create_time as createTime,
+        create_by as createBy,
+        update_time as updateTime,
+        update_by as updateBy,
+        remark
+    </sql>
+
+    <!--获取佣金方案-->
+    <select id="queryPage" parameterType="com.gameplat.model.entity.proxy.RebatePlan"
+            resultType="com.gameplat.admin.model.vo.RebatePlanVO">
+        select
+        <include refid="sqlResult"/>
+        from rebate_same_level_plan
+        <where>
+            <if test="dto.planId != null">
+                and plan_id = #{dto.planId}
+            </if>
+            <if test="dto.defaultFlag != null">
+                and default_flag = #{dto.defaultFlag}
+            </if>
+            <if test="dto.planName != null and dto.planName != ''">
+                and plan_name like concat('%', #{dto.planName}, '%')
+            </if>
+        </where>
+    </select>
+
+    <!--获取佣金方案-->
+    <select id="getRebatePlan" parameterType="com.gameplat.model.entity.proxy.RebatePlan"
+            resultType="com.gameplat.admin.model.vo.RebatePlanVO">
+        select
+        <include refid="sqlResult"/>
+        from rebate_same_level_plan
+        <where>
+            <if test="planId != null">
+                and plan_id = #{planId}
+            </if>
+            <if test="defaultFlag != null">
+                and default_flag = #{defaultFlag}
+            </if>
+            <if test="planName != null and planName != ''">
+                and plan_name like concat('%', #{planName}, '%')
+            </if>
+        </where>
+    </select>
+
+    <!--新增佣金方案-->
+    <insert id="addRebatePlan" parameterType="com.gameplat.model.entity.proxy.RebatePlan">
+        insert into rebate_same_level_plan
+        <trim prefix="(" suffix=") values">
+            <if test="planName != null and planName != ''">plan_name,</if>
+            <if test="lowerCommission != null">lower_commission,</if>
+            <if test="subCommission != null">sub_commission,</if>
+            <if test="turnoverCommission != null">turnover_commission,</if>
+            <if test="remark != null and remark != ''">remark,</if>
+            <if test="createBy != null and createBy != ''">create_by,</if>
+            create_time
+        </trim>
+        <trim prefix="(" suffix=")">
+            <if test="planName != null and planName != ''">#{planName},</if>
+            <if test="lowerCommission != null">#{lowerCommission},</if>
+            <if test="subCommission != null">#{subCommission},</if>
+            <if test="turnoverCommission != null">#{turnoverCommission},</if>
+            <if test="remark != null and remark != ''">#{remark},</if>
+            <if test="createBy != null and createBy != ''">#{createBy},</if>
+            sysdate()
+        </trim>
+    </insert>
+
+    <!--编辑佣金方案-->
+    <update id="editRebatePlan" parameterType="com.gameplat.model.entity.proxy.RebatePlan">
+        update rebate_same_level_plan set
+        <if test="planName != null and planName != ''">plan_name = #{planName},</if>
+        <if test="lowerCommission != null">lower_commission = #{lowerCommission},</if>
+        <if test="subCommission != null">sub_commission = #{subCommission},</if>
+        <if test="turnoverCommission != null">turnover_commission = #{turnoverCommission},</if>
+        <if test="remark != null and remark != ''">remark = #{remark},</if>
+        <if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
+        update_time = sysdate()
+        where plan_id = #{planId}
+    </update>
+
+    <!--删除佣金方案-->
+    <delete id="removeRebatePlan" parameterType="long">
+        delete from rebate_same_level_plan where plan_id = #{planId}
+    </delete>
+</mapper>

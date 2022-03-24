@@ -334,8 +334,6 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
           memberRwReportService.addWithdraw(
               member, memberInfo.getTotalWithdrawTimes(), memberWithdraw);
         }
-        // 扣除会员余额
-        memberInfoService.updateBalance(member.getId(), memberWithdraw.getCashMoney().negate());
         // 删除出款验证打码量记录的数据
         validWithdrawService.remove(memberWithdraw.getMemberId(), memberWithdraw.getCreateTime());
         // 免提直充
@@ -344,6 +342,8 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
         }
 
       } else if (WithdrawStatus.CANCELLED.getValue() == cashStatus) { // 取消出款操作
+        // 释放会员提现冻结金额
+        memberInfoService.updateFreeze(member.getId(), memberWithdraw.getCashMoney().negate());
         // 释放会员提现金额
         memberInfoService.updateBalance(member.getId(), memberWithdraw.getCashMoney());
         String billContent =

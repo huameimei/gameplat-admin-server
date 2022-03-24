@@ -24,6 +24,7 @@ public class RechVirtualController {
   @Autowired private SysDictDataService dictDataService;
 
   @GetMapping("/list")
+  @PreAuthorize("hasAuthority('thirdParty:rechVirtual:list')")
   public IPage<DictDataVo> list(PageDTO<SysDictData> page, SysDictDataDTO dictData) {
     dictData.setDictType(DictTypeEnum.RECH_VIRTUAL.getValue());
     return dictDataService.selectDictDataList(page, dictData);

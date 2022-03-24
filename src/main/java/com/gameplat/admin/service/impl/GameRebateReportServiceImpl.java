@@ -19,15 +19,36 @@ import com.gameplat.admin.model.dto.GameRebateReportQueryDTO;
 import com.gameplat.admin.model.vo.GameMemberDayReportVO;
 import com.gameplat.admin.model.vo.MemberInfoVO;
 import com.gameplat.admin.model.vo.PageDtoVO;
-import com.gameplat.admin.service.*;
+import com.gameplat.admin.service.GameBlacklistService;
+import com.gameplat.admin.service.GameRebateReportService;
+import com.gameplat.admin.service.MemberBillService;
+import com.gameplat.admin.service.MemberInfoService;
+import com.gameplat.admin.service.MemberService;
+import com.gameplat.admin.service.ValidWithdrawService;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.json.JsonUtils;
 import com.gameplat.common.enums.GameBlacklistTypeEnum;
 import com.gameplat.common.enums.TranTypes;
-import com.gameplat.model.entity.game.*;
+import com.gameplat.model.entity.game.GameBlacklist;
+import com.gameplat.model.entity.game.GameRebateConfig;
+import com.gameplat.model.entity.game.GameRebateDetail;
+import com.gameplat.model.entity.game.GameRebatePeriod;
+import com.gameplat.model.entity.game.GameRebateReport;
 import com.gameplat.model.entity.member.MemberBill;
 import com.gameplat.model.entity.recharge.RechargeOrder;
 import com.gameplat.redis.api.RedisService;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -36,11 +57,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.util.*;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -157,7 +173,7 @@ public class GameRebateReportServiceImpl
     if (StringUtils.isNotBlank(gameRebatePeriod.getBlackLevels())) {
       String[] levels = gameRebatePeriod.getBlackLevels().split(",");
       List<String> levelsLists =
-          Arrays.stream(levels).filter(StringUtils::isEmpty).collect(Collectors.toList());
+          Arrays.stream(levels).filter(StringUtils::isNotEmpty).collect(Collectors.toList());
       List<String> list = memberService.findAccountByUserLevelIn(levelsLists);
       // 转小写比较
       list.forEach(item -> memberList.add(item.toLowerCase()));

@@ -1,9 +1,10 @@
 package com.gameplat.admin.feign;
 
-import com.gameplat.admin.model.bean.ProxyCallbackContext;
-import com.gameplat.admin.model.bean.ProxyDispatchContext;
-import com.gameplat.admin.model.bean.ProxyPayBackResult;
 import com.gameplat.admin.model.bean.ReturnMessage;
+import com.gameplat.base.common.web.Result;
+import com.gameplat.basepay.proxypay.thirdparty.ProxyCallbackContext;
+import com.gameplat.basepay.proxypay.thirdparty.ProxyDispatchContext;
+import com.gameplat.basepay.proxypay.thirdparty.ProxyPayBackResult;
 import com.gameplat.web.config.feign.FeignClientConfig;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -14,19 +15,19 @@ import org.springframework.web.bind.annotation.RequestBody;
 public interface PaymentCenterFeign {
 
   @PostMapping("/api/internal/proxyPay/onlineProxyPay/{code}/{name}")
-  String onlineProxyPay(
+  Result<ProxyPayBackResult> onlineProxyPay(
       @RequestBody ProxyDispatchContext context,
       @PathVariable("code") String code,
       @PathVariable("name") String name);
 
   @PostMapping("/api/internal/proxyPay/onlineQueryProxyPay/{code}/{name}")
-  ReturnMessage onlineQueryProxyPay(
+  Result<ReturnMessage> onlineQueryProxyPay(
       @RequestBody ProxyDispatchContext context,
       @PathVariable("code") String code,
       @PathVariable("name") String name);
 
   @PostMapping("/api/internal/proxyPay/asyncCallbackProxyPay/{code}/{name}")
-  ProxyPayBackResult asyncCallbackProxyPay(
+  Result<ProxyPayBackResult> asyncCallbackProxyPay(
       @RequestBody ProxyCallbackContext context,
       @PathVariable("code") String code,
       @PathVariable("name") String name);

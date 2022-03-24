@@ -159,10 +159,16 @@
             <artifactId>gameplat-common</artifactId>
             <version>${gameplat-common.version}</version>
         </dependency>
+
         <dependency>
             <groupId>com.gameplat</groupId>
             <artifactId>gameplat-common-game</artifactId>
             <version>${gameplat-common-game.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.gameplat</groupId>
+            <artifactId>base-pay-spring-boot-starter</artifactId>
         </dependency>
 
         <dependency>

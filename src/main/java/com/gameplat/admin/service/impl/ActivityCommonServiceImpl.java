@@ -196,6 +196,7 @@ public class ActivityCommonServiceImpl implements ActivityCommonService {
       endTime = DateUtil.date(endTime).offset(DateField.DAY_OF_YEAR, 1);
     }
 
+    log.error("countDate={},startTime={}",countDate,activityLobby.getStartTime());
     if (countDate.before(activityLobby.getStartTime())) {
       // 活动未开始
       throw new ServiceException("活动未开始");

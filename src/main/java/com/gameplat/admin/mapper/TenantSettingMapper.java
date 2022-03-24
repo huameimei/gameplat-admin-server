@@ -52,4 +52,11 @@ public interface TenantSettingMapper extends BaseMapper<TenantSetting> {
    * @return
    */
   int initSportConfig(TenantSetting tenantSetting);
+
+  /**
+   * 修改体育配置排序开关列表
+   * @param tenantSetting
+   * @return
+   */
+  int updateListSortConfig(TenantSetting tenantSetting);
 }

@@ -142,7 +142,7 @@
     </insert>
 
     <insert id="initSportConfig" parameterType="com.gameplat.model.entity.setting.TenantSetting">
-        INSERT INTO `sys_tenant_setting`(`tenant`,
+        INSERT INTO `tenant_setting`(`tenant`,
                                          `setting_type`,
                                          `setting_code`,
                                          `setting_value`,
@@ -178,8 +178,16 @@
                `create_time`,
                `update_by`,
                `update_time`
-        from sys_tenant_setting
+        from tenant_setting
         where setting_type = 'sport_config' limit 1;
     </select>
+
+    <update id="updateListSortConfig" parameterType="com.gameplat.model.entity.setting.TenantSetting">
+        update tenant_setting
+        <set>
+            <if test='settingValue != null and settingValue != ""'>setting_value = #{settingValue},</if>
+        </set>
+        where setting_type = 'sport_config' and setting_code = 'listSort'
+    </update>
 
 </mapper>

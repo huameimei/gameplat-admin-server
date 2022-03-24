@@ -10,9 +10,11 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.constant.Constants;
+import com.gameplat.admin.enums.ListSortTypeEnum;
 import com.gameplat.admin.feign.SportFeignClient;
 import com.gameplat.admin.mapper.TenantSettingMapper;
 import com.gameplat.admin.model.vo.GameKindVO;
+import com.gameplat.admin.model.vo.ListSortConfigVO;
 import com.gameplat.admin.model.vo.SportConfigValueVO;
 import com.gameplat.admin.model.vo.TenantSettingVO;
 import com.gameplat.admin.service.TenantSettingService;
@@ -29,9 +31,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
- * @author martin
+ * @author james
  * @date 2022/3/10
  */
 @Service
@@ -275,6 +278,21 @@ public class TenantSettingServiceImpl extends ServiceImpl<TenantSettingMapper, T
             sportConfigValueVO = JSON.parseObject(json, SportConfigValueVO.class);
         }
         return sportConfigValueVO;
+    }
+
+    @Override
+    public int updateListSortConfig(List<ListSortConfigVO> listSortConfigVOS) {
+        ListSortTypeEnum[] values = ListSortTypeEnum.values();
+        List<String> types = Arrays.stream(values).map(e -> e.type).collect(Collectors.toList());
+        for (ListSortConfigVO configVO : listSortConfigVOS) {
+            if (org.apache.commons.lang3.StringUtils.isBlank(configVO.getType()) || !types.contains(configVO.getType())) {
+                throw new ServiceException(String.format("%s type错误", configVO.getName()));
+            }
+        }
+        String settingValue = JSONObject.toJSONString(listSortConfigVOS);
+        TenantSetting tenantSetting = new TenantSetting();
+        tenantSetting.setSettingValue(settingValue);
+        return tenantSettingMapper.updateListSortConfig(tenantSetting);
     }
 
     /**

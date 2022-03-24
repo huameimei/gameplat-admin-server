@@ -118,13 +118,17 @@ public class GameBarServiceImpl extends ServiceImpl<GameBarMapper, GameBar> impl
    */
   @Override
   public void setHot(Long id) {
-    GameBar one = this.lambdaQuery().eq(GameBar::getId, id).one();
-    if (one != null){
-      one.setCode(HOT_GAME);
-      this.save(one);
-    }else{
-      throw new ServiceException("异常的操作");
+    try {
+      GameBar one = this.lambdaQuery().eq(GameBar::getId, id).one();
+      if (one != null){
+        one.setId(null);
+        one.setCode(HOT_GAME);
+        this.save(one);
+      }
+    }catch (Exception e){
+      throw new ServiceException("重复的添加");
     }
+
   }
 
 

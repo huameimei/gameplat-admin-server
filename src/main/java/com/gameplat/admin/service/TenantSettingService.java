@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.gameplat.admin.model.vo.TenantSettingVO;
 import com.gameplat.model.entity.setting.TenantSetting;
+import com.gameplat.model.entity.sys.SysTenantSetting;
 
 import java.util.List;
 
@@ -97,4 +98,12 @@ public interface TenantSettingService extends IService<TenantSetting> {
    * @param id 游戏浮窗类型ID
    */
   void deleteSysFloatById(Integer id);
+
+  /**
+   * 修改租户设置的值
+   *
+   * @param tenantSetting
+   * @return
+   */
+  void updateTenantSettingValue(TenantSettingVO tenantSetting);
 }

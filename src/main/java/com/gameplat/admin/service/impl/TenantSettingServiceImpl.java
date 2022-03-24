@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.nacos.common.utils.CollectionUtils;
 import com.aliyun.oss.ServiceException;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -15,6 +16,7 @@ import com.gameplat.admin.service.TenantSettingService;
 import com.gameplat.base.common.context.DyDataSourceContextHolder;
 import com.gameplat.base.common.context.StrategyContext;
 import com.gameplat.model.entity.setting.TenantSetting;
+import com.gameplat.model.entity.sys.SysTenantSetting;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
@@ -22,6 +24,7 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
@@ -204,10 +207,10 @@ public class TenantSettingServiceImpl extends ServiceImpl<TenantSettingMapper, T
     // 广场导航栏选择一个首页后，其他选择的首页自动置为0
     else if (Constants.SETTING_SQUARE_NAVIGATION.equals(vo.getSettingType())
         && vo.getIsIndex() == 1) {
-      TenantSetting tenantSetting1 = new TenantSetting();
-      tenantSetting1.setSettingType(Constants.SETTING_SQUARE_NAVIGATION);
-      tenantSetting1.setIsIndex(0);
-      tenantSettingMapper.updateIndex(tenantSetting1);
+      TenantSetting tenantSetting = new TenantSetting();
+      tenantSetting.setSettingType(Constants.SETTING_SQUARE_NAVIGATION);
+      tenantSetting.setIsIndex(0);
+      tenantSettingMapper.updateIndex(tenantSetting);
     }
     HashMap<Object, Object> map = new HashMap<>(8);
     map.put("en-US", vo.getEnUs());
@@ -238,5 +241,16 @@ public class TenantSettingServiceImpl extends ServiceImpl<TenantSettingMapper, T
   @Override
   public void deleteSysFloatById(Integer id) {
     this.removeById(id);
+  }
+
+  @Override
+  public void updateTenantSettingValue(TenantSettingVO tenantSetting) {
+    LambdaUpdateWrapper<TenantSetting> updateWrapper = new LambdaUpdateWrapper<>();
+    updateWrapper
+            .eq(TenantSetting::getSettingType, tenantSetting.getSettingType())
+            .eq(TenantSetting::getSettingCode, tenantSetting.getSettingCode())
+            .set(TenantSetting::getSettingValue, tenantSetting.getSettingValue())
+            .set(TenantSetting::getUpdateTime, new Date());
+    update(updateWrapper);
   }
 }

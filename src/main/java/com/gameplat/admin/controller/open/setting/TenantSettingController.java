@@ -163,15 +163,15 @@ public class TenantSettingController {
      * 广场的开关开启/关闭
      */
     @RequestMapping("/updateSquareSwitch")
-    @CacheEvict(cacheNames = Constants.TENANT_SQUARE_SWITCH,allEntries = true)
-    public Result updateSquareSwitch(SysTenantSetting sysTenantSetting) {
-        sysTenantSetting.setSettingType(Constants.SYSTEM_SETTING);
-        sysTenantSetting.setSettingCode(Constants.SQUARE_SWITCH);
-        if (org.apache.commons.lang3.StringUtils.isEmpty(sysTenantSetting.getSettingValue())) {
-            return Result.failed("修改值不允许为空...");
-        }
-        sysTenantSettingService.updateTenantSettingValue(sysTenantSetting);
-        return Result.succeed();
+    @CacheEvict(cacheNames = Constants.TENANT_SQUARE_SWITCH, allEntries = true)
+    public Result updateSquareSwitch(TenantSettingVO tenantSetting) {
+      tenantSetting.setSettingType(Constants.SYSTEM_SETTING);
+      tenantSetting.setSettingCode(Constants.SQUARE_SWITCH);
+      if (org.apache.commons.lang3.StringUtils.isEmpty(tenantSetting.getSettingValue())) {
+        return Result.failed("修改值不允许为空...");
+      }
+      tenantSettingService.updateTenantSettingValue(tenantSetting);
+      return Result.succeed();
     }
 
     /**

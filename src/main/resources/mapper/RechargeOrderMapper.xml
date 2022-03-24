@@ -301,4 +301,14 @@
         <!-- 在分组统计一下,防止一个通道配置了一个在线商户 -->
         GROUP BY aa.interfaceCode
     </select>
+
+    <select id="getUntreatedRechargeCount" resultType="java.lang.Integer">
+        SELECT
+            count( 1 )
+        FROM
+            ( SELECT id FROM recharge_order WHERE `status` = 1 AND MODE = 1
+              UNION
+              SELECT id FROM recharge_order_history WHERE `status` = 1 AND MODE = 1
+            ) a
+    </select>
 </mapper>

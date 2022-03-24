@@ -237,10 +237,15 @@ public class ValidWithdrawServiceImpl extends ServiceImpl<ValidWithdrawMapper, V
         allDmlPass = false;
       }
       // 提现需打码金额
-      validateDmlBean.setRemainRequiredDml(subtract);
+      if (subtract.compareTo(BigDecimal.ZERO) < 1) {
+        validateDmlBean.setRemainRequiredDml(BigDecimal.ZERO);
+      } else {
+        validateDmlBean.setRemainRequiredDml(subtract);
+      }
     } else {
       // 提现需打码金额
       validateDmlBean.setRemainRequiredDml(BigDecimal.ZERO);
+
     }
     validateDmlBean.setUsername(username);
     // 常态打码量

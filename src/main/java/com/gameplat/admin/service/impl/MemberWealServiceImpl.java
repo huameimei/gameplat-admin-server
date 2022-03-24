@@ -292,7 +292,10 @@ public class MemberWealServiceImpl extends ServiceImpl<MemberWealMapper, MemberW
                 model.setWealId(id);
                 model.setUserId(memberWealDetail.getUserId());
                 model.setUserName(memberService.getById(memberWealDetail.getUserId()).getAccount());
-                model.setLevel(memberWealDetail.getLevel());
+                model.setLevel(memberInfoService.lambdaQuery()
+                        .eq(MemberInfo::getMemberId, memberWealDetail.getUserId())
+                        .one()
+                        .getVipLevel());
                 model.setRewordAmount(memberWealDetail.getRewordAmount());
                 model.setStatus(1);
                 model.setCreateBy(GlobalContextHolder.getContext().getUsername());

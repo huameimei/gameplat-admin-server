@@ -859,7 +859,8 @@ public class DividePeriodsServiceImpl extends ServiceImpl<DividePeriodsMapper, D
       if (BeanUtil.isEmpty(member)) {
         continue;
       }
-      MemberInfo memberInfo = memberInfoService.getById(summary.getUserId());
+      MemberInfo memberInfo =
+          memberInfoService.lambdaQuery().eq(MemberInfo::getMemberId, summary.getUserId()).one();
       if (BeanUtil.isEmpty(memberInfo)) {
         continue;
       }
@@ -908,7 +909,8 @@ public class DividePeriodsServiceImpl extends ServiceImpl<DividePeriodsMapper, D
       if (BeanUtil.isEmpty(member)) {
         continue;
       }
-      MemberInfo memberInfo = memberInfoService.getById(summary.getUserId());
+      MemberInfo memberInfo =
+          memberInfoService.lambdaQuery().eq(MemberInfo::getMemberId, summary.getUserId()).one();
       if (BeanUtil.isEmpty(memberInfo)) {
         continue;
       }
@@ -1005,7 +1007,12 @@ public class DividePeriodsServiceImpl extends ServiceImpl<DividePeriodsMapper, D
     messageDistribute.setUserId(member.getId());
     messageDistribute.setUserAccount(member.getAccount());
     messageDistribute.setRechargeLevel(member.getUserLevel());
-    messageDistribute.setVipLevel(memberInfoService.getById(member.getId()).getVipLevel());
+    messageDistribute.setVipLevel(
+        memberInfoService
+            .lambdaQuery()
+            .eq(MemberInfo::getMemberId, member.getId())
+            .one()
+            .getVipLevel());
     messageDistribute.setReadStatus(NumberConstant.ZERO);
     messageDistribute.setCreateBy(userCredential.getUsername());
     messageDistributeService.save(messageDistribute);

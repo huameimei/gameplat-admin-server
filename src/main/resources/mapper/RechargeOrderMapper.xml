@@ -250,6 +250,58 @@
         group by account
     </select>
 
+    <select id="getLeaderboard" resultType="com.gameplat.admin.model.bean.PayLeaderboard">
+        select
+        aa.interfaceName,
+        aa.interfaceCode,
+        sum(aa.totalOrderNum) as totalOrderNum,
+        sum(aa.successOrderNum) as successOrderNum,
+        sum(aa.autoSuccessOrderNum) as autoSuccessOrderNum,
+        sum(aa.autoSuccessAmount) as autoSuccessAmount,
+        sum(aa.totalAmount) as totalAmount
+        from(
+        SELECT
+        <!-- 三方接口名称 -->
+        dm.name as interfaceName,
+        <!-- 三方接口code -->
+        dm.tp_interface_code as interfaceCode,
+        <!-- 总订单数 -->
+        count( r.id ) as totalOrderNum,
+        <!-- 成功订单数 -->
+        sum(if(r.`status` = 3, 1, 0)) as successOrderNum,
+        <!-- 自动成功订单数 -->
+        sum(if(r.auditor_account = '系统审批' and r.`status` = 3, 1, 0)) as autoSuccessOrderNum,
+        <!-- 自动成功金额 -->
+        sum(if(r.auditor_account = '系统审批' and r.`status` = 3, r.amount, 0)) as autoSuccessAmount,
+        <!-- 总金额 -->
+        sum( r.amount ) as totalAmount
+        FROM
+        recharge_order r
+        LEFT JOIN tp_merchant dm ON r.tp_merchant_id = dm.id
+        LEFT JOIN tp_pay_type dt ON r.pay_type = dt.code
+        WHERE
+        r.mode = 2
+        <if test="payTypeCode != null and payTypeCode != ''">
+            and r.pay_type = #{payTypeCode}
+        </if>
+        <if test="startTime != null and startTime != ''">
+            and r.audit_time <![CDATA[>=]]> #{startTime}
+        </if>
+        <if test="endTime != null and endTime != ''">
+            and r.audit_time <![CDATA[<=]]> #{endTime}
+        </if>
+        <if test="interfaceCode != null and interfaceCode != ''">
+            and dm.tp_interface_code = #{interfaceCode}
+        </if>
+        GROUP BY
+        r.tp_merchant_id
+        ) as aa
+        <!-- 去掉空值,防止修改商户配置信息或者删除重新配置信息等其他问题操作的空数据 -->
+        where aa.interfaceName is not null and aa.interfaceCode is not null
+        <!-- 在分组统计一下,防止一个通道配置了一个在线商户 -->
+        GROUP BY aa.interfaceCode
+    </select>
+
     <select id="getUntreatedRechargeCount" resultType="java.lang.Integer">
         SELECT
             count( 1 )

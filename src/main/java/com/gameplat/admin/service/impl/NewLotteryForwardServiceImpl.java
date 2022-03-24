@@ -10,6 +10,7 @@ import com.gameplat.security.SecurityUserHolder;
 import com.gameplat.security.context.UserCredential;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
@@ -44,7 +45,7 @@ public class NewLotteryForwardServiceImpl implements NewLotteryForwardService {
 
     // 封装请求头参数
     Map<String, String> headers = new HashMap<>();
-    headers.put("locale", "zh");
+    headers.put("locale", LocaleContextHolder.getLocale().toLanguageTag());
     headers.put("attribution", attribution);
     headers.put("username", userCredential.getUsername());
     Object object =

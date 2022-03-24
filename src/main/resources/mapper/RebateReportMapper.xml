@@ -1,0 +1,370 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gameplat.admin.mapper.RebateReportMapper">
+
+    <sql id="sqlResult">
+        report_id as reportId,
+        count_date as countDate,
+        parent_id as parentId,
+        parent_name as parentName,
+        agent_id as agentId,
+        agent_name as agentName,
+        agent_path as agentPath,
+        level_num as levelNum,
+        account_status as accountStatus,
+        ifnull(sub_member, 0) as subMember,
+        ifnull(efficient_member, 0) as efficientMember,
+        ifnull(sub_agent, 0) as subAgent,
+        ifnull(efficient_agent, 0) as efficientAgent,
+        plan_id as planId,
+        plan_name as planName,
+        config_id as configId,
+        rebate_level as rebateLevel,
+        ifnull(game_win, 0) as gameWin,
+        ifnull(member_commission, 0) as memberCommission,
+        ifnull(member_proportion, 0) as memberProportion,
+        ifnull(agent_commission, 0) as agentCommission,
+        ifnull(agent_proportion, 0) as agentProportion,
+        ifnull(sub_agent_commission, 0) as subAgentCommission,
+        ifnull(turnover_rebate, 0) as turnoverRebate,
+        ifnull(turnover_proportion, 0) as turnoverProportion,
+        ifnull(total_cost, 0) as totalCost,
+        ifnull(negative_profit, 0) as negativeProfit,
+        ifnull(actual_commission, 0) as actualCommission,
+        adjustment_amount as adjustmentAmount,
+        status,
+        create_time as createTime,
+        create_by as createBy,
+        update_time as updateTime,
+        update_by as updateBy,
+        remark
+    </sql>
+
+    <resultMap id="PlatformFee" type="com.gameplat.admin.model.vo.PlatformFeeVO">
+        <result column="count_month" property="countMonth"/>
+        <result column="game_name" property="gameName"/>
+        <result column="game_code" property="gameCode"/>
+        <result column="win_amount" property="winAmount"/>
+        <result column="valid_amount" property="validAmount"/>
+        <result column="report_rate" property="reportRate"/>
+    </resultMap>
+
+    <!--查看平级分红佣金报表-->
+    <select id="queryPage" parameterType="com.gameplat.admin.model.dto.RebateReportDTO"
+            resultType="com.gameplat.admin.model.vo.RebateReportVO">
+        select
+        <include refid="sqlResult"/>
+        from rebate_same_level_report
+        <where>
+            <if test="dto.reportId != null">
+                and report_id = #{dto.reportId}
+            </if>
+            <if test="dto.countDate != null and dto.countDate != ''">
+                and count_date = #{dto.countDate}
+            </if>
+            <if test="dto.parentId != null">
+                and parent_id = #{dto.parentId}
+            </if>
+            <if test="dto.parentName != null and dto.parentName != ''">
+                and parent_name = #{dto.parentName}
+            </if>
+            <if test="dto.agentId != null">
+                and agent_id = #{dto.agentId}
+            </if>
+            <if test="dto.agentName != null and dto.agentName != ''">
+                and agent_name = #{dto.agentName}
+            </if>
+            <if test="dto.levelNum != null and dto.levelNum != -1">
+                and level_num = #{dto.levelNum}
+            </if>
+            <if test="dto.agentPath != null and dto.agentPath != ''">
+                and agent_path like concat(#{dto.agentPath}, '%')
+            </if>
+            <if test="dto.accountStatus != null and dto.accountStatus != -1">
+                and account_status = #{dto.accountStatus}
+            </if>
+            <if test="dto.status != null and dto.status != -1">
+                and status = #{dto.status}
+            </if>
+            <if test="dto.planId != null and dto.planId != -1">
+                and plan_id = #{dto.planId}
+            </if>
+            <if test="dto.actualCommissionLeast > 0 and dto.actualCommissionMost == 0">
+                and actual_commission <![CDATA[>=]]> #{dto.actualCommissionLeast}
+            </if>
+            <if test="dto.actualCommissionMost > 0 and dto.actualCommissionLeast == 0">
+                and actual_commission <![CDATA[<=]]> #{dto.actualCommissionMost}
+            </if>
+            <if test="dto.actualCommissionLeast > 0 and dto.actualCommissionMost > 0">
+                and actual_commission between #{dto.actualCommissionLeast} and #{dto.actualCommissionMost}
+            </if>
+        </where>
+        group by report_id
+    </select>
+
+    <!--查看平级分红佣金报表-->
+    <select id="getRebateReport" parameterType="com.gameplat.admin.model.dto.RebateReportDTO"
+            resultType="com.gameplat.admin.model.vo.RebateReportVO">
+        select
+        <include refid="sqlResult"/>
+        from rebate_same_level_report
+        <where>
+            <if test="reportId != null">
+                and report_id = #{reportId}
+            </if>
+            <if test="countDate != null and countDate != ''">
+                and count_date = #{countDate}
+            </if>
+            <if test="parentId != null">
+                and parent_id = #{parentId}
+            </if>
+            <if test="parentName != null and parentName != ''">
+                and parent_name = #{parentName}
+            </if>
+            <if test="agentId != null">
+                and agent_id = #{agentId}
+            </if>
+            <if test="agentName != null and agentName != ''">
+                and agent_name = #{agentName}
+            </if>
+            <if test="levelNum != null and levelNum != -1">
+                and level_num = #{levelNum}
+            </if>
+            <if test="agentPath != null and agentPath != ''">
+                and agent_path like concat(#{agentPath}, '%')
+            </if>
+            <if test="accountStatus != null and accountStatus != -1">
+                and account_status = #{accountStatus}
+            </if>
+            <if test="status != null and status != -1">
+                and status = #{status}
+            </if>
+            <if test="planId != null and planId != -1">
+                and plan_id = #{planId}
+            </if>
+            <if test="actualCommissionLeast > 0 and actualCommissionMost == 0">
+                and actual_commission <![CDATA[>=]]> #{actualCommissionLeast}
+            </if>
+            <if test="actualCommissionMost > 0 and actualCommissionLeast == 0">
+                and actual_commission <![CDATA[<=]]> #{actualCommissionMost}
+            </if>
+            <if test="actualCommissionLeast > 0 and actualCommissionMost > 0">
+                and actual_commission between #{actualCommissionLeast} and #{actualCommissionMost}
+            </if>
+        </where>
+        group by report_id
+    </select>
+
+    <!--获取已结算的代理账号-->
+    <select id="getSettlementAgent" parameterType="string" resultType="string">
+        select agent_name from rebate_same_level_report where status = 3 and count_date = #{countMonth}
+    </select>
+
+    <!--获取下级会员报表-->
+    <select id="getSubMemberReport" resultType="com.gameplat.admin.model.vo.MemberReportVO">
+        select
+          #{countMonth} as countMonth,
+          parent_id as parentId,
+          parent_name as parentName,
+          user_id as userId,
+          user_name as userName,
+          agent_path as agentPath,
+          ifnull(sum(ifnull(recharge_amount, 0)), 0) as rechargeAmount,
+          ifnull(sum(ifnull(valid_amount, 0)), 0) as validAmount,
+          ifnull(sum(ifnull(water_amount, 0)), 0) as rebateAmount,
+          ifnull(sum(ifnull(discount_amount, 0) + ifnull(jackpot_amount, 0) + ifnull(vip_reword_amount, 0) + ifnull(activity_amount, 0) + ifnull(chat_amount, 0)), 0) as dividendAmount
+        from member_day_report
+        where parent_id = #{agentId} and count_date like concat(#{countMonth}, '%') and user_type = 2
+        group by user_id
+    </select>
+
+    <!--获取下级会员报表-->
+    <select id="pageSubMemberReport" resultType="com.gameplat.admin.model.vo.MemberReportVO">
+        select
+          #{countMonth} as countMonth,
+          parent_id as parentId,
+          parent_name as parentName,
+          user_id as userId,
+          user_name as userName,
+          agent_path as agentPath,
+          ifnull(sum(ifnull(recharge_amount, 0)), 0) as rechargeAmount,
+          ifnull(sum(ifnull(valid_amount, 0)), 0) as validAmount,
+          ifnull(sum(ifnull(water_amount, 0)), 0) as rebateAmount,
+          ifnull(sum(ifnull(discount_amount, 0) + ifnull(jackpot_amount, 0) + ifnull(vip_reword_amount, 0) + ifnull(activity_amount, 0) + ifnull(chat_amount, 0)), 0) as dividendAmount
+        from member_day_report
+        where parent_id = #{agentId} and count_date like concat(#{countMonth}, '%') and user_type = 2
+        group by user_id
+    </select>
+
+    <!--获取平台费-->
+    <select id="getPlatformFee" resultMap="PlatformFee">
+        select
+        count_month,
+        game_name,
+        game_code,
+        win_amount,
+        valid_amount,
+        report_rate
+        from
+        (
+        select
+          #{countMonth} as count_month,
+          glo.name as game_name,
+          mgdr.game_kind as game_code,
+          ifnull(sum(ifnull(win_amount, 0)), 0)*-1 as win_amount,
+          ifnull(sum(ifnull(valid_amount, 0)), 0) as valid_amount,
+          ifnull(glo.report_rate, 0) as report_rate
+        from game_bet_daily_report as mgdr
+        left join game_kind as glo on mgdr.game_kind = glo.code
+        where user_type = 'M' and super_id = #{agentId} and stat_time like concat(#{countMonth}, '%')
+        group by mgdr.game_kind
+        ) as a
+    </select>
+
+    <!--获取平台费-->
+    <select id="pagePlatformFee" resultMap="PlatformFee">
+        select
+        count_month,
+        game_name,
+        game_code,
+        win_amount,
+        valid_amount,
+        report_rate
+        from
+        (
+        select
+          #{countMonth} as count_month,
+          glo.name as game_name,
+          mgdr.game_kind as game_code,
+          ifnull(sum(ifnull(win_amount, 0)), 0)*-1 as win_amount,
+          ifnull(sum(ifnull(valid_amount, 0)), 0) as valid_amount,
+          ifnull(glo.report_rate, 0) as report_rate
+        from game_bet_daily_report as mgdr
+        left join game_kind as glo on mgdr.game_kind = glo.code
+        where user_type = 'M' and super_id = #{agentId} and stat_time like concat(#{countMonth}, '%')
+        group by mgdr.game_kind
+        ) as a
+    </select>
+
+    <!--获取下级会员佣金详情-->
+    <select id="getMemberCommission" resultType="com.gameplat.admin.model.vo.MemberCommissionVO">
+        select
+          ifnull(negative_profit, 0) as negativeProfit,
+          (ifnull(game_win, 0) - ifnull(total_cost, 0)) as netProfit,
+          member_proportion as memberProportion,
+          member_commission as memberCommission
+        from rebate_same_level_report
+        where agent_id = #{agentId} and count_date = #{countDate}
+    </select>
+
+    <!--批量新增平级佣金报表-->
+    <insert id="batchAddRebateReport" parameterType="com.gameplat.model.entity.proxy.RebateReport">
+        insert into rebate_same_level_report
+        ( count_date, parent_id, parent_name, agent_id, agent_name, agent_path, level_num,
+        account_status, sub_member, efficient_member, sub_agent, efficient_agent, plan_id,
+        plan_name, config_id, rebate_level, game_win, member_commission, member_proportion, agent_commission,
+        agent_proportion,
+        sub_agent_commission, turnover_rebate, turnover_proportion,
+        total_cost, negative_profit, actual_commission, create_time, create_by
+        ) values
+        <foreach collection="list" item="report" separator=",">
+            (
+            #{report.countDate}, #{report.parentId}, #{report.parentName}, #{report.agentId}, #{report.agentName},
+            #{report.agentPath},
+            #{report.levelNum}, #{report.accountStatus}, #{report.subMember}, #{report.efficientMember},
+            #{report.subAgent},
+            #{report.efficientAgent}, #{report.planId}, #{report.planName}, #{report.configId}, #{report.rebateLevel},
+            #{report.gameWin},
+            #{report.memberCommission}, #{report.memberProportion}, #{report.agentCommission},
+            #{report.agentProportion},
+            #{report.subAgentCommission}, #{report.turnoverRebate}, #{report.turnoverProportion},
+            #{report.totalCost}, #{report.negativeProfit}, #{report.actualCommission}, #{report.createTime},
+            #{report.createBy}
+            )
+        </foreach>
+        on duplicate key update
+        parent_id = values(parent_id), parent_name = values(parent_name), agent_path = values(agent_path),
+        level_num = values(level_num), account_status = values(account_status), sub_member = values(sub_member),
+        efficient_member = values(efficient_member), sub_agent = values(sub_agent), efficient_agent =
+        values(efficient_agent),
+        plan_id = values(plan_id), plan_name = values(plan_name), config_id = values(config_id), rebate_level =
+        values(rebate_level), game_win = values(game_win),
+        member_commission = values(member_commission), member_proportion = values(member_proportion), agent_commission =
+        values(agent_commission),
+        agent_proportion = values(agent_proportion), sub_agent_commission = values(sub_agent_commission),
+        turnover_rebate = values(turnover_rebate), turnover_proportion = values(turnover_proportion), total_cost =
+        values(total_cost), negative_profit = values(negative_profit),
+        actual_commission = values(actual_commission), update_time = values(update_time), update_by = values(update_by)
+    </insert>
+
+    <select id="getPlatformFeeSum" resultType="com.gameplat.admin.model.vo.GameWinVO">
+        select
+          #{countMonth} as countMonth,
+          ifnull(sum(ifnull(win_amount, 0)), 0)*-1 as totalWinAmount,
+          ifnull(sum(ifnull(valid_amount, 0)), 0) as totalValidAmount
+        from game_bet_daily_report
+        where user_type = 'M' and super_id = #{agentId} and stat_time like concat(#{countMonth}, '%')
+    </select>
+
+    <sql id="agentCommission">
+        count_date as countDate,
+        level_num as levelNum,
+        parent_name as parentName,
+        agent_name as agentName,
+        ifnull(sub_agent, 0) as subAgent,
+        ifnull(efficient_agent, 0) as efficientAgent,
+        ifnull(member_commission, 0) as memberCommission,
+        ifnull(agent_commission, 0) as agentCommission,
+        plan_name as planName,
+        rebate_level as rebateLevel
+    </sql>
+
+    <!--获取代理佣金数据-->
+    <select id="getAgentCommission" resultType="com.gameplat.admin.model.vo.AgentCommissionVO">
+        select
+        <include refid="agentCommission"/>
+        from rebate_same_level_report where agent_id = #{agentId} and count_date = #{countDate}
+    </select>
+
+    <!--获取下级代理佣金数据-->
+    <select id="pageSubAgentCommission" resultType="com.gameplat.admin.model.vo.AgentCommissionVO">
+        select
+        <include refid="agentCommission"/>
+        from rebate_same_level_report where parent_id = #{parentId} and parent_id != agent_id and count_date =
+        #{countDate}
+    </select>
+
+    <!--通过ID查看结算状态-->
+    <select id="getReportByReportId" resultType="com.gameplat.admin.model.vo.RebateReportVO">
+        select status, account_status as accountStatus
+        from rebate_same_level_report
+        <where>
+            <choose>
+                <when test="reportId != null">
+                    and report_id = #{reportId}
+                </when>
+                <when test="extendId != null">
+                    and report_id = (select report_id from same_level_report_extend where extend_id = #{extendId})
+                </when>
+            </choose>
+        </where>
+    </select>
+
+    <!--更新状态-->
+    <update id="updateStatus">
+        update rebate_same_level_report set
+        status = #{status}, update_by = #{updateBy}, update_time = sysdate()
+        where report_id = #{reportId} and account_status = 1
+    </update>
+
+    <!--批量更新状态-->
+    <update id="batchUpdateStatus">
+        update rebate_same_level_report set
+        status = #{status} + 1,
+        update_by = #{updateBy},
+        update_time = sysdate()
+        where count_date = #{countDate} and status = #{status} and account_status = 1
+    </update>
+
+
+</mapper>

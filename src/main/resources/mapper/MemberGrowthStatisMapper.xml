@@ -5,10 +5,10 @@
 
     <resultMap type="com.gameplat.model.entity.member.MemberGrowthStatis" id="memberGrowthStatisResult">
         <result property="id" column="id"/>
-        <result property="userId" column="user_id"/>
-        <result property="userName" column="user_name"/>
-        <result property="level" column="level"/>
-        <result property="growth" column="growth"/>
+        <result property="memberId" column="member_id"/>
+        <result property="account" column="account"/>
+        <result property="vipLevel" column="vip_level"/>
+        <result property="vipGrowth" column="vip_growth"/>
         <result property="rechargeGrowth" column="recharge_growth"/>
         <result property="signGrowth" column="sign_growth"/>
         <result property="damaGrowth" column="dama_growth"/>
@@ -27,9 +27,9 @@
     <select id="getMemberSalaryInfo" parameterType="java.lang.Integer"
             resultType="com.gameplat.model.entity.member.MemberWealDetail">
         SELECT
-        gs.user_id userId,
-        gs.user_name userName,
-        gs.`level`,
+        gs.member_id userId,
+        gs.account userName,
+        gs.vip_level,
         (
         case #{type}
         when 0 then gl.week_wage
@@ -40,7 +40,7 @@
         ) rewordAmount
         FROM
         member_growth_statis gs
-        LEFT JOIN member_growth_level gl ON gs.`level`= gl.`level`
+        LEFT JOIN member_growth_level gl ON gs.vip_level = gl.`level`
         <where>
             <if test="type != null and type == 0">
                 AND gl.week_wage >0
@@ -80,10 +80,10 @@
     <insert id="insertOrUpdate">
         insert into member_growth_statis
         (
-        <if test="userId != null">user_id,</if>
-        <if test="userName != null and userName != ''">user_name,</if>
-        <if test="level != null">`level`,</if>
-        <if test="growth != null">growth,</if>
+        <if test="memberId != null">member_id,</if>
+        <if test="account != null and account != ''">account,</if>
+        <if test="vipLevel != null">vip_level,</if>
+        <if test="growth != null">vip_growth,</if>
         <if test="rechargeGrowth != null">recharge_growth,</if>
         <if test="signGrowth != null">sign_growth,</if>
         <if test="damaGrowth != null">dama_growth,</if>
@@ -94,10 +94,10 @@
         <if test="createBy != null and createBy != ''">create_by,</if>
         create_time
         ) values (
-        <if test="userId != null">#{userId},</if>
-        <if test="userName != null and userName != ''">#{userName},</if>
-        <if test="level != null">#{level},</if>
-        <if test="growth != null">#{growth},</if>
+        <if test="memberId != null">#{memberId},</if>
+        <if test="account != null and account != ''">#{account},</if>
+        <if test="vipLevel != null">#{vipLevel},</if>
+        <if test="vipGrowth != null">#{vipGrowth},</if>
         <if test="rechargeGrowth != null">#{rechargeGrowth},</if>
         <if test="signGrowth != null">#{signGrowth},</if>
         <if test="damaGrowth != null">#{damaGrowth},</if>
@@ -109,10 +109,10 @@
         now()
         )
         on duplicate key update
-        <if test="userId != null">user_id = values(user_id),</if>
-        <if test="userName != null and userName != ''">user_name = values(user_name),</if>
-        <if test="level != null">`level` = values(`level`),</if>
-        <if test="growth != null">growth = values(growth),</if>
+        <if test="memberId != null">member_id = values(member_id),</if>
+        <if test="account != null and account != ''">account = values(account),</if>
+        <if test="vipLevel != null">vip_level = values(vip_level),</if>
+        <if test="vipGrowth != null">vip_growth = values(vip_growth),</if>
         <if test="rechargeGrowth != null">recharge_growth = values(recharge_growth),</if>
         <if test="signGrowth != null">sign_growth = values(sign_growth),</if>
         <if test="damaGrowth != null">dama_growth = values(dama_growth),</if>

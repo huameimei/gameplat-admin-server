@@ -2,6 +2,7 @@ package com.gameplat.admin.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
+import com.baomidou.mybatisplus.extension.service.IService;
 import com.gameplat.admin.model.vo.RebateConfigVO;
 import com.gameplat.model.entity.proxy.RebateConfig;
 import org.apache.ibatis.annotations.Param;
@@ -9,7 +10,7 @@ import org.apache.ibatis.annotations.Param;
 import java.math.BigDecimal;
 import java.util.List;
 
-public interface RebateConfigService {
+public interface RebateConfigService extends IService<RebateConfig> {
 
   /**
    * 查看返佣配置

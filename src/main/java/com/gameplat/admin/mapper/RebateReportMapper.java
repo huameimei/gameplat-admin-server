@@ -9,6 +9,7 @@ import com.gameplat.admin.model.vo.*;
 import com.gameplat.model.entity.proxy.RebateReport;
 import org.apache.ibatis.annotations.Param;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 public interface RebateReportMapper extends BaseMapper<RebateReport> {
@@ -146,4 +147,21 @@ public interface RebateReportMapper extends BaseMapper<RebateReport> {
       @Param("countDate") String countDate,
       @Param("updateBy") String updateBy,
       @Param("status") Integer status);
+
+  /**
+   * 更新调整金额
+   *
+   * @param reportId
+   * @return
+   */
+  int updateAdjustmentAmount(Long reportId);
+
+  /**
+   * 更新实际佣金
+   *
+   * @param reportId
+   * @return
+   */
+  int updateActualCommission(
+      @Param("reportId") Long reportId, @Param("actualCommission") BigDecimal actualCommission);
 }

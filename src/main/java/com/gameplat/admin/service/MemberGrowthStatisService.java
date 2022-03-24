@@ -24,4 +24,6 @@ public interface MemberGrowthStatisService extends IService<MemberGrowthStatis> 
   void insertOrUpdate(MemberGrowthStatis userGrowthStatis);
 
   List<ActivityMemberInfo> findActivityMemberInfo(Map map);
+
+  MemberGrowthStatis findOrInsert(Long memberId,String account);
 }

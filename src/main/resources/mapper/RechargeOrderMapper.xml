@@ -249,4 +249,14 @@
         </choose>
         group by account
     </select>
+
+    <select id="getUntreatedRechargeCount" resultType="java.lang.Integer">
+        SELECT
+            count( 1 )
+        FROM
+            ( SELECT id FROM recharge_order WHERE `status` = 1 AND MODE = 1
+              UNION
+              SELECT id FROM recharge_order_history WHERE `status` = 1 AND MODE = 1
+            ) a
+    </select>
 </mapper>

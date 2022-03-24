@@ -66,4 +66,6 @@ public interface RechargeOrderMapper extends BaseMapper<RechargeOrder> {
       @Param("endDate") String endDate,
       @Param("agentName") String agentName,
       @Param("isInclude") Integer isInclude);
+
+  Integer getUntreatedRechargeCount();
 }

@@ -483,11 +483,14 @@ public class SalaryPeriodsServiceImpl extends ServiceImpl<SalaryPeriodsMapper, S
           dailyReportMapper.findReportForSalary(
               periods.getStartDate(), periods.getEndDate(), account, isIncludeAgent);
       if (account.equalsIgnoreCase("newdl01")) {
-        log.info("获取到的游戏报表的数据：{}", gameReports);
+        log.info("获取到的游戏报表的数据：{}游戏编码{}", gameReports,codes);
       }
       // 按游戏大类分组
       Map<String, List<SalaryRechargeVO>> gameTypeReportMap =
           gameReports.stream().collect(Collectors.groupingBy(SalaryRechargeVO::getGameType));
+      if (account.equalsIgnoreCase("newdl01")) {
+        log.info("分组后{}",gameTypeReportMap);
+      }
       for (String gameType : codes) {
         Map<String, SalaryConfig> levelMap = configMap.get(agentLevel);
         if (CollectionUtil.isEmpty(levelMap)) {
@@ -497,7 +500,9 @@ public class SalaryPeriodsServiceImpl extends ServiceImpl<SalaryPeriodsMapper, S
         if (BeanUtil.isEmpty(finalConfig)) {
           continue;
         }
-
+        if (account.equalsIgnoreCase("newdl01")) {
+          log.info("当前游戏编码{}", gameType);
+        }
         List<SalaryRechargeVO> tmpGameReport =
             CollectionUtil.isEmpty(gameTypeReportMap.get(gameType))
                 ? new ArrayList<>()

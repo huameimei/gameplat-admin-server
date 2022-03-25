@@ -21,6 +21,7 @@ import com.gameplat.admin.mapper.RechargeOrderMapper;
 import com.gameplat.admin.model.bean.*;
 import com.gameplat.admin.model.dto.GameRWDataReportDto;
 import com.gameplat.admin.model.dto.MemberActivationDTO;
+import com.gameplat.admin.model.dto.MemberGrowthChangeDto;
 import com.gameplat.admin.model.dto.RechargeOrderQueryDTO;
 import com.gameplat.admin.model.vo.MemberActivationVO;
 import com.gameplat.admin.model.vo.RechargeOrderVO;
@@ -33,15 +34,13 @@ import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.json.JsonUtils;
 import com.gameplat.base.common.snowflake.IdGeneratorSnowflake;
 import com.gameplat.base.common.util.DateUtil;
-import com.gameplat.common.enums.BooleanEnum;
-import com.gameplat.common.enums.MemberEnums;
-import com.gameplat.common.enums.SwitchStatusEnum;
-import com.gameplat.common.enums.UserTypes;
+import com.gameplat.common.enums.*;
 import com.gameplat.common.model.bean.UserEquipment;
 import com.gameplat.common.model.bean.limit.MemberRechargeLimit;
 import com.gameplat.model.entity.DiscountType;
 import com.gameplat.model.entity.member.Member;
 import com.gameplat.model.entity.member.MemberBill;
+import com.gameplat.model.entity.member.MemberGrowthConfig;
 import com.gameplat.model.entity.member.MemberInfo;
 import com.gameplat.model.entity.pay.PayAccount;
 import com.gameplat.model.entity.pay.TpMerchant;
@@ -57,9 +56,12 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -102,6 +104,8 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
   @Autowired private MemberBillService memberBillService;
   @Autowired private ValidWithdrawService validWithdrawService;
   @Autowired private MemberRwReportService memberRwReportService;
+  @Autowired private MemberGrowthConfigService memberGrowthConfigService;
+  @Autowired private MemberGrowthRecordService memberGrowthRecordService;
 
   @Override
   public PageExt<RechargeOrderVO, SummaryVO> findPage(
@@ -298,6 +302,32 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
           rechargeOrder.getOrderNo(),
           rechargeOrder.getPointFlag());
     }
+
+    //兑换成长值
+    MemberGrowthConfig memberGrowthConfig = memberGrowthConfigService.getOneConfig();
+    if (memberGrowthConfig.getIsEnableVip() == TrueFalse.FALSE.getValue()) {
+      log.info(
+              "会员充值兑换成长值失败-未开启VIP功能开关: account={}，orderNo={},pointFlag={}",
+              rechargeOrder.getAccount(),
+              rechargeOrder.getOrderNo(),
+              rechargeOrder.getPointFlag());
+      return;
+    }
+    if (memberGrowthConfig.getIsEnableRecharge() == TrueFalse.FALSE.getValue()) {
+      log.info(
+              "会员充值兑换成长值失败-未开启充值成长计算开关： account={}，orderNo={},pointFlag={}",
+              rechargeOrder.getAccount(),
+              rechargeOrder.getOrderNo(),
+              rechargeOrder.getPointFlag());
+      return;
+    }
+    MemberGrowthChangeDto memberGrowthChangeDto = new MemberGrowthChangeDto();
+    memberGrowthChangeDto.setUserId(rechargeOrder.getMemberId());
+    memberGrowthChangeDto.setUserName(rechargeOrder.getAccount());
+    memberGrowthChangeDto.setType(GrowthChangeEnum.recharge.getCode());
+    memberGrowthChangeDto.setChangeGrowth(memberGrowthConfig.getRechageRate().multiply(rechargeOrder.getAmount()).longValue());
+    memberGrowthRecordService.editMemberGrowth(memberGrowthChangeDto,
+            ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest());
   }
 
   @Override

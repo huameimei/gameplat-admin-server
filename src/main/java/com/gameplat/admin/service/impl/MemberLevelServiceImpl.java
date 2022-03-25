@@ -331,6 +331,18 @@ public class MemberLevelServiceImpl extends ServiceImpl<MemberLevelMapper, Membe
     // 过滤层级无变化的会员
     updateMembers.removeIf(member -> member.getUserLevel().equals(levelValue));
 
+    // 如果要转入的层级是锁定状态, 则不允许转入
+    updateMembers =
+        updateMembers.stream()
+            .filter(
+                m ->
+                    !MemberLevelEnums.Locked.isLocked(
+                        levelList.stream()
+                            .filter(l -> l.getLevelValue().equals(m.getUserLevel()))
+                            .findAny()
+                            .get()
+                            .getLocked()))
+            .collect(Collectors.toList());
     log.info("层级{}，共{}条需要重新分配层级的会员", dto.getLevelName(), updateMembers.size());
 
     // 批量更新会员层级

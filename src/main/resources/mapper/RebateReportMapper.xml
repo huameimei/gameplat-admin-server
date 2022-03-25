@@ -213,7 +213,7 @@
           mgdr.game_kind as game_code,
           ifnull(sum(ifnull(win_amount, 0)), 0)*-1 as win_amount,
           ifnull(sum(ifnull(valid_amount, 0)), 0) as valid_amount,
-          ifnull(glo.report_rate, 0) as report_rate
+          ifnull(glo.rebate_rate, 0) as report_rate
         from game_bet_daily_report as mgdr
         left join game_kind as glo on mgdr.game_kind = glo.code
         where user_type = 'M' and super_id = #{agentId} and stat_time like concat(#{countMonth}, '%')

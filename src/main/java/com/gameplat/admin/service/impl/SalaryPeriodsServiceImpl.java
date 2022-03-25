@@ -180,6 +180,7 @@ public class SalaryPeriodsServiceImpl extends ServiceImpl<SalaryPeriodsMapper, S
    */
   @Override
   public void settle(Long id) {
+    log.info("日志打印记录");
     Assert.isTrue(id != null, "期数主键ID参数缺失！");
     SalaryPeriods periods = this.getById(id);
     Assert.isTrue(BeanUtil.isNotEmpty(periods), "期数不存在！");
@@ -193,6 +194,7 @@ public class SalaryPeriodsServiceImpl extends ServiceImpl<SalaryPeriodsMapper, S
     Assert.isTrue(!isLock, "您的操作过于频繁！请稍后重试！");
     distributedLocker.lock(key);
     try {
+      log.info("日志打印记录2");
       // todo 调用封装方法 处理grant结算
       this.salarySettle(periods);
       // 修改期数的状态为 已结算
@@ -356,6 +358,7 @@ public class SalaryPeriodsServiceImpl extends ServiceImpl<SalaryPeriodsMapper, S
    * @param periods
    */
   public void salarySettle(SalaryPeriods periods) {
+    log.info("日志打印记录3");
     // 删除grant
     // 删除分红详情
     QueryWrapper<SalaryGrant> deleteGrantWrapper = new QueryWrapper<>();
@@ -388,6 +391,7 @@ public class SalaryPeriodsServiceImpl extends ServiceImpl<SalaryPeriodsMapper, S
     }
 
     Map<Integer, Map<String, SalaryConfig>> configMap = new TreeMap<>();
+    log.info("日志打印记录4{}",openSalaryAgents);
     // 先把所有需要的工资配置查询出来
     for (Member user : openSalaryAgents) {
       Map<String, SalaryConfig> tmpMap = new TreeMap<>();

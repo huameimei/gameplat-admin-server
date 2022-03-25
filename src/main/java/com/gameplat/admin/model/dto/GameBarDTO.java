@@ -63,7 +63,7 @@ public class GameBarDTO implements Serializable {
     private String gameLogo;
 
     /**
-     * 是否适配多场景
+     * 是否适配多场景  0 否  1 是
      */
     private Integer isScenes;
 

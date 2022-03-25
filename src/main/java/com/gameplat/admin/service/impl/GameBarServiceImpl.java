@@ -123,6 +123,7 @@ public class GameBarServiceImpl extends ServiceImpl<GameBarMapper, GameBar> impl
       if (one != null){
         one.setId(null);
         one.setCode(HOT_GAME);
+        one.setCreateBy(SecurityUserHolder.getCredential().getUsername());
         this.save(one);
       }
     }catch (Exception e){

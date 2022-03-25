@@ -93,7 +93,7 @@ public class RebateReportServiceImpl extends ServiceImpl<RebateReportMapper, Reb
               rebateReportPO.setCreateBy("system");
               rebateReportPO.setUpdateBy("system");
               rebateReportPO.setCreateTime(DateUtil.parse(DateUtil.now(), "yyyy-MM-dd HH:mm:ss"));
-              rebateReportPO.setUpdateTime(DateUtil.parse(DateUtil.now(), "yyyy-MM-dd HH:mm:szs"));
+              rebateReportPO.setUpdateTime(DateUtil.parse(DateUtil.now(), "yyyy-MM-dd HH:mm:ss"));
               // 实际佣金
               BigDecimal actualCommission;
               // 流水返利

@@ -35,8 +35,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Isolation;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
@@ -47,7 +45,6 @@ import java.util.*;
  */
 @Slf4j
 @Service
-@Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)
 public class ActivityQualificationServiceImpl
     extends ServiceImpl<ActivityQualificationMapper, ActivityQualification>
     implements ActivityQualificationService {

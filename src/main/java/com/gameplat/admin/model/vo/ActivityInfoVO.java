@@ -298,4 +298,16 @@ public class ActivityInfoVO implements Serializable {
   /** 活动说明html */
   @ApiModelProperty("活动说明html")
   private String explainHtml;
+
+  /** html兼容模式 0关闭1开启 */
+  @ApiModelProperty("html兼容模式 0关闭1开启")
+  private Integer htmlCompatibleMode;
+
+  /** web活动说明html */
+  @ApiModelProperty("兼容模式web活动说明html")
+  private String webExplainHtml;
+
+  /** h5活动说明html */
+  @ApiModelProperty("h5活动说明html")
+  private String h5ExplainHtml;
 }

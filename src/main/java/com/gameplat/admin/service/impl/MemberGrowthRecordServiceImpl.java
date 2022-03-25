@@ -119,6 +119,10 @@ public class MemberGrowthRecordServiceImpl
 
         IPage<MemberGrowthRecordVO> result =
                 this.lambdaQuery()
+                        .eq(
+                                ObjectUtils.isNotEmpty(dto.getMemberId()),
+                                MemberGrowthRecord::getUserId,
+                                dto.getMemberId())
                         .ne(MemberGrowthRecord::getType, 6)
                         .like(
                                 ObjectUtils.isNotEmpty(dto.getUserName()),
@@ -133,6 +137,10 @@ public class MemberGrowthRecordServiceImpl
                                 ObjectUtils.isNotEmpty(dto.getEndTime()),
                                 MemberGrowthRecord::getCreateTime,
                                 dto.getEndTime())
+                        .eq(
+                                ObjectUtils.isNotEmpty(dto.getCalcTime()),
+                                MemberGrowthRecord::getCreateTime,
+                                dto.getCalcTime())
                         .orderByDesc(MemberGrowthRecord::getCreateTime)
                         .page(page)
                         .convert(recordConvert::toVo);
@@ -454,6 +462,46 @@ public class MemberGrowthRecordServiceImpl
         };
     }
 
+    @Override
+    public List<MemberGrowthRecord> findRecordList(MemberGrowthRecordDTO dto) {
+        List<MemberGrowthRecord> list = this.lambdaQuery()
+                .eq(
+                        ObjectUtils.isNotEmpty(dto.getMemberId()),
+                        MemberGrowthRecord::getUserId,
+                        dto.getMemberId())
+                .like(
+                        ObjectUtils.isNotEmpty(dto.getUserName()),
+                        MemberGrowthRecord::getUserName,
+                        dto.getUserName())
+                .eq(
+                        ObjectUtils.isNotEmpty(dto.getType()),
+                        MemberGrowthRecord::getType,
+                        dto.getType())
+                .ge(
+                        ObjectUtils.isNotEmpty(dto.getStartTime()),
+                        MemberGrowthRecord::getCreateTime,
+                        dto.getStartTime())
+                .le(
+                        ObjectUtils.isNotEmpty(dto.getEndTime()),
+                        MemberGrowthRecord::getCreateTime,
+                        dto.getEndTime())
+                .eq(
+                        ObjectUtils.isNotEmpty(dto.getCalcTime()),
+                        MemberGrowthRecord::getCreateTime,
+                        dto.getCalcTime())
+                .orderByDesc(MemberGrowthRecord::getCreateTime)
+                .list();
+
+        for (MemberGrowthRecord memberGrowthRecord : list) {
+            if (ObjectUtils.isNotNull(memberGrowthRecord.getKindName())) {
+                JSONObject jsonKindName = JSONObject.parseObject(memberGrowthRecord.getKindName());
+                memberGrowthRecord.setKindName(jsonKindName.getString(dto.getLanguage()));
+            }
+        }
+
+        return list;
+    }
+
     /**
      * 处理升级
      */
@@ -487,7 +535,7 @@ public class MemberGrowthRecordServiceImpl
                     levels.stream()
                             .collect(
                                     Collectors.toMap(
-                                            MemberGrowthLevel::getLevel, UserGrowthLevel -> UserGrowthLevel));
+                                            MemberGrowthLevel::getLevel, MemberGrowthLevel -> MemberGrowthLevel));
             // 获取是否重复派发升级奖励 0 不允许重复派发   1 允许重复派发
             Integer isRepeatPayUpReword =
                     growthConfig.getIsRepeatPayUpReword() == null ? 0 : growthConfig.getIsRepeatPayUpReword();

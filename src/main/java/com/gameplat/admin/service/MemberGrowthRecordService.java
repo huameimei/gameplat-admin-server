@@ -30,6 +30,8 @@ public interface MemberGrowthRecordService extends IService<MemberGrowthRecord> 
 
   GrowthScaleVO progressBar(Integer level, Long memberId);
 
+  List<MemberGrowthRecord> findRecordList(MemberGrowthRecordDTO dto);
+
   /** 处理升级 */
   void dealPayUpReword(
       Integer beforeLevel,

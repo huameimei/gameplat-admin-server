@@ -26,4 +26,10 @@ public class MemberGrowthRecordDTO implements Serializable {
   private String endTime;
 
   private String language;
+
+  private Long memberId;
+
+  private String calcTime;
+
+  private String kindCode;
 }

@@ -20,13 +20,17 @@ import com.gameplat.model.entity.game.GameBetDailyReport;
 import com.gameplat.model.entity.game.GamePlatform;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
-
-import javax.validation.Valid;
 import java.util.Date;
 import java.util.List;
+import javax.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
 @Api("游戏日报表")
@@ -41,6 +45,7 @@ public class GameBetDailyReportController {
   @Autowired private GameBetRecordInfoService gameBetRecordInfoService;
 
   @GetMapping(value = "/queryPage")
+  @PreAuthorize("hasAuthority('game:gameBetDailyReport:list')")
   public PageDtoVO<GameBetDailyReport> queryPage(
       Page<GameBetDailyReport> page, GameBetDailyReportQueryDTO dto) {
     return gameBetDailyReportService.queryPage(page, dto);
@@ -50,12 +55,14 @@ public class GameBetDailyReportController {
 
   /** 游戏平台维度数据统计 */
   @GetMapping(value = "/queryGamePlatformReport")
+  @PreAuthorize("hasAuthority('game:gamePlatformReport:list')")
   public List<GameReportVO> queryGamePlatformReport(GameBetDailyReportQueryDTO dto) {
     return gameBetDailyReportService.queryGamePlatformReport(dto);
   }
 
   /** 游戏重新生成日报表 */
   @PostMapping(value = "/resetDayReport")
+  @PreAuthorize("hasAuthority('game:gameBetDailyReport:reset')")
   public void resetDayReport(@RequestBody OperGameMemberDayReportDTO dto) {
     List<GamePlatform> list = gamePlatformService.list();
     GamePlatform gamePlatform =
@@ -68,6 +75,7 @@ public class GameBetDailyReportController {
 
   @ApiOperation("查询真人数据统计")
   @GetMapping(value = "/queryReport")
+  @PreAuthorize("hasAuthority('game:gameReport:list')")
   public List<GameReportVO> queryReport(GameBetDailyReportQueryDTO dto) {
     if (StringUtils.isBlank(dto.getBeginTime())) {
       String beginTime = DateUtil.getDateToString(new Date());

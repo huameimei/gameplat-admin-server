@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.gameplat.admin.constant.Constants;
 import com.gameplat.admin.enums.TenantSettingEnum;
 import com.gameplat.admin.model.vo.ListSortConfigVO;
+import com.gameplat.admin.model.vo.SportConfigVO;
 import com.gameplat.admin.model.vo.TenantSettingVO;
 import com.gameplat.admin.service.SysTenantSettingService;
 import com.gameplat.admin.service.TenantSettingService;
@@ -222,5 +223,17 @@ public class TenantSettingController {
             Result.failed("修改体育配置参数为空");
         }
         return Result.succeed(tenantSettingService.updateListSortConfig(listSortConfigVOS));
+    }
+
+    /**
+     * 修改体育配置
+     */
+    @RequestMapping("/updateSportConfig")
+    @CacheEvict(cacheNames = Constants.TENANT_SPORT_CONFIG, allEntries = true)
+    public Result updateSportConfig(@RequestBody SportConfigVO sportConfigVo){
+        if(sportConfigVo==null){
+            Result.failed("修改体育配置参数为空");
+        }
+        return Result.succeed(tenantSettingService.updateSportConfig(sportConfigVo));
     }
 }

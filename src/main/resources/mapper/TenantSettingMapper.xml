@@ -216,4 +216,12 @@
         order by sort ASC
     </select>
 
+    <update id="updateSportConfig" parameterType="com.gameplat.model.entity.setting.TenantSetting">
+        update tenant_setting
+        <set>
+            <if test='settingValue != null and settingValue != ""'>setting_value = #{settingValue},</if>
+        </set>
+        where setting_type = 'sport_config' and setting_code = 'sportConfig'
+    </update>
+
 </mapper>

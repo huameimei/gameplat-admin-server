@@ -45,6 +45,9 @@ public interface Constants {
   /** 数据字典Type */
   String TENANT_CUSTOM_CONFIG = "TENANT_CUSTOM_CONFIG";
 
+  /** 租户体育配置*/
+  String TENANT_SPORT_CONFIG = "TENANT_SPORT_CONFIG";
+
   /** 原生体育游戏Code */
   String SPORT_IM = "imapi_sport";
 

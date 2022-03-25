@@ -3,6 +3,7 @@ package com.gameplat.admin.service;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.gameplat.admin.model.vo.ListSortConfigVO;
+import com.gameplat.admin.model.vo.SportConfigVO;
 import com.gameplat.admin.model.vo.SportConfigValueVO;
 import com.gameplat.admin.model.vo.TenantSettingVO;
 import com.gameplat.model.entity.setting.TenantSetting;
@@ -120,5 +121,8 @@ public interface TenantSettingService extends IService<TenantSetting> {
    * @return
    */
   int updateListSortConfig(List<ListSortConfigVO> listSortConfigVOS);
+
+  /**修改体育配置*/
+  int updateSportConfig(SportConfigVO sportConfigVo);
 
 }

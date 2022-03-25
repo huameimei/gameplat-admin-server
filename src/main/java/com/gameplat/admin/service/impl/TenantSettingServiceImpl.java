@@ -13,10 +13,7 @@ import com.gameplat.admin.constant.Constants;
 import com.gameplat.admin.enums.ListSortTypeEnum;
 import com.gameplat.admin.feign.SportFeignClient;
 import com.gameplat.admin.mapper.TenantSettingMapper;
-import com.gameplat.admin.model.vo.GameKindVO;
-import com.gameplat.admin.model.vo.ListSortConfigVO;
-import com.gameplat.admin.model.vo.SportConfigValueVO;
-import com.gameplat.admin.model.vo.TenantSettingVO;
+import com.gameplat.admin.model.vo.*;
 import com.gameplat.admin.service.TenantSettingService;
 import com.gameplat.base.common.context.DyDataSourceContextHolder;
 import com.gameplat.base.common.context.StrategyContext;
@@ -312,6 +309,7 @@ public class TenantSettingServiceImpl extends ServiceImpl<TenantSettingMapper, T
         return tenantSettingMapper.updateListSortConfig(tenantSetting);
     }
 
+
     /**
      * 初始化体育数据
      */
@@ -403,5 +401,31 @@ public class TenantSettingServiceImpl extends ServiceImpl<TenantSettingMapper, T
             throw new ServiceException("初始化数据异常");
         }
         return tenantSetting;
+    }
+
+    @Override
+    public int updateSportConfig(SportConfigVO sportConfigVo) {
+        TenantSetting tenantSetting = new TenantSetting();
+        SportConfigValueVO sportConfigValueVo = new SportConfigValueVO();
+        sportConfigValueVo.setH5ActivityImg(sportConfigVo.getH5ActivityImg());
+        sportConfigValueVo.setAppActivityImg(sportConfigVo.getAppActivityImg());
+        sportConfigValueVo.setCustomerUrl(sportConfigVo.getCustomerUrl());
+        sportConfigValueVo.setCustomerDownloadUrl(sportConfigVo.getCustomerDownloadUrl());
+        sportConfigValueVo.setScene(sportConfigVo.getScene());
+        sportConfigValueVo.setHandicap(sportConfigVo.getHandicap());
+        sportConfigValueVo.setCpChatEnable(sportConfigVo.getCpChatEnable());
+
+        sportConfigValueVo.setStyle(sportConfigVo.getStyle());
+        sportConfigValueVo.setBallHeadRule(sportConfigVo.getBallHeadRule());
+        sportConfigValueVo.setSportBallNavigation(sportConfigVo.getSportBallNavigation());
+        sportConfigValueVo.setSportLeagueNavigation(sportConfigVo.getSportLeagueNavigation());
+        //保存数据到体育服
+        int rst = saveSportBallHead(sportConfigValueVo);
+        if (rst == 1) {
+            log.info("球头配置写入到体育服成功");
+        }
+        String settingValue = JSONObject.toJSONString(sportConfigValueVo);
+        tenantSetting.setSettingValue(settingValue);
+        return tenantSettingMapper.updateSportConfig(tenantSetting);
     }
 }

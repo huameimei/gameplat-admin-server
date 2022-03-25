@@ -184,7 +184,8 @@ public class MemberGrowthRecordServiceImpl
         // todo 2.获取成长值配置
         MemberGrowthConfig growthConfig = memberGrowthConfigService.getOneConfig();
         if (growthConfig.getIsEnableVip() == 0) {
-            throw new ServiceException("未开启VIP功能");
+            log.info("成长值计算失败，未开启VIP功能");
+            return;
         }
         // 会员id
         Long memberId = dto.getUserId();
@@ -192,15 +193,16 @@ public class MemberGrowthRecordServiceImpl
         MemberInfo memberInfo = memberInfoService.lambdaQuery().eq(MemberInfo::getMemberId, memberId).one();
         if (BeanUtil.isEmpty(member)) {
             log.info("VIP 成长值变动 会员不存在");
-            throw new ServiceException("用户不存在！");
+            return;
         }
         // 变动的类型
         Integer type = dto.getType();
-        if (dto.getChangeGrowth() == null) {
-            throw new ServiceException("此次变动金额参数不存在");
-        }
+//        if (dto.getChangeGrowth() == null) {
+//            throw new ServiceException("此次变动金额参数不存在");
+//        }
         // 变动的成长值
         Long changeGrowth = dto.getChangeGrowth();
+
         // todo 1.获取用户成长值汇总数据
         List<MemberGrowthRecord> memberGrowthRecords = this.findOne(dto);
         MemberGrowthRecord memberGrowthRecord = new MemberGrowthRecord();
@@ -213,8 +215,8 @@ public class MemberGrowthRecordServiceImpl
             memberGrowthRecord.setCurrentLevel(0);
         }
         // 当前成长值
-        Long oldGrowth = memberInfoService.lambdaQuery().eq(MemberInfo::getMemberId, dto.getUserId()).one().getVipGrowth();
-//    Long oldGrowth = memberGrowthRecord.getCurrentGrowth();
+//        Long oldGrowth = memberInfoService.lambdaQuery().eq(MemberInfo::getMemberId, dto.getUserId()).one().getVipGrowth();
+        Long oldGrowth = memberGrowthRecord.getCurrentGrowth();
         // 最终变动成长值  由于类型不同  可能最终变成的成长值倍数也不同
         Long changeFinalGrowth = 0L;
 
@@ -224,12 +226,11 @@ public class MemberGrowthRecordServiceImpl
 
         // todo 3.按变动类型执行不同逻辑
         if (type == GrowthChangeEnum.recharge.getCode()) {
-            // 充值
             // 判断是否开启了充值
             if (BooleanEnum.YES.match(growthConfig.getIsEnableRecharge())) {
                 // 获取充值 成长值 兑换比例
-                changeFinalGrowth =
-                        growthConfig.getRechageRate().multiply(BigDecimal.valueOf(changeGrowth)).longValue();
+                changeFinalGrowth = changeGrowth;
+
                 saveRecord.setKindName(kindName);
                 saveRecord.setKindCode("plat");
                 saveRecord.setChangeMult(growthConfig.getRechageRate());

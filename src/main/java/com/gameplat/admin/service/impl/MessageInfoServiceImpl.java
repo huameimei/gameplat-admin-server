@@ -215,8 +215,26 @@ public class MessageInfoServiceImpl extends ServiceImpl<MessageMapper, Message>
     }
     // 部分会员
     if (dto.getPushRange().equals(2)) {
-      memberQueryDTO.setAccount(dto.getLinkAccount());
-      return readStatus(page, memberQueryDTO, dto);
+      String[] linkAccountArray = dto.getLinkAccount().split(",");
+
+      IPage<MessageDistributeVO> messageDistributePage = new PageDTO<>();
+      List<MessageDistributeVO> records = new ArrayList<>();
+
+      for (String linkAccount : linkAccountArray) {
+        memberQueryDTO.setAccount(linkAccount);
+        MessageDistributeVO messageDistributeVO = readStatus(page, memberQueryDTO, dto).getRecords().get(0);
+        records.add(messageDistributeVO);
+      }
+
+      long total = (int) records.size();
+      long size = page.getSize();
+      long pages = total % size == 0 ? total / size : (total / size) + 1;
+      messageDistributePage.setCurrent(page.getCurrent());
+      messageDistributePage.setSize(size);
+      messageDistributePage.setTotal(total);
+      messageDistributePage.setPages(pages);
+      messageDistributePage.setRecords(records);
+      return messageDistributePage;
     }
     // 在线会员
     if (dto.getPushRange().equals(3)) {

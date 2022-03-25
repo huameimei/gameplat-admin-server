@@ -41,4 +41,7 @@ public interface MemberWithdrawService extends IService<MemberWithdraw> {
       UserCredential userCredential,
       Long memberId)
       throws Exception;
+
+
+  long getUntreatedWithdrawCount();
 }

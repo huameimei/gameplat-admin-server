@@ -71,5 +71,4 @@ public interface RechargeOrderMapper extends BaseMapper<RechargeOrder> {
 
   List<PayLeaderboard> getLeaderboard(PayLeaderboardParam payLeaderboardParam);
 
-  Integer getUntreatedRechargeCount();
 }

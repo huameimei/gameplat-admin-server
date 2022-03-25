@@ -854,8 +854,10 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
   }
 
   @Override
-  public Integer getUntreatedRechargeCount() {
-    return rechargeOrderMapper.getUntreatedRechargeCount();
+  public long getUntreatedRechargeCount() {
+    return this.lambdaQuery()
+            .eq(RechargeOrder::getMode, 1)
+            .eq(RechargeOrder::getStatus, 1).count();
   }
 
   /** 查询在线支付 */

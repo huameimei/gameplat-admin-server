@@ -1,13 +1,13 @@
 package com.gameplat.admin.controller.open.finance;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.gameplat.admin.mapper.MemberWithdrawMapper;
 import com.gameplat.admin.model.bean.ManualRechargeOrderBo;
 import com.gameplat.admin.model.bean.PageExt;
 import com.gameplat.admin.model.dto.RechargeOrderQueryDTO;
 import com.gameplat.admin.model.vo.RechargeOrderVO;
 import com.gameplat.admin.model.vo.SummaryVO;
 import com.gameplat.admin.model.vo.WithdrawChargeVO;
+import com.gameplat.admin.service.MemberWithdrawService;
 import com.gameplat.admin.service.RechargeOrderService;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.common.constant.ServiceName;
@@ -17,14 +17,12 @@ import com.gameplat.log.enums.LogType;
 import com.gameplat.model.entity.recharge.RechargeOrder;
 import com.gameplat.security.SecurityUserHolder;
 import com.gameplat.security.context.UserCredential;
-import io.swagger.annotations.ApiModelProperty;
 import io.swagger.annotations.ApiOperation;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
 import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
 import java.util.List;
@@ -36,7 +34,8 @@ public class RechargeOrderController {
 
   @Autowired private RechargeOrderService rechargeOrderService;
 
-  @Autowired private MemberWithdrawMapper memberWithdrawMapper;
+  @Autowired
+  private MemberWithdrawService memberWithdrawService;
 
   @PostMapping("/handle")
   @PreAuthorize("hasAuthority('finance:rechargeOrder:handle')")
@@ -168,8 +167,8 @@ public class RechargeOrderController {
   @GetMapping("/withdraw_charge")
   public WithdrawChargeVO getTotal(){
     WithdrawChargeVO vo = new WithdrawChargeVO();
-    Integer rechargeCount = rechargeOrderService.getUntreatedRechargeCount();
-    Integer withdrawCount = memberWithdrawMapper.getUntreatedWithdrawCount();
+    long rechargeCount = rechargeOrderService.getUntreatedRechargeCount();
+    long withdrawCount = memberWithdrawService.getUntreatedWithdrawCount();
     vo.setRechargeCount(rechargeCount);
     vo.setWithdrawCount(withdrawCount);
     return vo;

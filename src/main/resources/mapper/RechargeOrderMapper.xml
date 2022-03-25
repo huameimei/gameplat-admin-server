@@ -302,13 +302,4 @@
         GROUP BY aa.interfaceCode
     </select>
 
-    <select id="getUntreatedRechargeCount" resultType="java.lang.Integer">
-        SELECT
-            sum( count )
-        FROM
-            ( SELECT count(*) count FROM recharge_order WHERE `status` = 1 AND MODE = 1
-              UNION
-              SELECT count(*) count FROM recharge_order_history WHERE `status` = 1 AND MODE = 1
-            ) a
-    </select>
 </mapper>

@@ -19,14 +19,19 @@ import com.gameplat.model.entity.game.GameRebateDetail;
 import com.gameplat.model.entity.game.GameRebatePeriod;
 import com.gameplat.redis.api.RedisService;
 import com.gameplat.redis.exception.RedisOpsResultIsNullException;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-import java.util.concurrent.TimeUnit;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
 @RestController
@@ -46,27 +51,32 @@ public class GameRebatePeriodController {
   @Autowired private RedisService redisService;
 
   @GetMapping(value = "queryAll")
+  @PreAuthorize("hasAuthority('game:gameRebatePeriod:list')")
   public IPage<GameRebatePeriodVO> queryGameRebatePeriod(
       Page<GameRebatePeriod> page, GameRebatePeriodQueryDTO dto) {
     return gameRebatePeriodService.queryGameRebatePeriod(page, dto);
   }
 
   @PostMapping(value = "add")
+  @PreAuthorize("hasAuthority('game:gameRebatePeriod:add')")
   public void add(@RequestBody OperGameRebatePeriodDTO dto) {
     gameRebatePeriodService.addGameRebatePeriod(dto);
   }
 
   @PutMapping(value = "update")
+  @PreAuthorize("hasAuthority('game:gameRebatePeriod:update')")
   public void update(@RequestBody OperGameRebatePeriodDTO dto) {
     gameRebatePeriodService.updateGameRebatePeriod(dto);
   }
 
   @PostMapping(value = "delete")
+  @PreAuthorize("hasAuthority('game:gameRebatePeriod:remove')")
   public void delete(@RequestBody OperGameRebatePeriodDTO dto) {
     gameRebatePeriodService.deleteGameRebatePeriod(dto.getId(), dto.getOnly());
   }
 
   @PostMapping(value = "settle")
+  @PreAuthorize("hasAuthority('game:gameRebatePeriod:settle')")
   public void settle(@RequestBody OperGameRebatePeriodDTO dto) {
     // 正在发放、回收，不允许进行结算操作
     try {
@@ -93,6 +103,7 @@ public class GameRebatePeriodController {
   }
 
   @PostMapping(value = "batchAccept")
+  @PreAuthorize("hasAuthority('game:gameRebatePeriod:batchAccept')")
   public void accept(@RequestBody OperGameRebatePeriodDTO dto) {
     GameRebatePeriod rebatePeriod = gameRebatePeriodService.getById(dto.getId());
     Assert.notNull(rebatePeriod, "游戏返水期号不存在");
@@ -105,6 +116,7 @@ public class GameRebatePeriodController {
 
   @Async
   public void asyncAcceptSingleTask(String taskName, OperGameRebatePeriodDTO dto) {
+    log.info("");
     List<GameRebateDetail> gameRebateDetailList =
         gameRebateDetailService.gameRebateDetailByStatus(
             dto.getId(), GameRebateReportStatus.UNACCEPTED.getValue());
@@ -139,7 +151,8 @@ public class GameRebatePeriodController {
   }
 
   /** 游戏返水回收:期数 */
-  @RequestMapping(value = "rollBack", method = RequestMethod.POST)
+  @PostMapping(value = "rollBack")
+  @PreAuthorize("hasAuthority('game:gameRebatePeriod:rollBack')")
   public void rollBack(@RequestBody OperGameRebatePeriodDTO dto) {
     GameRebatePeriod rebatePeriod = gameRebatePeriodService.getById(dto.getId());
     Assert.isNull(rebatePeriod, "游戏返水期号不存在");

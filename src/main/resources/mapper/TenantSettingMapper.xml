@@ -179,7 +179,7 @@
                `update_by`,
                `update_time`
         from tenant_setting
-        where setting_type = 'sport_config' limit 1;
+        where setting_type = 'sport_config' and setting_code = 'sportConfig';
     </select>
 
     <update id="updateListSortConfig" parameterType="com.gameplat.model.entity.setting.TenantSetting">

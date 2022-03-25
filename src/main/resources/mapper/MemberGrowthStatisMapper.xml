@@ -42,6 +42,7 @@
         member_growth_statis gs
         LEFT JOIN member_growth_level gl ON gs.vip_level = gl.`level`
         <where>
+            gs.vip_level != 0
             <if test="type != null and type == 0">
                 AND gl.week_wage >0
             </if>

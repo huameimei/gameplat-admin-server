@@ -93,6 +93,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
         .eq(ObjectUtils.isNotNull(userDTO.getRoleId()), SysUser::getRoleId, userDTO.getRoleId())
         .eq(ObjectUtils.isNotNull(userDTO.getStatus()), SysUser::getStatus, userDTO.getStatus())
         .eq(ObjectUtils.isNotEmpty(userDTO.getPhone()), SysUser::getPhone, userDTO.getPhone())
+            .eq(SysUser::getIsAllowDelete, 0)
         .between(
             ObjectUtils.isNotEmpty(userDTO.getBeginTime()),
             SysUser::getCreateTime,
@@ -164,7 +165,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
 
     // 删除用户角色表
     userRoleMapper.deleteUserRole(new Long[] {id});
-    Assert.isTrue(this.removeById(id), "删除用户失败!");
+    Assert.isTrue(this.lambdaUpdate().set(SysUser::getIsAllowDelete, 1).eq(SysUser::getUserId, id).update(), "删除用户失败!");
   }
 
   @Override

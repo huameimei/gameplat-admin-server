@@ -44,9 +44,11 @@ import java.util.Set;
 public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole>
     implements SysRoleService {
 
-  @Autowired private SysRoleMapper roleMapper;
+  @Autowired(required = false)
+  private SysRoleMapper roleMapper;
 
-  @Autowired private SysRoleMenuMapper roleMenuMapper;
+  @Autowired(required = false)
+  private SysRoleMenuMapper roleMenuMapper;
 
   @Autowired private RoleConvert roleConvert;
 
@@ -79,7 +81,7 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole>
     List<SysUser> userRoles = userService.getUserByRoleId(id);
     Assert.isFalse(userRoles.size() > 0, "分组下存在用户无法删除");
     Assert.isFalse(BooleanEnum.YES.match(role.getDefaultFlag()), "默认分组不能删除");
-    if (!this.removeById(id)) {
+    if (!this.lambdaUpdate().set(SysRole::getIsDel, "1").eq(SysRole::getRoleId, id).update()) {
       throw new ServiceException("删除分组失败!");
     }
   }
@@ -91,7 +93,8 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole>
     queryWrapper
             .like(ObjectUtils.isNotEmpty(dto.getRoleName()), "r.role_name", dto.getRoleName())
             .eq(ObjectUtils.isNotNull(dto.getStatus()), "r.status", dto.getStatus())
-            .like(ObjectUtils.isNotEmpty(dto.getRoleKey()), "r.role_key", dto.getRoleKey());
+            .like(ObjectUtils.isNotEmpty(dto.getRoleKey()), "r.role_key", dto.getRoleKey())
+            .eq("is_del", "0");
 
     return roleMapper.selectRoleList(page, queryWrapper).convert(roleConvert::toVo);
   }

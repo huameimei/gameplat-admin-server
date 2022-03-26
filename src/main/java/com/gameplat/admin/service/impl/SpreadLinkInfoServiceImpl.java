@@ -4,6 +4,7 @@ import cn.afterturn.easypoi.excel.ExcelExportUtil;
 import cn.afterturn.easypoi.excel.entity.ExportParams;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
@@ -24,16 +25,20 @@ import com.gameplat.admin.model.vo.GameDivideVo;
 import com.gameplat.admin.model.vo.SpreadConfigVO;
 import com.gameplat.admin.service.MemberService;
 import com.gameplat.admin.service.SpreadLinkInfoService;
+import com.gameplat.admin.service.SysDictDataService;
 import com.gameplat.base.common.enums.EnableEnum;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.StringUtils;
 import com.gameplat.base.common.validator.ValidatorUtil;
 import com.gameplat.common.enums.BooleanEnum;
+import com.gameplat.common.enums.DictDataEnum;
+import com.gameplat.common.enums.DictTypeEnum;
 import com.gameplat.common.enums.UserTypes;
 import com.gameplat.common.lang.Assert;
 import com.gameplat.model.entity.member.Member;
 import com.gameplat.model.entity.proxy.DivideLayerConfig;
 import com.gameplat.model.entity.spread.SpreadLinkInfo;
+import com.gameplat.model.entity.sys.SysDictData;
 import lombok.Cleanup;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -68,6 +73,8 @@ public class SpreadLinkInfoServiceImpl extends ServiceImpl<SpreadLinkInfoMapper,
   @Autowired private MemberInfoMapper memberInfoMapper;
 
   @Autowired private DivideLayerConfigMapper layerConfigMapper;
+
+  @Autowired private SysDictDataService sysDictDataService;
 
   @Override
   public IPage<SpreadConfigVO> page(PageDTO<SpreadLinkInfo> page, SpreadLinkInfoDTO dto) {
@@ -170,13 +177,32 @@ public class SpreadLinkInfoServiceImpl extends ServiceImpl<SpreadLinkInfoMapper,
             .getByAccount(linkInfo.getAgentAccount())
             .orElseThrow(() -> new ServiceException("代理账号不存在!"));
     Assert.isTrue(UserTypes.AGENT.value().equalsIgnoreCase(member.getUserType()), "账号类型不支持！");
+    // 推广码最少字符限制
+    SysDictData agentMinCodeNumData =
+        sysDictDataService.getDictData(
+            DictTypeEnum.SYSTEM_PARAMETER_CONFIG.getValue(),
+            DictDataEnum.AGENT_MIN_CODE_NUM.getLabel());
+    Integer agentMinCodeNum = Convert.toInt(agentMinCodeNumData.getDictValue());
+    // 代理推广码最大条数
+    SysDictData agentMaxSpreadNumData =
+        sysDictDataService.getDictData(
+            DictTypeEnum.SYSTEM_PARAMETER_CONFIG.getValue(),
+            DictDataEnum.AGENT_MAX_SPREAD_NUM.getLabel());
+    Integer agentMaxSpreadNum = Convert.toInt(agentMaxSpreadNumData.getDictValue());
     // 如果推广码为空  随机生成 4-20位
     if (StrUtil.isBlank(linkInfo.getCode())) {
-      linkInfo.setCode(RandomStringUtils.random(6, true, true).toLowerCase());
+      linkInfo.setCode(
+          RandomStringUtils.random(agentMinCodeNum == 0 ? 6 : agentMinCodeNum, true, true)
+              .toLowerCase());
     }
     linkInfo.setIsOpenDividePreset(dto.getIsOpenDividePreset());
     // 校验推广码格式 并且是否已经存在
-    this.checkCode(linkInfo.getCode());
+    this.checkCode(linkInfo.getCode(), agentMinCodeNum);
+    // 校验此推广拥有几个推广码连接条数
+    Long count =
+        this.lambdaQuery().eq(SpreadLinkInfo::getAgentAccount, linkInfo.getAgentAccount()).count();
+    Assert.isTrue((count + 1) <= agentMaxSpreadNum, "单个代理账户不能超过" + agentMaxSpreadNum + "条推广码链接！");
+
     // 当推广链接不为空时 需要校验 此推广链接地址是否被其它代理作为了专属域名
     if (StrUtil.isNotBlank(linkInfo.getExternalUrl())) {
       boolean exists =
@@ -289,10 +315,11 @@ public class SpreadLinkInfoServiceImpl extends ServiceImpl<SpreadLinkInfoMapper,
   }
 
   @Override
-  public void checkCode(String code) {
-    String reg = "^[a-zA-Z0-9]{4,20}$";
+  public void checkCode(String code, Integer agentMinCodeNum) {
+    String reg = "^[a-zA-Z0-9]{" + agentMinCodeNum + ",20}$";
     if (!code.matches(reg)) {
-      throw new ServiceException("推广码必须由4-20位数字或字母组成！");
+      String eStr = agentMinCodeNum == 20 ? "" : (agentMinCodeNum + "-");
+      throw new ServiceException("推广码必须由" + eStr + "20位数字或字母组成！");
     }
 
     if (this.lambdaQuery()

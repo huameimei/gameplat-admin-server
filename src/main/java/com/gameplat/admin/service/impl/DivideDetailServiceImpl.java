@@ -33,7 +33,7 @@ public class DivideDetailServiceImpl extends ServiceImpl<DivideDetailMapper, Div
         .eq(ObjectUtils.isNotNull(dto.getId()), "id", dto.getId())
         .eq(ObjectUtils.isNotNull(dto.getPeriodsId()), "periods_id", dto.getPeriodsId())
         .eq(ObjectUtils.isNotNull(dto.getProxyId()), "proxy_id", dto.getProxyId())
-        .orderByDesc("create_time");
+        .orderByAsc("agent_level");
 
     IPage<DivideDetailVO> pageResult =
         divideDetailMapper.selectPage(page, queryWrapper).convert(divideDetailConvert::toVo);

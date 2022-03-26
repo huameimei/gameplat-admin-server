@@ -474,4 +474,29 @@ public class LotteryManagerController {
   public Object updateRebate(HttpServletRequest request) {
     return serviceHandler.serviceHandler(request);
   }
+
+  @ApiOperation("竞速彩预设开奖--彩系和彩种列表")
+  @PostMapping("getJscPresetLottList")
+  public Object getJscPresetLottList(HttpServletRequest request) {
+    return serviceHandler.serviceHandler(request);
+  }
+
+  @ApiOperation("竞速彩预设开奖--列表")
+  @PostMapping("getJscPresetNumberList")
+  public Object getJscPresetNumberList(HttpServletRequest request) {
+    return serviceHandler.serviceHandler(request);
+  }
+
+
+  @ApiOperation("竞速彩预设开奖--批量删除-删除")
+  @PostMapping("deleteJscPresetNumber")
+  public Object deleteJscPresetNumber(HttpServletRequest request) {
+    return serviceHandler.serviceHandler(request);
+  }
+
+  @ApiOperation("竞速彩开奖预设--批量添加预设号码")
+  @PostMapping("addJscPresetNumber")
+  public Object addJscPresetNumber(HttpServletRequest request) {
+    return serviceHandler.serviceHandler(request);
+  }
 }

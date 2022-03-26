@@ -39,7 +39,7 @@ import java.util.Objects;
 public class RebateReportController {
   @Autowired private RebateReportService rebateReportService;
 
-  @ApiOperation(value = "查询可选代理账号列表")
+  @ApiOperation(value = "平级分红报表")
   @GetMapping("/list")
   public IPage<RebateReportVO> list(PageDTO<AgentPlanVO> page, RebateReportDTO rebateReportDTO) {
     // todo 参数初始化

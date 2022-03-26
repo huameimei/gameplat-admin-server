@@ -45,7 +45,7 @@ public class NewLotteryForwardServiceImpl implements NewLotteryForwardService {
 
     // 封装请求头参数
     Map<String, String> headers = new HashMap<>();
-    headers.put("locale", LocaleContextHolder.getLocale().toLanguageTag());
+    headers.put("locale", "zh");
     headers.put("attribution", attribution);
     headers.put("username", userCredential.getUsername());
     Object object =

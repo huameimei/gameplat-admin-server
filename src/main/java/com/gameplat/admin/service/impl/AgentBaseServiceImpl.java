@@ -114,7 +114,7 @@ public class AgentBaseServiceImpl implements AgentBaseService {
       memberBill.setMemberId(agentId);
       memberBill.setAccount(agentName);
       memberBill.setMemberPath(member.getSuperPath());
-      memberBill.setTranType(TranTypes.DIVIDE_AMOUNT_BACK.getValue());
+      memberBill.setTranType(TranTypes.SAME_REPORT_AMOUNT.getValue());
       memberBill.setOrderNo(String.valueOf(IdGeneratorSnowflake.getInstance().nextId()));
       memberBill.setAmount(settleMoney);
       memberBill.setBalance(memberInfo.getBalance());

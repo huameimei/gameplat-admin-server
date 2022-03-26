@@ -12,9 +12,9 @@ import java.io.Serializable;
 @Data
 public class WithdrawChargeVO implements Serializable {
 
-    private Integer withdrawCount;
+  private long withdrawCount;
 
-    private Integer rechargeCount;
+  private long rechargeCount;
 
 //    private Integer withdrawCounts;
 }

@@ -73,13 +73,19 @@
         </foreach>
     </select>
 
-    <select id="getLowerIds" resultType="long" parameterType="String">
+    <select id="getLowerIds" resultType="java.lang.Long">
         select id from member
         where 1 = 1
-        and super_path REGEXP
-        <foreach collection="superProxyNames" index="i" item="name" open="'" separator="|" close="'">
-            concat('/',${name},'/')
+        and super_path regexp
+        <foreach collection="superProxyNames" index="i" item="itemName" open="'/" separator="/|/" close="/'">
+            #{itemName}
         </foreach>
+    </select>
+
+    <select id="getProxyLowerIds" resultType="java.lang.Long">
+        select id from member
+        where 1 = 1
+        and super_path like concat('%/',#{agentName},'/%')
     </select>
 
     <!--代理绑定分红方案-->
@@ -94,7 +100,7 @@
         select
         m.id as agentId,
         m.account as agentName,
-        m.enabled as accountStatus,
+        m.status as accountStatus,
         m.agent_level as levelNum,
         m.parent_id as parentId,
         m.parent_name as parentName,

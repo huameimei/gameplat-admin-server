@@ -49,6 +49,8 @@ public interface AgentDivideMapper {
 
   Set<Long> getLowerIds(@Param("superProxyNames") Set<String> superProxyNames);
 
+  Set<Long> getProxyLowerIds(@Param("agentName") String agentName);
+
   /**
    * 代理绑定分红方案
    *

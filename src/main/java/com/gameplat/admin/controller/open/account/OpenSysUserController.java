@@ -1,5 +1,6 @@
 package com.gameplat.admin.controller.open.account;
 
+import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.gameplat.admin.model.dto.OperUserDTO;
@@ -36,6 +37,12 @@ public class OpenSysUserController {
   @GetMapping("/list")
   @PreAuthorize("hasAuthority('account:subUser:view')")
   public IPage<UserVo> list(PageDTO<SysUser> page, UserDTO dto) {
+    if (ObjectUtil.isNotEmpty(dto.getBeginTime())) {
+      dto.setBeginTime(dto.getBeginTime() + " 00:00:00");
+    }
+    if (ObjectUtil.isNotEmpty(dto.getEndTime())) {
+      dto.setEndTime(dto.getEndTime() + " 23:59:59");
+    }
     return userService.selectUserList(page, dto);
   }
 

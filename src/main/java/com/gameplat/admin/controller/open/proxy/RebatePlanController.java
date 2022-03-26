@@ -1,6 +1,8 @@
 package com.gameplat.admin.controller.open.proxy;
 
+import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.toolkit.Assert;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.gameplat.admin.model.vo.RebatePlanVO;
 import com.gameplat.admin.service.RebatePlanService;
@@ -68,13 +70,17 @@ public class RebatePlanController {
     rebatePlanService.editRebatePlan(rebatePlanPO);
   }
 
-  @ApiOperation("平级分红->删除平级分红方案")
-  @PostMapping(value = "/remove")
+  @ApiOperation(value = "平级分红->删除平级分红方案")
+  @DeleteMapping("/remove")
   @Log(
       module = ServiceName.ADMIN_SERVICE,
       type = LogType.AGENT,
       desc = "平级分红->删除平级分红方案，方案ID：#{#planId}")
-  public void removeRebatePlan(@RequestParam Long planId) {
-    rebatePlanService.removeRebatePlan(planId);
+  public void remove(@RequestBody String ids) {
+    Assert.isTrue(StrUtil.isNotBlank(ids), "参数为空！");
+    String[] idArr = ids.split(",");
+    for (String id : idArr) {
+      rebatePlanService.removeRebatePlan(Long.valueOf(id));
+    }
   }
 }

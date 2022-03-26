@@ -9,13 +9,16 @@ import com.gameplat.admin.service.GameKindService;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.common.enums.GameDemoEnableEnum;
 import com.gameplat.model.entity.game.GameKind;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
-
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/admin/game/gameKind")
@@ -36,11 +39,13 @@ public class GameKindController {
   }
 
   @PutMapping("/updateEnable")
+  @PreAuthorize("hasAuthority('game:gameKind:updateEnable')")
   public void updateEnable(@RequestBody OperGameKindDTO dto) {
     gameKindService.updateEnable(dto);
   }
 
   @PutMapping("/updateDemoEnable")
+  @PreAuthorize("hasAuthority('game:gameKind:updateDemoEnable')")
   public void updateDemoEnable(@RequestBody OperGameKindDTO dto) {
     if (dto.getDemoEnable() != GameDemoEnableEnum.ENABLE.getCode()
         && dto.getDemoEnable() != GameDemoEnableEnum.DISABLE.getCode()) {

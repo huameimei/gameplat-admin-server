@@ -21,6 +21,13 @@ import com.gameplat.common.game.api.GameApi;
 import com.gameplat.elasticsearch.page.PageResponse;
 import com.gameplat.elasticsearch.service.IBaseElasticsearchService;
 import com.gameplat.model.entity.game.GameBetRecord;
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import javax.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
@@ -45,14 +52,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-
-import javax.annotation.Resource;
-import java.io.IOException;
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 @Slf4j
 @Service
@@ -135,15 +134,12 @@ public class GameBetRecordInfoServiceImpl implements GameBetRecordInfoService {
       SearchResponse searchResponse =
           restHighLevelClient.search(searchRequest, optionsBuilder.build());
       Map<String, Aggregation> aggregationMap = searchResponse.getAggregations().getAsMap();
-      BigDecimal betAmount =
-          Convert.toBigDecimal(((ParsedSum) aggregationMap.get("betAmountSum")).getValue())
-              .setScale(2, BigDecimal.ROUND_DOWN);
-      BigDecimal validAmount =
-          Convert.toBigDecimal(((ParsedSum) aggregationMap.get("validAmountSum")).getValue())
-              .setScale(2, BigDecimal.ROUND_DOWN);
-      BigDecimal winAmount =
-          Convert.toBigDecimal(((ParsedSum) aggregationMap.get("winAmountSum")).getValue())
-              .setScale(2, BigDecimal.ROUND_DOWN);
+      BigDecimal betAmount = Convert.toBigDecimal(((ParsedSum) aggregationMap.get("betAmountSum")).getValue())
+              .divide(new BigDecimal("1000"), BigDecimal.ROUND_DOWN, 2);
+      BigDecimal validAmount = Convert.toBigDecimal(((ParsedSum) aggregationMap.get("validAmountSum")).getValue())
+              .divide(new BigDecimal("1000"), BigDecimal.ROUND_DOWN, 2);
+      BigDecimal winAmount = Convert.toBigDecimal(((ParsedSum) aggregationMap.get("winAmountSum")).getValue())
+              .divide(new BigDecimal("1000"), BigDecimal.ROUND_DOWN, 2);
       otherData.put("betAmount", betAmount);
       otherData.put("validAmount", validAmount);
       otherData.put("winAmount", winAmount);

@@ -93,7 +93,7 @@ public class RebateReportServiceImpl extends ServiceImpl<RebateReportMapper, Reb
               rebateReportPO.setCreateBy("system");
               rebateReportPO.setUpdateBy("system");
               rebateReportPO.setCreateTime(DateUtil.parse(DateUtil.now(), "yyyy-MM-dd HH:mm:ss"));
-              rebateReportPO.setUpdateTime(DateUtil.parse(DateUtil.now(), "yyyy-MM-dd HH:mm:szs"));
+              rebateReportPO.setUpdateTime(DateUtil.parse(DateUtil.now(), "yyyy-MM-dd HH:mm:ss"));
               // 实际佣金
               BigDecimal actualCommission;
               // 流水返利
@@ -430,5 +430,29 @@ public class RebateReportServiceImpl extends ServiceImpl<RebateReportMapper, Reb
     }
     return rebateReportMapper.batchUpdateStatus(
         countDate, SecurityUserHolder.getUsername(), currentStatus);
+  }
+
+  @Override
+  public int updateActualCommission(Long reportId) {
+    RebateReportVO rebateReportVO = getRebateReportVO(reportId);
+    // 实际佣金
+    BigDecimal actualCommission;
+    // 下级会员佣金（负数计为零）
+    BigDecimal memberCommission = rebateReportVO.getMemberCommission();
+    // 下级代理佣金
+    BigDecimal agentCommission = rebateReportVO.getAgentCommission();
+    // 流水返利
+    BigDecimal turnoverCommission = rebateReportVO.getTurnoverRebate();
+    // 佣金调整
+    BigDecimal adjustmentAmount = rebateReportVO.getAdjustmentAmount();
+    if (memberCommission.compareTo(BigDecimal.ZERO) <= 0) {
+      // todo 下级会员佣金为负数 实际佣金 = 下级代理佣金 + 流水返利 + 佣金调整
+      actualCommission = agentCommission.add(turnoverCommission).add(adjustmentAmount);
+    } else {
+      // todo 下级会员佣金为正数 实际佣金 = 下级会员佣金 + 下级代理佣金 + 流水返利 + 佣金调整
+      actualCommission =
+          memberCommission.add(agentCommission).add(turnoverCommission).add(adjustmentAmount);
+    }
+    return rebateReportMapper.updateActualCommission(reportId, actualCommission);
   }
 }

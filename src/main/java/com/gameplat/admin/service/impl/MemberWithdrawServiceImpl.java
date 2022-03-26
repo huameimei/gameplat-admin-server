@@ -716,4 +716,11 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
       }
     }
   }
+
+  @Override
+  public long getUntreatedWithdrawCount() {
+    return this.lambdaQuery()
+            .eq(MemberWithdraw::getCashStatus, 1)
+            .count();
+  }
 }

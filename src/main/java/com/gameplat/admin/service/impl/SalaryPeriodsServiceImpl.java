@@ -487,7 +487,6 @@ public class SalaryPeriodsServiceImpl extends ServiceImpl<SalaryPeriodsMapper, S
         if (BeanUtil.isEmpty(finalConfig)) {
           continue;
         }
-
         List<SalaryRechargeVO> tmpGameReport =
             CollectionUtil.isEmpty(gameTypeReportMap.get(gameType))
                 ? new ArrayList<>()
@@ -570,7 +569,6 @@ public class SalaryPeriodsServiceImpl extends ServiceImpl<SalaryPeriodsMapper, S
             && totalWinAmount.compareTo(winAmountLimit) < 0) {
           isReach = false;
         }
-
         // 计算总有效投注金额  需要区分是否只查下级
         if (isOnlyChild == 1) {
           tmpGameReport =

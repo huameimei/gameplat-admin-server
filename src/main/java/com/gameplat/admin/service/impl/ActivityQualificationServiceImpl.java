@@ -35,8 +35,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Isolation;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
@@ -47,7 +45,6 @@ import java.util.*;
  */
 @Slf4j
 @Service
-@Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)
 public class ActivityQualificationServiceImpl
     extends ServiceImpl<ActivityQualificationMapper, ActivityQualification>
     implements ActivityQualificationService {
@@ -303,7 +300,7 @@ public class ActivityQualificationServiceImpl
   @Override
   public Map<String, Object> checkQualification(ActivityQualificationCheckDTO dto) {
     MemberInfoVO memberInfo = null;
-    Map<String, Object> retMap = new HashMap<>(3);
+    Map<String, Object> retMap = new HashMap<>(6);
     try {
       memberInfo = memberService.getMemberInfo(dto.getUsername());
       if (memberInfo == null) {
@@ -311,6 +308,7 @@ public class ActivityQualificationServiceImpl
       }
       activityCommonService.userDetection(memberInfo, 3);
     } catch (ServiceException e) {
+      log.error("step1出现异常:{}", e);
       retMap.put("step", 1);
       retMap.put("success", false);
       retMap.put("message", e.getMessage());
@@ -323,6 +321,7 @@ public class ActivityQualificationServiceImpl
       // 活动检测
       activityLobby = activityCommonService.activityDetection(dto.getActivityId(), countDate, 3);
     } catch (ServiceException e) {
+      log.error("step2出现异常:{}", e);
       retMap.put("step", 2);
       retMap.put("success", false);
       retMap.put("message", e.getMessage());
@@ -333,6 +332,7 @@ public class ActivityQualificationServiceImpl
       // 黑名单检测
       activityCommonService.blacklistDetection(activityLobby, memberInfo, 3);
     } catch (ServiceException e) {
+      log.error("step3出现异常:{}", e);
       retMap.put("step", 3);
       retMap.put("success", false);
       retMap.put("message", e.getMessage());
@@ -343,6 +343,7 @@ public class ActivityQualificationServiceImpl
       // 资格检测
       activityCommonService.qualificationDetection(activityLobby, memberInfo, countDate, 3);
     } catch (ServiceException e) {
+      log.error("step4出现异常:{}", e);
       retMap.put("step", 4);
       retMap.put("success", false);
       retMap.put("message", e.getMessage());
@@ -354,6 +355,7 @@ public class ActivityQualificationServiceImpl
       manageList =
           activityCommonService.activityRuleDetection(activityLobby, countDate, memberInfo, 3);
     } catch (ServiceException e) {
+      log.error("step5出现异常:{}", e);
       retMap.put("step", 5);
       retMap.put("success", false);
       retMap.put("message", e.getMessage());

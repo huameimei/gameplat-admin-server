@@ -21,13 +21,21 @@ public class AgentDivideController {
   @Autowired private AgentDivideService agentDivideService;
 
   @ApiOperation(value = "查询可选代理账号列表")
-  @GetMapping("/list")
-  public IPage<AgentPlanVO> list(
-      PageDTO<AgentPlanVO> page,
-      @RequestParam(required = true, defaultValue = "0") Integer divideType,
-      @RequestParam(required = false) String agentName) {
+  @GetMapping("/optionalList")
+  public IPage<AgentPlanVO> optionalList(
+      PageDTO<AgentPlanVO> page, @RequestParam(required = false) String agentName) {
+    Integer divideType = 0;
     return agentDivideService.queryPage(page, divideType, agentName);
   }
+
+  @ApiOperation(value = "查询已绑定代理账号列表")
+  @GetMapping("/boundList")
+  public IPage<AgentPlanVO> boundAgentPlanList(
+      PageDTO<AgentPlanVO> page, @RequestParam(required = false) String agentName) {
+    Integer divideType = 1;
+    return agentDivideService.queryPage(page, divideType, agentName);
+  }
+
 
   @ApiOperation("代理线绑定平级分红方案")
   @PostMapping(value = "/bindAgentLine")

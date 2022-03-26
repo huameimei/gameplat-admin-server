@@ -61,7 +61,7 @@ public interface SpreadLinkInfoService extends IService<SpreadLinkInfo> {
    *
    * @param code String
    */
-  void checkCode(String code);
+  void checkCode(String code, Integer agentMinCodeNum);
 
   /**
    * 根据用户名获取返点等级下拉

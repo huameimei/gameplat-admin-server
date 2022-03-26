@@ -4,11 +4,10 @@ import cn.afterturn.easypoi.excel.annotation.Excel;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.gameplat.admin.util.Date2LongSerializerUtils;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
-
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
+import lombok.Data;
 
 /**
  * @author lily
@@ -59,8 +58,8 @@ public class MemberBillVO implements Serializable {
         "优惠扣除_30",
         "其他扣除_31",
         "冲销派奖_32",
-        "额度转入_33",
-        "额度转出_34",
+        "游戏上分_33",
+        "游戏下分_34",
         "体育下注_35",
         "体育结算_36",
         "违规退还本金_37",

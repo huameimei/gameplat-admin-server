@@ -13,10 +13,4 @@ public interface MemberWithdrawMapper extends BaseMapper<MemberWithdraw> {
 
   @Select("select sum(cash_money) from member_withdraw ${ew.customSqlSegment}")
   BigDecimal summaryMemberWithdraw(@Param(Constants.WRAPPER) Wrapper<MemberWithdraw> wrapper);
-
-  @Select("select sum(count) from\n" +
-          "(select count(*) count from member_withdraw where cash_status = 1\n" +
-          "UNION\n" +
-          "select count(*) count from member_withdraw_history where cash_status = 1) c")
-  Integer getUntreatedWithdrawCount();
 }

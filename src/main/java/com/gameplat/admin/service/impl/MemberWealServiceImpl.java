@@ -38,9 +38,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.gameplat.common.enums.TranTypes.*;
@@ -68,9 +66,6 @@ public class MemberWealServiceImpl extends ServiceImpl<MemberWealMapper, MemberW
 
     @Autowired
     private RechargeOrderMapper rechargeOrderMapper;
-
-    @Autowired
-    private GameMemberReportMapper dayReportMapper;
 
     @Autowired
     private MemberMapper memberMapper;
@@ -306,6 +301,9 @@ public class MemberWealServiceImpl extends ServiceImpl<MemberWealMapper, MemberW
             }
             memberWeal.setTotalUserCount(totalUserCount);
             memberWeal.setTotalPayMoney(totalPayMoney);
+        }else{
+            memberWeal.setTotalUserCount(0);
+            memberWeal.setTotalPayMoney(new BigDecimal(0));
         }
 
         // 修改了福利信息时，要重新结算，所以应该先删除
@@ -341,7 +339,7 @@ public class MemberWealServiceImpl extends ServiceImpl<MemberWealMapper, MemberW
             if (CollectionUtil.isNotEmpty(list)) {
                 // 过滤出已派发或已取消的
                 list = list.stream().filter(item -> item.getStatus() == 1).collect(toList());
-                // 1：周俸禄  2：月俸禄  3：生日礼金 4：每月红包
+                // 0:升级奖励 1：周俸禄  2：月俸禄  3：生日礼金 4：每月红包
                 Integer type = memberWeal.getType();
                 // 查询成长值配置
                 MemberGrowthConfig growthConfig =
@@ -385,7 +383,7 @@ public class MemberWealServiceImpl extends ServiceImpl<MemberWealMapper, MemberW
                                 String content = "";
                                 // 周俸禄
                                 if (1 == type) {
-                                    sourceType = WEEK_WEAL.getValue();
+                                    sourceType = TranTypes.WEEK_WEAL.getValue();
                                     content = "本周俸禄奖励已派发 金额:" + item.getRewordAmount() + "，请领取";
                                     // 月俸禄
                                 } else if (2 == type) {
@@ -625,4 +623,5 @@ public class MemberWealServiceImpl extends ServiceImpl<MemberWealMapper, MemberW
 
         return WEEK_WEAL_RECYCLE;
     }
+
 }

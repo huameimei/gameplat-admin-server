@@ -23,11 +23,11 @@
         c.current_level level,
         (
         case #{type}
-        when 0 then d.week_wage
-        when 1 then d.month_wage
-        when 2 then d.birth_gift_money
-        when 3 then d.red_envelope
-        else 0 end
+        when 1 then d.week_wage
+        when 2 then d.month_wage
+        when 3 then d.birth_gift_money
+        when 4 then d.red_envelope
+        else 1 end
         ) rewordAmount
         from
         (

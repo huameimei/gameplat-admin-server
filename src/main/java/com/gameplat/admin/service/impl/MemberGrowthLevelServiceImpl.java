@@ -51,6 +51,7 @@ public class MemberGrowthLevelServiceImpl
   @Autowired private MemberGrowthConfigService memberGrowthConfigService;
   @Autowired private MemberLoanService memberLoanService;
   @Autowired private MemberService memberService;
+  @Autowired private MemberGrowthStatisService memberGrowthStatisService;
 
   /** 查询所有等级 */
   @Override
@@ -103,7 +104,7 @@ public class MemberGrowthLevelServiceImpl
       for (MemberGrowthRecord userRecord : recordList) {
         // 得到重新计算后的等级
         Integer newLevel =
-            memberGrowthRecordService.dealUpLevel(userRecord.getCurrentGrowth(), growthConfig);
+                memberGrowthStatisService.dealUpLevel(userRecord.getCurrentGrowth(), growthConfig);
         // 更新借呗表额度
         BigDecimal loanMoney =
             this.lambdaQuery().eq(MemberGrowthLevel::getLevel, newLevel).one().getLoanMoney();
@@ -120,6 +121,10 @@ public class MemberGrowthLevelServiceImpl
         }
         // 如果等级有所变化，就添加一条变动记录
         if (!newLevel.equals(userRecord.getCurrentLevel())) {
+
+          MemberGrowthStatis memberGrowthStatis =
+                  memberGrowthStatisService.findOrInsert(userRecord.getUserId(), userRecord.getUserName());
+
           LambdaUpdateWrapper<MemberInfo> wrapper = new LambdaUpdateWrapper<>();
 
           MemberGrowthRecord record = new MemberGrowthRecord();
@@ -144,9 +149,17 @@ public class MemberGrowthLevelServiceImpl
                       .one()
                       .getGrowth();
             }
+
+            Long changeGrowth = currentGrowth - userRecord.getCurrentGrowth();
+
             record.setCurrentGrowth(currentGrowth);
-            record.setChangeGrowth(currentGrowth - userRecord.getCurrentGrowth());
-          } else if ((newLevel > userRecord.getCurrentLevel())) {
+            record.setChangeGrowth(changeGrowth);
+
+            memberGrowthStatis.setBackGrowth(memberGrowthStatis.getBackGrowth() + changeGrowth);
+
+          }
+
+          else if ((newLevel > userRecord.getCurrentLevel())) {
             // 修改余额
             BigDecimal upReward = BigDecimal.ZERO;
             // 下级
@@ -174,19 +187,25 @@ public class MemberGrowthLevelServiceImpl
 
             Member member = memberService.getById(userRecord.getUserId());
             // 处理升级
-            memberGrowthRecordService.dealPayUpReword(
-                userRecord.getCurrentLevel(), newLevel, growthConfig, member, request);
+            memberGrowthStatisService.dealPayUpReword(
+                userRecord.getCurrentLevel(), newLevel, growthConfig, member);
           }
           record.setCreateBy(GlobalContextHolder.getContext().getUsername());
           record.setCreateTime(new Date());
-          record.setRemark("VIP等级晋级下级所需成长值变动");
+          record.setRemark("VIP等级变动所需成长值变动");
           Assert.isTrue(memberGrowthRecordService.save(record), "操作失败!");
+
+          memberGrowthStatis.setVipGrowth(currentGrowth);
+          memberGrowthStatis.setVipLevel(newLevel);
+          memberGrowthStatisService.insertOrUpdate(memberGrowthStatis);
 
           wrapper
               .set(MemberInfo::getVipLevel, newLevel)
               .set(MemberInfo::getVipGrowth, currentGrowth)
               .eq(MemberInfo::getMemberId, userRecord.getUserId());
           memberInfoService.update(wrapper);
+
+
         }
       }
     }

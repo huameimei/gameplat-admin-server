@@ -1,5 +1,6 @@
 package com.gameplat.admin.service.impl;
 
+import cn.hutool.core.convert.Convert;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.gameplat.admin.config.TenantConfig;
 import com.gameplat.admin.convert.GameBetRecordConvert;
@@ -21,6 +22,7 @@ import com.gameplat.elasticsearch.page.PageResponse;
 import com.gameplat.elasticsearch.service.IBaseElasticsearchService;
 import com.gameplat.model.entity.game.GameBetRecord;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -132,9 +134,12 @@ public class GameBetRecordInfoServiceImpl implements GameBetRecordInfoService {
       SearchResponse searchResponse =
           restHighLevelClient.search(searchRequest, optionsBuilder.build());
       Map<String, Aggregation> aggregationMap = searchResponse.getAggregations().getAsMap();
-      double betAmount = ((ParsedSum) aggregationMap.get("betAmountSum")).getValue();
-      double validAmount = ((ParsedSum) aggregationMap.get("validAmountSum")).getValue();
-      double winAmount = ((ParsedSum) aggregationMap.get("winAmountSum")).getValue();
+      BigDecimal betAmount = Convert.toBigDecimal(((ParsedSum) aggregationMap.get("betAmountSum")).getValue())
+              .divide(new BigDecimal("1000"), BigDecimal.ROUND_DOWN, 2);
+      BigDecimal validAmount = Convert.toBigDecimal(((ParsedSum) aggregationMap.get("validAmountSum")).getValue())
+              .divide(new BigDecimal("1000"), BigDecimal.ROUND_DOWN, 2);
+      BigDecimal winAmount = Convert.toBigDecimal(((ParsedSum) aggregationMap.get("winAmountSum")).getValue())
+              .divide(new BigDecimal("1000"), BigDecimal.ROUND_DOWN, 2);
       otherData.put("betAmount", betAmount);
       otherData.put("validAmount", validAmount);
       otherData.put("winAmount", winAmount);

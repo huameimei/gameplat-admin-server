@@ -106,6 +106,7 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
   @Autowired private MemberRwReportService memberRwReportService;
   @Autowired private MemberGrowthConfigService memberGrowthConfigService;
   @Autowired private MemberGrowthRecordService memberGrowthRecordService;
+  @Autowired private MemberGrowthStatisService memberGrowthStatisService;
 
   @Override
   public PageExt<RechargeOrderVO, SummaryVO> findPage(
@@ -326,8 +327,10 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
     memberGrowthChangeDto.setUserName(rechargeOrder.getAccount());
     memberGrowthChangeDto.setType(GrowthChangeEnum.recharge.getCode());
     memberGrowthChangeDto.setChangeGrowth(memberGrowthConfig.getRechageRate().multiply(rechargeOrder.getAmount()).longValue());
-    memberGrowthRecordService.editMemberGrowth(memberGrowthChangeDto,
-            ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest());
+
+    memberGrowthStatisService.changeGrowth(memberGrowthChangeDto);
+//    memberGrowthRecordService.editMemberGrowth(memberGrowthChangeDto,
+//            ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest());
   }
 
   @Override

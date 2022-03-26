@@ -14,7 +14,7 @@ import java.io.Serializable;
 public class MemberGrowthStatisDTO implements Serializable {
 
   @ApiModelProperty(value = "会员账号")
-  private String userName;
+  private String account;
 
   @ApiModelProperty(value = "创建开始时间")
   private String startTime;

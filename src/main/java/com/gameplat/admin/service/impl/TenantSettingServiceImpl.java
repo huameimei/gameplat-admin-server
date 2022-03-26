@@ -229,18 +229,16 @@ public class TenantSettingServiceImpl extends ServiceImpl<TenantSettingMapper, T
         // flushTenantSetting(tenantSetting);
     }
 
-    @Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)
     @Override
+
     public void updateBatchTenantSetting(List<TenantSetting> tenantSettings) {
         if (tenantSettings == null || tenantSettings.isEmpty()) {
             throw new ServiceException("数据错误");
         }
-        LambdaQueryWrapper<TenantSetting> queryWrapper = new LambdaQueryWrapper<TenantSetting>();
+        LambdaQueryWrapper<TenantSetting> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(TenantSetting::getId, tenantSettings.get(0).getId());
-        TenantSetting sysTenantSetting = this.getOne(queryWrapper);
+        this.getOne(queryWrapper);
         this.updateBatchById(tenantSettings);
-        // todo 刷新缓存
-        // kgRedisService.flushTenantSetting(sysTenantSetting);
     }
 
     @Override

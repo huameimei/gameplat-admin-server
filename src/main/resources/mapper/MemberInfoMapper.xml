@@ -41,4 +41,42 @@
             </foreach>
         </if>
     </update>
+
+    <select id="getTest" resultType="com.gameplat.admin.model.vo.TestVO">
+        SELECT
+            a.user_id memberId,
+            a.user_name account,
+            a.change_growth changes,
+            a.type,
+            b.vip_level vip,
+            b.vip_growth growth
+        FROM
+            member_growth_record a LEFT JOIN member_info b on b.member_id = a.user_id
+        WHERE 1=1
+        <if test="type != null">
+            and a.type = #{type}
+        </if>
+        <if test="memberId != null">
+          and a.user_id = #{memberId}
+        </if>
+        <if test="remark != null">
+          and a.remark = #{remark}
+        </if>
+    </select>
+
+    <select id="getTest1" resultType="com.gameplat.admin.model.vo.TestVO">
+        SELECT
+        a.user_id memberId,
+        a.user_name account,
+        a.change_growth changes,
+        a.type,
+        b.vip_level vip,
+        b.vip_growth growth
+        FROM
+        member_growth_record a LEFT JOIN member_info b on b.member_id = a.user_id
+        WHERE
+        a.type = 3
+        and a.user_id = #{memberId}
+        and a.remark != "未达到保底系统降级"
+    </select>
 </mapper>

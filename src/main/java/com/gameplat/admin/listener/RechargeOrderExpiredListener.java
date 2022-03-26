@@ -26,7 +26,8 @@ public class RechargeOrderExpiredListener extends KeyExpirationEventMessageListe
     if (channel.startsWith("rechargeOrder") && channel.split(channel).length > 1) {
       RechargeOrder rechargeOrder =
           rechargeOrderService.getById(Long.valueOf(channel.split(channel)[1]));
-      if (RechargeStatus.UNHANDLED.getValue() == rechargeOrder.getStatus()) {
+
+      if (RechargeStatus.UNHANDLED.match(rechargeOrder.getStatus())) {
         rechargeOrder.setStatus(RechargeStatus.CANCELLED.getValue());
         rechargeOrder.setAuditRemarks("自动取消");
         rechargeOrder.setAuditTime(new Date());

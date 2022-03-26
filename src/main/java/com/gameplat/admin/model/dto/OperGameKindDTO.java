@@ -1,10 +1,9 @@
 package com.gameplat.admin.model.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import lombok.Data;
-
 import java.io.Serializable;
 import java.util.Date;
+import lombok.Data;
 
 @Data
 public class OperGameKindDTO implements Serializable {
@@ -53,4 +52,7 @@ public class OperGameKindDTO implements Serializable {
 
   /** 运营状态(0已下架、1下架中、2运营中) */
   private Integer status;
+
+  /** 游戏分类显示名称 */
+  private String showName;
 }

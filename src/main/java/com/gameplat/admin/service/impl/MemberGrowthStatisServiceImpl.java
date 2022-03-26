@@ -6,6 +6,7 @@ import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -105,9 +106,9 @@ public class MemberGrowthStatisServiceImpl
             PageDTO<MemberGrowthStatis> page, MemberGrowthStatisDTO dto) {
         return this.lambdaQuery()
                 .like(
-                        ObjectUtils.isNotEmpty(dto.getUserName()),
+                        ObjectUtils.isNotEmpty(dto.getAccount()),
                         MemberGrowthStatis::getAccount,
-                        dto.getUserName())
+                        dto.getAccount())
                 .ge(
                         ObjectUtils.isNotEmpty(dto.getStartTime()),
                         MemberGrowthStatis::getCreateTime,
@@ -125,9 +126,9 @@ public class MemberGrowthStatisServiceImpl
     public List<MemberGrowthStatis> findList(MemberGrowthStatisDTO dto) {
         return this.lambdaQuery()
                 .like(
-                        ObjectUtils.isNotEmpty(dto.getUserName()),
+                        ObjectUtils.isNotEmpty(dto.getAccount()),
                         MemberGrowthStatis::getAccount,
-                        dto.getUserName())
+                        dto.getAccount())
                 .ge(
                         ObjectUtils.isNotEmpty(dto.getStartTime()),
                         MemberGrowthStatis::getCreateTime,
@@ -166,8 +167,12 @@ public class MemberGrowthStatisServiceImpl
 
     @Override
     public void insertOrUpdate(MemberGrowthStatis userGrowthStatis) {
-        if (growthStatisMapper.insertOrUpdate(userGrowthStatis) <= 0) {
-            throw new ServiceException("操作失败");
+
+        MemberGrowthStatis memberGrowthStatis = this.lambdaQuery().eq(MemberGrowthStatis::getMemberId, userGrowthStatis.getMemberId()).one();
+        if(memberGrowthStatis == null){
+            this.save(userGrowthStatis);
+        }else{
+            this.updateMemberGrowthStatis(userGrowthStatis);
         }
     }
 
@@ -176,7 +181,7 @@ public class MemberGrowthStatisServiceImpl
         MemberGrowthStatis find = this.lambdaQuery()
                 .eq(MemberGrowthStatis::getMemberId, memberId)
                 .one();
-        if (BeanUtil.isEmpty(find)){
+        if (BeanUtil.isEmpty(find)) {
             find = new MemberGrowthStatis();
             find.setMemberId(memberId);
             find.setAccount(account);
@@ -187,8 +192,7 @@ public class MemberGrowthStatisServiceImpl
                 throw new ServiceException("添加或修改会员成长值汇总失败！");
             }
         }
-
-        return null;
+        return find;
     }
 
     @Override
@@ -201,7 +205,7 @@ public class MemberGrowthStatisServiceImpl
      */
 //    @Transactional
     @Override
-    public void changeGrowth(MemberGrowthChangeDto dto){
+    public void changeGrowth(MemberGrowthChangeDto dto) {
 
         //判断是否开启了VIP
         //todo 2.获取成长值配置
@@ -221,7 +225,7 @@ public class MemberGrowthStatisServiceImpl
         //变动的类型
         Integer type = dto.getType();
         //变动的成长值
-        Long changeGrowth =  dto.getChangeGrowth();
+        Long changeGrowth = dto.getChangeGrowth();
 
         //todo 1.获取用户成长值汇总数据
         MemberGrowthStatis memberGrowthStatis = this.findOrInsert(memberId, member.getAccount());
@@ -254,7 +258,7 @@ public class MemberGrowthStatisServiceImpl
             } else {
                 return;
             }
-        } else if(type == GrowthChangeEnum.sign.getCode()){
+        } else if (type == GrowthChangeEnum.sign.getCode()) {
             //判断是否开启了签到
             if (growthConfig.getIsEnableSign() == EnableEnum.ENABLED.code()) {
                 Long oldSignGrowth = memberGrowthStatis.getSignGrowth();
@@ -272,11 +276,11 @@ public class MemberGrowthStatisServiceImpl
                 saveRecord.setChangeMult(new BigDecimal("1"));
 
                 //金币记录备注
-                savaGoldCoinRecord.setRemark(member.getAccount() + "签到赠送金币,操作成长值：" + changeFinalGrowth+",操作实时兑换比例：" + growthConfig.getCoinRate());
+                savaGoldCoinRecord.setRemark(member.getAccount() + "签到赠送金币,操作成长值：" + changeFinalGrowth + ",操作实时兑换比例：" + growthConfig.getCoinRate());
             } else {
                 return;
             }
-        } else if(type == GrowthChangeEnum.dama.getCode()){
+        } else if (type == GrowthChangeEnum.dama.getCode()) {
             //判断是否开启了打码量
             if (growthConfig.getIsEnableDama() == EnableEnum.ENABLED.code()) {
                 // 如果已存在打码量转换成长值记录则不添加
@@ -287,7 +291,7 @@ public class MemberGrowthStatisServiceImpl
                     setCalcTime(DateUtil.today());
                 }});
 
-                if(CollectionUtil.isNotEmpty(list)){
+                if (CollectionUtil.isNotEmpty(list)) {
                     log.info("会员ID==={}===日期==={}已计算打码量成长值,不再计算", memberId, DateUtil.today());
                     return;
                 }
@@ -302,17 +306,23 @@ public class MemberGrowthStatisServiceImpl
             } else {
                 return;
             }
-        } else if(type == GrowthChangeEnum.backEdit.getCode()){//后台修改
+        } else if (type == GrowthChangeEnum.backEdit.getCode()) {
+            //后台修改
             changeFinalGrowth = changeGrowth;
+
             memberGrowthStatis.setBackGrowth(memberGrowthStatis.getBackGrowth() + changeFinalGrowth);
+
             saveRecord.setKindName(kindName);
             saveRecord.setKindCode("plat");
             saveRecord.setChangeMult(new BigDecimal("1"));
+            if (dto.getRemark() != null) {
+                saveRecord.setRemark(dto.getRemark());
+            }
             //金币记录备注
             savaGoldCoinRecord.setRemark(member.getAccount() + "后台修改成长值赠送金币,操作成长值：" + changeFinalGrowth + ",操作实时兑换比例：" + growthConfig.getCoinRate());
-        } else if(type == GrowthChangeEnum.finishInfo.getCode()){
+        } else if (type == GrowthChangeEnum.finishInfo.getCode()) {
             //完善资料
-        } else if(type == GrowthChangeEnum.bindBankCard.getCode()){
+        } else if (type == GrowthChangeEnum.bindBankCard.getCode()) {
             //判断是否已经绑定过银行卡加过成长值
             if (memberGrowthStatis.getBindGrowth() == 0) {
                 changeFinalGrowth = growthConfig.getBindBankGrowth();
@@ -325,7 +335,7 @@ public class MemberGrowthStatisServiceImpl
 
         //记录金币数量
         MemberGrowthLevel memberGrowthLevel = growthLevelService.getLevel(memberGrowthStatis.getVipLevel());
-        Integer changeGoldCoin =   growthConfig.getCoinRate().multiply(BigDecimal.valueOf(changeFinalGrowth)).intValue();
+        Integer changeGoldCoin = growthConfig.getCoinRate().multiply(BigDecimal.valueOf(changeFinalGrowth)).intValue();
         savaGoldCoinRecord.setMemberId(memberId);
         savaGoldCoinRecord.setAccount(member.getAccount());
         savaGoldCoinRecord.setSourceType(1);
@@ -340,39 +350,39 @@ public class MemberGrowthStatisServiceImpl
 
         MemberInfo memberInfo = memberInfoService.lambdaQuery().eq(MemberInfo::getMemberId, memberId).one();
 
-        if (dailyCoin == null && dailyMaxCoin !=null && dailyMaxCoin!=0 && changeGoldCoin>0){
-            if (changeGoldCoin > dailyMaxCoin){
+        if (dailyCoin == null && dailyMaxCoin != null && dailyMaxCoin != 0 && changeGoldCoin > 0) {
+            if (changeGoldCoin > dailyMaxCoin) {
                 changeGoldCoin = dailyMaxCoin;
                 savaGoldCoinRecord.setAmount(changeGoldCoin);
                 savaGoldCoinRecord.setBeforeBalance(memberInfo.getGoldCoin());
                 savaGoldCoinRecord.setAfterBalance(changeGoldCoin + memberInfo.getGoldCoin());
                 memberGoldCoinRecordService.save(savaGoldCoinRecord);
                 redisTemplate.opsForValue().set(userDailtKey, changeGoldCoin, getNowToNextDaySeconds().intValue(), TimeUnit.SECONDS);
-            }else {
+            } else {
                 savaGoldCoinRecord.setAmount(changeGoldCoin);
                 savaGoldCoinRecord.setBeforeBalance(memberInfo.getGoldCoin());
                 savaGoldCoinRecord.setAfterBalance(changeGoldCoin + memberInfo.getGoldCoin());
                 memberGoldCoinRecordService.save(savaGoldCoinRecord);
                 redisTemplate.opsForValue().set(userDailtKey, changeGoldCoin, getNowToNextDaySeconds().intValue(), TimeUnit.SECONDS);
             }
-        }else if (dailyCoin!=null&&dailyCoin<dailyMaxCoin &&changeGoldCoin>0){
-            if (changeGoldCoin+dailyCoin>dailyMaxCoin){
-                changeGoldCoin = dailyMaxCoin-dailyCoin;
+        } else if (dailyCoin != null && dailyCoin < dailyMaxCoin && changeGoldCoin > 0) {
+            if (changeGoldCoin + dailyCoin > dailyMaxCoin) {
+                changeGoldCoin = dailyMaxCoin - dailyCoin;
                 savaGoldCoinRecord.setAmount(changeGoldCoin);
                 savaGoldCoinRecord.setBeforeBalance(memberInfo.getGoldCoin());
                 savaGoldCoinRecord.setAfterBalance(changeGoldCoin + memberInfo.getGoldCoin());
                 memberGoldCoinRecordService.save(savaGoldCoinRecord);
                 redisTemplate.opsForValue().set(userDailtKey, dailyMaxCoin, getNowToNextDaySeconds().intValue(), TimeUnit.SECONDS);
-            }else {
+            } else {
                 savaGoldCoinRecord.setAmount(changeGoldCoin);
                 savaGoldCoinRecord.setBeforeBalance(memberInfo.getGoldCoin());
                 savaGoldCoinRecord.setAfterBalance(changeGoldCoin + memberInfo.getGoldCoin());
                 memberGoldCoinRecordService.save(savaGoldCoinRecord);
                 redisTemplate.opsForValue().set(userDailtKey, (dailyCoin + changeGoldCoin), getNowToNextDaySeconds().intValue(), TimeUnit.SECONDS);
             }
-        }else {
+        } else {
             //如果玩家到达日常领取上限就设置改变金币为0，防止更新用户表添加金币
-            changeGoldCoin =0;
+            changeGoldCoin = 0;
         }
 
         //设置最新总成长值
@@ -382,7 +392,7 @@ public class MemberGrowthStatisServiceImpl
         Integer beforeLevel = memberGrowthStatis.getVipLevel();
 
         //todo 4.通过变动后的最新成长值 执行 增加成长值升级
-        if(memberGrowthStatis.getVipGrowth() < 0L) {
+        if (memberGrowthStatis.getVipGrowth() < 0L) {
             memberGrowthStatis.setVipGrowth(0L);
         }
         Integer afterLevel = this.dealUpLevel(memberGrowthStatis.getVipGrowth(), growthConfig);
@@ -413,7 +423,7 @@ public class MemberGrowthStatisServiceImpl
 
             //VIP变动更新会员vip
             LambdaUpdateWrapper<MemberInfo> wrapper = new LambdaUpdateWrapper<>();
-            wrapper.set(MemberInfo::getVipGrowth, changeFinalGrowth)
+            wrapper.set(MemberInfo::getVipGrowth, memberInfo.getVipGrowth() + changeFinalGrowth)
                     .set(MemberInfo::getVipLevel, afterLevel)
                     .set(MemberInfo::getGoldCoin, memberInfo.getGoldCoin() + changeGoldCoin)
                     .eq(MemberInfo::getMemberId, memberId);
@@ -421,7 +431,7 @@ public class MemberGrowthStatisServiceImpl
         } else {
             //VIP变动更新会员vip
             LambdaUpdateWrapper<MemberInfo> wrapper = new LambdaUpdateWrapper<>();
-            wrapper.set(MemberInfo::getVipGrowth, changeFinalGrowth)
+            wrapper.set(MemberInfo::getVipGrowth, memberInfo.getVipGrowth() + changeFinalGrowth)
                     .set(MemberInfo::getVipLevel, afterLevel)
                     .set(MemberInfo::getGoldCoin, memberInfo.getGoldCoin() + changeGoldCoin)
                     .eq(MemberInfo::getMemberId, memberId);
@@ -434,17 +444,17 @@ public class MemberGrowthStatisServiceImpl
      * 根据变动前后的等级  计算奖励金额
      */
     @Override
-    public BigDecimal calcRewordAmount(Integer beforeLevel, Integer afterLevel,MemberGrowthConfig growthConfig){
+    public BigDecimal calcRewordAmount(Integer beforeLevel, Integer afterLevel, MemberGrowthConfig growthConfig) {
         //先计算出升级奖励的金额  可能会连升几级
         Integer limitLevel = growthConfig.getLimitLevel();
-        if (limitLevel == null){
+        if (limitLevel == null) {
             limitLevel = 50;
         }
         List<MemberGrowthLevel> levels = growthLevelService.getList(limitLevel);
         Map<Integer, MemberGrowthLevel> levelMap = levels.stream().collect(Collectors.toMap(MemberGrowthLevel::getLevel, MemberGrowthLevel -> MemberGrowthLevel));
         //总的奖励金额
         BigDecimal rewordAmount = new BigDecimal("0");
-        for(int i = beforeLevel+1; i <= afterLevel; i++) {
+        for (int i = beforeLevel + 1; i <= afterLevel; i++) {
             rewordAmount = rewordAmount.add(levelMap.get(i).getUpReward());
         }
         return rewordAmount;
@@ -499,16 +509,16 @@ public class MemberGrowthStatisServiceImpl
                     queryDto.setVipLevel(i);
                     Long isPayCount = memberWealRewordService.findCountReword(queryDto);
                     log.info("不允许重复派发升级奖励:用户({0}),当前判断等级:VIP{1},是否发放:{2}"
-                            ,member.getId(), i, isPayCount);
+                            , member.getId(), i, isPayCount);
 
-                    if (isPayCount > 0){
+                    if (isPayCount > 0) {
                         continue;
                     }
                 }
                 rewordAmount = rewordAmount.add(levelMap.get(i).getUpReward());
             }
             //判断升级奖励金额是否大于0
-            if (rewordAmount.compareTo(new BigDecimal("0")) > 0){
+            if (rewordAmount.compareTo(new BigDecimal("0")) > 0) {
                 MemberWealRewordAddDTO saveRewordObj = new MemberWealRewordAddDTO();
                 saveRewordObj.setUserId(member.getId());
                 saveRewordObj.setUserName(member.getAccount());
@@ -516,6 +526,10 @@ public class MemberGrowthStatisServiceImpl
                 saveRewordObj.setCurrentLevel(afterLevel);
                 saveRewordObj.setRewordAmount(rewordAmount);
                 saveRewordObj.setType(0);
+                saveRewordObj.setParentId(member.getParentId());
+                saveRewordObj.setParentName(member.getParentName());
+                saveRewordObj.setAgentPath(member.getSuperPath());
+                saveRewordObj.setUserType(member.getUserType());
                 saveRewordObj.setSerialNumber(RandomUtil.generateNumber(18));
 
                 //是否自动派发
@@ -534,7 +548,7 @@ public class MemberGrowthStatisServiceImpl
                     validWithdraw.setRemark(member.getAccount() + "从VIP" + beforeLevel + "升至VIP" + afterLevel + "奖励金额增加打码量");
                     validWithdrawService.saveValidWithdraw(validWithdraw);
 
-                    synchronized (lockHelper){
+                    synchronized (lockHelper) {
 
                         MemberInfo memberInfo = memberInfoService.lambdaQuery()
                                 .eq(MemberInfo::getMemberId, member.getId())
@@ -572,11 +586,10 @@ public class MemberGrowthStatisServiceImpl
                 }
                 log.info("添加奖励记录");
 
-
-                    saveRewordObj.setParentId(member.getParentId());
-                    saveRewordObj.setParentName(member.getParentName());
-                    saveRewordObj.setAgentPath(member.getSuperPath());
-                    saveRewordObj.setUserType(member.getUserType());
+                saveRewordObj.setParentId(member.getParentId());
+                saveRewordObj.setParentName(member.getParentName());
+                saveRewordObj.setAgentPath(member.getSuperPath());
+                saveRewordObj.setUserType(member.getUserType());
 
                 memberWealRewordService.insertMemberWealReword(saveRewordObj);
             }
@@ -602,25 +615,25 @@ public class MemberGrowthStatisServiceImpl
      */
     @Override
     @Async
-    public void asyncChangeGrowth(MemberGrowthChangeDto dto){
+    public void asyncChangeGrowth(MemberGrowthChangeDto dto) {
         changeGrowth(dto);
     }
 
     /**
      * 修改成长值汇总数据
-     * */
+     */
     @Override
-    public Boolean updateMemberGrowthStatis(MemberGrowthStatis entity){
+    public Boolean updateMemberGrowthStatis(MemberGrowthStatis entity) {
         LambdaUpdateWrapper<MemberGrowthStatis> wrapper = new LambdaUpdateWrapper<>();
         wrapper.set(ObjectUtils.isNotEmpty(entity.getVipLevel()), MemberGrowthStatis::getVipLevel, entity.getVipLevel())
-                .set(ObjectUtils.isNotEmpty(entity.getVipGrowth()),MemberGrowthStatis::getVipGrowth, entity.getVipGrowth())
-                .set(ObjectUtils.isNotEmpty(entity.getRechargeGrowth()),MemberGrowthStatis::getRechargeGrowth, entity.getRechargeGrowth())
-                .set(ObjectUtils.isNotEmpty(entity.getSignGrowth()),MemberGrowthStatis::getSignGrowth, entity.getSignGrowth())
-                .set(ObjectUtils.isNotEmpty(entity.getDamaGrowth()),MemberGrowthStatis::getDamaGrowth, entity.getDamaGrowth())
-                .set(ObjectUtils.isNotEmpty(entity.getBackGrowth()),MemberGrowthStatis::getBackGrowth, entity.getBackGrowth())
-                .set(ObjectUtils.isNotEmpty(entity.getInfoGrowth()),MemberGrowthStatis::getInfoGrowth, entity.getInfoGrowth())
-                .set(ObjectUtils.isNotEmpty(entity.getBindGrowth()),MemberGrowthStatis::getBindGrowth, entity.getBindGrowth())
-                .set(ObjectUtils.isNotEmpty(entity.getDemoteGrowth()),MemberGrowthStatis::getDemoteGrowth, entity.getDemoteGrowth())
+                .set(ObjectUtils.isNotEmpty(entity.getVipGrowth()), MemberGrowthStatis::getVipGrowth, entity.getVipGrowth())
+                .set(ObjectUtils.isNotEmpty(entity.getRechargeGrowth()), MemberGrowthStatis::getRechargeGrowth, entity.getRechargeGrowth())
+                .set(ObjectUtils.isNotEmpty(entity.getSignGrowth()), MemberGrowthStatis::getSignGrowth, entity.getSignGrowth())
+                .set(ObjectUtils.isNotEmpty(entity.getDamaGrowth()), MemberGrowthStatis::getDamaGrowth, entity.getDamaGrowth())
+                .set(ObjectUtils.isNotEmpty(entity.getBackGrowth()), MemberGrowthStatis::getBackGrowth, entity.getBackGrowth())
+                .set(ObjectUtils.isNotEmpty(entity.getInfoGrowth()), MemberGrowthStatis::getInfoGrowth, entity.getInfoGrowth())
+                .set(ObjectUtils.isNotEmpty(entity.getBindGrowth()), MemberGrowthStatis::getBindGrowth, entity.getBindGrowth())
+                .set(ObjectUtils.isNotEmpty(entity.getDemoteGrowth()), MemberGrowthStatis::getDemoteGrowth, entity.getDemoteGrowth())
                 .eq(MemberGrowthStatis::getMemberId, entity.getMemberId());
         return this.update(wrapper);
     }

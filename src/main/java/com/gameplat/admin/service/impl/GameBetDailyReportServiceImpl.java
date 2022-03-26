@@ -1,7 +1,6 @@
 package com.gameplat.admin.service.impl;
 
 import cn.hutool.core.date.DateTime;
-import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
@@ -26,10 +25,21 @@ import com.gameplat.base.common.util.DateUtils;
 import com.gameplat.base.common.util.StringUtils;
 import com.gameplat.common.enums.SettleStatusEnum;
 import com.gameplat.common.enums.UserTypes;
+import com.gameplat.common.lang.Assert;
 import com.gameplat.model.entity.game.GameBetDailyReport;
 import com.gameplat.model.entity.game.GamePlatform;
 import com.gameplat.model.entity.member.Member;
 import com.google.common.collect.Lists;
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
@@ -57,11 +67,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.IOException;
-import java.math.BigDecimal;
-import java.util.*;
-import java.util.stream.Collectors;
-
 @Slf4j
 @Service
 @Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)
@@ -79,9 +84,7 @@ public class GameBetDailyReportServiceImpl
     PageDtoVO<GameBetDailyReport> pageDtoVO = new PageDtoVO();
     if (StringUtils.isNotBlank(dto.getSuperAccount())) {
       Member member = memberService.getByAccount(dto.getSuperAccount()).orElse(null);
-      if (ObjectUtil.isNotNull(member)) {
-        throw new ServiceException("用户不存在");
-      }
+      Assert.notNull(member, "用户不存在");
       dto.setUserPaths(member.getSuperPath());
       // 是否代理账号
       if (member.getUserType().equals(UserTypes.AGENT.value())) {
@@ -445,7 +448,7 @@ public class GameBetDailyReportServiceImpl
     return gameBetDailyReportMapper.queryGamePlatformReport(dto);
   }
 
-  //获取达到有效投注金额的会员账号
+  // 获取达到有效投注金额的会员账号
   @Override
   public List<String> getSatisfyBetAccount(String minBetAmount, String startTime, String endTime) {
 

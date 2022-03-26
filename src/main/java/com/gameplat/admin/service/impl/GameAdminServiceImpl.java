@@ -150,7 +150,7 @@ public class GameAdminServiceImpl implements GameAdminService {
     }
   }
 
-  /** 真人补单 */
+  /** 游戏补单 */
   @Override
   public void fillOrders(OperGameTransferRecordDTO gameTransferRecord) throws Exception {
     GameTransferRecord record = gameTransferRecordService.getById(gameTransferRecord.getId());
@@ -207,8 +207,7 @@ public class GameAdminServiceImpl implements GameAdminService {
           MemberInfo memberInfo = memberInfoService.getById(member.getId());
           Assert.notNull(memberInfo, "请查询会员余额是否存在");
           // 平台入款操作
-          memberInfoService.updateBalanceWithRecharge(
-              member.getId(), record.getAmount(), record.getAmount());
+          memberInfoService.updateBalance(member.getId(), record.getAmount());
           memberBill.setBalance(memberInfo.getBalance());
           memberBill.setAmount(record.getAmount());
           memberBill.setTranType(TranTypes.GAME_IN.getValue());
@@ -352,7 +351,7 @@ public class GameAdminServiceImpl implements GameAdminService {
     gameBizBean.setConfig(gameConfigService.queryGameConfigInfoByPlatCode(transferOut));
     BigDecimal balance = gameApi.getBalance(gameBizBean);
     // 3.平台出款操作
-    memberInfoService.updateBalanceWithWithdraw(memberInfo.getMemberId(), amount);
+    memberInfoService.updateBalance(memberInfo.getMemberId(), amount.negate());
     gameBizBean = new GameBizBean();
     gameBizBean.setParams(null);
     String orderNo = gameApi.generateOrderNo(gameBizBean);
@@ -518,7 +517,7 @@ public class GameAdminServiceImpl implements GameAdminService {
       }
       try {
         // 4. 我们平台入款操作
-        memberInfoService.updateBalanceWithRecharge(memberInfo.getMemberId(), amount, amount);
+        memberInfoService.updateBalance(memberInfo.getMemberId(), amount);
         // 5. 记录现金流水
         MemberBill bill = new MemberBill();
         bill.setAmount(amount);
@@ -569,7 +568,7 @@ public class GameAdminServiceImpl implements GameAdminService {
   public void saveTransferRecord(GameTransferRecord transferRecord) {
     try {
       log.info(
-          "真人插入数据:"
+          "游戏转换插入数据:"
               + transferRecord.getAccount()
               + ",金额:"
               + transferRecord.getAmount()
@@ -579,7 +578,7 @@ public class GameAdminServiceImpl implements GameAdminService {
               + transferRecord.getRemark());
       gameTransferRecordService.save(transferRecord);
     } catch (Exception e) {
-      log.error("真人插入数据:订单号=" + transferRecord.getOrderNo(), e);
+      log.error("游戏转换插入数据:订单号=" + transferRecord.getOrderNo(), e);
     }
   }
 

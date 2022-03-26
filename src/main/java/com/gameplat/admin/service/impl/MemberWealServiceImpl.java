@@ -301,6 +301,9 @@ public class MemberWealServiceImpl extends ServiceImpl<MemberWealMapper, MemberW
             }
             memberWeal.setTotalUserCount(totalUserCount);
             memberWeal.setTotalPayMoney(totalPayMoney);
+        }else{
+            memberWeal.setTotalUserCount(0);
+            memberWeal.setTotalPayMoney(new BigDecimal(0));
         }
 
         // 修改了福利信息时，要重新结算，所以应该先删除

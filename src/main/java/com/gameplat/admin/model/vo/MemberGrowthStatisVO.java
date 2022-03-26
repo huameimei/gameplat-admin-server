@@ -23,13 +23,13 @@ public class MemberGrowthStatisVO implements Serializable {
   private Long id;
 
   @ApiModelProperty(value = "会员账号")
-  private String userName;
+  private String account;
 
   @ApiModelProperty(value = "会员当前等级")
-  private Integer level;
+  private Integer vipLevel;
 
   @ApiModelProperty(value = "会员当前的成长值")
-  private Integer growth;
+  private Integer vipGrowth;
 
   @ApiModelProperty(value = "充值累计成长值")
   private Integer rechargeGrowth;

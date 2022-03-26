@@ -336,7 +336,7 @@ public class MemberWealServiceImpl extends ServiceImpl<MemberWealMapper, MemberW
             if (CollectionUtil.isNotEmpty(list)) {
                 // 过滤出已派发或已取消的
                 list = list.stream().filter(item -> item.getStatus() == 1).collect(toList());
-                // 1：周俸禄  2：月俸禄  3：生日礼金 4：每月红包
+                // 0:升级奖励 1：周俸禄  2：月俸禄  3：生日礼金 4：每月红包
                 Integer type = memberWeal.getType();
                 // 查询成长值配置
                 MemberGrowthConfig growthConfig =
@@ -380,7 +380,7 @@ public class MemberWealServiceImpl extends ServiceImpl<MemberWealMapper, MemberW
                                 String content = "";
                                 // 周俸禄
                                 if (1 == type) {
-                                    sourceType = WEEK_WEAL.getValue();
+                                    sourceType = TranTypes.WEEK_WEAL.getValue();
                                     content = "本周俸禄奖励已派发 金额:" + item.getRewordAmount() + "，请领取";
                                     // 月俸禄
                                 } else if (2 == type) {

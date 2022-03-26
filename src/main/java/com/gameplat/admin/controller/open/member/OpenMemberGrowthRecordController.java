@@ -8,6 +8,7 @@ import com.gameplat.admin.model.dto.MemberGrowthRecordDTO;
 import com.gameplat.admin.model.vo.GrowthScaleVO;
 import com.gameplat.admin.model.vo.MemberGrowthRecordVO;
 import com.gameplat.admin.service.MemberGrowthRecordService;
+import com.gameplat.admin.service.MemberGrowthStatisService;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.common.lang.Assert;
 import com.gameplat.model.entity.member.MemberGrowthRecord;
@@ -34,6 +35,9 @@ public class OpenMemberGrowthRecordController {
 
   @Autowired private MemberGrowthRecordService memberGrowthRecordService;
 
+  @Autowired
+  private MemberGrowthStatisService memberGrowthStatisService;
+
   @GetMapping("/list")
   @ApiOperation(value = "查询成长值记录列表")
   @PreAuthorize("hasAuthority('member:growthRecord:list')")
@@ -55,7 +59,7 @@ public class OpenMemberGrowthRecordController {
       throw new ServiceException("扣除/添加成长值不能为0！");
     }
     dto.setType(3);
-    memberGrowthRecordService.editMemberGrowth(dto, request);
+    memberGrowthStatisService.changeGrowth(dto);
   }
 
   @GetMapping("/getBar")

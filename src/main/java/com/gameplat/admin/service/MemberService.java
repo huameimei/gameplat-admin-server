@@ -157,4 +157,10 @@ public interface MemberService extends IService<Member> {
    * @param id Long
    */
   void releaseLoginLimit(Long id);
+
+  /**
+   * 跟据会员账号获取会员
+   */
+  Boolean getMemberCount(String account);
+
 }

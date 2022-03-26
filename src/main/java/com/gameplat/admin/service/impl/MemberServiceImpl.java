@@ -574,4 +574,13 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
       redisTemplate.delete(String.format(CachedKeys.MEMBER_PWD_ERROR_COUNT, member.getAccount()));
     }
   }
+
+  /**
+   * 账号获取
+   */
+  @Override
+  public Boolean getMemberCount(String account) {
+    return this.lambdaQuery().eq(Member::getAccount,account).eq(Member::getUserType,"A").count() > 0;
+  }
+
 }

@@ -145,9 +145,7 @@ public class GameRebatePeriodController {
     if (!gameRebatePeriodService.update(gameRebatePeriod, updateWrapper)) {
       throw new ServiceException("更新游戏返水期数配置失败！");
     }
-    // TODO 添加真人返水每日统计
-    // this.userBusDayReportManager.userBusDayReportQueue(BusReportType.LIVE_REBATE.getValue(),
-    // statTime);
+    // 添加游戏返水每日统计 由定时任务处理
   }
 
   /** 游戏返水回收:期数 */
@@ -195,9 +193,7 @@ public class GameRebatePeriodController {
       LambdaUpdateWrapper<GameRebatePeriod> updateWrapper = Wrappers.lambdaUpdate();
       updateWrapper.eq(GameRebatePeriod::getId, dto.getId());
       gameRebatePeriodService.update(gameRebatePeriod, updateWrapper);
-      // TODO 添加真人返水每日统计
-      // this.userBusDayReportManager.userBusDayReportQueue(BusReportType.LIVE_REBATE.getValue(),
-      // statTime);
+      //  添加游戏返水每日统计 由定时任务处理
     } catch (RedisOpsResultIsNullException e) {
       String name = (String) redisService.getStringOps().get(GAME_REBATE_RUNNING_TASK_NAME);
       throw new ServiceException(String.format("正在执行[%s]，请稍后重试！", name));

@@ -447,6 +447,6 @@ public class GameRebateReportServiceImpl
     memberBillService.save(memberBill);
 
     // 修改账户余额
-    memberInfoService.updateBalanceWithWithdraw(member.getId(), realRebateMoney);
+    memberInfoService.updateBalance(member.getId(), realRebateMoney.negate());
   }
 }

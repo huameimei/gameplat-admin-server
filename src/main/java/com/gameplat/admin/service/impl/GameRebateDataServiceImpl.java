@@ -24,6 +24,13 @@ import com.gameplat.common.lang.Assert;
 import com.gameplat.model.entity.game.GamePlatform;
 import com.gameplat.model.entity.game.GameRebateData;
 import com.gameplat.model.entity.member.Member;
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
@@ -52,10 +59,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.IOException;
-import java.math.BigDecimal;
-import java.util.*;
-
 @Slf4j
 @Service
 @Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)
@@ -73,7 +76,7 @@ public class GameRebateDataServiceImpl extends ServiceImpl<GameRebateDataMapper,
     PageDtoVO<GameRebateData> pageDtoVO = new PageDtoVO();
     if (StringUtils.isNotBlank(dto.getSuperAccount())) {
       Member member = memberService.getByAccount(dto.getSuperAccount()).orElse(null);
-      Assert.isNull(member, "用户不存在");
+      Assert.notNull(member, "用户不存在");
       dto.setUserPaths(member.getSuperPath());
       // 是否代理账号
       if (member.getUserType().equals(UserTypes.AGENT.value())) {

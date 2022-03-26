@@ -5,6 +5,7 @@ import com.gameplat.common.util.I18nSerializerUtils;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Date;
 
 @Data
@@ -41,13 +42,13 @@ public class GameBetRecordVO implements Serializable {
   private Integer settle;
 
   /** 投注金额 */
-  private String betAmount;
+  private BigDecimal betAmount;
 
   /** 有效投注额 */
-  private String validAmount;
+  private BigDecimal validAmount;
 
   /** 输赢金额 */
-  private String winAmount;
+  private BigDecimal winAmount;
 
   /** 投注内容 */
   private String betContent;

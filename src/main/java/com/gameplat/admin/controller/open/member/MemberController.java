@@ -8,16 +8,7 @@ import cn.hutool.http.useragent.UserAgent;
 import cn.hutool.http.useragent.UserAgentUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
-import com.gameplat.admin.model.dto.CleanAccountDTO;
-import com.gameplat.admin.model.dto.MemberAddDTO;
-import com.gameplat.admin.model.dto.MemberContactCleanDTO;
-import com.gameplat.admin.model.dto.MemberContactUpdateDTO;
-import com.gameplat.admin.model.dto.MemberEditDTO;
-import com.gameplat.admin.model.dto.MemberPwdUpdateDTO;
-import com.gameplat.admin.model.dto.MemberQueryDTO;
-import com.gameplat.admin.model.dto.MemberResetRealNameDTO;
-import com.gameplat.admin.model.dto.MemberTransformDTO;
-import com.gameplat.admin.model.dto.MemberWithdrawPwdUpdateDTO;
+import com.gameplat.admin.model.dto.*;
 import com.gameplat.admin.model.vo.MemberBalanceVO;
 import com.gameplat.admin.model.vo.MemberInfoVO;
 import com.gameplat.admin.model.vo.MemberVO;
@@ -35,24 +26,18 @@ import com.gameplat.log.enums.LogType;
 import com.gameplat.model.entity.member.Member;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import java.util.List;
-import java.util.Map;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import lombok.SneakyThrows;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.List;
+import java.util.Map;
 
 @Api(tags = "会员管理")
 @RestController
@@ -279,5 +264,13 @@ public class MemberController {
       Assert.notNull(dto.getUserNames(), "会员不能为空！");
     }
     memberService.updateTGClearMember(dto);
+  }
+
+  @ApiOperation("解除登录限制")
+  @PostMapping("releaseLoginLimit/{id}")
+  @PreAuthorize("hasAuthority('system:member:releaseLoginLimit')")
+  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.MEMBER, desc = "''解除会员#{id}登录限制'")
+  public void releaseLoginLimit(@PathVariable Long id) {
+    memberService.releaseLoginLimit(id);
   }
 }

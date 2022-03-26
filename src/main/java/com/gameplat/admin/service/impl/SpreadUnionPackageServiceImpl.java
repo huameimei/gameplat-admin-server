@@ -9,6 +9,7 @@ import com.gameplat.admin.convert.SpreadUnionConvert;
 import com.gameplat.admin.mapper.SpreadUnionPackageMapper;
 import com.gameplat.admin.model.dto.SpreadUnionPackageDTO;
 import com.gameplat.admin.model.vo.SpreadUnionPackageVO;
+import com.gameplat.admin.service.MemberService;
 import com.gameplat.admin.service.SpreadUnionPackageService;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.common.lang.Assert;
@@ -33,6 +34,9 @@ public class SpreadUnionPackageServiceImpl
 
   @Autowired private SpreadUnionPackageMapper spreadUnionPackageMapper;
 
+  @Autowired private MemberService memberService;
+
+
   /** 联盟包设置列表 检索条件 代理账号，联盟名称，联运类型 */
   @Override
   @SentinelResource(value = "getUnionPackage")
@@ -45,6 +49,11 @@ public class SpreadUnionPackageServiceImpl
   @Override
   @SentinelResource(value = "insertUnionPackage")
   public void insertUnionPackage(SpreadUnionPackageDTO spreadUnionPackageDTO) {
+    //判断是否属于代理
+    String agentAccount = spreadUnionPackageDTO.getAgentAccount();
+    if (memberService.getMemberCount(agentAccount)){
+      throw new ServiceException("此账号非代理账号");
+    }
     if (!this.save(spreadUnionConvert.toSpreadUnionPackageDTO(spreadUnionPackageDTO))) {
       log.error("增加联盟包设置失败,传入的参数 {}", spreadUnionPackageDTO);
       throw new ServiceException("增加联盟包设置失败");

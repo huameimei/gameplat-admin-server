@@ -105,9 +105,9 @@ public class MemberGrowthStatisServiceImpl
             PageDTO<MemberGrowthStatis> page, MemberGrowthStatisDTO dto) {
         return this.lambdaQuery()
                 .like(
-                        ObjectUtils.isNotEmpty(dto.getUserName()),
+                        ObjectUtils.isNotEmpty(dto.getAccount()),
                         MemberGrowthStatis::getAccount,
-                        dto.getUserName())
+                        dto.getAccount())
                 .ge(
                         ObjectUtils.isNotEmpty(dto.getStartTime()),
                         MemberGrowthStatis::getCreateTime,
@@ -125,9 +125,9 @@ public class MemberGrowthStatisServiceImpl
     public List<MemberGrowthStatis> findList(MemberGrowthStatisDTO dto) {
         return this.lambdaQuery()
                 .like(
-                        ObjectUtils.isNotEmpty(dto.getUserName()),
+                        ObjectUtils.isNotEmpty(dto.getAccount()),
                         MemberGrowthStatis::getAccount,
-                        dto.getUserName())
+                        dto.getAccount())
                 .ge(
                         ObjectUtils.isNotEmpty(dto.getStartTime()),
                         MemberGrowthStatis::getCreateTime,

@@ -57,7 +57,7 @@ public class MemberWealDetailServiceImpl
             ObjectUtils.isNotEmpty(queryDTO.getStatus()),
             MemberWealDetail::getStatus,
             queryDTO.getStatus())
-        .orderByDesc(MemberWealDetail::getCreateTime)
+        .orderByDesc(MemberWealDetail::getId)
         .page(page)
         .convert(detailConvert::toVo);
   }

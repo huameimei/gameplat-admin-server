@@ -38,9 +38,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.gameplat.common.enums.TranTypes.*;
@@ -68,9 +66,6 @@ public class MemberWealServiceImpl extends ServiceImpl<MemberWealMapper, MemberW
 
     @Autowired
     private RechargeOrderMapper rechargeOrderMapper;
-
-    @Autowired
-    private GameMemberReportMapper dayReportMapper;
 
     @Autowired
     private MemberMapper memberMapper;
@@ -625,4 +620,5 @@ public class MemberWealServiceImpl extends ServiceImpl<MemberWealMapper, MemberW
 
         return WEEK_WEAL_RECYCLE;
     }
+
 }

@@ -9,6 +9,7 @@ import com.gameplat.common.enums.BooleanEnum;
 import com.gameplat.common.lang.Assert;
 import com.gameplat.common.model.bean.limit.AdminLoginLimit;
 import com.gameplat.model.entity.sys.SysAuthIp;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
@@ -28,7 +29,10 @@ public class IpWhitelistInterceptor extends HandlerInterceptorAdapter {
   @Autowired private CommonService commonService;
 
   @Override
-  public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
+  public boolean preHandle(
+      @NotNull HttpServletRequest request,
+      @NotNull HttpServletResponse response,
+      @NotNull Object handler)
       throws Exception {
     AdminLoginLimit limit = Assert.notNull(commonService.getLoginLimit(), "登录配置信息未配置");
     this.checkIpWhiteList(limit.getIpWhiteListSwitch(), IPUtils.getIpAddress(request));

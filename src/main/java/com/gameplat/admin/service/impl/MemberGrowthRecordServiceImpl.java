@@ -91,7 +91,7 @@ public class MemberGrowthRecordServiceImpl
     private MessageMapper messageMapper;
 
     @Autowired
-    private MessageDistributeService messageDistributeService;
+    private MemberGrowthStatisService memberGrowthStatisService;
 
     @Autowired
     private MemberInfoService memberInfoService;
@@ -232,6 +232,16 @@ public class MemberGrowthRecordServiceImpl
 
         MemberGoldCoinRecord saveGoldCoinRecord = new MemberGoldCoinRecord();
 
+        if(memberGrowthStatisService.lambdaQuery().eq(MemberGrowthStatis::getMemberId, memberId).one() == null){
+            MemberGrowthStatis growthStatis = new MemberGrowthStatis();
+            growthStatis.setMemberId(memberId);
+            growthStatis.setAccount(member.getAccount());
+            memberGrowthStatisService.save(growthStatis);
+        }
+
+        LambdaUpdateWrapper<MemberGrowthStatis> wrapperGrowthStatis = new LambdaUpdateWrapper();
+
+
         // todo 3.按变动类型执行不同逻辑
         if (type == GrowthChangeEnum.recharge.getCode()) {
             // 判断是否开启了充值
@@ -242,6 +252,8 @@ public class MemberGrowthRecordServiceImpl
                 saveRecord.setKindName(kindName);
                 saveRecord.setKindCode("plat");
                 saveRecord.setChangeMult(growthConfig.getRechageRate());
+
+                wrapperGrowthStatis.set(MemberGrowthStatis::getRechargeGrowth, changeFinalGrowth);
 
                 saveGoldCoinRecord.setRemark(member.getAccount() + "充值赠送金币,操作成长值：" + changeFinalGrowth + ",操作实时兑换比例：" + growthConfig.getCoinRate());
             } else {
@@ -265,6 +277,7 @@ public class MemberGrowthRecordServiceImpl
                 saveRecord.setChangeMult(new BigDecimal("1"));
                 saveRecord.setRemark(dto.getRemark());
 
+                wrapperGrowthStatis.set(MemberGrowthStatis::getSignGrowth, changeFinalGrowth);
                 //金币记录备注
                 saveGoldCoinRecord.setRemark(member.getAccount() + "签到赠送金币,操作成长值：" + changeFinalGrowth + ",操作实时兑换比例：" + growthConfig.getCoinRate());
             } else {
@@ -281,6 +294,8 @@ public class MemberGrowthRecordServiceImpl
                 saveRecord.setChangeMult(
                         growthConfig.getDamaRate().multiply(dto.getChangeMult()).setScale(2));
 
+                wrapperGrowthStatis.set(MemberGrowthStatis::getDamaGrowth, changeFinalGrowth);
+
                 //金币记录备注
                 saveGoldCoinRecord.setRemark(member.getAccount() + "打码量赠送金币,操作成长值：" + changeFinalGrowth + ",操作实时兑换比例：" + growthConfig.getCoinRate());
             } else {
@@ -295,6 +310,8 @@ public class MemberGrowthRecordServiceImpl
             if (dto.getRemark() != null) {
                 saveRecord.setRemark(dto.getRemark());
             }
+
+            wrapperGrowthStatis.set(MemberGrowthStatis::getBackGrowth, changeFinalGrowth);
 
             //金币记录备注
             saveGoldCoinRecord.setRemark(member.getAccount() + "后台修改成长值赠送金币,操作成长值：" + changeFinalGrowth + ",操作实时兑换比例：" + growthConfig.getCoinRate());
@@ -408,6 +425,10 @@ public class MemberGrowthRecordServiceImpl
         if (!save) {
             throw new ServiceException("服务器繁忙，请稍后再试");
         }
+
+
+        memberGrowthStatisService.update(wrapperGrowthStatis);
+
         // todo 6.传入变动前和变动后的等级 处理发放升级奖励
         LambdaUpdateWrapper<MemberInfo> wrapper = new LambdaUpdateWrapper<>();
         if (beforeLevel.compareTo(afterLevel) < 0) {

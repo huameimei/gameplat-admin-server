@@ -84,7 +84,7 @@
         <if test="memberId != null">member_id,</if>
         <if test="account != null and account != ''">account,</if>
         <if test="vipLevel != null">vip_level,</if>
-        <if test="growth != null">vip_growth,</if>
+        <if test="vipGrowth != null">vip_growth,</if>
         <if test="rechargeGrowth != null">recharge_growth,</if>
         <if test="signGrowth != null">sign_growth,</if>
         <if test="damaGrowth != null">dama_growth,</if>

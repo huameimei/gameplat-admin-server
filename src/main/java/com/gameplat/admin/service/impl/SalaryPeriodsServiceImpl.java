@@ -180,7 +180,6 @@ public class SalaryPeriodsServiceImpl extends ServiceImpl<SalaryPeriodsMapper, S
    */
   @Override
   public void settle(Long id) {
-    log.info("日志打印记录");
     Assert.isTrue(id != null, "期数主键ID参数缺失！");
     SalaryPeriods periods = this.getById(id);
     Assert.isTrue(BeanUtil.isNotEmpty(periods), "期数不存在！");
@@ -194,7 +193,6 @@ public class SalaryPeriodsServiceImpl extends ServiceImpl<SalaryPeriodsMapper, S
     Assert.isTrue(!isLock, "您的操作过于频繁！请稍后重试！");
     distributedLocker.lock(key);
     try {
-      log.info("日志打印记录2");
       // todo 调用封装方法 处理grant结算
       this.salarySettle(periods);
       // 修改期数的状态为 已结算
@@ -358,7 +356,6 @@ public class SalaryPeriodsServiceImpl extends ServiceImpl<SalaryPeriodsMapper, S
    * @param periods
    */
   public void salarySettle(SalaryPeriods periods) {
-    log.info("日志打印记录3");
     // 删除grant
     // 删除分红详情
     QueryWrapper<SalaryGrant> deleteGrantWrapper = new QueryWrapper<>();
@@ -391,7 +388,6 @@ public class SalaryPeriodsServiceImpl extends ServiceImpl<SalaryPeriodsMapper, S
     }
 
     Map<Integer, Map<String, SalaryConfig>> configMap = new TreeMap<>();
-    log.info("日志打印记录4{}",openSalaryAgents);
     // 先把所有需要的工资配置查询出来
     for (Member user : openSalaryAgents) {
       Map<String, SalaryConfig> tmpMap = new TreeMap<>();
@@ -460,9 +456,6 @@ public class SalaryPeriodsServiceImpl extends ServiceImpl<SalaryPeriodsMapper, S
     // 有效会员 最低充值定义
     BigDecimal rechargeAmountLower = recommendConfig.getRechargeAmountLimit();
     for (Member member : openSalaryAgents) {
-      if (member.getAccount().equalsIgnoreCase("newdl01")) {
-        log.info("newdl01工资结算进来了！");
-      }
       Integer agentLevel = member.getAgentLevel();
       String account = member.getAccount();
       if (CollectionUtil.isNotEmpty(accountBlacks) && accountBlacks.contains(account)) {
@@ -482,15 +475,9 @@ public class SalaryPeriodsServiceImpl extends ServiceImpl<SalaryPeriodsMapper, S
       List<SalaryRechargeVO> gameReports =
           dailyReportMapper.findReportForSalary(
               periods.getStartDate(), periods.getEndDate(), account, isIncludeAgent);
-      if (account.equalsIgnoreCase("newdl01")) {
-        log.info("获取到的游戏报表的数据：{}游戏编码{}", gameReports,codes);
-      }
       // 按游戏大类分组
       Map<String, List<SalaryRechargeVO>> gameTypeReportMap =
           gameReports.stream().collect(Collectors.groupingBy(SalaryRechargeVO::getGameType));
-      if (account.equalsIgnoreCase("newdl01")) {
-        log.info("分组后{}",gameTypeReportMap);
-      }
       for (String gameType : codes) {
         Map<String, SalaryConfig> levelMap = configMap.get(agentLevel);
         if (CollectionUtil.isEmpty(levelMap)) {
@@ -499,9 +486,6 @@ public class SalaryPeriodsServiceImpl extends ServiceImpl<SalaryPeriodsMapper, S
         SalaryConfig finalConfig = levelMap.get(gameType);
         if (BeanUtil.isEmpty(finalConfig)) {
           continue;
-        }
-        if (account.equalsIgnoreCase("newdl01")) {
-          log.info("当前游戏编码{}", gameType);
         }
         List<SalaryRechargeVO> tmpGameReport =
             CollectionUtil.isEmpty(gameTypeReportMap.get(gameType))
@@ -585,9 +569,6 @@ public class SalaryPeriodsServiceImpl extends ServiceImpl<SalaryPeriodsMapper, S
             && totalWinAmount.compareTo(winAmountLimit) < 0) {
           isReach = false;
         }
-        if (account.equalsIgnoreCase("newdl01")) {
-          log.info("tmpGameReport集合:{}",tmpGameReport);
-        }
         // 计算总有效投注金额  需要区分是否只查下级
         if (isOnlyChild == 1) {
           tmpGameReport =
@@ -599,9 +580,6 @@ public class SalaryPeriodsServiceImpl extends ServiceImpl<SalaryPeriodsMapper, S
             tmpGameReport.stream()
                 .map(SalaryRechargeVO::getValidAmount)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
-        if (account.equalsIgnoreCase("newdl01")) {
-          log.info("总的有效投注的指:{}",totalValidAmount);
-        }
         saveObj.setValidAmount(totalValidAmount);
         if (totalValidAmount.compareTo(validAmountLimit) < 0) {
           isReach = false;

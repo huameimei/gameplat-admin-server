@@ -107,6 +107,7 @@ public class GameAdminServiceImpl implements GameAdminService {
     gameBizBean.setParams(null);
     String orderNo = gameApi.generateOrderNo(gameBizBean);
     gameBizBean.setGameAccount(member.getGameAccount());
+    gameBizBean.setAccount(member.getAccount());
     gameBizBean.setAmount(amount.negate());
     gameBizBean.setOrderNo(orderNo);
     gameBizBean.setTransferIn(platformCode);
@@ -177,6 +178,7 @@ public class GameAdminServiceImpl implements GameAdminService {
     GameBizBean gameBizBean = new GameBizBean();
     gameBizBean.setOrderNo(record.getOrderNo());
     gameBizBean.setGameAccount(member.getGameAccount());
+    gameBizBean.setAccount(member.getAccount());
     gameBizBean.setAmount(
         status == GameTransferStatus.IN.getValue()
             ? record.getAmount().negate()
@@ -348,6 +350,7 @@ public class GameAdminServiceImpl implements GameAdminService {
     // 2.查询转入游戏平台的余额
     GameBizBean gameBizBean = new GameBizBean();
     gameBizBean.setGameAccount(member.getGameAccount());
+    gameBizBean.setAccount(member.getAccount());
     gameBizBean.setConfig(gameConfigService.queryGameConfigInfoByPlatCode(transferOut));
     BigDecimal balance = gameApi.getBalance(gameBizBean);
     // 3.平台出款操作
@@ -381,6 +384,7 @@ public class GameAdminServiceImpl implements GameAdminService {
     try {
       gameBizBean = new GameBizBean();
       gameBizBean.setGameAccount(member.getGameAccount());
+      gameBizBean.setAccount(member.getAccount());
       gameBizBean.setAmount(amount);
       gameBizBean.setOrderNo(orderNo);
       gameBizBean.setConfig(gameConfigService.queryGameConfigInfoByPlatCode(transferOut));
@@ -464,6 +468,7 @@ public class GameAdminServiceImpl implements GameAdminService {
     // 2.获取会员在游戏平台的余额
     GameBizBean gameBizBean = new GameBizBean();
     gameBizBean.setGameAccount(member.getGameAccount());
+    gameBizBean.setAccount(member.getAccount());
     gameBizBean.setConfig(gameConfigService.queryGameConfigInfoByPlatCode(transferIn));
     BigDecimal balance = gameApi.getBalance(gameBizBean);
     // 自动转动实际上回收的是在第三方游戏的所有余额
@@ -496,6 +501,7 @@ public class GameAdminServiceImpl implements GameAdminService {
       try {
         gameBizBean = new GameBizBean();
         gameBizBean.setGameAccount(member.getGameAccount());
+        gameBizBean.setAccount(member.getAccount());
         gameBizBean.setAmount(balance.negate());
         gameBizBean.setOrderNo(orderNo);
         gameBizBean.setConfig(gameConfigService.queryGameConfigInfoByPlatCode(transferIn));

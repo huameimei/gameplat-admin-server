@@ -150,4 +150,10 @@ public interface MemberService extends IService<Member> {
    * @param dto
    */
   void updateTGClearMember(CleanAccountDTO dto);
+
+
+  /**
+   * 跟据会员账号获取会员
+   */
+  Boolean getMemberCount(String account);
 }

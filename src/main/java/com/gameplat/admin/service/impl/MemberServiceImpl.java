@@ -557,6 +557,14 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
     log.info("批量清理账号余额结束，操作人：{}，参数：{}", SecurityUserHolder.getUsername(), dto);
   }
 
+  /**
+   * 账号获取
+   */
+  @Override
+  public Boolean getMemberCount(String account) {
+    return this.lambdaQuery().eq(Member::getAccount,account).eq(Member::getUserType,"A").count() > 0;
+  }
+
   /*  @Override
   public MemberBalanceVO findMemberVip(String username, String level, String vipGrade) {
     return memberMapper.findMemberVip(username, level, vipGrade);

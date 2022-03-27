@@ -1,6 +1,7 @@
 package com.gameplat.admin.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -440,6 +441,12 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
   public void crossAccountCheck(UserCredential userCredential, RechargeOrder rechargeOrder)
       throws ServiceException {
     MemberRechargeLimit limit = limitInfoService.getRechargeLimit();
+    boolean isRechargeProcess =
+            BooleanEnum.YES.match(limit.getIsRechargeProcess());
+    if (isRechargeProcess && !ObjectUtil.equal(2, rechargeOrder.getStatus())) {
+      throw new ServiceException("请先受理订单:" + rechargeOrder.getOrderNo());
+    }
+
     boolean toCheck =
         BooleanEnum.NO.match(limit.getIsHandledAllowOthersOperate())
             && !userCredential.isSuperAdmin();

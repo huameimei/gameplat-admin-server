@@ -12,7 +12,6 @@ public class AuthIpEnum {
 
     /** 后台 */
     ADMIN("1", "后台");
-    ;
 
     /** 值 */
     private final String value;

@@ -31,11 +31,11 @@ public class SysUserEnums {
 
   public enum Status {
 
-    /** 冻结 */
-    FROZEN(-1),
-
     /** 禁用 */
-    DISABLED(0),
+    DISABLED(-1),
+
+    /** 冻结 */
+    FROZEN(0),
 
     /** 启用 */
     ENABLED(1);

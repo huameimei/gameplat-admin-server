@@ -72,4 +72,6 @@ public interface RechargeOrderService extends IService<RechargeOrder> {
   List<ThreeRechReportVo> findThreeRechReport(GameRWDataReportDto dto);
 
   long getUntreatedRechargeCount();
+
+  void expired(Long id);
 }

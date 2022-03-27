@@ -32,6 +32,7 @@ import com.gameplat.security.SecurityUserHolder;
 import com.google.common.collect.Lists;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -47,21 +48,31 @@ import java.util.stream.Collectors;
 @Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)
 public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> implements MemberService {
 
-  private final String DL_FORMAL_TYPE = "A";
+  private static final String DL_FORMAL_TYPE = "A";
 
-  @Autowired(required = false)
-  private MemberMapper memberMapper;
+  @Autowired private MemberMapper memberMapper;
 
   @Autowired private MemberConvert memberConvert;
+
   @Autowired private MemberInfoService memberInfoService;
+
   @Autowired private MemberQueryCondition memberQueryCondition;
+
   @Autowired private PasswordService passwordService;
+
   @Autowired private MemberRemarkService memberRemarkService;
+
   @Autowired private OnlineUserService onlineUserService;
+
   @Autowired private TenantConfig tenantConfig;
+
   @Autowired private GameTransferInfoService gameTransferInfoService;
+
   @Autowired private SpreadLinkInfoService spreadLinkInfoService;
+
   @Autowired private GameAdminService gameAdminService;
+
+  @Autowired private RedisTemplate<String, Integer> redisTemplate;
 
   @Override
   public IPage<MemberVO> queryPage(Page<Member> page, MemberQueryDTO dto) {
@@ -517,12 +528,13 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
       String[] userNames = dto.getUserNames().split(",");
       List<String> userNameList = Lists.newArrayList(userNames);
       dto.setUserNameList(userNameList);
-      if (ObjectUtil.equals(dto.getUserType(), 4))
+      if (ObjectUtil.equals(dto.getUserType(), 4)) {
         memberList =
             this.lambdaQuery()
                 .in(Member::getAccount, dto.getUserNames().split(","))
                 .eq(Member::getUserType, dto.getUserType())
                 .list();
+      }
       if (StringUtils.isEmpty(memberList) || memberList.size() != userNames.length) {
         throw new ServiceException("未找到账号信息");
       }
@@ -549,16 +561,26 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
     }
     // 额度回收
     memberList.parallelStream()
-        .forEach(
-            a -> {
-              gameAdminService.recyclingAmountByAccount(a.getAccount());
-            });
+        .map(Member::getAccount)
+        .forEach(gameAdminService::recyclingAmountByAccount);
     memberInfoService.updateClearGTMember(dto);
     log.info("批量清理账号余额结束，操作人：{}，参数：{}", SecurityUserHolder.getUsername(), dto);
   }
 
-  /*  @Override
-  public MemberBalanceVO findMemberVip(String username, String level, String vipGrade) {
-    return memberMapper.findMemberVip(username, level, vipGrade);
-  }*/
+  @Override
+  public void releaseLoginLimit(Long id) {
+    Member member = this.getById(id);
+    if (null != member) {
+      redisTemplate.delete(String.format(CachedKeys.MEMBER_PWD_ERROR_COUNT, member.getAccount()));
+    }
+  }
+
+  /**
+   * 账号获取
+   */
+  @Override
+  public Boolean getMemberCount(String account) {
+    return this.lambdaQuery().eq(Member::getAccount,account).eq(Member::getUserType,"A").count() > 0;
+  }
+
 }

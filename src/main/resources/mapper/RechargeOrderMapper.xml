@@ -70,10 +70,10 @@
                 AND mode IN (${payType})
             </if>
             <if test="startTime != null and startTime != ''">
-                AND add_time <![CDATA[>= ]]> #{startTime}
+                AND create_time <![CDATA[>= ]]> #{startTime}
             </if>
             <if test="endTime != null and endTime != ''">
-                AND add_time <![CDATA[<= ]]> #{endTime}
+                AND create_time <![CDATA[<= ]]> #{endTime}
             </if>
             AND status = 3
         </where>

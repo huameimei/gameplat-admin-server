@@ -42,6 +42,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -92,6 +93,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
         .eq(ObjectUtils.isNotNull(userDTO.getRoleId()), SysUser::getRoleId, userDTO.getRoleId())
         .eq(ObjectUtils.isNotNull(userDTO.getStatus()), SysUser::getStatus, userDTO.getStatus())
         .eq(ObjectUtils.isNotEmpty(userDTO.getPhone()), SysUser::getPhone, userDTO.getPhone())
+            .eq(SysUser::getIsAllowDelete, 0)
         .between(
             ObjectUtils.isNotEmpty(userDTO.getBeginTime()),
             SysUser::getCreateTime,
@@ -163,7 +165,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
 
     // 删除用户角色表
     userRoleMapper.deleteUserRole(new Long[] {id});
-    Assert.isTrue(this.removeById(id), "删除用户失败!");
+    Assert.isTrue(this.lambdaUpdate().set(SysUser::getIsAllowDelete, 1).eq(SysUser::getUserId, id).update(), "删除用户失败!");
   }
 
   @Override
@@ -232,7 +234,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
   @Override
   public void disableAccount(String account) {
     SysUser user = this.getByUsername(account);
-    if (EnableEnum.isEnabled(user.getStatus())) {
+    if (Objects.nonNull(user) && EnableEnum.isEnabled(user.getStatus())) {
       this.lambdaUpdate()
           .set(SysUser::getStatus, EnableEnum.DISABLED.code())
           .eq(SysUser::getUserId, user.getUserId())

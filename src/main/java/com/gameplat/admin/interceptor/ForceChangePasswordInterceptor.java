@@ -5,6 +5,7 @@ import com.gameplat.base.common.enums.EnableEnum;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.model.entity.sys.SysUser;
 import com.gameplat.security.SecurityUserHolder;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
@@ -21,7 +22,10 @@ public class ForceChangePasswordInterceptor extends HandlerInterceptorAdapter {
   @Autowired private SysUserService userService;
 
   @Override
-  public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
+  public boolean preHandle(
+      @NotNull HttpServletRequest request,
+      @NotNull HttpServletResponse response,
+      @NotNull Object handler)
       throws Exception {
     SysUser user = userService.getById(SecurityUserHolder.getUserId());
     if (EnableEnum.isEnabled(user.getChangeFlag())) {

@@ -5,6 +5,7 @@ import com.gameplat.admin.model.dto.LimitInfoDTO;
 import com.gameplat.common.enums.LimitEnums;
 import com.gameplat.common.model.bean.limit.AdminLoginLimit;
 import com.gameplat.common.model.bean.limit.MemberRechargeLimit;
+import com.gameplat.common.model.bean.limit.MemberWithdrawLimit;
 import com.gameplat.model.entity.limit.LimitInfo;
 
 import java.util.Optional;
@@ -18,6 +19,8 @@ public interface LimitInfoService extends IService<LimitInfo> {
   AdminLoginLimit getAdminLimit();
 
   MemberRechargeLimit getRechargeLimit();
+
+  MemberWithdrawLimit getWithradLimit();
 
   LimitInfo getLimitInfo(String name);
 

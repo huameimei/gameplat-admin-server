@@ -187,6 +187,9 @@ public class MemberGrowthStatisServiceImpl
             if (i <= 0) {
                 throw new ServiceException("添加或修改会员成长值汇总失败！");
             }
+            find = this.lambdaQuery()
+                    .eq(MemberGrowthStatis::getMemberId, memberId)
+                    .one();
         }
         return find;
     }

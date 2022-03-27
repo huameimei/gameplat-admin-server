@@ -4,6 +4,7 @@ import com.gameplat.base.common.util.StringUtils;
 import com.gameplat.security.context.UserCredential;
 import com.gameplat.security.jwt.JwtTokenUtil;
 import com.gameplat.security.manager.JwtTokenAuthenticationManager;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
@@ -65,7 +66,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         new ChannelInterceptor() {
 
           @Override
-          public Message<?> preSend(Message<?> message, MessageChannel channel) {
+          public Message<?> preSend(@NotNull Message<?> message, @NotNull MessageChannel channel) {
             StompHeaderAccessor accessor =
                 MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
             if (accessor != null && StompCommand.CONNECT.equals(accessor.getCommand())) {

@@ -8,6 +8,7 @@ import com.gameplat.common.compent.captcha.CaptchaStrategyContext;
 import com.gameplat.common.enums.BooleanEnum;
 import com.gameplat.common.lang.Assert;
 import com.gameplat.common.model.bean.limit.AdminLoginLimit;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
@@ -33,7 +34,9 @@ public class LoginInterceptor extends HandlerInterceptorAdapter {
 
   @Override
   public boolean preHandle(
-      HttpServletRequest request, HttpServletResponse response, Object handler) {
+      @NotNull HttpServletRequest request,
+      @NotNull HttpServletResponse response,
+      @NotNull Object handler) {
     AdminLoginLimit limit = Assert.notNull(commonService.getLoginLimit(), "登录配置信息未配置");
 
     // 验证验证码

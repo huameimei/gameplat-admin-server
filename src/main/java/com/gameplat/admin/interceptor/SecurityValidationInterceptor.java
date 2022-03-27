@@ -3,6 +3,7 @@ package com.gameplat.admin.interceptor;
 import com.gameplat.base.common.util.IPUtils;
 import com.gameplat.security.SecurityUserHolder;
 import com.gameplat.security.context.UserCredential;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
@@ -18,7 +19,9 @@ public class SecurityValidationInterceptor extends HandlerInterceptorAdapter {
 
   @Override
   public boolean preHandle(
-      HttpServletRequest request, HttpServletResponse response, Object handler) {
+      @NotNull HttpServletRequest request,
+      @NotNull HttpServletResponse response,
+      @NotNull Object handler) {
     UserCredential credential = SecurityUserHolder.getCredential();
     String requestIp = IPUtils.getIpAddress(request);
     if (!credential.getLoginIp().equals(requestIp)) {

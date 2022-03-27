@@ -199,7 +199,7 @@ public class TenantSettingController {
             return Result.failed("修改值不允许为空...");
         }
         tenantSettingService.updateTenantSettingValue(tenantSetting);
-        adminCache.deleteKey(CacheKey.getSquareEnableKey());
+        adminCache.deleteObject(CacheKey.getSquareEnableKey());
         return Result.succeed();
     }
 

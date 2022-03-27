@@ -302,6 +302,7 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
           rechargeOrder.getAccount(),
           rechargeOrder.getOrderNo(),
           rechargeOrder.getPointFlag());
+      return;
     }
 
     //兑换成长值
@@ -327,6 +328,7 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
     memberGrowthChangeDto.setUserName(rechargeOrder.getAccount());
     memberGrowthChangeDto.setType(GrowthChangeEnum.recharge.getCode());
     memberGrowthChangeDto.setChangeGrowth(memberGrowthConfig.getRechageRate().multiply(rechargeOrder.getAmount()).longValue());
+    memberGrowthChangeDto.setRemark("人工充值成长值变动");
 
     memberGrowthStatisService.changeGrowth(memberGrowthChangeDto);
 //    memberGrowthRecordService.editMemberGrowth(memberGrowthChangeDto,

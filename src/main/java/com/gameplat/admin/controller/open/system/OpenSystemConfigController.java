@@ -66,27 +66,32 @@ public class OpenSystemConfigController {
   }
 
   @GetMapping("/list/{dictType}")
+  @PreAuthorize("hasAuthority('system:config:view')")
   public List<SysDictData> findList(@PathVariable String dictType) {
     return systemConfigService.findList(dictType);
   }
 
   @PutMapping("/update/{dictType}")
+  @PreAuthorize("hasAuthority('system:config:add')")
   public void updateConfig(
       @PathVariable String dictType, @RequestBody List<SysDictData> dictDataList) {
     systemConfigService.updateConfig(dictType, dictDataList);
   }
 
   @PutMapping("/update")
+  @PreAuthorize("hasAuthority('system:config:add')")
   public void configDataEdit(@RequestBody OperSystemConfigDTO dto) {
     systemConfigService.configDataEdit(dto);
   }
 
   @GetMapping("/email/list")
+  @PreAuthorize("hasAuthority('system:config:view')")
   public EmailConfig findEmailList() {
     return systemConfigService.findEmailConfig();
   }
 
   @PutMapping("/email/update")
+  @PreAuthorize("hasAuthority('system:config:add')")
   public void updateEmail(@RequestBody EmailConfig emailConfig) {
     systemConfigService.updateEmail(emailConfig);
   }

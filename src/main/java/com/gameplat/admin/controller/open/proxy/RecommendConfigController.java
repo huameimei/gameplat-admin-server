@@ -29,6 +29,7 @@ public class RecommendConfigController {
 
   @GetMapping("/get")
   @ApiOperation(value = "获取层层代配置")
+  @PreAuthorize("hasAuthority('system:dict:view')")
   public RecommendConfig getRecommendConfig() {
     return recommendConfigService.getRecommendConfig();
   }
@@ -53,7 +54,7 @@ public class RecommendConfigController {
 
   @PostMapping("/edit")
   @ApiOperation(value = "编辑层层代配置")
-  @PreAuthorize("hasAuthority('recommendConfig:edit')")
+  @PreAuthorize("hasAuthority('system:recommendConfig:edit')")
   @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.AGENT, desc = "编辑层层代配置")
   public void edit(@Validated @RequestBody RecommendConfigDto dto) {
     recommendConfigService.edit(dto);

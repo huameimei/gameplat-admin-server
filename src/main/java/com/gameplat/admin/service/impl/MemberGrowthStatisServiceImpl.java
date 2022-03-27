@@ -96,6 +96,9 @@ public class MemberGrowthStatisServiceImpl
     @Autowired
     private MemberInfoService memberInfoService;
 
+    @Autowired
+    private MemberGrowthStatisMapper memberGrowthStatisMapper;
+
     public static final Object lockHelper = new Object();
 
     public static final String kindName = "{\"en-US\": \"platform\", \"in-ID\": \"peron\", \"th-TH\": \"แพลตฟอร์ม\", \"vi-VN\": \"nền tảng\", \"zh-CN\": \"平台\"}";
@@ -166,13 +169,7 @@ public class MemberGrowthStatisServiceImpl
 
     @Override
     public void insertOrUpdate(MemberGrowthStatis userGrowthStatis) {
-
-        MemberGrowthStatis memberGrowthStatis = this.lambdaQuery().eq(MemberGrowthStatis::getMemberId, userGrowthStatis.getMemberId()).one();
-        if(memberGrowthStatis == null){
-            this.save(userGrowthStatis);
-        }else{
-            this.updateMemberGrowthStatis(userGrowthStatis);
-        }
+        memberGrowthStatisMapper.insertOrUpdate(userGrowthStatis);
     }
 
     @Override

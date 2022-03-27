@@ -6,7 +6,6 @@ import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -191,6 +190,9 @@ public class MemberGrowthStatisServiceImpl
             if (i <= 0) {
                 throw new ServiceException("添加或修改会员成长值汇总失败！");
             }
+            find = this.lambdaQuery()
+                    .eq(MemberGrowthStatis::getMemberId, memberId)
+                    .one();
         }
         return find;
     }

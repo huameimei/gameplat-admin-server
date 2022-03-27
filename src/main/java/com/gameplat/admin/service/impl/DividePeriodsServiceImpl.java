@@ -508,7 +508,14 @@ public class DividePeriodsServiceImpl extends ServiceImpl<DividePeriodsMapper, D
               .amountRatio(amountRatio)
               .build();
       // 分红比例的（源用户的层级 - 分红代理的层级)次幂
-      BigDecimal pow = divideRatio.pow((userLevelNum - currentMember.getAgentLevel()));
+      Integer subLevel = userLevelNum - currentMember.getAgentLevel();
+      if (subLevel < 0) {
+        continue;
+      }
+      if (subLevel == 0) {
+        subLevel = 1;
+      }
+      BigDecimal pow = divideRatio.pow((subLevel));
       saveDetailDto.setDivideRatio(pow); // 代理分红比例
       // 分红基数金额
       BigDecimal baseAmount =
@@ -525,7 +532,7 @@ public class DividePeriodsServiceImpl extends ServiceImpl<DividePeriodsMapper, D
               + "%x"
               + divideRatio.multiply(BigDecimal.valueOf(100)).toString()
               + "%^"
-              + (userLevelNum - currentMember.getAgentLevel()));
+              + (subLevel));
       // 添加分红详情
       DivideDetail detail = detailConvert.toEntity(saveDetailDto);
       int insertCount = detailMapper.insert(detail);
@@ -619,8 +626,11 @@ public class DividePeriodsServiceImpl extends ServiceImpl<DividePeriodsMapper, D
 
       Integer curLevelNum = currentMember.getAgentLevel(); // 享分红代理
       Integer subLevelNum = userLevelNum - curLevelNum; // 等级差
-      if (subLevelNum <= NumberConstant.ZERO) {
+      if (subLevelNum < NumberConstant.ZERO) {
         continue;
+      }
+      if (subLevelNum == 0) {
+        subLevelNum = 1;
       }
 
       if (CollectionUtil.isEmpty(fissionConfigLevelVos)

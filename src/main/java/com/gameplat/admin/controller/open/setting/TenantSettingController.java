@@ -166,6 +166,33 @@ public class TenantSettingController {
     }
 
     /**
+     * 个人中心编辑
+     */
+    @RequestMapping("/updatePersonalCenter")
+    @ApiOperation("个人中心编辑")
+    public Result updatePersonalCenter(@RequestBody TenantSettingVO tenantSettingVO) {
+        UserCredential user = SecurityUserHolder.getCredential();
+        if (user != null) {
+            tenantSettingVO.setUpdateBy(user.getUsername());
+        }
+        if (StringUtils.isBlank(tenantSettingVO.getSettingType())) {
+            throw new ServiceException("导航栏类型不允许为空");
+        }
+        if (tenantSettingVO.getDisplay() != null
+                && tenantSettingVO.getIsIndex() != null
+                && tenantSettingVO.getDisplay() == 0
+                && tenantSettingVO.getIsIndex() == 1) {
+            throw new ServiceException("关闭的导航栏不能设置默认首页");
+        }
+        if (tenantSettingVO.getId() == null) {
+            throw new ServiceException("id不允许为空");
+        }
+        tenantSettingService.updateAppNavigation(tenantSettingVO);
+        adminCache.deleteByPrefix(CacheKey.getPersonCenterListKey());
+        return Result.succeed();
+    }
+
+    /**
      * 批量修改排序
      */
     @RequestMapping("/updateBatchTenantSort")

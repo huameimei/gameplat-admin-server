@@ -28,6 +28,8 @@ public class TenantFloatTypeController {
   @GetMapping("/query")
   @ApiOperation("游戏浮窗类型列表查询")
   public List<TenantFloatTypeVo> list(TenantFloatTypeVo tenantFloatTypeVo) {
+    TenantFloatTypeVo tenantFloatTypeVo1 = new TenantFloatTypeVo();
+    tenantFloatTypeVo1.setOsType(tenantFloatTypeVo.getOsType());
     return tenantFloatTypeService.selectSysFloatTypeList(tenantFloatTypeVo);
   }
 

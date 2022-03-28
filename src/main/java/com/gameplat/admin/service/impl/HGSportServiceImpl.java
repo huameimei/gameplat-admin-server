@@ -6,14 +6,19 @@ import com.alibaba.fastjson.JSONObject;
 import com.gameplat.admin.model.dto.HGSportDTO;
 import com.gameplat.admin.service.GameConfigService;
 import com.gameplat.admin.service.HGSportService;
+import com.gameplat.admin.service.MemberService;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.StringUtils;
 import com.gameplat.common.enums.GamePlatformEnum;
 import com.gameplat.common.game.api.hg.config.HgConfig;
 import com.gameplat.common.game.api.hg.enums.API;
+import com.gameplat.model.entity.member.Member;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * @author aBen
@@ -24,7 +29,11 @@ import org.springframework.stereotype.Service;
 @Service
 public class HGSportServiceImpl implements HGSportService {
 
-  @Autowired private GameConfigService gameConfigService;
+  @Autowired
+  private GameConfigService gameConfigService;
+
+  @Autowired
+  private MemberService memberService;
 
   @Override
   public Object queryHGBetOrder(HGSportDTO dto) {
@@ -84,7 +93,7 @@ public class HGSportServiceImpl implements HGSportService {
   @Override
   public Object queryHGHandOrdersDetail(HGSportDTO dto) {
     return doGetRequest(
-        API.QUERY_HAND_ORDERS_DETAIL.getUrl(), dto, API.QUERY_HAND_ORDERS_DETAIL.getName());
+            API.QUERY_HAND_ORDERS_DETAIL.getUrl(), dto, API.QUERY_HAND_ORDERS_DETAIL.getName());
   }
 
   @Override
@@ -100,61 +109,71 @@ public class HGSportServiceImpl implements HGSportService {
   @Override
   public Object inputResultForFoot(HGSportDTO dto) {
     return doPostRequest(
-        API.HG_INPUT_RESULT_FOR_FOOT.getUrl(), dto, API.HG_INPUT_RESULT_FOR_FOOT.getName());
+            API.HG_INPUT_RESULT_FOR_FOOT.getUrl(), dto, API.HG_INPUT_RESULT_FOR_FOOT.getName());
   }
 
   @Override
   public Object inputResultForBasketball(HGSportDTO dto) {
     return doPostRequest(
-        API.HG_INPUT_RESULT_FOR_BASKETBALL.getUrl(),
-        dto,
-        API.HG_INPUT_RESULT_FOR_BASKETBALL.getName());
+            API.HG_INPUT_RESULT_FOR_BASKETBALL.getUrl(),
+            dto,
+            API.HG_INPUT_RESULT_FOR_BASKETBALL.getName());
   }
 
   @Override
   public Object updateSportStatus(HGSportDTO dto) {
     return doPostRequest(
-        API.HG_UPDATE_SPORT_STATUS.getUrl(), dto, API.HG_UPDATE_SPORT_STATUS.getName());
+            API.HG_UPDATE_SPORT_STATUS.getUrl(), dto, API.HG_UPDATE_SPORT_STATUS.getName());
   }
 
   @Override
   public Object updateSportBetLimitMoney(HGSportDTO dto) {
     return doPostRequest(
-        API.HG_UPDATE_SPORT_BET_LIMIT_MONEY.getUrl(),
-        dto,
-        API.HG_UPDATE_SPORT_BET_LIMIT_MONEY.getName());
+            API.HG_UPDATE_SPORT_BET_LIMIT_MONEY.getUrl(),
+            dto,
+            API.HG_UPDATE_SPORT_BET_LIMIT_MONEY.getName());
   }
 
   @Override
   public Object updateBetConfig(HGSportDTO dto) {
+    if (StringUtils.isNotEmpty(dto.getBlackList())) {
+      String[] userNameStr = dto.getBlackList().split(",");
+      List<String> userNameList = Arrays.asList(userNameStr);
+      for (String userName : userNameList) {
+        Member member = memberService.getByAccount(userName).orElse(null);
+        if (StringUtils.isNull(member)) {
+          throw new ServiceException(userName + "不存在，无法添加到黑名单");
+        }
+      }
+    }
     return doPostRequest(
-        API.HG_UPDATE_BET_CONFIG.getUrl(), dto, API.HG_UPDATE_BET_CONFIG.getName());
+            API.HG_UPDATE_BET_CONFIG.getUrl(), dto, API.HG_UPDATE_BET_CONFIG.getName());
   }
 
   @Override
   public Object betUpdateActions(HGSportDTO dto) {
     return doPostRequest(
-        API.HG_BET_UPDATE_ACTIONS.getUrl(), dto, API.HG_BET_UPDATE_ACTIONS.getName());
+            API.HG_BET_UPDATE_ACTIONS.getUrl(), dto, API.HG_BET_UPDATE_ACTIONS.getName());
   }
 
   @Override
   public Object batchActionsByStatus(HGSportDTO dto) {
     return doPostRequest(
-        API.HG_BATCH_ACTIONS_BY_STATUS.getUrl(), dto, API.HG_BATCH_ACTIONS_BY_STATUS.getName());
+            API.HG_BATCH_ACTIONS_BY_STATUS.getUrl(), dto, API.HG_BATCH_ACTIONS_BY_STATUS.getName());
   }
 
   @Override
   public Object settlingResultForFoot(HGSportDTO dto) {
     return doPostRequest(
-        API.HG_SETTLING_RESULT_FOR_FOOT.getUrl(), dto, API.HG_SETTLING_RESULT_FOR_FOOT.getName());
+            API.HG_SETTLING_RESULT_FOR_FOOT.getUrl(), dto, API.HG_SETTLING_RESULT_FOR_FOOT.getName());
   }
 
   @Override
   public Object settlingResultForBasketball(HGSportDTO dto) {
     return doPostRequest(
-        API.HG_SETTLING_RESULT_FOR_BASKETBALL.getUrl(),
-        dto,
-        API.HG_SETTLING_RESULT_FOR_BASKETBALL.getName());
+            API.HG_SETTLING_RESULT_FOR_BASKETBALL.getUrl(),
+            dto,
+            API.HG_SETTLING_RESULT_FOR_BASKETBALL.getName());
   }
 
   @Override
@@ -165,37 +184,37 @@ public class HGSportServiceImpl implements HGSportService {
   @Override
   public Object updateUserLimit(HGSportDTO dto) {
     return doPostRequest(
-        API.HG_UPDATE_USER_LIMIT.getUrl(), dto, API.HG_UPDATE_USER_LIMIT.getName());
+            API.HG_UPDATE_USER_LIMIT.getUrl(), dto, API.HG_UPDATE_USER_LIMIT.getName());
   }
 
   @Override
   public Object removeUserLimit(HGSportDTO dto) {
     return doPostRequest(
-        API.HG_REMOVE_USER_LIMIT.getUrl(), dto, API.HG_REMOVE_USER_LIMIT.getName());
+            API.HG_REMOVE_USER_LIMIT.getUrl(), dto, API.HG_REMOVE_USER_LIMIT.getName());
   }
 
   @Override
   public Object saveSportMessage(HGSportDTO dto) {
     return doPostRequest(
-        API.HG_SAVE_SPORT_MESSAGE.getUrl(), dto, API.HG_SAVE_SPORT_MESSAGE.getName());
+            API.HG_SAVE_SPORT_MESSAGE.getUrl(), dto, API.HG_SAVE_SPORT_MESSAGE.getName());
   }
 
   @Override
   public Object removeSportMessage(HGSportDTO dto) {
     return doPostRequest(
-        API.HG_REMOVE_SPORT_MESSAGE.getUrl(), dto, API.HG_REMOVE_SPORT_MESSAGE.getName());
+            API.HG_REMOVE_SPORT_MESSAGE.getUrl(), dto, API.HG_REMOVE_SPORT_MESSAGE.getName());
   }
 
   @Override
   public Object modifySportMessage(HGSportDTO dto) {
     return doPostRequest(
-        API.HG_MODIFY_SPORT_MESSAGE.getUrl(), dto, API.HG_MODIFY_SPORT_MESSAGE.getName());
+            API.HG_MODIFY_SPORT_MESSAGE.getUrl(), dto, API.HG_MODIFY_SPORT_MESSAGE.getName());
   }
 
   @Override
   public Object sportChangeNotice(HGSportDTO dto) {
     return doPostRequest(
-        API.HG_SPORT_CHANGE_NOTICE.getUrl(), dto, API.HG_SPORT_CHANGE_NOTICE.getName());
+            API.HG_SPORT_CHANGE_NOTICE.getUrl(), dto, API.HG_SPORT_CHANGE_NOTICE.getName());
   }
 
   @Override
@@ -205,7 +224,7 @@ public class HGSportServiceImpl implements HGSportService {
 
   public Object doGetRequest(String apiUrl, HGSportDTO dto, String describe) {
     JSONObject configJson =
-        gameConfigService.queryGameConfigInfoByPlatCode(GamePlatformEnum.HG.getName());
+            gameConfigService.queryGameConfigInfoByPlatCode(GamePlatformEnum.HG.getName());
     if (StringUtils.isNull(configJson)) {
       throw new ServiceException("未找到皇冠体育游戏配置");
     }
@@ -216,7 +235,7 @@ public class HGSportServiceImpl implements HGSportService {
     requestParam.put("operatorId", hgConfig.getOperatorId());
     log.info("获取HG{}，请求地址:{}，请求参数:{}", describe, url, requestParam);
     String result =
-        HttpRequest.get(url).header("tenant", "kguat").form(requestParam).execute().body();
+            HttpRequest.get(url).header("tenant", hgConfig.getTenant()).form(requestParam).execute().body();
     log.info("获取HG{}，请求响应:{}", describe, result);
     if (StringUtils.isEmpty(result)) {
       throw new ServiceException("皇冠体育请求响应为空");
@@ -242,7 +261,7 @@ public class HGSportServiceImpl implements HGSportService {
 
   public Object doPostRequest(String apiUrl, HGSportDTO dto, String describe) {
     JSONObject configJson =
-        gameConfigService.queryGameConfigInfoByPlatCode(GamePlatformEnum.HG.getName());
+            gameConfigService.queryGameConfigInfoByPlatCode(GamePlatformEnum.HG.getName());
     if (StringUtils.isNull(configJson)) {
       throw new ServiceException("未找到皇冠体育游戏配置");
     }
@@ -253,7 +272,7 @@ public class HGSportServiceImpl implements HGSportService {
     requestParam.put("operatorId", hgConfig.getOperatorId());
     log.info("获取HG{}，请求地址:{}，请求参数:{}", describe, url, requestParam);
     String result =
-        HttpRequest.post(url).header("tenant", "kguat").form(requestParam).execute().body();
+            HttpRequest.post(url).header("tenant", hgConfig.getTenant()).form(requestParam).execute().body();
     log.info("获取HG{}，请求响应:{}", describe, result);
     if (StringUtils.isEmpty(result)) {
       throw new ServiceException("皇冠体育请求响应为空");

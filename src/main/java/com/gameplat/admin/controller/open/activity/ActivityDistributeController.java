@@ -43,9 +43,8 @@ public class ActivityDistributeController {
     @ApiImplicitParam(name = "size", value = "每页条数"),
   })
   public PageExt<IPage<ActivityDistributeVO>, ActivityDistributeStatisticsVO> list(
-      @ApiIgnore PageDTO<ActivityDistribute> page,
-      ActivityDistributeQueryDTO activityDistributeQueryDTO) {
-    return activityDistributeService.list(page, activityDistributeQueryDTO);
+      @ApiIgnore PageDTO<ActivityDistribute> page, ActivityDistributeQueryDTO dto) {
+    return activityDistributeService.list(page, dto);
   }
 
   @ApiOperation(value = "修改结算状态")

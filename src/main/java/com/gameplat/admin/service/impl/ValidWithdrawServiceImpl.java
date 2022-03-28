@@ -167,7 +167,7 @@ public class ValidWithdrawServiceImpl extends ServiceImpl<ValidWithdrawMapper, V
       validWithdraws =
           validWithdraws.stream().filter(v -> 0 == v.getStatus()).collect(Collectors.toList());
       return validateValidWithdraws(
-          name, validWithdraws, toFix(2, safetyGetDecimal(memberWithdrawLimit.getRelaxQuota())));
+              name, validWithdraws, toFix(2, safetyGetDecimal(memberWithdrawLimit.getRelaxQuota())), memberWithdrawLimit);
     }
     return passAll(name, validWithdraws, memberWithdrawLimit.getRelaxQuota());
   }
@@ -224,7 +224,7 @@ public class ValidWithdrawServiceImpl extends ServiceImpl<ValidWithdrawMapper, V
    * @return ValidateDmlBeanVo
    */
   private ValidateDmlBeanVo validateValidWithdraws(
-      String username, List<ValidWithdraw> validWithdraws, BigDecimal relaxQuota) {
+          String username, List<ValidWithdraw> validWithdraws, BigDecimal relaxQuota, MemberWithdrawLimit memberWithdrawLimit) {
     ValidateDmlBeanVo validateDmlBean = new ValidateDmlBeanVo();
     boolean allDmlPass = true;
     log.info("放宽额度：{}", relaxQuota);
@@ -275,8 +275,26 @@ public class ValidWithdrawServiceImpl extends ServiceImpl<ValidWithdrawMapper, V
             .map(ValidWithdraw::getRechMoney)
             .reduce(BigDecimal.ZERO, BigDecimal::add);
     log.info("总共需要常态打码量：{}", rechMoney);
+    //todo 提现手续费  0 只扣除优惠费用  1只收行政费用  2 不扣除全部费用 */
     // 需要扣除金额
-    // validateDmlBean.setSumAllDeduct(sumAllDeduct);
+    validateDmlBean.setSumAllDeduct(validateDmlBean.getRemainRequiredDml());
+    Integer whetherDeductAdministrationCost = memberWithdrawLimit.getWhetherDeductAdministrationCost();
+    if (ObjectUtil.equal(whetherDeductAdministrationCost, 0)) {
+      BigDecimal fee =
+              validWithdraws.stream()
+                      .map(ValidWithdraw::getDiscountDml)
+                      .reduce(BigDecimal.ZERO, BigDecimal::add);
+      log.info("扣除优惠费用：{}", fee);
+    } else if (ObjectUtil.equal(whetherDeductAdministrationCost, 1)) {
+      BigDecimal moneyRatio = memberWithdrawLimit.getAdministrationCostDeductPayMoneyRatio();
+      log.info("只收行政费用百分比：{}", moneyRatio);
+      BigDecimal multiply =
+              validateDmlBean
+                      .getRemainRequiredDml()
+                      .multiply(moneyRatio.divide(BigDecimal.valueOf(100)));
+      log.info("只收取行政费用：{}", multiply);
+      validateDmlBean.setSumAllDeduct(multiply);
+    }
     validateDmlBean.setYetWithdraw(BigDecimal.ZERO);
     List<ValidWithdrawVO> validWithdrawVo =
         BeanUtils.mapList(validWithdraws, ValidWithdrawVO.class);

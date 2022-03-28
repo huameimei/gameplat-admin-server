@@ -150,4 +150,13 @@ public interface MemberService extends IService<Member> {
    * @param dto
    */
   void updateTGClearMember(CleanAccountDTO dto);
+
+  /**
+   * 解除登录限制
+   *
+   * @param id Long
+   */
+  void releaseLoginLimit(Long id);
+
+
 }

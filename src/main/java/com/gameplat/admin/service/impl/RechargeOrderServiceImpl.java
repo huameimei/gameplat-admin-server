@@ -1,6 +1,7 @@
 package com.gameplat.admin.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -15,7 +16,6 @@ import com.gameplat.admin.constant.RechargeMode;
 import com.gameplat.admin.constant.TrueFalse;
 import com.gameplat.admin.convert.RechargeOrderConvert;
 import com.gameplat.admin.enums.BlacklistConstant.BizBlacklistType;
-import com.gameplat.admin.enums.RechargeStatus;
 import com.gameplat.admin.mapper.RechargeOrderHistoryMapper;
 import com.gameplat.admin.mapper.RechargeOrderMapper;
 import com.gameplat.admin.model.bean.*;
@@ -35,6 +35,7 @@ import com.gameplat.base.common.json.JsonUtils;
 import com.gameplat.base.common.snowflake.IdGeneratorSnowflake;
 import com.gameplat.base.common.util.DateUtil;
 import com.gameplat.common.enums.*;
+import com.gameplat.common.lang.Assert;
 import com.gameplat.common.model.bean.UserEquipment;
 import com.gameplat.common.model.bean.limit.MemberRechargeLimit;
 import com.gameplat.model.entity.DiscountType;
@@ -56,12 +57,9 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -107,6 +105,7 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
   @Autowired private MemberGrowthConfigService memberGrowthConfigService;
   @Autowired private MemberGrowthRecordService memberGrowthRecordService;
   @Autowired private MemberGrowthStatisService memberGrowthStatisService;
+  @Autowired private MessagePushService pushService;
 
   @Override
   public PageExt<RechargeOrderVO, SummaryVO> findPage(
@@ -294,6 +293,15 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
     // 更新会员充值信息
     memberInfoService.updateBalanceWithRecharge(
         memberInfo.getMemberId(), rechargeOrder.getPayAmount(), rechargeOrder.getTotalAmount());
+    String account = member.getAccount();
+
+    try {
+      log.info("===================开始推送充值成功的消息用户: {}=====================",member);
+      pushService.send(account,PushMessage.builder().channel(1).title("充值成功").build());
+      pushService.send(PushMessage.builder().channel(1).title("发送至指定频道").build());
+    }catch (Exception e){
+      log.error("=========用户充值推送消息异常========",e);
+    }
 
     // 判断充值是否计算积分
     if (TrueFalse.TRUE.getValue() != rechargeOrder.getPointFlag()) {
@@ -305,22 +313,22 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
       return;
     }
 
-    //兑换成长值
+    // 兑换成长值
     MemberGrowthConfig memberGrowthConfig = memberGrowthConfigService.getOneConfig();
     if (memberGrowthConfig.getIsEnableVip() == TrueFalse.FALSE.getValue()) {
       log.info(
-              "会员充值兑换成长值失败-未开启VIP功能开关: account={}，orderNo={},pointFlag={}",
-              rechargeOrder.getAccount(),
-              rechargeOrder.getOrderNo(),
-              rechargeOrder.getPointFlag());
+          "会员充值兑换成长值失败-未开启VIP功能开关: account={}，orderNo={},pointFlag={}",
+          rechargeOrder.getAccount(),
+          rechargeOrder.getOrderNo(),
+          rechargeOrder.getPointFlag());
       return;
     }
     if (memberGrowthConfig.getIsEnableRecharge() == TrueFalse.FALSE.getValue()) {
       log.info(
-              "会员充值兑换成长值失败-未开启充值成长计算开关： account={}，orderNo={},pointFlag={}",
-              rechargeOrder.getAccount(),
-              rechargeOrder.getOrderNo(),
-              rechargeOrder.getPointFlag());
+          "会员充值兑换成长值失败-未开启充值成长计算开关： account={}，orderNo={},pointFlag={}",
+          rechargeOrder.getAccount(),
+          rechargeOrder.getOrderNo(),
+          rechargeOrder.getPointFlag());
       return;
     }
     MemberGrowthChangeDto memberGrowthChangeDto = new MemberGrowthChangeDto();
@@ -331,8 +339,9 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
     memberGrowthChangeDto.setRemark("人工充值成长值变动");
 
     memberGrowthStatisService.changeGrowth(memberGrowthChangeDto);
-//    memberGrowthRecordService.editMemberGrowth(memberGrowthChangeDto,
-//            ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest());
+    //    memberGrowthRecordService.editMemberGrowth(memberGrowthChangeDto,
+    //            ((ServletRequestAttributes)
+    // RequestContextHolder.getRequestAttributes()).getRequest());
   }
 
   @Override
@@ -443,6 +452,12 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
   public void crossAccountCheck(UserCredential userCredential, RechargeOrder rechargeOrder)
       throws ServiceException {
     MemberRechargeLimit limit = limitInfoService.getRechargeLimit();
+    boolean isRechargeProcess =
+            BooleanEnum.YES.match(limit.getIsRechargeProcess());
+    if (isRechargeProcess && !ObjectUtil.equal(2, rechargeOrder.getStatus())) {
+      throw new ServiceException("请先受理订单:" + rechargeOrder.getOrderNo());
+    }
+
     boolean toCheck =
         BooleanEnum.NO.match(limit.getIsHandledAllowOthersOperate())
             && !userCredential.isSuperAdmin();
@@ -860,9 +875,21 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
 
   @Override
   public long getUntreatedRechargeCount() {
-    return this.lambdaQuery()
-            .eq(RechargeOrder::getMode, 1)
-            .eq(RechargeOrder::getStatus, 1).count();
+    return this.lambdaQuery().eq(RechargeOrder::getMode, 1).eq(RechargeOrder::getStatus, 1).count();
+  }
+
+  @Override
+  public void expired(Long id) {
+    RechargeOrder rechargeOrder = this.getById(id);
+    if (RechargeStatus.UNHANDLED.match(rechargeOrder.getStatus())) {
+      rechargeOrder.setStatus(RechargeStatus.CANCELLED.getValue());
+      rechargeOrder.setAuditRemarks("自动取消");
+      rechargeOrder.setAuditTime(new Date());
+
+      rechargeOrder.setAuditorAccount("系统审批");
+      rechargeOrder.setRemarks("自动取消");
+      Assert.isTrue(this.updateById(rechargeOrder), "自动取消订单:{}失败", rechargeOrder.getOrderNo());
+    }
   }
 
   /** 查询在线支付 */

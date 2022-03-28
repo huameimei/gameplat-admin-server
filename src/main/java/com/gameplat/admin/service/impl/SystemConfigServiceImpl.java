@@ -30,14 +30,17 @@ import com.gameplat.common.lang.Assert;
 import com.gameplat.common.model.bean.EmailConfig;
 import com.gameplat.model.entity.AgentContacaConfig;
 import com.gameplat.model.entity.sys.SysDictData;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.*;
 
 @Slf4j
 @Service
@@ -163,7 +166,7 @@ public class SystemConfigServiceImpl implements SystemConfigService {
       queryWrapper
           .eq(SysDictData::getDictType, dto.getDictType())
           .eq(SysDictData::getDictLabel, entry.getKey());
-      if (!dictDataService.update(sysDictData, queryWrapper)) {
+      if (!dictDataService.saveOrUpdate(sysDictData, queryWrapper)) {
         throw new ServiceException("更新配置失败!");
       }
     }

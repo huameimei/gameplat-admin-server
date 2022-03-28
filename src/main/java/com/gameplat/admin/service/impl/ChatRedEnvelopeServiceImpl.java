@@ -48,7 +48,9 @@ public class ChatRedEnvelopeServiceImpl extends ServiceImpl<ChatRedEnvelopeMappe
     if (dto.getStartTime() < System.currentTimeMillis()) {
       throw new ServiceException("开始发送时间不能早于当前时间");
     }
-    save(chatRedEnvelopeConvert.toEntity(dto));
+    ChatRedEnvelope chatRedEnvelope = chatRedEnvelopeConvert.toEntity(dto);
+    chatRedEnvelope.setLastTime(chatRedEnvelope.getStartTime());
+    save(chatRedEnvelope);
   }
 
   @Override

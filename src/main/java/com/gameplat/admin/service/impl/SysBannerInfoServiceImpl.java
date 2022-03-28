@@ -73,9 +73,7 @@ public class SysBannerInfoServiceImpl extends ServiceImpl<SysBannerInfoMapper, S
   private void validBannerInfo(SysBannerInfo sysBannerInfo) {
     if (sysBannerInfo.getType() == SysBannerInfoEnum.Type.SPORT.getValue()) {
       // 校验选择不同类型的数据判断
-      if (sysBannerInfo
-          .getBannerType()
-          .equals(configService.getValueInteger(DictDataEnum.ACTIVITY))) {
+      if (sysBannerInfo.getBannerType().equals(configService.getInteger(DictDataEnum.ACTIVITY))) {
         if (sysBannerInfo.getChildType() == null || sysBannerInfo.getChildType() == 0) {
           throw new ServiceException("活动优惠，子分类不能为空");
         }
@@ -83,7 +81,7 @@ public class SysBannerInfoServiceImpl extends ServiceImpl<SysBannerInfoMapper, S
       // 配置跳转页
       else if (sysBannerInfo
           .getBannerType()
-          .equals(configService.getValueInteger(DictDataEnum.JUMP_PAGES))) {
+          .equals(configService.getInteger(DictDataEnum.JUMP_PAGES))) {
         if (StringUtils.isBlank(sysBannerInfo.getJumpUrl())) {
           throw new ServiceException("配置跳转页，调整地址不能为空");
         }
@@ -91,7 +89,7 @@ public class SysBannerInfoServiceImpl extends ServiceImpl<SysBannerInfoMapper, S
       // 游戏分类
       else if (sysBannerInfo
           .getBannerType()
-          .equals(configService.getValueInteger(DictDataEnum.GAME_CATEGORY))) {
+          .equals(configService.getInteger(DictDataEnum.GAME_CATEGORY))) {
         //                if (StringUtils.isBlank(sysBannerInfo.getGameKind())) {
         //                    throw new ServiceException("选择游戏分类，游戏类别不能为空");
         //                }

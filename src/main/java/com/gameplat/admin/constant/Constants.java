@@ -17,6 +17,7 @@ public interface Constants {
   String SPORT_CONFIG_TYPE = "sport_config";
   String SPORT_CONFIG_CODE = "sportConfig";
   String SPORT_CONFIG_DESC = "体育配置";
+  String SQUARE_NAVIGATION ="square_navigation";
   /** 启动图 */
   String START_UP_IMAGE = "start_up_image";
   /** 个人中心 */
@@ -25,9 +26,6 @@ public interface Constants {
   String TENANT_SQUARE_SWITCH = "tenant_square_switch";
 
   String SQUARE_SWITCH = "square_switch";
-
-  /** 导航栏列表 */
-  String TENANT_NAVIGATION_LIST = "TENANT_NAVIGATION_LIST";
 
   /**场景六排序列表*/
   String LIST_SORT_CODE = "listSort";

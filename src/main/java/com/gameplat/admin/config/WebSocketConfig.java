@@ -4,6 +4,7 @@ import com.gameplat.base.common.util.StringUtils;
 import com.gameplat.security.context.UserCredential;
 import com.gameplat.security.jwt.JwtTokenUtil;
 import com.gameplat.security.manager.JwtTokenAuthenticationManager;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
@@ -32,9 +33,17 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
   @Autowired private JwtTokenAuthenticationManager tokenAuthenticationManager;
 
+
+  public static final String TOPIC_BROKER = "/topic";
+  public static final String USER_BROKER = "/user";
+  private static final String ENDPOINT = "/websocket";
+  private static final String QUEUE = "/queue";
+  private static final String APPLICATION_DESTINATION_PREFIXES = "/app";
+  private static final long[] HEARTBEAT = new long[] {10000, 10000};
+
   @Override
   public void registerStompEndpoints(StompEndpointRegistry registry) {
-    registry.addEndpoint("/websocket").setAllowedOrigins("*").withSockJS();
+    registry.addEndpoint(ENDPOINT).setAllowedOrigins("*").withSockJS();
   }
 
   @Override
@@ -45,11 +54,11 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     taskScheduler.initialize();
 
     registry
-        .enableSimpleBroker("/topic", "/queue", "/user")
-        .setHeartbeatValue(new long[] {10000, 10000})
+        .enableSimpleBroker(TOPIC_BROKER, QUEUE, USER_BROKER)
+        .setHeartbeatValue(HEARTBEAT)
         .setTaskScheduler(taskScheduler);
 
-    registry.setApplicationDestinationPrefixes("/app");
+    registry.setApplicationDestinationPrefixes(APPLICATION_DESTINATION_PREFIXES);
     registry.setUserDestinationPrefix("/user/");
   }
 
@@ -65,7 +74,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         new ChannelInterceptor() {
 
           @Override
-          public Message<?> preSend(Message<?> message, MessageChannel channel) {
+          public Message<?> preSend(@NotNull Message<?> message, @NotNull MessageChannel channel) {
             StompHeaderAccessor accessor =
                 MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
             if (accessor != null && StompCommand.CONNECT.equals(accessor.getCommand())) {

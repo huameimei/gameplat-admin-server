@@ -1,20 +1,22 @@
 package com.gameplat.admin.model.vo;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import lombok.Data;
-
 import java.io.Serializable;
 import java.util.Date;
+import lombok.Data;
 
 @Data
 public class GameKindVO implements Serializable {
 
   private Long id;
-  /** 平台编码 */
+  /** 游戏分类编码 */
   private String code;
 
-  /** 平台名称 */
+  /** 游戏分类名称 */
   private String name;
+
+  /** 游戏分类显示名称 */
+  private String showName;
 
   /** 平台编码 */
   private String platformCode;

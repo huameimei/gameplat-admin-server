@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gameplat.admin.mapper.ChatLeaderBoardMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.gameplat.model.entity.chart.ChatLeaderBoard">
+        <id column="id" property="id"/>
+        <result column="user_id" property="userId"/>
+        <result column="account" property="account"/>
+        <result column="game_id" property="gameId"/>
+        <result column="win_money" property="winMoney"/>
+        <result column="type" property="type"/>
+        <result column="room_id" property="roomId"/>
+        <result column="create_time" property="createTime"/>
+    </resultMap>
+
+    <insert id="batchAdd" parameterType="list">
+        insert into `chat_leader_board` (`user_id`, `account`, `win_money`, `game_id`, `type`, `room_id`,`create_time`)
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (
+            #{item.userId}, #{item.account}, #{item.winMoney}, #{item.gameId},#{item.type},#{item.roomId},now()
+            )
+        </foreach>
+    </insert>
+
+
+    <!--    查询彩票盈利 -->
+    <select id="slaveLottWin" resultType="com.gameplat.admin.model.vo.ChatLeaderBoardVO">
+        select user_id as userId, account, SUM(win_money) as winMoney
+        from chat_leader_board
+        where
+        game_id in
+        <foreach collection="gameIds" item="item" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+        and create_time > #{createTime}
+        and `type` = 2
+        GROUP BY account
+        ORDER BY win_money DESC
+    </select>
+
+    <!--    查询自定义开奖推送-->
+    <select id="slaveQueryPushWinReport" resultType="com.gameplat.admin.model.vo.ChatLeaderBoardVO">
+        select user_id as userId, account, SUM(win_money) as winMoney
+        from chat_leader_board
+        where game_id in
+        <foreach collection="gameIds" item="item" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+        and create_time >= #{createTime}
+        and room_id =#{roomId}
+        and `type` = 1
+        GROUP BY account
+        ORDER BY win_money DESC
+    </select>
+</mapper>

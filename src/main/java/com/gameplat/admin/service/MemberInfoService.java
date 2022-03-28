@@ -1,78 +1,64 @@
 package com.gameplat.admin.service;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.gameplat.admin.model.dto.MemberInfoAddDTO;
-import com.gameplat.admin.model.dto.MemberInfoEditDTO;
-import com.gameplat.admin.model.dto.MemberInfoQueryDTO;
-import com.gameplat.admin.model.entity.MemberInfo;
-import com.gameplat.admin.model.vo.MemberInfoVO;
+import com.gameplat.admin.model.dto.CleanAccountDTO;
+import com.gameplat.model.entity.member.MemberInfo;
+
+import java.math.BigDecimal;
 
 public interface MemberInfoService extends IService<MemberInfo> {
 
   /**
-   * 根据指定的id，获取分类的全部属性。
+   * 提现更新余额<br>
+   * 失败时，默认重试3次
    *
-   * @param id 分类id
-   * @return 分类的实体对象
-   * @throws IllegalArgumentException 如果id不是正数
+   * @param memberId Long
+   * @param amount 金额，正数
    */
-  MemberInfo findById(Long id);
+  void updateBalanceWithWithdraw(Long memberId, BigDecimal amount);
 
   /**
-   * 获取所有分类的数量。
+   * 充值更新余额<br>
+   * 失败时，默认重试3次
    *
-   * @return 数量
+   * @param memberId Long
+   * @param amount 金额，正数
    */
-  int count();
+  void updateBalanceWithRecharge(Long memberId, BigDecimal amount, BigDecimal totalAmount);
 
   /**
-   * 新增一个分类，其ID属性将自动生成或计算，并返回。 新增分类的继承关系由parent属性指定，parent为0表示该分类为一级分类。
+   * 更新余额<br>
+   * 失败时，默认重试3次
    *
-   * @param memberInfo 分类实体对象
-   * @param parent 上级分类id
-   * @throws IllegalArgumentException 如果parent所指定的分类不存在、category为null或category中存在属性为null
+   * @param memberId 会员ID
+   * @param amount 扣除传负数，增加传正数
    */
-  Long add(MemberInfo memberInfo, Long parent);
+  void updateBalance(Long memberId, BigDecimal amount);
 
   /**
-   * 该方法仅更新分类的属性，不修改继承关系，若要移动节点请使用 <code>Category.moveTo()</code>和<code>Category.moveTreeTo()</code>
+   * 获取用户彩票投注返点
    *
-   * @param memberInfo 新的对象
+   * @param account String
+   * @return BigDecimal
    */
-  void update(MemberInfo memberInfo);
+  BigDecimal findUserRebate(String account);
 
   /**
-   * 删除一个分类，原来在该分类下的子分类将被移动到该分类的父分类中， 如果此分类是一级分类，则删除后子分类将全部成为一级分类。
+   * 冻结金额退回<br>
+   * 失败时，默认重试3次
    *
-   * <p>顶级分类不可删除。
-   *
-   * @param id 要删除的分类的id
-   * @throws IllegalArgumentException 如果指定id的分类不存在
+   * @param memberId Long
+   * @param amount 金额，正数
    */
-  void delete(Long id);
+  void updateFreeze(Long memberId, BigDecimal amount);
 
   /**
-   * 删除一个分类及其所有的下级分类。
+   * 获取用户下级最大投注返点
    *
-   * <p>顶级分类不可删除。
-   *
-   * @param id 要删除的分类的id
-   * @throws IllegalArgumentException 如果指定id的分类不存在
+   * @param agentAccount String
+   * @return BigDecimal
    */
-  void deleteTree(Long id);
+  BigDecimal findUserLowerMaxRebate(String agentAccount);
 
-  /**
-   * 删除一个分类，两个表中的相关记录都删除
-   *
-   * @param id 分类id
-   */
-  void deleteBoth(Long id);
-
-  IPage<MemberInfoVO> queryPage(Page<MemberInfo> page, MemberInfoQueryDTO memberInfoQueryDto);
-
-  void save(MemberInfoAddDTO memberInfoAddDto);
-
-  void update(MemberInfoEditDTO memberInfoEditDto);
+  int updateClearGTMember(CleanAccountDTO dto);
 }

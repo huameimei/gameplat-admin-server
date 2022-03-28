@@ -1,0 +1,305 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gameplat.admin.mapper.RechargeOrderMapper">
+
+    <!--获取充值金额达标的会员账号-->
+    <select id="getSatisfyRechargeAccount" parameterType="java.lang.String" resultType="java.lang.String">
+        SELECT
+        account
+        FROM
+        (
+        SELECT
+        account
+        FROM
+        (
+        SELECT
+        t.account
+        FROM
+        (
+        SELECT
+        account,
+        sum( amount ) rechargeMoney
+        FROM
+        recharge_order
+        <where>
+            STATUS = 3
+            <if test="startTime != null and startTime != ''">
+                and create_time &gt;= #{startTime}
+            </if>
+            <if test="endTime != null and endTime != ''">
+                and create_time &lt;= #{endTime}
+            </if>
+        </where> GROUP BY member_id, account ) t WHERE rechargeMoney >= #{minRechargeAmount}
+        ) r UNION ALL
+        SELECT
+        t.account
+        FROM
+        (
+        SELECT
+        account,
+        sum( amount ) rechargeMoney
+        FROM
+        recharge_order_history
+        <where>
+            and status = 3
+            <if test="startTime != null and startTime != ''">
+                and create_time &gt;= #{startTime}
+            </if>
+            <if test="endTime != null and endTime != ''">
+                and create_time &lt;= #{endTime}
+            </if>
+        </where> group by member_id, account ) t where rechargeMoney >= #{minRechargeAmount}
+        ) ro
+        GROUP BY
+        account
+    </select>
+
+    <select id="findRechargeInfo" resultType="com.gameplat.admin.model.bean.ActivityStatisticItem">
+        SELECT
+        a.member_id as userId,
+        a.account as userName,
+        a.accumulativeRechargeAmount
+        <if test="rechargeValidAmount != null">
+            ,SUM(IFNULL( b.num, 0 )) AS accumulativeRechargeNum
+        </if>
+        FROM(
+        SELECT member_id, account, SUM(amount) accumulativeRechargeAmount
+        FROM recharge_order
+        <where>
+            <if test="payType != null and payType != ''">
+                AND mode IN (${payType})
+            </if>
+            <if test="startTime != null and startTime != ''">
+                AND create_time <![CDATA[>= ]]> #{startTime}
+            </if>
+            <if test="endTime != null and endTime != ''">
+                AND create_time <![CDATA[<= ]]> #{endTime}
+            </if>
+            AND status = 3
+        </where>
+        GROUP BY member_id ) a
+        <if test="rechargeValidAmount != null">
+            LEFT JOIN ( SELECT member_id, CASE WHEN SUM( amount ) >= #{rechargeValidAmount} THEN 1 ELSE 0 END num
+            FROM recharge_order
+            <where>
+                <if test="payType != null and payType != ''">
+                    AND mode IN (${payType})
+                </if>
+                <if test="startTime != null and startTime != ''">
+                    AND recharge_time <![CDATA[>= ]]> #{startTime}
+                </if>
+                <if test="endTime != null and endTime != ''">
+                    AND recharge_time <![CDATA[<= ]]> #{endTime}
+                </if>
+                AND status = 3
+            </where>
+            GROUP BY member_id, date_format( recharge_time, '%Y-%m-%d' )) b ON a.member_id = b.member_id
+        </if>
+        <where>
+            <if test="userIdList != null and userIdList.size > 0">
+                AND a.member_id IN
+                <foreach collection="userIdList" index="index" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="userNameList != null and userNameList.size > 0">
+                AND a.account IN
+                <foreach collection="userNameList" index="index" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+        GROUP BY a.member_id
+    </select>
+
+    <select id="findRechargeDateList" resultType="com.gameplat.admin.model.bean.ActivityStatisticItem">
+        SELECT
+        member_id userId,
+        account userName,
+        GROUP_CONCAT(DISTINCT(recharge_time)) AS rechargeTimes
+        FROM (SELECT
+        member_id,
+        account,
+        date_format( recharge_time, '%Y-%m-%d') AS recharge_time,
+        SUM(amount) AS totalAmount
+        FROM recharge_order
+        <where>
+            AND status = 3
+            <if test="userIdList != null and userIdList.size > 0">
+                AND member_id IN
+                <foreach collection="userIdList" index="index" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="userNameList != null and userNameList.size > 0">
+                AND account IN
+                <foreach collection="userNameList" index="index" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="payType != null and payType != ''">
+                AND mode IN (${payType})
+            </if>
+            <if test="startTime != null and startTime != ''">
+                AND recharge_time <![CDATA[>= ]]> #{startTime}
+            </if>
+            <if test="endTime != null and endTime != ''">
+                AND recharge_time <![CDATA[<= ]]> #{endTime}
+            </if>
+        </where>
+        GROUP BY member_id, recharge_time) AS a
+        WHERE
+        totalAmount >= #{rechargeValidAmount}
+        GROUP BY a.member_id
+    </select>
+
+    <select id="findFirstRechargeAmount" resultType="com.gameplat.admin.model.bean.ActivityStatisticItem">
+        SELECT
+        member_id userId,
+        account userName,
+        DATE_FORMAT(recharge_time,'%Y-%m-%d') AS rechargeTime,
+        amount AS firstRechargeAmount
+        FROM recharge_order
+        <where>
+            AND status = 3
+            <if test="userIdList != null and userIdList.size > 0">
+                AND member_id IN
+                <foreach collection="userIdList" index="index" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="userNameList != null and userNameList.size > 0">
+                AND account IN
+                <foreach collection="userNameList" index="index" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="payType != null and payType != ''">
+                AND mode IN (${payType})
+            </if>
+            <if test="startTime != null and startTime != ''">
+                AND recharge_time <![CDATA[>= ]]> #{startTime}
+            </if>
+            <if test="endTime != null and endTime != ''">
+                AND recharge_time <![CDATA[<= ]]> #{endTime}
+            </if>
+        </where>
+        GROUP BY member_id
+        ORDER BY recharge_time,id
+    </select>
+
+    <!--根据会员和时间获取充值次数、充值金额、充值优惠、其它优惠-->
+    <select id="getRechargeInfoByNameAndUpdateTime" resultType="com.gameplat.admin.model.vo.MemberActivationVO">
+        SELECT sum( rechargeCount ), sum( rechargeMoney ), sum( rechargeDiscounts )
+        FROM ( SELECT count( amount ) rechargeCount, sum( amount ) rechargeMoney, sum( discount_amount ) rechargeDiscounts FROM recharge_order
+                WHERE STATUS = 3
+                <if test="username != null and username != ''">
+                    and account = #{username}
+                </if>
+                <if test="beginTime != null and beginTime != ''">
+                    and update_time &gt;= #{beginTime}
+                </if>
+                <if test="endTime != null and endTime != ''">
+                    and update_time &lt;= #{endTime}
+                </if>
+                UNION ALL
+                SELECT count( amount ) rechargeCount, sum( amount ) rechargeMoney, sum( discount_amount ) rechargeDiscounts FROM recharge_order_history
+                 WHERE STATUS = 3
+                <if test="username != null and username != ''">
+                    and account = #{username}
+                </if>
+                <if test="beginTime != null and beginTime != ''">
+                    and update_time &gt;= #{beginTime}
+                </if>
+                <if test="endTime != null and endTime != ''">
+                    and update_time &lt;= #{endTime}
+                </if>) r
+    </select>
+    <!-- 获取时间段内某代理下的所有数据-->
+    <select id="getSpreadReport" resultType="com.alibaba.fastjson.JSONObject">
+        SELECT account,count(0) countSize,sum(amount) amountSum, sum(discount_amount) discountAmountSum
+        FROM recharge_order
+        WHERE
+        create_time BETWEEN #{startTime} AND #{endTime}
+        AND
+        status = 3
+        AND
+        super_path regexp concat(
+        <foreach collection="list" item="obj" open="" close="" separator=",'|',">
+            concat('^/',#{obj.agentAccount})
+        </foreach>
+        )
+        GROUP BY account
+    </select>
+
+    <select id="getRechargeForSalary" resultType="com.gameplat.admin.model.vo.SalaryRechargeVO">
+        select
+        account as account,
+        ifnull(sum(amount), 0) as rechargeAmount
+        from recharge_order
+        where DATE_FORMAT(audit_time, '%Y-%m-%d' ) BETWEEN #{startDate} AND #{endDate}
+        and `status` = 3 and ( super_path like concat('%/',#{agentName},'/%')
+        <choose>
+            <when test="isInclude != null and isInclude == 0">
+                and account != #{agentName} )
+            </when>
+            <otherwise>
+                or  account = #{agentName} )
+            </otherwise>
+        </choose>
+        group by account
+    </select>
+
+    <select id="getLeaderboard" resultType="com.gameplat.admin.model.bean.PayLeaderboard">
+        select
+        aa.interfaceName,
+        aa.interfaceCode,
+        sum(aa.totalOrderNum) as totalOrderNum,
+        sum(aa.successOrderNum) as successOrderNum,
+        sum(aa.autoSuccessOrderNum) as autoSuccessOrderNum,
+        sum(aa.autoSuccessAmount) as autoSuccessAmount,
+        sum(aa.totalAmount) as totalAmount
+        from(
+        SELECT
+        <!-- 三方接口名称 -->
+        dm.name as interfaceName,
+        <!-- 三方接口code -->
+        dm.tp_interface_code as interfaceCode,
+        <!-- 总订单数 -->
+        count( r.id ) as totalOrderNum,
+        <!-- 成功订单数 -->
+        sum(if(r.`status` = 3, 1, 0)) as successOrderNum,
+        <!-- 自动成功订单数 -->
+        sum(if(r.auditor_account = '系统审批' and r.`status` = 3, 1, 0)) as autoSuccessOrderNum,
+        <!-- 自动成功金额 -->
+        sum(if(r.auditor_account = '系统审批' and r.`status` = 3, r.amount, 0)) as autoSuccessAmount,
+        <!-- 总金额 -->
+        sum( r.amount ) as totalAmount
+        FROM
+        recharge_order r
+        LEFT JOIN tp_merchant dm ON r.tp_merchant_id = dm.id
+        LEFT JOIN tp_pay_type dt ON r.pay_type = dt.code
+        WHERE
+        r.mode = 2
+        <if test="payTypeCode != null and payTypeCode != ''">
+            and r.pay_type = #{payTypeCode}
+        </if>
+        <if test="startTime != null and startTime != ''">
+            and r.audit_time <![CDATA[>=]]> #{startTime}
+        </if>
+        <if test="endTime != null and endTime != ''">
+            and r.audit_time <![CDATA[<=]]> #{endTime}
+        </if>
+        <if test="interfaceCode != null and interfaceCode != ''">
+            and dm.tp_interface_code = #{interfaceCode}
+        </if>
+        GROUP BY
+        r.tp_merchant_id
+        ) as aa
+        <!-- 去掉空值,防止修改商户配置信息或者删除重新配置信息等其他问题操作的空数据 -->
+        where aa.interfaceName is not null and aa.interfaceCode is not null
+        <!-- 在分组统计一下,防止一个通道配置了一个在线商户 -->
+        GROUP BY aa.interfaceCode
+    </select>
+
+</mapper>

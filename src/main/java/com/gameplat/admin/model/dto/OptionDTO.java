@@ -2,16 +2,34 @@ package com.gameplat.admin.model.dto;
 
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Objects;
-import java.io.Serializable;
-import lombok.Data;
 
-@Data
+import java.io.Serializable;
+
 public class OptionDTO<T> implements Serializable {
+
   private T value;
   private String text;
 
+  public OptionDTO() {}
+
   public OptionDTO(T value, String text) {
     this.value = value;
+    this.text = text;
+  }
+
+  public T getValue() {
+    return value;
+  }
+
+  public void setValue(T value) {
+    this.value = value;
+  }
+
+  public String getText() {
+    return text;
+  }
+
+  public void setText(String text) {
     this.text = text;
   }
 

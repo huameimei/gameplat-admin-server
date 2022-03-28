@@ -1,6 +1,7 @@
 package com.gameplat.admin.service.impl;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -8,29 +9,27 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.convert.PpMerchantConvert;
-import com.gameplat.admin.dao.PpMerchantMapper;
+import com.gameplat.admin.mapper.PpMerchantMapper;
 import com.gameplat.admin.model.bean.ProxyPayMerBean;
 import com.gameplat.admin.model.dto.PpMerchantAddDTO;
 import com.gameplat.admin.model.dto.PpMerchantEditDTO;
-import com.gameplat.admin.model.entity.PpMerchant;
 import com.gameplat.admin.model.vo.PpInterfaceVO;
 import com.gameplat.admin.model.vo.PpMerchantVO;
 import com.gameplat.admin.service.PpInterfaceService;
 import com.gameplat.admin.service.PpMerchantService;
-import com.gameplat.admin.utils.EncryptUtils;
-import com.gameplat.common.exception.ServiceException;
-import com.gameplat.common.json.JsonUtils;
-import com.gameplat.security.util.SecurityUtil;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
+import com.gameplat.base.common.exception.ServiceException;
+import com.gameplat.base.common.json.JsonUtils;
+import com.gameplat.common.util.EncryptUtils;
+import com.gameplat.model.entity.pay.PpMerchant;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.Map;
 
 @Service
 @Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)
@@ -47,15 +46,19 @@ public class PpMerchantServiceImpl extends ServiceImpl<PpMerchantMapper, PpMerch
   public void update(PpMerchantEditDTO dto) {
     PpMerchant ppMerchant = this.getById(dto.getId());
     PpInterfaceVO ppInterfaceVO = ppInterfaceService.queryPpInterface(dto.getPpInterfaceCode());
-    Map<String, String> oriMerchantParameters = JsonUtils.toMapObject(ppMerchant.getParameters());
+    if (null == ppInterfaceVO) {
+      throw new ServiceException("代付接口不存在或已被删除，请删除商户重新配置");
+    }
+    Map<String, String> oriMerchantParameters =
+        JSONObject.parseObject(ppMerchant.getParameters(), Map.class);
     List<String> ppInterfaceParameters =
         JSON.parseArray(ppInterfaceVO.getParameters(), String.class);
-    Map<String, String> parametersMap = JsonUtils.toMapObject(dto.getParameters());
+    Map<String, String> parametersMap = JSONObject.parseObject(dto.getParameters(), Map.class);
     // 如果加密字段没变，过滤字段不加密,如果加密字段在原基础上修改，抛异常重新处理
     if (CollectionUtils.isNotEmpty(ppInterfaceParameters)) {
       ppInterfaceParameters.forEach(
           paramJsonStr -> {
-            Map<String, Object> config = JsonUtils.toMapObject(paramJsonStr);
+            Map<String, Object> config = JSONObject.parseObject(paramJsonStr, Map.class);
             if (config != null) {
               String key = String.valueOf(config.get("name"));
               String result = oriMerchantParameters.get(key);
@@ -73,7 +76,7 @@ public class PpMerchantServiceImpl extends ServiceImpl<PpMerchantMapper, PpMerch
           });
     }
     dto.setParameters(JsonUtils.toJson(oriMerchantParameters));
-    this.conver2PpMerchant(dto);
+    this.convert2PpMerchant(dto);
     if (!this.updateById(ppMerchantConvert.toEntity(dto))) {
       throw new ServiceException("商户信息更新失败!");
     }
@@ -81,7 +84,7 @@ public class PpMerchantServiceImpl extends ServiceImpl<PpMerchantMapper, PpMerch
 
   @Override
   public void save(PpMerchantAddDTO dto) {
-    this.conver2PpMerchant(dto);
+    this.convert2PpMerchant(dto);
     if (!this.save(ppMerchantConvert.toEntity(dto))) {
       throw new ServiceException("接口添加失败!");
     }
@@ -89,28 +92,32 @@ public class PpMerchantServiceImpl extends ServiceImpl<PpMerchantMapper, PpMerch
 
   @Override
   public void delete(Long id) {
-    this.getById(id).deleteById();
+    this.removeById(id);
   }
 
   @Override
   public PpMerchantVO getPpMerchantById(Long id) {
     PpMerchantVO ppMerchantVO = ppMerchantConvert.toVo(this.getById(id));
     // 设置限制信息
-    this.conver2MerVo(ppMerchantVO);
+    this.convert2MerVo(ppMerchantVO);
     if (null == ppMerchantVO) {
       throw new ServiceException("商户不存在!");
     }
     PpInterfaceVO ppInterfaceVO =
         ppInterfaceService.queryPpInterface(ppMerchantVO.getPpInterfaceCode());
     ppMerchantVO.setPpInterfaceVO(ppInterfaceVO);
-    Map<String, String> merchantParameters = JsonUtils.toMapObject(ppMerchantVO.getParameters());
+    if (null == ppInterfaceVO) {
+      throw new ServiceException("代付接口不存在或已被删除，请删除商户重新配置");
+    }
+    Map<String, String> merchantParameters =
+        JSONObject.parseObject(ppMerchantVO.getParameters(), Map.class);
     List<String> ppInterfaceParameters =
         JSON.parseArray(ppInterfaceVO.getParameters(), String.class);
     // 商户号秘钥等信息加密展示处理
     if (CollectionUtils.isNotEmpty(ppInterfaceParameters)) {
       ppInterfaceParameters.forEach(
           jsonStrParam -> {
-            Map<String, Object> config = JsonUtils.toMapObject(jsonStrParam);
+            Map<String, Object> config = JSONObject.parseObject(jsonStrParam, Map.class);
             if (config != null && !"0".equals(String.valueOf(config.get("encrypted")))) {
               String key = String.valueOf(config.get("name"));
               String result = EncryptUtils.summaryEncrypt(merchantParameters.get(key));
@@ -128,26 +135,23 @@ public class PpMerchantServiceImpl extends ServiceImpl<PpMerchantMapper, PpMerch
       throw new ServiceException("状态不能为空!");
     }
     LambdaUpdateWrapper<PpMerchant> update = Wrappers.lambdaUpdate();
-    update.set(PpMerchant::getStatus, status);
-    update.eq(PpMerchant::getId, id);
-    this.update(update);
+    update.set(PpMerchant::getStatus, status).eq(PpMerchant::getId, id);
+    this.update(new PpMerchant(), update);
   }
 
   @Override
-  public IPage<PpMerchantVO> queryPage(Page<PpMerchantVO> page, Integer status, String name) {
+  public IPage<PpMerchantVO> queryPage(Page<PpMerchant> page, Integer status, String name) {
     return ppMerchantMapper.findPpMerchantPage(page, status, name);
   }
 
   @Override
-  public List<PpMerchantVO> queryAllMerchant(Integer status) {
+  public List<PpMerchant> queryAllMerchant(Integer status) {
     LambdaQueryWrapper<PpMerchant> query = Wrappers.lambdaQuery();
     query.eq(PpMerchant::getStatus, status);
-    return this.list(query).stream()
-        .map(e -> ppMerchantConvert.toVo(e))
-        .collect(Collectors.toList());
+    return this.list(query);
   }
 
-  private PpMerchantAddDTO conver2PpMerchant(PpMerchantAddDTO ppMerchantAddDTO) {
+  private PpMerchantAddDTO convert2PpMerchant(PpMerchantAddDTO ppMerchantAddDTO) {
     ProxyPayMerBean merBean =
         new ProxyPayMerBean(
             ppMerchantAddDTO.getMaxLimitCash(),
@@ -157,7 +161,7 @@ public class PpMerchantServiceImpl extends ServiceImpl<PpMerchantMapper, PpMerch
     return ppMerchantAddDTO;
   }
 
-  private PpMerchantEditDTO conver2PpMerchant(PpMerchantEditDTO ppMerchantEditDTO) {
+  private PpMerchantEditDTO convert2PpMerchant(PpMerchantEditDTO ppMerchantEditDTO) {
     ProxyPayMerBean merBean =
         new ProxyPayMerBean(
             ppMerchantEditDTO.getMaxLimitCash(),
@@ -167,10 +171,11 @@ public class PpMerchantServiceImpl extends ServiceImpl<PpMerchantMapper, PpMerch
     return ppMerchantEditDTO;
   }
 
-  private void conver2MerVo(PpMerchantVO vo) {
+  public PpMerchantVO convert2MerVo(PpMerchantVO vo) {
     ProxyPayMerBean merBean = ProxyPayMerBean.conver2Bean(vo.getMerLimits());
     vo.setMaxLimitCash(merBean.getMaxLimitCash());
     vo.setMinLimitCash(merBean.getMinLimitCash());
     vo.setUserLever(merBean.getUserLever());
+    return vo;
   }
 }

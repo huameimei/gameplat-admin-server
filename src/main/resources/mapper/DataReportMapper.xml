@@ -1,0 +1,480 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gameplat.admin.mapper.DataReportMapper">
+
+
+    <!--充值数据 -->
+    <select id="findRechReport" parameterType="com.gameplat.admin.model.dto.GameRWDataReportDto" resultType="com.gameplat.admin.model.vo.GameRechDataReportVO">
+        SELECT
+            sum( bank_money + online_money + hand_rech_money ) allRechAmount,
+            count( DISTINCT account ) allRechCount,
+            sum( bank_money ) bankMoney,
+            sum( online_money ) onlineMoney,
+            sum( hand_rech_money ) handMoney,
+            sum( first_rech_money ) firstRechMoney,
+            sum( CASE WHEN first_rech_money > 0 THEN 1 ELSE 0 END ) firstRechCount,
+            sum( bank_money + online_money + hand_rech_money - first_rech_money ) secondRechMoney,
+            sum( bank_count + online_count + hand_rech_count -  (CASE WHEN first_rech_money > 0 THEN 1 ELSE 0 END)) secondRechCount,
+            sum( exception_recharge_amount ) exceptionRechAmount,
+            sum( virtual_recharge_money ) virtualRechMoney
+        FROM
+            member_rw_report
+            <where>
+                (bank_money > 0 or online_money > 0 or hand_rech_money > 0)
+                <include refid="whereSql" />
+            </where>
+
+    </select>
+
+
+    <sql id="whereSql">
+         and stat_time BETWEEN #{startTime} and #{endTime}
+        <if test="account != null and account != ''" >
+            and account = #{account}
+        </if>
+        <if test="superAccount != null and superAccount != null">
+            <choose>
+                <when test="flag != null and flag == 1">
+                    AND parent_account = #{superAccount}
+                </when>
+                <otherwise>
+                    AND super_path like concat('%',#{superAccount},'%')
+                </otherwise>
+            </choose>
+        </if>
+
+    </sql>
+
+
+
+    <sql id="whereGameSql">
+        and stat_time BETWEEN #{startTime} and #{endTime}
+        <if test="account != null and account != ''" >
+            and account = #{account}
+        </if>
+        <if test="superAccount != null and superAccount != null">
+            <choose>
+                <when test="flag != null and flag == 1">
+                    AND super_account = #{superAccount}
+                </when>
+                <otherwise>
+                    AND user_paths like concat('%',#{superAccount},'%')
+                </otherwise>
+            </choose>
+        </if>
+
+    </sql>
+
+    <select id="findRechReportNums" resultType="hashmap" >
+        SELECT
+            'a' rechCode,
+            count( DISTINCT account ) rechNum
+        FROM
+          member_rw_report
+        WHERE
+          bank_count > 0
+          <include refid="whereSql" />
+        UNION ALL
+        SELECT
+            'b' rechCode,
+            count( DISTINCT account ) rechNum
+        FROM
+          member_rw_report
+        WHERE
+          online_count > 0
+          <include refid="whereSql" />
+        UNION ALL
+        SELECT
+          'c' rechCode,
+          count( DISTINCT account ) rechNum
+        FROM
+          member_rw_report
+        WHERE
+          hand_rech_count > 0
+        <include refid="whereSql" />
+        UNION ALL
+        SELECT
+          'd' rechCode,
+          count( DISTINCT account ) rechNum
+        FROM
+          member_rw_report
+        WHERE
+          virtual_recharge_number > 0
+          <include refid="whereSql" />
+        UNION ALL
+        SELECT
+          'e' rechCode,
+          count( DISTINCT account ) rechNum
+        FROM
+          member_rw_report
+        WHERE
+          exception_recharge_amount > 0
+          <include refid="whereSql" />
+    </select>
+
+
+
+    <!--提现数据 -->
+    <select id="findWithReport" parameterType="com.gameplat.admin.model.dto.GameRWDataReportDto" resultType="com.gameplat.admin.model.vo.GameWithDataReportVO">
+        SELECT
+        sum( withdraw_money + hand_withdraw_money) allWithAmount,
+        count( DISTINCT account ) allWithCount,
+        sum( withdraw_money ) withdrawMoney,
+        sum( hand_withdraw_money ) handWithdrawMoney,
+        sum(counter_fee) counterFee,
+        sum( first_withdraw_money ) firstWithMoney,
+        sum( CASE WHEN first_withdraw_money > 0 THEN 1 ELSE 0 END ) firstWithCount,
+        sum( withdraw_money + hand_withdraw_money - first_withdraw_money ) secondWithMoney,
+        sum( withdraw_count + hand_withdraw_count  -  (CASE WHEN first_withdraw_money > 0 THEN 1 ELSE 0 END)) secondWithCount,
+        sum(third_withdraw_money) thirdWithdrawMoney,
+        sum(third_withdraw_count) thirdWithdrawCount,
+        sum( exception_withdraw_amount ) exceptionWithdrawAmount,
+        sum( virtual_withdraw_money ) virtualWithdrawMoney
+        FROM
+        member_rw_report
+        <where>
+            (withdraw_money>0 or hand_withdraw_money > 0)
+            <include refid="whereSql" />
+        </where>
+    </select>
+
+    <select id="findWithReportNums" resultType="hashmap">
+        SELECT
+          'a' withCode,
+          count( DISTINCT account ) withNum
+        FROM
+          member_rw_report
+        WHERE
+          withdraw_count > 0
+          <include refid="whereSql" />
+        UNION ALL
+        SELECT
+          'b' withCode,
+          count( DISTINCT account ) withNum
+        FROM
+          member_rw_report
+        WHERE
+          hand_withdraw_count > 0
+          <include refid="whereSql" />
+					 UNION ALL
+        SELECT
+            'c' withCode,
+            count( DISTINCT account ) withNum
+        FROM
+          member_rw_report
+        WHERE
+          exception_withdraw_amount > 0
+          <include refid="whereSql" />
+					 UNION ALL
+        SELECT
+            'd' withCode,
+            count( DISTINCT account ) withNum
+        FROM
+          member_rw_report
+        WHERE
+          virtual_withdraw_number > 0
+          <include refid="whereSql" />
+
+    </select>
+
+    <!--游戏数据 -->
+    <select id="findGameReport" parameterType="com.gameplat.admin.model.dto.GameRWDataReportDto" resultType="com.gameplat.admin.model.vo.GameBetDataReportVO">
+        select
+            game_type gameType,
+            sum(bet_amount) betAmount,
+            sum(valid_amount) validAmount,
+            sum(win_amount) winAmount,
+            sum(valid_amount+win_amount) payoutAmount,
+            count(DISTINCT account) gameNum
+        from game_bet_daily_report
+        <where>
+            <include refid="whereGameSql" />
+        </where>
+        GROUP BY game_type
+    </select>
+
+    <!--返水数据 -->
+    <select id="findGameWaterReport" parameterType="com.gameplat.admin.model.dto.GameRWDataReportDto" resultType="com.gameplat.admin.model.vo.GameWaterDataReportVO">
+        select
+          game_type gameType,
+          sum(real_rebate_money) waterAmount
+        from game_rebate_report
+        where status = 1
+         <include refid="whereGameSql" />
+         GROUP BY game_type
+    </select>
+
+    <!--游戏人数 -->
+    <select id="findGameDataUserNum" parameterType="com.gameplat.admin.model.dto.GameRWDataReportDto" resultType="string">
+        select
+            account
+        from game_bet_daily_report
+        <where>
+            <include refid="whereGameSql" />
+        </where>
+        GROUP BY account
+    </select>
+
+
+    <select id="findReportMemberRegNum" parameterType="com.gameplat.admin.model.dto.GameRWDataReportDto" resultType="integer">
+        select count(account)from member
+        where create_time BETWEEN #{startTime} and #{endTime}
+            <if test="account != null and account != ''" >
+                and account = #{account}
+            </if>
+            <if test="superAccount != null and superAccount != null">
+                <choose>
+                    <when test="flag != null and flag == 1">
+                        AND parent_name = #{superAccount}
+                    </when>
+                    <otherwise>
+                        AND super_path like concat('%',#{superAccount},'%')
+                    </otherwise>
+                </choose>
+            </if>
+    </select>
+
+    <select id="findReportMemberLogNum" parameterType="com.gameplat.admin.model.dto.GameRWDataReportDto" resultType="java.lang.Integer">
+
+        select
+          count(info.member_id)
+        from
+          member_info info
+        INNER JOIN member m on info.member_id = m.id
+            <if test="account != null and account != ''" >
+                and m.account = #{account}
+            </if>
+            <if test="superAccount != null and superAccount != null">
+                <choose>
+                    <when test="flag != null and flag == 1">
+                        AND m.parent_name = #{superAccount}
+                    </when>
+                    <otherwise>
+                        AND m.super_path like concat('%',#{superAccount},'%')
+                    </otherwise>
+                </choose>
+            </if>
+        where info.last_login_time BETWEEN #{startTime} and #{endTime}
+    </select>
+    
+    
+    <select id="findReportMemberBalance" parameterType="com.gameplat.admin.model.dto.GameRWDataReportDto" resultType="com.gameplat.admin.model.vo.AccountReportVo" >
+        select a.account account,a.balance goodMoney from ( select m.account account,CONVERT(info.balance,DECIMAL(22,2)) balance from member m INNER join
+        member_info info on m.id = info.member_id and info.balance > 0 where m.account != 'webRoot' and user_type in
+        ('M','A')
+        <if test="dto.account != null and dto.account != ''">
+            and account = #{dto.account}
+        </if>
+        <if test="dto.superAccount != null and dto.superAccount != null">
+            <choose>
+                <when test="dto.flag != null and dto.flag == 1">
+                    AND parent_name = #{dto.superAccount}
+                </when>
+                <otherwise>
+                    AND super_path like concat('%',#{dto.superAccount},'%')
+                </otherwise>
+            </choose>
+        </if>
+        ) a ORDER BY a.balance desc
+    </select>
+
+    <select id="findReportMemberBalanceCount" parameterType="com.gameplat.admin.model.dto.GameRWDataReportDto" resultType="integer" >
+        select count(a.balance) from ( select m.account account,CONVERT(info.balance,DECIMAL(22,2)) balance from member m INNER join
+        member_info info on m.id = info.member_id and info.balance > 0 where m.account != 'webRoot' and user_type in
+        ('M','A')
+        <if test="account != null and account != ''">
+            and account = #{account}
+        </if>
+        <if test="superAccount != null and superAccount != null">
+            <choose>
+                <when test="flag != null and flag == 1">
+                    AND parent_name = #{superAccount}
+                </when>
+                <otherwise>
+                    AND super_path like concat('%',#{superAccount},'%')
+                </otherwise>
+            </choose>
+        </if>
+        ) a
+    </select>
+
+
+
+    <select id="findReportMemberAllBalance" parameterType="com.gameplat.admin.model.dto.GameRWDataReportDto" resultType="BIGDECIMAL" >
+        select CONVERT(sum(info.balance),DECIMAL(22,2)) from member m  INNER  join member_info info on m.id = info.member_id and info.balance > 0 where m.account != 'webRoot' and user_type in ('M','A')
+        <if test="account != null and account != ''" >
+            and account = #{account}
+        </if>
+        <if test="superAccount != null and superAccount != null">
+            <choose>
+                <when test="flag != null and flag == 1">
+                    AND parent_name = #{superAccount}
+                </when>
+                <otherwise>
+                    AND super_path like concat('%',#{superAccount},'%')
+                </otherwise>
+            </choose>
+        </if>
+    </select>
+
+
+
+
+    <!--优惠彩金数据 -->
+    <select id="findDiscountDataReport" resultType="map">
+        SELECT
+        ifnull(CONVERT(sum( rech_discount ),DECIMAL(22,2)),0) rechDiscount,
+        ifnull(CONVERT(sum( other_discount ),DECIMAL(22,2)),0) otherDiscount
+        FROM
+        member_rw_report
+        <where>
+            (rech_discount > 0 or other_discount)
+            <include refid="whereSql" />
+        </where>
+    </select>
+
+    <!--vip彩金 -->
+    <select id="findDividendDataReport" resultType="BIGDECIMAL">
+        select
+            ifnull(sum(reword_amount),0) rewordAmount
+        from member_weal_reword
+        where
+            status = 2 and type != 5
+            and user_type in ('M','A')
+            and draw_time BETWEEN #{startTime} and #{endTime}
+        <if test="account != null and account != ''" >
+            and user_name = #{account}
+        </if>
+        <if test="superAccount != null and superAccount != null">
+            <choose>
+                <when test="flag != null and flag == 1">
+                    AND parent_name = #{superAccount}
+                </when>
+                <otherwise>
+                    AND agent_path like concat('%',#{superAccount},'%')
+                </otherwise>
+            </choose>
+        </if>
+    </select>
+
+    <select id="findActivityDataReport" resultType="BIGDECIMAL">
+        select
+        ifnull(sum(discounts_money),0) discounts_money
+        from activity_distribute
+         where
+            status = 2
+           and settlement_time BETWEEN #{startTime} and #{endTime}
+            <if test="account != null and account != ''" >
+                and username = #{account}
+            </if>
+            <if test="superAccount != null and superAccount != null">
+                <choose>
+                    <when test="flag != null and flag == 1">
+                        AND parent_name = #{superAccount}
+                    </when>
+                    <otherwise>
+                        AND agent_path like concat('%',#{superAccount},'%')
+                    </otherwise>
+                </choose>
+            </if>
+    </select>
+
+    <select id="findRedDataReport" resultType="BIGDECIMAL">
+        select
+          ifnull(sum(draw_money),0) draw_money
+        from
+          chat_red_envelope_draw
+        where status = 2 and draw_time between #{startTime} and #{endTime}
+            <if test="account != null and account != ''" >
+                and nickname = #{account}
+            </if>
+            <if test="superAccount != null and superAccount != null">
+                <choose>
+                    <when test="flag != null and flag == 1">
+                        AND parent_name = #{superAccount}
+                    </when>
+                    <otherwise>
+                        AND agent_path like concat('%',#{superAccount},'%')
+                    </otherwise>
+                </choose>
+            </if>
+    </select>
+
+
+
+    <select id="findProxyData" resultType="java.util.HashMap">
+        SELECT
+            'a' type,
+            ifnull( sum( divide_amount ), 0 ) amount,
+            count( DISTINCT account ) num
+        FROM
+            divide_summary
+        WHERE
+            STATUS = 2
+            AND create_time BETWEEN '2021-02-01 00:00:00'
+            AND '2022-04-01 00:00:00'
+            <if test="account != null and account != ''" >
+                and account = #{account}
+            </if>
+            <if test="superAccount != null and superAccount != null">
+                <choose>
+                    <when test="flag != null and flag == 1">
+                        AND parent_name = #{superAccount}
+                    </when>
+                    <otherwise>
+                        AND agent_path like concat('%',#{superAccount},'%')
+                    </otherwise>
+                </choose>
+            </if>
+
+             UNION ALL
+        SELECT
+            'b' type,
+            ifnull( sum( salary_amount ), 0 ) amount,
+            count( DISTINCT account ) num
+        FROM
+            salary_grant
+        WHERE
+            grant_status = 2
+            AND create_time BETWEEN '2021-02-01 00:00:00'
+            AND '2022-04-01 00:00:00'
+            <if test="account != null and account != ''" >
+                and account = #{account}
+            </if>
+            <if test="superAccount != null and superAccount != null">
+                <choose>
+                    <when test="flag != null and flag == 1">
+                        AND parent_name = #{superAccount}
+                    </when>
+                    <otherwise>
+                        AND super_path like concat('%',#{superAccount},'%')
+                    </otherwise>
+                </choose>
+            </if>
+        UNION ALL
+        SELECT
+            'c' type,
+            ifnull( sum( back_water_amount ), 0 ) amount,
+            count( DISTINCT user_name ) num
+        FROM
+            lottery_rebate_report
+        WHERE
+            STATUS = 1
+            AND create_time BETWEEN '2021-02-01 00:00:00'
+            AND '2022-04-01 00:00:00'
+            <if test="account != null and account != ''" >
+                and user_name = #{account}
+            </if>
+            <if test="superAccount != null and superAccount != null">
+                <choose>
+                    <when test="flag != null and flag == 1">
+                        AND parent_name = #{superAccount}
+                    </when>
+                    <otherwise>
+                        AND agent_path like concat('%',#{superAccount},'%')
+                    </otherwise>
+                </choose>
+            </if>
+    </select>
+
+</mapper>

@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gameplat.admin.mapper.MemberGrowthStatisMapper">
+
+    <resultMap type="com.gameplat.model.entity.member.MemberGrowthStatis" id="memberGrowthStatisResult">
+        <result property="id" column="id"/>
+        <result property="memberId" column="member_id"/>
+        <result property="account" column="account"/>
+        <result property="vipLevel" column="vip_level"/>
+        <result property="vipGrowth" column="vip_growth"/>
+        <result property="rechargeGrowth" column="recharge_growth"/>
+        <result property="signGrowth" column="sign_growth"/>
+        <result property="damaGrowth" column="dama_growth"/>
+        <result property="backGrowth" column="back_growth"/>
+        <result property="infoGrowth" column="info_growth"/>
+        <result property="bindGrowth" column="bind_growth"/>
+        <result property="demoteGrowth" column="demote_growth"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="createBy" column="create_by"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="remark" column="remark"/>
+    </resultMap>
+
+    <!-- 获取达到有效投注金额的会员账号 -->
+    <select id="getMemberSalaryInfo" parameterType="java.lang.Integer"
+            resultType="com.gameplat.model.entity.member.MemberWealDetail">
+        SELECT
+        gs.member_id userId,
+        gs.account userName,
+        gs.vip_level,
+        (
+        case #{type}
+        when 0 then gl.week_wage
+        when 1 then gl.month_wage
+        when 2 then gl.birth_gift_money
+        when 3 then gl.red_envelope
+        else 0 end
+        ) rewordAmount
+        FROM
+        member_growth_statis gs
+        LEFT JOIN member_growth_level gl ON gs.vip_level = gl.`level`
+        <where>
+            gs.vip_level != 0
+            <if test="type != null and type == 0">
+                AND gl.week_wage >0
+            </if>
+            <if test="type != null and type == 1">
+                AND gl.month_wage >0
+            </if>
+        </where>
+    </select>
+
+    <select id="findActivityMemberInfo" resultType="com.gameplat.admin.model.bean.ActivityMemberInfo">
+        select a.id AS userId,
+        a.status AS status,
+        a.account AS username,
+        a.user_level AS userRank,
+        i.last_login_ip AS lastLoginIp,
+        IFNULL(a.level,0) AS userLevel
+        FROM member a
+        LEFT JOIN member_info i ON a.id = i.member_id
+        <where>
+            <if test="userIdList != null and userIdList.size > 0">
+                and a.id in
+                <foreach collection="userIdList" index="index" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="userNameList != null and userNameList.size() > 0">
+                and a.account in
+                <foreach collection="userNameList" index="index" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+    </select>
+
+
+    <insert id="insertOrUpdate">
+        insert into member_growth_statis
+        (
+        <if test="memberId != null">member_id,</if>
+        <if test="account != null and account != ''">account,</if>
+        <if test="vipLevel != null">vip_level,</if>
+        <if test="vipGrowth != null">vip_growth,</if>
+        <if test="rechargeGrowth != null">recharge_growth,</if>
+        <if test="signGrowth != null">sign_growth,</if>
+        <if test="damaGrowth != null">dama_growth,</if>
+        <if test="backGrowth != null">back_growth,</if>
+        <if test="infoGrowth != null">info_growth,</if>
+        <if test="bindGrowth != null">bind_growth,</if>
+        <if test="demoteGrowth != null">demote_growth,</if>
+        <if test="createBy != null and createBy != ''">create_by,</if>
+        create_time
+        ) values (
+        <if test="memberId != null">#{memberId},</if>
+        <if test="account != null and account != ''">#{account},</if>
+        <if test="vipLevel != null">#{vipLevel},</if>
+        <if test="vipGrowth != null">#{vipGrowth},</if>
+        <if test="rechargeGrowth != null">#{rechargeGrowth},</if>
+        <if test="signGrowth != null">#{signGrowth},</if>
+        <if test="damaGrowth != null">#{damaGrowth},</if>
+        <if test="backGrowth != null">#{backGrowth},</if>
+        <if test="infoGrowth != null">#{infoGrowth},</if>
+        <if test="bindGrowth != null">#{bindGrowth},</if>
+        <if test="demoteGrowth != null">#{demoteGrowth},</if>
+        <if test="createBy != null and createBy != ''">#{createBy},</if>
+        now()
+        )
+        on duplicate key update
+        <if test="memberId != null">member_id = values(member_id),</if>
+        <if test="account != null and account != ''">account = values(account),</if>
+        <if test="vipLevel != null">vip_level = values(vip_level) + vip_level,</if>
+        <if test="vipGrowth != null">vip_growth = values(vip_growth) + vip_growth,</if>
+        <if test="rechargeGrowth != null">recharge_growth = values(recharge_growth) + recharge_growth,</if>
+        <if test="signGrowth != null">sign_growth = values(sign_growth) + sign_growth,</if>
+        <if test="damaGrowth != null">dama_growth = values(dama_growth) + dama_growth,</if>
+        <if test="backGrowth != null">back_growth = values(back_growth) + back_growth,</if>
+        <if test="infoGrowth != null">info_growth = values(info_growth) + info_growth,</if>
+        <if test="bindGrowth != null">bind_growth = values(bind_growth) + bind_growth,</if>
+        <if test="demoteGrowth != null">demote_growth = values(demote_growth) + demote_growth,</if>
+        <if test="remark != null">remark = values(remark),</if>
+        update_time = now()
+    </insert>
+</mapper>

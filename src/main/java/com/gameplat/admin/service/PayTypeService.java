@@ -5,8 +5,9 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.gameplat.admin.model.dto.PayTypeAddDTO;
 import com.gameplat.admin.model.dto.PayTypeEditDTO;
-import com.gameplat.admin.model.entity.PayType;
 import com.gameplat.admin.model.vo.PayTypeVO;
+import com.gameplat.model.entity.pay.PayType;
+
 import java.util.List;
 
 public interface PayTypeService extends IService<PayType> {
@@ -39,7 +40,7 @@ public interface PayTypeService extends IService<PayType> {
    *
    * @return List
    */
-  List<PayTypeVO> queryList();
+  List<PayTypeVO> queryList(String name);
 
   /**
    * 支付方式列表
@@ -48,4 +49,6 @@ public interface PayTypeService extends IService<PayType> {
    * @return IPage
    */
   IPage<PayType> queryPage(Page<PayType> page);
+
+  List<PayTypeVO> queryEnableVirtual();
 }

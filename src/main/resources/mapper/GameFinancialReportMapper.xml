@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gameplat.admin.mapper.GameFinancialReportMapper">
+
+    <resultMap id="GameFinancialReportVO" type="com.gameplat.admin.model.vo.GameFinancialReportVO">
+        <result property="id" column="id" />
+        <result property="customerCode" column="customer_code" />
+        <result property="statisticsTime" column="statistics_time" />
+        <result property="gameType" column="game_type" />
+        <result property="gameTypeName" column="game_type_name" />
+        <result property="gameTypeId" column="game_type_id" />
+        <result property="platformCode" column="platform_code" />
+        <result property="platformName" column="platform_name" />
+        <result property="gameKind" column="game_kind" />
+        <result property="gameName" column="game_name" />
+        <result property="validAmount" column="valid_amount" />
+        <result property="winAmount" column="win_amount" />
+        <result property="accumulateWinAmount" column="accumulate_win_amount" />
+        <result property="startTime" column="start_time" />
+        <result property="endTime" column="end_time" />
+        <result property="createTime" column="create_time" />
+        <result property="createBy" column="create_by" />
+    </resultMap>
+
+    <resultMap id="GameFinancialReport" type="com.gameplat.model.entity.report.GameFinancialReport">
+        <result property="id" column="id" />
+        <result property="customerCode" column="customer_code" />
+        <result property="statisticsTime" column="statistics_time" />
+        <result property="gameType" column="game_type" />
+        <result property="platformCode" column="platform_code" />
+        <result property="gameKind" column="game_kind" />
+        <result property="validAmount" column="valid_amount" />
+        <result property="winAmount" column="win_amount" />
+        <result property="accumulateWinAmount" column="accumulate_win_amount" />
+        <result property="startTime" column="start_time" />
+        <result property="endTime" column="end_time" />
+        <result property="createTime" column="create_time" />
+        <result property="createBy" column="create_by" />
+    </resultMap>
+
+    <select id="findGameFinancialReportList" resultMap="GameFinancialReportVO">
+        select
+        a.id,
+        a.statistics_time,
+        a.customer_code,
+        a.game_kind,
+        a.valid_amount,
+        a.win_amount,
+        a.accumulate_win_amount,
+        a.game_type,
+        a.start_time,
+        a.end_time,
+        a.create_time,
+        a.create_by,
+        b.name game_name,
+        c.name platform_name,
+        d.game_type_name,
+        d.id game_type_id
+        from game_financial_report a
+        left join game_kind as b on a.game_kind = b.code
+        left join game_platform as c on a.platform_code = c.code
+        left join game_type as d on a.game_type = d.game_type_code
+        <where>
+            <if test="statisticsTime != null and statisticsTime != ''">
+                and a.statistics_time = #{statisticsTime}
+            </if>
+            <if test="gameType != null and gameType != ''">
+                and a.game_type = #{gameType}
+            </if>
+            <if test="platformCode != null and platformCode != ''">
+                and a.platform_code = #{platformCode}
+            </if>
+        </where>
+    </select>
+
+    <select id="findGameFinancialReportPage" resultMap="GameFinancialReportVO">
+        select
+        a.id,
+        a.statistics_time,
+        a.customer_code,
+        a.game_kind,
+        a.valid_amount,
+        a.win_amount,
+        a.accumulate_win_amount,
+        a.game_type,
+        a.start_time,
+        a.end_time,
+        a.create_time,
+        a.create_by,
+        b.name game_name,
+        c.name platform_name,
+        d.game_type_name,
+        d.id game_type_id
+        from game_financial_report a
+        left join game_kind as b on a.game_kind = b.code
+        left join game_platform as c on a.platform_code = c.code
+        left join game_type as d on a.game_type = d.game_type_code
+        <where>
+            <if test="dto.statisticsTime != null and dto.statisticsTime != ''">
+                and a.statistics_time = #{dto.statisticsTime}
+            </if>
+            <if test="dto.gameType != null and dto.gameType != ''">
+                and a.game_type = #{dto.gameType}
+            </if>
+            <if test="dto.platformCode != null and dto.platformCode != ''">
+                and a.platform_code = #{dto.platformCode}
+            </if>
+        </where>
+        order by d.id
+    </select>
+
+    <select id="initGameFinancialReport" resultMap="GameFinancialReport">
+        SELECT
+        #{statisticsTime} statistics_time,
+        #{customerCode} customer_code,
+        g.code game_kind,
+        g.platform_code,
+        g.game_type,
+        #{startTime} start_time,
+        #{endTime} end_time
+        FROM game_kind g
+        where
+        status in (1,2)
+    </select>
+
+</mapper>

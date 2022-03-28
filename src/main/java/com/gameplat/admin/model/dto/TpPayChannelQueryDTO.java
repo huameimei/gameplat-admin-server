@@ -1,8 +1,9 @@
 package com.gameplat.admin.model.dto;
 
+import lombok.Data;
+
 import java.io.Serializable;
 import java.util.List;
-import lombok.Data;
 
 @Data
 public class TpPayChannelQueryDTO implements Serializable {
@@ -13,5 +14,5 @@ public class TpPayChannelQueryDTO implements Serializable {
 
   private String payType;
 
-  private List<String> userLevelList;
+  private List<String> memberLevelList;
 }

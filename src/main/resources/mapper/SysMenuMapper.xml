@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.gameplat.admin.mapper.SysMenuMapper">
+
+  <delete id="deleteMenuByIds" parameterType="Long">
+    DELETE FROM sys_menu WHERE menu_id IN
+    <foreach close=")" collection="array" item="ids" open="(" separator=",">
+      #{ids}
+    </foreach>
+
+  </delete>
+
+  <insert id="insertMenu" parameterType="com.gameplat.model.entity.sys.SysMenu">
+    INSERT INTO sys_menu(
+    <if test="menuId != null and menuId != 0">menu_id,</if>
+    <if test="parentId != null and parentId != 0">parent_id,</if>
+    <if test="parentName != null and parentName != ''">parent_name,</if>
+    <if test="menuName != null and menuName != ''">menu_name,</if>
+    <if test="title != null and title != ''">title,</if>
+    <if test="menuSort != null and menuSort != ''">menu_sort,</if>
+    <if test="component != null and component != ''">component,</if>
+    <if test="path != null and path != ''">`path`,</if>
+    <if test="url != null and url != ''">url,</if>
+    <if test="menuType != null and menuType != ''">menu_type,</if>
+    <if test="visible != null and visible != 0">visible,</if>
+    <if test="iFrame != null and iFrame != 0">i_frame,</if>
+    <if test="cacheFlag != null and cacheFlag != 0">cache_flag,</if>
+    <if test="perms !=null and perms != ''">perms,</if>
+    <if test="icon != null and icon != ''">icon,</if>
+    <if test="status != null and status != -1">status,</if>
+    <if test="remark != null and remark != ''">remark,</if>
+    <if test="createBy != null and createBy != ''">create_by,</if>
+    create_time
+    ) VALUES (
+    <if test="menuId != null and menuId != 0">#{menuId},</if>
+    <if test="parentId != null and parentId != 0">#{parentId},</if>
+    <if test="parentName != null and parentName != ''">#{parentName},</if>
+    <if test="menuName != null and menuName != ''">#{menuName},</if>
+    <if test="title != null and title != ''">#{title},</if>
+    <if test="menuSort != null and menuSort != ''">#{menuSort},</if>
+    <if test="component != null and component != ''">#{component},</if>
+    <if test="path != null and path != ''">#{path},</if>
+    <if test="url != null and url != ''">#{url},</if>
+    <if test="menuType != null and menuType != ''">#{menuType},</if>
+    <if test="visible != null and visible != 0">#{visible},</if>
+    <if test="iFrame != null and iFrame != 0">#{iFrame},</if>
+    <if test="cacheFlag != null and cacheFlag != 0">#{cacheFlag},</if>
+    <if test="perms !=null and perms != ''">#{perms},</if>
+    <if test="icon != null and icon != ''">#{icon},</if>
+    <if test="status != null and status != -1">#{status},</if>
+    <if test="remark != null and remark != ''">#{remark},</if>
+    <if test="createBy != null and createBy != ''">#{createBy},</if>
+    sysdate()
+    )
+  </insert>
+
+  <resultMap id="SysMenuResult" type="com.gameplat.model.entity.sys.SysMenu">
+    <id column="menu_id" property="menuId"/>
+    <result column="menu_name" property="menuName"/>
+    <result column="title" property="title"/>
+    <result column="parent_id" property="parentId"/>
+    <result column="parent_name" property="parentName"/>
+    <result column="menu_sort" property="menuSort"/>
+    <result column="component" property="component"/>
+    <result column="path" property="path"/>
+    <result column="url" property="url"/>
+    <result column="menu_type" property="menuType"/>
+    <result column="visible" property="visible"/>
+    <result column="i_frame" property="iFrame"/>
+    <result column="cache_flag" property="cacheFlag"/>
+    <result column="perms" property="perms"/>
+    <result column="icon" property="icon"/>
+    <result column="status" property="status"/>
+    <result column="create_by" property="createBy"/>
+    <result column="create_time" property="createTime"/>
+    <result column="update_time" property="updateTime"/>
+    <result column="update_by" property="updateBy"/>
+    <result column="remark" property="remark"/>
+  </resultMap>
+
+  <select id="selectMenusByUserId" parameterType="Long" resultMap="SysMenuResult">
+    SELECT DISTINCT m.menu_id,
+                    m.parent_id,
+                    m.menu_name,
+                    m.title,
+                    m.component,
+                    m.path,
+                    m.url,
+                    m.visible,
+                    i_frame,
+                    m.menu_sort,
+                    cache_flag,
+                    ifnull(m.perms, '') as perms,
+                    m.menu_type,
+                    m.icon,
+                    m.status,
+                    m.create_time
+    FROM sys_menu m
+           LEFT JOIN sys_role_menu rm ON m.menu_id = rm.menu_id
+           left join sys_user_role ur ON rm.role_id = ur.role_id
+           LEFT JOIN sys_role ro ON ur.role_id = ro.role_id
+    WHERE ur.user_id = #{userId}
+      AND m.menu_type IN ('M', 'C', 'F')
+      AND m.visible = 0
+      AND ro.status = 1
+    ORDER BY m.parent_id, m.menu_sort
+  </select>
+
+  <select id="selectMenuAll" resultMap="SysMenuResult">
+    <include refid="selectMenuVo"/>
+    ORDER BY parent_id, menu_sort
+  </select>
+
+  <select id="selectMenuNormalAll" resultMap="SysMenuResult">
+    SELECT DISTINCT m.menu_id,
+                    m.parent_id,
+                    m.menu_name,
+                    m.title,
+                    m.component,
+                    m.path,
+                    m.url,
+                    m.visible,
+                    i_frame,
+                    cache_flag,
+                    ifnull(m.perms, '') as perms,
+                    m.menu_type,
+                    m.icon,
+                    m.menu_sort,
+                    m.create_time
+    FROM sys_menu m
+    WHERE m.menu_type IN ('M', 'C', 'F')
+      AND m.visible = 0
+    ORDER BY m.parent_id, m.menu_sort
+  </select>
+
+  <select id="selectPermsByUserId" parameterType="Long" resultType="String">
+    SELECT DISTINCT m.perms
+    FROM sys_menu m
+           LEFT JOIN sys_role_menu rm ON m.menu_id = rm.menu_id
+           LEFT JOIN sys_user_role ur ON rm.role_id = ur.role_id
+           LEFT JOIN sys_role r ON r.role_id = ur.role_id
+    WHERE m.visible = 0
+      AND r.status = 1
+      AND ur.user_id = #{userId}
+  </select>
+
+  <select id="selectMenuTree" parameterType="Long" resultType="String">
+    SELECT concat(m.menu_id, ifnull(m.perms, '')) AS perms
+    FROM sys_menu m
+           LEFT JOIN sys_role_menu rm ON m.menu_id = rm.menu_id
+    WHERE rm.role_id = #{roleId}
+    ORDER BY m.parent_id, m.menu_sort
+  </select>
+
+  <select id="selectMenuList" parameterType="com.gameplat.model.entity.sys.SysMenu"
+    resultMap="SysMenuResult">
+    <include refid="selectMenuVo"/>
+    <where>
+      <if test="menuName != null and menuName != ''">
+        AND menu_name LIKE concat('%', #{menuName}, '%')
+      </if>
+      <if test="visible != null">
+        AND visible = #{visible}
+      </if>
+    </where>
+    ORDER BY parent_id, menu_sort
+  </select>
+
+  <select id="checkMenuNameUnique" parameterType="com.gameplat.model.entity.sys.SysMenu"
+    resultMap="SysMenuResult">
+    <include refid="selectMenuVo"/>
+    WHERE menu_name = #{menuName} AND parent_id = #{parentId}
+  </select>
+
+  <select id="getPermissionsByUserId" parameterType="java.lang.Long" resultType="java.lang.String">
+    SELECT DISTINCT t5.perms
+    FROM sys_user t1
+           LEFT JOIN sys_user_role t2 ON t1.user_id = t2.user_id
+           LEFT JOIN sys_role t3 ON t3.role_id = t2.role_id
+           LEFT JOIN sys_role_menu t4 ON t4.role_id = t3.role_id
+           LEFT JOIN sys_menu t5 ON t5.menu_id = t4.menu_id
+    WHERE t5.menu_type != 'M'
+          AND t1.user_id = #{userId}
+  </select>
+
+  <sql id="selectMenuVo">
+    SELECT menu_id,
+           menu_name,
+           title,
+           parent_id,
+           parent_name,
+           menu_sort,
+           component,
+           `path`,
+           url,
+           menu_type,
+           visible,
+           i_frame,
+           cache_flag,
+           ifnull(perms, '') AS perms,
+           icon,
+           status,
+           create_by,
+           create_time
+    FROM sys_menu
+  </sql>
+
+  <update id="updateMenu" parameterType="com.gameplat.model.entity.sys.SysMenu">
+    UPDATE sys_menu
+    <set>
+      <if test="menuName != null and menuName != ''">menu_name = #{menuName},</if>
+      <if test="title != null and title != ''">title = #{title},</if>
+      <if test="parentName != null and parentName != ''">parent_name = #{parentName},</if>
+      <if test="parentId != null and parentId != 0">parent_id = #{parentId},</if>
+      <if test="parentName != null and parentName != ''">parent_name = #{parentName},</if>
+      <if test="menuSort != null and menuSort != ''">menu_sort = #{menuSort},</if>
+      <if test="component != null and component != ''">component = #{component},</if>
+      <if test="path != null and path != ''">path = #{path},</if>
+      <if test="url != null and url != ''">url = #{url},</if>
+      <if test="menuType != null and menuType != ''">menu_type = #{menuType},</if>
+      <if test="visible != null and visible != 0">visible = #{visible},</if>
+      <if test="iFrame != null and iFrame != 0">i_frame = #{iFrame},</if>
+      <if test="cacheFlag != null and cacheFlag != 0">cache_flag = #{cacheFlag},</if>
+      <if test="perms !=null">perms = #{perms},</if>
+      <if test="icon !=null and icon != ''">icon = #{icon},</if>
+      <if test="status != null and status != -1">status = #{status},</if>
+      <if test="remark != null">remark = #{remark},</if>
+      <if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
+      update_time = sysdate()
+    </set>
+    WHERE menu_id = #{menuId}
+  </update>
+
+</mapper>

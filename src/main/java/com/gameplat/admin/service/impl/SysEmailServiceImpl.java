@@ -1,39 +1,82 @@
 package com.gameplat.admin.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.alibaba.csp.sentinel.annotation.SentinelResource;
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.core.toolkit.Wrappers;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.gameplat.admin.convert.SysEmailConvert;
-import com.gameplat.admin.dao.SysEmailMapper;
-import com.gameplat.admin.model.dto.SysEmailQueryDTO;
-import com.gameplat.admin.model.entity.SysEmail;
-import com.gameplat.admin.model.vo.SysEmailVO;
+import com.gameplat.admin.convert.EmailConvert;
+import com.gameplat.admin.mapper.SysEmailMapper;
+import com.gameplat.admin.model.dto.EmailDTO;
+import com.gameplat.admin.model.dto.OperEmailDTO;
+import com.gameplat.admin.model.vo.EmailVO;
 import com.gameplat.admin.service.SysEmailService;
-import org.apache.commons.lang.StringUtils;
+import com.gameplat.base.common.exception.ServiceException;
+import com.gameplat.model.entity.sys.SysEmail;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 
-/** @author Lenovo */
+import java.util.Date;
+
+/**
+ * 邮件记录 服务实现层
+ *
+ * @author three
+ */
+@Deprecated
 @Service
+@Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)
 public class SysEmailServiceImpl extends ServiceImpl<SysEmailMapper, SysEmail>
     implements SysEmailService {
 
-  @Autowired private SysEmailConvert sysEmailConvert;
+  @Autowired private SysEmailMapper emailMapper;
+
+  @Autowired private EmailConvert emailConvert;
 
   @Override
-  public IPage<SysEmailVO> queryPage(Page<SysEmail> page, SysEmailQueryDTO queryDto) {
-    LambdaQueryWrapper<SysEmail> query = Wrappers.lambdaQuery();
-    if (StringUtils.isNotBlank(queryDto.getTitle())) {
-      query.like(SysEmail::getTitle, queryDto.getTitle());
+  @SentinelResource(value = "selectEmailList")
+  public IPage<EmailVO> selectEmailList(IPage<SysEmail> page, EmailDTO emailDTO) {
+    return this.lambdaQuery()
+        .eq(ObjectUtils.isNotEmpty(emailDTO.getTitle()), SysEmail::getTitle, emailDTO.getTitle())
+        .eq(ObjectUtils.isNotNull(emailDTO.getStatus()), SysEmail::getStatus, emailDTO.getStatus())
+        .eq(
+            ObjectUtils.isNotNull(emailDTO.getEmailType()),
+            SysEmail::getEmailType,
+            emailDTO.getEmailType())
+        .between(
+            ObjectUtils.isNotEmpty(emailDTO.getBeginTime()),
+            SysEmail::getCreateTime,
+            emailDTO.getBeginTime(),
+            emailDTO.getEndTime())
+        .orderByDesc(SysEmail::getCreateTime)
+        .page(page)
+        .convert(emailConvert::toVo);
+  }
+
+  @Override
+  @SentinelResource(value = "insertEmail")
+  public void insertEmail(OperEmailDTO emailDTO) {
+    SysEmail email = emailConvert.toEntity(emailDTO);
+    email.setCreateTime(new Date());
+    if (!this.save(email)) {
+      throw new ServiceException("添加邮件失败");
     }
-    if (queryDto.getType() != null) {
-      query.eq(SysEmail::getType, queryDto.getType());
+  }
+
+  @Override
+  @SentinelResource(value = "updateEmail")
+  public void updateEmail(OperEmailDTO emailDTO) {
+    SysEmail email = emailConvert.toEntity(emailDTO);
+    email.setUpdateTime(new Date());
+    if (!this.updateById(email)) {
+      throw new ServiceException("修改邮件失败");
     }
-    if (queryDto.getStatus() != null) {
-      query.eq(SysEmail::getStatus, queryDto.getStatus());
-    }
-    return this.page(page, query).convert(sysEmailConvert::toVo);
+  }
+
+  @Override
+  @SentinelResource(value = "cleanEmail")
+  public void cleanEmail() {
+    emailMapper.clean();
   }
 }

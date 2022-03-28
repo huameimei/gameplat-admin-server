@@ -1,12 +1,15 @@
 package com.gameplat.admin.model.dto;
 
 import com.alibaba.fastjson.JSON;
-import com.gameplat.common.model.entity.BaseEntity;
-import java.io.Serializable;
 import lombok.Data;
 
+import java.io.Serializable;
+import java.math.BigDecimal;
+
 @Data
-public class TpPayChannelEditDTO extends BaseEntity {
+public class TpPayChannelEditDTO implements Serializable {
+
+  private Long id;
 
   private String name;
 
@@ -14,7 +17,7 @@ public class TpPayChannelEditDTO extends BaseEntity {
 
   private String tpPayType;
 
-  private String userLevels;
+  private String memberLevels;
 
   private String remarks;
 
@@ -26,7 +29,7 @@ public class TpPayChannelEditDTO extends BaseEntity {
 
   private Long rechargeTimes;
 
-  private Long rechargeAmount;
+  private BigDecimal rechargeAmount;
 
   private String limitInfo;
 
@@ -36,7 +39,7 @@ public class TpPayChannelEditDTO extends BaseEntity {
   private Integer limitStatus;
 
   /** 通道金额收款上限 */
-  private Long limitAmount;
+  private BigDecimal limitAmount;
 
   /** 通道时间设置标识，0为启用时间设置，1位禁用时间设置 */
   private Integer channelTimeStatus;
@@ -51,16 +54,18 @@ public class TpPayChannelEditDTO extends BaseEntity {
   private String channelShows;
 
   /** 通道单笔金额金额最小值 */
-  private Long minAmountPerOrder;
+  private BigDecimal minAmountPerOrder;
 
   /** 通道单笔金额金额最小值 */
-  private Long maxAmountPerOrder;
+  private BigDecimal maxAmountPerOrder;
 
   /** 通道风控金额类型 0.任何金额 1.浮动金额 2.固定金额 3浮动固定金额 */
   private Integer riskControlType;
 
   /** 风控值 */
   private String riskControlValue;
+
+  private Integer typeSubscript;
 
   @Override
   public String toString() {

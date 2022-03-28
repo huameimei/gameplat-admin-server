@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gameplat.admin.mapper.SpreadLinkInfoMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.gameplat.model.entity.spread.SpreadLinkInfo">
+        <id column="id" property="id"/>
+        <id column="agent_id" property="agentId"/>
+        <id column="agent_account" property="agentAccount"/>
+        <id column="code" property="code"/>
+        <id column="external_url" property="externalUrl"/>
+        <id column="spread_type" property="spreadType"/>
+        <id column="exclusive_flag" property="exclusiveFlag"/>
+        <id column="user_type" property="userType"/>
+        <id column="user_level" property="userLevel"/>
+        <id column="effective_days" property="effectiveDays"/>
+        <id column="visit_count" property="visitCount"/>
+        <id column="regist_count" property="registCount"/>
+        <id column="rebate" property="rebate"/>
+        <id column="discount_amount" property="discountAmount"/>
+        <id column="status" property="status"/>
+        <id column="is_open_divide_preset" property="isOpenDividePreset"/>
+        <id column="divide_config" property="divideConfig"/>
+        <result property="createTime" column="create_time"/>
+        <result property="createBy" column="create_by"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="remark" column="remark"/>
+    </resultMap>
+
+    <select id="getTeamLinkInfo" resultType="com.gameplat.admin.model.vo.SpreadLinkInfoVo">
+        SELECT
+        sl.`id`,
+        sl.`agent_account` as agentAccount,
+        sl.`code`,
+        sl.`external_url` as externalUrl,
+        sl.`spread_type` as spreadType,
+        sl.`exclusive_flag` as exclusiveFlag,
+        sl.`user_type` as userType,
+        sl.`user_level` as userLevel,
+        sl.`effective_days` as effectiveDays,
+        sl.`visit_count` as visitCount,
+        sl.`regist_count` as registCount,
+        sl.`rebate`,
+        sl.`discount_amount` as discountAmount,
+        sl.`status`,
+        sl.`is_open_divide_preset` as isOpenDividePreset,
+        sl.`divide_config` as divideConfig,
+        sl.`create_by` as createBy,
+        sl.`create_time` as createTime,
+        sl.`update_by` as updateBy,
+        sl.`update_time` as updateTime,
+        sl.`remark`,
+        m.`super_path` as superPath,
+        m.`agent_level` as agentLevel
+        FROM `spread_link_info` as sl inner join `member` as m on sl.agent_account = m.account
+        <where>
+            <if test="agentAccount != null and agentAccount != ''">
+                m.parent_name = #{agentAccount}
+            </if>
+        </where>
+    </select>
+
+    <select id="getlinkMaxDivideRatio" parameterType="string" resultType="java.math.BigDecimal">
+        select IFNULL(max(maxRatio), 0) as minRatio
+        from (
+                 select JSON_UNQUOTE(
+                                json_extract(
+                                        json_extract(
+                                                sl.divide_config, CONCAT('$.', concat('"', concat(#{code}, '"')))),
+                                        CONCAT('$.', concat('"', concat('divideRatio', '"'))
+                                            )
+                                    )
+                            ) AS maxRatio
+                 from spread_link_info sl
+                 where sl.agent_account = #{userName}
+                   and sl.divide_config != '' and sl.user_type = 1
+            and sl.divide_config is not null
+             ) tmp
+    </select>
+</mapper>

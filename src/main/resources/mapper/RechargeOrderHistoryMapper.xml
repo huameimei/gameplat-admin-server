@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gameplat.admin.mapper.RechargeOrderHistoryMapper">
+
+
+    <select id="findIp" parameterType="com.gameplat.admin.model.dto.QueryIpStatReportDTO"
+            resultType="com.gameplat.admin.model.vo.IpStatisticsVO">
+        select
+        ip_address as loginIp,
+        count(1) as frequency
+        from recharge_order_history
+        where 1=1
+        <if test="ip != null">
+            and ip_address = #{ip}
+        </if>
+        <if test="beginDate != null and beginDate != ''">
+            and date_format(create_time,'%y%m%d') <![CDATA[ >= ]]> date_format(#{beginDate},'%y%m%d')
+        </if>
+        <if test="endDate != null and endDate != ''">
+            and date_format(create_time,'%y%m%d') <![CDATA[ <= ]]> date_format(#{endDate},'%y%m%d')
+        </if>
+        group by ip_address
+        <if test="count != null and count != ''">
+            having count(1) >= #{count}
+        </if>
+        ORDER BY create_Time desc
+    </select>
+
+    <!--   充值IP分析  -->
+    <select id="page" parameterType="com.gameplat.admin.model.dto.IpAnalysisDTO"
+            resultType="com.gameplat.admin.model.vo.IpAnalysisVO">
+        SELECT
+        distinct member_id as memberId,
+        account,
+        nickname fullName,
+        ip_address as ipAddress,
+        balance money,
+        (select count(COALESCE(ip_address,'null')) from recharge_order_history where 1=1 and ip_address = ipAddress)
+        ipCount
+        from recharge_order_history
+        WHERE 1 = 1
+        <if test="dto.account != null">and account = #{dto.account}</if>
+        <if test="dto.loginIp != null">and ip_address = #{dto.loginIp}</if>
+        <if test="dto.beginTime != null and dto.beginTime != ''">
+            and date_format(create_time,'%y%m%d') <![CDATA[ >= ]]> date_format(#{dto.beginTime},'%y%m%d')
+        </if>
+        <if test="dto.endTime != null and dto.endTime != ''">
+            and date_format(create_time,'%y%m%d') <![CDATA[ <= ]]> date_format(#{dto.endTime},'%y%m%d')
+        </if>
+        group by member_id, ip_address
+        order by member_id desc, create_time desc
+    </select>
+</mapper>

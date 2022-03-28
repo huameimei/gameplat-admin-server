@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <groupId>org.springframework.boot</groupId>
@@ -9,7 +9,7 @@
     </parent>
 
     <groupId>com.gameplat</groupId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1-0-0-SNAPSHOT</version>
     <modelVersion>4.0.0</modelVersion>
     <packaging>jar</packaging>
     <name>gameplat-admin-server</name>
@@ -21,9 +21,12 @@
         <maven.compiler.target>8</maven.compiler.target>
         <spring-cloud.version>Hoxton.SR8</spring-cloud.version>
         <spring-cloud-alibaba.version>2.2.5.RELEASE</spring-cloud-alibaba.version>
-        <gameplat-dependencies.version>0.0.1-SNAPSHOT</gameplat-dependencies.version>
+        <gameplat-dependencies.version>1-0-0-SNAPSHOT</gameplat-dependencies.version>
         <org.mapstruct.version>1.4.2.Final</org.mapstruct.version>
-        <poi.version>3.17</poi.version>
+        <gameplat-common.version>1-0-0-SNAPSHOT</gameplat-common.version>
+        <gameplat-common-game.version>1-0-0-SNAPSHOT</gameplat-common-game.version>
+        <gameplat-model.version>1-0-0-SNAPSHOT</gameplat-model.version>
+        <easy-poi.version>4.4.0</easy-poi.version>
     </properties>
 
     <dependencyManagement>
@@ -67,27 +70,17 @@
 
         <dependency>
             <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-openfeign</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-stream-binder-kafka</artifactId>
         </dependency>
 
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-cache</artifactId>
-        </dependency>
-
-        <dependency>
             <groupId>com.gameplat</groupId>
-            <artifactId>web-spring-boot-starter</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>com.gameplat</groupId>
-            <artifactId>log-spring-boot-starter</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>com.gameplat</groupId>
-            <artifactId>rocketmq-spring-boot-starter</artifactId>
+            <artifactId>log-stream-spring-boot-starter</artifactId>
         </dependency>
 
         <dependency>
@@ -97,7 +90,7 @@
 
         <dependency>
             <groupId>com.gameplat</groupId>
-            <artifactId>datasource-tenant-manage-spring-boot-starter</artifactId>
+            <artifactId>datasource-standalone-spring-boot-starter</artifactId>
         </dependency>
 
         <dependency>
@@ -112,31 +105,35 @@
 
         <dependency>
             <groupId>com.gameplat</groupId>
-            <artifactId>common-spring-boot-starter</artifactId>
+            <artifactId>web-spring-boot-starter</artifactId>
         </dependency>
 
         <dependency>
-            <groupId>org.apache.poi</groupId>
-            <artifactId>poi</artifactId>
-            <version>${poi.version}</version>
+            <groupId>com.gameplat</groupId>
+            <artifactId>elasticsearch-spring-boot-starter</artifactId>
         </dependency>
 
         <dependency>
-            <groupId>org.apache.poi</groupId>
-            <artifactId>poi-ooxml</artifactId>
-            <version>${poi.version}</version>
+            <groupId>com.gameplat</groupId>
+            <artifactId>gameplat-model</artifactId>
+            <version>${gameplat-model.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-websocket</artifactId>
         </dependency>
 
         <!-- easypoi -->
         <dependency>
             <groupId>cn.afterturn</groupId>
             <artifactId>easypoi-spring-boot-starter</artifactId>
-            <version>4.3.0</version>
+            <version>${easy-poi.version}</version>
         </dependency>
 
         <dependency>
-            <groupId>cn.hutool</groupId>
-            <artifactId>hutool-all</artifactId>
+            <groupId>com.github.xiaoymin</groupId>
+            <artifactId>knife4j-spring-boot-starter</artifactId>
         </dependency>
 
         <dependency>
@@ -144,6 +141,11 @@
             <artifactId>json-lib</artifactId>
             <version>2.4</version>
             <classifier>jdk15</classifier>
+        </dependency>
+
+        <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-sentinel</artifactId>
         </dependency>
 
         <!-- SpringBoot集成quartz定時任務 -->
@@ -155,14 +157,85 @@
         <dependency>
             <groupId>com.gameplat</groupId>
             <artifactId>gameplat-common</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>${gameplat-common.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.gameplat</groupId>
+            <artifactId>gameplat-common-game</artifactId>
+            <version>${gameplat-common-game.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.gameplat</groupId>
+            <artifactId>base-pay-spring-boot-starter</artifactId>
         </dependency>
 
         <dependency>
             <groupId>org.mapstruct</groupId>
             <artifactId>mapstruct</artifactId>
             <version>${org.mapstruct.version}</version>
-            <scope>compile</scope>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mapstruct</groupId>
+            <artifactId>mapstruct-processor</artifactId>
+            <version>${org.mapstruct.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mapstruct</groupId>
+            <artifactId>mapstruct-jdk8</artifactId>
+            <version>${org.mapstruct.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>de.siegmar</groupId>
+            <artifactId>logback-gelf</artifactId>
+            <version>3.0.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.github.openfeign</groupId>
+            <artifactId>feign-okhttp</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.squareup.okhttp3</groupId>
+            <artifactId>okhttp</artifactId>
+            <version>4.9.3</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.github.openfeign</groupId>
+            <artifactId>feign-jackson</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>dev.samstevens.totp</groupId>
+            <artifactId>totp-spring-boot-starter</artifactId>
+            <version>1.7.1</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jxls</groupId>
+            <artifactId>jxls-poi</artifactId>
+            <version>2.11.0</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.jxls</groupId>
+                    <artifactId>jxls</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>net.sf.jxls</groupId>
+            <artifactId>jxls-core</artifactId>
+            <version>1.0.6</version>
         </dependency>
     </dependencies>
 
@@ -183,9 +256,9 @@
             </properties>
         </profile>
         <profile>
-            <id>test</id>
+            <id>sit</id>
             <properties>
-                <profiles.active>test</profiles.active>
+                <profiles.active>sit</profiles.active>
             </properties>
         </profile>
     </profiles>
@@ -214,6 +287,7 @@
                     <include>**/*.json</include>
                     <include>**/*.xml</include>
                     <include>**/*.txt</include>
+                    <include>**/*.xlsx</include>
                 </includes>
             </resource>
         </resources>
@@ -246,30 +320,55 @@
                     </annotationProcessorPaths>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <configuration>
+                    <encoding>${project.build.sourceEncoding}</encoding>
+                    <useDefaultDelimiters>false</useDefaultDelimiters>
+                    <delimiters>
+                        <delimiter>@</delimiter>
+                        <delimiter>${*}</delimiter>
+                        <delimiter>$[*]</delimiter>
+                    </delimiters>
+
+                    <!-- 过滤后缀不需要转码的文件后缀名.crt/.p8 -->
+                    <nonFilteredFileExtensions>
+                        <nonFilteredFileExtension>xlsx</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>xls</nonFilteredFileExtension>
+                    </nonFilteredFileExtensions>
+
+                </configuration>
+            </plugin>
         </plugins>
+
     </build>
 
     <repositories>
         <repository>
             <id>maven</id>
             <name>Maven Repository</name>
-            <url>http://192.168.3.213:8081/repository/maven-public/</url>
+            <url>http://103.139.241.104:8081/repository/maven-public/</url>
             <releases>
                 <enabled>true</enabled>
+                <updatePolicy>always</updatePolicy>
             </releases>
             <snapshots>
                 <enabled>true</enabled>
+                <updatePolicy>always</updatePolicy>
             </snapshots>
         </repository>
         <repository>
             <id>nexus</id>
             <name>Nexus Snapshot Repository</name>
-            <url>http://192.168.3.213:8081/repository/gameplat-public/</url>
+            <url>http://103.139.241.104:8081/repository/gameplat-public/</url>
             <releases>
                 <enabled>true</enabled>
+                <updatePolicy>always</updatePolicy>
             </releases>
             <snapshots>
                 <enabled>true</enabled>
+                <updatePolicy>always</updatePolicy>
             </snapshots>
         </repository>
     </repositories>

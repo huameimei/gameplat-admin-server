@@ -1,7 +1,12 @@
 package com.gameplat.admin.model.vo;
 
 import com.baomidou.mybatisplus.extension.activerecord.Model;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.gameplat.admin.util.Date2LongSerializerUtils;
 import lombok.Data;
+
+import java.math.BigDecimal;
+import java.util.Date;
 
 @Data
 public class PpMerchantVO extends Model<PpMerchantVO> {
@@ -18,7 +23,7 @@ public class PpMerchantVO extends Model<PpMerchantVO> {
 
   private Long proxyTimes;
 
-  private Long proxyAmount;
+  private BigDecimal proxyAmount;
 
   private String interfaceName;
 
@@ -26,11 +31,21 @@ public class PpMerchantVO extends Model<PpMerchantVO> {
 
   private String merLimits;
 
-  private Long maxLimitCash; // 最大金额限制
+  private BigDecimal maxLimitCash; // 最大金额限制
 
-  private Long minLimitCash; // 最小金额限制
+  private BigDecimal minLimitCash; // 最小金额限制
 
   private String userLever; // 用户层级
 
   private PpInterfaceVO ppInterfaceVO;
+
+  private String createBy;
+
+  @JsonSerialize(using = Date2LongSerializerUtils.class)
+  private Date createTime;
+
+  private String updateBy;
+
+  @JsonSerialize(using = Date2LongSerializerUtils.class)
+  private Date updateTime;
 }

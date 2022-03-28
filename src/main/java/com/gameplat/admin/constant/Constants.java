@@ -1,15 +1,72 @@
 package com.gameplat.admin.constant;
 
-public class Constants {
-  public static final String CHECKCODE = "checkCode";
+public interface Constants {
 
-  public static final int LOGIN_EXPIRE = 1800 * 1000; // 登录状态过期时间   30分钟
+  /** 账户资金锁 0 用户名 */
+  String MEMBER_FINANCIAL_LOCK = "lock:member_financial:{0}";
 
-  public static final String TOKEN_NAME = "token"; // 登录状态过期时间   1天
+  /** 租户设置类型常量类 */
+  String TEMPLATE_CONFIG_THEME = "template_config_theme";
 
-  public static final String LOGIN_TOKEN_KEY = "qaz@!#321"; // token前面key
+  String TEMPLATE_CONFIG_TYPE = "template_config_type";
+  String SETTING_LANGUAGE = "tenant_language";
+  String SETTING_APP_NAVIGATION = "app_navigation";
+  String SETTING_H5_NAVIGATION = "h5_navigation";
+  String SETTING_SQUARE_NAVIGATION = "square_navigation";
+  String SYSTEM_SETTING = "system_setting";
+  String SPORT_CONFIG_TYPE = "sport_config";
+  String SPORT_CONFIG_CODE = "sportConfig";
+  String SPORT_CONFIG_DESC = "体育配置";
+  String SQUARE_NAVIGATION ="square_navigation";
+  /** 启动图 */
+  String START_UP_IMAGE = "start_up_image";
+  /** 个人中心 */
+  String PERSONAL_CENTER = "personal_center";
+  /** 广场开关 */
+  String TENANT_SQUARE_SWITCH = "tenant_square_switch";
 
-  public static final String ADMIN_TOKEN_NAME = "admin_token"; // admin登录token名
+  String SQUARE_SWITCH = "square_switch";
 
-  public static final String TENANT = "tenant_"; //
+  /**场景六排序列表*/
+  String LIST_SORT_CODE = "listSort";
+
+  String LIST_SORT_DESC = "体育配置场景6排序开关列表";
+
+  /**
+   * 租户原体育场景6排序开关设置
+   */
+  String TENANT_LIST_SORT = "TENANT_LIST_SORT";
+
+  /** 浮窗列表 */
+  String TENANT_FLOAT_LIST = "TENANT_FLOAT_LIST";
+
+  /** 数据字典Type */
+  String TENANT_CUSTOM_CONFIG = "TENANT_CUSTOM_CONFIG";
+
+  /** 租户体育配置*/
+  String TENANT_SPORT_CONFIG = "TENANT_SPORT_CONFIG";
+
+  /** 原生体育游戏Code */
+  String SPORT_IM = "imapi_sport";
+
+  String SPORT_SB = "sb_sport2";
+  String SPORT_BTI = "bti_sport";
+
+  String OSS_IMG_DOMAIN = "oss_img_domain"; // OSS域名
+  String DFS_IMG_DOMAIN = "dfs_img_domain"; // DFS域名
+
+  String NO_GAME = "noGame";
+
+  /** 游戏状态(0:维护中/1:正常) */
+  Integer GAME_NORMAL = 1;
+
+  Integer GAME_MAINTAIN = 0;
+
+  /** 游戏是否支持试玩 */
+  Integer TRIAL_YES = 2;
+
+  Integer TRIAL_NO = 0; // 不支持试玩
+
+  String ON = "on";
+  String OFF = "off";
 }

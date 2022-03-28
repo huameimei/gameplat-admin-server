@@ -1,0 +1,409 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gameplat.admin.mapper.GameBetDailyReportMapper">
+  <select id="getDayCount" resultType="java.lang.Integer">
+    SELECT COUNT(1) AS ts
+    FROM
+      ${tableName}
+    WHERE settle = 1
+      and stat_time = #{statTime}
+  </select>
+
+
+  <select id="queryReportList" resultType="com.gameplat.admin.model.vo.GameReportVO"
+    parameterType="com.gameplat.admin.model.dto.GameBetDailyReportQueryDTO">
+
+    SELECT
+    a.num userNumber,
+    a.bet_count gameCount,
+    a.bet_amount betAmount,
+    a.valid_amount validAmount,
+    a.win_amount winAmount,
+    ifnull( b.real_rebate_money, 0 ) rebateMoney,
+    (
+    a.win_amount - ifnull( b.real_rebate_money, 0 )) companyAmount ,
+    a.game_type gameTypeCode,
+    a.game_type_name gameTypeName
+    FROM
+    (
+    SELECT
+    count(
+    DISTINCT ( t.account )) num,
+    sum( t.bet_count ) bet_count,
+    sum( t.bet_amount ) bet_amount,
+    sum( t.valid_amount ) valid_amount,
+    sum( t.win_amount ) win_amount,
+    t.game_kind ,
+    t.game_type game_type,
+    d.game_type_name game_type_name
+    FROM
+    game_bet_daily_report t
+    LEFT JOIN game_type d on d.game_type_code = t.game_type
+    WHERE 1 = 1
+    <if test="beginTime != null and endTime != null">
+      and t.stat_time BETWEEN #{beginTime} AND #{endTime}
+    </if>
+    <if test="userPaths != null and userPaths != ''">
+      and t.super_account = #{userPaths}
+    </if>
+    <if test="account != null and account != ''">
+      and t.account = #{account}
+    </if>
+    GROUP BY
+    t.game_type
+    ) a
+    LEFT JOIN (
+    SELECT
+    game_type,
+    sum(
+    ifnull( real_rebate_money, 0 )) real_rebate_money
+    FROM
+    game_rebate_report
+    WHERE
+    STATUS = 1
+    <if test="beginTime != null and endTime != null">
+      AND period_name BETWEEN #{beginTime}
+      AND #{endTime}
+    </if>
+    <if test="userPaths != null and userPaths != ''">
+      and super_account = #{userPaths}
+    </if>
+    <if test="account != null and account != ''">
+      and account = #{account}
+    </if>
+    GROUP BY
+    game_type
+    ) b on a.game_type = b.game_type
+  </select>
+
+
+
+
+  <select id="findByStatTimeBetweenAndValidBetAmountGtZero"
+    resultType="com.gameplat.admin.model.vo.GameMemberDayReportVO">
+    SELECT t.`member_id`,
+    t.`account`,
+    t.`real_name`,
+    t.`user_paths`,
+    t.`platform_code`,
+    t.`stat_time`,
+    t.`game_kind`,
+    t.`game_type`,
+    SUM(t.`valid_amount`) AS `valid_amount`,
+    u.user_level as userLevel
+    FROM game_bet_daily_report t
+    left join member u
+    on t.member_id = u.id WHERE valid_amount > 0
+    <choose>
+      <when test="endDate == startDate">
+        AND stat_time = #{startDate}
+      </when>
+      <otherwise>
+        AND stat_time BETWEEN #{startDate} AND #{endDate}
+      </otherwise>
+    </choose>
+    GROUP BY t.`member_id`, t.`platform_code`, t.`game_kind`
+  </select>
+
+
+  <select id="querybetReportList" resultType="com.gameplat.admin.model.vo.GameBetReportVO"
+    parameterType="com.gameplat.admin.model.dto.GameBetDailyReportQueryDTO">
+    SELECT
+    t.stat_time reportTime,
+    t.account account,
+    t.game_type gameCode,
+    d.game_type_name gameName,
+    t.platform_code platformCode,
+    k.name platformName,
+    sum( t.bet_count ) gameCount,
+    sum( t.bet_amount ) betAmount,
+    sum( t.valid_amount ) validAmount,
+    sum( t.win_amount ) winAmount
+    FROM
+    game_bet_daily_report t
+    LEFT JOIN game_platform k on t.platform_code = k.`code`
+    LEFT JOIN game_type d on d.game_type_code = t.game_type
+    WHERE
+    1 = 1
+    <if test="dto.beginTime != null and dto.endTime != null">
+      AND stat_time BETWEEN #{dto.beginTime}
+      AND #{dto.endTime}
+    </if>
+    <if test="dto.userPaths != null and dto.userPaths != ''">
+      and super_account = #{dto.userPaths}
+    </if>
+    <if test="dto.account != null and dto.account != ''">
+      and account = #{dto.account}
+    </if>
+    <if test="dto.gameType!=null and dto.gameType!=''">
+      and game_type in ${dto.gameType}
+    </if>
+    <if test="dto.platformCode!=null and dto.platformCode!=''">
+      and platform_code in ${dto.platformCode}
+    </if>
+    GROUP BY t.platform_code,t.stat_time,account,t.game_type
+    order by t.stat_time desc
+  </select>
+
+
+  <select id="querySumReport" parameterType="com.gameplat.admin.model.dto.GameBetDailyReportQueryDTO" resultType="map">
+        SELECT
+            sum( t.bet_count ) gameCount,
+            sum( t.bet_amount ) betAmount,
+            sum( t.valid_amount ) validAmount,
+            sum( t.win_amount ) winAmount
+        FROM
+           game_bet_daily_report t
+        WHERE
+            1 = 1
+            <if test="beginTime != null and endTime != null">
+                AND stat_time BETWEEN #{beginTime}
+                AND #{endTime}
+            </if>
+            <if test="userPaths != null and userPaths != ''">
+                and super_account = #{userPaths}
+            </if>
+            <if test="account != null and account != ''">
+                and account = #{account}
+            </if>
+            <if test="liveGameSuperType!=null and liveGameSuperType!=''">
+                and game_type in ${liveGameSuperType}
+            </if>
+            <if test="platformCode!=null and platformCode!=''">
+                and platform_code in ${platformCode}
+            </if>
+    </select>
+
+
+    <select id="getGameReportInfo" resultType="com.gameplat.admin.model.bean.ActivityStatisticItem">
+      SELECT
+      a.account userName,
+      a.cumulativeGameDml,
+      a.gameWinAmount
+      <if test="sportValidAmount != null">
+        ,SUM(IFNULL( b.num, 0 )) AS cumulativeGameDmDays
+      </if>
+      FROM(
+      SELECT account, SUM( valid_amount ) cumulativeGameDml, SUM( win_amount ) gameWinAmount
+      FROM game_bet_daily_report
+      <where>
+        <if test="startTime != null">
+          AND stat_time <![CDATA[ >= ]]> date_format(#{startTime}, '%Y-%m-%d')
+        </if>
+        <if test="endTime != null">
+          AND stat_time <![CDATA[ <= ]]> date_format(#{endTime}, '%Y-%m-%d')
+        </if>
+        <if test="sportGameList != null and sportGameList != ''">
+          AND FIND_IN_SET(first_kind, #{sportGameList})
+        </if>
+      </where>
+      GROUP BY account ) a
+      <if test="sportValidAmount != null">
+        LEFT JOIN ( SELECT account,
+                           CASE WHEN SUM( valid_amount ) >= #{sportValidAmount} THEN
+                               1 ELSE 0 END num
+        FROM game_bet_daily_report
+        <where>
+          <if test="startTime != null">
+            AND stat_time <![CDATA[ >= ]]> date_format(#{startTime}, '%Y-%m-%d')
+          </if>
+          <if test="endTime != null">
+            AND stat_time <![CDATA[ <= ]]> date_format(#{endTime}, '%Y-%m-%d')
+          </if>
+          <if test="sportGameList != null and sportGameList != ''">
+            AND FIND_IN_SET(first_kind, #{sportGameList})
+          </if>
+        </where>
+        GROUP BY account,stat_time ) b ON a.account = b.account
+      </if>
+      <where>
+        <if test="userNameList != null and userNameList.size > 0">
+          AND a.user_name in
+          <foreach collection="userNameList" index="index" item="item" open="(" close=")" separator=",">
+            #{item}
+          </foreach>
+        </if>
+      </where>
+      GROUP BY a.user_name
+    </select>
+
+  <select id="findGameDmlDateList" resultType="com.gameplat.admin.model.bean.ActivityStatisticItem">
+    SELECT
+    user_name userName,
+    GROUP_CONCAT(DISTINCT(count_date)) AS gameCountDates
+    FROM
+    ( SELECT user_name, count_date, sum( valid_amount ) AS totalAmount
+    FROM
+    member_game_day_report
+    <where>
+      <if test="userNameList != null and userNameList.size > 0">
+        and user_name in
+        <foreach collection="userNameList" index="index" item="item" open="(" close=")" separator=",">
+          #{item}
+        </foreach>
+      </if>
+      <if test="startTime != null">
+        and count_date <![CDATA[ >= ]]> date_format(#{startTime}, '%Y-%m-%d')
+      </if>
+      <if test="endTime != null">
+        and count_date <![CDATA[ <= ]]> date_format(#{endTime}, '%Y-%m-%d')
+      </if>
+      <if test="sportGameList != null and sportGameList != ''">
+        and find_in_set(first_kind, #{sportGameList})
+      </if>
+    </where>
+    GROUP BY user_name, count_date ) AS a
+    <where>
+      <if test="sportValidAmount != null">
+        and totalAmount >= #{sportValidAmount}
+      </if>
+    </where>
+    GROUP BY a.user_name
+  </select>
+
+
+  <!-- 插入投注日报表 -->
+  <insert id="insertGameBetDailyReport">
+    INSERT INTO game_bet_daily_report
+    (member_id,account,real_name,super_id,super_account,user_paths,platform_code,game_kind,game_type,bet_amount,
+    valid_amount,win_amount,bet_count,win_count,stat_time,create_time
+    ) VALUES
+    <foreach collection="list" item="item" index="index" separator=",">
+      ( #{item.memberId}, #{item.account},#{item.realName},#{item.superId},#{item.superAccount},#{item.userPaths},
+      #{item.platformCode},#{item.gameKind},#{item.gameType},#{item.betAmount},
+      #{item.validAmount},#{item.winAmount},#{item.betCount},
+      #{item.winCount},#{item.statTime},sysdate()
+      )
+    </foreach>
+    ON duplicate KEY UPDATE
+    bet_count = VALUES(bet_count),
+    bet_amount = VALUES(bet_amount),
+    valid_amount = VALUES(valid_amount),
+    win_amount = VALUES(win_amount),
+    update_time = sysdate()
+  </insert>
+
+  <select id="queryGamePlatformReport"   resultType="com.gameplat.admin.model.vo.GameReportVO">
+    SELECT s1.betAmount,
+           s1.validAmount,
+           s1.gameCount,
+           s1.winAmount,
+           s1.userNumber,
+           s1.platform_code platformCode,
+           IF(s2.rebateMoney is null,0,s2.rebateMoney) rebateMoney,
+           s1.winAmount - IF(s2.rebateMoney is null,0,s2.rebateMoney) companyAmount
+    from (
+        SELECT
+          sum(dr.bet_amount) betAmount,
+          sum(dr.valid_amount) validAmount,
+          sum(dr.bet_count) gameCount,
+          sum(dr.win_amount) winAmount,
+          count(DISTINCT dr.account) userNumber,
+          dr.platform_code
+          FROM game_bet_daily_report dr  where 1 = 1
+            <if test="beginTime != null and endTime != null">
+              and dr.stat_time BETWEEN #{beginTime} AND #{endTime}
+            </if>
+            <if test="userPaths != null and userPaths != ''">
+              and dr.user_paths like contact(#{userPaths},'%')
+            </if>
+            <if test="account != null and account != ''">
+              and dr.account = #{account}
+            </if>
+            GROUP BY dr.platform_code) s1 LEFT JOIN (
+        SELECT
+          sum(rr.real_rebate_money) rebateMoney,
+             rr.platform_code
+         FROM game_rebate_report rr where 1=1
+        <if test="beginTime != null and endTime != null">
+          and rr.stat_time BETWEEN #{beginTime} AND #{endTime}
+        </if>
+        <if test="userPaths != null and userPaths != ''">
+          and rr.user_paths like contact(#{userPaths},'%')
+        </if>
+        <if test="account != null and account != ''">
+          and rr.account = #{account}
+        </if>
+        GROUP BY rr.platform_code) s2
+      on s1.platform_code = s2.platform_code
+  </select>
+
+
+    <select id="findReportForDivide" resultType="com.gameplat.admin.model.vo.DivideGameReportVO">
+        select
+            t.memberId,
+            t.account,
+            t.superId,
+            t.memberId,
+            t.superAccount,
+            t.userPaths,
+            t.userType,
+            t.gameKind,
+            t.gameType,
+            t.validAmount,
+            t.winAmount,
+            (pm.agent_level + 1) as agentLevel
+        from (
+            SELECT
+                r.member_id as memberId,
+                r.account as account,
+                r.super_id as superId,
+                r.super_account as superAccount,
+                r.user_paths as userPaths,
+                r.user_type as userType,
+                r.game_kind as gameKind,
+                r.game_type as gameType,
+                IFNULL(SUM(r.valid_amount),0) as validAmount,
+                IFNULL(SUM(r.win_amount),0) as winAmount
+            FROM `game_bet_daily_report` as r
+            where DATE_FORMAT(r.stat_time,'%Y-%m-%d')
+            BETWEEN DATE_FORMAT(#{startDate},'%Y-%m-%d') and DATE_FORMAT(#{endDate},'%Y-%m-%d')
+            <if test="isIncludeAgent != null and isIncludeAgent == 0">
+                and r.user_type != 'A'
+            </if>
+            GROUP BY r.member_id,r.account,r.super_id,r.super_account,r.user_paths,r.user_type,r.game_kind,r.game_type
+        ) as t INNER JOIN member as pm on pm.account = t.superAccount
+    </select>
+
+    <select id="findReportForSalary"  resultType="com.gameplat.admin.model.vo.SalaryRechargeVO">
+        SELECT
+        r.account as account,
+        r.super_account as superAccount,
+        r.game_kind as gameKind,
+        r.game_type as gameType,
+        IFNULL(SUM(r.valid_amount),0) as validAmount,
+        IFNULL(SUM(r.win_amount),0) as winAmount
+        FROM `game_bet_daily_report` as r
+        where DATE_FORMAT(r.stat_time,'%Y-%m-%d')
+        BETWEEN DATE_FORMAT(#{startDate},'%Y-%m-%d') and DATE_FORMAT(#{endDate},'%Y-%m-%d')
+        and ( user_paths like concat('%/',#{agentName},'/%')
+        <choose>
+            <when test="isInclude != null and isInclude == 0">
+                and account != #{agentName} )
+            </when>
+            <otherwise>
+                or account = #{agentName} )
+            </otherwise>
+        </choose>
+        GROUP BY r.account,r.super_account,r.game_kind,r.game_type
+    </select>
+
+    <select id="getSatisfyBetAccount" resultType="java.lang.String">
+        select t.account from
+        (select member_id as memberId, account, sum(valid_amount) as validAmount from game_bet_daily_report
+        <where>
+            <if test="startTime != null and startTime != ''">
+                AND stat_time &gt;= #{startTime}
+            </if>
+            <if test="endTime != null and endTime != ''">
+                AND stat_time &lt;= #{endTime}
+            </if>
+        </where>
+        GROUP BY member_id
+        ) t
+        where validAmount >= #{minBetAmount}
+    </select>
+
+
+</mapper>

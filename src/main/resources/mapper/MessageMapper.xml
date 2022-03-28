@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gameplat.admin.mapper.MessageMapper">
+
+
+    <insert id="saveReturnId" useGeneratedKeys="true" keyProperty="id"
+            parameterType="com.gameplat.model.entity.message.Message">
+        insert into message_info
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="title != null">
+                title,
+            </if>
+            <if test="content != null">
+                content,
+            </if>
+            <if test="category != null">
+                category,
+            </if>
+            <if test="position != null">
+                position,
+            </if>
+            <if test="showType != null">
+                show_type,
+            </if>
+            <if test="pcImage != null">
+                pc_image,
+            </if>
+            <if test="appImage != null">
+                app_image,
+            </if>
+            <if test="popsCount != null">
+                pops_count,
+            </if>
+            <if test="pushRange != null">
+                push_range,
+            </if>
+            <if test="linkAccount != null">
+                link_account,
+            </if>
+            <if test="beginTime != null">
+                begin_time,
+            </if>
+            <if test="endTime != null">
+                end_time,
+            </if>
+            <if test="sort != null">
+                sort,
+            </if>
+            <if test="type != null">
+                type,
+            </if>
+            <if test="language != null">
+                language,
+            </if>
+            <if test="status != null">
+                status,
+            </if>
+            <if test="immediateFlag != null">
+                immediate_flag,
+            </if>
+            <if test="remarks != null">
+                remarks,
+            </if>
+            <if test="createBy != null">
+                create_by,
+            </if>
+            create_time
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="title != null">
+                #{title},
+            </if>
+            <if test="content != null">
+                #{content},
+            </if>
+            <if test="category != null">
+                #{category},
+            </if>
+            <if test="position != null">
+                #{position},
+            </if>
+            <if test="showType != null">
+                #{showType},
+            </if>
+            <if test="pcImage != null">
+                #{pcImage},
+            </if>
+            <if test="appImage != null">
+                #{appImage},
+            </if>
+            <if test="popsCount != null">
+                #{popsCount},
+            </if>
+            <if test="pushRange != null">
+                #{pushRange},
+            </if>
+            <if test="linkAccount != null">
+                #{linkAccount},
+            </if>
+            <if test="beginTime != null">
+                #{beginTime},
+            </if>
+            <if test="endTime != null">
+                #{endTime},
+            </if>
+            <if test="sort != null">
+                #{sort},
+            </if>
+            <if test="type != null">
+                #{type},
+            </if>
+            <if test="language != null">
+                #{language},
+            </if>
+            <if test="status != null">
+                #{status},
+            </if>
+            <if test="immediateFlag != null">
+                #{immediateFlag},
+            </if>
+            <if test="remarks != null">
+                #{remarks},
+            </if>
+            <if test="createBy != null">
+                #{createBy},
+            </if>
+            now()
+        </trim>
+    </insert>
+
+
+</mapper>

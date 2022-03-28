@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gameplat.admin.mapper.MemberBankMapper">
+
+    <select id="getMemberBankList" resultType="com.gameplat.admin.model.vo.MemberBankVO">
+        SELECT t1.*, t2.account, t2.real_name
+        FROM member_bank t1
+                 LEFT JOIN member t2 ON t1.member_id = t2.id
+        WHERE t1.type = #{type}
+          AND t2.id = #{memberId}
+        ORDER BY t1.update_time DESC, t1.create_time DESC
+    </select>
+
+</mapper>

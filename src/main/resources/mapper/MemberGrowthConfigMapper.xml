@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gameplat.admin.mapper.MemberGrowthConfigMapper">
+
+    <resultMap type="com.gameplat.model.entity.member.MemberGrowthConfig" id="memberGrowthConfigResult">
+        <result property="id" column="id"/>
+        <result property="isEnableVip" column="is_enable_vip"/>
+        <result property="isEnableRecharge" column="is_enable_recharge"/>
+        <result property="isEnableSign" column="is_enable_sign"/>
+        <result property="isEnableDama" column="is_enable_dama"/>
+        <result property="isPayUpReword" column="is_pay_up_reword"/>
+        <result property="isRepeatPayUpReword" column="is_repeat_pay_up_reword"/>
+        <result property="isAutoPayReword" column="is_auto_pay_reword"/>
+        <result property="signEveryDayGrowth" column="sign_every_day_growth"/>
+        <result property="signMaxGrowth" column="sign_max_growth"/>
+        <result property="signMinRechargeAmount" column="sign_min_recharge_amount"/>
+        <result property="signDayMinRechargeAmount" column="sign_day_min_recharge_amount"/>
+        <result property="signIpLimitCount" column="sign_ip_limit_count"/>
+        <result property="rechageRate" column="rechage_rate"/>
+        <result property="damaRate" column="dama_rate"/>
+        <result property="bindBankGrowth" column="bind_bank_growth"/>
+        <result property="perfectUserInfoGrowth" column="perfect_user_info_growth"/>
+        <result property="perfectUserInfoField" column="perfect_user_info_field"/>
+        <result property="demoteCycle" column="demote_cycle"/>
+        <result property="receiveLimitCycle" column="receive_limit_cycle"/>
+        <result property="limitLevel" column="limit_level"/>
+        <result property="growthDesc" column="growth_desc"/>
+        <result property="otherDesc" column="other_desc"/>
+        <result property="carousel" column="carousel"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="createBy" column="create_by"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="remark" column="remark"/>
+        <result property="growthDescEn" column="growth_desc_en"/>
+        <result property="growthDescTh" column="growth_desc_th"/>
+        <result property="growthDescVi" column="growth_desc_vi"/>
+        <result property="growthDescIn" column="growth_desc_in"/>
+        <result property="otherDescEn" column="other_desc_en"/>
+        <result property="otherDescTh" column="other_desc_th"/>
+        <result property="otherDescIn" column="other_desc_in"/>
+        <result property="otherDescVi" column="other_desc_vi"/>
+        <result property="isMemberLoan" column="is_member_loan"/>
+        <result property="isLoanMoney" column="is_loan_money"/>
+        <result property="dayLendLimit" column="day_lend_limit"/>
+        <result property="dayReturnLimit" column="day_return_limit"/>
+        <result property="lowerMoney" column="lower_money"/>
+        <result property="coinRatio" column="coin_ratio"/>
+        <result property="coinRate" column="coin_rate"/>
+    </resultMap>
+
+
+    <!-- 只查询一条 -->
+    <select id="findOneConfig" resultMap="memberGrowthConfigResult">
+        select
+        id,
+        is_enable_vip,
+        is_enable_recharge,
+        is_enable_sign,
+        is_enable_dama,
+        is_pay_up_reword,
+        is_repeat_pay_up_reword,
+        is_auto_pay_reword,
+        sign_every_day_growth,
+        sign_max_growth,
+        sign_min_recharge_amount,
+        sign_day_min_recharge_amount,
+        sign_ip_limit_count,
+        rechage_rate,
+        dama_rate,
+        bind_bank_growth,
+        perfect_user_info_growth,
+        perfect_user_info_field,
+        demote_cycle,
+        limit_level,
+        receive_limit_cycle,
+        carousel,
+        create_by,
+        create_time,
+        update_by,
+        update_time,
+        remark,
+        coin_ratio,
+        coin_rate,
+        is_member_loan,
+        is_loan_money,
+        day_lend_limit,
+        day_return_limit,
+        lower_money,
+        (
+            case #{language}
+                when 'zh-CN' then growth_desc
+                when 'en-US' then growth_desc_en
+                when 'th-TH' then growth_desc_th
+                when 'id-ID' then growth_desc_in
+                when 'vi-VN' then growth_desc_vi
+                else growth_desc
+            end
+        ) growth_desc,
+        (
+            case #{language}
+                when 'zh-CN' then other_desc
+                when 'en-US' then other_desc_en
+                when 'th-TH' then other_desc_th
+                when 'id-ID' then other_desc_in
+                when 'vi-VN' then other_desc_vi
+                else other_desc
+            end
+        ) other_desc
+        from member_growth_config
+        order by create_time desc limit 1
+    </select>
+
+    <update id="updateGrowthConfig">
+        update member_growth_config
+        <set>
+            <if test="isMemberLoan != null">is_member_loan = #{isMemberLoan},</if>
+            <if test="isLoanMoney != null">is_loan_money = #{isLoanMoney},</if>
+            <if test="isEnableVip != null">is_enable_vip = #{isEnableVip},</if>
+            <if test="isEnableRecharge != null">is_enable_recharge = #{isEnableRecharge},</if>
+            <if test="isEnableSign != null">is_enable_sign = #{isEnableSign},</if>
+            <if test="isEnableDama != null">is_enable_dama = #{isEnableDama},</if>
+            <if test="isPayUpReword != null">is_pay_up_reword = #{isPayUpReword},</if>
+            <if test="isRepeatPayUpReword != null">is_repeat_pay_up_reword = #{isRepeatPayUpReword},</if>
+            <if test="isAutoPayReword != null">is_auto_pay_reword = #{isAutoPayReword},</if>
+            <if test="signEveryDayGrowth != null">sign_every_day_growth = #{signEveryDayGrowth},</if>
+            <if test="signMaxGrowth != null">sign_max_growth = #{signMaxGrowth},</if>
+            <if test="signMinRechargeAmount != null">sign_min_recharge_amount = #{signMinRechargeAmount},</if>
+            <if test="signDayMinRechargeAmount != null">sign_day_min_recharge_amount = #{signDayMinRechargeAmount},</if>
+            <if test="signIpLimitCount != null">sign_ip_limit_count = #{signIpLimitCount},</if>
+            <if test="rechageRate != null">rechage_rate = #{rechageRate},</if>
+            <if test="damaRate != null">dama_rate = #{damaRate},</if>
+            <if test="demoteCycle != null">demote_cycle = #{demoteCycle},</if>
+            <if test="limitLevel != null">limit_level = #{limitLevel},</if>
+            <if test="receiveLimitCycle != null">receive_limit_cycle = #{receiveLimitCycle},</if>
+            <if test="bindBankGrowth != null">bind_bank_growth = #{bindBankGrowth},</if>
+            <if test="perfectUserInfoGrowth != null">perfect_user_info_growth = #{perfectUserInfoGrowth},</if>
+            <if test="coinRatio != null">coin_ratio = #{coinRatio},</if>
+            <if test="coinRate != null">coin_rate = #{coinRate},</if>
+            <if test="dayLendLimit != null">day_lend_limit = #{dayLendLimit},</if>
+            <if test="dayReturnLimit != null">day_return_limit = #{dayReturnLimit},</if>
+            <if test="lowerMoney != null">lower_money = #{lowerMoney},</if>
+            <if test="perfectUserInfoField != null and perfectUserInfoField != ''">perfect_user_info_field =
+                #{perfectUserInfoField},
+            </if>
+            <if test="carousel != null and carousel != ''">carousel = #{carousel},</if>
+            <if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
+            <if test='growthDesc != null and growthDesc != "" and language != null and language == "zh-CN"'>growth_desc = #{growthDesc},</if>
+            <if test='growthDesc != null and growthDesc != "" and language != null and language == "en-US"'>growth_desc_en = #{growthDesc},</if>
+            <if test='growthDesc != null and growthDesc != "" and language != null and language == "th-TH"'>growth_desc_th = #{growthDesc},</if>
+            <if test='growthDesc != null and growthDesc != "" and language != null and language == "id-ID"'>growth_desc_in = #{growthDesc},</if>
+            <if test='growthDesc != null and growthDesc != "" and language != null and language == "vi-VN"'>growth_desc_vi = #{growthDesc},</if>
+            <if test='otherDesc != null and otherDesc != "" and language != null and language == "zh-CN"'>other_desc = #{otherDesc},</if>
+            <if test='otherDesc != null and otherDesc != "" and language != null and language == "en-US"'>other_desc_en = #{otherDesc},</if>
+            <if test='otherDesc != null and otherDesc != "" and language != null and language == "th-TH"'>other_desc_th = #{otherDesc},</if>
+            <if test='otherDesc != null and otherDesc != "" and language != null and language == "id-ID"'>other_desc_in = #{otherDesc},</if>
+            <if test='otherDesc != null and otherDesc != "" and language != null and language == "vi-VN"'>other_desc_vi = #{otherDesc},</if>
+            update_time = now()
+        </set>
+        where id = #{id}
+    </update>
+
+    <!-- 后台获取金币说明配置 -->
+    <select id="getGoldCoinDesc" resultType="com.gameplat.model.entity.member.MemberGrowthConfig">
+        select id, coin_ratio coinRatio, coin_rate coinRate, JSON_UNQUOTE(json_extract(gold_coin_desc, concat('$.',concat('"',concat(#{language},'"'))))) as goldCoinDesc
+        from member_growth_config order by create_time desc limit 1
+    </select>
+</mapper>

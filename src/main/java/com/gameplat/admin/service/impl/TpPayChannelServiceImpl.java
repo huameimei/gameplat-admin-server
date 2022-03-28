@@ -8,27 +8,23 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.convert.TpPayChannelConvert;
-import com.gameplat.admin.convert.TpPayTypeConvert;
-import com.gameplat.admin.dao.TpPayChannelMapper;
+import com.gameplat.admin.mapper.TpPayChannelMapper;
 import com.gameplat.admin.model.bean.ChannelLimitsBean;
 import com.gameplat.admin.model.dto.TpPayChannelAddDTO;
 import com.gameplat.admin.model.dto.TpPayChannelEditDTO;
 import com.gameplat.admin.model.dto.TpPayChannelQueryDTO;
-import com.gameplat.admin.model.entity.TpMerchant;
-import com.gameplat.admin.model.entity.TpPayChannel;
 import com.gameplat.admin.model.vo.TpPayChannelVO;
 import com.gameplat.admin.service.TpPayChannelService;
-import com.gameplat.common.exception.BusinessException;
-import com.gameplat.common.exception.ServiceException;
-import com.gameplat.common.json.JsonUtils;
-import com.gameplat.security.util.SecurityUtil;
-import java.util.Date;
-import java.util.List;
-import org.springframework.beans.BeanUtils;
+import com.gameplat.base.common.exception.ServiceException;
+import com.gameplat.base.common.json.JsonUtils;
+import com.gameplat.model.entity.pay.TpPayChannel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.math.BigDecimal;
+import java.util.List;
 
 @Service
 @Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)
@@ -70,9 +66,8 @@ public class TpPayChannelServiceImpl extends ServiceImpl<TpPayChannelMapper, TpP
       throw new ServiceException("状态不能为空!");
     }
     LambdaUpdateWrapper<TpPayChannel> update = Wrappers.lambdaUpdate();
-    update.set(TpPayChannel::getStatus, status);
-    update.eq(TpPayChannel::getId, id);
-    this.update(update);
+    update.set(TpPayChannel::getStatus, status).eq(TpPayChannel::getId, id);
+    this.update(new TpPayChannel(), update);
   }
 
   @Override
@@ -85,7 +80,7 @@ public class TpPayChannelServiceImpl extends ServiceImpl<TpPayChannelMapper, TpP
     conver2TpPayChannel(dto);
     dto.setStatus(0);
     dto.setRechargeTimes(0L);
-    dto.setRechargeAmount(0L);
+    dto.setRechargeAmount(BigDecimal.ZERO);
     if (!this.save(tpPayChannelConvert.toEntity(dto))) {
       throw new ServiceException("添加失败!");
     }
@@ -93,19 +88,14 @@ public class TpPayChannelServiceImpl extends ServiceImpl<TpPayChannelMapper, TpP
 
   @Override
   public void delete(Long id) {
-    this.getById(id).deleteById();
+    this.removeById(id);
   }
 
   @Override
   public IPage<TpPayChannelVO> findTpPayChannelPage(
-      Page<TpPayChannelVO> page, TpPayChannelQueryDTO dto) {
+      Page<TpPayChannel> page, TpPayChannelQueryDTO dto) {
     IPage<TpPayChannelVO> ipage = tpPayChannelMapper.findTpPayChannelPage(page, dto);
-    List<TpPayChannelVO> list = ipage.getRecords();
-    list.stream()
-        .forEach(
-            (a -> {
-              this.conver2LimitInfo(a);
-            }));
+    ipage.getRecords().forEach((this::conver2LimitInfo));
     return ipage;
   }
 
@@ -117,8 +107,8 @@ public class TpPayChannelServiceImpl extends ServiceImpl<TpPayChannelMapper, TpP
     vo.setChannelTimeStart(limitInfo.getInteger("channelTimeStart"));
     vo.setChannelTimeEnd(limitInfo.getInteger("channelTimeEnd"));
     vo.setChannelShows(limitInfo.getString("channelShows"));
-    vo.setMinAmountPerOrder(limitInfo.getLong("minAmountPerOrder"));
-    vo.setMaxAmountPerOrder(limitInfo.getLong("maxAmountPerOrder"));
+    vo.setMinAmountPerOrder(limitInfo.getBigDecimal("minAmountPerOrder"));
+    vo.setMaxAmountPerOrder(limitInfo.getBigDecimal("maxAmountPerOrder"));
     vo.setRiskControlType(limitInfo.getInteger("riskControlType"));
     vo.setRiskControlValue(limitInfo.getString("riskControlValue"));
   }

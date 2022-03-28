@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.gameplat.admin.mapper.VersionControlMapper">
+
+    <resultMap id="SysRoleResult" type="com.gameplat.model.entity.VersionControl">
+        <id property="id" column="id"/>
+        <result property="title" column="title"/>
+        <result property="version" column="version"/>
+        <result property="forceUpdate" column="force_update"/>
+        <result property="content" column="content"/>
+        <result property="type" column="type"/>
+        <result property="state" column="state"/>
+        <result property="androidUrl" column="android_url"/>
+        <result property="urlType" column="url_type"/>
+        <result property="iosEnterpriseSing" column="ios_enterprise_sing"/>
+        <result property="iosSuperSing" column="ios_super_sing"/>
+        <result property="iosDescribeUrl" column="ios_describe_url"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+</mapper>

@@ -1,14 +1,25 @@
 package com.gameplat.admin.model.vo;
 
 import com.baomidou.mybatisplus.extension.activerecord.Model;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.gameplat.admin.util.Date2LongSerializerUtils;
 import lombok.Data;
+
+import java.math.BigDecimal;
+import java.util.Date;
 
 @Data
 public class TpPayChannelVO extends Model<TpPayChannelVO> {
 
+  private Long id;
+
   private String name;
 
-  private String userLevels;
+  private Long merchantId;
+
+  private String tpPayType;
+
+  private String memberLevels;
 
   private String remarks;
 
@@ -20,7 +31,7 @@ public class TpPayChannelVO extends Model<TpPayChannelVO> {
 
   private Long rechargeTimes;
 
-  private Long rechargeAmount;
+  private BigDecimal rechargeAmount;
 
   private String limitInfo;
 
@@ -37,6 +48,8 @@ public class TpPayChannelVO extends Model<TpPayChannelVO> {
   private String tpPayTypeName;
 
   private String payType;
+
+  private Integer typeSubscript;
 
   /** 通道金额设置标识，0位禁用 */
   private Integer limitStatus;
@@ -57,14 +70,19 @@ public class TpPayChannelVO extends Model<TpPayChannelVO> {
   private String channelShows;
 
   /** 通道单笔金额金额最小值 */
-  private Long minAmountPerOrder;
+  private BigDecimal minAmountPerOrder;
 
   /** 通道单笔金额金额最小值 */
-  private Long maxAmountPerOrder;
+  private BigDecimal maxAmountPerOrder;
 
   /** 通道风控金额类型 0.任何金额 1.浮动金额 2.固定金额 3浮动固定金额 */
   private Integer riskControlType;
 
   /** 风控值 */
   private String riskControlValue;
+
+  private String updateBy;
+
+  @JsonSerialize(using = Date2LongSerializerUtils.class)
+  private Date updateTime;
 }

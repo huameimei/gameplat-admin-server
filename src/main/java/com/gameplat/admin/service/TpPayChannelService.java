@@ -6,8 +6,8 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.gameplat.admin.model.dto.TpPayChannelAddDTO;
 import com.gameplat.admin.model.dto.TpPayChannelEditDTO;
 import com.gameplat.admin.model.dto.TpPayChannelQueryDTO;
-import com.gameplat.admin.model.entity.TpPayChannel;
 import com.gameplat.admin.model.vo.TpPayChannelVO;
+import com.gameplat.model.entity.pay.TpPayChannel;
 
 public interface TpPayChannelService extends IService<TpPayChannel> {
 
@@ -21,5 +21,5 @@ public interface TpPayChannelService extends IService<TpPayChannel> {
 
   void delete(Long id);
 
-  IPage<TpPayChannelVO> findTpPayChannelPage(Page<TpPayChannelVO> page, TpPayChannelQueryDTO dto);
+  IPage<TpPayChannelVO> findTpPayChannelPage(Page<TpPayChannel> page, TpPayChannelQueryDTO dto);
 }

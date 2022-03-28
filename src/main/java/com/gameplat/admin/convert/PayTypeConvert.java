@@ -3,8 +3,8 @@ package com.gameplat.admin.convert;
 import com.gameplat.admin.model.dto.PayTypeAddDTO;
 import com.gameplat.admin.model.dto.PayTypeEditDTO;
 import com.gameplat.admin.model.dto.PayTypeQueryDTO;
-import com.gameplat.admin.model.entity.PayType;
 import com.gameplat.admin.model.vo.PayTypeVO;
+import com.gameplat.model.entity.pay.PayType;
 import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")

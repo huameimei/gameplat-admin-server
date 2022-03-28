@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gameplat.admin.mapper.ValidWithdrawMapper">
+
+    <resultMap id="BaseResultMap" type="com.gameplat.model.entity.ValidWithdraw">
+        <id column="id" property="id"/>
+        <result column="member_id" property="memberId"/>
+        <result column="account" property="account"/>
+        <result column="rech_id" property="rechId"/>
+        <result column="rech_money" property="rechMoney"/>
+        <result column="discount_money" property="discountMoney"/>
+        <result column="type" property="type"/>
+        <result column="end_time" property="endTime"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="morm_dml" property="mormDml"/>
+        <result column="discount_dml" property="discountDml"/>
+        <result column="cp_dml" property="cpDml"/>
+        <result column="sports_dml" property="sportsDml"/>
+        <result column="video_dml" property="videoDml"/>
+        <result column="status" property="status"/>
+        <result column="remark" property="remark"/>
+    </resultMap>
+
+    <select id="findValidWithdraw" parameterType="com.gameplat.model.entity.ValidWithdraw"
+            resultMap="BaseResultMap">
+        select
+        *
+        from valid_withdraw
+        where 1 = 1
+        <if test="account != null">
+            and account = #{account}
+        </if>
+        <if test="rechId != null">
+            and rech_id = #{rechId}
+        </if>
+        <if test="rechMoney != null">
+            and rech_money = #{rechMoney}
+        </if>
+        <if test="discountMoney != null">
+            and discount_money = #{discountMoney}
+        </if>
+        <if test="type != null">
+            and type = #{type}
+        </if>
+        <if test="createTime != null">
+            and create_time = #{createTime}
+        </if>
+        <if test="updateTime != null">
+            and update_time = #{updateTime}
+        </if>
+        <if test="mormDml != null">
+            and morm_dml = #{mormDml}
+        </if>
+        <if test="discountDml != null">
+            and discount_dml = #{discountDml}
+        </if>
+        <if test="cpDml != null">
+            and cp_dml = #{cpDml}
+        </if>
+        <if test="videoDml != null">
+            and video_dml = #{videoDml}
+        </if>
+        <if test="sportsDml != null">
+            and sports_dml = #{sportsDml}
+        </if>
+        <if test="status != null">
+            and status = #{status}
+        </if>
+        order by
+        create_time desc limit 1
+    </select>
+
+
+    <insert id="save" parameterType="com.gameplat.model.entity.ValidWithdraw">
+        insert into valid_withdraw
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="memberId != null">
+                member_id,
+            </if>
+            <if test="account != null">
+                account,
+            </if>
+            <if test="rechId != null">
+                rech_id,
+            </if>
+            <if test="rechMoney != null">
+                rech_money,
+            </if>
+            <if test="discountMoney != null">
+                discount_money,
+            </if>
+            <if test="status != null">
+                status,
+            </if>
+            <if test="type != null">
+                type,
+            </if>
+            <if test="createTime != null">
+                create_time,
+            </if>
+            <if test="updateTime != null">
+                update_time,
+            </if>
+            <if test="remark != null">
+                remark,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="memberId != null">
+                #{memberId},
+            </if>
+            <if test="account != null">
+                #{account},
+            </if>
+            <if test="rechId != null">
+                #{rechId},
+            </if>
+            <if test="rechMoney != null">
+                #{rechMoney},
+            </if>
+            <if test="discountMoney != null">
+                #{discountMoney},
+            </if>
+            <if test="status != null">
+                #{status},
+            </if>
+            <if test="type != null">
+                #{type},
+            </if>
+            <if test="createTime != null">
+                #{createTime},
+            </if>
+            <if test="updateTime != null">
+                #{updateTime},
+            </if>
+            <if test="remark != null">
+                #{remark},
+            </if>
+        </trim>
+    </insert>
+
+    <update id="updateByUserId" parameterType="com.gameplat.model.entity.ValidWithdraw">
+        update valid_withdraw
+        <set>
+            <if test="account != null">
+                account = #{account},
+            </if>
+            <if test="rechId != null">
+                rech_id = #{rechId},
+            </if>
+            <if test="rechMoney != null">
+                rech_money = #{rechMoney},
+            </if>
+            <if test="discountMoney != null">
+                discount_money = #{discountMoney},
+            </if>
+            <if test="status != null">
+                status = #{status},
+            </if>
+            <if test="type != null">
+                type = #{type},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime},
+            </if>
+            <if test="endTime != null">
+                end_time = #{endTime},
+            </if>
+            <if test="remark != null">
+                remark = #{remark},
+            </if>
+
+        </set>
+        where (type = 0 or status = 1)
+        <if test="account != null and account != ''">
+            and account = #{account}
+        </if>
+        <if test="memberId != null">
+            and member_id = #{memberId}
+        </if>
+        <if test="id != null">
+            and id = #{id}
+        </if>
+    </update>
+
+
+    <update id="updateByBetId">
+        update valid_withdraw
+        <set>
+            <if test="betContext != null and betContext != ''">
+                bet_context = #{betContext},
+            </if>
+            <if test="vaildAmount != null">
+                video_dml = #{vaildAmount},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <select id="findAccountValidWithdraw" parameterType="string"
+            resultType="com.gameplat.admin.model.vo.ValidAccoutWithdrawVo">
+         SELECT
+            a.id id,
+            a.member_id memberId,
+            a.account account,
+            (a.morm_dml + a.discount_dml ) dmlClaim,
+            a.create_time createTime,
+            ifnull(a.end_time,sysdate()) AS endTime,
+            (a.rech_money + a.discount_money) rechMoney
+        FROM valid_withdraw AS a
+        WHERE a.STATUS = 0
+          AND a.account = #{account}
+        ORDER BY a.id ASC
+    </select>
+
+
+
+</mapper>

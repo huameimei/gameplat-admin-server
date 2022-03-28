@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gameplat.admin.mapper.DivideLayerConfigMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.gameplat.model.entity.proxy.DivideLayerConfig">
+        <id column="id" property="id"/>
+        <result property="userId" column="user_id"/>
+        <result property="userName" column="user_name"/>
+        <result property="divideConfig" column="divide_config"/>
+        <result property="createTime" column="create_time"/>
+        <result property="createBy" column="create_by"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="updateBy" column="update_by"/>
+    </resultMap>
+
+    <sql id="base_column">
+        id
+        ,
+        user_id,
+        user_name,
+        divide_config,
+        create_time,
+        create_by,
+        update_time,
+        update_by
+    </sql>
+
+    <select id="pageList" resultType="com.gameplat.admin.model.vo.DivideLayerConfigVo">
+        SELECT
+        dl.id as id,
+        dl.user_id as userId,
+        dl.user_name as userName,
+        dl.divide_config as divideConfig,
+        dl.create_time as createTime,
+        dl.create_by as createBy,
+        dl.update_time as updateTime,
+        dl.update_by as updateBy,
+        m.user_type as userType,
+        m.parent_id as parentId,
+        m.parent_name as parentName,
+        m.agent_level as agentLevel,
+        m.super_path as superPath
+        FROM divide_layer_config dl
+        INNER JOIN member m on m.id = dl.user_id
+        where 1 = 1
+        <choose>
+            <when test="dto.agentName != null and dto.agentName != ''">
+                and m.parent_name = #{dto.agentName} and dl.user_name != #{dto.agentName}
+                <if test="dto.userName != null and dto.userName != ''">
+                    and dl.user_name = #{dto.userName}
+                </if>
+            </when>
+            <otherwise>
+                <choose>
+                    <when test="dto.userName != null and dto.userName != ''">
+                        and dl.user_name = #{dto.userName}
+                    </when>
+                    <otherwise>
+                        and (m.agent_level = 1 or m.agent_level = 0)
+                    </otherwise>
+                </choose>
+            </otherwise>
+        </choose>
+        and m.user_type = 'A'
+        order by dl.create_time desc
+    </select>
+
+    <select id="getTeamList" resultType="com.gameplat.admin.model.vo.DivideLayerConfigVo">
+        SELECT dl.id            as id,
+               m.parent_id      as parentId,
+               m.parent_name    as parentName,
+               dl.divide_config as divideConfig
+        FROM divide_layer_config dl
+                 INNER JOIN member m on dl.user_id = m.id
+        where 1 = 1
+          and m.account != #{userName}
+          and m.super_path like concat('%/'
+            , #{userName}
+            , '/%')
+    </select>
+
+    <select id="getChildMaxDivideRatio" parameterType="string" resultType="java.math.BigDecimal">
+        select IFNULL(max(maxRatio), 0) as minRatio
+        from (
+                 select JSON_UNQUOTE(
+                                json_extract(
+                                        json_extract(
+                                                dl.divide_config, CONCAT('$.', concat('"', concat(#{code}, '"')))),
+                                        CONCAT('$.', concat('"', concat('divideRatio', '"'))
+                                            )
+                                    )
+                            ) AS maxRatio
+                 from divide_layer_config dl
+                          INNER JOIN member m on dl.user_id = m.id
+                 where m.parent_name = #{userName}
+                   and m.account != #{userName}
+             ) tmp
+    </select>
+
+    <select id="getConfigByGameCode" resultType="string">
+        select
+            JSON_UNQUOTE(json_extract(divide_config,CONCAT('$.',concat('"', concat(#{code},'"')))))
+        from divide_layer_config where user_name = #{userName}
+    </select>
+</mapper>

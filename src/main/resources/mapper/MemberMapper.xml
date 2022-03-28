@@ -1,0 +1,440 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gameplat.admin.mapper.MemberMapper">
+    <select id="queryPage" resultType="com.gameplat.admin.model.vo.MemberVO">
+        SELECT t1.id,
+               t1.account,
+               t1.nickname,
+               t1.user_level,
+               t1.agent_level,
+               t1.super_path,
+               t1.user_type,
+               t1.parent_name,
+               t1.status,
+               t1.remark,
+               t1.qq,
+               t1.wechat,
+               t1.email,
+               t1.withdraw_flag,
+               t1.dial_code,
+               t1.phone,
+               t1.register_ip,
+               t1.register_host,
+               t1.register_source,
+               t1.register_browser,
+               t1.register_os,
+               t1.create_time,
+               t1.real_name,
+               t1.lower_num,
+               t2.vip_level,
+               t2.vip_growth,
+               t2.last_login_ip,
+               t2.last_login_time,
+               t2.balance,
+               t2.freeze,
+               t2.invitation_code,
+               t2.total_rech_amount,
+               t2.total_rech_times,
+               t2.total_withdraw_amount,
+               t2.total_withdraw_times,
+               t2.gold_coin goldCoin,
+               t2.salary_flag salaryFlag
+        FROM member t1
+                 LEFT JOIN member_info t2 ON t1.id = t2.member_id
+            ${ew.customSqlSegment}
+    </select>
+
+    <select id="queryList" resultType="com.gameplat.admin.model.vo.MemberVO">
+        SELECT t1.id,
+               t1.account,
+               t1.nickname,
+               t1.user_level,
+               t1.agent_level,
+               t1.super_path,
+               t1.user_type,
+               t1.parent_id,
+               t1.parent_name,
+               t1.status,
+               t1.remark,
+               t1.qq,
+               t1.wechat,
+               t1.email,
+               t1.withdraw_flag,
+               t1.dial_code,
+               t1.phone,
+               t1.register_ip,
+               t1.register_host,
+               t1.register_source,
+               t1.register_browser,
+               t1.register_os,
+               t1.create_time,
+               t1.real_name,
+               t1.lower_num,
+               t2.vip_level vipLevel,
+               t2.vip_growth,
+               t2.last_login_ip,
+               t2.last_login_time,
+               t2.balance,
+               t2.freeze,
+               t2.invitation_code,
+               t2.total_rech_amount,
+               t2.total_rech_times,
+               t2.total_withdraw_amount,
+               t2.total_withdraw_times,
+               t2.gold_coin goldCoin
+        FROM member t1
+                     LEFT JOIN member_info t2 ON t1.id = t2.member_id
+                ${ew.customSqlSegment}
+    </select>
+
+    <select id="getMemberInfo" parameterType="java.lang.Long" resultType="com.gameplat.admin.model.vo.MemberInfoVO">
+        SELECT t1.id,
+               t1.account,
+               t1.nickname,
+               t1.user_level,
+               t1.agent_level,
+               t1.user_type,
+               t1.withdraw_flag,
+               t1.parent_name,
+               t1.status,
+               t1.language,
+               t1.remark,
+               t1.sex,
+               t1.qq,
+               t1.wechat,
+               t1.email,
+               t1.phone,
+               t1.dial_code,
+               t1.birthday,
+               t1.register_ip,
+               t1.register_host,
+               t1.register_source,
+               t1.register_browser,
+               t1.register_os,
+               t1.create_time,
+               t1.real_name,
+               t2.vip_level,
+               t2.vip_growth,
+               t2.last_login_ip,
+               t2.last_login_time,
+               t2.balance,
+               t2.freeze,
+               t2.rebate,
+               t2.invitation_code,
+               t2.last_rech_time,
+               t2.last_withdraw_time,
+               t2.total_rech_amount,
+               t2.total_rech_times,
+               t2.total_withdraw_amount,
+               t2.total_withdraw_times,
+               t2.gold_coin goldCoin,
+               t2.salary_flag salaryFlag
+        FROM member t1
+                 LEFT JOIN member_info t2 ON t1.id = t2.member_id
+        WHERE t1.id = #{id}
+    </select>
+
+    <select id="batchUpdateSuperPathAndAgentLevel">
+        UPDATE member
+        SET super_path = REPLACE(super_path, #{originSuperPath}, #{superPath}),
+        agent_level = (agent_level - #{agentLevel})
+        WHERE super_path LIKE CONCAT(#{originSuperPath}, '%')
+        <if test="null != account and '' != account">
+            AND account != #{account}
+        </if>
+    </select>
+
+    <update id="updateLowerNumByAccount">
+        UPDATE member SET lower_num = lower_num + #{lowerNum} WHERE account = #{account}
+    </update>
+
+    <select id="getMemberInfoByAccount" parameterType="java.lang.String" resultType="com.gameplat.admin.model.vo.MemberInfoVO">
+        SELECT t1.id,
+               t1.account,
+               t1.nickname,
+               t1.user_level as userLevel,
+               t1.agent_level as agentLevel,
+               t1.parent_id as parentId,
+               t1.user_type as userType,
+               t1.parent_name as parentName,
+               t1.status,
+               t1.remark,
+               t1.sex,
+               t1.qq,
+               t1.wechat,
+               t1.email,
+               t1.phone,
+               t1.birthday,
+               t1.register_ip as registerIp,
+               t1.register_source as registerSource,
+               t1.create_time as createTime,
+               t1.real_name as realName,
+               t1.table_index as tableIndex,
+               t2.vip_level,
+               t2.vip_growth,
+               t1.super_path as superPath,
+               t2.last_login_ip as lastLoginIp,
+               t2.last_login_time as lastLoginTime,
+               t2.balance,
+               t2.invitation_code as invitationCode,
+               t2.last_rech_time as lastRechTime,
+               t2.last_withdraw_time as lastWithdrawTime,
+               t2.total_rech_amount as totalRechAmount,
+               t2.total_rech_times as totalRechTimes,
+               t2.total_withdraw_amount as totalWithdrawAmount,
+               t2.total_withdraw_times as totalWithdrawTimes
+        FROM member t1
+                 LEFT JOIN member_info t2 ON t1.id = t2.member_id
+        WHERE t1.account = #{account}
+    </select>
+
+    <select id="getListByAgentAccout" resultType="com.gameplat.model.entity.member.Member">
+        SELECT t1.id,
+               t1.account,
+               t1.nickname,
+               t1.user_level,
+               t1.agent_level,
+               t1.parent_id,
+               t1.user_type,
+               t1.parent_name,
+               t1.status,
+               t1.remark,
+               t1.sex,
+               t1.qq,
+               t1.wechat,
+               t1.email,
+               t1.phone,
+               t1.birthday,
+               t1.register_ip,
+               t1.register_source,
+               t1.create_time,
+               t1.real_name,
+               t1.super_path,
+               t2.vip_level,
+               t2.vip_growth,
+               t2.last_login_ip,
+               t2.last_login_time,
+               t2.balance,
+               t2.invitation_code,
+               t2.last_rech_time,
+               t2.last_withdraw_time,
+               t2.total_rech_amount,
+               t2.total_rech_times,
+               t2.total_withdraw_amount,
+               t2.total_withdraw_times
+        FROM member t1
+                 LEFT JOIN member_info t2 ON t1.id = t2.member_id
+        WHERE t1.super_path LIKE concat('%', #{agentAccout},'%')
+    </select>
+
+    <select id="findByUserNameList" resultType="com.gameplat.model.entity.member.Member">
+        select * from member t where t.account in
+        <foreach item="userName" collection="userNames" open="(" separator="," close=")">
+            #{userName}
+        </foreach>
+
+    </select>
+
+    <select id="findIp" parameterType="com.gameplat.admin.model.dto.QueryIpStatReportDTO" resultType="com.gameplat.admin.model.vo.IpStatisticsVO">
+        select
+        register_ip as loginIp,
+        count(1) as frequency
+        from  member
+        where 1=1
+        and user_type = 'M'
+        <if test="ip != null">
+            and register_ip = #{ip}
+        </if>
+        <if test="beginDate != null and beginDate != ''">
+            and date_format(create_time,'%y%m%d') <![CDATA[ >= ]]> date_format(#{beginDate},'%y%m%d')
+        </if>
+        <if test="endDate != null and endDate != ''">
+            and date_format(create_time,'%y%m%d') <![CDATA[ <= ]]> date_format(#{endDate},'%y%m%d')
+        </if>
+        group by register_ip
+        <if test="count != null and count != ''">
+            having count(1) >= #{count}
+        </if>
+        ORDER BY create_Time desc
+    </select>
+
+    <select id="findIpAnalysisList" parameterType="com.gameplat.admin.model.dto.QueryIpStatReportDTO" resultType="com.gameplat.admin.model.vo.IpAnalysisVO">
+        select
+        id as memberId,
+        account,
+        real_name as fullName,
+        register_ip as ipAddress,
+        count(*) as ipCount
+        from member
+        WHERE 1=1
+        AND user_type = 'M'
+        <if test="account != null and account != ''">
+            AND account = #{account}
+        </if>
+        <if test="ip != null and ip != ''">
+            AND register_ip = #{ip}
+        </if>
+        <if test="beginDate != null and beginDate != ''">
+            and date_format(create_time,'%y%m%d') <![CDATA[ >= ]]> date_format(#{beginDate},'%y%m%d')
+        </if>
+        <if test="endDate != null and endDate != ''">
+            and date_format(create_time,'%y%m%d') <![CDATA[ <= ]]> date_format(#{endDate},'%y%m%d')
+        </if>
+        group by register_ip
+        order by id desc, create_time desc
+    </select>
+
+    <select id="getInfoByAccount" resultType="com.gameplat.model.entity.member.Member">
+        select
+        id as id,
+        account as account,
+        real_name as realName,
+        super_path as superPath
+        from member
+        <where>
+            <if test="accountList != null and accountList.size > 0">
+                account in
+                <foreach collection="accountList" item="account" open="(" close=")" separator="," index="index">
+                    #{account}
+                </foreach>
+            </if>
+        </where>
+    </select>
+
+    <!--    提现IP分析  -->
+    <select id="page" parameterType="com.gameplat.admin.model.dto.IpAnalysisDTO" resultType="com.gameplat.admin.model.vo.IpAnalysisVO">
+        SELECT
+        m.id as memberId,
+        m.account as account,
+        m.real_name as fullName,
+        m.register_ip as ipAddress,
+        (select count(1) from member where 1=1 AND user_type = 'M' and register_ip = ipAddress) as ipCount,
+        mi.balance as money
+        from member m
+        left join member_info mi on m.id = mi.member_id
+        where 1=1
+        and user_type = 'M'
+        <if test="dto.account != null"> and m.account = #{dto.account}</if>
+        <if test="dto.loginIp != null"> and m.register_ip = #{dto.loginIp}</if>
+        <if test="dto.beginTime != null and dto.beginTime != ''">
+            and date_format(m.create_time,'%y%m%d') <![CDATA[ >= ]]> date_format(#{dto.beginTime},'%y%m%d')
+        </if>
+        <if test="dto.endTime != null and dto.endTime != ''">
+            and date_format(m.create_time,'%y%m%d') <![CDATA[ <= ]]> date_format(#{dto.endTime},'%y%m%d')
+        </if>
+        group  by m.id, m.register_ip
+        order by m.id desc, m.create_time desc
+    </select>
+
+    <!-- 根据代理获取代理下的信息 -->
+    <select id="getAgentMember" resultType="com.gameplat.model.entity.member.Member">
+        SELECT id,account FROM member
+        WHERE
+        create_time BETWEEN #{startTime} AND #{endTime}
+        AND
+        super_path regexp concat(
+        <foreach collection="list" item="obj" open="" close="" separator=",'|',">
+            concat('^/',#{obj.agentAccount})
+        </foreach>
+        )
+    </select>
+
+    <select id="getOpenSalaryAgent" resultType="com.gameplat.model.entity.member.Member">
+        select
+            m.id,
+            m.account,
+            m.agent_level as agentLevel,
+            m.super_path as superPath,
+            m.parent_id as parentId,
+            m.parent_name as parentName
+        from member as m inner join member_info as mi on m.id = mi.member_id
+        where mi.salary_flag = '1' and m.user_type = 'A'
+        <if test="list != null and list.size() > 0">
+            and m.agent_level in
+            <foreach collection="list" index="ind" item="level" open="(" separator="," close=")">
+                #{level}
+            </foreach>
+        </if>
+    </select>
+
+    <!-- 获取各个充值层级下会员数量和锁定会员数量 -->
+    <select id="getUserLevelAccountNum" resultType="com.gameplat.admin.model.vo.MemberLevelVO">
+        SELECT
+        user_level levelValue,
+        sum( CASE WHEN level_lock_flag = 'N' THEN 1 ELSE 0 end ) memberNum,
+        sum( CASE WHEN level_lock_flag = 'Y' THEN 1 ELSE 0 end) memberLockNum
+        FROM
+        member where user_type in ('M','A')
+        GROUP BY
+        user_level
+    </select>
+
+    <!-- 获取某个充值层级下会员数量总数 -->
+    <select id="getUserLevelTotalAccountNum" resultType="java.lang.Integer">
+        SELECT
+        count(id)
+        FROM
+        member
+        where
+        user_type in ('M','A')
+        and user_level = #{userLevel}
+    </select>
+
+    <!-- 获取代理线下的会员信息 -->
+    <select id="getMemberListByAgentAccount" resultType="com.gameplat.model.entity.member.Member">
+        SELECT
+        t1.id,
+        t1.account,
+        t1.user_level userLevel
+        FROM member t1
+        LEFT JOIN member_info t2 ON t1.id = t2.member_id
+        <where>
+            <if test="parentName != null and parentName != ''">
+                (
+                <choose>
+                    <when test="subordinateOnly != null and subordinateOnly == true">
+                        t1.parent_name = #{parentName}
+                    </when>
+                    <otherwise>
+                        t1.super_path LIKE concat('%', #{parentName},'%')
+                    </otherwise>
+                </choose>
+                <if test="itself != null and itself == 1">
+                    or t1.account = #{parentName}
+                </if>
+                )
+            </if>
+            <if test="levelList != null and levelList.size() > 0">
+                and t1.user_level in
+                <foreach collection="levelList" item="level" open="(" close=")" separator="," index="index">
+                    #{level}
+                </foreach>
+            </if>
+            <if test="rechTimesFrom != null">
+                and t2.total_rech_times <![CDATA[>= ]]> #{rechTimesFrom}
+            </if>
+            <if test="rechTimesTo != null">
+                and t2.total_rech_times <![CDATA[<= ]]> #{rechTimesTo}
+            </if>
+            <if test="rechAmountFrom != null">
+                and t2.total_rech_amount <![CDATA[>= ]]> #{rechAmountFrom}
+            </if>
+            <if test="rechAmountTo != null">
+                and t2.total_rech_amount <![CDATA[<= ]]> #{rechAmountTo}
+            </if>
+            <if test="lastRechTimeFrom != null">
+                and t2.last_rech_time <![CDATA[>= ]]> #{lastRechTimeFrom}
+            </if>
+            <if test="lastRechTimeTo != null">
+                and t2.last_rech_time <![CDATA[>= ]]> #{lastRechTimeTo}
+            </if>
+            <if test="userType != null and userType != ''">
+                and t1.user_type = #{userType}
+            </if>
+        </where>
+    </select>
+
+
+
+</mapper>

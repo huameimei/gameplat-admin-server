@@ -2,12 +2,19 @@
 <permit-uri>
     <!-- 允许不带token 也可以访问的uri路径列表 -->
     <uri-list>
-        <uri>/webjars/springfox-swagger-ui/**</uri>
-        <uri>/v2/api-docs**</uri>
+        <uri>/favicon.ico</uri>
+        <uri>/swagger-ui/**</uri>
+        <uri>/v2/api-docs</uri>
+        <uri>/v3/api-docs</uri>
         <uri>/swagger-resources/**</uri>
         <uri>/doc.html</uri>
-        <uri>/webjars/bycdao-ui/**</uri>
-        <uri>/api/open/user-server/oauth/login.json</uri>
-        <uri>/api/**</uri>
+        <uri>/webjars/**</uri>
+        <uri>/api/admin/auth/login</uri>
+        <uri>/api/admin/common/**</uri>
+        <uri>/api/admin/spread/management/**</uri>
+        <uri>/api/admin/report/game/financial/masterPullReport</uri>
+        <uri>/api/admin/report/game/financial/exportReport</uri>
+        <uri>/websocket/**</uri>
+        <uri>/api/internal/**</uri>
     </uri-list>
 </permit-uri>

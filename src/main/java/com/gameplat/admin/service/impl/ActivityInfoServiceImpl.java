@@ -113,7 +113,7 @@ public class ActivityInfoServiceImpl extends ServiceImpl<ActivityInfoMapper, Act
       if (null != activityInfo.getId() && activityInfo.getId() > 0) {
         // 保存活动显示的图片
         SysBannerInfo banner = new SysBannerInfo();
-        banner.setBannerType(configService.getValueInteger(DictDataEnum.ACTIVITY));
+        banner.setBannerType(configService.getInteger(DictDataEnum.ACTIVITY));
         banner.setChildType(activityInfo.getId());
         banner.setChildName(activityInfo.getTitle());
         banner.setLanguage(LocaleContextHolder.getLocale().toLanguageTag());

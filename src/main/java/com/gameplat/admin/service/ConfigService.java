@@ -10,23 +10,25 @@ public interface ConfigService {
 
   String getValue(DictDataEnum dataEnum, String defaultValue);
 
-  Integer getValueInteger(DictDataEnum dataEnum);
+  Integer getInteger(DictDataEnum dataEnum);
 
-  Integer getValueInteger(DictDataEnum dataEnum, Integer defaultValue);
+  Integer getInteger(DictDataEnum dataEnum, Integer defaultValue);
 
-  Long getValueLong(DictDataEnum dataEnum);
+  Long getLong(DictDataEnum dataEnum);
 
-  Long getValueLong(DictDataEnum dataEnum, Long defaultValue);
+  Long getLong(DictDataEnum dataEnum, Long defaultValue);
 
-  Double getValueDouble(DictDataEnum dataEnum, Double defaultValue);
+  Double getDouble(DictDataEnum dataEnum, Double defaultValue);
 
-  Double getValueDouble(DictDataEnum dataEnum);
+  Double getDouble(DictDataEnum dataEnum);
 
-  Boolean getValueBoolean(DictDataEnum dataEnum, Boolean defaultValue);
+  Boolean getBoolean(DictDataEnum dataEnum, Boolean defaultValue);
 
-  Boolean getValueBoolean(DictDataEnum dataEnum);
+  Boolean getBoolean(DictDataEnum dataEnum);
 
   <T> T get(DictDataEnum dataEnum, Class<T> clazz);
+
+  <T> T get(String type, String label, Class<T> clazz);
 
   <T> T get(DictDataEnum dataEnum, TypeReference<T> clazz);
 

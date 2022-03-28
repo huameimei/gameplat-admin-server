@@ -115,7 +115,7 @@ public class TenantSettingController {
      */
     @RequestMapping("/deleteStartImagePage")
     @ApiOperation("启动图配置删除")
-    public Result<Object> deleteStartImagePage(@RequestParam(value = "id", required = true) int id) {
+    public Result<Object> deleteStartImagePage(@RequestParam(value = "id") int id) {
         TenantSetting tenantSetting = new TenantSetting();
         tenantSetting.setSettingType(TenantSettingEnum.START_UP_IMAGE.getCode());
         tenantSetting.setId(id);

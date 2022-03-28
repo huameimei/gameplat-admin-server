@@ -12,6 +12,7 @@ import com.gameplat.common.enums.LimitEnums;
 import com.gameplat.common.lang.Assert;
 import com.gameplat.common.model.bean.limit.AdminLoginLimit;
 import com.gameplat.common.model.bean.limit.MemberRechargeLimit;
+import com.gameplat.common.model.bean.limit.MemberWithdrawLimit;
 import com.gameplat.model.entity.limit.LimitInfo;
 import com.gameplat.security.SecurityUserHolder;
 import lombok.extern.slf4j.Slf4j;
@@ -86,6 +87,13 @@ public class LimitInfoServiceImpl extends ServiceImpl<LimitInfoMapper, LimitInfo
   public MemberRechargeLimit getRechargeLimit() {
     return this.getLimitInfo(LimitEnums.MEMBER_RECHARGE_LIMIT, MemberRechargeLimit.class)
         .orElseThrow(() -> new ServiceException("加载出入款配置信息失败，请联系客服!"));
+  }
+
+
+  @Override
+  public MemberWithdrawLimit getWithradLimit() {
+    return this.getLimitInfo(LimitEnums.MEMBER_WITHDRAW_LIMIT, MemberWithdrawLimit.class)
+            .orElseThrow(() -> new ServiceException("加载出入款配置信息失败，请联系客服!"));
   }
 
   @Override

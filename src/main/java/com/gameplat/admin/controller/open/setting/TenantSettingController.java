@@ -161,7 +161,11 @@ public class TenantSettingController {
             throw new ServiceException("id不允许为空");
         }
         tenantSettingService.updateAppNavigation(tenantSettingVO);
-        adminCache.deleteByPrefix(CacheKey.getTenantNavPrefixKey());
+        if (Constants.SQUARE_NAVIGATION.equals(tenantSettingVO.getSettingType())) {
+            adminCache.deleteByPrefix(CacheKey.getSquareNavListKey());
+        } else {
+            adminCache.deleteByPrefix(CacheKey.getTenantNavPrefixKey());
+        }
         return Result.succeed();
     }
 
@@ -226,7 +230,7 @@ public class TenantSettingController {
             return Result.failed("修改值不允许为空...");
         }
         tenantSettingService.updateTenantSettingValue(tenantSetting);
-        adminCache.deleteKey(CacheKey.getSquareEnableKey());
+        adminCache.deleteObject(CacheKey.getSquareEnableKey());
         return Result.succeed();
     }
 

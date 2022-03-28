@@ -1,5 +1,6 @@
 package com.gameplat.admin.service.impl;
 
+import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -31,6 +32,7 @@ import com.gameplat.common.enums.*;
 import com.gameplat.common.model.bean.Builder;
 import com.gameplat.common.model.bean.UserEquipment;
 import com.gameplat.common.model.bean.limit.MemberRechargeLimit;
+import com.gameplat.common.model.bean.limit.MemberWithdrawLimit;
 import com.gameplat.model.entity.member.*;
 import com.gameplat.model.entity.pay.PpInterface;
 import com.gameplat.model.entity.pay.PpMerchant;
@@ -259,8 +261,8 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
     if (cashStatus.equals(curStatus) || null == id || null == cashStatus || null == curStatus) {
       throw new ServiceException("错误的参数.");
     }
-    MemberWithdraw memberWithdraw = this.getById(id);
 
+    MemberWithdraw memberWithdraw = this.getById(id);
     if (memberWithdraw == null) {
       throw new ServiceException("充值订单不存在或订单已处理");
     }
@@ -286,9 +288,12 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
     }
     if (WithdrawStatus.UNHANDLED.getValue() != curStatus) {
       // 验证已受理出款订单是否开启允许其他账户验证
-
       crossAccountCheck(userCredential, memberWithdraw);
     }
+
+    //验证出款流程 ,未受理订单是否可以直接入款
+    withdrawProcess(memberWithdraw);
+
     /** 校验子账号当天受理会员取款审核额度 */
     if (null != userCredential.getUsername()
         && StringUtils.equals(UserTypes.SUBUSER.value(), userCredential.getUserType())
@@ -577,6 +582,8 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
     if (userCredential != null
         && StringUtils.isNotEmpty(userCredential.getUsername())
         && null != memberWithdraw) {
+
+
       MemberRechargeLimit limitInfo = limitInfoService.getRechargeLimit();
       boolean toCheck =
           BooleanEnum.NO.match(limitInfo.getIsHandledAllowOthersOperate())
@@ -590,6 +597,20 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
       }
     }
   }
+
+  /**
+   * 检查订单是否需要先受理
+   **/
+  private void withdrawProcess(MemberWithdraw memberWithdraw) {
+    MemberWithdrawLimit withradLimit = limitInfoService.getWithradLimit();
+
+    boolean withdrawProcess =
+            BooleanEnum.YES.match(withradLimit.getIsWithdrawProcess());
+    if (withdrawProcess && !ObjectUtil.equal(memberWithdraw.getCashStatus(), 2)) {
+      throw new ServiceException("请先受理此订单:" + memberWithdraw.getCashOrderNo());
+    }
+  }
+
 
   /** 检查用户，封装用户信息 */
   private void checkUserInfo(Member member, MemberInfo memberInfo, boolean checkUserState)

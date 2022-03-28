@@ -17,6 +17,7 @@ public interface Constants {
   String SPORT_CONFIG_TYPE = "sport_config";
   String SPORT_CONFIG_CODE = "sportConfig";
   String SPORT_CONFIG_DESC = "体育配置";
+  String SQUARE_NAVIGATION ="square_navigation";
   /** 启动图 */
   String START_UP_IMAGE = "start_up_image";
   /** 个人中心 */

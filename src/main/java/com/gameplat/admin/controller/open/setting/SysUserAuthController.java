@@ -34,6 +34,7 @@ public class SysUserAuthController {
 
   @ApiOperation("保存用户认证")
   @GetMapping("lsit")
+  @PreAuthorize("hasAuthority('system:userAuth:view')")
   public List<SysUserAuthVo> lsit() {
     return sysUserAuthService.findAuth();
   }

@@ -7,6 +7,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -20,7 +21,7 @@ public class SysRechargeLimitController {
 
   @Autowired private SysDictDataService dictDataService;
 
-  // @PreAuthorize("hasAuthority('system:recharge:edit')")
+  @PreAuthorize("hasAuthority('system:recharge:edit')")
   @ApiOperation(value = "直播间发言限制信息修改")
   @PostMapping("/updaterechargelimit")
   public Result configDataEdit(@RequestBody DictParamDTO dictParamDTO) {

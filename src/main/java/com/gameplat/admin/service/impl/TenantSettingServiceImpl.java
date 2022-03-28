@@ -154,7 +154,7 @@ public class TenantSettingServiceImpl extends ServiceImpl<TenantSettingMapper, T
         LambdaQueryWrapper<TenantSetting> queryWrapper = new LambdaQueryWrapper<TenantSetting>();
         queryWrapper.eq(TenantSetting::getId, tenantSetting.getId());
         queryWrapper.eq(TenantSetting::getSettingType, tenantSetting.getSettingType());
-        this.removeById(queryWrapper);
+        this.remove(queryWrapper);
     }
 
     @Override

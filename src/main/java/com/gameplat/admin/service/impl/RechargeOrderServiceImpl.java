@@ -302,9 +302,6 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
       log.error("=========用户充值推送消息异常========",e);
     }
 
-
-
-
     // 判断充值是否计算积分
     if (TrueFalse.TRUE.getValue() != rechargeOrder.getPointFlag()) {
       log.info(

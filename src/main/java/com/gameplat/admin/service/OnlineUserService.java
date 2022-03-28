@@ -37,6 +37,8 @@ public interface OnlineUserService {
    */
   void kick(String uuid);
 
+  void kickByUsername(String username);
+
   /** 踢出所有用户 */
   void kickAll();
 }

@@ -1,10 +1,10 @@
 package com.gameplat.admin.interceptor;
 
+import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.IPUtils;
 import com.gameplat.security.SecurityUserHolder;
 import com.gameplat.security.context.UserCredential;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
 import javax.servlet.http.HttpServletRequest;
@@ -25,7 +25,7 @@ public class SecurityValidationInterceptor extends HandlerInterceptorAdapter {
     UserCredential credential = SecurityUserHolder.getCredential();
     String requestIp = IPUtils.getIpAddress(request);
     if (!credential.getLoginIp().equals(requestIp)) {
-      throw new AccessDeniedException("IP发生变更，您已被迫下线!");
+      throw new ServiceException("IP发生变更，您已被迫下线!");
     }
     return true;
   }

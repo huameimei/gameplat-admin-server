@@ -297,8 +297,8 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
 
     try {
       log.info("===================开始推送充值成功的消息用户: {}=====================",member);
-      pushService.send(account,PushMessage.builder().channel(1).title("充值成功").build());
-      pushService.send(PushMessage.builder().channel(1).title("发送至指定频道").build());
+      pushService.send(account,PushMessage.builder().channel("TEST_ONE").title("充值成功").build());
+      pushService.send(PushMessage.builder().channel("TEST_407").title("发送至指定频道").build());
     }catch (Exception e){
       log.error("=========用户充值推送消息异常========",e);
     }

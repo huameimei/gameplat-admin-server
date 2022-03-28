@@ -294,14 +294,13 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
     memberInfoService.updateBalanceWithRecharge(
         memberInfo.getMemberId(), rechargeOrder.getPayAmount(), rechargeOrder.getTotalAmount());
     String account = member.getAccount();
-    new Thread(new Runnable() {
-      @Override
-      public void run() {
-        log.info("===================开始推送充值成功的消息用户: {}=====================",member);
-        pushService.send(account,PushMessage.builder().channel(1).title("充值成功").build());
-      }
-    }).start();
 
+    try {
+      log.info("===================开始推送充值成功的消息用户: {}=====================",member);
+      pushService.send(account,PushMessage.builder().channel(1).title("充值成功").build());
+    }catch (Exception e){
+      log.error("=========用户充值推送消息异常========",e);
+    }
 
     // 判断充值是否计算积分
     if (TrueFalse.TRUE.getValue() != rechargeOrder.getPointFlag()) {

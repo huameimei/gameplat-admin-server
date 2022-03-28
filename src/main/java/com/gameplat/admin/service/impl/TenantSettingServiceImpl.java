@@ -112,6 +112,7 @@ public class TenantSettingServiceImpl extends ServiceImpl<TenantSettingMapper, T
                 StringUtils.isNotBlank(tenantSetting.getSettingLabel()),
                 TenantSetting::getSettingLabel,
                 tenantSetting.getSettingLabel());
+        queryWrapper.orderByDesc(TenantSetting::getCreateTime);
         return this.page(page, queryWrapper);
     }
 
@@ -127,6 +128,7 @@ public class TenantSettingServiceImpl extends ServiceImpl<TenantSettingMapper, T
                     throw new ServiceException("开启的图片/视频已达上线 (最多开启三个)");
                 }
             }
+            queryWrapper.eq(TenantSetting::getCreateTime, new Date());
             // 新增
             this.save(tenantSetting);
         } else {
@@ -145,6 +147,7 @@ public class TenantSettingServiceImpl extends ServiceImpl<TenantSettingMapper, T
                     throw new ServiceException("开启的图片/视频已达上线 (最多开启三个)");
                 }
             }
+            queryWrapper.eq(TenantSetting::getUpdateTime, new Date());
             this.updateById(tenantSetting);
         }
     }

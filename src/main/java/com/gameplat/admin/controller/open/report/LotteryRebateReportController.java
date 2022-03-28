@@ -25,7 +25,7 @@ public class LotteryRebateReportController {
 
   @GetMapping(value = "/page")
   @ApiOperation(value = "裂变")
-  @PreAuthorize("hasAuthority('lottery:rebate:page')")
+  @PreAuthorize("hasAuthority('lottery:rebate:view')")
   public PageDtoVO<LotteryRebateReportVO> page(
       PageDTO<LotteryRebateReport> page, LotteryRebateReportDTO dto) {
     return rebateReportService.page(page, dto);

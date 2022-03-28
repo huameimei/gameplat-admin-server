@@ -30,7 +30,7 @@ public class MemberLoanController {
 
   @GetMapping("/page")
   @ApiOperation(value = "查")
-  @PreAuthorize("hasAuthority('member:loan:page')")
+  @PreAuthorize("hasAuthority('member:loan:view')")
   public LoanVO page(PageDTO<MemberLoan> page, MemberLoanQueryDTO dto) {
     return memberLoanService.page(page, dto);
   }

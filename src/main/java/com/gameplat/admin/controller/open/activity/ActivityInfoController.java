@@ -61,7 +61,7 @@ public class ActivityInfoController {
    */
   @ApiOperation(value = "活动列表")
   @GetMapping("/list")
-  @PreAuthorize("hasAuthority('activity:info:page')")
+  @PreAuthorize("hasAuthority('activity:info:view')")
   @ApiImplicitParams({
     @ApiImplicitParam(name = "current", value = "分页参数：当前页", defaultValue = "1"),
     @ApiImplicitParam(name = "size", value = "每页条数")
@@ -135,7 +135,7 @@ public class ActivityInfoController {
    */
   @ApiOperation(value = "编辑活动")
   @PostMapping("/update")
-  @PreAuthorize("hasAuthority('activity:info:update')")
+  @PreAuthorize("hasAuthority('activity:info:edit')")
   public void update(@RequestBody ActivityInfoUpdateDTO activityInfoUpdateDTO) {
     checkActivityInfo(
         activityInfoUpdateDTO.getValidStatus(),

@@ -33,7 +33,7 @@ public class ActivityQualificationController {
 
   @ApiOperation(value = "活动资格列表")
   @GetMapping("/list")
-  @PreAuthorize("hasAuthority('activity:qualification:page')")
+  @PreAuthorize("hasAuthority('activity:qualification:view')")
   public IPage<ActivityQualificationVO> list(
       @ApiIgnore PageDTO<ActivityQualification> page, ActivityQualificationQueryDTO dto) {
     return activityQualificationService.list(page, dto);

@@ -22,6 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -124,6 +125,7 @@ public class TenantSettingController {
      */
     @RequestMapping("/getTenantSettings")
     @ApiOperation("获取租户设置信息")
+    @PreAuthorize("hasAuthority('system:teant:view')")
     public Result<Object> getTenantSettings(TenantSettingVO tenantSettingVO) {
         // 查询租户主题
         if (Constants.TEMPLATE_CONFIG_THEME.equals(tenantSettingVO.getSettingType())) {
@@ -138,12 +140,14 @@ public class TenantSettingController {
      */
     @RequestMapping("/updateDisplayAndSort")
     @ApiOperation("修改显示与排序")
+    @PreAuthorize("hasAuthority('system:teant:edit')")
     @CacheEvict(cacheNames = Constants.TENANT_NAVIGATION_LIST, allEntries = true)
     public void updateDisplayAndSort(@RequestBody TenantSettingVO tenantSettingVO) {
         UserCredential user = SecurityUserHolder.getCredential();
         if (user != null) {
             tenantSettingVO.setUpdateBy(user.getUsername());
         }
+        if (StringUtils.isBlank(tenantSettingVO.getSettingType())) {
         if (StringUtils.isBlank(tenantSettingVO.getSettingType())) {
             throw new ServiceException("导航栏类型不允许为空");
         }
@@ -198,6 +202,7 @@ public class TenantSettingController {
      * 获取广场的开关
      */
     @RequestMapping("/getSquareSwitch")
+    @PreAuthorize("hasAuthority('system:teant:..zgetSquareSwitch')")
     public Result getSquareSwitch(TenantSettingVO sysTenantSetting) {
         sysTenantSetting.setSettingType(Constants.SYSTEM_SETTING);
         sysTenantSetting.setSettingCode(Constants.SQUARE_SWITCH);
@@ -234,6 +239,7 @@ public class TenantSettingController {
         if(sportConfigVo==null){
             Result.failed("修改体育配置参数为空");
         }
+
         return Result.succeed(tenantSettingService.updateSportConfig(sportConfigVo));
     }
 }

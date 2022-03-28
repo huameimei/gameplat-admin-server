@@ -51,7 +51,7 @@ public class GameRebatePeriodController {
   @Autowired private RedisService redisService;
 
   @GetMapping(value = "queryAll")
-  @PreAuthorize("hasAuthority('game:gameRebatePeriod:list')")
+  @PreAuthorize("hasAuthority('game:gameRebatePeriod:view')")
   public IPage<GameRebatePeriodVO> queryGameRebatePeriod(
       Page<GameRebatePeriod> page, GameRebatePeriodQueryDTO dto) {
     return gameRebatePeriodService.queryGameRebatePeriod(page, dto);

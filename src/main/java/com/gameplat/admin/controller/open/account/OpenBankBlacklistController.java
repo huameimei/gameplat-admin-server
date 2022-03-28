@@ -19,13 +19,13 @@ public class OpenBankBlacklistController {
   @Autowired private BankBlacklistService bankBlacklistService;
 
   @DeleteMapping("/del/{id}")
-  @PreAuthorize("hasAuthority('account:bankBlack:del')")
+  @PreAuthorize("hasAuthority('account:bankBlack:remove')")
   public void delete(@PathVariable Long id) {
     bankBlacklistService.delete(id);
   }
 
   @GetMapping("/list")
-  @PreAuthorize("hasAuthority('account:bankBlack:list')")
+  @PreAuthorize("hasAuthority('account:bankBlack:view')")
   public IPage<BankBlacklist> findBankBlacklist(
       PageDTO<BankBlacklist> page, BankBlacklistQueryDTO bankBlacklistQueryDTO) {
     return bankBlacklistService.queryBankBlacklistList(page, bankBlacklistQueryDTO);

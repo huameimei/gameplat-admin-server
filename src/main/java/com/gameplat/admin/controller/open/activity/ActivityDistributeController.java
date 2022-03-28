@@ -37,7 +37,7 @@ public class ActivityDistributeController {
 
   @ApiOperation(value = "活动分发列表")
   @GetMapping("/list")
-  @PreAuthorize("hasAuthority('activity:distribute:page')")
+  @PreAuthorize("hasAuthority('activity:distribute:view')")
   @ApiImplicitParams({
     @ApiImplicitParam(name = "current", value = "分页参数：当前页", defaultValue = "1"),
     @ApiImplicitParam(name = "size", value = "每页条数"),

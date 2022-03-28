@@ -36,7 +36,7 @@ public class OpenMemberWealController {
 
   @GetMapping("/list")
   @ApiOperation(value = "查询福利发放记录列表")
-  @PreAuthorize("hasAuthority('member:weal:list')")
+  @PreAuthorize("hasAuthority('member:weal:view')")
   public IPage<MemberWealVO> listWeal(PageDTO<MemberWeal> page, MemberWealDTO dto) {
     return wealService.findMemberWealList(page, dto);
   }
@@ -97,14 +97,14 @@ public class OpenMemberWealController {
 
   @DeleteMapping("/delete")
   @ApiOperation(value = "删除会员俸禄")
-  @PreAuthorize("hasAuthority('member:weal:remove')")
+  @PreAuthorize("hasAuthority('member:weal:removeMember')")
   public void deleteByUserId(Long id) {
     memberWealDetailService.deleteById(id);
   }
 
   @PutMapping("/updateRewordAmount")
   @ApiOperation(value = "修改会员俸禄")
-  @PreAuthorize("hasAuthority('member:weal:edit')")
+  @PreAuthorize("hasAuthority('member:weal:editMember')")
   public void editRewordAmount(@RequestBody MemberWealDetailEditDTO dto) {
     memberWealDetailService.editRewordAmount(dto.getId(), dto.getRewordAmount());
   }

@@ -18,7 +18,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 public class PushMessage implements Serializable {
 
-  private Integer channel;
+  private String channel;
 
   private String title;
 }

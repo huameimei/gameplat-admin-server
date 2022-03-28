@@ -92,9 +92,19 @@
         d.game_type_name,
         d.id game_type_id
         from game_financial_report a
-        left join game_kind as b on a.game_kind = b.code
-        left join game_platform as c on a.platform_code = c.code
-        left join game_type as d on a.game_type = d.game_type_code
+        LEFT JOIN  game_kind as b on a.game_kind = b.code
+        LEFT JOIN  game_platform as c on a.platform_code = c.code
+        LEFT JOIN  game_type as d on a.game_type = d.game_type_code
+        LEFT JOIN (
+        SELECT
+        first_kind,
+        win_amount
+        FROM
+        game_financial_report
+        WHERE
+        count_date = DATE_FORMAT( date_sub( CONCAT( #{month}, '-01' ), INTERVAL 1 MONTH ), '%Y-%m' )
+        ) d ON d.first_kind = a.first_kind
+        where a.count_date = #{month}
         <where>
             <if test="dto.statisticsTime != null and dto.statisticsTime != ''">
                 and a.statistics_time = #{dto.statisticsTime}

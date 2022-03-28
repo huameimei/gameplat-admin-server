@@ -105,6 +105,7 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
   @Autowired private MemberGrowthConfigService memberGrowthConfigService;
   @Autowired private MemberGrowthRecordService memberGrowthRecordService;
   @Autowired private MemberGrowthStatisService memberGrowthStatisService;
+  @Autowired private MessagePushService pushService;
 
   @Override
   public PageExt<RechargeOrderVO, SummaryVO> findPage(
@@ -292,6 +293,15 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
     // 更新会员充值信息
     memberInfoService.updateBalanceWithRecharge(
         memberInfo.getMemberId(), rechargeOrder.getPayAmount(), rechargeOrder.getTotalAmount());
+    String account = member.getAccount();
+    new Thread(new Runnable() {
+      @Override
+      public void run() {
+        log.info("===================开始推送充值成功的消息用户: {}=====================",member);
+        pushService.send(account,PushMessage.builder().channel(1).title("充值成功").build());
+      }
+    }).start();
+
 
     // 判断充值是否计算积分
     if (TrueFalse.TRUE.getValue() != rechargeOrder.getPointFlag()) {

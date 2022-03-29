@@ -4,6 +4,7 @@ import com.alibaba.nacos.common.utils.CollectionUtils;
 import com.aliyun.oss.ServiceException;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
+import com.gameplat.admin.cache.AdminCache;
 import com.gameplat.admin.constant.Constants;
 import com.gameplat.admin.enums.TenantSettingEnum;
 import com.gameplat.admin.model.vo.ListSortConfigVO;
@@ -129,7 +130,6 @@ public class TenantSettingController {
      */
     @RequestMapping("/getTenantSettings")
     @ApiOperation("获取租户设置信息")
-    @PreAuthorize("hasAuthority('system:teant:view')")
     public Result<Object> getTenantSettings(TenantSettingVO tenantSettingVO) {
         // 查询租户主题
         if (Constants.TEMPLATE_CONFIG_THEME.equals(tenantSettingVO.getSettingType())) {
@@ -145,9 +145,6 @@ public class TenantSettingController {
     @RequestMapping("/updateDisplayAndSort")
     @ApiOperation("修改显示与排序")
     public Result updateDisplayAndSort(@RequestBody TenantSettingVO tenantSettingVO) {
-    @PreAuthorize("hasAuthority('system:teant:edit')")
-    @CacheEvict(cacheNames = Constants.TENANT_NAVIGATION_LIST, allEntries = true)
-    public void updateDisplayAndSort(@RequestBody TenantSettingVO tenantSettingVO) {
         UserCredential user = SecurityUserHolder.getCredential();
         if (user != null) {
             tenantSettingVO.setUpdateBy(user.getUsername());

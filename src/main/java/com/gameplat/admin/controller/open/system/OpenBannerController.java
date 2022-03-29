@@ -34,7 +34,7 @@ public class OpenBannerController {
 
   @ApiOperation(value = "banner列表")
   @GetMapping("/list")
-  @PreAuthorize("hasAuthority('system:banner:page')")
+  @PreAuthorize("hasAuthority('system:banner:view')")
   public IPage<SysBannerInfoVO> list(@ApiIgnore PageDTO<SysBannerInfo> page, Integer type) {
     return sysBannerInfoService.list(page, LocaleContextHolder.getLocale().toLanguageTag(), type);
   }

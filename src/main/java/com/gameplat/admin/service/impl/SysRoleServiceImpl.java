@@ -94,7 +94,7 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole>
             .like(ObjectUtils.isNotEmpty(dto.getRoleName()), "r.role_name", dto.getRoleName())
             .eq(ObjectUtils.isNotNull(dto.getStatus()), "r.status", dto.getStatus())
             .like(ObjectUtils.isNotEmpty(dto.getRoleKey()), "r.role_key", dto.getRoleKey())
-            .eq("is_del", "0");
+            .eq("r.is_del", "0");
 
     return roleMapper.selectRoleList(page, queryWrapper).convert(roleConvert::toVo);
   }

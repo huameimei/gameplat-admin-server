@@ -355,7 +355,8 @@ public class ValidWithdrawServiceImpl extends ServiceImpl<ValidWithdrawMapper, V
             BigDecimal vaildAmount =
                 gameBetValidRecordVoList.stream()
                     .map(GameBetValidRecordVo::getValidAmount)
-                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+                        .reduce(BigDecimal.ZERO, BigDecimal::add)
+                        .divide(Convert.toBigDecimal(1000));
             log.info("每笔总投注记录:{}", vaildAmount);
             validAccoutWithdrawVo.setVaildAmount(vaildAmount);
             // 根据游戏类型进行分类
@@ -375,7 +376,8 @@ public class ValidWithdrawServiceImpl extends ServiceImpl<ValidWithdrawMapper, V
                       BigDecimal betAmount =
                           list.stream()
                               .map(GameBetValidRecordVo::getValidAmount)
-                              .reduce(BigDecimal.ZERO, BigDecimal::add);
+                                  .reduce(BigDecimal.ZERO, BigDecimal::add)
+                                  .divide(Convert.toBigDecimal(1000));
                       String gameName = list.get(0).getGameName();
                       jsonObject.put("vaildBetAmount", betAmount);
                       jsonObject.put("gameKind", b);

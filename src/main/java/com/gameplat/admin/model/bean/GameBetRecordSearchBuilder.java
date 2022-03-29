@@ -1,17 +1,16 @@
 package com.gameplat.admin.model.bean;
 
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.gameplat.admin.enums.TimeTypeEnum;
 import com.gameplat.admin.model.dto.GameBetRecordQueryDTO;
 import com.gameplat.admin.model.dto.GameVaildBetRecordQueryDTO;
 import com.gameplat.base.common.util.DateUtils;
 import com.gameplat.base.common.util.StringUtils;
+import com.gameplat.common.game.util.GameDateUtils;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
-
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 public class GameBetRecordSearchBuilder {
 
@@ -32,24 +31,15 @@ public class GameBetRecordSearchBuilder {
     if (StringUtils.isNotEmpty(dto.getGameType())) {
       builder.must(QueryBuilders.matchQuery("gameType", dto.getGameType()));
     }
-    if (null != dto.getTimeType() && StringUtils.isNotBlank(dto.getBeginTime())) {
-      String keyword = "betTime.keyword";
-      if (TimeTypeEnum.BET_TIME.getValue() == dto.getTimeType()) {
-        keyword = "betTime.keyword";
-      }
-      if (TimeTypeEnum.THIRD_TIME.getValue() == dto.getTimeType()) {
-        keyword = "amesTime.keyword";
-      }
-      if (TimeTypeEnum.SETTLE_TIME.getValue() == dto.getTimeType()) {
-        keyword = "settleTime.keyword";
-      }
-      if (TimeTypeEnum.STAT_TIME.getValue() == dto.getTimeType()) {
-        keyword = "statTime.keyword";
-      }
+    if (null != dto.getTimeType() && ObjectUtil.isNotNull(dto.getBeginTime())) {
       builder.must(
-          QueryBuilders.rangeQuery(keyword)
-              .from(dto.getBeginTime())
-              .to(dto.getEndTime() == null ? "now" : dto.getEndTime())
+          QueryBuilders.rangeQuery(convertTimeType(dto.getTimeType()))
+              .from(DateUtil.date(GameDateUtils.get0ZoneDate(dto.getBeginTime())).toJdkDate())
+              .to(
+                  dto.getEndTime() == null
+                      ? DateUtil.date(GameDateUtils.get0ZoneDate(System.currentTimeMillis()))
+                          .toJdkDate()
+                      : DateUtil.date(GameDateUtils.get0ZoneDate(dto.getEndTime())).toJdkDate())
               .format(DateUtils.DATE_TIME_PATTERN));
     }
     return builder;
@@ -57,54 +47,49 @@ public class GameBetRecordSearchBuilder {
 
   public static QueryBuilder buildBetRecordSearch(GameVaildBetRecordQueryDTO dto) {
     BoolQueryBuilder builder = QueryBuilders.boolQuery();
-    if (org.apache.commons.lang3.StringUtils.isNotBlank(dto.getAccount())) {
+    if (StringUtils.isNotBlank(dto.getAccount())) {
       builder.must(QueryBuilders.termQuery("account", dto.getAccount()));
     }
-
-    if (org.apache.commons.lang3.StringUtils.isNotEmpty(dto.getBillNo())) {
+    if (StringUtils.isNotEmpty(dto.getBillNo())) {
       builder.must(QueryBuilders.matchQuery("billNo", dto.getBillNo()));
     }
-
-    if (org.apache.commons.lang3.StringUtils.isNotEmpty(dto.getPlatformCode())) {
+    if (StringUtils.isNotEmpty(dto.getPlatformCode())) {
       builder.must(QueryBuilders.matchQuery("platformCode", dto.getPlatformCode()));
     }
-
-    if (org.apache.commons.lang3.StringUtils.isNotEmpty(dto.getGameKind())) {
+    if (StringUtils.isNotEmpty(dto.getGameKind())) {
       builder.must(QueryBuilders.matchQuery("gameKind", dto.getGameKind()));
     }
-
-    if (org.apache.commons.lang3.StringUtils.isNotEmpty(dto.getState())) {
+    if (StringUtils.isNotEmpty(dto.getState())) {
       builder.must(QueryBuilders.matchQuery("settle", dto.getState()));
     }
-
-    if (ObjectUtil.isNotEmpty(dto.getBeginTime())) {
-      String keyword = "betTime.keyword";
+    if (null != dto.getTimeType() && StringUtils.isNotBlank(dto.getBeginTime())) {
       builder.must(
-          QueryBuilders.rangeQuery(keyword)
-                  .gte(
-                          DateUtils.get0ZoneDate(
-                                  date2TimeStamp(dto.getBeginTime()), DateUtils.DATE_TIME_PATTERN))
-                  .lte(
-                          dto.getEndTime() == null
-                                  ? new Date()
-                                  : DateUtils.get0ZoneDate(
-                                  date2TimeStamp(dto.getEndTime()), DateUtils.DATE_TIME_PATTERN)));
+          QueryBuilders.rangeQuery(convertTimeType(dto.getTimeType()))
+              .from(DateUtil.date(GameDateUtils.get0ZoneDate(dto.getBeginTime())))
+              .to(
+                  dto.getEndTime() == null
+                      ? DateUtil.date(GameDateUtils.get0ZoneDate(System.currentTimeMillis()))
+                      : DateUtil.date(GameDateUtils.get0ZoneDate(dto.getEndTime())))
+              .format(DateUtils.DATE_TIME_PATTERN));
     }
-
     return builder;
   }
 
-  /**
-   * 22 * 日期格式字符串转换成时间戳 23 * @param date 字符串日期 24 * @param format 如：yyyy-MM-dd HH:mm:ss 25 * @return
-   * 26
-   */
-  public static Date date2TimeStamp(String date_str) {
-    try {
-      SimpleDateFormat sdf = new SimpleDateFormat(DateUtils.DATE_TIME_PATTERN);
-      return sdf.parse(date_str);
-    } catch (Exception e) {
-      e.printStackTrace();
+  /** 1 -- 投注时间, 2 -- 三方时间, 3 -- 结算时间, 4 -- 报表时间 */
+  public static String convertTimeType(Integer timeType) {
+    String keyword = "betTime.keyword";
+    if (TimeTypeEnum.BET_TIME.getValue() == timeType) {
+      keyword = "betTime.keyword";
     }
-    return new Date();
+    if (TimeTypeEnum.THIRD_TIME.getValue() == timeType) {
+      keyword = "amesTime.keyword";
+    }
+    if (TimeTypeEnum.SETTLE_TIME.getValue() == timeType) {
+      keyword = "settleTime.keyword";
+    }
+    if (TimeTypeEnum.STAT_TIME.getValue() == timeType) {
+      keyword = "statTime.keyword";
+    }
+    return keyword;
   }
 }

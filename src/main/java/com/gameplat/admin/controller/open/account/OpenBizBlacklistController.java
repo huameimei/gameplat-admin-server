@@ -25,13 +25,13 @@ public class OpenBizBlacklistController {
   @Autowired private BizBlacklistService bizBlacklistService;
 
   @DeleteMapping("/del/{id}")
-  @PreAuthorize("hasAuthority('account:bizBlack:del')")
+  @PreAuthorize("hasAuthority('account:bizBlack:remove')")
   public void delete(@PathVariable Long id) {
     bizBlacklistService.delete(id);
   }
 
   @GetMapping("/list")
-  @PreAuthorize("hasAuthority('account:bizBlack:list')")
+  @PreAuthorize("hasAuthority('account:bizBlack:view')")
   public IPage<BizBlacklist> findAccountBlacklist(
       PageDTO<BizBlacklist> page, BizBlacklistQueryDTO bizBlacklistQueryDTO) {
     return bizBlacklistService.queryBizBlacklistList(page, bizBlacklistQueryDTO);

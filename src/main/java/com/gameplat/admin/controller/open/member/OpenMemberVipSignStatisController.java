@@ -45,7 +45,7 @@ public class OpenMemberVipSignStatisController {
 
   @GetMapping("/list")
   @ApiOperation(value = "查询VIP会员签到记录列表")
-  @PreAuthorize("hasAuthority('member:sign:list')")
+  @PreAuthorize("hasAuthority('member:sign:view')")
   public IPage<MemberVipSignStatisVO> querySignList(
       PageDTO<MemberVipSignStatis> page, MemberVipSignStatisDTO dto) {
     return signStatisService.findSignListPage(page, dto);

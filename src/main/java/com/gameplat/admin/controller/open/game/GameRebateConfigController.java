@@ -22,7 +22,7 @@ public class GameRebateConfigController {
   @Autowired private GameRebateConfigService gameRebateConfigService;
 
   @GetMapping(value = "/queryAll/{userLevel}")
-  @PreAuthorize("hasAuthority('game:gameRebateConfig:list')")
+  @PreAuthorize("hasAuthority('game:gameRebateConfig:view')")
   public List<GameRebateConfig> queryAll(
       @PathVariable(value = "userLevel", required = false) String userLevel) {
     return gameRebateConfigService.queryAll(userLevel);

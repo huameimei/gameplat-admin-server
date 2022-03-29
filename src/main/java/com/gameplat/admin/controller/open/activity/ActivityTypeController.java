@@ -50,7 +50,7 @@ public class ActivityTypeController {
 
   @ApiOperation(value = "活动板块列表")
   @GetMapping("/list")
-  @PreAuthorize("hasAuthority('activity:type:page')")
+  @PreAuthorize("hasAuthority('activity:type:view')")
   @ApiImplicitParams({
     @ApiImplicitParam(name = "current", value = "分页参数：当前页", defaultValue = "1"),
     @ApiImplicitParam(name = "size", value = "每页条数"),
@@ -84,7 +84,7 @@ public class ActivityTypeController {
 
   @ApiOperation(value = "更新活动板块")
   @PutMapping("/update")
-  @PreAuthorize("hasAuthority('activity:type:update')")
+  @PreAuthorize("hasAuthority('activity:type:edit')")
   public void update(@Validated @RequestBody ActivityTypeUpdateDTO dto) {
     dto.setLanguage(LocaleContextHolder.getLocale().toLanguageTag());
     if (dto.getFloatStatus() != null && dto.getFloatStatus() != BooleanEnum.NO.value()) {

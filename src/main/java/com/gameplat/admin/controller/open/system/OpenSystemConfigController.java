@@ -49,18 +49,21 @@ public class OpenSystemConfigController {
 
   @ApiOperation(value = "代理联系方式地址列表")
   @GetMapping("/agent/list")
+  @PreAuthorize("hasAuthority('system:agent:view')")
   public List<AgentContacaVO> findAgentContacaList() {
     return systemConfigService.findAgentContacaList();
   }
 
   @ApiOperation(value = "编辑、新增代理联系方式地址")
   @PutMapping("/agent/edit")
+  @PreAuthorize("hasAuthority('system:agent:edit')")
   public void updateAgentContact(@RequestBody AgentContacaDTO dto) {
     systemConfigService.updateAgentContaca(dto);
   }
 
   @ApiOperation(value = "删除代理联系方式地址")
   @DeleteMapping("/agent/del/{id}")
+  @PreAuthorize("hasAuthority('system:agent:remove')")
   public void delAgentContaca(@PathVariable("id") Long id) {
     systemConfigService.delAgentContaca(id);
   }

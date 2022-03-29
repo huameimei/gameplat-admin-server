@@ -34,7 +34,7 @@ public class ActivityBlacklistController {
 
   @ApiOperation(value = "活动黑名单列表")
   @GetMapping("/list")
-  @PreAuthorize("hasAuthority('activity:blacklist:page')")
+  @PreAuthorize("hasAuthority('account:activityBlack:view')")
   @ApiImplicitParams({
     @ApiImplicitParam(name = "current", value = "分页参数：当前页", defaultValue = "1"),
     @ApiImplicitParam(name = "size", value = "每页条数")
@@ -46,14 +46,14 @@ public class ActivityBlacklistController {
 
   @ApiOperation(value = "新增活动黑名单")
   @PostMapping("/add")
-  @PreAuthorize("hasAuthority('activity:blacklist:add')")
+  @PreAuthorize("hasAuthority('account:activityBlack:add')")
   public void add(@Validated @RequestBody ActivityBlacklistAddDTO dto) {
     activityBlacklistService.add(dto);
   }
 
   @ApiOperation(value = "删除活动黑名单")
   @DeleteMapping("/delete")
-  @PreAuthorize("hasAuthority('activity:blacklist:remove')")
+  @PreAuthorize("hasAuthority('account:activityBlack:remove')")
   public void remove(@RequestBody String ids) {
     if (StringUtils.isBlank(ids)) {
       throw new ServiceException("ids不能为空");

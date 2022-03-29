@@ -34,7 +34,7 @@ public class LogoConfigController {
 
   @ApiOperation(value = "logo配置列表")
   @GetMapping("/list")
-  @PreAuthorize("hasAuthority('member:logo:list')")
+  @PreAuthorize("hasAuthority('member:logo:view')")
   public List<LogoConfigVO> list() {
     List<MemberGrowthLevel> list =
         memberGrowthLevelService

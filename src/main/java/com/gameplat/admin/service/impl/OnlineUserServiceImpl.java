@@ -1,7 +1,6 @@
 package com.gameplat.admin.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
-import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.crypto.digest.DigestUtil;
 import com.alibaba.csp.sentinel.annotation.SentinelResource;
@@ -151,8 +150,9 @@ public class OnlineUserServiceImpl implements OnlineUserService {
     } else if (UserTypes.TEST.match(userType)) {
       onlineCount.setTestUserCount(onlineCount.getTestUserCount() + 1);
     }
-    //统计在告警会员
-    onlineCount.setWarningCount(onlineCount.getWarningCount() + Convert.toInt(warningAccounts.stream().filter(a -> a.equals(credential.getUsername())).count()));
+    if (warningAccounts.contains(credential.getUsername())) {
+      onlineCount.setWarningCount(onlineCount.getWarningCount() + 1);
+    }
   }
 
   private Set<String> getOnlineUserKeys() {

@@ -1,5 +1,6 @@
 package com.gameplat.admin.service.impl;
 
+import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
@@ -215,14 +216,15 @@ public class ProxyPayServiceImpl implements ProxyPayService {
 
     /** 请求第三方代付接口 */
     log.info("进入第三方出入款中心出款订单号: {}", memberWithdraw.getCashOrderNo());
-    Result<ProxyPayBackResult> resultStr =
+    String resultStr =
         paymentCenterFeign.onlineProxyPay(
             context, memberWithdraw.getPpInterface(), memberWithdraw.getPpInterfaceName());
+    Result<ProxyPayBackResult> result = JSONUtil.toBean(resultStr,Result.class);
     log.info("代付请求中心响应{}", resultStr);
-    if (!resultStr.isSucceed() || HttpStatus.OK.value() != resultStr.getCode()) {
-      throw new ServiceException("请求代付返回结果提示:" + resultStr.getMessage() + "！！！请立即联系第三方核实再出款！！！");
+    if (!result.isSucceed() || 0 != result.getCode()) {
+      throw new ServiceException("请求代付返回结果提示:" + result.getMessage() + "！！！请立即联系第三方核实再出款！！！");
     }
-    ProxyPayBackResult proxyPayBackResult = resultStr.getData();
+    ProxyPayBackResult proxyPayBackResult = result.getData();
     /** 设置虚拟货币真实出款汇率、数量 */
     if (null != proxyPayBackResult && null != proxyPayBackResult.getApproveCurrencyRate()
         || null != proxyPayBackResult.getApproveCurrencyCount()) {
@@ -272,12 +274,13 @@ public class ProxyPayServiceImpl implements ProxyPayService {
     context.setBankName(memberWithdraw.getBankName());
     /** 请求第三方代付接口 */
     log.info("进入第三方出入款中心查询订单号: {}", memberWithdraw.getCashOrderNo());
-    Result<ReturnMessage> resultStr = paymentCenterFeign.onlineQueryProxyPay(
+    String resultStr = paymentCenterFeign.onlineQueryProxyPay(
         context, ppInterface.getCode(), ppInterface.getName());
-    if (!resultStr.isSucceed() || HttpStatus.OK.value() != resultStr.getCode()) {
-      throw new ServiceException("查询第三方代付异常:" + resultStr.getMessage() + "！！！请立即联系第三方核实再出款！！！");
+    Result<ReturnMessage> result = JSONUtil.toBean(resultStr,Result.class);
+    if (!result.isSucceed() || 0 != result.getCode()) {
+      throw new ServiceException("查询第三方代付异常:" + result.getMessage() + "！！！请立即联系第三方核实再出款！！！");
     }
-    return resultStr.getData();
+    return result.getData();
   }
 
   @Override
@@ -304,9 +307,10 @@ public class ProxyPayServiceImpl implements ProxyPayService {
     proxyCallbackContext.setIp(ipAddress);
     proxyCallbackContext.setCallbackParameters(callbackParameters);
     proxyCallbackContext.setRequestBody(requestBody);
-    Result<ProxyPayBackResult> result =
+    String resultStr =
         paymentCenterFeign.asyncCallbackProxyPay(
             proxyCallbackContext, beanName, memberWithdraw.getPpInterfaceName());
+    Result<ProxyPayBackResult> result = JSONUtil.toBean(resultStr,Result.class);
     log.info("代付查询请求中心响应{}", result);
     if (!result.isSucceed() || 200 != result.getCode()) {
       throw new ServiceException("第三方代付异步回调异常:" + result.getMessage() + "！！！请立即联系第三方核实再出款！！！");

@@ -17,6 +17,7 @@ import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.common.lang.Assert;
 import com.gameplat.model.entity.game.GameRebateDetail;
 import com.gameplat.model.entity.game.GameRebatePeriod;
+import com.gameplat.model.entity.game.GameRebateReport;
 import com.gameplat.redis.api.RedisService;
 import com.gameplat.redis.exception.RedisOpsResultIsNullException;
 import java.util.List;
@@ -69,12 +70,14 @@ public class GameRebatePeriodController {
     gameRebatePeriodService.updateGameRebatePeriod(dto);
   }
 
+  /** 期数删除 */
   @PostMapping(value = "delete")
   @PreAuthorize("hasAuthority('game:gameRebatePeriod:remove')")
   public void delete(@RequestBody OperGameRebatePeriodDTO dto) {
     gameRebatePeriodService.deleteGameRebatePeriod(dto.getId(), dto.getOnly());
   }
 
+  /** 期数结算 */
   @PostMapping(value = "settle")
   @PreAuthorize("hasAuthority('game:gameRebatePeriod:settle')")
   public void settle(@RequestBody OperGameRebatePeriodDTO dto) {
@@ -102,6 +105,7 @@ public class GameRebatePeriodController {
     }
   }
 
+  /** 期数派发 */
   @PostMapping(value = "batchAccept")
   @PreAuthorize("hasAuthority('game:gameRebatePeriod:batchAccept')")
   public void accept(@RequestBody OperGameRebatePeriodDTO dto) {
@@ -116,7 +120,7 @@ public class GameRebatePeriodController {
 
   @Async
   public void asyncAcceptSingleTask(String taskName, OperGameRebatePeriodDTO dto) {
-    log.info("");
+    log.info("异步任务执行：{}", taskName);
     List<GameRebateDetail> gameRebateDetailList =
         gameRebateDetailService.gameRebateDetailByStatus(
             dto.getId(), GameRebateReportStatus.UNACCEPTED.getValue());
@@ -144,6 +148,14 @@ public class GameRebatePeriodController {
     updateWrapper.eq(GameRebatePeriod::getId, dto.getId());
     if (!gameRebatePeriodService.update(gameRebatePeriod, updateWrapper)) {
       throw new ServiceException("更新游戏返水期数配置失败！");
+    }
+
+    GameRebateReport gameRebateReport = new GameRebateReport();
+    gameRebatePeriod.setStatus(GameRebateReportStatus.ACCEPTED.getValue());
+    LambdaUpdateWrapper<GameRebateReport> reportUpdateWrapper = Wrappers.lambdaUpdate();
+    reportUpdateWrapper.eq(GameRebateReport::getPeriodId, dto.getId());
+    if (!gameRebateReportService.update(gameRebateReport, reportUpdateWrapper)) {
+      throw new ServiceException("更新游戏返水报表状态失败！");
     }
     // 添加游戏返水每日统计 由定时任务处理
   }
@@ -193,6 +205,15 @@ public class GameRebatePeriodController {
       LambdaUpdateWrapper<GameRebatePeriod> updateWrapper = Wrappers.lambdaUpdate();
       updateWrapper.eq(GameRebatePeriod::getId, dto.getId());
       gameRebatePeriodService.update(gameRebatePeriod, updateWrapper);
+
+      GameRebateReport gameRebateReport = new GameRebateReport();
+      gameRebatePeriod.setStatus(GameRebateReportStatus.ROLLBACKED.getValue());
+      LambdaUpdateWrapper<GameRebateReport> reportUpdateWrapper = Wrappers.lambdaUpdate();
+      reportUpdateWrapper.eq(GameRebateReport::getPeriodId, dto.getId());
+      if (!gameRebateReportService.update(gameRebateReport, reportUpdateWrapper)) {
+        throw new ServiceException("更新游戏返水报表状态失败！");
+      }
+
       //  添加游戏返水每日统计 由定时任务处理
     } catch (RedisOpsResultIsNullException e) {
       String name = (String) redisService.getStringOps().get(GAME_REBATE_RUNNING_TASK_NAME);

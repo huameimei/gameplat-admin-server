@@ -3,8 +3,6 @@ spring:
     name: admin-server
   profiles:
     active: @profiles.active@
-  main:
-    allow-bean-definition-overriding: true
   cloud:
     nacos:
       config:
@@ -14,9 +12,9 @@ spring:
         password: t1KMNoXowYr2DK9L
         file-extension: yml
         namespace: ea9f2fb3-4fce-4cc9-a820-4508330af65b
-        group: DEFAULT_GROUP
+        group: SERVICE_GROUP
         refresh-enabled: true
-        shared-dataids: redis.yml,spring-kafka-producer-config.yml
+        shared-dataids: redis.yml,spring-kafka-log.yml,spring-kafka-producer-config.yml,elasticsearch.yml
       discovery:
         service: admin-server
         namespace: ${spring.cloud.nacos.config.namespace}

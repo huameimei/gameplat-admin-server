@@ -45,7 +45,7 @@ public class GameBetDailyReportController {
   @Autowired private GameBetRecordInfoService gameBetRecordInfoService;
 
   @GetMapping(value = "/queryPage")
-  @PreAuthorize("hasAuthority('game:gameBetDailyReport:list')")
+  @PreAuthorize("hasAuthority('game:gameBetDailyReport:view')")
   public PageDtoVO<GameBetDailyReport> queryPage(
       Page<GameBetDailyReport> page, GameBetDailyReportQueryDTO dto) {
     return gameBetDailyReportService.queryPage(page, dto);
@@ -55,7 +55,7 @@ public class GameBetDailyReportController {
 
   /** 游戏平台维度数据统计 */
   @GetMapping(value = "/queryGamePlatformReport")
-  @PreAuthorize("hasAuthority('game:gamePlatformReport:list')")
+  @PreAuthorize("hasAuthority('game:gamePlatformReport:view')")
   public List<GameReportVO> queryGamePlatformReport(GameBetDailyReportQueryDTO dto) {
     return gameBetDailyReportService.queryGamePlatformReport(dto);
   }
@@ -75,7 +75,7 @@ public class GameBetDailyReportController {
 
   @ApiOperation("查询真人数据统计")
   @GetMapping(value = "/queryReport")
-  @PreAuthorize("hasAuthority('game:gameReport:list')")
+  @PreAuthorize("hasAuthority('game:gameReport:view')")
   public List<GameReportVO> queryReport(GameBetDailyReportQueryDTO dto) {
     if (StringUtils.isBlank(dto.getBeginTime())) {
       String beginTime = DateUtil.getDateToString(new Date());
@@ -132,6 +132,7 @@ public class GameBetDailyReportController {
 
   @ApiOperation(value = "获取会员投注记录")
   @GetMapping("findUserGameBetRecord")
+  @PreAuthorize("hasAuthority('game:gameReport:view')")
   public PageDtoVO<GameBetRecordVO> findUserGameBetRecord(
       Page<GameBetRecordVO> page, @Valid UserGameBetRecordDto dto) {
     GameBetRecordQueryDTO gameBetRecordQueryDTO = new GameBetRecordQueryDTO();

@@ -33,6 +33,7 @@ public class ProxyMemberReportController {
   @Autowired private MemberDayReportService memberDayReportService;
 
   @GetMapping("/list")
+  @PreAuthorize("hasAuthority('agent:report:view')")
   public PageDtoVO<MemberDayReportVo> list(PageDTO<MemberDayReport> page, AgentReportQueryDTO dto) {
     return memberDayReportService.agentReportList(page, dto);
   }

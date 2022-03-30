@@ -499,4 +499,10 @@ public class LotteryManagerController {
   public Object addJscPresetNumber(HttpServletRequest request) {
     return serviceHandler.serviceHandler(request);
   }
+
+  @ApiOperation("批量竞速彩获取随机号码")
+  @PostMapping("getJscRandomNumber")
+  public Object getJscRandomNumber(HttpServletRequest request) {
+    return serviceHandler.serviceHandler(request);
+  }
 }

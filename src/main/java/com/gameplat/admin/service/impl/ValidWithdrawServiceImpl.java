@@ -84,7 +84,7 @@ public class ValidWithdrawServiceImpl extends ServiceImpl<ValidWithdrawMapper, V
     validWithdraw.setMormDml(rechargeOrder.getNormalDml());
     validWithdraw.setRemark(rechargeOrder.getRemarks());
     deleteByUserId(rechargeOrder.getMemberId(), 1);
-    updateTypeByUserId(rechargeOrder.getMemberId());
+    updateTypeByUserId(rechargeOrder.getMemberId(),validWithdraw.getCreateTime());
     this.save(validWithdraw);
   }
 
@@ -116,12 +116,13 @@ public class ValidWithdrawServiceImpl extends ServiceImpl<ValidWithdrawMapper, V
     this.remove(query);
   }
 
-  public void updateTypeByUserId(Long memberId) throws Exception {
+  public void updateTypeByUserId(Long memberId,Date createTime) throws Exception {
     this.lambdaUpdate()
         .set(ValidWithdraw::getType, 1)
+        .set(ValidWithdraw::getEndTime, createTime)
         .eq(ValidWithdraw::getMemberId, memberId)
         .eq(ValidWithdraw::getType, 0)
-        .update();
+        .update(new ValidWithdraw());
   }
 
   @Override
@@ -355,7 +356,8 @@ public class ValidWithdrawServiceImpl extends ServiceImpl<ValidWithdrawMapper, V
             BigDecimal vaildAmount =
                 gameBetValidRecordVoList.stream()
                     .map(GameBetValidRecordVo::getValidAmount)
-                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+                        .reduce(BigDecimal.ZERO, BigDecimal::add)
+                        .divide(Convert.toBigDecimal(1000));
             log.info("每笔总投注记录:{}", vaildAmount);
             validAccoutWithdrawVo.setVaildAmount(vaildAmount);
             // 根据游戏类型进行分类
@@ -375,7 +377,8 @@ public class ValidWithdrawServiceImpl extends ServiceImpl<ValidWithdrawMapper, V
                       BigDecimal betAmount =
                           list.stream()
                               .map(GameBetValidRecordVo::getValidAmount)
-                              .reduce(BigDecimal.ZERO, BigDecimal::add);
+                                  .reduce(BigDecimal.ZERO, BigDecimal::add)
+                                  .divide(Convert.toBigDecimal(1000));
                       String gameName = list.get(0).getGameName();
                       jsonObject.put("vaildBetAmount", betAmount);
                       jsonObject.put("gameKind", b);

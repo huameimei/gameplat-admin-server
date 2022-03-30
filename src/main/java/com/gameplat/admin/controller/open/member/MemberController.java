@@ -53,6 +53,7 @@ public class MemberController {
 
   @ApiOperation(value = "会员列表")
   @GetMapping("/list")
+  @PreAuthorize("hasAuthority('member:view')")
   public IPage<MemberVO> list(PageDTO<Member> page, MemberQueryDTO dto) {
     return memberService.queryPage(page, dto);
   }

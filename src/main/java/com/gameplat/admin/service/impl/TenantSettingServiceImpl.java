@@ -3,7 +3,6 @@ package com.gameplat.admin.service.impl;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.nacos.common.utils.CollectionUtils;
-import com.aliyun.oss.ServiceException;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -17,6 +16,7 @@ import com.gameplat.admin.model.vo.*;
 import com.gameplat.admin.service.TenantSettingService;
 import com.gameplat.base.common.context.DyDataSourceContextHolder;
 import com.gameplat.base.common.context.StrategyContext;
+import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.model.entity.setting.TenantSetting;
 import com.gameplat.security.SecurityUserHolder;
 import com.gameplat.security.context.UserCredential;
@@ -112,6 +112,7 @@ public class TenantSettingServiceImpl extends ServiceImpl<TenantSettingMapper, T
                 StringUtils.isNotBlank(tenantSetting.getSettingLabel()),
                 TenantSetting::getSettingLabel,
                 tenantSetting.getSettingLabel());
+        queryWrapper.orderByDesc(TenantSetting::getCreateTime);
         return this.page(page, queryWrapper);
     }
 
@@ -127,6 +128,7 @@ public class TenantSettingServiceImpl extends ServiceImpl<TenantSettingMapper, T
                     throw new ServiceException("开启的图片/视频已达上线 (最多开启三个)");
                 }
             }
+            queryWrapper.eq(TenantSetting::getCreateTime, new Date());
             // 新增
             this.save(tenantSetting);
         } else {
@@ -145,6 +147,7 @@ public class TenantSettingServiceImpl extends ServiceImpl<TenantSettingMapper, T
                     throw new ServiceException("开启的图片/视频已达上线 (最多开启三个)");
                 }
             }
+            queryWrapper.eq(TenantSetting::getUpdateTime, new Date());
             this.updateById(tenantSetting);
         }
     }
@@ -154,7 +157,7 @@ public class TenantSettingServiceImpl extends ServiceImpl<TenantSettingMapper, T
         LambdaQueryWrapper<TenantSetting> queryWrapper = new LambdaQueryWrapper<TenantSetting>();
         queryWrapper.eq(TenantSetting::getId, tenantSetting.getId());
         queryWrapper.eq(TenantSetting::getSettingType, tenantSetting.getSettingType());
-        this.removeById(queryWrapper);
+        this.remove(queryWrapper);
     }
 
     @Override

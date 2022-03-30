@@ -26,7 +26,7 @@ public class GameRebateReportController {
   @Autowired private GameRebateReportService gameRebateReportService;
 
   @GetMapping(value = "/queryPage")
-  @PreAuthorize("hasAuthority('game:gameRebateReport:list')")
+  @PreAuthorize("hasAuthority('game:gameRebateReport:view')")
   public PageDtoVO<GameRebateDetail> queryPage(
       Page<GameRebateDetail> page, GameRebateReportQueryDTO dto) {
     return gameRebateReportService.queryPage(page, dto);

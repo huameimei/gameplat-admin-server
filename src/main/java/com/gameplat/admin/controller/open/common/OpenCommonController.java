@@ -3,22 +3,19 @@ package com.gameplat.admin.controller.open.common;
 import com.alibaba.fastjson.JSONObject;
 import com.gameplat.admin.model.bean.router.VueRouter;
 import com.gameplat.admin.model.vo.ConfigVO;
+import com.gameplat.admin.service.CaptchaService;
 import com.gameplat.admin.service.CommonService;
-import com.gameplat.admin.service.ConfigService;
+import com.gameplat.admin.service.OssService;
 import com.gameplat.admin.service.PermissionService;
 import com.gameplat.base.common.util.StringUtils;
-import com.gameplat.common.compent.captcha.CaptchaStrategyContext;
 import com.gameplat.common.compent.captcha.image.Kaptcha;
-import com.gameplat.common.compent.oss.FileStorageProvider;
-import com.gameplat.common.compent.oss.FileStorageStrategyContext;
-import com.gameplat.common.compent.oss.config.FileConfig;
-import com.gameplat.common.enums.DictTypeEnum;
 import com.gameplat.model.entity.sys.SysMenu;
 import com.gameplat.security.SecurityUserHolder;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -45,18 +42,16 @@ public class OpenCommonController {
 
   @Autowired private PermissionService permissionService;
 
-  @Autowired private CaptchaStrategyContext captchaStrategyContext;
+  @Autowired private OssService ossService;
 
-  @Autowired private FileStorageStrategyContext fileStorageStrategyContext;
-
-  @Autowired private ConfigService configService;
+  @Autowired private CaptchaService captchaService;
 
   @GetMapping("/vCode")
   public Kaptcha createCode(HttpServletRequest request, HttpServletResponse response) {
-    response.setHeader("param", "no-cache");
-    response.setHeader("cache-control", "no-cache");
-    response.setIntHeader("expires", 0);
-    return captchaStrategyContext.getImage().create(request, 1);
+    response.setHeader(HttpHeaders.PRAGMA, "no-cache");
+    response.setHeader(HttpHeaders.CACHE_CONTROL, "no-cache");
+    response.setIntHeader(HttpHeaders.EXPIRES, 0);
+    return captchaService.getImage().create(request, 1);
   }
 
   @GetMapping("/menuList")
@@ -77,13 +72,8 @@ public class OpenCommonController {
 
   @PostMapping("/file/upload")
   public Map<String, String> fileUpload(@RequestPart MultipartFile file) throws IOException {
-    FileConfig fileConfig =
-        configService.getDefaultConfig(DictTypeEnum.FILE_CONFIG, FileConfig.class);
-    FileStorageProvider fileStorageProvider = fileStorageStrategyContext.getProvider(fileConfig);
-    String url = fileStorageProvider.upload(file.getResource().getFile());
-
     Map<String, String> map = new HashMap<>(1);
-    map.put("url", url);
+    map.put("url", ossService.upload(file));
     return map;
   }
 }

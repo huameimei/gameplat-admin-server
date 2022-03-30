@@ -575,12 +575,5 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
     }
   }
 
-  /**
-   * 账号获取
-   */
-  @Override
-  public Boolean getMemberCount(String account) {
-    return this.lambdaQuery().eq(Member::getAccount,account).eq(Member::getUserType,"A").count() > 0;
-  }
 
 }

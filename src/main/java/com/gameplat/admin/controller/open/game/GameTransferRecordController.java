@@ -33,7 +33,7 @@ public class GameTransferRecordController {
   @Autowired private GamePlatformService gamePlatformService;
 
   @GetMapping(value = "/queryPage")
-  @PreAuthorize("hasAuthority('game:gameTransferRecord:list')")
+  @PreAuthorize("hasAuthority('game:gameTransferRecord:view')")
   public PageDtoVO<GameTransferRecord> queryGameTransferRecord(
       Page<GameTransferRecord> page, GameTransferRecordQueryDTO dto) {
     return gameTransferRecordService.queryGameTransferRecord(page, dto);

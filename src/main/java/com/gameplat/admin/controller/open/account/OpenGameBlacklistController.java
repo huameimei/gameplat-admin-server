@@ -19,13 +19,13 @@ public class OpenGameBlacklistController {
   @Autowired private GameBlacklistService gameBlacklistService;
 
   @DeleteMapping("/del/{id}")
-  @PreAuthorize("hasAuthority('account:gameBlack:del')")
+  @PreAuthorize("hasAuthority('account:gameBlack:remove')")
   public void delete(@PathVariable Long id) {
     gameBlacklistService.delete(id);
   }
 
   @GetMapping("/list")
-  @PreAuthorize("hasAuthority('account:gameBlack:list')")
+  @PreAuthorize("hasAuthority('account:gameBlack:view')")
   public IPage<GameBlacklist> findAccountBlacklist(
       PageDTO<GameBlacklist> page, GameBlacklistQueryDTO gameBlacklistQueryDTO) {
     return gameBlacklistService.queryGameBlacklistList(page, gameBlacklistQueryDTO);

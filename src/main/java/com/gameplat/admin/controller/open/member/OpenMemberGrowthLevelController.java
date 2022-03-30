@@ -61,7 +61,7 @@ public class OpenMemberGrowthLevelController {
   }
 
   @ApiOperation(value = "后台批量修改VIP等级")
-  @PreAuthorize("hasAuthority('member:growthLevel:updateLevel')")
+  @PreAuthorize("hasAuthority('member:growthLevel:edit')")
   @PutMapping("/updateLevel")
   public void batchUpdateLevel(@RequestBody JSONObject obj, HttpServletRequest request) {
     levelService.batchUpdateLevel(obj, request);

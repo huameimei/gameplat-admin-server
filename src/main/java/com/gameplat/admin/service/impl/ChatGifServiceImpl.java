@@ -12,12 +12,12 @@ import com.gameplat.admin.model.dto.ChatGifEditDTO;
 import com.gameplat.admin.model.vo.ChatGifVO;
 import com.gameplat.admin.service.ChatGifService;
 import com.gameplat.admin.service.ConfigService;
+import com.gameplat.admin.service.OssService;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.StringUtils;
-import com.gameplat.common.compent.oss.FileStorageProvider;
-import com.gameplat.common.compent.oss.FileStorageStrategyContext;
 import com.gameplat.common.compent.oss.config.FileConfig;
 import com.gameplat.common.enums.DictTypeEnum;
+import com.gameplat.common.lang.Assert;
 import com.gameplat.common.util.FileUtils;
 import com.gameplat.model.entity.chart.ChatGif;
 import lombok.SneakyThrows;
@@ -49,7 +49,7 @@ public class ChatGifServiceImpl extends ServiceImpl<ChatGifMapper, ChatGif>
 
   @Autowired private ConfigService configService;
 
-  @Autowired private FileStorageStrategyContext fileStorageStrategyContext;
+  @Autowired private OssService ossService;
 
   @Override
   public IPage<ChatGifVO> page(PageDTO<ChatGif> page, String name) {
@@ -110,7 +110,6 @@ public class ChatGifServiceImpl extends ServiceImpl<ChatGifMapper, ChatGif>
     // 上传图片
     FileConfig fileConfig =
         configService.getDefaultConfig(DictTypeEnum.FILE_CONFIG, FileConfig.class);
-    FileStorageProvider fileStorageProvider = fileStorageStrategyContext.getProvider(fileConfig);
     if (ObjectUtil.isNotNull(chatGif)) {
       chatGif.setServiceProvider(fileConfig.getProvider());
     }
@@ -119,9 +118,9 @@ public class ChatGifServiceImpl extends ServiceImpl<ChatGifMapper, ChatGif>
     if (this.findMd5(md5) > 0) {
       throw new ServiceException("不允许相同图片");
     }
+
     // 上传成功，返回图片地址
-    return fileStorageProvider.upload(
-        file.getInputStream(), file.getContentType(), file.getOriginalFilename());
+    return ossService.upload(file);
   }
 
   @Override
@@ -130,13 +129,10 @@ public class ChatGifServiceImpl extends ServiceImpl<ChatGifMapper, ChatGif>
     if (ObjectUtil.isEmpty(chatGif)) {
       throw new ServiceException("存储位置未知");
     }
-    // 删储服务器图片
-    FileConfig fileConfig =
-        configService.getDefaultConfig(DictTypeEnum.FILE_CONFIG, FileConfig.class);
-    FileStorageProvider fileStorageProvider = fileStorageStrategyContext.getProvider(fileConfig);
-    fileStorageProvider.delete(chatGif.getStoreFileName());
+
     // 删库
     super.removeById(id);
+    Assert.isTrue(ossService.remove(chatGif.getStoreFileName()), "删除文件失败!");
   }
 
   @Override

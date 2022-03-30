@@ -9,9 +9,9 @@ spring:
     nacos:
       config:
         enabled: true
-        server-addr: 192.168.3.101:8848
+        server-addr: 192.168.12.50:8848,192.168.12.50:8848
         username: nacos
-        password: nacos
+        password: t1KMNoXowYr2DK9L
         file-extension: yml
         namespace: prod
         group: DEFAULT_GROUP

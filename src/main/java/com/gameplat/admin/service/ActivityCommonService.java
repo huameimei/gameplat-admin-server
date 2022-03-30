@@ -38,12 +38,12 @@ public interface ActivityCommonService {
   /**
    * 活动信息检测
    *
-   * @param activityId Long
+   * @param lobbyId Long
    * @param countDate Date
    * @param flagCheck int
    * @return ActivityLobby
    */
-  ActivityLobby activityDetection(Long activityId, Date countDate, int flagCheck);
+  ActivityLobby activityDetection(Long lobbyId, Date countDate, int flagCheck);
 
   /**
    * 黑名单信息检测

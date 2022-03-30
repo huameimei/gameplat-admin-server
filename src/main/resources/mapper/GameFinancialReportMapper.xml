@@ -15,6 +15,7 @@
         <result property="gameName" column="game_name" />
         <result property="validAmount" column="valid_amount" />
         <result property="winAmount" column="win_amount" />
+        <result property="lastWinAmount" column="last_win_amount" />
         <result property="accumulateWinAmount" column="accumulate_win_amount" />
         <result property="startTime" column="start_time" />
         <result property="endTime" column="end_time" />
@@ -46,6 +47,7 @@
         a.game_kind,
         a.valid_amount,
         a.win_amount,
+        e.win_amount last_win_amount,
         a.accumulate_win_amount,
         a.game_type,
         a.start_time,
@@ -56,10 +58,19 @@
         c.name platform_name,
         d.game_type_name,
         d.id game_type_id
-        from game_financial_report a
-        left join game_kind as b on a.game_kind = b.code
-        left join game_platform as c on a.platform_code = c.code
-        left join game_type as d on a.game_type = d.game_type_code
+        FROM game_financial_report a
+        LEFT JOIN game_kind as b on a.game_kind = b.code
+        LEFT JOIN game_platform as c on a.platform_code = c.code
+        LEFT JOIN game_type as d on a.game_type = d.game_type_code
+        LEFT JOIN (
+        SELECT
+        game_kind,
+        win_amount
+        FROM
+        game_financial_report
+        WHERE
+        statistics_time = DATE_FORMAT( date_sub( CONCAT( #{dto.statisticsTime}, '-01' ), INTERVAL 1 MONTH ), '%Y-%m' )
+        ) e ON a.game_kind = e.game_kind
         <where>
             <if test="statisticsTime != null and statisticsTime != ''">
                 and a.statistics_time = #{statisticsTime}
@@ -81,6 +92,7 @@
         a.game_kind,
         a.valid_amount,
         a.win_amount,
+        e.win_amount last_win_amount,
         a.accumulate_win_amount,
         a.game_type,
         a.start_time,
@@ -91,20 +103,19 @@
         c.name platform_name,
         d.game_type_name,
         d.id game_type_id
-        from game_financial_report a
+        FROM game_financial_report a
         LEFT JOIN  game_kind as b on a.game_kind = b.code
         LEFT JOIN  game_platform as c on a.platform_code = c.code
         LEFT JOIN  game_type as d on a.game_type = d.game_type_code
         LEFT JOIN (
         SELECT
-        first_kind,
+        game_kind,
         win_amount
         FROM
         game_financial_report
         WHERE
-        count_date = DATE_FORMAT( date_sub( CONCAT( #{month}, '-01' ), INTERVAL 1 MONTH ), '%Y-%m' )
-        ) d ON d.first_kind = a.first_kind
-        where a.count_date = #{month}
+        statistics_time = DATE_FORMAT( date_sub( CONCAT( #{dto.statisticsTime}, '-01' ), INTERVAL 1 MONTH ), '%Y-%m' )
+        ) e ON a.game_kind = e.game_kind
         <where>
             <if test="dto.statisticsTime != null and dto.statisticsTime != ''">
                 and a.statistics_time = #{dto.statisticsTime}
@@ -129,8 +140,25 @@
         #{startTime} start_time,
         #{endTime} end_time
         FROM game_kind g
-        where
+        WHERE
         status in (1,2)
+    </select>
+
+    <select id="findTotalLastWinAmount" resultType="java.math.BigDecimal">
+        SELECT
+        ifnull(sum(win_amount), 0)
+        FROM game_financial_report
+        <where>
+            <if test="statisticsTime != null and statisticsTime != ''">
+                and statistics_time = DATE_FORMAT( date_sub( CONCAT( #{statisticsTime}, '-01' ), INTERVAL 1 MONTH ), '%Y-%m' )
+            </if>
+            <if test="gameType != null and gameType != ''">
+                and game_type = #{gameType}
+            </if>
+            <if test="platformCode != null and platformCode != ''">
+                and platform_code = #{platformCode}
+            </if>
+        </where>
     </select>
 
 </mapper>

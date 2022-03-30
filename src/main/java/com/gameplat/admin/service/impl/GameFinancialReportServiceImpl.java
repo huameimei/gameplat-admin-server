@@ -19,6 +19,7 @@ import com.gameplat.admin.service.GameFinancialReportService;
 import com.gameplat.admin.util.JxlsExcelUtils;
 import com.gameplat.base.common.constant.ContextConstant;
 import com.gameplat.base.common.exception.ServiceException;
+import com.gameplat.base.common.util.Converts;
 import com.gameplat.base.common.util.DateUtils;
 import com.gameplat.base.common.util.StringUtils;
 import com.gameplat.base.common.util.UUIDUtils;
@@ -103,6 +104,9 @@ public class GameFinancialReportServiceImpl
     GameFinancialReport gameFinancialReport = gameFinancialReportMapper.selectOne(queryOne);
     TotalGameFinancialReportVO totalGameFinancialReport =
             gameFinancialReportConvert.toTotalVO(gameFinancialReport);
+
+    BigDecimal totalLastWinAmount = gameFinancialReportMapper.findTotalLastWinAmount(queryDTO);
+    totalGameFinancialReport.setLastWinAmount(totalLastWinAmount);
     Map<String, Object> otherData = new HashMap<>();
     otherData.put("totalData", totalGameFinancialReport);
     pageDtoVO.setPage(result);
@@ -154,16 +158,18 @@ public class GameFinancialReportServiceImpl
     Map<String, Object> map = new HashMap<>();
     map.put("statisticsTime", statisticsTime);
     map.put("gameList", finalExportList);
-    final BigDecimal[] bigDecimal = {new BigDecimal(0), new BigDecimal(0), new BigDecimal(0)};
+    final BigDecimal[] bigDecimal = {new BigDecimal(0), new BigDecimal(0), new BigDecimal(0), new BigDecimal(0)};
     reportList.forEach(
             a -> {
               bigDecimal[0] = bigDecimal[0].add(a.getValidAmount());
               bigDecimal[1] = bigDecimal[1].add(a.getWinAmount());
-              bigDecimal[2] = bigDecimal[2].add(a.getAccumulateWinAmount());
+              bigDecimal[2] = bigDecimal[2].add(a.getLastWinAmount());
+              bigDecimal[3] = bigDecimal[3].add(a.getAccumulateWinAmount());
             });
     map.put("totalValidAmount", bigDecimal[0]);
     map.put("totalWinAmount", bigDecimal[1]);
-    map.put("totalAccumulateWinAmount", bigDecimal[2]);
+    map.put("totalLastWinAmount", bigDecimal[2]);
+    map.put("totalAccumulateWinAmount", bigDecimal[3]);
     // 将数据渲染到excel模板上
     // 定义ZIP包的包名
     String zipFileName = statisticsTime + "财务报表导出";
@@ -249,22 +255,14 @@ public class GameFinancialReportServiceImpl
     // 获取游戏的有效投注额和输赢金额
     Map<String, List<GameDataVO>> gameDataMap = initGameData(startTime, endTime, tenant);
 
-    // 获取游戏的累计输赢金额
-    Map<String, List<GameDataVO>> gameAccumulateDataMap = initGameAccumulateData(endTime, tenant);
-
     // 组装数据
-    if (StringUtils.isNotNull(gameDataMap) && StringUtils.isNotNull(gameAccumulateDataMap)) {
+    if (StringUtils.isNotNull(gameDataMap)) {
       gameFinancialReportList.parallelStream().forEach(gameFinancialReport -> {
         List<GameDataVO> gameDataVO = gameDataMap.get(gameFinancialReport.getGameKind());
-        List<GameDataVO> gameAccumulateDataVO = gameAccumulateDataMap.get(gameFinancialReport.getGameKind());
         // 如果有对应的游戏数据则填充，没有则是0
         if (StringUtils.isNotEmpty(gameDataVO)) {
           gameFinancialReport.setValidAmount(gameDataVO.get(0).getValidAmount());
           gameFinancialReport.setWinAmount(gameDataVO.get(0).getWinAmount());
-        }
-
-        if (StringUtils.isNotEmpty(gameAccumulateDataVO)) {
-          gameFinancialReport.setAccumulateWinAmount(gameAccumulateDataVO.get(0).getAccumulateWinAmount());
         }
       });
     }
@@ -321,66 +319,17 @@ public class GameFinancialReportServiceImpl
       Object gameKind = bucket.getKey();
       GameDataVO gameDataVO = new GameDataVO();
       gameDataVO.setGameKind(gameKind.toString());
-      double validAmount = ((ParsedSum) bucket.getAggregations().get("validAmount")).getValue();
-      double winAmount = ((ParsedSum) bucket.getAggregations().get("winAmount")).getValue() * -1;
-      gameDataVO.setValidAmount(BigDecimal.valueOf(validAmount).setScale(2, BigDecimal.ROUND_DOWN));
-      gameDataVO.setWinAmount(BigDecimal.valueOf(winAmount).setScale(2, BigDecimal.ROUND_DOWN));
+      BigDecimal validAmount = Converts.toBigDecimal(((ParsedSum) bucket.getAggregations().get("validAmount")).getValue())
+              .divide(new BigDecimal("1000"), BigDecimal.ROUND_DOWN, 2);
+      BigDecimal winAmount = Converts.toBigDecimal(((ParsedSum) bucket.getAggregations().get("winAmount")).getValue()).abs()
+              .divide(new BigDecimal("1000"), BigDecimal.ROUND_DOWN, 2);
+
+      gameDataVO.setValidAmount(validAmount.setScale(2, BigDecimal.ROUND_DOWN));
+      gameDataVO.setWinAmount(winAmount.setScale(2, BigDecimal.ROUND_DOWN));
       gameDataList.add(gameDataVO);
     }
 
     return gameDataList.stream().collect(Collectors.groupingBy(GameDataVO::getGameKind));
-  }
-
-  public Map<String, List<GameDataVO>> initGameAccumulateData(String endTime, String tenant) {
-    endTime = endTime + " 23:59:59";
-    GameBetRecordQueryDTO dto = new GameBetRecordQueryDTO();
-    dto.setTimeType(TimeTypeEnum.STAT_TIME.getValue());
-    dto.setEndTime(endTime);
-    QueryBuilder builder = GameBetRecordSearchBuilder.buildBetRecordSearch(dto);
-
-    String indexName = ContextConstant.ES_INDEX.BET_RECORD_ + tenant;
-    SearchRequest searchRequest = new SearchRequest(indexName);
-
-    TermsAggregationBuilder groupTerms =
-            AggregationBuilders.terms("gameKindGroup").field("gameKind.keyword");
-
-    SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
-    SumAggregationBuilder winAmountSumBuilder = AggregationBuilders.sum("winAmount").field("winAmount");
-
-    groupTerms.subAggregation(winAmountSumBuilder);
-
-    searchSourceBuilder.size(0);
-    searchSourceBuilder.aggregation(groupTerms);
-    searchSourceBuilder.query(builder);
-
-    searchRequest.source(searchSourceBuilder);
-
-    RequestOptions.Builder optionsBuilder = RequestOptions.DEFAULT.toBuilder();
-    optionsBuilder.setHttpAsyncResponseConsumerFactory(
-            new HttpAsyncResponseConsumerFactory.HeapBufferedResponseConsumerFactory(31457280));
-
-    SearchResponse searchResponse = null;
-    try {
-      searchResponse = restHighLevelClient.search(searchRequest, optionsBuilder.build());
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-
-    Terms terms = searchResponse.getAggregations().get("gameKindGroup");
-    if (StringUtils.isNull(terms)) {
-      return null;
-    }
-    List<GameDataVO> gameAccumulateDataList = new ArrayList<>();
-    for (Terms.Bucket bucket : terms.getBuckets()) {
-      Object gameKind = bucket.getKey();
-      GameDataVO gameDataVO = new GameDataVO();
-      gameDataVO.setGameKind(gameKind.toString());
-      double accumulateWinAmount = ((ParsedSum) bucket.getAggregations().get("winAmount")).getValue() * -1;
-      gameDataVO.setAccumulateWinAmount(BigDecimal.valueOf(accumulateWinAmount).setScale(2, BigDecimal.ROUND_DOWN));
-      gameAccumulateDataList.add(gameDataVO);
-    }
-
-    return gameAccumulateDataList.stream().collect(Collectors.groupingBy(GameDataVO::getGameKind));
   }
 
   /**

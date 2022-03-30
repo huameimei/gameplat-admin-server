@@ -21,7 +21,7 @@ public class RechargeConfigController {
   @Autowired private RechargeConfigService rechargeConfigService;
 
   @GetMapping("/queryAll")
-  @PreAuthorize("hasAuthority('thirdParty:rechargeConfig:queryAll')")
+  @PreAuthorize("hasAuthority('thirdParty:rechargeConfig:view')")
   public List<RechargeConfig> queryAll(Integer mode, String payCode) {
     return rechargeConfigService.queryAll(-99, mode, payCode);
   }

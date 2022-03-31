@@ -99,7 +99,7 @@ public class GameFinancialReportServiceImpl
     // 查询总计
     QueryWrapper<GameFinancialReport> queryOne = Wrappers.query();
     queryOne.select(
-            "sum(valid_amount) as valid_amount,sum(win_amount) as win_amount,sum(accumulate_win_amount) as accumulateWinAmount");
+            "ifNull(sum(valid_amount), 0) as valid_amount,ifNull(sum(win_amount), 0) as win_amount,ifNull(sum(accumulate_win_amount),0) as accumulateWinAmount");
     fillQueryWrapper(queryDTO, queryOne);
     GameFinancialReport gameFinancialReport = gameFinancialReportMapper.selectOne(queryOne);
     TotalGameFinancialReportVO totalGameFinancialReport =

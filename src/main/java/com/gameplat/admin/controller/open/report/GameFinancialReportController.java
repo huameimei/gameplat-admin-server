@@ -48,10 +48,14 @@ public class GameFinancialReportController {
     @PreAuthorize("hasAuthority('financial:report:init')")
     @Log(module = ServiceName.ADMIN_SERVICE, desc = "初始化财务报表")
     public void initReportList(@RequestParam("statisticsTime") String statisticsTime) {
+      try {
         if (StringUtils.isEmpty(statisticsTime)) {
             statisticsTime = DateUtil.format(new Date(), "yyyy-MM");
         }
         gameFinancialReportService.initGameFinancialReport(statisticsTime);
+      } catch (Exception e) {
+        log.info("初始化财务报表异常");
+      }
     }
 
     @ApiOperation("导出财务报表")

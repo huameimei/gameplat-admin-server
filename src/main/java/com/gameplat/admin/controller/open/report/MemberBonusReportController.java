@@ -12,6 +12,7 @@ import com.gameplat.log.annotation.Log;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -34,6 +35,7 @@ public class MemberBonusReportController {
 
   @GetMapping(value = "/findReportPage")
   @ApiOperation(value = "查询会员红利报表")
+  @PreAuthorize("hasAuthority('bonus:report:page')")
   public PageDtoVO<MemberBonusReportVO> findReportPage(PageDTO<MemberBonusReportVO> page, MemberBonusReportQueryDTO queryDTO) {
     if (StringUtils.isEmpty(queryDTO.getStartTime()) || StringUtils.isEmpty(queryDTO.getEndTime())) {
       queryDTO.setStartTime(DateUtil.format(new Date(), "YYYY-MM-dd"));
@@ -44,6 +46,7 @@ public class MemberBonusReportController {
 
   @GetMapping(value = "/exportReport")
   @ApiOperation(value = "导出会员红利报表")
+  @PreAuthorize("hasAuthority('bonus:report:export')")
   @Log(module = ServiceName.ADMIN_SERVICE, desc = "导出会员红利报表")
   public void exportReport(MemberBonusReportQueryDTO queryDTO, HttpServletResponse response) {
     if (StringUtils.isEmpty(queryDTO.getStartTime()) || StringUtils.isEmpty(queryDTO.getEndTime())) {

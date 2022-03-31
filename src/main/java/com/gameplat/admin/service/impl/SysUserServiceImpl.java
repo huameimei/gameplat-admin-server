@@ -231,7 +231,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
   @Override
   @SentinelResource(value = "changeStatus")
   public void changeStatus(Long id, Integer status) {
-    Assert.isTrue(!id.equals(SecurityUserHolder.getUserId()), "不允许操作自己账号!");
+//    Assert.isTrue(!id.equals(SecurityUserHolder.getUserId()), "不允许操作自己账号!");
     SysUser user = Assert.notNull(this.getById(id), "用户不存在!");
     user.setStatus(status);
 

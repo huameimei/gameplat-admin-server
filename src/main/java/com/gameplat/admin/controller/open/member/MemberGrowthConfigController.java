@@ -30,7 +30,7 @@ public class MemberGrowthConfigController {
 
   @ApiOperation(value = "查询")
   @GetMapping("/get")
-  @PreAuthorize("hasAuthority('member:growthConfig:get')")
+  @PreAuthorize("hasAuthority('member:growthConfig:view')")
   public MemberGrowthConfigVO getOne() {
     return memberGrowthConfigService.findOneConfig();
   }

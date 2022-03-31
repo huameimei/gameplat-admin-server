@@ -1,54 +1,116 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.gameplat.admin.mapper.GameRebateReportMapper">
 
-    <resultMap id="gameRebateReport" type="com.gameplat.model.entity.game.GameRebateReport">
-        <result property="memberId" column="member_id"/>
-        <result property="account" column="account"/>
-        <result property="realName" column="real_name"/>
-        <result property="userPaths" column="user_paths"/>
-        <result property="platformCode" column="platform_code"/>
-        <result property="gameKind" column="game_kind"/>
-        <result property="gameType" column="game_type"/>
-        <result property="rebateMoney" column="rebate_money"/>
-        <result property="realRebateMoney" column="real_rebate_money"/>
-        <result property="createTime" column="create_time"/>
-        <result property="periodId" column="period_id"/>
-        <result property="periodName" column="period_name"/>
-        <result property="beginDate" column="begin_date"/>
-        <result property="endDate" column="end_date"/>
-        <result property="status" column="status"/>
-        <result property="remark" column="remark"/>
-        <result property="validAmount" column="valid_amount"/>
-        <result property="statTime" column="stat_time"/>
-        <result property="userLevel" column="user_level"/>
-    </resultMap>
+  <resultMap id="gameRebateReport" type="com.gameplat.model.entity.game.GameRebateReport">
+    <result column="member_id" property="memberId"/>
+    <result column="account" property="account"/>
+    <result column="real_name" property="realName"/>
+    <result column="user_paths" property="userPaths"/>
+    <result column="platform_code" property="platformCode"/>
+    <result column="game_kind" property="gameKind"/>
+    <result column="game_type" property="gameType"/>
+    <result column="rebate_money" property="rebateMoney"/>
+    <result column="real_rebate_money" property="realRebateMoney"/>
+    <result column="create_time" property="createTime"/>
+    <result column="period_id" property="periodId"/>
+    <result column="period_name" property="periodName"/>
+    <result column="begin_date" property="beginDate"/>
+    <result column="end_date" property="endDate"/>
+    <result column="status" property="status"/>
+    <result column="remark" property="remark"/>
+    <result column="valid_amount" property="validAmount"/>
+    <result column="stat_time" property="statTime"/>
+    <result column="user_level" property="userLevel"/>
+  </resultMap>
 
-    <select id="queryGameRebateReportByStatus" resultMap="gameRebateReport">
-        select a.member_id,
-               a.account,
-               b.real_name,
-               a.user_paths,
-               SUM(a.rebate_money)      AS rebate_money,
-               SUM(a.real_rebate_money) AS real_rebate_money,
-               a.create_time,
-               a.period_id,
-               a.period_name,
-               a.begin_date,
-               a.end_date,
-               a.status,
-               a.remark,
-               SUM(a.valid_amount)      AS valid_amount,
-               a.stat_time,
-               b.user_level
-        from game_rebate_report a
-                 left join `member` b
-                           on a.member_id = b.id
-        WHERE 1 = 1
-          and a.period_id = #{periodId}
-          and a.status = #{status}
-        GROUP BY a.member_id
-    </select>
+  <select id="queryGameRebateReportByStatus" resultMap="gameRebateReport">
+    select a.member_id,
+           a.account,
+           b.real_name,
+           a.user_paths,
+           SUM(a.rebate_money)      AS rebate_money,
+           SUM(a.real_rebate_money) AS real_rebate_money,
+           a.create_time,
+           a.period_id,
+           a.period_name,
+           a.begin_date,
+           a.end_date,
+           a.status,
+           a.remark,
+           SUM(a.valid_amount)      AS valid_amount,
+           a.stat_time,
+           b.user_level
+    from game_rebate_report a
+           left join `member` b
+                     on a.member_id = b.id
+    WHERE 1 = 1
+      and a.period_id = #{periodId}
+      and a.status = #{status}
+    GROUP BY a.member_id
+  </select>
+
+
+  <select id="queryGameReport" parameterType="com.gameplat.admin.model.dto.GameRebateStatisQueryDTO"
+    resultType="com.gameplat.admin.model.vo.GameReportVO">
+    SELECT s1.betAmount,
+    s1.validAmount,
+    s1.gameCount,
+    s1.winAmount,
+    s1.userNumber,
+    s1.platform_code platformCode,
+    IF(s2.rebateMoney is null,0,s2.rebateMoney) rebateMoney,
+    s1.winAmount-IF(s2.rebateMoney is null,0,s2.rebateMoney)
+    companyAmount from (
+    SELECT
+    sum(dr.bet_amount) betAmount,
+    sum(dr.valid_amount) validAmount,
+    sum(dr.bet_count) gameCount,
+    sum(dr.win_amount) winAmount,
+    count(DISTINCT dr.account) userNumber,
+    dr.platform_code
+    FROM
+    game_bet_daily_report dr where 1=1
+    <if test="beginTime != null">
+      <![CDATA[
+         and dr.stat_time >= STR_TO_DATE(#{beginTime},'%Y-%m-%d')
+       ]]>
+    </if>
+    <if test="endTime != null">
+      <![CDATA[
+         and dr.stat_time <= STR_TO_DATE(#{endTime},'%Y-%m-%d')
+       ]]>
+    </if>
+    <if test="userPaths != null and userPaths != ''">
+      and dr.user_paths like #{userPaths}
+    </if>
+    <if test="account != null and account != ''">
+      and dr.account like #{account}
+    </if>
+    GROUP BY dr.platform_code) s1 left Join (
+    SELECT
+    sum(rr.real_rebate_money) rebateMoney,
+    rr.platform_code
+    FROM
+    game_rebate_report rr where 1=1
+    <if test="beginTime != null">
+      <![CDATA[
+         and rr.stat_time >=  STR_TO_DATE(#{beginTime},'%Y-%m-%d')
+      ]]>
+    </if>
+    <if test="endTime != null">
+      <![CDATA[
+         and rr.stat_time <= STR_TO_DATE(#{endTime},'%Y-%m-%d')
+      ]]>
+    </if>
+    <if test="userPaths != null and userPaths != ''">
+      and rr.user_paths like #{userPaths}
+    </if>
+    <if test="account != null and account != ''">
+      and rr.account like #{account}
+    </if>
+    GROUP BY rr.platform_code) s2 on s1.platform_code=s2.platform_code
+  </select>
 
 </mapper>

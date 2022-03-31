@@ -41,6 +41,7 @@ public class OpenOnlineController {
   private MemberService memberService;
 
   @GetMapping("/list")
+  @PreAuthorize("hasAuthority('account:online:view')")
   public IPage<OnlineUserVo> onlineList(PageDTO<OnlineUserVo> page, OnlineUserDTO dto) {
     return onlineUserService.selectOnlineList(page, dto);
   }
@@ -66,6 +67,7 @@ public class OpenOnlineController {
    * @return
    */
   @GetMapping("/allBalance/{account}")
+  @PreAuthorize("hasAuthority('account:online:balance')")
   public Result allBalance(@PathVariable(value = "account", required = true) String account) {
     Assert.notNull(account, "请输入会员！");
     gameAdminService.recyclingAmountByAccount(account);

@@ -37,7 +37,7 @@ public class MemberGrowthStatisController {
 
     @ApiOperation(value = "查询")
     @GetMapping("/page")
-    @PreAuthorize("hasAuthority('member:growthStatis:get')")
+    @PreAuthorize("hasAuthority('member:growthStatis:view')")
     public IPage<MemberGrowthStatisVO> page(PageDTO<MemberGrowthStatis> page, MemberGrowthStatisDTO dto) {
         return memberGrowthStatisService.findStatisList(page, dto);
     }

@@ -1,6 +1,6 @@
 package com.gameplat.admin.service.impl;
 
-import cn.hutool.core.convert.Convert;
+import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.gameplat.admin.config.TenantConfig;
 import com.gameplat.admin.convert.GameBetRecordConvert;
@@ -18,6 +18,7 @@ import com.gameplat.common.enums.TransferTypesEnum;
 import com.gameplat.common.game.GameBizBean;
 import com.gameplat.common.game.GameResult;
 import com.gameplat.common.game.api.GameApi;
+import com.gameplat.common.util.MathUtils;
 import com.gameplat.elasticsearch.page.PageResponse;
 import com.gameplat.elasticsearch.service.IBaseElasticsearchService;
 import com.gameplat.model.entity.game.GameBetRecord;
@@ -85,9 +86,10 @@ public class GameBetRecordInfoServiceImpl implements GameBetRecordInfoService {
   @Override
   public PageDtoVO<GameBetRecordVO> queryPageBetRecord(
       Page<GameBetRecordVO> page, GameBetRecordQueryDTO dto) {
+    log.info("请求下注记录分页数据参数：{}", JSONUtil.toJsonStr(dto));
     QueryBuilder builder = GameBetRecordSearchBuilder.buildBetRecordSearch(dto);
     SortBuilder<FieldSortBuilder> sortBuilder =
-        SortBuilders.fieldSort(convertTimeType(dto.getTimeType()) + ".keyword")
+        SortBuilders.fieldSort(GameBetRecordSearchBuilder.convertTimeType(dto.getTimeType()))
             .order(SortOrder.DESC);
     String indexName = ContextConstant.ES_INDEX.BET_RECORD_ + tenantConfig.getTenantCode();
     // 调用封装的分页 页码不用减1
@@ -101,6 +103,7 @@ public class GameBetRecordInfoServiceImpl implements GameBetRecordInfoService {
             sortBuilder);
 
     List<GameBetRecordVO> betRecordList = new ArrayList<>();
+    log.info("分页查询返回数据,总数{}", result.getTotal());
     if (CollectionUtils.isNotEmpty(result.getList())) {
       result.getList().forEach(o -> betRecordList.add(gameBetRecordConvert.toVo(o)));
     }
@@ -134,12 +137,12 @@ public class GameBetRecordInfoServiceImpl implements GameBetRecordInfoService {
       SearchResponse searchResponse =
           restHighLevelClient.search(searchRequest, optionsBuilder.build());
       Map<String, Aggregation> aggregationMap = searchResponse.getAggregations().getAsMap();
-      BigDecimal betAmount = Convert.toBigDecimal(((ParsedSum) aggregationMap.get("betAmountSum")).getValue())
-              .divide(new BigDecimal("1000"), BigDecimal.ROUND_DOWN, 2);
-      BigDecimal validAmount = Convert.toBigDecimal(((ParsedSum) aggregationMap.get("validAmountSum")).getValue())
-              .divide(new BigDecimal("1000"), BigDecimal.ROUND_DOWN, 2);
-      BigDecimal winAmount = Convert.toBigDecimal(((ParsedSum) aggregationMap.get("winAmountSum")).getValue())
-              .divide(new BigDecimal("1000"), BigDecimal.ROUND_DOWN, 2);
+      BigDecimal betAmount =
+          MathUtils.divide1000(((ParsedSum) aggregationMap.get("betAmountSum")).getValue());
+      BigDecimal validAmount =
+          MathUtils.divide1000(((ParsedSum) aggregationMap.get("validAmountSum")).getValue());
+      BigDecimal winAmount =
+          MathUtils.divide1000(((ParsedSum) aggregationMap.get("winAmountSum")).getValue());
       otherData.put("betAmount", betAmount);
       otherData.put("validAmount", validAmount);
       otherData.put("winAmount", winAmount);
@@ -151,22 +154,6 @@ public class GameBetRecordInfoServiceImpl implements GameBetRecordInfoService {
     pageDtoVO.setPage(resultPage);
     pageDtoVO.setOtherData(otherData);
     return pageDtoVO;
-  }
-
-  public String convertTimeType(Integer timeType) {
-    /** 1 -- 投注时间, 2 -- 三方时间, 3 -- 结算时间, 4 -- 报表时间 */
-    switch (timeType) {
-      case 1:
-        return "betTime";
-      case 2:
-        return "amesTime";
-      case 3:
-        return "settleTime";
-      case 4:
-        return "statTime";
-      default:
-        return "betTime";
-    }
   }
 
   @Override

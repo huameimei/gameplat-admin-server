@@ -36,7 +36,7 @@ public class OpenMessageInfoController {
 
   @ApiOperation(value = "分页查询消息")
   @GetMapping("/page")
-  @PreAuthorize("hasAuthority('operator:message:page')")
+  @PreAuthorize("hasAuthority('operator:message:view')")
   @ApiImplicitParams({
     @ApiImplicitParam(name = "current", value = "分页参数：当前页", defaultValue = "1"),
     @ApiImplicitParam(name = "size", value = "每页条数")
@@ -47,7 +47,7 @@ public class OpenMessageInfoController {
 
   @ApiOperation(value = "新增消息")
   @PostMapping("/save")
-  @PreAuthorize("hasAuthority('operator:message:save')")
+  @PreAuthorize("hasAuthority('operator:message:add')")
   public void save(@Validated MessageInfoAddDTO dto) {
     messageInfoService.insertMessage(dto);
   }

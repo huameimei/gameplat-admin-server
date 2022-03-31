@@ -31,4 +31,6 @@ public class MemberBalanceVO implements Serializable {
 
   /** 上级代理 */
   private String parentName;
+
+  private long id;
 }

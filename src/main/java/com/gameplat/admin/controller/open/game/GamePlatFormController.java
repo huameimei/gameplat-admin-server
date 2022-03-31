@@ -22,7 +22,7 @@ public class GamePlatFormController {
   @Autowired private GamePlatformService gamePlatformService;
 
   @GetMapping("/list")
-  @PreAuthorize("hasAuthority('game:gamePlatform:list')")
+  @PreAuthorize("hasAuthority('game:gamePlatform:view')")
   public IPage<GamePlatform> selectGameList(PageDTO<GamePlatform> page, GamePlatformQueryDTO dto) {
     return gamePlatformService.selectGamePlatformList(page, dto);
   }

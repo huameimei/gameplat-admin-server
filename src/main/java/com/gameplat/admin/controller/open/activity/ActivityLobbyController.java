@@ -54,7 +54,7 @@ public class ActivityLobbyController {
 
   @ApiOperation(value = "活动大厅列表")
   @GetMapping("/list")
-  @PreAuthorize("hasAuthority('activity:lobby:page')")
+  @PreAuthorize("hasAuthority('activity:lobby:view')")
   public IPage<ActivityLobbyVO> list(
       @ApiIgnore PageDTO<ActivityLobby> page, ActivityLobbyQueryDTO dto) {
     return activityLobbyService.findActivityLobbyList(page, dto);
@@ -79,7 +79,7 @@ public class ActivityLobbyController {
 
   @ApiOperation(value = "修改活动大厅")
   @PutMapping("/update")
-  @PreAuthorize("hasAuthority('activity:lobby:update')")
+  @PreAuthorize("hasAuthority('activity:lobby:edit')")
   public void update(@RequestBody ActivityLobbyUpdateDTO dto) {
     if (dto.getId() == null || dto.getId() == 0) {
       throw new ServiceException("id不能为空");

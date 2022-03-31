@@ -22,13 +22,13 @@ public class OpenAccountBlacklistController {
   @Autowired private AccountBlacklistService accountBlacklistService;
 
   @DeleteMapping("/del/{id}")
-  @PreAuthorize("hasAuthority('account:accountBlack:del')")
+  @PreAuthorize("hasAuthority('account:accountBlack:remove')")
   public void delete(@PathVariable Long id) {
     accountBlacklistService.delete(id);
   }
 
   @GetMapping("/list")
-  @PreAuthorize("hasAuthority('account:accountBlack:list')")
+  @PreAuthorize("hasAuthority('account:accountBlack:view')")
   public IPage<AccountBlacklist> findAccountBlacklist(
       PageDTO<AccountBlacklist> page, AccountBlacklistQueryDTO accountBlacklistQueryDTO) {
     return accountBlacklistService.selectAccountBlacklistList(page, accountBlacklistQueryDTO);

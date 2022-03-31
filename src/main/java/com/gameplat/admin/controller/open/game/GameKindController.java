@@ -27,7 +27,7 @@ public class GameKindController {
   @Autowired private GameKindService gameKindService;
 
   @GetMapping("/list")
-  @PreAuthorize("hasAuthority('game:gameKind:list')")
+  @PreAuthorize("hasAuthority('game:gameKind:view')")
   public IPage<GameKindVO> selectGameKindList(PageDTO<GameKind> page, GameKindQueryDTO dto) {
     return gameKindService.selectGameKindList(page, dto);
   }

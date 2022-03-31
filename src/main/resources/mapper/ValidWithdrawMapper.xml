@@ -209,7 +209,7 @@
             a.account account,
             (a.morm_dml + a.discount_dml ) dmlClaim,
             a.create_time createTime,
-            ifnull(a.end_time,sysdate()) AS endTime,
+            a.end_time AS endTime,
             (a.rech_money + a.discount_money) rechMoney
         FROM valid_withdraw AS a
         WHERE a.STATUS = 0

@@ -24,6 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -238,6 +239,7 @@ public class TenantSettingController {
      * 获取广场的开关
      */
     @RequestMapping("/getSquareSwitch")
+    @PreAuthorize("hasAuthority('system:teant:..zgetSquareSwitch')")
     public Result getSquareSwitch(TenantSettingVO sysTenantSetting) {
         sysTenantSetting.setSettingType(Constants.SYSTEM_SETTING);
         sysTenantSetting.setSettingCode(Constants.SQUARE_SWITCH);

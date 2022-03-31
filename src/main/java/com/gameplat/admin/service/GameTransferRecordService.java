@@ -6,7 +6,6 @@ import com.gameplat.admin.model.dto.GameTransferRecordQueryDTO;
 import com.gameplat.admin.model.dto.OperGameTransferRecordDTO;
 import com.gameplat.admin.model.vo.PageDtoVO;
 import com.gameplat.model.entity.game.GameTransferRecord;
-
 import java.util.List;
 
 public interface GameTransferRecordService extends IService<GameTransferRecord> {
@@ -19,4 +18,6 @@ public interface GameTransferRecordService extends IService<GameTransferRecord> 
   boolean findTransferRecordCount(GameTransferRecord dto);
 
   List<GameTransferRecord> findPlatformCodeList(Long id);
+
+  void saveTransferRecord(GameTransferRecord transferRecord);
 }

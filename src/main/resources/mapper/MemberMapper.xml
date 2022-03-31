@@ -183,7 +183,9 @@
                t2.total_rech_amount as totalRechAmount,
                t2.total_rech_times as totalRechTimes,
                t2.total_withdraw_amount as totalWithdrawAmount,
-               t2.total_withdraw_times as totalWithdrawTimes
+               t2.total_withdraw_times as totalWithdrawTimes,
+               t2.first_rech_time as firstRechTime,
+               t2.first_rech_amount as firstRechAmount
         FROM member t1
                  LEFT JOIN member_info t2 ON t1.id = t2.member_id
         WHERE t1.account = #{account}

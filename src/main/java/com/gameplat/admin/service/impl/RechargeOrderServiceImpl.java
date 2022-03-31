@@ -425,6 +425,23 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
 
   @Override
   public List<ActivityStatisticItem> findAllFirstRechargeAmount(Map<String, Object> map) {
+    String startTime = (String) map.get("startTime");
+    String endTime = (String) map.get("endTime");
+    //查询出包含历史记录在内会员的首次成功充值订单
+    map.remove("startTime");
+    map.remove("endTime");
+    List<ActivityStatisticItem> firstRechargeOrderList = rechargeOrderMapper.findFirstRechargeOrderList(map);
+    if (CollectionUtils.isNotEmpty(firstRechargeOrderList)) {
+      for (ActivityStatisticItem firstRechargeOrder : firstRechargeOrderList) {
+        //判断该订单的充值时间是否在活动的有效期内
+        if (cn.hutool.core.date.DateUtil.isIn(firstRechargeOrder.getRechargeTime(), cn.hutool.core.date.DateUtil.parseDate(startTime), cn.hutool.core.date.DateUtil.parseDate(endTime))) {
+          firstRechargeOrder.setIsNewUser(1);
+        } else {
+          firstRechargeOrder.setIsNewUser(2);
+        }
+      }
+      return firstRechargeOrderList;
+    }
     return null;
   }
 

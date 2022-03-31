@@ -70,10 +70,10 @@
                 AND mode IN (${payType})
             </if>
             <if test="startTime != null and startTime != ''">
-                AND create_time <![CDATA[>= ]]> #{startTime}
+                AND audit_time <![CDATA[>= ]]> #{startTime}
             </if>
             <if test="endTime != null and endTime != ''">
-                AND create_time <![CDATA[<= ]]> #{endTime}
+                AND audit_time <![CDATA[<= ]]> #{endTime}
             </if>
             AND status = 3
         </where>
@@ -86,14 +86,14 @@
                     AND mode IN (${payType})
                 </if>
                 <if test="startTime != null and startTime != ''">
-                    AND recharge_time <![CDATA[>= ]]> #{startTime}
+                    AND audit_time <![CDATA[>= ]]> #{startTime}
                 </if>
                 <if test="endTime != null and endTime != ''">
-                    AND recharge_time <![CDATA[<= ]]> #{endTime}
+                    AND audit_time <![CDATA[<= ]]> #{endTime}
                 </if>
                 AND status = 3
             </where>
-            GROUP BY member_id, date_format( recharge_time, '%Y-%m-%d' )) b ON a.member_id = b.member_id
+            GROUP BY member_id, date_format( audit_time, '%Y-%m-%d' )) b ON a.member_id = b.member_id
         </if>
         <where>
             <if test="userIdList != null and userIdList.size > 0">
@@ -116,11 +116,11 @@
         SELECT
         member_id userId,
         account userName,
-        GROUP_CONCAT(DISTINCT(recharge_time)) AS rechargeTimes
+        GROUP_CONCAT(DISTINCT(audit_time)) AS rechargeTimes
         FROM (SELECT
         member_id,
         account,
-        date_format( recharge_time, '%Y-%m-%d') AS recharge_time,
+        date_format( audit_time, '%Y-%m-%d') AS recharge_time,
         SUM(amount) AS totalAmount
         FROM recharge_order
         <where>
@@ -141,13 +141,13 @@
                 AND mode IN (${payType})
             </if>
             <if test="startTime != null and startTime != ''">
-                AND recharge_time <![CDATA[>= ]]> #{startTime}
+                AND audit_time <![CDATA[>= ]]> #{startTime}
             </if>
             <if test="endTime != null and endTime != ''">
-                AND recharge_time <![CDATA[<= ]]> #{endTime}
+                AND audit_time <![CDATA[<= ]]> #{endTime}
             </if>
         </where>
-        GROUP BY member_id, recharge_time) AS a
+        GROUP BY member_id, audit_time) AS a
         WHERE
         totalAmount >= #{rechargeValidAmount}
         GROUP BY a.member_id
@@ -157,7 +157,7 @@
         SELECT
         member_id userId,
         account userName,
-        DATE_FORMAT(recharge_time,'%Y-%m-%d') AS rechargeTime,
+        DATE_FORMAT(audit_time,'%Y-%m-%d') AS rechargeTime,
         amount AS firstRechargeAmount
         FROM recharge_order
         <where>
@@ -178,14 +178,14 @@
                 AND mode IN (${payType})
             </if>
             <if test="startTime != null and startTime != ''">
-                AND recharge_time <![CDATA[>= ]]> #{startTime}
+                AND audit_time <![CDATA[>= ]]> #{startTime}
             </if>
             <if test="endTime != null and endTime != ''">
-                AND recharge_time <![CDATA[<= ]]> #{endTime}
+                AND audit_time <![CDATA[<= ]]> #{endTime}
             </if>
         </where>
         GROUP BY member_id
-        ORDER BY recharge_time,id
+        ORDER BY audit_time,id
     </select>
 
     <!--根据会员和时间获取充值次数、充值金额、充值优惠、其它优惠-->
@@ -300,6 +300,43 @@
         where aa.interfaceName is not null and aa.interfaceCode is not null
         <!-- 在分组统计一下,防止一个通道配置了一个在线商户 -->
         GROUP BY aa.interfaceCode
+    </select>
+
+    <select id="findFirstRechargeOrderList" resultType="com.gameplat.admin.model.bean.ActivityStatisticItem">
+        SELECT
+        member_id userId,
+        account userName,
+        DATE_FORMAT(audit_time,'%Y-%m-%d') AS rechargeTime,
+        amount as firstRechargeAmount
+        FROM recharge_order
+        <where>
+            <if test="userIdList != null and userIdList.size > 0">
+                and member_id in
+                <foreach collection="userIdList" index="index" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="userNameList != null and userNameList.size > 0">
+                and account in
+                <foreach collection="userNameList" index="index" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="payType != null and payType != ''">
+                and mode in (${payType})
+            </if>
+            <if test="startTime != null and startTime != ''">
+                AND audit_time <![CDATA[>= ]]> #{startTime}
+            </if>
+            <if test="endTime != null and endTime != ''">
+                AND audit_time <![CDATA[<= ]]> #{endTime}
+            </if>
+            and status = 3
+            and (point_flag = 1 or point_flag is null)
+            and amount > 0
+        </where>
+        GROUP BY member_id
+        ORDER BY audit_time
     </select>
 
 </mapper>

@@ -195,7 +195,7 @@
           AND stat_time <![CDATA[ <= ]]> date_format(#{endTime}, '%Y-%m-%d')
         </if>
         <if test="sportGameList != null and sportGameList != ''">
-          AND FIND_IN_SET(first_kind, #{sportGameList})
+          AND FIND_IN_SET(game_kind, #{sportGameList})
         </if>
       </where>
       GROUP BY account ) a
@@ -212,7 +212,7 @@
             AND stat_time <![CDATA[ <= ]]> date_format(#{endTime}, '%Y-%m-%d')
           </if>
           <if test="sportGameList != null and sportGameList != ''">
-            AND FIND_IN_SET(first_kind, #{sportGameList})
+            AND FIND_IN_SET(game_kind, #{sportGameList})
           </if>
         </where>
         GROUP BY account,stat_time ) b ON a.account = b.account
@@ -230,36 +230,36 @@
 
   <select id="findGameDmlDateList" resultType="com.gameplat.admin.model.bean.ActivityStatisticItem">
     SELECT
-    user_name userName,
+      account userName,
     GROUP_CONCAT(DISTINCT(count_date)) AS gameCountDates
     FROM
-    ( SELECT user_name, count_date, sum( valid_amount ) AS totalAmount
+    ( SELECT account, stat_time as count_date, sum( valid_amount ) AS totalAmount
     FROM
-    member_game_day_report
+      game_bet_daily_report
     <where>
       <if test="userNameList != null and userNameList.size > 0">
-        and user_name in
+        and account in
         <foreach collection="userNameList" index="index" item="item" open="(" close=")" separator=",">
           #{item}
         </foreach>
       </if>
       <if test="startTime != null">
-        and count_date <![CDATA[ >= ]]> date_format(#{startTime}, '%Y-%m-%d')
+        and stat_time <![CDATA[ >= ]]> date_format(#{startTime}, '%Y-%m-%d')
       </if>
       <if test="endTime != null">
-        and count_date <![CDATA[ <= ]]> date_format(#{endTime}, '%Y-%m-%d')
+        and stat_time <![CDATA[ <= ]]> date_format(#{endTime}, '%Y-%m-%d')
       </if>
       <if test="sportGameList != null and sportGameList != ''">
-        and find_in_set(first_kind, #{sportGameList})
+        and find_in_set(game_kind, #{sportGameList})
       </if>
     </where>
-    GROUP BY user_name, count_date ) AS a
+    GROUP BY account, stat_time ) AS a
     <where>
       <if test="sportValidAmount != null">
         and totalAmount >= #{sportValidAmount}
       </if>
     </where>
-    GROUP BY a.user_name
+    GROUP BY a.account
   </select>
 
 

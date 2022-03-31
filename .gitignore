@@ -32,7 +32,6 @@ build/
 ### VS Code ###
 .vscode/
 /data
-static
 web-ui/*
 localData/sql/*
 localData/doc/*

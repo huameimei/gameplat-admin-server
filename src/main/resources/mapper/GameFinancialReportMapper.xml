@@ -69,7 +69,7 @@
         FROM
         game_financial_report
         WHERE
-        statistics_time = DATE_FORMAT( date_sub( CONCAT( #{dto.statisticsTime}, '-01' ), INTERVAL 1 MONTH ), '%Y-%m' )
+        statistics_time = DATE_FORMAT( date_sub( CONCAT( #{statisticsTime}, '-01' ), INTERVAL 1 MONTH ), '%Y-%m' )
         ) e ON a.game_kind = e.game_kind
         <where>
             <if test="statisticsTime != null and statisticsTime != ''">
@@ -142,6 +142,7 @@
         FROM game_kind g
         WHERE
         status in (1,2)
+        and code != 'KGNL_LOTTERY'
     </select>
 
     <select id="findTotalLastWinAmount" resultType="java.math.BigDecimal">

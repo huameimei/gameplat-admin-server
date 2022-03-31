@@ -252,6 +252,8 @@ public class GameFinancialReportServiceImpl
       throw new ServiceException("游戏已全部下架");
     }
 
+    startTime = startTime + " 00:00:00";
+    endTime = endTime + " 23:59:59";
     // 获取游戏的有效投注额和输赢金额
     Map<String, List<GameDataVO>> gameDataMap = initGameData(startTime, endTime, tenant);
 
@@ -267,13 +269,17 @@ public class GameFinancialReportServiceImpl
       });
     }
 
+    // 初始化KG新彩票的游戏数据（按彩种划分）
+    List<GameFinancialReport> KgNlReportList = iniKgNlData(statisticsTime, startTime, endTime, tenant);
+    if (StringUtils.isNotEmpty(KgNlReportList)) {
+      allGameFinancialReportList.addAll(KgNlReportList);
+    }
+
     allGameFinancialReportList.addAll(gameFinancialReportList);
     return allGameFinancialReportList;
   }
 
   public Map<String, List<GameDataVO>> initGameData(String startTime, String endTime, String tenant) {
-    startTime = startTime + " 00:00:00";
-    endTime = endTime + " 23:59:59";
     GameBetRecordQueryDTO dto = new GameBetRecordQueryDTO();
     dto.setTimeType(TimeTypeEnum.STAT_TIME.getValue());
     dto.setBeginTime(startTime);
@@ -332,6 +338,79 @@ public class GameFinancialReportServiceImpl
     return gameDataList.stream().collect(Collectors.groupingBy(GameDataVO::getGameKind));
   }
 
+  public List<GameFinancialReport> iniKgNlData(String statisticsTime, String startTime, String endTime, String tenant) {
+    GameBetRecordQueryDTO dto = new GameBetRecordQueryDTO();
+    dto.setTimeType(TimeTypeEnum.STAT_TIME.getValue());
+    dto.setBeginTime(startTime);
+    dto.setEndTime(endTime);
+    QueryBuilder builder = GameBetRecordSearchBuilder.buildBetRecordSearch(dto);
+
+    String indexName = ContextConstant.ES_INDEX.BET_RECORD_ + tenant;
+    SearchRequest searchRequest = new SearchRequest(indexName);
+
+    TermsAggregationBuilder groupTerms =
+            AggregationBuilders.terms("lottCodeGroup").field("lottCode.keyword");
+
+    SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+    SumAggregationBuilder validAmountSumBuilder = AggregationBuilders.sum("validAmount").field("validAmount");
+    SumAggregationBuilder winAmountSumBuilder = AggregationBuilders.sum("winAmount").field("winAmount");
+
+    groupTerms.subAggregation(validAmountSumBuilder);
+    groupTerms.subAggregation(winAmountSumBuilder);
+
+    searchSourceBuilder.size(0);
+    searchSourceBuilder.aggregation(groupTerms);
+    searchSourceBuilder.query(builder);
+
+    searchRequest.source(searchSourceBuilder);
+
+    RequestOptions.Builder optionsBuilder = RequestOptions.DEFAULT.toBuilder();
+    optionsBuilder.setHttpAsyncResponseConsumerFactory(
+            new HttpAsyncResponseConsumerFactory.HeapBufferedResponseConsumerFactory(31457280));
+
+    SearchResponse searchResponse = null;
+    try {
+      searchResponse = restHighLevelClient.search(searchRequest, optionsBuilder.build());
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+
+    Terms terms = searchResponse.getAggregations().get("lottCodeGroup");
+    if (StringUtils.isNull(terms)) {
+      return null;
+    }
+    List<GameFinancialReport> KgNlReportList = new ArrayList<>();
+    for (Terms.Bucket bucket : terms.getBuckets()) {
+      Object lottCode = bucket.getKey();
+      GameFinancialReport gameFinancialReport = new GameFinancialReport();
+      // 官彩
+      if (lottCode.toString().equals("1")) {
+        gameFinancialReport.setGameKind("kgnl_lottery_official");
+        // 私彩
+      } else if (lottCode.toString().equals("2")) {
+        gameFinancialReport.setGameKind("kgnl_lottery_self");
+        // 六合彩
+      } else if (lottCode.toString().equals("3")) {
+        gameFinancialReport.setGameKind("kgnl_lottery_lhc");
+      }
+      BigDecimal validAmount = Converts.toBigDecimal(((ParsedSum) bucket.getAggregations().get("validAmount")).getValue())
+              .divide(new BigDecimal("1000"), BigDecimal.ROUND_DOWN, 2);
+      BigDecimal winAmount = Converts.toBigDecimal(((ParsedSum) bucket.getAggregations().get("winAmount")).getValue()).abs()
+              .divide(new BigDecimal("1000"), BigDecimal.ROUND_DOWN, 2);
+      gameFinancialReport.setValidAmount(validAmount);
+      gameFinancialReport.setWinAmount(winAmount);
+      gameFinancialReport.setStatisticsTime(statisticsTime);
+      gameFinancialReport.setStartTime(startTime);
+      gameFinancialReport.setEndTime(endTime);
+      gameFinancialReport.setCustomerCode(tenant);
+      gameFinancialReport.setPlatformCode("KGNL");
+      gameFinancialReport.setGameType("LOTTERY");
+      KgNlReportList.add(gameFinancialReport);
+    }
+
+    return KgNlReportList;
+  }
+
   /**
    * 对KG新彩票的三个彩种做特殊处理
    *
@@ -340,18 +419,20 @@ public class GameFinancialReportServiceImpl
   public void assembleKgNewLottery(List<GameFinancialReportVO> list) {
     if (StringUtils.isNotEmpty(list)) {
       for (GameFinancialReportVO vo : list) {
-        if (vo.getGameKind().equals("kgnl_lottery_official") || vo.getGameKind().equals("kgnl_lottery_self") || vo.getGameKind().equals("kgnl_lottery_lhc")) {
-          vo.setGameTypeName("KG新彩票");
-          vo.setGameTypeId(9);
-          if (vo.getGameKind().equals("kgnl_lottery_official")) {
-            vo.setGameName("新官方彩");
-          }
-          if (vo.getGameKind().equals("kgnl_lottery_self")) {
-            vo.setGameName("新自营彩");
-          }
-          if (vo.getGameKind().equals("kgnl_lottery_lhc")) {
-            vo.setGameName("新六合彩");
-          }
+        if (vo.getGameKind().equals("kgnl_lottery_official")) {
+          vo.setGameTypeId(3);
+          vo.setGameTypeName("彩票投注");
+          vo.setGameName("新官方彩");
+        }
+        if (vo.getGameKind().equals("kgnl_lottery_self")) {
+          vo.setGameTypeId(3);
+          vo.setGameTypeName("彩票投注");
+          vo.setGameName("新自营彩");
+        }
+        if (vo.getGameKind().equals("kgnl_lottery_lhc")) {
+          vo.setGameTypeId(3);
+          vo.setGameTypeName("彩票投注");
+          vo.setGameName("新六合彩");
         }
       }
     }

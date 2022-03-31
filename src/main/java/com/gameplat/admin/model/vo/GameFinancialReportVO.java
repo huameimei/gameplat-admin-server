@@ -52,7 +52,7 @@ public class GameFinancialReportVO implements Serializable {
   private BigDecimal winAmount;
 
   @ApiModelProperty(value = "上月输赢金额")
-  private BigDecimal lastWinAmount;
+  private BigDecimal lastWinAmount = BigDecimal.ZERO;
 
   @ApiModelProperty(value = "累计输赢金额")
   private BigDecimal accumulateWinAmount;

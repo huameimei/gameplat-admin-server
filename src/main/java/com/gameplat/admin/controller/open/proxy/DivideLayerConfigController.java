@@ -27,6 +27,7 @@ public class DivideLayerConfigController {
   @Autowired private DivideLayerConfigService layerConfigService;
 
   @GetMapping("/list")
+  @PreAuthorize("hasAuthority('agent:bonusconfig:view')")
   public IPage<DivideLayerConfigVo> list(
       PageDTO<DivideLayerConfig> page, DivideConfigDTO divideConfigDTO) {
     return layerConfigService.page(page, divideConfigDTO);
@@ -39,6 +40,7 @@ public class DivideLayerConfigController {
    * @return Map
    */
   @GetMapping("/getLayerConfigForEdit")
+  @PreAuthorize("hasAuthority('divide:layer:edit')")
   public Map<String, Object> getLayerConfigForEdit(DivideConfigDTO dto) {
     return layerConfigService.getLayerConfigForEdit(dto.getUserName(), "zh-CN");
   }

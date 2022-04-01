@@ -23,7 +23,7 @@ public class GameBetRecordController {
 
   @SneakyThrows
   @GetMapping(value = "/queryPage")
-  @PreAuthorize("hasAuthority('game:gameBetRecord:list')")
+  @PreAuthorize("hasAuthority('game:gameBetRecord:view')")
   public PageDtoVO<GameBetRecordVO> queryPage(
       Page<GameBetRecordVO> page, GameBetRecordQueryDTO dto) {
     return gameBetRecordInfoService.queryPageBetRecord(page, dto);
@@ -31,6 +31,7 @@ public class GameBetRecordController {
 
   @SneakyThrows
   @GetMapping(value = "/getGameResult")
+  @PreAuthorize("hasAuthority('game:gameBetRecord:gameResult')")
   public GameResult getGameResult(GameBetRecordQueryDTO dto) {
     return gameBetRecordInfoService.getGameResult(dto);
   }

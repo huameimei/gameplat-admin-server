@@ -21,6 +21,7 @@ import lombok.Cleanup;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -41,6 +42,7 @@ public class RebateReportController {
 
   @ApiOperation(value = "平级分红报表")
   @GetMapping("/list")
+  @PreAuthorize("hasAuthority('dividend:report:list')")
   public IPage<RebateReportVO> list(PageDTO<AgentPlanVO> page, RebateReportDTO rebateReportDTO) {
     // todo 参数初始化
     if (StrUtil.isBlank(rebateReportDTO.getCountDate())) {
@@ -70,6 +72,7 @@ public class RebateReportController {
 
   @ApiOperation("导出")
   @GetMapping(value = "/export")
+  @PreAuthorize("hasAuthority('dividend:report:export')")
   public void export(
       RebateReportDTO rebateReportDTO, HttpServletRequest request, HttpServletResponse response) {
     // todo 参数初始化
@@ -120,6 +123,7 @@ public class RebateReportController {
 
   @ApiOperation("更新佣金报表")
   @PostMapping(value = "/updateReport")
+  @PreAuthorize("hasAuthority('dividend:report:edit')")
   public void updateReport(
       @RequestParam(required = false) String agentName, @RequestParam String countDate) {
     rebateReportService.updateRebateReport(countDate, agentName);
@@ -201,6 +205,7 @@ public class RebateReportController {
 
   @ApiOperation("风控审核")
   @PostMapping(value = "/riskControlAudit")
+  @PreAuthorize("hasAuthority('dividend:report:riskControlAudit')")
   public void riskControlAudit(@RequestParam Long reportId) {
     log.info("风控审核：reportId={}", reportId);
     rebateReportService.reviewOrSettlement(NumberConstant.ONE, reportId);
@@ -208,6 +213,7 @@ public class RebateReportController {
 
   @ApiOperation("财务审核")
   @PostMapping(value = "/financialAudit")
+  @PreAuthorize("hasAuthority('dividend:report:financialAudit')")
   public void financialAudit(@RequestParam Long reportId) {
     log.info("财务审核：reportId={}", reportId);
     rebateReportService.reviewOrSettlement(NumberConstant.TWO, reportId);
@@ -215,6 +221,7 @@ public class RebateReportController {
 
   @ApiOperation("结算")
   @PostMapping(value = "/settlement")
+  @PreAuthorize("hasAuthority('dividend:report:settlement')")
   public void settlement(@RequestParam Long reportId) {
     log.info("结算：reportId={}", reportId);
     rebateReportService.reviewOrSettlement(NumberConstant.THREE, reportId);
@@ -222,6 +229,7 @@ public class RebateReportController {
 
   @ApiOperation("批量风控审核")
   @PostMapping(value = "/batchRiskControlAudit")
+  @PreAuthorize("hasAuthority('dividend:report:batchRiskControlAudit')")
   public void batchRiskControlAudit(@RequestParam String countDate) {
     log.info("批量风控审核：countDate={}", countDate);
     rebateReportService.batchReviewOrSettlement(NumberConstant.ZERO, countDate);
@@ -229,6 +237,7 @@ public class RebateReportController {
 
   @ApiOperation("批量财务审核")
   @PostMapping(value = "/batchFinancialAudit")
+  @PreAuthorize("hasAuthority('dividend:report:batchFinancialAudit')")
   public void batchFinancialAudit(@RequestParam String countDate) {
     log.info("批量财务审核：countDate={}", countDate);
     rebateReportService.batchReviewOrSettlement(NumberConstant.ONE, countDate);
@@ -236,6 +245,7 @@ public class RebateReportController {
 
   @ApiOperation("批量结算")
   @PostMapping(value = "/batchSettlement")
+  @PreAuthorize("hasAuthority('dividend:report:batchSettlement')")
   public void batchSettlement(@RequestParam String countDate) {
     log.info("批量结算：countDate={}", countDate);
     rebateReportService.batchReviewOrSettlement(NumberConstant.TWO, countDate);

@@ -50,7 +50,7 @@ public class MemberDayReportController {
 
   @ApiOperation(value = "会员日报表")
   @GetMapping(value = "memberGameDayReport")
-  @PreAuthorize("hasAuthority('member:dayReport:list')")
+  @PreAuthorize("hasAuthority('member:dayReport:view')")
   public PageDtoVO<MemberGameDayReportVo> queryBetReport(
       Page<MemberGameDayReportVo> page, MemberReportDto dto) {
     log.info("会员日报表入参：{}", JSON.toJSONString(dto));

@@ -51,7 +51,7 @@ public class DiscountTypeController {
   }
 
   @PostMapping("/page")
-  @PreAuthorize("hasAuthority('thirdParty:discountType:page')")
+  @PreAuthorize("hasAuthority('thirdParty:discountType:view')")
   public IPage<DiscountType> queryPage(Page<DiscountType> page) {
     return discountTypeService.findDiscountTypePage(page);
   }

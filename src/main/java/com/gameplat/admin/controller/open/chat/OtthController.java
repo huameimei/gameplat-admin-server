@@ -20,6 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -59,6 +60,7 @@ public class OtthController {
   @SneakyThrows
   @ApiOperation(value = "平台聊天室限制配置/聊天室成员管理/关键词管理/聊天室房间管理/角色管理/聊天室自定义消息管理")
   @PostMapping(value = "/{url}", produces = MediaType.APPLICATION_JSON_VALUE)
+  @PreAuthorize("hasAuthority('chat:edit')")
   public String post(
       @PathVariable String url, @RequestBody String body, HttpServletRequest request) {
     String apiUrl = getApiUrl(url);
@@ -83,6 +85,7 @@ public class OtthController {
 
   @ApiOperation(value = "平台聊天室限制配置/聊天室成员管理/关键词管理/聊天室房间管理/角色管理/聊天室自定义消息管理")
   @GetMapping(value = "/{url}", produces = MediaType.APPLICATION_JSON_VALUE)
+  @PreAuthorize("hasAuthority('chat:get')")
   public Object get(
       @PathVariable String url,
       HttpServletRequest request,
@@ -99,12 +102,14 @@ public class OtthController {
 
   @ApiOperation(value = "获取彩票游戏类型")
   @GetMapping(value = "/getLottTypeList", produces = MediaType.APPLICATION_JSON_VALUE)
+  @PreAuthorize("hasAuthority('chat:ottType:list')")
   public List<LotteryCodeVo> getLottTypeList() throws Exception {
     return otthService.getLottTypeList();
   }
 
   @ApiOperation(value = "中奖推送接口")
   @PostMapping("/pushLotteryWin")
+  @PreAuthorize("hasAuthority('chat:push')")
   public void pushLotteryWin(
       @RequestBody List<PushLottWinVo> lottWinVos, HttpServletRequest request) {
     otthService.pushLotteryWin(lottWinVos, request);
@@ -112,11 +117,13 @@ public class OtthController {
 
   @ApiOperation(value = "分享彩票下注")
   @RequestMapping(value = "/cpbet", method = RequestMethod.POST)
+  @PreAuthorize("hasAuthority('chat:share:bet')")
   public void cpbet(@RequestBody List<PushCPBetMessageReq> req, HttpServletRequest request) {
     otthService.cpbet(req, request);
   }
 
   @ApiOperation(value = "修改平台聊天室开关")
+  @PreAuthorize("hasAuthority('chat:edit:flag')")
   private void updateChatEnable(String body) {
     JSONObject json = JSONObject.parseObject(body);
     Integer chatOpen = json.getInteger("chatOpen");
@@ -126,6 +133,7 @@ public class OtthController {
 
   @SneakyThrows
   @ApiOperation(value = "查找聊天室会员")
+  @PreAuthorize("hasAuthority('chat:room:member')")
   @RequestMapping(value = "/getChatUser", method = RequestMethod.GET)
   public ChatUserVO getChatUser(String account) {
     return otthService.getChatUser(account);
@@ -133,6 +141,7 @@ public class OtthController {
 
   @ApiOperation(value = "给游戏调用的更新游戏状态")
   @PostMapping("updateGameStatus")
+  @PreAuthorize("hasAuthority('chat:game:updateGameStatus')")
   public void updateGameStuats(String gameId, int gameStatus) {
     // 游戏维护更新自定义中奖推送
     chatPushPlanService.updatePushPlan(gameId, gameStatus);

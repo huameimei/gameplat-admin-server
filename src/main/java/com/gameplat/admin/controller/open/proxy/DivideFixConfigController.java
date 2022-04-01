@@ -29,6 +29,7 @@ public class DivideFixConfigController {
   @Autowired private DivideFixConfigService fixConfigService;
 
   @GetMapping("/pageList")
+  @PreAuthorize("hasAuthority('agent:bonusFixconfig:view')")
   public IPage<DivideFixConfig> list(PageDTO<DivideFixConfig> page, DivideConfigDTO queryObj) {
     LambdaQueryWrapper<DivideFixConfig> queryWrapper = new LambdaQueryWrapper<>();
     queryWrapper

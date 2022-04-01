@@ -17,7 +17,7 @@ public interface MemberGoldCoinRecordService extends IService<MemberGoldCoinReco
       PageDTO<MemberGoldCoinRecord> page, MemberGoldCoinRecordQueryDTO dto);
 
     /** 增 */
-    void add(Long memberId, Integer amount);
+    void add(Long memMemberGoldCoinRecordberId, Integer amount);
 
     void addGoldCoin(String[] account, Integer amount);
 

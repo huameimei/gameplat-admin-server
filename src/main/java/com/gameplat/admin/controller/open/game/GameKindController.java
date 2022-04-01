@@ -55,6 +55,7 @@ public class GameKindController {
   }
 
   @GetMapping(value = "/queryGameKindList")
+  @PreAuthorize("hasAuthority('game:gameKind:view')")
   public List<GameKind> queryGameKindList() {
     return Optional.ofNullable(gameKindService.query().list()).orElse(Collections.emptyList());
   }

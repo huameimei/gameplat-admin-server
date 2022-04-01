@@ -26,6 +26,7 @@ public class DividePeriodsController {
 
   @ApiOperation(value = "期数列表")
   @GetMapping("/list")
+  @PreAuthorize("hasAuthority('divide:periods:view')")
   public IPage<DividePeriodsVO> list(PageDTO<DividePeriods> page, DividePeriodsQueryDTO dto) {
     return periodsService.queryPage(page, dto);
   }
@@ -48,7 +49,7 @@ public class DividePeriodsController {
 
   @ApiOperation(value = "删除期数")
   @DeleteMapping("/delete")
-  @PreAuthorize("hasAuthority('divide:periods:del')")
+  @PreAuthorize("hasAuthority('divide:periods:remove')")
   public void remove(@RequestBody String ids) {
     periodsService.delete(ids);
   }

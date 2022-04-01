@@ -28,6 +28,7 @@ public class SalaryGrantController {
 
   @ApiOperation(value = "工资统计")
   @GetMapping("/list")
+  @PreAuthorize("hasAuthority('salary:grant:view')")
   public IPage<SalaryGrantVO> list(PageDTO<SalaryGrant> page, SalaryGrantDTO dto) {
     return salaryGrantService.queryPage(page, dto);
   }

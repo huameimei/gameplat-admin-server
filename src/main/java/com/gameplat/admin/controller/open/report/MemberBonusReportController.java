@@ -34,6 +34,7 @@ public class MemberBonusReportController {
   private MemberBonusReportService memberBonusReportService;
 
   @GetMapping(value = "/findReportPage")
+  @PreAuthorize("hasAuthority('report:dividendtDataReport:view')")
   @ApiOperation(value = "查询会员红利报表")
   @PreAuthorize("hasAuthority('bonus:report:page')")
   public PageDtoVO<MemberBonusReportVO> findReportPage(PageDTO<MemberBonusReportVO> page, MemberBonusReportQueryDTO queryDTO) {

@@ -17,7 +17,7 @@ public class GameBetRecordSearchBuilder {
   public static QueryBuilder buildBetRecordSearch(GameBetRecordQueryDTO dto) {
     BoolQueryBuilder builder = QueryBuilders.boolQuery();
     if (StringUtils.isNotBlank(dto.getAccount())) {
-      builder.must(QueryBuilders.termQuery("account", dto.getAccount()));
+      builder.must(QueryBuilders.termQuery("account.keyword", dto.getAccount()));
     }
     if (StringUtils.isNotEmpty(dto.getBillNo())) {
       builder.must(QueryBuilders.matchQuery("billNo", dto.getBillNo()));
@@ -48,7 +48,7 @@ public class GameBetRecordSearchBuilder {
   public static QueryBuilder buildBetRecordSearch(GameVaildBetRecordQueryDTO dto) {
     BoolQueryBuilder builder = QueryBuilders.boolQuery();
     if (StringUtils.isNotBlank(dto.getAccount())) {
-      builder.must(QueryBuilders.termQuery("account", dto.getAccount()));
+      builder.must(QueryBuilders.termQuery("account.keyword", dto.getAccount()));
     }
     if (StringUtils.isNotEmpty(dto.getBillNo())) {
       builder.must(QueryBuilders.matchQuery("billNo", dto.getBillNo()));

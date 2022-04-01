@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -93,9 +94,8 @@ public class GameTransferRecordServiceImpl
             GameTransferStatus.OUT.getValue(),
             GameTransferStatus.IN.getValue(),
             GameTransferStatus.IN_GAME_FAIL.getValue()));
-    GameTransferRecord transferRecord = new GameTransferRecord();
-    transferRecord.setId(dto.getId());
-    if (gameTransferRecordMapper.update(transferRecord, updateWrapper) < 0) {
+    updateWrapper.eq("id", dto.getId());
+    if (gameTransferRecordMapper.update(new GameTransferRecord(), updateWrapper) < 0) {
       throw new ServiceException("额度转换记录更新失败");
     }
   }
@@ -115,5 +115,24 @@ public class GameTransferRecordServiceImpl
     queryWrapper.select("distinct platform_code");
     queryWrapper.eq("member_id", memberId);
     return gameTransferRecordMapper.selectList(queryWrapper);
+  }
+
+  @Override
+  @Async
+  public void saveTransferRecord(GameTransferRecord transferRecord) {
+    try {
+      log.info(
+          "游戏转换插入数据:"
+              + transferRecord.getAccount()
+              + ",金额:"
+              + transferRecord.getAmount()
+              + ",订单号:"
+              + transferRecord.getOrderNo()
+              + ",备注:"
+              + transferRecord.getRemark());
+      this.save(transferRecord);
+    } catch (Exception e) {
+      log.error("游戏转换插入数据:订单号=" + transferRecord.getOrderNo(), e);
+    }
   }
 }

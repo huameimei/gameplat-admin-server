@@ -16,6 +16,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @Api(tags = "平级分红方案")
@@ -34,6 +35,7 @@ public class RebatePlanController {
 
   @ApiOperation("平级分红->新增平级分红方案")
   @PostMapping(value = "/add")
+  @PreAuthorize("hasAuthority('system:plan:add')")
   @Log(
       module = ServiceName.ADMIN_SERVICE,
       type = LogType.AGENT,

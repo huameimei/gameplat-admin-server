@@ -29,6 +29,7 @@ public class DivideFissionConfigController {
   @Autowired private DivideFissionConfigService fissionConfigService;
 
   @GetMapping("/pageList")
+  @PreAuthorize("hasAuthority('agent:bonusFissionconfig:view')")
   public IPage<DivideFissionConfig> list(PageDTO<DivideFissionConfig> page, DivideConfigDTO dto) {
     LambdaQueryWrapper<DivideFissionConfig> queryWrapper = new LambdaQueryWrapper<>();
     queryWrapper

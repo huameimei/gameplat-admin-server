@@ -25,6 +25,7 @@ public class SalaryConfigController {
 
   @ApiOperation(value = "工资配置列表")
   @GetMapping("/list")
+  @PreAuthorize("hasAuthority('salary:config:view')")
   public IPage<SalaryConfigVO> list(PageDTO<SalaryConfig> page, SalaryConfigDTO dto) {
     return salaryConfigService.queryPage(page, dto);
   }
@@ -52,7 +53,7 @@ public class SalaryConfigController {
 
   @ApiOperation(value = "删除期数")
   @DeleteMapping("/delete")
-  @PreAuthorize("hasAuthority('salary:config:del')")
+  @PreAuthorize("hasAuthority('salary:config:remove')")
   public void remove(@RequestBody String ids) {
     salaryConfigService.delete(ids);
   }

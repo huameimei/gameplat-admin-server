@@ -25,6 +25,7 @@ public class SalaryPeriodsController {
 
   @ApiOperation(value = "期数列表")
   @GetMapping("/list")
+  @PreAuthorize("hasAuthority('salary:periods:view')")
   public IPage<SalaryPeriodsVO> list(PageDTO<SalaryPeriods> page, SalaryPeriodsDTO dto) {
     return salaryPeriodsService.queryPage(page, dto);
   }

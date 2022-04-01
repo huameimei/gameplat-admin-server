@@ -40,7 +40,7 @@ public class ChatConfigController {
 
   @ApiOperation(value = "查看彩票下注分享配置")
   @GetMapping("/getLottPushBet")
-  @PreAuthorize("hasAuthority('chat:config:getLottPushBet')")
+  @PreAuthorize("hasAuthority('chat:lottPushBet:view')")
   public ChatPushCPBet getLottPushBet() {
     String chatConfig =
         dictDataService.getDictDataValue(
@@ -51,7 +51,7 @@ public class ChatConfigController {
 
   @ApiOperation(value = "修改彩票下注分享配置")
   @PutMapping("/editLottPushBet")
-  @PreAuthorize("hasAuthority('chat:config:getLottPushBet')")
+  @PreAuthorize("hasAuthority('chat:lottPushBet:edit')")
   public void editLottPushBet(@RequestBody ChatPushCPBet chatPushCpBet) {
     // 获取额度转换配置
     JSONObject json = otthService.getLottConfig();
@@ -85,7 +85,7 @@ public class ChatConfigController {
 
   @ApiOperation(value = "查看彩票中奖推送配置")
   @GetMapping("/getPushLotteryWin")
-  @PreAuthorize("hasAuthority('chat:config:getPushLotteryWin')")
+  @PreAuthorize("hasAuthority('chat:pushLotteryWin:view')")
   public PushLotteryWin getPushLotteryWin() {
     String chatConfig =
         dictDataService.getDictDataValue(
@@ -96,7 +96,7 @@ public class ChatConfigController {
 
   @ApiOperation(value = "修改彩票中奖推送配置")
   @PutMapping("/editPushLotteryWin")
-  @PreAuthorize("hasAuthority('chat:config:editPushLotteryWin')")
+  @PreAuthorize("hasAuthority('chat:pushLotteryWin:edit')")
   public void editPushLotteryWin(@RequestBody PushLotteryWin pushLotteryWin) {
     // 获取额度转换配置
     JSONObject json = otthService.getLottConfig();
@@ -127,7 +127,7 @@ public class ChatConfigController {
 
   @ApiOperation(value = "查看聊天室浮窗配置")
   @GetMapping("/getChatConfig")
-  @PreAuthorize("hasAuthority('chat:config:getChatConfig')")
+  @PreAuthorize("hasAuthority('chat:chatConfig:view')")
   public ChatConfig getChatConfig() {
     String chatConfig =
         dictDataService.getDictDataValue(
@@ -138,7 +138,7 @@ public class ChatConfigController {
 
   @ApiOperation(value = "修改聊天室浮窗配置")
   @PutMapping("/updateChatConfig")
-  @PreAuthorize("hasAuthority('chat:config:updateChatConfig')")
+  @PreAuthorize("hasAuthority('chat:chatConfig:edit')")
   public void updateChatConfig(@RequestBody ChatConfig chatConfig) {
     // 获取额度转换配置
     JSONObject json = otthService.getLottConfig();

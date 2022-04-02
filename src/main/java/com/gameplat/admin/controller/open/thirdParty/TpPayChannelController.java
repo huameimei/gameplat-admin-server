@@ -53,7 +53,7 @@ public class TpPayChannelController {
   }
 
   @PostMapping("/page")
-  @PreAuthorize("hasAuthority('thirdParty:tpPayChannels:page')")
+  @PreAuthorize("hasAuthority('thirdParty:tpPayChannels:view')")
   public IPage<TpPayChannelVO> queryPage(Page<TpPayChannel> page, TpPayChannelQueryDTO dto) {
     return tpPayChannelService.findTpPayChannelPage(page, dto);
   }

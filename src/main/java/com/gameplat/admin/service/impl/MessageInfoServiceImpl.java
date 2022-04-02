@@ -1,5 +1,6 @@
 package com.gameplat.admin.service.impl;
 
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -222,8 +223,11 @@ public class MessageInfoServiceImpl extends ServiceImpl<MessageMapper, Message>
 
       for (String linkAccount : linkAccountArray) {
         memberQueryDTO.setAccount(linkAccount);
-        MessageDistributeVO messageDistributeVO = readStatus(page, memberQueryDTO, dto).getRecords().get(0);
-        records.add(messageDistributeVO);
+        List<MessageDistributeVO> records1 = readStatus(page, memberQueryDTO, dto).getRecords();
+        if (CollectionUtil.isNotEmpty(records1)) {
+          MessageDistributeVO messageDistributeVO = records1.get(0);
+          records.add(messageDistributeVO);
+        }
       }
 
       long total = (int) records.size();

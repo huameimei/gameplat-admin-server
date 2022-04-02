@@ -40,7 +40,7 @@ public class OpenMemberGrowthRecordController {
 
   @GetMapping("/list")
   @ApiOperation(value = "查询成长值记录列表")
-  @PreAuthorize("hasAuthority('member:growthRecord:list')")
+  @PreAuthorize("hasAuthority('member:growthRecord:view')")
   public IPage<MemberGrowthRecordVO> listWealGrowthRecord(
       PageDTO<MemberGrowthRecord> page, MemberGrowthRecordDTO dto) {
     dto.setLanguage(LocaleContextHolder.getLocale().toLanguageTag());
@@ -49,7 +49,7 @@ public class OpenMemberGrowthRecordController {
 
   @PutMapping("/editGrowth")
   @ApiOperation(value = "修改单个会员成长值")
-  @PreAuthorize("hasAuthority('member:growthRecord:editGrowth')")
+  @PreAuthorize("hasAuthority('member:growthRecord:edit')")
   public void editMemberGrowth(@RequestBody MemberGrowthChangeDto dto, HttpServletRequest request) {
     log.info("单个会员成长值变动：MemberGrowthRecord={}", dto);
     if (dto == null || dto.getChangeGrowth() == null) {
@@ -64,7 +64,7 @@ public class OpenMemberGrowthRecordController {
 
   @GetMapping("/getBar")
   @ApiOperation(value = "进度条")
-  @PreAuthorize("hasAuthority('member:growthRecord:getBar')")
+  @PreAuthorize("hasAuthority('member:growthRecord:view')")
   public GrowthScaleVO progressBar(Integer level, Long memberId) {
     Assert.isTrue(ObjectUtils.isNotNull(level) && ObjectUtils.isNotNull(memberId), "参数不全!");
     return memberGrowthRecordService.progressBar(level, memberId);

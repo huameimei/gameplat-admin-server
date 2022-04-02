@@ -8,6 +8,7 @@ import com.gameplat.model.entity.proxy.RecommendConfig;
 import java.util.List;
 import java.util.Map;
 
+/** @Description : 层层代分红配置 @Author : cc @Date : 2022/4/2 */
 public interface RecommendConfigService extends IService<RecommendConfig> {
   /**
    * 获取代理配置

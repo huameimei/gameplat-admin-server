@@ -20,6 +20,7 @@ import com.gameplat.admin.model.dto.UserResetPasswordDTO;
 import com.gameplat.admin.model.vo.RoleVo;
 import com.gameplat.admin.model.vo.UserVo;
 import com.gameplat.admin.service.CommonService;
+import com.gameplat.admin.service.OnlineUserService;
 import com.gameplat.admin.service.PasswordService;
 import com.gameplat.admin.service.SysUserService;
 import com.gameplat.base.common.enums.EnableEnum;
@@ -42,7 +43,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -66,9 +66,14 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
 
   @Autowired private RoleConvert roleConvert;
 
+  @Autowired OnlineUserService onlineUserService;
+
   @Override
   public SysUser getByUsername(String username) {
-    return this.lambdaQuery().eq(SysUser::getUserName, username).one();
+    return this.lambdaQuery()
+        .eq(SysUser::getUserName, username)
+        .eq(SysUser::getIsDel, BooleanEnum.NO.value())
+        .one();
   }
 
   @Override
@@ -93,7 +98,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
         .eq(ObjectUtils.isNotNull(userDTO.getRoleId()), SysUser::getRoleId, userDTO.getRoleId())
         .eq(ObjectUtils.isNotNull(userDTO.getStatus()), SysUser::getStatus, userDTO.getStatus())
         .eq(ObjectUtils.isNotEmpty(userDTO.getPhone()), SysUser::getPhone, userDTO.getPhone())
-            .eq(SysUser::getIsAllowDelete, 0)
+        .eq(SysUser::getIsDel, BooleanEnum.NO.value())
         .between(
             ObjectUtils.isNotEmpty(userDTO.getBeginTime()),
             SysUser::getCreateTime,
@@ -161,11 +166,19 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
   public void deleteUserById(Long id) {
     Assert.isFalse(id.equals(SecurityUserHolder.getUserId()), "不允许操作自己账号");
     SysUser user = this.getById(id);
-    Assert.isTrue(BooleanEnum.YES.match(user.getIsAllowDelete()), "系统内置账号，不允许删除!");
+    Assert.isTrue(BooleanEnum.YES.match(user.getIsDefault()), "系统内置账号，不允许删除!");
 
     // 删除用户角色表
     userRoleMapper.deleteUserRole(new Long[] {id});
-    Assert.isTrue(this.lambdaUpdate().set(SysUser::getIsAllowDelete, 1).eq(SysUser::getUserId, id).update(), "删除用户失败!");
+
+    // 踢线
+    onlineUserService.kickByUsername(user.getUserName());
+
+    // 修改状态为已删除
+    this.lambdaUpdate()
+        .set(SysUser::getIsDel, BooleanEnum.YES.value())
+        .eq(SysUser::getUserId, id)
+        .update(new SysUser());
   }
 
   @Override
@@ -218,9 +231,15 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
   @Override
   @SentinelResource(value = "changeStatus")
   public void changeStatus(Long id, Integer status) {
-    Assert.isTrue(!id.equals(SecurityUserHolder.getUserId()), "不允许操作自己账号!");
+//    Assert.isTrue(!id.equals(SecurityUserHolder.getUserId()), "不允许操作自己账号!");
     SysUser user = Assert.notNull(this.getById(id), "用户不存在!");
     user.setStatus(status);
+
+    // 踢线
+    if (EnableEnum.DISABLED.match(status)) {
+      onlineUserService.kickByUsername(user.getUserName());
+    }
+
     Assert.isTrue(this.updateById(user), "修改状态失败!");
   }
 
@@ -234,12 +253,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
   @Override
   public void disableAccount(String account) {
     SysUser user = this.getByUsername(account);
-    if (Objects.nonNull(user) && EnableEnum.isEnabled(user.getStatus())) {
-      this.lambdaUpdate()
-          .set(SysUser::getStatus, EnableEnum.DISABLED.code())
-          .eq(SysUser::getUserId, user.getUserId())
-          .update(new SysUser());
-    }
+    this.changeStatus(user.getUserId(), EnableEnum.DISABLED.code());
   }
 
   /**

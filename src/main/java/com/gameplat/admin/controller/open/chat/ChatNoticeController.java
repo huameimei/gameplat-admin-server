@@ -29,7 +29,7 @@ public class ChatNoticeController {
 
   @ApiOperation(value = "分页列表")
   @GetMapping("/page")
-  @PreAuthorize("hasAuthority('chat:notice:page')")
+  @PreAuthorize("hasAuthority('chat:notice:view')")
   public IPage<ChatNoticeVO> page(PageDTO<ChatNotice> page, ChatNoticeQueryDTO dto) {
     return chatNoticeService.page(page, dto);
   }

@@ -17,12 +17,21 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Set;
 
+/** @Description : 平级分红详情 @Author : cc @Date : 2022/4/2 */
 @Service
 public class AgentDivideServiceImpl implements AgentDivideService {
   @Autowired private AgentDivideMapper agentDivideMapper;
   @Autowired private RebatePlanMapper rebatePlanMapper;
   @Autowired private AgentBaseService agentBaseService;
 
+  /**
+   * 平级分红详情列表
+   *
+   * @param page
+   * @param divideType
+   * @param agentName
+   * @return
+   */
   @Override
   public IPage<AgentPlanVO> queryPage(
       PageDTO<AgentPlanVO> page, Integer divideType, String agentName) {

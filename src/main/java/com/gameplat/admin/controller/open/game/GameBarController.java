@@ -19,7 +19,7 @@ public class GameBarController {
      * 获取游戏导航列表
      */
     @GetMapping("/list")
-    @PreAuthorize("hasAuthority('game:bar:list')")
+    @PreAuthorize("hasAuthority('game:bar:view')")
     public List<GameBarVO> gameBarList(GameBarDTO dto) {
         return service.gameBarList(dto);
     }
@@ -40,7 +40,7 @@ public class GameBarController {
      * 将游戏从热门导航中移除
      */
     @PostMapping("/delete")
-    @PreAuthorize("hasAuthority('game:bar:delete')")
+    @PreAuthorize("hasAuthority('game:bar:remove')")
     public void deleteGameBar(@RequestParam Long id) {
         service.deleteGameBar(id);
     }

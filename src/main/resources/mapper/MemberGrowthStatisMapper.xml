@@ -112,15 +112,15 @@
         on duplicate key update
         <if test="memberId != null">member_id = values(member_id),</if>
         <if test="account != null and account != ''">account = values(account),</if>
-        <if test="vipLevel != null">vip_level = values(vip_level) + vip_level,</if>
-        <if test="vipGrowth != null">vip_growth = values(vip_growth) + vip_growth,</if>
-        <if test="rechargeGrowth != null">recharge_growth = values(recharge_growth) + recharge_growth,</if>
-        <if test="signGrowth != null">sign_growth = values(sign_growth) + sign_growth,</if>
-        <if test="damaGrowth != null">dama_growth = values(dama_growth) + dama_growth,</if>
-        <if test="backGrowth != null">back_growth = values(back_growth) + back_growth,</if>
-        <if test="infoGrowth != null">info_growth = values(info_growth) + info_growth,</if>
-        <if test="bindGrowth != null">bind_growth = values(bind_growth) + bind_growth,</if>
-        <if test="demoteGrowth != null">demote_growth = values(demote_growth) + demote_growth,</if>
+        <if test="vipLevel != null">vip_level = values(vip_level),</if>
+        <if test="vipGrowth != null">vip_growth = values(vip_growth),</if>
+        <if test="rechargeGrowth != null">recharge_growth = values(recharge_growth),</if>
+        <if test="signGrowth != null">sign_growth = values(sign_growth),</if>
+        <if test="damaGrowth != null">dama_growth = values(dama_growth),</if>
+        <if test="backGrowth != null">back_growth = values(back_growth),</if>
+        <if test="infoGrowth != null">info_growth = values(info_growth),</if>
+        <if test="bindGrowth != null">bind_growth = values(bind_growth),</if>
+        <if test="demoteGrowth != null">demote_growth = values(demote_growth),</if>
         <if test="remark != null">remark = values(remark),</if>
         update_time = now()
     </insert>

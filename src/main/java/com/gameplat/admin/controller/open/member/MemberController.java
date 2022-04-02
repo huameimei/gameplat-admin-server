@@ -53,6 +53,7 @@ public class MemberController {
 
   @ApiOperation(value = "会员列表")
   @GetMapping("/list")
+  @PreAuthorize("hasAuthority('member:view')")
   public IPage<MemberVO> list(PageDTO<Member> page, MemberQueryDTO dto) {
     return memberService.queryPage(page, dto);
   }
@@ -216,6 +217,7 @@ public class MemberController {
    */
   @ApiOperation(value = "批量更改日工资")
   @PostMapping("/updateDaySalary")
+  @PreAuthorize("hasAuthority('member:updateDaySalary')")
   @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.MEMBER, desc = "修改会员工资状态")
   public void updateDaySalary(
       @RequestParam(required = true) String ids, @RequestParam(required = true) Integer state) {

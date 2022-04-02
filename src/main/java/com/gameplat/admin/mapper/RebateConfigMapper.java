@@ -20,6 +20,13 @@ public interface RebateConfigMapper extends BaseMapper<RebateConfig> {
    */
   List<RebateConfigVO> getRebateConfig(RebateConfig rebateConfig);
 
+  /**
+   * 列表查询
+   *
+   * @param page
+   * @param dto
+   * @return
+   */
   IPage<RebateConfigVO> queryPage(PageDTO<RebateConfig> page, @Param("dto") RebateConfig dto);
 
   /**

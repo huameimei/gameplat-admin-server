@@ -39,7 +39,7 @@ public class ChatRedEnvelopeController {
 
   @ApiOperation(value = "分页列表")
   @GetMapping("/page")
-  @PreAuthorize("hasAuthority('chat:redEnvelope:page')")
+  @PreAuthorize("hasAuthority('chat:redEnvelope:view')")
   public IPage<ChatRedEnvelopeVO> page(PageDTO<ChatRedEnvelope> page, ChatRedEnvelopeQueryDTO dto) {
     return redEnvelopeService.page(page, dto);
   }
@@ -67,7 +67,7 @@ public class ChatRedEnvelopeController {
 
   @ApiOperation(value = "红包记录详情")
   @GetMapping("/getRedEnvelopeRecord")
-  @PreAuthorize("hasAuthority('chat:redEnvelopeRecord:page')")
+  @PreAuthorize("hasAuthority('chat:redEnvelopeRecord:view')")
   public IPage<ChatRedEnvelopeRecord> page(
       PageDTO<ChatRedEnvelopeRecord> page, @Validated ChatRedEnvelopeRecordQueryDTO dto) {
     return chatRedEnvelopeRecordService.page(page, dto);
@@ -75,7 +75,7 @@ public class ChatRedEnvelopeController {
 
   @ApiOperation(value = "红包领取记录详情")
   @GetMapping("/getRedEnvelopeDraw")
-  @PreAuthorize("hasAuthority('chat:redEnvelopeDraw:page')")
+  @PreAuthorize("hasAuthority('chat:redEnvelopeDraw:view')")
   public IPage<ChatRedEnvelopeDrawVO> page(
       PageDTO<ChatRedEnvelopeDraw> page, String id, Integer sort) {
     return chatRedEnvelopeDrawService.page(page, id, sort);

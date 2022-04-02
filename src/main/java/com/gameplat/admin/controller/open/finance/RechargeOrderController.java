@@ -83,7 +83,7 @@ public class RechargeOrderController {
     distributedLocker.lock(lock_key);
     try {
       UserCredential userCredential = SecurityUserHolder.getCredential();
-      rechargeOrderService.accept(id, userCredential, null);
+      rechargeOrderService.accept(id, userCredential, null, true);
     } catch (Exception e) {
       log.error(e.getMessage(), e);
       throw e;
@@ -165,7 +165,7 @@ public class RechargeOrderController {
       }
       UserCredential userCredential = SecurityUserHolder.getCredential();
       for (Long id : ids) {
-        rechargeOrderService.accept(id, userCredential, null);
+        rechargeOrderService.accept(id, userCredential, null, true);
       }
     } catch (Exception e) {
       log.error(e.getMessage(), e);

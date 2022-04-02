@@ -34,10 +34,8 @@ public class MemberBonusReportController {
   @GetMapping(value = "/findReportPage")
   @PreAuthorize("hasAuthority('report:dividendtDataReport:view')")
   @ApiOperation(value = "查询会员红利报表")
-  public PageDtoVO<MemberBonusReportVO> findReportPage(
-      PageDTO<MemberBonusReportVO> page, MemberBonusReportQueryDTO queryDTO) {
-    if (StringUtils.isEmpty(queryDTO.getStartTime())
-        || StringUtils.isEmpty(queryDTO.getEndTime())) {
+  public PageDtoVO<MemberBonusReportVO> findReportPage(PageDTO<MemberBonusReportVO> page, MemberBonusReportQueryDTO queryDTO) {
+    if (StringUtils.isEmpty(queryDTO.getStartTime()) || StringUtils.isEmpty(queryDTO.getEndTime())) {
       queryDTO.setStartTime(DateUtil.format(new Date(), "YYYY-MM-dd"));
       queryDTO.setEndTime(DateUtil.format(new Date(), "YYYY-MM-dd"));
     }

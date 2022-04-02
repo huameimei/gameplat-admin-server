@@ -16,6 +16,7 @@ import com.gameplat.admin.constant.RechargeMode;
 import com.gameplat.admin.constant.TrueFalse;
 import com.gameplat.admin.convert.RechargeOrderConvert;
 import com.gameplat.admin.enums.BlacklistConstant.BizBlacklistType;
+import com.gameplat.admin.feign.MessageFeignClient;
 import com.gameplat.admin.mapper.RechargeOrderHistoryMapper;
 import com.gameplat.admin.mapper.RechargeOrderMapper;
 import com.gameplat.admin.model.bean.*;
@@ -236,7 +237,7 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
         RechargeStatus.UNHANDLED.getValue(),
         userCredential.getUsername());
   }
-
+  @Autowired private MessageFeignClient client;
   @Override
   public void accept(Long id, UserCredential userCredential, String auditRemarks) throws Exception {
     RechargeOrder rechargeOrder = this.getById(id);
@@ -292,7 +293,11 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
     // 更新会员充值信息
     memberInfoService.updateBalanceWithRecharge(
         memberInfo.getMemberId(), rechargeOrder.getPayAmount(), rechargeOrder.getTotalAmount());
-
+    Map<String,String> map = new HashMap<>();
+    map.put("user",member.getAccount());
+    map.put("channel","TEST_FEIGN_SOCKET");
+    map.put("title","充值成功");
+    client.userSend(map);
     // 判断充值是否计算积分
     if (TrueFalse.TRUE.getValue() != rechargeOrder.getPointFlag()) {
       log.info(

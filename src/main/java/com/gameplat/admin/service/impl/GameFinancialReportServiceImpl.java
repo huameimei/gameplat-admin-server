@@ -238,11 +238,11 @@ public class GameFinancialReportServiceImpl
   public List<GameFinancialReport> statisticsGameReportList(String statisticsTime) {
     String tenant = tenantConfig.getTenantCode();
     // 统计开始时间
-    String startTime = statisticsTime + "-01";
+    String startTime = statisticsTime + "-01 00:00:00";
     // 当前统计月份的最后一天的日期
     Date endDate = DateUtil.endOfMonth(DateUtils.parseDate(startTime, "yyyy-MM-dd"));
     // 统计结束时间
-    String endTime = DateUtils.formatDate(endDate, "yyyy-MM-dd");
+    String endTime = DateUtils.formatDate(endDate, "yyyy-MM-dd HH:mm:ss");
 
     List<GameFinancialReport> allGameFinancialReportList = new ArrayList<>();
 
@@ -252,8 +252,6 @@ public class GameFinancialReportServiceImpl
       throw new ServiceException("游戏已全部下架");
     }
 
-    startTime = startTime + " 00:00:00";
-    endTime = endTime + " 23:59:59";
     // 获取游戏的有效投注额和输赢金额
     Map<String, List<GameDataVO>> gameDataMap = initGameData(startTime, endTime, tenant);
 
@@ -280,10 +278,12 @@ public class GameFinancialReportServiceImpl
   }
 
   public Map<String, List<GameDataVO>> initGameData(String startTime, String endTime, String tenant) {
+    long startTimestamp = DateUtils.parseDate(startTime, "yyyy-MM-dd HH:mm:ss").getTime();
+    long endTimestamp = DateUtils.parseDate(endTime, "yyyy-MM-dd HH:mm:ss").getTime();
     GameBetRecordQueryDTO dto = new GameBetRecordQueryDTO();
     dto.setTimeType(TimeTypeEnum.STAT_TIME.getValue());
-    dto.setBeginTime(startTime);
-    dto.setEndTime(endTime);
+    dto.setBeginTime(Long.toString(startTimestamp));
+    dto.setEndTime(Long.toString(endTimestamp));
     QueryBuilder builder = GameBetRecordSearchBuilder.buildBetRecordSearch(dto);
 
     String indexName = ContextConstant.ES_INDEX.BET_RECORD_ + tenant;
@@ -339,17 +339,20 @@ public class GameFinancialReportServiceImpl
   }
 
   public List<GameFinancialReport> iniKgNlData(String statisticsTime, String startTime, String endTime, String tenant) {
+    long startTimestamp = DateUtils.parseDate(startTime, "yyyy-MM-dd HH:mm:ss").getTime();
+    long endTimestamp = DateUtils.parseDate(endTime, "yyyy-MM-dd HH:mm:ss").getTime();
     GameBetRecordQueryDTO dto = new GameBetRecordQueryDTO();
     dto.setTimeType(TimeTypeEnum.STAT_TIME.getValue());
-    dto.setBeginTime(startTime);
-    dto.setEndTime(endTime);
+    dto.setBeginTime(Long.toString(startTimestamp));
+    dto.setEndTime(Long.toString(endTimestamp));
+    dto.setGameKind("KGNL_LOTTERY");
     QueryBuilder builder = GameBetRecordSearchBuilder.buildBetRecordSearch(dto);
 
     String indexName = ContextConstant.ES_INDEX.BET_RECORD_ + tenant;
     SearchRequest searchRequest = new SearchRequest(indexName);
 
     TermsAggregationBuilder groupTerms =
-            AggregationBuilders.terms("lottCodeGroup").field("lottCode.keyword");
+            AggregationBuilders.terms("lottTypeGroup").field("lottType");
 
     SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
     SumAggregationBuilder validAmountSumBuilder = AggregationBuilders.sum("validAmount").field("validAmount");
@@ -375,23 +378,23 @@ public class GameFinancialReportServiceImpl
       e.printStackTrace();
     }
 
-    Terms terms = searchResponse.getAggregations().get("lottCodeGroup");
+    Terms terms = searchResponse.getAggregations().get("lottTypeGroup");
     if (StringUtils.isNull(terms)) {
       return null;
     }
     List<GameFinancialReport> KgNlReportList = new ArrayList<>();
     for (Terms.Bucket bucket : terms.getBuckets()) {
-      Object lottCode = bucket.getKey();
+      Object lottType = bucket.getKey();
       GameFinancialReport gameFinancialReport = new GameFinancialReport();
       // 官彩
-      if (lottCode.toString().equals("1")) {
-        gameFinancialReport.setGameKind("kgnl_lottery_official");
+      if (lottType.toString().equals("1")) {
+        gameFinancialReport.setGameKind("KGNL_LOTTERY_OFFICIAL");
         // 私彩
-      } else if (lottCode.toString().equals("2")) {
-        gameFinancialReport.setGameKind("kgnl_lottery_self");
+      } else if (lottType.toString().equals("2")) {
+        gameFinancialReport.setGameKind("KGNL_LOTTERY_SELF");
         // 六合彩
-      } else if (lottCode.toString().equals("3")) {
-        gameFinancialReport.setGameKind("kgnl_lottery_lhc");
+      } else if (lottType.toString().equals("3")) {
+        gameFinancialReport.setGameKind("KGNL_LOTTERY_LHC");
       }
       BigDecimal validAmount = Converts.toBigDecimal(((ParsedSum) bucket.getAggregations().get("validAmount")).getValue())
               .divide(new BigDecimal("1000"), BigDecimal.ROUND_DOWN, 2);
@@ -419,17 +422,17 @@ public class GameFinancialReportServiceImpl
   public void assembleKgNewLottery(List<GameFinancialReportVO> list) {
     if (StringUtils.isNotEmpty(list)) {
       for (GameFinancialReportVO vo : list) {
-        if (vo.getGameKind().equals("kgnl_lottery_official")) {
+        if (vo.getGameKind().equals("KGNL_LOTTERY_OFFICIAL")) {
           vo.setGameTypeId(3);
           vo.setGameTypeName("彩票投注");
           vo.setGameName("新官方彩");
         }
-        if (vo.getGameKind().equals("kgnl_lottery_self")) {
+        if (vo.getGameKind().equals("KGNL_LOTTERY_SELF")) {
           vo.setGameTypeId(3);
           vo.setGameTypeName("彩票投注");
           vo.setGameName("新自营彩");
         }
-        if (vo.getGameKind().equals("kgnl_lottery_lhc")) {
+        if (vo.getGameKind().equals("KGNL_LOTTERY_LHC")) {
           vo.setGameTypeId(3);
           vo.setGameTypeName("彩票投注");
           vo.setGameName("新六合彩");

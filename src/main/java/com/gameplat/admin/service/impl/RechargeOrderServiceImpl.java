@@ -35,6 +35,7 @@ import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.json.JsonUtils;
 import com.gameplat.base.common.snowflake.IdGeneratorSnowflake;
 import com.gameplat.base.common.util.DateUtil;
+import com.gameplat.common.constant.SocketEnum;
 import com.gameplat.common.enums.*;
 import com.gameplat.common.lang.Assert;
 import com.gameplat.common.model.bean.UserEquipment;
@@ -295,7 +296,7 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
         memberInfo.getMemberId(), rechargeOrder.getPayAmount(), rechargeOrder.getTotalAmount());
     Map<String,String> map = new HashMap<>();
     map.put("user",member.getAccount());
-    map.put("channel","TEST_FEIGN_SOCKET");
+    map.put("channel", SocketEnum.SOCKET_RECHARGE_SUCCESS);
     map.put("title","充值成功");
     client.userSend(map);
     // 判断充值是否计算积分

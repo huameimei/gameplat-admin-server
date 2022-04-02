@@ -252,6 +252,18 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
   @Override
   public void accept(Long id, UserCredential userCredential, String auditRemarks, boolean flag) throws Exception {
     RechargeOrder rechargeOrder = this.getById(id);
+    //系统最高配置金额（充值金额  优惠金额）
+    String maxAmount = configService.getValue(MAX_RECHARGE_MONEY);
+    if (rechargeOrder.getAmount().compareTo(new BigDecimal(maxAmount)) > 0) {
+      throw new ServiceException("人工充值金额不能大于系统配置的最高金额：" + maxAmount);
+    }
+
+    String maxDiscount = configService.getValue(MAX_DISCOUNT_MONEY);
+    if (rechargeOrder.getDiscountAmount() != null) {
+      if (rechargeOrder.getDiscountAmount().compareTo(new BigDecimal(maxDiscount)) > 0) {
+        throw new ServiceException("人工充值优惠金额不能大于系统配置的最高金额：" + maxDiscount);
+      }
+    }
     // 校验订单状态
     verifyRechargeOrderForAuditing(rechargeOrder);
     // 校验已处理订单是否允许其他账户操作

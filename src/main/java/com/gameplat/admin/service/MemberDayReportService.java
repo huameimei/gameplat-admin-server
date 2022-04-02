@@ -9,12 +9,23 @@ import com.gameplat.model.entity.member.MemberDayReport;
 
 import javax.servlet.http.HttpServletResponse;
 
-/**
- * @Description : 会员日报表 @Author : cc @Date : 2022/3/11
- */
+/** @Description : 会员日报表 @Author : cc @Date : 2022/3/11 */
 public interface MemberDayReportService extends IService<MemberDayReport> {
+  /**
+   * 分页列表
+   *
+   * @param page
+   * @param dto
+   * @return
+   */
   PageDtoVO<MemberDayReportVo> agentReportList(
       PageDTO<MemberDayReport> page, AgentReportQueryDTO dto);
 
+  /**
+   * 导出
+   *
+   * @param dto
+   * @param response
+   */
   void exportAgentReport(AgentReportQueryDTO dto, HttpServletResponse response);
 }

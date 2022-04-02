@@ -62,6 +62,11 @@ public class DivideLayerConfigController {
     return layerConfigService.getLayerConfigForLinkEdit(dto.getId(), "zh-CN");
   }
 
+  /**
+   * 添加
+   *
+   * @param dto
+   */
   @PostMapping("/add")
   @ApiOperation(value = "新增层层代分红配置")
   @PreAuthorize("hasAuthority('agent:bonusconfig:add')")
@@ -70,6 +75,11 @@ public class DivideLayerConfigController {
     layerConfigService.add(dto.getUserName(), "zh-CN");
   }
 
+  /**
+   * 编辑
+   *
+   * @param dto
+   */
   @PostMapping("/edit")
   @ApiOperation(value = "编辑层层代分红配置")
   @PreAuthorize("hasAuthority('agent:bonusconfig:edit')")
@@ -78,6 +88,11 @@ public class DivideLayerConfigController {
     layerConfigService.edit(dto, "zh-CN");
   }
 
+  /**
+   * 删除
+   *
+   * @param ids
+   */
   @ApiOperation(value = "删除分红配置")
   @DeleteMapping("/delete")
   @PreAuthorize("hasAuthority('agent:bonusconfig:remove')")

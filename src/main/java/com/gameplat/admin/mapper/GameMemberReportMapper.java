@@ -16,9 +16,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
-/**
- * @Author kb @Date 2022/2/8 18:31 @Version 1.0
- */
+/** @Author kb @Date 2022/2/8 18:31 @Version 1.0 */
 public interface GameMemberReportMapper extends BaseMapper<MemberDayReport> {
 
   Page<MemberDayReport> findMemberDayReportPage(
@@ -93,6 +91,18 @@ public interface GameMemberReportMapper extends BaseMapper<MemberDayReport> {
       @Param("startDate") String startDate,
       @Param("endDate") String endDate);
 
+  /**
+   * 分页列表
+   *
+   * @param page
+   * @param agentName
+   * @param startDate
+   * @param endDate
+   * @param isIncludeProxy
+   * @param limitRecharge
+   * @param limitValidAmount
+   * @return
+   */
   Page<MemberDayReportVo> pageList(
       PageDTO<MemberDayReport> page,
       @Param("agentName") String agentName,
@@ -102,6 +112,17 @@ public interface GameMemberReportMapper extends BaseMapper<MemberDayReport> {
       @Param("limitRecharge") BigDecimal limitRecharge,
       @Param("limitValidAmount") BigDecimal limitValidAmount);
 
+  /**
+   * 代理报表查询
+   *
+   * @param agentName
+   * @param startDate
+   * @param endDate
+   * @param isIncludeProxy
+   * @param limitRecharge
+   * @param limitValidAmount
+   * @return
+   */
   List<MemberDayReportVo> agentReport(
       @Param("agentName") String agentName,
       @Param("startDate") String startDate,
@@ -110,6 +131,14 @@ public interface GameMemberReportMapper extends BaseMapper<MemberDayReport> {
       @Param("limitRecharge") BigDecimal limitRecharge,
       @Param("limitValidAmount") BigDecimal limitValidAmount);
 
+  /**
+   * 代理的下级会员和代理
+   *
+   * @param agentName
+   * @param startDate
+   * @param endDate
+   * @return
+   */
   List<MemberDayReportVo> getMemberAndProxy(
       @Param("agentName") String agentName,
       @Param("startDate") String startDate,

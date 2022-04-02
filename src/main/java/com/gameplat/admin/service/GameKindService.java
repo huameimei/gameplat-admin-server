@@ -23,6 +23,12 @@ public interface GameKindService extends IService<GameKind> {
   /** 根据游戏大类类型获取相关游戏平台 */
   List<GameKindVO> getGameKindInBanner(String gameType);
 
+  /**
+   * 根据编码获取
+   *
+   * @param code
+   * @return
+   */
   GameKindVO getByCode(String code);
 
   List<GameKind> queryGameKindListByPlatformCode(String platformCode);

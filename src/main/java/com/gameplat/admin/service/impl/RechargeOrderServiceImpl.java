@@ -356,9 +356,11 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
 
     memberGrowthStatisService.changeGrowth(memberGrowthChangeDto);
 
-    //入款成功 添加 消息
-    //
-    this.addMessageInfo(rechargeOrder, 3);
+    // 入款成功 添加 消息  mode   在线 转账支付
+    if (ObjectUtil.equals(1, rechargeOrder.getMode())
+            || ObjectUtil.equals(2, rechargeOrder.getMode())) {
+      this.addMessageInfo(rechargeOrder, 3);
+    }
   }
 
   public void addMessageInfo(RechargeOrder rechargeOrder, Integer state) {

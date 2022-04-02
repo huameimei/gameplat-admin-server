@@ -40,6 +40,13 @@ public class SalaryConfigServiceImpl extends ServiceImpl<SalaryConfigMapper, Sal
 
   @Autowired private SysDictDataMapper sysDictDataMapper;
 
+  /**
+   * 分页列表
+   *
+   * @param page
+   * @param dto
+   * @return
+   */
   @Override
   public IPage<SalaryConfigVO> queryPage(PageDTO<SalaryConfig> page, SalaryConfigDTO dto) {
     QueryWrapper<SalaryConfig> queryWrapper = new QueryWrapper<>();
@@ -60,11 +67,21 @@ public class SalaryConfigServiceImpl extends ServiceImpl<SalaryConfigMapper, Sal
     return pageResult;
   }
 
+  /**
+   * 获取最大代理层级
+   *
+   * @return
+   */
   @Override
   public Integer getMaxLevel() {
     return memberService.getMaxLevel();
   }
 
+  /**
+   * 添加
+   *
+   * @param dto
+   */
   @Override
   public void add(SalaryConfigDTO dto) {
     SalaryConfig saveObj = salaryConfigConvert.toEntity(dto);
@@ -72,6 +89,11 @@ public class SalaryConfigServiceImpl extends ServiceImpl<SalaryConfigMapper, Sal
     Assert.isTrue(this.save(saveObj), "添加工资配置失败！");
   }
 
+  /**
+   * 编辑
+   *
+   * @param dto
+   */
   @Override
   public void edit(SalaryConfigDTO dto) {
     Assert.isTrue(dto.getId() != null, "主键ID参数缺失！");
@@ -81,6 +103,11 @@ public class SalaryConfigServiceImpl extends ServiceImpl<SalaryConfigMapper, Sal
     Assert.isTrue(this.updateById(editObj), "编辑工资配置失败！");
   }
 
+  /**
+   * 删除
+   *
+   * @param ids
+   */
   @Override
   public void delete(String ids) {
     Assert.isTrue(StrUtil.isNotBlank(ids), "参数为空！");

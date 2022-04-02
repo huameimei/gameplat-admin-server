@@ -6,7 +6,15 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.gameplat.admin.model.vo.RebatePlanVO;
 import com.gameplat.model.entity.proxy.RebatePlan;
 
+/** @Description : 平级分红方案 @Author : cc @Date : 2022/4/2 */
 public interface RebatePlanService extends IService<RebatePlan> {
+  /**
+   * 分页列表
+   *
+   * @param page
+   * @param dto
+   * @return
+   */
   IPage<RebatePlanVO> queryPage(PageDTO<RebatePlan> page, RebatePlan dto);
 
   /**

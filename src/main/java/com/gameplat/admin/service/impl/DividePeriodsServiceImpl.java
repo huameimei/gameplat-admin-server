@@ -112,6 +112,13 @@ public class DividePeriodsServiceImpl extends ServiceImpl<DividePeriodsMapper, D
 
   @Autowired private RedissonClient redissonClient;
 
+  /**
+   * 分页列表
+   *
+   * @param page
+   * @param dto
+   * @return
+   */
   @Override
   @SentinelResource(value = "queryPage")
   public IPage<DividePeriodsVO> queryPage(PageDTO<DividePeriods> page, DividePeriodsQueryDTO dto) {
@@ -120,6 +127,11 @@ public class DividePeriodsServiceImpl extends ServiceImpl<DividePeriodsMapper, D
     return dividePeriodsMapper.selectPage(page, queryWrapper).convert(periodsConvert::toVo);
   }
 
+  /**
+   * 添加
+   *
+   * @param dto
+   */
   @Override
   @SentinelResource("add")
   public void add(DividePeriodsDTO dto) {
@@ -135,6 +147,11 @@ public class DividePeriodsServiceImpl extends ServiceImpl<DividePeriodsMapper, D
     Assert.isTrue(this.save(saveObj), "添加失败！");
   }
 
+  /**
+   * 编辑
+   *
+   * @param dto
+   */
   @Override
   @SentinelResource("edit")
   public void edit(DividePeriodsDTO dto) {
@@ -146,6 +163,11 @@ public class DividePeriodsServiceImpl extends ServiceImpl<DividePeriodsMapper, D
     Assert.isTrue(this.updateById(editObj), "编辑失败！");
   }
 
+  /**
+   * 删除
+   *
+   * @param ids
+   */
   @Override
   @SentinelResource("delete")
   public void delete(String ids) {

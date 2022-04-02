@@ -15,9 +15,11 @@ import com.gameplat.common.model.bean.UserEquipment;
 import com.gameplat.log.annotation.Log;
 import com.gameplat.log.enums.LogType;
 import com.gameplat.model.entity.recharge.RechargeOrder;
+import com.gameplat.redis.redisson.DistributedLocker;
 import com.gameplat.security.SecurityUserHolder;
 import com.gameplat.security.context.UserCredential;
 import io.swagger.annotations.ApiOperation;
+import java.util.concurrent.TimeUnit;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,53 +34,100 @@ import java.util.List;
 @RequestMapping("/api/admin/finance/rechargeOrder")
 public class RechargeOrderController {
 
-  @Autowired private RechargeOrderService rechargeOrderService;
-
+  @Autowired
+  private RechargeOrderService rechargeOrderService;
   @Autowired
   private MemberWithdrawService memberWithdrawService;
+  @Autowired
+  private DistributedLocker distributedLocker;
 
   @PostMapping("/handle")
   @PreAuthorize("hasAuthority('finance:rechargeOrder:handle')")
   @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.RECHARGE, desc = "'受理订单：' + #id")
-  public void handle(Long id) {
-    UserCredential userCredential = SecurityUserHolder.getCredential();
-    rechargeOrderService.handle(id, userCredential);
+  public void handle(Long id, Long memberId) {
+    String lock_key = "member_rw_" + memberId;
+    distributedLocker.lock(lock_key);
+    try {
+      UserCredential userCredential = SecurityUserHolder.getCredential();
+      rechargeOrderService.handle(id, userCredential);
+    } catch (Exception e) {
+      log.error(e.getMessage(), e);
+      throw e;
+    } finally {
+      distributedLocker.unlock(lock_key);
+    }
   }
 
   @PostMapping("/unHandle")
   @PreAuthorize("hasAuthority('finance:rechargeOrder:unHandle')")
   @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.RECHARGE, desc = "'取消受理订单：' + #id")
-  public void unHandle(Long id) {
-    UserCredential userCredential = SecurityUserHolder.getCredential();
-    rechargeOrderService.unHandle(id, userCredential);
+  public void unHandle(Long id, Long memberId) {
+    String lock_key = "member_rw_" + memberId;
+    distributedLocker.lock(lock_key);
+    try {
+      UserCredential userCredential = SecurityUserHolder.getCredential();
+      rechargeOrderService.unHandle(id, userCredential);
+    } catch (Exception e) {
+      log.error(e.getMessage(), e);
+      throw e;
+    } finally {
+      distributedLocker.unlock(lock_key);
+    }
   }
 
   @PostMapping("/accept")
   @PreAuthorize("hasAuthority('finance:rechargeOrder:accept')")
   @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.RECHARGE, desc = "'入款订单：' + #id")
-  public void accept(Long id) throws Exception {
-    UserCredential userCredential = SecurityUserHolder.getCredential();
-    rechargeOrderService.accept(id, userCredential, null, true);
+  public void accept(Long id, Long memberId) throws Exception {
+    String lock_key = "member_rw_" + memberId;
+    distributedLocker.lock(lock_key);
+    try {
+      UserCredential userCredential = SecurityUserHolder.getCredential();
+      rechargeOrderService.accept(id, userCredential, null);
+    } catch (Exception e) {
+      log.error(e.getMessage(), e);
+      throw e;
+    } finally {
+      distributedLocker.unlock(lock_key);
+    }
   }
 
   @PostMapping("/cancel")
   @PreAuthorize("hasAuthority('finance:rechargeOrder:cancel')")
   @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.RECHARGE, desc = "'取消订单：' + #id")
-  public void cancel(Long id) {
-    UserCredential userCredential = SecurityUserHolder.getCredential();
-    rechargeOrderService.cancel(id, userCredential);
+  public void cancel(Long id, Long memberId) {
+    String lock_key = "member_rw_" + memberId;
+    distributedLocker.lock(lock_key);
+    try {
+      UserCredential userCredential = SecurityUserHolder.getCredential();
+      rechargeOrderService.cancel(id, userCredential);
+    } catch (Exception e) {
+      log.error(e.getMessage(), e);
+      throw e;
+    } finally {
+      distributedLocker.unlock(lock_key);
+    }
   }
 
   @PostMapping("/batchHandle")
   @PreAuthorize("hasAuthority('finance:rechargeOrder:handle')")
   @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.RECHARGE, desc = "'批量受理订单：' + #ids")
   public void batchHandle(@RequestParam List<Long> ids) {
-    if (null == ids || ids.size() == 0) {
-      throw new ServiceException("ids不能为空");
-    }
-    UserCredential userCredential = SecurityUserHolder.getCredential();
-    for (Long id : ids) {
-      rechargeOrderService.handle(id, userCredential);
+    String lock_key = "member_rw_single";
+    distributedLocker.lock(lock_key);
+    try {
+      if (null == ids || ids.size() == 0) {
+        throw new ServiceException("ids不能为空");
+      }
+      UserCredential userCredential = SecurityUserHolder.getCredential();
+      for (Long id : ids) {
+        rechargeOrderService.handle(id, userCredential);
+      }
+    } catch (Exception e) {
+      log.error(e.getMessage(), e);
+      throw e;
+    } finally {
+      distributedLocker.unlock(lock_key);
     }
   }
 
@@ -86,12 +135,21 @@ public class RechargeOrderController {
   @PreAuthorize("hasAuthority('finance:rechargeOrder:unHandle')")
   @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.RECHARGE, desc = "'批量取消受理订单：' + #ids")
   public void batchUnHandle(@RequestParam List<Long> ids) {
-    if (null == ids || ids.size() == 0) {
-      throw new ServiceException("ids不能为空");
-    }
-    UserCredential userCredential = SecurityUserHolder.getCredential();
-    for (Long id : ids) {
-      rechargeOrderService.unHandle(id, userCredential);
+    String lock_key = "member_rw_single";
+    distributedLocker.lock(lock_key);
+    try {
+      if (null == ids || ids.size() == 0) {
+        throw new ServiceException("ids不能为空");
+      }
+      UserCredential userCredential = SecurityUserHolder.getCredential();
+      for (Long id : ids) {
+        rechargeOrderService.unHandle(id, userCredential);
+      }
+    } catch (Exception e) {
+      log.error(e.getMessage(), e);
+      throw e;
+    } finally {
+      distributedLocker.unlock(lock_key);
     }
   }
 
@@ -99,12 +157,21 @@ public class RechargeOrderController {
   @PreAuthorize("hasAuthority('finance:rechargeOrder:accept')")
   @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.RECHARGE, desc = "'批量入款订单：' + #ids")
   public void batchAccept(@RequestParam List<Long> ids) throws Exception {
-    if (null == ids || ids.size() == 0) {
-      throw new ServiceException("ids不能为空");
-    }
-    UserCredential userCredential = SecurityUserHolder.getCredential();
-    for (Long id : ids) {
-      rechargeOrderService.accept(id, userCredential, null, true);
+    String lock_key = "member_rw_single";
+    distributedLocker.lock(lock_key);
+    try {
+      if (null == ids || ids.size() == 0) {
+        throw new ServiceException("ids不能为空");
+      }
+      UserCredential userCredential = SecurityUserHolder.getCredential();
+      for (Long id : ids) {
+        rechargeOrderService.accept(id, userCredential, null);
+      }
+    } catch (Exception e) {
+      log.error(e.getMessage(), e);
+      throw e;
+    } finally {
+      distributedLocker.unlock(lock_key);
     }
   }
 
@@ -112,12 +179,21 @@ public class RechargeOrderController {
   @PreAuthorize("hasAuthority('finance:rechargeOrder:cancel')")
   @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.RECHARGE, desc = "'批量取消订单：' + #ids")
   public void batchCancel(@RequestParam List<Long> ids) {
-    if (null == ids || ids.size() == 0) {
-      throw new ServiceException("ids不能为空");
-    }
-    UserCredential userCredential = SecurityUserHolder.getCredential();
-    for (Long id : ids) {
-      rechargeOrderService.cancel(id, userCredential);
+    String lock_key = "member_rw_single";
+    distributedLocker.lock(lock_key);
+    try {
+      if (null == ids || ids.size() == 0) {
+        throw new ServiceException("ids不能为空");
+      }
+      UserCredential userCredential = SecurityUserHolder.getCredential();
+      for (Long id : ids) {
+        rechargeOrderService.cancel(id, userCredential);
+      }
+    } catch (Exception e) {
+      log.error(e.getMessage(), e);
+      throw e;
+    } finally {
+      distributedLocker.unlock(lock_key);
     }
   }
 
@@ -128,8 +204,18 @@ public class RechargeOrderController {
       type = LogType.RECHARGE,
       desc = "'修改优惠金额为：' + #discountAmount")
   public void updateDiscount(
-      Long id, Integer discountType, BigDecimal discountAmount, BigDecimal discountDml) {
-    rechargeOrderService.updateDiscount(id, discountType, discountAmount, discountDml);
+      Long id, Integer discountType, BigDecimal discountAmount, BigDecimal discountDml,
+      Long memberId) {
+    String lock_key = "member_rw_" + memberId;
+    distributedLocker.lock(lock_key);
+    try {
+      rechargeOrderService.updateDiscount(id, discountType, discountAmount, discountDml);
+    } catch (Exception e) {
+      log.error(e.getMessage(), e);
+      throw e;
+    } finally {
+      distributedLocker.unlock(lock_key);
+    }
   }
 
   @PostMapping("/editRemarks")
@@ -158,14 +244,23 @@ public class RechargeOrderController {
       desc = "'人工入款memberId：' + #manualRechargeOrderBo.memberId")
   public void manual(ManualRechargeOrderBo manualRechargeOrderBo, HttpServletRequest request) {
     UserCredential userCredential = SecurityUserHolder.getCredential();
+    String lock_key = "recharge_manual_" + userCredential.getUserId();
     UserEquipment clientInfo = UserEquipment.create(request);
-    rechargeOrderService.manual(manualRechargeOrderBo, userCredential, clientInfo);
+    distributedLocker.lock(lock_key);
+    try {
+      rechargeOrderService.manual(manualRechargeOrderBo, userCredential, clientInfo);
+    } catch (Exception e) {
+      log.error(e.getMessage(), e);
+      throw e;
+    } finally {
+      distributedLocker.unlock(lock_key);
+    }
   }
 
 
   @ApiOperation(value = "获取未处理数据统计数据")
   @GetMapping("/withdraw_charge")
-  public WithdrawChargeVO getTotal(){
+  public WithdrawChargeVO getTotal() {
     WithdrawChargeVO vo = new WithdrawChargeVO();
     long rechargeCount = rechargeOrderService.getUntreatedRechargeCount();
     long withdrawCount = memberWithdrawService.getUntreatedWithdrawCount();

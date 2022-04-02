@@ -1,6 +1,7 @@
 package com.gameplat.admin.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -16,13 +17,11 @@ import com.gameplat.admin.constant.RechargeMode;
 import com.gameplat.admin.constant.TrueFalse;
 import com.gameplat.admin.convert.RechargeOrderConvert;
 import com.gameplat.admin.enums.BlacklistConstant.BizBlacklistType;
+import com.gameplat.admin.mapper.MessageMapper;
 import com.gameplat.admin.mapper.RechargeOrderHistoryMapper;
 import com.gameplat.admin.mapper.RechargeOrderMapper;
 import com.gameplat.admin.model.bean.*;
-import com.gameplat.admin.model.dto.GameRWDataReportDto;
-import com.gameplat.admin.model.dto.MemberActivationDTO;
-import com.gameplat.admin.model.dto.MemberGrowthChangeDto;
-import com.gameplat.admin.model.dto.RechargeOrderQueryDTO;
+import com.gameplat.admin.model.dto.*;
 import com.gameplat.admin.model.vo.MemberActivationVO;
 import com.gameplat.admin.model.vo.RechargeOrderVO;
 import com.gameplat.admin.model.vo.SummaryVO;
@@ -34,6 +33,7 @@ import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.json.JsonUtils;
 import com.gameplat.base.common.snowflake.IdGeneratorSnowflake;
 import com.gameplat.base.common.util.DateUtil;
+import com.gameplat.common.constant.NumberConstant;
 import com.gameplat.common.enums.*;
 import com.gameplat.common.lang.Assert;
 import com.gameplat.common.model.bean.UserEquipment;
@@ -43,12 +43,15 @@ import com.gameplat.model.entity.member.Member;
 import com.gameplat.model.entity.member.MemberBill;
 import com.gameplat.model.entity.member.MemberGrowthConfig;
 import com.gameplat.model.entity.member.MemberInfo;
+import com.gameplat.model.entity.message.Message;
+import com.gameplat.model.entity.message.MessageDistribute;
 import com.gameplat.model.entity.pay.PayAccount;
 import com.gameplat.model.entity.pay.TpMerchant;
 import com.gameplat.model.entity.pay.TpPayChannel;
 import com.gameplat.model.entity.recharge.RechargeOrder;
 import com.gameplat.model.entity.recharge.RechargeOrderHistory;
 import com.gameplat.model.entity.spread.SpreadUnion;
+import com.gameplat.model.entity.sys.SysDictData;
 import com.gameplat.model.entity.sys.SysUser;
 import com.gameplat.security.SecurityUserHolder;
 import com.gameplat.security.context.UserCredential;
@@ -57,6 +60,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -103,9 +107,16 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
   @Autowired private ValidWithdrawService validWithdrawService;
   @Autowired private MemberRwReportService memberRwReportService;
   @Autowired private MemberGrowthConfigService memberGrowthConfigService;
-  @Autowired private MemberGrowthRecordService memberGrowthRecordService;
-  @Autowired private MemberGrowthStatisService memberGrowthStatisService;
+  @Autowired
+  @Lazy
+  private MemberGrowthStatisService memberGrowthStatisService;
   @Autowired private MessagePushService pushService;
+  @Autowired
+  private MessageMapper messageMapper;
+  @Autowired
+  private MessageDistributeService messageDistributeService;
+  @Autowired
+  private SysDictDataService sysDictDataService;
 
   @Override
   public PageExt<RechargeOrderVO, SummaryVO> findPage(
@@ -239,12 +250,16 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
   }
 
   @Override
-  public void accept(Long id, UserCredential userCredential, String auditRemarks) throws Exception {
+  public void accept(Long id, UserCredential userCredential, String auditRemarks, boolean flag) throws Exception {
     RechargeOrder rechargeOrder = this.getById(id);
     // 校验订单状态
     verifyRechargeOrderForAuditing(rechargeOrder);
     // 校验已处理订单是否允许其他账户操作
     crossAccountCheck(userCredential, rechargeOrder);
+    //校验审核流程
+    if (flag) {
+      rechargeProcess(rechargeOrder);
+    }
     // 校验会员账户状态
     Member member = memberService.getById(rechargeOrder.getMemberId());
     MemberInfo memberInfo = memberInfoService.getById(rechargeOrder.getMemberId());
@@ -340,9 +355,97 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
     memberGrowthChangeDto.setRemark("人工充值成长值变动");
 
     memberGrowthStatisService.changeGrowth(memberGrowthChangeDto);
-    //    memberGrowthRecordService.editMemberGrowth(memberGrowthChangeDto,
-    //            ((ServletRequestAttributes)
-    // RequestContextHolder.getRequestAttributes()).getRequest());
+
+    //入款成功 添加 消息
+    //
+    this.addMessageInfo(rechargeOrder, 3);
+  }
+
+  public void addMessageInfo(RechargeOrder rechargeOrder, Integer state) {
+    if (this.verifyMessage() == com.gameplat.common.enums.TrueFalse.FALSE.getValue()) {
+      return;
+    }
+    Message messageInfo = new Message();
+    messageInfo.setTitle(title(1, state));
+    messageInfo.setContent(
+            context(state, rechargeOrder.getCreateTime(), rechargeOrder.getAmount(), 1));
+    messageInfo.setCategory(4);
+    messageInfo.setPosition(1);
+    messageInfo.setShowType(0);
+    messageInfo.setPopsCount(0);
+    messageInfo.setPushRange(2);
+    messageInfo.setLinkAccount(rechargeOrder.getAccount());
+    messageInfo.setSort(0);
+    messageInfo.setType(1);
+    messageInfo.setLanguage("zh-CN");
+    messageInfo.setStatus(1);
+    messageInfo.setImmediateFlag(0);
+    messageInfo.setRemarks("系统消息");
+    messageInfo.setCreateBy("system");
+    messageInfo.setCreateTime(new Date());
+    messageMapper.insert(messageInfo);
+
+    MessageDistribute messageDistribute = new MessageDistribute();
+    messageDistribute.setMessageId(messageInfo.getId());
+    messageDistribute.setUserId(rechargeOrder.getMemberId());
+    messageDistribute.setUserAccount(messageInfo.getLinkAccount());
+    messageDistribute.setRechargeLevel(Convert.toInt(rechargeOrder.getMemberLevel()));
+    messageDistribute.setVipLevel(
+            memberInfoService
+                    .lambdaQuery()
+                    .eq(MemberInfo::getMemberId, rechargeOrder.getMemberId())
+                    .one()
+                    .getVipLevel());
+    messageDistribute.setReadStatus(NumberConstant.ZERO);
+    messageDistribute.setCreateBy("system");
+    messageDistributeService.save(messageDistribute);
+  }
+
+
+  public int verifyMessage() {
+    SysDictData sysDictData =
+            sysDictDataService.getDictData(
+                    DictTypeEnum.SYSTEM_PARAMETER_CONFIG.getValue(),
+                    DictDataEnum.RECHARGE_PUSH_MSG.getLabel());
+    return ObjectUtil.isNull(sysDictData) ? 0 : Convert.toInt(sysDictData.getDictValue());
+  }
+
+  /**
+   * @param state 状态
+   * @param date  时间
+   * @param money 金额
+   * @param mode  1 充值 2 提现
+   * @return
+   */
+  public String context(Integer state, Date date, BigDecimal money, int mode) {
+    String context = "";
+    String dateStr = DateUtil.dateToStr(date, DateUtil.YYYY_MM_DD_HH_MM_SS);
+
+    if (ObjectUtil.equals(1, mode)) {
+      if (ObjectUtil.equals(3, state)) {
+        context = "您于" + dateStr + "充值的" + money.setScale(2, 2) + "已成功到账。";
+      } else {
+        context = "您于" + dateStr + "充值的" + money.setScale(2, 2) + "已取消。";
+      }
+    }
+
+    return context;
+  }
+
+  /**
+   * @param mode 1 充值 2 提现
+   * @return
+   */
+  public String title(int mode, int state) {
+    String title = "";
+    if (ObjectUtil.equals(1, mode)) {
+      if (ObjectUtil.equals(state, 3)) {
+        title = "充值成功";
+      } else {
+        title = "充值失败";
+      }
+    }
+    return title;
   }
 
   @Override
@@ -352,11 +455,15 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
     verifyRechargeOrderForAuditing(rechargeOrder);
     // 校验已处理订单是否允许其他账户操作
     crossAccountCheck(userCredential, rechargeOrder);
+    //审核流校验
+    rechargeProcess(rechargeOrder);
     // 更新订单状态
     rechargeOrder.setAuditorAccount(userCredential.getUsername());
     rechargeOrder.setAuditTime(new Date());
     rechargeOrder.setStatus(RechargeStatus.CANCELLED.getValue());
     updateRechargeOrder(rechargeOrder);
+    //添加消息
+    this.addMessageInfo(rechargeOrder, 4);
   }
 
   @Override
@@ -399,7 +506,7 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
     if (manualRechargeOrderBo.isSkipAuditing()) {
       String auditRemarks =
           StringUtils.isBlank(manualRechargeOrderBo.getAuditRemarks()) ? null : "直接入款";
-      accept(rechargeOrder.getId(), userCredential, auditRemarks);
+      accept(rechargeOrder.getId(), userCredential, auditRemarks, false);
     }
   }
 
@@ -470,12 +577,6 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
   public void crossAccountCheck(UserCredential userCredential, RechargeOrder rechargeOrder)
       throws ServiceException {
     MemberRechargeLimit limit = limitInfoService.getRechargeLimit();
-    boolean isRechargeProcess =
-            BooleanEnum.YES.match(limit.getIsRechargeProcess());
-    if (isRechargeProcess && !ObjectUtil.equal(2, rechargeOrder.getStatus())) {
-      throw new ServiceException("请先受理订单:" + rechargeOrder.getOrderNo());
-    }
-
     boolean toCheck =
         BooleanEnum.NO.match(limit.getIsHandledAllowOthersOperate())
             && !userCredential.isSuperAdmin();
@@ -484,6 +585,16 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
           && !userCredential.getUsername().equals(rechargeOrder.getAuditorAccount())) {
         throw new ServiceException("您无权操作此订单:" + rechargeOrder.getOrderNo());
       }
+    }
+  }
+
+
+  public void rechargeProcess(RechargeOrder rechargeOrder) {
+    MemberRechargeLimit limit = limitInfoService.getRechargeLimit();
+    boolean isRechargeProcess =
+            BooleanEnum.YES.match(limit.getIsRechargeProcess());
+    if (isRechargeProcess && !ObjectUtil.equal(2, rechargeOrder.getStatus())) {
+      throw new ServiceException("请先受理订单:" + rechargeOrder.getOrderNo());
     }
   }
 

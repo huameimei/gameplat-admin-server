@@ -58,7 +58,7 @@ public class RechargeOrderController {
   @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.RECHARGE, desc = "'入款订单：' + #id")
   public void accept(Long id) throws Exception {
     UserCredential userCredential = SecurityUserHolder.getCredential();
-    rechargeOrderService.accept(id, userCredential, null);
+    rechargeOrderService.accept(id, userCredential, null, true);
   }
 
   @PostMapping("/cancel")
@@ -104,7 +104,7 @@ public class RechargeOrderController {
     }
     UserCredential userCredential = SecurityUserHolder.getCredential();
     for (Long id : ids) {
-      rechargeOrderService.accept(id, userCredential, null);
+      rechargeOrderService.accept(id, userCredential, null, true);
     }
   }
 

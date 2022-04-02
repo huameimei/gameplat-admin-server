@@ -46,6 +46,12 @@ public class DivideFixConfigServiceImpl extends ServiceImpl<DivideFixConfigMappe
 
   @Autowired private GameKindMapper gameKindMapper;
 
+  /**
+   * 添加
+   *
+   * @param userName
+   * @param lang
+   */
   @Override
   public void add(String userName, String lang) {
     Assert.isTrue(StrUtil.isNotBlank(userName), "用户名参数缺失！");
@@ -65,6 +71,13 @@ public class DivideFixConfigServiceImpl extends ServiceImpl<DivideFixConfigMappe
     Assert.isTrue(this.save(saveObj), "添加失败！");
   }
 
+  /**
+   * 编辑前获取
+   *
+   * @param userName
+   * @param s
+   * @return
+   */
   @Override
   public Map<String, Object> getFixConfigForEdit(String userName, String s) {
     Assert.isTrue(StrUtil.isNotBlank(userName), "用户名参数缺失！");
@@ -151,6 +164,11 @@ public class DivideFixConfigServiceImpl extends ServiceImpl<DivideFixConfigMappe
     Assert.isTrue(this.updateById(editObj), "编辑失败！");
   }
 
+  /**
+   * 删除
+   *
+   * @param ids
+   */
   @Override
   public void remove(String ids) {
     String[] idArr = ids.split(",");
@@ -159,6 +177,13 @@ public class DivideFixConfigServiceImpl extends ServiceImpl<DivideFixConfigMappe
     }
   }
 
+  /**
+   * 根据游戏编码获取
+   *
+   * @param superName
+   * @param code
+   * @return
+   */
   @Override
   public GameDivideVo getConfigByGameCode(String superName, String code) {
     String configByFidAndCode = fixConfigMapper.getConfigByGameCode(superName, code);

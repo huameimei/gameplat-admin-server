@@ -76,6 +76,13 @@ public class SpreadLinkInfoServiceImpl extends ServiceImpl<SpreadLinkInfoMapper,
 
   @Autowired private SysDictDataService sysDictDataService;
 
+  /**
+   * 分页列表
+   *
+   * @param page
+   * @param dto
+   * @return
+   */
   @Override
   public IPage<SpreadConfigVO> page(PageDTO<SpreadLinkInfo> page, SpreadLinkInfoDTO dto) {
     return this.lambdaQuery()
@@ -110,6 +117,12 @@ public class SpreadLinkInfoServiceImpl extends ServiceImpl<SpreadLinkInfoMapper,
         .convert(spreadLinkInfoConvert::toVo);
   }
 
+  /**
+   * 导出
+   *
+   * @param dto
+   * @param response
+   */
   @Override
   public void exportList(SpreadLinkInfoDTO dto, HttpServletResponse response) {
     try {
@@ -226,6 +239,11 @@ public class SpreadLinkInfoServiceImpl extends ServiceImpl<SpreadLinkInfoMapper,
     }
   }
 
+  /**
+   * 修改
+   *
+   * @param dto
+   */
   @Override
   public void update(SpreadLinkInfoEditDTO dto) {
     SpreadLinkInfo linkInfo = spreadLinkInfoConvert.toEntity(dto);
@@ -263,11 +281,21 @@ public class SpreadLinkInfoServiceImpl extends ServiceImpl<SpreadLinkInfoMapper,
     }
   }
 
+  /**
+   * 根据主键删除
+   *
+   * @param id
+   */
   @Override
   public void deleteById(Long id) {
     this.removeById(id);
   }
 
+  /**
+   * 改变状态
+   *
+   * @param dto
+   */
   @Override
   public void changeStatus(SpreadLinkInfoEditDTO dto) {
     if (!this.updateById(spreadLinkInfoConvert.toEntity(dto))) {
@@ -275,6 +303,11 @@ public class SpreadLinkInfoServiceImpl extends ServiceImpl<SpreadLinkInfoMapper,
     }
   }
 
+  /**
+   * 增加推广码时间
+   *
+   * @param id Long
+   */
   @Override
   public void changeReleaseTime(Long id) {
     if (!this.updateById(SpreadLinkInfo.builder().id(id).createTime(new Date()).build())) {
@@ -282,6 +315,11 @@ public class SpreadLinkInfoServiceImpl extends ServiceImpl<SpreadLinkInfoMapper,
     }
   }
 
+  /**
+   * 批量启用
+   *
+   * @param ids
+   */
   @Override
   public void batchEnableStatus(List<Long> ids) {
     if (!this.lambdaUpdate()
@@ -292,6 +330,11 @@ public class SpreadLinkInfoServiceImpl extends ServiceImpl<SpreadLinkInfoMapper,
     }
   }
 
+  /**
+   * 批量关闭状态
+   *
+   * @param ids List
+   */
   @Override
   public void batchDisableStatus(List<Long> ids) {
     if (!this.lambdaUpdate()
@@ -302,6 +345,11 @@ public class SpreadLinkInfoServiceImpl extends ServiceImpl<SpreadLinkInfoMapper,
     }
   }
 
+  /**
+   * 批量删除
+   *
+   * @param ids List
+   */
   @Override
   public void batchDeleteByIds(List<Long> ids) {
     if (!this.removeByIds(ids)) {
@@ -309,11 +357,22 @@ public class SpreadLinkInfoServiceImpl extends ServiceImpl<SpreadLinkInfoMapper,
     }
   }
 
+  /**
+   * 根据代理账号获取代理信息
+   *
+   * @param agentAccount
+   * @return
+   */
   @Override
   public List<SpreadLinkInfo> getSpreadList(String agentAccount) {
     return this.lambdaQuery().eq(SpreadLinkInfo::getAgentAccount, agentAccount).list();
   }
 
+  /**
+   * 校验推广码
+   *
+   * @param code String
+   */
   @Override
   public void checkCode(String code, Integer agentMinCodeNum) {
     String reg = "^[a-zA-Z0-9]{" + agentMinCodeNum + ",20}$";
@@ -329,6 +388,14 @@ public class SpreadLinkInfoServiceImpl extends ServiceImpl<SpreadLinkInfoMapper,
     }
   }
 
+  /**
+   * 根据用户名获取返点等级下拉
+   *
+   * @param account String
+   * @param statisMax Boolean
+   * @param statisMin Boolean
+   * @return JSONArray
+   */
   @Override
   public JSONArray getSpreadLinkRebate(String account, Boolean statisMax, Boolean statisMin) {
     BigDecimal min = BigDecimal.ZERO;
@@ -392,6 +459,13 @@ public class SpreadLinkInfoServiceImpl extends ServiceImpl<SpreadLinkInfoMapper,
     return jsonArray;
   }
 
+  /**
+   * 添加或编辑推广码分红配置预设
+   *
+   * @param linkId
+   * @param agentAccount
+   * @param paramOwnerConfigMap
+   */
   @Override
   public void saveOrEditDivideConfig(
       Long linkId, String agentAccount, Map<String, List<GameDivideVo>> paramOwnerConfigMap) {
@@ -427,6 +501,12 @@ public class SpreadLinkInfoServiceImpl extends ServiceImpl<SpreadLinkInfoMapper,
     }
   }
 
+  /**
+   * 获取最大推广码代理返点等级配置列表
+   *
+   * @param account
+   * @return
+   */
   @Override
   public BigDecimal getMaxSpreadLinkRebate(String account) {
     return this.lambdaQuery()

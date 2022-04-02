@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+/** @Description : 代理账号的平级分红方案 @Author : cc @Date : 2022/4/2 */
 @Api(tags = "代理账号的平级分红方案")
 @Slf4j
 @RestController
@@ -38,7 +39,6 @@ public class AgentDivideController {
     Integer divideType = 1;
     return agentDivideService.queryPage(page, divideType, agentName);
   }
-
 
   @ApiOperation("代理线绑定平级分红方案")
   @PostMapping(value = "/bindAgentLine")

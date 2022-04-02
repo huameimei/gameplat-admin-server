@@ -17,6 +17,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+/** @Description : 层层代分红期数 @Author : cc @Date : 2022/4/2 */
 @Api(tags = "分红期数")
 @RestController
 @RequestMapping("/api/admin/divide/periods")
@@ -24,6 +25,13 @@ public class DividePeriodsController {
 
   @Autowired private DividePeriodsService periodsService;
 
+  /**
+   * 期数分页列表
+   *
+   * @param page
+   * @param dto
+   * @return
+   */
   @ApiOperation(value = "期数列表")
   @GetMapping("/list")
   @PreAuthorize("hasAuthority('divide:periods:view')")
@@ -31,6 +39,11 @@ public class DividePeriodsController {
     return periodsService.queryPage(page, dto);
   }
 
+  /**
+   * 添加期数
+   *
+   * @param dto
+   */
   @PostMapping("/add")
   @ApiOperation(value = "新增期数")
   @PreAuthorize("hasAuthority('divide:periods:add')")
@@ -39,6 +52,11 @@ public class DividePeriodsController {
     periodsService.add(dto);
   }
 
+  /**
+   * 编辑
+   *
+   * @param dto
+   */
   @PostMapping("/edit")
   @ApiOperation(value = "编辑期数")
   @PreAuthorize("hasAuthority('divide:periods:edit')")
@@ -47,6 +65,11 @@ public class DividePeriodsController {
     periodsService.edit(dto);
   }
 
+  /**
+   * 删除
+   *
+   * @param ids
+   */
   @ApiOperation(value = "删除期数")
   @DeleteMapping("/delete")
   @PreAuthorize("hasAuthority('divide:periods:remove')")
@@ -54,6 +77,11 @@ public class DividePeriodsController {
     periodsService.delete(ids);
   }
 
+  /**
+   * 结算
+   *
+   * @param dto
+   */
   @PostMapping("/settle")
   @ApiOperation(value = "期数结算")
   @PreAuthorize("hasAuthority('divide:periods:settle')")
@@ -62,6 +90,11 @@ public class DividePeriodsController {
     periodsService.settle(dto);
   }
 
+  /**
+   * 派发
+   *
+   * @param dto
+   */
   @PostMapping("/grant")
   @ApiOperation(value = "期数派发")
   @PreAuthorize("hasAuthority('divide:periods:grant')")
@@ -70,6 +103,11 @@ public class DividePeriodsController {
     periodsService.grant(dto);
   }
 
+  /**
+   * 回收
+   *
+   * @param dto
+   */
   @PostMapping("/recycle")
   @ApiOperation(value = "期数回收")
   @PreAuthorize("hasAuthority('divide:periods:recycle')")

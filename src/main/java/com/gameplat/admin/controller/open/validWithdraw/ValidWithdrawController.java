@@ -12,6 +12,7 @@ import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,6 +30,7 @@ public class ValidWithdrawController {
   private final LimitInfoService limitInfoService;
 
   @GetMapping(value = "findVaildWithdraw")
+  @PreAuthorize("hasAuthority('funds:validWithdraw:view')")
   public ValidateDmlBeanVo findVaildWithdraw(@RequestParam("username") String name) {
     if (StringUtils.isEmpty(name)) {
       throw new ServiceException("用户名不能为空！");
@@ -39,6 +41,7 @@ public class ValidWithdrawController {
   }
 
   @ApiOperation(value = "调整单条打码量记录")
+  @PreAuthorize("hasAuthority('funds:validWithdraw:edit')")
   @PutMapping("/updateValidWithdraw")
   public void updateValidWithdraw(@Validated @RequestBody ValidWithdrawDto dto) {
     validWithdrawService.updateValidWithdraw(dto);
@@ -47,6 +50,7 @@ public class ValidWithdrawController {
   @SneakyThrows
   @ApiOperation(value = "清除会员打码量记录")
   @DeleteMapping("/delValidWithdraw")
+  @PreAuthorize("hasAuthority('funds:validWithdraw:remove')")
   public void delValidWithdraw(@RequestParam("member") String member) {
     if (StringUtils.isEmpty(member)) {
       throw new ServiceException("会员账号不能空！");

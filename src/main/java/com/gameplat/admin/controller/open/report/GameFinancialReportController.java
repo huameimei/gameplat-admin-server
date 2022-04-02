@@ -14,6 +14,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -37,25 +38,29 @@ public class GameFinancialReportController {
 
     @ApiOperation("查询财务报表")
     @GetMapping(value = "/findReportPage")
-//    @PreAuthorize("hasAuthority('financial:report:page')")
+    @PreAuthorize("hasAuthority('financial:report:view')")
     public PageDtoVO<GameFinancialReportVO> findReportPage(Page<GameFinancialReport> page, GameFinancialReportQueryDTO queryDTO) {
         return gameFinancialReportService.findReportPage(page, queryDTO);
     }
 
     @ApiOperation("初始化财务报表")
     @GetMapping("/initReportList")
-//    @PreAuthorize("hasAuthority('financial:report:init')")
+    @PreAuthorize("hasAuthority('financial:report:init')")
     @Log(module = ServiceName.ADMIN_SERVICE, desc = "初始化财务报表")
     public void initReportList(@RequestParam("statisticsTime") String statisticsTime) {
+      try {
         if (StringUtils.isEmpty(statisticsTime)) {
             statisticsTime = DateUtil.format(new Date(), "yyyy-MM");
         }
         gameFinancialReportService.initGameFinancialReport(statisticsTime);
+      } catch (Exception e) {
+        log.info("初始化财务报表异常");
+      }
     }
 
     @ApiOperation("导出财务报表")
     @GetMapping("/exportReport")
-//    @PreAuthorize("hasAuthority('financial:report:export')")
+    @PreAuthorize("hasAuthority('financial:report:export')")
     @Log(module = ServiceName.ADMIN_SERVICE, desc = "导出财务报表")
     public void exportReport(@RequestParam("statisticsTime") String statisticsTime, HttpServletResponse response) {
         if (StringUtils.isEmpty(statisticsTime)) {

@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+/** @Description : 层层代分红详情 @Author : cc @Date : 2022/4/2 */
 @Api(tags = "分红详情")
 @RestController
 @RequestMapping("/api/admin/divide/detail")
@@ -20,6 +21,13 @@ public class DivideDetailController {
 
   @Autowired private DivideDetailService divideDetailService;
 
+  /**
+   * 分页列表
+   *
+   * @param page
+   * @param dto
+   * @return
+   */
   @ApiOperation(value = "分红详情")
   @GetMapping("/list")
   public IPage<DivideDetailVO> list(PageDTO<DivideDetail> page, DivideDetailQueryDTO dto) {

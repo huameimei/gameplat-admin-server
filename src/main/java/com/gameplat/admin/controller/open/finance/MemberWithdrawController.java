@@ -203,7 +203,7 @@ public class MemberWithdrawController {
   }
 
   @PostMapping("/page")
-  @PreAuthorize("hasAuthority('finance:memberWithdraw:page')")
+  @PreAuthorize("hasAuthority('finance:memberWithdraw:view')")
   public PageExt<MemberWithdrawVO, SummaryVO> queryPage(
       Page<MemberWithdraw> page, MemberWithdrawQueryDTO dto) {
     return userWithdrawService.findPage(page, dto);

@@ -23,7 +23,7 @@ public class TpInterfaceController {
   }
 
   @GetMapping("/queryList")
-  @PreAuthorize("hasAuthority('thirdParty:tpInterfaces:queryList')")
+  @PreAuthorize("hasAuthority('thirdParty:tpInterfaces:view')")
   public List<TpInterface> getList() {
     return tpInterfaceService.list();
   }

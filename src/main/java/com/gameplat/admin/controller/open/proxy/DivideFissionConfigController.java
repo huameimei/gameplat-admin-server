@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
+/** @Description : 裂变分红模式 @Author : cc @Date : 2022/4/2 */
 @Api(tags = "裂变分红模式")
 @RestController
 @RequestMapping("/api/admin/divide/fission")
@@ -28,7 +29,15 @@ public class DivideFissionConfigController {
 
   @Autowired private DivideFissionConfigService fissionConfigService;
 
+  /**
+   * 裂变配置分页裂变
+   *
+   * @param page
+   * @param dto
+   * @return
+   */
   @GetMapping("/pageList")
+  @PreAuthorize("hasAuthority('agent:bonusFissionconfig:view')")
   public IPage<DivideFissionConfig> list(PageDTO<DivideFissionConfig> page, DivideConfigDTO dto) {
     LambdaQueryWrapper<DivideFissionConfig> queryWrapper = new LambdaQueryWrapper<>();
     queryWrapper
@@ -40,6 +49,11 @@ public class DivideFissionConfigController {
     return fissionConfigService.page(page, queryWrapper);
   }
 
+  /**
+   * 添加裂变配置
+   *
+   * @param dto
+   */
   @PostMapping("/add")
   @ApiOperation(value = "新增裂变分红配置")
   @PreAuthorize("hasAuthority('agent:bonusFissionconfig:add')")
@@ -48,11 +62,22 @@ public class DivideFissionConfigController {
     fissionConfigService.add(dto.getUserName(), "zh-CN");
   }
 
+  /**
+   * 编辑前获取基础配置
+   *
+   * @param dto
+   * @return
+   */
   @GetMapping("/getFissionConfigForEdit")
   public Map<String, Object> getFissionConfigForEdit(DivideConfigDTO dto) {
     return fissionConfigService.getFissionConfigForEdit(dto.getUserName(), "zh-CN");
   }
 
+  /**
+   * 编辑裂变分红配置
+   *
+   * @param dto
+   */
   @PostMapping("/edit")
   @ApiOperation(value = "编辑裂变分红配置")
   @PreAuthorize("hasAuthority('agent:bonusFissionconfig:edit')")
@@ -61,6 +86,11 @@ public class DivideFissionConfigController {
     fissionConfigService.edit(dto, "zh-CN");
   }
 
+  /**
+   * 删除裂变分红配置
+   *
+   * @param ids
+   */
   @ApiOperation(value = "删除裂变分红配置")
   @DeleteMapping("/delete")
   @PreAuthorize("hasAuthority('agent:bonusFissionconfig:remove')")

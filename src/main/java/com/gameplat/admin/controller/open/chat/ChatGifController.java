@@ -27,7 +27,7 @@ public class ChatGifController {
 
   @ApiOperation(value = "分页列表")
   @GetMapping("/page")
-  @PreAuthorize("hasAuthority('chat:gif:page')")
+  @PreAuthorize("hasAuthority('chat:gif:view')")
   public IPage<ChatGifVO> page(PageDTO<ChatGif> page, String name) {
     return chatGifService.page(page, name);
   }

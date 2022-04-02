@@ -71,4 +71,11 @@ public interface RechargeOrderMapper extends BaseMapper<RechargeOrder> {
 
   List<PayLeaderboard> getLeaderboard(PayLeaderboardParam payLeaderboardParam);
 
+  /**
+   * 查询用户的首充金额记录
+   *
+   * @param map
+   * @return
+   */
+  List<ActivityStatisticItem> findFirstRechargeOrderList(Map<String, Object> map);
 }

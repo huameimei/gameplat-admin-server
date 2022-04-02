@@ -12,7 +12,6 @@ import com.gameplat.admin.model.vo.SpreadUnionPackageVO;
 import com.gameplat.admin.service.SpreadLinkInfoService;
 import com.gameplat.admin.service.SpreadUnionPackageService;
 import com.gameplat.base.common.exception.ServiceException;
-import com.gameplat.common.lang.Assert;
 import com.gameplat.model.entity.spread.SpreadLinkInfo;
 import com.gameplat.model.entity.spread.SpreadUnionPackage;
 import lombok.extern.slf4j.Slf4j;
@@ -130,6 +129,6 @@ public class SpreadUnionPackageServiceImpl
   public void removeByUnionId(List<Long> unionId) {
     LambdaQueryWrapper<SpreadUnionPackage> query = Wrappers.lambdaQuery();
     query.in(SpreadUnionPackage::getUnionId, unionId);
-    Assert.isTrue(this.remove(query), "删除失败");
+    this.remove(query);
   }
 }

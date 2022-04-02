@@ -229,7 +229,7 @@ public class RechargeOrderController {
   }
 
   @PostMapping("/page")
-  @PreAuthorize("hasAuthority('finance:rechargeOrder:page')")
+  @PreAuthorize("hasAuthority('finance:rechargeOrder:view')")
   public PageExt<RechargeOrderVO, SummaryVO> queryPage(
       Page<RechargeOrder> page, RechargeOrderQueryDTO dto) {
     return rechargeOrderService.findPage(page, dto);

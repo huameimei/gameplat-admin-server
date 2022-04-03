@@ -89,6 +89,7 @@ public class SpreadUnionServiceImpl extends ServiceImpl<SpreadUnionMapper, Sprea
         .set(SpreadUnion::getUnionName, spreadUnionDTO.getUnionName())
         .set(SpreadUnion::getAgentAccount, spreadUnionDTO.getAgentAccount())
         .set(SpreadUnion::getChannel, spreadUnionDTO.getChannel())
+        .set(SpreadUnion::getUpdateBy,spreadUnionDTO.getUpdateBy())
         .eq(SpreadUnion::getId, spreadUnionDTO.getId())
         .update()) {
       log.error("修改联盟设置失败,传入的参数  spreadUnionDTO：{}", spreadUnionDTO);

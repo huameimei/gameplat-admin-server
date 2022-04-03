@@ -1,5 +1,6 @@
 package com.gameplat.admin.model.dto;
 
+import com.gameplat.security.SecurityUserHolder;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
@@ -27,4 +28,14 @@ public class SpreadUnionDTO implements Serializable {
 
   @NotEmpty(message = "结束时间不能为空")
   private String endTime;
+
+  /**
+   * 创建人
+   */
+  private String createBy = SecurityUserHolder.getCredential().getUsername();
+
+  /**
+   * 修改人
+   */
+  private String updateBy = SecurityUserHolder.getCredential().getUsername();
 }

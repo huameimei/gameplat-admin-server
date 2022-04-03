@@ -23,6 +23,10 @@ import com.gameplat.base.common.util.Converts;
 import com.gameplat.base.common.util.DateUtils;
 import com.gameplat.base.common.util.StringUtils;
 import com.gameplat.base.common.util.UUIDUtils;
+import com.gameplat.common.enums.GamePlatformEnum;
+import com.gameplat.common.enums.GameTypeEnum;
+import com.gameplat.common.enums.KgNLLottTypeEnum;
+import com.gameplat.common.enums.KgNLTypeKindEnum;
 import com.gameplat.common.util.ZipUtils;
 import com.gameplat.model.entity.report.GameFinancialReport;
 import lombok.extern.slf4j.Slf4j;
@@ -387,14 +391,14 @@ public class GameFinancialReportServiceImpl
       Object lottType = bucket.getKey();
       GameFinancialReport gameFinancialReport = new GameFinancialReport();
       // 官彩
-      if (lottType.toString().equals("1")) {
-        gameFinancialReport.setGameKind("KGNL_LOTTERY_OFFICIAL");
+      if (lottType.toString().equals(KgNLLottTypeEnum.OFFICIAL.value())) {
+        gameFinancialReport.setGameKind(KgNLTypeKindEnum.OFFICIAL.value());
         // 私彩
-      } else if (lottType.toString().equals("2")) {
-        gameFinancialReport.setGameKind("KGNL_LOTTERY_SELF");
+      } else if (lottType.toString().equals(KgNLLottTypeEnum.SELF.value())) {
+        gameFinancialReport.setGameKind(KgNLTypeKindEnum.SELF.value());
         // 六合彩
-      } else if (lottType.toString().equals("3")) {
-        gameFinancialReport.setGameKind("KGNL_LOTTERY_LHC");
+      } else if (lottType.toString().equals(KgNLLottTypeEnum.LHC.value())) {
+        gameFinancialReport.setGameKind(KgNLTypeKindEnum.LHC.value());
       }
       BigDecimal validAmount = Converts.toBigDecimal(((ParsedSum) bucket.getAggregations().get("validAmount")).getValue())
               .divide(new BigDecimal("1000"), BigDecimal.ROUND_DOWN, 2);
@@ -406,8 +410,8 @@ public class GameFinancialReportServiceImpl
       gameFinancialReport.setStartTime(startTime);
       gameFinancialReport.setEndTime(endTime);
       gameFinancialReport.setCustomerCode(tenant);
-      gameFinancialReport.setPlatformCode("KGNL");
-      gameFinancialReport.setGameType("LOTTERY");
+      gameFinancialReport.setPlatformCode(GamePlatformEnum.KGNL.getCode());
+      gameFinancialReport.setGameType(GameTypeEnum.LOTTERY.code());
       KgNlReportList.add(gameFinancialReport);
     }
 
@@ -422,20 +426,20 @@ public class GameFinancialReportServiceImpl
   public void assembleKgNewLottery(List<GameFinancialReportVO> list) {
     if (StringUtils.isNotEmpty(list)) {
       for (GameFinancialReportVO vo : list) {
-        if (vo.getGameKind().equals("KGNL_LOTTERY_OFFICIAL")) {
-          vo.setGameTypeId(3);
-          vo.setGameTypeName("彩票投注");
-          vo.setGameName("新官方彩");
+        if (vo.getGameKind().equals(KgNLTypeKindEnum.OFFICIAL.value())) {
+          vo.setGameTypeId(GameTypeEnum.LOTTERY.id());
+          vo.setGameTypeName(GameTypeEnum.LOTTERY.desc());
+          vo.setGameName(KgNLTypeKindEnum.OFFICIAL.desc());
         }
-        if (vo.getGameKind().equals("KGNL_LOTTERY_SELF")) {
-          vo.setGameTypeId(3);
-          vo.setGameTypeName("彩票投注");
-          vo.setGameName("新自营彩");
+        if (vo.getGameKind().equals(KgNLTypeKindEnum.SELF.value())) {
+          vo.setGameTypeId(GameTypeEnum.LOTTERY.id());
+          vo.setGameTypeName(GameTypeEnum.LOTTERY.desc());
+          vo.setGameName(KgNLTypeKindEnum.SELF.desc());
         }
-        if (vo.getGameKind().equals("KGNL_LOTTERY_LHC")) {
-          vo.setGameTypeId(3);
-          vo.setGameTypeName("彩票投注");
-          vo.setGameName("新六合彩");
+        if (vo.getGameKind().equals(KgNLTypeKindEnum.LHC.value())) {
+          vo.setGameTypeId(GameTypeEnum.LOTTERY.id());
+          vo.setGameTypeName(GameTypeEnum.LOTTERY.desc());
+          vo.setGameName(KgNLTypeKindEnum.LHC.desc());
         }
       }
     }

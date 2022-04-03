@@ -17,6 +17,7 @@ import com.gameplat.admin.constant.RechargeMode;
 import com.gameplat.admin.constant.TrueFalse;
 import com.gameplat.admin.convert.RechargeOrderConvert;
 import com.gameplat.admin.enums.BlacklistConstant.BizBlacklistType;
+import com.gameplat.admin.feign.MessageFeignClient;
 import com.gameplat.admin.mapper.MessageMapper;
 import com.gameplat.admin.mapper.RechargeOrderHistoryMapper;
 import com.gameplat.admin.mapper.RechargeOrderMapper;
@@ -34,6 +35,7 @@ import com.gameplat.base.common.json.JsonUtils;
 import com.gameplat.base.common.snowflake.IdGeneratorSnowflake;
 import com.gameplat.base.common.util.DateUtil;
 import com.gameplat.common.constant.NumberConstant;
+import com.gameplat.common.constant.SocketEnum;
 import com.gameplat.common.enums.*;
 import com.gameplat.common.lang.Assert;
 import com.gameplat.common.model.bean.UserEquipment;
@@ -110,7 +112,6 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
   @Autowired
   @Lazy
   private MemberGrowthStatisService memberGrowthStatisService;
-  @Autowired private MessagePushService pushService;
   @Autowired
   private MessageMapper messageMapper;
   @Autowired
@@ -321,15 +322,12 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
     memberInfoService.updateBalanceWithRecharge(
         memberInfo.getMemberId(), rechargeOrder.getPayAmount(), rechargeOrder.getTotalAmount());
     String account = member.getAccount();
-
-    try {
-      log.info("===================开始推送充值成功的消息用户: {}=====================",account);
-      pushService.send(account,PushMessage.builder().channel("TEST_ONE").title("充值成功").build());
-      log.info("===================发送至指定频道的用户消息: {}=====================",account);
-      pushService.send(PushMessage.builder().channel("TEST_407").title("发送至指定频道").build());
-    }catch (Exception e){
-      log.error("=========用户充值推送消息异常========",e);
-    }
+    Map<String,String> map = new HashMap<>();
+    map.put("user",account);
+    map.put("channel", SocketEnum.SOCKET_RECHARGE_SUCCESS);
+    map.put("title","充值成功");
+    log.info("充值成功=============>开始推送Socket消息,相关参数{}",map);
+    client.userSend(map);
 
     // 判断充值是否计算积分
     if (TrueFalse.TRUE.getValue() != rechargeOrder.getPointFlag()) {
@@ -461,7 +459,7 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
     }
     return title;
   }
-
+@Autowired private MessageFeignClient client;
   @Override
   public void cancel(Long id, UserCredential userCredential) throws ServiceException {
     RechargeOrder rechargeOrder = this.getById(id);
@@ -478,6 +476,13 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
     updateRechargeOrder(rechargeOrder);
     //添加消息
     this.addMessageInfo(rechargeOrder, 4);
+    //消息推送到 socket
+    Map<String,String> map = new HashMap<>();
+    map.put("user",userCredential.getUsername());
+    map.put("channel", SocketEnum.SOCKET_RECHARGE_FAIL);
+    map.put("title","充值失败");
+    log.info("充值取消=============>开始推送Socket消息,相关参数{}",map);
+    client.userSend(map);
   }
 
   @Override

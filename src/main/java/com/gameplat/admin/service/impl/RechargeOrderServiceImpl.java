@@ -328,7 +328,8 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
     map.put("title","充值成功");
     log.info("充值成功=============>开始推送Socket消息,相关参数{}",map);
     client.userSend(map);
-
+    log.info("充值成功=============>topic推送测试,相关参数{}",map);
+    client.topicSend(map);
     // 判断充值是否计算积分
     if (TrueFalse.TRUE.getValue() != rechargeOrder.getPointFlag()) {
       log.info(

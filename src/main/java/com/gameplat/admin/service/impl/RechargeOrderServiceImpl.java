@@ -119,6 +119,9 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
   @Autowired
   private SysDictDataService sysDictDataService;
 
+  @Autowired
+  private MessageFeignClient client;
+
   @Override
   public PageExt<RechargeOrderVO, SummaryVO> findPage(
       Page<RechargeOrder> page, RechargeOrderQueryDTO dto) {
@@ -321,15 +324,6 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
     // 更新会员充值信息
     memberInfoService.updateBalanceWithRecharge(
         memberInfo.getMemberId(), rechargeOrder.getPayAmount(), rechargeOrder.getTotalAmount());
-    String account = member.getAccount();
-    Map<String,String> map = new HashMap<>();
-    map.put("user",account);
-    map.put("channel", SocketEnum.SOCKET_RECHARGE_SUCCESS);
-    map.put("title","充值成功");
-    log.info("充值成功=============>开始推送Socket消息,相关参数{}",map);
-    client.userSend(map);
-    log.info("充值成功=============>topic推送测试,相关参数{}",map);
-    client.topicSend(map);
     // 判断充值是否计算积分
     if (TrueFalse.TRUE.getValue() != rechargeOrder.getPointFlag()) {
       log.info(
@@ -371,6 +365,9 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
     if (ObjectUtil.equals(1, rechargeOrder.getMode())
             || ObjectUtil.equals(2, rechargeOrder.getMode())) {
       this.addMessageInfo(rechargeOrder, 3);
+      MemberRechargeLimit limit = limitInfoService.getRechargeLimit();
+      this.sendMessage(
+              rechargeOrder.getAccount(), SocketEnum.SOCKET_RECHARGE_SUCCESS, limit.getRechargeTip());
     }
   }
 
@@ -412,8 +409,19 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
     messageDistribute.setReadStatus(NumberConstant.ZERO);
     messageDistribute.setCreateBy("system");
     messageDistributeService.save(messageDistribute);
+
   }
 
+  public void sendMessage(String account, String channel, String message) {
+    Map<String, String> map = new HashMap<>();
+    map.put("user", account);
+    map.put("channel", channel);
+    map.put("title", message);
+    log.info("充值成功=============>开始推送Socket消息,相关参数{}", map);
+    client.userSend(map);
+    log.info("充值成功=============>topic推送测试,相关参数{}", map);
+    client.topicSend(map);
+  }
 
   public int verifyMessage() {
     SysDictData sysDictData =
@@ -460,7 +468,7 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
     }
     return title;
   }
-@Autowired private MessageFeignClient client;
+
   @Override
   public void cancel(Long id, UserCredential userCredential) throws ServiceException {
     RechargeOrder rechargeOrder = this.getById(id);
@@ -468,22 +476,20 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
     verifyRechargeOrderForAuditing(rechargeOrder);
     // 校验已处理订单是否允许其他账户操作
     crossAccountCheck(userCredential, rechargeOrder);
-    //审核流校验
+    // 审核流校验
     rechargeProcess(rechargeOrder);
     // 更新订单状态
     rechargeOrder.setAuditorAccount(userCredential.getUsername());
     rechargeOrder.setAuditTime(new Date());
     rechargeOrder.setStatus(RechargeStatus.CANCELLED.getValue());
     updateRechargeOrder(rechargeOrder);
-    //添加消息
+    // 添加消息
     this.addMessageInfo(rechargeOrder, 4);
-    //消息推送到 socket
-    Map<String,String> map = new HashMap<>();
-    map.put("user",userCredential.getUsername());
-    map.put("channel", SocketEnum.SOCKET_RECHARGE_FAIL);
-    map.put("title","充值失败");
-    log.info("充值取消=============>开始推送Socket消息,相关参数{}",map);
-    client.userSend(map);
+    // 消息推送到 socket
+    this.sendMessage(
+            rechargeOrder.getAccount(),
+            SocketEnum.SOCKET_RECHARGE_FAIL,
+            SocketEnum.SEND_RECHARGE_FAIL_MESSAGE);
   }
 
   @Override

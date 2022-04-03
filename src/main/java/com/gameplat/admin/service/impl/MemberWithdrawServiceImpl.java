@@ -117,7 +117,7 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
   @Autowired
   private SysDictDataService sysDictDataService;
 
-  @Autowired
+  @Autowired(required = false)
   private MessageFeignClient client;
 
   private static boolean verifyPpMerchant(
@@ -326,7 +326,7 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
 
     //验证出款流程 ,未受理订单是否可以直接入款
     if (ObjectUtil.equals(3, cashStatus)) {
-      withdrawProcess(memberWithdraw);
+      withdrawProcess(memberWithdraw, cashStatus);
     }
 
     /** 校验子账号当天受理会员取款审核额度 */

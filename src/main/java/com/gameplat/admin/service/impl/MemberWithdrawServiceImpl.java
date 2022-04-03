@@ -324,8 +324,8 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
       crossAccountCheck(userCredential, memberWithdraw);
     }
 
-    //验证出款流程 ,未受理订单是否可以直接入款
-    if (ObjectUtil.equals(3, cashStatus)) {
+    // 验证出款流程 ,未受理订单是否可以直接入款
+    if (ObjectUtil.equals(WithdrawStatus.SUCCESS.getValue(), cashStatus)) {
       withdrawProcess(memberWithdraw, cashStatus);
     }
 

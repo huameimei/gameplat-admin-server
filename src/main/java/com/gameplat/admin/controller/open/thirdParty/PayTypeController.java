@@ -30,7 +30,7 @@ public class PayTypeController {
   }
 
   @PostMapping("/list")
-  @PreAuthorize("hasAuthority('thirdParty:payTypes:list')")
+  @PreAuthorize("hasAuthority('thirdParty:payTypes:view')")
   public List<PayTypeVO> findPayTypes(String name) {
     return payTypeService.queryList(name);
   }
@@ -60,7 +60,7 @@ public class PayTypeController {
   }
 
   @PostMapping("/page")
-  @PreAuthorize("hasAuthority('thirdParty:payTypes:page')")
+  @PreAuthorize("hasAuthority('thirdParty:payTypes:view')")
   public IPage<PayType> queryPage(Page<PayType> page) {
     return payTypeService.queryPage(page);
   }

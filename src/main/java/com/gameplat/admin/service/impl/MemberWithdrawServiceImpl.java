@@ -1,5 +1,6 @@
 package com.gameplat.admin.service.impl;
 
+import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
@@ -17,6 +18,7 @@ import com.gameplat.admin.enums.CashEnum;
 import com.gameplat.admin.enums.ProxyPayStatusEnum;
 import com.gameplat.admin.enums.WithdrawStatus;
 import com.gameplat.admin.mapper.MemberWithdrawMapper;
+import com.gameplat.admin.mapper.MessageMapper;
 import com.gameplat.admin.model.bean.*;
 import com.gameplat.admin.model.dto.MemberWithdrawQueryDTO;
 import com.gameplat.admin.model.vo.MemberWithdrawVO;
@@ -28,14 +30,18 @@ import com.gameplat.base.common.json.JsonUtils;
 import com.gameplat.base.common.snowflake.IdGeneratorSnowflake;
 import com.gameplat.base.common.util.DateUtil;
 import com.gameplat.base.common.util.StringUtils;
+import com.gameplat.common.constant.NumberConstant;
 import com.gameplat.common.enums.*;
 import com.gameplat.common.model.bean.Builder;
 import com.gameplat.common.model.bean.UserEquipment;
 import com.gameplat.common.model.bean.limit.MemberRechargeLimit;
 import com.gameplat.common.model.bean.limit.MemberWithdrawLimit;
 import com.gameplat.model.entity.member.*;
+import com.gameplat.model.entity.message.Message;
+import com.gameplat.model.entity.message.MessageDistribute;
 import com.gameplat.model.entity.pay.PpInterface;
 import com.gameplat.model.entity.pay.PpMerchant;
+import com.gameplat.model.entity.sys.SysDictData;
 import com.gameplat.model.entity.sys.SysUser;
 import com.gameplat.security.context.UserCredential;
 import jodd.util.StringUtil;
@@ -59,7 +65,8 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
 
   @Autowired private MemberWithdrawConvert userWithdrawConvert;
 
-  @Autowired private MemberWithdrawMapper memberWithdrawMapper;
+  @Autowired(required = false)
+  private MemberWithdrawMapper memberWithdrawMapper;
 
   @Autowired private MemberWithdrawHistoryService memberWithdrawHistoryService;
 
@@ -86,6 +93,13 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
   @Autowired private ConfigService configService;
 
   @Autowired private MemberRwReportService memberRwReportService;
+
+  @Autowired(required = false)
+  private MessageMapper messageMapper;
+  @Autowired
+  private MessageDistributeService messageDistributeService;
+  @Autowired
+  private SysDictDataService sysDictDataService;
 
   private static boolean verifyPpMerchant(
       MemberWithdraw memberWithdraw, PpMerchant ppMerchant, PpInterface ppInterface) {
@@ -388,6 +402,10 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
       }
       // 新增出款记录
       insertWithdrawHistory(memberWithdraw);
+    }
+    // 新增消息
+    if (ObjectUtil.equals(cashStatus, 3) || ObjectUtil.equals(cashStatus, 4)) {
+      addMessageInfo(memberWithdraw, 3);
     }
   }
 
@@ -743,5 +761,91 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
     return this.lambdaQuery()
             .eq(MemberWithdraw::getCashStatus, 1)
             .count();
+  }
+
+  /**
+   * 出款消息
+   *
+   * @param memberWithdraw 出款信息
+   * @param state          状态
+   */
+  public void addMessageInfo(MemberWithdraw memberWithdraw, Integer state) {
+    if (this.verifyMessage() == com.gameplat.common.enums.TrueFalse.FALSE.getValue()) {
+      return;
+    }
+    Message messageInfo = new Message();
+    messageInfo.setTitle(title(state));
+    messageInfo.setContent(
+            context(state, memberWithdraw.getCreateTime(), memberWithdraw.getCashMoney()));
+    messageInfo.setCategory(4);
+    messageInfo.setPosition(1);
+    messageInfo.setShowType(0);
+    messageInfo.setPopsCount(0);
+    messageInfo.setPushRange(2);
+    messageInfo.setLinkAccount(memberWithdraw.getAccount());
+    messageInfo.setSort(0);
+    messageInfo.setType(1);
+    messageInfo.setLanguage("zh-CN");
+    messageInfo.setStatus(1);
+    messageInfo.setImmediateFlag(0);
+    messageInfo.setRemarks("系统消息");
+    messageInfo.setCreateBy("system");
+    messageInfo.setCreateTime(new Date());
+    messageMapper.insert(messageInfo);
+
+    MessageDistribute messageDistribute = new MessageDistribute();
+    messageDistribute.setMessageId(messageInfo.getId());
+    messageDistribute.setUserId(memberWithdraw.getMemberId());
+    messageDistribute.setUserAccount(messageInfo.getLinkAccount());
+    messageDistribute.setRechargeLevel(Convert.toInt(memberWithdraw.getMemberLevel()));
+    messageDistribute.setVipLevel(
+            memberInfoService
+                    .lambdaQuery()
+                    .eq(MemberInfo::getMemberId, memberWithdraw.getMemberId())
+                    .one()
+                    .getVipLevel());
+    messageDistribute.setReadStatus(NumberConstant.ZERO);
+    messageDistribute.setCreateBy("system");
+    messageDistributeService.save(messageDistribute);
+  }
+
+  public int verifyMessage() {
+    SysDictData sysDictData =
+            sysDictDataService.getDictData(
+                    DictTypeEnum.SYSTEM_PARAMETER_CONFIG.getValue(),
+                    DictDataEnum.WITHDRAW_PUSH_MSG.getLabel());
+    return ObjectUtil.isNull(sysDictData) ? 0 : Convert.toInt(sysDictData.getDictValue());
+  }
+
+  /**
+   * @param state 状态
+   * @param date  时间
+   * @param money 金额
+   * @return
+   */
+  public String context(Integer state, Date date, BigDecimal money) {
+    String context;
+    String dateStr = DateUtil.dateToStr(date, DateUtil.YYYY_MM_DD_HH_MM_SS);
+    if (ObjectUtil.equals(3, state)) {
+      context = "您于" + dateStr + "提现的" + money.setScale(2, 2) + "已提现成功。";
+    } else {
+      context = "您于" + date + "提现的" + money.setScale(2, 2) + "已失败。";
+    }
+    return context;
+  }
+
+  /**
+   * @param state
+   * @return
+   */
+  public String title(int state) {
+    String title;
+    if (ObjectUtil.equals(state, 3)) {
+      title = "提现成功";
+    } else {
+      title = "提现失败";
+    }
+
+    return title;
   }
 }

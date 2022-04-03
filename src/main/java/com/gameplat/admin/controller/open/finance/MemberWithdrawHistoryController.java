@@ -20,7 +20,7 @@ public class MemberWithdrawHistoryController {
   @Autowired private MemberWithdrawHistoryService userWithdrawHistoryService;
 
   @PostMapping("/page")
-  @PreAuthorize("hasAuthority('finance:memberWithdrawHistory:page')")
+  @PreAuthorize("hasAuthority('finance:memberWithdrawHistory:view')")
   public IPage<MemberWithdrawHistoryVO> queryPage(
       Page<MemberWithdrawHistory> page, MemberWithdrawHistoryQueryDTO dto) {
     return userWithdrawHistoryService.findPage(page, dto);

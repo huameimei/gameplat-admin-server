@@ -17,7 +17,7 @@ public class MemberRemarkController {
   @Autowired private MemberRemarkService memberRemarkService;
 
   @GetMapping("/getByMemberId/{memberId}")
-  @PreAuthorize("hasAuthority('member:remark:getByMemberId')")
+  @PreAuthorize("hasAuthority('member:remark:view')")
   public List<MemberRemarkVO> getByMemberId(@PathVariable Long memberId) {
     return memberRemarkService.getByMemberId(memberId);
   }
@@ -29,7 +29,7 @@ public class MemberRemarkController {
   }
 
   @DeleteMapping("/delete/{id}")
-  @PreAuthorize("hasAuthority('member:remark:delete')")
+  @PreAuthorize("hasAuthority('member:remark:remove')")
   public void deleteByRemarkId(@PathVariable Long id) {
     memberRemarkService.deleteById(id);
   }

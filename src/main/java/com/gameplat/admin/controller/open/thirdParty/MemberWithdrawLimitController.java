@@ -43,7 +43,7 @@ public class MemberWithdrawLimitController {
   }
 
   @PostMapping("/page")
-  @PreAuthorize("hasAuthority('thirdParty:memberWithdrawLimit:page')")
+  @PreAuthorize("hasAuthority('thirdParty:memberWithdrawLimit:view')")
   public IPage<MemberWithdrawDictDataVo> queryPage(Page<SysDictData> page) {
     return dictDataService.queryWithdrawPage(page);
   }

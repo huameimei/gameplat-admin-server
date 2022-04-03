@@ -67,7 +67,7 @@ public class TpMerchantController {
   }
 
   @PostMapping("/page")
-  @PreAuthorize("hasAuthority('thirdParty:tpMerchants:page')")
+  @PreAuthorize("hasAuthority('thirdParty:tpMerchants:view')")
   public IPage<TpMerchantVO> getPage(Page<TpMerchant> page, Integer status, String name) {
     return tpMerchantService.queryPage(page, status, name);
   }

@@ -63,36 +63,50 @@ import java.util.*;
 public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper, MemberWithdraw>
     implements MemberWithdrawService {
 
-  @Autowired private MemberWithdrawConvert userWithdrawConvert;
+  @Autowired
+  private MemberWithdrawConvert userWithdrawConvert;
 
   @Autowired(required = false)
   private MemberWithdrawMapper memberWithdrawMapper;
 
-  @Autowired private MemberWithdrawHistoryService memberWithdrawHistoryService;
+  @Autowired
+  private MemberWithdrawHistoryService memberWithdrawHistoryService;
 
-  @Autowired private MemberService memberService;
+  @Autowired
+  private MemberService memberService;
 
-  @Autowired private SysUserService sysUserService;
+  @Autowired
+  private SysUserService sysUserService;
 
-  @Autowired private LimitInfoService limitInfoService;
+  @Autowired
+  private LimitInfoService limitInfoService;
 
-  @Autowired private PpInterfaceService ppInterfaceService;
+  @Autowired
+  private PpInterfaceService ppInterfaceService;
 
-  @Autowired private PpMerchantService ppMerchantService;
+  @Autowired
+  private PpMerchantService ppMerchantService;
 
-  @Autowired private MemberInfoService memberInfoService;
+  @Autowired
+  private MemberInfoService memberInfoService;
 
-  @Autowired private MemberBillService memberBillService;
+  @Autowired
+  private MemberBillService memberBillService;
 
-  @Autowired private ValidWithdrawService validWithdrawService;
+  @Autowired
+  private ValidWithdrawService validWithdrawService;
 
-  @Autowired private RechargeOrderService rechargeOrderService;
+  @Autowired
+  private RechargeOrderService rechargeOrderService;
 
-  @Autowired private BizBlacklistFacade bizBlacklistFacade;
+  @Autowired
+  private BizBlacklistFacade bizBlacklistFacade;
 
-  @Autowired private ConfigService configService;
+  @Autowired
+  private ConfigService configService;
 
-  @Autowired private MemberRwReportService memberRwReportService;
+  @Autowired
+  private MemberRwReportService memberRwReportService;
 
   @Autowired(required = false)
   private MessageMapper messageMapper;
@@ -306,7 +320,7 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
     }
 
     //验证出款流程 ,未受理订单是否可以直接入款
-    withdrawProcess(memberWithdraw);
+    withdrawProcess(memberWithdraw, cashStatus);
 
     /** 校验子账号当天受理会员取款审核额度 */
     if (null != userCredential.getUsername()
@@ -409,7 +423,9 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
     }
   }
 
-  /** 过滤不符合规则的第三方出款商户 */
+  /**
+   * 过滤不符合规则的第三方出款商户
+   */
   @Override
   public List<PpMerchant> queryProxyMerchant(Long id) {
     // 根据体现记录查询用户的层级和出款金额
@@ -543,7 +559,7 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
    * 检验子账号出款受理额度
    *
    * @param adminLimitInfo AdminLimitInfo
-   * @param cashMode Integer
+   * @param cashMode       Integer
    */
   public void checkZzhWithdrawAmountAudit(
       AdminLimitInfo adminLimitInfo, Integer cashMode, BigDecimal cashMoney, String userName) {
@@ -568,7 +584,7 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
                 + adminLimitInfo.getMaxManualWithdrawAmount()
                 + "元。 超过额度"
                 + MoneyUtils.toYuanStr(
-                    cashMoney.subtract(adminLimitInfo.getMaxManualWithdrawAmount()))
+                cashMoney.subtract(adminLimitInfo.getMaxManualWithdrawAmount()))
                 + "元";
         throw new ServiceException(buffer);
       }
@@ -594,13 +610,14 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
     }
   }
 
-  /** 开启出入款订单是否允许其他账户操作配置 校验非超管账号是否原受理人 */
+  /**
+   * 开启出入款订单是否允许其他账户操作配置 校验非超管账号是否原受理人
+   */
   private void crossAccountCheck(UserCredential userCredential, MemberWithdraw memberWithdraw)
       throws ServiceException {
     if (userCredential != null
         && StringUtils.isNotEmpty(userCredential.getUsername())
         && null != memberWithdraw) {
-
 
       MemberRechargeLimit limitInfo = limitInfoService.getRechargeLimit();
       boolean toCheck =
@@ -609,7 +626,7 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
       if (toCheck) {
         if (!Objects.equals(WithdrawStatus.UNHANDLED.getValue(), memberWithdraw.getCashStatus())
             && !StringUtils.equalsIgnoreCase(
-                userCredential.getUsername(), memberWithdraw.getOperatorAccount())) {
+            userCredential.getUsername(), memberWithdraw.getOperatorAccount())) {
           throw new ServiceException("您无权操作此订单:" + memberWithdraw.getCashOrderNo());
         }
       }
@@ -619,18 +636,22 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
   /**
    * 检查订单是否需要先受理
    **/
-  private void withdrawProcess(MemberWithdraw memberWithdraw) {
+  private void withdrawProcess(MemberWithdraw memberWithdraw, Integer cashStatus) {
     MemberWithdrawLimit withradLimit = limitInfoService.getWithradLimit();
 
     boolean withdrawProcess =
-            BooleanEnum.YES.match(withradLimit.getIsWithdrawProcess());
-    if (withdrawProcess && !ObjectUtil.equal(memberWithdraw.getCashStatus(), 2)) {
+        BooleanEnum.YES.match(withradLimit.getIsWithdrawProcess());
+    if (withdrawProcess &&
+        memberWithdraw.getCashStatus() != WithdrawStatus.HANDLED.getValue() &&
+        WithdrawStatus.SUCCESS.getValue() == cashStatus) {
       throw new ServiceException("请先受理此订单:" + memberWithdraw.getCashOrderNo());
     }
   }
 
 
-  /** 检查用户，封装用户信息 */
+  /**
+   * 检查用户，封装用户信息
+   */
   private void checkUserInfo(Member member, MemberInfo memberInfo, boolean checkUserState)
       throws Exception {
     // 查询用户是否存在
@@ -759,8 +780,8 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
   @Override
   public long getUntreatedWithdrawCount() {
     return this.lambdaQuery()
-            .eq(MemberWithdraw::getCashStatus, 1)
-            .count();
+        .eq(MemberWithdraw::getCashStatus, 1)
+        .count();
   }
 
   /**
@@ -776,7 +797,7 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
     Message messageInfo = new Message();
     messageInfo.setTitle(title(state));
     messageInfo.setContent(
-            context(state, memberWithdraw.getCreateTime(), memberWithdraw.getCashMoney()));
+        context(state, memberWithdraw.getCreateTime(), memberWithdraw.getCashMoney()));
     messageInfo.setCategory(4);
     messageInfo.setPosition(1);
     messageInfo.setShowType(0);
@@ -799,11 +820,11 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
     messageDistribute.setUserAccount(messageInfo.getLinkAccount());
     messageDistribute.setRechargeLevel(Convert.toInt(memberWithdraw.getMemberLevel()));
     messageDistribute.setVipLevel(
-            memberInfoService
-                    .lambdaQuery()
-                    .eq(MemberInfo::getMemberId, memberWithdraw.getMemberId())
-                    .one()
-                    .getVipLevel());
+        memberInfoService
+            .lambdaQuery()
+            .eq(MemberInfo::getMemberId, memberWithdraw.getMemberId())
+            .one()
+            .getVipLevel());
     messageDistribute.setReadStatus(NumberConstant.ZERO);
     messageDistribute.setCreateBy("system");
     messageDistributeService.save(messageDistribute);
@@ -811,9 +832,9 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
 
   public int verifyMessage() {
     SysDictData sysDictData =
-            sysDictDataService.getDictData(
-                    DictTypeEnum.SYSTEM_PARAMETER_CONFIG.getValue(),
-                    DictDataEnum.WITHDRAW_PUSH_MSG.getLabel());
+        sysDictDataService.getDictData(
+            DictTypeEnum.SYSTEM_PARAMETER_CONFIG.getValue(),
+            DictDataEnum.WITHDRAW_PUSH_MSG.getLabel());
     return ObjectUtil.isNull(sysDictData) ? 0 : Convert.toInt(sysDictData.getDictValue());
   }
 

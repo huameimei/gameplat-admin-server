@@ -40,8 +40,8 @@ public class ProxyPayController {
       type = LogType.WITHDRAW,
       desc = "'第三方代付出款商户:'#ppMerchantId + ',订单id:' #id ")
   public void proxyPay(
-      @NotNull(message = "{NoNull}") Long id,
-      @NotNull(message = "{NoNull}") Long ppMerchantId,
+      Long id,
+      Long ppMerchantId,
       HttpServletRequest request) {
     String lock_key = "recharge_rw_" + id;
     distributedLocker.lock(lock_key);

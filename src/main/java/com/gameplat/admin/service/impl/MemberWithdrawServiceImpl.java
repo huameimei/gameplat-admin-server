@@ -425,15 +425,16 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
       insertWithdrawHistory(memberWithdraw);
     }
     // 新增消息
-    if (ObjectUtil.equals(cashStatus, 3) || ObjectUtil.equals(cashStatus, 4)) {
-      this.addMessageInfo(memberWithdraw, 3);
-      if (ObjectUtil.equals(3, cashStatus)) {
+    if (ObjectUtil.equals(cashStatus, WithdrawStatus.SUCCESS.getValue())
+            || ObjectUtil.equals(cashStatus, WithdrawStatus.CANCELLED.getValue())) {
+      this.addMessageInfo(memberWithdraw, WithdrawStatus.SUCCESS.getValue());
+      if (ObjectUtil.equals(WithdrawStatus.SUCCESS.getValue(), cashStatus)) {
         MemberWithdrawLimit withradLimit = limitInfoService.getWithradLimit();
         this.sendMessage(
                 memberWithdraw.getAccount(),
                 SocketEnum.SOCKET_WITHDRAW_CANCEL,
                 withradLimit.getUserApplyLoanAfterHintsMessage());
-      } else if (ObjectUtil.equals(cashStatus, 4)) {
+      } else if (ObjectUtil.equals(cashStatus, WithdrawStatus.CANCELLED.getValue())) {
         this.sendMessage(
                 memberWithdraw.getAccount(),
                 SocketEnum.SOCKET_WITHDRAW_SUCCESS,

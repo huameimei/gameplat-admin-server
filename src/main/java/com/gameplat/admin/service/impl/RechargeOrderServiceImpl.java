@@ -112,14 +112,14 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
   @Autowired
   @Lazy
   private MemberGrowthStatisService memberGrowthStatisService;
-  @Autowired
+  @Autowired(required = false)
   private MessageMapper messageMapper;
   @Autowired
   private MessageDistributeService messageDistributeService;
   @Autowired
   private SysDictDataService sysDictDataService;
 
-  @Autowired
+  @Autowired(required = false)
   private MessageFeignClient client;
 
   @Override
@@ -362,9 +362,9 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
     memberGrowthStatisService.changeGrowth(memberGrowthChangeDto);
 
     // 入款成功 添加 消息  mode   在线 转账支付
-    if (ObjectUtil.equals(1, rechargeOrder.getMode())
-            || ObjectUtil.equals(2, rechargeOrder.getMode())) {
-      this.addMessageInfo(rechargeOrder, 3);
+    if (ObjectUtil.equals(RechargeMode.TRANSFER.getValue(), rechargeOrder.getMode())
+            || ObjectUtil.equals(RechargeMode.ONLINE_PAY.getValue(), rechargeOrder.getMode())) {
+      this.addMessageInfo(rechargeOrder, RechargeStatus.SUCCESS.getValue());
       MemberRechargeLimit limit = limitInfoService.getRechargeLimit();
       this.sendMessage(
               rechargeOrder.getAccount(), SocketEnum.SOCKET_RECHARGE_SUCCESS, limit.getRechargeTip());
@@ -484,7 +484,7 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
     rechargeOrder.setStatus(RechargeStatus.CANCELLED.getValue());
     updateRechargeOrder(rechargeOrder);
     // 添加消息
-    this.addMessageInfo(rechargeOrder, 4);
+    this.addMessageInfo(rechargeOrder, RechargeStatus.CANCELLED.getValue());
     // 消息推送到 socket
     this.sendMessage(
             rechargeOrder.getAccount(),

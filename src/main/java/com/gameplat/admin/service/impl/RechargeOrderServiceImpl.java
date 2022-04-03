@@ -17,6 +17,7 @@ import com.gameplat.admin.constant.RechargeMode;
 import com.gameplat.admin.constant.TrueFalse;
 import com.gameplat.admin.convert.RechargeOrderConvert;
 import com.gameplat.admin.enums.BlacklistConstant.BizBlacklistType;
+import com.gameplat.admin.feign.MessageFeignClient;
 import com.gameplat.admin.mapper.MessageMapper;
 import com.gameplat.admin.mapper.RechargeOrderHistoryMapper;
 import com.gameplat.admin.mapper.RechargeOrderMapper;
@@ -34,6 +35,7 @@ import com.gameplat.base.common.json.JsonUtils;
 import com.gameplat.base.common.snowflake.IdGeneratorSnowflake;
 import com.gameplat.base.common.util.DateUtil;
 import com.gameplat.common.constant.NumberConstant;
+import com.gameplat.common.constant.SocketEnum;
 import com.gameplat.common.enums.*;
 import com.gameplat.common.lang.Assert;
 import com.gameplat.common.model.bean.UserEquipment;
@@ -110,13 +112,15 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
   @Autowired
   @Lazy
   private MemberGrowthStatisService memberGrowthStatisService;
-  @Autowired private MessagePushService pushService;
   @Autowired
   private MessageMapper messageMapper;
   @Autowired
   private MessageDistributeService messageDistributeService;
   @Autowired
   private SysDictDataService sysDictDataService;
+
+  @Autowired
+  private MessageFeignClient client;
 
   @Override
   public PageExt<RechargeOrderVO, SummaryVO> findPage(
@@ -320,17 +324,6 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
     // 更新会员充值信息
     memberInfoService.updateBalanceWithRecharge(
         memberInfo.getMemberId(), rechargeOrder.getPayAmount(), rechargeOrder.getTotalAmount());
-    String account = member.getAccount();
-
-    try {
-      log.info("===================开始推送充值成功的消息用户: {}=====================",account);
-      pushService.send(account,PushMessage.builder().channel("TEST_ONE").title("充值成功").build());
-      log.info("===================发送至指定频道的用户消息: {}=====================",account);
-      pushService.send(PushMessage.builder().channel("TEST_407").title("发送至指定频道").build());
-    }catch (Exception e){
-      log.error("=========用户充值推送消息异常========",e);
-    }
-
     // 判断充值是否计算积分
     if (TrueFalse.TRUE.getValue() != rechargeOrder.getPointFlag()) {
       log.info(
@@ -372,6 +365,9 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
     if (ObjectUtil.equals(1, rechargeOrder.getMode())
             || ObjectUtil.equals(2, rechargeOrder.getMode())) {
       this.addMessageInfo(rechargeOrder, 3);
+      MemberRechargeLimit limit = limitInfoService.getRechargeLimit();
+      this.sendMessage(
+              rechargeOrder.getAccount(), SocketEnum.SOCKET_RECHARGE_SUCCESS, limit.getRechargeTip());
     }
   }
 
@@ -413,8 +409,19 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
     messageDistribute.setReadStatus(NumberConstant.ZERO);
     messageDistribute.setCreateBy("system");
     messageDistributeService.save(messageDistribute);
+
   }
 
+  public void sendMessage(String account, String channel, String message) {
+    Map<String, String> map = new HashMap<>();
+    map.put("user", account);
+    map.put("channel", channel);
+    map.put("title", message);
+    log.info("充值成功=============>开始推送Socket消息,相关参数{}", map);
+    client.userSend(map);
+    log.info("充值成功=============>topic推送测试,相关参数{}", map);
+    client.topicSend(map);
+  }
 
   public int verifyMessage() {
     SysDictData sysDictData =
@@ -469,15 +476,20 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
     verifyRechargeOrderForAuditing(rechargeOrder);
     // 校验已处理订单是否允许其他账户操作
     crossAccountCheck(userCredential, rechargeOrder);
-    //审核流校验
+    // 审核流校验
     rechargeProcess(rechargeOrder);
     // 更新订单状态
     rechargeOrder.setAuditorAccount(userCredential.getUsername());
     rechargeOrder.setAuditTime(new Date());
     rechargeOrder.setStatus(RechargeStatus.CANCELLED.getValue());
     updateRechargeOrder(rechargeOrder);
-    //添加消息
+    // 添加消息
     this.addMessageInfo(rechargeOrder, 4);
+    // 消息推送到 socket
+    this.sendMessage(
+            rechargeOrder.getAccount(),
+            SocketEnum.SOCKET_RECHARGE_FAIL,
+            SocketEnum.SEND_RECHARGE_FAIL_MESSAGE);
   }
 
   @Override

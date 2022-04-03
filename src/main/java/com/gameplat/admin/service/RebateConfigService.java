@@ -10,6 +10,7 @@ import org.apache.ibatis.annotations.Param;
 import java.math.BigDecimal;
 import java.util.List;
 
+/** @Description : 平级分红方案 @Author : cc @Date : 2022/4/2 */
 public interface RebateConfigService extends IService<RebateConfig> {
 
   /**
@@ -20,6 +21,13 @@ public interface RebateConfigService extends IService<RebateConfig> {
    */
   List<RebateConfigVO> getRebateConfig(RebateConfig rebateConfig);
 
+  /**
+   * 列表查询
+   *
+   * @param page
+   * @param dto
+   * @return
+   */
   IPage<RebateConfigVO> queryPage(PageDTO<RebateConfig> page, RebateConfig dto);
 
   /**

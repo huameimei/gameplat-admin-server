@@ -24,7 +24,7 @@ public class RechVirtualController {
   @Autowired private SysDictDataService dictDataService;
 
   @GetMapping("/list")
-  @PreAuthorize("hasAuthority('thirdParty:rechVirtual:list')")
+  @PreAuthorize("hasAuthority('thirdParty:rechVirtual:view')")
   public IPage<DictDataVo> list(PageDTO<SysDictData> page, SysDictDataDTO dictData) {
     dictData.setDictType(DictTypeEnum.RECH_VIRTUAL.getValue());
     return dictDataService.selectDictDataList(page, dictData);
@@ -62,7 +62,7 @@ public class RechVirtualController {
   }
 
   @DeleteMapping("/delete/{id}")
-  @PreAuthorize("hasAuthority('thirdParty:rechVirtual:delete')")
+  @PreAuthorize("hasAuthority('thirdParty:rechVirtual:remove')")
   @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.RECHARGE, desc = "'删除虚拟币id=' + #id")
   public void remove(@PathVariable Long id) {
     dictDataService.removeById(id);

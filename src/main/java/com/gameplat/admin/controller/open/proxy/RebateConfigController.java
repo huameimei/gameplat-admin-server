@@ -16,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+/** @Description : 平级分红方案 @Author : cc @Date : 2022/4/2 */
 @Api(tags = "平级分红方案")
 @Slf4j
 @RestController
@@ -23,12 +24,24 @@ import org.springframework.web.bind.annotation.*;
 public class RebateConfigController {
   @Autowired private RebateConfigService rebateConfigService;
 
+  /**
+   * 平级分红列表
+   *
+   * @param page
+   * @param dto
+   * @return
+   */
   @ApiOperation(value = "查询平级分红方案列表")
   @GetMapping("/list")
   public IPage<RebateConfigVO> list(PageDTO<RebateConfig> page, RebateConfig dto) {
     return rebateConfigService.queryPage(page, dto);
   }
 
+  /**
+   * 添加平级分红
+   *
+   * @param rebateConfigPO
+   */
   @ApiOperation("平级分红->新增平级分红方案明细")
   @PostMapping(value = "/add")
   @Log(
@@ -49,6 +62,11 @@ public class RebateConfigController {
     rebateConfigService.addRebateConfig(rebateConfigPO);
   }
 
+  /**
+   * 编辑平级分红
+   *
+   * @param rebateConfigPO
+   */
   @ApiOperation("平级分红->编辑平级分红方案明细")
   @PostMapping(value = "/edit")
   @Log(
@@ -69,6 +87,12 @@ public class RebateConfigController {
     rebateConfigService.editRebateConfig(rebateConfigPO);
   }
 
+  /**
+   * 删除平级分红
+   *
+   * @param planId
+   * @param configIds
+   */
   @ApiOperation("平级分红->删除平级分红方案明细")
   @PostMapping(value = "/remove")
   @Log(

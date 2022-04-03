@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
+/** @Description : 固定比例分红模式 @Author : cc @Date : 2022/4/2 */
 @Api(tags = "固定比例分红模式")
 @RestController
 @RequestMapping("/api/admin/divide/fix")
@@ -28,7 +29,15 @@ public class DivideFixConfigController {
 
   @Autowired private DivideFixConfigService fixConfigService;
 
+  /**
+   * 固定分红比例分页列表
+   *
+   * @param page
+   * @param queryObj
+   * @return
+   */
   @GetMapping("/pageList")
+  @PreAuthorize("hasAuthority('agent:bonusFixconfig:view')")
   public IPage<DivideFixConfig> list(PageDTO<DivideFixConfig> page, DivideConfigDTO queryObj) {
     LambdaQueryWrapper<DivideFixConfig> queryWrapper = new LambdaQueryWrapper<>();
     queryWrapper
@@ -40,6 +49,11 @@ public class DivideFixConfigController {
     return fixConfigService.page(page, queryWrapper);
   }
 
+  /**
+   * 添加
+   *
+   * @param divideConfigDTO
+   */
   @PostMapping("/add")
   @ApiOperation(value = "新增固定比例分红配置")
   @PreAuthorize("hasAuthority('agent:bonusFixconfig:add')")
@@ -48,11 +62,22 @@ public class DivideFixConfigController {
     fixConfigService.add(divideConfigDTO.getUserName(), "zh-CN");
   }
 
+  /**
+   * 编辑前获取固定比例配置
+   *
+   * @param dto
+   * @return
+   */
   @GetMapping("/getFixConfigForEdit")
   public Map<String, Object> getFixConfigForEdit(DivideConfigDTO dto) {
     return fixConfigService.getFixConfigForEdit(dto.getUserName(), "zh-CN");
   }
 
+  /**
+   * 编辑固定分红配置
+   *
+   * @param dto
+   */
   @PostMapping("/edit")
   @ApiOperation(value = "编辑固定比例分红配置")
   @PreAuthorize("hasAuthority('agent:bonusFixconfig:edit')")
@@ -61,6 +86,11 @@ public class DivideFixConfigController {
     fixConfigService.edit(dto, "zh-CN");
   }
 
+  /**
+   * 删除
+   *
+   * @param ids
+   */
   @ApiOperation(value = "删除固定分红配置")
   @DeleteMapping("/delete")
   @PreAuthorize("hasAuthority('agent:bonusFixconfig:remove')")

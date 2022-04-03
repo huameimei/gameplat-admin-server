@@ -36,6 +36,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+/** @Description : 会员日报表 @Author : cc @Date : 2022/3/11 */
 @Service
 @Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)
 public class MemberDayReportServiceImpl extends ServiceImpl<MemberDayReportMapper, MemberDayReport>
@@ -47,6 +48,13 @@ public class MemberDayReportServiceImpl extends ServiceImpl<MemberDayReportMappe
   @Autowired private RecommendConfigService recommendConfigService;
   @Autowired private GameMemberReportMapper memberReportMapper;
 
+  /**
+   * 分页列表
+   *
+   * @param page
+   * @param dto
+   * @return
+   */
   @Override
   public PageDtoVO<MemberDayReportVo> agentReportList(
       PageDTO<MemberDayReport> page, AgentReportQueryDTO dto) {
@@ -127,6 +135,12 @@ public class MemberDayReportServiceImpl extends ServiceImpl<MemberDayReportMappe
     return pageDtoVO;
   }
 
+  /**
+   * 导出
+   *
+   * @param dto
+   * @param response
+   */
   @Override
   public void exportAgentReport(AgentReportQueryDTO dto, HttpServletResponse response) {
     try {

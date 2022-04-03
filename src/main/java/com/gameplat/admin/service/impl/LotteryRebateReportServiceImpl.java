@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.HashMap;
 import java.util.Map;
 
+/** @Description : KG新彩票代理返点 @Author : cc @Date : 2022/3/21 */
 @Slf4j
 @Service
 @Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)
@@ -27,6 +28,13 @@ public class LotteryRebateReportServiceImpl
 
   @Autowired private LotteryRebateReportMapper lotteryRebateReportMapper;
 
+  /**
+   * 分页列表
+   *
+   * @param page
+   * @param dto
+   * @return
+   */
   @Override
   public PageDtoVO<LotteryRebateReportVO> page(
       PageDTO<LotteryRebateReport> page, LotteryRebateReportDTO dto) {

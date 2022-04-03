@@ -140,6 +140,10 @@ public class GameFinancialReportServiceImpl
     List<GameFinancialReportVO> reportList =
             gameFinancialReportMapper.findGameFinancialReportList(queryDTO);
 
+    if (StringUtils.isEmpty(reportList)) {
+      throw new ServiceException("请先初始化" + statisticsTime + "的游戏财务报表");
+    }
+
     // 对KG新彩票的三个彩种做特殊处理
     assembleKgNewLottery(reportList);
 

@@ -17,6 +17,7 @@ import com.gameplat.admin.enums.BlacklistConstant.BizBlacklistType;
 import com.gameplat.admin.enums.CashEnum;
 import com.gameplat.admin.enums.ProxyPayStatusEnum;
 import com.gameplat.admin.enums.WithdrawStatus;
+import com.gameplat.admin.feign.MessageFeignClient;
 import com.gameplat.admin.mapper.MemberWithdrawMapper;
 import com.gameplat.admin.mapper.MessageMapper;
 import com.gameplat.admin.model.bean.*;
@@ -31,6 +32,7 @@ import com.gameplat.base.common.snowflake.IdGeneratorSnowflake;
 import com.gameplat.base.common.util.DateUtil;
 import com.gameplat.base.common.util.StringUtils;
 import com.gameplat.common.constant.NumberConstant;
+import com.gameplat.common.constant.SocketEnum;
 import com.gameplat.common.enums.*;
 import com.gameplat.common.model.bean.Builder;
 import com.gameplat.common.model.bean.UserEquipment;
@@ -114,6 +116,9 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
   private MessageDistributeService messageDistributeService;
   @Autowired
   private SysDictDataService sysDictDataService;
+
+  @Autowired(required = false)
+  private MessageFeignClient client;
 
   private static boolean verifyPpMerchant(
       MemberWithdraw memberWithdraw, PpMerchant ppMerchant, PpInterface ppInterface) {
@@ -319,8 +324,10 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
       crossAccountCheck(userCredential, memberWithdraw);
     }
 
-    //验证出款流程 ,未受理订单是否可以直接入款
-    withdrawProcess(memberWithdraw, cashStatus);
+    // 验证出款流程 ,未受理订单是否可以直接入款
+    if (ObjectUtil.equals(WithdrawStatus.SUCCESS.getValue(), cashStatus)) {
+      withdrawProcess(memberWithdraw, cashStatus);
+    }
 
     /** 校验子账号当天受理会员取款审核额度 */
     if (null != userCredential.getUsername()
@@ -418,8 +425,21 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
       insertWithdrawHistory(memberWithdraw);
     }
     // 新增消息
-    if (ObjectUtil.equals(cashStatus, 3) || ObjectUtil.equals(cashStatus, 4)) {
-      addMessageInfo(memberWithdraw, 3);
+    if (ObjectUtil.equals(cashStatus, WithdrawStatus.SUCCESS.getValue())
+            || ObjectUtil.equals(cashStatus, WithdrawStatus.CANCELLED.getValue())) {
+      this.addMessageInfo(memberWithdraw, WithdrawStatus.SUCCESS.getValue());
+      if (ObjectUtil.equals(WithdrawStatus.SUCCESS.getValue(), cashStatus)) {
+        MemberWithdrawLimit withradLimit = limitInfoService.getWithradLimit();
+        this.sendMessage(
+                memberWithdraw.getAccount(),
+                SocketEnum.SOCKET_WITHDRAW_CANCEL,
+                withradLimit.getUserApplyLoanAfterHintsMessage());
+      } else if (ObjectUtil.equals(cashStatus, WithdrawStatus.CANCELLED.getValue())) {
+        this.sendMessage(
+                memberWithdraw.getAccount(),
+                SocketEnum.SOCKET_WITHDRAW_SUCCESS,
+                SocketEnum.SEND_WITHDRAW_FAIL_MESSAGE);
+      }
     }
   }
 
@@ -828,6 +848,18 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
     messageDistribute.setReadStatus(NumberConstant.ZERO);
     messageDistribute.setCreateBy("system");
     messageDistributeService.save(messageDistribute);
+  }
+
+
+  public void sendMessage(String account, String channel, String message) {
+    Map<String, String> map = new HashMap<>();
+    map.put("user", account);
+    map.put("channel", channel);
+    map.put("title", message);
+    log.info("充值成功=============>开始推送Socket消息,相关参数{}", map);
+    client.userSend(map);
+    log.info("充值成功=============>topic推送测试,相关参数{}", map);
+    client.topicSend(map);
   }
 
   public int verifyMessage() {

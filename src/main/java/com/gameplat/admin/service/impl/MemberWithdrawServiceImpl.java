@@ -306,7 +306,9 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
     }
 
     //验证出款流程 ,未受理订单是否可以直接入款
-    withdrawProcess(memberWithdraw);
+    if (ObjectUtil.equals(3, cashStatus)) {
+      withdrawProcess(memberWithdraw);
+    }
 
     /** 校验子账号当天受理会员取款审核额度 */
     if (null != userCredential.getUsername()

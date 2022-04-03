@@ -48,6 +48,7 @@ public class SpreadUnionServiceImpl extends ServiceImpl<SpreadUnionMapper, Sprea
     if (spreadList.size() == 0) {
       throw new ServiceException("未获取到您需要绑定的代理信息");
     }
+    spreadUnionDTO.setLevel(spreadList.get(0).getUserLevel());
     if (!this.save(spreadUnionConvert.toSpreadUnionDTO(spreadUnionDTO))) {
       log.error("新建联运设置参数信息  spreadUnionDTO：{}", spreadUnionDTO);
       throw new ServiceException("插入失败,请联系管理员");

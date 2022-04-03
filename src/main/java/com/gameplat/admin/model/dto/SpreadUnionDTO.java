@@ -38,4 +38,9 @@ public class SpreadUnionDTO implements Serializable {
    * 修改人
    */
   private String updateBy = SecurityUserHolder.getCredential().getUsername();
+
+  /**
+   * 层级
+   */
+  private Integer level;
 }

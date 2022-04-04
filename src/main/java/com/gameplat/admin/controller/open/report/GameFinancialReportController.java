@@ -57,7 +57,7 @@ public class GameFinancialReportController {
 
   @ApiOperation("导出财务报表")
   @GetMapping("/exportReport")
-//  @PreAuthorize("hasAuthority('financial:report:export')")
+  @PreAuthorize("hasAuthority('financial:report:export')")
   @Log(module = ServiceName.ADMIN_SERVICE, desc = "导出财务报表")
   public void exportReport(@RequestParam("statisticsTime") String statisticsTime, HttpServletResponse response) {
     if (StringUtils.isEmpty(statisticsTime)) {

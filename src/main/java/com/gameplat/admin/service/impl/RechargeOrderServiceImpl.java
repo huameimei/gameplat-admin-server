@@ -3,6 +3,7 @@ package com.gameplat.admin.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.ObjectUtil;
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -23,10 +24,7 @@ import com.gameplat.admin.mapper.RechargeOrderHistoryMapper;
 import com.gameplat.admin.mapper.RechargeOrderMapper;
 import com.gameplat.admin.model.bean.*;
 import com.gameplat.admin.model.dto.*;
-import com.gameplat.admin.model.vo.MemberActivationVO;
-import com.gameplat.admin.model.vo.RechargeOrderVO;
-import com.gameplat.admin.model.vo.SummaryVO;
-import com.gameplat.admin.model.vo.ThreeRechReportVo;
+import com.gameplat.admin.model.vo.*;
 import com.gameplat.admin.service.*;
 import com.gameplat.admin.util.MoneyUtils;
 import com.gameplat.base.common.enums.EnableEnum;
@@ -34,6 +32,7 @@ import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.json.JsonUtils;
 import com.gameplat.base.common.snowflake.IdGeneratorSnowflake;
 import com.gameplat.base.common.util.DateUtil;
+import com.gameplat.base.common.util.EasyExcelUtil;
 import com.gameplat.common.constant.NumberConstant;
 import com.gameplat.common.constant.SocketEnum;
 import com.gameplat.common.enums.*;
@@ -63,10 +62,13 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -1066,5 +1068,98 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
             "super_path",
             dto.getSuperAccount())
         .groupBy("tp_interface_code");
+  }
+
+  @Override
+  @Async
+  public void fileUserNameRech(
+          ManualRechargeOrderDto dto,
+          MultipartFile file,
+          HttpServletRequest request,
+          UserCredential credential)
+          throws Exception {
+    // 开始批量解析文件
+    List<RechargeMemberFileBean> strAccount =
+            EasyExcelUtil.readExcel(file.getInputStream(), RechargeMemberFileBean.class);
+    log.info("会员账号数据：{}", strAccount.size());
+    if (com.gameplat.base.common.util.StringUtils.isEmpty(strAccount)) {
+      return;
+    }
+
+    UserEquipment clientInfo = UserEquipment.create(request);
+
+    strAccount.stream()
+            .forEach(
+                    a -> {
+                      MemberBalanceVO memberVip =
+                              memberService.findMemberVip(a.getUsername(), dto.getLevel(), dto.getVip());
+                      if (memberVip == null
+                              || com.gameplat.base.common.util.StringUtils.isEmpty(memberVip.getAccount())) {
+                        return;
+                      }
+                      log.info("会员：{},充值金额:{}", a, dto.getAmount());
+                      dto.setAccount(memberVip.getAccount());
+                      ManualRechargeOrderBo manualRechargeOrderBo = new ManualRechargeOrderBo();
+                      BeanUtil.copyProperties(dto, manualRechargeOrderBo);
+                      manualRechargeOrderBo.setMemberId(memberVip.getId());
+                      try {
+                        manual(manualRechargeOrderBo, credential, clientInfo);
+                      } catch (Exception e) {
+                        log.info("充值失败：{}", e);
+                      }
+                    });
+  }
+
+  @Override
+  @Async
+  public void fileRech(
+          MultipartFile file,
+          Integer discountType,
+          HttpServletRequest request,
+          UserCredential credential)
+          throws Exception {
+    // 开始批量解析文件
+    List<MemberRechBalanceVO> memberRechBalanceVOList =
+            EasyExcelUtil.readExcel(file.getInputStream(), MemberRechBalanceVO.class);
+    log.info("批量上传数据：{}", memberRechBalanceVOList.size());
+    // 请求的ip
+    UserEquipment userEquipment = UserEquipment.create(request);
+    memberRechBalanceVOList.stream()
+            .forEach(
+                    a -> {
+                      MemberInfoVO memberInfo = memberService.getMemberInfo(a.getAccount());
+                      if (memberInfo == null
+                              || com.gameplat.base.common.util.StringUtils.isEmpty(memberInfo.getAccount())) {
+                        return;
+                      }
+                      // 开始创建订单，入款
+                      try {
+                        ManualRechargeOrderBo manualRechargeOrderBo =
+                                fillRechargeOrder(a, memberInfo, discountType);
+                        log.info("充值数据：{}", JSON.toJSONString(manualRechargeOrderBo));
+                        manual(manualRechargeOrderBo, credential, userEquipment);
+                      } catch (Exception e) {
+                        e.printStackTrace();
+                      }
+                    });
+  }
+
+  public ManualRechargeOrderBo fillRechargeOrder(
+          MemberRechBalanceVO memberRechBalanceVO, MemberInfoVO memberInfoVO, Integer discountType) {
+    ManualRechargeOrderBo manualRechargeOrderBo = new ManualRechargeOrderBo();
+    manualRechargeOrderBo.setMemberId(memberInfoVO.getId());
+    manualRechargeOrderBo.setAccount(memberRechBalanceVO.getAccount());
+    manualRechargeOrderBo.setPointFlag(1);
+    manualRechargeOrderBo.setRemarks(memberRechBalanceVO.getRemark());
+    manualRechargeOrderBo.setAuditRemarks(memberRechBalanceVO.getAuditRemarks());
+    manualRechargeOrderBo.setSkipAuditing(true);
+    manualRechargeOrderBo.setAmount(BigDecimal.ZERO);
+    manualRechargeOrderBo.setNormalDml(BigDecimal.ZERO);
+    manualRechargeOrderBo.setDiscountType(discountType);
+    manualRechargeOrderBo.setDiscountAmount(memberRechBalanceVO.getAmount());
+    manualRechargeOrderBo.setDiscountDml(
+            memberRechBalanceVO.getBetMultiple().multiply(memberRechBalanceVO.getAmount()));
+    manualRechargeOrderBo.setDmlFlag(1);
+    return manualRechargeOrderBo;
   }
 }

@@ -100,6 +100,9 @@ public class GameFinancialReportServiceImpl
     Page<GameFinancialReportVO> result =
             gameFinancialReportMapper.findGameFinancialReportPage(page, queryDTO);
 
+    // 对KG新彩票的三个彩种做特殊处理
+    assembleKgNewLottery(result.getRecords());
+
     // 查询总计
     QueryWrapper<GameFinancialReport> queryOne = Wrappers.query();
     queryOne.select(
@@ -334,12 +337,12 @@ public class GameFinancialReportServiceImpl
       GameDataVO gameDataVO = new GameDataVO();
       gameDataVO.setGameKind(gameKind.toString());
       BigDecimal validAmount = Converts.toBigDecimal(((ParsedSum) bucket.getAggregations().get("validAmount")).getValue())
-              .divide(new BigDecimal("1000"), BigDecimal.ROUND_DOWN, 2);
+              .divide(new BigDecimal("1000"), 2, BigDecimal.ROUND_DOWN);
       BigDecimal winAmount = Converts.toBigDecimal(((ParsedSum) bucket.getAggregations().get("winAmount")).getValue()).abs()
-              .divide(new BigDecimal("1000"), BigDecimal.ROUND_DOWN, 2);
+              .divide(new BigDecimal("1000"), 2, BigDecimal.ROUND_DOWN);
 
-      gameDataVO.setValidAmount(validAmount.setScale(2, BigDecimal.ROUND_DOWN));
-      gameDataVO.setWinAmount(winAmount.setScale(2, BigDecimal.ROUND_DOWN));
+      gameDataVO.setValidAmount(validAmount);
+      gameDataVO.setWinAmount(winAmount);
       gameDataList.add(gameDataVO);
     }
 
@@ -405,9 +408,9 @@ public class GameFinancialReportServiceImpl
         gameFinancialReport.setGameKind(KgNLTypeKindEnum.LHC.value());
       }
       BigDecimal validAmount = Converts.toBigDecimal(((ParsedSum) bucket.getAggregations().get("validAmount")).getValue())
-              .divide(new BigDecimal("1000"), BigDecimal.ROUND_DOWN, 2);
+              .divide(new BigDecimal("1000"), 2, BigDecimal.ROUND_DOWN);
       BigDecimal winAmount = Converts.toBigDecimal(((ParsedSum) bucket.getAggregations().get("winAmount")).getValue()).abs()
-              .divide(new BigDecimal("1000"), BigDecimal.ROUND_DOWN, 2);
+              .divide(new BigDecimal("1000"), 2, BigDecimal.ROUND_DOWN);
       gameFinancialReport.setValidAmount(validAmount);
       gameFinancialReport.setWinAmount(winAmount);
       gameFinancialReport.setStatisticsTime(statisticsTime);

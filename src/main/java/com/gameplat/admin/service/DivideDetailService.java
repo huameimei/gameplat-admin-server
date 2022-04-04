@@ -8,5 +8,12 @@ import com.gameplat.admin.model.vo.DivideDetailVO;
 import com.gameplat.model.entity.proxy.DivideDetail;
 
 public interface DivideDetailService extends IService<DivideDetail> {
+  /**
+   * 分红详情分页列表
+   *
+   * @param page
+   * @param dto
+   * @return
+   */
   IPage<DivideDetailVO> queryPage(PageDTO<DivideDetail> page, DivideDetailQueryDTO dto);
 }

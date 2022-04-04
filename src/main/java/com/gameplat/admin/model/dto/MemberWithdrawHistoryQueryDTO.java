@@ -39,9 +39,9 @@ public class MemberWithdrawHistoryQueryDTO implements Serializable {
 
   private String operatorAccounts;
 
-  private String beginDatetime;
+  private String startDate;
 
-  private String endDatetime;
+  private String endDate;
 
   private String order;
 

@@ -153,7 +153,7 @@ public class MemberLevelController {
     rechargeConfigService.add(rechargeConfig);
   }
 
-  @PostMapping("/list")
+  @PostMapping("/findPayTypesList")
 //  @PreAuthorize("hasAuthority('thirdParty:payTypes:list')")
   public List<PayTypeVO> findPayTypes(String name) {
     return payTypeService.queryList(name);

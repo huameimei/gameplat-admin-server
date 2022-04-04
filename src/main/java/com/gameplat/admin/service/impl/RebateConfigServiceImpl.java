@@ -18,6 +18,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Objects;
 
+/** @Description : 平级分红方案 @Author : cc @Date : 2022/4/2 */
 @Service
 @Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)
 public class RebateConfigServiceImpl extends ServiceImpl<RebateConfigMapper, RebateConfig>
@@ -27,22 +28,47 @@ public class RebateConfigServiceImpl extends ServiceImpl<RebateConfigMapper, Reb
 
   @Autowired private AgentBaseService agentBaseService;
 
+  /**
+   * 查看返佣配置
+   *
+   * @param rebateConfig
+   * @return
+   */
   @Override
   public List<RebateConfigVO> getRebateConfig(RebateConfig rebateConfig) {
     return rebateConfigMapper.getRebateConfig(rebateConfig);
   }
 
+  /**
+   * 列表查询
+   *
+   * @param page
+   * @param dto
+   * @return
+   */
   @Override
   public IPage<RebateConfigVO> queryPage(PageDTO<RebateConfig> page, RebateConfig dto) {
     return rebateConfigMapper.queryPage(page, dto);
   }
 
+  /**
+   * 新增返佣配置
+   *
+   * @param rebateConfig
+   * @return
+   */
   @Override
   public int addRebateConfig(RebateConfig rebateConfig) {
     agentBaseService.rebatePlanCheck(rebateConfig.getPlanId());
     return rebateConfigMapper.addRebateConfig(rebateConfig);
   }
 
+  /**
+   * 编辑返佣配置
+   *
+   * @param rebateConfig
+   * @return
+   */
   @Override
   public int editRebateConfig(RebateConfig rebateConfig) {
     int result = rebateConfigMapper.editRebateConfig(rebateConfig);
@@ -52,12 +78,27 @@ public class RebateConfigServiceImpl extends ServiceImpl<RebateConfigMapper, Reb
     return result;
   }
 
+  /**
+   * 删除返佣配置
+   *
+   * @param configIds
+   * @param planId
+   * @return
+   */
   @Override
   public int removeRebateConfig(String configIds, Long planId) {
     agentBaseService.planUsedCheck(planId);
     return rebateConfigMapper.removeRebateConfig(configIds);
   }
 
+  /**
+   * 根据参数获取分红配置
+   *
+   * @param planId
+   * @param agentProfit
+   * @param activityMember
+   * @return
+   */
   @Override
   public RebateConfig getRebateConfigByParam(
       Long planId, BigDecimal agentProfit, Integer activityMember) {

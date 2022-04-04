@@ -34,6 +34,7 @@ import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/** @Description : 裂变分红配置 @Author : cc @Date : 2022/4/2 */
 @Service
 @Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)
 public class DivideFissionConfigServiceImpl
@@ -50,6 +51,12 @@ public class DivideFissionConfigServiceImpl
 
   @Autowired private GameKindMapper gameKindMapper;
 
+  /**
+   * 添加
+   *
+   * @param userName
+   * @param s
+   */
   @Override
   public void add(String userName, String lang) {
     Assert.isTrue(StrUtil.isNotBlank(userName), "用户名参数缺失！");
@@ -71,6 +78,13 @@ public class DivideFissionConfigServiceImpl
     Assert.isTrue(this.save(saveObj), "添加失败！");
   }
 
+  /**
+   * 获取裂变分红配置编辑前
+   *
+   * @param userName
+   * @param s
+   * @return
+   */
   @Override
   public Map<String, Object> getFissionConfigForEdit(String userName, String lang) {
     Assert.isTrue(StrUtil.isNotBlank(userName), "用户名参数缺失！");
@@ -132,6 +146,12 @@ public class DivideFissionConfigServiceImpl
     return returnMap;
   }
 
+  /**
+   * 编辑
+   *
+   * @param divideConfigDTO
+   * @param lang
+   */
   @Override
   public void edit(DivideConfigDTO divideConfigDTO, String lang) {
     Assert.isTrue(divideConfigDTO.getId() != null, "主键参数丢失！");
@@ -178,6 +198,11 @@ public class DivideFissionConfigServiceImpl
     Assert.isTrue(this.updateById(editObj), "编辑失败！");
   }
 
+  /**
+   * 删除
+   *
+   * @param ids
+   */
   @Override
   public void remove(String ids) {
     String[] idArr = ids.split(",");
@@ -186,6 +211,13 @@ public class DivideFissionConfigServiceImpl
     }
   }
 
+  /**
+   * 根据一级游戏编码获取配置
+   *
+   * @param superName
+   * @param code
+   * @return
+   */
   @Override
   public GameDivideVo getConfigByFirstCode(String superName, String code) {
     String configByFidAndCode = fissionConfigMapper.getConfigByGameCode(superName, code);
@@ -196,6 +228,12 @@ public class DivideFissionConfigServiceImpl
     }
   }
 
+  /**
+   * 根据账号获取配置
+   *
+   * @param account
+   * @return
+   */
   @Override
   public DivideFissionConfig getByAccount(String account) {
     return fissionConfigMapper.getByUserName(account);

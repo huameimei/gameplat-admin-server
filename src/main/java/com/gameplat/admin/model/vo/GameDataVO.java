@@ -14,15 +14,15 @@ import java.math.BigDecimal;
 @Data
 public class GameDataVO implements Serializable {
 
-    @ApiModelProperty(value = "一级游戏编码")
-    private String gameKind;
+  @ApiModelProperty(value = "一级游戏编码")
+  private String gameKind;
 
-    @ApiModelProperty(value = "有效投注额")
-    private BigDecimal validAmount;
+  @ApiModelProperty(value = "有效投注额")
+  private BigDecimal validAmount;
 
-    @ApiModelProperty(value = "输赢金额")
-    private BigDecimal winAmount;
+  @ApiModelProperty(value = "输赢金额")
+  private BigDecimal winAmount;
 
-    @ApiModelProperty(value = "累计输赢金额")
-    private BigDecimal accumulateWinAmount;
+  @ApiModelProperty(value = "累计输赢金额")
+  private BigDecimal accumulateWinAmount;
 }

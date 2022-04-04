@@ -16,8 +16,10 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+/** @Description : 平级分红方案 @Author : cc @Date : 2022/4/2 */
 @Api(tags = "平级分红方案")
 @Slf4j
 @RestController
@@ -26,14 +28,27 @@ public class RebatePlanController {
 
   @Autowired private RebatePlanService rebatePlanService;
 
+  /**
+   * 分页列表
+   *
+   * @param page
+   * @param dto
+   * @return
+   */
   @ApiOperation(value = "查询平级分红方案列表")
   @GetMapping("/list")
   public IPage<RebatePlanVO> list(PageDTO<RebatePlan> page, RebatePlan dto) {
     return rebatePlanService.queryPage(page, dto);
   }
 
+  /**
+   * 新增
+   *
+   * @param rebatePlanPO
+   */
   @ApiOperation("平级分红->新增平级分红方案")
   @PostMapping(value = "/add")
+  @PreAuthorize("hasAuthority('system:plan:add')")
   @Log(
       module = ServiceName.ADMIN_SERVICE,
       type = LogType.AGENT,
@@ -51,6 +66,11 @@ public class RebatePlanController {
     rebatePlanService.addRebatePlan(rebatePlanPO);
   }
 
+  /**
+   * 编辑
+   *
+   * @param rebatePlanPO
+   */
   @ApiOperation("平级分红->编辑平级分红方案")
   @PostMapping(value = "/edit")
   @Log(
@@ -70,6 +90,11 @@ public class RebatePlanController {
     rebatePlanService.editRebatePlan(rebatePlanPO);
   }
 
+  /**
+   * 删除
+   *
+   * @param ids
+   */
   @ApiOperation(value = "平级分红->删除平级分红方案")
   @DeleteMapping("/remove")
   @Log(

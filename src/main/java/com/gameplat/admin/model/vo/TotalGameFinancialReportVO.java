@@ -20,6 +20,9 @@ public class TotalGameFinancialReportVO implements Serializable {
   @ApiModelProperty(value = "输赢金额")
   private BigDecimal winAmount;
 
+  @ApiModelProperty(value = "上月输赢金额")
+  private BigDecimal lastWinAmount;
+
   @ApiModelProperty(value = "累计输赢金额")
   private BigDecimal accumulateWinAmount;
 }

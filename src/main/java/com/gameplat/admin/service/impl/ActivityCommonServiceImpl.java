@@ -460,18 +460,18 @@ public class ActivityCommonServiceImpl implements ActivityCommonService {
                 flagCheck,
                 countDate);
         break;
-      case 10:
-        // 指定比赛打码量
-        manageList =
-            dealAssignMatch(
-                activityLobby,
-                lobbyDiscounts,
-                memberInfo,
-                statisticalStartTime,
-                statisticalEndTime,
-                flagCheck,
-                countDate);
-        break;
+        //      case 10:
+        //        // 指定比赛打码量
+        //        manageList =
+        //            dealAssignMatch(
+        //                activityLobby,
+        //                lobbyDiscounts,
+        //                memberInfo,
+        //                statisticalStartTime,
+        //                statisticalEndTime,
+        //                flagCheck,
+        //                countDate);
+        //        break;
       default:
         break;
     }
@@ -959,7 +959,7 @@ public class ActivityCommonServiceImpl implements ActivityCommonService {
       Date countDate) {
     String errorMsg = null;
     // 查询统计周期内的会员游戏日报表汇总数据(打码量)
-    Map<String, Object> map = new HashMap<>();
+    Map map = new HashMap<>();
     if (memberInfo != null) {
       map.put("userNameList", Lists.newArrayList(memberInfo.getAccount()));
     }

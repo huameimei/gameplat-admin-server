@@ -11,6 +11,7 @@ import com.gameplat.base.common.util.StringUtils;
 import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -36,6 +37,7 @@ public class MemberReportController {
    * @return PageDtoVO
    */
   @GetMapping(value = "pageQueryDepositReport")
+  @PreAuthorize("hasAuthority('report:memberReport:view')")
   public PageDtoVO<MemberRWReportVo> pageQueryDepositReport(
       Page<MemberRWReportVo> page, DepositReportDto dto) {
     log.info("充提入参：{}", JSON.toJSONString(dto));

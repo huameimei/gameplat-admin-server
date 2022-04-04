@@ -11,8 +11,10 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+/** @Description : 代理账号的平级分红方案 @Author : cc @Date : 2022/4/2 */
 @Api(tags = "代理账号的平级分红方案")
 @Slf4j
 @RestController
@@ -22,6 +24,7 @@ public class AgentDivideController {
 
   @ApiOperation(value = "查询可选代理账号列表")
   @GetMapping("/optionalList")
+  @PreAuthorize("hasAuthority('agent:divide:optionalList')")
   public IPage<AgentPlanVO> optionalList(
       PageDTO<AgentPlanVO> page, @RequestParam(required = false) String agentName) {
     Integer divideType = 0;
@@ -30,15 +33,16 @@ public class AgentDivideController {
 
   @ApiOperation(value = "查询已绑定代理账号列表")
   @GetMapping("/boundList")
+  @PreAuthorize("hasAuthority('agent:divide:boundList')")
   public IPage<AgentPlanVO> boundAgentPlanList(
       PageDTO<AgentPlanVO> page, @RequestParam(required = false) String agentName) {
     Integer divideType = 1;
     return agentDivideService.queryPage(page, divideType, agentName);
   }
 
-
   @ApiOperation("代理线绑定平级分红方案")
   @PostMapping(value = "/bindAgentLine")
+  @PreAuthorize("hasAuthority('agent:divide:bindAgentLine')")
   @Log(
       module = ServiceName.ADMIN_SERVICE,
       type = LogType.AGENT,
@@ -51,6 +55,7 @@ public class AgentDivideController {
 
   @ApiOperation("代理绑定平级分红方案")
   @PostMapping(value = "/bindAgent")
+  @PreAuthorize("hasAuthority('agent:divide:bindAgent')")
   @Log(
       module = ServiceName.ADMIN_SERVICE,
       type = LogType.AGENT,

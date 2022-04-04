@@ -11,10 +11,7 @@ import com.gameplat.admin.model.bean.PageExt;
 import com.gameplat.admin.model.dto.OnlineUserDTO;
 import com.gameplat.admin.model.vo.MemberInfoVO;
 import com.gameplat.admin.model.vo.OnlineUserVo;
-import com.gameplat.admin.service.ConfigService;
-import com.gameplat.admin.service.MemberService;
-import com.gameplat.admin.service.OnlineUserService;
-import com.gameplat.admin.service.SysUserService;
+import com.gameplat.admin.service.*;
 import com.gameplat.base.common.enums.ClientType;
 import com.gameplat.base.common.util.CollectorUtils;
 import com.gameplat.base.common.util.StringUtils;
@@ -125,6 +122,7 @@ public class OnlineUserServiceImpl implements OnlineUserService {
           this.countClientType(onlineCount, user.getClientType());
           // 统计会员数量
           this.countUserType(onlineCount, warningAccounts, user);
+
         });
 
     return onlineCount;
@@ -151,7 +149,8 @@ public class OnlineUserServiceImpl implements OnlineUserService {
       onlineCount.setMemberCount(onlineCount.getMemberCount() + 1);
     } else if (UserTypes.TEST.match(userType)) {
       onlineCount.setTestUserCount(onlineCount.getTestUserCount() + 1);
-    } else if (warningAccounts.contains(credential.getUsername())) {
+    }
+    if (warningAccounts.contains(credential.getUsername())) {
       onlineCount.setWarningCount(onlineCount.getWarningCount() + 1);
     }
   }

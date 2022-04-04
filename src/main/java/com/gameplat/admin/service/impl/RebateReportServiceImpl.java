@@ -67,7 +67,7 @@ public class RebateReportServiceImpl extends ServiceImpl<RebateReportMapper, Reb
 
   @Override
   public void updateRebateReport(String countDate, String agentName) {
-    // todo 使用平级分红方案的代理
+    // 使用平级分红方案的代理
     List<RebateReport> rebateReportPOList = agentDivideMapper.agentRebateReport(agentName);
     for (RebateReport rebateReport : rebateReportPOList) {
       // 填充每个代理的 总下级代理数 总下级会员数
@@ -78,7 +78,7 @@ public class RebateReportServiceImpl extends ServiceImpl<RebateReportMapper, Reb
       queryWrapper.eq("user_type", MemberEnums.Type.AGENT);
       rebateReport.setSubMember(memberMapper.selectCount(queryWrapper).intValue());
     }
-    // todo 已结算的代理不再更新佣金报表
+    // 已结算的代理不再更新佣金报表
     List<String> agentNameList = rebateReportMapper.getSettlementAgent(countDate);
     rebateReportPOList =
         rebateReportPOList.stream()
@@ -88,7 +88,7 @@ public class RebateReportServiceImpl extends ServiceImpl<RebateReportMapper, Reb
     rebateReportPOList.parallelStream()
         .forEach(
             rebateReportPO -> {
-              // todo 初始化
+              // 初始化
               rebateReportPO.setCountDate(countDate);
               rebateReportPO.setCreateBy("system");
               rebateReportPO.setUpdateBy("system");
@@ -101,7 +101,7 @@ public class RebateReportServiceImpl extends ServiceImpl<RebateReportMapper, Reb
               // 累计负盈利
               BigDecimal lastNegativeProfit;
 
-              // todo 佣金报表统计
+              // 佣金报表统计
               // 1、统计下级有效会员
               List<MemberReportVO> memberReportPOList =
                   getMemberReport(rebateReportPO.getAgentId(), countDate);
@@ -154,7 +154,7 @@ public class RebateReportServiceImpl extends ServiceImpl<RebateReportMapper, Reb
                     profitAmount.compareTo(BigDecimal.ZERO) == -1 ? profitAmount : BigDecimal.ZERO;
               }
 
-              // todo 计算实际佣金
+              // 计算实际佣金
               // 1、获取分红配置
               RebateConfig rebateConfigPO =
                   rebateConfigService.getRebateConfigByParam(
@@ -220,18 +220,18 @@ public class RebateReportServiceImpl extends ServiceImpl<RebateReportMapper, Reb
 
   @Override
   public List<MemberReportVO> getMemberReport(Long agentId, String countMonth) {
-    // todo 统计下级有效会员
+    // 统计下级有效会员
     List<MemberReportVO> memberReportPOList =
         rebateReportMapper.getSubMemberReport(agentId, countMonth);
     if (!StringUtils.isEmpty(memberReportPOList)) {
-      // todo 获取有效会员配置
+      // 获取有效会员配置
       RecommendConfig recommendConfig = recommendConfigService.getRecommendConfig();
       BigDecimal limitRecharge = recommendConfig.getRechargeAmountLimit();
       BigDecimal limitValidAmount = recommendConfig.getValidAmountLimit();
       memberReportPOList.stream()
           .forEach(
               memberReportPO -> {
-                // todo 满足有效会员配置，计入标识
+                // 满足有效会员配置，计入标识
                 if (memberReportPO.getRechargeAmount().compareTo(limitRecharge) >= 0
                     && memberReportPO.getValidAmount().compareTo(limitValidAmount) >= 0) {
                   memberReportPO.setEfficient(1);
@@ -246,11 +246,11 @@ public class RebateReportServiceImpl extends ServiceImpl<RebateReportMapper, Reb
   @Override
   public IPage<MemberReportVO> pageMemberReport(
       PageDTO<MemberReportVO> page, Long agentId, String countMonth) {
-    // todo 统计下级有效会员
+    // 统计下级有效会员
     IPage<MemberReportVO> memberReportPOList =
         rebateReportMapper.pageSubMemberReport(page, agentId, countMonth);
     if (!StringUtils.isEmpty(memberReportPOList.getRecords())) {
-      // todo 获取有效会员配置
+      // 获取有效会员配置
       RecommendConfig recommendConfig = recommendConfigService.getRecommendConfig();
       BigDecimal limitRecharge = recommendConfig.getRechargeAmountLimit();
       BigDecimal limitValidAmount = recommendConfig.getValidAmountLimit();
@@ -258,7 +258,7 @@ public class RebateReportServiceImpl extends ServiceImpl<RebateReportMapper, Reb
           .getRecords()
           .forEach(
               memberReportPO -> {
-                // todo 满足有效会员配置，计入标识
+                // 满足有效会员配置，计入标识
                 if (memberReportPO.getRechargeAmount().compareTo(limitRecharge) >= 0
                     && memberReportPO.getValidAmount().compareTo(limitValidAmount) >= 0) {
                   memberReportPO.setEfficient(1);
@@ -315,9 +315,9 @@ public class RebateReportServiceImpl extends ServiceImpl<RebateReportMapper, Reb
   @Override
   public List<CompanyCostVO> pagePlatformCost(Long agentId, String countMonth) {
     List<CompanyCostVO> allCostVO = new ArrayList<>();
-    // todo 统计下级有效会员
+    // 统计下级有效会员
     List<MemberReportVO> memberReportPOList = getMemberReport(agentId, countMonth);
-    // todo 统计红利
+    // 统计红利
     BigDecimal dividendAmount =
         memberReportPOList.stream()
             .map(MemberReportVO::getDividendAmount)
@@ -330,7 +330,7 @@ public class RebateReportServiceImpl extends ServiceImpl<RebateReportMapper, Reb
             setFee(dividendAmount);
           }
         });
-    // todo 统计返水
+    // 统计返水
     BigDecimal waterAmount =
         memberReportPOList.stream()
             .map(MemberReportVO::getRebateAmount)
@@ -343,7 +343,7 @@ public class RebateReportServiceImpl extends ServiceImpl<RebateReportMapper, Reb
             setFee(waterAmount);
           }
         });
-    // todo 公司总输赢
+    // 公司总输赢
     List<PlatformFeeVO> platformFeePOList = getPlatformFee(agentId, countMonth);
     List<CompanyCostVO> companyCostVOS = BeanUtils.mapList(platformFeePOList, CompanyCostVO.class);
     allCostVO.addAll(companyCostVOS);
@@ -370,7 +370,7 @@ public class RebateReportServiceImpl extends ServiceImpl<RebateReportMapper, Reb
   public int reviewOrSettlement(Integer currentStatus, Long reportId) {
     UserCredential userCredential = SecurityUserHolder.getCredential();
 
-    // todo 0未结算 1风控审核 2财务审核 3结算
+    // 0未结算 1风控审核 2财务审核 3结算
     RebateReportVO report = rebateReportMapper.getReportByReportId(reportId, null);
     if (Objects.isNull(report)) {
       throw new ServiceException("参数错误");
@@ -379,7 +379,7 @@ public class RebateReportServiceImpl extends ServiceImpl<RebateReportMapper, Reb
     } else if (report.getAccountStatus() == NumberConstant.ZERO) {
       throw new ServiceException("该代理账号已停用");
     } else if (currentStatus == NumberConstant.THREE) {
-      // todo 结算
+      // 结算
       RebateReportVO rebateReportVO = getRebateReportVO(reportId);
       if (rebateReportVO.getActualCommission().compareTo(BigDecimal.ZERO) == 1) {
         agentBaseService.settle(
@@ -405,7 +405,7 @@ public class RebateReportServiceImpl extends ServiceImpl<RebateReportMapper, Reb
 
   @Override
   public int batchReviewOrSettlement(Integer currentStatus, String countDate) {
-    // todo 批量结算
+    // 批量结算
     if (currentStatus == NumberConstant.TWO) {
       RebateReportDTO rebateReportDTO = new RebateReportDTO();
       rebateReportDTO.setCountDate(countDate);
@@ -446,10 +446,10 @@ public class RebateReportServiceImpl extends ServiceImpl<RebateReportMapper, Reb
     // 佣金调整
     BigDecimal adjustmentAmount = rebateReportVO.getAdjustmentAmount();
     if (memberCommission.compareTo(BigDecimal.ZERO) <= 0) {
-      // todo 下级会员佣金为负数 实际佣金 = 下级代理佣金 + 流水返利 + 佣金调整
+      // 下级会员佣金为负数 实际佣金 = 下级代理佣金 + 流水返利 + 佣金调整
       actualCommission = agentCommission.add(turnoverCommission).add(adjustmentAmount);
     } else {
-      // todo 下级会员佣金为正数 实际佣金 = 下级会员佣金 + 下级代理佣金 + 流水返利 + 佣金调整
+      // 下级会员佣金为正数 实际佣金 = 下级会员佣金 + 下级代理佣金 + 流水返利 + 佣金调整
       actualCommission =
           memberCommission.add(agentCommission).add(turnoverCommission).add(adjustmentAmount);
     }

@@ -1,13 +1,12 @@
 package com.gameplat.admin.model.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import lombok.Data;
-
 import java.io.Serializable;
 import java.util.List;
+import lombok.Data;
 
 @Data
-public class GameRebateDataQueryDTO implements Serializable {
+public class GameRebateStatisQueryDTO implements Serializable {
 
   /** 游戏平台 */
   private List<String> platformCodeList;

@@ -28,7 +28,7 @@ public class ChatPushPlanController {
 
   @ApiOperation(value = "分页列表")
   @GetMapping("/page")
-  @PreAuthorize("hasAuthority('chat:pushPlan:page')")
+  @PreAuthorize("hasAuthority('chat:pushPlan:view')")
   public IPage<ChatPushPlanVO> page(PageDTO<ChatPushPlan> page, ChatPushPlanQueryDTO dto) {
     return chatPushPlanService.page(page, dto);
   }

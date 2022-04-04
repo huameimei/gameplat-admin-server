@@ -26,6 +26,13 @@ public class DivideDetailServiceImpl extends ServiceImpl<DivideDetailMapper, Div
 
   @Autowired private GameKindService gameKindService;
 
+  /**
+   * 分红详情分页列表
+   *
+   * @param page
+   * @param dto
+   * @return
+   */
   @Override
   public IPage<DivideDetailVO> queryPage(PageDTO<DivideDetail> page, DivideDetailQueryDTO dto) {
     QueryWrapper<DivideDetail> queryWrapper = new QueryWrapper<>();

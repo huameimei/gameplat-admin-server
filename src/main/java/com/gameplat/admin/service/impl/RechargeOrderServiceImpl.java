@@ -612,12 +612,11 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
     }
   }
 
-
   public void rechargeProcess(RechargeOrder rechargeOrder) {
     MemberRechargeLimit limit = limitInfoService.getRechargeLimit();
-    boolean isRechargeProcess =
-            BooleanEnum.YES.match(limit.getIsRechargeProcess());
-    if (isRechargeProcess && !ObjectUtil.equal(2, rechargeOrder.getStatus())) {
+    boolean isRechargeProcess = BooleanEnum.YES.match(limit.getIsRechargeProcess());
+    if (isRechargeProcess
+            && !ObjectUtil.equal(RechargeStatus.HANDLED.getValue(), rechargeOrder.getStatus())) {
       throw new ServiceException("请先受理订单:" + rechargeOrder.getOrderNo());
     }
   }

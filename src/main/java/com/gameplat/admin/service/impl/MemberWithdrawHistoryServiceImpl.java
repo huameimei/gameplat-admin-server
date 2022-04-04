@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.gameplat.admin.constant.WithdrawTypeConstant;
 import com.gameplat.admin.convert.MemberWithdrawHistoryConvert;
 import com.gameplat.admin.enums.OprateMode;
 import com.gameplat.admin.mapper.MemberWithdrawHistoryMapper;
@@ -14,6 +15,7 @@ import com.gameplat.admin.model.vo.MemberWithdrawHistorySummaryVO;
 import com.gameplat.admin.model.vo.MemberWithdrawHistoryVO;
 import com.gameplat.admin.service.MemberWithdrawHistoryService;
 import com.gameplat.base.common.util.StringUtils;
+import com.gameplat.model.entity.member.MemberWithdraw;
 import com.gameplat.model.entity.member.MemberWithdrawHistory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -121,7 +123,15 @@ public class MemberWithdrawHistoryServiceImpl
         .eq(
             ObjectUtils.isNotEmpty(dto.getBankCard()),
             MemberWithdrawHistory::getBankCard,
-            dto.getBankCard());
+            dto.getBankCard())
+        .ge(
+            ObjectUtils.isNotNull(dto.getStartDate()),
+            MemberWithdrawHistory::getCreateTime,
+            dto.getStartDate())
+        .le(
+            ObjectUtils.isNotNull(dto.getEndDate()),
+            MemberWithdrawHistory::getCreateTime,
+            dto.getEndDate());
     if (ObjectUtils.isNotEmpty(dto.getAccounts())) {
       query.in(
           MemberWithdrawHistory::getAccount,
@@ -146,16 +156,16 @@ public class MemberWithdrawHistoryServiceImpl
     if (OprateMode.OPRATE_MANUAL.match(dto.getOprateMode())) {
       query
           .isNull(MemberWithdrawHistory::getPpMerchantId)
-          .eq(MemberWithdrawHistory::getWithdrawType, "BANK");
+          .eq(MemberWithdrawHistory::getWithdrawType, WithdrawTypeConstant.BANK);
     }
     if (OprateMode.OPRATE_ATUO.match(dto.getOprateMode())) {
       query.isNotNull(MemberWithdrawHistory::getPpMerchantId);
     }
     if (OprateMode.OPRATE_VIRTUAL.match(dto.getOprateMode())) {
-      query.notIn(MemberWithdrawHistory::getWithdrawType, "BANK", "MANUAL", "DIRECT");
+      query.notIn(MemberWithdrawHistory::getWithdrawType, WithdrawTypeConstant.BANK, WithdrawTypeConstant.MANUAL, WithdrawTypeConstant.DIRECT);
     }
     if (OprateMode.OPRATE_MODE.match(dto.getOprateMode())) {
-      query.eq(MemberWithdrawHistory::getWithdrawType, "DIRECT");
+      query.eq(MemberWithdrawHistory::getWithdrawType, WithdrawTypeConstant.DIRECT);
     }
     return query;
   }

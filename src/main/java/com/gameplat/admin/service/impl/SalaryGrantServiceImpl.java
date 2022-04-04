@@ -31,6 +31,13 @@ public class SalaryGrantServiceImpl extends ServiceImpl<SalaryGrantMapper, Salar
 
   @Autowired private SalaryGrantConvert salaryGrantConvert;
 
+  /**
+   * 分页列表
+   *
+   * @param page
+   * @param dto
+   * @return
+   */
   @Override
   public IPage<SalaryGrantVO> queryPage(PageDTO<SalaryGrant> page, SalaryGrantDTO dto) {
     LambdaQueryWrapper<SalaryGrant> queryWrapper = new LambdaQueryWrapper<>();
@@ -57,6 +64,12 @@ public class SalaryGrantServiceImpl extends ServiceImpl<SalaryGrantMapper, Salar
     return salaryGrantMapper.selectPage(page, queryWrapper).convert(salaryGrantConvert::toVo);
   }
 
+  /**
+   * 工资金额调整
+   *
+   * @param id
+   * @param salaryAmount
+   */
   @Override
   public void change(Long id, BigDecimal salaryAmount) {
     Assert.isTrue(id != null, "主键参数不能为空！");

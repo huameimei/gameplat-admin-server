@@ -10,6 +10,7 @@ import com.gameplat.base.common.util.DateUtil;
 import com.gameplat.base.common.util.StringUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -28,6 +29,7 @@ public class GameMemberReportController {
 
   /** 查询投注日报表记录 */
   @GetMapping(value = "/queryBetReport")
+  @PreAuthorize("hasAuthority('report:gameMemberReport:view')")
   public PageDtoVO<MemberDayReportVo> queryMemberReport(
       Page<MemberDayReportVo> page, MemberDayReportDto dto) {
     log.info("充提入参：{}", JSON.toJSONString(dto));

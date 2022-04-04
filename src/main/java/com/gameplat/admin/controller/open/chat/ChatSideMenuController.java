@@ -24,7 +24,7 @@ public class ChatSideMenuController {
   @Autowired private ChatSideMenuService chatSideMenuService;
 
   @ApiOperation(value = "聊天室侧滑菜单列表")
-  @PreAuthorize("hasAuthority('chat:menu:list')")
+  @PreAuthorize("hasAuthority('chat:menu:view')")
   @GetMapping("/list")
   public List<ChatSideMenuVO> queryAllSideMenu() {
     return chatSideMenuService.queryAllSideMenu();

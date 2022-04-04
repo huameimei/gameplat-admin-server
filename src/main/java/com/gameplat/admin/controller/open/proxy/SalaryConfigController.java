@@ -16,24 +16,43 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-@Api(tags = "分红期数")
+/** @Description : 工资配置 @Author : cc @Date : 2022/4/2 */
+@Api(tags = "工资配置")
 @RestController
 @RequestMapping("/api/admin/salary/config")
 public class SalaryConfigController {
 
   @Autowired private SalaryConfigService salaryConfigService;
 
+  /**
+   * 分页列表
+   *
+   * @param page
+   * @param dto
+   * @return
+   */
   @ApiOperation(value = "工资配置列表")
   @GetMapping("/list")
+  @PreAuthorize("hasAuthority('salary:config:view')")
   public IPage<SalaryConfigVO> list(PageDTO<SalaryConfig> page, SalaryConfigDTO dto) {
     return salaryConfigService.queryPage(page, dto);
   }
 
+  /**
+   * 最大代理层级
+   *
+   * @return
+   */
   @GetMapping("/maxLevel")
   public Integer getMaxLevel() {
     return salaryConfigService.getMaxLevel();
   }
 
+  /**
+   * 添加
+   *
+   * @param dto
+   */
   @PostMapping("/add")
   @ApiOperation(value = "新增工资配置")
   @PreAuthorize("hasAuthority('salary:config:add')")
@@ -42,6 +61,11 @@ public class SalaryConfigController {
     salaryConfigService.add(dto);
   }
 
+  /**
+   * 编辑
+   *
+   * @param dto
+   */
   @PostMapping("/edit")
   @ApiOperation(value = "编辑工资配置")
   @PreAuthorize("hasAuthority('salary:config:edit')")
@@ -50,9 +74,14 @@ public class SalaryConfigController {
     salaryConfigService.edit(dto);
   }
 
+  /**
+   * 删除
+   *
+   * @param ids
+   */
   @ApiOperation(value = "删除期数")
   @DeleteMapping("/delete")
-  @PreAuthorize("hasAuthority('salary:config:del')")
+  @PreAuthorize("hasAuthority('salary:config:remove')")
   public void remove(@RequestBody String ids) {
     salaryConfigService.delete(ids);
   }

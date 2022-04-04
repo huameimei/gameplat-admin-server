@@ -20,7 +20,7 @@ public class RechargeOrderHistoryController {
   @Autowired private RechargeOrderHistoryService rechargeOrderHistoryService;
 
   @PostMapping("/page")
-  @PreAuthorize("hasAuthority('finance:rechargeOrderHistory:page')")
+  @PreAuthorize("hasAuthority('finance:rechargeOrderHistory:view')")
   public IPage<RechargeOrderHistoryVO> queryPage(
       Page<RechargeOrderHistory> page, RechargeOrderHistoryQueryDTO dto) {
     return rechargeOrderHistoryService.findPage(page, dto);

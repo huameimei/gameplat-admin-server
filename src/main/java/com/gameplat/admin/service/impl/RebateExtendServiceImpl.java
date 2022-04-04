@@ -28,11 +28,24 @@ public class RebateExtendServiceImpl extends ServiceImpl<RebateExtendMapper, Reb
 
   @Autowired private RebateReportService rebateReportService;
 
+  /**
+   * 分页列表
+   *
+   * @param page
+   * @param reportId
+   * @return
+   */
   @Override
   public IPage<RebateReportExtend> queryPage(PageDTO<RebateReportExtend> page, Long reportId) {
     return rebateExtendMapper.queryPage(page, reportId);
   }
 
+  /**
+   * 新增佣金调整记录
+   *
+   * @param reportExtendPO
+   * @return
+   */
   @Override
   public int addReportExtend(RebateReportExtend reportExtendPO) {
     // 佣金报表已结算
@@ -46,6 +59,12 @@ public class RebateExtendServiceImpl extends ServiceImpl<RebateExtendMapper, Reb
     return 1;
   }
 
+  /**
+   * 编辑佣金调整记录
+   *
+   * @param reportExtendPO
+   * @return
+   */
   @Override
   public int editReportExtend(RebateReportExtend reportExtendPO) {
     // 佣金报表已结算
@@ -59,6 +78,12 @@ public class RebateExtendServiceImpl extends ServiceImpl<RebateExtendMapper, Reb
     return 1;
   }
 
+  /**
+   * 删除佣金调整记录
+   *
+   * @param reportExtendPO
+   * @return
+   */
   @Override
   public int removeReportExtend(RebateReportExtend reportExtendPO) {
     // 佣金报表已结算
@@ -72,6 +97,12 @@ public class RebateExtendServiceImpl extends ServiceImpl<RebateExtendMapper, Reb
     return 1;
   }
 
+  /**
+   * 判断状态
+   *
+   * @param reportId
+   * @param extendId
+   */
   public void reportStatus(Long reportId, Long extendId) {
     RebateReportVO reportVO = reportMapper.getReportByReportId(reportId, extendId);
     if (Objects.isNull(reportVO)) {

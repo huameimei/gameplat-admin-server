@@ -22,7 +22,7 @@ public class PpInterfaceController {
   }
 
   @GetMapping("/queryList")
-  @PreAuthorize("hasAuthority('thirdParty:ppInterfaces:queryList')")
+  @PreAuthorize("hasAuthority('thirdParty:ppInterfaces:view')")
   public List<PpInterface> getList() {
     return ppInterfaceService.list();
   }

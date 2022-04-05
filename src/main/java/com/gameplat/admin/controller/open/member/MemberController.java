@@ -255,7 +255,7 @@ public class MemberController {
    * @param dto 推广会员账号
    */
   @ApiOperation("清除推广会员余额")
-  @PostMapping("findTGMemberBalance")
+  @PostMapping("clearTGMemberBalance")
   @PreAuthorize("hasAuthority('system:TGMember:clear')")
   @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.MEMBER, desc = "清除推广会员#{dto.userNames}余额")
   public void updateTGClearMember(@RequestBody CleanAccountDTO dto) {

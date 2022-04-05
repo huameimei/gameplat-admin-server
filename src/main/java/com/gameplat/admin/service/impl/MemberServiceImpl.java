@@ -575,5 +575,8 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
     }
   }
 
-
+  @Override
+  public MemberBalanceVO findMemberVip(String username, String level, String vipGrade) {
+    return memberMapper.findMemberVip(username, level, vipGrade);
+  }
 }

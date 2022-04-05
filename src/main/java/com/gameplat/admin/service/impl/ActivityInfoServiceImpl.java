@@ -239,25 +239,37 @@ public class ActivityInfoServiceImpl extends ServiceImpl<ActivityInfoMapper, Act
   }
 
   @Override
-  public List<ActivityLobbyVO> findUnboundLobbyList() {
+  public List<ActivityLobbyVO> findUnboundLobbyList(boolean isBind) {
     List<ActivityLobby> activityLobbyList =
         activityLobbyService
             .lambdaQuery()
             .eq(ActivityLobby::getStatus, BooleanEnum.YES.value())
             .orderByDesc(Lists.newArrayList(ActivityLobby::getCreateTime, ActivityLobby::getId))
             .list();
-    List<ActivityLobbyVO> lobbyList = new ArrayList<>();
+    if (CollectionUtils.isEmpty(activityLobbyList)) {
+      return new ArrayList<>();
+    }
+    // 未绑定列表
+    List<ActivityLobbyVO> unBoundLobbyList = new ArrayList<>();
+    // 已绑定列表
+    List<ActivityLobbyVO> boundLobbyList = new ArrayList<>();
     if (CollectionUtils.isNotEmpty(activityLobbyList)) {
       for (ActivityLobby activityLobby : activityLobbyList) {
         // 查询是否已被绑定活动发布记录
         Long count =
             this.lambdaQuery().eq(ActivityInfo::getActivityLobbyId, activityLobby.getId()).count();
+        ActivityLobbyVO activityLobbyVO = activityLobbyConvert.toVo(activityLobby);
         if (count > 0) {
-          continue;
+          boundLobbyList.add(activityLobbyVO);
+        } else {
+          unBoundLobbyList.add(activityLobbyVO);
         }
-        lobbyList.add(activityLobbyConvert.toVo(activityLobby));
       }
     }
-    return lobbyList;
+    if (isBind) {
+      return boundLobbyList;
+    } else {
+      return unBoundLobbyList;
+    }
   }
 }

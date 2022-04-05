@@ -286,11 +286,16 @@ public class OtthServiceImpl implements OtthService {
     }
 
     if (StringUtils.isNotBlank(result)) {
-      JSONObject jsonObject = JSONObject.parseObject(result);
-      Object code = jsonObject.get("code");
-      if (code.equals("system_error") || code.equals("400")) {
-        throw new ServiceException(jsonObject.getString("msg"));
+      try{
+        JSONObject jsonObject = JSONObject.parseObject(result);
+        Object code = jsonObject.get("code");
+        if (code.equals("system_error") || code.equals("400")) {
+          throw new ServiceException(jsonObject.getString("msg"));
+        }
+      }catch (Exception e){
+        log.error(" 聊天室接口异常 {},{}",request,e);
       }
+
     }
 
     return result;

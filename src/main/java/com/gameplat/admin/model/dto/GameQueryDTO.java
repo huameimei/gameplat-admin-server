@@ -1,8 +1,7 @@
 package com.gameplat.admin.model.dto;
 
-import lombok.Data;
-
 import java.io.Serializable;
+import lombok.Data;
 
 @Data
 public class GameQueryDTO implements Serializable {
@@ -11,6 +10,8 @@ public class GameQueryDTO implements Serializable {
   private String gameType;
 
   private String gameName;
+
+  private String gameKind;
 
   private Integer isH5;
 

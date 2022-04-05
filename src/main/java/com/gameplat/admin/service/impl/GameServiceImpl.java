@@ -14,14 +14,13 @@ import com.gameplat.admin.service.GameService;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.StringUtils;
 import com.gameplat.model.entity.game.Game;
+import java.util.ArrayList;
+import java.util.List;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Service
 @Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)
@@ -39,6 +38,7 @@ public class GameServiceImpl extends ServiceImpl<GameMapper, Game> implements Ga
             Game::getPlatformCode,
             dto.getPlatformCode())
         .eq(ObjectUtils.isNotEmpty(dto.getGameType()), Game::getGameType, dto.getGameType())
+        .eq(ObjectUtils.isNotEmpty(dto.getGameKind()), Game::getGameKind, dto.getGameKind())
         .eq(ObjectUtils.isNotEmpty(dto.getIsH5()), Game::getIsH5, dto.getIsH5())
         .eq(ObjectUtils.isNotEmpty(dto.getIsPc()), Game::getIsPc, dto.getIsPc())
         .page(page)

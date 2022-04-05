@@ -148,6 +148,14 @@ public class MessageInfoServiceImpl extends ServiceImpl<MessageMapper, Message>
 
   @Override
   public void insertMessage(MessageInfoAddDTO dto) {
+    if (dto.getShowType() != null && dto.getShowType() == 3){
+      if (StringUtils.isEmpty(dto.getPcImage())){
+        throw new ServiceException("请上传PC弹窗图片");
+      }
+      if (StringUtils.isEmpty(dto.getAppImage())){
+        throw new ServiceException("请上传APP弹窗图片");
+      }
+    }
     Message messageInfo = messageInfoConvert.toEntity(dto);
     messageInfo.setStatus(BooleanEnum.YES.value());
     this.save(messageInfo);

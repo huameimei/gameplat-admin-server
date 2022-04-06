@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gameplat.admin.mapper.ActivityStatisticItemMapper">
+
+    <select id="findRechargeInfo" resultType="com.gameplat.admin.model.bean.ActivityStatisticItem">
+        SELECT
+        a.member_id as userId,
+        a.account as userName,
+        a.accumulativeRechargeAmount
+        <if test="rechargeValidAmount != null">
+            ,sum(ifnull( b.num, 0 )) AS accumulativeRechargeNum
+        </if>
+        FROM(
+        SELECT member_id, account, SUM( amount ) accumulativeRechargeAmount
+        FROM
+        recharge_order
+        <where>
+            and status = 3
+            <if test="payType != null and payType != ''">
+                and mode in (${payType})
+            </if>
+            <if test="startTime != null and startTime != ''">
+                AND recharge_time <![CDATA[>= ]]> #{startTime}
+            </if>
+            <if test="endTime != null and endTime != ''">
+                AND recharge_time <![CDATA[<= ]]> #{endTime}
+            </if>
+        </where>
+        GROUP BY member_id ) a
+        <if test="rechargeValidAmount != null">
+            LEFT JOIN ( SELECT member_id, CASE WHEN sum( amount ) >= #{rechargeValidAmount} THEN 1 ELSE 0 END num
+            FROM recharge_order
+            <where>
+                and status = 3
+                <if test="payType != null and payType != ''">
+                    and mode in (${payType})
+                </if>
+                <if test="startTime != null and startTime != ''">
+                    AND recharge_time <![CDATA[>= ]]> #{startTime}
+                </if>
+                <if test="endTime != null and endTime != ''">
+                    AND recharge_time <![CDATA[<= ]]> #{endTime}
+                </if>
+            </where>
+            GROUP BY member_id, date_format( recharge_time, '%Y-%m-%d' )) b ON a.member_id = b.member_id
+        </if>
+        <where>
+            <if test="userName != null and userName != '' ">
+                and a.account = #{userName}
+            </if>
+        </where>
+        GROUP BY a.member_id
+    </select>
+
+    <select id="findRechargeDateList" resultType="com.gameplat.admin.model.bean.ActivityStatisticItem">
+        SELECT
+        member_id userId,
+        account userName,
+        GROUP_CONCAT(DISTINCT(addTime)) as rechargeTimes
+        FROM (SELECT
+        member_id,
+        account,
+        date_format( recharge_time, '%Y-%m-%d') as addTime,
+        sum(amount) as totalAmount
+        FROM recharge_order
+        <where>
+            <if test="userName != null and userName != '' ">
+                and account = #{userName}
+            </if>
+            <if test="payType != null and payType != ''">
+                and mode in (${payType})
+            </if>
+            <if test="startTime != null and startTime != ''">
+                AND recharge_time <![CDATA[>= ]]> #{startTime}
+            </if>
+            <if test="endTime != null and endTime != ''">
+                AND recharge_time <![CDATA[<= ]]> #{endTime}
+            </if>
+            and status = 3
+        </where>
+        GROUP BY member_id, recharge_time) as a
+        WHERE
+        totalAmount >= #{rechargeValidAmount}
+        GROUP BY a.member_id
+    </select>
+
+    <select id="findFirstRechargeOrder" resultType="com.gameplat.admin.model.bean.ActivityStatisticItem">
+        SELECT
+        member_id userId,
+        account userName,
+        DATE_FORMAT(recharge_time,'%Y-%m-%d') AS rechargeTime,
+        amount as firstRechargeAmount
+        FROM recharge_order
+        <where>
+            <if test="userName != null and userName != '' ">
+                and account = #{userName}
+            </if>
+            <if test="payType != null and payType != ''">
+                and mode in (${payType})
+            </if>
+            <if test="startTime != null and startTime != ''">
+                AND recharge_time <![CDATA[>= ]]> #{startTime}
+            </if>
+            <if test="endTime != null and endTime != ''">
+                AND recharge_time <![CDATA[<= ]]> #{endTime}
+            </if>
+            and status = 3
+        </where>
+        GROUP BY account
+        ORDER BY recharge_time
+    </select>
+
+    <select id="getGameReportInfo" resultType="com.gameplat.admin.model.bean.ActivityStatisticItem">
+        SELECT
+        a.member_id userId,
+        a.account userName,
+        a.cumulativeGameDml,
+        a.gameWinAmount
+        <if test="sportValidAmount != null">
+            ,sum(ifnull( b.num, 0 )) AS cumulativeGameDmDays
+        </if>
+        FROM(
+        SELECT member_id, account, SUM( valid_amount ) cumulativeGameDml, SUM( win_amount ) gameWinAmount
+        FROM
+        game_bet_daily_report
+        <where>
+            <if test="startTime != null">
+                and stat_time <![CDATA[ >= ]]> date_format(#{startTime}, '%Y-%m-%d')
+            </if>
+            <if test="endTime != null">
+                and stat_time <![CDATA[ <= ]]> date_format(#{endTime}, '%Y-%m-%d')
+            </if>
+            <if test="sportGameList != null and sportGameList != ''">
+                and find_in_set(game_kind, #{sportGameList})
+            </if>
+        </where>
+        GROUP BY account ) a
+        <if test="sportValidAmount != null">
+            LEFT JOIN ( SELECT account, CASE WHEN sum( valid_amount ) >= #{sportValidAmount} THEN
+            1 ELSE 0
+            END num
+            FROM game_bet_daily_report
+            <where>
+                <if test="startTime != null">
+                    and stat_time <![CDATA[ >= ]]> date_format(#{startTime}, '%Y-%m-%d')
+                </if>
+                <if test="endTime != null">
+                    and stat_time <![CDATA[ <= ]]> date_format(#{endTime}, '%Y-%m-%d')
+                </if>
+                <if test="sportGameList != null and sportGameList != ''">
+                    and find_in_set(game_kind, #{sportGameList})
+                </if>
+            </where>
+            GROUP BY account,stat_time ) b ON a.account = b.account
+        </if>
+        <where>
+            <if test="userName != null and userName != ''">
+                AND a.account = #{userName}
+            </if>
+        </where>
+        GROUP BY a.account
+    </select>
+
+    <select id="findGameDmlDateList" resultType="com.gameplat.admin.model.bean.ActivityStatisticItem">
+        SELECT
+        member_id userId,
+        account userName,
+        GROUP_CONCAT(DISTINCT(count_date)) AS gameCountDates
+        FROM
+        ( SELECT account, stat_time, sum( valid_amount ) AS totalAmount
+        FROM
+        game_bet_daily_report
+        <where>
+            <if test="userName != null and userName != ''">
+                AND account = #{userName}
+            </if>
+            <if test="startTime != null">
+                and stat_time <![CDATA[ >= ]]> date_format(#{startTime}, '%Y-%m-%d')
+            </if>
+            <if test="endTime != null">
+                and stat_time <![CDATA[ <= ]]> date_format(#{endTime}, '%Y-%m-%d')
+            </if>
+            <if test="sportGameList != null and sportGameList != ''">
+                and find_in_set(game_kind, #{sportGameList})
+            </if>
+        </where>
+        GROUP BY account, stat_time ) AS a
+        <where>
+            <if test="sportValidAmount != null">
+                and totalAmount >= #{sportValidAmount}
+            </if>
+        </where>
+        GROUP BY a.account
+    </select>
+</mapper>

@@ -19,11 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletResponse;
 
-/**
- * 代理报表
- *
- * @author cc
- */
+/** @Description : 代理报表 @Author : cc @Date : 2022/4/2 */
 @Slf4j
 @Api(tags = "代理报表")
 @RestController
@@ -32,14 +28,27 @@ public class ProxyMemberReportController {
 
   @Autowired private MemberDayReportService memberDayReportService;
 
+  /**
+   * 分页列表
+   *
+   * @param page
+   * @param dto
+   * @return
+   */
   @GetMapping("/list")
   @PreAuthorize("hasAuthority('agent:report:view')")
   public PageDtoVO<MemberDayReportVo> list(PageDTO<MemberDayReport> page, AgentReportQueryDTO dto) {
     return memberDayReportService.agentReportList(page, dto);
   }
 
+  /**
+   * 导出代理报表
+   *
+   * @param dto
+   * @param response
+   */
   @GetMapping("/export")
-  @ApiOperation("导出财务报表")
+  @ApiOperation("代理报表导出")
   @PreAuthorize("hasAuthority('agent:report:export')")
   @Log(module = ServiceName.ADMIN_SERVICE, desc = "代理报表导出")
   public void list(AgentReportQueryDTO dto, HttpServletResponse response) {

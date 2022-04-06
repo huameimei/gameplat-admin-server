@@ -121,7 +121,14 @@ public class ActivityLobbyController {
   @GetMapping("/findUnboundLobbyList")
   @PreAuthorize("hasAuthority('activity:lobby:findUnboundLobbyList')")
   public List<ActivityLobbyVO> findUnboundLobbyList() {
-    return activityInfoService.findUnboundLobbyList();
+    return activityInfoService.findUnboundLobbyList(false);
+  }
+
+  @ApiOperation(value = "查询所有的活动大厅列表")
+  @GetMapping("/findAllLobbyList")
+  @PreAuthorize("hasAuthority('activity:lobby:findAllLobbyList')")
+  public List<ActivityLobbyVO> findAllLobbyList() {
+    return activityLobbyService.findAllLobbyList();
   }
 
   @ApiOperation(value = "游戏类型列表")

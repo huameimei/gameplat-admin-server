@@ -1,5 +1,6 @@
 package com.gameplat.admin.service.impl;
 
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -147,6 +148,14 @@ public class MessageInfoServiceImpl extends ServiceImpl<MessageMapper, Message>
 
   @Override
   public void insertMessage(MessageInfoAddDTO dto) {
+    if (dto.getShowType() != null && dto.getShowType() == 3){
+      if (StringUtils.isEmpty(dto.getPcImage())){
+        throw new ServiceException("请上传PC弹窗图片");
+      }
+      if (StringUtils.isEmpty(dto.getAppImage())){
+        throw new ServiceException("请上传APP弹窗图片");
+      }
+    }
     Message messageInfo = messageInfoConvert.toEntity(dto);
     messageInfo.setStatus(BooleanEnum.YES.value());
     this.save(messageInfo);
@@ -222,8 +231,11 @@ public class MessageInfoServiceImpl extends ServiceImpl<MessageMapper, Message>
 
       for (String linkAccount : linkAccountArray) {
         memberQueryDTO.setAccount(linkAccount);
-        MessageDistributeVO messageDistributeVO = readStatus(page, memberQueryDTO, dto).getRecords().get(0);
-        records.add(messageDistributeVO);
+        List<MessageDistributeVO> records1 = readStatus(page, memberQueryDTO, dto).getRecords();
+        if (CollectionUtil.isNotEmpty(records1)) {
+          MessageDistributeVO messageDistributeVO = records1.get(0);
+          records.add(messageDistributeVO);
+        }
       }
 
       long total = (int) records.size();

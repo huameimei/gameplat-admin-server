@@ -3,7 +3,6 @@ package com.gameplat.admin.controller.open.chat;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
-import com.gameplat.admin.config.TenantConfig;
 import com.gameplat.admin.model.bean.RoomMember;
 import com.gameplat.admin.model.dto.PushCPBetMessageReq;
 import com.gameplat.admin.model.vo.ChatUserVO;
@@ -49,7 +48,7 @@ public class OtthController {
   @Autowired private ChatLeaderBoardService chatLeaderBoardService;
   @Autowired private SysTenantSettingService sysTenantSettingService;
   @Autowired private ChatPushPlanService chatPushPlanService;
-  @Autowired private TenantConfig tenantConfig;
+  //@Autowired private TenantConfig tenantConfig;
 
   @ApiOperation(value = "聊天室排行榜热任务")
   @GetMapping(value = "/chatLeaderBoardTask", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -65,7 +64,7 @@ public class OtthController {
       @PathVariable String url, @RequestBody String body, HttpServletRequest request) {
     String apiUrl = getApiUrl(url);
     // 获取当前租户标识
-    String dbSuffix = tenantConfig.getTenantCode();
+    String dbSuffix = otthService.getLottTenantCode();
     // 聊天室批量添加请求特殊处理处理
     if (StringUtils.contains(url, ROOM_MEMBER_BATCHADD_URL)) {
       body = dealAddRoomMemberBody(body, dbSuffix);

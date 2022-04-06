@@ -51,7 +51,7 @@ public class GameBetDailyReportController {
     return gameBetDailyReportService.queryPage(page, dto);
   }
 
-  // TODO 导出真人投注日报表
+  // TODO 导出游戏投注日报表
 
   /** 游戏平台维度数据统计 */
   @GetMapping(value = "/queryGamePlatformReport")
@@ -73,7 +73,7 @@ public class GameBetDailyReportController {
     gameBetDailyReportService.saveGameBetDailyReport(dto.getStatTime(), gamePlatform);
   }
 
-  @ApiOperation("查询真人数据统计")
+  @ApiOperation("查询游戏数据统计")
   @GetMapping(value = "/queryReport")
   @PreAuthorize("hasAuthority('game:gameReport:view')")
   public List<GameReportVO> queryReport(GameBetDailyReportQueryDTO dto) {

@@ -16,18 +16,52 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
+/** @Description : 代理推广管理 @Author : cc @Date : 2022/4/2 */
 public interface SpreadLinkInfoService extends IService<SpreadLinkInfo> {
 
+  /**
+   * 分页列表
+   *
+   * @param page
+   * @param dto
+   * @return
+   */
   IPage<SpreadConfigVO> page(PageDTO<SpreadLinkInfo> page, SpreadLinkInfoDTO dto);
 
+  /**
+   * 导出
+   *
+   * @param dto
+   * @param response
+   */
   void exportList(SpreadLinkInfoDTO dto, HttpServletResponse response);
 
+  /**
+   * 添加
+   *
+   * @param configAddDTO
+   */
   void add(SpreadLinkInfoAddDTO configAddDTO);
 
+  /**
+   * 修改
+   *
+   * @param configEditDTO
+   */
   void update(SpreadLinkInfoEditDTO configEditDTO);
 
+  /**
+   * 根据主键删除
+   *
+   * @param id
+   */
   void deleteById(Long id);
 
+  /**
+   * 改变状态
+   *
+   * @param configEditDTO
+   */
   void changeStatus(SpreadLinkInfoEditDTO configEditDTO);
 
   /**
@@ -37,6 +71,11 @@ public interface SpreadLinkInfoService extends IService<SpreadLinkInfo> {
    */
   void changeReleaseTime(Long id);
 
+  /**
+   * 批量启用
+   *
+   * @param ids
+   */
   void batchEnableStatus(List<Long> ids);
 
   /**
@@ -53,7 +92,12 @@ public interface SpreadLinkInfoService extends IService<SpreadLinkInfo> {
    */
   void batchDeleteByIds(List<Long> ids);
 
-  /** 根据代理账号获取代理信息 */
+  /**
+   * 根据代理账号获取代理信息
+   *
+   * @param agentAccount
+   * @return
+   */
   List<SpreadLinkInfo> getSpreadList(String agentAccount);
 
   /**
@@ -73,8 +117,21 @@ public interface SpreadLinkInfoService extends IService<SpreadLinkInfo> {
    */
   JSONArray getSpreadLinkRebate(String account, Boolean statisMax, Boolean statisMin);
 
+  /**
+   * 添加或编辑推广码分红配置预设
+   *
+   * @param linkId
+   * @param agentAccount
+   * @param paramOwnerConfigMap
+   */
   void saveOrEditDivideConfig(
       Long linkId, String agentAccount, Map<String, List<GameDivideVo>> paramOwnerConfigMap);
 
+  /**
+   * 获取最大推广码代理返点等级配置列表
+   *
+   * @param account
+   * @return
+   */
   BigDecimal getMaxSpreadLinkRebate(String account);
 }

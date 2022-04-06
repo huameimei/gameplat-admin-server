@@ -41,6 +41,7 @@ import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/** @Description : 层层代分红配置 @Author : cc @Date : 2022/4/2 */
 @Service
 @Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)
 public class DivideLayerConfigServiceImpl
@@ -59,11 +60,25 @@ public class DivideLayerConfigServiceImpl
 
   @Autowired private GameKindMapper gameKindMapper;
 
+  /**
+   * 分页列表
+   *
+   * @param page
+   * @param dto
+   * @return
+   */
   @Override
   public IPage<DivideLayerConfigVo> page(PageDTO<DivideLayerConfig> page, DivideConfigDTO dto) {
     return layerConfigMapper.pageList(page, dto);
   }
 
+  /**
+   * 添加前获取
+   *
+   * @param userName
+   * @param lang
+   * @return
+   */
   @Override
   public Map<String, Object> getLayerConfigForLinkAdd(String userName, String lang) {
     Assert.isTrue(StrUtil.isNotBlank(userName), "用户名参数缺失！");
@@ -121,6 +136,13 @@ public class DivideLayerConfigServiceImpl
     return returnMap;
   }
 
+  /**
+   * 编辑前获取
+   *
+   * @param linkId
+   * @param lang
+   * @return
+   */
   @Override
   public Map<String, Object> getLayerConfigForLinkEdit(Long linkId, String lang) {
     Map<String, Object> returnMap = new HashMap<>();
@@ -203,6 +225,13 @@ public class DivideLayerConfigServiceImpl
     return returnMap;
   }
 
+  /**
+   * 编辑前获取
+   *
+   * @param userName
+   * @param lang
+   * @return
+   */
   @Override
   public Map<String, Object> getLayerConfigForEdit(String userName, String lang) {
     Assert.isTrue(StrUtil.isNotBlank(userName), "用户名参数缺失！");
@@ -311,6 +340,11 @@ public class DivideLayerConfigServiceImpl
     return returnMap;
   }
 
+  /**
+   * 删除
+   *
+   * @param ids
+   */
   @Override
   public void remove(String ids) {
     Assert.isTrue(StrUtil.isNotBlank(ids), "参数为空！");
@@ -330,6 +364,12 @@ public class DivideLayerConfigServiceImpl
     }
   }
 
+  /**
+   * 添加
+   *
+   * @param userName
+   * @param lang
+   */
   @Override
   public void add(String userName, String lang) {
     Assert.isTrue(StrUtil.isNotBlank(userName), "用户名参数缺失！");
@@ -397,6 +437,12 @@ public class DivideLayerConfigServiceImpl
     Assert.isTrue(this.save(saveObj), "");
   }
 
+  /**
+   * 编辑
+   *
+   * @param divideConfigDTO
+   * @param s
+   */
   @Override
   public void edit(DivideConfigDTO divideConfigDTO, String s) {
     Assert.isTrue(divideConfigDTO.getId() != null, "主键参数缺失！");
@@ -570,6 +616,13 @@ public class DivideLayerConfigServiceImpl
     return superPath.split("/")[0];
   }
 
+  /**
+   * 根据游戏编码获取配置
+   *
+   * @param userName
+   * @param code
+   * @return
+   */
   @Override
   public GameDivideVo getConfigByGameCode(String userName, String code) {
     return Optional.ofNullable(layerConfigMapper.getConfigByGameCode(userName, code))

@@ -63,9 +63,9 @@ public interface ActivityLobbyService extends IService<ActivityLobby> {
   void updateStatus(ActivityLobbyUpdateStatusDTO dto);
 
   /**
-   * 查询未绑定的大厅活动列表
+   * 查询所有活动大厅列表
    *
-   * @return List
+   * @return
    */
-  List<ActivityLobbyVO> findUnboundLobbyList();
+  List<ActivityLobbyVO> findAllLobbyList();
 }

@@ -363,7 +363,7 @@ public class MemberLevelServiceImpl extends ServiceImpl<MemberLevelMapper, Membe
   }
 
   private List<MemberLevel> getEnabledLevels() {
-    return this.lambdaQuery().eq(MemberLevel::getStatus, MemberLevelEnums.Status.Y.value()).list();
+    return this.lambdaQuery()/*.eq(MemberLevel::getStatus, MemberLevelEnums.Status.Y.value())*/.list();
   }
 
   private Integer getMatchedLevel(List<MemberLevel> levelList, MemberInfo memberInfo) {

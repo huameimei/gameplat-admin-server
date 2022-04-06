@@ -44,7 +44,7 @@ public class RebateReportController {
   @GetMapping("/list")
   @PreAuthorize("hasAuthority('dividend:report:list')")
   public IPage<RebateReportVO> list(PageDTO<AgentPlanVO> page, RebateReportDTO rebateReportDTO) {
-    // todo 参数初始化
+    // 参数初始化
     if (StrUtil.isBlank(rebateReportDTO.getCountDate())) {
       rebateReportDTO.setCountDate(DateUtil.format(DateTime.now(), "yyyy-MM"));
     }
@@ -75,7 +75,7 @@ public class RebateReportController {
   @PreAuthorize("hasAuthority('dividend:report:export')")
   public void export(
       RebateReportDTO rebateReportDTO, HttpServletRequest request, HttpServletResponse response) {
-    // todo 参数初始化
+    // 参数初始化
     if (StringUtils.isEmpty(rebateReportDTO.getCountDate())) {
       rebateReportDTO.setCountDate(DateUtil.format(DateTime.now(), "yyyy-MM"));
     }

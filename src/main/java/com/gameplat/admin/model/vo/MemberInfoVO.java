@@ -72,6 +72,12 @@ public class MemberInfoVO implements Serializable {
 
   private Date lastRechTime;
 
+  /** 首次充值金额 */
+  private BigDecimal firstRechAmount;
+
+  /** 首次充值时间 */
+  private Date firstRechTime;
+
   private Date lastWithdrawTime;
 
   private String language;

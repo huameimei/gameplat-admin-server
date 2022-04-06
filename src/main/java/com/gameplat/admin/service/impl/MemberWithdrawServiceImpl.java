@@ -287,7 +287,6 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
       Long id,
       Integer cashStatus,
       Integer curStatus,
-      boolean isDirect,
       UserCredential userCredential,
       UserEquipment userEquipment)
       throws Exception {
@@ -299,7 +298,8 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
     if (memberWithdraw == null) {
       throw new ServiceException("充值订单不存在或订单已处理");
     }
-
+    // 是否为免提直充
+    boolean isDirect = WithdrawTypeConstant.DIRECT.equals(memberWithdraw.getWithdrawType());
     Integer origCashStatus = memberWithdraw.getCashStatus();
     if (!curStatus.equals(origCashStatus)) {
       throw new ServiceException("订单状态已变化,请刷新重试.");

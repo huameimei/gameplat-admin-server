@@ -9,6 +9,4 @@ public class MemberWithdrawDTO {
 
   private Integer curStatus;
 
-  private Boolean isDirect;
-
 }

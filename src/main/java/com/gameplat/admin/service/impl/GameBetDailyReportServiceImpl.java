@@ -30,16 +30,6 @@ import com.gameplat.model.entity.game.GameBetDailyReport;
 import com.gameplat.model.entity.game.GamePlatform;
 import com.gameplat.model.entity.member.Member;
 import com.google.common.collect.Lists;
-import java.io.IOException;
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
@@ -66,6 +56,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -444,6 +439,11 @@ public class GameBetDailyReportServiceImpl
     if (StringUtils.isBlank(dto.getEndTime())) {
       String endTime = DateUtil.getDateToString(new Date());
       dto.setEndTime(endTime);
+    }
+    if (StringUtils.isNotBlank(dto.getSuperAccount())) {
+      Member member = memberService.getAgentByAccount(dto.getSuperAccount()).orElse(null);
+      Assert.notNull(member, "代理不存在");
+      dto.setUserPaths(member.getSuperPath());
     }
     return gameBetDailyReportMapper.queryGamePlatformReport(dto);
   }

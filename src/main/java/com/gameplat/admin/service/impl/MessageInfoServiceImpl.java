@@ -34,6 +34,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -178,6 +179,25 @@ public class MessageInfoServiceImpl extends ServiceImpl<MessageMapper, Message>
     if (dto.getShowType() == PushMessageEnum.MessageShowType.PIC_POPUP.value()
         && (StringUtils.isBlank(dto.getAppImage()) || StringUtils.isBlank(dto.getPcImage()))) {
       throw new ServiceException("选择消息类型为图片弹窗，web端和移动端图片不能为空");
+    }
+
+    if(dto.getEndTime() != null){
+      SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+      Date endDate = null;
+      Date now = null;
+      try{
+        endDate = sdf.parse(dto.getEndTime());
+        now = sdf.parse(DateUtil.now());
+      }catch (Exception e){
+        e.printStackTrace();
+      }
+      int i = endDate.compareTo(now);
+
+      if( i > 0){
+        dto.setStatus(1);
+      }else{
+        dto.setStatus(0);
+      }
     }
 
     MessageInfoAddDTO messageInfoAddDTO = new MessageInfoAddDTO();

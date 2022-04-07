@@ -1,6 +1,6 @@
 package com.gameplat.admin.service.impl;
 
-import cn.hutool.core.date.DateTime;
+import cn.hutool.core.convert.Convert;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
@@ -18,7 +18,6 @@ import com.gameplat.admin.model.vo.PageDtoVO;
 import com.gameplat.admin.service.GameBetDailyReportService;
 import com.gameplat.admin.service.MemberService;
 import com.gameplat.base.common.constant.ContextConstant;
-import com.gameplat.base.common.constant.ContextConstant.ES_INDEX;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.DateUtil;
 import com.gameplat.base.common.util.DateUtils;
@@ -26,10 +25,21 @@ import com.gameplat.base.common.util.StringUtils;
 import com.gameplat.common.enums.SettleStatusEnum;
 import com.gameplat.common.enums.UserTypes;
 import com.gameplat.common.lang.Assert;
+import com.gameplat.common.util.MathUtils;
 import com.gameplat.model.entity.game.GameBetDailyReport;
 import com.gameplat.model.entity.game.GamePlatform;
 import com.gameplat.model.entity.member.Member;
 import com.google.common.collect.Lists;
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
@@ -42,12 +52,8 @@ import org.elasticsearch.common.Strings;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
-import org.elasticsearch.search.aggregations.bucket.filter.FilterAggregationBuilder;
-import org.elasticsearch.search.aggregations.bucket.filter.ParsedFilter;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms;
 import org.elasticsearch.search.aggregations.bucket.terms.TermsAggregationBuilder;
-import org.elasticsearch.search.aggregations.metrics.CardinalityAggregationBuilder;
-import org.elasticsearch.search.aggregations.metrics.ParsedCardinality;
 import org.elasticsearch.search.aggregations.metrics.ParsedSum;
 import org.elasticsearch.search.aggregations.metrics.SumAggregationBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
@@ -56,11 +62,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.io.IOException;
-import java.math.BigDecimal;
-import java.util.*;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -130,7 +131,7 @@ public class GameBetDailyReportServiceImpl
   @Override
   public void saveGameBetDailyReport(String statTime, GamePlatform gamePlatform) {
     log.info(
-        "{}[{}],statTime:[{}]> Start save game_user_day_report",
+        "{}[{}],statTime:[{}]> Start save game_bet_daily_report",
         gamePlatform.getName(),
         gamePlatform.getCode(),
         statTime);
@@ -157,14 +158,14 @@ public class GameBetDailyReportServiceImpl
       optionsBuilder.setHttpAsyncResponseConsumerFactory(
           new HttpAsyncResponseConsumerFactory.HeapBufferedResponseConsumerFactory(31457280));
       CountResponse countResponse = restHighLevelClient.count(countRequest, optionsBuilder.build());
-      long count = countResponse.getCount();
-      if (count > 0) {
+      long sumCount = countResponse.getCount();
+      if (sumCount > 0) {
         log.info(
-            "{}[{}],statTime:[{}] > game_user_day_report bet record data size:[{}]",
+            "{}[{}],statTime:[{}] > game_bet_daily_report bet record data size:[{}]",
             gamePlatform.getName(),
             gamePlatform.getCode(),
             statTime,
-            count);
+            sumCount);
         // 先删除统计数据
         LambdaUpdateWrapper<GameBetDailyReport> updateWrapper = Wrappers.lambdaUpdate();
         updateWrapper
@@ -172,13 +173,13 @@ public class GameBetDailyReportServiceImpl
             .eq(GameBetDailyReport::getStatTime, statTime);
         int deleted = gameBetDailyReportMapper.delete(updateWrapper);
         log.info(
-            "{}[{}],statTime:[{}] > game_user_day_report delete exists data size:[{}]",
+            "{}[{}],statTime:[{}] > game_bet_daily_report delete exists data size:[{}]",
             gamePlatform.getName(),
             gamePlatform.getCode(),
             statTime,
             deleted);
         log.info(
-            "{}[{}],statTime:[{}]> Start save game_user_day_report",
+            "{}[{}],statTime:[{}]> Start save game_bet_daily_report",
             gamePlatform.getName(),
             gamePlatform.getCode(),
             statTime);
@@ -198,25 +199,22 @@ public class GameBetDailyReportServiceImpl
             AggregationBuilders.sum("validAmount").field("validAmount");
         SumAggregationBuilder sumWinAmount =
             AggregationBuilders.sum("winAmount").field("winAmount");
-        // 订单号去重
-        CardinalityAggregationBuilder countBetCount =
-            AggregationBuilders.cardinality("betCount").field("billNo.keyword");
-        FilterAggregationBuilder countWinCount =
-            AggregationBuilders.filter(
-                "winCountFilter", QueryBuilders.rangeQuery("winAmount").gt(0));
+        SumAggregationBuilder sumLoseWin = AggregationBuilders.sum("loseWin").field("loseWin");
+
         gameKindGroup.subAggregation(sumBetAmount);
         gameKindGroup.subAggregation(sumValidAmount);
         gameKindGroup.subAggregation(sumWinAmount);
-        gameKindGroup.subAggregation(countBetCount);
-        gameKindGroup.subAggregation(countWinCount);
+        gameKindGroup.subAggregation(sumLoseWin);
         accountGroup.subAggregation(gameKindGroup);
-        searchSourceBuilder.query(builder);
 
+        searchSourceBuilder.size(0);
+        searchSourceBuilder.query(builder);
         searchSourceBuilder.aggregation(accountGroup);
         searchSourceBuilder.fetchSource(
             new FetchSourceContext(
                 true, new String[] {"platformCode", "gameKind"}, Strings.EMPTY_ARRAY));
         searchRequest.source(searchSourceBuilder);
+        log.info("resetGameBetDailyReport DSL语句为：{}", searchRequest.source().toString());
         SearchResponse searchResponse =
             restHighLevelClient.search(searchRequest, optionsBuilder.build());
 
@@ -231,14 +229,18 @@ public class GameBetDailyReportServiceImpl
           Terms gameKindTerms = bucket.getAggregations().get("gameKindGroup");
           for (Terms.Bucket bucket2 : gameKindTerms.getBuckets()) {
             String gameKind = bucket2.getKeyAsString();
-            double betCount =
-                ((ParsedCardinality) bucket2.getAggregations().get("betCount")).getValue();
-            double winCount =
-                ((ParsedFilter) bucket2.getAggregations().get("winCountFilter")).getDocCount();
-            double betAmount = ((ParsedSum) bucket2.getAggregations().get("betAmount")).getValue();
-            double validAmount =
-                ((ParsedSum) bucket2.getAggregations().get("validAmount")).getValue();
-            double winAmount = ((ParsedSum) bucket2.getAggregations().get("winAmount")).getValue();
+            long count = bucket2.getDocCount();
+            BigDecimal betAmount =
+                MathUtils.divide1000(
+                    ((ParsedSum) bucket2.getAggregations().get("betAmount")).getValue());
+            BigDecimal validAmount =
+                MathUtils.divide1000(
+                    ((ParsedSum) bucket2.getAggregations().get("validAmount")).getValue());
+            BigDecimal winAmount =
+                MathUtils.divide1000(
+                    ((ParsedSum) bucket2.getAggregations().get("winAmount")).getValue());
+            long loseWin =
+                Convert.toLong(((ParsedSum) bucket2.getAggregations().get("loseWin")).getValue());
             // 保存生成数据
             GameBetDailyReport gameBetDailyReport = new GameBetDailyReport();
             gameBetDailyReport.setMemberId(memberInfo.getId());
@@ -251,31 +253,31 @@ public class GameBetDailyReportServiceImpl
             gameBetDailyReport.setPlatformCode(gameKind.split("_")[0]);
             gameBetDailyReport.setGameKind(gameKind);
             gameBetDailyReport.setGameType(gameKind.split("_")[1]);
-            gameBetDailyReport.setBetAmount(new BigDecimal(betAmount));
-            gameBetDailyReport.setValidAmount(new BigDecimal(validAmount));
-            gameBetDailyReport.setWinAmount(new BigDecimal(winAmount));
-            gameBetDailyReport.setBetCount((long) betCount);
-            gameBetDailyReport.setWinCount((long) winCount);
+            gameBetDailyReport.setBetAmount(betAmount);
+            gameBetDailyReport.setValidAmount(validAmount);
+            gameBetDailyReport.setWinAmount(winAmount);
+            gameBetDailyReport.setBetCount(count);
+            gameBetDailyReport.setWinCount(loseWin);
             gameBetDailyReport.setStatTime(statTime);
             list.add(gameBetDailyReport);
           }
         }
         gameBetDailyReportMapper.insertGameBetDailyReport(list);
         log.info(
-            "{}[{}],statTime:[{}] > game_user_day_report generate data size:[{}]",
+            "{}[{}],statTime:[{}] > game_bet_daily_report generate data size:[{}]",
             gamePlatform.getName(),
             gamePlatform.getCode(),
             statTime,
             list.size());
       } else {
         log.info(
-            "{}[{}],statTime:[{}]> no data save to game_user_day_report",
+            "{}[{}],statTime:[{}]> no data save to game_bet_daily_report",
             gamePlatform.getName(),
             gamePlatform.getCode(),
             statTime);
       }
       log.info(
-          "{}[{}],statTime:[{}]> End save game_user_day_report",
+          "{}[{}],statTime:[{}]> End save game_bet_daily_report",
           gamePlatform.getName(),
           gamePlatform.getCode(),
           statTime);
@@ -337,97 +339,6 @@ public class GameBetDailyReportServiceImpl
       }
     }
     return activityStatisticItemVOList;
-  }
-
-  @Override
-  public void assembleBetDailyReport(List<String> list) {
-    // todo 待完善
-    List<GameBetDailyReport> assembleList = new ArrayList<>();
-    list.forEach(
-        day -> {
-          DateTime parseTime = cn.hutool.core.date.DateUtil.parse(day, "yyyy-MM-dd");
-          String beginTime = cn.hutool.core.date.DateUtil.beginOfDay(parseTime).toString();
-          String endTime = cn.hutool.core.date.DateUtil.endOfDay(parseTime).toString();
-
-          log.info("{}~{}游戏日报表汇总，开始执行...", beginTime, endTime);
-
-          BoolQueryBuilder builder = QueryBuilders.boolQuery();
-          builder.must(QueryBuilders.termQuery("tenant.keyword", tenantConfig.getTenantCode()));
-          builder.must(QueryBuilders.termQuery("settle", SettleStatusEnum.YES.getValue()));
-          builder.must(
-              QueryBuilders.rangeQuery("settleTime.keyword")
-                  .from(beginTime)
-                  .to(endTime)
-                  .format(DateUtils.DATE_TIME_PATTERN));
-
-          SearchRequest searchRequest =
-              new SearchRequest(ES_INDEX.BET_RECORD_ + tenantConfig.getTenantCode());
-          SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
-          TermsAggregationBuilder accountGroup =
-              AggregationBuilders.terms("accountGroup").field("account.keyword");
-          TermsAggregationBuilder gameKindGroup =
-              AggregationBuilders.terms("gameKindGroup").field("gameKind.keyword");
-
-          SumAggregationBuilder sumBetAmount =
-              AggregationBuilders.sum("betAmount").field("betAmount");
-          SumAggregationBuilder sumValidAmount =
-              AggregationBuilders.sum("validAmount").field("validAmount");
-          SumAggregationBuilder sumWinAmount =
-              AggregationBuilders.sum("winAmount").field("winAmount");
-
-          gameKindGroup.subAggregation(sumBetAmount);
-          gameKindGroup.subAggregation(sumValidAmount);
-          gameKindGroup.subAggregation(sumWinAmount);
-          accountGroup.subAggregation(gameKindGroup);
-
-          searchSourceBuilder.size(0);
-          searchSourceBuilder.query(builder);
-          searchSourceBuilder.aggregation(accountGroup);
-          searchSourceBuilder.fetchSource(
-              new FetchSourceContext(
-                  true, new String[] {"platformCode", "gameKind"}, Strings.EMPTY_ARRAY));
-          searchRequest.source(searchSourceBuilder);
-          try {
-            RequestOptions.Builder optionsBuilder = RequestOptions.DEFAULT.toBuilder();
-            optionsBuilder.setHttpAsyncResponseConsumerFactory(
-                new HttpAsyncResponseConsumerFactory.HeapBufferedResponseConsumerFactory(31457280));
-            SearchResponse search =
-                restHighLevelClient.search(searchRequest, optionsBuilder.build());
-            Terms terms = search.getAggregations().get("accountGroup");
-
-            for (Terms.Bucket bucket : terms.getBuckets()) {
-              String account = bucket.getKeyAsString();
-              Terms terms2 = bucket.getAggregations().get("gameKindGroup");
-              for (Terms.Bucket bucket2 : terms2.getBuckets()) {
-                String gameKind = bucket2.getKeyAsString();
-                long count = bucket2.getDocCount();
-                double betAmount =
-                    ((ParsedSum) bucket2.getAggregations().get("betAmount")).getValue();
-                double validAmount =
-                    ((ParsedSum) bucket2.getAggregations().get("validAmount")).getValue();
-                double winAmount =
-                    ((ParsedSum) bucket2.getAggregations().get("winAmount")).getValue();
-
-                GameBetDailyReport report = new GameBetDailyReport();
-                report.setAccount(account);
-                report.setPlatformCode(gameKind.split("_")[0]);
-                report.setGameKind(gameKind);
-                report.setGameType(gameKind.split("_")[1]);
-                report.setBetCount(count);
-                report.setBetAmount(new BigDecimal(betAmount));
-                report.setValidAmount(new BigDecimal(validAmount));
-                report.setWinAmount(new BigDecimal(winAmount));
-                report.setStatTime(day);
-                assembleList.add(report);
-              }
-            }
-          } catch (IOException e) {
-            e.printStackTrace();
-          }
-          log.info("{}~{}游戏日报表汇总，执行结束。。。", beginTime, endTime);
-        });
-
-    gameBetDailyReportMapper.insertGameBetDailyReport(assembleList);
   }
 
   @Override

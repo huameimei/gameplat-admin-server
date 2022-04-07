@@ -532,7 +532,7 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
         memberList =
             this.lambdaQuery()
                 .in(Member::getAccount, dto.getUserNames().split(","))
-                .eq(Member::getUserType, dto.getUserType())
+                    .eq(Member::getUserType, MemberEnums.Type.PROMOTION.value())
                 .list();
       }
       if (StringUtils.isEmpty(memberList) || memberList.size() != userNames.length) {
@@ -560,7 +560,8 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
       throw new ServiceException("isCleanAll是错误的传参数据");
     }
     // 额度回收
-    memberList.parallelStream()
+    memberList
+            .parallelStream()
         .map(Member::getAccount)
         .forEach(gameAdminService::recyclingAmountByAccount);
     memberInfoService.updateClearGTMember(dto);

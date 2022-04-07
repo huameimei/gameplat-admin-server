@@ -19,6 +19,12 @@ public interface OtthService {
 
   JSONObject getLottConfig();
 
+  /**
+   * 获取租户标识
+   * @return
+   */
+  public String getLottTenantCode();
+
   void pushChatOpen(String body);
 
   // 更新聊天室房间管理内的游戏状态

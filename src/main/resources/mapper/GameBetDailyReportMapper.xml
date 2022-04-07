@@ -306,7 +306,7 @@
               and dr.stat_time BETWEEN #{beginTime} AND #{endTime}
             </if>
             <if test="userPaths != null and userPaths != ''">
-              and dr.user_paths like contact(#{userPaths},'%')
+                and dr.user_paths like concat(#{userPaths},'%')
             </if>
             <if test="account != null and account != ''">
               and dr.account = #{account}
@@ -320,7 +320,7 @@
           and rr.stat_time BETWEEN #{beginTime} AND #{endTime}
         </if>
         <if test="userPaths != null and userPaths != ''">
-          and rr.user_paths like contact(#{userPaths},'%')
+            and rr.user_paths like concat(#{userPaths},'%')
         </if>
         <if test="account != null and account != ''">
           and rr.account = #{account}

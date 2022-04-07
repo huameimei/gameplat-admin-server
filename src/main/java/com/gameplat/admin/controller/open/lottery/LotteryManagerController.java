@@ -125,28 +125,28 @@ public class LotteryManagerController {
 
   @ApiOperation("检查是否有编辑权限")
   @PostMapping("/checkEdit")
-  @PreAuthorize("hasAuthority('lottery:open:getOpenResult')")
+  @PreAuthorize("hasAuthority('lottery:checkEdit')")
   public Object checkEdit(HttpServletRequest request) {
     return serviceHandler.serviceHandler(request);
   }
 
   @ApiOperation("预设开奖--可见彩种管理--权限列表")
   @PostMapping("/roleList")
-  @PreAuthorize("hasAuthority('lottery:preset:getOpenResult')")
+  @PreAuthorize("hasAuthority('lottery:role:view')")
   public Object roleList(HttpServletRequest request) {
     return serviceHandler.serviceHandler(request);
   }
 
   @ApiOperation("预设开奖--可见彩种管理--保存/撤销权限/保存权限")
   @PostMapping("/roleUpdate")
-  @PreAuthorize("hasAuthority('lottery:open:getOpenResult')")
+  @PreAuthorize("hasAuthority('lottery:role:edit')")
   public Object roleUpdate(HttpServletRequest request) {
     return serviceHandler.serviceHandler(request);
   }
 
   @ApiOperation("获取开奖时间")
   @PostMapping("/getOpenTime")
-  @PreAuthorize("hasAuthority('lottery:open:getOpenResult')")
+  @PreAuthorize("hasAuthority('lottery:open:getOpenTime')")
   public Object getOpenTime(HttpServletRequest request) {
     return serviceHandler.serviceHandler(request);
   }

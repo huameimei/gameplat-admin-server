@@ -168,7 +168,10 @@ public class ValidWithdrawServiceImpl extends ServiceImpl<ValidWithdrawMapper, V
       validWithdraws =
           validWithdraws.stream().filter(v -> 0 == v.getStatus()).collect(Collectors.toList());
       return validateValidWithdraws(
-              name, validWithdraws, toFix(2, safetyGetDecimal(memberWithdrawLimit.getRelaxQuota())), memberWithdrawLimit);
+              name,
+              validWithdraws,
+              toFix(2, safetyGetDecimal(memberWithdrawLimit.getRelaxQuota())),
+              memberWithdrawLimit);
     }
     return passAll(name, validWithdraws, memberWithdrawLimit.getRelaxQuota());
   }
@@ -246,24 +249,23 @@ public class ValidWithdrawServiceImpl extends ServiceImpl<ValidWithdrawMapper, V
     } else {
       // 提现需打码金额
       validateDmlBean.setRemainRequiredDml(BigDecimal.ZERO);
-
     }
     validateDmlBean.setUsername(username);
     // 常态打码量
-    BigDecimal requireDml =
-        validWithdraws.stream()
-            .map(ValidWithdraw::getDmlClaim)
-            .reduce(BigDecimal.ZERO, BigDecimal::add);
-    log.info("总共要求打码量：{}", requireDml);
+    BigDecimal requireDML =
+            validWithdraws.stream()
+                    .map(ValidWithdraw::getDmlClaim)
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+    log.info("总共要求打码量：{}", requireDML);
     // 要求打码量
-    validateDmlBean.setRequireDML(requireDml);
+    validateDmlBean.setRequireDML(requireDML);
     // 放宽额度
     validateDmlBean.setRelaxQuota(relaxQuota);
 
     BigDecimal sumBetAmount =
-        validWithdraws.stream()
-            .map(ValidWithdraw::getBetAmount)
-            .reduce(BigDecimal.ZERO, BigDecimal::add);
+            validWithdraws.stream()
+                    .map(ValidWithdraw::getBetAmount)
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
     log.info("总投注打码量：{}", sumBetAmount);
     // 有效投注额
     validateDmlBean.setSumAllDml(sumBetAmount);
@@ -272,20 +274,25 @@ public class ValidWithdrawServiceImpl extends ServiceImpl<ValidWithdrawMapper, V
 
     // 常态打码金额
     BigDecimal rechMoney =
-        validWithdraws.stream()
-            .map(ValidWithdraw::getRechMoney)
-            .reduce(BigDecimal.ZERO, BigDecimal::add);
+            validWithdraws.stream()
+                    .map(ValidWithdraw::getRechMoney)
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
     log.info("总共需要常态打码量：{}", rechMoney);
-    //todo 提现手续费  0 只扣除优惠费用  1只收行政费用  2 不扣除全部费用 */
-    // 需要扣除金额
-    validateDmlBean.setSumAllDeduct(validateDmlBean.getRemainRequiredDml());
-    Integer whetherDeductAdministrationCost = memberWithdrawLimit.getWhetherDeductAdministrationCost();
+
+    // 需要扣除金额提现手续费  0 只扣除优惠费用  1只收行政费用  2 不扣除全部费用 */
+    Integer whetherDeductAdministrationCost =
+            memberWithdrawLimit.getWhetherDeductAdministrationCost();
     if (ObjectUtil.equal(whetherDeductAdministrationCost, 0)) {
-      BigDecimal fee =
+      BigDecimal disAmount =
               validWithdraws.stream()
                       .map(ValidWithdraw::getDiscountDml)
                       .reduce(BigDecimal.ZERO, BigDecimal::add);
-      log.info("扣除优惠费用：{}", fee);
+      log.info("扣除优惠费用：{}", disAmount);
+      BigDecimal fixedBalance = memberWithdrawLimit.getFixedBalance();
+      log.info("扣除优惠费用百分比：{}", fixedBalance);
+      BigDecimal deductAmount = disAmount.multiply(fixedBalance.divide(BigDecimal.valueOf(100)));
+      log.info("扣除优惠金额：{}", deductAmount);
+      validateDmlBean.setSumAllDeduct(deductAmount);
     } else if (ObjectUtil.equal(whetherDeductAdministrationCost, 1)) {
       BigDecimal moneyRatio = memberWithdrawLimit.getAdministrationCostDeductPayMoneyRatio();
       log.info("只收行政费用百分比：{}", moneyRatio);
@@ -295,11 +302,13 @@ public class ValidWithdrawServiceImpl extends ServiceImpl<ValidWithdrawMapper, V
                       .multiply(moneyRatio.divide(BigDecimal.valueOf(100)));
       log.info("只收取行政费用：{}", multiply);
       validateDmlBean.setSumAllDeduct(multiply);
+    } else if (ObjectUtil.equal(whetherDeductAdministrationCost, 2)) {
+      validateDmlBean.setSumAllDeduct(BigDecimal.ZERO);
     }
     validateDmlBean.setYetWithdraw(BigDecimal.ZERO);
-    List<ValidWithdrawVO> validWithdrawVo =
-        BeanUtils.mapList(validWithdraws, ValidWithdrawVO.class);
-    validateDmlBean.setRows(validWithdrawVo);
+    List<ValidWithdrawVO> validWithdrawVOS =
+            BeanUtils.mapList(validWithdraws, ValidWithdrawVO.class);
+    validateDmlBean.setRows(validWithdrawVOS);
     return validateDmlBean;
   }
 

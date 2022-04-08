@@ -1,5 +1,6 @@
 package com.gameplat.admin.service.impl;
 
+import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -46,18 +47,15 @@ public class PayTypeServiceImpl extends ServiceImpl<PayTypeMapper, PayType>
   }
 
   @Override
-  public List<PayTypeVO> onlineQueryList() {
-    return this.lambdaQuery().eq(PayType::getOnlinePayEnabled, 1).list().stream()
+  public List<PayTypeVO> payTypeQueryList(int type) {
+    return this.lambdaQuery()
+            .eq(ObjectUtils.isNotNull(type) && ObjectUtil.equal(type, 2), PayType::getOnlinePayEnabled, 1)
+            .eq(ObjectUtils.isNotNull(type) && ObjectUtil.equal(type, 1), PayType::getTransferEnabled, 1)
+            .list().stream()
             .map(payTypeConvert::toVo)
             .collect(Collectors.toList());
   }
 
-  @Override
-  public List<PayTypeVO> transferQueryList() {
-    return this.lambdaQuery().eq(PayType::getTransferEnabled, 1).list().stream()
-            .map(payTypeConvert::toVo)
-            .collect(Collectors.toList());
-  }
 
   @Override
   public void save(PayTypeAddDTO dto) throws ServiceException {

@@ -41,7 +41,7 @@ public class PayTypeController {
   @GetMapping("/transferQueryList")
   @PreAuthorize("hasAuthority('transferPay:payTypes:view')")
   public List<PayTypeVO> transferQueryList() {
-    return payTypeService.transferQueryList();
+    return payTypeService.payTypeQueryList(1);
   }
 
   /**
@@ -52,7 +52,7 @@ public class PayTypeController {
   @GetMapping("/onlineQueryList")
   @PreAuthorize("hasAuthority('onlinePay:payTypes:view')")
   public List<PayTypeVO> onlineQueryList() {
-    return payTypeService.onlineQueryList();
+    return payTypeService.payTypeQueryList(2);
   }
 
   @PostMapping("/add")

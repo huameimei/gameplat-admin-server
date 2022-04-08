@@ -44,14 +44,10 @@ public interface PayTypeService extends IService<PayType> {
 
 
   /**
-   * 转账支付
+   * 过滤不支持的支付方式
    */
-  List<PayTypeVO> onlineQueryList();
+  List<PayTypeVO> payTypeQueryList(int type);
 
-  /**
-   * 在线支付
-   */
-  List<PayTypeVO> transferQueryList();
 
 
   /**

@@ -18,8 +18,6 @@ import com.gameplat.base.common.util.StringUtils;
 import com.gameplat.common.enums.DictDataEnum;
 import com.gameplat.model.entity.activity.ActivityInfo;
 import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,10 +60,6 @@ public class ActivityInfoController {
   @ApiOperation(value = "活动列表")
   @GetMapping("/list")
   @PreAuthorize("hasAuthority('activity:info:view')")
-  @ApiImplicitParams({
-    @ApiImplicitParam(name = "current", value = "分页参数：当前页", defaultValue = "1"),
-    @ApiImplicitParam(name = "size", value = "每页条数")
-  })
   public IPage<ActivityInfoVO> list(
       @ApiIgnore PageDTO<ActivityInfo> page, ActivityInfoQueryDTO dto) {
     return activityInfoService.list(page, dto);

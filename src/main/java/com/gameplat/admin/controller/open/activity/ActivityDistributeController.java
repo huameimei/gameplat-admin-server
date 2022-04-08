@@ -11,8 +11,6 @@ import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.StringUtils;
 import com.gameplat.model.entity.activity.ActivityDistribute;
 import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,10 +36,6 @@ public class ActivityDistributeController {
   @ApiOperation(value = "活动分发列表")
   @GetMapping("/list")
   @PreAuthorize("hasAuthority('activity:distribute:view')")
-  @ApiImplicitParams({
-    @ApiImplicitParam(name = "current", value = "分页参数：当前页", defaultValue = "1"),
-    @ApiImplicitParam(name = "size", value = "每页条数"),
-  })
   public PageExt<IPage<ActivityDistributeVO>, ActivityDistributeStatisticsVO> list(
       @ApiIgnore PageDTO<ActivityDistribute> page, ActivityDistributeQueryDTO dto) {
     return activityDistributeService.list(page, dto);

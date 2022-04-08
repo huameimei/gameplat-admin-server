@@ -35,6 +35,26 @@ public class PayTypeController {
     return payTypeService.queryList(name);
   }
 
+  /**
+   * 转账类型 return List<PayTypeVO>
+   */
+  @GetMapping("/transferQueryList")
+  @PreAuthorize("hasAuthority('transferPay:payTypes:view')")
+  public List<PayTypeVO> transferQueryList() {
+    return payTypeService.payTypeQueryList(1);
+  }
+
+  /**
+   * 在线支付类型
+   *
+   * @return List<PayTypeVO>
+   */
+  @GetMapping("/onlineQueryList")
+  @PreAuthorize("hasAuthority('onlinePay:payTypes:view')")
+  public List<PayTypeVO> onlineQueryList() {
+    return payTypeService.payTypeQueryList(2);
+  }
+
   @PostMapping("/add")
   @PreAuthorize("hasAuthority('thirdParty:payTypes:add')")
   @Log(

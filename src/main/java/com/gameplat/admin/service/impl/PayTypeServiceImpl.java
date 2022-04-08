@@ -17,6 +17,7 @@ import com.gameplat.admin.service.PayAccountService;
 import com.gameplat.admin.service.PayTypeService;
 import com.gameplat.base.common.enums.EnableEnum;
 import com.gameplat.base.common.exception.ServiceException;
+import com.gameplat.common.enums.RechargeMode;
 import com.gameplat.model.entity.pay.PayType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -49,13 +50,19 @@ public class PayTypeServiceImpl extends ServiceImpl<PayTypeMapper, PayType>
   @Override
   public List<PayTypeVO> payTypeQueryList(int type) {
     return this.lambdaQuery()
-            .eq(ObjectUtils.isNotNull(type) && ObjectUtil.equal(type, 2), PayType::getOnlinePayEnabled, 1)
-            .eq(ObjectUtils.isNotNull(type) && ObjectUtil.equal(type, 1), PayType::getTransferEnabled, 1)
+            .eq(
+                    ObjectUtils.isNotNull(type)
+                            && ObjectUtil.equal(type, RechargeMode.ONLINE_PAY.getValue()),
+                    PayType::getOnlinePayEnabled,
+                    1)
+            .eq(
+                    ObjectUtils.isNotNull(type) && ObjectUtil.equal(type, RechargeMode.TRANSFER.getValue()),
+                    PayType::getTransferEnabled,
+                    1)
             .list().stream()
             .map(payTypeConvert::toVo)
             .collect(Collectors.toList());
   }
-
 
   @Override
   public void save(PayTypeAddDTO dto) throws ServiceException {

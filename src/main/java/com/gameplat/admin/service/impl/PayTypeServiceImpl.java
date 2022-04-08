@@ -46,6 +46,20 @@ public class PayTypeServiceImpl extends ServiceImpl<PayTypeMapper, PayType>
   }
 
   @Override
+  public List<PayTypeVO> onlineQueryList() {
+    return this.lambdaQuery().eq(PayType::getOnlinePayEnabled, 1).list().stream()
+            .map(payTypeConvert::toVo)
+            .collect(Collectors.toList());
+  }
+
+  @Override
+  public List<PayTypeVO> transferQueryList() {
+    return this.lambdaQuery().eq(PayType::getTransferEnabled, 1).list().stream()
+            .map(payTypeConvert::toVo)
+            .collect(Collectors.toList());
+  }
+
+  @Override
   public void save(PayTypeAddDTO dto) throws ServiceException {
     LambdaQueryWrapper<PayType> query = Wrappers.lambdaQuery();
     query.eq(PayType::getCode, dto.getCode());

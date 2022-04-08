@@ -42,6 +42,18 @@ public interface PayTypeService extends IService<PayType> {
    */
   List<PayTypeVO> queryList(String name);
 
+
+  /**
+   * 转账支付
+   */
+  List<PayTypeVO> onlineQueryList();
+
+  /**
+   * 在线支付
+   */
+  List<PayTypeVO> transferQueryList();
+
+
   /**
    * 支付方式列表
    *

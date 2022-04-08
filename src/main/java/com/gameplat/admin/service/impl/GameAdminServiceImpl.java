@@ -308,6 +308,7 @@ public class GameAdminServiceImpl implements GameAdminService {
     try {
       GameBizBean bizBean = new GameBizBean();
       bizBean.setGameAccount(member.getGameAccount());
+      bizBean.setAccount(member.getAccount());
       bizBean.setConfig(gameConfigService.queryGameConfigInfoByPlatCode(platformCode));
       return gameApi.getBalance(bizBean);
     } catch (Exception ex) {

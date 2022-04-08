@@ -58,7 +58,7 @@ public class GameAdminController {
           gameAdminService.getBalance(dto.getPlatformCode(), member).setScale(2, RoundingMode.DOWN);
       gameBalanceVO.setBalance(amount);
     } catch (Exception e) {
-      log.error("查询失败：{}", e.getMessage());
+      log.error("游戏余额查询失败", e);
       gameBalanceVO.setStatus(ResultStatusEnum.FAILED.getValue());
       gameBalanceVO.setErrorMsg("游戏余额查询失败");
     }

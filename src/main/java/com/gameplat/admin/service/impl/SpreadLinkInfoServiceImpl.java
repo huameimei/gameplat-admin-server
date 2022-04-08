@@ -51,6 +51,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.math.BigDecimal;
+import java.text.MessageFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -85,36 +86,44 @@ public class SpreadLinkInfoServiceImpl extends ServiceImpl<SpreadLinkInfoMapper,
    */
   @Override
   public IPage<SpreadConfigVO> page(PageDTO<SpreadLinkInfo> page, SpreadLinkInfoDTO dto) {
-    return this.lambdaQuery()
-        .eq(ObjectUtils.isNotNull(dto.getId()), SpreadLinkInfo::getId, dto.getId())
-        .eq(
-            ObjectUtils.isNotEmpty(dto.getAgentAccount()),
-            SpreadLinkInfo::getAgentAccount,
-            dto.getAgentAccount())
-        .eq(
-            ObjectUtils.isNotEmpty(dto.getSpreadType()),
-            SpreadLinkInfo::getSpreadType,
-            dto.getSpreadType())
-        .eq(
-            ObjectUtils.isNotNull(dto.getUserType()),
-            SpreadLinkInfo::getUserType,
-            dto.getUserType())
-        .eq(ObjectUtils.isNotNull(dto.getStatus()), SpreadLinkInfo::getStatus, dto.getStatus())
-        .eq(ObjectUtils.isNotEmpty(dto.getCode()), SpreadLinkInfo::getCode, dto.getCode())
-        .orderBy(
-            StringUtils.equals(dto.getOrderByColumn(), "createTime"),
-            ValidatorUtil.isAsc(dto.getSortBy()),
-            SpreadLinkInfo::getCreateTime)
-        .orderBy(
-            StringUtils.equals(dto.getOrderByColumn(), "visitCount"),
-            ValidatorUtil.isAsc(dto.getSortBy()),
-            SpreadLinkInfo::getVisitCount)
-        .orderBy(
-            StringUtils.equals(dto.getOrderByColumn(), "registCount"),
-            ValidatorUtil.isAsc(dto.getSortBy()),
-            SpreadLinkInfo::getRegistCount)
-        .page(page)
-        .convert(spreadLinkInfoConvert::toVo);
+    IPage<SpreadConfigVO> convert =
+        this.lambdaQuery()
+            .eq(ObjectUtils.isNotNull(dto.getId()), SpreadLinkInfo::getId, dto.getId())
+            .eq(
+                ObjectUtils.isNotEmpty(dto.getAgentAccount()),
+                SpreadLinkInfo::getAgentAccount,
+                dto.getAgentAccount())
+            .eq(
+                ObjectUtils.isNotEmpty(dto.getSpreadType()),
+                SpreadLinkInfo::getSpreadType,
+                dto.getSpreadType())
+            .eq(
+                ObjectUtils.isNotNull(dto.getUserType()),
+                SpreadLinkInfo::getUserType,
+                dto.getUserType())
+            .eq(ObjectUtils.isNotNull(dto.getStatus()), SpreadLinkInfo::getStatus, dto.getStatus())
+            .eq(ObjectUtils.isNotEmpty(dto.getCode()), SpreadLinkInfo::getCode, dto.getCode())
+            .orderBy(
+                StringUtils.equals(dto.getOrderByColumn(), "createTime"),
+                ValidatorUtil.isAsc(dto.getSortBy()),
+                SpreadLinkInfo::getCreateTime)
+            .orderBy(
+                StringUtils.equals(dto.getOrderByColumn(), "visitCount"),
+                ValidatorUtil.isAsc(dto.getSortBy()),
+                SpreadLinkInfo::getVisitCount)
+            .orderBy(
+                StringUtils.equals(dto.getOrderByColumn(), "registCount"),
+                ValidatorUtil.isAsc(dto.getSortBy()),
+                SpreadLinkInfo::getRegistCount)
+            .page(page)
+            .convert(spreadLinkInfoConvert::toVo);
+    for (SpreadConfigVO obj : convert.getRecords()) {
+      if (StrUtil.isNotBlank(obj.getExternalUrl()) && !obj.getExternalUrl().contains("?rc=")) {
+        obj.setExternalUrl(
+            MessageFormat.format("{0}/?rc={1}", obj.getExternalUrl(), obj.getCode()));
+      }
+    }
+    return convert;
   }
 
   /**

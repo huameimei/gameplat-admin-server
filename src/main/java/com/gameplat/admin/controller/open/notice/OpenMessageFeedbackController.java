@@ -8,8 +8,6 @@ import com.gameplat.admin.model.vo.MessageFeedbackVO;
 import com.gameplat.admin.service.MessageFeedbackService;
 import com.gameplat.model.entity.message.MessageFeedback;
 import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,10 +30,6 @@ public class OpenMessageFeedbackController {
 
   @ApiOperation(value = "意见反馈列表")
   @GetMapping("/list")
-  @ApiImplicitParams({
-    @ApiImplicitParam(name = "current", value = "分页参数：当前页", defaultValue = "1"),
-    @ApiImplicitParam(name = "size", value = "每页条数")
-  })
   @PreAuthorize("hasAuthority('notice:feedback:view')")
   public IPage<MessageFeedbackVO> getList(
       @Validated PageDTO<MessageFeedback> page, MessageFeedbackQueryDTO dto) {

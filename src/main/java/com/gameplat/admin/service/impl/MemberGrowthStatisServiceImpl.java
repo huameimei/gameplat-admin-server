@@ -4,6 +4,7 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.util.RandomUtil;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
@@ -21,7 +22,6 @@ import com.gameplat.admin.service.*;
 import com.gameplat.base.common.context.GlobalContextHolder;
 import com.gameplat.base.common.enums.EnableEnum;
 import com.gameplat.base.common.exception.ServiceException;
-import com.gameplat.base.common.util.RandomUtil;
 import com.gameplat.common.enums.BooleanEnum;
 import com.gameplat.common.enums.GrowthChangeEnum;
 import com.gameplat.common.enums.TranTypes;
@@ -338,7 +338,7 @@ public class MemberGrowthStatisServiceImpl
         savaGoldCoinRecord.setMemberId(memberId);
         savaGoldCoinRecord.setAccount(member.getAccount());
         savaGoldCoinRecord.setSourceType(1);
-        savaGoldCoinRecord.setOrderNo(RandomUtil.generateNumber(11));
+    savaGoldCoinRecord.setOrderNo(RandomUtil.randomNumbers(11));
         savaGoldCoinRecord.setCreateBy(member.getAccount());
 
         String userDailtKey = new StringBuilder().append("TENANT_USER_DAILY_COIN").append(":").append(member.getAccount()).toString();
@@ -529,11 +529,11 @@ public class MemberGrowthStatisServiceImpl
                 saveRewordObj.setParentName(member.getParentName());
                 saveRewordObj.setAgentPath(member.getSuperPath());
                 saveRewordObj.setUserType(member.getUserType());
-                saveRewordObj.setSerialNumber(RandomUtil.generateNumber(18));
+        saveRewordObj.setSerialNumber(RandomUtil.randomNumbers(18));
 
                 //是否自动派发
                 if (EnableEnum.ENABLED.match(growthConfig.getIsAutoPayReword())) {
-                    String sourceId = RandomUtil.generateNumber(22);
+          String sourceId = RandomUtil.randomNumbers(22);
                     // 新增打码量记录
                     ValidWithdraw validWithdraw = new ValidWithdraw();
                     validWithdraw.setAccount(member.getAccount());

@@ -427,16 +427,12 @@ public class OtthServiceImpl implements OtthService {
       throw new ServiceException("推送失败,获取不到租户标识");
     }
     // 获取分享配置
-    ChatPushCPBet config =
-        (ChatPushCPBet)
-            redisTemplate.opsForValue().get(String.format("%s_%s", dbSuffix, CHAT_PUSH_CP_BET));
-    if (config == null) {
-      String chatConfig = menuService.queryChatConfig(ChatConfigEnum.CHAT_PUSH_CP_BET);
-      config = JSON.parseObject(chatConfig, ChatPushCPBet.class);
-      if (config != null) {
-        redisTemplate.opsForValue().set(String.format("%s_%s", dbSuffix, CHAT_PUSH_CP_BET), config);
-      }
+    String chatConfig = menuService.queryChatConfig(ChatConfigEnum.CHAT_PUSH_CP_BET);
+    ChatPushCPBet config = JSON.parseObject(chatConfig, ChatPushCPBet.class);
+    if (config != null) {
+      redisTemplate.opsForValue().set(String.format("%s_%s", dbSuffix, CHAT_PUSH_CP_BET), config);
     }
+
     ChatPushCPBet finalConfig = config;
     req.forEach(
         x -> {

@@ -9,8 +9,6 @@ import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.StringUtils;
 import com.gameplat.model.entity.activity.ActivityBlacklist;
 import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,10 +33,6 @@ public class ActivityBlacklistController {
   @ApiOperation(value = "活动黑名单列表")
   @GetMapping("/list")
   @PreAuthorize("hasAuthority('account:activityBlack:view')")
-  @ApiImplicitParams({
-    @ApiImplicitParam(name = "current", value = "分页参数：当前页", defaultValue = "1"),
-    @ApiImplicitParam(name = "size", value = "每页条数")
-  })
   public IPage<ActivityBlacklist> list(
       @ApiIgnore PageDTO<ActivityBlacklist> page, ActivityBlacklistQueryDTO dto) {
     return activityBlacklistService.list(page, dto);

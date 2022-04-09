@@ -151,4 +151,14 @@ public class MemberVO implements Serializable {
   private Integer goldCoin;
 
   private Integer salaryFlag;
+
+  /**
+   * 输赢金额
+   */
+  private BigDecimal winAmount = BigDecimal.ZERO;
+
+  /**
+   * 返水金额
+   */
+  private BigDecimal waterAmount = BigDecimal.ZERO;
 }

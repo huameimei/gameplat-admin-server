@@ -10,10 +10,13 @@ import com.gameplat.admin.model.dto.MemberBankEditDTO;
 import com.gameplat.admin.model.vo.MemberBankVO;
 import com.gameplat.admin.service.MemberBankService;
 import com.gameplat.admin.service.MemberService;
+import com.gameplat.admin.service.SysDictDataService;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.StringUtils;
+import com.gameplat.common.enums.DictTypeEnum;
 import com.gameplat.model.entity.member.Member;
 import com.gameplat.model.entity.member.MemberBank;
+import com.gameplat.model.entity.sys.SysDictData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -32,6 +35,9 @@ public class MemberBankServiceImpl extends ServiceImpl<MemberBankMapper, MemberB
   @Autowired private MemberBankConvert memberBankConvert;
 
   @Autowired private MemberBankMapper memberBankMapper;
+
+  @Autowired
+  private SysDictDataService sysDictDataService;
 
   @Override
   public List<MemberBankVO> getMemberBankList(Long memberId, String type) {
@@ -52,14 +58,16 @@ public class MemberBankServiceImpl extends ServiceImpl<MemberBankMapper, MemberB
     MemberBank memberBank =
         Optional.ofNullable(this.getById(dto.getId()))
             .orElseThrow(() -> new ServiceException("银行卡信息不存在!"));
-
     if (MemberBankEnums.TYPE.BANKCARD.match(memberBank.getType())) {
       this.checkBankcardParams(dto.getCardHolder(), dto.getBankName(), dto.getAddress());
+      MemberBank memberBanks = memberBankConvert.toEntity(dto);
+      memberBanks.setIcon(getBankAddress(dto.getBankName()));
+      Assert.isTrue(this.updateById(memberBanks), () -> new ServiceException("修改失败!"));
     } else {
+      MemberBank memberBanks = memberBankConvert.toEntity(dto);
       this.checkCryptocurrencyParams(dto.getAlias(), dto.getNetwork(), dto.getCurrency());
+      Assert.isTrue(this.updateById(memberBanks), () -> new ServiceException("修改失败!"));
     }
-
-    Assert.isTrue(updateById(memberBankConvert.toEntity(dto)), () -> new ServiceException("修改失败!"));
   }
 
   @Override
@@ -125,7 +133,18 @@ public class MemberBankServiceImpl extends ServiceImpl<MemberBankMapper, MemberB
     }
 
     MemberBank memberBank = memberBankConvert.toEntity(dto);
+    memberBank.setIcon(getBankAddress(dto.getBankName()));
     Assert.isTrue(this.save(memberBank), () -> new ServiceException("添加会员银行卡失败!"));
+  }
+
+
+  public String getBankAddress(String bankName) {
+
+    // 获取银行卡图片
+    SysDictData sysDictData =
+            sysDictDataService.getDictData(DictTypeEnum.RECH_BANK.getValue(), bankName);
+
+    return sysDictData.getRemark();
   }
 
   /**

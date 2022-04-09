@@ -6,7 +6,6 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.gameplat.admin.model.dto.*;
 import com.gameplat.admin.model.vo.*;
 import com.gameplat.model.entity.member.Member;
-
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -157,6 +156,12 @@ public interface MemberService extends IService<Member> {
    * @param id Long
    */
   void releaseLoginLimit(Long id);
+
+
+  /**
+   * 根据会员账号 层级  vip 等级去查询会员
+   */
+  MemberBalanceVO findMemberVip(String username, String level, String vipGrade);
 
 
 }

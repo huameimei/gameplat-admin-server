@@ -1,9 +1,10 @@
 package com.gameplat.admin.service.impl;
 
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
+import com.gameplat.admin.model.dto.GameBalanceQueryDTO;
 import com.gameplat.admin.model.dto.OperGameTransferRecordDTO;
 import com.gameplat.admin.model.vo.GameBalanceVO;
-import com.gameplat.admin.model.vo.GameConfiscatedVO;
 import com.gameplat.admin.model.vo.GameRecycleVO;
 import com.gameplat.admin.service.GameAdminService;
 import com.gameplat.admin.service.GameAmountControlService;
@@ -43,11 +44,9 @@ import com.gameplat.model.entity.member.MemberBill;
 import com.gameplat.model.entity.member.MemberInfo;
 import com.gameplat.model.entity.message.Message;
 import com.gameplat.redis.redisson.DistributedLocker;
-import com.google.common.collect.Lists;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -65,7 +64,6 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.StopWatch;
 
 @Slf4j
 @Service
@@ -308,6 +306,7 @@ public class GameAdminServiceImpl implements GameAdminService {
     try {
       GameBizBean bizBean = new GameBizBean();
       bizBean.setGameAccount(member.getGameAccount());
+      bizBean.setAccount(member.getAccount());
       bizBean.setConfig(gameConfigService.queryGameConfigInfoByPlatCode(platformCode));
       return gameApi.getBalance(bizBean);
     } catch (Exception ex) {
@@ -601,84 +600,74 @@ public class GameAdminServiceImpl implements GameAdminService {
     log.error("{}一键回收游戏平台额度操作频繁", account);
     String key = USER_GAME_BALANCE + member.getId();
     distributedLocker.lock(key, TimeUnit.SECONDS, 300);
-    List<GameRecycleVO> resultList = new ArrayList<>();
     try {
-      StopWatch stopwatch = new StopWatch();
-      stopwatch.start();
-      // 每10个切分成一个list去请求
-      List<List<GamePlatform>> allList = Lists.partition(playedPlatformList, 10);
-      for (List<GamePlatform> partList : allList) {
-        int size = partList.size();
-        CompletableFuture<GameRecycleVO>[] arrays = new CompletableFuture[size];
-        for (int i = 0; i < size; i++) {
-          GamePlatform item = partList.get(i);
-          CompletableFuture<GameRecycleVO> completableFuture =
-              CompletableFuture.supplyAsync(
-                  () -> {
-                    GameRecycleVO gameRecycleVO =
-                        GameRecycleVO.builder()
-                            .platformName(item.getName())
-                            .platformCode(item.getCode())
-                            .status(ResultStatusEnum.SUCCESS.getValue()) // 默认成功
-                            .build();
-                    try {
-                      BigDecimal amount =
-                          this.getBalance(item.getCode(), member).setScale(2, RoundingMode.DOWN);
-                      gameRecycleVO.setBalance(amount);
-                      if (amount.compareTo(BigDecimal.ZERO) > 0) {
-                        this.transfer(
-                            item.getCode(),
-                            TransferTypesEnum.SELF.getCode(),
-                            amount,
-                            member,
-                            false);
-                        log.info(
-                            "游戏额度回收:会员账号:{}，游戏编码：{},游戏金额：{}",
-                            member.getAccount(),
-                            item.getCode(),
-                            amount);
-                      } else {
-                        gameRecycleVO.setErrorMsg(item.getCode() + "游戏余额不足，忽略操作");
-                        gameRecycleVO.setStatus(ResultStatusEnum.WARNING.getValue());
-                        // 记录日志
-                        log.info(
-                            "游戏额度回收:会员账号:{}，游戏编码：{},游戏金额：{},忽略操作",
-                            member.getAccount(),
-                            item.getCode(),
-                            amount);
-                      }
-                    } catch (Exception e) {
-                      log.error("回收游戏金额失败：{}", e.getMessage());
-                      gameRecycleVO.setStatus(ResultStatusEnum.FAILED.getValue());
-                      gameRecycleVO.setErrorMsg("回收游戏金额失败");
-                    }
-                    return gameRecycleVO;
-                  });
-          arrays[i] = completableFuture;
-        }
-        // 等待10次异步请求结果
-        CompletableFuture.allOf(arrays).join();
-        Arrays.stream(arrays)
-            .forEach(
-                item -> {
-                  try {
-                    resultList.add(item.get());
-                  } catch (InterruptedException | ExecutionException e) {
-                    e.printStackTrace();
-                  }
-                });
+      List<GamePlatform> playedGamePlatform = this.getPlayedPlatform(member.getId());
+      if (CollectionUtil.isEmpty(playedGamePlatform)) {
+        throw new ServiceException("游戏平台额度转换通道维护中");
       }
-      stopwatch.stop();
+      List<CompletableFuture<GameRecycleVO>> futures =
+          this.batchRecovery(playedGamePlatform, member);
+      // 等待异步任务完成
+      CompletableFuture.allOf(futures.toArray(new CompletableFuture[] {})).join();
+      return futures.stream().map(this::getRecoveryResult).collect(Collectors.toList());
     } finally {
       distributedLocker.unlock(key);
     }
-    return resultList;
+  }
+
+  private GameRecycleVO getRecoveryResult(CompletableFuture<GameRecycleVO> future) {
+    try {
+      return future.get();
+    } catch (InterruptedException | ExecutionException ex) {
+      ex.printStackTrace();
+    }
+    return null;
+  }
+
+  private List<CompletableFuture<GameRecycleVO>> batchRecovery(
+      List<GamePlatform> playedGamePlatform, Member member) {
+    return playedGamePlatform.stream()
+        .map(platform -> this.asyncRecovery(platform, member))
+        .collect(Collectors.toList());
+  }
+
+  private CompletableFuture<GameRecycleVO> asyncRecovery(GamePlatform platform, Member member) {
+    return CompletableFuture.supplyAsync(
+        () -> doRecoveryGameBalance(platform, member), asyncGameExecutor);
+  }
+
+  private GameRecycleVO doRecoveryGameBalance(GamePlatform platform, Member member) {
+    GameRecycleVO gameRecycleVO =
+        GameRecycleVO.builder()
+            .platformName(platform.getName())
+            .platformCode(platform.getCode())
+            .status(ResultStatusEnum.SUCCESS.getValue()) // 默认成功
+            .build();
+    try {
+      BigDecimal amount =
+          this.getBalance(platform.getCode(), member).setScale(2, RoundingMode.DOWN);
+      gameRecycleVO.setBalance(amount);
+      if (amount.compareTo(BigDecimal.ZERO) > 0) {
+        this.transfer(platform.getCode(), TransferTypesEnum.SELF.getCode(), amount, member, false);
+        log.info("游戏额度回收:会员账号:{}，游戏编码：{},游戏金额：{}", member.getAccount(), platform.getCode(), amount);
+      } else {
+        gameRecycleVO.setErrorMsg(platform.getCode() + "游戏余额不足，忽略操作");
+        gameRecycleVO.setStatus(ResultStatusEnum.WARNING.getValue());
+        // 记录日志
+        log.info(
+            "游戏额度回收:会员账号:{}，游戏编码：{},游戏金额：{},忽略操作", member.getAccount(), platform.getCode(), amount);
+      }
+    } catch (Exception e) {
+      log.error("回收游戏金额失败：{}", e.getMessage());
+      gameRecycleVO.setStatus(ResultStatusEnum.FAILED.getValue());
+      gameRecycleVO.setErrorMsg("回收游戏金额失败");
+    }
+    return gameRecycleVO;
   }
 
   /** 一键查询 */
   @Override
   public List<GameBalanceVO> selectGameBalanceByAccount(String account) {
-    List<GameBalanceVO> resultList = new ArrayList<>();
     Assert.notEmpty(account, "会员账号不能为空");
     Member member = memberService.getMemberAndFillGameAccount(account);
     Assert.notNull(member, "会员账号不存在，请重新检查");
@@ -690,68 +679,91 @@ public class GameAdminServiceImpl implements GameAdminService {
     distributedLocker.lock(key, TimeUnit.SECONDS, 300);
     log.info("{}一键回收游戏平台额度操作:", account);
     try {
-      StopWatch stopwatch = new StopWatch();
-      stopwatch.start();
-      // 每10个切分成一个list去请求
-      List<List<GamePlatform>> allList = Lists.partition(playedPlatformList, 10);
-      for (List<GamePlatform> partList : allList) {
-        int size = partList.size();
-        CompletableFuture<GameBalanceVO>[] arrays = new CompletableFuture[size];
-        for (int i = 0; i < size; i++) {
-          GamePlatform item = partList.get(i);
-          CompletableFuture<GameBalanceVO> completableFuture =
-              CompletableFuture.supplyAsync(
-                  () -> {
-                    GameBalanceVO gameBalanceVO =
-                        GameBalanceVO.builder()
-                            .platformCode(item.getCode())
-                            .platformName(item.getName())
-                            .status(ResultStatusEnum.SUCCESS.getValue())
-                            .build();
-                    if (item.getTransfer() != null
-                        && item.getTransfer().equals(TrueFalse.FALSE.getValue())) {
-                      gameBalanceVO.setErrorMsg(item.getName() + "查询余额通道正在维护中,请耐心等待");
-                      gameBalanceVO.setBalance(BigDecimal.ZERO);
-                      gameBalanceVO.setStatus(ResultStatusEnum.FAILED.getValue());
-                      return gameBalanceVO;
-                    }
-                    try {
-                      gameBalanceVO.setBalance(
-                          this.getBalance(item.getCode(), member).setScale(2, RoundingMode.DOWN));
-                    } catch (Exception e) {
-                      log.error("查询余额错误：{}", e.getMessage());
-                      gameBalanceVO.setBalance(BigDecimal.ZERO);
-                      gameBalanceVO.setStatus(ResultStatusEnum.FAILED.getValue());
-                      gameBalanceVO.setErrorMsg("查询游戏余额失败");
-                    }
-                    return gameBalanceVO;
-                  },
-                  asyncGameExecutor);
-          arrays[i] = completableFuture;
-        }
-        // 等待10次异步请求结果
-        CompletableFuture.allOf(arrays).join();
-        Arrays.stream(arrays)
-            .forEach(
-                item -> {
-                  try {
-                    resultList.add(item.get());
-                  } catch (InterruptedException | ExecutionException e) {
-                    e.printStackTrace();
-                  }
-                });
+      List<GamePlatform> playedGamePlatform = this.getPlayedPlatform(member.getId());
+      if (CollectionUtil.isEmpty(playedGamePlatform)) {
+        throw new ServiceException("游戏平台额度转换通道维护中");
       }
-      stopwatch.stop();
+      List<CompletableFuture<GameBalanceVO>> futures =
+          this.batchQueryBalance(playedGamePlatform, member);
+      // 等待异步任务完成
+      CompletableFuture.allOf(futures.toArray(new CompletableFuture[] {})).join();
+      return futures.stream().map(this::getQueryBalanceResult).collect(Collectors.toList());
     } finally {
       distributedLocker.unlock(key);
     }
-    return resultList;
+  }
+
+  private GameBalanceVO getQueryBalanceResult(CompletableFuture<GameBalanceVO> future) {
+    try {
+      return future.get();
+    } catch (InterruptedException | ExecutionException ex) {
+      ex.printStackTrace();
+    }
+    return null;
+  }
+
+  private List<CompletableFuture<GameBalanceVO>> batchQueryBalance(
+      List<GamePlatform> playedGamePlatform, Member member) {
+    return playedGamePlatform.stream()
+        .map(platform -> this.asyncQueryBalance(platform, member))
+        .collect(Collectors.toList());
+  }
+
+  private CompletableFuture<GameBalanceVO> asyncQueryBalance(GamePlatform platform, Member member) {
+    return CompletableFuture.supplyAsync(
+        () -> doQueryGameBalance(platform, member), asyncGameExecutor);
+  }
+
+  private GameBalanceVO doQueryGameBalance(GamePlatform platform, Member member) {
+    GameBalanceVO gameBalanceVO =
+        GameBalanceVO.builder()
+            .platformCode(platform.getCode())
+            .platformName(platform.getName())
+            .status(ResultStatusEnum.SUCCESS.getValue())
+            .build();
+    if (platform.getTransfer() != null
+        && platform.getTransfer().equals(TrueFalse.FALSE.getValue())) {
+      gameBalanceVO.setErrorMsg(platform.getName() + "查询余额通道正在维护中,请耐心等待");
+      gameBalanceVO.setBalance(BigDecimal.ZERO);
+      gameBalanceVO.setStatus(ResultStatusEnum.FAILED.getValue());
+      return gameBalanceVO;
+    }
+    try {
+      gameBalanceVO.setBalance(
+          this.getBalance(platform.getCode(), member).setScale(2, RoundingMode.DOWN));
+    } catch (Exception e) {
+      log.error("查询余额错误：{}", e.getMessage());
+      gameBalanceVO.setBalance(BigDecimal.ZERO);
+      gameBalanceVO.setStatus(ResultStatusEnum.FAILED.getValue());
+      gameBalanceVO.setErrorMsg("查询游戏余额失败");
+    }
+    return gameBalanceVO;
+  }
+
+  private List<GamePlatform> getPlayedPlatform(Long memberId) {
+    List<GamePlatform> allGamePlatform = gamePlatformService.list();
+    return this.getPlayedPlatform(allGamePlatform, memberId);
+  }
+
+  private List<GamePlatform> getPlayedPlatform(List<GamePlatform> allGamePlatform, Long memberId) {
+    List<String> played = this.getPlayedGames(memberId);
+    return CollectionUtil.isNotEmpty(played)
+        ? allGamePlatform.stream()
+            .filter(e -> played.contains(e.getCode()))
+            .collect(Collectors.toList())
+        : CollectionUtil.empty(ArrayList.class);
+  }
+
+  /** 会员进入过的游戏平台 */
+  private List<String> getPlayedGames(Long memberId) {
+    return gameTransferRecordService.findPlatformCodeList(memberId).stream()
+        .map(GameTransferRecord::getPlatformCode)
+        .collect(Collectors.toList());
   }
 
   /** 一键没收 */
   @Override
-  public List<GameConfiscatedVO> confiscatedGameByAccount(String account) {
-    List<GameConfiscatedVO> resultList = new ArrayList<>();
+  public List<GameRecycleVO> confiscatedGameByAccount(String account) {
     Assert.notEmpty(account, "会员账号不能为空");
     Member member = memberService.getMemberAndFillGameAccount(account);
     Assert.notNull(member, "会员账号不存在");
@@ -760,72 +772,163 @@ public class GameAdminServiceImpl implements GameAdminService {
     distributedLocker.lock(key, TimeUnit.SECONDS, 300);
     log.info("{}一键没收游戏平台额度操作:", account);
     try {
-      StopWatch stopwatch = new StopWatch();
-      stopwatch.start();
-      // 每10个切分成一个list去请求
-      List<List<GamePlatform>> allList = Lists.partition(playedPlatformList, 10);
-
-      for (List<GamePlatform> partList : allList) {
-        int size = partList.size();
-        CompletableFuture<GameConfiscatedVO>[] arrays = new CompletableFuture[size];
-        for (int i = 0; i < size; i++) {
-          GamePlatform item = partList.get(i);
-          CompletableFuture<GameConfiscatedVO> completableFuture =
-              CompletableFuture.supplyAsync(
-                  () -> {
-                    GameConfiscatedVO gameConfiscatedVO =
-                        GameConfiscatedVO.builder()
-                            .platformName(item.getName())
-                            .platformCode(item.getCode())
-                            .status(ResultStatusEnum.SUCCESS.getValue())
-                            .build();
-                    if (item.getTransfer() != null
-                        && item.getTransfer().equals(TrueFalse.FALSE.getValue())) {
-                      gameConfiscatedVO.setErrorMsg(item.getName() + "查询余额通道正在维护中,请耐心等待");
-                      gameConfiscatedVO.setStatus(ResultStatusEnum.FAILED.getValue());
-                      return gameConfiscatedVO;
-                    }
-                    try {
-                      // 先获取游戏余额
-                      BigDecimal amount =
-                          this.getBalance(item.getCode(), member).setScale(2, RoundingMode.DOWN);
-                      if (amount.compareTo(BigDecimal.ZERO) > 0) {
-                        this.confiscated(item.getCode(), member, amount);
-                      } else {
-                        gameConfiscatedVO.setErrorMsg(item.getCode() + "游戏余额不足，忽略操作");
-                        gameConfiscatedVO.setStatus(ResultStatusEnum.WARNING.getValue());
-                        log.info(
-                            "没收玩家{}在{}平台的余额，余额为{}，跳过处理。",
-                            member.getAccount(),
-                            item.getCode(),
-                            amount);
-                      }
-                    } catch (Exception e) {
-                      log.error("没收游戏余额错误：{}", e.getMessage());
-                      gameConfiscatedVO.setStatus(ResultStatusEnum.FAILED.getValue());
-                      gameConfiscatedVO.setErrorMsg("没收游戏余额失败");
-                    }
-                    return gameConfiscatedVO;
-                  },
-                  asyncGameExecutor);
-          arrays[i] = completableFuture;
-        }
-        // 等待10次异步请求结果
-        CompletableFuture.allOf(arrays).join();
-        Arrays.stream(arrays)
-            .forEach(
-                item -> {
-                  try {
-                    resultList.add(item.get());
-                  } catch (InterruptedException | ExecutionException e) {
-                    e.printStackTrace();
-                  }
-                });
+      List<GamePlatform> playedGamePlatform = this.getPlayedPlatform(member.getId());
+      if (CollectionUtil.isEmpty(playedGamePlatform)) {
+        throw new ServiceException("游戏平台额度转换通道维护中");
       }
-      stopwatch.stop();
+      List<CompletableFuture<GameRecycleVO>> futures =
+          this.batchConfiscated(playedGamePlatform, member);
+      // 等待异步任务完成
+      CompletableFuture.allOf(futures.toArray(new CompletableFuture[] {})).join();
+      return futures.stream().map(this::getRecoveryResult).collect(Collectors.toList());
     } finally {
       distributedLocker.unlock(key);
     }
-    return resultList;
+  }
+
+  private List<CompletableFuture<GameRecycleVO>> batchConfiscated(
+      List<GamePlatform> playedGamePlatform, Member member) {
+    return playedGamePlatform.stream()
+        .map(platform -> this.asyncConfiscated(platform, member))
+        .collect(Collectors.toList());
+  }
+
+  private CompletableFuture<GameRecycleVO> asyncConfiscated(GamePlatform platform, Member member) {
+    return CompletableFuture.supplyAsync(() -> doConfiscated(platform, member), asyncGameExecutor);
+  }
+
+  private GameRecycleVO doConfiscated(GamePlatform platform, Member member) {
+    GameRecycleVO gameRecycleVO =
+        GameRecycleVO.builder()
+            .platformName(platform.getName())
+            .platformCode(platform.getCode())
+            .status(ResultStatusEnum.SUCCESS.getValue())
+            .build();
+    if (platform.getTransfer() != null
+        && platform.getTransfer().equals(TrueFalse.FALSE.getValue())) {
+      gameRecycleVO.setErrorMsg(platform.getName() + "查询余额通道正在维护中,请耐心等待");
+      gameRecycleVO.setStatus(ResultStatusEnum.FAILED.getValue());
+      return gameRecycleVO;
+    }
+    try {
+      // 先获取游戏余额
+      BigDecimal amount =
+          this.getBalance(platform.getCode(), member).setScale(2, RoundingMode.DOWN);
+      if (amount.compareTo(BigDecimal.ZERO) > 0) {
+        this.confiscated(platform.getCode(), member, amount);
+      } else {
+        gameRecycleVO.setErrorMsg(platform.getCode() + "游戏余额不足，忽略操作");
+        gameRecycleVO.setStatus(ResultStatusEnum.WARNING.getValue());
+        log.info("没收玩家{}在{}平台的余额，余额为{}，跳过处理。", member.getAccount(), platform.getCode(), amount);
+      }
+    } catch (Exception e) {
+      log.error("没收游戏余额错误：{}", e.getMessage());
+      gameRecycleVO.setStatus(ResultStatusEnum.FAILED.getValue());
+      gameRecycleVO.setErrorMsg("没收游戏余额失败");
+    }
+    return gameRecycleVO;
+  }
+
+  @Override
+  public GameBalanceVO selectGameBalance(GameBalanceQueryDTO dto) {
+    GameBalanceVO gameBalanceVO = new GameBalanceVO();
+    Member member = checkGameBalanceParam(dto);
+    gameBalanceVO.setPlatformCode(dto.getPlatformCode());
+    gameBalanceVO.setStatus(ResultStatusEnum.SUCCESS.getValue());
+    try {
+      BigDecimal amount =
+          this.getBalance(dto.getPlatformCode(), member).setScale(2, RoundingMode.DOWN);
+      gameBalanceVO.setBalance(amount);
+    } catch (Exception e) {
+      log.error("查询失败：{}", e.getMessage());
+      gameBalanceVO.setStatus(ResultStatusEnum.FAILED.getValue());
+      gameBalanceVO.setErrorMsg("游戏余额查询失败");
+    }
+    return gameBalanceVO;
+  }
+
+  @Override
+  public GameRecycleVO recyclingAmount(GameBalanceQueryDTO dto) {
+    GameRecycleVO gameRecycleVO = new GameRecycleVO();
+    Member member = checkGameBalanceParam(dto);
+    String key = USER_GAME_BALANCE + member.getId();
+    distributedLocker.lock(key, TimeUnit.SECONDS, 300);
+    log.info("{}回收游戏平台{}额度操作:", dto.getAccount(), dto.getPlatformCode());
+    gameRecycleVO.setPlatformCode(dto.getPlatformCode());
+    gameRecycleVO.setStatus(ResultStatusEnum.SUCCESS.getValue());
+    try {
+      BigDecimal amount =
+          this.getBalance(dto.getPlatformCode(), member).setScale(2, RoundingMode.DOWN);
+      gameRecycleVO.setBalance(amount);
+      if (amount.compareTo(BigDecimal.ZERO) > 0) {
+        this.transfer(
+            dto.getPlatformCode(), TransferTypesEnum.SELF.getCode(), amount, member, false);
+      } else {
+        gameRecycleVO.setStatus(ResultStatusEnum.WARNING.getValue());
+        gameRecycleVO.setErrorMsg(dto.getPlatformCode() + "游戏余额不足，忽略操作");
+        log.info("回收玩家{}在{}平台的余额，余额为{}，跳过处理。", member.getAccount(), dto.getPlatformCode(), amount);
+      }
+    } catch (Exception e) {
+      log.error("回收失败：{}", e.getMessage());
+      gameRecycleVO.setStatus(ResultStatusEnum.FAILED.getValue());
+      gameRecycleVO.setErrorMsg("游戏余额回收失败");
+    } finally {
+      distributedLocker.unlock(key);
+    }
+    return gameRecycleVO;
+  }
+
+  @Override
+  public GameRecycleVO confiscatedAmount(GameBalanceQueryDTO dto) {
+    GameRecycleVO gameRecycleVO = new GameRecycleVO();
+    Member member = checkGameBalanceParam(dto);
+    String key = USER_GAME_BALANCE + member.getId();
+    distributedLocker.lock(key, TimeUnit.SECONDS, 300);
+    log.info("{}没收游戏平台{}额度操作:", dto.getAccount(), dto.getPlatformCode());
+    gameRecycleVO.setPlatformName(dto.getPlatformCode());
+    gameRecycleVO.setStatus(ResultStatusEnum.SUCCESS.getValue());
+    try {
+      // 先获取游戏余额
+      BigDecimal amount =
+          this.getBalance(dto.getPlatformCode(), member).setScale(2, RoundingMode.DOWN);
+      gameRecycleVO.setBalance(amount);
+      if (amount.compareTo(BigDecimal.ZERO) > 0) {
+        this.confiscated(dto.getPlatformCode(), member, amount);
+      } else {
+        gameRecycleVO.setErrorMsg(dto.getPlatformCode() + "游戏余额不足，忽略操作");
+        gameRecycleVO.setStatus(ResultStatusEnum.WARNING.getValue());
+        log.info("没收玩家{}在{}平台的余额，余额为{}，跳过处理。", member.getAccount(), dto.getPlatformCode(), amount);
+      }
+    } catch (Exception e) {
+      log.info(e.getMessage());
+      gameRecycleVO.setErrorMsg("没收会员游戏金额失败");
+      gameRecycleVO.setStatus(ResultStatusEnum.FAILED.getValue());
+    } finally {
+      distributedLocker.unlock(key);
+    }
+    return gameRecycleVO;
+  }
+
+  private Member checkGameBalanceParam(GameBalanceQueryDTO dto) {
+    Assert.notEmpty(dto.getAccount(), "会员账号不能为空");
+    Assert.notEmpty(dto.getPlatformCode(), "游戏平台编码不能为空");
+    Member member = memberService.getMemberAndFillGameAccount(dto.getAccount());
+    Assert.notNull(member, "会员账号不存在，请重新检查");
+    return member;
+  }
+
+  @Override
+  public void transferToGame(OperGameTransferRecordDTO record) {
+    String key = "self_" + record.getPlatformCode() + '_' + record.getAccount();
+    try {
+      distributedLocker.lock(key, TimeUnit.SECONDS, 300);
+      Member member = memberService.getMemberAndFillGameAccount(record.getAccount());
+      Assert.notNull(member, "会员账号不存在");
+      this.transferOut(record.getPlatformCode(), record.getAmount(), member, false);
+    } catch (Exception e) {
+      e.printStackTrace();
+    } finally {
+      distributedLocker.unlock(key);
+    }
   }
 }

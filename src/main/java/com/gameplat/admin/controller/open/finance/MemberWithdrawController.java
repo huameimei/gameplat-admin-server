@@ -49,7 +49,6 @@ public class MemberWithdrawController {
       Long id,
       Integer cashStatus,
       Integer curStatus,
-      boolean isDirect,
       HttpServletRequest request,
       Long memberId)
       throws Exception {
@@ -59,7 +58,7 @@ public class MemberWithdrawController {
       UserCredential userCredential = SecurityUserHolder.getCredential();
       UserEquipment clientInfo = UserEquipment.create(request);
       userWithdrawService.modify(
-          id, cashStatus, curStatus, isDirect, userCredential, clientInfo);
+          id, cashStatus, curStatus, userCredential, clientInfo);
     } catch (Exception e) {
       log.error(e.getMessage(), e);
       throw e;
@@ -90,7 +89,7 @@ public class MemberWithdrawController {
       for (MemberWithdrawDTO memberWithdrawDTO : memberWithdrawDTOList) {
         userWithdrawService.modify(
             memberWithdrawDTO.getId(), WithdrawStatus.HANDLED.getValue(),
-            memberWithdrawDTO.getCurStatus(), memberWithdrawDTO.getIsDirect(), userCredential,
+            memberWithdrawDTO.getCurStatus(), userCredential,
             clientInfo);
       }
       return "成功受理" + memberWithdrawDTOList.size() + "条订单";
@@ -127,7 +126,7 @@ public class MemberWithdrawController {
       for (MemberWithdrawDTO memberWithdrawDTO : memberWithdrawDTOList) {
         userWithdrawService.modify(
             memberWithdrawDTO.getId(), WithdrawStatus.UNHANDLED.getValue(),
-            memberWithdrawDTO.getCurStatus(), memberWithdrawDTO.getIsDirect(), userCredential,
+            memberWithdrawDTO.getCurStatus(), userCredential,
             clientInfo);
       }
       return "成功取消受理" + memberWithdrawDTOList.size() + "条订单";
@@ -164,7 +163,7 @@ public class MemberWithdrawController {
       for (MemberWithdrawDTO memberWithdrawDTO : memberWithdrawDTOList) {
         userWithdrawService.modify(
             memberWithdrawDTO.getId(), WithdrawStatus.SUCCESS.getValue(),
-            memberWithdrawDTO.getCurStatus(), memberWithdrawDTO.getIsDirect(), userCredential,
+            memberWithdrawDTO.getCurStatus(), userCredential,
             clientInfo);
       }
       return "成功出款" + memberWithdrawDTOList.size() + "条订单";

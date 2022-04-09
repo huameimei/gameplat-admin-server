@@ -9,8 +9,6 @@ import com.gameplat.admin.model.vo.GameReportVO;
 import com.gameplat.admin.model.vo.PageDtoVO;
 import com.gameplat.model.entity.game.GameBetDailyReport;
 import com.gameplat.model.entity.game.GamePlatform;
-import org.apache.ibatis.annotations.Param;
-
 import java.util.List;
 import java.util.Map;
 
@@ -34,15 +32,8 @@ public interface GameBetDailyReportService extends IService<GameBetDailyReport> 
    */
   List<ActivityStatisticItem> getGameReportInfo(Map map);
 
-  /**
-   * 汇总投注日报
-   *
-   * @param list List
-   */
-  void assembleBetDailyReport(List<String> list);
-
   List<GameReportVO> queryGamePlatformReport(GameBetDailyReportQueryDTO dto);
 
-  //获取达到有效投注金额的会员账号
+  // 获取达到有效投注金额的会员账号
   List<String> getSatisfyBetAccount(String minBetAmount, String startTime, String endTime);
 }

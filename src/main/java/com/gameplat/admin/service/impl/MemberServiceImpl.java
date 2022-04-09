@@ -7,6 +7,7 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
 import com.alicp.jetcache.anno.CacheInvalidate;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -27,6 +28,7 @@ import com.gameplat.common.enums.TransferTypesEnum;
 import com.gameplat.common.lang.Assert;
 import com.gameplat.model.entity.game.GameTransferInfo;
 import com.gameplat.model.entity.member.Member;
+import com.gameplat.model.entity.member.MemberDayReport;
 import com.gameplat.model.entity.member.MemberInfo;
 import com.gameplat.security.SecurityUserHolder;
 import com.google.common.collect.Lists;
@@ -50,7 +52,8 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
 
   private static final String DL_FORMAL_TYPE = "A";
 
-  @Autowired private MemberMapper memberMapper;
+  @Autowired(required = false)
+  private MemberMapper memberMapper;
 
   @Autowired private MemberConvert memberConvert;
 
@@ -72,13 +75,67 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
 
   @Autowired private GameAdminService gameAdminService;
 
-  @Autowired private RedisTemplate<String, Integer> redisTemplate;
+  @Autowired(required = false)
+  private RedisTemplate<String, Integer> redisTemplate;
+
+  @Autowired
+  private MemberDayReportService memberDayReportService;
 
   @Override
   public IPage<MemberVO> queryPage(Page<Member> page, MemberQueryDTO dto) {
-    return memberMapper
-        .queryPage(page, memberQueryCondition.builderQueryWrapper(dto))
-        .convert(this::setOnlineStatus);
+    IPage<MemberVO> memberVOIPage =
+            memberMapper
+                    .queryPage(page, memberQueryCondition.builderQueryWrapper(dto))
+                    .convert(this::setOnlineStatus);
+
+    // 游戏数据
+    memberVOIPage.setRecords(gameData(memberVOIPage.getRecords()));
+    return memberVOIPage;
+  }
+
+  public List<MemberVO> gameData(List<MemberVO> list) {
+    if (StringUtils.isNotEmpty(list)) {
+      List<String> listAccount =
+              list.stream().map(MemberVO::getAccount).collect(Collectors.toList());
+      String account = getAccount(listAccount);
+      QueryWrapper<MemberDayReport> queryWrapper = new QueryWrapper<>();
+      queryWrapper.select("sum(win_amount) win_amount, sum(water_amount) water_amount,user_name");
+      queryWrapper.in("user_name", account.split(","));
+      queryWrapper.groupBy("user_name");
+      List<MemberDayReport> listMemberDayReport = memberDayReportService.list(queryWrapper);
+      if (StringUtils.isEmpty(listMemberDayReport)) {
+        return list;
+      }
+      list.stream()
+              .forEach(
+                      a -> {
+                        BigDecimal winAmount =
+                                listMemberDayReport.stream()
+                                        .filter(b -> a.getAccount().equalsIgnoreCase(b.getUserName()))
+                                        .map(MemberDayReport::getWinAmount)
+                                        .reduce(BigDecimal.ZERO, BigDecimal::add);
+                        BigDecimal waterAmount =
+                                listMemberDayReport.stream()
+                                        .filter(b -> a.getAccount().equalsIgnoreCase(b.getUserName()))
+                                        .map(MemberDayReport::getWaterAmount)
+                                        .reduce(BigDecimal.ZERO, BigDecimal::add);
+                        a.setWaterAmount(waterAmount);
+                        a.setWinAmount(winAmount);
+                      });
+    }
+    return list;
+  }
+
+  public String getAccount(List<String> listAccount) {
+    StringBuilder sb = new StringBuilder();
+    if (StringUtils.isNotEmpty(listAccount)) {
+      for (String s : listAccount) {
+        sb.append(s).append(",");
+      }
+    }
+    sb.deleteCharAt(sb.toString().length() - 1);
+    String str = sb.toString();
+    return str;
   }
 
   @Override
@@ -532,7 +589,7 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
         memberList =
             this.lambdaQuery()
                 .in(Member::getAccount, dto.getUserNames().split(","))
-                .eq(Member::getUserType, dto.getUserType())
+                    .eq(Member::getUserType, MemberEnums.Type.PROMOTION.value())
                 .list();
       }
       if (StringUtils.isEmpty(memberList) || memberList.size() != userNames.length) {
@@ -560,7 +617,8 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
       throw new ServiceException("isCleanAll是错误的传参数据");
     }
     // 额度回收
-    memberList.parallelStream()
+    memberList
+            .parallelStream()
         .map(Member::getAccount)
         .forEach(gameAdminService::recyclingAmountByAccount);
     memberInfoService.updateClearGTMember(dto);
@@ -575,5 +633,8 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
     }
   }
 
-
+  @Override
+  public MemberBalanceVO findMemberVip(String username, String level, String vipGrade) {
+    return memberMapper.findMemberVip(username, level, vipGrade);
+  }
 }

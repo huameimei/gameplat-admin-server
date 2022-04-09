@@ -1,5 +1,6 @@
 package com.gameplat.admin.service.impl;
 
+import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -16,6 +17,7 @@ import com.gameplat.admin.service.PayAccountService;
 import com.gameplat.admin.service.PayTypeService;
 import com.gameplat.base.common.enums.EnableEnum;
 import com.gameplat.base.common.exception.ServiceException;
+import com.gameplat.common.enums.RechargeMode;
 import com.gameplat.model.entity.pay.PayType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -43,6 +45,23 @@ public class PayTypeServiceImpl extends ServiceImpl<PayTypeMapper, PayType>
         .stream()
         .map(payTypeConvert::toVo)
         .collect(Collectors.toList());
+  }
+
+  @Override
+  public List<PayTypeVO> payTypeQueryList(int type) {
+    return this.lambdaQuery()
+            .eq(
+                    ObjectUtils.isNotNull(type)
+                            && ObjectUtil.equal(type, RechargeMode.ONLINE_PAY.getValue()),
+                    PayType::getOnlinePayEnabled,
+                    1)
+            .eq(
+                    ObjectUtils.isNotNull(type) && ObjectUtil.equal(type, RechargeMode.TRANSFER.getValue()),
+                    PayType::getTransferEnabled,
+                    1)
+            .list().stream()
+            .map(payTypeConvert::toVo)
+            .collect(Collectors.toList());
   }
 
   @Override

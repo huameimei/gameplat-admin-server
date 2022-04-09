@@ -3,6 +3,7 @@ package com.gameplat.admin.controller.open.finance;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.gameplat.admin.model.bean.ManualRechargeOrderBo;
 import com.gameplat.admin.model.bean.PageExt;
+import com.gameplat.admin.model.dto.ManualRechargeOrderDto;
 import com.gameplat.admin.model.dto.RechargeOrderQueryDTO;
 import com.gameplat.admin.model.vo.RechargeOrderVO;
 import com.gameplat.admin.model.vo.SummaryVO;
@@ -19,12 +20,12 @@ import com.gameplat.redis.redisson.DistributedLocker;
 import com.gameplat.security.SecurityUserHolder;
 import com.gameplat.security.context.UserCredential;
 import io.swagger.annotations.ApiOperation;
-import java.util.concurrent.TimeUnit;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
 import java.util.List;
@@ -200,12 +201,15 @@ public class RechargeOrderController {
   @PostMapping("/editDiscount")
   @PreAuthorize("hasAuthority('finance:rechargeOrder:editDiscount')")
   @Log(
-      module = ServiceName.ADMIN_SERVICE,
-      type = LogType.RECHARGE,
-      desc = "'修改优惠金额为：' + #discountAmount")
+          module = ServiceName.ADMIN_SERVICE,
+          type = LogType.RECHARGE,
+          desc = "'修改优惠金额为：' + #discountAmount")
   public void updateDiscount(
-      Long id, Integer discountType, BigDecimal discountAmount, BigDecimal discountDml,
-      Long memberId) {
+          Long id,
+          Integer discountType,
+          BigDecimal discountAmount,
+          BigDecimal discountDml,
+          Long memberId) {
     String lock_key = "member_rw_" + memberId;
     distributedLocker.lock(lock_key);
     try {
@@ -221,9 +225,9 @@ public class RechargeOrderController {
   @PostMapping("/editRemarks")
   @PreAuthorize("hasAuthority('finance:rechargeOrder:editRemarks')")
   @Log(
-      module = ServiceName.ADMIN_SERVICE,
-      type = LogType.RECHARGE,
-      desc = "'修改备注：' + #auditRemarks")
+          module = ServiceName.ADMIN_SERVICE,
+          type = LogType.RECHARGE,
+          desc = "'修改备注：' + #auditRemarks")
   public void updateRemarks(Long id, String auditRemarks) {
     rechargeOrderService.updateRemarks(id, auditRemarks);
   }
@@ -231,7 +235,7 @@ public class RechargeOrderController {
   @PostMapping("/page")
   @PreAuthorize("hasAuthority('finance:rechargeOrder:view')")
   public PageExt<RechargeOrderVO, SummaryVO> queryPage(
-      Page<RechargeOrder> page, RechargeOrderQueryDTO dto) {
+          Page<RechargeOrder> page, RechargeOrderQueryDTO dto) {
     return rechargeOrderService.findPage(page, dto);
   }
 
@@ -239,9 +243,9 @@ public class RechargeOrderController {
   @PostMapping("/manual")
   @PreAuthorize("hasAuthority('finance:rechargeOrder:manual')")
   @Log(
-      module = ServiceName.ADMIN_SERVICE,
-      type = LogType.RECHARGE,
-      desc = "'人工入款memberId：' + #manualRechargeOrderBo.memberId")
+          module = ServiceName.ADMIN_SERVICE,
+          type = LogType.RECHARGE,
+          desc = "'人工入款memberId：' + #manualRechargeOrderBo.memberId")
   public void manual(ManualRechargeOrderBo manualRechargeOrderBo, HttpServletRequest request) {
     UserCredential userCredential = SecurityUserHolder.getCredential();
     String lock_key = "recharge_manual_" + userCredential.getUserId();
@@ -257,7 +261,6 @@ public class RechargeOrderController {
     }
   }
 
-
   @ApiOperation(value = "获取未处理数据统计数据")
   @GetMapping("/withdraw_charge")
   public WithdrawChargeVO getTotal() {
@@ -267,5 +270,31 @@ public class RechargeOrderController {
     vo.setRechargeCount(rechargeCount);
     vo.setWithdrawCount(withdrawCount);
     return vo;
+  }
+
+  /**
+   * 人工批量充值（文件上传 username）
+   */
+  @PostMapping("/fileUserNameRech")
+  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.RECHARGE, desc = "'人工入款批量充值")
+  public void fileUserNameRech(
+          ManualRechargeOrderDto dto,
+          @RequestPart(value = "file", required = false) MultipartFile file,
+          HttpServletRequest request)
+          throws Exception {
+    log.info("根据用户名进行批量充值操作人：{}", SecurityUserHolder.getCredential().getUsername());
+    rechargeOrderService.fileUserNameRech(dto, file, request, SecurityUserHolder.getCredential());
+  }
+
+  /** 人工批量充值（文件上传） */
+  @PostMapping("/fileRech")
+  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.RECHARGE, desc = "'人工入款文件批量充值")
+  public void fileRech(
+          @RequestPart(value = "file", required = false) MultipartFile file,
+          @RequestParam("discountType") Integer discountType,
+          HttpServletRequest request)
+          throws Exception {
+    log.info("根据上传文件进行批量充值操作人：{}", SecurityUserHolder.getCredential().getUsername());
+    rechargeOrderService.fileRech(file, discountType, request, SecurityUserHolder.getCredential());
   }
 }

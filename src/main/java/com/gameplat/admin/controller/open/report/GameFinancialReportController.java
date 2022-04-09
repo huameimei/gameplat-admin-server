@@ -39,7 +39,7 @@ public class GameFinancialReportController {
 
   @ApiOperation("查询财务报表")
   @GetMapping(value = "/findReportPage")
-  @PreAuthorize("hasAuthority('financial:report:page')")
+  @PreAuthorize("hasAuthority('financial:report:view')")
   public PageDtoVO<GameFinancialReportVO> findReportPage(Page<GameFinancialReport> page, GameFinancialReportQueryDTO queryDTO) {
     return gameFinancialReportService.findReportPage(page, queryDTO);
   }

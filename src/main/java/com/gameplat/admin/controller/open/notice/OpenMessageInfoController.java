@@ -13,8 +13,6 @@ import com.gameplat.admin.service.MessageInfoService;
 import com.gameplat.model.entity.member.Member;
 import com.gameplat.model.entity.message.Message;
 import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -37,10 +35,6 @@ public class OpenMessageInfoController {
   @ApiOperation(value = "分页查询消息")
   @GetMapping("/page")
   @PreAuthorize("hasAuthority('operator:message:view')")
-  @ApiImplicitParams({
-    @ApiImplicitParam(name = "current", value = "分页参数：当前页", defaultValue = "1"),
-    @ApiImplicitParam(name = "size", value = "每页条数")
-  })
   public IPage<MessageInfoVO> page(@ApiIgnore PageDTO<Message> page, MessageInfoQueryDTO dto) {
     return messageInfoService.findMessageList(page, dto);
   }

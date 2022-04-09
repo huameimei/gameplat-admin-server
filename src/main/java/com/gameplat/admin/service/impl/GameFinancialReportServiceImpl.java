@@ -140,6 +140,7 @@ public class GameFinancialReportServiceImpl
   public void exportGameFinancialReport(String statisticsTime, HttpServletResponse response) {
     // 根据年月查询需要导出报表数据
     GameFinancialReportQueryDTO queryDTO = new GameFinancialReportQueryDTO();
+    queryDTO.setStatisticsTime(statisticsTime);
     List<GameFinancialReportVO> reportList =
             gameFinancialReportMapper.findGameFinancialReportList(queryDTO);
 

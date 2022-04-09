@@ -17,6 +17,8 @@ import com.gameplat.model.entity.member.MemberDevice;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
+
 /**
  * @author aBen
  * @date 2022/4/9 0:18
@@ -53,7 +55,7 @@ public class MemberDeviceServiceImpl extends ServiceImpl<MemberDeviceMapper, Mem
       query.select("max( last_login_time ) lastLoginTime, device_client_id deviceClientId, username");
       query.gt("length(device_client_id)", 0);
       query.likeRight(StringUtils.isNotEmpty(queryDTO.getDeviceClientId()), "device_client_id", queryDTO.getDeviceClientId())
-              .groupBy("user_id").orderByDesc("last_login_time");
+              .groupBy("member_id").orderByDesc("last_login_time");
       list = memberDeviceMapper.selectPage(page, query).convert(memberDeviceConvert::toVo);
     } else {
       throw new ServiceException("标识传参错误");

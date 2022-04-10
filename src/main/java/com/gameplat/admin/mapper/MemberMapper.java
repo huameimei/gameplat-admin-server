@@ -8,11 +8,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.gameplat.admin.model.dto.IpAnalysisDTO;
 import com.gameplat.admin.model.dto.MemberQueryDTO;
-import com.gameplat.admin.model.vo.IpAnalysisVO;
-import com.gameplat.admin.model.vo.MemberInfoVO;
-import com.gameplat.admin.model.vo.MemberLevelVO;
-import com.gameplat.admin.model.vo.MemberVO;
-import com.gameplat.admin.model.vo.SpreadUnionVO;
+import com.gameplat.admin.model.vo.*;
 import com.gameplat.model.entity.member.Member;
 import java.util.List;
 import org.apache.ibatis.annotations.Param;
@@ -94,4 +90,7 @@ public interface MemberMapper extends BaseMapper<Member> {
 
   /** 获取代理线下的会员账号信息 */
   List<Member> getMemberListByAgentAccount(MemberQueryDTO memberQueryDTO);
+
+  MemberBalanceVO findMemberVip(@Param("username") String username, @Param("userlevel") String userlevel, @Param("vipGrade") String vipGrade);
+
 }

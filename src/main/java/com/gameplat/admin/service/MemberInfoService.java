@@ -44,6 +44,15 @@ public interface MemberInfoService extends IService<MemberInfo> {
   BigDecimal findUserRebate(String account);
 
   /**
+   * 冻结金额退回<br>
+   * 失败时，默认重试3次
+   *
+   * @param memberId Long
+   * @param amount 金额，正数
+   */
+  void updateFreeze(Long memberId, BigDecimal amount);
+
+  /**
    * 获取用户下级最大投注返点
    *
    * @param agentAccount String

@@ -12,11 +12,16 @@ import com.gameplat.common.enums.SwitchStatusEnum;
 import com.gameplat.log.annotation.Log;
 import com.gameplat.log.enums.LogType;
 import com.gameplat.model.entity.pay.TpMerchant;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/admin/thirdParty/tpMerchants")
@@ -62,13 +67,12 @@ public class TpMerchantController {
   }
 
   @PostMapping("/page")
-  @PreAuthorize("hasAuthority('thirdParty:tpMerchants:page')")
+  @PreAuthorize("hasAuthority('thirdParty:tpMerchants:view')")
   public IPage<TpMerchantVO> getPage(Page<TpMerchant> page, Integer status, String name) {
     return tpMerchantService.queryPage(page, status, name);
   }
 
   @GetMapping("/queryAllMerchant")
-  @PreAuthorize("hasAuthority('thirdParty:tpMerchants:queryAllMerchant')")
   public List<TpMerchantVO> getAllMerchant() {
     return tpMerchantService.queryAllMerchant(SwitchStatusEnum.ENABLED.getValue());
   }

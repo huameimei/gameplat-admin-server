@@ -30,9 +30,29 @@ public class PayTypeController {
   }
 
   @PostMapping("/list")
-  @PreAuthorize("hasAuthority('thirdParty:payTypes:list')")
+  @PreAuthorize("hasAuthority('thirdParty:payTypes:view')")
   public List<PayTypeVO> findPayTypes(String name) {
     return payTypeService.queryList(name);
+  }
+
+  /**
+   * 转账类型 return List<PayTypeVO>
+   */
+  @GetMapping("/transferQueryList")
+  @PreAuthorize("hasAuthority('transferPay:payTypes:view')")
+  public List<PayTypeVO> transferQueryList() {
+    return payTypeService.payTypeQueryList(1);
+  }
+
+  /**
+   * 在线支付类型
+   *
+   * @return List<PayTypeVO>
+   */
+  @GetMapping("/onlineQueryList")
+  @PreAuthorize("hasAuthority('onlinePay:payTypes:view')")
+  public List<PayTypeVO> onlineQueryList() {
+    return payTypeService.payTypeQueryList(2);
   }
 
   @PostMapping("/add")
@@ -60,7 +80,7 @@ public class PayTypeController {
   }
 
   @PostMapping("/page")
-  @PreAuthorize("hasAuthority('thirdParty:payTypes:page')")
+  @PreAuthorize("hasAuthority('thirdParty:payTypes:view')")
   public IPage<PayType> queryPage(Page<PayType> page) {
     return payTypeService.queryPage(page);
   }

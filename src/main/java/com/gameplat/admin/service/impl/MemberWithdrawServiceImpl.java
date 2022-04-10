@@ -1,5 +1,7 @@
 package com.gameplat.admin.service.impl;
 
+import cn.hutool.core.convert.Convert;
+import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -15,7 +17,9 @@ import com.gameplat.admin.enums.BlacklistConstant.BizBlacklistType;
 import com.gameplat.admin.enums.CashEnum;
 import com.gameplat.admin.enums.ProxyPayStatusEnum;
 import com.gameplat.admin.enums.WithdrawStatus;
+import com.gameplat.admin.feign.MessageFeignClient;
 import com.gameplat.admin.mapper.MemberWithdrawMapper;
+import com.gameplat.admin.mapper.MessageMapper;
 import com.gameplat.admin.model.bean.*;
 import com.gameplat.admin.model.dto.MemberWithdrawQueryDTO;
 import com.gameplat.admin.model.vo.MemberWithdrawVO;
@@ -27,13 +31,19 @@ import com.gameplat.base.common.json.JsonUtils;
 import com.gameplat.base.common.snowflake.IdGeneratorSnowflake;
 import com.gameplat.base.common.util.DateUtil;
 import com.gameplat.base.common.util.StringUtils;
+import com.gameplat.common.constant.NumberConstant;
+import com.gameplat.common.constant.SocketEnum;
 import com.gameplat.common.enums.*;
 import com.gameplat.common.model.bean.Builder;
 import com.gameplat.common.model.bean.UserEquipment;
 import com.gameplat.common.model.bean.limit.MemberRechargeLimit;
+import com.gameplat.common.model.bean.limit.MemberWithdrawLimit;
 import com.gameplat.model.entity.member.*;
+import com.gameplat.model.entity.message.Message;
+import com.gameplat.model.entity.message.MessageDistribute;
 import com.gameplat.model.entity.pay.PpInterface;
 import com.gameplat.model.entity.pay.PpMerchant;
+import com.gameplat.model.entity.sys.SysDictData;
 import com.gameplat.model.entity.sys.SysUser;
 import com.gameplat.security.context.UserCredential;
 import jodd.util.StringUtil;
@@ -55,35 +65,60 @@ import java.util.*;
 public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper, MemberWithdraw>
     implements MemberWithdrawService {
 
-  @Autowired private MemberWithdrawConvert userWithdrawConvert;
+  @Autowired
+  private MemberWithdrawConvert userWithdrawConvert;
 
-  @Autowired private MemberWithdrawMapper memberWithdrawMapper;
+  @Autowired(required = false)
+  private MemberWithdrawMapper memberWithdrawMapper;
 
-  @Autowired private MemberWithdrawHistoryService memberWithdrawHistoryService;
+  @Autowired
+  private MemberWithdrawHistoryService memberWithdrawHistoryService;
 
-  @Autowired private MemberService memberService;
+  @Autowired
+  private MemberService memberService;
 
-  @Autowired private SysUserService sysUserService;
+  @Autowired
+  private SysUserService sysUserService;
 
-  @Autowired private LimitInfoService limitInfoService;
+  @Autowired
+  private LimitInfoService limitInfoService;
 
-  @Autowired private PpInterfaceService ppInterfaceService;
+  @Autowired
+  private PpInterfaceService ppInterfaceService;
 
-  @Autowired private PpMerchantService ppMerchantService;
+  @Autowired
+  private PpMerchantService ppMerchantService;
 
-  @Autowired private MemberInfoService memberInfoService;
+  @Autowired
+  private MemberInfoService memberInfoService;
 
-  @Autowired private MemberBillService memberBillService;
+  @Autowired
+  private MemberBillService memberBillService;
 
-  @Autowired private ValidWithdrawService validWithdrawService;
+  @Autowired
+  private ValidWithdrawService validWithdrawService;
 
-  @Autowired private RechargeOrderService rechargeOrderService;
+  @Autowired
+  private RechargeOrderService rechargeOrderService;
 
-  @Autowired private BizBlacklistFacade bizBlacklistFacade;
+  @Autowired
+  private BizBlacklistFacade bizBlacklistFacade;
 
-  @Autowired private ConfigService configService;
+  @Autowired
+  private ConfigService configService;
 
-  @Autowired private MemberRwReportService memberRwReportService;
+  @Autowired
+  private MemberRwReportService memberRwReportService;
+
+  @Autowired(required = false)
+  private MessageMapper messageMapper;
+  @Autowired
+  private MessageDistributeService messageDistributeService;
+  @Autowired
+  private SysDictDataService sysDictDataService;
+
+  @Autowired(required = false)
+  private MessageFeignClient client;
 
   private static boolean verifyPpMerchant(
       MemberWithdraw memberWithdraw, PpMerchant ppMerchant, PpInterface ppInterface) {
@@ -252,19 +287,19 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
       Long id,
       Integer cashStatus,
       Integer curStatus,
-      boolean isDirect,
       UserCredential userCredential,
       UserEquipment userEquipment)
       throws Exception {
     if (cashStatus.equals(curStatus) || null == id || null == cashStatus || null == curStatus) {
       throw new ServiceException("错误的参数.");
     }
-    MemberWithdraw memberWithdraw = this.getById(id);
 
+    MemberWithdraw memberWithdraw = this.getById(id);
     if (memberWithdraw == null) {
       throw new ServiceException("充值订单不存在或订单已处理");
     }
-
+    // 是否为免提直充
+    boolean isDirect = WithdrawTypeConstant.DIRECT.equals(memberWithdraw.getWithdrawType());
     Integer origCashStatus = memberWithdraw.getCashStatus();
     if (!curStatus.equals(origCashStatus)) {
       throw new ServiceException("订单状态已变化,请刷新重试.");
@@ -286,9 +321,14 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
     }
     if (WithdrawStatus.UNHANDLED.getValue() != curStatus) {
       // 验证已受理出款订单是否开启允许其他账户验证
-
       crossAccountCheck(userCredential, memberWithdraw);
     }
+
+    // 验证出款流程 ,未受理订单是否可以直接入款
+    if (ObjectUtil.equals(WithdrawStatus.SUCCESS.getValue(), cashStatus)) {
+      withdrawProcess(memberWithdraw, cashStatus);
+    }
+
     /** 校验子账号当天受理会员取款审核额度 */
     if (null != userCredential.getUsername()
         && StringUtils.equals(UserTypes.SUBUSER.value(), userCredential.getUserType())
@@ -340,8 +380,11 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
         if (isDirect) {
           this.directCharge(memberWithdraw, userCredential, userEquipment);
         }
-
+        // 移除会员提现冻结金额
+        memberInfoService.updateFreeze(member.getId(), memberWithdraw.getCashMoney().negate());
       } else if (WithdrawStatus.CANCELLED.getValue() == cashStatus) { // 取消出款操作
+        // 释放会员提现冻结金额
+        memberInfoService.updateFreeze(member.getId(), memberWithdraw.getCashMoney().negate());
         // 释放会员提现金额
         memberInfoService.updateBalance(member.getId(), memberWithdraw.getCashMoney());
         String billContent =
@@ -375,13 +418,34 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
         bill.setContent(content);
         bill.setOperator(userCredential.getUsername());
         memberBillService.save(member, bill);
+        // 移除会员提现冻结金额
+        memberInfoService.updateFreeze(member.getId(), memberWithdraw.getCashMoney().negate());
       }
       // 新增出款记录
       insertWithdrawHistory(memberWithdraw);
     }
+    // 新增消息
+    if (ObjectUtil.equals(cashStatus, WithdrawStatus.SUCCESS.getValue())
+            || ObjectUtil.equals(cashStatus, WithdrawStatus.CANCELLED.getValue())) {
+      this.addMessageInfo(memberWithdraw, WithdrawStatus.SUCCESS.getValue());
+      if (ObjectUtil.equals(WithdrawStatus.SUCCESS.getValue(), cashStatus)) {
+        MemberWithdrawLimit withradLimit = limitInfoService.getWithradLimit();
+        this.sendMessage(
+                memberWithdraw.getAccount(),
+                SocketEnum.SOCKET_WITHDRAW_CANCEL,
+                withradLimit.getUserApplyLoanAfterHintsMessage());
+      } else if (ObjectUtil.equals(cashStatus, WithdrawStatus.CANCELLED.getValue())) {
+        this.sendMessage(
+                memberWithdraw.getAccount(),
+                SocketEnum.SOCKET_WITHDRAW_SUCCESS,
+                SocketEnum.SEND_WITHDRAW_FAIL_MESSAGE);
+      }
+    }
   }
 
-  /** 过滤不符合规则的第三方出款商户 */
+  /**
+   * 过滤不符合规则的第三方出款商户
+   */
   @Override
   public List<PpMerchant> queryProxyMerchant(Long id) {
     // 根据体现记录查询用户的层级和出款金额
@@ -515,7 +579,7 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
    * 检验子账号出款受理额度
    *
    * @param adminLimitInfo AdminLimitInfo
-   * @param cashMode Integer
+   * @param cashMode       Integer
    */
   public void checkZzhWithdrawAmountAudit(
       AdminLimitInfo adminLimitInfo, Integer cashMode, BigDecimal cashMoney, String userName) {
@@ -540,7 +604,7 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
                 + adminLimitInfo.getMaxManualWithdrawAmount()
                 + "元。 超过额度"
                 + MoneyUtils.toYuanStr(
-                    cashMoney.subtract(adminLimitInfo.getMaxManualWithdrawAmount()))
+                cashMoney.subtract(adminLimitInfo.getMaxManualWithdrawAmount()))
                 + "元";
         throw new ServiceException(buffer);
       }
@@ -566,12 +630,15 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
     }
   }
 
-  /** 开启出入款订单是否允许其他账户操作配置 校验非超管账号是否原受理人 */
+  /**
+   * 开启出入款订单是否允许其他账户操作配置 校验非超管账号是否原受理人
+   */
   private void crossAccountCheck(UserCredential userCredential, MemberWithdraw memberWithdraw)
       throws ServiceException {
     if (userCredential != null
         && StringUtils.isNotEmpty(userCredential.getUsername())
         && null != memberWithdraw) {
+
       MemberRechargeLimit limitInfo = limitInfoService.getRechargeLimit();
       boolean toCheck =
           BooleanEnum.NO.match(limitInfo.getIsHandledAllowOthersOperate())
@@ -579,14 +646,32 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
       if (toCheck) {
         if (!Objects.equals(WithdrawStatus.UNHANDLED.getValue(), memberWithdraw.getCashStatus())
             && !StringUtils.equalsIgnoreCase(
-                userCredential.getUsername(), memberWithdraw.getOperatorAccount())) {
+            userCredential.getUsername(), memberWithdraw.getOperatorAccount())) {
           throw new ServiceException("您无权操作此订单:" + memberWithdraw.getCashOrderNo());
         }
       }
     }
   }
 
-  /** 检查用户，封装用户信息 */
+  /**
+   * 检查订单是否需要先受理
+   **/
+  private void withdrawProcess(MemberWithdraw memberWithdraw, Integer cashStatus) {
+    MemberWithdrawLimit withradLimit = limitInfoService.getWithradLimit();
+
+    boolean withdrawProcess =
+        BooleanEnum.YES.match(withradLimit.getIsWithdrawProcess());
+    if (withdrawProcess &&
+        memberWithdraw.getCashStatus() != WithdrawStatus.HANDLED.getValue() &&
+        WithdrawStatus.SUCCESS.getValue() == cashStatus) {
+      throw new ServiceException("请先受理此订单:" + memberWithdraw.getCashOrderNo());
+    }
+  }
+
+
+  /**
+   * 检查用户，封装用户信息
+   */
   private void checkUserInfo(Member member, MemberInfo memberInfo, boolean checkUserState)
       throws Exception {
     // 查询用户是否存在
@@ -710,5 +795,110 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
             memberWithdraw.getAccount());
       }
     }
+  }
+
+  @Override
+  public long getUntreatedWithdrawCount() {
+    return this.lambdaQuery()
+        .eq(MemberWithdraw::getCashStatus, 1)
+        .count();
+  }
+
+  /**
+   * 出款消息
+   *
+   * @param memberWithdraw 出款信息
+   * @param state          状态
+   */
+  public void addMessageInfo(MemberWithdraw memberWithdraw, Integer state) {
+    if (this.verifyMessage() == com.gameplat.common.enums.TrueFalse.FALSE.getValue()) {
+      return;
+    }
+    Message messageInfo = new Message();
+    messageInfo.setTitle(title(state));
+    messageInfo.setContent(
+        context(state, memberWithdraw.getCreateTime(), memberWithdraw.getCashMoney()));
+    messageInfo.setCategory(4);
+    messageInfo.setPosition(1);
+    messageInfo.setShowType(0);
+    messageInfo.setPopsCount(0);
+    messageInfo.setPushRange(2);
+    messageInfo.setLinkAccount(memberWithdraw.getAccount());
+    messageInfo.setSort(0);
+    messageInfo.setType(1);
+    messageInfo.setLanguage("zh-CN");
+    messageInfo.setStatus(1);
+    messageInfo.setImmediateFlag(0);
+    messageInfo.setRemarks("系统消息");
+    messageInfo.setCreateBy("system");
+    messageInfo.setCreateTime(new Date());
+    messageMapper.insert(messageInfo);
+
+    MessageDistribute messageDistribute = new MessageDistribute();
+    messageDistribute.setMessageId(messageInfo.getId());
+    messageDistribute.setUserId(memberWithdraw.getMemberId());
+    messageDistribute.setUserAccount(messageInfo.getLinkAccount());
+    messageDistribute.setRechargeLevel(Convert.toInt(memberWithdraw.getMemberLevel()));
+    messageDistribute.setVipLevel(
+        memberInfoService
+            .lambdaQuery()
+            .eq(MemberInfo::getMemberId, memberWithdraw.getMemberId())
+            .one()
+            .getVipLevel());
+    messageDistribute.setReadStatus(NumberConstant.ZERO);
+    messageDistribute.setCreateBy("system");
+    messageDistributeService.save(messageDistribute);
+  }
+
+
+  public void sendMessage(String account, String channel, String message) {
+    Map<String, String> map = new HashMap<>();
+    map.put("user", account);
+    map.put("channel", channel);
+    map.put("title", message);
+    log.info("充值成功=============>开始推送Socket消息,相关参数{}", map);
+    client.userSend(map);
+    log.info("充值成功=============>topic推送测试,相关参数{}", map);
+    client.topicSend(map);
+  }
+
+  public int verifyMessage() {
+    SysDictData sysDictData =
+        sysDictDataService.getDictData(
+            DictTypeEnum.SYSTEM_PARAMETER_CONFIG.getValue(),
+            DictDataEnum.WITHDRAW_PUSH_MSG.getLabel());
+    return ObjectUtil.isNull(sysDictData) ? 0 : Convert.toInt(sysDictData.getDictValue());
+  }
+
+  /**
+   * @param state 状态
+   * @param date  时间
+   * @param money 金额
+   * @return
+   */
+  public String context(Integer state, Date date, BigDecimal money) {
+    String context;
+    String dateStr = DateUtil.dateToStr(date, DateUtil.YYYY_MM_DD_HH_MM_SS);
+    if (ObjectUtil.equals(3, state)) {
+      context = "您于" + dateStr + "提现的" + money.setScale(2, 2) + "已提现成功。";
+    } else {
+      context = "您于" + date + "提现的" + money.setScale(2, 2) + "已失败。";
+    }
+    return context;
+  }
+
+  /**
+   * @param state
+   * @return
+   */
+  public String title(int state) {
+    String title;
+    if (ObjectUtil.equals(state, 3)) {
+      title = "提现成功";
+    } else {
+      title = "提现失败";
+    }
+
+    return title;
   }
 }

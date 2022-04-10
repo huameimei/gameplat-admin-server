@@ -9,9 +9,10 @@ import com.gameplat.admin.convert.SpreadUnionConvert;
 import com.gameplat.admin.mapper.SpreadUnionPackageMapper;
 import com.gameplat.admin.model.dto.SpreadUnionPackageDTO;
 import com.gameplat.admin.model.vo.SpreadUnionPackageVO;
+import com.gameplat.admin.service.SpreadLinkInfoService;
 import com.gameplat.admin.service.SpreadUnionPackageService;
 import com.gameplat.base.common.exception.ServiceException;
-import com.gameplat.common.lang.Assert;
+import com.gameplat.model.entity.spread.SpreadLinkInfo;
 import com.gameplat.model.entity.spread.SpreadUnionPackage;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +34,9 @@ public class SpreadUnionPackageServiceImpl
 
   @Autowired private SpreadUnionPackageMapper spreadUnionPackageMapper;
 
+  @Autowired private SpreadLinkInfoService spreadLinkInfoService;
+
+
   /** 联盟包设置列表 检索条件 代理账号，联盟名称，联运类型 */
   @Override
   @SentinelResource(value = "getUnionPackage")
@@ -45,6 +49,12 @@ public class SpreadUnionPackageServiceImpl
   @Override
   @SentinelResource(value = "insertUnionPackage")
   public void insertUnionPackage(SpreadUnionPackageDTO spreadUnionPackageDTO) {
+    //判断是否属于代理
+    List<SpreadLinkInfo> spreadList =
+            spreadLinkInfoService.getSpreadList(spreadUnionPackageDTO.getAgentAccount());
+    if (spreadList.size() == 0) {
+      throw new ServiceException("未获取到您需要绑定的代理信息");
+    }
     if (!this.save(spreadUnionConvert.toSpreadUnionPackageDTO(spreadUnionPackageDTO))) {
       log.error("增加联盟包设置失败,传入的参数 {}", spreadUnionPackageDTO);
       throw new ServiceException("增加联盟包设置失败");
@@ -119,6 +129,6 @@ public class SpreadUnionPackageServiceImpl
   public void removeByUnionId(List<Long> unionId) {
     LambdaQueryWrapper<SpreadUnionPackage> query = Wrappers.lambdaQuery();
     query.in(SpreadUnionPackage::getUnionId, unionId);
-    Assert.isTrue(this.remove(query), "删除失败");
+    this.remove(query);
   }
 }

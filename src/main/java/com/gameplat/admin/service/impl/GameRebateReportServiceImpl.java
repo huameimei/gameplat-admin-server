@@ -16,7 +16,9 @@ import com.gameplat.admin.mapper.GameRebateConfigMapper;
 import com.gameplat.admin.mapper.GameRebateDetailMapper;
 import com.gameplat.admin.mapper.GameRebateReportMapper;
 import com.gameplat.admin.model.dto.GameRebateReportQueryDTO;
+import com.gameplat.admin.model.dto.GameRebateStatisQueryDTO;
 import com.gameplat.admin.model.vo.GameMemberDayReportVO;
+import com.gameplat.admin.model.vo.GameReportVO;
 import com.gameplat.admin.model.vo.MemberInfoVO;
 import com.gameplat.admin.model.vo.PageDtoVO;
 import com.gameplat.admin.service.GameBlacklistService;
@@ -29,11 +31,13 @@ import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.json.JsonUtils;
 import com.gameplat.common.enums.GameBlacklistTypeEnum;
 import com.gameplat.common.enums.TranTypes;
+import com.gameplat.common.lang.Assert;
 import com.gameplat.model.entity.game.GameBlacklist;
 import com.gameplat.model.entity.game.GameRebateConfig;
 import com.gameplat.model.entity.game.GameRebateDetail;
 import com.gameplat.model.entity.game.GameRebatePeriod;
 import com.gameplat.model.entity.game.GameRebateReport;
+import com.gameplat.model.entity.member.Member;
 import com.gameplat.model.entity.member.MemberBill;
 import com.gameplat.model.entity.recharge.RechargeOrder;
 import com.gameplat.redis.api.RedisService;
@@ -49,7 +53,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
@@ -80,6 +83,8 @@ public class GameRebateReportServiceImpl
   @Autowired private GameRebateDetailMapper gameRebateDetailMapper;
 
   @Autowired private GameBetDailyReportMapper gameBetDailyReportMapper;
+
+  @Autowired private GameRebateReportMapper gameRebateReportMapper;
 
   @Autowired private RedisService redisService;
 
@@ -115,7 +120,7 @@ public class GameRebateReportServiceImpl
     return pageDtoVO;
   }
 
-  /** 真人返水拒发 */
+  /** 游戏返水拒发 */
   @Override
   public void reject(String account, String periodName, String remark) {
     QueryWrapper<GameRebateDetail> query = Wrappers.query();
@@ -334,8 +339,8 @@ public class GameRebateReportServiceImpl
   }
 
   @Override
-  @SneakyThrows
-  public void accept(Long periodId, Long memberId, BigDecimal realRebateMoney, String remark) {
+  public void accept(Long periodId, Long memberId, BigDecimal realRebateMoney, String remark)
+      throws Exception {
     verifyAndUpdate(memberId, periodId, GameRebateReportStatus.ACCEPTED.getValue(), remark);
     MemberInfoVO member = memberService.getInfo(memberId);
     // 添加打码量
@@ -447,6 +452,18 @@ public class GameRebateReportServiceImpl
     memberBillService.save(memberBill);
 
     // 修改账户余额
-    memberInfoService.updateBalanceWithWithdraw(member.getId(), realRebateMoney);
+    memberInfoService.updateBalance(member.getId(), realRebateMoney.negate());
+  }
+
+  @Override
+  public List<GameReportVO> queryGameReport(GameRebateStatisQueryDTO dto) {
+    if (com.gameplat.base.common.util.StringUtils.isNotBlank(dto.getSuperAccount())) {
+      Member member = memberService.getByAccount(dto.getSuperAccount()).orElse(null);
+      Assert.notNull(member, "用户不存在");
+      dto.setUserPaths(member.getSuperPath());
+      // 是否代理账号
+      dto.setAccount(null);
+    }
+    return gameRebateReportMapper.queryGameReport(dto);
   }
 }

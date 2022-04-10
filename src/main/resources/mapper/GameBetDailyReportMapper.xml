@@ -195,7 +195,7 @@
           AND stat_time <![CDATA[ <= ]]> date_format(#{endTime}, '%Y-%m-%d')
         </if>
         <if test="sportGameList != null and sportGameList != ''">
-          AND FIND_IN_SET(first_kind, #{sportGameList})
+          AND FIND_IN_SET(game_kind, #{sportGameList})
         </if>
       </where>
       GROUP BY account ) a
@@ -212,7 +212,7 @@
             AND stat_time <![CDATA[ <= ]]> date_format(#{endTime}, '%Y-%m-%d')
           </if>
           <if test="sportGameList != null and sportGameList != ''">
-            AND FIND_IN_SET(first_kind, #{sportGameList})
+            AND FIND_IN_SET(game_kind, #{sportGameList})
           </if>
         </where>
         GROUP BY account,stat_time ) b ON a.account = b.account
@@ -230,36 +230,36 @@
 
   <select id="findGameDmlDateList" resultType="com.gameplat.admin.model.bean.ActivityStatisticItem">
     SELECT
-    user_name userName,
+      account userName,
     GROUP_CONCAT(DISTINCT(count_date)) AS gameCountDates
     FROM
-    ( SELECT user_name, count_date, sum( valid_amount ) AS totalAmount
+    ( SELECT account, stat_time as count_date, sum( valid_amount ) AS totalAmount
     FROM
-    member_game_day_report
+      game_bet_daily_report
     <where>
       <if test="userNameList != null and userNameList.size > 0">
-        and user_name in
+        and account in
         <foreach collection="userNameList" index="index" item="item" open="(" close=")" separator=",">
           #{item}
         </foreach>
       </if>
       <if test="startTime != null">
-        and count_date <![CDATA[ >= ]]> date_format(#{startTime}, '%Y-%m-%d')
+        and stat_time <![CDATA[ >= ]]> date_format(#{startTime}, '%Y-%m-%d')
       </if>
       <if test="endTime != null">
-        and count_date <![CDATA[ <= ]]> date_format(#{endTime}, '%Y-%m-%d')
+        and stat_time <![CDATA[ <= ]]> date_format(#{endTime}, '%Y-%m-%d')
       </if>
       <if test="sportGameList != null and sportGameList != ''">
-        and find_in_set(first_kind, #{sportGameList})
+        and find_in_set(game_kind, #{sportGameList})
       </if>
     </where>
-    GROUP BY user_name, count_date ) AS a
+    GROUP BY account, stat_time ) AS a
     <where>
       <if test="sportValidAmount != null">
         and totalAmount >= #{sportValidAmount}
       </if>
     </where>
-    GROUP BY a.user_name
+    GROUP BY a.account
   </select>
 
 
@@ -306,7 +306,7 @@
               and dr.stat_time BETWEEN #{beginTime} AND #{endTime}
             </if>
             <if test="userPaths != null and userPaths != ''">
-              and dr.user_paths like contact(#{userPaths},'%')
+                and dr.user_paths like concat(#{userPaths},'%')
             </if>
             <if test="account != null and account != ''">
               and dr.account = #{account}
@@ -320,7 +320,7 @@
           and rr.stat_time BETWEEN #{beginTime} AND #{endTime}
         </if>
         <if test="userPaths != null and userPaths != ''">
-          and rr.user_paths like contact(#{userPaths},'%')
+            and rr.user_paths like concat(#{userPaths},'%')
         </if>
         <if test="account != null and account != ''">
           and rr.account = #{account}
@@ -387,6 +387,22 @@
             </otherwise>
         </choose>
         GROUP BY r.account,r.super_account,r.game_kind,r.game_type
+    </select>
+
+    <select id="getSatisfyBetAccount" resultType="java.lang.String">
+        select t.account from
+        (select member_id as memberId, account, sum(valid_amount) as validAmount from game_bet_daily_report
+        <where>
+            <if test="startTime != null and startTime != ''">
+                AND stat_time &gt;= #{startTime}
+            </if>
+            <if test="endTime != null and endTime != ''">
+                AND stat_time &lt;= #{endTime}
+            </if>
+        </where>
+        GROUP BY member_id
+        ) t
+        where validAmount >= #{minBetAmount}
     </select>
 
 

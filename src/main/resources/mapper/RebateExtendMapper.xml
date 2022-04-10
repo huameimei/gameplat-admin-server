@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gameplat.admin.mapper.RebateExtendMapper">
+
+    <sql id="sqlResult">
+        extend_id as extendId,
+        report_id as reportId,
+        change_reason as changeReason,
+        ifnull(change_amount, 0) as changeAmount,
+        update_time as updateTime,
+        update_by as updateBy,
+        remark
+    </sql>
+
+    <!--获取佣金调整记录-->
+    <select id="queryPage" parameterType="long"
+            resultType="com.gameplat.model.entity.proxy.RebateReportExtend">
+        select
+        <include refid="sqlResult"/>
+        from same_level_report_extend where report_id = #{reportId} and status = 1
+    </select>
+
+    <!--新增佣金调整记录-->
+    <insert id="addReportExtend" parameterType="com.gameplat.model.entity.proxy.RebateReportExtend">
+        insert into same_level_report_extend
+        (
+            report_id,
+            change_reason,
+            change_amount,
+            update_time,
+            update_by,
+            remark
+        )
+        values
+        (
+            #{reportId},
+            #{changeReason},
+            #{changeAmount},
+            sysdate(),
+            #{updateBy},
+            #{remark}
+        )
+    </insert>
+
+    <!--编辑佣金调整记录-->
+    <update id="editReportExtend" parameterType="com.gameplat.model.entity.proxy.RebateReportExtend">
+        update same_level_report_extend set
+        <if test="changeReason != null and changeReason != ''">change_reason = #{changeReason},</if>
+        <if test="changeAmount != null">change_amount = #{changeAmount},</if>
+        <if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
+        <if test="remark != null and remark != ''">remark = #{remark},</if>
+        update_time = sysdate()
+        where extend_id = #{extendId}
+    </update>
+
+    <!--删除佣金调整记录-->
+    <update id="removeReportExtend" parameterType="com.gameplat.model.entity.proxy.RebateReportExtend">
+        update same_level_report_extend set status = 0, update_time = sysdate(), update_by = #{updateBy} where extend_id = #{extendId}
+    </update>
+</mapper>

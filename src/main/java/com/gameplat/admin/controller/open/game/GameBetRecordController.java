@@ -9,6 +9,7 @@ import com.gameplat.common.game.GameResult;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -22,6 +23,7 @@ public class GameBetRecordController {
 
   @SneakyThrows
   @GetMapping(value = "/queryPage")
+  @PreAuthorize("hasAuthority('game:gameBetRecord:view')")
   public PageDtoVO<GameBetRecordVO> queryPage(
       Page<GameBetRecordVO> page, GameBetRecordQueryDTO dto) {
     return gameBetRecordInfoService.queryPageBetRecord(page, dto);
@@ -29,6 +31,7 @@ public class GameBetRecordController {
 
   @SneakyThrows
   @GetMapping(value = "/getGameResult")
+  @PreAuthorize("hasAuthority('game:gameBetRecord:gameResult')")
   public GameResult getGameResult(GameBetRecordQueryDTO dto) {
     return gameBetRecordInfoService.getGameResult(dto);
   }

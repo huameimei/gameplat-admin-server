@@ -26,6 +26,13 @@ public class DivideDetailServiceImpl extends ServiceImpl<DivideDetailMapper, Div
 
   @Autowired private GameKindService gameKindService;
 
+  /**
+   * 分红详情分页列表
+   *
+   * @param page
+   * @param dto
+   * @return
+   */
   @Override
   public IPage<DivideDetailVO> queryPage(PageDTO<DivideDetail> page, DivideDetailQueryDTO dto) {
     QueryWrapper<DivideDetail> queryWrapper = new QueryWrapper<>();
@@ -33,7 +40,7 @@ public class DivideDetailServiceImpl extends ServiceImpl<DivideDetailMapper, Div
         .eq(ObjectUtils.isNotNull(dto.getId()), "id", dto.getId())
         .eq(ObjectUtils.isNotNull(dto.getPeriodsId()), "periods_id", dto.getPeriodsId())
         .eq(ObjectUtils.isNotNull(dto.getProxyId()), "proxy_id", dto.getProxyId())
-        .orderByDesc("create_time");
+        .orderByAsc("agent_level");
 
     IPage<DivideDetailVO> pageResult =
         divideDetailMapper.selectPage(page, queryWrapper).convert(divideDetailConvert::toVo);

@@ -23,9 +23,16 @@ import org.springframework.web.bind.annotation.RestController;
 public class LotteryRebateReportController {
   @Autowired private LotteryRebateReportService rebateReportService;
 
+  /**
+   * 代理返点分页列表
+   *
+   * @param page
+   * @param dto
+   * @return
+   */
   @GetMapping(value = "/page")
-  @ApiOperation(value = "裂变")
-  @PreAuthorize("hasAuthority('lottery:rebate:page')")
+  @ApiOperation(value = "代理返点分页列表")
+  @PreAuthorize("hasAuthority('lottery:rebate:view')")
   public PageDtoVO<LotteryRebateReportVO> page(
       PageDTO<LotteryRebateReport> page, LotteryRebateReportDTO dto) {
     return rebateReportService.page(page, dto);

@@ -100,14 +100,16 @@ public interface ActivityInfoService extends IService<ActivityInfo> {
   /**
    * 更新活动排序
    *
-   * @param dto ActivityInfoUpdateSortDTO
+   * @param activityInfoUpdateSortDTO
    */
   void updateSort(ActivityInfoUpdateSortDTO activityInfoUpdateSortDTO);
 
   /**
    * 查询未绑定的活动大厅
    *
+   * @param isBind
    * @return
    */
-  List<ActivityLobbyVO> findUnboundLobbyList();
+  List<ActivityLobbyVO> findUnboundLobbyList(boolean isBind);
+
 }

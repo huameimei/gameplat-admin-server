@@ -25,7 +25,7 @@ public class RechBankController {
   @Autowired private SysDictDataService dictDataService;
 
   @DeleteMapping("/delete")
-  @PreAuthorize("hasAuthority('thirdParty:rechBank:delete')")
+  @PreAuthorize("hasAuthority('thirdParty:rechBank:remove')")
   @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.WITHDRAW, desc = "'删除银行ids=' + #ids")
   public void remove(@RequestBody List<Long> ids) {
     dictDataService.deleteDictDataByIds(ids);
@@ -59,7 +59,7 @@ public class RechBankController {
   }
 
   @GetMapping("/list")
-  @PreAuthorize("hasAuthority('thirdParty:rechBank:list')")
+  @PreAuthorize("hasAuthority('thirdParty:rechBank:view')")
   public IPage<DictDataVo> list(PageDTO<SysDictData> page, SysDictDataDTO dto) {
     return dictDataService.selectDictDataList(page, dto);
   }

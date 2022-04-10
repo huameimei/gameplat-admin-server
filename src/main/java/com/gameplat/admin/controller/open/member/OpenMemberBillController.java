@@ -40,7 +40,7 @@ public class OpenMemberBillController {
 
   @ApiOperation(value = "现金流水")
   @GetMapping("/pageList")
-  @PreAuthorize("hasAuthority('funds:cash:list')")
+  @PreAuthorize("hasAuthority('funds:cash:view')")
   public IPage<MemberBillVO> queryPage(PageDTO<MemberBill> page, MemberBillDTO dto) {
     return memberBillService.queryPage(page, dto);
   }

@@ -22,7 +22,7 @@
     <select id="getUnionPackage" resultType="com.gameplat.admin.model.vo.SpreadUnionPackageVO">
         SELECT
         su.union_name unionName,
-        su.agent_account agentAccount,
+        sup.agent_account agentAccount,
         su.channel,
         su.id unionId,
         sup.id,

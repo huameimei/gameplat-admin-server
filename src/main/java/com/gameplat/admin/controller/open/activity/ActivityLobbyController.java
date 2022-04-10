@@ -54,7 +54,7 @@ public class ActivityLobbyController {
 
   @ApiOperation(value = "活动大厅列表")
   @GetMapping("/list")
-  @PreAuthorize("hasAuthority('activity:lobby:page')")
+  @PreAuthorize("hasAuthority('activity:lobby:view')")
   public IPage<ActivityLobbyVO> list(
       @ApiIgnore PageDTO<ActivityLobby> page, ActivityLobbyQueryDTO dto) {
     return activityLobbyService.findActivityLobbyList(page, dto);
@@ -79,7 +79,7 @@ public class ActivityLobbyController {
 
   @ApiOperation(value = "修改活动大厅")
   @PutMapping("/update")
-  @PreAuthorize("hasAuthority('activity:lobby:update')")
+  @PreAuthorize("hasAuthority('activity:lobby:edit')")
   public void update(@RequestBody ActivityLobbyUpdateDTO dto) {
     if (dto.getId() == null || dto.getId() == 0) {
       throw new ServiceException("id不能为空");
@@ -119,9 +119,16 @@ public class ActivityLobbyController {
 
   @ApiOperation(value = "查询未绑定的活动大厅列表")
   @GetMapping("/findUnboundLobbyList")
-  @PreAuthorize("hasAuthority('activity:lobby:list')")
+  @PreAuthorize("hasAuthority('activity:lobby:findUnboundLobbyList')")
   public List<ActivityLobbyVO> findUnboundLobbyList() {
-    return activityInfoService.findUnboundLobbyList();
+    return activityInfoService.findUnboundLobbyList(false);
+  }
+
+  @ApiOperation(value = "查询所有的活动大厅列表")
+  @GetMapping("/findAllLobbyList")
+  @PreAuthorize("hasAuthority('activity:lobby:findAllLobbyList')")
+  public List<ActivityLobbyVO> findAllLobbyList() {
+    return activityLobbyService.findAllLobbyList();
   }
 
   @ApiOperation(value = "游戏类型列表")
@@ -149,7 +156,7 @@ public class ActivityLobbyController {
 
   @ApiOperation(value = "游戏列表")
   @GetMapping("/gameList")
-  @PreAuthorize("hasAuthority('activity:lobby:gameKindList')")
+  @PreAuthorize("hasAuthority('activity:lobby:gameList')")
   public List<GameKindVO> getGameKindInBanner(String gameTypeCode) {
     return gameKindService.getGameKindInBanner(gameTypeCode);
   }

@@ -4,7 +4,6 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
-import com.gameplat.admin.config.TenantConfig;
 import com.gameplat.admin.enums.ClientTypeEnum;
 import com.gameplat.admin.feign.RemoteLogService;
 import com.gameplat.admin.model.bean.ChatPushCPBet;
@@ -66,7 +65,6 @@ public class OtthServiceImpl implements OtthService {
   private final String CHAT_PUSH_SP_BET =
       "{\"autoShare\":0,\"gameIds\":\"23,25,29,27,,33,131,70,173\",\"isOpen\":1,\"notPushAccount\":\"baozi\",\"notPushPlayCode\":\"\",\"onlyPushAccount\":0,\"pushAccount\":\"jeff13,sss111\",\"pushPlayCode\":\"\",\"rechCount\":0,\"rechMoney\":0.0,\"showHeel\":1,\"showHeelMinMoney\":20.0,\"todayRechMoney\":0.0,\"totalMoney\":0.0,\"validBetMoney\":0.0}";
 
-  @Autowired private TenantConfig tenantConfig;
 
   @Autowired private ChatSideMenuService menuService;
 
@@ -134,6 +132,11 @@ public class OtthServiceImpl implements OtthService {
     return gameConfigService.queryGameConfigInfoByPlatCode(TransferTypesEnum.KGNL.getCode());
   }
 
+  public String getLottTenantCode() {
+    return getLottConfig()
+            .getString("proxy");
+  }
+
   /** 获取头信息 */
   private Header[] getHeader(String tenant) {
     return new Header[] {
@@ -192,7 +195,7 @@ public class OtthServiceImpl implements OtthService {
     if (org.apache.commons.lang3.StringUtils.isBlank(chatDomain)) {
       throw new ServiceException("未配服务");
     }
-    String dbSuffix = tenantConfig.getTenantCode();
+    String dbSuffix = getLottTenantCode();
 
     String apiUrl = chatDomain + "/api/room/query";
     HttpClient httpClient = HttpClient.build().get(apiUrl);
@@ -230,6 +233,10 @@ public class OtthServiceImpl implements OtthService {
   @SneakyThrows
   public String otthProxyHttpPost(
       String apiUrl, String body, HttpServletRequest request, String proxy) {
+
+    //修改，从gameconfig获取租户标识
+    proxy = getLottTenantCode();
+
     Header[] header =
         new Header[] {
           new BasicHeader("Content-Type", "application/json"), new BasicHeader("plat_code", proxy)
@@ -269,7 +276,7 @@ public class OtthServiceImpl implements OtthService {
             sysLog.setIpDesc(getAddressByIpThird(ipaddress));
             sysLog.setDesc(content);
             sysLog.setPath(apiUrl);
-            sysLog.setDbSuffix(proxy);
+            sysLog.setDbSuffix(getLottTenantCode());
             sysLog.setCreateTime(DateUtils.get0ZoneDate(new Date(), DateUtils.DATE_TIME_PATTERN));
             sysLog.setDoTime((System.currentTimeMillis() - start) + "");
             // 保存操作日志
@@ -279,11 +286,16 @@ public class OtthServiceImpl implements OtthService {
     }
 
     if (StringUtils.isNotBlank(result)) {
-      JSONObject jsonObject = JSONObject.parseObject(result);
-      Object code = jsonObject.get("code");
-      if (code.equals("system_error") || code.equals("400")) {
-        throw new ServiceException(jsonObject.getString("msg"));
+      try{
+        JSONObject jsonObject = JSONObject.parseObject(result);
+        Object code = jsonObject.get("code");
+        if (code.equals("system_error") || code.equals("400")) {
+          throw new ServiceException(jsonObject.getString("msg"));
+        }
+      }catch (Exception e){
+        log.error(" 聊天室接口异常 {},{}",request,e);
       }
+
     }
 
     return result;
@@ -292,7 +304,8 @@ public class OtthServiceImpl implements OtthService {
   @Override
   public Object otthProxyHttpGet(
       String apiUrl, HttpServletRequest request, HttpServletResponse response, PageDTO page) {
-    String dbSuffix = tenantConfig.getTenantCode();
+
+    String dbSuffix = getLottTenantCode();
     Enumeration<String> names = request.getParameterNames();
     Map<String, String> params = new HashMap<>();
     while (names.hasMoreElements()) {
@@ -315,7 +328,7 @@ public class OtthServiceImpl implements OtthService {
   public void pushLotteryWin(List<PushLottWinVo> lottWinVos, HttpServletRequest request) {
     // 中奖推送接口地址
     String apiUrl = getApiUrl("api/push/cpwin");
-    String dbSuffix = tenantConfig.getTenantCode();
+    String dbSuffix = getLottTenantCode();
     if (dbSuffix == null) {
       throw new ServiceException("推送失败,获取不到租户标识");
     }
@@ -409,21 +422,17 @@ public class OtthServiceImpl implements OtthService {
     }
     // 分享推送接口地址
     String apiUrl = getApiUrl("/api/push/cpbet");
-    String dbSuffix = tenantConfig.getTenantCode();
+    String dbSuffix = getLottTenantCode();
     if (dbSuffix == null) {
       throw new ServiceException("推送失败,获取不到租户标识");
     }
     // 获取分享配置
-    ChatPushCPBet config =
-        (ChatPushCPBet)
-            redisTemplate.opsForValue().get(String.format("%s_%s", dbSuffix, CHAT_PUSH_CP_BET));
-    if (config == null) {
-      String chatConfig = menuService.queryChatConfig(ChatConfigEnum.CHAT_PUSH_CP_BET);
-      config = JSON.parseObject(chatConfig, ChatPushCPBet.class);
-      if (config != null) {
-        redisTemplate.opsForValue().set(String.format("%s_%s", dbSuffix, CHAT_PUSH_CP_BET), config);
-      }
+    String chatConfig = menuService.queryChatConfig(ChatConfigEnum.CHAT_PUSH_CP_BET);
+    ChatPushCPBet config = JSON.parseObject(chatConfig, ChatPushCPBet.class);
+    if (config != null) {
+      redisTemplate.opsForValue().set(String.format("%s_%s", dbSuffix, CHAT_PUSH_CP_BET), config);
     }
+
     ChatPushCPBet finalConfig = config;
     req.forEach(
         x -> {
@@ -571,6 +580,8 @@ public class OtthServiceImpl implements OtthService {
     ;
   }
 
+
+
   @Override
   public ChatUserVO getChatUser(String account) {
     Member user =
@@ -580,7 +591,7 @@ public class OtthServiceImpl implements OtthService {
       throw new ServiceException("未配服务");
     }
     String apiUrl = chatDomain + "/api/u/simpleUserInfoList";
-    String proxy = tenantConfig.getTenantCode();
+    String proxy = getLottTenantCode();
     Map<String, String> params = new HashMap<>();
     params.put("userIds", user.getId().toString());
     params.put("platCode", proxy);

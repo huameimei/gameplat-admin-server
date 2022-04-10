@@ -35,7 +35,7 @@ public class OpenMemberWealRewordController {
 
   @GetMapping("/list")
   @ApiOperation(value = "vip福利记录列表")
-  @PreAuthorize("hasAuthority('member:wealReword:list')")
+  @PreAuthorize("hasAuthority('member:wealReword:view')")
   public IPage<MemberWealRewordVO> listWealReword(
       PageDTO<MemberWealReword> page, MemberWealRewordDTO dto) {
     return rewordService.findWealRewordList(page, dto);
@@ -43,6 +43,7 @@ public class OpenMemberWealRewordController {
 
   @PutMapping("/updateRemark")
   @ApiOperation(value = "修改vip福利记录备注")
+  @PreAuthorize("hasAuthority('member:wealReword:edit')")
   public void updateRemark(Long id, String remark) {
     rewordService.updateRemark(id, remark);
   }

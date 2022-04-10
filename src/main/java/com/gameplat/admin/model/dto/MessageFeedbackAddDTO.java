@@ -17,8 +17,6 @@ import java.util.Date;
 @ApiModel("反馈消息新增DTO")
 public class MessageFeedbackAddDTO implements Serializable {
 
-  private Long id;
-
   /** 反馈标题 */
   @NotBlank(message = "反馈标题不能为空")
   @ApiModelProperty("反馈标题")

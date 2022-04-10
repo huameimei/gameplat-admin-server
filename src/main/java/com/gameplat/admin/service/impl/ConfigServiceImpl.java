@@ -19,12 +19,12 @@ public class ConfigServiceImpl implements ConfigService {
   @Autowired private SysDictDataService dictDataService;
 
   @Override
-  public Integer getValueInteger(DictDataEnum dataEnum) {
-    return this.getValueInteger(dataEnum, null);
+  public Integer getInteger(DictDataEnum dataEnum) {
+    return this.getInteger(dataEnum, null);
   }
 
   @Override
-  public Integer getValueInteger(DictDataEnum dataEnum, Integer defaultValue) {
+  public Integer getInteger(DictDataEnum dataEnum, Integer defaultValue) {
     return this.getDictData(dataEnum).map(Integer::new).orElse(defaultValue);
   }
 
@@ -40,9 +40,7 @@ public class ConfigServiceImpl implements ConfigService {
 
   @Override
   public <T> T get(DictDataEnum dataEnum, Class<T> clazz) {
-    return this.getDictData(dataEnum)
-        .map(c -> JsonUtils.parse(c, clazz))
-        .orElseThrow(() -> new ServiceException("配置信息不存在!"));
+    return this.get(dataEnum.getType().getValue(), dataEnum.getLabel(), clazz);
   }
 
   @Override
@@ -53,33 +51,40 @@ public class ConfigServiceImpl implements ConfigService {
   }
 
   @Override
-  public Long getValueLong(DictDataEnum dataEnum) {
-    return this.getValueLong(dataEnum, null);
+  public <T> T get(String type, String label, Class<T> clazz) {
+    return this.getDictData(type, label)
+        .map(e -> JsonUtils.parse(e, clazz))
+        .orElseThrow(() -> new ServiceException("配置信息不存在!"));
   }
 
   @Override
-  public Long getValueLong(DictDataEnum dataEnum, Long defaultValue) {
+  public Long getLong(DictDataEnum dataEnum) {
+    return this.getLong(dataEnum, null);
+  }
+
+  @Override
+  public Long getLong(DictDataEnum dataEnum, Long defaultValue) {
     return this.getDictData(dataEnum).map(Long::new).orElse(defaultValue);
   }
 
   @Override
-  public Double getValueDouble(DictDataEnum dataEnum, Double defaultValue) {
+  public Double getDouble(DictDataEnum dataEnum, Double defaultValue) {
     return this.getDictData(dataEnum).map(Double::new).orElse(defaultValue);
   }
 
   @Override
-  public Double getValueDouble(DictDataEnum dataEnum) {
-    return this.getValueDouble(dataEnum, null);
+  public Double getDouble(DictDataEnum dataEnum) {
+    return this.getDouble(dataEnum, null);
   }
 
   @Override
-  public Boolean getValueBoolean(DictDataEnum dataEnum, Boolean defaultValue) {
+  public Boolean getBoolean(DictDataEnum dataEnum, Boolean defaultValue) {
     return this.getDictData(dataEnum).map(Boolean::new).orElse(defaultValue);
   }
 
   @Override
-  public Boolean getValueBoolean(DictDataEnum dataEnum) {
-    return this.getValueBoolean(dataEnum, Boolean.FALSE);
+  public Boolean getBoolean(DictDataEnum dataEnum) {
+    return this.getBoolean(dataEnum, Boolean.FALSE);
   }
 
   @Override
@@ -91,8 +96,11 @@ public class ConfigServiceImpl implements ConfigService {
         .orElseThrow(() -> new ServiceException("配置信息不存在或未指定默认配置!"));
   }
 
+  private Optional<String> getDictData(String type, String label) {
+    return Optional.ofNullable(dictDataService.getDictDataValue(type, label));
+  }
+
   private Optional<String> getDictData(DictDataEnum dataEnum) {
-    return Optional.ofNullable(
-        dictDataService.getDictDataValue(dataEnum.getType().getValue(), dataEnum.getLabel()));
+    return this.getDictData(dataEnum.getType().getValue(), dataEnum.getLabel());
   }
 }

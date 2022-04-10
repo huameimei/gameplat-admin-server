@@ -49,44 +49,52 @@ public class OpenSystemConfigController {
 
   @ApiOperation(value = "代理联系方式地址列表")
   @GetMapping("/agent/list")
+  @PreAuthorize("hasAuthority('system:agent:view')")
   public List<AgentContacaVO> findAgentContacaList() {
     return systemConfigService.findAgentContacaList();
   }
 
   @ApiOperation(value = "编辑、新增代理联系方式地址")
   @PutMapping("/agent/edit")
+  @PreAuthorize("hasAuthority('system:agent:edit')")
   public void updateAgentContact(@RequestBody AgentContacaDTO dto) {
     systemConfigService.updateAgentContaca(dto);
   }
 
   @ApiOperation(value = "删除代理联系方式地址")
   @DeleteMapping("/agent/del/{id}")
+  @PreAuthorize("hasAuthority('system:agent:remove')")
   public void delAgentContaca(@PathVariable("id") Long id) {
     systemConfigService.delAgentContaca(id);
   }
 
   @GetMapping("/list/{dictType}")
+  @PreAuthorize("hasAuthority('system:config:view')")
   public List<SysDictData> findList(@PathVariable String dictType) {
     return systemConfigService.findList(dictType);
   }
 
   @PutMapping("/update/{dictType}")
+  @PreAuthorize("hasAuthority('system:config:add')")
   public void updateConfig(
       @PathVariable String dictType, @RequestBody List<SysDictData> dictDataList) {
     systemConfigService.updateConfig(dictType, dictDataList);
   }
 
   @PutMapping("/update")
+  @PreAuthorize("hasAuthority('system:config:add')")
   public void configDataEdit(@RequestBody OperSystemConfigDTO dto) {
     systemConfigService.configDataEdit(dto);
   }
 
   @GetMapping("/email/list")
+  @PreAuthorize("hasAuthority('system:config:view')")
   public EmailConfig findEmailList() {
     return systemConfigService.findEmailConfig();
   }
 
   @PutMapping("/email/update")
+  @PreAuthorize("hasAuthority('system:config:add')")
   public void updateEmail(@RequestBody EmailConfig emailConfig) {
     systemConfigService.updateEmail(emailConfig);
   }

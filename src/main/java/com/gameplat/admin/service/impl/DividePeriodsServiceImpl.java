@@ -112,6 +112,13 @@ public class DividePeriodsServiceImpl extends ServiceImpl<DividePeriodsMapper, D
 
   @Autowired private RedissonClient redissonClient;
 
+  /**
+   * 分页列表
+   *
+   * @param page
+   * @param dto
+   * @return
+   */
   @Override
   @SentinelResource(value = "queryPage")
   public IPage<DividePeriodsVO> queryPage(PageDTO<DividePeriods> page, DividePeriodsQueryDTO dto) {
@@ -120,6 +127,11 @@ public class DividePeriodsServiceImpl extends ServiceImpl<DividePeriodsMapper, D
     return dividePeriodsMapper.selectPage(page, queryWrapper).convert(periodsConvert::toVo);
   }
 
+  /**
+   * 添加
+   *
+   * @param dto
+   */
   @Override
   @SentinelResource("add")
   public void add(DividePeriodsDTO dto) {
@@ -135,6 +147,11 @@ public class DividePeriodsServiceImpl extends ServiceImpl<DividePeriodsMapper, D
     Assert.isTrue(this.save(saveObj), "添加失败！");
   }
 
+  /**
+   * 编辑
+   *
+   * @param dto
+   */
   @Override
   @SentinelResource("edit")
   public void edit(DividePeriodsDTO dto) {
@@ -146,6 +163,11 @@ public class DividePeriodsServiceImpl extends ServiceImpl<DividePeriodsMapper, D
     Assert.isTrue(this.updateById(editObj), "编辑失败！");
   }
 
+  /**
+   * 删除
+   *
+   * @param ids
+   */
   @Override
   @SentinelResource("delete")
   public void delete(String ids) {
@@ -508,7 +530,14 @@ public class DividePeriodsServiceImpl extends ServiceImpl<DividePeriodsMapper, D
               .amountRatio(amountRatio)
               .build();
       // 分红比例的（源用户的层级 - 分红代理的层级)次幂
-      BigDecimal pow = divideRatio.pow((userLevelNum - currentMember.getAgentLevel()));
+      Integer subLevel = userLevelNum - currentMember.getAgentLevel();
+      if (subLevel < 0) {
+        continue;
+      }
+      if (subLevel == 0) {
+        subLevel = 1;
+      }
+      BigDecimal pow = divideRatio.pow((subLevel));
       saveDetailDto.setDivideRatio(pow); // 代理分红比例
       // 分红基数金额
       BigDecimal baseAmount =
@@ -525,7 +554,7 @@ public class DividePeriodsServiceImpl extends ServiceImpl<DividePeriodsMapper, D
               + "%x"
               + divideRatio.multiply(BigDecimal.valueOf(100)).toString()
               + "%^"
-              + (userLevelNum - currentMember.getAgentLevel()));
+              + (subLevel));
       // 添加分红详情
       DivideDetail detail = detailConvert.toEntity(saveDetailDto);
       int insertCount = detailMapper.insert(detail);
@@ -619,8 +648,11 @@ public class DividePeriodsServiceImpl extends ServiceImpl<DividePeriodsMapper, D
 
       Integer curLevelNum = currentMember.getAgentLevel(); // 享分红代理
       Integer subLevelNum = userLevelNum - curLevelNum; // 等级差
-      if (subLevelNum <= NumberConstant.ZERO) {
+      if (subLevelNum < NumberConstant.ZERO) {
         continue;
+      }
+      if (subLevelNum == 0) {
+        subLevelNum = 1;
       }
 
       if (CollectionUtil.isEmpty(fissionConfigLevelVos)
@@ -859,7 +891,8 @@ public class DividePeriodsServiceImpl extends ServiceImpl<DividePeriodsMapper, D
       if (BeanUtil.isEmpty(member)) {
         continue;
       }
-      MemberInfo memberInfo = memberInfoService.getById(summary.getUserId());
+      MemberInfo memberInfo =
+          memberInfoService.lambdaQuery().eq(MemberInfo::getMemberId, summary.getUserId()).one();
       if (BeanUtil.isEmpty(memberInfo)) {
         continue;
       }
@@ -908,7 +941,8 @@ public class DividePeriodsServiceImpl extends ServiceImpl<DividePeriodsMapper, D
       if (BeanUtil.isEmpty(member)) {
         continue;
       }
-      MemberInfo memberInfo = memberInfoService.getById(summary.getUserId());
+      MemberInfo memberInfo =
+          memberInfoService.lambdaQuery().eq(MemberInfo::getMemberId, summary.getUserId()).one();
       if (BeanUtil.isEmpty(memberInfo)) {
         continue;
       }
@@ -1005,7 +1039,12 @@ public class DividePeriodsServiceImpl extends ServiceImpl<DividePeriodsMapper, D
     messageDistribute.setUserId(member.getId());
     messageDistribute.setUserAccount(member.getAccount());
     messageDistribute.setRechargeLevel(member.getUserLevel());
-    messageDistribute.setVipLevel(memberInfoService.getById(member.getId()).getVipLevel());
+    messageDistribute.setVipLevel(
+        memberInfoService
+            .lambdaQuery()
+            .eq(MemberInfo::getMemberId, member.getId())
+            .one()
+            .getVipLevel());
     messageDistribute.setReadStatus(NumberConstant.ZERO);
     messageDistribute.setCreateBy(userCredential.getUsername());
     messageDistributeService.save(messageDistribute);

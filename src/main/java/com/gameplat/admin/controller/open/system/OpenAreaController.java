@@ -12,6 +12,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
@@ -27,6 +28,7 @@ public class OpenAreaController {
 
   @ApiOperation("列表查询")
   @GetMapping("/list")
+  @PreAuthorize("hasAuthority('system:area:view')")
   public IPage<SysSmsAreaVO> findSmsAreaList(
       @ApiIgnore PageDTO<SysSmsArea> page, SmsAreaQueryDTO queryDTO) {
     return areaService.findSmsAreaList(page, queryDTO);
@@ -34,30 +36,35 @@ public class OpenAreaController {
 
   @ApiOperation("新增")
   @PostMapping("/add")
+  @PreAuthorize("hasAuthority('system:area:add')")
   public void saveArea(@Validated @RequestBody SmsAreaAddDTO addDTO) {
     areaService.addSmsArea(addDTO);
   }
 
   @ApiOperation("编辑")
   @PutMapping("/edit")
+  @PreAuthorize("hasAuthority('system:area:edit')")
   public void updateArea(@Validated @RequestBody SmsAreaEditDTO editDTO) {
     areaService.editSmsArea(editDTO);
   }
 
   @ApiOperation("删除")
   @DeleteMapping("/delete/{id}")
+  @PreAuthorize("hasAuthority('system:area:remove')")
   public void deleteById(@PathVariable Long id) {
     areaService.deleteAreaById(id);
   }
 
   @ApiOperation("改变状态")
   @PutMapping("/changeStatus/{id}/{status}")
+  @PreAuthorize("hasAuthority('system:area:edit')")
   public void changeStatus(@PathVariable Long id, @PathVariable Integer status) {
     areaService.changeStatus(id, status);
   }
 
   @ApiOperation("设置默认区号")
   @PutMapping("/setDefaultStatus/{id}/{status}")
+  @PreAuthorize("hasAuthority('system:area:edit')")
   public void setDefaultStatus(@PathVariable Long id, @PathVariable Integer status) {
     areaService.setDefaultStatus(id, status);
   }

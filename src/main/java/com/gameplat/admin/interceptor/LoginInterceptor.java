@@ -1,13 +1,14 @@
 package com.gameplat.admin.interceptor;
 
 import com.gameplat.admin.cache.AdminCache;
+import com.gameplat.admin.service.CaptchaService;
 import com.gameplat.admin.service.CommonService;
 import com.gameplat.admin.service.SysUserService;
 import com.gameplat.base.common.exception.ServiceException;
-import com.gameplat.common.compent.captcha.CaptchaStrategyContext;
 import com.gameplat.common.enums.BooleanEnum;
 import com.gameplat.common.lang.Assert;
 import com.gameplat.common.model.bean.limit.AdminLoginLimit;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
@@ -25,7 +26,7 @@ public class LoginInterceptor extends HandlerInterceptorAdapter {
 
   @Autowired private CommonService commonService;
 
-  @Autowired private CaptchaStrategyContext captchaStrategyContext;
+  @Autowired private CaptchaService captchaService;
 
   @Autowired private AdminCache adminCache;
 
@@ -33,7 +34,9 @@ public class LoginInterceptor extends HandlerInterceptorAdapter {
 
   @Override
   public boolean preHandle(
-      HttpServletRequest request, HttpServletResponse response, Object handler) {
+      @NotNull HttpServletRequest request,
+      @NotNull HttpServletResponse response,
+      @NotNull Object handler) {
     AdminLoginLimit limit = Assert.notNull(commonService.getLoginLimit(), "登录配置信息未配置");
 
     // 验证验证码
@@ -54,7 +57,7 @@ public class LoginInterceptor extends HandlerInterceptorAdapter {
    */
   private void checkCaptchaCode(int loginCaptchaSwitch, HttpServletRequest request) {
     if (BooleanEnum.YES.match(loginCaptchaSwitch)) {
-      captchaStrategyContext.getImage().verify(request);
+      captchaService.getImage().verify(request);
     }
   }
 

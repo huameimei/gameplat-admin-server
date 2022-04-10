@@ -4,6 +4,7 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.util.RandomUtil;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
@@ -20,17 +21,14 @@ import com.gameplat.admin.service.*;
 import com.gameplat.base.common.context.GlobalContextHolder;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.IPUtils;
-import com.gameplat.base.common.util.RandomUtil;
 import com.gameplat.common.enums.BooleanEnum;
 import com.gameplat.common.enums.TranTypes;
 import com.gameplat.common.lang.Assert;
 import com.gameplat.model.entity.ValidWithdraw;
 import com.gameplat.model.entity.member.*;
 import com.gameplat.model.entity.message.Message;
-import com.gameplat.redis.redisson.DistributedLocker;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -72,9 +70,6 @@ public class MemberWealServiceImpl extends ServiceImpl<MemberWealMapper, MemberW
     private RechargeOrderMapper rechargeOrderMapper;
 
     @Autowired
-    private GameMemberReportMapper dayReportMapper;
-
-    @Autowired
     private MemberMapper memberMapper;
 
     @Autowired
@@ -109,6 +104,9 @@ public class MemberWealServiceImpl extends ServiceImpl<MemberWealMapper, MemberW
 
     @Autowired
     private MemberService memberService;
+
+    @Autowired
+    private GameBetDailyReportService gameBetDailyReportService;
 
     @Override
     public IPage<MemberWealVO> findMemberWealList(IPage<MemberWeal> page, MemberWealDTO queryDTO) {
@@ -205,15 +203,14 @@ public class MemberWealServiceImpl extends ServiceImpl<MemberWealMapper, MemberW
                     memberSalaryInfoList.stream().map(MemberWealDetail::getUserName).collect(toList());
         }
 
-        // 获取达到有效投注金额的会员账号
+        // 获取达到有效投注金额的会员账号(游戏日报表)
         List<String> betAccountList = new ArrayList<>();
         if (memberWeal.getMinBetAmount() != null
                 && memberWeal.getMinBetAmount().compareTo(new BigDecimal("0")) > 0) {
-            betAccountList =
-                    dayReportMapper.getSatisfyBetAccount(
-                            String.valueOf(memberWeal.getMinBetAmount()),
-                            formatter.format(memberWeal.getStartDate()),
-                            formatter.format(memberWeal.getEndDate()));
+            betAccountList = gameBetDailyReportService.getSatisfyBetAccount(
+                    String.valueOf(memberWeal.getMinBetAmount()),
+                    formatter.format(memberWeal.getStartDate()),
+                    formatter.format(memberWeal.getEndDate()));
         } else {
             betAccountList =
                     memberSalaryInfoList.stream().map(MemberWealDetail::getUserName).collect(toList());
@@ -292,26 +289,24 @@ public class MemberWealServiceImpl extends ServiceImpl<MemberWealMapper, MemberW
                 model.setWealId(id);
                 model.setUserId(memberWealDetail.getUserId());
                 model.setUserName(memberService.getById(memberWealDetail.getUserId()).getAccount());
-                model.setLevel(memberWealDetail.getLevel());
+                model.setLevel(memberInfoService.lambdaQuery()
+                        .eq(MemberInfo::getMemberId, memberWealDetail.getUserId())
+                        .one()
+                        .getVipLevel());
                 model.setRewordAmount(memberWealDetail.getRewordAmount());
                 model.setStatus(1);
                 model.setCreateBy(GlobalContextHolder.getContext().getUsername());
+                model.setCreateTime(DateUtil.date());
                 list.add(model);
                 totalUserCount++;
                 totalPayMoney = totalPayMoney.add(memberWealDetail.getRewordAmount());
             }
             memberWeal.setTotalUserCount(totalUserCount);
             memberWeal.setTotalPayMoney(totalPayMoney);
+        }else{
+            memberWeal.setTotalUserCount(0);
+            memberWeal.setTotalPayMoney(new BigDecimal(0));
         }
-
-        // fixme 无用代码及时删除
-        List<MemberWealDetail> memberWealDetailList =
-                wealDetailService.findSatisfyMember(
-                        new MemberWealDetail() {
-                            {
-                                setWealId(id);
-                            }
-                        });
 
         // 修改了福利信息时，要重新结算，所以应该先删除
         wealDetailService.removeWealDetail(id);
@@ -346,7 +341,7 @@ public class MemberWealServiceImpl extends ServiceImpl<MemberWealMapper, MemberW
             if (CollectionUtil.isNotEmpty(list)) {
                 // 过滤出已派发或已取消的
                 list = list.stream().filter(item -> item.getStatus() == 1).collect(toList());
-                // 1：周俸禄  2：月俸禄  3：生日礼金 4：每月红包
+                // 0:升级奖励 1：周俸禄  2：月俸禄  3：生日礼金 4：每月红包
                 Integer type = memberWeal.getType();
                 // 查询成长值配置
                 MemberGrowthConfig growthConfig =
@@ -389,19 +384,19 @@ public class MemberWealServiceImpl extends ServiceImpl<MemberWealMapper, MemberW
                                 }
                                 String content = "";
                                 // 周俸禄
-                                if (WEEK_WEAL.match(type)) {
-                                    sourceType = WEEK_WEAL.getValue();
+                                if (1 == type) {
+                                    sourceType = TranTypes.WEEK_WEAL.getValue();
                                     content = "本周俸禄奖励已派发 金额:" + item.getRewordAmount() + "，请领取";
                                     // 月俸禄
-                                } else if (MONTH_WEAL.match(type)) {
+                                } else if (2 == type) {
                                     sourceType = TranTypes.MONTH_WEAL.getValue();
                                     content = "本月俸禄奖励已派发 金额:" + item.getRewordAmount() + "，请领取";
                                     // 生日礼金
-                                } else if (BIRTH_WEAL.match(type)) {
+                                } else if (3 == type) {
                                     sourceType = TranTypes.BIRTH_WEAL.getValue();
                                     content = "您的生日礼金奖励已派发 金额:" + item.getRewordAmount() + "，请领取";
                                     // 每月红包
-                                } else if (RED_ENVELOPE_WEAL.match(type)) {
+                                } else if (4 == type) {
                                     sourceType = TranTypes.RED_ENVELOPE_WEAL.getValue();
                                     content = "当月红包奖励已派发 金额:" + item.getRewordAmount() + "，请领取";
                                 }
@@ -428,14 +423,14 @@ public class MemberWealServiceImpl extends ServiceImpl<MemberWealMapper, MemberW
                                 if (BooleanEnum.YES.match(growthConfig.getIsAutoPayReword())) {
 
                                     //当前余额
-                                    BigDecimal currentBalance = memberInfoService.lambdaQuery()
+                                    BigDecimal beforeBalance = memberInfoService.lambdaQuery()
                                             .eq(MemberInfo::getMemberId, item.getUserId())
                                             .one()
                                             .getBalance();
 
                                     //更新会员余额
                                     LambdaUpdateWrapper<MemberInfo> wrapper = new LambdaUpdateWrapper<>();
-                                    wrapper.set(MemberInfo::getBalance, currentBalance.add(item.getRewordAmount()))
+                                    wrapper.set(MemberInfo::getBalance, beforeBalance.add(item.getRewordAmount()))
                                             .eq(MemberInfo::getMemberId, item.getUserId());
                                     memberInfoService.update(wrapper);
 
@@ -463,7 +458,7 @@ public class MemberWealServiceImpl extends ServiceImpl<MemberWealMapper, MemberW
                                     memberBill.setTranType(sourceType);
                                     memberBill.setOrderNo(sourceId);
                                     memberBill.setAmount(item.getRewordAmount());
-                                    memberBill.setBalance(currentBalance);
+                                    memberBill.setBalance(beforeBalance);
                                     memberBill.setRemark(content);
                                     memberBill.setContent(content);
                                     memberBill.setOperator("system");
@@ -581,7 +576,7 @@ public class MemberWealServiceImpl extends ServiceImpl<MemberWealMapper, MemberW
                                 memberBill.setAccount(member.getAccount());
                                 memberBill.setMemberPath(member.getSuperPath());
                                 memberBill.setTranType(tranType.getValue());
-                                memberBill.setOrderNo(RandomUtil.generateNumber(22));
+                memberBill.setOrderNo(RandomUtil.randomNumbers(22));
                                 memberBill.setAmount(negate);
                                 memberBill.setBalance(currentBalance);
                                 memberBill.setRemark(tranType.getDesc());
@@ -630,4 +625,5 @@ public class MemberWealServiceImpl extends ServiceImpl<MemberWealMapper, MemberW
 
         return WEEK_WEAL_RECYCLE;
     }
+
 }

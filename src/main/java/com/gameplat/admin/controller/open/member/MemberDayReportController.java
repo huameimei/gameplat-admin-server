@@ -50,6 +50,7 @@ public class MemberDayReportController {
 
   @ApiOperation(value = "会员日报表")
   @GetMapping(value = "memberGameDayReport")
+  @PreAuthorize("hasAuthority('member:dayReport:view')")
   public PageDtoVO<MemberGameDayReportVo> queryBetReport(
       Page<MemberGameDayReportVo> page, MemberReportDto dto) {
     log.info("会员日报表入参：{}", JSON.toJSONString(dto));
@@ -66,6 +67,7 @@ public class MemberDayReportController {
 
   @ApiOperation(value = "投注分析")
   @GetMapping(value = "findMemberbetAnalysis")
+  @PreAuthorize("hasAuthority('member:dayReport:betAnalysis')")
   public MemberbetAnalysisVo findMemberbetAnalysis(MemberbetAnalysisdto dto) {
     log.info("会员日报表入参：{}", JSON.toJSONString(dto));
     if (StringUtils.isEmpty(dto.getStartTime())) {

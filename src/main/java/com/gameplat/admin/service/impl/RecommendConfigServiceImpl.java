@@ -30,6 +30,7 @@ import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/** @Description : 层层代分红配置 @Author : cc @Date : 2022/4/2 */
 @Service
 @Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)
 public class RecommendConfigServiceImpl extends ServiceImpl<RecommendConfigMapper, RecommendConfig>
@@ -39,6 +40,11 @@ public class RecommendConfigServiceImpl extends ServiceImpl<RecommendConfigMappe
 
   @Autowired private GameKindMapper gameKindMapper;
 
+  /**
+   * 获取代理配置
+   *
+   * @return RecommendConfig
+   */
   @Override
   public RecommendConfig getRecommendConfig() {
     return this.lambdaQuery()
@@ -48,6 +54,11 @@ public class RecommendConfigServiceImpl extends ServiceImpl<RecommendConfigMappe
         .orElseThrow(() -> new ServiceException("代理限制信息不存在!"));
   }
 
+  /**
+   * 获取层层代分红配置
+   *
+   * @return Map
+   */
   @Override
   public Map<String, List<GameDivideVo>> getDefaultLayerDivideConfig() {
     Map<String, List<GameDivideVo>> tmpMap = new TreeMap<>();
@@ -81,6 +92,11 @@ public class RecommendConfigServiceImpl extends ServiceImpl<RecommendConfigMappe
     return tmpMap;
   }
 
+  /**
+   * 获取固定模式配置
+   *
+   * @return Map
+   */
   @Override
   public Map<String, List<GameDivideVo>> getDefaultFixDivideConfig() {
     Map<String, List<GameDivideVo>> tmpMap = new TreeMap<>();
@@ -113,6 +129,11 @@ public class RecommendConfigServiceImpl extends ServiceImpl<RecommendConfigMappe
     return tmpMap;
   }
 
+  /**
+   * 获取列表模式配置
+   *
+   * @return Map
+   */
   @Override
   public Map<String, Object> getDefaultFissionDivideConfig() {
     Map<String, List<FissionDivideConfigVo>> tmpMap = new TreeMap<>();
@@ -159,6 +180,11 @@ public class RecommendConfigServiceImpl extends ServiceImpl<RecommendConfigMappe
     return returnMap;
   }
 
+  /**
+   * 编辑代理配置
+   *
+   * @param dto RecommendConfigDto
+   */
   @Override
   public void edit(RecommendConfigDto dto) {
     RecommendConfig recommendConfig = new RecommendConfig();
@@ -228,6 +254,11 @@ public class RecommendConfigServiceImpl extends ServiceImpl<RecommendConfigMappe
     Assert.isTrue(this.updateById(recommendConfig), "修改代理配置失败！");
   }
 
+  /**
+   * 初始化层层代或固定比例分红模式配置预设
+   *
+   * @return String
+   */
   @Override
   public String initDivideConfig() {
     List<SysDictData> liveGameTypeList = sysDictDataMapper.findDataByType("LIVE_GAME_TYPE", "1");
@@ -263,6 +294,11 @@ public class RecommendConfigServiceImpl extends ServiceImpl<RecommendConfigMappe
     return JSONUtil.toJsonStr(saveMap);
   }
 
+  /**
+   * 初始化裂变配置
+   *
+   * @return String
+   */
   @Override
   public String initFissionDivideConfig() {
     List<SysDictData> liveGameTypeList = sysDictDataMapper.findDataByType("LIVE_GAME_TYPE", "1");

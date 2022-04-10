@@ -40,7 +40,7 @@ public class MemberGoldCoinRecordController {
 
   @GetMapping("/page")
   @ApiOperation(value = "分页查询VIP金币明细")
-  @PreAuthorize("hasAuthority('member:coin:page')")
+  @PreAuthorize("hasAuthority('member:coin:view')")
   public IPage<MemberGoldCoinRecordVO> page(
       PageDTO<MemberGoldCoinRecord> page, MemberGoldCoinRecordQueryDTO dto) {
     return memberGoldCoinRecordService.page(page, dto);
@@ -64,7 +64,7 @@ public class MemberGoldCoinRecordController {
 
     @ApiOperation("上传excel修改会员金币数量")
     @PostMapping(value = "/importAddGoldCoin")
-    @PreAuthorize("hasAuthority('member:coin:import')")
+    @PreAuthorize("hasAuthority('member:coin:add')")
     public void importAddGoldCoin(@RequestPart(value = "file",required = false) MultipartFile file) throws IOException {
         if (file ==null ) {
             throw new ServiceException("导入文件不能为空");
@@ -87,6 +87,7 @@ public class MemberGoldCoinRecordController {
 
   @PutMapping("/updateGoldCoinDesc")
   @ApiOperation(value = "后台修改金币说明配置")
+  @PreAuthorize("hasAuthority('member:coin:edit')")
   public void updateGoldCoinDesc(GoldCoinDescUpdateDTO dto) {
     if (dto.getId() == null) {
       throw new ServiceException("id不能为空！");

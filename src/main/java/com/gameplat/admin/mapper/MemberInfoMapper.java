@@ -4,12 +4,14 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.gameplat.admin.model.dto.CleanAccountDTO;
 import com.gameplat.admin.model.dto.QueryIpStatReportDTO;
 import com.gameplat.admin.model.vo.IpStatisticsVO;
+import com.gameplat.admin.model.vo.TestVO;
 import com.gameplat.model.entity.member.MemberInfo;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
 public interface MemberInfoMapper extends BaseMapper<MemberInfo> {
 
@@ -37,4 +39,9 @@ public interface MemberInfoMapper extends BaseMapper<MemberInfo> {
   BigDecimal findUserLowerMaxRebate(@Param("account") String account);
 
   int updateClearGTMember(CleanAccountDTO dto);
+
+
+  List<TestVO> getTest(Integer type, Long memberId, String remark);
+
+  List<TestVO> getTest1(Long memberId);
 }

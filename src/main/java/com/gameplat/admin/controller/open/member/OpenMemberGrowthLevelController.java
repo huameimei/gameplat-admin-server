@@ -7,6 +7,7 @@ import com.gameplat.admin.model.vo.MemberConfigLevelVO;
 import com.gameplat.admin.model.vo.MemberGrowthLevelVO;
 import com.gameplat.admin.service.MemberGrowthConfigService;
 import com.gameplat.admin.service.MemberGrowthLevelService;
+import com.gameplat.admin.service.MemberGrowthStatisService;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.security.SecurityUserHolder;
 import io.swagger.annotations.Api;
@@ -60,7 +61,7 @@ public class OpenMemberGrowthLevelController {
   }
 
   @ApiOperation(value = "后台批量修改VIP等级")
-  @PreAuthorize("hasAuthority('member:growthLevel:updateLevel')")
+  @PreAuthorize("hasAuthority('member:growthLevel:edit')")
   @PutMapping("/updateLevel")
   public void batchUpdateLevel(@RequestBody JSONObject obj, HttpServletRequest request) {
     levelService.batchUpdateLevel(obj, request);

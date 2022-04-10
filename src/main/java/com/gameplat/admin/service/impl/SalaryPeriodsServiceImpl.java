@@ -100,6 +100,13 @@ public class SalaryPeriodsServiceImpl extends ServiceImpl<SalaryPeriodsMapper, S
 
   @Autowired private MessageDistributeService messageDistributeService;
 
+  /**
+   * 分页列表
+   *
+   * @param page
+   * @param dto
+   * @return
+   */
   @Override
   public IPage<SalaryPeriodsVO> queryPage(PageDTO<SalaryPeriods> page, SalaryPeriodsDTO dto) {
     QueryWrapper<SalaryPeriods> queryWrapper = new QueryWrapper<>();
@@ -148,12 +155,22 @@ public class SalaryPeriodsServiceImpl extends ServiceImpl<SalaryPeriodsMapper, S
     return pageResult;
   }
 
+  /**
+   * 添加
+   *
+   * @param dto
+   */
   @Override
   public void add(SalaryPeriodsDTO dto) {
     SalaryPeriods saveObj = salaryPeriodsConvert.toEntity(dto);
     Assert.isTrue(this.save(saveObj), "添加工资期数失败！");
   }
 
+  /**
+   * 编辑
+   *
+   * @param dto
+   */
   @Override
   public void edit(SalaryPeriodsDTO dto) {
     Assert.isTrue(dto.getId() != null, "主键ID参数缺失！");
@@ -161,6 +178,11 @@ public class SalaryPeriodsServiceImpl extends ServiceImpl<SalaryPeriodsMapper, S
     Assert.isTrue(this.updateById(editObj), "编辑工资期数失败！");
   }
 
+  /**
+   * 删除
+   *
+   * @param ids
+   */
   @Override
   public void delete(String ids) {
     Assert.isTrue(StrUtil.isNotBlank(ids), "参数为空！");
@@ -487,7 +509,6 @@ public class SalaryPeriodsServiceImpl extends ServiceImpl<SalaryPeriodsMapper, S
         if (BeanUtil.isEmpty(finalConfig)) {
           continue;
         }
-
         List<SalaryRechargeVO> tmpGameReport =
             CollectionUtil.isEmpty(gameTypeReportMap.get(gameType))
                 ? new ArrayList<>()
@@ -570,7 +591,6 @@ public class SalaryPeriodsServiceImpl extends ServiceImpl<SalaryPeriodsMapper, S
             && totalWinAmount.compareTo(winAmountLimit) < 0) {
           isReach = false;
         }
-
         // 计算总有效投注金额  需要区分是否只查下级
         if (isOnlyChild == 1) {
           tmpGameReport =
@@ -778,6 +798,15 @@ public class SalaryPeriodsServiceImpl extends ServiceImpl<SalaryPeriodsMapper, S
     }
   }
 
+  /**
+   * 期数资金回收
+   *
+   * @param periods
+   * @param salaryGrant
+   * @param member
+   * @param memberInfo
+   * @param operatorName
+   */
   public void financialRecycle(
       SalaryPeriods periods,
       SalaryGrant salaryGrant,

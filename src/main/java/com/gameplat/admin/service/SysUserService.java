@@ -57,14 +57,14 @@ public interface SysUserService extends IService<SysUser> {
   /**
    * 重置用户密码
    *
-   * @param userDTO OperUserDTO
+   * @param dto UserResetPasswordDTO
    */
   void resetUserPassword(UserResetPasswordDTO dto);
 
   /**
    * 重置谷歌验证码
    *
-   * @param userDTO OperUserDTO
+   * @param id Long
    */
   void resetGoogleSecret(Long id);
 

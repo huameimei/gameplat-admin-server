@@ -1,8 +1,8 @@
 package com.gameplat.admin.service;
 
+import com.gameplat.admin.model.dto.GameBalanceQueryDTO;
 import com.gameplat.admin.model.dto.OperGameTransferRecordDTO;
 import com.gameplat.admin.model.vo.GameBalanceVO;
-import com.gameplat.admin.model.vo.GameConfiscatedVO;
 import com.gameplat.admin.model.vo.GameRecycleVO;
 import com.gameplat.model.entity.member.Member;
 import java.math.BigDecimal;
@@ -31,5 +31,13 @@ public interface GameAdminService {
 
   List<GameBalanceVO> selectGameBalanceByAccount(String account);
 
-  List<GameConfiscatedVO> confiscatedGameByAccount(String account);
+  List<GameRecycleVO> confiscatedGameByAccount(String account);
+
+  GameBalanceVO selectGameBalance(GameBalanceQueryDTO dto);
+
+  GameRecycleVO recyclingAmount(GameBalanceQueryDTO dto);
+
+  GameRecycleVO confiscatedAmount(GameBalanceQueryDTO dto);
+
+  void transferToGame(OperGameTransferRecordDTO record);
 }

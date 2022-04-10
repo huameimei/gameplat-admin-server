@@ -8,6 +8,7 @@ import com.gameplat.model.entity.report.GameFinancialReport;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -21,11 +22,13 @@ public interface GameFinancialReportMapper extends BaseMapper<GameFinancialRepor
   List<GameFinancialReportVO> findGameFinancialReportList(GameFinancialReportQueryDTO dto);
 
   Page<GameFinancialReportVO> findGameFinancialReportPage(
-      Page<GameFinancialReport> page, @Param("dto") GameFinancialReportQueryDTO dto);
+          Page<GameFinancialReport> page, @Param("dto") GameFinancialReportQueryDTO dto);
 
   List<GameFinancialReport> initGameFinancialReport(
-      @Param("statisticsTime") String statisticsTime,
-      @Param("startTime") String startTime,
-      @Param("endTime") String endTime,
-      @Param("customerCode") String customerCode);
+          @Param("statisticsTime") String statisticsTime,
+          @Param("startTime") String startTime,
+          @Param("endTime") String endTime,
+          @Param("customerCode") String customerCode);
+
+  BigDecimal findTotalLastWinAmount(GameFinancialReportQueryDTO dto);
 }

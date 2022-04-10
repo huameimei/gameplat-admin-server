@@ -1,24 +1,22 @@
 spring:
   application:
-    name: gameplat-admin-server
+    name: admin-server
   profiles:
     active: @profiles.active@
-  main:
-    allow-bean-definition-overriding: true
   cloud:
     nacos:
       config:
         enabled: true
-        server-addr: 192.168.3.101:8848
+        server-addr: 192.168.12.50:8848
         username: nacos
-        password: nacos
+        password: t1KMNoXowYr2DK9L
         file-extension: yml
-        namespace: prod
-        group: DEFAULT_GROUP
+        namespace: ea9f2fb3-4fce-4cc9-a820-4508330af65b
+        group: SERVICE_GROUP
         refresh-enabled: true
-        shared-dataids: redis.yml,spring-kafka-producer-config.yml
+        shared-dataids: redis.yml,spring-kafka-log.yml,spring-kafka-producer-config.yml,elasticsearch.yml
       discovery:
-        service: ${USERDOMAIN}-admin-server
+        service: admin-server
         namespace: ${spring.cloud.nacos.config.namespace}
         group: SERVICE_GROUP
         server-addr: ${spring.cloud.nacos.config.server-addr}

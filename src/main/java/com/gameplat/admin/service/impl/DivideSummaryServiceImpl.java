@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
+/** @Description : 分红汇总 @Author : cc @Date : 2022/4/2 */
 @Service
 @Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)
 public class DivideSummaryServiceImpl extends ServiceImpl<DivideSummaryMapper, DivideSummary>
@@ -31,6 +32,13 @@ public class DivideSummaryServiceImpl extends ServiceImpl<DivideSummaryMapper, D
   @Autowired private DivideSummaryConvert summaryConvert;
   @Autowired private DividePeriodsMapper periodsMapper;
 
+  /**
+   * 分页列表
+   *
+   * @param page
+   * @param dto
+   * @return
+   */
   @Override
   public IPage<DivideSummaryVO> queryPage(PageDTO<DivideSummary> page, DivideSummaryQueryDTO dto) {
     QueryWrapper<DivideSummary> queryWrapper = new QueryWrapper();

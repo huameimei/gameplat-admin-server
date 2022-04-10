@@ -27,7 +27,6 @@ public interface MemberWithdrawService extends IService<MemberWithdraw> {
       Long id,
       Integer cashStatus,
       Integer curStatus,
-      boolean isDirect,
       UserCredential userCredential,
       UserEquipment userEquipment)
       throws Exception;
@@ -41,4 +40,7 @@ public interface MemberWithdrawService extends IService<MemberWithdraw> {
       UserCredential userCredential,
       Long memberId)
       throws Exception;
+
+
+  long getUntreatedWithdrawCount();
 }

@@ -22,7 +22,7 @@ public class GameTypeController {
   @Autowired private GameTypeService gameTypeService;
 
   @GetMapping("/list")
-  @PreAuthorize("hasAuthority('game:gameType:list')")
+  @PreAuthorize("hasAuthority('game:gameType:view')")
   public IPage<GameTypeVO> selectGameTypeList(PageDTO<GameType> page, GameTypeQueryDTO dto) {
     return gameTypeService.selectGameTypeList(page, dto);
   }

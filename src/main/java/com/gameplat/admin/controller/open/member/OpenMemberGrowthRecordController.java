@@ -8,6 +8,7 @@ import com.gameplat.admin.model.dto.MemberGrowthRecordDTO;
 import com.gameplat.admin.model.vo.GrowthScaleVO;
 import com.gameplat.admin.model.vo.MemberGrowthRecordVO;
 import com.gameplat.admin.service.MemberGrowthRecordService;
+import com.gameplat.admin.service.MemberGrowthStatisService;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.common.lang.Assert;
 import com.gameplat.model.entity.member.MemberGrowthRecord;
@@ -34,9 +35,12 @@ public class OpenMemberGrowthRecordController {
 
   @Autowired private MemberGrowthRecordService memberGrowthRecordService;
 
+  @Autowired
+  private MemberGrowthStatisService memberGrowthStatisService;
+
   @GetMapping("/list")
   @ApiOperation(value = "查询成长值记录列表")
-  @PreAuthorize("hasAuthority('member:growthRecord:list')")
+  @PreAuthorize("hasAuthority('member:growthRecord:view')")
   public IPage<MemberGrowthRecordVO> listWealGrowthRecord(
       PageDTO<MemberGrowthRecord> page, MemberGrowthRecordDTO dto) {
     dto.setLanguage(LocaleContextHolder.getLocale().toLanguageTag());
@@ -45,7 +49,7 @@ public class OpenMemberGrowthRecordController {
 
   @PutMapping("/editGrowth")
   @ApiOperation(value = "修改单个会员成长值")
-  @PreAuthorize("hasAuthority('member:growthRecord:editGrowth')")
+  @PreAuthorize("hasAuthority('member:growthRecord:edit')")
   public void editMemberGrowth(@RequestBody MemberGrowthChangeDto dto, HttpServletRequest request) {
     log.info("单个会员成长值变动：MemberGrowthRecord={}", dto);
     if (dto == null || dto.getChangeGrowth() == null) {
@@ -55,12 +59,12 @@ public class OpenMemberGrowthRecordController {
       throw new ServiceException("扣除/添加成长值不能为0！");
     }
     dto.setType(3);
-    memberGrowthRecordService.editMemberGrowth(dto, request);
+    memberGrowthStatisService.changeGrowth(dto);
   }
 
   @GetMapping("/getBar")
   @ApiOperation(value = "进度条")
-  @PreAuthorize("hasAuthority('member:growthRecord:getBar')")
+  @PreAuthorize("hasAuthority('member:growthRecord:view')")
   public GrowthScaleVO progressBar(Integer level, Long memberId) {
     Assert.isTrue(ObjectUtils.isNotNull(level) && ObjectUtils.isNotNull(memberId), "参数不全!");
     return memberGrowthRecordService.progressBar(level, memberId);

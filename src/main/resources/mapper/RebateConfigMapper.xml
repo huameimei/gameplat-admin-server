@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gameplat.admin.mapper.RebateConfigMapper">
+
+    <sql id="sqlResult">
+        rc.config_id as configId,
+        rc.plan_id as planId,
+        rp.plan_name as planName,
+        rp.default_flag as defaultFlag,
+        rp.lower_commission as lowerCommission,
+        rp.sub_commission as subCommission,
+        rp.turnover_commission as turnoverCommission,
+        rc.rebate_level as rebateLevel,
+        rc.agent_profit as agentProfit,
+        rc.activity_member as activityMember,
+        rc.commission,
+        rc.create_time as createTime,
+        rc.create_by as createBy,
+        rc.update_time as updateTime,
+        rc.update_by as updateBy,
+        rc.remark
+    </sql>
+
+    <!--获取返佣配置-->
+    <select id="getRebateConfig" parameterType="com.gameplat.model.entity.proxy.RebateConfig"
+            resultType="com.gameplat.admin.model.vo.RebateConfigVO">
+        select
+        <include refid="sqlResult"/>
+        from rebate_same_level_config as rc
+        left join rebate_same_level_plan as rp
+        on rc.plan_id = rp.plan_id
+        where rc.plan_id = #{planId}
+    </select>
+
+    <!--获取返佣配置-->
+    <select id="queryPage" parameterType="com.gameplat.model.entity.proxy.RebateConfig"
+            resultType="com.gameplat.admin.model.vo.RebateConfigVO">
+        select
+        <include refid="sqlResult"/>
+        from rebate_same_level_config as rc
+        left join rebate_same_level_plan as rp
+        on rc.plan_id = rp.plan_id
+        where rc.plan_id = #{dto.planId}
+    </select>
+
+    <!--新增返佣配置-->
+    <insert id="addRebateConfig" parameterType="com.gameplat.model.entity.proxy.RebateConfig">
+        insert into rebate_same_level_config
+        <trim prefix="(" suffix=") values">
+            <if test="planId">plan_id,</if>
+            <if test="rebateLevel != null">rebate_level,</if>
+            <if test="agentProfit != null">agent_profit,</if>
+            <if test="activityMember != null">activity_member,</if>
+            <if test="commission != null">commission,</if>
+            <if test="remark != null and remark != ''">remark,</if>
+            <if test="createBy != null and createBy != ''">create_by,</if>
+            create_time
+        </trim>
+        <trim prefix="(" suffix=")">
+            <if test="planId">#{planId},</if>
+            <if test="rebateLevel != null">#{rebateLevel},</if>
+            <if test="agentProfit != null">#{agentProfit},</if>
+            <if test="activityMember != null">#{activityMember},</if>
+            <if test="commission != null">#{commission},</if>
+            <if test="remark != null and remark != ''">#{remark},</if>
+            <if test="createBy != null and createBy != ''">#{createBy},</if>
+            sysdate()
+        </trim>
+    </insert>
+
+    <!--编辑返佣配置-->
+    <update id="editRebateConfig" parameterType="com.gameplat.model.entity.proxy.RebateConfig">
+        update rebate_same_level_config set
+        <if test="rebateLevel != null">rebate_level = #{rebateLevel},</if>
+        <if test="agentProfit != null">agent_profit = #{agentProfit},</if>
+        <if test="activityMember != null">activity_member = #{activityMember},</if>
+        <if test="commission != null">commission = #{commission},</if>
+        <if test="remark != null and remark != ''">remark = #{remark},</if>
+        <if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
+        update_time = sysdate()
+        where config_id = #{configId}
+    </update>
+
+    <!--删除返佣配置-->
+    <delete id="removeRebateConfig" parameterType="string">
+        delete from rebate_same_level_config where config_id in (${configIds})
+    </delete>
+
+    <!--获取佣金配置-->
+    <select id="getConfigByPlanId" parameterType="long" resultType="com.gameplat.model.entity.proxy.RebateConfig">
+        select
+        plan_id as planId,
+        plan_name as planName,
+        default_flag as defaultFlag,
+        lower_commission as lowerCommission,
+        sub_commission as subCommission,
+        turnover_commission as turnoverCommission
+        from rebate_same_level_plan
+        where plan_id = #{planId}
+    </select>
+
+    <!--根据参数获取分红配置-->
+    <select id="getConfigByParam" resultType="com.gameplat.model.entity.proxy.RebateConfig">
+        select
+        config_id as configId,
+        rebate_level as rebateLevel,
+        agent_profit as agentProfit,
+        activity_member as activityMember,
+        commission
+        from rebate_same_level_config
+        where plan_id = #{planId} and agent_profit <![CDATA[<= ]]> #{agentProfit} and activity_member <![CDATA[<= ]]> #{activityMember}
+        order by agent_profit desc limit 1
+    </select>
+</mapper>

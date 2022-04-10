@@ -166,20 +166,9 @@ public class ActivityCommonServiceImpl implements ActivityCommonService {
   }
 
   @Override
-  public ActivityLobby activityDetection(Long activityId, Date countDate, int flagCheck) {
-    if (flagCheck == 1) {
-      // 根据活动发布的ID查找绑定的活动大厅的ID
-      ActivityInfo activityInfo = activityInfoService.getById(activityId);
-      if (StringUtils.isNull(activityInfo)) {
-        // 活动发布信息异常
-        throw new ServiceException("活动信息异常");
-      }
-
-      activityId = activityInfo.getActivityLobbyId();
-    }
-
+  public ActivityLobby activityDetection(Long lobbyId, Date countDate, int flagCheck) {
     // 根据活动ID查询活动详细信息
-    ActivityLobby activityLobby = activityLobbyService.getById(activityId);
+    ActivityLobby activityLobby = activityLobbyService.getById(lobbyId);
     if (StringUtils.isNull(activityLobby)) {
       // 活动信息异常
       throw new ServiceException("活动信息没找到");
@@ -196,6 +185,7 @@ public class ActivityCommonServiceImpl implements ActivityCommonService {
       endTime = DateUtil.date(endTime).offset(DateField.DAY_OF_YEAR, 1);
     }
 
+    log.error("countDate={},startTime={}", countDate, activityLobby.getStartTime());
     if (countDate.before(activityLobby.getStartTime())) {
       // 活动未开始
       throw new ServiceException("活动未开始");
@@ -294,12 +284,12 @@ public class ActivityCommonServiceImpl implements ActivityCommonService {
         activityQualificationService
             .lambdaQuery()
             .eq(ActivityQualification::getActivityId, activityLobby.getId())
-            .eq(ActivityQualification::getActivityType, activityLobby.getType())
+            .eq(ActivityQualification::getActivityType, activityLobby.getActivityType())
             .eq(ActivityQualification::getUserId, memberInfo.getId())
             .eq(
-                activityLobby.getIsRepeat() == 1,
+                StringUtils.isNotBlank(query.getSoleIdentifier()),
                 ActivityQualification::getSoleIdentifier,
-                IdempotentKeyUtils.md5(DateUtil.formatDate(countDate)))
+                query.getSoleIdentifier())
             .count();
     if (count > 0) {
       if (activityLobby.getIsRepeat() == 1) {
@@ -327,12 +317,12 @@ public class ActivityCommonServiceImpl implements ActivityCommonService {
 
     // 判断用户VIP等级是否满足活动要求
     String userLevelRequire = activityLobby.getUserLevel();
-    String userLevel =
+    String vipLevel =
         memberInfo.getVipLevel() != null ? String.valueOf(memberInfo.getVipLevel()) : "0";
     if (StringUtils.isNotEmpty(userLevelRequire)) {
       String[] userLevels = userLevelRequire.split(",");
       List<String> userLevelList = Lists.newArrayList(userLevels);
-      if (!userLevelList.contains(userLevel)) {
+      if (!userLevelList.contains(vipLevel)) {
         log.info("活动:{},限制此用户VIP等级:{}", activityLobby.getTitle(), memberInfo.getId());
         // 你的VIP等级不符合该活动要求
         throw new ServiceException("你的VIP等级不符合该活动要求");
@@ -470,18 +460,18 @@ public class ActivityCommonServiceImpl implements ActivityCommonService {
                 flagCheck,
                 countDate);
         break;
-      case 10:
-        // 指定比赛打码量
-        manageList =
-            dealAssignMatch(
-                activityLobby,
-                lobbyDiscounts,
-                memberInfo,
-                statisticalStartTime,
-                statisticalEndTime,
-                flagCheck,
-                countDate);
-        break;
+        //      case 10:
+        //        // 指定比赛打码量
+        //        manageList =
+        //            dealAssignMatch(
+        //                activityLobby,
+        //                lobbyDiscounts,
+        //                memberInfo,
+        //                statisticalStartTime,
+        //                statisticalEndTime,
+        //                flagCheck,
+        //                countDate);
+        //        break;
       default:
         break;
     }
@@ -969,7 +959,7 @@ public class ActivityCommonServiceImpl implements ActivityCommonService {
       Date countDate) {
     String errorMsg = null;
     // 查询统计周期内的会员游戏日报表汇总数据(打码量)
-    Map<String, Object> map = new HashMap<>();
+    Map map = new HashMap<>();
     if (memberInfo != null) {
       map.put("userNameList", Lists.newArrayList(memberInfo.getAccount()));
     }

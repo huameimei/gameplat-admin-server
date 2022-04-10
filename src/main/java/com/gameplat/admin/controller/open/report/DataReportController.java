@@ -13,6 +13,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -38,6 +39,7 @@ public class DataReportController {
 
   @ApiOperation("充值数据统计")
   @GetMapping("findRechReport")
+  @PreAuthorize("hasAuthority('thirdParty:rechReport:count')")
   public GameRechDataReportVO findRechReport(GameRWDataReportDto dto) {
     log.info("查询数据统计充值入参：{}", JSON.toJSONString(dto));
     editGameRwDataReportDto(dto);
@@ -46,6 +48,7 @@ public class DataReportController {
 
   @ApiOperation("提现数据统计")
   @GetMapping("findWithReport")
+  @PreAuthorize("hasAuthority('thirdParty:withReport:count')")
   public GameWithDataReportVO findWithReport(GameRWDataReportDto dto) {
     log.info("查询数据统计提现入参：{}", JSON.toJSONString(dto));
     editGameRwDataReportDto(dto);
@@ -54,6 +57,7 @@ public class DataReportController {
 
   @ApiOperation("游戏数据统计")
   @GetMapping("findGameDataReport")
+  @PreAuthorize("hasAuthority('thirdParty:gameDataReport:count')")
   public GameDataReportVO findGameDataReport(GameRWDataReportDto dto) {
     log.info("查询数据统计游戏入参：{}", JSON.toJSONString(dto));
     editGameRwDataReportDto(dto);
@@ -62,6 +66,7 @@ public class DataReportController {
 
   @ApiOperation("会员数据统计")
   @GetMapping("findAccountDataReport")
+  @PreAuthorize("hasAuthority('thirdParty:accountDataReport:count')")
   public GameAccountDataReportVo findAccountDataReport(
       Page<AccountReportVo> page, GameRWDataReportDto dto) {
     log.info("查询数据统注册入参：{}", JSON.toJSONString(dto));
@@ -73,6 +78,7 @@ public class DataReportController {
   /** 红利 = 充值优惠 + 彩金 + VIP红利 + 活动红利 + 聊天室红包 VIP红利 = 周俸禄 + 月俸禄 + 升级奖励 + 生日礼金 + 每月红包 活动红利 = 活动彩金 */
   @ApiOperation("红利数据统计")
   @GetMapping("findDividendtDataReport")
+  @PreAuthorize("hasAuthority('thirdParty:dividendtDataReport:count')")
   public GameDividendDataVo findDividendtDataReport(GameRWDataReportDto dto) {
     log.info("查询数据统计红利入参：{}", JSON.toJSONString(dto));
     editGameRwDataReportDto(dto);
@@ -81,6 +87,7 @@ public class DataReportController {
 
   @ApiOperation("查询会员金额")
   @GetMapping("findAccountReport")
+  @PreAuthorize("hasAuthority('thirdParty:accountReport:balance')")
   public PageDtoVO<AccountReportVo> findAccountReport(
       Page<AccountReportVo> page, GameRWDataReportDto dto) {
     log.info("查询数据统计红利入参：{}", JSON.toJSONString(dto));
@@ -90,6 +97,7 @@ public class DataReportController {
 
   @ApiOperation("根据第三方查询第三方充值金额")
   @GetMapping("findThreeRech")
+  @PreAuthorize("hasAuthority('thirdParty:threeRech:balance')")
   public List<ThreeRechReportVo> findThreeRech(GameRWDataReportDto dto) {
     log.info("查询数据统计红利入参：{}", JSON.toJSONString(dto));
     editGameRwDataReportSecondDto(dto);
@@ -98,6 +106,7 @@ public class DataReportController {
 
   @ApiOperation(value = "代理总计")
   @GetMapping("findProxyData")
+  @PreAuthorize("hasAuthority('thirdParty:proxyData:count')")
   public GameProxyDataVo findProxyData(GameRWDataReportDto dto) {
     log.info("查询数据统计红利入参：{}", JSON.toJSONString(dto));
     editGameRwDataReportSecondDto(dto);

@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -32,6 +33,7 @@ public class GameTransferRecordController {
   @Autowired private GamePlatformService gamePlatformService;
 
   @GetMapping(value = "/queryPage")
+  @PreAuthorize("hasAuthority('game:gameTransferRecord:view')")
   public PageDtoVO<GameTransferRecord> queryGameTransferRecord(
       Page<GameTransferRecord> page, GameTransferRecordQueryDTO dto) {
     return gameTransferRecordService.queryGameTransferRecord(page, dto);
@@ -39,6 +41,7 @@ public class GameTransferRecordController {
 
   /** 后台补单 */
   @PostMapping(value = "/fillOrders")
+  @PreAuthorize("hasAuthority('game:gameTransferRecord:fillOrders')")
   public void fillOrders(@RequestBody OperGameTransferRecordDTO dto) throws Exception {
     gameAdminService.fillOrders(dto);
   }

@@ -23,21 +23,26 @@
         c.current_level level,
         (
         case #{type}
-        when 0 then d.week_wage
-        when 1 then d.month_wage
-        when 2 then d.birth_gift_money
-        when 3 then d.red_envelope
-        else 0 end
+        when 1 then d.week_wage
+        when 2 then d.month_wage
+        when 3 then d.birth_gift_money
+        when 4 then d.red_envelope
+        else 1 end
         ) rewordAmount
-        from (select max(id), user_id, user_name, create_time, current_level from member_growth_record GROUP BY user_id)
-        c
-        LEFT JOIN member_growth_level d ON c.current_level= d.`level`
+        from
+        (
+            select id, user_id, user_name, create_time, current_level from member_growth_record where id in (select max(id) from member_growth_record GROUP BY user_id)
+        ) c
+        LEFT JOIN
+        member_growth_level d ON c.current_level = d.`level`
         <where>
+            c.current_level != 0
+            and d.`level` != 0
             <if test="type != null and type == 0">
-                AND d.week_wage >0
+                AND d.week_wage > 0
             </if>
             <if test="type != null and type == 1">
-                AND d.month_wage >0
+                AND d.month_wage > 0
             </if>
         </where>
     </select>

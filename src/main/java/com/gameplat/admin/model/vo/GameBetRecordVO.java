@@ -1,11 +1,12 @@
 package com.gameplat.admin.model.vo;
 
+import com.alibaba.fastjson.annotation.JSONField;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.gameplat.common.util.I18nSerializerUtils;
-import lombok.Data;
-
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Date;
+import lombok.Data;
 
 @Data
 public class GameBetRecordVO implements Serializable {
@@ -41,29 +42,34 @@ public class GameBetRecordVO implements Serializable {
   private Integer settle;
 
   /** 投注金额 */
-  private String betAmount;
+  private BigDecimal betAmount;
 
   /** 有效投注额 */
-  private String validAmount;
+  private BigDecimal validAmount;
 
   /** 输赢金额 */
-  private String winAmount;
+  private BigDecimal winAmount;
 
   /** 投注内容 */
   private String betContent;
 
   /** 投注时间 */
+  @JSONField(format = "unixtime")
   private Date betTime;
 
   /** 结算时间 */
+  @JSONField(format = "unixtime")
   private Date settleTime;
 
   /** 报表统计时间 */
+  @JSONField(format = "unixtime")
   private Date statTime;
 
   /** 添加时间 */
+  @JSONField(format = "unixtime")
   private Date createTime;
 
   /** 更新时间 */
+  @JSONField(format = "unixtime")
   private Date updateTime;
 }

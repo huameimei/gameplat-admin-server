@@ -8,8 +8,6 @@ import com.gameplat.admin.model.vo.MessageFeedbackVO;
 import com.gameplat.admin.service.MessageFeedbackService;
 import com.gameplat.model.entity.message.MessageFeedback;
 import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,11 +30,7 @@ public class OpenMessageFeedbackController {
 
   @ApiOperation(value = "意见反馈列表")
   @GetMapping("/list")
-  @ApiImplicitParams({
-    @ApiImplicitParam(name = "current", value = "分页参数：当前页", defaultValue = "1"),
-    @ApiImplicitParam(name = "size", value = "每页条数")
-  })
-  @PreAuthorize("hasAuthority('notice:feedback:list')")
+  @PreAuthorize("hasAuthority('notice:feedback:view')")
   public IPage<MessageFeedbackVO> getList(
       @Validated PageDTO<MessageFeedback> page, MessageFeedbackQueryDTO dto) {
     return messageFeedbackService.getList(page, dto);
@@ -51,28 +45,28 @@ public class OpenMessageFeedbackController {
 
   @ApiOperation(value = "读反馈")
   @PutMapping("/read")
-  @PreAuthorize("hasAuthority('notice:feedback:read')")
+//  @PreAuthorize("hasAuthority('notice:feedback:read')")
   public void updateMessage(Long id) {
     messageFeedbackService.updateMessage(id);
   }
 
   @ApiOperation(value = "新增意见反馈")
   @PostMapping("/add")
-  @PreAuthorize("hasAuthority('notice:feedback:edit')")
+  @PreAuthorize("hasAuthority('notice:feedback:add')")
   public void insertMessage(@Validated MessageFeedbackAddDTO dto) {
     messageFeedbackService.insertMessage(dto);
   }
 
   @ApiOperation(value = "删除意见反馈")
   @DeleteMapping("/remove")
-  @PreAuthorize("hasAuthority('notice:feedback:delete')")
+  @PreAuthorize("hasAuthority('notice:feedback:remove')")
   public void removeMessage(@RequestParam(name = "id") Long id) {
     messageFeedbackService.removeMessage(id);
   }
 
   @ApiOperation(value = "查看已回复信件")
   @GetMapping("/getReplyContent")
-  @PreAuthorize("hasAuthority('notice:feedback:getReplyContent')")
+  @PreAuthorize("hasAuthority('notice:feedback:view')")
   public IPage<MessageFeedbackVO> getReplyContent(PageDTO<MessageFeedback> page) {
     return messageFeedbackService.getReplyContent(page);
   }

@@ -65,7 +65,7 @@ public class PayAccountController {
   }
 
   @PostMapping("/page")
-  @PreAuthorize("hasAuthority('thirdParty:payAccount:page')")
+  @PreAuthorize("hasAuthority('thirdParty:payAccount:view')")
   public IPage<PayAccountVO> queryPage(Page<PayAccount> page, PayAccountQueryDTO dto) {
     return payAccountService.findPayAccountPage(page, dto);
   }
@@ -77,7 +77,7 @@ public class PayAccountController {
   }
 
   @GetMapping("/queryAccounts")
-  @PreAuthorize("hasAuthority('thirdParty:payAccount:queryAccounts')")
+//  @PreAuthorize("hasAuthority('thirdParty:payAccount:queryAccounts')")
   public List<String> queryAccounts() {
     return payAccountService.queryAccounts();
   }

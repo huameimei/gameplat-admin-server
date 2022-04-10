@@ -52,7 +52,7 @@ public class MemberGrowthBannerController {
 
   @GetMapping("/page")
   @ApiOperation(value = "VIP banner图列表")
-  @PreAuthorize("hasAuthority('member:banner:page')")
+  @PreAuthorize("hasAuthority('member:banner:view')")
   public IPage<MemberGrowthBannerVO> findTrendsList(
       PageDTO<MemberGrowthBanner> page, MemberGrowthBannerQueryDTO dto) {
     return memberGrowthBannerService.getList(page, dto);

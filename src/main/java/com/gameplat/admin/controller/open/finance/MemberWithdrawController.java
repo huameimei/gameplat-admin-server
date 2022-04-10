@@ -16,23 +16,28 @@ import com.gameplat.log.annotation.Log;
 import com.gameplat.log.enums.LogType;
 import com.gameplat.model.entity.member.MemberWithdraw;
 import com.gameplat.model.entity.pay.PpMerchant;
+import com.gameplat.redis.redisson.DistributedLocker;
 import com.gameplat.security.SecurityUserHolder;
 import com.gameplat.security.context.UserCredential;
 import java.math.BigDecimal;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/admin/finance/memberWithdraw")
 public class MemberWithdrawController {
 
   @Autowired
   private MemberWithdrawService userWithdrawService;
+  @Autowired
+  private DistributedLocker distributedLocker;
 
   @PostMapping("/modifyCashStatus")
   @PreAuthorize("hasAuthority('finance:memberWithdraw:modifyCashStatus')")
@@ -44,13 +49,22 @@ public class MemberWithdrawController {
       Long id,
       Integer cashStatus,
       Integer curStatus,
-      boolean isDirect,
-      HttpServletRequest request)
+      HttpServletRequest request,
+      Long memberId)
       throws Exception {
-    UserCredential userCredential = SecurityUserHolder.getCredential();
-    UserEquipment clientInfo = UserEquipment.create(request);
-    userWithdrawService.modify(
-        id, cashStatus, curStatus, isDirect, userCredential, clientInfo);
+    String lock_key = "member_rw_" + memberId;
+    distributedLocker.lock(lock_key);
+    try {
+      UserCredential userCredential = SecurityUserHolder.getCredential();
+      UserEquipment clientInfo = UserEquipment.create(request);
+      userWithdrawService.modify(
+          id, cashStatus, curStatus, userCredential, clientInfo);
+    } catch (Exception e) {
+      log.error(e.getMessage(), e);
+      throw e;
+    } finally {
+      distributedLocker.unlock(lock_key);
+    }
   }
 
   @PostMapping("/batchHandle")
@@ -62,19 +76,29 @@ public class MemberWithdrawController {
   public String batchHandle(String list,
       HttpServletRequest request)
       throws Exception {
-    if (null == list) {
-      throw new ServiceException("批量受理请求参数为空");
+    String lock_key = "member_rw_single";
+    distributedLocker.lock(lock_key);
+    try {
+      if (null == list) {
+        throw new ServiceException("批量受理请求参数为空");
+      }
+      UserCredential userCredential = SecurityUserHolder.getCredential();
+      UserEquipment clientInfo = UserEquipment.create(request);
+      List<MemberWithdrawDTO> memberWithdrawDTOList = JSONUtil
+          .toList(list, MemberWithdrawDTO.class);
+      for (MemberWithdrawDTO memberWithdrawDTO : memberWithdrawDTOList) {
+        userWithdrawService.modify(
+            memberWithdrawDTO.getId(), WithdrawStatus.HANDLED.getValue(),
+            memberWithdrawDTO.getCurStatus(), userCredential,
+            clientInfo);
+      }
+      return "成功受理" + memberWithdrawDTOList.size() + "条订单";
+    } catch (Exception e) {
+      log.error(e.getMessage(), e);
+      throw e;
+    } finally {
+      distributedLocker.unlock(lock_key);
     }
-    UserCredential userCredential = SecurityUserHolder.getCredential();
-    UserEquipment clientInfo = UserEquipment.create(request);
-    List<MemberWithdrawDTO> memberWithdrawDTOList = JSONUtil.toList(list, MemberWithdrawDTO.class);
-    for (MemberWithdrawDTO memberWithdrawDTO : memberWithdrawDTOList) {
-      userWithdrawService.modify(
-          memberWithdrawDTO.getId(), WithdrawStatus.HANDLED.getValue(),
-          memberWithdrawDTO.getCurStatus(), memberWithdrawDTO.getIsDirect(), userCredential,
-          clientInfo);
-    }
-    return "成功受理" + memberWithdrawDTOList.size() + "条订单";
   }
 
   @PostMapping("/batchUnHandle")
@@ -86,19 +110,32 @@ public class MemberWithdrawController {
   public String batchModifyCashStatus(String list,
       HttpServletRequest request)
       throws Exception {
-    if (null == list) {
-      throw new ServiceException("批量取消受理请求参数为空");
+    String lock_key = "member_rw_single";
+    distributedLocker.lock(lock_key);
+    try {
+      if (null == list) {
+        throw new ServiceException("批量受理请求参数为空");
+      }
+      if (null == list) {
+        throw new ServiceException("批量取消受理请求参数为空");
+      }
+      UserCredential userCredential = SecurityUserHolder.getCredential();
+      UserEquipment clientInfo = UserEquipment.create(request);
+      List<MemberWithdrawDTO> memberWithdrawDTOList = JSONUtil
+          .toList(list, MemberWithdrawDTO.class);
+      for (MemberWithdrawDTO memberWithdrawDTO : memberWithdrawDTOList) {
+        userWithdrawService.modify(
+            memberWithdrawDTO.getId(), WithdrawStatus.UNHANDLED.getValue(),
+            memberWithdrawDTO.getCurStatus(), userCredential,
+            clientInfo);
+      }
+      return "成功取消受理" + memberWithdrawDTOList.size() + "条订单";
+    } catch (Exception e) {
+      log.error(e.getMessage(), e);
+      throw e;
+    } finally {
+      distributedLocker.unlock(lock_key);
     }
-    UserCredential userCredential = SecurityUserHolder.getCredential();
-    UserEquipment clientInfo = UserEquipment.create(request);
-    List<MemberWithdrawDTO> memberWithdrawDTOList = JSONUtil.toList(list, MemberWithdrawDTO.class);
-    for (MemberWithdrawDTO memberWithdrawDTO : memberWithdrawDTOList) {
-      userWithdrawService.modify(
-          memberWithdrawDTO.getId(), WithdrawStatus.UNHANDLED.getValue(),
-          memberWithdrawDTO.getCurStatus(), memberWithdrawDTO.getIsDirect(), userCredential,
-          clientInfo);
-    }
-    return "成功取消受理" + memberWithdrawDTOList.size() + "条订单";
   }
 
   @PostMapping("/batchWithdraw")
@@ -110,19 +147,32 @@ public class MemberWithdrawController {
   public String batchWithdraw(String list,
       HttpServletRequest request)
       throws Exception {
-    if (null == list) {
-      throw new ServiceException("批量出款请求参数为空");
+    String lock_key = "member_rw_single";
+    distributedLocker.lock(lock_key);
+    try {
+      if (null == list) {
+        throw new ServiceException("批量受理请求参数为空");
+      }
+      if (null == list) {
+        throw new ServiceException("批量出款请求参数为空");
+      }
+      UserCredential userCredential = SecurityUserHolder.getCredential();
+      UserEquipment clientInfo = UserEquipment.create(request);
+      List<MemberWithdrawDTO> memberWithdrawDTOList = JSONUtil
+          .toList(list, MemberWithdrawDTO.class);
+      for (MemberWithdrawDTO memberWithdrawDTO : memberWithdrawDTOList) {
+        userWithdrawService.modify(
+            memberWithdrawDTO.getId(), WithdrawStatus.SUCCESS.getValue(),
+            memberWithdrawDTO.getCurStatus(), userCredential,
+            clientInfo);
+      }
+      return "成功出款" + memberWithdrawDTOList.size() + "条订单";
+    } catch (Exception e) {
+      log.error(e.getMessage(), e);
+      throw e;
+    } finally {
+      distributedLocker.unlock(lock_key);
     }
-    UserCredential userCredential = SecurityUserHolder.getCredential();
-    UserEquipment clientInfo = UserEquipment.create(request);
-    List<MemberWithdrawDTO> memberWithdrawDTOList = JSONUtil.toList(list, MemberWithdrawDTO.class);
-    for (MemberWithdrawDTO memberWithdrawDTO : memberWithdrawDTOList) {
-      userWithdrawService.modify(
-          memberWithdrawDTO.getId(), WithdrawStatus.SUCCESS.getValue(),
-          memberWithdrawDTO.getCurStatus(), memberWithdrawDTO.getIsDirect(), userCredential,
-          clientInfo);
-    }
-    return "成功出款" + memberWithdrawDTOList.size() + "条订单";
   }
 
   @PostMapping("/editDiscount")
@@ -131,19 +181,28 @@ public class MemberWithdrawController {
       module = ServiceName.ADMIN_SERVICE,
       type = LogType.WITHDRAW,
       desc = "'修改手续费为:' + #afterCounterFee")
-  public void updateDiscount(Long id, BigDecimal afterCounterFee) {
-    userWithdrawService.updateCounterFee(id, afterCounterFee);
+  public void updateDiscount(Long id, BigDecimal afterCounterFee, Long memberId) {
+    String lock_key = "member_rw_" + memberId;
+    distributedLocker.lock(lock_key);
+    try {
+      userWithdrawService.updateCounterFee(id, afterCounterFee);
+    } catch (Exception e) {
+      log.error(e.getMessage(), e);
+      throw e;
+    } finally {
+      distributedLocker.unlock(lock_key);
+    }
   }
 
   @PostMapping("/editRemarks")
   @PreAuthorize("hasAuthority('finance:memberWithdraw:editRemarks')")
   @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.WITHDRAW, desc = "'修改备注为:' + #remarks")
-  public void updateRemarks(Long id, String remarks) {
-    userWithdrawService.updateRemarks(id, remarks);
+  public void updateRemarks(Long id, String remarks, Long memberId) {
+      userWithdrawService.updateRemarks(id, remarks);
   }
 
   @PostMapping("/page")
-  @PreAuthorize("hasAuthority('finance:memberWithdraw:page')")
+  @PreAuthorize("hasAuthority('finance:memberWithdraw:view')")
   public PageExt<MemberWithdrawVO, SummaryVO> queryPage(
       Page<MemberWithdraw> page, MemberWithdrawQueryDTO dto) {
     return userWithdrawService.findPage(page, dto);
@@ -164,6 +223,15 @@ public class MemberWithdrawController {
   public void save(BigDecimal cashMoney, String cashReason, Integer handPoints, Long memberId)
       throws Exception {
     UserCredential userCredential = SecurityUserHolder.getCredential();
-    userWithdrawService.save(cashMoney, cashReason, handPoints, userCredential, memberId);
+    String lock_key = "withdraw_save_" + userCredential.getUserId();
+    distributedLocker.lock(lock_key);
+    try {
+      userWithdrawService.save(cashMoney, cashReason, handPoints, userCredential, memberId);
+    } catch (Exception e) {
+      log.error(e.getMessage(), e);
+      throw e;
+    } finally {
+      distributedLocker.unlock(lock_key);
+    }
   }
 }

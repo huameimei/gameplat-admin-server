@@ -29,7 +29,7 @@ public class IpAnalysisController {
 
   @GetMapping(value = "/page")
   @ApiOperation(value = "IP分析报表列表")
-  @PreAuthorize("hasAuthority('ip:analysis:page')")
+  @PreAuthorize("hasAuthority('ip:analysis:view')")
   public IPage<IpAnalysisVO> page(PageDTO<IpAnalysisVO> page, IpAnalysisDTO dto) {
     return ipAnalysisService.page(page, dto);
   }

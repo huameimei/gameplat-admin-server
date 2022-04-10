@@ -183,7 +183,9 @@
                t2.total_rech_amount as totalRechAmount,
                t2.total_rech_times as totalRechTimes,
                t2.total_withdraw_amount as totalWithdrawAmount,
-               t2.total_withdraw_times as totalWithdrawTimes
+               t2.total_withdraw_times as totalWithdrawTimes,
+               t2.first_rech_time as firstRechTime,
+               t2.first_rech_amount as firstRechAmount
         FROM member t1
                  LEFT JOIN member_info t2 ON t1.id = t2.member_id
         WHERE t1.account = #{account}
@@ -391,17 +393,19 @@
         LEFT JOIN member_info t2 ON t1.id = t2.member_id
         <where>
             <if test="parentName != null and parentName != ''">
+                (
                 <choose>
                     <when test="subordinateOnly != null and subordinateOnly == true">
-                        and t1.parent_name = #{parentName}
+                        t1.parent_name = #{parentName}
                     </when>
                     <otherwise>
-                        and t1.super_path LIKE concat('%', #{parentName},'%')
+                        t1.super_path LIKE concat('%', #{parentName},'%')
                     </otherwise>
                 </choose>
                 <if test="itself != null and itself == 1">
                     or t1.account = #{parentName}
                 </if>
+                )
             </if>
             <if test="levelList != null and levelList.size() > 0">
                 and t1.user_level in
@@ -434,5 +438,31 @@
     </select>
 
 
+    <select id="findMemberVip" resultType="com.gameplat.admin.model.vo.MemberBalanceVO">
+        SELECT
+        m.id id,
+        m.account account,
+        m.nickname nickname,
+        m.real_name realName,
+        m.user_level userLevel,
+        m.user_type userType,
+        fo.balance balance,
+        fo.vip_level vipLevel,
+        m.parent_name parentName,
+        m.super_path superPath,
+        m.parent_id parentId
+        FROM
+        member m
+        INNER JOIN member_info fo
+        on m.id = fo.member_id
+        <if test="vipGrade != null and vipGrade != ''">
+            AND fo.vip_level = #{vipGrade}
+        </if>
+        WHERE
+        m.account = #{username}
+        <if test="userlevel != null and userlevel != ''">
+            AND user_level = #{userlevel}
+        </if>
+    </select>
 
 </mapper>

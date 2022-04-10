@@ -2,7 +2,7 @@ package com.gameplat.admin.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
-import cn.hutool.crypto.digest.MD5;
+import cn.hutool.crypto.digest.DigestUtil;
 import com.alibaba.csp.sentinel.annotation.SentinelResource;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
@@ -11,10 +11,7 @@ import com.gameplat.admin.model.bean.PageExt;
 import com.gameplat.admin.model.dto.OnlineUserDTO;
 import com.gameplat.admin.model.vo.MemberInfoVO;
 import com.gameplat.admin.model.vo.OnlineUserVo;
-import com.gameplat.admin.service.ConfigService;
-import com.gameplat.admin.service.MemberService;
-import com.gameplat.admin.service.OnlineUserService;
-import com.gameplat.admin.service.SysUserService;
+import com.gameplat.admin.service.*;
 import com.gameplat.base.common.enums.ClientType;
 import com.gameplat.base.common.util.CollectorUtils;
 import com.gameplat.base.common.util.StringUtils;
@@ -22,6 +19,7 @@ import com.gameplat.common.enums.UserTypes;
 import com.gameplat.model.entity.sys.SysUser;
 import com.gameplat.security.SecurityUserHolder;
 import com.gameplat.security.context.UserCredential;
+import com.gameplat.security.manager.JwtTokenAuthenticationManager;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -47,6 +45,8 @@ public class OnlineUserServiceImpl implements OnlineUserService {
   @Autowired private MemberService memberService;
 
   @Autowired private RedisTemplate<String, Object> redisTemplate;
+
+  @Autowired private JwtTokenAuthenticationManager tokenAuthenticationManager;
 
   @Override
   public List<UserCredential> getOnlineUsers() {
@@ -94,21 +94,22 @@ public class OnlineUserServiceImpl implements OnlineUserService {
   public void kick(String uuid) {
     Set<String> keys = this.getOnlineUserKeys();
     if (CollectionUtil.isNotEmpty(keys)) {
-      MD5 md5 = MD5.create();
-      keys.forEach(
-          key -> {
-            if (md5.digestHex(key).equals(uuid)) {
-              redisTemplate.delete(key);
-            }
-          });
+      keys.stream()
+          .filter(key -> DigestUtil.md5Hex(key).equals(uuid))
+          .forEach(key -> redisTemplate.delete(key));
     }
+  }
+
+  @Override
+  public void kickByUsername(String username) {
+    tokenAuthenticationManager.removeToken(username);
   }
 
   @Override
   @SentinelResource(value = "kickAll")
   public void kickAll() {
     Set<String> keys = redisTemplate.keys(TOKEN_PREFIX + "*");
-    if (CollectionUtil.isNotEmpty(keys)) {
+    if (Objects.nonNull(keys) && CollectionUtil.isNotEmpty(keys)) {
       redisTemplate.delete(keys);
     }
   }
@@ -121,6 +122,7 @@ public class OnlineUserServiceImpl implements OnlineUserService {
           this.countClientType(onlineCount, user.getClientType());
           // 统计会员数量
           this.countUserType(onlineCount, warningAccounts, user);
+
         });
 
     return onlineCount;
@@ -147,7 +149,8 @@ public class OnlineUserServiceImpl implements OnlineUserService {
       onlineCount.setMemberCount(onlineCount.getMemberCount() + 1);
     } else if (UserTypes.TEST.match(userType)) {
       onlineCount.setTestUserCount(onlineCount.getTestUserCount() + 1);
-    } else if (warningAccounts.contains(credential.getUsername())) {
+    }
+    if (warningAccounts.contains(credential.getUsername())) {
       onlineCount.setWarningCount(onlineCount.getWarningCount() + 1);
     }
   }

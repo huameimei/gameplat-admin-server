@@ -2,6 +2,9 @@ package com.gameplat.admin.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.gameplat.admin.model.vo.ListSortConfigVO;
+import com.gameplat.admin.model.vo.SportConfigVO;
+import com.gameplat.admin.model.vo.SportConfigValueVO;
 import com.gameplat.admin.model.vo.TenantSettingVO;
 import com.gameplat.model.entity.setting.TenantSetting;
 
@@ -97,4 +100,29 @@ public interface TenantSettingService extends IService<TenantSetting> {
    * @param id 游戏浮窗类型ID
    */
   void deleteSysFloatById(Integer id);
+
+  /**
+   * 修改租户设置的值
+   *
+   * @param tenantSetting
+   * @return
+   */
+  void updateTenantSettingValue(TenantSettingVO tenantSetting);
+
+  /**
+   * 获取体育配置
+   * @return
+   */
+  SportConfigValueVO getSportConfig();
+
+  /**
+   * 修改体育配置排序开关列表
+   * @param listSortConfigVOS
+   * @return
+   */
+  int updateListSortConfig(List<ListSortConfigVO> listSortConfigVOS);
+
+  /**修改体育配置*/
+  int updateSportConfig(SportConfigVO sportConfigVo);
+
 }

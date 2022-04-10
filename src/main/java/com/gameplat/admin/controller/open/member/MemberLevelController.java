@@ -7,7 +7,9 @@ import com.gameplat.admin.model.dto.MemberLevelAllocateDTO;
 import com.gameplat.admin.model.dto.MemberLevelEditDTO;
 import com.gameplat.admin.model.dto.MemberLevelFileDTO;
 import com.gameplat.admin.model.vo.MemberLevelVO;
+import com.gameplat.admin.model.vo.PayTypeVO;
 import com.gameplat.admin.service.MemberLevelService;
+import com.gameplat.admin.service.PayTypeService;
 import com.gameplat.admin.service.RechargeConfigService;
 import com.gameplat.base.common.util.EasyExcelUtil;
 import com.gameplat.common.constant.ServiceName;
@@ -42,69 +44,84 @@ public class MemberLevelController {
 
   @Autowired private RechargeConfigService rechargeConfigService;
 
+  @Autowired private PayTypeService payTypeService;
+
   @GetMapping("/list")
+  @PreAuthorize("hasAuthority('member:level:view')")
   public List<MemberLevelVO> getList() {
     return memberLevelService.getList();
   }
 
   @PostMapping("/add")
+  @PreAuthorize("hasAuthority('member:level:add')")
   public void add(@RequestBody @Validated MemberLevelAddDTO dto) {
     memberLevelService.add(dto);
   }
 
   @PutMapping("/update")
+  @PreAuthorize("hasAuthority('member:level:edit')")
   public void update(@RequestBody @Validated MemberLevelEditDTO dto) {
     memberLevelService.update(dto);
   }
 
   @DeleteMapping("/delete/{id}")
+  @PreAuthorize("hasAuthority('member:level:remove')")
   public void delete(@PathVariable Long id) {
     memberLevelService.delete(id);
   }
 
   @PostMapping("/lock/{id}")
+  @PreAuthorize("hasAuthority('member:level:lock')")
   public void lock(@PathVariable Long id) {
     memberLevelService.lock(id);
   }
 
   @PostMapping("/unlock/{id}")
+  @PreAuthorize("hasAuthority('member:level:unlock')")
   public void unlock(@PathVariable Long id) {
     memberLevelService.unlock(id);
   }
 
   @PostMapping("/enable/{id}")
+  @PreAuthorize("hasAuthority('member:level:enable')")
   public void enable(@PathVariable Long id) {
     memberLevelService.enable(id);
   }
 
   @PostMapping("/disable/{id}")
+  @PreAuthorize("hasAuthority('member:level:disable')")
   public void disable(@PathVariable Long id) {
     memberLevelService.disable(id);
   }
 
   @PostMapping("/enable/withdraw/{id}")
+  @PreAuthorize("hasAuthority('member:level:enableWithdraw')")
   public void enableWithdraw(@PathVariable Long id) {
     memberLevelService.enableWithdraw(id);
   }
 
   @PostMapping("/disable/withdraw/{id}")
+  @PreAuthorize("hasAuthority('member:level:disableWithdraw')")
   public void disableWithdraw(@PathVariable Long id) {
     memberLevelService.disableWithdraw(id);
   }
 
   @PostMapping("/batchAllocate")
+  @PreAuthorize("hasAuthority('member:level:ocate')")
   public void batchAllocate(@Valid @RequestBody List<MemberLevelAllocateDTO> dtos) {
     memberLevelService.batchAllocate(dtos);
   }
 
   @ApiOperation(value = "根据输入账号分层")
   @PostMapping("/allocateByUserNames")
+  @PreAuthorize("hasAuthority('member:level:allocateByUserNames')")
   public void allocateByUserNames(@Valid @RequestBody MemberLevelAllocateByUserNameDTO dto) {
     memberLevelService.allocateByUserNames(dto);
   }
 
   @ApiOperation(value = "根据上传文件分层")
   @PostMapping("/allocateByFile")
+  @PreAuthorize("hasAuthority('member:level:allocateByFile')")
   public void allocateByFile(
       @RequestParam("levelValue") Integer levelValue, @RequestPart MultipartFile file)
       throws IOException {
@@ -115,6 +132,7 @@ public class MemberLevelController {
 
   @ApiOperation(value = "根据筛选条件分层")
   @PostMapping("/allocateByCondition")
+  @PreAuthorize("hasAuthority('member:level:allocateByCondition')")
   public void allocateByCondition(@Valid @RequestBody MemberLevelAllocateByConditionDTO dto) {
     memberLevelService.allocateByCondition(dto);
   }
@@ -122,11 +140,11 @@ public class MemberLevelController {
   @GetMapping("/queryAll")
   @PreAuthorize("hasAuthority('member:level:queryAll')")
   public List<RechargeConfig> queryAll(Integer memberLevel) {
-    return rechargeConfigService.queryAll(memberLevel);
+    return rechargeConfigService.queryAll(memberLevel, null, null);
   }
 
   @PostMapping("/saveRechargeConfig")
-  @PreAuthorize("hasAuthority('member:level:add')")
+  @PreAuthorize("hasAuthority('member:level:saveRechargeConfig')")
   @Log(
       module = ServiceName.ADMIN_SERVICE,
       type = LogType.MEMBER,
@@ -134,4 +152,11 @@ public class MemberLevelController {
   public void add(RechargeConfig rechargeConfig) {
     rechargeConfigService.add(rechargeConfig);
   }
+
+  @PostMapping("/findPayTypesList")
+//  @PreAuthorize("hasAuthority('thirdParty:payTypes:list')")
+  public List<PayTypeVO> findPayTypes(String name) {
+    return payTypeService.queryList(name);
+  }
+
 }

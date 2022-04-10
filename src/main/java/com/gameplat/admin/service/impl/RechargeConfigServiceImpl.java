@@ -33,9 +33,11 @@ public class RechargeConfigServiceImpl extends ServiceImpl<RechargeConfigMapper,
   }
 
   @Override
-  public List<RechargeConfig> queryAll(Integer memberLevel) {
+  public List<RechargeConfig> queryAll(Integer memberLevel, Integer mode, String payCode) {
     return this.lambdaQuery()
         .eq(ObjectUtils.isNotEmpty(memberLevel), RechargeConfig::getMemberLevel, memberLevel)
+            .eq(ObjectUtils.isNotEmpty(mode), RechargeConfig::getMode, mode)
+            .eq(ObjectUtils.isNotEmpty(payCode), RechargeConfig::getPayType, payCode)
         .list();
   }
 }

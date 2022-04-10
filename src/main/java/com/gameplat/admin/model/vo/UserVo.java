@@ -50,6 +50,16 @@ public class UserVo {
   private Date loginDate;
   /** 创建时间 */
   private Date createTime;
+  /**
+   * 创建人
+   */
+  private String createBy;
+
   /** 修改时间 */
   private Date updateTime;
+
+  /**
+   * 修改人
+   */
+  private String updateBy;
 }

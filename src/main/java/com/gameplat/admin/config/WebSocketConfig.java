@@ -4,6 +4,7 @@ import com.gameplat.base.common.util.StringUtils;
 import com.gameplat.security.context.UserCredential;
 import com.gameplat.security.jwt.JwtTokenUtil;
 import com.gameplat.security.manager.JwtTokenAuthenticationManager;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
@@ -45,9 +46,9 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     taskScheduler.initialize();
 
     registry
-        .enableSimpleBroker("/topic", "/queue", "/user")
-        .setHeartbeatValue(new long[] {10000, 10000})
-        .setTaskScheduler(taskScheduler);
+            .enableSimpleBroker("/topic", "/queue", "/user")
+            .setHeartbeatValue(new long[] {10000, 10000})
+            .setTaskScheduler(taskScheduler);
 
     registry.setApplicationDestinationPrefixes("/app");
     registry.setUserDestinationPrefix("/user/");
@@ -62,36 +63,36 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
   public void configureClientInboundChannel(ChannelRegistration registration) {
     registration.taskExecutor().corePoolSize(10).maxPoolSize(20).keepAliveSeconds(60);
     registration.interceptors(
-        new ChannelInterceptor() {
+            new ChannelInterceptor() {
 
-          @Override
-          public Message<?> preSend(Message<?> message, MessageChannel channel) {
-            StompHeaderAccessor accessor =
-                MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
-            if (accessor != null && StompCommand.CONNECT.equals(accessor.getCommand())) {
-              String token = accessor.getFirstNativeHeader(HttpHeaders.AUTHORIZATION);
-              if (StringUtils.isNotBlank(token)) {
-                try {
-                  accessor.setUser(this.getPrincipal(token));
-                } catch (Exception e) {
-                  throw new MessagingException("请求未授权或登录凭证已过期!");
+              @Override
+              public Message<?> preSend(@NotNull Message<?> message, @NotNull MessageChannel channel) {
+                StompHeaderAccessor accessor =
+                        MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
+                if (accessor != null && StompCommand.CONNECT.equals(accessor.getCommand())) {
+                  String token = accessor.getFirstNativeHeader(HttpHeaders.AUTHORIZATION);
+                  if (StringUtils.isNotBlank(token)) {
+                    try {
+                      accessor.setUser(this.getPrincipal(token));
+                    } catch (Exception e) {
+                      throw new MessagingException("请求未授权或登录凭证已过期!");
+                    }
+                    return message;
+                  }
                 }
-                return message;
+                return ChannelInterceptor.super.preSend(message, channel);
               }
-            }
-            return ChannelInterceptor.super.preSend(message, channel);
-          }
 
-          private Principal getPrincipal(String token) {
-            String username = jwtTokenUtil.getUsernameFromToken(token);
-            UserCredential credential =
-                tokenAuthenticationManager.getCredentialCacheByUsername(username);
+              private Principal getPrincipal(String token) {
+                String username = jwtTokenUtil.getUsernameFromToken(token);
+                UserCredential credential =
+                        tokenAuthenticationManager.getCredentialCacheByUsername(username);
 
-            return jwtTokenUtil.validateToken(token, credential.getUsername())
-                ? credential::getUsername
-                : null;
-          }
-        });
+                return jwtTokenUtil.validateToken(token, credential.getUsername())
+                        ? credential::getUsername
+                        : null;
+              }
+            });
   }
 
   @Override

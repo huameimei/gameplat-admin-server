@@ -18,7 +18,7 @@ public class GameController {
   @Autowired private GameService gameService;
 
   @GetMapping("/list")
-  @PreAuthorize("hasAuthority('game:game:list')")
+  @PreAuthorize("hasAuthority('game:game:view')")
   public IPage<GameVO> selectGameList(PageDTO<Game> page, GameQueryDTO dto) {
     return gameService.selectGameList(page, dto);
   }

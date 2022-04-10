@@ -17,8 +17,6 @@ import com.gameplat.common.enums.BooleanEnum;
 import com.gameplat.common.enums.DictDataEnum;
 import com.gameplat.model.entity.activity.ActivityType;
 import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
@@ -50,11 +48,7 @@ public class ActivityTypeController {
 
   @ApiOperation(value = "活动板块列表")
   @GetMapping("/list")
-  @PreAuthorize("hasAuthority('activity:type:page')")
-  @ApiImplicitParams({
-    @ApiImplicitParam(name = "current", value = "分页参数：当前页", defaultValue = "1"),
-    @ApiImplicitParam(name = "size", value = "每页条数"),
-  })
+  @PreAuthorize("hasAuthority('activity:type:view')")
   public IPage<ActivityTypeVO> list(
       @ApiIgnore PageDTO<ActivityType> page, ActivityTypeQueryDTO dto) {
     if (StringUtils.isBlank(dto.getLanguage())) {
@@ -84,7 +78,7 @@ public class ActivityTypeController {
 
   @ApiOperation(value = "更新活动板块")
   @PutMapping("/update")
-  @PreAuthorize("hasAuthority('activity:type:update')")
+  @PreAuthorize("hasAuthority('activity:type:edit')")
   public void update(@Validated @RequestBody ActivityTypeUpdateDTO dto) {
     dto.setLanguage(LocaleContextHolder.getLocale().toLanguageTag());
     if (dto.getFloatStatus() != null && dto.getFloatStatus() != BooleanEnum.NO.value()) {

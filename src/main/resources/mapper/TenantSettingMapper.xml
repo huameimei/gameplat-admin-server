@@ -141,4 +141,87 @@
         </foreach>
     </insert>
 
+    <insert id="initSportConfig" parameterType="com.gameplat.model.entity.setting.TenantSetting">
+        INSERT INTO `tenant_setting`(`tenant`,
+                                         `setting_type`,
+                                         `setting_code`,
+                                         `setting_value`,
+                                         `setting_label`,
+                                         `create_by`,
+                                         `create_time`)
+        VALUES ('default',
+                #{settingType},
+                #{settingCode},
+                #{settingValue},
+                #{settingLabel},
+                #{createBy},
+                SYSDATE())
+    </insert>
+
+    <!--查询体育配置-->
+    <select id="getSportConfig" parameterType="com.gameplat.model.entity.setting.TenantSetting"
+            resultMap="sysTenantSettingResult">
+        select `id`,
+               `setting_type`,
+               `setting_code`,
+               `setting_label`,
+               `setting_desc`,
+               `setting_value`,
+               `display`,
+               `sort`,
+               `file_path`,
+               `picture_path`,
+               `is_index`,
+               `extend_1`,
+               `extend_2`,
+               `create_by`,
+               `create_time`,
+               `update_by`,
+               `update_time`
+        from tenant_setting
+        where setting_type = 'sport_config' and setting_code = 'sportConfig';
+    </select>
+
+    <update id="updateListSortConfig" parameterType="com.gameplat.model.entity.setting.TenantSetting">
+        update tenant_setting
+        <set>
+            <if test='settingValue != null and settingValue != ""'>setting_value = #{settingValue},</if>
+        </set>
+        where setting_type = 'sport_config' and setting_code = 'listSort'
+    </update>
+
+    <!--多条件查询租户设置列表-->
+    <select id="getTenantSetting" parameterType="com.gameplat.model.entity.setting.TenantSetting" resultMap="sysTenantSettingResult">
+        select * from tenant_setting
+        <where>
+            <if test='settingType != null and settingType != ""'>
+                and setting_type = #{settingType}
+            </if>
+            <if test='settingCode != null and settingCode != ""'>
+                and setting_code = #{settingCode}
+            </if>
+            <if test='tenant != null and tenant != ""'>
+                and tenant = #{tenant}
+            </if>
+            <if test='extend4 != null and extend4 != ""'>
+                and extend_4 = #{extend4}
+            </if>
+            <if test="display != null">
+                and display = #{display}
+            </if>
+            <if test="id != null">
+                and id = #{id}
+            </if>
+        </where>
+        order by sort ASC
+    </select>
+
+    <update id="updateSportConfig" parameterType="com.gameplat.model.entity.setting.TenantSetting">
+        update tenant_setting
+        <set>
+            <if test='settingValue != null and settingValue != ""'>setting_value = #{settingValue},</if>
+        </set>
+        where setting_type = 'sport_config' and setting_code = 'sportConfig'
+    </update>
+
 </mapper>

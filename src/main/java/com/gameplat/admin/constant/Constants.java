@@ -16,6 +16,8 @@ public interface Constants {
   String SYSTEM_SETTING = "system_setting";
   String SPORT_CONFIG_TYPE = "sport_config";
   String SPORT_CONFIG_CODE = "sportConfig";
+  String SPORT_CONFIG_DESC = "体育配置";
+  String SQUARE_NAVIGATION ="square_navigation";
   /** 启动图 */
   String START_UP_IMAGE = "start_up_image";
   /** 个人中心 */
@@ -25,14 +27,24 @@ public interface Constants {
 
   String SQUARE_SWITCH = "square_switch";
 
-  /** 导航栏列表 */
-  String TENANT_NAVIGATION_LIST = "TENANT_NAVIGATION_LIST";
+  /**场景六排序列表*/
+  String LIST_SORT_CODE = "listSort";
+
+  String LIST_SORT_DESC = "体育配置场景6排序开关列表";
+
+  /**
+   * 租户原体育场景6排序开关设置
+   */
+  String TENANT_LIST_SORT = "TENANT_LIST_SORT";
 
   /** 浮窗列表 */
   String TENANT_FLOAT_LIST = "TENANT_FLOAT_LIST";
 
   /** 数据字典Type */
   String TENANT_CUSTOM_CONFIG = "TENANT_CUSTOM_CONFIG";
+
+  /** 租户体育配置*/
+  String TENANT_SPORT_CONFIG = "TENANT_SPORT_CONFIG";
 
   /** 原生体育游戏Code */
   String SPORT_IM = "imapi_sport";

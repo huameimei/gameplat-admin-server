@@ -8,6 +8,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.alicp.jetcache.anno.CacheInvalidate;
 import com.alicp.jetcache.anno.CacheInvalidateContainer;
 import com.alicp.jetcache.anno.Cached;
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
@@ -48,8 +49,7 @@ import java.util.Map;
 public class SysDictDataServiceImpl extends ServiceImpl<SysDictDataMapper, SysDictData>
     implements SysDictDataService {
 
-  @Autowired
-  private DictDataConvert dictDataConvert;
+  @Autowired private DictDataConvert dictDataConvert;
 
   @Override
   @SentinelResource(value = "selectDictDataList")
@@ -146,7 +146,8 @@ public class SysDictDataServiceImpl extends ServiceImpl<SysDictDataMapper, SysDi
   public void insertDictData(OperDictDataDTO dto) {
     if (this.lambdaQuery()
         .eq(ObjectUtils.isNotNull(dto.getDictType()), SysDictData::getDictType, dto.getDictType())
-        .eq(SysDictData::getDictLabel, dto.getDictLabel()).exists()) {
+        .eq(SysDictData::getDictLabel, dto.getDictLabel())
+        .exists()) {
       throw new ServiceException("字典标签已存在，请勿重复添加");
     }
 
@@ -202,8 +203,8 @@ public class SysDictDataServiceImpl extends ServiceImpl<SysDictDataMapper, SysDi
   @SentinelResource(value = "addOrUpdateUserWithdrawLimit")
   @CacheInvalidateContainer(
       value = {
-          @CacheInvalidate(name = CachedKeys.DICT_DATA_CACHE, key = "#dictType"),
-          @CacheInvalidate(name = CachedKeys.DICT_DATA_CACHE, key = "#dictType + ':' + #dictLabel")
+        @CacheInvalidate(name = CachedKeys.DICT_DATA_CACHE, key = "#dictType"),
+        @CacheInvalidate(name = CachedKeys.DICT_DATA_CACHE, key = "#dictType + ':' + #dictLabel")
       })
   public void addOrUpdateUserWithdrawLimit(
       String dictType, String dictLabel, UserWithdrawLimitInfo limitInfo) {
@@ -265,8 +266,8 @@ public class SysDictDataServiceImpl extends ServiceImpl<SysDictDataMapper, SysDi
   @SentinelResource(value = "deleteByDictLabel")
   @CacheInvalidateContainer(
       value = {
-          @CacheInvalidate(name = CachedKeys.DICT_DATA_CACHE, key = "#dictType"),
-          @CacheInvalidate(name = CachedKeys.DICT_DATA_CACHE, key = "#dictType + ':' + #dictLabel")
+        @CacheInvalidate(name = CachedKeys.DICT_DATA_CACHE, key = "#dictType"),
+        @CacheInvalidate(name = CachedKeys.DICT_DATA_CACHE, key = "#dictType + ':' + #dictLabel")
       })
   public void delete(String dictType, String dictLabel) {
     if (!this.lambdaUpdate()
@@ -307,14 +308,23 @@ public class SysDictDataServiceImpl extends ServiceImpl<SysDictDataMapper, SysDi
     return super.saveOrUpdate(entity);
   }
 
+  @Override
+  @SentinelResource(value = "saveOrUpdate")
+  @CacheInvalidate(
+      name = CachedKeys.DICT_DATA_CACHE,
+      key = "#entity.dictType + ':' + #entity.dictLabel")
+  public boolean saveOrUpdate(SysDictData entity, Wrapper<SysDictData> updateWrapper) {
+    return super.saveOrUpdate(entity, updateWrapper);
+  }
+
+  @Override
   @CacheInvalidateContainer(
       value = {
-          @CacheInvalidate(name = CachedKeys.DICT_DATA_CACHE, key = "#data.dictType"),
-          @CacheInvalidate(
-              name = CachedKeys.DICT_DATA_CACHE,
-              key = "#data.dictType + ':' + #data.dictLabel")
+        @CacheInvalidate(name = CachedKeys.DICT_DATA_CACHE, key = "#data.dictType"),
+        @CacheInvalidate(
+            name = CachedKeys.DICT_DATA_CACHE,
+            key = "#data.dictType + ':' + #data.dictLabel")
       })
-  @Override
   public void updateByTypeAndLabel(SysDictData data) {
     LambdaUpdateWrapper<SysDictData> updateWrapper = new LambdaUpdateWrapper<>();
     updateWrapper

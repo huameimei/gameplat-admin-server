@@ -3,10 +3,8 @@ package com.gameplat.admin.service.impl;
 import cn.hutool.json.JSONObject;
 import com.alibaba.fastjson.JSONArray;
 import com.alicp.jetcache.anno.CacheInvalidate;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
-import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.gameplat.admin.convert.AgentContacaConfigConvert;
 import com.gameplat.admin.model.dto.AgentContacaDTO;
@@ -30,17 +28,14 @@ import com.gameplat.common.lang.Assert;
 import com.gameplat.common.model.bean.EmailConfig;
 import com.gameplat.model.entity.AgentContacaConfig;
 import com.gameplat.model.entity.sys.SysDictData;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.*;
 
 @Slf4j
 @Service
@@ -161,12 +156,7 @@ public class SystemConfigServiceImpl implements SystemConfigService {
       sysDictData.setDictType(dto.getDictType());
       sysDictData.setDictLabel(entry.getKey());
       sysDictData.setDictValue(entry.getValue().toString());
-
-      LambdaQueryWrapper<SysDictData> queryWrapper = Wrappers.lambdaQuery();
-      queryWrapper
-          .eq(SysDictData::getDictType, dto.getDictType())
-          .eq(SysDictData::getDictLabel, entry.getKey());
-      if (!dictDataService.saveOrUpdate(sysDictData, queryWrapper)) {
+      if (!dictDataService.saveOrUpdate(sysDictData)) {
         throw new ServiceException("更新配置失败!");
       }
     }

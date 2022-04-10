@@ -1,0 +1,24 @@
+spring:
+  application:
+    name: admin-server
+  profiles:
+    active: @profiles.active@
+  cloud:
+    nacos:
+      config:
+        enabled: true
+        server-addr: 192.168.12.50:8848
+        username: nacos
+        password: t1KMNoXowYr2DK9L
+        file-extension: yml
+        namespace: ea9f2fb3-4fce-4cc9-a820-4508330af65b
+        group: SERVICE_GROUP
+        refresh-enabled: true
+        shared-dataids: redis.yml,spring-kafka-log.yml,spring-kafka-producer-config.yml,elasticsearch.yml
+      discovery:
+        service: admin-server
+        namespace: ${spring.cloud.nacos.config.namespace}
+        group: SERVICE_GROUP
+        server-addr: ${spring.cloud.nacos.config.server-addr}
+        username: ${spring.cloud.nacos.config.username}
+        password: ${spring.cloud.nacos.config.password}

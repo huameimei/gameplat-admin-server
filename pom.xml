@@ -261,6 +261,18 @@
                 <profiles.active>sit</profiles.active>
             </properties>
         </profile>
+        <profile>
+            <id>kg266</id>
+            <properties>
+                <profiles.active>kg266</profiles.active>
+            </properties>
+        </profile>
+        <profile>
+            <id>kg277</id>
+            <properties>
+                <profiles.active>kg277</profiles.active>
+            </properties>
+        </profile>
     </profiles>
 
     <build>

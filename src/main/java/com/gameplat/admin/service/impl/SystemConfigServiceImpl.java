@@ -3,8 +3,10 @@ package com.gameplat.admin.service.impl;
 import cn.hutool.json.JSONObject;
 import com.alibaba.fastjson.JSONArray;
 import com.alicp.jetcache.anno.CacheInvalidate;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.gameplat.admin.convert.AgentContacaConfigConvert;
 import com.gameplat.admin.model.dto.AgentContacaDTO;
@@ -156,7 +158,12 @@ public class SystemConfigServiceImpl implements SystemConfigService {
       sysDictData.setDictType(dto.getDictType());
       sysDictData.setDictLabel(entry.getKey());
       sysDictData.setDictValue(entry.getValue().toString());
-      if (!dictDataService.saveOrUpdate(sysDictData)) {
+
+      LambdaQueryWrapper<SysDictData> queryWrapper = Wrappers.lambdaQuery();
+      queryWrapper
+          .eq(SysDictData::getDictType, dto.getDictType())
+          .eq(SysDictData::getDictLabel, entry.getKey());
+      if (!dictDataService.saveOrUpdate(sysDictData, queryWrapper)) {
         throw new ServiceException("更新配置失败!");
       }
     }

@@ -27,6 +27,8 @@ public interface MemberService extends IService<Member> {
 
   MemberInfoVO getInfo(Long id);
 
+  MemberInfoVO getMemberInfo(Long id);
+
   Member getById(Long id);
 
   Optional<Member> getByAccount(String account);
@@ -163,5 +165,7 @@ public interface MemberService extends IService<Member> {
    */
   MemberBalanceVO findMemberVip(String username, String level, String vipGrade);
 
+
+  MemberContactVo getMemberDateils(Long id);
 
 }

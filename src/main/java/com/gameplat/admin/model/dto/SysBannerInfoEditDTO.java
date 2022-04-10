@@ -72,4 +72,9 @@ public class SysBannerInfoEditDTO implements Serializable {
 
   @ApiModelProperty("排序")
   private Integer sort;
+
+  /**
+   * 展示位置  0 上 1下
+   */
+  private Integer location;
 }

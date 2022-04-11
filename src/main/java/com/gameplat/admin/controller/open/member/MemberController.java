@@ -10,6 +10,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.gameplat.admin.model.dto.*;
 import com.gameplat.admin.model.vo.MemberBalanceVO;
+import com.gameplat.admin.model.vo.MemberContactVo;
 import com.gameplat.admin.model.vo.MemberInfoVO;
 import com.gameplat.admin.model.vo.MemberVO;
 import com.gameplat.admin.service.GameAdminService;
@@ -61,7 +62,7 @@ public class MemberController {
   @ApiOperation(value = "会员详情")
   @GetMapping("/info/{id}")
   public MemberInfoVO info(@PathVariable Long id) {
-    return memberService.getInfo(id);
+    return memberService.getMemberInfo(id);
   }
 
   @ApiOperation(value = "会员详情")
@@ -275,4 +276,14 @@ public class MemberController {
   public void releaseLoginLimit(@PathVariable Long id) {
     memberService.releaseLoginLimit(id);
   }
+
+
+  @ApiOperation("查看会员真实资料")
+  @GetMapping("getMemberDateil/{id}")
+  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.MEMBER, desc = "查看会员真实资料#{id}")
+  @PreAuthorize("hasAuthority('member:memberContact:dateil')")
+  public MemberContactVo getMemberDateil(@PathVariable(required = true) long id) {
+    return memberService.getMemberDateils(id);
+  }
+
 }

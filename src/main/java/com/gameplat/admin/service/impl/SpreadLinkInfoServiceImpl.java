@@ -193,6 +193,9 @@ public class SpreadLinkInfoServiceImpl extends ServiceImpl<SpreadLinkInfoMapper,
     if (StrUtil.isBlank(linkInfo.getAgentAccount())) {
       throw new ServiceException("代理账号不能为空！");
     }
+    if (StrUtil.isBlank(linkInfo.getExternalUrl())){
+      throw new ServiceException("推广地址不能为空！");
+    }
     // 校验账号的用户类型
     Member member =
         memberService

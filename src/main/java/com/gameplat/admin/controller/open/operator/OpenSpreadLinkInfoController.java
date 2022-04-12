@@ -185,4 +185,14 @@ public class OpenSpreadLinkInfoController {
       @RequestParam(required = false) String agentAccount) {
     return spreadLinkInfoService.getSpreadLinkRebate(agentAccount, true, false);
   }
+
+
+  /**
+   * 获取
+   */
+  @GetMapping("/getDefaultLink")
+  @PreAuthorize("hasAuthority('diffusion:spreadConfig:add')")
+  public List<SpreadConfigVO> getDefaultLink() {
+    return spreadLinkInfoService.getDefaultLink();
+  }
 }

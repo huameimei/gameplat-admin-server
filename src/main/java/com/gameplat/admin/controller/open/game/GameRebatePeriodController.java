@@ -18,8 +18,7 @@ import com.gameplat.common.lang.Assert;
 import com.gameplat.model.entity.game.GameRebateDetail;
 import com.gameplat.model.entity.game.GameRebatePeriod;
 import com.gameplat.model.entity.game.GameRebateReport;
-import com.gameplat.redis.api.RedisService;
-import com.gameplat.redis.exception.RedisOpsResultIsNullException;
+import com.gameplat.redis.redisson.DistributedLocker;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import lombok.extern.slf4j.Slf4j;
@@ -40,16 +39,10 @@ import org.springframework.web.bind.annotation.RestController;
 public class GameRebatePeriodController {
 
   private static final String GAME_REBATE_PAY_REDIS_LOCK = "game_rebate_pay_redis_lock";
-
-  private static final String GAME_REBATE_RUNNING_TASK_NAME = "game_rebate_running_task_name";
-
   @Autowired private GameRebatePeriodService gameRebatePeriodService;
-
   @Autowired private GameRebateDetailService gameRebateDetailService;
-
   @Autowired private GameRebateReportService gameRebateReportService;
-
-  @Autowired private RedisService redisService;
+  @Autowired private DistributedLocker distributedLocker;
 
   @GetMapping(value = "queryAll")
   @PreAuthorize("hasAuthority('game:gameRebatePeriod:view')")
@@ -82,26 +75,21 @@ public class GameRebatePeriodController {
   @PreAuthorize("hasAuthority('game:gameRebatePeriod:settle')")
   public void settle(@RequestBody OperGameRebatePeriodDTO dto) {
     // 正在发放、回收，不允许进行结算操作
-    try {
-      redisService.getStringOps().setEx(GAME_REBATE_PAY_REDIS_LOCK, 0, 3600, TimeUnit.SECONDS);
-      GameRebatePeriod gameRebatePeriod = gameRebatePeriodService.getById(dto.getId());
-      if (gameRebatePeriod == null) {
-        redisService.getKeyOps().delete(GAME_REBATE_PAY_REDIS_LOCK);
-        throw new ServiceException("游戏返水期号不存在");
-      }
+    distributedLocker.lock(GAME_REBATE_PAY_REDIS_LOCK, TimeUnit.SECONDS, 300);
+    GameRebatePeriod gameRebatePeriod = gameRebatePeriodService.getById(dto.getId());
+    if (gameRebatePeriod == null) {
+      distributedLocker.unlock(GAME_REBATE_PAY_REDIS_LOCK);
+      throw new ServiceException("游戏返水期号不存在");
+    }
 
-      if (gameRebatePeriod.getStatus() != GameRebatePeriodStatus.UNSETTLED.getValue()) {
-        redisService.getKeyOps().delete(GAME_REBATE_PAY_REDIS_LOCK);
-        throw new ServiceException("期号状态不是未结算,不能进入结算操作");
-      }
-      try {
-        gameRebatePeriodService.settle(dto.getId());
-      } finally {
-        redisService.getKeyOps().delete(GAME_REBATE_PAY_REDIS_LOCK);
-      }
-    } catch (RedisOpsResultIsNullException e) {
-      String taskName = (String) redisService.getStringOps().get(GAME_REBATE_RUNNING_TASK_NAME);
-      throw new ServiceException(String.format("正在执行[%s]，请稍后重试！", taskName));
+    if (gameRebatePeriod.getStatus() != GameRebatePeriodStatus.UNSETTLED.getValue()) {
+      distributedLocker.unlock(GAME_REBATE_PAY_REDIS_LOCK);
+      throw new ServiceException("期号状态不是未结算,不能进入结算操作");
+    }
+    try {
+      gameRebatePeriodService.settle(dto.getId());
+    } finally {
+      distributedLocker.unlock(GAME_REBATE_PAY_REDIS_LOCK);
     }
   }
 
@@ -120,44 +108,49 @@ public class GameRebatePeriodController {
 
   @Async
   public void asyncAcceptSingleTask(String taskName, OperGameRebatePeriodDTO dto) {
-    log.info("异步任务执行：{}", taskName);
-    List<GameRebateDetail> gameRebateDetailList =
-        gameRebateDetailService.gameRebateDetailByStatus(
-            dto.getId(), GameRebateReportStatus.UNACCEPTED.getValue());
-    String statTime = "";
-    for (GameRebateDetail gameRebateDetail : gameRebateDetailList) {
-      try {
-        if (StringUtils.isEmpty(statTime)) {
-          statTime = gameRebateDetail.getStatTime();
+    log.info("异步派发任务执行：{}", taskName);
+    try {
+      distributedLocker.lock(GAME_REBATE_PAY_REDIS_LOCK, TimeUnit.SECONDS, 300);
+      List<GameRebateDetail> gameRebateDetailList =
+          gameRebateDetailService.gameRebateDetailByStatus(
+              dto.getId(), GameRebateReportStatus.UNACCEPTED.getValue());
+      String statTime = "";
+      for (GameRebateDetail gameRebateDetail : gameRebateDetailList) {
+        try {
+          if (StringUtils.isEmpty(statTime)) {
+            statTime = gameRebateDetail.getStatTime();
+          }
+          gameRebateReportService.accept(
+              dto.getId(),
+              gameRebateDetail.getMemberId(),
+              gameRebateDetail.getRealRebateMoney(),
+              gameRebateDetail.getPeriodName() + "-游戏返水");
+        } catch (Exception e) {
+          log.error("派发异常: " + JSONUtil.toJsonStr(gameRebateDetail));
+          throw new RuntimeException("派发异常", e);
         }
-        gameRebateReportService.accept(
-            dto.getId(),
-            gameRebateDetail.getMemberId(),
-            gameRebateDetail.getRealRebateMoney(),
-            gameRebateDetail.getPeriodName() + "-游戏返水");
-      } catch (Exception e) {
-        log.error("派发异常: " + JSONUtil.toJsonStr(gameRebateDetail));
-        throw new RuntimeException("派发异常", e);
       }
-    }
 
-    // 更新状态
-    GameRebatePeriod gameRebatePeriod = new GameRebatePeriod();
-    gameRebatePeriod.setStatus(GameRebatePeriodStatus.ACCEPTED.getValue());
-    LambdaUpdateWrapper<GameRebatePeriod> updateWrapper = Wrappers.lambdaUpdate();
-    updateWrapper.eq(GameRebatePeriod::getId, dto.getId());
-    if (!gameRebatePeriodService.update(gameRebatePeriod, updateWrapper)) {
-      throw new ServiceException("更新游戏返水期数配置失败！");
-    }
+      // 更新状态
+      GameRebatePeriod gameRebatePeriod = new GameRebatePeriod();
+      gameRebatePeriod.setStatus(GameRebatePeriodStatus.ACCEPTED.getValue());
+      LambdaUpdateWrapper<GameRebatePeriod> updateWrapper = Wrappers.lambdaUpdate();
+      updateWrapper.eq(GameRebatePeriod::getId, dto.getId());
+      if (!gameRebatePeriodService.update(gameRebatePeriod, updateWrapper)) {
+        throw new ServiceException("更新游戏返水期数配置失败！");
+      }
 
-    GameRebateReport gameRebateReport = new GameRebateReport();
-    gameRebatePeriod.setStatus(GameRebateReportStatus.ACCEPTED.getValue());
-    LambdaUpdateWrapper<GameRebateReport> reportUpdateWrapper = Wrappers.lambdaUpdate();
-    reportUpdateWrapper.eq(GameRebateReport::getPeriodId, dto.getId());
-    if (!gameRebateReportService.update(gameRebateReport, reportUpdateWrapper)) {
-      throw new ServiceException("更新游戏返水报表状态失败！");
+      GameRebateReport gameRebateReport = new GameRebateReport();
+      gameRebatePeriod.setStatus(GameRebateReportStatus.ACCEPTED.getValue());
+      LambdaUpdateWrapper<GameRebateReport> reportUpdateWrapper = Wrappers.lambdaUpdate();
+      reportUpdateWrapper.eq(GameRebateReport::getPeriodId, dto.getId());
+      if (!gameRebateReportService.update(gameRebateReport, reportUpdateWrapper)) {
+        throw new ServiceException("更新游戏返水报表状态失败！");
+      }
+      // 添加游戏返水每日统计 由定时任务处理
+    } finally {
+      distributedLocker.unlock(GAME_REBATE_PAY_REDIS_LOCK);
     }
-    // 添加游戏返水每日统计 由定时任务处理
   }
 
   /** 游戏返水回收:期数 */
@@ -176,9 +169,10 @@ public class GameRebatePeriodController {
   @Async
   public void asyncAndRollBackSingleTask(String taskName, OperGameRebatePeriodDTO dto)
       throws ServiceException {
+    log.info("异步回收任务执行：{}", taskName);
     try {
-      redisService.getStringOps().setEx(GAME_REBATE_PAY_REDIS_LOCK, 0, 3600, TimeUnit.SECONDS);
-      redisService.getStringOps().set(GAME_REBATE_RUNNING_TASK_NAME, taskName);
+      distributedLocker.lock(GAME_REBATE_PAY_REDIS_LOCK, TimeUnit.SECONDS, 300);
+
       String statTime = "";
       List<GameRebateDetail> gameRebateDetailList =
           gameRebateDetailService.gameRebateDetailByStatus(
@@ -213,11 +207,9 @@ public class GameRebatePeriodController {
       if (!gameRebateReportService.update(gameRebateReport, reportUpdateWrapper)) {
         throw new ServiceException("更新游戏返水报表状态失败！");
       }
-
       //  添加游戏返水每日统计 由定时任务处理
-    } catch (RedisOpsResultIsNullException e) {
-      String name = (String) redisService.getStringOps().get(GAME_REBATE_RUNNING_TASK_NAME);
-      throw new ServiceException(String.format("正在执行[%s]，请稍后重试！", name));
+    } finally {
+      distributedLocker.unlock(GAME_REBATE_PAY_REDIS_LOCK);
     }
   }
 }

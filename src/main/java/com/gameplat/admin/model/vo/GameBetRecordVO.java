@@ -19,6 +19,9 @@ public class GameBetRecordVO implements Serializable {
   /** 用户名 */
   private String account;
 
+  /** 游戏账号 */
+  private String gameAccount;
+
   /** 平台编码 */
   private String platformCode;
 

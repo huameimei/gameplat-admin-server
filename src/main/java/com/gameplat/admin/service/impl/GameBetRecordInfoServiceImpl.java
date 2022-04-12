@@ -158,12 +158,15 @@ public class GameBetRecordInfoServiceImpl implements GameBetRecordInfoService {
 
   @Override
   public GameResult getGameResult(GameBetRecordQueryDTO dto) throws Exception {
-    // TODO 直接连游戏查询结果
     GameApi gameApi = getGameApi(dto.getPlatformCode());
     GameBizBean gameBizBean = new GameBizBean();
     gameBizBean.setOrderNo(dto.getBillNo());
     gameBizBean.setGameType(dto.getGameType());
     gameBizBean.setPlatformCode(dto.getPlatformCode());
+    gameBizBean.setGameAccount(dto.getGameAccount());
+    gameBizBean.setPlayCode(dto.getPlayCode());
+    gameBizBean.setSettle(dto.getSettle());
+    gameBizBean.setTime(dto.getTime());
     gameBizBean.setConfig(gameConfigService.queryGameConfigInfoByPlatCode(dto.getPlatformCode()));
     GameResult gameResult = gameApi.getGameResult(gameBizBean);
     if (StringUtils.isBlank(gameResult.getData())) {

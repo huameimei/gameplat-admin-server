@@ -120,12 +120,12 @@ public class SpreadLinkInfoServiceImpl extends ServiceImpl<SpreadLinkInfoMapper,
                             SpreadLinkInfo::getRegistCount)
                     .page(page)
                     .convert(spreadLinkInfoConvert::toVo);
-    for (SpreadConfigVO obj : convert.getRecords()) {
-      if (StrUtil.isNotBlank(obj.getExternalUrl()) && !obj.getExternalUrl().contains("?rc=")) {
-        obj.setExternalUrl(
-                MessageFormat.format("{0}/?rc={1}", obj.getExternalUrl(), obj.getCode()));
-      }
-    }
+//    for (SpreadConfigVO obj : convert.getRecords()) {
+//      if (StrUtil.isNotBlank(obj.getExternalUrl()) && !obj.getExternalUrl().contains("?rc=")) {
+//        obj.setExternalUrl(
+//                MessageFormat.format("{0}/?rc={1}", obj.getExternalUrl(), obj.getCode()));
+//      }
+//    }
     return convert;
   }
 
@@ -227,13 +227,19 @@ public class SpreadLinkInfoServiceImpl extends ServiceImpl<SpreadLinkInfoMapper,
             sysDictDataService.getDictData(
                     DictTypeEnum.SYSTEM_PARAMETER_CONFIG.getValue(),
                     DictDataEnum.AGENT_MIN_CODE_NUM.getLabel());
-    Integer agentMinCodeNum = Convert.toInt(agentMinCodeNumData.getDictValue());
+    Integer agentMinCodeNum = 0;
+    if (agentMinCodeNumData != null) {
+      agentMinCodeNum = Convert.toInt(agentMinCodeNumData.getDictValue());
+    }
     // 代理推广码最大条数
     SysDictData agentMaxSpreadNumData =
             sysDictDataService.getDictData(
                     DictTypeEnum.SYSTEM_PARAMETER_CONFIG.getValue(),
                     DictDataEnum.AGENT_MAX_SPREAD_NUM.getLabel());
-    Integer agentMaxSpreadNum = Convert.toInt(agentMaxSpreadNumData.getDictValue());
+    Integer agentMaxSpreadNum = 1;
+    if (agentMaxSpreadNumData != null) {
+      agentMaxSpreadNum = Convert.toInt(agentMaxSpreadNumData.getDictValue());
+    }
     // 如果推广码为空  随机生成 4-20位
     if (StrUtil.isBlank(linkInfo.getCode()) && dto.getExclusiveFlag() != 2) {
       linkInfo.setCode(

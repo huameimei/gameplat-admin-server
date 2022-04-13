@@ -34,12 +34,11 @@ public class GameBetRecordSearchBuilder {
     if (null != dto.getTimeType() && ObjectUtil.isNotNull(dto.getBeginTime())) {
       builder.must(
           QueryBuilders.rangeQuery(convertTimeType(dto.getTimeType()))
-              .from(DateUtil.date(GameDateUtils.get0ZoneDate(dto.getBeginTime())).toJdkDate())
+              .from(DateUtil.date(Long.parseLong(dto.getBeginTime())).toJdkDate())
               .to(
                   dto.getEndTime() == null
-                      ? DateUtil.date(GameDateUtils.get0ZoneDate(System.currentTimeMillis()))
-                          .toJdkDate()
-                      : DateUtil.date(GameDateUtils.get0ZoneDate(dto.getEndTime())).toJdkDate())
+                      ? DateUtil.date(System.currentTimeMillis()).toJdkDate()
+                      : DateUtil.date(Long.parseLong(dto.getEndTime())).toJdkDate())
               .format(DateUtils.DATE_TIME_PATTERN));
     }
     return builder;

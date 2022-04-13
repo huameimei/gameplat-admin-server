@@ -130,6 +130,7 @@ public class GameBetRecordInfoServiceImpl implements GameBetRecordInfoService {
 
     SearchRequest searchRequest = new SearchRequest(indexName);
     searchRequest.source(searchSourceBuilder);
+    log.info("queryPageBetRecord DSL语句为：{}", searchRequest.source().toString());
     RequestOptions.Builder optionsBuilder = RequestOptions.DEFAULT.toBuilder();
     optionsBuilder.setHttpAsyncResponseConsumerFactory(
         new HttpAsyncResponseConsumerFactory.HeapBufferedResponseConsumerFactory(31457280));

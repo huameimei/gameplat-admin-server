@@ -1,9 +1,8 @@
 package com.gameplat.admin.model.dto;
 
-import lombok.Data;
-
-import javax.validation.constraints.NotEmpty;
 import java.io.Serializable;
+import javax.validation.constraints.NotEmpty;
+import lombok.Data;
 
 /**
  * @Author kb @Date 2022/3/7 14:31 @Version 1.0
@@ -16,7 +15,7 @@ public class UserGameBetRecordDto implements Serializable {
   private String account;
 
   /** 开始时间 */
-  private String startTime;
+  private String beginTime;
 
   /** 结束时间 */
   private String endTime;

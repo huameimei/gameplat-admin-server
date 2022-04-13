@@ -48,7 +48,6 @@ import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.client.core.CountRequest;
 import org.elasticsearch.client.core.CountResponse;
-import org.elasticsearch.common.Strings;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
@@ -57,7 +56,6 @@ import org.elasticsearch.search.aggregations.bucket.terms.TermsAggregationBuilde
 import org.elasticsearch.search.aggregations.metrics.ParsedSum;
 import org.elasticsearch.search.aggregations.metrics.SumAggregationBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
-import org.elasticsearch.search.fetch.subphase.FetchSourceContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -210,9 +208,6 @@ public class GameBetDailyReportServiceImpl
         searchSourceBuilder.size(0);
         searchSourceBuilder.query(builder);
         searchSourceBuilder.aggregation(accountGroup);
-        searchSourceBuilder.fetchSource(
-            new FetchSourceContext(
-                true, new String[] {"platformCode", "gameKind"}, Strings.EMPTY_ARRAY));
         searchRequest.source(searchSourceBuilder);
         log.info("resetGameBetDailyReport DSL语句为：{}", searchRequest.source().toString());
         SearchResponse searchResponse =
@@ -221,6 +216,7 @@ public class GameBetDailyReportServiceImpl
         Terms accountTerms = searchResponse.getAggregations().get("accountGroup");
         for (Terms.Bucket bucket : accountTerms.getBuckets()) {
           String account = bucket.getKeyAsString();
+          log.info("resetGameBetDailyReport account:{} ", account);
           MemberInfoVO memberInfo = memberService.getMemberInfo(account);
           Member member =
               memberService

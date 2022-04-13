@@ -262,6 +262,7 @@ public class TenantSettingController {
         if (listSortConfigVOS == null || listSortConfigVOS.isEmpty()) {
             Result.failed("修改体育配置参数为空");
         }
+        adminCache.deleteObject(CacheKey.getTenantListSortKey());
         return Result.succeed(tenantSettingService.updateListSortConfig(listSortConfigVOS));
     }
 
@@ -274,6 +275,7 @@ public class TenantSettingController {
         if(sportConfigVo==null){
             Result.failed("修改体育配置参数为空");
         }
+        adminCache.deleteObject(CacheKey.getSportConfigKey());
         return Result.succeed(tenantSettingService.updateSportConfig(sportConfigVo));
     }
 }

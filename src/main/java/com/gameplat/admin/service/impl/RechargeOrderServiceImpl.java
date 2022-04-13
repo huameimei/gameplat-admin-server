@@ -1010,11 +1010,17 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
     sb.append("订单编号 ")
         .append(rechargeOrder.getOrderNo())
         .append("，充值金额 ")
-        .append(CNYUtils.formatYuanAsYuan(rechargeOrder.getPayAmount()))
+            .append(
+                    CNYUtils.formatYuanAsYuan(
+                            rechargeOrder.getPayAmount().setScale(2, BigDecimal.ROUND_DOWN)))
         .append("，优惠金额 ")
-        .append(CNYUtils.formatYuanAsYuan(rechargeOrder.getDiscountAmount()))
+            .append(
+                    CNYUtils.formatYuanAsYuan(
+                            rechargeOrder.getDiscountAmount().setScale(2, BigDecimal.ROUND_DOWN)))
         .append("，余额 ")
-        .append(df.format(balance.add(rechargeOrder.getTotalAmount())));
+            .append(
+                    df.format(
+                            balance.add(rechargeOrder.getTotalAmount().setScale(2, BigDecimal.ROUND_DOWN))));
     if (StringUtils.isNotEmpty(rechargeOrder.getPayType())) {
       sb.append("，支付类型 ").append(rechargeOrder.getPayTypeName());
     }

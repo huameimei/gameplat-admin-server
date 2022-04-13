@@ -556,9 +556,11 @@ public class MemberWealServiceImpl extends ServiceImpl<MemberWealMapper, MemberW
         if (CollectionUtil.isNotEmpty(pageList)) {
           log.info("福利回收{},第{}批开始执行,条数:{}", wealId, j, pageList.size());
           for (MemberWealReword reword : pageList) {
+            log.info("开始回收之前状态：{}", reword.getStatus());
             try {
               // 已完成
               if (reword.getStatus() == 2) {
+                log.info("开始插入流水");
                 // 查询会员信息
                 Member member = memberMapper.selectById(reword.getUserId());
                 // 派发金额
@@ -585,6 +587,7 @@ public class MemberWealServiceImpl extends ServiceImpl<MemberWealMapper, MemberW
                 memberBill.setContent(tranType.getDesc());
                 memberBill.setOperator("system");
                 memberBillService.save(memberBill);
+                log.info("结束插入流水");
                 //
               }
               // 已失效状态

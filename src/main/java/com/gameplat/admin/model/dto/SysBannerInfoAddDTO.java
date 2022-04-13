@@ -70,4 +70,10 @@ public class SysBannerInfoAddDTO implements Serializable {
    * 展示位置  0 上 1下
    */
   private Integer location;
+
+  /**
+   * 标题
+   */
+  @ApiModelProperty("标题")
+  private String title;
 }

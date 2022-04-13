@@ -4,6 +4,7 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.RandomUtil;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -13,6 +14,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.convert.MemberWealConvert;
 import com.gameplat.admin.convert.MessageInfoConvert;
 import com.gameplat.admin.enums.LanguageEnum;
+import com.gameplat.admin.enums.MemberWealRewordEnums;
 import com.gameplat.admin.enums.PushMessageEnum;
 import com.gameplat.admin.mapper.*;
 import com.gameplat.admin.model.dto.*;
@@ -33,7 +35,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
-
 import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -42,7 +43,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
-
 import static com.gameplat.common.enums.TranTypes.*;
 import static java.util.stream.Collectors.toList;
 
@@ -516,114 +516,120 @@ public class MemberWealServiceImpl extends ServiceImpl<MemberWealMapper, MemberW
         }
     }
 
-    /**
-     * 福利回收
-     */
-    @Override
-    public void recycleWeal(Long wealId, HttpServletRequest request) {
-        // 通过流水号去回收福利奖励-->未领取的直接回收掉但不扣钱  已完成的直接扣钱回收
-        MemberWeal memberWeal = memberWealMapper.selectById(wealId);
-        // 福利类型
-        TranTypes tranType = this.getWealType(memberWeal.getType());
-        // 流水号
-        String serialNumber = memberWeal.getSerialNumber();
-        List<MemberWealReword> rewordList =
-                wealRewordService.findList(
-                        new MemberWealRewordDTO() {
-                            {
-                                setSerialNumber(serialNumber);
-                            }
-                        });
-        // 登录ip
-        String ipAddress = IPUtils.getIpAddress(request);
-        if (CollectionUtil.isNotEmpty(rewordList)) {
-            // 过滤已派发成功状态的数据, 每次7000条执行
-            int pageSize = 7000;
-            int size = rewordList.size();
-            log.info("需要回收的会员记录数:" + size);
+  /**
+   * 福利回收
+   */
+  @Override
+  public void recycleWeal(Long wealId, HttpServletRequest request) {
+    // 通过流水号去回收福利奖励-->未领取的直接回收掉但不扣钱  已完成的直接扣钱回收
+    MemberWeal memberWeal = memberWealMapper.selectById(wealId);
+    // 福利类型
+    TranTypes tranType = this.getWealType(memberWeal.getType());
+    // 流水号
+    String serialNumber = memberWeal.getSerialNumber();
+    List<MemberWealReword> rewordList =
+            wealRewordService.findList(
+                    new MemberWealRewordDTO() {
+                      {
+                        setSerialNumber(serialNumber);
+                      }
+                    });
+    // 登录ip
+    String ipAddress = IPUtils.getIpAddress(request);
+    if (CollectionUtil.isNotEmpty(rewordList)) {
+      // 过滤已派发成功状态的数据, 每次7000条执行
+      int pageSize = 7000;
+      int size = rewordList.size();
+      log.info("需要回收的会员记录数:" + size);
 
-            int part = size / pageSize;
-            for (int j = 1; j <= part + 1; j++) {
-                int fromIndex = (j - 1) * pageSize;
-                int toIndex = j * pageSize;
-                if (size < toIndex) {
-                    // 不需要分页
-                    toIndex = size;
-                }
-                log.info("当前fromIndex和toIndex：（{}），（{}）", fromIndex, toIndex);
-                List<MemberWealReword> pageList = rewordList.subList(fromIndex, toIndex);
-                // 开始处理
-                if (CollectionUtil.isNotEmpty(pageList)) {
-                    log.info("福利回收{},第{}批开始执行,条数:{}", wealId, j, pageList.size());
-                    for (MemberWealReword reword : pageList) {
-                        try {
-                            // 已完成
-                            if (reword.getStatus() == 2) {
-                                // 查询会员信息
-                                Member member = memberMapper.selectById(reword.getUserId());
-                                // 派发金额
-                                BigDecimal negate = reword.getRewordAmount().negate();
+      int part = size / pageSize;
+      for (int j = 1; j <= part + 1; j++) {
+        int fromIndex = (j - 1) * pageSize;
+        int toIndex = j * pageSize;
+        if (size < toIndex) {
+          // 不需要分页
+          toIndex = size;
+        }
+        log.info("当前fromIndex和toIndex：（{}），（{}）", fromIndex, toIndex);
+        List<MemberWealReword> pageList = rewordList.subList(fromIndex, toIndex);
+        // 开始处理
+        if (CollectionUtil.isNotEmpty(pageList)) {
+          log.info("福利回收{},第{}批开始执行,条数:{}", wealId, j, pageList.size());
+          for (MemberWealReword reword : pageList) {
+            try {
+              // 已完成
+              if (reword.getStatus() == 2) {
+                // 查询会员信息
+                Member member = memberMapper.selectById(reword.getUserId());
+                // 派发金额
+                BigDecimal negate = reword.getRewordAmount().negate();
 
-                                BigDecimal currentBalance = memberInfoService.getById(member.getId()).getBalance();
+                BigDecimal currentBalance = memberInfoService.getById(member.getId()).getBalance();
 
-                                LambdaUpdateWrapper<MemberInfo> wrapper = new LambdaUpdateWrapper<>();
-                                wrapper.set(MemberInfo::getBalance, currentBalance.add(negate))
-                                        .eq(MemberInfo::getMemberId, member.getId());
-                                memberInfoService.update(wrapper);
-                                // 添加流水记录
-                                MemberBill memberBill = new MemberBill();
-                                memberBill.setMemberId(member.getId());
-                                memberBill.setAccount(member.getAccount());
-                                memberBill.setMemberPath(member.getSuperPath());
-                                memberBill.setTranType(tranType.getValue());
+                LambdaUpdateWrapper<MemberInfo> wrapper = new LambdaUpdateWrapper<>();
+                wrapper
+                        .set(MemberInfo::getBalance, currentBalance.add(negate))
+                        .eq(MemberInfo::getMemberId, member.getId());
+                memberInfoService.update(wrapper);
+
+                // 添加流水记录
+                MemberBill memberBill = new MemberBill();
+                memberBill.setMemberId(member.getId());
+                memberBill.setAccount(member.getAccount());
+                memberBill.setMemberPath(member.getSuperPath());
+                memberBill.setTranType(tranType.getValue());
                 memberBill.setOrderNo(RandomUtil.randomNumbers(22));
-                                memberBill.setAmount(negate);
-                                memberBill.setBalance(currentBalance);
-                                memberBill.setRemark(tranType.getDesc());
-                                memberBill.setContent(tranType.getDesc());
-                                memberBill.setOperator("system");
-                                memberBillService.save(memberBill);
-//
-                            }
-                            // 已失效状态
-                            reword.setStatus(3);
-                            // 失效时间
-                            reword.setInvalidTime(DateTime.now());
-                            // 修改福利奖励
-                            wealRewordService.updateWealRecord(reword);
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }
+                memberBill.setAmount(negate);
+                memberBill.setBalance(currentBalance);
+                memberBill.setRemark(tranType.getDesc());
+                memberBill.setContent(tranType.getDesc());
+                memberBill.setOperator("system");
+                memberBillService.save(memberBill);
+                //
+              }
+              // 已失效状态
+              reword.setStatus(3);
+              // 失效时间
+              reword.setInvalidTime(DateTime.now());
+              // 修改福利奖励
+              wealRewordService.updateWealRecord(reword);
+            } catch (Exception e) {
+              e.printStackTrace();
             }
+          }
         }
-        log.info("福利回收处理完毕!当前时间:{}", DateTime.now());
+      }
+    }
+    log.info("福利回收处理完毕!当前时间:{}", DateTime.now());
 
-        // 修改福利详情(状态)
-        wealDetailService.updateByWealStatus(memberWeal.getId(), 3);
+    // 修改福利详情(状态)
+    wealDetailService.updateByWealStatus(memberWeal.getId(), 3);
 
-        // 修改福利发放
-        memberWeal.setStatus(3);
-        if (!this.updateById(memberWeal)) {
-            throw new ServiceException("操作失败");
-        }
+    // 修改福利发放
+    memberWeal.setStatus(3);
+    if (!this.updateById(memberWeal)) {
+      throw new ServiceException("操作失败");
+    }
+  }
+
+  private TranTypes getWealType(Integer type) {
+    if (ObjectUtil.equal(
+            MemberWealRewordEnums.MemberWealRewordStatus.MONTH_WEAL.getValue(), type)) {
+      return MONTH_WEAL_RECYCLE;
     }
 
-    private TranTypes getWealType(Integer type) {
-        if (MONTH_WEAL_RECYCLE.match(type)) {
-            return MONTH_WEAL_RECYCLE;
-        }
-
-        if (BIRTH_WEAL_RECYCLE.match(type)) {
-            return BIRTH_WEAL_RECYCLE;
-        }
-
-        if (RED_ENVELOPE_WEAL_RECYCLE.match(type)) {
-            return RED_ENVELOPE_WEAL_RECYCLE;
-        }
-
-        return WEEK_WEAL_RECYCLE;
+    if (ObjectUtil.equal(
+            MemberWealRewordEnums.MemberWealRewordStatus.BIRTH_WEAL.getValue(), type)) {
+      return BIRTH_WEAL_RECYCLE;
     }
 
+    if (ObjectUtil.equal(
+            MemberWealRewordEnums.MemberWealRewordStatus.RED_MONTH_WEAL.getValue(), type)) {
+      return RED_ENVELOPE_WEAL_RECYCLE;
+    }
+    if (ObjectUtil.equal(MemberWealRewordEnums.MemberWealRewordStatus.WEEK_WEAL.getValue(), type)) {
+      return WEEK_WEAL_RECYCLE;
+    }
+    return WEEK_WEAL_RECYCLE;
+  }
 }

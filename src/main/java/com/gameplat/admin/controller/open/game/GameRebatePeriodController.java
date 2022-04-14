@@ -141,7 +141,7 @@ public class GameRebatePeriodController {
       }
 
       GameRebateReport gameRebateReport = new GameRebateReport();
-      gameRebatePeriod.setStatus(GameRebateReportStatus.ACCEPTED.getValue());
+      gameRebateReport.setStatus(GameRebateReportStatus.ACCEPTED.getValue());
       LambdaUpdateWrapper<GameRebateReport> reportUpdateWrapper = Wrappers.lambdaUpdate();
       reportUpdateWrapper.eq(GameRebateReport::getPeriodId, dto.getId());
       if (!gameRebateReportService.update(gameRebateReport, reportUpdateWrapper)) {

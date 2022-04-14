@@ -187,11 +187,9 @@ public class ProxyPayServiceImpl implements ProxyPayService {
 
     // 封装第三方代付接口调用信息
     ProxyDispatchContext context = new ProxyDispatchContext();
-    String asyncUrl = asyncCallbackUrl + "/api/proxyPay/onlineProxyPayAsyncCallback";
+    String asyncUrl = asyncCallbackUrl + "/api/admin/finance/asyncCallback/onlineProxyPayAsyncCallback";
     context.setAsyncCallbackUrl(asyncUrl + "/" + memberWithdraw.getCashOrderNo());
     context.setSysPath(sysPath);
-    // 设置会员真实姓名
-    context.setName(memberWithdraw.getRealName());
     // 设置第三方接口信息
     fillProxyDispatchContext(context, ppInterface, memberWithdraw);
     // 设置银行编码,名称

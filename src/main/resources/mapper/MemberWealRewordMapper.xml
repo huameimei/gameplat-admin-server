@@ -12,10 +12,13 @@
         where
         draw_time between #{startTime} and #{endTime}
         and status = 2
-        and user_name in
-        <foreach collection="userNameList" index="index" item="item" open="(" close=")" separator=",">
-            #{item}
-        </foreach>
+        <if test="userNameList != null and userNameList.size() > 0">
+            and user_name in
+            <foreach collection="userNameList" index="index" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+
         GROUP BY user_name,`type`
     </select>
 
@@ -28,7 +31,7 @@
         where
         draw_time between #{startTime} and #{endTime}
         and status = 2 and `type` = 0
-        <if test="userName != null and userName != ''" >
+        <if test="userName != null and userName != ''">
             and user_name = #{userName}
         </if>
         <if test="superAccount != null and superAccount != null">
@@ -50,7 +53,7 @@
         where
         draw_time between #{startTime} and #{endTime}
         and status = 2 and `type` = 1
-        <if test="userName != null and userName != ''" >
+        <if test="userName != null and userName != ''">
             and user_name = #{userName}
         </if>
         <if test="superAccount != null and superAccount != null">
@@ -72,7 +75,7 @@
         where
         draw_time between #{startTime} and #{endTime}
         and status = 2 and `type` = 2
-        <if test="userName != null and userName != ''" >
+        <if test="userName != null and userName != ''">
             and user_name = #{userName}
         </if>
         <if test="superAccount != null and superAccount != null">
@@ -94,7 +97,7 @@
         where
         draw_time between #{startTime} and #{endTime}
         and status = 2 and `type` = 3
-        <if test="userName != null and userName != ''" >
+        <if test="userName != null and userName != ''">
             and user_name = #{userName}
         </if>
         <if test="superAccount != null and superAccount != null">
@@ -116,7 +119,7 @@
         where
         draw_time between #{startTime} and #{endTime}
         and status = 2 and `type` = 4
-        <if test="userName != null and userName != ''" >
+        <if test="userName != null and userName != ''">
             and user_name = #{userName}
         </if>
         <if test="superAccount != null and superAccount != null">

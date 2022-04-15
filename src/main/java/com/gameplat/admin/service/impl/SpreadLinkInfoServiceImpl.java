@@ -56,6 +56,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * 域名推广配置 服务实现层
@@ -65,7 +66,7 @@ import java.util.Map;
 @Service
 @Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)
 public class SpreadLinkInfoServiceImpl extends ServiceImpl<SpreadLinkInfoMapper, SpreadLinkInfo>
-    implements SpreadLinkInfoService {
+        implements SpreadLinkInfoService {
 
   @Autowired private SpreadLinkInfoConvert spreadLinkInfoConvert;
 
@@ -77,6 +78,8 @@ public class SpreadLinkInfoServiceImpl extends ServiceImpl<SpreadLinkInfoMapper,
 
   @Autowired private SysDictDataService sysDictDataService;
 
+  private static final String STR_URL = "/r/";
+
   /**
    * 分页列表
    *
@@ -87,42 +90,42 @@ public class SpreadLinkInfoServiceImpl extends ServiceImpl<SpreadLinkInfoMapper,
   @Override
   public IPage<SpreadConfigVO> page(PageDTO<SpreadLinkInfo> page, SpreadLinkInfoDTO dto) {
     IPage<SpreadConfigVO> convert =
-        this.lambdaQuery()
-            .eq(ObjectUtils.isNotNull(dto.getId()), SpreadLinkInfo::getId, dto.getId())
-            .eq(
-                ObjectUtils.isNotEmpty(dto.getAgentAccount()),
-                SpreadLinkInfo::getAgentAccount,
-                dto.getAgentAccount())
-            .eq(
-                ObjectUtils.isNotEmpty(dto.getSpreadType()),
-                SpreadLinkInfo::getSpreadType,
-                dto.getSpreadType())
-            .eq(
-                ObjectUtils.isNotNull(dto.getUserType()),
-                SpreadLinkInfo::getUserType,
-                dto.getUserType())
-            .eq(ObjectUtils.isNotNull(dto.getStatus()), SpreadLinkInfo::getStatus, dto.getStatus())
-            .eq(ObjectUtils.isNotEmpty(dto.getCode()), SpreadLinkInfo::getCode, dto.getCode())
-            .orderBy(
-                StringUtils.equals(dto.getOrderByColumn(), "createTime"),
-                ValidatorUtil.isAsc(dto.getSortBy()),
-                SpreadLinkInfo::getCreateTime)
-            .orderBy(
-                StringUtils.equals(dto.getOrderByColumn(), "visitCount"),
-                ValidatorUtil.isAsc(dto.getSortBy()),
-                SpreadLinkInfo::getVisitCount)
-            .orderBy(
-                StringUtils.equals(dto.getOrderByColumn(), "registCount"),
-                ValidatorUtil.isAsc(dto.getSortBy()),
-                SpreadLinkInfo::getRegistCount)
-            .page(page)
-            .convert(spreadLinkInfoConvert::toVo);
-    for (SpreadConfigVO obj : convert.getRecords()) {
-      if (StrUtil.isNotBlank(obj.getExternalUrl()) && !obj.getExternalUrl().contains("?rc=")) {
-        obj.setExternalUrl(
-            MessageFormat.format("{0}/?rc={1}", obj.getExternalUrl(), obj.getCode()));
-      }
-    }
+            this.lambdaQuery()
+                    .eq(ObjectUtils.isNotNull(dto.getId()), SpreadLinkInfo::getId, dto.getId())
+                    .eq(
+                            ObjectUtils.isNotEmpty(dto.getAgentAccount()),
+                            SpreadLinkInfo::getAgentAccount,
+                            dto.getAgentAccount())
+                    .eq(
+                            ObjectUtils.isNotEmpty(dto.getSpreadType()),
+                            SpreadLinkInfo::getSpreadType,
+                            dto.getSpreadType())
+                    .eq(
+                            ObjectUtils.isNotNull(dto.getUserType()),
+                            SpreadLinkInfo::getUserType,
+                            dto.getUserType())
+                    .eq(ObjectUtils.isNotNull(dto.getStatus()), SpreadLinkInfo::getStatus, dto.getStatus())
+                    .eq(ObjectUtils.isNotEmpty(dto.getCode()), SpreadLinkInfo::getCode, dto.getCode())
+                    .orderBy(
+                            StringUtils.equals(dto.getOrderByColumn(), "createTime"),
+                            ValidatorUtil.isAsc(dto.getSortBy()),
+                            SpreadLinkInfo::getCreateTime)
+                    .orderBy(
+                            StringUtils.equals(dto.getOrderByColumn(), "visitCount"),
+                            ValidatorUtil.isAsc(dto.getSortBy()),
+                            SpreadLinkInfo::getVisitCount)
+                    .orderBy(
+                            StringUtils.equals(dto.getOrderByColumn(), "registCount"),
+                            ValidatorUtil.isAsc(dto.getSortBy()),
+                            SpreadLinkInfo::getRegistCount)
+                    .page(page)
+                    .convert(spreadLinkInfoConvert::toVo);
+//    for (SpreadConfigVO obj : convert.getRecords()) {
+//      if (StrUtil.isNotBlank(obj.getExternalUrl()) && !obj.getExternalUrl().contains("?rc=")) {
+//        obj.setExternalUrl(
+//                MessageFormat.format("{0}/?rc={1}", obj.getExternalUrl(), obj.getCode()));
+//      }
+//    }
     return convert;
   }
 
@@ -136,44 +139,44 @@ public class SpreadLinkInfoServiceImpl extends ServiceImpl<SpreadLinkInfoMapper,
   public void exportList(SpreadLinkInfoDTO dto, HttpServletResponse response) {
     try {
       List<SpreadLinkInfo> list =
-          this.lambdaQuery()
-              .eq(ObjectUtils.isNotNull(dto.getId()), SpreadLinkInfo::getId, dto.getId())
-              .eq(
-                  ObjectUtils.isNotEmpty(dto.getAgentAccount()),
-                  SpreadLinkInfo::getAgentAccount,
-                  dto.getAgentAccount())
-              .eq(
-                  ObjectUtils.isNotEmpty(dto.getSpreadType()),
-                  SpreadLinkInfo::getSpreadType,
-                  dto.getSpreadType())
-              .eq(
-                  ObjectUtils.isNotNull(dto.getUserType()),
-                  SpreadLinkInfo::getUserType,
-                  dto.getUserType())
-              .eq(
-                  ObjectUtils.isNotNull(dto.getStatus()),
-                  SpreadLinkInfo::getStatus,
-                  dto.getStatus())
-              .eq(ObjectUtils.isNotEmpty(dto.getCode()), SpreadLinkInfo::getCode, dto.getCode())
-              .orderBy(
-                  StringUtils.equals(dto.getOrderByColumn(), "createTime"),
-                  ValidatorUtil.isAsc(dto.getSortBy()),
-                  SpreadLinkInfo::getCreateTime)
-              .orderBy(
-                  StringUtils.equals(dto.getOrderByColumn(), "visitCount"),
-                  ValidatorUtil.isAsc(dto.getSortBy()),
-                  SpreadLinkInfo::getVisitCount)
-              .orderBy(
-                  StringUtils.equals(dto.getOrderByColumn(), "registCount"),
-                  ValidatorUtil.isAsc(dto.getSortBy()),
-                  SpreadLinkInfo::getRegistCount)
-              .list();
+              this.lambdaQuery()
+                      .eq(ObjectUtils.isNotNull(dto.getId()), SpreadLinkInfo::getId, dto.getId())
+                      .eq(
+                              ObjectUtils.isNotEmpty(dto.getAgentAccount()),
+                              SpreadLinkInfo::getAgentAccount,
+                              dto.getAgentAccount())
+                      .eq(
+                              ObjectUtils.isNotEmpty(dto.getSpreadType()),
+                              SpreadLinkInfo::getSpreadType,
+                              dto.getSpreadType())
+                      .eq(
+                              ObjectUtils.isNotNull(dto.getUserType()),
+                              SpreadLinkInfo::getUserType,
+                              dto.getUserType())
+                      .eq(
+                              ObjectUtils.isNotNull(dto.getStatus()),
+                              SpreadLinkInfo::getStatus,
+                              dto.getStatus())
+                      .eq(ObjectUtils.isNotEmpty(dto.getCode()), SpreadLinkInfo::getCode, dto.getCode())
+                      .orderBy(
+                              StringUtils.equals(dto.getOrderByColumn(), "createTime"),
+                              ValidatorUtil.isAsc(dto.getSortBy()),
+                              SpreadLinkInfo::getCreateTime)
+                      .orderBy(
+                              StringUtils.equals(dto.getOrderByColumn(), "visitCount"),
+                              ValidatorUtil.isAsc(dto.getSortBy()),
+                              SpreadLinkInfo::getVisitCount)
+                      .orderBy(
+                              StringUtils.equals(dto.getOrderByColumn(), "registCount"),
+                              ValidatorUtil.isAsc(dto.getSortBy()),
+                              SpreadLinkInfo::getRegistCount)
+                      .list();
       response.setContentType("application/vnd.ms-excel");
       response.setHeader("Content-disposition", "attachment;filename = myExcel.xls");
       @Cleanup OutputStream outputStream = null;
       Workbook workbook =
-          ExcelExportUtil.exportExcel(
-              new ExportParams("域名推广列表导出", "域名推广列表"), SpreadLinkInfo.class, list);
+              ExcelExportUtil.exportExcel(
+                      new ExportParams("域名推广列表导出", "域名推广列表"), SpreadLinkInfo.class, list);
       outputStream = response.getOutputStream();
       workbook.write(outputStream);
     } catch (IOException e) {
@@ -184,70 +187,96 @@ public class SpreadLinkInfoServiceImpl extends ServiceImpl<SpreadLinkInfoMapper,
   /**
    * 新增推广信息 1.推广域名是否为空： 不为空 需要校验（是否被其它代理作为了专属域名）
    *
-   * @param dto 需求: 1、代理专属推广地址唯一 2、推广码唯一 3、公共推广地址下允许多个推广码 4、代理专属推广地址允许多个推广码
+   * @param dto 需求: 1、代理专属推广地址唯一 2、推广码唯一 3、公共推广地址下允许多个推广码 4、代理专属推广地址允许多个推广码   默认推广域名下可不绑定推广账号 以及 推广码
    */
   @Override
   public void add(SpreadLinkInfoAddDTO dto) {
-    // 实体转换
-    SpreadLinkInfo linkInfo = spreadLinkInfoConvert.toEntity(dto);
-    if (StrUtil.isBlank(linkInfo.getAgentAccount())) {
-      throw new ServiceException("代理账号不能为空！");
+
+    //1 专属域名 0 公共域名    专属域名下代理账号不能为空
+    if (dto.getExclusiveFlag() == 1 ) {
+      if (StrUtil.isBlank(dto.getAgentAccount()) ) {
+        throw new ServiceException("代理账号不能为空！");
+      }
+      if (StrUtil.isBlank(dto.getSourceDomain())) {
+        throw new ServiceException("来源域名不能为空！");
+      }
     }
-    if (StrUtil.isBlank(linkInfo.getExternalUrl())){
+
+    if (StrUtil.isBlank(dto.getExternalUrl())){
       throw new ServiceException("推广地址不能为空！");
     }
-    // 校验账号的用户类型
-    Member member =
-        memberService
-            .getByAccount(linkInfo.getAgentAccount())
-            .orElseThrow(() -> new ServiceException("代理账号不存在!"));
-    Assert.isTrue(UserTypes.AGENT.value().equalsIgnoreCase(member.getUserType()), "账号类型不支持！");
+
+    //默认域名不能重复
+    if (dto.getExclusiveFlag() == 2){
+      if (getLinkCount(dto.getExternalUrl()) > 0){
+        throw new ServiceException("默认推广域名重复");
+      }
+    }
+    // 实体转换
+    SpreadLinkInfo linkInfo = spreadLinkInfoConvert.toEntity(dto);
+    if (dto.getExclusiveFlag() != 2) {
+      // 校验账号的用户类型
+      Member member =
+              memberService
+                      .getByAccount(linkInfo.getAgentAccount())
+                      .orElseThrow(() -> new ServiceException("代理账号不存在!"));
+      Assert.isTrue(UserTypes.AGENT.value().equalsIgnoreCase(member.getUserType()), "账号类型不支持！");
+    }
     // 推广码最少字符限制
     SysDictData agentMinCodeNumData =
-        sysDictDataService.getDictData(
-            DictTypeEnum.SYSTEM_PARAMETER_CONFIG.getValue(),
-            DictDataEnum.AGENT_MIN_CODE_NUM.getLabel());
-    Integer agentMinCodeNum = Convert.toInt(agentMinCodeNumData.getDictValue());
+            sysDictDataService.getDictData(
+                    DictTypeEnum.SYSTEM_PARAMETER_CONFIG.getValue(),
+                    DictDataEnum.AGENT_MIN_CODE_NUM.getLabel());
+    Integer agentMinCodeNum = 0;
+    if (agentMinCodeNumData != null) {
+      agentMinCodeNum = Convert.toInt(agentMinCodeNumData.getDictValue());
+    }
     // 代理推广码最大条数
     SysDictData agentMaxSpreadNumData =
-        sysDictDataService.getDictData(
-            DictTypeEnum.SYSTEM_PARAMETER_CONFIG.getValue(),
-            DictDataEnum.AGENT_MAX_SPREAD_NUM.getLabel());
-    Integer agentMaxSpreadNum = Convert.toInt(agentMaxSpreadNumData.getDictValue());
+            sysDictDataService.getDictData(
+                    DictTypeEnum.SYSTEM_PARAMETER_CONFIG.getValue(),
+                    DictDataEnum.AGENT_MAX_SPREAD_NUM.getLabel());
+    Integer agentMaxSpreadNum = 1;
+    if (agentMaxSpreadNumData != null) {
+      agentMaxSpreadNum = Convert.toInt(agentMaxSpreadNumData.getDictValue());
+    }
     // 如果推广码为空  随机生成 4-20位
-    if (StrUtil.isBlank(linkInfo.getCode())) {
+    if (StrUtil.isBlank(linkInfo.getCode()) && dto.getExclusiveFlag() != 2) {
       linkInfo.setCode(
-          RandomStringUtils.random(agentMinCodeNum == 0 ? 6 : agentMinCodeNum, true, true)
-              .toLowerCase());
+              RandomStringUtils.random(agentMinCodeNum == 0 ? 6 : agentMinCodeNum, true, true)
+                      .toLowerCase());
     }
     linkInfo.setIsOpenDividePreset(dto.getIsOpenDividePreset());
     // 校验推广码格式 并且是否已经存在
-    this.checkCode(linkInfo.getCode(), agentMinCodeNum);
+    if(!StrUtil.isBlank(linkInfo.getCode())) {
+      this.checkCode(linkInfo.getCode(), agentMinCodeNum);
+    }
     // 校验此推广拥有几个推广码连接条数
     Long count =
-        this.lambdaQuery().eq(SpreadLinkInfo::getAgentAccount, linkInfo.getAgentAccount()).count();
+            this.lambdaQuery().eq(SpreadLinkInfo::getAgentAccount, linkInfo.getAgentAccount()).count();
     Assert.isTrue((count + 1) <= agentMaxSpreadNum, "单个代理账户不能超过" + agentMaxSpreadNum + "条推广码链接！");
 
     // 当推广链接不为空时 需要校验 此推广链接地址是否被其它代理作为了专属域名
     if (StrUtil.isNotBlank(linkInfo.getExternalUrl())) {
       boolean exists =
-          this.lambdaQuery()
-              .ne(SpreadLinkInfo::getAgentAccount, linkInfo.getAgentAccount())
-              .eq(SpreadLinkInfo::getExternalUrl, linkInfo.getExternalUrl())
-              .eq(SpreadLinkInfo::getExclusiveFlag, BooleanEnum.YES.value())
-              .exists();
+              this.lambdaQuery()
+                      .ne(SpreadLinkInfo::getAgentAccount, linkInfo.getAgentAccount())
+                      .eq(SpreadLinkInfo::getExternalUrl, linkInfo.getExternalUrl())
+                      .eq(SpreadLinkInfo::getExclusiveFlag, BooleanEnum.YES.value())
+                      .exists();
       if (exists) {
         throw new ServiceException("推广链接地址已被使用！");
       }
     }
+    linkInfo.setExternalUrl(linkInfo.getExternalUrl() + STR_URL + linkInfo.getCode());
     boolean saveResult = this.save(linkInfo);
     Assert.isTrue(saveResult, "创建失败！");
     if (saveResult
-        && linkInfo.getIsOpenDividePreset() == 1
-        && linkInfo.getUserType() == 1
-        && BeanUtil.isNotEmpty(dto.getOwnerConfigMap())) {
+            && linkInfo.getIsOpenDividePreset() == 1
+            && linkInfo.getUserType() == 1
+            && BeanUtil.isNotEmpty(dto.getOwnerConfigMap())) {
       this.saveOrEditDivideConfig(
-          linkInfo.getId(), linkInfo.getAgentAccount(), dto.getOwnerConfigMap());
+              linkInfo.getId(), linkInfo.getAgentAccount(), dto.getOwnerConfigMap());
     }
   }
 
@@ -264,20 +293,20 @@ public class SpreadLinkInfoServiceImpl extends ServiceImpl<SpreadLinkInfoMapper,
     }
     // 校验账号的用户类型
     Member member =
-        memberService
-            .getByAccount(linkInfo.getAgentAccount())
-            .orElseThrow(() -> new ServiceException("代理账号不存在!"));
+            memberService
+                    .getByAccount(linkInfo.getAgentAccount())
+                    .orElseThrow(() -> new ServiceException("代理账号不存在!"));
     Assert.isTrue(UserTypes.AGENT.value().equalsIgnoreCase(member.getUserType()), "账号类型不支持！");
     linkInfo.setIsOpenDividePreset(dto.getIsOpenDividePreset());
 
     // 当推广链接不为空时 需要校验 此推广链接地址是否被其它代理作为了专属域名
     if (StrUtil.isNotBlank(linkInfo.getExternalUrl())) {
       boolean exists =
-          this.lambdaQuery()
-              .ne(SpreadLinkInfo::getAgentAccount, linkInfo.getAgentAccount())
-              .eq(SpreadLinkInfo::getExternalUrl, linkInfo.getExternalUrl())
-              .eq(SpreadLinkInfo::getExclusiveFlag, BooleanEnum.YES.value())
-              .exists();
+              this.lambdaQuery()
+                      .ne(SpreadLinkInfo::getAgentAccount, linkInfo.getAgentAccount())
+                      .eq(SpreadLinkInfo::getExternalUrl, linkInfo.getExternalUrl())
+                      .eq(SpreadLinkInfo::getExclusiveFlag, BooleanEnum.YES.value())
+                      .exists();
       if (exists) {
         throw new ServiceException("推广链接地址已被使用！");
       }
@@ -285,11 +314,11 @@ public class SpreadLinkInfoServiceImpl extends ServiceImpl<SpreadLinkInfoMapper,
     boolean updateResult = this.updateById(linkInfo);
     Assert.isTrue(updateResult, "编辑失败！");
     if (updateResult
-        && linkInfo.getIsOpenDividePreset() == 1
-        && linkInfo.getUserType() == 1
-        && BeanUtil.isNotEmpty(dto.getOwnerConfigMap())) {
+            && linkInfo.getIsOpenDividePreset() == 1
+            && linkInfo.getUserType() == 1
+            && BeanUtil.isNotEmpty(dto.getOwnerConfigMap())) {
       this.saveOrEditDivideConfig(
-          linkInfo.getId(), linkInfo.getAgentAccount(), dto.getOwnerConfigMap());
+              linkInfo.getId(), linkInfo.getAgentAccount(), dto.getOwnerConfigMap());
     }
   }
 
@@ -335,9 +364,9 @@ public class SpreadLinkInfoServiceImpl extends ServiceImpl<SpreadLinkInfoMapper,
   @Override
   public void batchEnableStatus(List<Long> ids) {
     if (!this.lambdaUpdate()
-        .in(SpreadLinkInfo::getId, ids)
-        .set(SpreadLinkInfo::getStatus, EnableEnum.ENABLED.code())
-        .update(new SpreadLinkInfo())) {
+            .in(SpreadLinkInfo::getId, ids)
+            .set(SpreadLinkInfo::getStatus, EnableEnum.ENABLED.code())
+            .update(new SpreadLinkInfo())) {
       throw new ServiceException("批量修改状态失败!");
     }
   }
@@ -350,9 +379,9 @@ public class SpreadLinkInfoServiceImpl extends ServiceImpl<SpreadLinkInfoMapper,
   @Override
   public void batchDisableStatus(List<Long> ids) {
     if (!this.lambdaUpdate()
-        .in(SpreadLinkInfo::getId, ids)
-        .set(SpreadLinkInfo::getStatus, EnableEnum.DISABLED.code())
-        .update(new SpreadLinkInfo())) {
+            .in(SpreadLinkInfo::getId, ids)
+            .set(SpreadLinkInfo::getStatus, EnableEnum.DISABLED.code())
+            .update(new SpreadLinkInfo())) {
       throw new ServiceException("批量修改状态失败!");
     }
   }
@@ -394,8 +423,8 @@ public class SpreadLinkInfoServiceImpl extends ServiceImpl<SpreadLinkInfoMapper,
     }
 
     if (this.lambdaQuery()
-        .eq(ObjectUtils.isNotEmpty(code), SpreadLinkInfo::getCode, code)
-        .exists()) {
+            .eq(ObjectUtils.isNotEmpty(code), SpreadLinkInfo::getCode, code)
+            .exists()) {
       throw new ServiceException("推广码已被使用！");
     }
   }
@@ -419,9 +448,9 @@ public class SpreadLinkInfoServiceImpl extends ServiceImpl<SpreadLinkInfoMapper,
       if (statisMax) {
         BigDecimal userRebate = memberInfoMapper.findUserRebate(account);
         max =
-            ObjectUtils.isNull(userRebate)
-                ? new BigDecimal("9").setScale(2, BigDecimal.ROUND_HALF_UP)
-                : userRebate.setScale(2, BigDecimal.ROUND_HALF_UP);
+                ObjectUtils.isNull(userRebate)
+                        ? new BigDecimal("9").setScale(2, BigDecimal.ROUND_HALF_UP)
+                        : userRebate.setScale(2, BigDecimal.ROUND_HALF_UP);
       } else {
         max = new BigDecimal("9").setScale(2, BigDecimal.ROUND_HALF_UP);
       }
@@ -429,16 +458,16 @@ public class SpreadLinkInfoServiceImpl extends ServiceImpl<SpreadLinkInfoMapper,
         // 获取直属下级的最大返点等级
         BigDecimal userLowerMaxRebate = memberInfoMapper.findUserLowerMaxRebate(account);
         min =
-            ObjectUtils.isNull(userLowerMaxRebate)
-                ? new BigDecimal("0").setScale(2, BigDecimal.ROUND_HALF_UP)
-                : userLowerMaxRebate.setScale(2, BigDecimal.ROUND_HALF_UP);
+                ObjectUtils.isNull(userLowerMaxRebate)
+                        ? new BigDecimal("0").setScale(2, BigDecimal.ROUND_HALF_UP)
+                        : userLowerMaxRebate.setScale(2, BigDecimal.ROUND_HALF_UP);
         // 再获取此账号推广码的最大返点等级
         LambdaQueryWrapper<SpreadLinkInfo> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper
-            .eq(SpreadLinkInfo::getAgentAccount, account)
-            .orderByDesc(SpreadLinkInfo::getRebate)
-            .last("limit 1")
-            .select(SpreadLinkInfo::getRebate);
+                .eq(SpreadLinkInfo::getAgentAccount, account)
+                .orderByDesc(SpreadLinkInfo::getRebate)
+                .last("limit 1")
+                .select(SpreadLinkInfo::getRebate);
         SpreadLinkInfo linkMinRebateObj = this.getOne(queryWrapper);
         BigDecimal linkMinRebate = BigDecimal.ZERO;
         if (BeanUtil.isEmpty(linkMinRebateObj)) {
@@ -480,7 +509,7 @@ public class SpreadLinkInfoServiceImpl extends ServiceImpl<SpreadLinkInfoMapper,
    */
   @Override
   public void saveOrEditDivideConfig(
-      Long linkId, String agentAccount, Map<String, List<GameDivideVo>> paramOwnerConfigMap) {
+          Long linkId, String agentAccount, Map<String, List<GameDivideVo>> paramOwnerConfigMap) {
     if (BeanUtil.isEmpty(paramOwnerConfigMap)) {
       return;
     }
@@ -500,16 +529,16 @@ public class SpreadLinkInfoServiceImpl extends ServiceImpl<SpreadLinkInfoMapper,
       Map<String, JSONObject> map = JSONUtil.toBean(layerConfig.getDivideConfig(), Map.class);
       for (Map.Entry<String, JSONObject> m : saveMap.entrySet()) {
         m.getValue()
-            .put(
-                "parentDivideRatio",
-                map.get(m.getKey())
-                    .getBigDecimal("divideRatio")
-                    .subtract(m.getValue().getBigDecimal("divideRatio")));
+                .put(
+                        "parentDivideRatio",
+                        map.get(m.getKey())
+                                .getBigDecimal("divideRatio")
+                                .subtract(m.getValue().getBigDecimal("divideRatio")));
       }
       this.lambdaUpdate()
-          .set(SpreadLinkInfo::getDivideConfig, JSONUtil.toJsonStr(saveMap))
-          .eq(SpreadLinkInfo::getId, linkId)
-          .update(new SpreadLinkInfo());
+              .set(SpreadLinkInfo::getDivideConfig, JSONUtil.toJsonStr(saveMap))
+              .eq(SpreadLinkInfo::getId, linkId)
+              .update(new SpreadLinkInfo());
     }
   }
 
@@ -522,12 +551,31 @@ public class SpreadLinkInfoServiceImpl extends ServiceImpl<SpreadLinkInfoMapper,
   @Override
   public BigDecimal getMaxSpreadLinkRebate(String account) {
     return this.lambdaQuery()
-        .select(SpreadLinkInfo::getRebate)
-        .eq(SpreadLinkInfo::getAgentAccount, account)
-        .orderByDesc(SpreadLinkInfo::getRebate)
-        .last("LIMIT 1")
-        .oneOpt()
-        .map(SpreadLinkInfo::getRebate)
-        .orElse(BigDecimal.ZERO);
+            .select(SpreadLinkInfo::getRebate)
+            .eq(SpreadLinkInfo::getAgentAccount, account)
+            .orderByDesc(SpreadLinkInfo::getRebate)
+            .last("LIMIT 1")
+            .oneOpt()
+            .map(SpreadLinkInfo::getRebate)
+            .orElse(BigDecimal.ZERO);
+  }
+
+
+  /**
+   * 查询默认域名
+   */
+  public Long getLinkCount(String link){
+    return this.lambdaQuery().eq(SpreadLinkInfo::getExclusiveFlag,2).like(SpreadLinkInfo::getExternalUrl,link).count();
+  }
+
+
+  /**
+   * 获取默认的推广链接信息
+   */
+  @Override
+  public List<SpreadConfigVO> getDefaultLink(){
+    List<SpreadConfigVO> collect = this.lambdaQuery().eq(SpreadLinkInfo::getExclusiveFlag, 2).list().stream().map(spreadLinkInfoConvert::toVo)
+            .collect(Collectors.toList());
+    return collect;
   }
 }

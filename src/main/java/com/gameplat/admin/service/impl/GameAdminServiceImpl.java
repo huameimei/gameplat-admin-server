@@ -57,13 +57,11 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import javax.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.CollectionUtils;
 
 @Slf4j
 @Service
@@ -574,29 +572,12 @@ public class GameAdminServiceImpl implements GameAdminService {
         + CNYUtils.formatYuanAsYuan(balance);
   }
 
-  @NotNull
-  private List<GamePlatform> getGamePlatformList(Member member) {
-    List<GameTransferRecord> recordList =
-        gameTransferRecordService.findPlatformCodeList(member.getId());
-    List<String> platformList = new ArrayList<>();
-    recordList.forEach(item -> platformList.add(item.getPlatformCode()));
-    List<GamePlatform> gamePlatformList = gamePlatformService.list();
-    // 仅获取当前会员玩过得游戏
-    return gamePlatformList.stream()
-        .filter(item -> platformList.contains(item.getCode()))
-        .collect(Collectors.toList());
-  }
-
   /** 一键回收 */
   @Override
   public List<GameRecycleVO> recyclingAmountByAccount(String account) {
     Assert.notEmpty(account, "会员账号不能为空");
     Member member = memberService.getMemberAndFillGameAccount(account);
     Assert.notNull(member, "会员账号不存在，请重新检查");
-    List<GamePlatform> playedPlatformList = getGamePlatformList(member);
-    if (CollectionUtils.isEmpty(playedPlatformList)) {
-      new ArrayList<>();
-    }
     log.error("{}一键回收游戏平台额度操作频繁", account);
     String key = USER_GAME_BALANCE + member.getId();
     distributedLocker.lock(key, TimeUnit.SECONDS, 300);
@@ -671,10 +652,6 @@ public class GameAdminServiceImpl implements GameAdminService {
     Assert.notEmpty(account, "会员账号不能为空");
     Member member = memberService.getMemberAndFillGameAccount(account);
     Assert.notNull(member, "会员账号不存在，请重新检查");
-    List<GamePlatform> playedPlatformList = getGamePlatformList(member);
-    if (CollectionUtils.isEmpty(playedPlatformList)) {
-      throw new ServiceException("游戏平台额度转换通道维护中");
-    }
     String key = USER_GAME_BALANCE + member.getId();
     distributedLocker.lock(key, TimeUnit.SECONDS, 300);
     log.info("{}一键回收游戏平台额度操作:", account);
@@ -767,7 +744,6 @@ public class GameAdminServiceImpl implements GameAdminService {
     Assert.notEmpty(account, "会员账号不能为空");
     Member member = memberService.getMemberAndFillGameAccount(account);
     Assert.notNull(member, "会员账号不存在");
-    List<GamePlatform> playedPlatformList = getGamePlatformList(member);
     String key = USER_GAME_BALANCE + member.getId();
     distributedLocker.lock(key, TimeUnit.SECONDS, 300);
     log.info("{}一键没收游戏平台额度操作:", account);
@@ -847,6 +823,7 @@ public class GameAdminServiceImpl implements GameAdminService {
     return gameBalanceVO;
   }
 
+  /** 回收余额 */
   @Override
   public GameRecycleVO recyclingAmount(GameBalanceQueryDTO dto) {
     GameRecycleVO gameRecycleVO = new GameRecycleVO();
@@ -878,6 +855,7 @@ public class GameAdminServiceImpl implements GameAdminService {
     return gameRecycleVO;
   }
 
+  /** 没收余额 */
   @Override
   public GameRecycleVO confiscatedAmount(GameBalanceQueryDTO dto) {
     GameRecycleVO gameRecycleVO = new GameRecycleVO();

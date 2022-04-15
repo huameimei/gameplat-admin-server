@@ -23,6 +23,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
+import org.redisson.api.RLock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -53,7 +54,7 @@ public class MemberWithdrawController {
       Long memberId)
       throws Exception {
     String lock_key = "member_rw_" + memberId;
-    distributedLocker.lock(lock_key);
+    RLock lock = distributedLocker.lock(lock_key);
     try {
       UserCredential userCredential = SecurityUserHolder.getCredential();
       UserEquipment clientInfo = UserEquipment.create(request);
@@ -63,7 +64,7 @@ public class MemberWithdrawController {
       log.error(e.getMessage(), e);
       throw e;
     } finally {
-      distributedLocker.unlock(lock_key);
+      lock.unlock();
     }
   }
 
@@ -111,7 +112,7 @@ public class MemberWithdrawController {
       HttpServletRequest request)
       throws Exception {
     String lock_key = "member_rw_single";
-    distributedLocker.lock(lock_key);
+    RLock lock = distributedLocker.lock(lock_key);
     try {
       if (null == list) {
         throw new ServiceException("批量受理请求参数为空");

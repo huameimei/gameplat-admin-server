@@ -14,17 +14,29 @@ public class GameBetRecordQueryDTO implements Serializable {
   /** 用户名 */
   private String account;
 
+  /** 游戏账号 */
+  private String gameAccount;
+
   /** 平台编码 */
   private String platformCode;
 
   /** 游戏分类 */
   private String gameKind;
 
+  /** 游戏编码 */
+  private String playCode;
+
+  /** 结算状态 */
+  private String settle;
+
   /** 开始时间 */
   private String beginTime;
 
   /** 结束时间 */
   private String endTime;
+
+  /** 时间 */
+  private String time;
 
   /** 1 -- 投注时间, 2 -- 三方时间, 3 -- 结算时间, 4 -- 报表时间 */
   private Integer timeType;

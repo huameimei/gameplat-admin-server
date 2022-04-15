@@ -17,6 +17,7 @@ import com.gameplat.common.enums.DictTypeEnum;
 import com.gameplat.model.entity.sys.SysFileManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 
@@ -60,5 +61,33 @@ public class SysFileManagerServiceImpl extends ServiceImpl<SysFileManagerMapper,
     }
 
     return ossService.upload(file);
+  }
+
+  @Override
+  public void delete(String ids) {
+    FileConfig fileConfig = configService.getDefaultConfig(DictTypeEnum.FILE_CONFIG, FileConfig.class);
+    if (StringUtils.isNull(fileConfig)) {
+      throw new ServiceException("未找到文件配置");
+    }
+
+    String[] idsArray = ids.split(",");
+    for (String id : idsArray) {
+      SysFileManager sysFileManager = this.getById(id);
+      if (StringUtils.isNull(sysFileManager)) {
+        // 未找到跳过
+        continue;
+      }
+
+      if (!fileConfig.getProvider().equals(sysFileManager.getServiceProvider())) {
+        // 如果文件的上传服务器和默认文件配置不一样，则跳过这个文件的删除
+        continue;
+      }
+
+      // 删除服务器上的文件
+      ossService.remove(sysFileManager.getFileUrl());
+
+      // 删除数据库的文件记录
+      this.removeById(id);
+    }
   }
 }

@@ -7,6 +7,7 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
 import com.alicp.jetcache.anno.CacheInvalidate;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -27,6 +28,7 @@ import com.gameplat.common.enums.TransferTypesEnum;
 import com.gameplat.common.lang.Assert;
 import com.gameplat.model.entity.game.GameTransferInfo;
 import com.gameplat.model.entity.member.Member;
+import com.gameplat.model.entity.member.MemberDayReport;
 import com.gameplat.model.entity.member.MemberInfo;
 import com.gameplat.security.SecurityUserHolder;
 import com.google.common.collect.Lists;
@@ -50,7 +52,21 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
 
   private static final String DL_FORMAL_TYPE = "A";
 
-  @Autowired private MemberMapper memberMapper;
+
+  // 姓名
+  private final static String REALNAME_CODE = "([\\d\\D]{1})(.*)";
+  private final static String REALNAME_REPLACEMENT = "$1**";
+
+  // 手机号
+  private final static String PHONE_CODE = "(\\d{3})\\d{4}(\\d{4})";
+  private final static String PHONE_REPLACEMENT = "$1****$2";
+
+  //邮箱
+  private final static String EMAIL_CODE = "(\\w?)(\\w+)(\\w)(@\\w+\\.[a-z]+(\\.[a-z]+)?)";
+  private final static String EMAIL_REPLACEMENT = "$1****$3$4";
+
+  @Autowired(required = false)
+  private MemberMapper memberMapper;
 
   @Autowired private MemberConvert memberConvert;
 
@@ -72,13 +88,128 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
 
   @Autowired private GameAdminService gameAdminService;
 
-  @Autowired private RedisTemplate<String, Integer> redisTemplate;
+  @Autowired(required = false)
+  private RedisTemplate<String, Integer> redisTemplate;
+
+  @Autowired
+  private MemberDayReportService memberDayReportService;
 
   @Override
   public IPage<MemberVO> queryPage(Page<Member> page, MemberQueryDTO dto) {
-    return memberMapper
-        .queryPage(page, memberQueryCondition.builderQueryWrapper(dto))
-        .convert(this::setOnlineStatus);
+    IPage<MemberVO> memberVOIPage =
+            memberMapper
+                    .queryPage(page, memberQueryCondition.builderQueryWrapper(dto))
+                    .convert(this::setOnlineStatus);
+
+    // 游戏数据
+    memberVOIPage.setRecords(gameData(memberVOIPage.getRecords()));
+    return memberVOIPage;
+  }
+
+  public List<MemberVO> gameData(List<MemberVO> list) {
+
+    if (StringUtils.isNotEmpty(list)) {
+      List<String> listAccount =
+              list.stream().map(MemberVO::getAccount).collect(Collectors.toList());
+      String account = getAccount(listAccount);
+      QueryWrapper<MemberDayReport> queryWrapper = new QueryWrapper<>();
+      queryWrapper.select("sum(win_amount) win_amount, sum(water_amount) water_amount,user_name");
+      queryWrapper.in("user_name", account.split(","));
+      queryWrapper.groupBy("user_name");
+      List<MemberDayReport> listMemberDayReport = memberDayReportService.list(queryWrapper);
+      if (StringUtils.isEmpty(listMemberDayReport)) {
+        return list;
+      }
+      list.stream()
+              .forEach(
+                      a -> {
+                        if (StringUtils.isNotEmpty(listMemberDayReport)) {
+                          BigDecimal winAmount =
+                                  listMemberDayReport.stream()
+                                          .filter(b -> a.getAccount().equalsIgnoreCase(b.getUserName()))
+                                          .map(MemberDayReport::getWinAmount)
+                                          .reduce(BigDecimal.ZERO, BigDecimal::add);
+                          BigDecimal waterAmount =
+                                  listMemberDayReport.stream()
+                                          .filter(b -> a.getAccount().equalsIgnoreCase(b.getUserName()))
+                                          .map(MemberDayReport::getWaterAmount)
+                                          .reduce(BigDecimal.ZERO, BigDecimal::add);
+                          a.setWaterAmount(waterAmount);
+                          a.setWinAmount(winAmount);
+                        }
+                        // 真实姓名隐藏
+                        if (StringUtils.isNotEmpty(a.getRealName())) {
+                          a.setRealName(hideRealName(a.getRealName()));
+                        }
+                      });
+    }
+    return list;
+  }
+
+  /**
+   * @param id 会员id
+   * @return
+   */
+  @Override
+  public MemberContactVo getMemberDateils(Long id) {
+    MemberInfoVO memberInfo = this.memberMapper.getMemberInfo(id);
+    if (memberInfo == null) {
+      throw new ServiceException("会员不存在");
+    }
+    return MemberContactVo.builder()
+            .email(memberInfo.getEmail())
+            .phone(memberInfo.getPhone())
+            .qq(memberInfo.getQq())
+            .realName(memberInfo.getRealName())
+            .wechat(memberInfo.getWechat())
+            .build();
+  }
+
+  /**
+   * 真实姓名
+   *
+   * @param realName
+   * @return
+   */
+  private static String hideRealName(String realName) {
+    return realName.replaceAll(REALNAME_CODE, REALNAME_REPLACEMENT);
+  }
+
+  /**
+   * 手机号
+   *
+   * @param phone
+   * @return
+   */
+  private static String desensitizedPhoneNumber(String phone) {
+    if (phone.length() == 11) {
+      return phone.replaceAll(PHONE_CODE, PHONE_REPLACEMENT);
+    } else {
+      String substring = phone.substring(0, 3);
+      int length = phone.length();
+      String lastString = phone.substring(length - 2, length);
+      String str = substring + "****" + lastString;
+      return str;
+    }
+  }
+
+  /**
+   * 邮箱影藏
+   */
+  public static String getEmail(String email) {
+    return email.replaceAll(EMAIL_CODE, EMAIL_REPLACEMENT);
+  }
+
+  public String getAccount(List<String> listAccount) {
+    StringBuilder sb = new StringBuilder();
+    if (StringUtils.isNotEmpty(listAccount)) {
+      for (String s : listAccount) {
+        sb.append(s).append(",");
+      }
+    }
+    sb.deleteCharAt(sb.toString().length() - 1);
+    String str = sb.toString();
+    return str;
   }
 
   @Override
@@ -104,6 +235,33 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
   @Override
   public MemberInfoVO getInfo(Long id) {
     return memberMapper.getMemberInfo(id);
+  }
+
+  @Override
+  public MemberInfoVO getMemberInfo(Long id) {
+    MemberInfoVO memberInfo = memberMapper.getMemberInfo(id);
+    // 真实姓名
+    if (StringUtils.isNotEmpty(memberInfo.getRealName())) {
+      memberInfo.setRealName(hideRealName(memberInfo.getRealName()));
+    }
+    // 手机号
+    if (StringUtils.isNotEmpty(memberInfo.getPhone())) {
+      memberInfo.setPhone(desensitizedPhoneNumber(memberInfo.getPhone()));
+    }
+    // 邮箱
+    if (StringUtils.isNotEmpty(memberInfo.getEmail())) {
+      memberInfo.setEmail(getEmail(memberInfo.getEmail()));
+    }
+    // QQ
+    if (StringUtils.isNotEmpty(memberInfo.getQq())) {
+      memberInfo.setQq(desensitizedPhoneNumber(memberInfo.getQq()));
+    }
+    // 微信
+    if (StringUtils.isNotEmpty(memberInfo.getWechat())) {
+      memberInfo.setWechat(desensitizedPhoneNumber(memberInfo.getWechat()));
+    }
+
+    return memberInfo;
   }
 
   @Override

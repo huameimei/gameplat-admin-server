@@ -10,13 +10,11 @@ import com.gameplat.admin.enums.TenantSettingEnum;
 import com.gameplat.admin.model.vo.ListSortConfigVO;
 import com.gameplat.admin.model.vo.SportConfigVO;
 import com.gameplat.admin.model.vo.TenantSettingVO;
-import com.gameplat.admin.service.SysTenantSettingService;
 import com.gameplat.admin.service.TenantSettingService;
 import com.gameplat.base.common.enums.EnableEnum;
 import com.gameplat.base.common.web.Result;
 import com.gameplat.common.constant.CacheKey;
 import com.gameplat.model.entity.setting.TenantSetting;
-import com.gameplat.model.entity.sys.SysTenantSetting;
 import com.gameplat.security.SecurityUserHolder;
 import com.gameplat.security.context.UserCredential;
 import io.swagger.annotations.ApiOperation;
@@ -264,6 +262,7 @@ public class TenantSettingController {
         if (listSortConfigVOS == null || listSortConfigVOS.isEmpty()) {
             Result.failed("修改体育配置参数为空");
         }
+        adminCache.deleteObject(CacheKey.getTenantListSortKey());
         return Result.succeed(tenantSettingService.updateListSortConfig(listSortConfigVOS));
     }
 
@@ -276,6 +275,7 @@ public class TenantSettingController {
         if(sportConfigVo==null){
             Result.failed("修改体育配置参数为空");
         }
+        adminCache.deleteObject(CacheKey.getSportConfigKey());
         return Result.succeed(tenantSettingService.updateSportConfig(sportConfigVo));
     }
 }

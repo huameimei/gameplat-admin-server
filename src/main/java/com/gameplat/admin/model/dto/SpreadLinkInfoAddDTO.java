@@ -23,7 +23,7 @@ public class SpreadLinkInfoAddDTO {
   private Integer spreadType;
   /** 推广用户类型 */
   private Integer userType;
-  /** 是否专属 1 是 0 否 */
+  /** 2 默认推广域名 1 专属域名 0 公共域名 */
   private Integer exclusiveFlag;
   /** 用户层级 */
   private Integer userLevel;
@@ -35,4 +35,9 @@ public class SpreadLinkInfoAddDTO {
   private BigDecimal discountAmount;
 
   private Integer isOpenDividePreset;
+
+  /**
+   * 来源域名
+   */
+  private String sourceDomain;
 }

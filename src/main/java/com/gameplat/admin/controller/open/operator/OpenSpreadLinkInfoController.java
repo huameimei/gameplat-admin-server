@@ -3,7 +3,7 @@ package com.gameplat.admin.controller.open.operator;
 import cn.hutool.json.JSONArray;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
-import com.gameplat.admin.enums.SpreadTypes;
+import com.gameplat.common.enums.SpreadTypes;
 import com.gameplat.admin.model.dto.SpreadLinkInfoAddDTO;
 import com.gameplat.admin.model.dto.SpreadLinkInfoDTO;
 import com.gameplat.admin.model.dto.SpreadLinkInfoEditDTO;
@@ -184,5 +184,15 @@ public class OpenSpreadLinkInfoController {
   public JSONArray getLinkRebateOptionsForEdit(
       @RequestParam(required = false) String agentAccount) {
     return spreadLinkInfoService.getSpreadLinkRebate(agentAccount, true, false);
+  }
+
+
+  /**
+   * 获取
+   */
+  @GetMapping("/getDefaultLink")
+  @PreAuthorize("hasAuthority('diffusion:spreadConfig:add')")
+  public List<SpreadConfigVO> getDefaultLink() {
+    return spreadLinkInfoService.getDefaultLink();
   }
 }

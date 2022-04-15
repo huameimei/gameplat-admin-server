@@ -81,4 +81,9 @@ public class SpreadConfigVO {
   private Date createTime;
 
   private Date updateTime;
+
+  /**
+   * 来源域名
+   */
+  private String sourceDomain;
 }

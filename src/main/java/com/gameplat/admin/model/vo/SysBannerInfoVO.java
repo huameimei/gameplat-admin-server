@@ -86,4 +86,17 @@ public class SysBannerInfoVO implements Serializable {
 
   @ApiModelProperty("相关游戏配置")
   private String gameConfig;
+
+  /**
+   * 展示位置  0 上 1下
+   */
+  @ApiModelProperty("展示位置  0 上 1下")
+  private Integer location;
+
+  /**
+   * banner标题
+   */
+  @ApiModelProperty("banner标题")
+  private String title;
+
 }

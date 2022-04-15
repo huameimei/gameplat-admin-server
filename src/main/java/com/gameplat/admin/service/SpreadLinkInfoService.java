@@ -134,4 +134,9 @@ public interface SpreadLinkInfoService extends IService<SpreadLinkInfo> {
    * @return
    */
   BigDecimal getMaxSpreadLinkRebate(String account);
+
+  /**
+   * 获取默认的推广链接信息
+   */
+  List<SpreadConfigVO> getDefaultLink();
 }

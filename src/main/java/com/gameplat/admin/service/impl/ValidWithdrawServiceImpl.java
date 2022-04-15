@@ -83,6 +83,7 @@ public class ValidWithdrawServiceImpl extends ServiceImpl<ValidWithdrawMapper, V
     validWithdraw.setDiscountDml(rechargeOrder.getDiscountDml());
     validWithdraw.setMormDml(rechargeOrder.getNormalDml());
     validWithdraw.setRemark(rechargeOrder.getRemarks());
+    validWithdraw.setCreateTime(new Date());
     deleteByUserId(rechargeOrder.getMemberId(), 1);
     updateTypeByUserId(rechargeOrder.getMemberId(),validWithdraw.getCreateTime());
     this.save(validWithdraw);
@@ -334,7 +335,7 @@ public class ValidWithdrawServiceImpl extends ServiceImpl<ValidWithdrawMapper, V
   public void countAccountValidWithdraw(String username) {
     List<ValidAccoutWithdrawVo> validWithdraw =
         validWithdrawMapper.findAccountValidWithdraw(username);
-    if (StringUtils.isNotEmpty(validWithdraw)) {
+    if (StringUtils.isEmpty(validWithdraw)) {
       return;
     }
     String indexName = ContextConstant.ES_INDEX.BET_RECORD_ + tenantConfig.getTenantCode();

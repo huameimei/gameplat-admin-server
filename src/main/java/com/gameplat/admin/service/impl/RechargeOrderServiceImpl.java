@@ -665,7 +665,8 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
   public void rechargeProcess(RechargeOrder rechargeOrder) {
     MemberRechargeLimit limit = limitInfoService.getRechargeLimit();
     boolean isRechargeProcess = BooleanEnum.YES.match(limit.getIsRechargeProcess());
-    if (isRechargeProcess && !ObjectUtil.equal(2, rechargeOrder.getStatus())) {
+    if (isRechargeProcess
+            && !ObjectUtil.equal(RechargeStatus.HANDLED.getValue(), rechargeOrder.getStatus())) {
       throw new ServiceException("请先受理订单:" + rechargeOrder.getOrderNo());
     }
   }
@@ -1009,11 +1010,17 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
     sb.append("订单编号 ")
         .append(rechargeOrder.getOrderNo())
         .append("，充值金额 ")
-        .append(CNYUtils.formatYuanAsYuan(rechargeOrder.getPayAmount()))
+            .append(
+                    CNYUtils.formatYuanAsYuan(
+                            rechargeOrder.getPayAmount().setScale(2, BigDecimal.ROUND_DOWN)))
         .append("，优惠金额 ")
-        .append(CNYUtils.formatYuanAsYuan(rechargeOrder.getDiscountAmount()))
+            .append(
+                    CNYUtils.formatYuanAsYuan(
+                            rechargeOrder.getDiscountAmount().setScale(2, BigDecimal.ROUND_DOWN)))
         .append("，余额 ")
-        .append(df.format(balance.add(rechargeOrder.getTotalAmount())));
+            .append(
+                    df.format(
+                            balance.add(rechargeOrder.getTotalAmount().setScale(2, BigDecimal.ROUND_DOWN))));
     if (StringUtils.isNotEmpty(rechargeOrder.getPayType())) {
       sb.append("，支付类型 ").append(rechargeOrder.getPayTypeName());
     }

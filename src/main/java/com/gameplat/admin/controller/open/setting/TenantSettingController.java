@@ -102,10 +102,13 @@ public class TenantSettingController {
     @ApiOperation("启动图配置新增/修改")
     public Result<Object> insertStartImagePage(@RequestBody TenantSetting tenantSetting) {
         tenantSetting.setSettingType(TenantSettingEnum.START_UP_IMAGE.getCode());
-        tenantSetting.setCreateTime(new Date());
+        Date date = new Date();
+        tenantSetting.setCreateTime(date);
+        tenantSetting.setUpdateTime(date);
         UserCredential user = SecurityUserHolder.getCredential();
         if (user != null) {
             tenantSetting.setCreateBy(user.getUsername());
+            tenantSetting.setUpdateBy(user.getUsername());
         }
         tenantSettingService.insertStartImagePage(tenantSetting);
         adminCache.deleteByPrefix(CacheKey.getStartImgListKey());

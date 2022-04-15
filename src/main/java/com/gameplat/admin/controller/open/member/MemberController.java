@@ -61,6 +61,7 @@ public class MemberController {
 
   @ApiOperation(value = "会员详情")
   @GetMapping("/info/{id}")
+  @PreAuthorize("hasAuthority('member:info:view')")
   public MemberInfoVO info(@PathVariable Long id) {
     return memberService.getMemberInfo(id);
   }

@@ -109,6 +109,15 @@ public class ActivityInfoServiceImpl extends ServiceImpl<ActivityInfoMapper, Act
   @Override
   public void add(ActivityInfoAddDTO dto) {
     ActivityInfo activityInfo = activityInfoConvert.toEntity(dto);
+    // 校验是否绑定活动大厅
+    Long activityLobbyId = activityInfo.getActivityLobbyId();
+    if (activityLobbyId != null && activityLobbyId != 0 && activityLobbyId != -1) {
+      Long count = this.lambdaQuery().eq(ActivityInfo::getActivityLobbyId, activityLobbyId).count();
+      if (count != null && count > 0) {
+        throw new ServiceException("该活动大厅已被绑定，请重新选择活动大厅");
+      }
+    }
+
     if (this.saveActivityInfo(activityInfo)) {
       if (null != activityInfo.getId() && activityInfo.getId() > 0) {
         // 保存活动显示的图片

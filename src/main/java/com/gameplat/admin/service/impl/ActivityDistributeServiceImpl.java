@@ -122,14 +122,18 @@ public class ActivityDistributeServiceImpl
     BigDecimal subtotalMoney = BigDecimal.ZERO;
     if (CollectionUtils.isNotEmpty(iPage.getRecords())) {
       for (ActivityDistributeVO vo : iPage.getRecords()) {
-        subtotalMoney = subtotalMoney.add(vo.getDiscountsMoney());
+        if (ActivityDistributeEnum.ActivityDistributeStatus.SETTLED.getValue() == vo.getStatus()) {
+          subtotalMoney = subtotalMoney.add(vo.getDiscountsMoney());
+        }
       }
     }
 
     ActivityDistributeStatisticsVO activityDistributeStatisticsVO =
         new ActivityDistributeStatisticsVO();
     QueryWrapper<ActivityDistribute> queryWrapper = new QueryWrapper<>();
-    queryWrapper.select("SUM(discounts_money) aggregate");
+    queryWrapper
+        .select("SUM(discounts_money) aggregate")
+        .eq("status", ActivityDistributeEnum.ActivityDistributeStatus.SETTLED.getValue());
     Map<String, Object> map = this.getMap(queryWrapper);
     if (MapUtils.isNotEmpty(map) && map.get("aggregate") != null) {
       BigDecimal aggregate = new BigDecimal(map.get("aggregate").toString());

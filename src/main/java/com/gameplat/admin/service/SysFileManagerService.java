@@ -18,4 +18,6 @@ public interface SysFileManagerService {
 
   String upload(MultipartFile file);
 
+  void delete(String ids);
+
 }

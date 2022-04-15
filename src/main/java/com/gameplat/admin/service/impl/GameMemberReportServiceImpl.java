@@ -54,6 +54,8 @@ public class GameMemberReportServiceImpl
     pageDtoVO.setOtherData(sumMemberDayReport);
     pageDtoVO.setPage(resultPage);
     pageDtoVO.getPage().setTotal(memberDayReportPage.getTotal());
+    pageDtoVO.getPage().setSize(page.getSize());
+    pageDtoVO.getPage().setCurrent(page.getCurrent());
 
     return pageDtoVO;
   }

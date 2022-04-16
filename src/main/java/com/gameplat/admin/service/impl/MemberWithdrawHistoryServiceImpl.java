@@ -1,5 +1,6 @@
 package com.gameplat.admin.service.impl;
 
+import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
@@ -15,7 +16,6 @@ import com.gameplat.admin.model.vo.MemberWithdrawHistorySummaryVO;
 import com.gameplat.admin.model.vo.MemberWithdrawHistoryVO;
 import com.gameplat.admin.service.MemberWithdrawHistoryService;
 import com.gameplat.base.common.util.StringUtils;
-import com.gameplat.model.entity.member.MemberWithdraw;
 import com.gameplat.model.entity.member.MemberWithdrawHistory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -41,6 +41,12 @@ public class MemberWithdrawHistoryServiceImpl
 
   @Autowired(required = false)
   private MemberWithdrawHistoryMapper memberWithdrawHistoryMapper;
+
+  /***提现创建时间 */
+  private static final String ORDER_CREATE = "createTime";
+
+  /***提现审核时间 */
+  private static final String ORDER_OPERATOR = "operatorTime";
 
   @Override
   public IPage<MemberWithdrawHistoryVO> findPage(
@@ -123,15 +129,31 @@ public class MemberWithdrawHistoryServiceImpl
         .eq(
             ObjectUtils.isNotEmpty(dto.getBankCard()),
             MemberWithdrawHistory::getBankCard,
-            dto.getBankCard())
-        .ge(
-            ObjectUtils.isNotNull(dto.getStartDate()),
-            MemberWithdrawHistory::getCreateTime,
-            dto.getStartDate())
-        .le(
-            ObjectUtils.isNotNull(dto.getEndDate()),
-            MemberWithdrawHistory::getCreateTime,
-            dto.getEndDate());
+                dto.getBankCard());
+    if (ObjectUtils.isNotEmpty(dto.getOrderBy())
+            && ObjectUtil.equal(ORDER_OPERATOR, dto.getOrderBy())) {
+      query
+              .ge(
+                      ObjectUtils.isNotNull(dto.getStartDate()),
+                      MemberWithdrawHistory::getOperatorTime,
+                      dto.getStartDate())
+              .le(
+                      ObjectUtils.isNotNull(dto.getEndDate()),
+                      MemberWithdrawHistory::getOperatorTime,
+                      dto.getEndDate());
+    }
+    if (ObjectUtils.isNotEmpty(dto.getOrderBy())
+            && ObjectUtil.equal(ORDER_CREATE, dto.getOrderBy())) {
+      query
+              .ge(
+                      ObjectUtils.isNotNull(dto.getStartDate()),
+                      MemberWithdrawHistory::getCreateTime,
+                      dto.getStartDate())
+              .le(
+                      ObjectUtils.isNotNull(dto.getEndDate()),
+                      MemberWithdrawHistory::getCreateTime,
+                      dto.getEndDate());
+    }
     if (ObjectUtils.isNotEmpty(dto.getAccounts())) {
       query.in(
           MemberWithdrawHistory::getAccount,

@@ -1,13 +1,14 @@
 package com.gameplat.admin.service.impl;
 
+import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.gameplat.admin.constant.WithdrawTypeConstant;
 import com.gameplat.admin.mapper.MemberRwReportMapper;
 import com.gameplat.admin.service.MemberRwReportService;
 import com.gameplat.base.common.util.DateUtil;
 import com.gameplat.base.common.util.StringUtils;
-import com.gameplat.common.enums.CashEnum;
-import com.gameplat.common.enums.RechargeMode;
-import com.gameplat.common.enums.TrueFalse;
+import com.gameplat.common.enums.*;
+import com.gameplat.common.util.Convert;
 import com.gameplat.common.util.UserDlUtil;
 import com.gameplat.model.entity.member.Member;
 import com.gameplat.model.entity.member.MemberRwReport;
@@ -76,6 +77,16 @@ public class MemberRwReportServiceImpl extends ServiceImpl<MemberRwReportMapper,
     } else {
       report.setOtherDiscount(report.getOtherDiscount().add(rechargeOrder.getDiscountAmount()));
     }
+
+    // 计算虚拟币充值
+    if (ObjectUtil.isNotEmpty(rechargeOrder.getCurrencyCount())
+            && rechargeOrder.getCurrencyCount().compareTo(BigDecimal.ZERO) == 1) {
+      report.setVirtualRechargeNumber(
+              report.getVirtualRechargeNumber().add(rechargeOrder.getCurrencyCount()));
+      report.setVirtualRechargeMoney(
+              report.getVirtualRechargeMoney().add(rechargeOrder.getAmount()));
+    }
+
     report.setMemberId(member.getId());
     this.saveOrUpdate(report);
   }
@@ -110,6 +121,15 @@ public class MemberRwReportServiceImpl extends ServiceImpl<MemberRwReportMapper,
         report.setFirstWithdrawMoney(
             report.getFirstWithdrawMoney().add(memberWithdraw.getCashMoney()));
       }
+      if (ObjectUtil.equals(memberWithdraw.getWithdrawType(), WithdrawTypeConstant.BTC)
+              || ObjectUtil.equals(memberWithdraw.getWithdrawType(), WithdrawTypeConstant.USDT)
+              || ObjectUtil.equals(memberWithdraw.getWithdrawType(), WithdrawTypeConstant.ETH)
+              || ObjectUtil.equals(memberWithdraw.getWithdrawType(), WithdrawTypeConstant.VIRTUAL)) {
+        BigDecimal count = StringUtils.isNotEmpty(memberWithdraw.getCurrencyCount()) ? Convert.toBigDecimal(memberWithdraw.getCurrencyCount()) : BigDecimal.ZERO;
+        report.setVirtualWithdrawNumber(report.getVirtualWithdrawNumber().add(count));
+        report.setVirtualWithdrawMoney(report.getVirtualWithdrawMoney().add(memberWithdraw.getCashMoney()));
+      }
+
     } else {
       // 计算异常金额
       report.setExceptionWithdrawAmount(

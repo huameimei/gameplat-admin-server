@@ -2,25 +2,42 @@ package com.gameplat.admin.service.impl;
 
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.mapper.DataReportMapper;
 import com.gameplat.admin.model.dto.GameRWDataReportDto;
-import com.gameplat.admin.model.vo.*;
+import com.gameplat.admin.model.vo.AccountReportVo;
+import com.gameplat.admin.model.vo.GameAccountDataReportVo;
+import com.gameplat.admin.model.vo.GameBetDataReportVO;
+import com.gameplat.admin.model.vo.GameDataReportVO;
+import com.gameplat.admin.model.vo.GameDividendDataVo;
+import com.gameplat.admin.model.vo.GameProxyDataVo;
+import com.gameplat.admin.model.vo.GameRechDataReportVO;
+import com.gameplat.admin.model.vo.GameWaterDataReportVO;
+import com.gameplat.admin.model.vo.GameWithDataReportVO;
+import com.gameplat.admin.model.vo.PageDtoVO;
+import com.gameplat.admin.model.vo.ThreeRechReportVo;
 import com.gameplat.admin.service.DataReportService;
+import com.gameplat.admin.service.GameAmountControlService;
 import com.gameplat.admin.service.RechargeOrderService;
 import com.gameplat.base.common.util.StringUtils;
+import com.gameplat.common.enums.GameAmountControlTypeEnum;
+import com.gameplat.model.entity.game.GameAmountControl;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.math.BigDecimal;
-import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * @author kb @Date 2022/3/2 21:49 @Version 1.0
@@ -73,6 +90,8 @@ public class DataReportServiceImpl extends ServiceImpl<DataReportMapper, GameRec
 
   @Autowired(required = false)
   private DataReportMapper dataReportMapper;
+
+  @Autowired private GameAmountControlService gameAmountControlService;
 
   @Override
   public GameRechDataReportVO findRechReport(GameRWDataReportDto dto) {
@@ -197,6 +216,23 @@ public class DataReportServiceImpl extends ServiceImpl<DataReportMapper, GameRec
     BigDecimal allBalance = dataReportMapper.findReportMemberAllBalance(dto);
     log.info("全部余额：{}", allBalance);
     accountReportVo.setGoodMoney(allBalance);
+
+    // 彩票可用额度
+    GameAmountControl lotteryInfo =
+        gameAmountControlService.findInfoByType(GameAmountControlTypeEnum.LOTTERY.type());
+    if (ObjectUtil.isNotNull(lotteryInfo)) {
+      accountReportVo.setLotteryQuota(lotteryInfo.getAmount().subtract(lotteryInfo.getUseAmount()));
+    } else {
+      accountReportVo.setLotteryQuota(BigDecimal.ZERO);
+    }
+    // 游戏可用余额
+    GameAmountControl gameInfo =
+        gameAmountControlService.findInfoByType(GameAmountControlTypeEnum.LIVE.type());
+    if (ObjectUtil.isNotNull(gameInfo)) {
+      accountReportVo.setGameQuota(gameInfo.getAmount().subtract(gameInfo.getUseAmount()));
+    } else {
+      accountReportVo.setGameQuota(BigDecimal.ZERO);
+    }
     return accountReportVo;
   }
 

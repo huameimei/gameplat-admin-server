@@ -12,9 +12,11 @@ import com.gameplat.admin.model.dto.GameBarDTO;
 import com.gameplat.admin.model.vo.GameBarVO;
 import com.gameplat.admin.service.GameBarService;
 import com.gameplat.base.common.exception.ServiceException;
+import com.gameplat.model.entity.activity.ActivityInfo;
 import com.gameplat.model.entity.game.GameBar;
 import com.gameplat.security.SecurityUserHolder;
 import com.gameplat.security.context.UserCredential;
+import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -45,7 +47,7 @@ public class GameBarServiceImpl extends ServiceImpl<GameBarMapper, GameBar> impl
   @Override
   @SentinelResource(value = "gameBarList", fallback = "sentineFallBack")
   public List<GameBarVO> gameBarList(GameBarDTO dto) {
-    List<GameBar> list = this.lambdaQuery().orderByDesc(GameBar::getSort).list();
+    List<GameBar> list = this.lambdaQuery().orderByAsc(Lists.newArrayList(GameBar::getSort)).list();
     if (list != null && list.size() > 0){
       List<GameBarVO> barList = new ArrayList<>();
       list.forEach(x->{

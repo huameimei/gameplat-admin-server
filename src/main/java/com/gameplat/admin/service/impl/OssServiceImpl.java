@@ -1,5 +1,6 @@
 package com.gameplat.admin.service.impl;
 
+import com.gameplat.admin.service.AsyncSaveFileRecordService;
 import com.gameplat.admin.service.ConfigService;
 import com.gameplat.admin.service.OssService;
 import com.gameplat.common.compent.oss.FileStorageStrategyContext;
@@ -17,6 +18,9 @@ public class OssServiceImpl implements OssService {
 
   @Autowired private FileStorageStrategyContext fileStorageStrategyContext;
 
+  @Autowired
+  private AsyncSaveFileRecordService asyncSaveFileRecordService;
+
   @Override
   public String upload(MultipartFile file) {
     return this.upload(file, file.getOriginalFilename());
@@ -25,9 +29,16 @@ public class OssServiceImpl implements OssService {
   @Override
   @SneakyThrows
   public String upload(MultipartFile file, String filename) {
-    return fileStorageStrategyContext
-        .getProvider(this.getConfig())
+    FileConfig fileConfig = this.getConfig();
+
+    String fileUrl = fileStorageStrategyContext
+        .getProvider(fileConfig)
         .upload(file.getInputStream(), file.getContentType(), file.getOriginalFilename());
+
+    // 异步保存文件记录
+    asyncSaveFileRecordService.asyncSave(file, fileUrl, fileConfig.getProvider());
+
+    return fileUrl;
   }
 
   @Override

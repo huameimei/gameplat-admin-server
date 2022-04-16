@@ -115,7 +115,8 @@ public class ActivityDistributeServiceImpl
         .le(
             StringUtils.isNotBlank(dto.getApplyEndTime()),
             ActivityDistribute::getApplyTime,
-            dto.getApplyEndTime());
+            dto.getApplyEndTime())
+        .orderByDesc(ActivityDistribute::getApplyTime);
 
     IPage<ActivityDistributeVO> iPage =
         lambdaQuery.page(page).convert(activityDistributeConvert::toVo);

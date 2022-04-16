@@ -73,12 +73,13 @@ public class OnlineUserServiceImpl implements OnlineUserService {
     Set<String> keys = this.getOnlineUserKeys();
 
     if (CollectionUtil.isNotEmpty(keys)) {
-      total = keys.size();
       onlineUsers = this.getOnlineUsers(keys);
       // 在线会员统计
       onlineCount = this.countOnline(onlineUsers, warningAccounts);
       onlineUsers = this.filterOnlineUserByCondition(onlineUsers, dto, warningAccounts);
     }
+
+    total = onlineUsers.size();
 
     // 分页
     List<OnlineUserVo> records =

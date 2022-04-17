@@ -583,8 +583,9 @@ public class GameAdminServiceImpl implements GameAdminService {
     distributedLocker.lock(key, TimeUnit.SECONDS, 300);
     try {
       List<GamePlatform> playedGamePlatform = this.getPlayedPlatform(member.getId());
+      log.info("游戏平台额度转换通道中:{}", playedGamePlatform.size());
       if (CollectionUtil.isEmpty(playedGamePlatform)) {
-        throw new ServiceException("游戏平台额度转换通道维护中");
+        return new ArrayList();
       }
       List<CompletableFuture<GameRecycleVO>> futures =
           this.batchRecovery(playedGamePlatform, member);

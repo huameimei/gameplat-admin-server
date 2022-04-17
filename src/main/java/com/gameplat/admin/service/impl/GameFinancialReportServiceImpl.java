@@ -259,7 +259,7 @@ public class GameFinancialReportServiceImpl
     List<GameFinancialReport> allGameFinancialReportList = new ArrayList<>();
 
     // 初始化全部游戏的财务报表（无游戏数据）
-    List<GameFinancialReport> gameFinancialReportList = gameFinancialReportMapper.initGameFinancialReport(statisticsTime, startTime, endTime, tenant);
+    List<GameFinancialReport> gameFinancialReportList = gameFinancialReportMapper.initGameFinancialReport(statisticsTime, startTime.substring(0,10), endTime.substring(0,10), tenant);
     if (CollectionUtil.isEmpty(gameFinancialReportList)) {
       throw new ServiceException("游戏已全部下架");
     }
@@ -415,8 +415,8 @@ public class GameFinancialReportServiceImpl
       gameFinancialReport.setValidAmount(validAmount);
       gameFinancialReport.setWinAmount(winAmount);
       gameFinancialReport.setStatisticsTime(statisticsTime);
-      gameFinancialReport.setStartTime(startTime);
-      gameFinancialReport.setEndTime(endTime);
+      gameFinancialReport.setStartTime(startTime.substring(0,10));
+      gameFinancialReport.setEndTime(endTime.substring(0,10));
       gameFinancialReport.setCustomerCode(tenant);
       gameFinancialReport.setPlatformCode(GamePlatformEnum.KGNL.getCode());
       gameFinancialReport.setGameType(GameTypeEnum.LOTTERY.code());

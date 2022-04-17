@@ -28,7 +28,7 @@ public class AsyncSaveFileRecordServiceImpl extends ServiceImpl<SysFileManagerMa
 
   @Override
   @Async
-  public void asyncSave(MultipartFile file, String fileUrl, Integer serviceProvider) {
+  public void asyncSave(MultipartFile file, String fileUrl, Integer serviceProvider, String uploadBy, Long fileSize) {
     //获取文件类型
     String fileType = Objects.requireNonNull(file.getOriginalFilename()).substring(file.getOriginalFilename().lastIndexOf("."));
     SysFileManager sysFileManager = new SysFileManager();
@@ -38,8 +38,9 @@ public class AsyncSaveFileRecordServiceImpl extends ServiceImpl<SysFileManagerMa
     sysFileManager.setStoreFileName(FilenameUtils.getName(fileUrl));
     sysFileManager.setFileUrl(fileUrl);
     sysFileManager.setFileType(OssUtils.getFileType(fileType));
-    sysFileManager.setFileSize(OssUtils.getSize(file.getSize()));
+    sysFileManager.setFileSize(OssUtils.getSize(fileSize));
     sysFileManager.setStatus(SUCCEED);
+    sysFileManager.setCreateBy(uploadBy);
     this.save(sysFileManager);
   }
 }

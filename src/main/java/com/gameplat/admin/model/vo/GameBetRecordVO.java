@@ -58,15 +58,15 @@ public class GameBetRecordVO implements Serializable {
 
   /** 投注时间 */
   @JSONField(format = "unixtime")
-  private Date betTime;
+  private Long betTime;
 
   /** 结算时间 */
   @JSONField(format = "unixtime")
-  private Date settleTime;
+  private Long settleTime;
 
   /** 报表统计时间 */
   @JSONField(format = "unixtime")
-  private Date statTime;
+  private Long statTime;
 
   /** 添加时间 */
   @JSONField(format = "unixtime")

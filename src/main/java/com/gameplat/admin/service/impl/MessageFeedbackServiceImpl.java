@@ -55,7 +55,7 @@ public class MessageFeedbackServiceImpl extends ServiceImpl<MessageFeedbackMappe
     addDTO.setLinkAccount(dto.getUsername());
     addDTO.setStatus(1);
     addDTO.setFeedbackType(dto.getLetterType());
-    addDTO.setType(4);
+    addDTO.setType(dto.getType());
     if (StringUtils.isNotBlank(dto.getImgUrl())) {
       addDTO.setFeedbackImage(dto.getImgUrl());
     }
@@ -92,6 +92,7 @@ public class MessageFeedbackServiceImpl extends ServiceImpl<MessageFeedbackMappe
             ObjectUtil.isNotEmpty(dto.getEndTime()),
             MessageFeedback::getCreateTime,
             dto.getEndTime())
+        .ne(MessageFeedback::getType, 4)
         .orderByDesc(MessageFeedback::getCreateTime)
         .page(page)
         .convert(messageFeedbackConvert::toVo);
@@ -109,7 +110,7 @@ public class MessageFeedbackServiceImpl extends ServiceImpl<MessageFeedbackMappe
   @Override
   public IPage<MessageFeedbackVO> getReplyContent(PageDTO<MessageFeedback> page) {
     return this.lambdaQuery()
-        .eq(MessageFeedback::getType, 2)
+        .in(MessageFeedback::getType, 2, 4)
         .eq(MessageFeedback::getStatus, 1)
         .orderByDesc(MessageFeedback::getCreateTime)
         .page(page)

@@ -3,14 +3,17 @@ package com.gameplat.admin.controller.open.finance;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.gameplat.admin.model.bean.ManualRechargeOrderBo;
 import com.gameplat.admin.model.bean.PageExt;
+import com.gameplat.admin.model.bean.RechargeMemberFileBean;
 import com.gameplat.admin.model.dto.ManualRechargeOrderDto;
 import com.gameplat.admin.model.dto.RechargeOrderQueryDTO;
+import com.gameplat.admin.model.vo.MemberRechBalanceVO;
 import com.gameplat.admin.model.vo.RechargeOrderVO;
 import com.gameplat.admin.model.vo.SummaryVO;
 import com.gameplat.admin.model.vo.WithdrawChargeVO;
 import com.gameplat.admin.service.MemberWithdrawService;
 import com.gameplat.admin.service.RechargeOrderService;
 import com.gameplat.base.common.exception.ServiceException;
+import com.gameplat.base.common.util.EasyExcelUtil;
 import com.gameplat.common.constant.ServiceName;
 import com.gameplat.common.model.bean.UserEquipment;
 import com.gameplat.log.annotation.Log;
@@ -283,7 +286,17 @@ public class RechargeOrderController {
           HttpServletRequest request)
           throws Exception {
     log.info("根据用户名进行批量充值操作人：{}", SecurityUserHolder.getCredential().getUsername());
-    rechargeOrderService.fileUserNameRech(dto, file, request, SecurityUserHolder.getCredential());
+
+    // 开始批量解析文件
+    List<RechargeMemberFileBean> strAccount =
+            EasyExcelUtil.readExcel(file.getInputStream(), RechargeMemberFileBean.class);
+    log.info("会员账号数据：{}", strAccount.size());
+    if (com.gameplat.base.common.util.StringUtils.isEmpty(strAccount)) {
+      return;
+    }
+    UserEquipment clientInfo = UserEquipment.create(request);
+    rechargeOrderService.batchMemberRecharge(
+            clientInfo, strAccount, dto, SecurityUserHolder.getCredential());
   }
 
   /** 人工批量充值（文件上传） */
@@ -295,6 +308,14 @@ public class RechargeOrderController {
           HttpServletRequest request)
           throws Exception {
     log.info("根据上传文件进行批量充值操作人：{}", SecurityUserHolder.getCredential().getUsername());
-    rechargeOrderService.fileRech(file, discountType, request, SecurityUserHolder.getCredential());
+
+    // 开始批量解析文件
+    List<MemberRechBalanceVO> memberRechBalanceVOList =
+            EasyExcelUtil.readExcel(file.getInputStream(), MemberRechBalanceVO.class);
+    log.info("批量上传数据：{}", memberRechBalanceVOList.size());
+    // 请求的ip
+    UserEquipment userEquipment = UserEquipment.create(request);
+    rechargeOrderService.batchFileMemberRecharge(
+            memberRechBalanceVOList, discountType, userEquipment, SecurityUserHolder.getCredential());
   }
 }

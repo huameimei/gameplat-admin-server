@@ -1121,78 +1121,60 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
         .groupBy("tp_interface_code");
   }
 
-  @Override
   @Async
-  public void fileUserNameRech(
-      ManualRechargeOrderDto dto,
-      MultipartFile file,
-      HttpServletRequest request,
-      UserCredential credential)
-      throws Exception {
-    // 开始批量解析文件
-    List<RechargeMemberFileBean> strAccount =
-        EasyExcelUtil.readExcel(file.getInputStream(), RechargeMemberFileBean.class);
-    log.info("会员账号数据：{}", strAccount.size());
-    if (com.gameplat.base.common.util.StringUtils.isEmpty(strAccount)) {
-      return;
-    }
-
-    UserEquipment clientInfo = UserEquipment.create(request);
-
+  @Override
+  public void batchMemberRecharge(
+          UserEquipment clientInfo,
+          List<RechargeMemberFileBean> strAccount,
+          ManualRechargeOrderDto dto,
+          UserCredential credential) {
     strAccount.stream()
-        .forEach(
-            a -> {
-              MemberBalanceVO memberVip =
-                  memberService.findMemberVip(a.getUsername(), dto.getLevel(), dto.getVip());
-              if (memberVip == null
-                  || com.gameplat.base.common.util.StringUtils.isEmpty(memberVip.getAccount())) {
-                return;
-              }
-              log.info("会员：{},充值金额:{}", a, dto.getAmount());
-              dto.setAccount(memberVip.getAccount());
-              ManualRechargeOrderBo manualRechargeOrderBo = new ManualRechargeOrderBo();
-              BeanUtil.copyProperties(dto, manualRechargeOrderBo);
-              manualRechargeOrderBo.setMemberId(memberVip.getId());
-              try {
-                manual(manualRechargeOrderBo, credential, clientInfo);
-              } catch (Exception e) {
-                log.info("充值失败：{}", e);
-              }
-            });
+            .forEach(
+                    a -> {
+                      MemberBalanceVO memberVip =
+                              memberService.findMemberVip(a.getUsername(), dto.getLevel(), dto.getVip());
+                      if (memberVip == null
+                              || com.gameplat.base.common.util.StringUtils.isEmpty(memberVip.getAccount())) {
+                        return;
+                      }
+                      log.info("会员：{},充值金额:{}", a, dto.getAmount());
+                      dto.setAccount(memberVip.getAccount());
+                      ManualRechargeOrderBo manualRechargeOrderBo = new ManualRechargeOrderBo();
+                      BeanUtil.copyProperties(dto, manualRechargeOrderBo);
+                      manualRechargeOrderBo.setMemberId(memberVip.getId());
+                      try {
+                        manual(manualRechargeOrderBo, credential, clientInfo);
+                      } catch (Exception e) {
+                        log.info("充值失败：{}", e);
+                      }
+                    });
   }
 
-  @Override
   @Async
-  public void fileRech(
-      MultipartFile file,
-      Integer discountType,
-      HttpServletRequest request,
-      UserCredential credential)
-      throws Exception {
-    // 开始批量解析文件
-    List<MemberRechBalanceVO> memberRechBalanceVOList =
-        EasyExcelUtil.readExcel(file.getInputStream(), MemberRechBalanceVO.class);
-    log.info("批量上传数据：{}", memberRechBalanceVOList.size());
-    // 请求的ip
-    UserEquipment userEquipment = UserEquipment.create(request);
+  @Override
+  public void batchFileMemberRecharge(
+          List<MemberRechBalanceVO> memberRechBalanceVOList,
+          Integer discountType,
+          UserEquipment userEquipment,
+          UserCredential credential) {
     memberRechBalanceVOList.stream()
-        .forEach(
-            a -> {
-              MemberInfoVO memberInfo = memberService.getMemberInfo(a.getAccount());
-              if (memberInfo == null
-                  || com.gameplat.base.common.util.StringUtils.isEmpty(memberInfo.getAccount())) {
-                return;
-              }
-              // 开始创建订单，入款
-              try {
-                ManualRechargeOrderBo manualRechargeOrderBo =
-                    fillRechargeOrder(a, memberInfo, discountType);
-                log.info("充值数据：{}", JSON.toJSONString(manualRechargeOrderBo));
-                manual(manualRechargeOrderBo, credential, userEquipment);
-              } catch (Exception e) {
-                e.printStackTrace();
-              }
-            });
+            .forEach(
+                    a -> {
+                      MemberInfoVO memberInfo = memberService.getMemberInfo(a.getAccount());
+                      if (memberInfo == null
+                              || com.gameplat.base.common.util.StringUtils.isEmpty(memberInfo.getAccount())) {
+                        return;
+                      }
+                      // 开始创建订单，入款
+                      try {
+                        ManualRechargeOrderBo manualRechargeOrderBo =
+                                fillRechargeOrder(a, memberInfo, discountType);
+                        log.info("充值数据：{}", JSON.toJSONString(manualRechargeOrderBo));
+                        manual(manualRechargeOrderBo, credential, userEquipment);
+                      } catch (Exception e) {
+                        e.printStackTrace();
+                      }
+                    });
   }
 
   public ManualRechargeOrderBo fillRechargeOrder(

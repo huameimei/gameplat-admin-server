@@ -47,7 +47,7 @@ public class MemberLevelController {
   @Autowired private PayTypeService payTypeService;
 
   @GetMapping("/list")
-  @PreAuthorize("hasAuthority('member:level:view')")
+//  @PreAuthorize("hasAuthority('member:level:view')")
   public List<MemberLevelVO> getList() {
     return memberLevelService.getList();
   }

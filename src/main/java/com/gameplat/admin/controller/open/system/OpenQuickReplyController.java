@@ -70,7 +70,7 @@ public class OpenQuickReplyController {
   }
 
   @GetMapping("/getAll")
-  @PreAuthorize("hasAuthority('system:quickReply:getAll')")
+//  @PreAuthorize("hasAuthority('system:quickReply:getAll')")
   public List<QuickReply> getAll() {
     return replyService.list();
   }

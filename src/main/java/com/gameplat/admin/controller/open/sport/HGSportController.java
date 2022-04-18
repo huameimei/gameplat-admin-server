@@ -50,7 +50,7 @@ public class HGSportController {
 
   @ApiOperation(value = "HG即时注单详情")
   @GetMapping("/queryHGCurBetOrder")
-  @PreAuthorize("hasAuthority('sport:hGSport:queryHGCurBetOrder')")
+//  @PreAuthorize("hasAuthority('sport:hGSport:queryHGCurBetOrder')")
   public Object queryHgCurBetOrder(HGSportDTO dto) {
     return hgSportService.queryHGCurBetOrder(dto);
   }

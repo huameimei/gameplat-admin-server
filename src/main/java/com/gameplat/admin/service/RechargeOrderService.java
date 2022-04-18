@@ -6,14 +6,12 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.gameplat.admin.model.bean.ActivityStatisticItem;
 import com.gameplat.admin.model.bean.ManualRechargeOrderBo;
 import com.gameplat.admin.model.bean.PageExt;
+import com.gameplat.admin.model.bean.RechargeMemberFileBean;
 import com.gameplat.admin.model.dto.GameRWDataReportDto;
 import com.gameplat.admin.model.dto.ManualRechargeOrderDto;
 import com.gameplat.admin.model.dto.MemberActivationDTO;
 import com.gameplat.admin.model.dto.RechargeOrderQueryDTO;
-import com.gameplat.admin.model.vo.MemberActivationVO;
-import com.gameplat.admin.model.vo.RechargeOrderVO;
-import com.gameplat.admin.model.vo.SummaryVO;
-import com.gameplat.admin.model.vo.ThreeRechReportVo;
+import com.gameplat.admin.model.vo.*;
 import com.gameplat.common.model.bean.UserEquipment;
 import com.gameplat.model.entity.recharge.RechargeOrder;
 import com.gameplat.model.entity.spread.SpreadUnion;
@@ -78,7 +76,16 @@ public interface RechargeOrderService extends IService<RechargeOrder> {
 
   void expired(Long id);
 
-  void fileUserNameRech(ManualRechargeOrderDto dto, MultipartFile file, HttpServletRequest request, UserCredential credential) throws Exception;
 
-  void fileRech(MultipartFile file, Integer discountType, HttpServletRequest request, UserCredential credential) throws Exception;
+  void batchMemberRecharge(
+          UserEquipment clientInfo,
+          List<RechargeMemberFileBean> strAccount,
+          ManualRechargeOrderDto dto,
+          UserCredential credential);
+
+  void batchFileMemberRecharge(
+          List<MemberRechBalanceVO> memberRechBalanceVOList,
+          Integer discountType,
+          UserEquipment userEquipment,
+          UserCredential credential);
 }

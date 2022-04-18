@@ -1121,26 +1121,8 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
         .groupBy("tp_interface_code");
   }
 
-  @Override
-  public void fileUserNameRech(
-      ManualRechargeOrderDto dto,
-      MultipartFile file,
-      HttpServletRequest request,
-      UserCredential credential)
-      throws Exception {
-    // 开始批量解析文件
-    List<RechargeMemberFileBean> strAccount =
-        EasyExcelUtil.readExcel(file.getInputStream(), RechargeMemberFileBean.class);
-    log.info("会员账号数据：{}", strAccount.size());
-    if (com.gameplat.base.common.util.StringUtils.isEmpty(strAccount)) {
-      return;
-    }
-
-    UserEquipment clientInfo = UserEquipment.create(request);
-    batchMemberRecharge(clientInfo, strAccount, dto, credential);
-  }
-
   @Async
+  @Override
   public void batchMemberRecharge(
           UserEquipment clientInfo,
           List<RechargeMemberFileBean> strAccount,
@@ -1168,23 +1150,8 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
                     });
   }
 
-  @Override
-  public void fileRech(
-      MultipartFile file,
-      Integer discountType,
-      HttpServletRequest request,
-      UserCredential credential)
-          throws Exception {
-    // 开始批量解析文件
-    List<MemberRechBalanceVO> memberRechBalanceVOList =
-            EasyExcelUtil.readExcel(file.getInputStream(), MemberRechBalanceVO.class);
-    log.info("批量上传数据：{}", memberRechBalanceVOList.size());
-    // 请求的ip
-    UserEquipment userEquipment = UserEquipment.create(request);
-    batchFileMemberRecharge(memberRechBalanceVOList, discountType, userEquipment, credential);
-  }
-
   @Async
+  @Override
   public void batchFileMemberRecharge(
           List<MemberRechBalanceVO> memberRechBalanceVOList,
           Integer discountType,

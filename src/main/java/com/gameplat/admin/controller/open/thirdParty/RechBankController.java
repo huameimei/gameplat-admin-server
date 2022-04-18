@@ -65,7 +65,7 @@ public class RechBankController {
   }
 
   @GetMapping("/getAllBank")
-  @PreAuthorize("hasAuthority('thirdParty:rechBank:getAllBank')")
+//  @PreAuthorize("hasAuthority('thirdParty:rechBank:getAllBank')")
   public List<SysDictData> getAllBank() {
     SysDictData sysDictData = new SysDictData();
     sysDictData.setDictType("RECH_BANK");

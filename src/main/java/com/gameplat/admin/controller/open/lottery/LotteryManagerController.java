@@ -27,7 +27,7 @@ public class LotteryManagerController {
 
   @ApiOperation("获取彩系和彩种列表")
   @PostMapping("/getLottTypeList")
-  @PreAuthorize("hasAuthority('lottery:lottTypeList')")
+//  @PreAuthorize("hasAuthority('lottery:lottTypeList')")
   public Object getLottTypeList(HttpServletRequest request) {
     return serviceHandler.serviceHandler(request);
   }
@@ -428,7 +428,7 @@ public class LotteryManagerController {
 
   @PostMapping("/getBannerList")
   @ApiOperation("彩票banner配置--列表数据")
-  @PreAuthorize("hasAuthority('lottery:open:getOpenResult')")
+//  @PreAuthorize("hasAuthority('lottery:open:getOpenResult')")
   public Object getBannerList(HttpServletRequest request) {
     return serviceHandler.serviceHandler(request);
   }

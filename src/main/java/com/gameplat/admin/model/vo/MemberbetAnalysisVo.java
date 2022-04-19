@@ -150,19 +150,21 @@ public class MemberbetAnalysisVo implements Serializable {
   private BigDecimal realWaterAmount;
 
   /**
-   * 真人返水金额
+   * 电子返水金额
    */
   private BigDecimal eGameWaterAmount;
 
   /**
-   * 真人返水金额
+   * 电竞返水金额
    */
   private BigDecimal eSportWaterAmount;
 
-  /** 真人返水金额 */
+  /**
+   * 捕鱼返水金额
+   */
   private BigDecimal hunterWaterAmount;
 
-  /** 真人返水金额 */
+  /** 棋牌返水金额 */
   private BigDecimal chessWaterAmount;
 
 
@@ -175,6 +177,29 @@ public class MemberbetAnalysisVo implements Serializable {
 
   /** 真人盈利率 */
   private BigDecimal realProfitRate;
+
+  /**
+   * 电子盈利率
+   */
+  private BigDecimal eGameProfitRate;
+
+  /**
+   * 电竞盈利率
+   */
+  private BigDecimal eSportProfitRate;
+
+  /**
+   * 捕鱼盈利率
+   */
+  private BigDecimal hunterProfitRate;
+
+  /**
+   * 棋牌盈利率
+   */
+  private BigDecimal chessProfitRate;
+
+
+
 
   /** '彩票中奖率' */
   private BigDecimal lotteryWinRate;
@@ -249,6 +274,10 @@ public class MemberbetAnalysisVo implements Serializable {
     this.lotteryProfitRate = BigDecimal.ZERO;
     this.sportProfitRate = BigDecimal.ZERO;
     this.realProfitRate = BigDecimal.ZERO;
+    this.eGameProfitRate = BigDecimal.ZERO;
+    this.eSportProfitRate = BigDecimal.ZERO;
+    this.hunterProfitRate = BigDecimal.ZERO;
+    this.chessProfitRate = BigDecimal.ZERO;
     this.lotteryWinRate = BigDecimal.ZERO;
     this.sportWinRate = BigDecimal.ZERO;
     this.realWinRate = BigDecimal.ZERO;

@@ -162,6 +162,7 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
             .qq(memberInfo.getQq())
             .realName(memberInfo.getRealName())
             .wechat(memberInfo.getWechat())
+            .dialCode(memberInfo.getDialCode())
             .build();
   }
 

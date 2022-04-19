@@ -1,5 +1,6 @@
 package com.gameplat.admin.model.vo;
 
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Builder;
 import lombok.Data;
 
@@ -36,4 +37,7 @@ public class MemberContactVo implements Serializable {
    * 微信
    */
   private String wechat;
+
+  @ApiModelProperty(value = "手机区号")
+  private String dialCode;
 }

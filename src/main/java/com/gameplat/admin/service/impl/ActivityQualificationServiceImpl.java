@@ -367,4 +367,29 @@ public class ActivityQualificationServiceImpl
     retMap.put("message", "检测完毕,目前会员可领取的优惠金额:" + manageList.get(0).getMaxMoney());
     return retMap;
   }
+
+  @Override
+  public void activityRedEnvelopeQualification() {
+    long start = System.currentTimeMillis();
+    log.info("生成当天红包雨资格开始");
+    //清理45天前的资格
+
+
+    //判断红包雨活动ID是否有配置
+
+    //判断红包雨活动配置规则
+
+
+    //统计所有满足存款条件的用户及存款信息
+    //已入款状态为成功
+    //只查正式会员的充值记录
+    //是计算积分表示
+
+    //查询所有已经产生的资格
+    //如果已经产生资格,则不再生成
+
+    //批量插入资格
+
+    log.info("生成当天红包雨资格结束,消耗：{}ms", System.currentTimeMillis() - start);
+  }
 }

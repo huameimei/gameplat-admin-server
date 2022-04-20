@@ -13,6 +13,7 @@ import com.gameplat.admin.enums.ListSortTypeEnum;
 import com.gameplat.admin.feign.SportFeignClient;
 import com.gameplat.admin.mapper.TenantSettingMapper;
 import com.gameplat.admin.model.vo.*;
+import com.gameplat.admin.service.GameConfigService;
 import com.gameplat.admin.service.TenantSettingService;
 import com.gameplat.base.common.context.DyDataSourceContextHolder;
 import com.gameplat.base.common.context.StrategyContext;
@@ -22,6 +23,7 @@ import com.gameplat.security.SecurityUserHolder;
 import com.gameplat.security.context.UserCredential;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -45,6 +47,9 @@ public class TenantSettingServiceImpl extends ServiceImpl<TenantSettingMapper, T
 
     @Resource
     private SportFeignClient sportFeignClient;
+
+    @Resource
+    private GameConfigService gameConfigService;
 
     /**
      * 从当前访问线程中获取租户数据源标识设
@@ -352,14 +357,20 @@ public class TenantSettingServiceImpl extends ServiceImpl<TenantSettingMapper, T
      */
     public int saveSportBallHead(SportConfigValueVO sportConfigValueVo) {
         try {
+            JSONObject config = gameConfigService.getGameConfig("SB");
+            String proxy = "";
+            log.info("体育服配置结果为{}", config);
+            if(config!=null){
+                proxy= config.getString("proxy");
+            }
             Map<String, String> params = new HashMap<>(8);
             params.put("style", sportConfigValueVo.getStyle());
             params.put("ballHeadRule", sportConfigValueVo.getBallHeadRule());
             params.put("sportBallNavigation", sportConfigValueVo.getSportBallNavigation());
             params.put("sportLeagueNavigation", sportConfigValueVo.getSportLeagueNavigation());
-            params.put("tenant", getDBSuffix());
+            params.put("tenant", proxy);
             HashMap<String, String> headers = new HashMap<>();
-            headers.put("tenant", getDBSuffix());
+            headers.put("tenant", proxy);
             String result = sportFeignClient.updateAppConfig(headers, params);
             if (org.apache.commons.lang3.StringUtils.isBlank(result)) {
                 log.info("体育插入球头配置接口响应结果为空{}", sportConfigValueVo);

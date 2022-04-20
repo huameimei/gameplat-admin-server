@@ -31,6 +31,7 @@ import com.gameplat.model.entity.message.Message;
 import com.gameplat.redis.redisson.DistributedLocker;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -50,6 +51,7 @@ import java.util.stream.Collectors;
  */
 @Service
 @Slf4j
+@Lazy
 @Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)
 public class MemberGrowthRecordServiceImpl
         extends ServiceImpl<MemberGrowthRecordMapper, MemberGrowthRecord>

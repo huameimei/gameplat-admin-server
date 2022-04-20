@@ -17,6 +17,7 @@ import com.gameplat.admin.model.vo.MemberGrowthLevelVO;
 import com.gameplat.admin.service.*;
 import com.gameplat.model.entity.member.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -34,6 +35,7 @@ import java.util.Optional;
  * @description
  * @date 2021/11/20
  */
+@Lazy
 @Service
 @Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)
 public class MemberGrowthLevelServiceImpl

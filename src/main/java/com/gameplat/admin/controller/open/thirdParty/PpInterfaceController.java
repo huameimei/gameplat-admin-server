@@ -16,7 +16,7 @@ public class PpInterfaceController {
   @Autowired private PpInterfaceService ppInterfaceService;
 
   @GetMapping("/queryAll")
-  @PreAuthorize("hasAuthority('thirdParty:ppInterfaces:queryAll')")
+//  @PreAuthorize("hasAuthority('thirdParty:ppInterfaces:queryAll')")
   public List<PpInterfaceVO> getAll() {
     return ppInterfaceService.queryAll();
   }

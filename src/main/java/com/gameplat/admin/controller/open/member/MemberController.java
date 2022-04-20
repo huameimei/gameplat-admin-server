@@ -9,10 +9,7 @@ import cn.hutool.http.useragent.UserAgentUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.gameplat.admin.model.dto.*;
-import com.gameplat.admin.model.vo.MemberBalanceVO;
-import com.gameplat.admin.model.vo.MemberContactVo;
-import com.gameplat.admin.model.vo.MemberInfoVO;
-import com.gameplat.admin.model.vo.MemberVO;
+import com.gameplat.admin.model.vo.*;
 import com.gameplat.admin.service.GameAdminService;
 import com.gameplat.admin.service.MemberService;
 import com.gameplat.admin.service.MemberTransformService;
@@ -61,9 +58,22 @@ public class MemberController {
 
   @ApiOperation(value = "会员详情")
   @GetMapping("/info/{id}")
+  @PreAuthorize("hasAuthority('member:info:view')")
   public MemberInfoVO info(@PathVariable Long id) {
     return memberService.getMemberInfo(id);
   }
+
+  @ApiOperation(value = "会员联系方式")
+  @GetMapping("/contact/{id}")
+  @PreAuthorize("hasAuthority('member:contact:view')")
+  public MemberContactVo memberAccount(@PathVariable Long id) {
+    MemberContactVo memberDateils = memberService.getMemberDateils(id);
+    memberDateils.setRealName("");
+    return memberDateils;
+  }
+
+
+
 
   @ApiOperation(value = "会员详情")
   @GetMapping("/getAccount")

@@ -7,7 +7,8 @@ import com.gameplat.admin.model.dto.GameBetRecordQueryDTO;
 import com.gameplat.admin.model.dto.GameVaildBetRecordQueryDTO;
 import com.gameplat.base.common.util.DateUtils;
 import com.gameplat.base.common.util.StringUtils;
-import com.gameplat.common.game.util.GameDateUtils;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
@@ -34,12 +35,11 @@ public class GameBetRecordSearchBuilder {
     if (null != dto.getTimeType() && ObjectUtil.isNotNull(dto.getBeginTime())) {
       builder.must(
           QueryBuilders.rangeQuery(convertTimeType(dto.getTimeType()))
-              .from(DateUtil.date(Long.parseLong(dto.getBeginTime())).toJdkDate())
-              .to(
+              .gte(DateUtil.date(Long.parseLong(dto.getBeginTime())).getTime())
+              .lte(
                   dto.getEndTime() == null
-                      ? DateUtil.date(System.currentTimeMillis()).toJdkDate()
-                      : DateUtil.date(Long.parseLong(dto.getEndTime())).toJdkDate())
-              .format(DateUtils.DATE_TIME_PATTERN));
+                      ? DateUtil.date(System.currentTimeMillis()).getTime()
+                      : DateUtil.date(Long.parseLong(dto.getEndTime())).getTime()));
     }
     return builder;
   }
@@ -62,15 +62,16 @@ public class GameBetRecordSearchBuilder {
       builder.must(QueryBuilders.matchQuery("settle", dto.getState()));
     }
     if (null != dto.getTimeType() && StringUtils.isNotBlank(dto.getBeginTime())) {
+
       builder.must(
           QueryBuilders.rangeQuery(convertTimeType(dto.getTimeType()))
-              .from(DateUtil.date(GameDateUtils.get0ZoneDate(dto.getBeginTime())))
+              .from(date2TimeStamp(dto.getBeginTime()).getTime())
               .to(
-                  dto.getEndTime() == null
-                      ? DateUtil.date(GameDateUtils.get0ZoneDate(System.currentTimeMillis()))
-                      : DateUtil.date(GameDateUtils.get0ZoneDate(dto.getEndTime())))
-              .format(DateUtils.DATE_TIME_PATTERN));
+                  StringUtils.isNotEmpty(dto.getEndTime())
+                      ? date2TimeStamp(dto.getEndTime()).getTime()
+                      : System.currentTimeMillis()));
     }
+
     return builder;
   }
 
@@ -90,5 +91,19 @@ public class GameBetRecordSearchBuilder {
       keyword = "statTime.keyword";
     }
     return keyword;
+  }
+
+  /**
+   * 22 * 日期格式字符串转换成时间戳 23 * @param date 字符串日期 24 * @param format 如：yyyy-MM-dd HH:mm:ss 25 * @return
+   * 26
+   */
+  public static Date date2TimeStamp(String date_str) {
+    try {
+      SimpleDateFormat sdf = new SimpleDateFormat(DateUtils.DATE_TIME_PATTERN);
+      return sdf.parse(date_str);
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+    return new Date();
   }
 }

@@ -1,12 +1,11 @@
 package com.gameplat.admin.model.vo;
 
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
-
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import lombok.Data;
 
 /**
  * @Author kb @Date 2022/3/5 14:07 @Version 1.0
@@ -26,8 +25,11 @@ public class GameAccountDataReportVo implements Serializable {
   @ApiModelProperty(value = "过期时间")
   private String expiredTime;
 
-  @ApiModelProperty(value = " 可用额度")
-  private BigDecimal quota;
+  @ApiModelProperty(value = "彩票可用额度")
+  private BigDecimal lotteryQuota;
+
+  @ApiModelProperty(value = "游戏可用额度")
+  private BigDecimal gameQuota;
 
   @ApiModelProperty(value = " 全部会员")
   private int accountNum;

@@ -67,7 +67,7 @@ public class PpMerchantController {
   }
 
   @GetMapping("/queryAllMerchant")
-  @PreAuthorize("hasAuthority('thirdParty:ppMerchants:queryAllMerchant')")
+//  @PreAuthorize("hasAuthority('thirdParty:ppMerchants:queryAllMerchant')")
   public List<PpMerchant> getAllMerchant() {
     return ppMerchantService.queryAllMerchant(SwitchStatusEnum.ENABLED.getValue());
   }

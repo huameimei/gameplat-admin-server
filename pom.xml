@@ -237,6 +237,12 @@
             <artifactId>jxls-core</artifactId>
             <version>1.0.6</version>
         </dependency>
+
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-stream-test-support</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <profiles>
@@ -271,6 +277,12 @@
             <id>kg277</id>
             <properties>
                 <profiles.active>kg277</profiles.active>
+            </properties>
+        </profile>
+        <profile>
+            <id>oottt</id>
+            <properties>
+                <profiles.active>oottt</profiles.active>
             </properties>
         </profile>
     </profiles>

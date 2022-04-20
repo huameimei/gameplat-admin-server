@@ -115,7 +115,8 @@ public class ActivityDistributeServiceImpl
         .le(
             StringUtils.isNotBlank(dto.getApplyEndTime()),
             ActivityDistribute::getApplyTime,
-            dto.getApplyEndTime());
+            dto.getApplyEndTime())
+        .orderByDesc(ActivityDistribute::getApplyTime);
 
     IPage<ActivityDistributeVO> iPage =
         lambdaQuery.page(page).convert(activityDistributeConvert::toVo);
@@ -133,7 +134,8 @@ public class ActivityDistributeServiceImpl
     QueryWrapper<ActivityDistribute> queryWrapper = new QueryWrapper<>();
     queryWrapper
         .select("SUM(discounts_money) aggregate")
-        .eq("status", ActivityDistributeEnum.ActivityDistributeStatus.SETTLED.getValue());
+        .eq("status", ActivityDistributeEnum.ActivityDistributeStatus.SETTLED.getValue())
+        .eq("delete_flag", BooleanEnum.YES.value());
     Map<String, Object> map = this.getMap(queryWrapper);
     if (MapUtils.isNotEmpty(map) && map.get("aggregate") != null) {
       BigDecimal aggregate = new BigDecimal(map.get("aggregate").toString());

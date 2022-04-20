@@ -14,6 +14,7 @@ import com.gameplat.admin.service.TenantSettingService;
 import com.gameplat.base.common.enums.EnableEnum;
 import com.gameplat.base.common.web.Result;
 import com.gameplat.common.constant.CacheKey;
+import com.gameplat.common.util.DateUtil;
 import com.gameplat.model.entity.setting.TenantSetting;
 import com.gameplat.security.SecurityUserHolder;
 import com.gameplat.security.context.UserCredential;
@@ -26,6 +27,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -100,9 +102,13 @@ public class TenantSettingController {
     @ApiOperation("启动图配置新增/修改")
     public Result<Object> insertStartImagePage(@RequestBody TenantSetting tenantSetting) {
         tenantSetting.setSettingType(TenantSettingEnum.START_UP_IMAGE.getCode());
+        Date date = new Date();
+        tenantSetting.setCreateTime(date);
+        tenantSetting.setUpdateTime(date);
         UserCredential user = SecurityUserHolder.getCredential();
         if (user != null) {
             tenantSetting.setCreateBy(user.getUsername());
+            tenantSetting.setUpdateBy(user.getUsername());
         }
         tenantSettingService.insertStartImagePage(tenantSetting);
         adminCache.deleteByPrefix(CacheKey.getStartImgListKey());

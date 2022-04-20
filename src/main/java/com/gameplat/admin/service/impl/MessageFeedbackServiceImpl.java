@@ -39,8 +39,7 @@ public class MessageFeedbackServiceImpl extends ServiceImpl<MessageFeedbackMappe
 
   @Override
   public void insertMessage(MessageFeedbackAddDTO dto) {
-    //回复信件
-    dto.setType(2);
+    //回复反馈、给会员写反馈
     MessageFeedback messageFeedback = messageFeedbackConvert.toEntity(dto);
     this.save(messageFeedback);
 
@@ -92,6 +91,7 @@ public class MessageFeedbackServiceImpl extends ServiceImpl<MessageFeedbackMappe
             ObjectUtil.isNotEmpty(dto.getEndTime()),
             MessageFeedback::getCreateTime,
             dto.getEndTime())
+        .ne(MessageFeedback::getType, 5)
         .orderByDesc(MessageFeedback::getCreateTime)
         .page(page)
         .convert(messageFeedbackConvert::toVo);
@@ -109,7 +109,7 @@ public class MessageFeedbackServiceImpl extends ServiceImpl<MessageFeedbackMappe
   @Override
   public IPage<MessageFeedbackVO> getReplyContent(PageDTO<MessageFeedback> page) {
     return this.lambdaQuery()
-        .eq(MessageFeedback::getType, 2)
+        .in(MessageFeedback::getType, 2, 5)
         .eq(MessageFeedback::getStatus, 1)
         .orderByDesc(MessageFeedback::getCreateTime)
         .page(page)

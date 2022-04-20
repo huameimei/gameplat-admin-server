@@ -1,6 +1,7 @@
 package com.gameplat.admin.service.impl;
 
 import cn.hutool.core.convert.Convert;
+import cn.hutool.core.date.DateTime;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
@@ -139,13 +140,12 @@ public class GameBetDailyReportServiceImpl
     builder.must(QueryBuilders.termQuery("settle", SettleStatusEnum.YES.getValue()));
     builder.must(QueryBuilders.termQuery("platformCode.keyword", gamePlatform.getCode()));
     Date statDate = DateUtils.parseDate(statTime, DateUtils.DATE_PATTERN);
-    String beginTime = cn.hutool.core.date.DateUtil.beginOfDay(statDate).toString();
-    String endTime = cn.hutool.core.date.DateUtil.endOfDay(statDate).toString();
+    DateTime beginTime = cn.hutool.core.date.DateUtil.beginOfDay(statDate);
+    DateTime endTime = cn.hutool.core.date.DateUtil.endOfDay(statDate);
     builder.filter(
         QueryBuilders.rangeQuery("settleTime.keyword")
-            .from(beginTime)
-            .to(endTime)
-            .format(DateUtils.DATE_TIME_PATTERN));
+            .gte(beginTime.getTime())
+            .lte(endTime.getTime()));
 
     // 统计条数
     CountRequest countRequest =

@@ -2,6 +2,7 @@ package com.gameplat.admin.controller.internal;
 
 import com.gameplat.admin.model.dto.PushCPBetMessageReq;
 import com.gameplat.admin.model.vo.PushLottWinVo;
+import com.gameplat.admin.service.ActivityQualificationService;
 import com.gameplat.admin.service.ChatPushPlanService;
 import com.gameplat.admin.service.OtthService;
 import io.swagger.annotations.Api;
@@ -26,6 +27,9 @@ public class InternalOtthController {
 
   @Autowired private ChatPushPlanService chatPushPlanService;
 
+  @Autowired
+  private ActivityQualificationService activityQualificationService;
+
   /** 分享彩票下注 */
   @RequestMapping(value = "/cpbet", method = RequestMethod.POST)
   public void cpbet(@RequestBody List<PushCPBetMessageReq> req, HttpServletRequest request) {
@@ -46,5 +50,13 @@ public class InternalOtthController {
     chatPushPlanService.updatePushPlan(gameId, gameStatus);
     // 更新房间管理
     otthService.updateGameStuats(gameId, gameStatus);
+  }
+
+  /**
+   * 生成红包雨资格 work调用
+   */
+  @PostMapping("activityRedEnvelopeQualification")
+  public void activityRedEnvelopeQualification() {
+    activityQualificationService.activityRedEnvelopeQualification();
   }
 }

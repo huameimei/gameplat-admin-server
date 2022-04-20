@@ -17,7 +17,7 @@ public class TpInterfaceController {
   @Autowired private TpInterfaceService tpInterfaceService;
 
   @GetMapping("/queryAll")
-  @PreAuthorize("hasAuthority('thirdParty:tpInterfaces:queryAll')")
+//  @PreAuthorize("hasAuthority('thirdParty:tpInterfaces:queryAll')")
   public List<TpInterfaceVO> getAll() {
     return tpInterfaceService.queryAll();
   }

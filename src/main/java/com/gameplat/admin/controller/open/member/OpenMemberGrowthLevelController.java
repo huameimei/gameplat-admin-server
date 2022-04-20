@@ -41,7 +41,7 @@ public class OpenMemberGrowthLevelController {
 
   @ApiOperation(value = "VIP配置和VIP等级列表/查询logo配置列表")
   @GetMapping("/config")
-  @PreAuthorize("hasAuthority('member:growthLevel:config')")
+//  @PreAuthorize("hasAuthority('member:growthLevel:config')")
   public MemberConfigLevelVO getLevelConfig() {
     return levelService.getLevelConfig();
   }
@@ -69,7 +69,7 @@ public class OpenMemberGrowthLevelController {
 
   @ApiOperation(value = "VIP等级列表")
   @GetMapping("/vipList")
-  @PreAuthorize("hasAuthority('member:growthLevel:config')")
+//  @PreAuthorize("hasAuthority('member:growthLevel:config')")
   public List<MemberGrowthLevelVO> vipList() {
     return levelService.vipList();
   }

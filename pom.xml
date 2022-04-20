@@ -285,6 +285,12 @@
                 <profiles.active>oottt</profiles.active>
             </properties>
         </profile>
+        <profile>
+            <id>w888c</id>
+            <properties>
+                <profiles.active>w888c</profiles.active>
+            </properties>
+        </profile>
     </profiles>
 
     <build>

@@ -191,37 +191,23 @@ public class SpreadLinkInfoServiceImpl extends ServiceImpl<SpreadLinkInfoMapper,
    */
   @Override
   public void add(SpreadLinkInfoAddDTO dto) {
-
-    //1 专属域名 0 公共域名    专属域名下代理账号不能为空
-    if (dto.getExclusiveFlag() == 1 ) {
-      if (StrUtil.isBlank(dto.getAgentAccount()) ) {
-        throw new ServiceException("代理账号不能为空！");
-      }
-      if (StrUtil.isBlank(dto.getSourceDomain())) {
-        throw new ServiceException("来源域名不能为空！");
-      }
+    if (StrUtil.isBlank(dto.getAgentAccount()) ) {
+      throw new ServiceException("代理账号不能为空！");
     }
 
     if (StrUtil.isBlank(dto.getExternalUrl())){
       throw new ServiceException("推广地址不能为空！");
     }
 
-    //默认域名不能重复
-    if (dto.getExclusiveFlag() == 2){
-      if (getLinkCount(dto.getExternalUrl()) > 0){
-        throw new ServiceException("默认推广域名重复");
-      }
-    }
     // 实体转换
     SpreadLinkInfo linkInfo = spreadLinkInfoConvert.toEntity(dto);
-    if (dto.getExclusiveFlag() != 2) {
-      // 校验账号的用户类型
-      Member member =
-              memberService
-                      .getByAccount(linkInfo.getAgentAccount())
-                      .orElseThrow(() -> new ServiceException("代理账号不存在!"));
-      Assert.isTrue(UserTypes.AGENT.value().equalsIgnoreCase(member.getUserType()), "账号类型不支持！");
-    }
+    // 校验账号的用户类型
+    Member member =
+            memberService
+                    .getByAccount(linkInfo.getAgentAccount())
+                    .orElseThrow(() -> new ServiceException("代理账号不存在!"));
+    Assert.isTrue(UserTypes.AGENT.value().equalsIgnoreCase(member.getUserType()), "账号类型不支持！");
+
     // 推广码最少字符限制
     SysDictData agentMinCodeNumData =
             sysDictDataService.getDictData(
@@ -241,7 +227,7 @@ public class SpreadLinkInfoServiceImpl extends ServiceImpl<SpreadLinkInfoMapper,
       agentMaxSpreadNum = Convert.toInt(agentMaxSpreadNumData.getDictValue());
     }
     // 如果推广码为空  随机生成 4-20位
-    if (StrUtil.isBlank(linkInfo.getCode()) && dto.getExclusiveFlag() != 2) {
+    if (StrUtil.isBlank(linkInfo.getCode())) {
       linkInfo.setCode(
               RandomStringUtils.random(agentMinCodeNum == 0 ? 6 : agentMinCodeNum, true, true)
                       .toLowerCase());
@@ -268,6 +254,7 @@ public class SpreadLinkInfoServiceImpl extends ServiceImpl<SpreadLinkInfoMapper,
         throw new ServiceException("推广链接地址已被使用！");
       }
     }
+
     linkInfo.setExternalUrl(linkInfo.getExternalUrl() + STR_URL + linkInfo.getCode());
     boolean saveResult = this.save(linkInfo);
     Assert.isTrue(saveResult, "创建失败！");
@@ -278,6 +265,7 @@ public class SpreadLinkInfoServiceImpl extends ServiceImpl<SpreadLinkInfoMapper,
       this.saveOrEditDivideConfig(
               linkInfo.getId(), linkInfo.getAgentAccount(), dto.getOwnerConfigMap());
     }
+
   }
 
   /**

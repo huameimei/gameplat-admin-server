@@ -4,9 +4,11 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.gameplat.admin.model.dto.AgentDomainDTO;
+import com.gameplat.admin.model.dto.SpreadLinkInfoDTO;
 import com.gameplat.admin.model.vo.AgentDomainVO;
 import com.gameplat.model.entity.spread.AgentDomain;
 
+import javax.servlet.http.HttpServletResponse;
 
 
 public interface AgentDomainService extends IService<AgentDomain> {
@@ -30,4 +32,10 @@ public interface AgentDomainService extends IService<AgentDomain> {
     * 修改代理域名
     */
    void updateAgentDomain(AgentDomainDTO domainDTO);
+
+
+   /**
+    * 导出
+    */
+   void exportList(AgentDomainDTO domainDTO, HttpServletResponse response);
 }

@@ -36,7 +36,7 @@ public class AgentDomainController {
    *  新增代理域名
    */
   @PostMapping("/createAgentDomain")
-  @PreAuthorize("hasAuthority('diffusion:spreadConfig:add')")
+  @PreAuthorize("hasAuthority('diffusion:agnetDomain:add')")
   public void createAgentDomain(@RequestBody AgentDomainDTO domainDTO) {
     domainService.createAgentDomain(domainDTO);
   }
@@ -46,7 +46,7 @@ public class AgentDomainController {
    * 删除代理域名
    */
   @PostMapping("/deleteAgentDomain")
-  @PreAuthorize("hasAuthority('diffusion:spreadConfig:add')")
+  @PreAuthorize("hasAuthority('diffusion:agnetDomain:delete')")
   public void deleteAgentDomain(@RequestParam Integer id) {
     domainService.deleteAgentDomain(id);
   }
@@ -56,18 +56,18 @@ public class AgentDomainController {
    * 修改代理域名
    */
   @PostMapping("/updateAgentDomain")
-  @PreAuthorize("hasAuthority('diffusion:spreadConfig:add')")
+  @PreAuthorize("hasAuthority('diffusion:agnetDomain:edit')")
   public void updateAgentDomain(@RequestBody AgentDomainDTO domainDTO) {
     domainService.updateAgentDomain(domainDTO);
   }
 
-//  /**
-//   * 导出代理域名
-//   */
-//  @GetMapping("/exportList")
-//  @PreAuthorize("hasAuthority('diffusion:spreadConfig:export')")
-//  public void exportList(SpreadLinkInfoDTO configDTO, HttpServletResponse response) {
-//    spreadLinkInfoService.exportList(configDTO, response);
-//  }
+  /**
+   * 导出代理域名
+   */
+  @GetMapping("/exportList")
+  @PreAuthorize("hasAuthority('diffusion:agnetDomain:export')")
+  public void exportList(AgentDomainDTO domainDTO, HttpServletResponse response) {
+    domainService.exportList(domainDTO, response);
+  }
 
 }

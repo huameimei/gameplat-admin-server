@@ -1,5 +1,6 @@
 package com.gameplat.admin.service.impl;
 
+import cn.hutool.core.collection.CollUtil;
 import com.alibaba.csp.sentinel.annotation.SentinelResource;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.convert.MenuConvert;
@@ -16,8 +17,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -41,11 +42,11 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
   public List<SysMenu> selectMenuList(MenuDTO menuDTO) {
     SysMenu menu = menuConvert.toEntity(menuDTO);
     List<SysMenu> list = menuMapper.selectMenuList(menu);
-    if (StringUtils.isNotNull(list)) {
-      return getMenuTreeList(
-          list, list.stream().map(SysMenu::getParentId).findFirst().orElse(null));
+    if (CollUtil.isEmpty(list)) {
+      return null;
     }
-    return null;
+
+    return getMenuTreeList(list, list.stream().map(SysMenu::getParentId).findFirst().orElse(null));
   }
 
   @Override
@@ -53,11 +54,11 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
   public List<SysMenu> selectAllMenuList(MenuDTO menuDTO) {
     SysMenu menu = menuConvert.toEntity(menuDTO);
     List<SysMenu> list = menuMapper.selectMenuList(menu);
-    if (StringUtils.isNotNull(list)) {
-      return getMenuTreeList(
-          list, list.stream().map(SysMenu::getParentId).findFirst().orElse(null));
+    if (CollUtil.isEmpty(list)) {
+      return null;
     }
-    return null;
+
+    return getMenuTreeList(list, list.stream().map(SysMenu::getParentId).findFirst().orElse(null));
   }
 
   @Override
@@ -104,15 +105,9 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu>
   }
 
   private List<SysMenu> getMenuTreeList(List<SysMenu> list, Long parentId) {
-    List<SysMenu> routers = new ArrayList<>();
-    list.stream()
-        .filter(d -> String.valueOf(parentId).equals(String.valueOf(d.getParentId())))
-        .collect(Collectors.toList())
-        .forEach(
-            item -> {
-              item.setChildren(getMenuTreeList(list, item.getMenuId()));
-              routers.add(item);
-            });
-    return routers;
+    return list.stream()
+        .filter(e -> Objects.equals(parentId, e.getParentId()))
+        .peek(e -> e.setChildren(this.getMenuTreeList(list, e.getMenuId())))
+        .collect(Collectors.toList());
   }
 }

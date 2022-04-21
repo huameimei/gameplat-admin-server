@@ -37,13 +37,17 @@ import com.gameplat.common.enums.MemberEnums;
 import com.gameplat.common.enums.TranTypes;
 import com.gameplat.common.enums.UserTypes;
 import com.gameplat.common.lang.Assert;
+import com.gameplat.common.model.bean.AgentConfig;
 import com.gameplat.model.entity.blacklist.BizBlacklist;
 import com.gameplat.model.entity.member.Member;
 import com.gameplat.model.entity.member.MemberBill;
 import com.gameplat.model.entity.member.MemberInfo;
 import com.gameplat.model.entity.message.Message;
 import com.gameplat.model.entity.message.MessageDistribute;
-import com.gameplat.model.entity.proxy.*;
+import com.gameplat.model.entity.proxy.DivideDetail;
+import com.gameplat.model.entity.proxy.DivideFissionConfig;
+import com.gameplat.model.entity.proxy.DividePeriods;
+import com.gameplat.model.entity.proxy.DivideSummary;
 import com.gameplat.redis.redisson.DistributedLocker;
 import com.gameplat.security.SecurityUserHolder;
 import com.gameplat.security.context.UserCredential;
@@ -74,7 +78,7 @@ public class DividePeriodsServiceImpl extends ServiceImpl<DividePeriodsMapper, D
 
   @Autowired private DividePeriodsConvert periodsConvert;
 
-  @Autowired private RecommendConfigService recommendConfigService;
+  @Autowired private AgentConfigService agentConfigService;
 
   @Autowired private DivideDetailMapper detailMapper;
 
@@ -140,8 +144,8 @@ public class DividePeriodsServiceImpl extends ServiceImpl<DividePeriodsMapper, D
     DividePeriods saveObj = periodsConvert.toEntity(dto);
     saveObj.setStartDate(DateUtil.parse(saveObj.getStartDate()).toDateStr());
     saveObj.setEndDate(DateUtil.parse(saveObj.getEndDate()).toDateStr());
-    RecommendConfig recommendConfig = recommendConfigService.getRecommendConfig();
-    Integer divideModel = recommendConfig.getDivideModel();
+    AgentConfig agentConfig = agentConfigService.getAgentConfig();
+    Integer divideModel = agentConfig.getDivideModel();
     divideModel = ObjectUtil.defaultIfNull(divideModel, DivideStatusEnum.DIVIDE_MODEL_LAYER);
     saveObj.setDivideType(divideModel);
     Assert.isTrue(this.save(saveObj), "添加失败！");
@@ -332,18 +336,18 @@ public class DividePeriodsServiceImpl extends ServiceImpl<DividePeriodsMapper, D
       return;
     }
     // 删除分红详情
-    QueryWrapper<DivideDetail> deleteDetailWrapper = new QueryWrapper();
+    QueryWrapper<DivideDetail> deleteDetailWrapper = new QueryWrapper<>();
     deleteDetailWrapper.eq("periods_id", periodsId);
     detailMapper.delete(deleteDetailWrapper);
     // 删除分红汇总
-    QueryWrapper<DivideSummary> deleteSummaryWrapper = new QueryWrapper();
+    QueryWrapper<DivideSummary> deleteSummaryWrapper = new QueryWrapper<>();
     deleteSummaryWrapper.eq("periods_id", periodsId);
     summaryMapper.delete(deleteSummaryWrapper);
 
     // 分红模式 1 固定  2 裂变  3 层层代 4 平级
     Integer divideModel = periods.getDivideType();
-    RecommendConfig recommendConfig = recommendConfigService.getRecommendConfig();
-    Integer isIncludeAgent = recommendConfig.getIsIncludeAgent();
+    AgentConfig agentConfig = agentConfigService.getAgentConfig();
+    Integer isIncludeAgent = agentConfig.getIsIncludeAgent();
 
     // 获取用户游戏分组统计数据
     List<DivideGameReportVO> periodsGameReport =
@@ -355,7 +359,7 @@ public class DividePeriodsServiceImpl extends ServiceImpl<DividePeriodsMapper, D
             .filter(item -> StrUtil.isNotBlank(item.getUserPaths()))
             .collect(Collectors.toList());
     // 获取业务 分红黑名单 集合
-    QueryWrapper<BizBlacklist> queryBizWrapper = new QueryWrapper();
+    QueryWrapper<BizBlacklist> queryBizWrapper = new QueryWrapper<>();
     queryBizWrapper.like("types", BlacklistConstant.BizBlacklistType.DL_RATIO.getValue());
     List<BizBlacklist> bizBlacklists = blacklistMapper.selectList(queryBizWrapper);
     // 会员账号业务黑名单
@@ -437,7 +441,7 @@ public class DividePeriodsServiceImpl extends ServiceImpl<DividePeriodsMapper, D
         groupByPname.remove(SystemConstant.DEFAULT_WAP_ROOT);
         groupByPname.remove(SystemConstant.DEFAULT_TEST_ROOT);
         if (BeanUtil.isNotEmpty(groupByPname)) {
-          saveSummaryForSettle(groupByPname, periodsId, recommendConfig.getIsGrand());
+          saveSummaryForSettle(groupByPname, periodsId, agentConfig.getIsGrand());
         }
       }
     }

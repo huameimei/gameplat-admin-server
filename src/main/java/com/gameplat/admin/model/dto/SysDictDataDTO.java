@@ -6,7 +6,10 @@ import lombok.Data;
 public class SysDictDataDTO {
 
   private String dictName;
+
   private String dictLabel;
+
   private String dictType;
+
   private Integer status;
 }

@@ -1,5 +1,7 @@
 package com.gameplat.admin.service.impl;
 
+import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.util.ReflectUtil;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.gameplat.admin.service.ConfigService;
 import com.gameplat.admin.service.SysDictDataService;
@@ -8,9 +10,12 @@ import com.gameplat.base.common.json.JsonUtils;
 import com.gameplat.common.enums.DefaultEnums;
 import com.gameplat.common.enums.DictDataEnum;
 import com.gameplat.common.enums.DictTypeEnum;
+import com.gameplat.model.entity.sys.SysDictData;
+import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -55,6 +60,19 @@ public class ConfigServiceImpl implements ConfigService {
     return this.getDictData(type, label)
         .map(e -> JsonUtils.parse(e, clazz))
         .orElseThrow(() -> new ServiceException("配置信息不存在!"));
+  }
+
+  @Override
+  @SneakyThrows
+  public <T> T get(DictTypeEnum type, Class<T> clazz) {
+    List<SysDictData> list = dictDataService.getDictDataByType(type.getValue());
+    if (CollectionUtil.isEmpty(list)) {
+      return null;
+    }
+
+    T t = clazz.newInstance();
+    list.forEach(e -> ReflectUtil.setFieldValue(t, e.getDictLabel(), e.getDictValue()));
+    return t;
   }
 
   @Override

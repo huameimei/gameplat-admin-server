@@ -30,13 +30,13 @@ import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.snowflake.IdGeneratorSnowflake;
 import com.gameplat.common.enums.MemberEnums;
 import com.gameplat.common.enums.TranTypes;
+import com.gameplat.common.model.bean.AgentConfig;
 import com.gameplat.model.entity.blacklist.BizBlacklist;
 import com.gameplat.model.entity.member.Member;
 import com.gameplat.model.entity.member.MemberBill;
 import com.gameplat.model.entity.member.MemberInfo;
 import com.gameplat.model.entity.message.Message;
 import com.gameplat.model.entity.message.MessageDistribute;
-import com.gameplat.model.entity.proxy.RecommendConfig;
 import com.gameplat.model.entity.proxy.SalaryConfig;
 import com.gameplat.model.entity.proxy.SalaryGrant;
 import com.gameplat.model.entity.proxy.SalaryPeriods;
@@ -78,7 +78,7 @@ public class SalaryPeriodsServiceImpl extends ServiceImpl<SalaryPeriodsMapper, S
 
   @Autowired private MemberService memberService;
 
-  @Autowired private RecommendConfigService recommendConfigService;
+  @Autowired private AgentConfigService agentConfigService;
 
   @Autowired private SalaryConfigMapper salaryConfigMapper;
 
@@ -470,13 +470,13 @@ public class SalaryPeriodsServiceImpl extends ServiceImpl<SalaryPeriodsMapper, S
       SalaryPeriods periods,
       Map<Integer, Map<String, SalaryConfig>> configMap,
       String[] codes) {
-    RecommendConfig recommendConfig = recommendConfigService.getRecommendConfig();
+    AgentConfig agentConfig = agentConfigService.getAgentConfig();
     // 是否包含代理数据
-    Integer isIncludeAgent = recommendConfig.getIsIncludeAgent();
+    Integer isIncludeAgent = agentConfig.getIsIncludeAgent();
     // 有效会员 最低打码量定义
-    BigDecimal validAmountLower = recommendConfig.getValidAmountLimit();
+    BigDecimal validAmountLower = agentConfig.getValidAmountLimit();
     // 有效会员 最低充值定义
-    BigDecimal rechargeAmountLower = recommendConfig.getRechargeAmountLimit();
+    BigDecimal rechargeAmountLower = agentConfig.getRechargeAmountLimit();
     for (Member member : openSalaryAgents) {
       Integer agentLevel = member.getAgentLevel();
       String account = member.getAccount();

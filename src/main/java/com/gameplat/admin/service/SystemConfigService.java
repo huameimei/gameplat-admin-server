@@ -2,12 +2,11 @@ package com.gameplat.admin.service;
 
 import com.gameplat.admin.model.dto.AgentContacaDTO;
 import com.gameplat.admin.model.dto.EmailTestDTO;
-import com.gameplat.admin.model.dto.OperSystemConfigDTO;
 import com.gameplat.admin.model.vo.AgentContacaVO;
-import com.gameplat.common.model.bean.EmailConfig;
 import com.gameplat.model.entity.sys.SysDictData;
 
 import java.util.List;
+import java.util.Map;
 
 public interface SystemConfigService {
 
@@ -21,11 +20,7 @@ public interface SystemConfigService {
 
   void updateConfig(String dictType, List<SysDictData> dictDataList);
 
-  void configDataEdit(OperSystemConfigDTO dto);
-
-  EmailConfig findEmailConfig();
-
-  void updateEmail(EmailConfig emailConfig);
+  void updateConfig(String type, Map<String, Object> params);
 
   void testSendEmail(EmailTestDTO dto);
 }

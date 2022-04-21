@@ -20,9 +20,9 @@ import com.gameplat.admin.model.dto.SpreadLinkInfoDTO;
 import com.gameplat.admin.model.vo.DivideLayerConfigVo;
 import com.gameplat.admin.model.vo.GameDivideVo;
 import com.gameplat.admin.model.vo.SpreadLinkInfoVo;
+import com.gameplat.admin.service.AgentConfigService;
 import com.gameplat.admin.service.DivideLayerConfigService;
 import com.gameplat.admin.service.MemberService;
-import com.gameplat.admin.service.RecommendConfigService;
 import com.gameplat.base.common.enums.EnableEnum;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.common.constant.NumberConstant;
@@ -52,7 +52,7 @@ public class DivideLayerConfigServiceImpl
 
   @Autowired private MemberService memberService;
 
-  @Autowired private RecommendConfigService recommendConfigService;
+  @Autowired private AgentConfigService agentConfigService;
 
   @Autowired private SpreadLinkInfoMapper spreadLinkInfoMapper;
 
@@ -432,7 +432,7 @@ public class DivideLayerConfigServiceImpl
       }
       saveObj.setDivideConfig(JSONUtil.toJsonStr(saveMap));
     } else { // 也走初始化流程
-      saveObj.setDivideConfig(recommendConfigService.initDivideConfig());
+      saveObj.setDivideConfig(agentConfigService.initDivideConfig());
     }
     Assert.isTrue(this.save(saveObj), "");
   }

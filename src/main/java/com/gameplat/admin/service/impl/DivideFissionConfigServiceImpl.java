@@ -15,9 +15,9 @@ import com.gameplat.admin.model.dto.DivideConfigDTO;
 import com.gameplat.admin.model.vo.FissionConfigLevelVo;
 import com.gameplat.admin.model.vo.FissionDivideConfigVo;
 import com.gameplat.admin.model.vo.GameDivideVo;
+import com.gameplat.admin.service.AgentConfigService;
 import com.gameplat.admin.service.DivideFissionConfigService;
 import com.gameplat.admin.service.MemberService;
-import com.gameplat.admin.service.RecommendConfigService;
 import com.gameplat.base.common.enums.EnableEnum;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.common.lang.Assert;
@@ -45,7 +45,7 @@ public class DivideFissionConfigServiceImpl
 
   @Autowired private MemberService memberService;
 
-  @Autowired private RecommendConfigService recommendConfigService;
+  @Autowired private AgentConfigService agentConfigService;
 
   @Autowired private SysDictDataMapper sysDictDataMapper;
 
@@ -71,7 +71,7 @@ public class DivideFissionConfigServiceImpl
         DivideFissionConfig.builder()
             .userId(member.getId())
             .userName(member.getAccount())
-            .divideConfig(recommendConfigService.initFissionDivideConfig())
+            .divideConfig(agentConfigService.initFissionDivideConfig())
             .recycleConfig(new JSONArray().toString())
             .recycleOutConfig(BigDecimal.ZERO)
             .build();

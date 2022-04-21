@@ -9,7 +9,6 @@ import com.alicp.jetcache.anno.CacheInvalidate;
 import com.alicp.jetcache.anno.CacheInvalidateContainer;
 import com.alicp.jetcache.anno.Cached;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
-import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -115,7 +114,6 @@ public class SysDictDataServiceImpl extends ServiceImpl<SysDictDataMapper, SysDi
         .eq(SysDictData::getStatus, EnableEnum.ENABLED.code())
         .eq(SysDictData::getDictType, dictType)
         .eq(SysDictData::getDictLabel, dictLabel)
-        .eq(SysDictData::getStatus, 1)
         .oneOpt()
         .map(SysDictData::getDictValue)
         .orElse(null);
@@ -137,7 +135,7 @@ public class SysDictDataServiceImpl extends ServiceImpl<SysDictDataMapper, SysDi
             ObjectUtils.isNotEmpty(dictData.getDictType()),
             SysDictData::getDictType,
             dictData.getDictType())
-        .eq(SysDictData::getStatus, 1)
+        .eq(SysDictData::getStatus, EnableEnum.ENABLED.code())
         .list();
   }
 
@@ -292,9 +290,12 @@ public class SysDictDataServiceImpl extends ServiceImpl<SysDictDataMapper, SysDi
   }
 
   @Override
-  @CacheInvalidate(
-      name = CachedKeys.DICT_DATA_CACHE,
-      key = "#entity.dictType + ':' + #entity.dictLabel")
+  @CacheInvalidateContainer({
+    @CacheInvalidate(name = CachedKeys.DICT_DATA_CACHE, key = "#entity.dictType"),
+    @CacheInvalidate(
+        name = CachedKeys.DICT_DATA_CACHE,
+        key = "#entity.dictType + ':' + #entity.dictLabel")
+  })
   public boolean updateById(SysDictData entity) {
     return super.updateById(entity);
   }
@@ -318,20 +319,16 @@ public class SysDictDataServiceImpl extends ServiceImpl<SysDictDataMapper, SysDi
   }
 
   @Override
-  @CacheInvalidateContainer(
-      value = {
-        @CacheInvalidate(name = CachedKeys.DICT_DATA_CACHE, key = "#data.dictType"),
-        @CacheInvalidate(
-            name = CachedKeys.DICT_DATA_CACHE,
-            key = "#data.dictType + ':' + #data.dictLabel")
-      })
+  @CacheInvalidate(name = CachedKeys.DICT_DATA_CACHE, key = "#data.dictType")
+  @CacheInvalidate(
+      name = CachedKeys.DICT_DATA_CACHE,
+      key = "#data.dictType + ':' + #data.dictLabel")
   public void updateByTypeAndLabel(SysDictData data) {
-    LambdaUpdateWrapper<SysDictData> updateWrapper = new LambdaUpdateWrapper<>();
-    updateWrapper
+    this.lambdaUpdate()
         .eq(SysDictData::getDictLabel, data.getDictLabel())
         .eq(SysDictData::getDictType, data.getDictType())
-        .set(SysDictData::getDictValue, data.getDictValue());
-    update(updateWrapper);
+        .set(SysDictData::getDictValue, data.getDictValue())
+        .update();
   }
 
   @Override

@@ -27,6 +27,7 @@ public class VueRouter<T> implements Serializable {
 
   /** 父标题 */
   private String parentName;
+
   /** 页面路径/资源链接url */
   private String path;
 

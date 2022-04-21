@@ -12,9 +12,9 @@ import com.gameplat.admin.mapper.GameKindMapper;
 import com.gameplat.admin.mapper.SysDictDataMapper;
 import com.gameplat.admin.model.dto.DivideConfigDTO;
 import com.gameplat.admin.model.vo.GameDivideVo;
+import com.gameplat.admin.service.AgentConfigService;
 import com.gameplat.admin.service.DivideFixConfigService;
 import com.gameplat.admin.service.MemberService;
-import com.gameplat.admin.service.RecommendConfigService;
 import com.gameplat.base.common.enums.EnableEnum;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.common.lang.Assert;
@@ -40,7 +40,7 @@ public class DivideFixConfigServiceImpl extends ServiceImpl<DivideFixConfigMappe
 
   @Autowired private MemberService memberService;
 
-  @Autowired private RecommendConfigService recommendConfigService;
+  @Autowired private AgentConfigService agentConfigService;
 
   @Autowired private SysDictDataMapper sysDictDataMapper;
 
@@ -66,7 +66,7 @@ public class DivideFixConfigServiceImpl extends ServiceImpl<DivideFixConfigMappe
         DivideFixConfig.builder()
             .userId(member.getId())
             .userName(member.getAccount())
-            .divideConfig(recommendConfigService.initDivideConfig())
+            .divideConfig(agentConfigService.initDivideConfig())
             .build();
     Assert.isTrue(this.save(saveObj), "添加失败！");
   }

@@ -3,6 +3,7 @@ package com.gameplat.admin.controller.open.operator;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.gameplat.admin.model.dto.AgentDomainDTO;
+import com.gameplat.admin.model.dto.SpreadLinkInfoDTO;
 import com.gameplat.admin.model.vo.AgentDomainVO;
 import com.gameplat.admin.service.AgentDomainService;
 import com.gameplat.model.entity.spread.AgentDomain;
@@ -11,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletResponse;
 
 
 @Slf4j
@@ -58,5 +60,14 @@ public class AgentDomainController {
   public void updateAgentDomain(@RequestBody AgentDomainDTO domainDTO) {
     domainService.updateAgentDomain(domainDTO);
   }
+
+//  /**
+//   * 导出代理域名
+//   */
+//  @GetMapping("/exportList")
+//  @PreAuthorize("hasAuthority('diffusion:spreadConfig:export')")
+//  public void exportList(SpreadLinkInfoDTO configDTO, HttpServletResponse response) {
+//    spreadLinkInfoService.exportList(configDTO, response);
+//  }
 
 }

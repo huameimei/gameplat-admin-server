@@ -1,5 +1,6 @@
 package com.gameplat.admin.service.impl;
 
+import com.alibaba.csp.sentinel.annotation.SentinelResource;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -41,6 +42,7 @@ public class AgentDomainServiceImpl extends ServiceImpl<AgentDomainMapper, Agent
    * 代理域名列表
    */
   @Override
+  @SentinelResource(value = "agentDomainList")
   public IPage<AgentDomainVO>  agentDomainList(PageDTO<AgentDomain> page,AgentDomainDTO domainDTO) {
     return  this.lambdaQuery()
             .eq(ObjectUtils.isNotEmpty(domainDTO.getType()),AgentDomain::getType,domainDTO.getType())
@@ -55,6 +57,7 @@ public class AgentDomainServiceImpl extends ServiceImpl<AgentDomainMapper, Agent
    * 创建代理域名
    */
   @Override
+  @SentinelResource(value = "createAgentDomain")
   public void createAgentDomain(AgentDomainDTO domainDTO) {
     List<AgentDomain> list = this.lambdaQuery()
             .eq(AgentDomain::getPromoteProtocol, domainDTO.getPromoteProtocol())
@@ -68,6 +71,7 @@ public class AgentDomainServiceImpl extends ServiceImpl<AgentDomainMapper, Agent
    * 删除代理域名
    */
   @Override
+  @SentinelResource(value = "deleteAgentDomain")
   public void deleteAgentDomain(Integer id) {
     this.removeById(id);
   }
@@ -76,6 +80,7 @@ public class AgentDomainServiceImpl extends ServiceImpl<AgentDomainMapper, Agent
    * 修改代理域名
    */
   @Override
+  @SentinelResource(value = "updateAgentDomain")
   public void updateAgentDomain(AgentDomainDTO domainDTO) {
     this.lambdaUpdate()
             .set(AgentDomain::getPromoteProtocol,domainDTO.getDomain())

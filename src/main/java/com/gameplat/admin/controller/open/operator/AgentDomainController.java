@@ -21,7 +21,7 @@ public class AgentDomainController {
   @Autowired private AgentDomainService domainService;
 
 
-    /**
+  /**
    * 代理域名列表
    */
   @GetMapping("/agentDomainList")

@@ -14,6 +14,7 @@ import com.gameplat.admin.model.dto.ChatNoticeQueryDTO;
 import com.gameplat.admin.model.vo.AgentDomainVO;
 import com.gameplat.admin.model.vo.ChatNoticeVO;
 import com.gameplat.admin.service.AgentDomainService;
+import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.model.entity.chart.ChatNotice;
 import com.gameplat.model.entity.spread.AgentDomain;
 import com.gameplat.model.entity.spread.SpreadUnion;
@@ -22,6 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 
 
 /**
@@ -43,6 +45,7 @@ public class AgentDomainServiceImpl extends ServiceImpl<AgentDomainMapper, Agent
     return  this.lambdaQuery()
             .eq(ObjectUtils.isNotEmpty(domainDTO.getType()),AgentDomain::getType,domainDTO.getType())
             .eq(ObjectUtils.isNotEmpty(domainDTO.getStatus()),AgentDomain::getStatus,domainDTO.getStatus())
+            .like(ObjectUtils.isNotEmpty(domainDTO.getDomain()),AgentDomain::getDomain,domainDTO.getDomain())
             .orderByDesc(AgentDomain::getCreateTime)
             .page(page)
             .convert(convert::toVo);
@@ -53,7 +56,12 @@ public class AgentDomainServiceImpl extends ServiceImpl<AgentDomainMapper, Agent
    */
   @Override
   public void createAgentDomain(AgentDomainDTO domainDTO) {
-     this.save(convert.toDto(domainDTO));
+    List<AgentDomain> list = this.lambdaQuery()
+            .eq(AgentDomain::getPromoteProtocol, domainDTO.getPromoteProtocol())
+            .eq(AgentDomain::getDomain, domainDTO.getDomain())
+            .list();
+    if (list.size() > 1) throw new ServiceException("此域名已添加过了!");
+    this.save(convert.toDto(domainDTO));
   }
 
   /**

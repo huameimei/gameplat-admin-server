@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -48,7 +49,7 @@ public class MemberGrowthLevelServiceImpl
     private MemberGrowthLevelMapper levelMapper;
     @Autowired
     private MemberGrowthConfigService growthConfigService;
-    @Autowired
+    @Resource(name = "memberGrowthRecordServiceImpl")
     private MemberGrowthRecordService memberGrowthRecordService;
     @Autowired
     private MemberInfoService memberInfoService;
@@ -58,7 +59,7 @@ public class MemberGrowthLevelServiceImpl
     private MemberLoanService memberLoanService;
     @Autowired
     private MemberService memberService;
-    @Autowired
+    @Resource(name = "memberGrowthStatisServiceImpl")
     private MemberGrowthStatisService memberGrowthStatisService;
 
     /**

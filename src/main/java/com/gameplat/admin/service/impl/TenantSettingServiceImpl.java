@@ -358,19 +358,19 @@ public class TenantSettingServiceImpl extends ServiceImpl<TenantSettingMapper, T
     public int saveSportBallHead(SportConfigValueVO sportConfigValueVo) {
         try {
             JSONObject config = gameConfigService.getGameConfig("SB");
-            String proxy = "";
+            String tenant = "";
             log.info("体育服配置结果为{}", config);
             if(config!=null){
-                proxy= config.getString("proxy");
+                tenant= config.getString("tenant");
             }
             Map<String, String> params = new HashMap<>(8);
             params.put("style", sportConfigValueVo.getStyle());
             params.put("ballHeadRule", sportConfigValueVo.getBallHeadRule());
             params.put("sportBallNavigation", sportConfigValueVo.getSportBallNavigation());
             params.put("sportLeagueNavigation", sportConfigValueVo.getSportLeagueNavigation());
-            params.put("tenant", proxy);
+            params.put("tenant", tenant);
             HashMap<String, String> headers = new HashMap<>();
-            headers.put("tenant", proxy);
+            headers.put("tenant", tenant);
             String result = sportFeignClient.updateAppConfig(headers, params);
             if (org.apache.commons.lang3.StringUtils.isBlank(result)) {
                 log.info("体育插入球头配置接口响应结果为空{}", sportConfigValueVo);

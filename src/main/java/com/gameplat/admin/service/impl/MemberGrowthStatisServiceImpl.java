@@ -60,8 +60,7 @@ public class MemberGrowthStatisServiceImpl
     @Autowired
     private MemberGrowthLevelService growthLevelService;
 
-    @Autowired
-    private MemberGrowthStatisMapper growthStatisMapper;
+  @Autowired private MemberGrowthStatisMapper memberGrowthStatisMapper;
 
     @Autowired
     private MemberGrowthConfigService memberGrowthConfigService;
@@ -95,9 +94,6 @@ public class MemberGrowthStatisServiceImpl
 
     @Autowired
     private MemberInfoService memberInfoService;
-
-    @Autowired
-    private MemberGrowthStatisMapper memberGrowthStatisMapper;
 
     public static final Object lockHelper = new Object();
 
@@ -182,8 +178,8 @@ public class MemberGrowthStatisServiceImpl
             find.setMemberId(memberId);
             find.setAccount(account);
             find.setCreateBy("系统操作员");
-            //其余字段均默认为0
-            int i = growthStatisMapper.insertOrUpdate(find);
+      // 其余字段均默认为0
+      int i = memberGrowthStatisMapper.insertOrUpdate(find);
             if (i <= 0) {
                 throw new ServiceException("添加或修改会员成长值汇总失败！");
             }
@@ -196,7 +192,7 @@ public class MemberGrowthStatisServiceImpl
 
     @Override
     public List<ActivityMemberInfo> findActivityMemberInfo(Map map) {
-        return growthStatisMapper.findActivityMemberInfo(map);
+    return memberGrowthStatisMapper.findActivityMemberInfo(map);
     }
 
     /**

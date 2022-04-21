@@ -147,8 +147,8 @@ public class GameBetRecordInfoServiceImpl implements GameBetRecordInfoService {
       otherData.put("betAmount", betAmount);
       otherData.put("validAmount", validAmount);
       otherData.put("winAmount", winAmount);
-    } catch (IOException e) {
-      e.printStackTrace();
+    } catch (Exception e) {
+      log.error("统计es游戏投注总计报错:", e);
     }
 
     PageDtoVO<GameBetRecordVO> pageDtoVO = new PageDtoVO<>();

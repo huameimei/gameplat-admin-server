@@ -36,6 +36,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -63,7 +64,7 @@ public class MemberGrowthRecordServiceImpl
     @Autowired
     private MemberGrowthRecordMapper memberGrowthRecordMapper;
 
-    @Autowired
+    @Resource(name = "memberGrowthLevelServiceImpl")
     private MemberGrowthLevelService growthLevelService;
 
     @Autowired
@@ -87,7 +88,7 @@ public class MemberGrowthRecordServiceImpl
     @Autowired
     private MessageMapper messageMapper;
 
-    @Autowired
+    @Resource(name = "memberGrowthStatisServiceImpl")
     private MemberGrowthStatisService memberGrowthStatisService;
 
     @Autowired

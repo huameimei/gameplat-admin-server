@@ -36,6 +36,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.*;
@@ -57,16 +58,15 @@ public class MemberGrowthStatisServiceImpl
     @Autowired
     private MemberGrowthStatisConvert statisConvert;
 
-    @Autowired
+    @Resource(name = "memberGrowthLevelServiceImpl")
     private MemberGrowthLevelService growthLevelService;
 
-    @Autowired
-    private MemberGrowthStatisMapper growthStatisMapper;
+  @Autowired private MemberGrowthStatisMapper memberGrowthStatisMapper;
 
     @Autowired
     private MemberGrowthConfigService memberGrowthConfigService;
 
-    @Autowired
+    @Resource(name = "memberGrowthRecordServiceImpl")
     private MemberGrowthRecordService memberGrowthRecordService;
 
     @Autowired
@@ -95,9 +95,6 @@ public class MemberGrowthStatisServiceImpl
 
     @Autowired
     private MemberInfoService memberInfoService;
-
-    @Autowired
-    private MemberGrowthStatisMapper memberGrowthStatisMapper;
 
     public static final Object lockHelper = new Object();
 
@@ -182,8 +179,8 @@ public class MemberGrowthStatisServiceImpl
             find.setMemberId(memberId);
             find.setAccount(account);
             find.setCreateBy("系统操作员");
-            //其余字段均默认为0
-            int i = growthStatisMapper.insertOrUpdate(find);
+      // 其余字段均默认为0
+      int i = memberGrowthStatisMapper.insertOrUpdate(find);
             if (i <= 0) {
                 throw new ServiceException("添加或修改会员成长值汇总失败！");
             }
@@ -196,7 +193,7 @@ public class MemberGrowthStatisServiceImpl
 
     @Override
     public List<ActivityMemberInfo> findActivityMemberInfo(Map map) {
-        return growthStatisMapper.findActivityMemberInfo(map);
+    return memberGrowthStatisMapper.findActivityMemberInfo(map);
     }
 
     /**

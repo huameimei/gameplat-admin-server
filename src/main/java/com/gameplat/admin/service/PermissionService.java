@@ -1,5 +1,6 @@
 package com.gameplat.admin.service;
 
+import cn.hutool.core.collection.CollUtil;
 import com.alibaba.csp.sentinel.annotation.SentinelResource;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.enums.SysUserEnums;
@@ -10,7 +11,6 @@ import com.gameplat.admin.model.bean.router.RouterMeta;
 import com.gameplat.admin.model.bean.router.VueRouter;
 import com.gameplat.base.common.constant.ContextConstant;
 import com.gameplat.base.common.util.JwtUtils;
-import com.gameplat.base.common.util.StringUtils;
 import com.gameplat.common.enums.BooleanEnum;
 import com.gameplat.common.enums.SubjectEnum;
 import com.gameplat.common.enums.UserTypes;
@@ -22,10 +22,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -39,56 +36,44 @@ import java.util.stream.Collectors;
 public class PermissionService extends ServiceImpl<SysMenuMapper, SysMenu> {
 
   private final SysMenuMapper menuMapper;
+
   private final SysUserMapper userMapper;
+
   private final AdminLogBuilder adminLogBuilder;
 
-  /**
-   * 取系统授权菜单
-   *
-   * @return ArrayList
-   */
   @SentinelResource(value = "getMenuList")
   public ArrayList<VueRouter<SysMenu>> getMenuList(String userName) {
     SysUser user = userMapper.selectUserByUserName(userName);
-    if (StringUtils.isNull(user)) {
+    if (Objects.isNull(user)) {
       return Lists.newArrayList();
     }
-    List<SysMenu> list;
-    if (SysUserEnums.UserType.isAdmin(user.getUserType())) {
-      list = menuMapper.selectMenuNormalAll();
-    } else {
-      list = menuMapper.selectMenusByUserId(user.getUserId());
-    }
-    if (StringUtils.isNull(list)) {
-      return Lists.newArrayList();
-    }
-    List<VueRouter<SysMenu>> vueRouters = new ArrayList<>();
-    list.forEach(
-        item -> {
-          // 隐藏的菜单分配了不能展示出来
-          if (BooleanEnum.NO.match(item.getVisible())) {
-            VueRouter<SysMenu> router = new VueRouter<>();
-            router.setMenuId(item.getMenuId());
-            router.setParentId(item.getParentId());
-            router.setMeta(new RouterMeta());
-            router.setPath(item.getPath());
-            router.setName(item.getMenuName());
-            router.setPerms(item.getPerms());
-            router.setTitle(item.getTitle());
-            router.setMenuType(item.getMenuType());
-            router.setComponent(item.getComponent());
-            router.setIcon(item.getIcon());
-            router.setUrl(item.getUrl());
-            vueRouters.add(router);
-          }
-        });
+
+    List<VueRouter<SysMenu>> vueRouters =
+        this.getMenuList(user).stream().map(this::convert2VueRouter).collect(Collectors.toList());
+
     return buildVueRouter(vueRouters, 0L);
+  }
+
+  private VueRouter<SysMenu> convert2VueRouter(SysMenu menu) {
+    VueRouter<SysMenu> router = new VueRouter<>();
+    router.setMenuId(menu.getMenuId());
+    router.setParentId(menu.getParentId());
+    router.setMeta(new RouterMeta());
+    router.setPath(menu.getPath());
+    router.setName(menu.getMenuName());
+    router.setPerms(menu.getPerms());
+    router.setTitle(menu.getTitle());
+    router.setMenuType(menu.getMenuType());
+    router.setComponent(menu.getComponent());
+    router.setIcon(menu.getIcon());
+    router.setUrl(menu.getUrl());
+    return router;
   }
 
   public String getAccessLogToken() {
     String username = SecurityUserHolder.getUsername();
     Map<String, String> map = new HashMap<>();
-    UserTypes type = null;
+    UserTypes type;
     if (SecurityUserHolder.isSuperAdmin()) {
       type = UserTypes.ADMIN;
     } else {
@@ -101,10 +86,21 @@ public class PermissionService extends ServiceImpl<SysMenuMapper, SysMenu> {
     // TODO 暂时写死日志访问权限
     map.put(ContextConstant.AUTHORITY, "operator:logs:logininfoLog,operator:logs:operationLog");
     String secret = JwtUtils.getDefaultSecret();
-    String token =
-        JwtUtils.sign(secret, SecurityUserHolder.getCredential().getTokenExpireIn(), map);
-    return token;
+    return JwtUtils.sign(secret, SecurityUserHolder.getCredential().getTokenExpireIn(), map);
   }
+
+  private List<SysMenu> getMenuList(SysUser user) {
+    List<SysMenu> menuList;
+    if (SysUserEnums.UserType.isAdmin(user.getUserType())) {
+      menuList = menuMapper.selectMenuNormalAll();
+    } else {
+      menuList = menuMapper.selectMenusByUserId(user.getUserId());
+    }
+
+    menuList.removeIf(e -> BooleanEnum.YES.match(e.getVisible()));
+    return CollUtil.isNotEmpty(menuList) ? menuList : Lists.newArrayList();
+  }
+
   /**
    * 构造前端路由
    *
@@ -114,8 +110,7 @@ public class PermissionService extends ServiceImpl<SysMenuMapper, SysMenu> {
    */
   private ArrayList<VueRouter<SysMenu>> buildVueRouter(
       List<VueRouter<SysMenu>> list, Long parentId) {
-    List<VueRouter<SysMenu>> topRoutes = getMenuTreeList(list, 0L);
-    return new ArrayList<>(topRoutes);
+    return new ArrayList<>(this.getMenuTreeList(list, parentId));
   }
 
   /**
@@ -126,16 +121,9 @@ public class PermissionService extends ServiceImpl<SysMenuMapper, SysMenu> {
    * @return List
    */
   private List<VueRouter<SysMenu>> getMenuTreeList(List<VueRouter<SysMenu>> list, Long parentId) {
-    List<VueRouter<SysMenu>> routers = new ArrayList<>();
-    list.stream()
-        .filter(d -> String.valueOf(parentId).equals(String.valueOf(d.getParentId())))
-        .collect(Collectors.toList())
-        .forEach(
-            item -> {
-              item.setChildren(getMenuTreeList(list, item.getMenuId()));
-              routers.add(item);
-            });
-
-    return routers;
+    return list.stream()
+        .filter(e -> parentId.equals(e.getParentId()))
+        .peek(e -> e.setChildren(this.getMenuTreeList(list, e.getMenuId())))
+        .collect(Collectors.toList());
   }
 }

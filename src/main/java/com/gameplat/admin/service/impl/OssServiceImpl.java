@@ -3,6 +3,7 @@ package com.gameplat.admin.service.impl;
 import com.gameplat.admin.service.AsyncSaveFileRecordService;
 import com.gameplat.admin.service.ConfigService;
 import com.gameplat.admin.service.OssService;
+import com.gameplat.base.common.context.GlobalContextHolder;
 import com.gameplat.common.compent.oss.FileStorageStrategyContext;
 import com.gameplat.common.compent.oss.config.FileConfig;
 import com.gameplat.common.enums.DictTypeEnum;
@@ -36,7 +37,9 @@ public class OssServiceImpl implements OssService {
         .upload(file.getInputStream(), file.getContentType(), file.getOriginalFilename());
 
     // 异步保存文件记录
-    asyncSaveFileRecordService.asyncSave(file, fileUrl, fileConfig.getProvider());
+    String username = GlobalContextHolder.getContext().getUsername();
+    Long fileSize = file.getSize();
+    asyncSaveFileRecordService.asyncSave(file, fileUrl, fileConfig.getProvider(), username, fileSize);
 
     return fileUrl;
   }

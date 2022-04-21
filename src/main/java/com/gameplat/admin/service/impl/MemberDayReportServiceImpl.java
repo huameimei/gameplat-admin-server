@@ -12,14 +12,14 @@ import com.gameplat.admin.mapper.MemberDayReportMapper;
 import com.gameplat.admin.model.dto.AgentReportQueryDTO;
 import com.gameplat.admin.model.vo.MemberDayReportVo;
 import com.gameplat.admin.model.vo.PageDtoVO;
+import com.gameplat.admin.service.AgentConfigService;
 import com.gameplat.admin.service.MemberDayReportService;
-import com.gameplat.admin.service.RecommendConfigService;
 import com.gameplat.admin.util.JxlsExcelUtils;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.UUIDUtils;
+import com.gameplat.common.model.bean.AgentConfig;
 import com.gameplat.common.util.ZipUtils;
 import com.gameplat.model.entity.member.MemberDayReport;
-import com.gameplat.model.entity.proxy.RecommendConfig;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -36,7 +36,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-/** @Description : 会员日报表 @Author : cc @Date : 2022/3/11 */
+/**
+ * @Description : 会员日报表 @Author : cc @Date : 2022/3/11
+ */
 @Service
 @Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)
 public class MemberDayReportServiceImpl extends ServiceImpl<MemberDayReportMapper, MemberDayReport>
@@ -45,7 +47,8 @@ public class MemberDayReportServiceImpl extends ServiceImpl<MemberDayReportMappe
   /** 代理财务报表模板(重制) */
   private final String AGENT_REPORT_REMAKE = "agentReportRemakeTemplate.xlsx";
 
-  @Autowired private RecommendConfigService recommendConfigService;
+  @Autowired private AgentConfigService agentConfigService;
+
   @Autowired private GameMemberReportMapper memberReportMapper;
 
   /**
@@ -68,11 +71,11 @@ public class MemberDayReportServiceImpl extends ServiceImpl<MemberDayReportMappe
       dto.setIsIncludeProxy(true);
     }
     // 获取有效会员配置
-    RecommendConfig recommendConfig = recommendConfigService.getRecommendConfig();
+    AgentConfig agentConfig = agentConfigService.getAgentConfig();
     // 充值额
-    BigDecimal rechargeAmountLimit = recommendConfig.getRechargeAmountLimit();
+    BigDecimal rechargeAmountLimit = agentConfig.getRechargeAmountLimit();
     // 有效投注额
-    BigDecimal validAmountLimit = recommendConfig.getValidAmountLimit();
+    BigDecimal validAmountLimit = agentConfig.getValidAmountLimit();
     // 总计
     MemberDayReportVo total =
         memberReportMapper.agentReportSummary(
@@ -113,10 +116,7 @@ public class MemberDayReportServiceImpl extends ServiceImpl<MemberDayReportMappe
             dto.getAgentName(), dto.getStartDate(), dto.getEndDate());
     if (CollectionUtil.isNotEmpty(returnPage.getRecords())) {
       Map<String, MemberDayReportVo> poMap =
-          list.stream()
-              .collect(
-                  Collectors.toMap(
-                      MemberDayReportVo::getParentName, MemberDayReportPO -> MemberDayReportPO));
+          list.stream().collect(Collectors.toMap(MemberDayReportVo::getParentName, e -> e));
       for (MemberDayReportVo po : returnPage.getRecords()) {
         MemberDayReportVo obj = poMap.get(po.getParentName());
         if (BeanUtil.isEmpty(obj)) {
@@ -152,11 +152,11 @@ public class MemberDayReportServiceImpl extends ServiceImpl<MemberDayReportMappe
         dto.setIsIncludeProxy(true);
       }
       // 获取有效会员配置
-      RecommendConfig recommendConfig = recommendConfigService.getRecommendConfig();
+      AgentConfig agentConfig = agentConfigService.getAgentConfig();
       // 充值额
-      BigDecimal rechargeAmountLimit = recommendConfig.getRechargeAmountLimit();
+      BigDecimal rechargeAmountLimit = agentConfig.getRechargeAmountLimit();
       // 有效投注额
-      BigDecimal validAmountLimit = recommendConfig.getValidAmountLimit();
+      BigDecimal validAmountLimit = agentConfig.getValidAmountLimit();
       // 总计
       MemberDayReportVo total =
           memberReportMapper.agentReportSummary(
@@ -193,10 +193,7 @@ public class MemberDayReportServiceImpl extends ServiceImpl<MemberDayReportMappe
       // fixme 这里暂时返回有数据的代理
       if (CollectionUtil.isNotEmpty(returnPage)) {
         Map<String, MemberDayReportVo> poMap =
-            list.stream()
-                .collect(
-                    Collectors.toMap(
-                        MemberDayReportVo::getParentName, MemberDayReportPO -> MemberDayReportPO));
+            list.stream().collect(Collectors.toMap(MemberDayReportVo::getParentName, e -> e));
         for (MemberDayReportVo po : returnPage) {
           MemberDayReportVo obj = poMap.get(po.getParentName());
           if (BeanUtil.isEmpty(obj)) {

@@ -66,7 +66,6 @@ import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.json.JsonUtils;
 import com.gameplat.base.common.snowflake.IdGeneratorSnowflake;
 import com.gameplat.base.common.util.DateUtil;
-import com.gameplat.base.common.util.EasyExcelUtil;
 import com.gameplat.common.constant.NumberConstant;
 import com.gameplat.common.constant.SocketEnum;
 import com.gameplat.common.enums.BooleanEnum;
@@ -77,7 +76,6 @@ import com.gameplat.common.enums.MemberEnums;
 import com.gameplat.common.enums.RechargeStatus;
 import com.gameplat.common.enums.SwitchStatusEnum;
 import com.gameplat.common.enums.UserTypes;
-import com.gameplat.common.lang.Assert;
 import com.gameplat.common.model.bean.UserEquipment;
 import com.gameplat.common.model.bean.limit.MemberRechargeLimit;
 import com.gameplat.common.util.CNYUtils;
@@ -108,7 +106,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import javax.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -119,7 +116,6 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 @Slf4j
 @Service
@@ -666,7 +662,7 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
     MemberRechargeLimit limit = limitInfoService.getRechargeLimit();
     boolean isRechargeProcess = BooleanEnum.YES.match(limit.getIsRechargeProcess());
     if (isRechargeProcess
-            && !ObjectUtil.equal(RechargeStatus.HANDLED.getValue(), rechargeOrder.getStatus())) {
+        && !ObjectUtil.equal(RechargeStatus.HANDLED.getValue(), rechargeOrder.getStatus())) {
       throw new ServiceException("请先受理订单:" + rechargeOrder.getOrderNo());
     }
   }
@@ -1010,17 +1006,17 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
     sb.append("订单编号 ")
         .append(rechargeOrder.getOrderNo())
         .append("，充值金额 ")
-            .append(
-                    CNYUtils.formatYuanAsYuan(
-                            rechargeOrder.getPayAmount().setScale(2, BigDecimal.ROUND_DOWN)))
+        .append(
+            CNYUtils.formatYuanAsYuan(
+                rechargeOrder.getPayAmount().setScale(2, BigDecimal.ROUND_DOWN)))
         .append("，优惠金额 ")
-            .append(
-                    CNYUtils.formatYuanAsYuan(
-                            rechargeOrder.getDiscountAmount().setScale(2, BigDecimal.ROUND_DOWN)))
+        .append(
+            CNYUtils.formatYuanAsYuan(
+                rechargeOrder.getDiscountAmount().setScale(2, BigDecimal.ROUND_DOWN)))
         .append("，余额 ")
-            .append(
-                    df.format(
-                            balance.add(rechargeOrder.getTotalAmount().setScale(2, BigDecimal.ROUND_DOWN))));
+        .append(
+            df.format(
+                balance.add(rechargeOrder.getTotalAmount().setScale(2, BigDecimal.ROUND_DOWN))));
     if (StringUtils.isNotEmpty(rechargeOrder.getPayType())) {
       sb.append("，支付类型 ").append(rechargeOrder.getPayTypeName());
     }
@@ -1096,7 +1092,12 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
 
       rechargeOrder.setAuditorAccount("系统审批");
       rechargeOrder.setRemarks("自动取消");
-      Assert.isTrue(this.updateById(rechargeOrder), "自动取消订单:{}失败", rechargeOrder.getOrderNo());
+      if (this.updateById(rechargeOrder)) {
+        log.info("自动取消充值订单，订单号{}", rechargeOrder.getOrderNo());
+        RechargeOrderHistory rechargeOrderHistory = new RechargeOrderHistory();
+        BeanUtils.copyProperties(rechargeOrder, rechargeOrderHistory);
+        rechargeOrderHistoryMapper.insert(rechargeOrderHistory);
+      }
     }
   }
 
@@ -1121,24 +1122,13 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
         .groupBy("tp_interface_code");
   }
 
-  @Override
   @Async
-  public void fileUserNameRech(
+  @Override
+  public void batchMemberRecharge(
+      UserEquipment clientInfo,
+      List<RechargeMemberFileBean> strAccount,
       ManualRechargeOrderDto dto,
-      MultipartFile file,
-      HttpServletRequest request,
-      UserCredential credential)
-      throws Exception {
-    // 开始批量解析文件
-    List<RechargeMemberFileBean> strAccount =
-        EasyExcelUtil.readExcel(file.getInputStream(), RechargeMemberFileBean.class);
-    log.info("会员账号数据：{}", strAccount.size());
-    if (com.gameplat.base.common.util.StringUtils.isEmpty(strAccount)) {
-      return;
-    }
-
-    UserEquipment clientInfo = UserEquipment.create(request);
-
+      UserCredential credential) {
     strAccount.stream()
         .forEach(
             a -> {
@@ -1161,20 +1151,13 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
             });
   }
 
-  @Override
   @Async
-  public void fileRech(
-      MultipartFile file,
+  @Override
+  public void batchFileMemberRecharge(
+      List<MemberRechBalanceVO> memberRechBalanceVOList,
       Integer discountType,
-      HttpServletRequest request,
-      UserCredential credential)
-      throws Exception {
-    // 开始批量解析文件
-    List<MemberRechBalanceVO> memberRechBalanceVOList =
-        EasyExcelUtil.readExcel(file.getInputStream(), MemberRechBalanceVO.class);
-    log.info("批量上传数据：{}", memberRechBalanceVOList.size());
-    // 请求的ip
-    UserEquipment userEquipment = UserEquipment.create(request);
+      UserEquipment userEquipment,
+      UserCredential credential) {
     memberRechBalanceVOList.stream()
         .forEach(
             a -> {

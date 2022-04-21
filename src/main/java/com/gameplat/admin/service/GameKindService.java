@@ -32,4 +32,6 @@ public interface GameKindService extends IService<GameKind> {
   GameKindVO getByCode(String code);
 
   List<GameKind> queryGameKindListByPlatformCode(String platformCode);
+
+  List<GameKind> getList();
 }

@@ -69,7 +69,7 @@ public class OpenRoleController {
   @PostMapping("/authMenuScope")
   @PreAuthorize("hasAuthority('system:role:authMenu')")
   @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.ADMIN, desc = "'授权角色菜单角色Id='+#dto.roleId")
-  public void authMenuScope(@Validated @RequestBody AuthMenuDTO dto) {
+  public void authMenuScope(@Validated AuthMenuDTO dto) {
     roleService.authMenuScope(dto);
   }
 

@@ -12,17 +12,17 @@ import com.gameplat.admin.mapper.RebateReportMapper;
 import com.gameplat.admin.model.dto.RebateReportDTO;
 import com.gameplat.admin.model.vo.*;
 import com.gameplat.admin.service.AgentBaseService;
+import com.gameplat.admin.service.AgentConfigService;
 import com.gameplat.admin.service.RebateConfigService;
 import com.gameplat.admin.service.RebateReportService;
-import com.gameplat.admin.service.RecommendConfigService;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.BeanUtils;
 import com.gameplat.base.common.util.StringUtils;
 import com.gameplat.common.constant.NumberConstant;
 import com.gameplat.common.enums.MemberEnums;
+import com.gameplat.common.model.bean.AgentConfig;
 import com.gameplat.model.entity.proxy.RebateConfig;
 import com.gameplat.model.entity.proxy.RebateReport;
-import com.gameplat.model.entity.proxy.RecommendConfig;
 import com.gameplat.security.SecurityUserHolder;
 import com.gameplat.security.context.UserCredential;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,7 +48,7 @@ public class RebateReportServiceImpl extends ServiceImpl<RebateReportMapper, Reb
 
   @Autowired private MemberMapper memberMapper;
 
-  @Autowired private RecommendConfigService recommendConfigService;
+  @Autowired private AgentConfigService agentConfigService;
 
   @Autowired private RebateConfigService rebateConfigService;
 
@@ -225,20 +225,19 @@ public class RebateReportServiceImpl extends ServiceImpl<RebateReportMapper, Reb
         rebateReportMapper.getSubMemberReport(agentId, countMonth);
     if (!StringUtils.isEmpty(memberReportPOList)) {
       // 获取有效会员配置
-      RecommendConfig recommendConfig = recommendConfigService.getRecommendConfig();
-      BigDecimal limitRecharge = recommendConfig.getRechargeAmountLimit();
-      BigDecimal limitValidAmount = recommendConfig.getValidAmountLimit();
-      memberReportPOList.stream()
-          .forEach(
-              memberReportPO -> {
-                // 满足有效会员配置，计入标识
-                if (memberReportPO.getRechargeAmount().compareTo(limitRecharge) >= 0
-                    && memberReportPO.getValidAmount().compareTo(limitValidAmount) >= 0) {
-                  memberReportPO.setEfficient(1);
-                } else {
-                  memberReportPO.setEfficient(0);
-                }
-              });
+      AgentConfig agentConfig = agentConfigService.getAgentConfig();
+      BigDecimal limitRecharge = agentConfig.getRechargeAmountLimit();
+      BigDecimal limitValidAmount = agentConfig.getValidAmountLimit();
+      memberReportPOList.forEach(
+          memberReportPO -> {
+            // 满足有效会员配置，计入标识
+            if (memberReportPO.getRechargeAmount().compareTo(limitRecharge) >= 0
+                && memberReportPO.getValidAmount().compareTo(limitValidAmount) >= 0) {
+              memberReportPO.setEfficient(1);
+            } else {
+              memberReportPO.setEfficient(0);
+            }
+          });
     }
     return memberReportPOList;
   }
@@ -251,9 +250,9 @@ public class RebateReportServiceImpl extends ServiceImpl<RebateReportMapper, Reb
         rebateReportMapper.pageSubMemberReport(page, agentId, countMonth);
     if (!StringUtils.isEmpty(memberReportPOList.getRecords())) {
       // 获取有效会员配置
-      RecommendConfig recommendConfig = recommendConfigService.getRecommendConfig();
-      BigDecimal limitRecharge = recommendConfig.getRechargeAmountLimit();
-      BigDecimal limitValidAmount = recommendConfig.getValidAmountLimit();
+      AgentConfig agentConfig = agentConfigService.getAgentConfig();
+      BigDecimal limitRecharge = agentConfig.getRechargeAmountLimit();
+      BigDecimal limitValidAmount = agentConfig.getValidAmountLimit();
       memberReportPOList
           .getRecords()
           .forEach(
@@ -274,7 +273,8 @@ public class RebateReportServiceImpl extends ServiceImpl<RebateReportMapper, Reb
   public Page<PlatformFeeVO> gameWin(PageDTO<PlatformFeeVO> page, Long agentId, String countMonth) {
     Page<PlatformFeeVO> platformFeePOList =
         rebateReportMapper.pagePlatformFee(page, agentId, countMonth);
-    platformFeePOList.getRecords().stream()
+    platformFeePOList
+        .getRecords()
         .forEach(
             platformFeePO -> {
               BigDecimal gameFee =
@@ -292,18 +292,17 @@ public class RebateReportServiceImpl extends ServiceImpl<RebateReportMapper, Reb
   @Override
   public List<PlatformFeeVO> getPlatformFee(Long agentId, String countMonth) {
     List<PlatformFeeVO> platformFeePOList = rebateReportMapper.getPlatformFee(agentId, countMonth);
-    platformFeePOList.stream()
-        .forEach(
-            platformFeePO -> {
-              BigDecimal gameFee =
-                  platformFeePO.getWinAmount().compareTo(BigDecimal.ZERO) == 1
-                      ? platformFeePO
-                          .getWinAmount()
-                          .multiply(platformFeePO.getReportRate())
-                          .setScale(2, BigDecimal.ROUND_DOWN)
-                      : BigDecimal.ZERO;
-              platformFeePO.setGameFee(gameFee);
-            });
+    platformFeePOList.forEach(
+        platformFeePO -> {
+          BigDecimal gameFee =
+              platformFeePO.getWinAmount().compareTo(BigDecimal.ZERO) == 1
+                  ? platformFeePO
+                      .getWinAmount()
+                      .multiply(platformFeePO.getReportRate())
+                      .setScale(2, BigDecimal.ROUND_DOWN)
+                  : BigDecimal.ZERO;
+          platformFeePO.setGameFee(gameFee);
+        });
     return platformFeePOList;
   }
 

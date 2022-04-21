@@ -54,7 +54,7 @@ public class ActivityLobbyController {
 
   @ApiOperation(value = "活动大厅列表")
   @GetMapping("/list")
-  @PreAuthorize("hasAuthority('activity:lobby:view')")
+//  @PreAuthorize("hasAuthority('activity:lobby:view')")
   public IPage<ActivityLobbyVO> list(
       @ApiIgnore PageDTO<ActivityLobby> page, ActivityLobbyQueryDTO dto) {
     return activityLobbyService.findActivityLobbyList(page, dto);

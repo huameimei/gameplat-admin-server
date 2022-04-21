@@ -11,6 +11,7 @@ import com.gameplat.admin.model.dto.GameKindQueryDTO;
 import com.gameplat.admin.model.dto.OperGameKindDTO;
 import com.gameplat.admin.model.vo.GameKindVO;
 import com.gameplat.admin.service.GameKindService;
+import com.gameplat.base.common.enums.EnableEnum;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.StringUtils;
 import com.gameplat.common.enums.GameDemoEnableEnum;
@@ -114,5 +115,10 @@ public class GameKindServiceImpl extends ServiceImpl<GameKindMapper, GameKind>
             GameKind::getPlatformCode,
             platformCode)
         .list();
+  }
+
+  @Override
+  public List<GameKind> getList() {
+    return this.lambdaQuery().eq(GameKind::getEnable, EnableEnum.ENABLED.code()).list();
   }
 }

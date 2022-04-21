@@ -1,6 +1,5 @@
 package com.gameplat.admin.model.bean;
 
-import lombok.Data;
 
 import java.io.Serializable;
 
@@ -9,8 +8,17 @@ import java.io.Serializable;
  * @Date 2022/3/19 19:26
  * @Version 1.0
  */
-@Data
+
 public class RechargeMemberFileBean implements Serializable {
 
   private String username;
+
+
+  public String getUsername() {
+    return username;
+  }
+
+  public void setUsername(String username) {
+    this.username = username;
+  }
 }

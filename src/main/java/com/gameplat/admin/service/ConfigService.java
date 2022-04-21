@@ -28,6 +28,8 @@ public interface ConfigService {
 
   <T> T get(DictDataEnum dataEnum, Class<T> clazz);
 
+  <T> T get(DictTypeEnum type, Class<T> clazz);
+
   <T> T get(String type, String label, Class<T> clazz);
 
   <T> T get(DictDataEnum dataEnum, TypeReference<T> clazz);

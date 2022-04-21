@@ -79,6 +79,11 @@
         </dependency>
 
         <dependency>
+            <groupId>com.alibaba.csp</groupId>
+            <artifactId>sentinel-datasource-nacos</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>com.gameplat</groupId>
             <artifactId>log-stream-spring-boot-starter</artifactId>
         </dependency>
@@ -237,6 +242,12 @@
             <artifactId>jxls-core</artifactId>
             <version>1.0.6</version>
         </dependency>
+
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-stream-test-support</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <profiles>
@@ -271,6 +282,18 @@
             <id>kg277</id>
             <properties>
                 <profiles.active>kg277</profiles.active>
+            </properties>
+        </profile>
+        <profile>
+            <id>oottt</id>
+            <properties>
+                <profiles.active>oottt</profiles.active>
+            </properties>
+        </profile>
+        <profile>
+            <id>w888c</id>
+            <properties>
+                <profiles.active>w888c</profiles.active>
             </properties>
         </profile>
     </profiles>

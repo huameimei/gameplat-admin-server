@@ -1,21 +1,20 @@
 package com.gameplat.admin.service;
 
-import com.baomidou.mybatisplus.extension.service.IService;
-import com.gameplat.admin.model.dto.RecommendConfigDto;
 import com.gameplat.admin.model.vo.GameDivideVo;
-import com.gameplat.model.entity.proxy.RecommendConfig;
+import com.gameplat.common.model.bean.AgentConfig;
 
 import java.util.List;
 import java.util.Map;
 
-/** @Description : 层层代分红配置 @Author : cc @Date : 2022/4/2 */
-public interface RecommendConfigService extends IService<RecommendConfig> {
+/** 层层代分红配置 @Author : cc @Date : 2022/4/2 */
+public interface AgentConfigService {
+
   /**
    * 获取代理配置
    *
-   * @return RecommendConfig
+   * @return AgentConfig
    */
-  RecommendConfig getRecommendConfig();
+  AgentConfig getAgentConfig();
 
   /**
    * 获取层层代分红配置
@@ -55,7 +54,7 @@ public interface RecommendConfigService extends IService<RecommendConfig> {
   /**
    * 编辑代理配置
    *
-   * @param dto RecommendConfigDto
+   * @param params Map
    */
-  void edit(RecommendConfigDto dto);
+  void edit(Map<String, Object> params);
 }

@@ -43,10 +43,10 @@ public class SysFileManagerServiceImpl extends ServiceImpl<SysFileManagerMapper,
   @Override
   public IPage<SysFileManagerVO> list(PageDTO<SysFileManager> page, SysFileManagerQueryDTO queryDTO) {
     return this.lambdaQuery()
-            .eq(StringUtils.isNotEmpty(queryDTO.getOldFileName()), SysFileManager::getOldFileName, queryDTO.getOldFileName())
-            .eq(StringUtils.isNotEmpty(queryDTO.getStoreFileName()), SysFileManager::getStoreFileName, queryDTO.getStoreFileName())
+            .like(StringUtils.isNotEmpty(queryDTO.getOldFileName()), SysFileManager::getOldFileName, queryDTO.getOldFileName())
+            .like(StringUtils.isNotEmpty(queryDTO.getStoreFileName()), SysFileManager::getStoreFileName, queryDTO.getStoreFileName())
             .eq(StringUtils.isNotEmpty(queryDTO.getCreateBy()), SysFileManager::getCreateBy, queryDTO.getCreateBy())
-            .eq(StringUtils.isNotEmpty(queryDTO.getFileType()), SysFileManager::getFileType, queryDTO.getFileType())
+            .like(StringUtils.isNotEmpty(queryDTO.getFileType()), SysFileManager::getFileType, queryDTO.getFileType())
             .ge(StringUtils.isNotEmpty(queryDTO.getStartTime()), SysFileManager::getCreateTime, queryDTO.getStartTime())
             .le(StringUtils.isNotEmpty(queryDTO.getEndTime()), SysFileManager::getCreateTime, queryDTO.getEndTime())
             .page(page).convert(sysFileManagerConvert::toVo);

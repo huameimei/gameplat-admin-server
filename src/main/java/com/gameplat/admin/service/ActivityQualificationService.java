@@ -77,4 +77,9 @@ public interface ActivityQualificationService extends IService<ActivityQualifica
    * @return Map
    */
   Map<String, Object> checkQualification(ActivityQualificationCheckDTO dto);
+
+  /**
+   * 生成当天红包雨资格
+   */
+  void activityRedEnvelopeQualification();
 }

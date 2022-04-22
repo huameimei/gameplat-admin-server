@@ -1,6 +1,5 @@
 package com.gameplat.admin.model.vo;
 
-import cn.hutool.core.convert.Convert;
 import com.gameplat.admin.enums.TimeTypeEnum;
 import com.gameplat.admin.model.dto.GameBetRecordQueryDTO;
 import com.gameplat.base.common.util.DateUtils;
@@ -9,9 +8,6 @@ import lombok.Data;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
-import org.springframework.data.elasticsearch.annotations.DateFormat;
-import org.springframework.data.elasticsearch.annotations.Field;
-import org.springframework.data.elasticsearch.annotations.FieldType;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -32,14 +28,12 @@ public class GameBetValidRecordVo implements Serializable {
   private String id;
 
   /** 唯一编码 */
-  @Field(type = FieldType.Keyword, store = true)
   private String billNo;
 
   /** 租户编码 */
   private String tenant;
 
   /** 用户名 */
-  @Field(type = FieldType.Keyword, store = true)
   private String account;
 
   /** 平台编码 */
@@ -49,7 +43,6 @@ public class GameBetValidRecordVo implements Serializable {
   private String gameKind;
 
   /** 游戏编码 */
-  @Field(type = FieldType.Keyword, store = true)
   private String gameCode;
 
   /** 游戏名称 */
@@ -62,60 +55,33 @@ public class GameBetValidRecordVo implements Serializable {
   private Integer settle;
 
   /** 投注金额 */
-  @Field(type = FieldType.Double, store = true)
   private BigDecimal betAmount;
 
   /** 有效投注额 */
-  @Field(type = FieldType.Double, store = true)
   private BigDecimal validAmount;
 
   /** 输赢金额 */
-  @Field(type = FieldType.Double, store = true)
   private BigDecimal winAmount;
 
   /** 投注内容 */
   private String betContent;
 
   /** 投注时间 */
-  @Field(
-      type = FieldType.Date,
-      format = DateFormat.custom,
-      pattern = "yyyy-MM-dd HH:mm:ss||epoch_second")
   private Date betTime;
 
   /** 下注美东时间 */
-  @Field(
-      type = FieldType.Date,
-      format = DateFormat.custom,
-      pattern = "yyyy-MM-dd HH:mm:ss||epoch_second")
   private Date amesTime;
 
   /** 结算时间 */
-  @Field(
-      type = FieldType.Date,
-      format = DateFormat.custom,
-      pattern = "yyyy-MM-dd HH:mm:ss||epoch_second")
   private Date settleTime;
 
   /** 报表统计时间(美东) */
-  @Field(
-      type = FieldType.Date,
-      format = DateFormat.custom,
-      pattern = "yyyy-MM-dd HH:mm:ss||epoch_second")
   private Date statTime;
 
   /** 添加时间 */
-  @Field(
-      type = FieldType.Date,
-      format = DateFormat.custom,
-      pattern = "yyyy-MM-dd HH:mm:ss||epoch_second")
   private Date createTime;
 
   /** 更新时间 */
-  @Field(
-      type = FieldType.Date,
-      format = DateFormat.custom,
-      pattern = "yyyy-MM-dd HH:mm:ss||epoch_second")
   private Date updateTime;
 
   public static QueryBuilder buildBetRecordSearch(GameBetRecordQueryDTO dto) {
@@ -149,7 +115,4 @@ public class GameBetValidRecordVo implements Serializable {
     return builder;
   }
 
-  public BigDecimal getVailbetAmount() {
-    return Convert.toBigDecimal(validAmount);
-  }
 }

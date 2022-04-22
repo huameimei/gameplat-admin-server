@@ -1,8 +1,16 @@
 package com.gameplat.admin.controller.open.report;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.gameplat.admin.enums.TimeTypeEnum;
+import com.gameplat.admin.model.dto.GameBetRecordQueryDTO;
 import com.gameplat.admin.model.dto.HgSportWinReportQueryDTO;
+import com.gameplat.admin.model.vo.GameBetRecordVO;
 import com.gameplat.admin.model.vo.HgSportWinReportVO;
+import com.gameplat.admin.model.vo.PageDtoVO;
+import com.gameplat.admin.service.GameBetRecordInfoService;
 import com.gameplat.admin.service.HgSportWinReportService;
+import com.gameplat.common.enums.GameKindEnum;
+import com.gameplat.common.enums.SettleStatusEnum;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -12,6 +20,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
 import java.util.List;
 
 /**
@@ -28,11 +38,31 @@ public class HgSportWinReportController {
   @Autowired
   private HgSportWinReportService hgSportWinReportService;
 
+  @Autowired
+  private GameBetRecordInfoService gameBetRecordInfoService;
+
   @GetMapping(value = "/findList")
   @PreAuthorize("hasAuthority('report:hg:view')")
   @ApiOperation(value = "查询皇冠输赢报表")
-  public List<HgSportWinReportVO> findList(HgSportWinReportQueryDTO queryDTO) {
+  public List<HgSportWinReportVO> findList(@Valid HgSportWinReportQueryDTO queryDTO) {
     return hgSportWinReportService.findList(queryDTO);
+  }
+
+  @GetMapping(value = "/exportReport")
+  @PreAuthorize("hasAuthority('report:hg:export')")
+  @ApiOperation(value = "导出皇冠输赢报表")
+  public void exportReport(@Valid HgSportWinReportQueryDTO queryDTO, HttpServletResponse response) {
+    hgSportWinReportService.exportReport(queryDTO, response);
+  }
+
+  @GetMapping(value = "/findDetail")
+  @PreAuthorize("hasAuthority('report:hg:detail')")
+  @ApiOperation(value = "查询皇冠报表注单详情")
+  public PageDtoVO<GameBetRecordVO> findDetail(Page<GameBetRecordVO> page, GameBetRecordQueryDTO dto) {
+    dto.setGameKind(GameKindEnum.HG_SPORT.code());
+    dto.setSettle(SettleStatusEnum.YES.getValue().toString());
+    dto.setTimeType(TimeTypeEnum.STAT_TIME.getValue());
+    return gameBetRecordInfoService.queryPageBetRecord(page, dto);
   }
 
 

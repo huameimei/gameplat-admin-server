@@ -1,6 +1,7 @@
 package com.gameplat.admin.service;
 
 import com.gameplat.admin.model.dto.HgSportWinReportQueryDTO;
+import com.gameplat.admin.model.dto.SbSportWinReportQueryDTO;
 import com.gameplat.admin.model.vo.HgSportWinReportVO;
 
 import javax.servlet.http.HttpServletResponse;
@@ -11,9 +12,9 @@ import java.util.List;
  * @date 2022/4/17 19:34
  * @desc
  */
-public interface HgSportWinReportService {
+public interface SbSportWinReportService {
 
-  List<HgSportWinReportVO> findList(HgSportWinReportQueryDTO queryDTO);
+  List<HgSportWinReportVO> findList(SbSportWinReportQueryDTO queryDTO);
 
-  void exportReport(HgSportWinReportQueryDTO queryDTO, HttpServletResponse response);
+  void exportReport(SbSportWinReportQueryDTO queryDTO, HttpServletResponse response);
 }

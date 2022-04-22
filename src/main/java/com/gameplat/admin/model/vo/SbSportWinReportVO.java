@@ -15,7 +15,7 @@ import java.math.BigDecimal;
  * @desc
  */
 @Data
-public class HgSportWinReportVO implements Serializable {
+public class SbSportWinReportVO implements Serializable {
 
   @ApiModelProperty(value = "投注类型名字")
   @Excel(name = "投注类型", width = 15, isImportField = "true_st")

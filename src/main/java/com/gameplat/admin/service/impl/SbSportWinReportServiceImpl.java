@@ -5,13 +5,16 @@ import cn.afterturn.easypoi.excel.entity.ExportParams;
 import com.alibaba.fastjson.JSONObject;
 import com.gameplat.admin.config.TenantConfig;
 import com.gameplat.admin.model.dto.HgSportWinReportQueryDTO;
+import com.gameplat.admin.model.dto.SbSportWinReportQueryDTO;
 import com.gameplat.admin.model.vo.HgSportWinReportVO;
 import com.gameplat.admin.service.HgSportWinReportService;
+import com.gameplat.admin.service.SbSportWinReportService;
 import com.gameplat.base.common.constant.ContextConstant;
 import com.gameplat.base.common.util.Converts;
 import com.gameplat.base.common.util.DateUtils;
 import com.gameplat.base.common.util.StringUtils;
-import com.gameplat.common.enums.*;
+import com.gameplat.common.enums.GameKindEnum;
+import com.gameplat.common.enums.SettleStatusEnum;
 import joptsimple.internal.Strings;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -45,7 +48,7 @@ import java.util.List;
  */
 @Service
 @Slf4j
-public class HgSportWinReportServiceImpl implements HgSportWinReportService {
+public class SbSportWinReportServiceImpl implements SbSportWinReportService {
 
   @Autowired
   private TenantConfig tenantConfig;
@@ -54,20 +57,13 @@ public class HgSportWinReportServiceImpl implements HgSportWinReportService {
   private RestHighLevelClient restHighLevelClient;
 
   @Override
-  public List<HgSportWinReportVO> findList(HgSportWinReportQueryDTO queryDTO) {
-    return findHgReportData(queryDTO);
+  public List<HgSportWinReportVO> findList(SbSportWinReportQueryDTO queryDTO) {
+    return null;
   }
 
   @Override
-  public void exportReport(HgSportWinReportQueryDTO queryDTO, HttpServletResponse response) {
-    ExportParams exportParams = new ExportParams("皇冠输赢报表", "皇冠输赢报表");
-    response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename = vipWealReword.xls");
-    List<HgSportWinReportVO> list = findHgReportData(queryDTO);
-    try (Workbook workbook = ExcelExportUtil.exportExcel(exportParams, HgSportWinReportVO.class, list)) {
-      workbook.write(response.getOutputStream());
-    } catch (IOException e) {
-      log.error("皇冠输赢报表导出IO异常", e);
-    }
+  public void exportReport(SbSportWinReportQueryDTO queryDTO, HttpServletResponse response) {
+
   }
 
   public List<HgSportWinReportVO> findHgReportData(HgSportWinReportQueryDTO dto) {

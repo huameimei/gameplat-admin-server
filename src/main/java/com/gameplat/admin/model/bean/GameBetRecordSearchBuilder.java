@@ -32,6 +32,20 @@ public class GameBetRecordSearchBuilder {
     if (StringUtils.isNotEmpty(dto.getGameType())) {
       builder.must(QueryBuilders.matchQuery("gameType", dto.getGameType()));
     }
+    if (StringUtils.isNotEmpty(dto.getGameCode())) {
+      builder.must(QueryBuilders.termQuery("gameCode", dto.getGameCode()));
+    }
+    if (StringUtils.isNotEmpty(dto.getProxyAccount())) {
+      BoolQueryBuilder builder2 = QueryBuilders.boolQuery();
+      if (StringUtils.isNotNull(dto.getIsDirectly()) && dto.getIsDirectly() == 0) {
+        builder2.should(QueryBuilders.wildcardQuery("superPath", "*" + dto.getProxyAccount() + "*"));
+      } else {
+        // 默认只查询直属下级
+        builder2.should(QueryBuilders.termQuery("parentName", dto.getProxyAccount()));
+      }
+      builder2.should(QueryBuilders.termQuery("account", dto.getProxyAccount()));
+      builder.must(builder2);
+    }
     if (null != dto.getTimeType() && ObjectUtil.isNotNull(dto.getBeginTime())) {
       builder.must(
           QueryBuilders.rangeQuery(convertTimeType(dto.getTimeType()))

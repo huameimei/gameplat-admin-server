@@ -12,7 +12,7 @@ import java.io.Serializable;
  * @desc
  */
 @Data
-public class HgSportWinReportQueryDTO implements Serializable {
+public class SbSportWinReportQueryDTO implements Serializable {
 
   @ApiModelProperty(value = "会员账号")
   private String memberAccount;
@@ -22,12 +22,6 @@ public class HgSportWinReportQueryDTO implements Serializable {
 
   @ApiModelProperty(value = "是否只查询直属下级")
   private Integer isDirectly;
-
-  @ApiModelProperty(value = "盘口类型 1滚球 2今日 3早盘")
-  private Integer handicapType;
-
-  @ApiModelProperty(value = "运动类型 1足球 2篮球")
-  private String sportType;
 
   @ApiModelProperty(value = "开始时间")
   @NotEmpty(message = "开始时间不能为空")

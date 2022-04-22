@@ -353,7 +353,7 @@ public class ValidWithdrawServiceImpl extends ServiceImpl<ValidWithdrawMapper, V
           QueryBuilder builder = GameBetRecordSearchBuilder.buildBetRecordSearch(dto);
           // todo betTime
           SortBuilder<FieldSortBuilder> sortBuilder =
-              SortBuilders.fieldSort("betTime.keyword").order(SortOrder.DESC);
+              SortBuilders.fieldSort("betTime").order(SortOrder.DESC);
           PageResponse<GameBetValidRecordVo> result =
               baseElasticsearchService.search(
                   builder, indexName, GameBetValidRecordVo.class, 0, 9999, sortBuilder);

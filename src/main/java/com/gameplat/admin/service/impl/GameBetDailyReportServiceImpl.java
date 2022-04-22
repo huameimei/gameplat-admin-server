@@ -143,7 +143,7 @@ public class GameBetDailyReportServiceImpl
     DateTime beginTime = cn.hutool.core.date.DateUtil.beginOfDay(statDate);
     DateTime endTime = cn.hutool.core.date.DateUtil.endOfDay(statDate);
     builder.filter(
-        QueryBuilders.rangeQuery("settleTime.keyword")
+        QueryBuilders.rangeQuery("settleTime")
             .gte(beginTime.getTime())
             .lte(endTime.getTime()));
 

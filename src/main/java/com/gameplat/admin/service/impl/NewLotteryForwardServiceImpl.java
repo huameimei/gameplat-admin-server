@@ -2,17 +2,18 @@ package com.gameplat.admin.service.impl;
 
 import cn.hutool.http.HttpStatus;
 import cn.hutool.json.JSONUtil;
-import com.gameplat.admin.config.LotteryConfig;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.gameplat.admin.service.GameConfigService;
 import com.gameplat.admin.service.NewLotteryForwardService;
 import com.gameplat.base.common.util.StringUtils;
 import com.gameplat.base.common.web.Result;
+import com.gameplat.common.enums.GamePlatformEnum;
 import com.gameplat.security.SecurityUserHolder;
 import com.gameplat.security.context.UserCredential;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
-
 import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.Map;
@@ -23,13 +24,17 @@ public class NewLotteryForwardServiceImpl implements NewLotteryForwardService {
 
   @Autowired private RoutingDelegate routingDelegate;
 
-  @Autowired private LotteryConfig lotteryConfig;
+  @Autowired
+  private GameConfigService gameConfigService;
 
   @Override
   public Object serviceHandler(HttpServletRequest request) {
     String uri = request.getRequestURI();
-    String platformCode = lotteryConfig.getPlatformCode();
-    String proxyCode = lotteryConfig.getProxyCode();
+    JSONObject gameConfig = gameConfigService.getGameConfig(GamePlatformEnum.KGNL.getCode());
+    log.info("彩票配置：{}", JSON.toJSONString(gameConfig));
+    String proxyCode = gameConfig.getString("proxy");
+    String platformCode = gameConfig.getString("platform");
+
     if (StringUtils.isAnyBlank(platformCode, proxyCode)) {
       log.info("彩票服转发前获取租户标识失败 platformCode={}, proxyCode={}", platformCode, proxyCode);
       throw new RuntimeException(
@@ -50,7 +55,7 @@ public class NewLotteryForwardServiceImpl implements NewLotteryForwardService {
     headers.put("username", userCredential.getUsername());
     Object object =
         routingDelegate.redirect(
-            request, headers, lotteryConfig.getServerHost(), "/api/admin/lottery");
+                request, headers, gameConfig.getString("host"), "/api/admin/lottery");
     String result = JSONUtil.toJsonStr(object);
     com.alibaba.fastjson.JSONObject jsonObject1 =
         com.alibaba.fastjson.JSONObject.parseObject(result);

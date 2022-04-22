@@ -120,12 +120,12 @@ public class SpreadLinkInfoServiceImpl extends ServiceImpl<SpreadLinkInfoMapper,
                             SpreadLinkInfo::getRegistCount)
                     .page(page)
                     .convert(spreadLinkInfoConvert::toVo);
-//    for (SpreadConfigVO obj : convert.getRecords()) {
-//      if (StrUtil.isNotBlank(obj.getExternalUrl()) && !obj.getExternalUrl().contains("?rc=")) {
-//        obj.setExternalUrl(
-//                MessageFormat.format("{0}/?rc={1}", obj.getExternalUrl(), obj.getCode()));
-//      }
-//    }
+    for (SpreadConfigVO obj : convert.getRecords()) {
+      if (StrUtil.isNotBlank(obj.getExternalUrl()) && !obj.getExternalUrl().contains("?rc=")) {
+        obj.setExternalUrl(
+                MessageFormat.format("{0}{1}{2}", obj.getExternalUrl(), STR_URL, obj.getCode()));
+      }
+    }
     return convert;
   }
 
@@ -255,7 +255,7 @@ public class SpreadLinkInfoServiceImpl extends ServiceImpl<SpreadLinkInfoMapper,
       }
     }
 
-    linkInfo.setExternalUrl(linkInfo.getExternalUrl() + STR_URL + linkInfo.getCode());
+//    linkInfo.setExternalUrl(linkInfo.getExternalUrl() + STR_URL + linkInfo.getCode());
     boolean saveResult = this.save(linkInfo);
     Assert.isTrue(saveResult, "创建失败！");
     if (saveResult

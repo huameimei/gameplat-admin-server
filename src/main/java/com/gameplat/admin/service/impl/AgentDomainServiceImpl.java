@@ -88,7 +88,7 @@ public class AgentDomainServiceImpl extends ServiceImpl<AgentDomainMapper, Agent
   @SentinelResource(value = "updateAgentDomain")
   public void updateAgentDomain(AgentDomainDTO domainDTO) {
     this.lambdaUpdate()
-            .set(AgentDomain::getPromoteProtocol,domainDTO.getDomain())
+            .set(AgentDomain::getPromoteProtocol,domainDTO.getPromoteProtocol())
             .set(AgentDomain::getDomain,domainDTO.getDomain())
             .set(AgentDomain::getType,domainDTO.getType())
             .set(AgentDomain::getStatus,domainDTO.getStatus())

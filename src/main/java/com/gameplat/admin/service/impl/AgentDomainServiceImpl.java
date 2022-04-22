@@ -95,6 +95,7 @@ public class AgentDomainServiceImpl extends ServiceImpl<AgentDomainMapper, Agent
             .set(AgentDomain::getRemark,domainDTO.getRemark())
             .set(AgentDomain::getUpdateBy,domainDTO.getUpdateBy())
             .set(AgentDomain::getUpdateTime,domainDTO.getUpdateTime())
+            .eq(AgentDomain::getId,domainDTO.getId())
             .update();
   }
 

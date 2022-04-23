@@ -330,8 +330,8 @@
     <select id="pageSubAgentCommission" resultType="com.gameplat.admin.model.vo.AgentCommissionVO">
         select
         <include refid="agentCommission"/>
-        from rebate_same_level_report where parent_id = #{parentId} and parent_id != agent_id and count_date =
-        #{countDate}
+        from rebate_same_level_report where parent_id = #{agentId} and parent_id != agent_id and count_date =
+        #{countMonth}
     </select>
 
     <!--通过ID查看结算状态-->

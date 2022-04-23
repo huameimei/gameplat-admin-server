@@ -280,6 +280,7 @@ public class RechargeOrderController {
    */
   @PostMapping("/fileUserNameRech")
   @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.RECHARGE, desc = "'人工入款批量充值")
+  @PreAuthorize("hasAuthority('finance:rechargeOrder:batchFileRecharge')")
   public void fileUserNameRech(
           ManualRechargeOrderDto dto,
           @RequestPart(value = "file", required = false) MultipartFile file,
@@ -302,6 +303,7 @@ public class RechargeOrderController {
   /** 人工批量充值（文件上传） */
   @PostMapping("/fileRech")
   @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.RECHARGE, desc = "'人工入款文件批量充值")
+  @PreAuthorize("hasAuthority('finance:rechargeOrder:batchRecharge')")
   public void fileRech(
           @RequestPart(value = "file", required = false) MultipartFile file,
           @RequestParam("discountType") Integer discountType,

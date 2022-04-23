@@ -17,6 +17,7 @@ import com.gameplat.admin.model.vo.MemberGrowthLevelVO;
 import com.gameplat.admin.service.*;
 import com.gameplat.model.entity.member.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -50,6 +51,7 @@ public class MemberGrowthLevelServiceImpl
     @Autowired
     private MemberGrowthConfigService growthConfigService;
     @Resource(name = "memberGrowthRecordServiceImpl")
+    @Lazy
     private MemberGrowthRecordService memberGrowthRecordService;
     @Autowired
     private MemberInfoService memberInfoService;
@@ -60,6 +62,7 @@ public class MemberGrowthLevelServiceImpl
     @Autowired
     private MemberService memberService;
     @Resource(name = "memberGrowthStatisServiceImpl")
+    @Lazy
     private MemberGrowthStatisService memberGrowthStatisService;
 
     /**

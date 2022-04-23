@@ -12,19 +12,27 @@ import java.util.Date;
 @Data
 public class MemberDeviceVO implements Serializable {
 
+  @ApiModelProperty(value = "主键")
+  private Long id;
+
   @ApiModelProperty(value = "会员账号")
   private String username;
+
+  @ApiModelProperty(value = "设备名称")
+  private String deviceName;
 
   @ApiModelProperty(value = "设备唯一标识")
   private String deviceClientId;
 
+  @ApiModelProperty(value = "用户代理")
+  private String deviceUserAgent;
+
+  @ApiModelProperty(value = "操作系统")
+  private String deviceOsType;
+
+  @ApiModelProperty(value = "IP地址")
+  private String ip;
+
   @ApiModelProperty(value = "上次登录时间")
   private Date lastLoginTime;
-
-  @ApiModelProperty(value = "是否重复 0未重复 1重复")
-  private Integer isRepetition;
-
-  @ApiModelProperty(value = "同一个设备号的会员数量")
-  private Integer deviceNum;
-
 }

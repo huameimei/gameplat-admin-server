@@ -45,7 +45,7 @@ public class SystemConfigServiceImpl implements SystemConfigService {
 
   @Override
   public List<AgentContacaVO> findAgentContacaList() {
-    String dictData = configService.getValue(DictDataEnum.AGENT_CONTACT_CONFIG);
+    String dictData = configService.getValue(DictDataEnum.AGENT_CONTACT);
     if (StringUtils.isNotBlank(dictData)) {
       return JSONArray.parseArray(dictData, AgentContacaVO.class);
     }
@@ -57,7 +57,7 @@ public class SystemConfigServiceImpl implements SystemConfigService {
   public void updateAgentContaca(AgentContacaDTO dto) {
     SysDictData dictData =
         dictDataService.getDictData(
-            DictTypeEnum.AGENT_CONTACT.getValue(), DictDataEnum.AGENT_CONTACT_CONFIG.getLabel());
+            DictTypeEnum.AGENT_CONTACT_CONFIG.getValue(), DictDataEnum.AGENT_CONTACT.getLabel());
 
     List<AgentContacaConfig> agentContacaConfigList =
         Optional.of(dictData)
@@ -104,7 +104,7 @@ public class SystemConfigServiceImpl implements SystemConfigService {
 
     SysDictData dictData =
         dictDataService.getDictData(
-            DictTypeEnum.AGENT_CONTACT.getValue(), DictDataEnum.AGENT_CONTACT_CONFIG.getLabel());
+            DictTypeEnum.AGENT_CONTACT_CONFIG.getValue(), DictDataEnum.AGENT_CONTACT.getLabel());
 
     List<AgentContacaConfig> agentContacaConfigList =
         Optional.of(dictData)

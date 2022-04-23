@@ -78,7 +78,7 @@ public class HgSportWinReportServiceImpl implements HgSportWinReportService {
     BoolQueryBuilder builder = QueryBuilders.boolQuery();
     builder.must(QueryBuilders.matchQuery("gameKind", GameKindEnum.HG_SPORT.code()));
     builder.must(QueryBuilders.termQuery("settle", SettleStatusEnum.YES.getValue()));
-    builder.must(QueryBuilders.rangeQuery("statTime.keyword").gte(startTimestamp).lte(endTimestamp));
+    builder.must(QueryBuilders.rangeQuery("statTime").gte(startTimestamp).lte(endTimestamp));
     if (StringUtils.isNotEmpty(dto.getMemberAccount())) {
       builder.must(QueryBuilders.termQuery("account.keyword", dto.getMemberAccount()));
     }

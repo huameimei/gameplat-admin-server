@@ -51,6 +51,7 @@ public class MemberGrowthLevelServiceImpl
     @Autowired
     private MemberGrowthConfigService growthConfigService;
     @Resource(name = "memberGrowthRecordServiceImpl")
+    @Lazy
     private MemberGrowthRecordService memberGrowthRecordService;
     @Autowired
     private MemberInfoService memberInfoService;

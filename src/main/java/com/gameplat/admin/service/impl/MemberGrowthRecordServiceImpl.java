@@ -66,6 +66,7 @@ public class MemberGrowthRecordServiceImpl
     private MemberGrowthRecordMapper memberGrowthRecordMapper;
 
     @Resource(name = "memberGrowthLevelServiceImpl")
+    @Lazy
     private MemberGrowthLevelService growthLevelService;
 
     @Autowired

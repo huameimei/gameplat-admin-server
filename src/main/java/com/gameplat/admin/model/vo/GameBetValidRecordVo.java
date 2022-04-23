@@ -127,18 +127,18 @@ public class GameBetValidRecordVo implements Serializable {
       builder.must(QueryBuilders.matchQuery("billNo", dto.getBillNo()));
     }
     if (null != dto.getTimeType() && StringUtils.isNotBlank(dto.getBeginTime())) {
-      String keyword = "betTime.keyword";
+      String keyword = "betTime";
       if (TimeTypeEnum.BET_TIME.getValue() == dto.getTimeType()) {
-        keyword = "betTime.keyword";
+        keyword = "betTime";
       }
       if (TimeTypeEnum.THIRD_TIME.getValue() == dto.getTimeType()) {
-        keyword = "amesTime.keyword";
+        keyword = "amesTime";
       }
       if (TimeTypeEnum.SETTLE_TIME.getValue() == dto.getTimeType()) {
-        keyword = "settleTime.keyword";
+        keyword = "settleTime";
       }
       if (TimeTypeEnum.STAT_TIME.getValue() == dto.getTimeType()) {
-        keyword = "statTime.keyword";
+        keyword = "statTime";
       }
       builder.must(
           QueryBuilders.rangeQuery(keyword)

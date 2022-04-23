@@ -53,7 +53,7 @@ public class GameKGLotteryDto implements Serializable {
     if (StringUtils.isNotEmpty(dto.getLotteryCode())) {
       builder.must(QueryBuilders.termQuery("gameKind", dto.getLotteryCode()));
     }
-    String keyword = "betTime.keyword";
+    String keyword = "betTime";
     builder.must(
         QueryBuilders.rangeQuery(keyword)
             .from(dto.getStartTime())

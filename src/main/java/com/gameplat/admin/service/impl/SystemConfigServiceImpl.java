@@ -16,7 +16,6 @@ import com.gameplat.common.constant.CachedKeys;
 import com.gameplat.common.enums.DefaultEnums;
 import com.gameplat.common.enums.DictDataEnum;
 import com.gameplat.common.enums.DictTypeEnum;
-import com.gameplat.common.lang.Assert;
 import com.gameplat.model.entity.AgentContacaConfig;
 import com.gameplat.model.entity.sys.SysDictData;
 import lombok.extern.slf4j.Slf4j;
@@ -118,9 +117,7 @@ public class SystemConfigServiceImpl implements SystemConfigService {
     dictData.forEach(
         e -> {
           e.setIsDefault(DefaultEnums.NO.value());
-          SysDictData entity =
-              dictDataList.stream().filter(c -> c.getId().equals(e.getId())).findAny().orElse(e);
-          Assert.isTrue(dictDataService.updateById(entity), "修改失败!");
+          dictDataService.saveOrUpdate(this.replaceConfig(dictDataList, e));
         });
   }
 
@@ -132,12 +129,12 @@ public class SystemConfigServiceImpl implements SystemConfigService {
   @Override
   public void updateConfig(String type, Map<String, Object> params) {
     params.forEach(
-        (k, v) ->
+        (label, value) ->
             dictDataService.updateByTypeAndLabel(
                 SysDictData.builder()
                     .dictType(type)
-                    .dictLabel(k)
-                    .dictValue(Optional.ofNullable(v).map(Object::toString).orElse(null))
+                    .dictLabel(label)
+                    .dictValue(Objects.nonNull(value) ? value.toString() : null)
                     .build()));
   }
 
@@ -146,5 +143,12 @@ public class SystemConfigServiceImpl implements SystemConfigService {
   public void testSendEmail(EmailTestDTO dto) {
     // EmailSender sender = EmailSender.buildWithConfig(this.findEmailConfig());
     // sender.send(dto.getSubject(), dto.getContent(), dto.getTo());
+  }
+
+  private SysDictData replaceConfig(List<SysDictData> dictDataList, SysDictData entity) {
+    return dictDataList.stream()
+        .filter(c -> c.getId().equals(entity.getId()))
+        .findAny()
+        .orElse(entity);
   }
 }

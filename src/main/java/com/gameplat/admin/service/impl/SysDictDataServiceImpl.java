@@ -141,6 +141,12 @@ public class SysDictDataServiceImpl extends ServiceImpl<SysDictDataMapper, SysDi
 
   @Override
   @SentinelResource(value = "insertDictData")
+  @CacheInvalidateContainer({
+    @CacheInvalidate(name = CachedKeys.DICT_DATA_CACHE, key = "#dto.dictType"),
+    @CacheInvalidate(
+        name = CachedKeys.DICT_DATA_CACHE,
+        key = "#dto.dictType + ':' + #dto.dictLabel")
+  })
   public void insertDictData(OperDictDataDTO dto) {
     if (this.lambdaQuery()
         .eq(ObjectUtils.isNotNull(dto.getDictType()), SysDictData::getDictType, dto.getDictType())
@@ -168,7 +174,12 @@ public class SysDictDataServiceImpl extends ServiceImpl<SysDictDataMapper, SysDi
 
   @Override
   @SentinelResource(value = "updateDictData")
-  @CacheInvalidate(name = CachedKeys.DICT_DATA_CACHE, key = "#dto.dictType + ':' + #dto.dictLabel")
+  @CacheInvalidateContainer({
+    @CacheInvalidate(name = CachedKeys.DICT_DATA_CACHE, key = "#dto.dictType"),
+    @CacheInvalidate(
+        name = CachedKeys.DICT_DATA_CACHE,
+        key = "#dto.dictType + ':' + #dto.dictLabel")
+  })
   public void updateDictData(OperDictDataDTO dto) {
     SysDictData dictData = dictDataConvert.toEntity(dto);
     if (!this.updateById(dictData)) {
@@ -199,11 +210,10 @@ public class SysDictDataServiceImpl extends ServiceImpl<SysDictDataMapper, SysDi
 
   @Override
   @SentinelResource(value = "addOrUpdateUserWithdrawLimit")
-  @CacheInvalidateContainer(
-      value = {
-        @CacheInvalidate(name = CachedKeys.DICT_DATA_CACHE, key = "#dictType"),
-        @CacheInvalidate(name = CachedKeys.DICT_DATA_CACHE, key = "#dictType + ':' + #dictLabel")
-      })
+  @CacheInvalidateContainer({
+    @CacheInvalidate(name = CachedKeys.DICT_DATA_CACHE, key = "#dictType"),
+    @CacheInvalidate(name = CachedKeys.DICT_DATA_CACHE, key = "#dictType + ':' + #dictLabel")
+  })
   public void addOrUpdateUserWithdrawLimit(
       String dictType, String dictLabel, UserWithdrawLimitInfo limitInfo) {
     if (this.lambdaQuery()
@@ -262,11 +272,10 @@ public class SysDictDataServiceImpl extends ServiceImpl<SysDictDataMapper, SysDi
 
   @Override
   @SentinelResource(value = "deleteByDictLabel")
-  @CacheInvalidateContainer(
-      value = {
-        @CacheInvalidate(name = CachedKeys.DICT_DATA_CACHE, key = "#dictType"),
-        @CacheInvalidate(name = CachedKeys.DICT_DATA_CACHE, key = "#dictType + ':' + #dictLabel")
-      })
+  @CacheInvalidateContainer({
+    @CacheInvalidate(name = CachedKeys.DICT_DATA_CACHE, key = "#dictType"),
+    @CacheInvalidate(name = CachedKeys.DICT_DATA_CACHE, key = "#dictType + ':' + #dictLabel")
+  })
   public void delete(String dictType, String dictLabel) {
     if (!this.lambdaUpdate()
         .eq(SysDictData::getDictType, dictType)
@@ -302,18 +311,24 @@ public class SysDictDataServiceImpl extends ServiceImpl<SysDictDataMapper, SysDi
 
   @Override
   @SentinelResource(value = "saveOrUpdate")
-  @CacheInvalidate(
-      name = CachedKeys.DICT_DATA_CACHE,
-      key = "#entity.dictType + ':' + #entity.dictLabel")
+  @CacheInvalidateContainer({
+    @CacheInvalidate(name = CachedKeys.DICT_DATA_CACHE, key = "#entity.dictType"),
+    @CacheInvalidate(
+        name = CachedKeys.DICT_DATA_CACHE,
+        key = "#entity.dictType + ':' + #entity.dictLabel")
+  })
   public boolean saveOrUpdate(SysDictData entity) {
     return super.saveOrUpdate(entity);
   }
 
   @Override
   @SentinelResource(value = "saveOrUpdate")
-  @CacheInvalidate(
-      name = CachedKeys.DICT_DATA_CACHE,
-      key = "#entity.dictType + ':' + #entity.dictLabel")
+  @CacheInvalidateContainer({
+    @CacheInvalidate(name = CachedKeys.DICT_DATA_CACHE, key = "#entity.dictType"),
+    @CacheInvalidate(
+        name = CachedKeys.DICT_DATA_CACHE,
+        key = "#entity.dictType + ':' + #entity.dictLabel")
+  })
   public boolean saveOrUpdate(SysDictData entity, Wrapper<SysDictData> updateWrapper) {
     return super.saveOrUpdate(entity, updateWrapper);
   }

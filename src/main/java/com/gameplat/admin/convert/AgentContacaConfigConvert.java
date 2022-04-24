@@ -1,6 +1,6 @@
 package com.gameplat.admin.convert;
 
-import com.gameplat.admin.model.dto.AgentContacaDTO;
+import com.gameplat.admin.model.dto.AgentContactDTO;
 import com.gameplat.model.entity.AgentContacaConfig;
 import org.mapstruct.Mapper;
 
@@ -11,5 +11,5 @@ import org.mapstruct.Mapper;
  */
 @Mapper(componentModel = "spring")
 public interface AgentContacaConfigConvert {
-  AgentContacaConfig toEntity(AgentContacaDTO dto);
+  AgentContacaConfig toEntity(AgentContactDTO dto);
 }

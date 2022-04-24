@@ -82,8 +82,11 @@ public class HgSportWinReportServiceImpl implements HgSportWinReportService {
     if (StringUtils.isNotEmpty(dto.getMemberAccount())) {
       builder.must(QueryBuilders.termQuery("account.keyword", dto.getMemberAccount()));
     }
-    if (StringUtils.isNotEmpty(dto.getSportType())) {
-      builder.must(QueryBuilders.termQuery("sportType.keyword", dto.getSportType()));
+    if (StringUtils.isNotNull(dto.getHandicapType())) {
+      builder.must(QueryBuilders.termQuery("handicapType", dto.getHandicapType()));
+    }
+    if (StringUtils.isNotNull(dto.getSportType())) {
+      builder.must(QueryBuilders.termQuery("sportType", dto.getSportType()));
     }
     if (StringUtils.isNotEmpty(dto.getProxyAccount())) {
       BoolQueryBuilder builder2 = QueryBuilders.boolQuery();

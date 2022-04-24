@@ -27,7 +27,7 @@ public class HgSportWinReportQueryDTO implements Serializable {
   private Integer handicapType;
 
   @ApiModelProperty(value = "运动类型 1足球 2篮球")
-  private String sportType;
+  private Integer sportType;
 
   @ApiModelProperty(value = "开始时间")
   @NotEmpty(message = "开始时间不能为空")

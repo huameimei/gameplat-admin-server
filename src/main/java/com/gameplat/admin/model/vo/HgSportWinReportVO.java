@@ -1,13 +1,18 @@
 package com.gameplat.admin.model.vo;
 
 import cn.afterturn.easypoi.excel.annotation.Excel;
+import cn.hutool.json.JSONObject;
+import cn.hutool.json.JSONUtil;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.gameplat.base.common.util.StringUtils;
 import com.gameplat.common.util.I18nSerializerUtils;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import org.springframework.context.i18n.LocaleContextHolder;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.Locale;
 
 /**
  * @author aBen
@@ -19,7 +24,6 @@ public class HgSportWinReportVO implements Serializable {
 
   @ApiModelProperty(value = "投注类型名字")
   @Excel(name = "投注类型", width = 15, isImportField = "true_st")
-  @JsonSerialize(using = I18nSerializerUtils.class)
   private String betTypeName;
 
   @ApiModelProperty(value = "投注类型")
@@ -67,5 +71,18 @@ public class HgSportWinReportVO implements Serializable {
 
   @ApiModelProperty(value = "结束时间")
   private Long endTime;
+
+  public void setBetTypeName(String jsonStr) {
+    if (StringUtils.isNotEmpty(jsonStr)) {
+      Locale locale = LocaleContextHolder.getLocale();
+      JSONObject jsonObject = JSONUtil.parseObj(jsonStr);
+      String str = jsonObject.getStr(locale.toLanguageTag());
+      // 如果浏览器语言不在5种语言内，则默认返回中文
+      if (StringUtils.isEmpty(str)) {
+        str = jsonObject.getStr("zh-CN");
+      }
+      this.betTypeName = str;
+    }
+  }
 
 }

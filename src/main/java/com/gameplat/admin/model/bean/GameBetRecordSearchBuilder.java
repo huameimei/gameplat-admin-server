@@ -35,6 +35,9 @@ public class GameBetRecordSearchBuilder {
     if (StringUtils.isNotEmpty(dto.getGameCode())) {
       builder.must(QueryBuilders.termQuery("gameCode", dto.getGameCode()));
     }
+    if (StringUtils.isNotEmpty(dto.getSettle())) {
+      builder.must(QueryBuilders.matchQuery("settle", dto.getSettle()));
+    }
     if (StringUtils.isNotEmpty(dto.getProxyAccount())) {
       BoolQueryBuilder builder2 = QueryBuilders.boolQuery();
       if (StringUtils.isNotNull(dto.getIsDirectly()) && dto.getIsDirectly() == 0) {

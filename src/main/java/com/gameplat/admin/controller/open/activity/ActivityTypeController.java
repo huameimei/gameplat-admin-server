@@ -115,7 +115,8 @@ public class ActivityTypeController {
     JSONObject jsonObject = JSONObject.parseObject(activityTypeConfig);
     JSONArray jsonArray = jsonObject.getJSONArray(language);
     if (CollectionUtils.isEmpty(jsonArray)) {
-      throw new ServiceException("语言【" + language + "】活动板块类型配置信息不存在");
+      // 默认中文
+      jsonArray = jsonObject.getJSONArray("zh-CN");
     }
 
     List<CodeDataVO> codeDataVOList = new ArrayList<>();

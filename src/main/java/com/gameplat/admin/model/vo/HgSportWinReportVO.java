@@ -23,7 +23,7 @@ import java.util.Locale;
 public class HgSportWinReportVO implements Serializable {
 
   @ApiModelProperty(value = "投注类型名字")
-  @Excel(name = "投注类型", width = 15, isImportField = "true_st")
+  @Excel(name = "投注类型", width = 20, isImportField = "true_st")
   private String betTypeName;
 
   @ApiModelProperty(value = "投注类型")

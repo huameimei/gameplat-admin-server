@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @RefreshScope
 @Data
-public class TenantConfig {
+public class SysTheme {
   @Value(value = "${tenant}")
   private String tenantCode;
 }

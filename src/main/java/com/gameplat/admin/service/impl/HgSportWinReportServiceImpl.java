@@ -3,7 +3,7 @@ package com.gameplat.admin.service.impl;
 import cn.afterturn.easypoi.excel.ExcelExportUtil;
 import cn.afterturn.easypoi.excel.entity.ExportParams;
 import com.alibaba.fastjson.JSONObject;
-import com.gameplat.admin.config.TenantConfig;
+import com.gameplat.admin.config.SysTheme;
 import com.gameplat.admin.model.dto.HgSportWinReportQueryDTO;
 import com.gameplat.admin.model.vo.HgSportWinReportVO;
 import com.gameplat.admin.service.HgSportWinReportService;
@@ -48,7 +48,7 @@ import java.util.List;
 public class HgSportWinReportServiceImpl implements HgSportWinReportService {
 
   @Autowired
-  private TenantConfig tenantConfig;
+  private SysTheme sysTheme;
 
   @Resource
   private RestHighLevelClient restHighLevelClient;
@@ -71,7 +71,7 @@ public class HgSportWinReportServiceImpl implements HgSportWinReportService {
   }
 
   public List<HgSportWinReportVO> findHgReportData(HgSportWinReportQueryDTO dto) {
-    String tenant = tenantConfig.getTenantCode();
+    String tenant = sysTheme.getTenantCode();
     long startTimestamp = DateUtils.parseDate(dto.getBeginTime(), "yyyy-MM-dd HH:mm:ss").getTime();
     long endTimestamp = DateUtils.parseDate(dto.getEndTime(), "yyyy-MM-dd HH:mm:ss").getTime();
 

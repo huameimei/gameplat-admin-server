@@ -44,7 +44,7 @@ public class OtthController {
   private static final String ROOM_MEMBER_BATCHADD_URL = "api_room_batchAddMember";
   private static final String API_ROOM_UPDATE = "api_room_update";
   @Autowired private OtthService otthService;
-  @Autowired private TenantDomainService tenantDomainService;
+  @Autowired private SysDomainService sysDomainService;
   @Autowired private ChatLeaderBoardService chatLeaderBoardService;
   @Autowired private SysTenantSettingService sysTenantSettingService;
   @Autowired private ChatPushPlanService chatPushPlanService;
@@ -149,7 +149,7 @@ public class OtthController {
   }
 
   private String getApiUrl(String url) {
-    String chatDomain = tenantDomainService.getChatDomain();
+    String chatDomain = sysDomainService.getChatDomain();
     url = chatDomain + "/" + url.replace("_", "/");
     return url;
   }

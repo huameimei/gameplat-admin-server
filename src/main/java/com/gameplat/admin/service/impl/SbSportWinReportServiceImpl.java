@@ -1,13 +1,10 @@
 package com.gameplat.admin.service.impl;
 
-import cn.afterturn.easypoi.excel.ExcelExportUtil;
-import cn.afterturn.easypoi.excel.entity.ExportParams;
 import com.alibaba.fastjson.JSONObject;
-import com.gameplat.admin.config.TenantConfig;
+import com.gameplat.admin.config.SysTheme;
 import com.gameplat.admin.model.dto.HgSportWinReportQueryDTO;
 import com.gameplat.admin.model.dto.SbSportWinReportQueryDTO;
 import com.gameplat.admin.model.vo.HgSportWinReportVO;
-import com.gameplat.admin.service.HgSportWinReportService;
 import com.gameplat.admin.service.SbSportWinReportService;
 import com.gameplat.base.common.constant.ContextConstant;
 import com.gameplat.base.common.util.Converts;
@@ -17,7 +14,6 @@ import com.gameplat.common.enums.GameKindEnum;
 import com.gameplat.common.enums.SettleStatusEnum;
 import joptsimple.internal.Strings;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.poi.ss.usermodel.Workbook;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.HttpAsyncResponseConsumerFactory;
@@ -31,7 +27,6 @@ import org.elasticsearch.search.aggregations.bucket.terms.TermsAggregationBuilde
 import org.elasticsearch.search.aggregations.metrics.*;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -51,7 +46,7 @@ import java.util.List;
 public class SbSportWinReportServiceImpl implements SbSportWinReportService {
 
   @Autowired
-  private TenantConfig tenantConfig;
+  private SysTheme sysTheme;
 
   @Resource
   private RestHighLevelClient restHighLevelClient;
@@ -67,7 +62,7 @@ public class SbSportWinReportServiceImpl implements SbSportWinReportService {
   }
 
   public List<HgSportWinReportVO> findHgReportData(HgSportWinReportQueryDTO dto) {
-    String tenant = tenantConfig.getTenantCode();
+    String tenant = sysTheme.getTenantCode();
     long startTimestamp = DateUtils.parseDate(dto.getBeginTime(), "yyyy-MM-dd HH:mm:ss").getTime();
     long endTimestamp = DateUtils.parseDate(dto.getEndTime(), "yyyy-MM-dd HH:mm:ss").getTime();
 

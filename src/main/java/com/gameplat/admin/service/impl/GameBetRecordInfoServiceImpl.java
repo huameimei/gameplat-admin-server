@@ -2,7 +2,7 @@ package com.gameplat.admin.service.impl;
 
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.gameplat.admin.config.TenantConfig;
+import com.gameplat.admin.config.SysTheme;
 import com.gameplat.admin.convert.GameBetRecordConvert;
 import com.gameplat.admin.model.bean.ActivityStatisticItem;
 import com.gameplat.admin.model.bean.GameBetRecordSearchBuilder;
@@ -22,7 +22,7 @@ import com.gameplat.common.util.MathUtils;
 import com.gameplat.elasticsearch.page.PageResponse;
 import com.gameplat.elasticsearch.service.IBaseElasticsearchService;
 import com.gameplat.model.entity.game.GameBetRecord;
-import java.io.IOException;
+
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -67,7 +67,7 @@ public class GameBetRecordInfoServiceImpl implements GameBetRecordInfoService {
 
   @Autowired private GameConfigService gameConfigService;
 
-  @Autowired private TenantConfig tenantConfig;
+  @Autowired private SysTheme sysTheme;
 
   @Resource private RestHighLevelClient restHighLevelClient;
 
@@ -91,7 +91,7 @@ public class GameBetRecordInfoServiceImpl implements GameBetRecordInfoService {
     SortBuilder<FieldSortBuilder> sortBuilder =
         SortBuilders.fieldSort(GameBetRecordSearchBuilder.convertTimeType(dto.getTimeType()))
             .order(SortOrder.DESC);
-    String indexName = ContextConstant.ES_INDEX.BET_RECORD_ + tenantConfig.getTenantCode();
+    String indexName = ContextConstant.ES_INDEX.BET_RECORD_ + sysTheme.getTenantCode();
     // 调用封装的分页 页码不用减1
     PageResponse<GameBetRecord> result =
         baseElasticsearchService.search(

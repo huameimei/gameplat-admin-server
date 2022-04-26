@@ -8,7 +8,7 @@ import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.gameplat.admin.config.TenantConfig;
+import com.gameplat.admin.config.SysTheme;
 import com.gameplat.admin.mapper.GameBetDailyReportMapper;
 import com.gameplat.admin.model.bean.ActivityStatisticItem;
 import com.gameplat.admin.model.dto.GameBetDailyReportQueryDTO;
@@ -72,7 +72,7 @@ public class GameBetDailyReportServiceImpl
   @Autowired public RestHighLevelClient restHighLevelClient;
   @Autowired private MemberService memberService;
   @Autowired private GameBetDailyReportMapper gameBetDailyReportMapper;
-  @Autowired private TenantConfig tenantConfig;
+  @Autowired private SysTheme sysTheme;
 
   @Override
   public PageDtoVO queryPage(Page<GameBetDailyReport> page, GameBetDailyReportQueryDTO dto) {
@@ -136,7 +136,7 @@ public class GameBetDailyReportServiceImpl
         statTime);
     // 获取某一游戏平台当天的统计数据 结算时间为传入时间， 已结算的
     BoolQueryBuilder builder = QueryBuilders.boolQuery();
-    builder.must(QueryBuilders.termQuery("tenant.keyword", tenantConfig.getTenantCode()));
+    builder.must(QueryBuilders.termQuery("tenant.keyword", sysTheme.getTenantCode()));
     builder.must(QueryBuilders.termQuery("settle", SettleStatusEnum.YES.getValue()));
     builder.must(QueryBuilders.termQuery("platformCode.keyword", gamePlatform.getCode()));
     Date statDate = DateUtils.parseDate(statTime, DateUtils.DATE_PATTERN);
@@ -149,7 +149,7 @@ public class GameBetDailyReportServiceImpl
 
     // 统计条数
     CountRequest countRequest =
-        new CountRequest(ContextConstant.ES_INDEX.BET_RECORD_ + tenantConfig.getTenantCode());
+        new CountRequest(ContextConstant.ES_INDEX.BET_RECORD_ + sysTheme.getTenantCode());
     countRequest.query(builder);
     try {
       RequestOptions.Builder optionsBuilder = RequestOptions.DEFAULT.toBuilder();
@@ -184,7 +184,7 @@ public class GameBetDailyReportServiceImpl
         // 查询出所有数据
         List<GameBetDailyReport> list = new ArrayList<>();
         SearchRequest searchRequest =
-            new SearchRequest(ContextConstant.ES_INDEX.BET_RECORD_ + tenantConfig.getTenantCode());
+            new SearchRequest(ContextConstant.ES_INDEX.BET_RECORD_ + sysTheme.getTenantCode());
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
         TermsAggregationBuilder accountGroup =
             AggregationBuilders.terms("accountGroup").field("account.keyword");

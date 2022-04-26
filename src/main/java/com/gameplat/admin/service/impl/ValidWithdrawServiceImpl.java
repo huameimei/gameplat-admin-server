@@ -8,7 +8,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.gameplat.admin.config.TenantConfig;
+import com.gameplat.admin.config.SysTheme;
 import com.gameplat.admin.convert.ValidWithdrawConvert;
 import com.gameplat.admin.mapper.ValidWithdrawMapper;
 import com.gameplat.admin.model.bean.GameBetRecordSearchBuilder;
@@ -59,7 +59,7 @@ public class ValidWithdrawServiceImpl extends ServiceImpl<ValidWithdrawMapper, V
 
   @Resource private IBaseElasticsearchService baseElasticsearchService;
 
-  @Resource private TenantConfig tenantConfig;
+  @Resource private SysTheme sysTheme;
 
   private static BigDecimal safetyGetDecimal(BigDecimal d) {
     return Optional.ofNullable(d).orElse(BigDecimal.ZERO);
@@ -338,7 +338,7 @@ public class ValidWithdrawServiceImpl extends ServiceImpl<ValidWithdrawMapper, V
     if (StringUtils.isEmpty(validWithdraw)) {
       return;
     }
-    String indexName = ContextConstant.ES_INDEX.BET_RECORD_ + tenantConfig.getTenantCode();
+    String indexName = ContextConstant.ES_INDEX.BET_RECORD_ + sysTheme.getTenantCode();
     validWithdraw.forEach(
         a -> {
           GameVaildBetRecordQueryDTO dto =

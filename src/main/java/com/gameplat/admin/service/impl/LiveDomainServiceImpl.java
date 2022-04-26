@@ -3,7 +3,7 @@ package com.gameplat.admin.service.impl;
 import cn.hutool.http.HttpRequest;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.gameplat.admin.config.TenantConfig;
+import com.gameplat.admin.config.SysTheme;
 import com.gameplat.admin.model.bean.SportGameConfig;
 import com.gameplat.admin.model.bean.SportProperty;
 import com.gameplat.admin.model.dto.LiveDomainParamDTO;
@@ -32,12 +32,12 @@ public class LiveDomainServiceImpl implements ILiveDomainService {
 
   @Autowired private SportRequestUtil requestUtil;
 
-  @Autowired private TenantConfig tenantConfig;
+  @Autowired private SysTheme sysTheme;
 
   @Override
   public String getLiveDomainTrafficData(LiveDomainParamDTO param) {
     try {
-      String tenant = tenantConfig.getTenantCode();
+      String tenant = sysTheme.getTenantCode();
       JSONObject sportConfigJson = gameConfigService.getGameConfig("SB");
       SportGameConfig config =
           JSONObject.parseObject(sportConfigJson.toJSONString(), SportGameConfig.class);
@@ -73,7 +73,7 @@ public class LiveDomainServiceImpl implements ILiveDomainService {
   @Override
   public Object getLiveDomainList(LiveDomainParamDTO param) {
     try {
-      String tenant = tenantConfig.getTenantCode();
+      String tenant = sysTheme.getTenantCode();
       JSONObject sportConfigJson = gameConfigService.getGameConfig("SB");
       SportGameConfig config =
           JSONObject.parseObject(sportConfigJson.toJSONString(), SportGameConfig.class);

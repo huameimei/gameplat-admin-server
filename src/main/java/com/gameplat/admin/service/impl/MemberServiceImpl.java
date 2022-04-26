@@ -13,7 +13,7 @@ import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.component.MemberQueryCondition;
-import com.gameplat.admin.config.TenantConfig;
+import com.gameplat.admin.config.SysTheme;
 import com.gameplat.admin.constant.SystemConstant;
 import com.gameplat.admin.convert.MemberConvert;
 import com.gameplat.admin.mapper.MemberMapper;
@@ -80,7 +80,7 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
 
   @Autowired private OnlineUserService onlineUserService;
 
-  @Autowired private TenantConfig tenantConfig;
+  @Autowired private SysTheme sysTheme;
 
   @Autowired private GameTransferInfoService gameTransferInfoService;
 
@@ -551,10 +551,10 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
   public Member getMemberAndFillGameAccount(String account) {
     Member member = this.getByAccount(account).orElseThrow(() -> new ServiceException("会员信息不存在!"));
     if (StringUtils.isBlank(member.getGameAccount())) {
-      Assert.notNull(tenantConfig.getTenantCode(), "平台编码未配置，请联系客服");
+      Assert.notNull(sysTheme.getTenantCode(), "平台编码未配置，请联系客服");
       // 固定13位
       StringBuffer gameAccount =
-          new StringBuffer(tenantConfig.getTenantCode()).append(member.getId());
+          new StringBuffer(sysTheme.getTenantCode()).append(member.getId());
       String suffix = RandomUtil.randomString(13 - gameAccount.length());
       member.setGameAccount(gameAccount.append(suffix).toString());
       Assert.isTrue(this.updateById(member), "添加会员游戏账号信息!");

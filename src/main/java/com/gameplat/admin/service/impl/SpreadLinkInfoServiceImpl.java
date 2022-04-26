@@ -120,12 +120,12 @@ public class SpreadLinkInfoServiceImpl extends ServiceImpl<SpreadLinkInfoMapper,
                             SpreadLinkInfo::getRegistCount)
                     .page(page)
                     .convert(spreadLinkInfoConvert::toVo);
-//    for (SpreadConfigVO obj : convert.getRecords()) {
-//      if (StrUtil.isNotBlank(obj.getExternalUrl()) && !obj.getExternalUrl().contains("?rc=")) {
-//        obj.setExternalUrl(
-//                MessageFormat.format("{0}/?rc={1}", obj.getExternalUrl(), obj.getCode()));
-//      }
-//    }
+    for (SpreadConfigVO obj : convert.getRecords()) {
+      if (StrUtil.isNotBlank(obj.getExternalUrl()) && !obj.getExternalUrl().contains("?rc=")) {
+        obj.setExternalUrl(
+                MessageFormat.format("{0}{1}{2}", obj.getExternalUrl(), STR_URL, obj.getCode()));
+      }
+    }
     return convert;
   }
 
@@ -210,18 +210,18 @@ public class SpreadLinkInfoServiceImpl extends ServiceImpl<SpreadLinkInfoMapper,
 
     // 推广码最少字符限制
     SysDictData agentMinCodeNumData =
-            sysDictDataService.getDictData(
-                    DictTypeEnum.SYSTEM_PARAMETER_CONFIG.getValue(),
-                    DictDataEnum.AGENT_MIN_CODE_NUM.getLabel());
+        sysDictDataService.getDictData(
+            DictTypeEnum.SYSTEM_PARAMETER_CONFIG.getValue(),
+            DictDataEnum.MAX_SPREAD_LENGTH.getLabel());
     Integer agentMinCodeNum = 0;
     if (agentMinCodeNumData != null) {
       agentMinCodeNum = Convert.toInt(agentMinCodeNumData.getDictValue());
     }
     // 代理推广码最大条数
     SysDictData agentMaxSpreadNumData =
-            sysDictDataService.getDictData(
-                    DictTypeEnum.SYSTEM_PARAMETER_CONFIG.getValue(),
-                    DictDataEnum.AGENT_MAX_SPREAD_NUM.getLabel());
+        sysDictDataService.getDictData(
+            DictTypeEnum.SYSTEM_PARAMETER_CONFIG.getValue(),
+            DictDataEnum.MAX_SPREAD_NUM.getLabel());
     Integer agentMaxSpreadNum = 1;
     if (agentMaxSpreadNumData != null) {
       agentMaxSpreadNum = Convert.toInt(agentMaxSpreadNumData.getDictValue());
@@ -255,7 +255,7 @@ public class SpreadLinkInfoServiceImpl extends ServiceImpl<SpreadLinkInfoMapper,
       }
     }
 
-    linkInfo.setExternalUrl(linkInfo.getExternalUrl() + STR_URL + linkInfo.getCode());
+//    linkInfo.setExternalUrl(linkInfo.getExternalUrl() + STR_URL + linkInfo.getCode());
     boolean saveResult = this.save(linkInfo);
     Assert.isTrue(saveResult, "创建失败！");
     if (saveResult

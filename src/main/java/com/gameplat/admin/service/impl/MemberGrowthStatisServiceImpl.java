@@ -30,6 +30,7 @@ import com.gameplat.model.entity.member.*;
 import com.gameplat.model.entity.message.Message;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -59,14 +60,16 @@ public class MemberGrowthStatisServiceImpl
     private MemberGrowthStatisConvert statisConvert;
 
     @Resource(name = "memberGrowthLevelServiceImpl")
+    @Lazy
     private MemberGrowthLevelService growthLevelService;
 
-  @Autowired private MemberGrowthStatisMapper memberGrowthStatisMapper;
+    @Autowired private MemberGrowthStatisMapper memberGrowthStatisMapper;
 
     @Autowired
     private MemberGrowthConfigService memberGrowthConfigService;
 
     @Resource(name = "memberGrowthRecordServiceImpl")
+    @Lazy
     private MemberGrowthRecordService memberGrowthRecordService;
 
     @Autowired

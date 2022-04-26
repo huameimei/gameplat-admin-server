@@ -7,7 +7,7 @@ import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.gameplat.admin.config.TenantConfig;
+import com.gameplat.admin.config.SysTheme;
 import com.gameplat.admin.convert.GameFinancialReportConvert;
 import com.gameplat.admin.enums.TimeTypeEnum;
 import com.gameplat.admin.mapper.GameFinancialReportMapper;
@@ -72,7 +72,7 @@ public class GameFinancialReportServiceImpl
   private GameFinancialReportMapper gameFinancialReportMapper;
 
   @Autowired
-  private TenantConfig tenantConfig;
+  private SysTheme sysTheme;
 
   @Autowired
   private GameFinancialReportConvert gameFinancialReportConvert;
@@ -248,7 +248,7 @@ public class GameFinancialReportServiceImpl
    * @return
    */
   public List<GameFinancialReport> statisticsGameReportList(String statisticsTime) {
-    String tenant = tenantConfig.getTenantCode();
+    String tenant = sysTheme.getTenantCode();
     // 统计开始时间
     String startTime = statisticsTime + "-01 00:00:00";
     // 当前统计月份的最后一天的日期

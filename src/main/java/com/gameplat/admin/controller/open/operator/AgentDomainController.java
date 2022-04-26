@@ -27,6 +27,7 @@ public class AgentDomainController {
    * 代理域名列表
    */
   @GetMapping("/agentDomainList")
+  @PreAuthorize("hasAuthority('diffusion:agnetDomain:list')")
   public IPage<AgentDomainVO> agentDomainList(PageDTO<AgentDomain> page, AgentDomainDTO domainDTO) {
     return domainService.agentDomainList(page,domainDTO);
   }

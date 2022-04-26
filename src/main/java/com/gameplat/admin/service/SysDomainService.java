@@ -1,12 +1,12 @@
 package com.gameplat.admin.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.gameplat.model.entity.setting.TenantDomain;
+import com.gameplat.model.entity.setting.SysDomain;
 
 /**
  * @author Lily
  */
-public interface TenantDomainService extends IService<TenantDomain> {
+public interface SysDomainService extends IService<SysDomain> {
 
   String getChatDomain();
 }

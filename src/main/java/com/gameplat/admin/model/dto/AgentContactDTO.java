@@ -1,19 +1,12 @@
-package com.gameplat.admin.model.vo;
+package com.gameplat.admin.model.dto;
 
-import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.io.Serializable;
 
-/**
- * @author lily
- * @description 代理联系方式
- * @date 2022/1/3
- */
 @Data
-@ApiModel(value = "代理联系方式VO", description = "代理联系方式VO")
-public class AgentContacaVO implements Serializable {
+public class AgentContactDTO implements Serializable {
 
   @ApiModelProperty(value = "主键")
   private Long id;

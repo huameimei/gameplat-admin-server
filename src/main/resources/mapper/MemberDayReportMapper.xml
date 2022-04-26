@@ -419,7 +419,7 @@
 
     <select id="findMemberGameDayReport" resultMap="memberGameDayReport">
         SELECT
-        d.count_date,
+        b.count_date,
         ifnull(a.bank_count,0) bank_count,
         ifnull(a.bank_money,0) bank_money,
         ifnull(a.online_count,0) online_count,
@@ -447,8 +447,35 @@
         ifnull(b.real_water_amount,0) real_water_amount,
         ifnull(b.totail_game_winAmout,0) totail_game_winAmout
         FROM
-        tab_qp_date d left JOIN
         (
+        SELECT
+        count_date,
+        sum( sport_valid_amount ) sport_valid_amount,
+        sum( sport_win_amount ) sport_win_amount,
+        sum( lottery_valid_amount ) lottery_valid_amount,
+        sum( lottery_win_amount ) lottery_win_amount,
+        sum( real_valid_amount ) real_valid_amount,
+        sum( real_win_amount ) real_win_amount,
+        sum( real_water_amount ) real_water_amount,
+        sum( lottery_win_amount + sport_win_amount + real_win_amount ) totail_game_winAmout
+        FROM
+        member_day_report
+        where
+        count_date BETWEEN #{dto.startTime} and #{dto.endTime}
+        <if test="dto.type != null and dto.type == 1">
+            <if test="dto.username != null and dto.username != ''">
+                and agent_path like concat('%',#{dto.username},'%')
+            </if>
+        </if>
+        <if test="dto.type == null or dto.type != 1">
+            <if test="dto.username != null and dto.username != ''">
+                and user_name = #{dto.username}
+            </if>
+        </if>
+        GROUP BY
+        count_date
+        ) b
+        left JOIN (
         SELECT
         stat_time,
         sum( bank_count ) bank_count,
@@ -487,37 +514,7 @@
         </if>
         GROUP BY
         stat_time
-        ) a on d.count_date = a.stat_time
-        left JOIN (
-        SELECT
-        count_date,
-        sum( sport_valid_amount ) sport_valid_amount,
-        sum( sport_win_amount ) sport_win_amount,
-        sum( lottery_valid_amount ) lottery_valid_amount,
-        sum( lottery_win_amount ) lottery_win_amount,
-        sum( real_valid_amount ) real_valid_amount,
-        sum( real_win_amount ) real_win_amount,
-        sum( real_water_amount ) real_water_amount,
-        sum( lottery_win_amount + sport_win_amount + real_win_amount ) totail_game_winAmout
-        FROM
-        member_day_report
-        where
-        count_date BETWEEN #{dto.startTime} and #{dto.endTime}
-        <if test="dto.type != null and dto.type == 1">
-            <if test="dto.username != null and dto.username != ''">
-                and agent_path like concat('%',#{dto.username},'%')
-            </if>
-        </if>
-        <if test="dto.type == null or dto.type != 1">
-            <if test="dto.username != null and dto.username != ''">
-                and user_name = #{dto.username}
-            </if>
-        </if>
-        GROUP BY
-        count_date
-        ) b ON d.count_date = b.count_date
-        where
-        d.count_date BETWEEN #{dto.startTime} and #{dto.endTime}
+        ) a ON a.stat_time = b.count_date
     </select>
 
 

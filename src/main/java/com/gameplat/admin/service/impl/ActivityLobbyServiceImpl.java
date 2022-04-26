@@ -536,14 +536,14 @@ public class ActivityLobbyServiceImpl extends ServiceImpl<ActivityLobbyMapper, A
   @Override
   public List<ActivityLobbyVO> findAllLobbyList() {
     List<ActivityLobby> activityLobbies =
-        this.lambdaQuery().eq(ActivityLobby::getStatus, BooleanEnum.YES.value()).list();
+            this.lambdaQuery()
+                    .eq(ActivityLobby::getStatus, BooleanEnum.YES.value())
+                    .le(ActivityLobby::getStartTime, DateUtil.getNowTime())
+                    .ge(ActivityLobby::getEndTime, DateUtil.getNowTime())
+                    .list();
     if (CollectionUtils.isEmpty(activityLobbies)) {
       return new ArrayList<>();
     }
-    List<ActivityLobbyVO> lobbyList = new ArrayList<>(activityLobbies.size());
-    for (ActivityLobby activityLobby : activityLobbies) {
-      lobbyList.add(activityLobbyConvert.toVo(activityLobby));
-    }
-    return lobbyList;
+    return activityLobbies.stream().map(activityLobbyConvert::toVo).collect(Collectors.toList());
   }
 }

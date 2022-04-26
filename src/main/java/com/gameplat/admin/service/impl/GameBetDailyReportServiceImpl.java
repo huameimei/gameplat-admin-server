@@ -187,7 +187,7 @@ public class GameBetDailyReportServiceImpl
             new SearchRequest(ContextConstant.ES_INDEX.BET_RECORD_ + sysTheme.getTenantCode());
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
         TermsAggregationBuilder accountGroup =
-            AggregationBuilders.terms("accountGroup").field("account.keyword");
+            AggregationBuilders.terms("accountGroup").field("account.keyword").size((int)sumCount);
         TermsAggregationBuilder gameKindGroup =
             AggregationBuilders.terms("gameKindGroup").field("gameKind.keyword");
 

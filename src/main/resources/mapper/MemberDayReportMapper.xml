@@ -91,18 +91,18 @@
         </if>
         <if test="dto.isFristCharge != null and dto.isFristCharge != ''">
             <if test="dto.isFristCharge == dto.isNFristCharge">
-                and first_recharge_amount is null
+                and first_recharge_amount = 0
             </if>
             <if test="dto.isFristCharge == dto.isYFristCharge">
-                and first_recharge_amount is not null
+                and first_recharge_amount > 0
             </if>
         </if>
         <if test="dto.isFristWithdraw != null and dto.isFristWithdraw != ''">
             <if test="dto.isFristWithdraw == dto.isNFristWithdraw">
-                and first_withdraw_amount is null
+                and first_withdraw_amount = 0
             </if>
             <if test="dto.isFristWithdraw == dto.isYFristWithdraw">
-                and first_withdraw_amount is not null
+                and first_withdraw_amount > 0
             </if>
         </if>
         GROUP BY

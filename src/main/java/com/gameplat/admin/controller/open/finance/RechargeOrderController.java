@@ -10,6 +10,7 @@ import com.gameplat.admin.model.vo.MemberRechBalanceVO;
 import com.gameplat.admin.model.vo.RechargeOrderVO;
 import com.gameplat.admin.model.vo.SummaryVO;
 import com.gameplat.admin.model.vo.WithdrawChargeVO;
+import com.gameplat.admin.service.GameTransferRecordService;
 import com.gameplat.admin.service.MemberWithdrawService;
 import com.gameplat.admin.service.RechargeOrderService;
 import com.gameplat.base.common.exception.ServiceException;
@@ -44,6 +45,8 @@ public class RechargeOrderController {
   private MemberWithdrawService memberWithdrawService;
   @Autowired
   private DistributedLocker distributedLocker;
+  @Autowired
+  private GameTransferRecordService gameTransferRecordService;
 
   @PostMapping("/handle")
   @PreAuthorize("hasAuthority('finance:rechargeOrder:handle')")
@@ -268,10 +271,15 @@ public class RechargeOrderController {
   @GetMapping("/withdraw_charge")
   public WithdrawChargeVO getTotal() {
     WithdrawChargeVO vo = new WithdrawChargeVO();
+    //未受理充值订单
     long rechargeCount = rechargeOrderService.getUntreatedRechargeCount();
+    //未受理提现订单
     long withdrawCount = memberWithdrawService.getUntreatedWithdrawCount();
+    //额度流水补发
+    long warningCount = gameTransferRecordService.findGameTransferFailRecord();
     vo.setRechargeCount(rechargeCount);
     vo.setWithdrawCount(withdrawCount);
+    vo.setWarningCount(warningCount);
     return vo;
   }
 

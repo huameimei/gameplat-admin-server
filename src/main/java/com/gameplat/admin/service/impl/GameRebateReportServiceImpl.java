@@ -3,6 +3,7 @@ package com.gameplat.admin.service.impl;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.json.JSONUtil;
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
@@ -21,22 +22,20 @@ import com.gameplat.admin.model.vo.GameMemberDayReportVO;
 import com.gameplat.admin.model.vo.GameReportVO;
 import com.gameplat.admin.model.vo.MemberInfoVO;
 import com.gameplat.admin.model.vo.PageDtoVO;
-import com.gameplat.admin.service.GameBlacklistService;
-import com.gameplat.admin.service.GameRebateReportService;
-import com.gameplat.admin.service.MemberBillService;
-import com.gameplat.admin.service.MemberInfoService;
-import com.gameplat.admin.service.MemberService;
-import com.gameplat.admin.service.ValidWithdrawService;
+import com.gameplat.admin.service.*;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.json.JsonUtils;
 import com.gameplat.common.enums.GameBlacklistTypeEnum;
+import com.gameplat.common.enums.LimitEnums;
 import com.gameplat.common.enums.TranTypes;
 import com.gameplat.common.lang.Assert;
+import com.gameplat.common.model.bean.limit.MemberWithdrawLimit;
 import com.gameplat.model.entity.game.GameBlacklist;
 import com.gameplat.model.entity.game.GameRebateConfig;
 import com.gameplat.model.entity.game.GameRebateDetail;
 import com.gameplat.model.entity.game.GameRebatePeriod;
 import com.gameplat.model.entity.game.GameRebateReport;
+import com.gameplat.model.entity.limit.LimitInfo;
 import com.gameplat.model.entity.member.Member;
 import com.gameplat.model.entity.member.MemberBill;
 import com.gameplat.model.entity.recharge.RechargeOrder;
@@ -87,6 +86,8 @@ public class GameRebateReportServiceImpl
   @Autowired private GameRebateReportMapper gameRebateReportMapper;
 
   @Autowired private RedisService redisService;
+
+  @Autowired private LimitInfoService limitInfoService;
 
   @Override
   public PageDtoVO<GameRebateDetail> queryPage(
@@ -342,6 +343,16 @@ public class GameRebateReportServiceImpl
   public void accept(Long periodId, Long memberId, BigDecimal realRebateMoney, String remark)
       throws Exception {
     verifyAndUpdate(memberId, periodId, GameRebateReportStatus.ACCEPTED.getValue(), remark);
+    LimitInfo limitInfo = limitInfoService.getLimitInfo(LimitEnums.MEMBER_WITHDRAW_LIMIT.getName());
+    if (ObjectUtils.isNull(limitInfo)) {
+      throw new ServiceException("未找到会员提现限制配置");
+    }
+
+    // 查找返水打码量比例 默认比例为1
+    MemberWithdrawLimit memberWithdrawLimit = JSONObject.parseObject(limitInfo.getValue(), MemberWithdrawLimit.class);
+    BigDecimal dmlWaterRate = memberWithdrawLimit.getDmlWaterRate() != null ?
+            new BigDecimal(memberWithdrawLimit.getDmlWaterRate()) : BigDecimal.ONE;
+
     MemberInfoVO member = memberService.getInfo(memberId);
     // 添加打码量
     RechargeOrder rechargeOrder = new RechargeOrder();
@@ -349,7 +360,7 @@ public class GameRebateReportServiceImpl
     rechargeOrder.setAmount(BigDecimal.ZERO);
     rechargeOrder.setNormalDml(BigDecimal.ZERO);
     rechargeOrder.setDiscountAmount(realRebateMoney);
-    rechargeOrder.setDiscountDml(realRebateMoney);
+    rechargeOrder.setDiscountDml(realRebateMoney.multiply(dmlWaterRate));
     rechargeOrder.setRemarks(remark);
     rechargeOrder.setAccount(member.getAccount());
     validWithdrawService.addRechargeOrder(rechargeOrder);

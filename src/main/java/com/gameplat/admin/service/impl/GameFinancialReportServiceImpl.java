@@ -23,10 +23,7 @@ import com.gameplat.base.common.util.Converts;
 import com.gameplat.base.common.util.DateUtils;
 import com.gameplat.base.common.util.StringUtils;
 import com.gameplat.base.common.util.UUIDUtils;
-import com.gameplat.common.enums.GamePlatformEnum;
-import com.gameplat.common.enums.GameTypeEnum;
-import com.gameplat.common.enums.KgNLLottTypeEnum;
-import com.gameplat.common.enums.KgNLTypeKindEnum;
+import com.gameplat.common.enums.*;
 import com.gameplat.common.util.ZipUtils;
 import com.gameplat.model.entity.report.GameFinancialReport;
 import lombok.extern.slf4j.Slf4j;
@@ -259,7 +256,7 @@ public class GameFinancialReportServiceImpl
     List<GameFinancialReport> allGameFinancialReportList = new ArrayList<>();
 
     // 初始化全部游戏的财务报表（无游戏数据）
-    List<GameFinancialReport> gameFinancialReportList = gameFinancialReportMapper.initGameFinancialReport(statisticsTime, startTime.substring(0,10), endTime.substring(0,10), tenant);
+    List<GameFinancialReport> gameFinancialReportList = gameFinancialReportMapper.initGameFinancialReport(statisticsTime, startTime.substring(0, 10), endTime.substring(0, 10), tenant);
     if (CollectionUtil.isEmpty(gameFinancialReportList)) {
       throw new ServiceException("游戏已全部下架");
     }
@@ -302,7 +299,7 @@ public class GameFinancialReportServiceImpl
     SearchRequest searchRequest = new SearchRequest(indexName);
 
     TermsAggregationBuilder groupTerms =
-            AggregationBuilders.terms("gameKindGroup").field("gameKind.keyword");
+            AggregationBuilders.terms("gameKindGroup").field("gameKind.keyword").size(GameKindEnum.values().length);
 
     SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
     SumAggregationBuilder validAmountSumBuilder = AggregationBuilders.sum("validAmount").field("validAmount");
@@ -364,7 +361,7 @@ public class GameFinancialReportServiceImpl
     SearchRequest searchRequest = new SearchRequest(indexName);
 
     TermsAggregationBuilder groupTerms =
-            AggregationBuilders.terms("lottTypeGroup").field("lottType");
+            AggregationBuilders.terms("lottTypeGroup").field("lottType").size(KgNLLottTypeEnum.values().length);
 
     SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
     SumAggregationBuilder validAmountSumBuilder = AggregationBuilders.sum("validAmount").field("validAmount");
@@ -415,8 +412,8 @@ public class GameFinancialReportServiceImpl
       gameFinancialReport.setValidAmount(validAmount);
       gameFinancialReport.setWinAmount(winAmount);
       gameFinancialReport.setStatisticsTime(statisticsTime);
-      gameFinancialReport.setStartTime(startTime.substring(0,10));
-      gameFinancialReport.setEndTime(endTime.substring(0,10));
+      gameFinancialReport.setStartTime(startTime.substring(0, 10));
+      gameFinancialReport.setEndTime(endTime.substring(0, 10));
       gameFinancialReport.setCustomerCode(tenant);
       gameFinancialReport.setPlatformCode(GamePlatformEnum.KGNL.getCode());
       gameFinancialReport.setGameType(GameTypeEnum.LOTTERY.code());

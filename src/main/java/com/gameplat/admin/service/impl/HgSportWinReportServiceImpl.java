@@ -104,7 +104,7 @@ public class HgSportWinReportServiceImpl implements HgSportWinReportService {
     SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
 
     TermsAggregationBuilder groupTerms =
-            AggregationBuilders.terms("gameCodeGroup").field("gameCode.keyword");
+            AggregationBuilders.terms("gameCodeGroup").field("gameCode.keyword").size(HgSportGameCodeEnum.values().length);
 
     SumAggregationBuilder betAmountSumBuilder = AggregationBuilders.sum("betAmount").field("betAmount");
     SumAggregationBuilder validAmountSumBuilder = AggregationBuilders.sum("validAmount").field("validAmount");

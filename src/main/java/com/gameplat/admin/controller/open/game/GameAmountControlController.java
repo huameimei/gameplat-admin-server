@@ -1,6 +1,7 @@
 package com.gameplat.admin.controller.open.game;
 
 import com.gameplat.admin.model.vo.GameAmountControlVO;
+import com.gameplat.admin.model.vo.GameAmountNotifyVO;
 import com.gameplat.admin.service.GameAmountControlService;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
@@ -21,5 +22,10 @@ public class GameAmountControlController {
   @PreAuthorize("hasAuthority('game:gameAmountControl:list')")
   public List<GameAmountControlVO> selectGameAmountList() {
     return gameAmountControlService.selectGameAmountList();
+  }
+
+  @GetMapping("/notifyInfo")
+  public GameAmountNotifyVO getGameAmountNotify() {
+    return gameAmountControlService.getGameAmountNotify();
   }
 }

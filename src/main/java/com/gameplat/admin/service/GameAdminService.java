@@ -39,5 +39,5 @@ public interface GameAdminService {
 
   GameRecycleVO confiscatedAmount(GameBalanceQueryDTO dto);
 
-  void transferToGame(OperGameTransferRecordDTO record);
+  void transferToGame(OperGameTransferRecordDTO record) throws Exception;
 }

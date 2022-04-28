@@ -2,6 +2,7 @@ package com.gameplat.admin.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.json.JSONUtil;
 import com.gameplat.admin.model.dto.GameBalanceQueryDTO;
 import com.gameplat.admin.model.dto.OperGameTransferRecordDTO;
 import com.gameplat.admin.model.vo.GameBalanceVO;
@@ -18,6 +19,7 @@ import com.gameplat.admin.service.MemberService;
 import com.gameplat.admin.service.MessageInfoService;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.DateUtil;
+import com.gameplat.common.constant.CacheKey;
 import com.gameplat.common.enums.GameAmountControlTypeEnum;
 import com.gameplat.common.enums.GamePlatformEnum;
 import com.gameplat.common.enums.GameTransferStatus;
@@ -43,6 +45,7 @@ import com.gameplat.model.entity.member.Member;
 import com.gameplat.model.entity.member.MemberBill;
 import com.gameplat.model.entity.member.MemberInfo;
 import com.gameplat.model.entity.message.Message;
+import com.gameplat.redis.api.RedisService;
 import com.gameplat.redis.redisson.DistributedLocker;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -57,6 +60,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import javax.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -81,6 +85,7 @@ public class GameAdminServiceImpl implements GameAdminService {
   @Resource private DistributedLocker distributedLocker;
   @Resource private GamePlatformService gamePlatformService;
   @Resource private Executor asyncGameExecutor;
+  @Autowired private RedisService redisService;
 
   @Transactional(propagation = Propagation.NOT_SUPPORTED)
   public GameApi getGameApi(String platformCode) {
@@ -334,10 +339,16 @@ public class GameAdminServiceImpl implements GameAdminService {
       }
     }
     // 转换成功需要增加游戏使用额度
-    GameAmountControl gameAmountControl =
-        gameAmountControlService.findInfoByType(
-            GameAmountControlTypeEnum.checkGameAmountControlType(transferOut));
-    if (ObjectUtil.isNotNull(gameAmountControl)
+    Object value = redisService.getStringOps().get(CacheKey.GAME_AMOUNT_CONTROL);
+    GameAmountControl gameAmountControl;
+    if (ObjectUtil.isNotNull(value)) {
+      gameAmountControl = JSONUtil.toBean(value.toString(), GameAmountControl.class);
+    } else {
+      gameAmountControl =
+          gameAmountControlService.findInfoByType(GameAmountControlTypeEnum.LIVE.type());
+    }
+    if (GameAmountControlTypeEnum.checkGameAmountControlType(transferOut)
+        && ObjectUtil.isNotNull(gameAmountControl)
         && gameAmountControl
                 .getUseAmount()
                 .add(amount.abs())
@@ -396,9 +407,6 @@ public class GameAdminServiceImpl implements GameAdminService {
       status = GameTransferStatus.SUCCESS.getValue();
       // 7. 添加额度转换记录
       gameTransferInfoService.update(memberInfo.getMemberId(), transferOut, orderNo);
-      // 8. 增加转出额度数据
-      gameAmountControl.setUseAmount(gameAmountControl.getUseAmount().add(amount.abs()));
-      gameAmountControlService.updateById(gameAmountControl);
     } catch (GameException | GameRollbackException ex) {
       boolean bool = gameApi.queryOrderStatus(gameBizBean);
       if (bool) {
@@ -897,15 +905,13 @@ public class GameAdminServiceImpl implements GameAdminService {
   }
 
   @Override
-  public void transferToGame(OperGameTransferRecordDTO record) {
+  public void transferToGame(OperGameTransferRecordDTO record) throws Exception {
     String key = "self_" + record.getPlatformCode() + '_' + record.getAccount();
     try {
       distributedLocker.lock(key, TimeUnit.SECONDS, 300);
       Member member = memberService.getMemberAndFillGameAccount(record.getAccount());
       Assert.notNull(member, "会员账号不存在");
       this.transferOut(record.getPlatformCode(), record.getAmount(), member, false);
-    } catch (Exception e) {
-      e.printStackTrace();
     } finally {
       distributedLocker.unlock(key);
     }

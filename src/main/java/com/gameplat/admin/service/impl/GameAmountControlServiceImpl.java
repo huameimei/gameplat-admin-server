@@ -4,16 +4,19 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.convert.GameAmountControlConvert;
 import com.gameplat.admin.mapper.GameAmountControlMapper;
 import com.gameplat.admin.model.vo.GameAmountControlVO;
+import com.gameplat.admin.model.vo.GameAmountNotifyVO;
 import com.gameplat.admin.service.GameAmountControlService;
+import com.gameplat.common.enums.GameAmountControlTypeEnum;
 import com.gameplat.model.entity.game.GameAmountControl;
+import java.math.BigDecimal;
+import java.text.NumberFormat;
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -35,5 +38,27 @@ public class GameAmountControlServiceImpl
   @Override
   public GameAmountControl findInfoByType(Integer type) {
     return this.lambdaQuery().eq(GameAmountControl::getType, type).one();
+  }
+
+  @Override
+  public GameAmountNotifyVO getGameAmountNotify() {
+    GameAmountNotifyVO gameAmountNotifyVO = new GameAmountNotifyVO();
+    GameAmountControl gameAmountControl =
+        this.lambdaQuery()
+            .eq(GameAmountControl::getType, GameAmountControlTypeEnum.LIVE.type())
+            .one();
+    BigDecimal percentBigDecimal =
+        gameAmountControl
+            .getUseAmount()
+            .divide(gameAmountControl.getAmount(), 4, BigDecimal.ROUND_HALF_UP);
+    NumberFormat percent = NumberFormat.getPercentInstance();
+    percent.setMaximumFractionDigits(4);
+    if (percentBigDecimal.compareTo(new BigDecimal("0.8000")) >= 0) {
+      gameAmountNotifyVO.setAmount(gameAmountControl.getAmount());
+      gameAmountNotifyVO.setUseAmount(gameAmountControl.getUseAmount());
+      gameAmountNotifyVO.setPercent(percent.format(percentBigDecimal.doubleValue()));
+      return gameAmountNotifyVO;
+    }
+    return null;
   }
 }

@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.gameplat.admin.mapper.TenantFloatTypeMapper">
+<mapper namespace="com.gameplat.admin.mapper.SysFloatTypeMapper">
 
-    <resultMap type="com.gameplat.admin.model.vo.TenantFloatTypeVo" id="SysFloatTypeResult">
+    <resultMap type="com.gameplat.admin.model.vo.SysFloatTypeVo" id="SysFloatTypeResult">
         <result property="id"    column="id"    />
         <result property="tenant"    column="tenant"    />
         <result property="osType"    column="os_type"    />
@@ -16,11 +16,11 @@
         <result property="updateTime"    column="update_time"    />
     </resultMap>
 
-    <resultMap type="com.gameplat.admin.model.vo.TenantFloatTypeVo" id="SysFloatTypeVo" extends="SysFloatTypeResult">
+    <resultMap type="com.gameplat.admin.model.vo.SysFloatTypeVo" id="SysFloatTypeVo" extends="SysFloatTypeResult">
         <collection property="settingList" resultMap="SysFloatSetting"></collection>
     </resultMap>
 
-    <resultMap type="com.gameplat.admin.model.vo.TenantFloatSettingVo" id="SysFloatSetting">
+    <resultMap type="com.gameplat.admin.model.vo.SysFloatSettingVo" id="SysFloatSetting">
         <result property="id"    column="setting_id"    />
         <result property="typeId"    column="type_id"    />
         <result property="floatIndex"    column="float_index"    />
@@ -32,7 +32,7 @@
         <result property="updateTime"    column="update_time_float"    />
     </resultMap>
 
-    <select id="selectSysFloatTypeList" parameterType="com.gameplat.admin.model.vo.TenantFloatTypeVo" resultMap="SysFloatTypeVo">
+    <select id="selectSysFloatTypeList" parameterType="com.gameplat.admin.model.vo.SysFloatTypeVo" resultMap="SysFloatTypeVo">
         SELECT
         sft.id,
         sft.tenant,
@@ -54,8 +54,8 @@
         sfs.can_drag,
         sfs.icon_path
         FROM
-        tenant_float_type sft
-        LEFT JOIN tenant_float_setting sfs ON sft.id = sfs.type_id
+        sys_float_type sft
+        LEFT JOIN sys_float_setting sfs ON sft.id = sfs.type_id
         <where>
             <if test='osType != null  and osType != ""'> and sft.os_type = #{osType}</if>
             <if test='floatType != null  and floatType != ""'> and sft.float_type = #{floatType}</if>
@@ -65,15 +65,15 @@
         order by  sft.float_index ASC,sfs.float_index ASC
     </select>
 
-    <insert id="insertSysFloatSetting" parameterType="com.gameplat.model.entity.setting.TenantFloatSetting">
-        INSERT INTO `tenant_float_setting` (`type_id`, `float_index`, `whether_open`, `can_drag`,
+    <insert id="insertSysFloatSetting" parameterType="com.gameplat.model.entity.setting.SysFloatSetting">
+        INSERT INTO `sys_float_setting` (`type_id`, `float_index`, `whether_open`, `can_drag`,
                                                             `jump_url`, `icon_path`, `create_time`, `update_time`)
         VALUES (#{typeId}, #{floatIndex},#{whetherOpen},#{canDrag}, #{jumpUrl}, #{iconPath},
                 now(), now());
     </insert>
 
     <update id="updateSysFloat">
-        update tenant_float_setting
+        update sys_float_setting
         <trim prefix="SET" suffixOverrides=",">
             <if test="floatIndex != null ">float_index = #{floatIndex},</if>
             <if test="whetherOpen != null ">whether_open = #{whetherOpen},</if>
@@ -87,7 +87,7 @@
 
     <update id="updateBatch" parameterType="java.util.List">
         <foreach collection="list" item="item" index="index" separator=";">
-            update tenant_float_setting
+            update sys_float_setting
             <set>
                 <if test="item.floatIndex != null">float_index = #{item.floatIndex},</if>
                 update_time = sysdate()
@@ -97,7 +97,7 @@
     </update>
 
     <update id="updateShowPosition">
-        update tenant_float_type
+        update sys_float_type
     SET show_position = #{showPosition}
         where os_type = 'mobile'
     </update>

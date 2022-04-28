@@ -8,10 +8,10 @@ import java.io.Serializable;
 import java.util.Date;
 
 /**
- * @Author key @Date 2022/3/10 游戏浮窗对象 tenant_float_setting
+ * @Author key @Date 2022/3/10 游戏浮窗对象 sys_float_setting
  */
 @Data
-public class TenantFloatSettingVo implements Serializable {
+public class SysFloatSettingVo implements Serializable {
   private static final long serialVersionUID = 1L;
 
   /** id */

@@ -10,7 +10,7 @@ import java.util.List;
  * @Author key @Date 2022/3/10
  */
 @Data
-public class TenantFloatTypeVo implements Serializable {
+public class SysFloatTypeVo implements Serializable {
 
   private static final long serialVersionUID = 1L;
 
@@ -55,7 +55,7 @@ public class TenantFloatTypeVo implements Serializable {
   /** 更新时间 */
   private Date updateTime;
 
-  private List<TenantFloatSettingVo> settingList;
+  private List<SysFloatSettingVo> settingList;
 
   private List<String> showPositionList;
 }

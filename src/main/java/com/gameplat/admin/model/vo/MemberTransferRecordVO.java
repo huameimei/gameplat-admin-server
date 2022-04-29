@@ -6,13 +6,15 @@ import java.io.Serializable;
 import java.util.Date;
 
 @Data
-public class MemberBackupVO implements Serializable {
+public class MemberTransferRecordVO implements Serializable {
 
   private Long id;
 
   private String serialNo;
 
   private Integer type;
+
+  private Integer status;
 
   private String content;
 

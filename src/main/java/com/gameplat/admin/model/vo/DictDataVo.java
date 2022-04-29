@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.gameplat.admin.util.Date2LongSerializerUtils;
 import lombok.Data;
 
+import java.io.Serializable;
 import java.util.Date;
 
 /**
@@ -12,21 +13,29 @@ import java.util.Date;
  * @author three
  */
 @Data
-public class DictDataVo {
+public class DictDataVo implements Serializable {
 
   private Long id;
+
   private String dictName;
+
   private String dictType;
+
   private String dictLabel;
+
   private String dictValue;
+
   private Integer status;
 
   @JsonSerialize(using = Date2LongSerializerUtils.class)
   private Date createTime;
 
   private String remark;
+
   private Integer dictSort;
+
   private String updateBy;
+
   private String createBy;
 
   @JsonSerialize(using = Date2LongSerializerUtils.class)

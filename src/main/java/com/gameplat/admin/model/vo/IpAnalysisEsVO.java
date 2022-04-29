@@ -9,7 +9,10 @@ import lombok.Data;
  */
 @Data
 public class IpAnalysisEsVO {
+
   private String ipAddress;
+
   private String createTime;
+
   private String username;
 }

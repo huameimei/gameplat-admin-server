@@ -8,7 +8,7 @@ import java.util.Date;
 @Data
 public class MemberWithdrawVO {
 
-  public Long id;
+  private Long id;
 
   private String cashOrderNo;
 

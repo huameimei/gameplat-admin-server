@@ -237,11 +237,12 @@ public class SpreadLinkInfoServiceImpl extends ServiceImpl<SpreadLinkInfoMapper,
     if(!StrUtil.isBlank(linkInfo.getCode())) {
       this.checkCode(linkInfo.getCode(), agentMinCodeNum);
     }
-    // 校验此推广拥有几个推广码连接条数
-    Long count =
-            this.lambdaQuery().eq(SpreadLinkInfo::getAgentAccount, linkInfo.getAgentAccount()).count();
-    Assert.isTrue((count + 1) <= agentMaxSpreadNum, "单个代理账户不能超过" + agentMaxSpreadNum + "条推广码链接！");
-
+    if (agentMaxSpreadNum > 0) {
+      // 校验此推广拥有几个推广码连接条数
+      Long count =
+              this.lambdaQuery().eq(SpreadLinkInfo::getAgentAccount, linkInfo.getAgentAccount()).count();
+      Assert.isTrue((count + 1) <= agentMaxSpreadNum, "单个代理账户不能超过" + agentMaxSpreadNum + "条推广码链接！");
+    }
     // 当推广链接不为空时 需要校验 此推广链接地址是否被其它代理作为了专属域名
     if (StrUtil.isNotBlank(linkInfo.getExternalUrl())) {
       boolean exists =
@@ -276,9 +277,9 @@ public class SpreadLinkInfoServiceImpl extends ServiceImpl<SpreadLinkInfoMapper,
   @Override
   public void update(SpreadLinkInfoEditDTO dto) {
     SpreadLinkInfo linkInfo = spreadLinkInfoConvert.toEntity(dto);
-    if (StrUtil.isBlank(linkInfo.getAgentAccount())) {
-      throw new ServiceException("代理账号不能为空！");
-    }
+//    if (StrUtil.isBlank(linkInfo.getAgentAccount())) {
+//      throw new ServiceException("代理账号不能为空！");
+//    }
     // 校验账号的用户类型
     Member member =
             memberService

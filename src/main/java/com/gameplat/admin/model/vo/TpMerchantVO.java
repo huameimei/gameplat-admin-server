@@ -1,15 +1,15 @@
 package com.gameplat.admin.model.vo;
 
-import com.baomidou.mybatisplus.extension.activerecord.Model;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.gameplat.admin.util.Date2LongSerializerUtils;
 import lombok.Data;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 
 @Data
-public class TpMerchantVO extends Model<TpMerchantVO> {
+public class TpMerchantVO implements Serializable {
 
   private Long id;
 

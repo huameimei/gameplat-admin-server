@@ -1,17 +1,15 @@
 package com.gameplat.admin.model.vo;
 
-import com.baomidou.mybatisplus.extension.activerecord.Model;
 import com.gameplat.model.entity.pay.TpPayType;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 
+import java.io.Serializable;
 import java.util.List;
 
 @Data
-@EqualsAndHashCode(callSuper = true)
-public class TpInterfacePayTypeVo extends Model<TpInterfacePayTypeVo> {
+public class TpInterfacePayTypeVo implements Serializable {
 
-  public Long id;
+  private Long id;
 
   private String name;
 

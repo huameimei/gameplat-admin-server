@@ -1,17 +1,17 @@
 package com.gameplat.admin.model.vo;
 
-import com.baomidou.mybatisplus.extension.activerecord.Model;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.gameplat.admin.util.Date2LongSerializerUtils;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 
 @Data
-public class PayAccountVO extends Model<PayAccountVO> {
+public class PayAccountVO implements Serializable {
 
   private Long id;
 

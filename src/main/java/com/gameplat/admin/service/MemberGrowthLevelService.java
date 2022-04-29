@@ -4,6 +4,7 @@ import cn.hutool.json.JSONObject;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.gameplat.admin.model.dto.GrowthLevelLogoEditDTO;
 import com.gameplat.admin.model.dto.MemberGrowthLevelEditDto;
+import com.gameplat.admin.model.vo.LogoConfigVO;
 import com.gameplat.admin.model.vo.MemberConfigLevelVO;
 import com.gameplat.admin.model.vo.MemberGrowthLevelVO;
 import com.gameplat.model.entity.member.MemberGrowthLevel;
@@ -38,4 +39,6 @@ public interface MemberGrowthLevelService extends IService<MemberGrowthLevel> {
 
   /** VIP等级列表 */
   List<MemberGrowthLevelVO> vipList();
+
+  List<LogoConfigVO> getLogoConfig();
 }

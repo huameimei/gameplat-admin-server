@@ -15,7 +15,7 @@ import com.gameplat.admin.model.vo.MemberInfoVO;
 import com.gameplat.admin.model.vo.MemberVO;
 import com.gameplat.admin.service.GameAdminService;
 import com.gameplat.admin.service.MemberService;
-import com.gameplat.admin.service.MemberTransformService;
+import com.gameplat.admin.service.MemberTransferAgentService;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.ip.IpAddressParser;
 import com.gameplat.base.common.util.BeanUtils;
@@ -47,7 +47,7 @@ public class MemberController {
 
   @Autowired private MemberService memberService;
 
-  @Autowired private MemberTransformService memberTransformService;
+  @Autowired private MemberTransferAgentService memberTransferAgentService;
 
   @Autowired private GameAdminService gameAdminService;
 
@@ -135,7 +135,7 @@ public class MemberController {
   @PreAuthorize("hasAuthority('member:transform')")
   @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.MEMBER, desc = "转代理")
   public void transform(@RequestBody MemberTransformDTO dto) {
-    memberTransformService.transform(dto);
+    memberTransferAgentService.transform(dto);
   }
 
   @ApiOperation("恢复转代理数据")
@@ -143,7 +143,7 @@ public class MemberController {
   @PreAuthorize("hasAuthority('member:recoverTransform')")
   @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.MEMBER, desc = "恢复转代理数据")
   public void recoverTransform(@PathVariable String serialNo) {
-    memberTransformService.recover(serialNo);
+    memberTransferAgentService.recover(serialNo);
   }
 
   @ApiOperation("根据账号获取会员信息")

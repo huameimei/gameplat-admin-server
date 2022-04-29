@@ -630,11 +630,8 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
     }
   }
 
-  /**
-   * 开启出入款订单是否允许其他账户操作配置 校验非超管账号是否原受理人
-   */
-  private void crossAccountCheck(UserCredential userCredential, MemberWithdraw memberWithdraw)
-      throws ServiceException {
+  /** 开启出入款订单是否允许其他账户操作配置 校验非超管账号是否原受理人 */
+  private void crossAccountCheck(UserCredential userCredential, MemberWithdraw memberWithdraw) {
     if (userCredential != null
         && StringUtils.isNotEmpty(userCredential.getUsername())
         && null != memberWithdraw) {
@@ -772,7 +769,7 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
             .with(ManualRechargeOrderBo::setDiscountType, discountType)
             .with(ManualRechargeOrderBo::setRemarks, directCharge.getRemarks())
             .build();
-    rechargeOrderService.manual(manualRechargeOrderBo, userCredential, userEquipment);
+    rechargeOrderService.manual(manualRechargeOrderBo, userEquipment);
     log.info(
         "\n免提直充配置:{},\n充值信息： 会员账号：{}，入款金额：{}，优惠金额：{}，常态打码量：{},优惠打码量：{},备注：{},层级：{}",
         directCharge.toString(),

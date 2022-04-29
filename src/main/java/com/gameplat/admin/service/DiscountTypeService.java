@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.gameplat.admin.model.dto.DiscountTypeAddDTO;
 import com.gameplat.admin.model.dto.DiscountTypeEditDTO;
+import com.gameplat.admin.model.vo.DiscountTypeVO;
 import com.gameplat.model.entity.DiscountType;
 
 public interface DiscountTypeService extends IService<DiscountType> {
@@ -17,7 +18,7 @@ public interface DiscountTypeService extends IService<DiscountType> {
 
   void delete(Long id);
 
-  IPage<DiscountType> findDiscountTypePage(Page<DiscountType> page);
+  IPage<DiscountTypeVO> findDiscountTypePage(Page<DiscountType> page);
 
   DiscountType getByValue(Integer value);
 }

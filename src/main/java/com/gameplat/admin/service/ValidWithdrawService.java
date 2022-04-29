@@ -12,7 +12,7 @@ import java.util.Date;
 
 public interface ValidWithdrawService extends IService<ValidWithdraw> {
 
-  void addRechargeOrder(RechargeOrder rechargeOrder) throws Exception;
+  void addRechargeOrder(RechargeOrder rechargeOrder);
 
   void remove(Long memberId, Date cashDate) throws Exception;
 

@@ -7,36 +7,35 @@ import com.gameplat.admin.mapper.MemberMapper;
 import com.gameplat.admin.model.dto.MemberTransBackupDTO;
 import com.gameplat.admin.model.dto.MemberTransformDTO;
 import com.gameplat.admin.model.dto.UpdateLowerNumDTO;
-import com.gameplat.admin.service.MemberBackupService;
 import com.gameplat.admin.service.MemberService;
-import com.gameplat.admin.service.MemberTransformService;
+import com.gameplat.admin.service.MemberTransferAgentService;
+import com.gameplat.admin.service.MemberTransferRecordService;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.json.JsonUtils;
 import com.gameplat.base.common.util.StringUtils;
 import com.gameplat.common.lang.Assert;
 import com.gameplat.model.entity.member.Member;
-import com.gameplat.model.entity.member.MemberBackup;
+import com.gameplat.model.entity.member.MemberTransferRecord;
+import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
 @Service
 @Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)
-public class MemberTransformServiceImpl implements MemberTransformService {
+public class MemberTransferAgentServiceImpl implements MemberTransferAgentService {
 
   @Autowired private MemberService memberService;
 
   @Autowired private MemberMapper memberMapper;
 
-  @Autowired private MemberBackupService memberBackupService;
+  @Autowired private MemberTransferRecordService memberTransferRecordService;
 
   @Override
   public void transform(MemberTransformDTO dto) {
@@ -55,32 +54,28 @@ public class MemberTransformServiceImpl implements MemberTransformService {
 
   @Override
   public void recover(String serialNo) {
-    List<MemberBackup> backups = memberBackupService.getBySerialNo(serialNo);
+    List<MemberTransferRecord> records = memberTransferRecordService.getBySerialNo(serialNo);
     // 解析备份内容
     List<MemberTransBackupDTO> contents = new ArrayList<>();
-    backups.forEach(backup -> contents.addAll(this.parseBackupContent(backup.getContent())));
+    records.forEach(record -> contents.addAll(this.parseContent(record.getContent())));
 
     // 批量恢复
     contents.forEach(
         e -> {
           log.info("恢复账号{}代理关系至{}", e.getAccount(), e.getParentName());
-          Member source =
-              memberService
-                  .getByAccount(e.getAccount())
-                  .orElseThrow(() -> new ServiceException("恢复失败，用户信息不存在!"));
-
-          // 原上级
-          Member target =
-              memberService
-                  .getByAccount(e.getParentName())
-                  .orElseThrow(() -> new ServiceException("恢复失败，代理不存在!"));
-
-          // 转代理
+          Member source = this.getMemberByAccount(e.getParentName(), "恢复失败，用户信息不存在!");
+          Member target = this.getMemberByAccount(e.getParentName(), "恢复失败，代理不存在!");
           this.doTransform(source, target);
         });
 
     // 更新最后恢复时间
-    memberBackupService.updateBatchById(backups);
+    memberTransferRecordService.updateBatchById(records);
+  }
+
+  private Member getMemberByAccount(String account, String errorMessage) {
+    return memberService
+        .getByAccount(account)
+        .orElseThrow(() -> new ServiceException(errorMessage));
   }
 
   /**
@@ -102,16 +97,9 @@ public class MemberTransformServiceImpl implements MemberTransformService {
    * @param serialNo 流水号存在时备份
    */
   private void doTransform(Member source, Member target, Boolean excludeSelf, String serialNo) {
-    Member updateMember =
-        Member.builder()
-            .account(source.getAccount())
-            .agentLevel(source.getAgentLevel())
-            .superPath(target.getSuperPath())
-            .build();
-
-    // 流水号不为空时备份
+    // 流水号不为空时添加记录
     if (StringUtils.isNotEmpty(serialNo)) {
-      this.addBackup(serialNo, source, target.getAccount(), excludeSelf);
+      this.addTransferAgentRecord(serialNo, source, target.getAccount(), excludeSelf);
     }
 
     // 仅转移直属下级，更新原直属下级的直接上级
@@ -124,22 +112,19 @@ public class MemberTransformServiceImpl implements MemberTransformService {
       Assert.isTrue(source.updateById(), "更新会员信息失败!");
     }
 
-    // 更新代理路径和代理等级
+    // 更新代理路径和代理/会员等级
     String newSuperPath = target.getSuperPath().concat(source.getAccount()).concat("/");
     int agentLevel = source.getAgentLevel() - target.getAgentLevel();
     memberMapper.batchUpdateSuperPathAndAgentLevel(
         excludeSelf ? source.getAccount() : null, source.getSuperPath(), newSuperPath, agentLevel);
 
     // 更新下级人数
-    this.batchUpdateLowerNum(source, target.getSuperPath(), excludeSelf);
+    this.updateLowerNum(source, target.getSuperPath(), excludeSelf);
   }
 
   private void preCheck(Member source, Member target, Boolean excludeSelf) {
     Assert.notNull(source, "会员信息不存在！");
-    Assert.isFalse(SystemConstant.DEFAULT_WEB_ROOT.equals(source.getAccount()), "不能转移系统保留账号！");
-    Assert.isFalse(SystemConstant.DEFAULT_WAP_ROOT.equals(source.getAccount()), "不能转移系统保留账号！");
-    Assert.isFalse(SystemConstant.DEFAULT_TEST_ROOT.equals(source.getAccount()), "不能转移系统保留账号！");
-
+    Assert.isFalse(isInnerAccount(source.getAccount()), "不能转移系统保留账号！");
     Assert.isFalse(StringUtils.equals(source.getAccount(), target.getAccount()), "不能自己转移自己！");
     Assert.isFalse(
         Boolean.FALSE.equals(excludeSelf)
@@ -150,6 +135,12 @@ public class MemberTransformServiceImpl implements MemberTransformService {
 
     // 不包含自身时检查是否存在下级
     Assert.isFalse(Boolean.TRUE.equals(excludeSelf) && source.getLowerNum() == 0, "当前会员没有可转移的下级！");
+  }
+
+  private boolean isInnerAccount(String account) {
+    return SystemConstant.DEFAULT_WEB_ROOT.equals(account)
+        || SystemConstant.DEFAULT_WAP_ROOT.equals(account)
+        || SystemConstant.DEFAULT_TEST_ROOT.equals(account);
   }
 
   /**
@@ -174,72 +165,90 @@ public class MemberTransformServiceImpl implements MemberTransformService {
    * @param targetSuperPath 目标代理路径
    * @param excludeSelf 为true不包含本身（仅转移下级)
    */
-  private void batchUpdateLowerNum(Member source, String targetSuperPath, Boolean excludeSelf) {
+  private void updateLowerNum(Member source, String targetSuperPath, Boolean excludeSelf) {
     int lowerNum = source.getLowerNum();
-    List<UpdateLowerNumDTO> list = new ArrayList<>();
-    this.splitSuperPath(source.getSuperPath())
-        .forEach(
-            account -> {
-              if (Boolean.TRUE.equals(excludeSelf)) {
-                // 仅转移下级时，修改自身和上级的下级人数
-                list.add(new UpdateLowerNumDTO(account, -lowerNum));
-              } else if (account.equals(source.getAccount())) {
-                // 转移全部时当前会员下级人数归零
-                list.add(new UpdateLowerNumDTO(account, -lowerNum));
-              } else {
-                // 减去当前会员
-                list.add(new UpdateLowerNumDTO(account, -lowerNum - 1));
-              }
-            });
-
-    // 处理新上级下级人数
-    this.splitSuperPath(targetSuperPath)
-        .forEach(
-            account -> {
-              if (Boolean.TRUE.equals(excludeSelf)) {
-                list.add(new UpdateLowerNumDTO(account, lowerNum));
-              } else {
-                // 转移全部时包含自身
-                list.add(new UpdateLowerNumDTO(account, lowerNum + 1));
-              }
-            });
-
-    // 修改下级人数
-    list.forEach(
-        e -> {
-          log.info("变更代理线更新下级人数，账号{}下级人数{}", e.getAccount(), e.getLowerNum());
-          memberMapper.updateLowerNumByAccount(e.getAccount(), e.getLowerNum());
-        });
+    Map<String, Integer> originMap = this.getOriginLineLowNum(source, excludeSelf, lowerNum);
+    Map<String, Integer> newMap = this.getNewtLineLowNum(targetSuperPath, excludeSelf, lowerNum);
+    // 合并相同账号，减少修改次数
+    originMap.forEach((k, v) -> newMap.merge(k, v, Integer::sum));
+    this.batchUpdateLowerNumWithPartition(newMap);
   }
 
   /**
-   * 添加备份
+   * 处理新上级
+   *
+   * @param superPath 新上级代理路径
+   * @param excludeSelf boolean
+   * @param m 下级人数
+   * @return List
+   */
+  private Map<String, Integer> getNewtLineLowNum(String superPath, Boolean excludeSelf, int m) {
+    List<String> accounts = this.splitSuperPath(superPath);
+    // 仅转移下级，新代理线下级人数增加M个；转移全部，新代理线下级人数增加M+1个
+    Map<String, Integer> map = new HashMap<>(accounts.size());
+    accounts.forEach(account -> map.put(account, Boolean.TRUE.equals(excludeSelf) ? m : m + 1));
+    return map;
+  }
+
+  /**
+   * 处理原上级
+   *
+   * @param source Member
+   * @param excludeSelf boolean
+   * @param m 下级人数
+   * @return List<UpdateLowerNumDTO>
+   */
+  private Map<String, Integer> getOriginLineLowNum(Member source, Boolean excludeSelf, int m) {
+    List<String> accounts = this.splitSuperPath(source.getSuperPath());
+    // 转移全部时，删除自身
+    accounts.removeIf(e -> Boolean.TRUE.equals(excludeSelf) && e.equals(source.getAccount()));
+
+    // 仅转移下级，自身下级人数归零，原代理线下级人数减少M个；转移全部，其他代理线会员人数减少M+1个
+    Map<String, Integer> map = new HashMap<>(accounts.size());
+    accounts.forEach(account -> map.put(account, Boolean.TRUE.equals(excludeSelf) ? -m : -(m + 1)));
+    return map;
+  }
+
+  /**
+   * 分批修改会员下级人数
+   *
+   * @param map Map<String, Integer>
+   */
+  private void batchUpdateLowerNumWithPartition(Map<String, Integer> map) {
+    List<UpdateLowerNumDTO> list = new ArrayList<>(map.size());
+    map.forEach((k, v) -> list.add(new UpdateLowerNumDTO(k, v)));
+
+    List<List<UpdateLowerNumDTO>> partition = Lists.partition(list, 50);
+    partition.parallelStream().forEach(e -> memberMapper.batchUpdateLowerNumByAccount(e));
+  }
+
+  /**
+   * 添加转代理记录
    *
    * @param serialNo 流水号
    * @param member 会员信息
    * @param target 目标代理
    */
-  private void addBackup(String serialNo, Member member, String target, Boolean excludeSelf) {
+  private void addTransferAgentRecord(
+      String serialNo, Member member, String target, Boolean excludeSelf) {
     List<Member> backupMembers = new ArrayList<>();
     if (Boolean.TRUE.equals(excludeSelf)) {
-      // 备份当前会员的直属下级
+      // 记录当前会员的直属下级
       backupMembers.addAll(memberService.getByParentName(member.getAccount()));
     } else {
-      // 备份当前会员
+      // 记录当前会员
       backupMembers.add(member);
     }
 
-    // 添加备份
-    memberBackupService.save(
-        MemberBackup.builder()
+    memberTransferRecordService.save(
+        MemberTransferRecord.builder()
             .serialNo(serialNo)
-            .content(JsonUtils.toJson(this.builderBackupContent(backupMembers, target)))
+            .content(JsonUtils.toJson(this.builderContent(backupMembers, target)))
             .type(MemberBackupEnums.Type.AGENT.value())
             .build());
   }
 
-  private List<MemberTransBackupDTO> builderBackupContent(
-      List<Member> backupMembers, String target) {
+  private List<MemberTransBackupDTO> builderContent(List<Member> backupMembers, String target) {
     return backupMembers.stream()
         .map(
             member ->
@@ -255,7 +264,7 @@ public class MemberTransformServiceImpl implements MemberTransformService {
         .collect(Collectors.toList());
   }
 
-  private List<MemberTransBackupDTO> parseBackupContent(String content) {
+  private List<MemberTransBackupDTO> parseContent(String content) {
     return JsonUtils.parse(content, new TypeReference<List<MemberTransBackupDTO>>() {});
   }
 

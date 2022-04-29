@@ -71,7 +71,7 @@ public class ValidWithdrawServiceImpl extends ServiceImpl<ValidWithdrawMapper, V
   }
 
   @Override
-  public void addRechargeOrder(RechargeOrder rechargeOrder) throws Exception {
+  public void addRechargeOrder(RechargeOrder rechargeOrder) {
     ValidWithdraw validWithdraw = new ValidWithdraw();
     validWithdraw.setMemberId(rechargeOrder.getMemberId());
     validWithdraw.setAccount(rechargeOrder.getAccount());
@@ -105,19 +105,19 @@ public class ValidWithdrawServiceImpl extends ServiceImpl<ValidWithdrawMapper, V
     }
   }
 
-  private void deleteByUserId(Long memberId, Integer status) throws Exception {
+  private void deleteByUserId(Long memberId, Integer status) {
     LambdaQueryWrapper<ValidWithdraw> query = Wrappers.lambdaQuery();
     query.eq(ValidWithdraw::getMemberId, memberId).eq(ValidWithdraw::getStatus, status);
     this.remove(query);
   }
 
-  private void deleteByUserName(String member, Integer status) throws Exception {
+  private void deleteByUserName(String member, Integer status) {
     LambdaQueryWrapper<ValidWithdraw> query = Wrappers.lambdaQuery();
     query.eq(ValidWithdraw::getAccount, member).eq(ValidWithdraw::getStatus, status);
     this.remove(query);
   }
 
-  public void updateTypeByUserId(Long memberId,Date createTime) throws Exception {
+  public void updateTypeByUserId(Long memberId, Date createTime) {
     this.lambdaUpdate()
         .set(ValidWithdraw::getType, 1)
         .set(ValidWithdraw::getEndTime, createTime)

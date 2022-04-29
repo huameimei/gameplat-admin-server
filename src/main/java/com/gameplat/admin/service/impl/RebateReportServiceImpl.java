@@ -74,11 +74,14 @@ public class RebateReportServiceImpl extends ServiceImpl<RebateReportMapper, Reb
     for (RebateReport rebateReport : rebateReportPOList) {
       // 填充每个代理的 总下级代理数 总下级会员数
       QueryWrapper queryWrapper = new QueryWrapper();
-      queryWrapper.eq("user_type", MemberEnums.Type.MEMBER.value());
+      queryWrapper.eq("user_type", MemberEnums.Type.AGENT.value());
       queryWrapper.like("super_path", "/".concat(rebateReport.getAgentName()).concat("/"));
       rebateReport.setSubAgent(memberMapper.selectCount(queryWrapper).intValue());
-      queryWrapper.eq("user_type", MemberEnums.Type.AGENT.value());
-      rebateReport.setSubMember(memberMapper.selectCount(queryWrapper).intValue());
+
+      QueryWrapper queryWrapper2 = new QueryWrapper();
+      queryWrapper2.like("super_path", "/".concat(rebateReport.getAgentName()).concat("/"));
+      queryWrapper2.eq("user_type", MemberEnums.Type.MEMBER.value());
+      rebateReport.setSubMember(memberMapper.selectCount(queryWrapper2).intValue());
     }
     // 已结算的代理不再更新佣金报表
     List<String> agentNameList = rebateReportMapper.getSettlementAgent(countDate);

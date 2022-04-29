@@ -25,9 +25,6 @@ public class GameAccountDataReportVo implements Serializable {
   @ApiModelProperty(value = "过期时间")
   private String expiredTime;
 
-  @ApiModelProperty(value = "彩票可用额度")
-  private BigDecimal lotteryQuota;
-
   @ApiModelProperty(value = "游戏可用额度")
   private BigDecimal gameQuota;
 

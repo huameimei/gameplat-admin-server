@@ -2,10 +2,10 @@ package com.gameplat.admin.config;
 
 import com.gameplat.security.authz.URIAdapter;
 import com.github.xiaoymin.knife4j.spring.annotations.EnableKnife4j;
-import io.swagger.annotations.Api;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpHeaders;
 import springfox.documentation.builders.ApiInfoBuilder;
 import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestHandlerSelectors;
@@ -32,23 +32,22 @@ public class Swagger2Config {
   public Docket createRestApi() {
     return new Docket(DocumentationType.OAS_30)
         .apiInfo(apiInfo())
-        .securityContexts(this.securityContext())
-        .securitySchemes(this.securitySchemes())
-        .groupName("1.0")
         .select()
-        .apis(RequestHandlerSelectors.withClassAnnotation(Api.class))
+        .apis(RequestHandlerSelectors.basePackage("com.gameplat.admin.controller.open"))
         .paths(PathSelectors.any())
-        .build();
+        .build()
+        .securityContexts(this.securityContext())
+        .securitySchemes(this.securitySchemes());
   }
 
   private ApiInfo apiInfo() {
-    return new ApiInfoBuilder().title("租户后台API文档").description("API文档").version("1.0").build();
+    return new ApiInfoBuilder().title("租户管理后台API文档").description("API文档").version("1.0").build();
   }
 
   private List<SecurityContext> securityContext() {
     return Collections.singletonList(
         SecurityContext.builder()
-            .securityReferences(this.securityReferences())
+            .securityReferences(this.defaultAuth())
             .operationSelector(this.forExcludeAntPaths())
             .build());
   }
@@ -59,20 +58,19 @@ public class Swagger2Config {
             .noneMatch(url -> PathSelectors.ant(url).test(context.requestMappingPattern()));
   }
 
-  private List<SecurityReference> securityReferences() {
-    SecurityReference securityReference =
+  private List<SecurityReference> defaultAuth() {
+    return Collections.singletonList(
         SecurityReference.builder()
             .scopes(new AuthorizationScope[0])
-            .reference("Authorization")
-            .build();
-    return Collections.singletonList(securityReference);
+            .reference(HttpHeaders.AUTHORIZATION)
+            .build());
   }
 
   private List<SecurityScheme> securitySchemes() {
     return Collections.singletonList(
         HttpAuthenticationScheme.JWT_BEARER_BUILDER
-            .name("Authorization")
-            .description("Authorization Bearer")
+            .name(HttpHeaders.AUTHORIZATION)
+            .description("Bearer Token")
             .build());
   }
 }

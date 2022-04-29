@@ -11,6 +11,7 @@ import com.gameplat.admin.service.SpreadUnionPackageService;
 import com.gameplat.admin.service.SpreadUnionService;
 import com.gameplat.model.entity.spread.SpreadUnion;
 import com.gameplat.model.entity.spread.SpreadUnionPackage;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -19,6 +20,7 @@ import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.List;
 
+@Api(tags = "联盟管理")
 @RestController
 @RequestMapping("/api/admin/operator/management")
 public class SpreadUnionController {
@@ -66,7 +68,7 @@ public class SpreadUnionController {
 
   @ApiOperation(value = "联盟包设置增加")
   @PostMapping("/insertUnionPackage")
- @PreAuthorize("hasAuthority('spreadUnion:unionpackage:add')")
+  @PreAuthorize("hasAuthority('spreadUnion:unionpackage:add')")
   public void insertUnionPackage(@RequestBody SpreadUnionPackageDTO dto) {
     spreadUnionPackageService.insertUnionPackage(dto);
   }

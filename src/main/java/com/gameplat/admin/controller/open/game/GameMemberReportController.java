@@ -8,6 +8,8 @@ import com.gameplat.admin.model.vo.PageDtoVO;
 import com.gameplat.admin.service.GameMemberReportService;
 import com.gameplat.base.common.util.DateUtil;
 import com.gameplat.base.common.util.StringUtils;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -17,9 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Date;
 
-/**
- * @author kb @Date 2022/2/8 18:26 @Version 1.0
- */
+@Api(tags = "玩家游戏报表")
 @Slf4j
 @RestController
 @RequestMapping("/api/admin/game/gameMemberReport")
@@ -27,7 +27,7 @@ public class GameMemberReportController {
 
   @Autowired private GameMemberReportService gameMemberReportService;
 
-  /** 查询投注日报表记录 */
+  @ApiOperation("查询投注日报表记录")
   @GetMapping(value = "/queryBetReport")
   @PreAuthorize("hasAuthority('report:gameMemberReport:view')")
   public PageDtoVO<MemberDayReportVo> queryMemberReport(

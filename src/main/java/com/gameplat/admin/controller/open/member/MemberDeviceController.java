@@ -23,14 +23,14 @@ public class MemberDeviceController {
   @Autowired private MemberDeviceService memberDeviceService;
 
   @ApiOperation("获取用户登录设备")
-  @GetMapping(value = "/page")
+  @GetMapping("/page")
   @PreAuthorize("hasAuthority('member:device:view')")
   public IPage<MemberDeviceVO> page(@Validated Page<MemberDevice> page, MemberDeviceQueryDTO dto) {
     return memberDeviceService.page(page, dto);
   }
 
   @ApiOperation("删除设备")
-  @DeleteMapping(value = "/delete/{id}")
+  @DeleteMapping("/delete/{id}")
   @PreAuthorize("hasAuthority('member:device:delete')")
   public void delete(@PathVariable Long id) {
     memberDeviceService.delete(id);

@@ -23,9 +23,9 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 
 /**
+ * 用户成长值记录
+ *
  * @author lily
- * @description 用户成长值记录
- * @date 2021/11/23
  */
 @Slf4j
 @Api(tags = "VIP成长记录")
@@ -35,8 +35,7 @@ public class OpenMemberGrowthRecordController {
 
   @Autowired private MemberGrowthRecordService memberGrowthRecordService;
 
-  @Autowired
-  private MemberGrowthStatisService memberGrowthStatisService;
+  @Autowired private MemberGrowthStatisService memberGrowthStatisService;
 
   @GetMapping("/list")
   @ApiOperation(value = "查询成长值记录列表")

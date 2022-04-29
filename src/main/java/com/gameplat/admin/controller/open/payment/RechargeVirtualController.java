@@ -1,4 +1,4 @@
-package com.gameplat.admin.controller.open.thirdParty;
+package com.gameplat.admin.controller.open.payment;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
@@ -13,16 +13,20 @@ import com.gameplat.common.enums.DictTypeEnum;
 import com.gameplat.log.annotation.Log;
 import com.gameplat.log.enums.LogType;
 import com.gameplat.model.entity.sys.SysDictData;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+@Api(tags = "虚拟币")
 @RestController
 @RequestMapping("/api/admin/thirdParty/rechVirtual")
-public class RechVirtualController {
+public class RechargeVirtualController {
 
   @Autowired private SysDictDataService dictDataService;
 
+  @ApiOperation("查询")
   @GetMapping("/list")
   @PreAuthorize("hasAuthority('thirdParty:rechVirtual:view')")
   public IPage<DictDataVo> list(PageDTO<SysDictData> page, SysDictDataDTO dictData) {
@@ -30,6 +34,7 @@ public class RechVirtualController {
     return dictDataService.selectDictDataList(page, dictData);
   }
 
+  @ApiOperation("修改")
   @PutMapping("/edit")
   @PreAuthorize("hasAuthority('thirdParty:rechVirtual:edit')")
   @Log(
@@ -47,6 +52,7 @@ public class RechVirtualController {
     dictDataService.updateDictData(dictData);
   }
 
+  @ApiOperation("添加")
   @PutMapping("/add")
   @PreAuthorize("hasAuthority('thirdParty:rechVirtual:add')")
   @Log(
@@ -61,6 +67,7 @@ public class RechVirtualController {
     dictDataService.insertDictData(dictData);
   }
 
+  @ApiOperation("删除")
   @DeleteMapping("/delete/{id}")
   @PreAuthorize("hasAuthority('thirdParty:rechVirtual:remove')")
   @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.RECHARGE, desc = "'删除虚拟币id=' + #id")
@@ -68,6 +75,7 @@ public class RechVirtualController {
     dictDataService.removeById(id);
   }
 
+  @ApiOperation("修改状态")
   @PostMapping("/editStatus")
   @PreAuthorize("hasAuthority('thirdParty:rechVirtual:editStatus')")
   @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.RECHARGE, desc = "'修改虚拟币状态id=' + #id")

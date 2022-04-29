@@ -29,9 +29,9 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
 /**
+ * VIP会员签到汇总
+ *
  * @author lily
- * @description VIP会员签到汇总
- * @date 2021/11/24
  */
 @Api(tags = "VIP会员签到汇总")
 @Slf4j

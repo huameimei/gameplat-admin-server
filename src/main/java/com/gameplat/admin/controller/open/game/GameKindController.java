@@ -9,41 +9,45 @@ import com.gameplat.admin.service.GameKindService;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.common.enums.GameDemoEnableEnum;
 import com.gameplat.model.entity.game.GameKind;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 
+@Api(tags = "游戏分类")
 @RestController
 @RequestMapping("/api/admin/game/gameKind")
 public class GameKindController {
 
   @Autowired private GameKindService gameKindService;
 
+  @ApiOperation("查询")
   @GetMapping("/list")
   @PreAuthorize("hasAuthority('game:gameKind:view')")
   public IPage<GameKindVO> selectGameKindList(PageDTO<GameKind> page, GameKindQueryDTO dto) {
     return gameKindService.selectGameKindList(page, dto);
   }
 
+  @ApiOperation("编辑")
   @PutMapping("/edit")
   @PreAuthorize("hasAuthority('game:gameKind:edit')")
   public void updateGameKind(@RequestBody OperGameKindDTO dto) {
     gameKindService.updateGameKind(dto);
   }
 
+  @ApiOperation("游戏开关")
   @PutMapping("/updateEnable")
   @PreAuthorize("hasAuthority('game:gameKind:updateEnable')")
   public void updateEnable(@RequestBody OperGameKindDTO dto) {
     gameKindService.updateEnable(dto);
   }
 
+  @ApiOperation("试玩开关")
   @PutMapping("/updateDemoEnable")
   @PreAuthorize("hasAuthority('game:gameKind:updateDemoEnable')")
   public void updateDemoEnable(@RequestBody OperGameKindDTO dto) {
@@ -54,6 +58,7 @@ public class GameKindController {
     gameKindService.updateDemoEnable(dto);
   }
 
+  @ApiOperation("获取全部")
   @GetMapping(value = "/queryGameKindList")
   @PreAuthorize("hasAuthority('game:gameKind:view')")
   public List<GameKind> queryGameKindList() {

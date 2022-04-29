@@ -7,12 +7,10 @@ import com.gameplat.admin.model.vo.MemberConfigLevelVO;
 import com.gameplat.admin.model.vo.MemberGrowthLevelVO;
 import com.gameplat.admin.service.MemberGrowthConfigService;
 import com.gameplat.admin.service.MemberGrowthLevelService;
-import com.gameplat.admin.service.MemberGrowthStatisService;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.security.SecurityUserHolder;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -27,7 +25,6 @@ import java.util.List;
  * 用户成长等级
  *
  * @author lily
- * @date 2021/11/20
  */
 @Slf4j
 @Api(tags = "VIP等级配置")
@@ -41,7 +38,7 @@ public class OpenMemberGrowthLevelController {
 
   @ApiOperation(value = "VIP配置和VIP等级列表/查询logo配置列表")
   @GetMapping("/config")
-//  @PreAuthorize("hasAuthority('member:growthLevel:config')")
+  //  @PreAuthorize("hasAuthority('member:growthLevel:config')")
   public MemberConfigLevelVO getLevelConfig() {
     return levelService.getLevelConfig();
   }
@@ -49,7 +46,7 @@ public class OpenMemberGrowthLevelController {
   @ApiOperation(value = "修改VIP配置")
   @PutMapping("/update")
   @PreAuthorize("hasAuthority('member:growthLevel:edit')")
-  @ApiParam(name = "修改VIP配置入参", value = "传入json格式", required = true)
+  // @ApiParam(name = "修改VIP配置入参", value = "传入json格式", required = true)
   public void update(@Validated @RequestBody MemberGrowthConfigEditDto dto) {
     if (ObjectUtils.isEmpty(dto.getId())) {
       throw new ServiceException(" 编号不能为空");
@@ -69,7 +66,7 @@ public class OpenMemberGrowthLevelController {
 
   @ApiOperation(value = "VIP等级列表")
   @GetMapping("/vipList")
-//  @PreAuthorize("hasAuthority('member:growthLevel:config')")
+  //  @PreAuthorize("hasAuthority('member:growthLevel:config')")
   public List<MemberGrowthLevelVO> vipList() {
     return levelService.vipList();
   }

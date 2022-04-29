@@ -42,15 +42,17 @@ public class AccountBlacklistServiceImpl
 
   @Override
   public void update(OperAccountBlacklistDTO dto) {
-    AccountBlacklist accountBlacklist = accountBlacklistConvert.toEntity(dto);
     if (StringUtils.isNotBlank(dto.getAccount())) {
       memberService
           .getByAccount(dto.getAccount())
           .orElseThrow(() -> new ServiceException("会员信息不存在！"));
     }
+
     if (StringUtils.isBlank(dto.getAccount()) && StringUtils.isBlank(dto.getIp())) {
       throw new ServiceException("会员帐号和IP地址不能同时为空");
     }
+
+    AccountBlacklist accountBlacklist = accountBlacklistConvert.toEntity(dto);
     if (!this.updateById(accountBlacklist)) {
       throw new ServiceException("更新会员黑名单失败!");
     }
@@ -58,7 +60,6 @@ public class AccountBlacklistServiceImpl
 
   @Override
   public void save(OperAccountBlacklistDTO dto) {
-    AccountBlacklist accountBlacklist = accountBlacklistConvert.toEntity(dto);
     if (StringUtils.isNotBlank(dto.getAccount())) {
       memberService
           .getByAccount(dto.getAccount())
@@ -69,6 +70,7 @@ public class AccountBlacklistServiceImpl
       throw new ServiceException("会员帐号和IP地址不能同时为空");
     }
 
+    AccountBlacklist accountBlacklist = accountBlacklistConvert.toEntity(dto);
     if (!this.save(accountBlacklist)) {
       throw new ServiceException("新增会员黑名单失败!");
     }

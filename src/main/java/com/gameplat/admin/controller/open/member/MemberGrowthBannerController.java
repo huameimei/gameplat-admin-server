@@ -17,9 +17,9 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 /**
+ * VIP轮播图配置
+ *
  * @author lily
- * @description VIP轮播图配置
- * @date 2022/1/14
  */
 @Api(tags = "VIP轮播图配置")
 @Slf4j
@@ -30,13 +30,13 @@ public class MemberGrowthBannerController {
   @Autowired private MemberGrowthBannerService memberGrowthBannerService;
 
   @PostMapping("/add")
-  @ApiOperation(value = "新增banner图")
+  @ApiOperation("新增banner图")
   @PreAuthorize("hasAuthority('member:banner:add')")
   public void addBanner(@Validated MemberGrowthBannerAddDTO dto) {
     memberGrowthBannerService.addBanner(dto);
   }
 
-  @ApiOperation(value = "删除VIP banner图")
+  @ApiOperation("删除VIP banner图")
   @DeleteMapping("/remove/{id}")
   @PreAuthorize("hasAuthority('member:banner:remove')")
   public void removeBanner(@PathVariable Long id) {
@@ -44,14 +44,14 @@ public class MemberGrowthBannerController {
   }
 
   @PutMapping("/edit")
-  @ApiOperation(value = "修改VIP banner图")
+  @ApiOperation("修改VIP banner图")
   @PreAuthorize("hasAuthority('member:banner:edit')")
   public void updateBanner(@Validated MemberGrowthBannerEditDTO dto) {
     memberGrowthBannerService.updateBanner(dto);
   }
 
   @GetMapping("/page")
-  @ApiOperation(value = "VIP banner图列表")
+  @ApiOperation("VIP banner图列表")
   @PreAuthorize("hasAuthority('member:banner:view')")
   public IPage<MemberGrowthBannerVO> findTrendsList(
       PageDTO<MemberGrowthBanner> page, MemberGrowthBannerQueryDTO dto) {

@@ -1,4 +1,4 @@
-package com.gameplat.admin.controller.open.validWithdraw;
+package com.gameplat.admin.controller.open.validwithdraw;
 
 import com.gameplat.admin.model.dto.ValidWithdrawDto;
 import com.gameplat.admin.model.vo.ValidateDmlBeanVo;
@@ -8,6 +8,7 @@ import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.StringUtils;
 import com.gameplat.common.enums.LimitEnums;
 import com.gameplat.common.model.bean.limit.MemberWithdrawLimit;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 /**
  * @Author kb @Date 2022/2/20 14:54 @Version 1.0
  */
+@Api(tags = "打码量")
 @Slf4j
 @RestController
 @RequestMapping("/api/admin/validWithdraw")
@@ -29,6 +31,7 @@ public class ValidWithdrawController {
 
   private final LimitInfoService limitInfoService;
 
+  @ApiOperation("查询")
   @GetMapping(value = "findVaildWithdraw")
   @PreAuthorize("hasAuthority('funds:validWithdraw:view')")
   public ValidateDmlBeanVo findVaildWithdraw(@RequestParam("username") String name) {

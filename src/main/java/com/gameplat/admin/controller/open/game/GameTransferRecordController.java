@@ -9,18 +9,17 @@ import com.gameplat.admin.service.GamePlatformService;
 import com.gameplat.admin.service.GameTransferRecordService;
 import com.gameplat.model.entity.game.GamePlatform;
 import com.gameplat.model.entity.game.GameTransferRecord;
-import java.util.List;
-import java.util.stream.Collectors;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
+@Api(tags = "游戏额度转换记录")
 @Slf4j
 @RestController
 @RequestMapping("/api/admin/game/gameTransferRecord")
@@ -32,6 +31,7 @@ public class GameTransferRecordController {
 
   @Autowired private GamePlatformService gamePlatformService;
 
+  @ApiOperation("查询")
   @GetMapping(value = "/queryPage")
   @PreAuthorize("hasAuthority('game:gameTransferRecord:view')")
   public PageDtoVO<GameTransferRecord> queryGameTransferRecord(
@@ -39,13 +39,14 @@ public class GameTransferRecordController {
     return gameTransferRecordService.queryGameTransferRecord(page, dto);
   }
 
-  /** 后台补单 */
+  @ApiOperation("后台补单")
   @PostMapping(value = "/fillOrders")
   @PreAuthorize("hasAuthority('game:gameTransferRecord:fillOrders')")
   public void fillOrders(@RequestBody OperGameTransferRecordDTO dto) throws Exception {
     gameAdminService.fillOrders(dto);
   }
 
+  @ApiOperation("根据会员ID查询")
   @GetMapping(value = "/queryPlatformByMemberId/{memberId}")
   public List<GamePlatform> queryPlatformByMemberId(@PathVariable("memberId") Long memberId) {
     List<String> platformCodeList =

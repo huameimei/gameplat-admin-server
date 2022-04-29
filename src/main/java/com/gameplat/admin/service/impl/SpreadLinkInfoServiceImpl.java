@@ -23,6 +23,7 @@ import com.gameplat.admin.model.dto.SpreadLinkInfoDTO;
 import com.gameplat.admin.model.dto.SpreadLinkInfoEditDTO;
 import com.gameplat.admin.model.vo.GameDivideVo;
 import com.gameplat.admin.model.vo.SpreadConfigVO;
+import com.gameplat.admin.service.ConfigService;
 import com.gameplat.admin.service.MemberService;
 import com.gameplat.admin.service.SpreadLinkInfoService;
 import com.gameplat.admin.service.SysDictDataService;
@@ -35,6 +36,7 @@ import com.gameplat.common.enums.DictDataEnum;
 import com.gameplat.common.enums.DictTypeEnum;
 import com.gameplat.common.enums.UserTypes;
 import com.gameplat.common.lang.Assert;
+import com.gameplat.common.model.bean.AgentBackendConfig;
 import com.gameplat.model.entity.member.Member;
 import com.gameplat.model.entity.proxy.DivideLayerConfig;
 import com.gameplat.model.entity.spread.SpreadLinkInfo;
@@ -52,10 +54,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.text.MessageFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -77,6 +76,8 @@ public class SpreadLinkInfoServiceImpl extends ServiceImpl<SpreadLinkInfoMapper,
   @Autowired private DivideLayerConfigMapper layerConfigMapper;
 
   @Autowired private SysDictDataService sysDictDataService;
+
+  @Autowired private ConfigService configService;
 
   private static final String STR_URL = "/r/";
 
@@ -207,25 +208,11 @@ public class SpreadLinkInfoServiceImpl extends ServiceImpl<SpreadLinkInfoMapper,
                     .getByAccount(linkInfo.getAgentAccount())
                     .orElseThrow(() -> new ServiceException("代理账号不存在!"));
     Assert.isTrue(UserTypes.AGENT.value().equalsIgnoreCase(member.getUserType()), "账号类型不支持！");
-
+    AgentBackendConfig agentBackendConfig = configService.get(DictTypeEnum.AGENT_BACKEND_CONFIG, AgentBackendConfig.class);
     // 推广码最少字符限制
-    SysDictData agentMinCodeNumData =
-        sysDictDataService.getDictData(
-            DictTypeEnum.SYSTEM_PARAMETER_CONFIG.getValue(),
-            DictDataEnum.MAX_SPREAD_LENGTH.getLabel());
-    Integer agentMinCodeNum = 0;
-    if (agentMinCodeNumData != null) {
-      agentMinCodeNum = Convert.toInt(agentMinCodeNumData.getDictValue());
-    }
+    Integer agentMinCodeNum = Optional.ofNullable(agentBackendConfig.getMinSpreadLength()).orElse(0);
     // 代理推广码最大条数
-    SysDictData agentMaxSpreadNumData =
-        sysDictDataService.getDictData(
-            DictTypeEnum.SYSTEM_PARAMETER_CONFIG.getValue(),
-            DictDataEnum.MAX_SPREAD_NUM.getLabel());
-    Integer agentMaxSpreadNum = 1;
-    if (agentMaxSpreadNumData != null) {
-      agentMaxSpreadNum = Convert.toInt(agentMaxSpreadNumData.getDictValue());
-    }
+    Integer agentMaxSpreadNum = Optional.ofNullable(agentBackendConfig.getMaxSpreadNum()).orElse(0);
     // 如果推广码为空  随机生成 4-20位
     if (StrUtil.isBlank(linkInfo.getCode())) {
       linkInfo.setCode(

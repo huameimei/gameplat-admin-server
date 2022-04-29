@@ -191,9 +191,9 @@ public class SpreadLinkInfoServiceImpl extends ServiceImpl<SpreadLinkInfoMapper,
    */
   @Override
   public void add(SpreadLinkInfoAddDTO dto) {
-    if (StrUtil.isBlank(dto.getAgentAccount()) ) {
-      throw new ServiceException("代理账号不能为空！");
-    }
+//    if (StrUtil.isBlank(dto.getAgentAccount()) ) {
+//      throw new ServiceException("代理账号不能为空！");
+//    }
 
     if (StrUtil.isBlank(dto.getExternalUrl())){
       throw new ServiceException("推广地址不能为空！");

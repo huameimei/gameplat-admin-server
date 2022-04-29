@@ -1,8 +1,5 @@
 package com.gameplat.admin.model.dto;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -16,7 +13,6 @@ import java.util.Date;
  * @since 2020-06-16
  */
 @Data
-@TableName("activity_red_packet_condition")
 @EqualsAndHashCode(callSuper = false)
 @ApiModel(value = "ActivityRedPacketCondition对象")
 public class ActivityRedPacketConditionAddDTO implements Serializable {
@@ -24,7 +20,6 @@ public class ActivityRedPacketConditionAddDTO implements Serializable {
   private static final long serialVersionUID = 1L;
 
   @ApiModelProperty(value = "主键")
-  @TableId(value = "id", type = IdType.AUTO)
   private Long conditionId;
 
   @ApiModelProperty(value = "红包id")

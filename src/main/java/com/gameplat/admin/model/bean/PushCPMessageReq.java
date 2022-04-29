@@ -6,10 +6,10 @@ import lombok.experimental.Accessors;
 @Data
 @Accessors(chain = true)
 public class PushCPMessageReq {
-  protected Long userId;
-  protected String account;
-  protected String gameId;
-  protected String gameName;
-  protected Long roomId;
+  private Long userId;
+  private String account;
+  private String gameId;
+  private String gameName;
+  private Long roomId;
   private double winMoney; // 中奖金额
 }

@@ -1,10 +1,11 @@
 package com.gameplat.admin.model.vo;
 
-import com.baomidou.mybatisplus.extension.activerecord.Model;
 import lombok.Data;
 
+import java.io.Serializable;
+
 @Data
-public class TpPayTypeVO extends Model<TpInterfaceVO> {
+public class TpPayTypeVO implements Serializable {
 
   private Long id;
 

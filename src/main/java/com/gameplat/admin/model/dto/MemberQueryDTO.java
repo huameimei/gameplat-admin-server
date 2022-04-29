@@ -9,9 +9,10 @@ import java.util.List;
 public class MemberQueryDTO implements Serializable {
 
   /** 会员账号 */
-  public String account;
+  private String account;
 
   private Long id;
+
   /** 多账号 */
   private List<String> accountList;
 

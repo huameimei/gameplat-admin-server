@@ -13,12 +13,6 @@ public class IpAnalysisVO {
   @ApiModelProperty(value = "会员账号")
   private String account;
 
-  //	@ApiModelProperty(value = "会员姓名")
-  //	private String fullName;
-  //
-  //	@ApiModelProperty(value = "会员id")
-  //	private Long memberId;
-
   @ApiModelProperty(value = "ip地址")
   private String ipAddress;
 
@@ -33,7 +27,4 @@ public class IpAnalysisVO {
 
   @ApiModelProperty(value = "在线状态 0不在线 1在线")
   private String uuid;
-
-  //	@ApiModelProperty(value = "账户余额")
-  //	private BigDecimal money;
 }

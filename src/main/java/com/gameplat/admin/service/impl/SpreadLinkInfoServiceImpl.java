@@ -202,12 +202,14 @@ public class SpreadLinkInfoServiceImpl extends ServiceImpl<SpreadLinkInfoMapper,
 
     // 实体转换
     SpreadLinkInfo linkInfo = spreadLinkInfoConvert.toEntity(dto);
-    // 校验账号的用户类型
-    Member member =
-            memberService
-                    .getByAccount(linkInfo.getAgentAccount())
-                    .orElseThrow(() -> new ServiceException("代理账号不存在!"));
-    Assert.isTrue(UserTypes.AGENT.value().equalsIgnoreCase(member.getUserType()), "账号类型不支持！");
+    if (StringUtils.isNotEmpty(linkInfo.getAgentAccount())) {
+      // 校验账号的用户类型
+      Member member =
+              memberService
+                      .getByAccount(linkInfo.getAgentAccount())
+                      .orElseThrow(() -> new ServiceException("代理账号不存在!"));
+      Assert.isTrue(UserTypes.AGENT.value().equalsIgnoreCase(member.getUserType()), "账号类型不支持！");
+    }
     AgentBackendConfig agentBackendConfig = configService.get(DictTypeEnum.AGENT_BACKEND_CONFIG, AgentBackendConfig.class);
     // 推广码最少字符限制
     Integer agentMinCodeNum = Optional.ofNullable(agentBackendConfig.getMinSpreadLength()).orElse(0);

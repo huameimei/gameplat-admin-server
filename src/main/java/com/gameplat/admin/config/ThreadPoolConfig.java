@@ -2,6 +2,7 @@ package com.gameplat.admin.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.security.concurrent.DelegatingSecurityContextRunnable;
 import org.springframework.security.task.DelegatingSecurityContextAsyncTaskExecutor;
@@ -44,6 +45,7 @@ public class ThreadPoolConfig {
   }
 
   @Bean("asyncGameExecutor")
+  @Primary
   public Executor asyncGameExecutor() {
     ThreadPoolTaskExecutor taskExecutor = new ThreadPoolTaskExecutor();
     taskExecutor.setCorePoolSize(CORE_POOL_SIZE);

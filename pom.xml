@@ -317,6 +317,7 @@
             <resource>
                 <directory>src/main/resources</directory>
                 <includes>
+                    <include>mapper/**</include>
                     <include>*.properties</include>
                     <include>*.json</include>
                     <include>*.xml</include>

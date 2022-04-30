@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gameplat.admin.mapper.ActivityLobbyMapper">
+
+    <select id="getActivityLobbyVOById" resultMap="getActivityLobbyVOByIdResultMap">
+        select *
+        from activity_lobby
+        where id = #{id}
+    </select>
+
+    <resultMap id="getActivityLobbyVOByIdResultMap" type="com.gameplat.admin.model.vo.ActivityLobbyVO">
+        <id property="id" column="id"/>
+        <association property="lobbyDiscountList" column="id" select="com.gameplat.admin.mapper.ActivityLobbyDiscountMapper.selectByActivityLobbyId"/>
+    </resultMap>
+
+</mapper>

@@ -316,14 +316,13 @@
             </resource>
             <resource>
                 <directory>src/main/resources</directory>
-                <filtering>true</filtering>
                 <includes>
                     <include>**/*.properties</include>
                     <include>**/*.json</include>
                     <include>**/*.xml</include>
                     <include>**/*.txt</include>
                     <include>**/*.xlsx</include>
-                    <include>authorize.yml</include>
+                    <include>*.yml</include>
                 </includes>
             </resource>
         </resources>

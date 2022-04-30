@@ -3,6 +3,7 @@ package com.gameplat.admin.service.impl;
 import cn.hutool.core.util.NumberUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
@@ -15,12 +16,8 @@ import com.gameplat.admin.convert.ActivityQualificationConvert;
 import com.gameplat.admin.enums.ActivityInfoEnum;
 import com.gameplat.admin.mapper.ActivityQualificationMapper;
 import com.gameplat.admin.model.dto.*;
-import com.gameplat.admin.model.vo.ActivityQualificationVO;
-import com.gameplat.admin.model.vo.MemberInfoVO;
-import com.gameplat.admin.service.ActivityCommonService;
-import com.gameplat.admin.service.ActivityDistributeService;
-import com.gameplat.admin.service.ActivityQualificationService;
-import com.gameplat.admin.service.MemberService;
+import com.gameplat.admin.model.vo.*;
+import com.gameplat.admin.service.*;
 import com.gameplat.base.common.context.GlobalContextHolder;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.DateUtil;
@@ -30,13 +27,17 @@ import com.gameplat.common.enums.BooleanEnum;
 import com.gameplat.model.entity.activity.ActivityDistribute;
 import com.gameplat.model.entity.activity.ActivityLobby;
 import com.gameplat.model.entity.activity.ActivityQualification;
+import com.gameplat.model.entity.recharge.RechargeOrderHistory;
 import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 活动资格管理
@@ -58,6 +59,16 @@ public class ActivityQualificationServiceImpl
   @Autowired private ActivityLobbyConvert activityLobbyConvert;
 
   @Autowired private ActivityCommonService activityCommonService;
+
+  @Autowired private ActivityRedPacketService activityRedPacketService;
+
+  @Autowired private RechargeOrderHistoryService rechargeOrderHistoryService;
+
+  @Autowired private ActivityLobbyService activityLobbyService;
+
+  private static final String EST4_BEGIN = " 12:00:00";
+
+  private static final String EST4_END = " 11:59:59";
 
   @Override
   public List<ActivityQualification> findQualificationList(
@@ -370,26 +381,264 @@ public class ActivityQualificationServiceImpl
 
   @Override
   public void activityRedEnvelopeQualification() {
-    long start = System.currentTimeMillis();
-    log.info("生成当天红包雨资格开始");
-    //清理45天前的资格
+    try {
+      long start = System.currentTimeMillis();
+      log.info("生成当天红包雨资格开始");
 
+      //清理资格
+      cleanRedEnvelopeQualification();
 
-    //判断红包雨活动ID是否有配置
+      //判断红包雨活动ID是否有配置
+      ActivityRedPacketConfigVO config = activityRedPacketService.getConfig();
 
-    //判断红包雨活动配置规则
+      if (config == null) {
+        log.info("红包雨配置信息为空,需要在后台配置");
+      } else {
+        //判断红包雨活动配置规则
+        Long redenvelopeId = config.getRedenvelopeId();
 
+        if (redenvelopeId == null || redenvelopeId <= 0) {
+          log.info("红包雨活动id异常,redenvelopeId={}", redenvelopeId);
+        } else {
+          //查询活动信息
+          ActivityLobbyVO activityLobby = activityLobbyService.getActivityLobbyVOById(redenvelopeId);
 
-    //统计所有满足存款条件的用户及存款信息
-    //已入款状态为成功
-    //只查正式会员的充值记录
-    //是计算积分表示
+          if (activityLobby == null) {
+            log.info("不存在红包雨活动,ActivityLobby id={}", redenvelopeId);
+          } else {
+            //检查活动是否ok
+            if (checkDoRedEnvelope(activityLobby)) {
+              List<Map<String, Object>> rechargeOrderList = getRechargeOrder();
 
-    //查询所有已经产生的资格
-    //如果已经产生资格,则不再生成
+              if (CollectionUtils.isEmpty(rechargeOrderList)) {
+                log.info("没有满足条件的充值记录");
+              } else {
+                Set blackSet = null,userLevelsSet = null;
+
+                //获取活动黑名单
+                String activityBalcklist = config.getActivityBalcklist();
+                if (StringUtils.isNotEmpty(activityBalcklist)) {
+                  blackSet = Arrays.stream(activityBalcklist.split(",")).collect(Collectors.toSet());
+                }
+
+                //获取允许参与活动的所有会员层级
+                String userLevels = activityLobby.getUserLevel();
+                if (StringUtils.isNotEmpty(userLevels)) {
+                  userLevelsSet = Arrays.stream(userLevels.split(",")).collect(Collectors.toSet());
+                }
+
+                //查询所有已经产生的资格
+                List<ActivityQualification> existActivityQualificationList = this.lambdaQuery()
+                        .eq(ActivityQualification::getActivityId,activityLobby.getId())
+                        .eq(ActivityQualification::getActivityType, ActivityInfoEnum.TypeEnum.RED_ENVELOPE.value())
+                        .between(ActivityQualification::getCreateTime,DateUtil.getDateStart(new Date()),DateUtil.getDateEnd(new Date()))
+                        .list();
+
+                doRedEnvelopeQualification(blackSet, userLevelsSet, activityLobby, rechargeOrderList, existActivityQualificationList);
+              }
+            }
+          }
+        }
+      }
+      log.info("生成当天红包雨资格结束,消耗：{}ms", System.currentTimeMillis() - start);
+    } catch (Exception e) {
+      log.error("生成当天红包雨资格异常", e);
+    }
+  }
+
+  /**
+   * 检查红包雨活动信息
+   * @param activityLobby
+   * @return
+   */
+  private boolean checkDoRedEnvelope(ActivityLobbyVO activityLobby) {
+    Date now = new Date();
+    if (!"1".equals(activityLobby.getStatus())) {
+      log.info("活动没有启用");
+      return false;
+    }
+    if (!now.after(activityLobby.getStartTime())) {
+      log.info("活动尚未开始,配置的开始时间为：{}", activityLobby.getStartTime());
+      return false;
+    }
+    if (!now.before(activityLobby.getEndTime())) {
+      log.info("活动已过期,配置的结束时间为：{}", activityLobby.getEndTime());
+      return false;
+    }
+    return true;
+  }
+
+  /**
+   * 处理红包雨活动产生资格
+   * @param blackSet
+   * @param userLevelsSet
+   * @param activityLobby
+   * @param list
+   * @param existActivityQualificationList
+   */
+  private void doRedEnvelopeQualification(Set blackSet,Set userLevelsSet,ActivityLobbyVO activityLobby,
+                                          List<Map<String, Object>> list,List<ActivityQualification> existActivityQualificationList){
+    //存放需要生成资格的会员和充值信息
+    Map<String, BigDecimal> newMap = new HashMap<>();
+
+    //账号和会员id之间的映射
+    Map<String, Long> nameAndId = new HashMap<>();
+
+    for (Map<String, Object> map : list) {
+      String dayTotalAmount = map.get("dayTotalAmount").toString();
+      String account = map.get("account").toString();
+      String memberLevel = map.get("memberLevel").toString();
+      nameAndId.put(account,new Long(map.get("memberId").toString()));
+
+      //过滤活动黑名单
+      if (blackSet != null && blackSet.contains(account)) {
+        log.info("账号={}在黑名单内,充值={}不给资格", account, dayTotalAmount);
+        continue;
+      }
+
+      //过滤不能层级内的充值
+      if (userLevelsSet != null && userLevelsSet.contains(memberLevel)) {
+        log.info("账号={}在充值等级={}内充值={}不能参与资格统计", account, dayTotalAmount);
+        continue;
+      }
+
+      //如果已经产生资格,则不再生成
+      if(checkExistActivityQualification(existActivityQualificationList,account)){
+        log.info("账号={}已经生成资格", account);
+        continue;
+      }
+
+      //合并同一个账号的充值金额
+      if (newMap.containsKey(account)) {
+        BigDecimal dayTotalAmountTemp = newMap.get(account);
+        newMap.put(account, dayTotalAmountTemp.add(new BigDecimal(dayTotalAmount)));
+      } else {
+        newMap.put(account, new BigDecimal(dayTotalAmount));
+      }
+    }
+
+    List<ActivityQualification> needAdd=new ArrayList<>();
+    for (Map.Entry<String, BigDecimal> entry : newMap.entrySet()) {
+      ActivityQualification qm=new ActivityQualification();
+      qm.setAuditRemark("红包雨活动资格自动审批,充值总额="+entry.getValue());
+      qm.setAuditPerson("system");
+      qm.setAuditTime(new Date());
+      qm.setActivityId(activityLobby.getId());
+      qm.setActivityName(activityLobby.getTitle());
+      qm.setActivityType(activityLobby.getActivityType());
+      qm.setUserId(nameAndId.get(entry.getKey()));
+      qm.setUsername(entry.getKey());
+      qm.setApplyTime(new Date());
+      qm.setStatus(ActivityInfoEnum.QualificationStatus.AUDITED.value());
+      qm.setActivityStartTime(activityLobby.getStartTime());
+      qm.setActivityEndTime(activityLobby.getEndTime());
+      //YES=1 代表未删除
+      qm.setDeleteFlag(BooleanEnum.YES.value());
+//      qm.setQualificationActivityId(IdWorker.getIdStr());
+//      qm.setAwardDetail("");
+      qm.setSoleIdentifier(RandomUtil.generateOrderCode());
+      //YES=1 代表启用
+      qm.setQualificationStatus(BooleanEnum.YES.value());
+      qm.setStatisItem(activityLobby.getStatisItem());
+      qm.setGetWay(ActivityInfoEnum.GetWay.DIRECT_RELEASE.value());
+      qm.setDrawNum(getCount(entry.getValue(),activityLobby.getLobbyDiscountList()));
+      //打码量是在抽奖时计算，这里不算
+      qm.setWithdrawDml(0);
+      //新增抽奖资格,使用次数为0
+      qm.setEmployNum(0);
+      needAdd.add(qm);
+    }
 
     //批量插入资格
-
-    log.info("生成当天红包雨资格结束,消耗：{}ms", System.currentTimeMillis() - start);
+    this.saveBatch(needAdd);
   }
+
+  /**
+   * 根据充值金额获取抽奖次数
+   * @param money
+   * @param lobbyDiscountList
+   * @return
+   */
+  private Integer getCount(BigDecimal money, List<ActivityLobbyDiscountVO> lobbyDiscountList) {
+    if (CollectionUtils.isEmpty(lobbyDiscountList)) {
+      return 0;
+    }
+    //money<=0
+    if (money == null || money.compareTo(BigDecimal.ZERO) == 0 || money.compareTo(BigDecimal.ZERO) == -1) {
+      return 0;
+    }
+    for (int i = 0; i < lobbyDiscountList.size(); i++) {
+      ActivityLobbyDiscountVO temp = lobbyDiscountList.get(i);
+      //targetValue: 充值金额
+      BigDecimal targetValue = new BigDecimal(temp.getTargetValue());
+      //money>=targetValue
+      if (money.compareTo(targetValue) == 0 || money.compareTo(targetValue) == 1) {
+        //presenterValue: 抽奖次数
+        return temp.getPresenterValue();
+      }
+      //如果充值金额第一条都不满足则返回第一条的抽奖次数
+      if (i == 0 && money.compareTo(targetValue) == 1) {
+        //presenterValue: 抽奖次数
+        return temp.getPresenterValue();
+      }
+    }
+
+    return 0;
+  }
+
+  /**
+   * 获取充值订单，判断会员是否有满足红包雨资格
+   * 1.查询时间段为昨天12点到当天时间12点
+   * 2.已入款状态为成功
+   * 3.只查正式会员的充值记录
+   * 4.是计算积分标识
+   * 5.时间以审核时间为准
+   * @return
+   */
+  private List<Map<String, Object>> getRechargeOrder() {
+    QueryWrapper<RechargeOrderHistory> rechargeOrderHistoryQueryWrapper = new QueryWrapper<>();
+    rechargeOrderHistoryQueryWrapper.select("IFNULL(sum(amount),0) as dayTotalAmount,member_id as memberId,account,member_level as memberLevel")
+            .eq("member_type", "M")
+            .eq("status", 3)
+            .eq("point_flag", 1)
+            .between("audit_time",
+                    DateUtil.strToDate(LocalDate.now().plusDays(-1).toString() + EST4_BEGIN, DateUtil.YYYY_MM_DD_HH_MM_SS),
+                    DateUtil.strToDate(LocalDate.now().toString() + EST4_END, DateUtil.YYYY_MM_DD_HH_MM_SS))
+            .groupBy("member_id,member_level")
+            .having("sum(amount)>0");
+    return rechargeOrderHistoryService.listMaps(rechargeOrderHistoryQueryWrapper);
+  }
+
+  /**
+   * 清理45天前的资格
+   */
+  private void cleanRedEnvelopeQualification() {
+    Calendar calendar = Calendar.getInstance();
+    calendar.add(Calendar.DAY_OF_YEAR, -45);
+    Date endTime = DateUtil.getDateEnd(calendar.getTime());
+    QueryWrapper<ActivityQualification> delWrapper = new QueryWrapper<>();
+    delWrapper.eq("activity_type", ActivityInfoEnum.TypeEnum.RED_ENVELOPE.value());
+    delWrapper.le("create_time", endTime);
+    this.remove(delWrapper);
+  }
+
+  /**
+   * 判断某个账号是否已经生成资格
+   *
+   * @param existActivityQualificationlist
+   * @param account
+   * @return
+   */
+  private boolean checkExistActivityQualification(List<ActivityQualification> existActivityQualificationlist, String account) {
+    if (CollectionUtils.isEmpty(existActivityQualificationlist)) {
+      return false;
+    }
+    for (ActivityQualification temp : existActivityQualificationlist) {
+      if (temp!=null && temp.getUsername().equals(account)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
 }

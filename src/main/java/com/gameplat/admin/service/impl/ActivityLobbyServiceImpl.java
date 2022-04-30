@@ -546,4 +546,9 @@ public class ActivityLobbyServiceImpl extends ServiceImpl<ActivityLobbyMapper, A
     }
     return lobbyList;
   }
+
+  @Override
+  public ActivityLobbyVO getActivityLobbyVOById(Long activityLobbyId) {
+    return baseMapper.getActivityLobbyVOById(activityLobbyId);
+  }
 }

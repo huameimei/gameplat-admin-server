@@ -68,4 +68,11 @@ public interface ActivityLobbyService extends IService<ActivityLobby> {
    * @return
    */
   List<ActivityLobbyVO> findAllLobbyList();
+
+  /**
+   * 查询单个活动信息
+   * @param activityLobbyId
+   * @return
+   */
+  ActivityLobbyVO getActivityLobbyVOById(Long activityLobbyId);
 }

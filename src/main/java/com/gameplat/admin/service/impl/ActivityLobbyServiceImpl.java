@@ -546,4 +546,9 @@ public class ActivityLobbyServiceImpl extends ServiceImpl<ActivityLobbyMapper, A
     }
     return activityLobbies.stream().map(activityLobbyConvert::toVo).collect(Collectors.toList());
   }
+
+  @Override
+  public ActivityLobbyVO getActivityLobbyVOById(Long activityLobbyId) {
+    return baseMapper.getActivityLobbyVOById(activityLobbyId);
+  }
 }

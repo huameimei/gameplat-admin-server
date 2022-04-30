@@ -33,7 +33,7 @@ public interface RechargeOrderService extends IService<RechargeOrder> {
 
   void unHandle(Long id);
 
-  void accept(Long id, String auditRemarks, boolean flag) throws Exception;
+  void accept(Long id, String auditRemarks, boolean flag);
 
   void cancel(Long id);
 

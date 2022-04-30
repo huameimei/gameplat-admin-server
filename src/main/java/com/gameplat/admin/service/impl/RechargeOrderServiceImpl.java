@@ -68,6 +68,7 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -80,15 +81,6 @@ import static com.gameplat.common.enums.DictDataEnum.MAX_RECHARGE_MONEY;
 public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, RechargeOrder>
     implements RechargeOrderService {
 
-  /** 充值会员、代理 */
-  private final String RECH_FORMAL_TYPE = "M";
-
-  /** 查询会员类型 */
-  private final String RECH_FORMAL_TYPE_QUERY = "M,A";
-
-  /** 充值推广 */
-  private final String RECH_TEST_TYPE = "P";
-
   @Autowired private RechargeOrderConvert rechargeOrderConvert;
 
   @Autowired(required = false)
@@ -98,25 +90,40 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
   private RechargeOrderHistoryMapper rechargeOrderHistoryMapper;
 
   @Autowired private LimitInfoService limitInfoService;
+
   @Autowired private MemberService memberService;
+
   @Autowired private SysUserService sysUserService;
+
   @Autowired private MemberInfoService memberInfoService;
+
   @Autowired private PayAccountService payAccountService;
+
   @Autowired private TpMerchantService tpMerchantService;
+
   @Autowired private TpPayChannelService tpPayChannelService;
+
   @Autowired private ConfigService configService;
+
   @Autowired private BizBlacklistFacade bizBlacklistFacade;
+
   @Autowired private DiscountTypeService discountTypeService;
+
   @Autowired private MemberBillService memberBillService;
+
   @Autowired private ValidWithdrawService validWithdrawService;
+
   @Autowired private MemberRwReportService memberRwReportService;
+
   @Autowired private MemberGrowthConfigService memberGrowthConfigService;
+
   @Autowired @Lazy private MemberGrowthStatisService memberGrowthStatisService;
 
   @Autowired(required = false)
   private MessageMapper messageMapper;
 
   @Autowired private MessageDistributeService messageDistributeService;
+
   @Autowired private SysDictDataService sysDictDataService;
 
   @Autowired(required = false)
@@ -152,12 +159,13 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
         .eq(ObjectUtils.isNotEmpty(dto.getAccount()), RechargeOrder::getAccount, dto.getAccount())
         .in(
             ObjectUtils.isNotEmpty(dto.getMemberType())
-                && dto.getMemberType().equalsIgnoreCase(RECH_FORMAL_TYPE),
+                && MemberEnums.Type.MEMBER.match(dto.getMemberType()),
             RechargeOrder::getMemberType,
-            RECH_FORMAL_TYPE_QUERY.split(","))
+            MemberEnums.Type.MEMBER.value(),
+            MemberEnums.Type.PROMOTION.value())
         .eq(
             ObjectUtils.isNotEmpty(dto.getMemberType())
-                && dto.getMemberType().equalsIgnoreCase(RECH_TEST_TYPE),
+                && MemberEnums.Type.PROMOTION.match(dto.getMemberType()),
             RechargeOrder::getMemberType,
             dto.getMemberType())
         .eq(ObjectUtils.isNotEmpty(dto.getOrderNo()), RechargeOrder::getOrderNo, dto.getOrderNo())
@@ -186,7 +194,7 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
     }
     query.orderBy(
         ObjectUtils.isNotEmpty(dto.getOrder()),
-        ObjectUtils.isEmpty(dto.getOrder()) ? false : dto.getOrder().equals("ASC"),
+        !ObjectUtils.isEmpty(dto.getOrder()) && dto.getOrder().equals("ASC"),
         RechargeOrder::getCreateTime);
     IPage<RechargeOrderVO> data = this.page(page, query).convert(rechargeOrderConvert::toVo);
     // 统计受理充值订单总金额、未受理充值订单总金额
@@ -360,103 +368,6 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
     }
   }
 
-  public void addMessageInfo(RechargeOrder rechargeOrder, Integer state) {
-    if (this.verifyMessage() == com.gameplat.common.enums.TrueFalse.FALSE.getValue()) {
-      return;
-    }
-    Message messageInfo = new Message();
-    messageInfo.setTitle(title(1, state));
-    messageInfo.setContent(
-        context(state, rechargeOrder.getCreateTime(), rechargeOrder.getAmount(), 1));
-    messageInfo.setCategory(4);
-    messageInfo.setPosition(1);
-    messageInfo.setShowType(0);
-    messageInfo.setPopsCount(0);
-    messageInfo.setPushRange(2);
-    messageInfo.setLinkAccount(rechargeOrder.getAccount());
-    messageInfo.setSort(0);
-    messageInfo.setType(1);
-    messageInfo.setLanguage("zh-CN");
-    messageInfo.setStatus(1);
-    messageInfo.setImmediateFlag(0);
-    messageInfo.setRemarks("系统消息");
-    messageInfo.setCreateBy("system");
-    messageInfo.setCreateTime(new Date());
-    messageMapper.insert(messageInfo);
-
-    MessageDistribute messageDistribute = new MessageDistribute();
-    messageDistribute.setMessageId(messageInfo.getId());
-    messageDistribute.setUserId(rechargeOrder.getMemberId());
-    messageDistribute.setUserAccount(messageInfo.getLinkAccount());
-    messageDistribute.setRechargeLevel(Convert.toInt(rechargeOrder.getMemberLevel()));
-    messageDistribute.setVipLevel(
-        memberInfoService
-            .lambdaQuery()
-            .eq(MemberInfo::getMemberId, rechargeOrder.getMemberId())
-            .one()
-            .getVipLevel());
-    messageDistribute.setReadStatus(NumberConstant.ZERO);
-    messageDistribute.setCreateBy("system");
-    messageDistributeService.save(messageDistribute);
-  }
-
-  public void sendMessage(String account, String channel, String message) {
-    Map<String, String> map = new HashMap<>();
-    map.put("user", account);
-    map.put("channel", channel);
-    map.put("title", message);
-    log.info("充值成功=============>开始推送Socket消息,相关参数{}", map);
-    client.userSend(map);
-    log.info("充值成功=============>topic推送测试,相关参数{}", map);
-    client.topicSend(map);
-  }
-
-  public int verifyMessage() {
-    SysDictData sysDictData =
-        sysDictDataService.getDictData(
-            DictTypeEnum.SYSTEM_PARAMETER_CONFIG.getValue(),
-            DictDataEnum.RECHARGE_PUSH_MSG.getLabel());
-    return ObjectUtil.isNull(sysDictData) ? 0 : Convert.toInt(sysDictData.getDictValue());
-  }
-
-  /**
-   * @param state 状态
-   * @param date 时间
-   * @param money 金额
-   * @param mode 1 充值 2 提现
-   * @return
-   */
-  public String context(Integer state, Date date, BigDecimal money, int mode) {
-    String context = "";
-    String dateStr = DateUtil.dateToStr(date, DateUtil.YYYY_MM_DD_HH_MM_SS);
-
-    if (ObjectUtil.equals(1, mode)) {
-      if (ObjectUtil.equals(3, state)) {
-        context = "您于" + dateStr + "充值的" + money.setScale(2, 2) + "已成功到账。";
-      } else {
-        context = "您于" + dateStr + "充值的" + money.setScale(2, 2) + "已取消。";
-      }
-    }
-
-    return context;
-  }
-
-  /**
-   * @param mode 1 充值 2 提现
-   * @return
-   */
-  public String title(int mode, int state) {
-    String title = "";
-    if (ObjectUtil.equals(1, mode)) {
-      if (ObjectUtil.equals(state, 3)) {
-        title = "充值成功";
-      } else {
-        title = "充值失败";
-      }
-    }
-    return title;
-  }
-
   @Override
   public void cancel(Long id) throws ServiceException {
     RechargeOrder rechargeOrder = this.getById(id);
@@ -563,6 +474,103 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
   public MemberActivationVO getRechargeInfoByNameAndUpdateTime(
       MemberActivationDTO memberActivationDTO) {
     return rechargeOrderMapper.getRechargeInfoByNameAndUpdateTime(memberActivationDTO);
+  }
+
+  private void addMessageInfo(RechargeOrder rechargeOrder, Integer state) {
+    if (this.verifyMessage() == com.gameplat.common.enums.TrueFalse.FALSE.getValue()) {
+      return;
+    }
+    Message messageInfo = new Message();
+    messageInfo.setTitle(title(1, state));
+    messageInfo.setContent(
+        context(state, rechargeOrder.getCreateTime(), rechargeOrder.getAmount(), 1));
+    messageInfo.setCategory(4);
+    messageInfo.setPosition(1);
+    messageInfo.setShowType(0);
+    messageInfo.setPopsCount(0);
+    messageInfo.setPushRange(2);
+    messageInfo.setLinkAccount(rechargeOrder.getAccount());
+    messageInfo.setSort(0);
+    messageInfo.setType(1);
+    messageInfo.setLanguage("zh-CN");
+    messageInfo.setStatus(1);
+    messageInfo.setImmediateFlag(0);
+    messageInfo.setRemarks("系统消息");
+    messageInfo.setCreateBy("system");
+    messageInfo.setCreateTime(new Date());
+    messageMapper.insert(messageInfo);
+
+    MessageDistribute messageDistribute = new MessageDistribute();
+    messageDistribute.setMessageId(messageInfo.getId());
+    messageDistribute.setUserId(rechargeOrder.getMemberId());
+    messageDistribute.setUserAccount(messageInfo.getLinkAccount());
+    messageDistribute.setRechargeLevel(Convert.toInt(rechargeOrder.getMemberLevel()));
+    messageDistribute.setVipLevel(
+        memberInfoService
+            .lambdaQuery()
+            .eq(MemberInfo::getMemberId, rechargeOrder.getMemberId())
+            .one()
+            .getVipLevel());
+    messageDistribute.setReadStatus(NumberConstant.ZERO);
+    messageDistribute.setCreateBy("system");
+    messageDistributeService.save(messageDistribute);
+  }
+
+  private void sendMessage(String account, String channel, String message) {
+    Map<String, String> map = new HashMap<>();
+    map.put("user", account);
+    map.put("channel", channel);
+    map.put("title", message);
+    log.info("充值成功=============>开始推送Socket消息,相关参数{}", map);
+    client.userSend(map);
+    log.info("充值成功=============>topic推送测试,相关参数{}", map);
+    client.topicSend(map);
+  }
+
+  private int verifyMessage() {
+    SysDictData sysDictData =
+        sysDictDataService.getDictData(
+            DictTypeEnum.SYSTEM_PARAMETER_CONFIG.getValue(),
+            DictDataEnum.RECHARGE_PUSH_MSG.getLabel());
+    return ObjectUtil.isNull(sysDictData) ? 0 : Convert.toInt(sysDictData.getDictValue());
+  }
+
+  /**
+   * @param state 状态
+   * @param date 时间
+   * @param money 金额
+   * @param mode 1 充值 2 提现
+   * @return String
+   */
+  private String context(Integer state, Date date, BigDecimal money, int mode) {
+    String context = "";
+    String dateStr = DateUtil.dateToStr(date, DateUtil.YYYY_MM_DD_HH_MM_SS);
+
+    if (ObjectUtil.equals(1, mode)) {
+      if (ObjectUtil.equals(3, state)) {
+        context = "您于" + dateStr + "充值的" + money.setScale(2, RoundingMode.HALF_UP) + "已成功到账。";
+      } else {
+        context = "您于" + dateStr + "充值的" + money.setScale(2, RoundingMode.HALF_UP) + "已取消。";
+      }
+    }
+
+    return context;
+  }
+
+  /**
+   * @param mode 1 充值 2 提现
+   * @return String
+   */
+  private String title(int mode, int state) {
+    String title = "";
+    if (ObjectUtil.equals(1, mode)) {
+      if (ObjectUtil.equals(state, 3)) {
+        title = "充值成功";
+      } else {
+        title = "充值失败";
+      }
+    }
+    return title;
   }
 
   private void verifyRechargeOrderForAuditing(RechargeOrder rechargeOrder) {
@@ -825,9 +833,11 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
 
     // 设置订单计算积分
     rechargeOrder.setPointFlag(manualRechargeOrderBo.getPointFlag());
-    /** 会员备注信息 */
+
+    // 会员备注信息
     rechargeOrder.setRemarks(manualRechargeOrderBo.getRemarks());
-    /** 审核备注信息 */
+
+    // 审核备注信息
     if (isDiscountIgnored) {
       StringBuilder sb = new StringBuilder("会员或层级在充值优惠黑名单中，不赠送优惠。");
       Optional.ofNullable(manualRechargeOrderBo.getAuditRemarks())
@@ -902,12 +912,13 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
         .in(ObjectUtils.isNotNull(dto.getModeList()), RechargeOrder::getMode, dto.getModeList())
         .in(
             ObjectUtils.isNotEmpty(dto.getMemberType())
-                && dto.getMemberType().equalsIgnoreCase(RECH_FORMAL_TYPE),
+                && MemberEnums.Type.MEMBER.match(dto.getMemberType()),
             RechargeOrder::getMemberType,
-            RECH_FORMAL_TYPE_QUERY.split(","))
+            MemberEnums.Type.MEMBER.value(),
+            MemberEnums.Type.PROMOTION.value())
         .eq(
             ObjectUtils.isNotEmpty(dto.getMemberType())
-                && dto.getMemberType().equalsIgnoreCase(RECH_TEST_TYPE),
+                && MemberEnums.Type.PROMOTION.match(dto.getMemberType()),
             RechargeOrder::getMemberType,
             dto.getMemberType())
         .in(
@@ -926,70 +937,6 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
             dto.getMemberLevelList());
     summaryVO.setAllUnhandledSum(rechargeOrderMapper.summaryRechargeOrder(queryUnHandle));
     return summaryVO;
-  }
-
-  private void addUserBill(
-      RechargeOrder rechargeOrder, Member member, BigDecimal balance, String operator) {
-    StringBuilder sb = new StringBuilder();
-    java.text.DecimalFormat df = new java.text.DecimalFormat("0.00");
-    sb.append("订单编号 ")
-        .append(rechargeOrder.getOrderNo())
-        .append("，充值金额 ")
-        .append(
-            CNYUtils.formatYuanAsYuan(
-                rechargeOrder.getPayAmount().setScale(2, BigDecimal.ROUND_DOWN)))
-        .append("，优惠金额 ")
-        .append(
-            CNYUtils.formatYuanAsYuan(
-                rechargeOrder.getDiscountAmount().setScale(2, BigDecimal.ROUND_DOWN)))
-        .append("，余额 ")
-        .append(
-            df.format(
-                balance.add(rechargeOrder.getTotalAmount().setScale(2, BigDecimal.ROUND_DOWN))));
-    if (StringUtils.isNotEmpty(rechargeOrder.getPayType())) {
-      sb.append("，支付类型 ").append(rechargeOrder.getPayTypeName());
-    }
-    if (rechargeOrder.getPayAccountId() != null) {
-      sb.append("，收款账号 ").append(rechargeOrder.getPayAccountAccount());
-      if (StringUtils.isNotEmpty(rechargeOrder.getPayAccountOwner())) {
-        sb.append("，收款人 ").append(rechargeOrder.getPayAccountOwner());
-      }
-      if (StringUtils.isNotEmpty(rechargeOrder.getPayAccountBankName())) {
-        sb.append("，收款银行 ").append(rechargeOrder.getPayAccountBankName());
-      }
-    }
-    sb.append("。");
-    if (StringUtils.isNotEmpty(rechargeOrder.getTpInterfaceCode())) {
-      sb.append("第三方接口 ").append(rechargeOrder.getTpInterfaceName());
-    }
-    add(member, balance, rechargeOrder, sb.toString(), operator, "");
-  }
-
-  public void add(
-      Member member,
-      BigDecimal balance,
-      RechargeOrder rechargeOrder,
-      String content,
-      String operator,
-      String... remark) {
-    MemberBill bill = new MemberBill();
-    bill.setBalance(balance);
-    bill.setOrderNo(rechargeOrder.getOrderNo());
-    bill.setTranType(RechargeMode.getTranType(rechargeOrder.getMode()));
-    bill.setAmount(rechargeOrder.getTotalAmount());
-    bill.setContent(content);
-    bill.setOperator(operator);
-    if (remark != null && remark.length > 0 && StringUtils.isNotEmpty(remark[0])) {
-      bill.setRemark(remark[0]);
-    }
-    memberBillService.save(member, bill);
-  }
-
-  private void fillClientInfo(RechargeOrder rechargeOrder, UserEquipment clientInfo) {
-    rechargeOrder.setBrowser(clientInfo.getUserAgent().getBrowser().getName());
-    rechargeOrder.setOs(clientInfo.getUserAgent().getOs().getName());
-    rechargeOrder.setIpAddress(clientInfo.getIpAddress());
-    rechargeOrder.setUserAgent(clientInfo.getUserAgentString());
   }
 
   /** 获取某时间段内某代理下所有会员的充值数据 */
@@ -1029,6 +976,120 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
     }
   }
 
+  @Async
+  @Override
+  public void batchMemberRecharge(
+      UserEquipment clientInfo,
+      List<RechargeMemberFileBean> strAccount,
+      ManualRechargeOrderDto dto) {
+    strAccount.forEach(
+        a -> {
+          MemberBalanceVO memberVip =
+              memberService.findMemberVip(a.getUsername(), dto.getLevel(), dto.getVip());
+          if (memberVip == null || StringUtils.isEmpty(memberVip.getAccount())) {
+            return;
+          }
+
+          log.info("会员：{},充值金额:{}", a, dto.getAmount());
+          dto.setAccount(memberVip.getAccount());
+          ManualRechargeOrderBo manualRechargeOrderBo = new ManualRechargeOrderBo();
+          BeanUtil.copyProperties(dto, manualRechargeOrderBo);
+          manualRechargeOrderBo.setMemberId(memberVip.getId());
+          try {
+            manual(manualRechargeOrderBo, clientInfo);
+          } catch (Exception e) {
+            log.info("充值失败", e);
+          }
+        });
+  }
+
+  @Async
+  @Override
+  public void batchFileMemberRecharge(
+      List<MemberRechBalanceVO> list, Integer discountType, UserEquipment userEquipment) {
+    list.forEach(
+        a -> {
+          MemberInfoVO memberInfo = memberService.getMemberInfo(a.getAccount());
+          if (memberInfo == null || StringUtils.isEmpty(memberInfo.getAccount())) {
+            return;
+          }
+
+          // 开始创建订单，入款
+          try {
+            ManualRechargeOrderBo manualRechargeOrderBo =
+                fillRechargeOrder(a, memberInfo, discountType);
+            log.info("充值数据：{}", JSON.toJSONString(manualRechargeOrderBo));
+            manual(manualRechargeOrderBo, userEquipment);
+          } catch (Exception e) {
+            e.printStackTrace();
+          }
+        });
+  }
+
+  private void add(
+      Member member,
+      BigDecimal balance,
+      RechargeOrder rechargeOrder,
+      String content,
+      String operator,
+      String... remark) {
+    MemberBill bill = new MemberBill();
+    bill.setBalance(balance);
+    bill.setOrderNo(rechargeOrder.getOrderNo());
+    bill.setTranType(RechargeMode.getTranType(rechargeOrder.getMode()));
+    bill.setAmount(rechargeOrder.getTotalAmount());
+    bill.setContent(content);
+    bill.setOperator(operator);
+    if (remark != null && remark.length > 0 && StringUtils.isNotEmpty(remark[0])) {
+      bill.setRemark(remark[0]);
+    }
+    memberBillService.save(member, bill);
+  }
+
+  private void addUserBill(
+      RechargeOrder rechargeOrder, Member member, BigDecimal balance, String operator) {
+    StringBuilder sb = new StringBuilder();
+    java.text.DecimalFormat df = new java.text.DecimalFormat("0.00");
+    sb.append("订单编号 ")
+        .append(rechargeOrder.getOrderNo())
+        .append("，充值金额 ")
+        .append(
+            CNYUtils.formatYuanAsYuan(
+                rechargeOrder.getPayAmount().setScale(2, BigDecimal.ROUND_DOWN)))
+        .append("，优惠金额 ")
+        .append(
+            CNYUtils.formatYuanAsYuan(
+                rechargeOrder.getDiscountAmount().setScale(2, BigDecimal.ROUND_DOWN)))
+        .append("，余额 ")
+        .append(
+            df.format(
+                balance.add(rechargeOrder.getTotalAmount().setScale(2, BigDecimal.ROUND_DOWN))));
+    if (StringUtils.isNotEmpty(rechargeOrder.getPayType())) {
+      sb.append("，支付类型 ").append(rechargeOrder.getPayTypeName());
+    }
+    if (rechargeOrder.getPayAccountId() != null) {
+      sb.append("，收款账号 ").append(rechargeOrder.getPayAccountAccount());
+      if (StringUtils.isNotEmpty(rechargeOrder.getPayAccountOwner())) {
+        sb.append("，收款人 ").append(rechargeOrder.getPayAccountOwner());
+      }
+      if (StringUtils.isNotEmpty(rechargeOrder.getPayAccountBankName())) {
+        sb.append("，收款银行 ").append(rechargeOrder.getPayAccountBankName());
+      }
+    }
+    sb.append("。");
+    if (StringUtils.isNotEmpty(rechargeOrder.getTpInterfaceCode())) {
+      sb.append("第三方接口 ").append(rechargeOrder.getTpInterfaceName());
+    }
+    add(member, balance, rechargeOrder, sb.toString(), operator, "");
+  }
+
+  private void fillClientInfo(RechargeOrder rechargeOrder, UserEquipment clientInfo) {
+    rechargeOrder.setBrowser(clientInfo.getUserAgent().getBrowser().getName());
+    rechargeOrder.setOs(clientInfo.getUserAgent().getOs().getName());
+    rechargeOrder.setIpAddress(clientInfo.getIpAddress());
+    rechargeOrder.setUserAgent(clientInfo.getUserAgentString());
+  }
+
   /** 查询在线支付 */
   private QueryWrapper<RechargeOrder> builderMemberTodayQuery(GameRWDataReportDto dto) {
     QueryWrapper<RechargeOrder> queryWrapper = new QueryWrapper<>();
@@ -1050,72 +1111,22 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
         .groupBy("tp_interface_code");
   }
 
-  @Async
-  @Override
-  public void batchMemberRecharge(
-      UserEquipment clientInfo,
-      List<RechargeMemberFileBean> strAccount,
-      ManualRechargeOrderDto dto) {
-    strAccount.forEach(
-        a -> {
-          MemberBalanceVO memberVip =
-              memberService.findMemberVip(a.getUsername(), dto.getLevel(), dto.getVip());
-          if (memberVip == null
-              || com.gameplat.base.common.util.StringUtils.isEmpty(memberVip.getAccount())) {
-            return;
-          }
-          log.info("会员：{},充值金额:{}", a, dto.getAmount());
-          dto.setAccount(memberVip.getAccount());
-          ManualRechargeOrderBo manualRechargeOrderBo = new ManualRechargeOrderBo();
-          BeanUtil.copyProperties(dto, manualRechargeOrderBo);
-          manualRechargeOrderBo.setMemberId(memberVip.getId());
-          try {
-            manual(manualRechargeOrderBo, clientInfo);
-          } catch (Exception e) {
-            log.info("充值失败", e);
-          }
-        });
-  }
-
-  @Async
-  @Override
-  public void batchFileMemberRecharge(
-      List<MemberRechBalanceVO> list, Integer discountType, UserEquipment userEquipment) {
-    list.forEach(
-        a -> {
-          MemberInfoVO memberInfo = memberService.getMemberInfo(a.getAccount());
-          if (memberInfo == null
-              || com.gameplat.base.common.util.StringUtils.isEmpty(memberInfo.getAccount())) {
-            return;
-          }
-          // 开始创建订单，入款
-          try {
-            ManualRechargeOrderBo manualRechargeOrderBo =
-                fillRechargeOrder(a, memberInfo, discountType);
-            log.info("充值数据：{}", JSON.toJSONString(manualRechargeOrderBo));
-            manual(manualRechargeOrderBo, userEquipment);
-          } catch (Exception e) {
-            e.printStackTrace();
-          }
-        });
-  }
-
-  public ManualRechargeOrderBo fillRechargeOrder(
+  private ManualRechargeOrderBo fillRechargeOrder(
       MemberRechBalanceVO memberRechBalanceVO, MemberInfoVO memberInfoVO, Integer discountType) {
-    ManualRechargeOrderBo manualRechargeOrderBo = new ManualRechargeOrderBo();
-    manualRechargeOrderBo.setMemberId(memberInfoVO.getId());
-    manualRechargeOrderBo.setAccount(memberRechBalanceVO.getAccount());
-    manualRechargeOrderBo.setPointFlag(1);
-    manualRechargeOrderBo.setRemarks(memberRechBalanceVO.getRemark());
-    manualRechargeOrderBo.setAuditRemarks(memberRechBalanceVO.getAuditRemarks());
-    manualRechargeOrderBo.setSkipAuditing(true);
-    manualRechargeOrderBo.setAmount(BigDecimal.ZERO);
-    manualRechargeOrderBo.setNormalDml(BigDecimal.ZERO);
-    manualRechargeOrderBo.setDiscountType(discountType);
-    manualRechargeOrderBo.setDiscountAmount(memberRechBalanceVO.getAmount());
-    manualRechargeOrderBo.setDiscountDml(
+    ManualRechargeOrderBo orderBo = new ManualRechargeOrderBo();
+    orderBo.setMemberId(memberInfoVO.getId());
+    orderBo.setAccount(memberRechBalanceVO.getAccount());
+    orderBo.setPointFlag(1);
+    orderBo.setRemarks(memberRechBalanceVO.getRemark());
+    orderBo.setAuditRemarks(memberRechBalanceVO.getAuditRemarks());
+    orderBo.setSkipAuditing(true);
+    orderBo.setAmount(BigDecimal.ZERO);
+    orderBo.setNormalDml(BigDecimal.ZERO);
+    orderBo.setDiscountType(discountType);
+    orderBo.setDiscountAmount(memberRechBalanceVO.getAmount());
+    orderBo.setDiscountDml(
         memberRechBalanceVO.getBetMultiple().multiply(memberRechBalanceVO.getAmount()));
-    manualRechargeOrderBo.setDmlFlag(1);
-    return manualRechargeOrderBo;
+    orderBo.setDmlFlag(1);
+    return orderBo;
   }
 }

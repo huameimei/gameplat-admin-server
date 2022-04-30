@@ -317,11 +317,11 @@
             <resource>
                 <directory>src/main/resources</directory>
                 <includes>
-                    <include>**/*.properties</include>
-                    <include>**/*.json</include>
-                    <include>**/*.xml</include>
-                    <include>**/*.txt</include>
-                    <include>**/*.xlsx</include>
+                    <include>*.properties</include>
+                    <include>*.json</include>
+                    <include>*.xml</include>
+                    <include>*.txt</include>
+                    <include>*.xlsx</include>
                     <include>*.yml</include>
                 </includes>
             </resource>

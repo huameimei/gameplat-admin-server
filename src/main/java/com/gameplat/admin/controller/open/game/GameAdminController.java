@@ -1,8 +1,10 @@
 package com.gameplat.admin.controller.open.game;
 
 import com.gameplat.admin.model.dto.GameBalanceQueryDTO;
+import com.gameplat.admin.model.dto.GameKickOutDTO;
 import com.gameplat.admin.model.dto.OperGameTransferRecordDTO;
 import com.gameplat.admin.model.vo.GameBalanceVO;
+import com.gameplat.admin.model.vo.GameKickOutVO;
 import com.gameplat.admin.model.vo.GameRecycleVO;
 import com.gameplat.admin.service.GameAdminService;
 import com.gameplat.common.constant.ServiceName;
@@ -101,5 +103,38 @@ public class GameAdminController {
       desc = "'回收会员所有游戏平台金额，account='+#dto.account")
   public List<GameRecycleVO> reclaimLiveAmountAsync(@RequestBody GameBalanceQueryDTO dto) {
     return gameAdminService.recyclingAmountByAccount(dto.getAccount());
+  }
+
+  @ApiOperation("一键踢出")
+  @RequestMapping(value = "/kickOutAll", method = RequestMethod.POST)
+  @PreAuthorize("hasAuthority('game:gameAdmin:kickOutAll')")
+  @Log(
+          module = ServiceName.ADMIN_SERVICE,
+          type = LogType.ADMIN,
+          desc = "'踢出会员所有游戏平台，账号='+#dto.account")
+  public List<GameKickOutVO> kickOutAll(@RequestBody GameKickOutDTO dto) {
+    return gameAdminService.kickOutAll(dto);
+  }
+
+  @ApiOperation("踢出单个游戏")
+  @RequestMapping(value = "/kickOut", method = RequestMethod.POST)
+  @PreAuthorize("hasAuthority('game:gameAdmin:kickOut')")
+  @Log(
+          module = ServiceName.ADMIN_SERVICE,
+          type = LogType.ADMIN,
+          desc = "'踢出会员，账号='+#dto.account+',游戏平台编码：'+#dto.platformCode")
+  public void kickOut(@RequestBody GameKickOutDTO dto) {
+    gameAdminService.kickOut(dto);
+  }
+
+  @ApiOperation("批量踢出")
+  @RequestMapping(value = "/batchKickOut", method = RequestMethod.POST)
+  @PreAuthorize("hasAuthority('game:gameAdmin:batchKickOut')")
+  @Log(
+          module = ServiceName.ADMIN_SERVICE,
+          type = LogType.ADMIN,
+          desc = "'踢出会员，账号='+#dto.account+',游戏平台编码：'+#dto.platformCode")
+  public List<GameKickOutVO> batchKickOut(@RequestBody GameKickOutDTO dto) {
+    return gameAdminService.batchKickOut(dto);
   }
 }

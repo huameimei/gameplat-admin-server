@@ -273,13 +273,15 @@ public class SpreadLinkInfoServiceImpl extends ServiceImpl<SpreadLinkInfoMapper,
 //    if (StrUtil.isBlank(linkInfo.getAgentAccount())) {
 //      throw new ServiceException("代理账号不能为空！");
 //    }
-    // 校验账号的用户类型
-    Member member =
-            memberService
-                    .getByAccount(linkInfo.getAgentAccount())
-                    .orElseThrow(() -> new ServiceException("代理账号不存在!"));
-    Assert.isTrue(UserTypes.AGENT.value().equalsIgnoreCase(member.getUserType()), "账号类型不支持！");
-    linkInfo.setIsOpenDividePreset(dto.getIsOpenDividePreset());
+    if (StrUtil.isNotBlank(linkInfo.getAgentAccount())) {
+      // 校验账号的用户类型
+      Member member =
+              memberService
+                      .getByAccount(linkInfo.getAgentAccount())
+                      .orElseThrow(() -> new ServiceException("代理账号不存在!"));
+      Assert.isTrue(UserTypes.AGENT.value().equalsIgnoreCase(member.getUserType()), "账号类型不支持！");
+      linkInfo.setIsOpenDividePreset(dto.getIsOpenDividePreset());
+    }
 
     // 当推广链接不为空时 需要校验 此推广链接地址是否被其它代理作为了专属域名
     if (StrUtil.isNotBlank(linkInfo.getExternalUrl())) {

@@ -8,7 +8,9 @@ security:
       - /doc.html
       - /webjars/**
       - /api/admin/auth/login
-      - /api/admin/common/**
+      - /api/admin/common/vCode
+      - /api/admin/common/config
+      - /api/admin/common/getDictByTypes/*
       - /api/admin/spread/management/**
       - /websocket/**
       - /api/internal/**

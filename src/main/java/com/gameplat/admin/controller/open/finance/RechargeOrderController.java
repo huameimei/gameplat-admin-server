@@ -57,6 +57,7 @@ public class RechargeOrderController {
   public void handle(Long id, Long memberId) {
     String lockKey = "member_rw_" + memberId;
     distributedLocker.lock(lockKey);
+
     try {
       rechargeOrderService.handle(id);
     } catch (Exception e) {
@@ -74,6 +75,7 @@ public class RechargeOrderController {
   public void unHandle(Long id, Long memberId) {
     String lockKey = "member_rw_" + memberId;
     distributedLocker.lock(lockKey);
+
     try {
       rechargeOrderService.unHandle(id);
     } catch (Exception e) {
@@ -88,7 +90,7 @@ public class RechargeOrderController {
   @PostMapping("/accept")
   @PreAuthorize("hasAuthority('finance:rechargeOrder:accept')")
   @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.RECHARGE, desc = "'入款订单：' + #id")
-  public void accept(Long id, Long memberId) throws Exception {
+  public void accept(Long id, Long memberId) {
     String lockKey = "member_rw_" + memberId;
     distributedLocker.lock(lockKey);
 
@@ -125,16 +127,15 @@ public class RechargeOrderController {
   @PreAuthorize("hasAuthority('finance:rechargeOrder:handle')")
   @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.RECHARGE, desc = "'批量受理订单：' + #ids")
   public void batchHandle(@RequestParam List<Long> ids) {
-    if (null == ids || ids.size() == 0) {
+    if (CollUtil.isNotEmpty(ids)) {
       throw new ServiceException("ids不能为空");
     }
+
     String lockKey = "member_rw_single";
     distributedLocker.lock(lockKey);
 
     try {
-      for (Long id : ids) {
-        rechargeOrderService.handle(id);
-      }
+      ids.forEach(id -> rechargeOrderService.handle(id));
     } catch (Exception e) {
       log.error(e.getMessage(), e);
       throw e;
@@ -148,16 +149,15 @@ public class RechargeOrderController {
   @PreAuthorize("hasAuthority('finance:rechargeOrder:unHandle')")
   @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.RECHARGE, desc = "'批量取消受理订单：' + #ids")
   public void batchUnHandle(@RequestParam List<Long> ids) {
-    if (null == ids || ids.size() == 0) {
+    if (CollUtil.isNotEmpty(ids)) {
       throw new ServiceException("ids不能为空");
     }
 
     String lockKey = "member_rw_single";
     distributedLocker.lock(lockKey);
+
     try {
-      for (Long id : ids) {
-        rechargeOrderService.unHandle(id);
-      }
+      ids.forEach(id -> rechargeOrderService.unHandle(id));
     } catch (Exception e) {
       log.error(e.getMessage(), e);
       throw e;
@@ -170,13 +170,14 @@ public class RechargeOrderController {
   @PostMapping("/batchAccept")
   @PreAuthorize("hasAuthority('finance:rechargeOrder:accept')")
   @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.RECHARGE, desc = "'批量入款订单：' + #ids")
-  public void batchAccept(@RequestParam List<Long> ids) throws Exception {
-    if (null == ids || ids.size() == 0) {
+  public void batchAccept(@RequestParam List<Long> ids) {
+    if (CollUtil.isNotEmpty(ids)) {
       throw new ServiceException("ids不能为空");
     }
 
     String lockKey = "member_rw_single";
     distributedLocker.lock(lockKey);
+
     try {
       for (Long id : ids) {
         rechargeOrderService.accept(id, null, true);
@@ -194,7 +195,7 @@ public class RechargeOrderController {
   @PreAuthorize("hasAuthority('finance:rechargeOrder:cancel')")
   @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.RECHARGE, desc = "'批量取消订单：' + #ids")
   public void batchCancel(@RequestParam List<Long> ids) {
-    if (null == ids || ids.size() == 0) {
+    if (CollUtil.isNotEmpty(ids)) {
       throw new ServiceException("ids不能为空");
     }
 
@@ -228,6 +229,7 @@ public class RechargeOrderController {
       Long memberId) {
     String lockKey = "member_rw_" + memberId;
     distributedLocker.lock(lockKey);
+
     try {
       rechargeOrderService.updateDiscount(id, discountType, discountAmount, discountDml);
     } catch (Exception e) {
@@ -324,7 +326,7 @@ public class RechargeOrderController {
   @PreAuthorize("hasAuthority('finance:rechargeOrder:batchRecharge')")
   public void fileRech(
       @RequestPart(value = "file", required = false) MultipartFile file,
-      @RequestParam("discountType") Integer discountType,
+      @RequestParam Integer discountType,
       HttpServletRequest request) {
 
     // 开始批量解析文件

@@ -122,8 +122,8 @@ public class SpreadLinkInfoServiceImpl extends ServiceImpl<SpreadLinkInfoMapper,
                     .page(page)
                     .convert(spreadLinkInfoConvert::toVo);
     for (SpreadConfigVO obj : convert.getRecords()) {
-      if (StrUtil.isNotBlank(obj.getExternalUrl()) && !obj.getExternalUrl().contains("?rc=")) {
-        obj.setExternalUrl(
+      if (StrUtil.isNotBlank(obj.getExternalUrl()) && !obj.getExternalUrl().contains(STR_URL)) {
+        obj.setRcDomain(
                 MessageFormat.format("{0}{1}{2}", obj.getExternalUrl(), STR_URL, obj.getCode()));
       }
     }
@@ -195,25 +195,32 @@ public class SpreadLinkInfoServiceImpl extends ServiceImpl<SpreadLinkInfoMapper,
 //    if (StrUtil.isBlank(dto.getAgentAccount()) ) {
 //      throw new ServiceException("代理账号不能为空！");
 //    }
+//    if (StrUtil.isBlank(dto.getExternalUrl()) && StrUtil.isBlank(dto.getCode())){
+//      throw new ServiceException("推广地址以及推广域名必须存在一个！");
+//    }
 
-    if (StrUtil.isBlank(dto.getExternalUrl())){
-      throw new ServiceException("推广地址不能为空！");
+
+    if (StrUtil.isBlank(dto.getExternalUrl()) && dto.getExclusiveFlag() == 1){
+      throw new ServiceException("专属域名推广地址不能为空！");
     }
 
     // 实体转换
     SpreadLinkInfo linkInfo = spreadLinkInfoConvert.toEntity(dto);
-    // 校验账号的用户类型
-    Member member =
-            memberService
-                    .getByAccount(linkInfo.getAgentAccount())
-                    .orElseThrow(() -> new ServiceException("代理账号不存在!"));
-    Assert.isTrue(UserTypes.AGENT.value().equalsIgnoreCase(member.getUserType()), "账号类型不支持！");
+    if (StringUtils.isNotEmpty(linkInfo.getAgentAccount())) {
+      // 校验账号的用户类型
+      Member member =
+              memberService
+                      .getByAccount(linkInfo.getAgentAccount())
+                      .orElseThrow(() -> new ServiceException("代理账号不存在!"));
+      Assert.isTrue(UserTypes.AGENT.value().equalsIgnoreCase(member.getUserType()), "账号类型不支持！");
+    }
     AgentBackendConfig agentBackendConfig = configService.get(DictTypeEnum.AGENT_BACKEND_CONFIG, AgentBackendConfig.class);
     // 推广码最少字符限制
     Integer agentMinCodeNum = Optional.ofNullable(agentBackendConfig.getMinSpreadLength()).orElse(0);
     // 代理推广码最大条数
     Integer agentMaxSpreadNum = Optional.ofNullable(agentBackendConfig.getMaxSpreadNum()).orElse(0);
-    // 如果推广码为空  随机生成 4-20位
+    // 如果推广码为空 并且推广地址为空  随机生成 4-20位
+//    if (StrUtil.isBlank(linkInfo.getCode()) && StrUtil.isBlank(dto.getExternalUrl())) {
     if (StrUtil.isBlank(linkInfo.getCode())) {
       linkInfo.setCode(
               RandomStringUtils.random(agentMinCodeNum == 0 ? 6 : agentMinCodeNum, true, true)
@@ -267,13 +274,18 @@ public class SpreadLinkInfoServiceImpl extends ServiceImpl<SpreadLinkInfoMapper,
 //    if (StrUtil.isBlank(linkInfo.getAgentAccount())) {
 //      throw new ServiceException("代理账号不能为空！");
 //    }
-    // 校验账号的用户类型
-    Member member =
-            memberService
-                    .getByAccount(linkInfo.getAgentAccount())
-                    .orElseThrow(() -> new ServiceException("代理账号不存在!"));
-    Assert.isTrue(UserTypes.AGENT.value().equalsIgnoreCase(member.getUserType()), "账号类型不支持！");
-    linkInfo.setIsOpenDividePreset(dto.getIsOpenDividePreset());
+    if (StrUtil.isBlank(linkInfo.getCode())) {
+      throw new ServiceException("推广码不能为空！");
+    }
+    if (StrUtil.isNotBlank(linkInfo.getAgentAccount())) {
+      // 校验账号的用户类型
+      Member member =
+              memberService
+                      .getByAccount(linkInfo.getAgentAccount())
+                      .orElseThrow(() -> new ServiceException("代理账号不存在!"));
+      Assert.isTrue(UserTypes.AGENT.value().equalsIgnoreCase(member.getUserType()), "账号类型不支持！");
+      linkInfo.setIsOpenDividePreset(dto.getIsOpenDividePreset());
+    }
 
     // 当推广链接不为空时 需要校验 此推广链接地址是否被其它代理作为了专属域名
     if (StrUtil.isNotBlank(linkInfo.getExternalUrl())) {

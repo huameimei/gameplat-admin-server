@@ -71,7 +71,7 @@ public class OpenCommonController {
   }
 
   @PostMapping("/file/upload")
-  public Map<String, String> fileUpload(@RequestPart MultipartFile file) throws IOException {
+  public Map<String, String> fileUpload(@RequestPart MultipartFile file) {
     Map<String, String> map = new HashMap<>(1);
     map.put("url", ossService.upload(file));
     return map;

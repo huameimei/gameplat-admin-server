@@ -86,4 +86,9 @@ public class SpreadConfigVO {
    * 来源域名
    */
   private String sourceDomain;
+
+  /**
+   * 展示的域名
+   */
+  private String rcDomain;
 }

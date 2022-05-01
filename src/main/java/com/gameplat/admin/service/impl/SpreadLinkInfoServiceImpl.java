@@ -122,8 +122,8 @@ public class SpreadLinkInfoServiceImpl extends ServiceImpl<SpreadLinkInfoMapper,
                     .page(page)
                     .convert(spreadLinkInfoConvert::toVo);
     for (SpreadConfigVO obj : convert.getRecords()) {
-      if (StrUtil.isNotBlank(obj.getExternalUrl()) && !obj.getExternalUrl().contains("?rc=")) {
-        obj.setExternalUrl(
+      if (StrUtil.isNotBlank(obj.getExternalUrl()) && !obj.getExternalUrl().contains(STR_URL)) {
+        obj.setRcDomain(
                 MessageFormat.format("{0}{1}{2}", obj.getExternalUrl(), STR_URL, obj.getCode()));
       }
     }
@@ -195,9 +195,13 @@ public class SpreadLinkInfoServiceImpl extends ServiceImpl<SpreadLinkInfoMapper,
 //    if (StrUtil.isBlank(dto.getAgentAccount()) ) {
 //      throw new ServiceException("代理账号不能为空！");
 //    }
+    if (StrUtil.isBlank(dto.getExternalUrl()) && StrUtil.isBlank(dto.getCode())){
+      throw new ServiceException("推广地址以及推广域名必须存在一个！");
+    }
 
-    if (StrUtil.isBlank(dto.getExternalUrl())){
-      throw new ServiceException("推广地址不能为空！");
+
+    if (StrUtil.isBlank(dto.getExternalUrl()) && dto.getExclusiveFlag() == 1){
+      throw new ServiceException("专属域名推广地址不能为空！");
     }
 
     // 实体转换
@@ -215,8 +219,8 @@ public class SpreadLinkInfoServiceImpl extends ServiceImpl<SpreadLinkInfoMapper,
     Integer agentMinCodeNum = Optional.ofNullable(agentBackendConfig.getMinSpreadLength()).orElse(0);
     // 代理推广码最大条数
     Integer agentMaxSpreadNum = Optional.ofNullable(agentBackendConfig.getMaxSpreadNum()).orElse(0);
-    // 如果推广码为空  随机生成 4-20位
-    if (StrUtil.isBlank(linkInfo.getCode())) {
+    // 如果推广码为空 并且推广地址为空  随机生成 4-20位
+    if (StrUtil.isBlank(linkInfo.getCode()) && StrUtil.isBlank(dto.getExternalUrl())) {
       linkInfo.setCode(
               RandomStringUtils.random(agentMinCodeNum == 0 ? 6 : agentMinCodeNum, true, true)
                       .toLowerCase());

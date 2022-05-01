@@ -103,7 +103,7 @@ public class GameAdminServiceImpl implements GameAdminService {
   @Override
   public void confiscated(String platformCode, Member member, BigDecimal amount) throws Exception {
     GameApi gameApi = getGameApi(platformCode);
-    gameApi.isOpen();
+
     GameBizBean gameBizBean = new GameBizBean();
     gameBizBean.setParams(null);
     String orderNo = gameApi.generateOrderNo(gameBizBean);
@@ -304,7 +304,6 @@ public class GameAdminServiceImpl implements GameAdminService {
       return memberInfoService.getById(member.getId()).getBalance();
     }
     GameApi gameApi = getGameApi(platformCode);
-    gameApi.isOpen();
     // 出款为游戏平台是的余额查询
     try {
       GameBizBean bizBean = new GameBizBean();
@@ -327,7 +326,6 @@ public class GameAdminServiceImpl implements GameAdminService {
   public void transferOut(
       String transferOut, BigDecimal amount, Member member, boolean transferType) throws Exception {
     GameApi gameApi = getGameApi(transferOut);
-    gameApi.isOpen();
     // 1.获取账号信息 获取余额
     MemberInfo memberInfo = memberInfoService.getById(member.getId());
     if (transferType) {
@@ -473,7 +471,7 @@ public class GameAdminServiceImpl implements GameAdminService {
     // 1.获取账号信息
     String account = member.getAccount();
     GameApi gameApi = getGameApi(transferIn);
-    gameApi.isOpen();
+
     // 2.获取会员在游戏平台的余额
     GameBizBean gameBizBean =
         GameBizBean.builder()

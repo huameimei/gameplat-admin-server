@@ -195,9 +195,9 @@ public class SpreadLinkInfoServiceImpl extends ServiceImpl<SpreadLinkInfoMapper,
 //    if (StrUtil.isBlank(dto.getAgentAccount()) ) {
 //      throw new ServiceException("代理账号不能为空！");
 //    }
-    if (StrUtil.isBlank(dto.getExternalUrl()) && StrUtil.isBlank(dto.getCode())){
-      throw new ServiceException("推广地址以及推广域名必须存在一个！");
-    }
+//    if (StrUtil.isBlank(dto.getExternalUrl()) && StrUtil.isBlank(dto.getCode())){
+//      throw new ServiceException("推广地址以及推广域名必须存在一个！");
+//    }
 
 
     if (StrUtil.isBlank(dto.getExternalUrl()) && dto.getExclusiveFlag() == 1){
@@ -220,7 +220,8 @@ public class SpreadLinkInfoServiceImpl extends ServiceImpl<SpreadLinkInfoMapper,
     // 代理推广码最大条数
     Integer agentMaxSpreadNum = Optional.ofNullable(agentBackendConfig.getMaxSpreadNum()).orElse(0);
     // 如果推广码为空 并且推广地址为空  随机生成 4-20位
-    if (StrUtil.isBlank(linkInfo.getCode()) && StrUtil.isBlank(dto.getExternalUrl())) {
+//    if (StrUtil.isBlank(linkInfo.getCode()) && StrUtil.isBlank(dto.getExternalUrl())) {
+    if (StrUtil.isBlank(linkInfo.getCode())) {
       linkInfo.setCode(
               RandomStringUtils.random(agentMinCodeNum == 0 ? 6 : agentMinCodeNum, true, true)
                       .toLowerCase());
@@ -273,6 +274,9 @@ public class SpreadLinkInfoServiceImpl extends ServiceImpl<SpreadLinkInfoMapper,
 //    if (StrUtil.isBlank(linkInfo.getAgentAccount())) {
 //      throw new ServiceException("代理账号不能为空！");
 //    }
+    if (StrUtil.isBlank(linkInfo.getCode())) {
+      throw new ServiceException("推广码不能为空！");
+    }
     if (StrUtil.isNotBlank(linkInfo.getAgentAccount())) {
       // 校验账号的用户类型
       Member member =

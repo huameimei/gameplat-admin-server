@@ -54,8 +54,8 @@ public class ActivityTypeController {
     if (StringUtils.isBlank(dto.getLanguage())) {
       dto.setLanguage(LocaleContextHolder.getLocale().toLanguageTag());
     }
-    if (StringUtils.isBlank(dto.getLanguage())) {
-      throw new ServiceException("语言language参数必传");
+    if (!dto.getLanguage().contains("zh-CN,en-US,in-ID,th-TH,vi-VN")) {
+      dto.setLanguage("zh-CN");
     }
     return activityTypeService.list(page, dto);
   }

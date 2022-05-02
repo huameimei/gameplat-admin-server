@@ -1,8 +1,10 @@
 package com.gameplat.admin.service;
 
 import com.gameplat.admin.model.dto.GameBalanceQueryDTO;
+import com.gameplat.admin.model.dto.GameKickOutDTO;
 import com.gameplat.admin.model.dto.OperGameTransferRecordDTO;
 import com.gameplat.admin.model.vo.GameBalanceVO;
+import com.gameplat.admin.model.vo.GameKickOutVO;
 import com.gameplat.admin.model.vo.GameRecycleVO;
 import com.gameplat.model.entity.member.Member;
 import java.math.BigDecimal;
@@ -40,4 +42,10 @@ public interface GameAdminService {
   GameRecycleVO confiscatedAmount(GameBalanceQueryDTO dto);
 
   void transferToGame(OperGameTransferRecordDTO record) throws Exception;
+
+  List<GameKickOutVO> kickOutAll(GameKickOutDTO dto);
+
+  void kickOut(GameKickOutDTO dto);
+
+  List<GameKickOutVO> batchKickOut(GameKickOutDTO dto);
 }

@@ -4,8 +4,10 @@ import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.json.JSONUtil;
 import com.gameplat.admin.model.dto.GameBalanceQueryDTO;
+import com.gameplat.admin.model.dto.GameKickOutDTO;
 import com.gameplat.admin.model.dto.OperGameTransferRecordDTO;
 import com.gameplat.admin.model.vo.GameBalanceVO;
+import com.gameplat.admin.model.vo.GameKickOutVO;
 import com.gameplat.admin.model.vo.GameRecycleVO;
 import com.gameplat.admin.service.GameAdminService;
 import com.gameplat.admin.service.GameAmountControlService;
@@ -19,6 +21,7 @@ import com.gameplat.admin.service.MemberService;
 import com.gameplat.admin.service.MessageInfoService;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.DateUtil;
+import com.gameplat.base.common.util.StringUtils;
 import com.gameplat.common.constant.CacheKey;
 import com.gameplat.common.enums.GameAmountControlTypeEnum;
 import com.gameplat.common.enums.GamePlatformEnum;
@@ -47,12 +50,11 @@ import com.gameplat.model.entity.member.MemberInfo;
 import com.gameplat.model.entity.message.Message;
 import com.gameplat.redis.api.RedisService;
 import com.gameplat.redis.redisson.DistributedLocker;
+
+import java.lang.reflect.Array;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
@@ -73,6 +75,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class GameAdminServiceImpl implements GameAdminService {
 
   public static final String USER_GAME_BALANCE = "user_game_balance_";
+  public static final String USER_GAME_KICKOUT = "user_game_kickOut_";
   @Resource private ApplicationContext applicationContext;
   @Resource private MemberInfoService memberInfoService;
   @Resource private MemberBillService memberBillService;
@@ -902,6 +905,14 @@ public class GameAdminServiceImpl implements GameAdminService {
     return member;
   }
 
+  private Member checkGameBalanceParam(GameKickOutDTO dto) {
+    Assert.notEmpty(dto.getAccount(), "会员账号不能为空");
+    Assert.notEmpty(dto.getPlatformCode(), "游戏平台编码不能为空");
+    Member member = memberService.getMemberAndFillGameAccount(dto.getAccount());
+    Assert.notNull(member, "会员账号不存在，请重新检查");
+    return member;
+  }
+
   @Override
   public void transferToGame(OperGameTransferRecordDTO record) throws Exception {
     String key = "self_" + record.getPlatformCode() + '_' + record.getAccount();
@@ -913,5 +924,119 @@ public class GameAdminServiceImpl implements GameAdminService {
     } finally {
       distributedLocker.unlock(key);
     }
+  }
+
+  @Override
+  public List<GameKickOutVO> kickOutAll(GameKickOutDTO dto) {
+    Assert.notEmpty(dto.getAccount(), "会员账号不能为空");
+    Member member = memberService.getMemberAndFillGameAccount(dto.getAccount());
+    Assert.notNull(member, "会员账号不存在，请重新检查");
+    String key = USER_GAME_KICKOUT + member.getId();
+    boolean flag = distributedLocker.tryLock(key, TimeUnit.SECONDS, 0, 300);
+    if (!flag) {
+      throw new ServiceException("会员一键踢出太频繁，请稍后再试");
+    }
+    try {
+      List<GamePlatform> playedGamePlatform = this.getPlayedPlatform(member.getId());
+      if (CollectionUtil.isEmpty(playedGamePlatform)) {
+        return new ArrayList();
+      }
+      List<CompletableFuture<GameKickOutVO>> futures =
+              this.batchGameKickOut(playedGamePlatform, member);
+      // 等待异步任务完成
+      CompletableFuture.allOf(futures.toArray(new CompletableFuture[]{})).join();
+      return futures.stream().map(this::getKickOutResult).collect(Collectors.toList());
+    } finally {
+      distributedLocker.unlock(key);
+    }
+  }
+
+  @Override
+  public void kickOut(GameKickOutDTO dto) {
+    Member member = checkGameBalanceParam(dto);
+    GameApi gameApi = getGameApi(dto.getPlatformCode());
+    GameBizBean gameBizBean = new GameBizBean();
+    gameBizBean.setAccount(member.getAccount());
+    gameBizBean.setGameAccount(member.getGameAccount());
+    try {
+      gameApi.kickOut(gameBizBean);
+    } catch (GameException e) {
+      throw new ServiceException(e.getMessage());
+    } catch (Exception e) {
+      log.error("踢出游戏失败", e);
+      throw new ServiceException("踢出游戏失败");
+    }
+  }
+
+  @Override
+  public List<GameKickOutVO> batchKickOut(GameKickOutDTO dto) {
+    Assert.notEmpty(dto.getAccounts(), "会员账号不能为空");
+    Assert.notEmpty(dto.getPlatformCode(), "游戏平台编码不能为空");
+    GamePlatform gamePlatform = gamePlatformService.queryByCode(dto.getPlatformCode());
+    Assert.notNull(gamePlatform, "未找到游戏平台信息");
+    List<String> accountList = Arrays.asList(dto.getAccounts().split(","));
+    List<GameKickOutVO> result = Collections.synchronizedList(new ArrayList<>());;
+    accountList.parallelStream().forEach(account -> {
+      Member member = memberService.getMemberAndFillGameAccount(dto.getAccount());
+      if (StringUtils.isNull(member)) {
+        GameKickOutVO gameKickOutVO =
+                GameKickOutVO.builder()
+                        .platformName(gamePlatform.getName())
+                        .platformCode(gamePlatform.getCode())
+                        .status(ResultStatusEnum.FAILED.getValue())
+                        .errorMsg("会员账号:" + account + "不存在，请重新检查")
+                        .build();
+        result.add(gameKickOutVO);
+        return;
+      }
+      GameKickOutVO gameKickOutVO = doGameKickOut(gamePlatform, member);
+      result.add(gameKickOutVO);
+    });
+    return result;
+  }
+
+  private List<CompletableFuture<GameKickOutVO>> batchGameKickOut(
+          List<GamePlatform> playedGamePlatform, Member member) {
+    return playedGamePlatform.stream()
+            .map(platform -> this.asyncGameKickOut(platform, member))
+            .collect(Collectors.toList());
+  }
+
+  private CompletableFuture<GameKickOutVO> asyncGameKickOut(GamePlatform platform, Member member) {
+    return CompletableFuture.supplyAsync(
+            () -> doGameKickOut(platform, member), asyncGameExecutor);
+  }
+
+  private GameKickOutVO doGameKickOut(GamePlatform platform, Member member) {
+    GameKickOutVO gameKickOutVO =
+            GameKickOutVO.builder()
+                    .platformName(platform.getName())
+                    .platformCode(platform.getCode())
+                    .status(ResultStatusEnum.SUCCESS.getValue()) // 默认成功
+                    .build();
+    try {
+      GameApi gameApi = getGameApi(platform.getCode());
+      GameBizBean gameBizBean = new GameBizBean();
+      gameBizBean.setAccount(member.getAccount());
+      gameBizBean.setGameAccount(member.getGameAccount());
+      gameApi.kickOut(gameBizBean);
+    } catch (GameException e) {
+      gameKickOutVO.setStatus(ResultStatusEnum.FAILED.getValue());
+      gameKickOutVO.setErrorMsg(e.getMessage());
+    } catch (Exception e) {
+      log.error("踢出游戏失败", e);
+      gameKickOutVO.setStatus(ResultStatusEnum.FAILED.getValue());
+      gameKickOutVO.setErrorMsg("踢出游戏失败");
+    }
+    return gameKickOutVO;
+  }
+
+  private GameKickOutVO getKickOutResult(CompletableFuture<GameKickOutVO> future) {
+    try {
+      return future.get();
+    } catch (InterruptedException | ExecutionException ex) {
+      ex.printStackTrace();
+    }
+    return null;
   }
 }

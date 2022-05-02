@@ -125,6 +125,9 @@ public class ActivityTypeServiceImpl extends ServiceImpl<ActivityTypeMapper, Act
   @Override
   public List<ActivityTypeVO> listAll() {
     String language = LocaleContextHolder.getLocale().toLanguageTag();
+    if(!language.contains("zh-CN,en-US,in-ID,th-TH,vi-VN")){
+      language = "zh-CN";
+    }
     List<ActivityType> list =
         this.lambdaQuery()
             .eq(ActivityType::getTypeStatus, BooleanEnum.YES.value())

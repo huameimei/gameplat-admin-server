@@ -10,6 +10,7 @@ import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
@@ -80,6 +81,9 @@ public class SpreadLinkInfoServiceImpl extends ServiceImpl<SpreadLinkInfoMapper,
   @Autowired private SysDictDataService sysDictDataService;
 
   @Autowired private ConfigService configService;
+
+  @Autowired private SpreadLinkInfoMapper spreadLinkInfoMapper;
+
 
   private static final String STR_URL = "/r/";
 
@@ -575,9 +579,11 @@ public class SpreadLinkInfoServiceImpl extends ServiceImpl<SpreadLinkInfoMapper,
    * 获取默认的推广链接信息
    */
   @Override
-  public List<SpreadConfigVO> getDefaultLink(){
-    List<SpreadConfigVO> collect = this.lambdaQuery().eq(SpreadLinkInfo::getExclusiveFlag, 2).list().stream().map(spreadLinkInfoConvert::toVo)
-            .collect(Collectors.toList());
-    return collect;
+  public List<Map<String, Object>> getDefaultLink(){
+    QueryWrapper<SpreadLinkInfo> queryWrapper = new QueryWrapper<>();
+    queryWrapper.select("DISTINCT external_url").eq("exclusive_flag",0);
+    List<Map<String, Object>> list = spreadLinkInfoMapper.selectMaps(queryWrapper);
+//    List<SpreadLinkInfo> list = spreadLinkInfoMapper.selectList(queryWrapper);
+    return list;
   }
 }

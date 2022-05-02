@@ -130,7 +130,7 @@ public class OpenSpreadLinkInfoController {
   @ApiOperation("获取默认推广链接")
   @GetMapping("/getDefaultLink")
   @PreAuthorize("hasAuthority('diffusion:spreadConfig:add')")
-  public List<SpreadConfigVO> getDefaultLink() {
+  public List<Map<String, Object>> getDefaultLink() {
     return spreadLinkInfoService.getDefaultLink();
   }
 }

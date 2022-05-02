@@ -138,5 +138,5 @@ public interface SpreadLinkInfoService extends IService<SpreadLinkInfo> {
   /**
    * 获取默认的推广链接信息
    */
-  List<SpreadConfigVO> getDefaultLink();
+  List<Map<String, Object>> getDefaultLink();
 }

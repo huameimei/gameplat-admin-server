@@ -37,7 +37,7 @@ public class SpreadLinkInfoAddDTO {
   private Integer isOpenDividePreset;
 
   /**
-   * 来源域名
+   * 专属域名地址
    */
   private String sourceDomain;
 }

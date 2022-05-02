@@ -192,16 +192,28 @@ public class SpreadLinkInfoServiceImpl extends ServiceImpl<SpreadLinkInfoMapper,
    */
   @Override
   public void add(SpreadLinkInfoAddDTO dto) {
-//    if (StrUtil.isBlank(dto.getAgentAccount()) ) {
-//      throw new ServiceException("代理账号不能为空！");
-//    }
-//    if (StrUtil.isBlank(dto.getExternalUrl()) && StrUtil.isBlank(dto.getCode())){
-//      throw new ServiceException("推广地址以及推广域名必须存在一个！");
-//    }
-
-
-    if (StrUtil.isBlank(dto.getExternalUrl()) && dto.getExclusiveFlag() == 1){
-      throw new ServiceException("专属域名推广地址不能为空！");
+    //专属域名验证
+    if (dto.getExclusiveFlag() == 1){
+      if (StrUtil.isBlank(dto.getAgentAccount()) ) {
+        throw new ServiceException("代理账号不能为空！");
+      }
+      if (StrUtil.isBlank(dto.getSourceDomain())){
+        throw new ServiceException("请输入专属域名地址");
+      }
+      if(StrUtil.isBlank(dto.getExternalUrl())){
+        throw new ServiceException("请输入跳转域名地址");
+      }
+      if (StrUtil.isNotBlank(dto.getSourceDomain())) {
+        boolean exists =
+                this.lambdaQuery()
+                        .ne(SpreadLinkInfo::getAgentAccount, dto.getAgentAccount())
+                        .eq(SpreadLinkInfo::getExternalUrl, dto.getSourceDomain())
+                        .eq(SpreadLinkInfo::getExclusiveFlag, BooleanEnum.YES.value())
+                        .exists();
+        if (exists) {
+          throw new ServiceException("此专属域名已被使用！");
+        }
+      }
     }
 
     // 实体转换
@@ -249,8 +261,6 @@ public class SpreadLinkInfoServiceImpl extends ServiceImpl<SpreadLinkInfoMapper,
         throw new ServiceException("推广链接地址已被使用！");
       }
     }
-
-//    linkInfo.setExternalUrl(linkInfo.getExternalUrl() + STR_URL + linkInfo.getCode());
     boolean saveResult = this.save(linkInfo);
     Assert.isTrue(saveResult, "创建失败！");
     if (saveResult
@@ -260,7 +270,6 @@ public class SpreadLinkInfoServiceImpl extends ServiceImpl<SpreadLinkInfoMapper,
       this.saveOrEditDivideConfig(
               linkInfo.getId(), linkInfo.getAgentAccount(), dto.getOwnerConfigMap());
     }
-
   }
 
   /**

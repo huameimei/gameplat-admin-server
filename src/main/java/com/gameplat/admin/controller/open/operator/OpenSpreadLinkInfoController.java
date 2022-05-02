@@ -129,6 +129,7 @@ public class OpenSpreadLinkInfoController {
 
   @ApiOperation("获取公共域名")
   @GetMapping("/getDefaultLink")
+  @PreAuthorize("hasAuthority('diffusion:spreadConfig:view')")
   public List<Map<String, Object>> getDefaultLink() {
     return spreadLinkInfoService.getDefaultLink();
   }

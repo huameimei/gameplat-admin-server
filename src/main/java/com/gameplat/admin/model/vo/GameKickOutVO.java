@@ -13,6 +13,9 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 @NoArgsConstructor
 public class GameKickOutVO implements Serializable {
+
+  private String account;
+
   private String platformCode;
 
   private BigDecimal balance;

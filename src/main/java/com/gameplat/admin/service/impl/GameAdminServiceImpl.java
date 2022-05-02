@@ -958,9 +958,10 @@ public class GameAdminServiceImpl implements GameAdminService {
     GameBizBean gameBizBean = new GameBizBean();
     gameBizBean.setAccount(member.getAccount());
     gameBizBean.setGameAccount(member.getGameAccount());
+    gameBizBean.setConfig(gameConfigService.queryGameConfigInfoByPlatCode(dto.getPlatformCode()));
     try {
       gameApi.kickOut(gameBizBean);
-    } catch (GameException e) {
+    } catch (ServiceException e) {
       throw new ServiceException(e.getMessage());
     } catch (Exception e) {
       log.error("踢出游戏失败", e);
@@ -975,16 +976,17 @@ public class GameAdminServiceImpl implements GameAdminService {
     GamePlatform gamePlatform = gamePlatformService.queryByCode(dto.getPlatformCode());
     Assert.notNull(gamePlatform, "未找到游戏平台信息");
     List<String> accountList = Arrays.asList(dto.getAccounts().split(","));
-    List<GameKickOutVO> result = Collections.synchronizedList(new ArrayList<>());;
+    List<GameKickOutVO> result = Collections.synchronizedList(new ArrayList<>());
     accountList.parallelStream().forEach(account -> {
-      Member member = memberService.getMemberAndFillGameAccount(dto.getAccount());
+      Member member = memberService.getMemberAndFillGameAccount(account);
       if (StringUtils.isNull(member)) {
         GameKickOutVO gameKickOutVO =
                 GameKickOutVO.builder()
                         .platformName(gamePlatform.getName())
                         .platformCode(gamePlatform.getCode())
                         .status(ResultStatusEnum.FAILED.getValue())
-                        .errorMsg("会员账号:" + account + "不存在，请重新检查")
+                        .errorMsg("会员账号不存在，请重新检查")
+                        .account(account)
                         .build();
         result.add(gameKickOutVO);
         return;
@@ -1013,14 +1015,16 @@ public class GameAdminServiceImpl implements GameAdminService {
                     .platformName(platform.getName())
                     .platformCode(platform.getCode())
                     .status(ResultStatusEnum.SUCCESS.getValue()) // 默认成功
+                    .account(member.getAccount())
                     .build();
     try {
       GameApi gameApi = getGameApi(platform.getCode());
       GameBizBean gameBizBean = new GameBizBean();
       gameBizBean.setAccount(member.getAccount());
       gameBizBean.setGameAccount(member.getGameAccount());
+      gameBizBean.setConfig(gameConfigService.queryGameConfigInfoByPlatCode(platform.getCode()));
       gameApi.kickOut(gameBizBean);
-    } catch (GameException e) {
+    } catch (ServiceException e) {
       gameKickOutVO.setStatus(ResultStatusEnum.FAILED.getValue());
       gameKickOutVO.setErrorMsg(e.getMessage());
     } catch (Exception e) {

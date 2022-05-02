@@ -296,6 +296,12 @@
                 <profiles.active>w888c</profiles.active>
             </properties>
         </profile>
+        <profile>
+            <id>kc102</id>
+            <properties>
+                <profiles.active>kc102</profiles.active>
+            </properties>
+        </profile>
     </profiles>
 
     <build>

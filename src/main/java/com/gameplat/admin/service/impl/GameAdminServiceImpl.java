@@ -961,7 +961,7 @@ public class GameAdminServiceImpl implements GameAdminService {
     gameBizBean.setConfig(gameConfigService.queryGameConfigInfoByPlatCode(dto.getPlatformCode()));
     try {
       gameApi.kickOut(gameBizBean);
-    } catch (GameException | ServiceException e) {
+    } catch (ServiceException e) {
       throw new ServiceException(e.getMessage());
     } catch (Exception e) {
       log.error("踢出游戏失败", e);
@@ -1024,7 +1024,7 @@ public class GameAdminServiceImpl implements GameAdminService {
       gameBizBean.setGameAccount(member.getGameAccount());
       gameBizBean.setConfig(gameConfigService.queryGameConfigInfoByPlatCode(platform.getCode()));
       gameApi.kickOut(gameBizBean);
-    } catch (GameException | ServiceException e) {
+    } catch (ServiceException e) {
       gameKickOutVO.setStatus(ResultStatusEnum.FAILED.getValue());
       gameKickOutVO.setErrorMsg(e.getMessage());
     } catch (Exception e) {

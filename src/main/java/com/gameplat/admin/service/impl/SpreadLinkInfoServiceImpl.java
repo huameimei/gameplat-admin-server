@@ -53,6 +53,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.math.BigDecimal;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.text.MessageFormat;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -122,9 +124,13 @@ public class SpreadLinkInfoServiceImpl extends ServiceImpl<SpreadLinkInfoMapper,
                     .page(page)
                     .convert(spreadLinkInfoConvert::toVo);
     for (SpreadConfigVO obj : convert.getRecords()) {
-      if (StrUtil.isNotBlank(obj.getExternalUrl()) && !obj.getExternalUrl().contains(STR_URL)) {
+     String externalUrl = obj.getExternalUrl();
+      if (StrUtil.isNotBlank(externalUrl) && !obj.getExternalUrl().contains(STR_URL)) {
+        if ((externalUrl.lastIndexOf("/")+1) == externalUrl.length()){
+          externalUrl = externalUrl.substring(0, externalUrl.length() - 1);
+        }
         obj.setRcDomain(
-                MessageFormat.format("{0}{1}{2}", obj.getExternalUrl(), STR_URL, obj.getCode()));
+                MessageFormat.format("{0}{1}{2}", externalUrl, STR_URL, obj.getCode()));
       }
     }
     return convert;

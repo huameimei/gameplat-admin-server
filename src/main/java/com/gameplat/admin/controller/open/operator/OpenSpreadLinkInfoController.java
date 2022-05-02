@@ -127,9 +127,8 @@ public class OpenSpreadLinkInfoController {
     return spreadLinkInfoService.getSpreadLinkRebate(agentAccount, true, false);
   }
 
-  @ApiOperation("获取默认推广链接")
+  @ApiOperation("获取公共域名")
   @GetMapping("/getDefaultLink")
-  @PreAuthorize("hasAuthority('diffusion:spreadConfig:add')")
   public List<Map<String, Object>> getDefaultLink() {
     return spreadLinkInfoService.getDefaultLink();
   }

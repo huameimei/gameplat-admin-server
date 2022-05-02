@@ -10,6 +10,7 @@ import com.gameplat.admin.convert.DiscountTypeConvert;
 import com.gameplat.admin.mapper.DiscountTypeMapper;
 import com.gameplat.admin.model.dto.DiscountTypeAddDTO;
 import com.gameplat.admin.model.dto.DiscountTypeEditDTO;
+import com.gameplat.admin.model.vo.DiscountTypeVO;
 import com.gameplat.admin.service.DiscountTypeService;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.model.entity.DiscountType;
@@ -62,8 +63,12 @@ public class DiscountTypeServiceImpl extends ServiceImpl<DiscountTypeMapper, Dis
   }
 
   @Override
-  public IPage<DiscountType> findDiscountTypePage(Page<DiscountType> page) {
-    return this.lambdaQuery().orderByAsc(DiscountType::getSort).orderByDesc(DiscountType::getCreateTime).page(page);
+  public IPage<DiscountTypeVO> findDiscountTypePage(Page<DiscountType> page) {
+    return this.lambdaQuery()
+        .orderByAsc(DiscountType::getSort)
+        .orderByDesc(DiscountType::getCreateTime)
+        .page(page)
+        .convert(discountTypeConvert::toVo);
   }
 
   @Override

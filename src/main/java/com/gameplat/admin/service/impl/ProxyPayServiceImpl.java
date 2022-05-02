@@ -7,7 +7,6 @@ import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.gameplat.admin.enums.CashEnum;
 import com.gameplat.admin.enums.ProxyPayStatusEnum;
-import com.gameplat.admin.enums.WithdrawStatus;
 import com.gameplat.admin.feign.PaymentCenterFeign;
 import com.gameplat.admin.model.bean.AdminLimitInfo;
 import com.gameplat.admin.model.bean.ProxyPayMerBean;
@@ -25,6 +24,7 @@ import com.gameplat.basepay.proxypay.thirdparty.ProxyPayBackResult;
 import com.gameplat.common.enums.BooleanEnum;
 import com.gameplat.common.enums.SwitchStatusEnum;
 import com.gameplat.common.enums.UserTypes;
+import com.gameplat.common.enums.WithdrawStatus;
 import com.gameplat.common.model.bean.limit.MemberRechargeLimit;
 import com.gameplat.model.entity.member.Member;
 import com.gameplat.model.entity.member.MemberInfo;
@@ -37,7 +37,6 @@ import com.gameplat.security.context.UserCredential;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -51,38 +50,27 @@ import java.util.stream.Collectors;
 @Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)
 public class ProxyPayServiceImpl implements ProxyPayService {
 
-  @Autowired
-  private MemberWithdrawService memberWithdrawService;
+  @Autowired private MemberWithdrawService memberWithdrawService;
 
-  @Autowired
-  private MemberWithdrawHistoryService memberWithdrawHistoryService;
+  @Autowired private MemberWithdrawHistoryService memberWithdrawHistoryService;
 
-  @Autowired
-  private MemberService memberService;
+  @Autowired private MemberService memberService;
 
-  @Autowired
-  private SysUserService sysUserService;
+  @Autowired private SysUserService sysUserService;
 
-  @Autowired
-  private LimitInfoService limitInfoService;
+  @Autowired private LimitInfoService limitInfoService;
 
-  @Autowired
-  private PpInterfaceService ppInterfaceService;
+  @Autowired private PpInterfaceService ppInterfaceService;
 
-  @Autowired
-  private PpMerchantService ppMerchantService;
+  @Autowired private PpMerchantService ppMerchantService;
 
-  @Autowired
-  private MemberInfoService memberInfoService;
+  @Autowired private MemberInfoService memberInfoService;
 
-  @Autowired
-  private PaymentCenterFeign paymentCenterFeign;
+  @Autowired private PaymentCenterFeign paymentCenterFeign;
 
-  @Autowired
-  private ValidWithdrawService validWithdrawService;
+  @Autowired private ValidWithdrawService validWithdrawService;
 
-  @Autowired
-  private MemberRwReportService memberRwReportService;
+  @Autowired private MemberRwReportService memberRwReportService;
 
   private static boolean verifyPpMerchant(
       MemberWithdraw memberWithdraw, PpMerchant ppMerchant, PpInterface ppInterface) {
@@ -101,17 +89,19 @@ public class ProxyPayServiceImpl implements ProxyPayService {
         return true;
       }
     }
-    Map<String, String> banksMap = JSONObject.parseArray(ppInterface.getLimtInfo()).stream()
-        .filter(Objects::nonNull).collect(Collectors.toMap(
-            o -> {
-              JSONObject o1 = (JSONObject) o;
-              return o1.getString("code");
-            },
-            o -> {
-              JSONObject o1 = (JSONObject) o;
-              return o1.getString("name");
-            }
-        ));
+    Map<String, String> banksMap =
+        JSONObject.parseArray(ppInterface.getLimtInfo()).stream()
+            .filter(Objects::nonNull)
+            .collect(
+                Collectors.toMap(
+                    o -> {
+                      JSONObject o1 = (JSONObject) o;
+                      return o1.getString("code");
+                    },
+                    o -> {
+                      JSONObject o1 = (JSONObject) o;
+                      return o1.getString("name");
+                    }));
     /** 模糊匹配银行名称 */
     boolean isBankName = true;
     for (Map.Entry<String, String> entry : banksMap.entrySet()) {
@@ -187,7 +177,8 @@ public class ProxyPayServiceImpl implements ProxyPayService {
 
     // 封装第三方代付接口调用信息
     ProxyDispatchContext context = new ProxyDispatchContext();
-    String asyncUrl = asyncCallbackUrl + "/api/admin/finance/asyncCallback/onlineProxyPayAsyncCallback";
+    String asyncUrl =
+        asyncCallbackUrl + "/api/admin/finance/asyncCallback/onlineProxyPayAsyncCallback";
     context.setAsyncCallbackUrl(asyncUrl + "/" + memberWithdraw.getCashOrderNo());
     context.setSysPath(sysPath);
     // 设置第三方接口信息
@@ -217,7 +208,7 @@ public class ProxyPayServiceImpl implements ProxyPayService {
     String resultStr =
         paymentCenterFeign.onlineProxyPay(
             context, memberWithdraw.getPpInterface(), memberWithdraw.getPpInterfaceName());
-    Result<ProxyPayBackResult> result = JSONUtil.toBean(resultStr,Result.class);
+    Result<ProxyPayBackResult> result = JSONUtil.toBean(resultStr, Result.class);
     log.info("代付请求中心响应{}", resultStr);
     if (!result.isSucceed() || 0 != result.getCode()) {
       throw new ServiceException("请求代付返回结果提示:" + result.getMessage() + "！！！请立即联系第三方核实再出款！！！");
@@ -226,11 +217,13 @@ public class ProxyPayServiceImpl implements ProxyPayService {
     /** 设置虚拟货币真实出款汇率、数量 */
     if (null != proxyPayBackResult && null != proxyPayBackResult.getApproveCurrencyRate()
         || null != proxyPayBackResult.getApproveCurrencyCount()) {
-      memberWithdrawService.lambdaUpdate()
+      memberWithdrawService
+          .lambdaUpdate()
           .set(MemberWithdraw::getApproveCurrencyRate, proxyPayBackResult.getApproveCurrencyRate())
-          .set(MemberWithdraw::getApproveCurrencyCount,
-              proxyPayBackResult.getApproveCurrencyCount())
-          .eq(MemberWithdraw::getId, memberWithdraw.getId()).update();
+          .set(
+              MemberWithdraw::getApproveCurrencyCount, proxyPayBackResult.getApproveCurrencyCount())
+          .eq(MemberWithdraw::getId, memberWithdraw.getId())
+          .update();
     }
     memberWithdrawService.updateById(memberWithdraw);
     /** 不需要异步通知，直接将状态改成第三方出款完成 */
@@ -272,9 +265,10 @@ public class ProxyPayServiceImpl implements ProxyPayService {
     context.setBankName(memberWithdraw.getBankName());
     /** 请求第三方代付接口 */
     log.info("进入第三方出入款中心查询订单号: {}", memberWithdraw.getCashOrderNo());
-    String resultStr = paymentCenterFeign.onlineQueryProxyPay(
-        context, ppInterface.getCode(), ppInterface.getName());
-    Result<ReturnMessage> result = JSONUtil.toBean(resultStr,Result.class);
+    String resultStr =
+        paymentCenterFeign.onlineQueryProxyPay(
+            context, ppInterface.getCode(), ppInterface.getName());
+    Result<ReturnMessage> result = JSONUtil.toBean(resultStr, Result.class);
     if (!result.isSucceed() || 0 != result.getCode()) {
       throw new ServiceException("查询第三方代付异常:" + result.getMessage() + "！！！请立即联系第三方核实再出款！！！");
     }
@@ -308,7 +302,7 @@ public class ProxyPayServiceImpl implements ProxyPayService {
     String resultStr =
         paymentCenterFeign.asyncCallbackProxyPay(
             proxyCallbackContext, beanName, memberWithdraw.getPpInterfaceName());
-    Result<ProxyPayBackResult> result = JSONUtil.toBean(resultStr,Result.class);
+    Result<ProxyPayBackResult> result = JSONUtil.toBean(resultStr, Result.class);
     log.info("代付查询请求中心响应{}", result);
     if (!result.isSucceed() || 200 != result.getCode()) {
       throw new ServiceException("第三方代付异步回调异常:" + result.getMessage() + "！！！请立即联系第三方核实再出款！！！");
@@ -357,9 +351,7 @@ public class ProxyPayServiceImpl implements ProxyPayService {
     return result.getData().getResponseMsg();
   }
 
-  /**
-   * 开启出入款订单是否允许其他账户操作配置 校验非超管账号是否原受理人
-   */
+  /** 开启出入款订单是否允许其他账户操作配置 校验非超管账号是否原受理人 */
   private void crossAccountCheck(UserCredential userCredential, MemberWithdraw memberWithdraw)
       throws ServiceException {
     if (userCredential != null
@@ -372,7 +364,7 @@ public class ProxyPayServiceImpl implements ProxyPayService {
       if (toCheck) {
         if (!Objects.equals(WithdrawStatus.UNHANDLED.getValue(), memberWithdraw.getCashStatus())
             && !StringUtils.equalsIgnoreCase(
-            userCredential.getUsername(), memberWithdraw.getOperatorAccount())) {
+                userCredential.getUsername(), memberWithdraw.getOperatorAccount())) {
           throw new ServiceException("您无权操作此订单:" + memberWithdraw.getCashOrderNo());
         }
       }
@@ -391,38 +383,35 @@ public class ProxyPayServiceImpl implements ProxyPayService {
   /**
    * 检验子账号出款受理额度
    *
-   * @param adminLimitInfo
-   * @param cashMode
-   * @throws Exception
+   * @param adminLimitInfo AdminLimitInfo
+   * @param cashMode Integer
    */
   public void checkZzhWithdrawAmountAudit(
       AdminLimitInfo adminLimitInfo, Integer cashMode, BigDecimal cashMoney, String userName) {
     if (cashMode == CashEnum.CASH_MODE_USER.getValue()) {
       if (adminLimitInfo.getMaxWithdrawAmount().compareTo(BigDecimal.ZERO) > 0
           && cashMoney.compareTo(adminLimitInfo.getMaxWithdrawAmount()) > 0) {
-        StringBuffer buffer =
-            new StringBuffer(userName)
-                .append("单笔出款受限。受理会员取款额度为：")
-                .append(adminLimitInfo.getMaxWithdrawAmount())
-                .append("元。 超过额度")
-                .append(
-                    MoneyUtils.toYuanStr(cashMoney.subtract(adminLimitInfo.getMaxWithdrawAmount())))
-                .append("元");
-        throw new ServiceException(buffer.toString());
+        String buffer =
+            userName
+                + "单笔出款受限。受理会员取款额度为："
+                + adminLimitInfo.getMaxWithdrawAmount()
+                + "元。 超过额度"
+                + MoneyUtils.toYuanStr(cashMoney.subtract(adminLimitInfo.getMaxWithdrawAmount()))
+                + "元";
+        throw new ServiceException(buffer);
       }
     } else if (cashMode == CashEnum.CASH_MODE_HAND.getValue()) {
       if (adminLimitInfo.getMaxManualWithdrawAmount().compareTo(BigDecimal.ZERO) > 0
           && cashMoney.compareTo(adminLimitInfo.getMaxManualWithdrawAmount()) > 0) {
-        StringBuffer buffer =
-            new StringBuffer(userName)
-                .append("单笔人工出款受限。受理人工取款额度为")
-                .append(adminLimitInfo.getMaxManualWithdrawAmount())
-                .append("元。 超过额度")
-                .append(
-                    MoneyUtils.toYuanStr(
-                        cashMoney.subtract(adminLimitInfo.getMaxManualWithdrawAmount())))
-                .append("元");
-        throw new ServiceException(buffer.toString());
+        String buffer =
+            userName
+                + "单笔人工出款受限。受理人工取款额度为"
+                + adminLimitInfo.getMaxManualWithdrawAmount()
+                + "元。 超过额度"
+                + MoneyUtils.toYuanStr(
+                    cashMoney.subtract(adminLimitInfo.getMaxManualWithdrawAmount()))
+                + "元";
+        throw new ServiceException(buffer);
       }
     }
   }
@@ -445,27 +434,25 @@ public class ProxyPayServiceImpl implements ProxyPayService {
 
   private String getProxyPayBankCode(
       MemberWithdraw memberWithdraw, PpMerchant ppMerchant, PpInterface ppinterface) {
-    if (null == ppMerchant || ppMerchant.getStatus() != SwitchStatusEnum.ENABLED.getValue()) {
+    if (null == ppMerchant || !SwitchStatusEnum.ENABLED.match(ppMerchant.getStatus())) {
       throw new ServiceException("第三方代付商户已关闭");
-    }
-
-    if (ppMerchant.getStatus() != SwitchStatusEnum.ENABLED.getValue()) {
-      throw new ServiceException("第三方代付商户已关闭。");
     }
 
     String bankCode = "";
     String bankName = memberWithdraw.getBankName();
-    Map<String, String> banksMap = JSONObject.parseArray(ppinterface.getLimtInfo()).stream()
-        .filter(Objects::nonNull).collect(Collectors.toMap(
-            o -> {
-              JSONObject o1 = (JSONObject) o;
-              return o1.getString("code");
-            },
-            o -> {
-              JSONObject o1 = (JSONObject) o;
-              return o1.getString("name");
-            }
-        ));
+    Map<String, String> banksMap =
+        JSONObject.parseArray(ppinterface.getLimtInfo()).stream()
+            .filter(Objects::nonNull)
+            .collect(
+                Collectors.toMap(
+                    o -> {
+                      JSONObject o1 = (JSONObject) o;
+                      return o1.getString("code");
+                    },
+                    o -> {
+                      JSONObject o1 = (JSONObject) o;
+                      return o1.getString("name");
+                    }));
     for (Map.Entry<String, String> entry : banksMap.entrySet()) {
       if (StringUtils.contains(entry.getValue(), bankName)
           || StringUtils.contains(bankName, entry.getValue())) {

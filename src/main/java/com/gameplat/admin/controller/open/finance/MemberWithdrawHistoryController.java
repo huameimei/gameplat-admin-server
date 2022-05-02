@@ -7,18 +7,22 @@ import com.gameplat.admin.model.vo.MemberWithdrawHistorySummaryVO;
 import com.gameplat.admin.model.vo.MemberWithdrawHistoryVO;
 import com.gameplat.admin.service.MemberWithdrawHistoryService;
 import com.gameplat.model.entity.member.MemberWithdrawHistory;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+@Api(tags = "会员提现记录")
 @RestController
 @RequestMapping("/api/admin/finance/memberWithdrawHistory")
 public class MemberWithdrawHistoryController {
 
   @Autowired private MemberWithdrawHistoryService userWithdrawHistoryService;
 
+  @ApiOperation("查询")
   @PostMapping("/page")
   @PreAuthorize("hasAuthority('finance:memberWithdrawHistory:view')")
   public IPage<MemberWithdrawHistoryVO> queryPage(
@@ -26,6 +30,7 @@ public class MemberWithdrawHistoryController {
     return userWithdrawHistoryService.findPage(page, dto);
   }
 
+  @ApiOperation("统计会员提现")
   @PostMapping("/findSumMemberWithdrawHistory")
   @PreAuthorize("hasAuthority('finance:memberWithdrawHistory:findSumMemberWithdrawHistory')")
   public MemberWithdrawHistorySummaryVO findSumMemberWithdrawHistory(

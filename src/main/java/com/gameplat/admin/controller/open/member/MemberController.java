@@ -9,10 +9,13 @@ import cn.hutool.http.useragent.UserAgentUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.gameplat.admin.model.dto.*;
-import com.gameplat.admin.model.vo.*;
+import com.gameplat.admin.model.vo.MemberBalanceVO;
+import com.gameplat.admin.model.vo.MemberContactVo;
+import com.gameplat.admin.model.vo.MemberInfoVO;
+import com.gameplat.admin.model.vo.MemberVO;
 import com.gameplat.admin.service.GameAdminService;
 import com.gameplat.admin.service.MemberService;
-import com.gameplat.admin.service.MemberTransformService;
+import com.gameplat.admin.service.MemberTransferAgentService;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.ip.IpAddressParser;
 import com.gameplat.base.common.util.BeanUtils;
@@ -44,44 +47,40 @@ public class MemberController {
 
   @Autowired private MemberService memberService;
 
-  @Autowired private MemberTransformService memberTransformService;
+  @Autowired private MemberTransferAgentService memberTransferAgentService;
 
-  @Autowired(required = false)
-  private GameAdminService gameAdminService;
+  @Autowired private GameAdminService gameAdminService;
 
-  @ApiOperation(value = "会员列表")
+  @ApiOperation("会员列表")
   @GetMapping("/list")
   @PreAuthorize("hasAuthority('member:view')")
   public IPage<MemberVO> list(PageDTO<Member> page, MemberQueryDTO dto) {
     return memberService.queryPage(page, dto);
   }
 
-  @ApiOperation(value = "会员详情")
+  @ApiOperation("会员详情")
   @GetMapping("/info/{id}")
   @PreAuthorize("hasAuthority('member:info:view')")
   public MemberInfoVO info(@PathVariable Long id) {
     return memberService.getMemberInfo(id);
   }
 
-  @ApiOperation(value = "会员联系方式")
+  @ApiOperation("会员联系方式")
   @GetMapping("/contact/{id}")
   @PreAuthorize("hasAuthority('member:contact:view')")
   public MemberContactVo memberAccount(@PathVariable Long id) {
-    MemberContactVo memberDateils = memberService.getMemberDateils(id);
-    memberDateils.setRealName("");
-    return memberDateils;
+    MemberContactVo detail = memberService.getMemberDetail(id);
+    detail.setRealName("");
+    return detail;
   }
 
-
-
-
-  @ApiOperation(value = "会员详情")
+  @ApiOperation("会员详情")
   @GetMapping("/getAccount")
   public MemberInfoVO memberInfo(@RequestParam String account) {
     return memberService.getMemberInfo(account);
   }
 
-  @ApiOperation(value = "添加会员")
+  @ApiOperation("添加会员")
   @PostMapping("/add")
   @PreAuthorize("hasAuthority('member:add')")
   @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.MEMBER, desc = "添加会员")
@@ -99,7 +98,7 @@ public class MemberController {
     memberService.add(dto);
   }
 
-  @ApiOperation(value = "编辑会员")
+  @ApiOperation("编辑会员")
   @PutMapping("/edit")
   @PreAuthorize("hasAuthority('member:edit')")
   @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.MEMBER, desc = "编辑会员信息")
@@ -107,7 +106,7 @@ public class MemberController {
     memberService.update(dto);
   }
 
-  @ApiOperation(value = "启用会员")
+  @ApiOperation("启用会员")
   @PutMapping("/enable")
   @PreAuthorize("hasAuthority('member:enable')")
   @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.MEMBER, desc = "启用会员")
@@ -115,7 +114,7 @@ public class MemberController {
     memberService.enable(ids);
   }
 
-  @ApiOperation(value = "禁用会员")
+  @ApiOperation("禁用会员")
   @PutMapping("/disable")
   @PreAuthorize("hasAuthority('member:disable')")
   @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.MEMBER, desc = "禁用会员")
@@ -136,7 +135,7 @@ public class MemberController {
   @PreAuthorize("hasAuthority('member:transform')")
   @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.MEMBER, desc = "转代理")
   public void transform(@RequestBody MemberTransformDTO dto) {
-    memberTransformService.transform(dto);
+    memberTransferAgentService.transform(dto);
   }
 
   @ApiOperation("恢复转代理数据")
@@ -144,7 +143,7 @@ public class MemberController {
   @PreAuthorize("hasAuthority('member:recoverTransform')")
   @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.MEMBER, desc = "恢复转代理数据")
   public void recoverTransform(@PathVariable String serialNo) {
-    memberTransformService.recover(serialNo);
+    memberTransferAgentService.recover(serialNo);
   }
 
   @ApiOperation("根据账号获取会员信息")
@@ -194,7 +193,7 @@ public class MemberController {
   }
 
   @SneakyThrows
-  @ApiOperation(value = "导出会员列表")
+  @ApiOperation("导出会员列表")
   @PreAuthorize("hasAuthority('member:export')")
   @GetMapping(value = "/exportList", produces = "application/vnd.ms-excel")
   @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.MEMBER, desc = "导出会员列表")
@@ -208,75 +207,53 @@ public class MemberController {
     }
   }
 
-  @ApiOperation(value = "添加用户或添加下级时 彩票投注返点数据集")
+  @ApiOperation("添加用户或添加下级时 彩票投注返点数据集")
   @GetMapping("/getRebateOptionsForAdd")
   public List<Map<String, String>> getRebateOptionsForAdd(
       @RequestParam(required = false) String agentAccount) {
     return memberService.getRebateForAdd(agentAccount);
   }
 
-  @ApiOperation(value = "编辑用户时 彩票投注返点数据集")
+  @ApiOperation("编辑用户时 彩票投注返点数据集")
   @GetMapping("/getRebateOptionsForEdit")
   public List<Map<String, String>> getRebateOptionsForEdit(
       @RequestParam(required = false) String agentAccount) {
     return memberService.getRebateForEdit(agentAccount);
   }
 
-  /**
-   * @param ids 会员id
-   * @param state 状态
-   */
-  @ApiOperation(value = "批量更改日工资")
+  @ApiOperation("批量更改日工资")
   @PostMapping("/updateDaySalary")
   @PreAuthorize("hasAuthority('member:updateDaySalary')")
   @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.MEMBER, desc = "修改会员工资状态")
   public void updateDaySalary(
-      @RequestParam(required = true) String ids, @RequestParam(required = true) Integer state) {
+      @RequestParam(required = true) String ids, @RequestParam Integer state) {
     memberService.updateDaySalary(ids, state);
   }
 
-  /**
-   * 人工扣款查询会员
-   *
-   * @param account 用户名
-   */
   @GetMapping("findMemberBalance")
-  public MemberBalanceVO findMemberBalance(
-      @RequestParam(value = "account", required = true) String account) {
-    // 额度回收
+  public MemberBalanceVO findMemberBalance(@RequestParam(value = "account") String account) {
     gameAdminService.recyclingAmountByAccount(account);
     return BeanUtils.map(memberService.getMemberInfo(account), MemberBalanceVO.class);
   }
 
-  /**
-   * 返回推广会员
-   *
-   * @param page
-   * @param dto
-   * @return
-   */
-  @GetMapping("findTGMemberBalance")
+  @GetMapping("findPromoteMemberBalance")
   @ApiOperation("返回推广会员")
-  public IPage<MemberBalanceVO> findTGMemberBalance(PageDTO<Member> page, MemberQueryDTO dto) {
-    dto.setUserType("P");
-    return memberService.findTGMemberBalance(page, dto);
+  public IPage<MemberBalanceVO> findPromoteMemberBalance(PageDTO<Member> page, MemberQueryDTO dto) {
+    return memberService.findPromoteMemberBalance(page, dto);
   }
 
-  /**
-   * @param dto 推广会员账号
-   */
   @ApiOperation("清除推广会员余额")
-  @PostMapping("clearTGMemberBalance")
-  @PreAuthorize("hasAuthority('system:TGMember:clear')")
+  @PostMapping("clearPromoteMemberBalance")
+  @PreAuthorize("hasAuthority('system:member:clearPromoteMemberBalance')")
   @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.MEMBER, desc = "清除推广会员#{dto.userNames}余额")
-  public void updateTGClearMember(@RequestBody CleanAccountDTO dto) {
+  public void clearPromoteMemberBalance(@RequestBody CleanAccountDTO dto) {
     Assert.notNull(dto.getIsCleanAll(), "是否清理全部不能为空！");
     Assert.notNull(dto.getUserType(), "会员类型不能为空！");
     // 如果不是清理全部
     if (ObjectUtil.equals(dto.getIsCleanAll(), 0)) {
       Assert.notNull(dto.getUserNames(), "会员不能为空！");
     }
-    memberService.updateTGClearMember(dto);
+    memberService.clearPromoteMemberBalance(dto);
   }
 
   @ApiOperation("解除登录限制")
@@ -287,13 +264,11 @@ public class MemberController {
     memberService.releaseLoginLimit(id);
   }
 
-
   @ApiOperation("查看会员真实资料")
-  @GetMapping("getMemberDateil/{id}")
+  @GetMapping("getMemberDetail/{id}")
   @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.MEMBER, desc = "查看会员真实资料#{id}")
-  @PreAuthorize("hasAuthority('member:memberContact:dateil')")
-  public MemberContactVo getMemberDateil(@PathVariable(required = true) long id) {
-    return memberService.getMemberDateils(id);
+  @PreAuthorize("hasAuthority('system:member:contact:detail')")
+  public MemberContactVo getMemberDetail(@PathVariable(required = true) long id) {
+    return memberService.getMemberDetail(id);
   }
-
 }

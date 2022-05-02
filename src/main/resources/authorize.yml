@@ -1,0 +1,16 @@
+security:
+  authorize:
+    path:
+      - /favicon.ico
+      - /swagger-ui.html
+      - /v3/api-docs
+      - /swagger-resources/**
+      - /doc.html
+      - /webjars/**
+      - /api/admin/auth/login
+      - /api/admin/common/vCode
+      - /api/admin/common/config
+      - /api/admin/common/getDictByTypes/*
+      - /api/admin/spread/management/**
+      - /websocket/**
+      - /api/internal/**

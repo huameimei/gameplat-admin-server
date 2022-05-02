@@ -26,9 +26,9 @@ import java.util.Date;
 import java.util.List;
 
 /**
+ * 会员日报表
+ *
  * @author lily
- * @description 会员日报表
- * @date 2022/1/8
  */
 @Api(tags = "会员日报表")
 @Slf4j
@@ -42,14 +42,14 @@ public class MemberDayReportController {
   @Autowired private GameMemberReportService gameMemberReportService;
 
   @GetMapping("/list")
-  @ApiOperation(value = "查询会员日报列表")
+  @ApiOperation("查询会员日报列表")
   @PreAuthorize("hasAuthority('member:dayReport:list')")
   public List<DayReportVO> findList(DayReportDTO dto) {
     return memberBusDayReportMapper.findList(dto);
   }
 
-  @ApiOperation(value = "会员日报表")
-  @GetMapping(value = "memberGameDayReport")
+  @ApiOperation("会员日报表")
+  @GetMapping("memberGameDayReport")
   @PreAuthorize("hasAuthority('member:dayReport:view')")
   public PageDtoVO<MemberGameDayReportVo> queryBetReport(
       Page<MemberGameDayReportVo> page, MemberReportDto dto) {
@@ -65,8 +65,8 @@ public class MemberDayReportController {
     return gameMemberReportService.findSumMemberGameDayReport(page, dto);
   }
 
-  @ApiOperation(value = "投注分析")
-  @GetMapping(value = "findMemberbetAnalysis")
+  @ApiOperation("投注分析")
+  @GetMapping("findMemberbetAnalysis")
   @PreAuthorize("hasAuthority('member:dayReport:betAnalysis')")
   public MemberbetAnalysisVo findMemberbetAnalysis(MemberbetAnalysisdto dto) {
     log.info("会员日报表入参：{}", JSON.toJSONString(dto));

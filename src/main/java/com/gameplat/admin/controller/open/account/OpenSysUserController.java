@@ -9,11 +9,14 @@ import com.gameplat.admin.model.dto.UserResetPasswordDTO;
 import com.gameplat.admin.model.vo.RoleVo;
 import com.gameplat.admin.model.vo.UserVo;
 import com.gameplat.admin.service.SysUserService;
+import com.gameplat.base.common.util.DateUtil;
 import com.gameplat.common.constant.ServiceName;
 import com.gameplat.common.group.Groups;
 import com.gameplat.log.annotation.Log;
 import com.gameplat.log.enums.LogType;
 import com.gameplat.model.entity.sys.SysUser;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -22,11 +25,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-/**
- * 子账号管理
- *
- * @author three
- */
+@Api(tags = "子账号管理")
 @Slf4j
 @RestController
 @RequestMapping("/api/admin/account/subUser")
@@ -34,18 +33,20 @@ public class OpenSysUserController {
 
   @Autowired private SysUserService userService;
 
+  @ApiOperation("查询")
   @GetMapping("/list")
   @PreAuthorize("hasAuthority('account:subUser:view')")
   public IPage<UserVo> list(PageDTO<SysUser> page, UserDTO dto) {
     if (ObjectUtil.isNotEmpty(dto.getBeginTime())) {
-      dto.setBeginTime(dto.getBeginTime() + " 00:00:00");
+      dto.setBeginTime(dto.getBeginTime() + DateUtil.TIME_START);
     }
     if (ObjectUtil.isNotEmpty(dto.getEndTime())) {
-      dto.setEndTime(dto.getEndTime() + " 23:59:59");
+      dto.setEndTime(dto.getEndTime() + DateUtil.TIME_END);
     }
     return userService.selectUserList(page, dto);
   }
 
+  @ApiOperation("添加")
   @PostMapping("/add")
   @Log(
       module = ServiceName.ADMIN_SERVICE,
@@ -56,6 +57,7 @@ public class OpenSysUserController {
     userService.insertUser(dto);
   }
 
+  @ApiOperation("编辑")
   @PutMapping("/edit")
   @PreAuthorize("hasAuthority('account:subUser:edit')")
   @Log(
@@ -66,6 +68,7 @@ public class OpenSysUserController {
     userService.updateUser(dto);
   }
 
+  @ApiOperation("删除")
   @DeleteMapping("/delete/{id}")
   @PreAuthorize("hasAuthority('account:subUser:remove')")
   @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.ADMIN, desc = "'删除后台账号id='+#id")
@@ -73,21 +76,13 @@ public class OpenSysUserController {
     userService.deleteUserById(id);
   }
 
-  /**
-   * 权限列表
-   *
-   * @return List
-   */
+  @ApiOperation("获取角色列表")
   @GetMapping("/roleList")
   public List<RoleVo> roleList() {
     return userService.getRoleList();
   }
 
-  /**
-   * 重置用户密码
-   *
-   * @param dto UserResetPasswordDTO
-   */
+  @ApiOperation("重置密码")
   @PostMapping("/resetPassword")
   @PreAuthorize("hasAuthority('account:subUser:changePassword')")
   @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.ADMIN, desc = "'重置后台账号密码,id='+#dto.id")
@@ -95,11 +90,7 @@ public class OpenSysUserController {
     userService.resetUserPassword(dto);
   }
 
-  /**
-   * 重置用户安全码
-   *
-   * @param id Long
-   */
+  @ApiOperation("重置安全码")
   @PostMapping("/resetSafeCode/{id}")
   @PreAuthorize("hasAuthority('account.subUser:restAuth')")
   @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.ADMIN, desc = "'重置谷歌验证器,id='+#id")
@@ -107,6 +98,7 @@ public class OpenSysUserController {
     userService.resetGoogleSecret(id);
   }
 
+  @ApiOperation("修改状态")
   @PutMapping("/changeStatus/{id}/{status}")
   @PreAuthorize("hasAuthority('account.subUser.enable')")
   @Log(

@@ -34,7 +34,7 @@ public class OpenMemberWealRewordController {
   @Autowired private MemberWealRewordService rewordService;
 
   @GetMapping("/list")
-  @ApiOperation(value = "vip福利记录列表")
+  @ApiOperation("vip福利记录列表")
   @PreAuthorize("hasAuthority('member:wealReword:view')")
   public IPage<MemberWealRewordVO> listWealReword(
       PageDTO<MemberWealReword> page, MemberWealRewordDTO dto) {
@@ -42,14 +42,14 @@ public class OpenMemberWealRewordController {
   }
 
   @PutMapping("/updateRemark")
-  @ApiOperation(value = "修改vip福利记录备注")
+  @ApiOperation("修改vip福利记录备注")
   @PreAuthorize("hasAuthority('member:wealReword:edit')")
   public void updateRemark(Long id, String remark) {
     rewordService.updateRemark(id, remark);
   }
 
   @SneakyThrows
-  @ApiOperation(value = "导出VIP福利记录列表")
+  @ApiOperation("导出VIP福利记录列表")
   @PutMapping(value = "/exportReword", produces = "application/vnd.ms-excel")
   @PreAuthorize("hasAuthority('member:wealReword:export')")
   public void exportWealReword(MemberWealRewordDTO queryDTO, HttpServletResponse response) {

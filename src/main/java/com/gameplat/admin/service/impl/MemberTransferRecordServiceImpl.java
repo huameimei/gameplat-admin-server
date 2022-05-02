@@ -7,12 +7,12 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.gameplat.admin.convert.MemberBackupConvert;
-import com.gameplat.admin.mapper.MemberBackupMapper;
-import com.gameplat.admin.model.vo.MemberBackupVO;
-import com.gameplat.admin.service.MemberBackupService;
+import com.gameplat.admin.convert.MemberTransferRecordConvert;
+import com.gameplat.admin.mapper.MemberTransferRecordMapper;
+import com.gameplat.admin.model.vo.MemberTransferRecordVO;
+import com.gameplat.admin.service.MemberTransferRecordService;
 import com.gameplat.base.common.json.JsonUtils;
-import com.gameplat.model.entity.member.MemberBackup;
+import com.gameplat.model.entity.member.MemberTransferRecord;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -25,45 +25,46 @@ import java.util.stream.Collectors;
 
 @Service
 @Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)
-public class MemberBackupServiceImpl extends ServiceImpl<MemberBackupMapper, MemberBackup>
-    implements MemberBackupService {
+public class MemberTransferRecordServiceImpl
+    extends ServiceImpl<MemberTransferRecordMapper, MemberTransferRecord>
+    implements MemberTransferRecordService {
 
-  @Autowired private MemberBackupConvert memberBackupConvert;
+  @Autowired private MemberTransferRecordConvert memberTransferRecordConvert;
 
   @Override
-  public IPage<MemberBackupVO> queryPage(PageDTO<MemberBackup> page, Integer type) {
-    LambdaQueryWrapper<MemberBackup> queryWrapper = Wrappers.lambdaQuery();
+  public IPage<MemberTransferRecordVO> queryPage(PageDTO<MemberTransferRecord> page, Integer type) {
+    LambdaQueryWrapper<MemberTransferRecord> queryWrapper = Wrappers.lambdaQuery();
     queryWrapper
-        .eq(MemberBackup::getType, type)
-        .groupBy(MemberBackup::getSerialNo)
-        .orderByDesc(MemberBackup::getCreateTime);
+        .eq(MemberTransferRecord::getType, type)
+        .groupBy(MemberTransferRecord::getSerialNo)
+        .orderByDesc(MemberTransferRecord::getCreateTime);
 
-    return this.page(page, queryWrapper).convert(memberBackupConvert::toVo);
+    return this.page(page, queryWrapper).convert(memberTransferRecordConvert::toVo);
   }
 
   @Override
-  public List<MemberBackup> getBySerialNo(String serialNo) {
-    return this.lambdaQuery().eq(MemberBackup::getSerialNo, serialNo).list();
+  public List<MemberTransferRecord> getBySerialNo(String serialNo) {
+    return this.lambdaQuery().eq(MemberTransferRecord::getSerialNo, serialNo).list();
   }
 
   @Override
   public List<String> getContent(String serialNo, String endTime, String startTime) {
-    List<String> backupContents =
+    List<String> contents =
         this.lambdaQuery()
-            .select(MemberBackup::getContent)
-            .eq(ObjectUtils.isNotNull(serialNo), MemberBackup::getSerialNo, serialNo)
+            .select(MemberTransferRecord::getContent)
+            .eq(ObjectUtils.isNotNull(serialNo), MemberTransferRecord::getSerialNo, serialNo)
             .between(
                 ObjectUtils.isNotNull(endTime) && ObjectUtils.isNotNull(startTime),
-                MemberBackup::getCreateTime,
+                MemberTransferRecord::getCreateTime,
                 endTime,
                 startTime)
             .list()
             .stream()
-            .map(MemberBackup::getContent)
+            .map(MemberTransferRecord::getContent)
             .collect(Collectors.toList());
 
     List<String> result = new ArrayList<>();
-    backupContents.forEach(
+    contents.forEach(
         content -> {
           List<Map<String, String>> maps = this.parseContent(content);
           if (null != maps) {
@@ -71,7 +72,7 @@ public class MemberBackupServiceImpl extends ServiceImpl<MemberBackupMapper, Mem
           }
         });
 
-    backupContents.clear();
+    contents.clear();
     return result;
   }
 

@@ -19,31 +19,35 @@ import com.gameplat.model.entity.game.GameRebateDetail;
 import com.gameplat.model.entity.game.GameRebatePeriod;
 import com.gameplat.model.entity.game.GameRebateReport;
 import com.gameplat.redis.redisson.DistributedLocker;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+
+@Api(tags = "会员返水预设")
 @Slf4j
 @RestController
 @RequestMapping("/api/admin/game/gameRebatePeriod/")
 public class GameRebatePeriodController {
 
   private static final String GAME_REBATE_PAY_REDIS_LOCK = "game_rebate_pay_redis_lock";
+
   @Autowired private GameRebatePeriodService gameRebatePeriodService;
+
   @Autowired private GameRebateDetailService gameRebateDetailService;
+
   @Autowired private GameRebateReportService gameRebateReportService;
+
   @Autowired private DistributedLocker distributedLocker;
 
+  @ApiOperation("查询")
   @GetMapping(value = "queryAll")
   @PreAuthorize("hasAuthority('game:gameRebatePeriod:view')")
   public IPage<GameRebatePeriodVO> queryGameRebatePeriod(
@@ -51,26 +55,28 @@ public class GameRebatePeriodController {
     return gameRebatePeriodService.queryGameRebatePeriod(page, dto);
   }
 
+  @ApiOperation("查询")
   @PostMapping(value = "add")
   @PreAuthorize("hasAuthority('game:gameRebatePeriod:add')")
   public void add(@RequestBody OperGameRebatePeriodDTO dto) {
     gameRebatePeriodService.addGameRebatePeriod(dto);
   }
 
+  @ApiOperation("查询")
   @PutMapping(value = "update")
   @PreAuthorize("hasAuthority('game:gameRebatePeriod:update')")
   public void update(@RequestBody OperGameRebatePeriodDTO dto) {
     gameRebatePeriodService.updateGameRebatePeriod(dto);
   }
 
-  /** 期数删除 */
+  @ApiOperation("删除期数")
   @PostMapping(value = "delete")
   @PreAuthorize("hasAuthority('game:gameRebatePeriod:remove')")
   public void delete(@RequestBody OperGameRebatePeriodDTO dto) {
     gameRebatePeriodService.deleteGameRebatePeriod(dto.getId(), dto.getOnly());
   }
 
-  /** 期数结算 */
+  @ApiOperation("结算")
   @PostMapping(value = "settle")
   @PreAuthorize("hasAuthority('game:gameRebatePeriod:settle')")
   public void settle(@RequestBody OperGameRebatePeriodDTO dto) {
@@ -93,7 +99,7 @@ public class GameRebatePeriodController {
     }
   }
 
-  /** 期数派发 */
+  @ApiOperation("发放")
   @PostMapping(value = "batchAccept")
   @PreAuthorize("hasAuthority('game:gameRebatePeriod:batchAccept')")
   public void accept(@RequestBody OperGameRebatePeriodDTO dto) {
@@ -108,6 +114,7 @@ public class GameRebatePeriodController {
 
   @Async
   public void asyncAcceptSingleTask(String taskName, OperGameRebatePeriodDTO dto) {
+    // fixme 内部调用无法代理，推荐移动至其他类中
     log.info("异步派发任务执行：{}", taskName);
     try {
       distributedLocker.lock(GAME_REBATE_PAY_REDIS_LOCK, TimeUnit.SECONDS, 300);
@@ -153,7 +160,7 @@ public class GameRebatePeriodController {
     }
   }
 
-  /** 游戏返水回收:期数 */
+  @ApiOperation("回收")
   @PostMapping(value = "rollBack")
   @PreAuthorize("hasAuthority('game:gameRebatePeriod:rollBack')")
   public void rollBack(@RequestBody OperGameRebatePeriodDTO dto) {
@@ -169,6 +176,7 @@ public class GameRebatePeriodController {
   @Async
   public void asyncAndRollBackSingleTask(String taskName, OperGameRebatePeriodDTO dto)
       throws ServiceException {
+    // fixme 内部调用无法代理，推荐移动至其他类中
     log.info("异步回收任务执行：{}", taskName);
     try {
       distributedLocker.lock(GAME_REBATE_PAY_REDIS_LOCK, TimeUnit.SECONDS, 300);

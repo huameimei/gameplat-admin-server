@@ -10,31 +10,27 @@ import com.gameplat.admin.mapper.MemberBillMapper;
 import com.gameplat.admin.model.dto.MemberBillDTO;
 import com.gameplat.admin.model.vo.MemberBillVO;
 import com.gameplat.admin.service.MemberBillService;
-import com.gameplat.admin.service.MemberService;
 import com.gameplat.common.enums.TranTypes;
 import com.gameplat.common.model.bean.TranTypeBean;
 import com.gameplat.model.entity.member.Member;
 import com.gameplat.model.entity.member.MemberBill;
-import java.util.List;
-import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)
 public class MemberBillServiceImpl extends ServiceImpl<MemberBillMapper, MemberBill>
     implements MemberBillService {
 
-  @Autowired private MemberBillMapper memberBillMapper;
-
   @Autowired private MemberBillConvert memberBillConvert;
 
-  @Autowired private MemberService memberService;
-
   @Override
-  public void save(Member member, MemberBill memberBill) throws Exception {
+  public void save(Member member, MemberBill memberBill) {
     memberBill.setAccount(member.getAccount());
     memberBill.setMemberPath(member.getSuperPath());
     memberBill.setMemberId(member.getId());

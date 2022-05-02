@@ -152,15 +152,9 @@ public class MemberVO implements Serializable {
 
   private Integer salaryFlag;
 
-  /**
-   * 输赢金额
-   */
+  /** 输赢金额 */
   private BigDecimal winAmount = BigDecimal.ZERO;
 
-  /**
-   * 返水金额
-   */
+  /** 返水金额 */
   private BigDecimal waterAmount = BigDecimal.ZERO;
-
-
 }

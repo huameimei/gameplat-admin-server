@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.gameplat.admin.model.dto.*;
 import com.gameplat.admin.model.vo.*;
 import com.gameplat.model.entity.member.Member;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -21,7 +22,7 @@ public interface MemberService extends IService<Member> {
 
   IPage<MessageDistributeVO> pageMessageDistribute(Page<Member> page, MemberQueryDTO dto);
 
-  IPage<MemberBalanceVO> findTGMemberBalance(Page<Member> page, MemberQueryDTO dto);
+  IPage<MemberBalanceVO> findPromoteMemberBalance(Page<Member> page, MemberQueryDTO dto);
 
   List<MemberVO> queryList(MemberQueryDTO dto);
 
@@ -148,9 +149,9 @@ public interface MemberService extends IService<Member> {
   /**
    * 清除推广会员余额
    *
-   * @param dto
+   * @param dto CleanAccountDTO
    */
-  void updateTGClearMember(CleanAccountDTO dto);
+  void clearPromoteMemberBalance(CleanAccountDTO dto);
 
   /**
    * 解除登录限制
@@ -165,7 +166,5 @@ public interface MemberService extends IService<Member> {
    */
   MemberBalanceVO findMemberVip(String username, String level, String vipGrade);
 
-
-  MemberContactVo getMemberDateils(Long id);
-
+  MemberContactVo getMemberDetail(Long id);
 }

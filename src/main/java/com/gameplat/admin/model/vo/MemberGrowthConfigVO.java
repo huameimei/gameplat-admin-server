@@ -5,6 +5,7 @@ import com.gameplat.admin.util.Date2LongSerializerUtils;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 
@@ -14,7 +15,7 @@ import java.util.Date;
  * @date 2021/11/20
  */
 @Data
-public class MemberGrowthConfigVO {
+public class MemberGrowthConfigVO implements Serializable {
 
   private Long id;
 

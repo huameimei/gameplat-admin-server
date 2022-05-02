@@ -16,6 +16,7 @@ import java.util.List;
  * @param <T>
  * @param <E>
  */
+@Deprecated
 @Data
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor

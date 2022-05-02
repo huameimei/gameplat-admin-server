@@ -20,7 +20,6 @@ import com.gameplat.admin.util.JxlsExcelUtils;
 import com.gameplat.base.common.constant.ContextConstant;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.Converts;
-import com.gameplat.base.common.util.DateUtils;
 import com.gameplat.base.common.util.StringUtils;
 import com.gameplat.base.common.util.UUIDUtils;
 import com.gameplat.common.enums.*;
@@ -45,10 +44,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.net.URLEncoder;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -56,46 +55,36 @@ import java.util.stream.Collectors;
 /**
  * @author aBen
  * @date 2022/3/6 17:25
- * @desc
  */
 @Slf4j
 @Service
 @Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)
 public class GameFinancialReportServiceImpl
-        extends ServiceImpl<GameFinancialReportMapper, GameFinancialReport>
-        implements GameFinancialReportService {
+    extends ServiceImpl<GameFinancialReportMapper, GameFinancialReport>
+    implements GameFinancialReportService {
 
-  @Autowired
-  private GameFinancialReportMapper gameFinancialReportMapper;
-
-  @Autowired
-  private SysTheme sysTheme;
-
-  @Autowired
-  private GameFinancialReportConvert gameFinancialReportConvert;
-
-  @Resource
-  private RestHighLevelClient restHighLevelClient;
-
-  /**
-   * 财务报表模板
-   */
+  /** 财务报表模板 */
   private static final String GAME_FINANCIAL_REPORT = "gameFinancialReport.xlsx";
+
+  @Autowired private GameFinancialReportMapper gameFinancialReportMapper;
+  @Autowired private SysTheme sysTheme;
+  @Autowired private GameFinancialReportConvert gameFinancialReportConvert;
+  @Autowired private RestHighLevelClient restHighLevelClient;
 
   @Override
   public List<GameFinancialReportVO> findGameFinancialReportList(GameFinancialReportQueryDTO dto) {
     List<GameFinancialReportVO> gameFinancialReportVOList =
-            gameFinancialReportMapper.findGameFinancialReportList(dto);
+        gameFinancialReportMapper.findGameFinancialReportList(dto);
     assembleKgNewLottery(gameFinancialReportVOList);
     return gameFinancialReportVOList;
   }
 
   @Override
   public PageDtoVO<GameFinancialReportVO> findReportPage(
-          Page<GameFinancialReport> page, GameFinancialReportQueryDTO queryDTO) {
+      Page<GameFinancialReport> page, GameFinancialReportQueryDTO queryDTO) {
     PageDtoVO<GameFinancialReportVO> pageDtoVO = new PageDtoVO<>();
     Page<GameFinancialReportVO> result =
-            gameFinancialReportMapper.findGameFinancialReportPage(page, queryDTO);
+        gameFinancialReportMapper.findGameFinancialReportPage(page, queryDTO);
 
     // 对KG新彩票的三个彩种做特殊处理
     assembleKgNewLottery(result.getRecords());
@@ -103,11 +92,11 @@ public class GameFinancialReportServiceImpl
     // 查询总计
     QueryWrapper<GameFinancialReport> queryOne = Wrappers.query();
     queryOne.select(
-            "ifNull(sum(valid_amount), 0) as valid_amount,ifNull(sum(win_amount), 0) as win_amount,ifNull(sum(accumulate_win_amount),0) as accumulateWinAmount");
+        "ifNull(sum(valid_amount), 0) as valid_amount,ifNull(sum(win_amount), 0) as win_amount,ifNull(sum(accumulate_win_amount),0) as accumulateWinAmount");
     fillQueryWrapper(queryDTO, queryOne);
     GameFinancialReport gameFinancialReport = gameFinancialReportMapper.selectOne(queryOne);
     TotalGameFinancialReportVO totalGameFinancialReport =
-            gameFinancialReportConvert.toTotalVO(gameFinancialReport);
+        gameFinancialReportConvert.toTotalVO(gameFinancialReport);
 
     BigDecimal totalLastWinAmount = gameFinancialReportMapper.findTotalLastWinAmount(queryDTO);
     totalGameFinancialReport.setLastWinAmount(totalLastWinAmount);
@@ -139,7 +128,7 @@ public class GameFinancialReportServiceImpl
     GameFinancialReportQueryDTO queryDTO = new GameFinancialReportQueryDTO();
     queryDTO.setStatisticsTime(statisticsTime);
     List<GameFinancialReportVO> reportList =
-            gameFinancialReportMapper.findGameFinancialReportList(queryDTO);
+        gameFinancialReportMapper.findGameFinancialReportList(queryDTO);
 
     if (StringUtils.isEmpty(reportList)) {
       throw new ServiceException("请先初始化" + statisticsTime + "的游戏财务报表");
@@ -150,7 +139,7 @@ public class GameFinancialReportServiceImpl
 
     // 根据游戏类型编号对List进行分组
     Map<String, List<GameFinancialReportVO>> listMap =
-            reportList.stream().collect(Collectors.groupingBy(GameFinancialReportVO::getGameTypeName));
+        reportList.stream().collect(Collectors.groupingBy(GameFinancialReportVO::getGameTypeName));
     List<GameReportExportVO> gameReportExportVOList = new ArrayList<>();
     // 组装模板渲染对象
     for (String key : listMap.keySet()) {
@@ -161,20 +150,22 @@ public class GameFinancialReportServiceImpl
       gameReportExportVOList.add(gameReportExportVO);
     }
     List<GameReportExportVO> finalExportList =
-            gameReportExportVOList.stream()
-                    .sorted(Comparator.comparing(GameReportExportVO::getGameTypeId))
-                    .collect(Collectors.toList());
+        gameReportExportVOList.stream()
+            .sorted(Comparator.comparing(GameReportExportVO::getGameTypeId))
+            .collect(Collectors.toList());
     Map<String, Object> map = new HashMap<>();
     map.put("statisticsTime", statisticsTime);
     map.put("gameList", finalExportList);
-    final BigDecimal[] bigDecimal = {new BigDecimal(0), new BigDecimal(0), new BigDecimal(0), new BigDecimal(0)};
+    final BigDecimal[] bigDecimal = {
+      new BigDecimal(0), new BigDecimal(0), new BigDecimal(0), new BigDecimal(0)
+    };
     reportList.forEach(
-            a -> {
-              bigDecimal[0] = bigDecimal[0].add(a.getValidAmount());
-              bigDecimal[1] = bigDecimal[1].add(a.getWinAmount());
-              bigDecimal[2] = bigDecimal[2].add(a.getLastWinAmount());
-              bigDecimal[3] = bigDecimal[3].add(a.getAccumulateWinAmount());
-            });
+        a -> {
+          bigDecimal[0] = bigDecimal[0].add(a.getValidAmount());
+          bigDecimal[1] = bigDecimal[1].add(a.getWinAmount());
+          bigDecimal[2] = bigDecimal[2].add(a.getLastWinAmount());
+          bigDecimal[3] = bigDecimal[3].add(a.getAccumulateWinAmount());
+        });
     map.put("totalValidAmount", bigDecimal[0]);
     map.put("totalWinAmount", bigDecimal[1]);
     map.put("totalLastWinAmount", bigDecimal[2]);
@@ -185,30 +176,22 @@ public class GameFinancialReportServiceImpl
 
     try {
       response.setHeader(
-              "Content-Disposition",
-              "attachment;fileName=" + URLEncoder.encode(zipFileName + ".zip", "UTF-8"));
+          "Content-Disposition",
+          "attachment;fileName=" + URLEncoder.encode(zipFileName + ".zip", "UTF-8"));
       response.setContentType("application/zip");
 
       final File dir =
-              new File(
-                      System.getProperty("java.io.tmpdir")
-                              + File.separator
-                              + "excel-"
-                              + UUIDUtils.getUUID32());
+          new File(
+              System.getProperty("java.io.tmpdir")
+                  + File.separator
+                  + "excel-"
+                  + UUIDUtils.getUUID32());
       if (!dir.exists()) {
         dir.mkdirs();
       }
 
       // 单个Excel文件的fileName
-      String fileName =
-              new StringBuilder()
-                      .append("(")
-                      .append("财务报表")
-                      .append(")")
-                      .append("-")
-                      .append(statisticsTime)
-                      .append(".xlsx")
-                      .toString();
+      String fileName = "(" + "财务报表" + ")" + "-" + statisticsTime + ".xlsx";
       FileOutputStream fo = null;
       try {
         fo = new FileOutputStream(new File(dir + File.separator + fileName));
@@ -241,22 +224,24 @@ public class GameFinancialReportServiceImpl
   /**
    * 统计三方游戏的财务报表数据
    *
-   * @param statisticsTime
-   * @return
+   * @param statisticsTime String
+   * @return List
    */
-  public List<GameFinancialReport> statisticsGameReportList(String statisticsTime) {
+  private List<GameFinancialReport> statisticsGameReportList(String statisticsTime) {
     String tenant = sysTheme.getTenantCode();
     // 统计开始时间
     String startTime = statisticsTime + "-01 00:00:00";
     // 当前统计月份的最后一天的日期
-    Date endDate = DateUtil.endOfMonth(DateUtils.parseDate(startTime, "yyyy-MM-dd"));
+    Date endDate = DateUtil.endOfMonth(DateUtil.parseDate(startTime));
     // 统计结束时间
-    String endTime = DateUtils.formatDate(endDate, "yyyy-MM-dd HH:mm:ss");
+    String endTime = DateUtil.formatDateTime(endDate);
 
     List<GameFinancialReport> allGameFinancialReportList = new ArrayList<>();
 
     // 初始化全部游戏的财务报表（无游戏数据）
-    List<GameFinancialReport> gameFinancialReportList = gameFinancialReportMapper.initGameFinancialReport(statisticsTime, startTime.substring(0, 10), endTime.substring(0, 10), tenant);
+    List<GameFinancialReport> gameFinancialReportList =
+        gameFinancialReportMapper.initGameFinancialReport(
+            statisticsTime, startTime.substring(0, 10), endTime.substring(0, 10), tenant);
     if (CollectionUtil.isEmpty(gameFinancialReportList)) {
       throw new ServiceException("游戏已全部下架");
     }
@@ -266,29 +251,32 @@ public class GameFinancialReportServiceImpl
 
     // 组装数据
     if (StringUtils.isNotNull(gameDataMap)) {
-      gameFinancialReportList.parallelStream().forEach(gameFinancialReport -> {
-        List<GameDataVO> gameDataVO = gameDataMap.get(gameFinancialReport.getGameKind());
-        // 如果有对应的游戏数据则填充，没有则是0
-        if (StringUtils.isNotEmpty(gameDataVO)) {
-          gameFinancialReport.setValidAmount(gameDataVO.get(0).getValidAmount());
-          gameFinancialReport.setWinAmount(gameDataVO.get(0).getWinAmount());
-        }
-      });
+      gameFinancialReportList.parallelStream()
+          .forEach(
+              gameFinancialReport -> {
+                List<GameDataVO> gameDataVO = gameDataMap.get(gameFinancialReport.getGameKind());
+                // 如果有对应的游戏数据则填充，没有则是0
+                if (StringUtils.isNotEmpty(gameDataVO)) {
+                  gameFinancialReport.setValidAmount(gameDataVO.get(0).getValidAmount());
+                  gameFinancialReport.setWinAmount(gameDataVO.get(0).getWinAmount());
+                }
+              });
     }
 
     // 初始化KG新彩票的游戏数据（按彩种划分）
-    List<GameFinancialReport> KgNlReportList = iniKgNlData(statisticsTime, startTime, endTime, tenant);
-    if (StringUtils.isNotEmpty(KgNlReportList)) {
-      allGameFinancialReportList.addAll(KgNlReportList);
+    List<GameFinancialReport> list = iniKgNlData(statisticsTime, startTime, endTime, tenant);
+    if (StringUtils.isNotEmpty(list)) {
+      allGameFinancialReportList.addAll(list);
     }
 
     allGameFinancialReportList.addAll(gameFinancialReportList);
     return allGameFinancialReportList;
   }
 
-  public Map<String, List<GameDataVO>> initGameData(String startTime, String endTime, String tenant) {
-    long startTimestamp = DateUtils.parseDate(startTime, "yyyy-MM-dd HH:mm:ss").getTime();
-    long endTimestamp = DateUtils.parseDate(endTime, "yyyy-MM-dd HH:mm:ss").getTime();
+  private Map<String, List<GameDataVO>> initGameData(
+      String startTime, String endTime, String tenant) {
+    long startTimestamp = DateUtil.parseDateTime(startTime).getTime();
+    long endTimestamp = DateUtil.parseDateTime(endTime).getTime();
     GameBetRecordQueryDTO dto = new GameBetRecordQueryDTO();
     dto.setTimeType(TimeTypeEnum.STAT_TIME.getValue());
     dto.setBeginTime(Long.toString(startTimestamp));
@@ -299,11 +287,15 @@ public class GameFinancialReportServiceImpl
     SearchRequest searchRequest = new SearchRequest(indexName);
 
     TermsAggregationBuilder groupTerms =
-            AggregationBuilders.terms("gameKindGroup").field("gameKind.keyword").size(GameKindEnum.values().length);
+        AggregationBuilders.terms("gameKindGroup")
+            .field("gameKind.keyword")
+            .size(GameKindEnum.values().length);
 
     SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
-    SumAggregationBuilder validAmountSumBuilder = AggregationBuilders.sum("validAmount").field("validAmount");
-    SumAggregationBuilder winAmountSumBuilder = AggregationBuilders.sum("winAmount").field("winAmount");
+    SumAggregationBuilder validAmountSumBuilder =
+        AggregationBuilders.sum("validAmount").field("validAmount");
+    SumAggregationBuilder winAmountSumBuilder =
+        AggregationBuilders.sum("winAmount").field("winAmount");
 
     groupTerms.subAggregation(validAmountSumBuilder);
     groupTerms.subAggregation(winAmountSumBuilder);
@@ -316,7 +308,7 @@ public class GameFinancialReportServiceImpl
 
     RequestOptions.Builder optionsBuilder = RequestOptions.DEFAULT.toBuilder();
     optionsBuilder.setHttpAsyncResponseConsumerFactory(
-            new HttpAsyncResponseConsumerFactory.HeapBufferedResponseConsumerFactory(31457280));
+        new HttpAsyncResponseConsumerFactory.HeapBufferedResponseConsumerFactory(31457280));
 
     SearchResponse searchResponse = null;
     try {
@@ -334,10 +326,14 @@ public class GameFinancialReportServiceImpl
       Object gameKind = bucket.getKey();
       GameDataVO gameDataVO = new GameDataVO();
       gameDataVO.setGameKind(gameKind.toString());
-      BigDecimal validAmount = Converts.toBigDecimal(((ParsedSum) bucket.getAggregations().get("validAmount")).getValue())
-              .divide(new BigDecimal("1000"), 2, BigDecimal.ROUND_DOWN);
-      BigDecimal winAmount = Converts.toBigDecimal(((ParsedSum) bucket.getAggregations().get("winAmount")).getValue()).abs()
-              .divide(new BigDecimal("1000"), 2, BigDecimal.ROUND_DOWN);
+      BigDecimal validAmount =
+          Converts.toBigDecimal(
+                  ((ParsedSum) bucket.getAggregations().get("validAmount")).getValue())
+              .divide(new BigDecimal("1000"), 2, RoundingMode.DOWN);
+      BigDecimal winAmount =
+          Converts.toBigDecimal(((ParsedSum) bucket.getAggregations().get("winAmount")).getValue())
+              .abs()
+              .divide(new BigDecimal("1000"), 2, RoundingMode.DOWN);
 
       gameDataVO.setValidAmount(validAmount);
       gameDataVO.setWinAmount(winAmount);
@@ -347,9 +343,10 @@ public class GameFinancialReportServiceImpl
     return gameDataList.stream().collect(Collectors.groupingBy(GameDataVO::getGameKind));
   }
 
-  public List<GameFinancialReport> iniKgNlData(String statisticsTime, String startTime, String endTime, String tenant) {
-    long startTimestamp = DateUtils.parseDate(startTime, "yyyy-MM-dd HH:mm:ss").getTime();
-    long endTimestamp = DateUtils.parseDate(endTime, "yyyy-MM-dd HH:mm:ss").getTime();
+  private List<GameFinancialReport> iniKgNlData(
+      String statisticsTime, String startTime, String endTime, String tenant) {
+    long startTimestamp = DateUtil.parseDateTime(startTime).getTime();
+    long endTimestamp = DateUtil.parseDateTime(endTime).getTime();
     GameBetRecordQueryDTO dto = new GameBetRecordQueryDTO();
     dto.setTimeType(TimeTypeEnum.STAT_TIME.getValue());
     dto.setBeginTime(Long.toString(startTimestamp));
@@ -361,11 +358,15 @@ public class GameFinancialReportServiceImpl
     SearchRequest searchRequest = new SearchRequest(indexName);
 
     TermsAggregationBuilder groupTerms =
-            AggregationBuilders.terms("lottTypeGroup").field("lottType").size(KgNLLottTypeEnum.values().length);
+        AggregationBuilders.terms("lottTypeGroup")
+            .field("lottType")
+            .size(KgNLLottTypeEnum.values().length);
 
     SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
-    SumAggregationBuilder validAmountSumBuilder = AggregationBuilders.sum("validAmount").field("validAmount");
-    SumAggregationBuilder winAmountSumBuilder = AggregationBuilders.sum("winAmount").field("winAmount");
+    SumAggregationBuilder validAmountSumBuilder =
+        AggregationBuilders.sum("validAmount").field("validAmount");
+    SumAggregationBuilder winAmountSumBuilder =
+        AggregationBuilders.sum("winAmount").field("winAmount");
 
     groupTerms.subAggregation(validAmountSumBuilder);
     groupTerms.subAggregation(winAmountSumBuilder);
@@ -378,7 +379,7 @@ public class GameFinancialReportServiceImpl
 
     RequestOptions.Builder optionsBuilder = RequestOptions.DEFAULT.toBuilder();
     optionsBuilder.setHttpAsyncResponseConsumerFactory(
-            new HttpAsyncResponseConsumerFactory.HeapBufferedResponseConsumerFactory(31457280));
+        new HttpAsyncResponseConsumerFactory.HeapBufferedResponseConsumerFactory(31457280));
 
     SearchResponse searchResponse = null;
     try {
@@ -405,9 +406,13 @@ public class GameFinancialReportServiceImpl
       } else if (lottType.toString().equals(KgNLLottTypeEnum.LHC.value())) {
         gameFinancialReport.setGameKind(KgNLTypeKindEnum.LHC.value());
       }
-      BigDecimal validAmount = Converts.toBigDecimal(((ParsedSum) bucket.getAggregations().get("validAmount")).getValue())
+      BigDecimal validAmount =
+          Converts.toBigDecimal(
+                  ((ParsedSum) bucket.getAggregations().get("validAmount")).getValue())
               .divide(new BigDecimal("1000"), 2, BigDecimal.ROUND_DOWN);
-      BigDecimal winAmount = Converts.toBigDecimal(((ParsedSum) bucket.getAggregations().get("winAmount")).getValue()).abs()
+      BigDecimal winAmount =
+          Converts.toBigDecimal(((ParsedSum) bucket.getAggregations().get("winAmount")).getValue())
+              .abs()
               .divide(new BigDecimal("1000"), 2, BigDecimal.ROUND_DOWN);
       gameFinancialReport.setValidAmount(validAmount);
       gameFinancialReport.setWinAmount(winAmount);
@@ -428,7 +433,7 @@ public class GameFinancialReportServiceImpl
    *
    * @param list
    */
-  public void assembleKgNewLottery(List<GameFinancialReportVO> list) {
+  private void assembleKgNewLottery(List<GameFinancialReportVO> list) {
     if (StringUtils.isNotEmpty(list)) {
       for (GameFinancialReportVO vo : list) {
         if (vo.getGameKind().equals(KgNLTypeKindEnum.OFFICIAL.value())) {
@@ -451,16 +456,16 @@ public class GameFinancialReportServiceImpl
   }
 
   private void fillQueryWrapper(
-          GameFinancialReportQueryDTO queryDTO, QueryWrapper<GameFinancialReport> queryWrapper) {
+      GameFinancialReportQueryDTO queryDTO, QueryWrapper<GameFinancialReport> queryWrapper) {
     queryWrapper.eq(
-            ObjectUtils.isNotEmpty(queryDTO.getStatisticsTime()),
-            "statistics_time",
-            queryDTO.getStatisticsTime());
+        ObjectUtils.isNotEmpty(queryDTO.getStatisticsTime()),
+        "statistics_time",
+        queryDTO.getStatisticsTime());
     queryWrapper.eq(
-            ObjectUtils.isNotEmpty(queryDTO.getGameType()), "game_type", queryDTO.getGameType());
+        ObjectUtils.isNotEmpty(queryDTO.getGameType()), "game_type", queryDTO.getGameType());
     queryWrapper.eq(
-            ObjectUtils.isNotEmpty(queryDTO.getPlatformCode()),
-            "platform_code",
-            queryDTO.getPlatformCode());
+        ObjectUtils.isNotEmpty(queryDTO.getPlatformCode()),
+        "platform_code",
+        queryDTO.getPlatformCode());
   }
 }

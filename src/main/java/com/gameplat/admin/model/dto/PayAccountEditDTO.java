@@ -9,7 +9,7 @@ import java.math.BigDecimal;
 @Data
 public class PayAccountEditDTO implements Serializable {
 
-  public Long id;
+  private Long id;
 
   private String name;
 

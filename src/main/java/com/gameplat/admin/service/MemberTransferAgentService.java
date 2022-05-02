@@ -2,7 +2,7 @@ package com.gameplat.admin.service;
 
 import com.gameplat.admin.model.dto.MemberTransformDTO;
 
-public interface MemberTransformService {
+public interface MemberTransferAgentService {
 
   /** 转代理 */
   void transform(MemberTransformDTO dto);

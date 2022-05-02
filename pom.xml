@@ -296,6 +296,12 @@
                 <profiles.active>w888c</profiles.active>
             </properties>
         </profile>
+        <profile>
+            <id>kc102</id>
+            <properties>
+                <profiles.active>kc102</profiles.active>
+            </properties>
+        </profile>
     </profiles>
 
     <build>
@@ -316,13 +322,14 @@
             </resource>
             <resource>
                 <directory>src/main/resources</directory>
-                <filtering>true</filtering>
                 <includes>
-                    <include>**/*.properties</include>
-                    <include>**/*.json</include>
-                    <include>**/*.xml</include>
-                    <include>**/*.txt</include>
-                    <include>**/*.xlsx</include>
+                    <include>mapper/**</include>
+                    <include>*.properties</include>
+                    <include>*.json</include>
+                    <include>*.xml</include>
+                    <include>*.txt</include>
+                    <include>*.xlsx</include>
+                    <include>*.yml</include>
                 </includes>
             </resource>
         </resources>
@@ -383,7 +390,7 @@
         <repository>
             <id>maven</id>
             <name>Maven Repository</name>
-            <url>http://103.139.241.104:8081/repository/maven-public/</url>
+            <url>https://nexus.kg822.com/repository/maven-public/</url>
             <releases>
                 <enabled>true</enabled>
                 <updatePolicy>always</updatePolicy>
@@ -396,7 +403,7 @@
         <repository>
             <id>nexus</id>
             <name>Nexus Snapshot Repository</name>
-            <url>http://103.139.241.104:8081/repository/gameplat-public/</url>
+            <url>https://nexus.kg822.com/repository/gameplat-public/</url>
             <releases>
                 <enabled>true</enabled>
                 <updatePolicy>always</updatePolicy>

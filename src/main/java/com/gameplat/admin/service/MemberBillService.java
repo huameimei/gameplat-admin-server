@@ -8,11 +8,12 @@ import com.gameplat.admin.model.vo.MemberBillVO;
 import com.gameplat.common.model.bean.TranTypeBean;
 import com.gameplat.model.entity.member.Member;
 import com.gameplat.model.entity.member.MemberBill;
+
 import java.util.List;
 
 public interface MemberBillService extends IService<MemberBill> {
 
-  void save(Member member, MemberBill memberBill) throws Exception;
+  void save(Member member, MemberBill memberBill);
 
   IPage<MemberBillVO> queryPage(PageDTO<MemberBill> page, MemberBillDTO dto);
 

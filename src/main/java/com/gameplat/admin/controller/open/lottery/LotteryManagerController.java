@@ -1,6 +1,7 @@
 package com.gameplat.admin.controller.open.lottery;
 
 import com.gameplat.admin.service.NewLotteryForwardService;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -14,11 +15,8 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
 
-/**
- * @Author kb @Date 2022/2/24 19:22 @Version 1.0
- */
+@Api(tags = "彩票管理")
 @Slf4j
-@ApiOperation("彩票管理")
 @RestController
 @RequestMapping("/api/admin/lottery/")
 public class LotteryManagerController {
@@ -27,7 +25,7 @@ public class LotteryManagerController {
 
   @ApiOperation("获取彩系和彩种列表")
   @PostMapping("/getLottTypeList")
-//  @PreAuthorize("hasAuthority('lottery:lottTypeList')")
+  //  @PreAuthorize("hasAuthority('lottery:lottTypeList')")
   public Object getLottTypeList(HttpServletRequest request) {
     return serviceHandler.serviceHandler(request);
   }
@@ -428,7 +426,7 @@ public class LotteryManagerController {
 
   @PostMapping("/getBannerList")
   @ApiOperation("彩票banner配置--列表数据")
-//  @PreAuthorize("hasAuthority('lottery:open:getOpenResult')")
+  //  @PreAuthorize("hasAuthority('lottery:open:getOpenResult')")
   public Object getBannerList(HttpServletRequest request) {
     return serviceHandler.serviceHandler(request);
   }
@@ -510,42 +508,42 @@ public class LotteryManagerController {
 
   @PostMapping("/getFundRecord")
   @ApiOperation("资金流水记录")
-//  @PreAuthorize("hasAuthority('lottery:open:getOpenResult')")
+  //  @PreAuthorize("hasAuthority('lottery:open:getOpenResult')")
   public Object getFundRecord(HttpServletRequest request) {
     return serviceHandler.serviceHandler(request);
   }
 
   @PostMapping("/changesType")
   @ApiOperation("资金类型")
-//  @PreAuthorize("hasAuthority('lottery:open:getOpenResult')")
+  //  @PreAuthorize("hasAuthority('lottery:open:getOpenResult')")
   public Object changesType(HttpServletRequest request) {
     return serviceHandler.serviceHandler(request);
   }
 
   @PostMapping("/getUserInfo")
   @ApiOperation("获取用户信息")
-//  @PreAuthorize("hasAuthority('lottery:open:getOpenResult')")
+  //  @PreAuthorize("hasAuthority('lottery:open:getOpenResult')")
   public Object getUserInfo(HttpServletRequest request) {
     return serviceHandler.serviceHandler(request);
   }
 
   @PostMapping("/updateBlack")
   @ApiOperation("更新用户官彩黑名单")
-//  @PreAuthorize("hasAuthority('lottery:open:getOpenResult')")
+  //  @PreAuthorize("hasAuthority('lottery:open:getOpenResult')")
   public Object updateBlack(HttpServletRequest request) {
     return serviceHandler.serviceHandler(request);
   }
 
   @PostMapping("/updateBetLimit")
   @ApiOperation("更新用户投注限额")
-//  @PreAuthorize("hasAuthority('lottery:open:getOpenResult')")
+  //  @PreAuthorize("hasAuthority('lottery:open:getOpenResult')")
   public Object updateBetLimit(HttpServletRequest request) {
     return serviceHandler.serviceHandler(request);
   }
 
   @PostMapping("/updateRebate")
   @ApiOperation("更新用户反水等级")
-//  @PreAuthorize("hasAuthority('lottery:open:getOpenResult')")
+  //  @PreAuthorize("hasAuthority('lottery:open:getOpenResult')")
   public Object updateRebate(HttpServletRequest request) {
     return serviceHandler.serviceHandler(request);
   }
@@ -563,7 +561,6 @@ public class LotteryManagerController {
   public Object getJscPresetNumberList(HttpServletRequest request) {
     return serviceHandler.serviceHandler(request);
   }
-
 
   @ApiOperation("竞速彩预设开奖--批量删除-删除")
   @PostMapping("deleteJscPresetNumber")

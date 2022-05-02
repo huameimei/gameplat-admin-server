@@ -15,10 +15,7 @@ import com.gameplat.admin.model.vo.*;
 import com.gameplat.common.model.bean.UserEquipment;
 import com.gameplat.model.entity.recharge.RechargeOrder;
 import com.gameplat.model.entity.spread.SpreadUnion;
-import com.gameplat.security.context.UserCredential;
-import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
@@ -32,21 +29,17 @@ public interface RechargeOrderService extends IService<RechargeOrder> {
 
   void updateRemarks(Long id, String auditRemarks);
 
-  void handle(Long id, UserCredential userCredential);
+  void handle(Long id);
 
-  void unHandle(Long id, UserCredential userCredential);
+  void unHandle(Long id);
 
-  void accept(Long id, UserCredential userCredential, String auditRemarks, boolean flag) throws Exception;
+  void accept(Long id, String auditRemarks, boolean flag);
 
-  void cancel(Long id, UserCredential userCredential);
+  void cancel(Long id);
 
-  void updateStatus(Long id, Integer curStatus, Integer newStatus, String auditorAccount);
+  void updateStatus(Long id, Integer curStatus, Integer newStatus);
 
-  void manual(
-      ManualRechargeOrderBo manualRechargeOrderBo,
-      UserCredential userCredential,
-      UserEquipment userEquipment)
-      throws Exception;
+  void manual(ManualRechargeOrderBo manualRechargeOrderBo, UserEquipment equipment);
 
   /**
    * 查询每天充值的金额
@@ -65,7 +58,7 @@ public interface RechargeOrderService extends IService<RechargeOrder> {
   List<ActivityStatisticItem> findAllFirstRechargeAmount(Map<String, Object> map);
 
   /** 根据会员和最后修改时间获取充值次数、充值金额、充值优惠、其它优惠 */
-  MemberActivationVO getRechargeInfoByNameAndUpdateTime(MemberActivationDTO memberActivationDTO);
+  MemberActivationVO getRechargeInfoByNameAndUpdateTime(MemberActivationDTO dto);
 
   /** 获取时间段内某代理下的所有充值成功数据 */
   List<JSONObject> getSpreadReport(List<SpreadUnion> list, String startTime, String endTime);
@@ -76,16 +69,11 @@ public interface RechargeOrderService extends IService<RechargeOrder> {
 
   void expired(Long id);
 
-
   void batchMemberRecharge(
-          UserEquipment clientInfo,
-          List<RechargeMemberFileBean> strAccount,
-          ManualRechargeOrderDto dto,
-          UserCredential credential);
+      UserEquipment clientInfo,
+      List<RechargeMemberFileBean> strAccount,
+      ManualRechargeOrderDto dto);
 
   void batchFileMemberRecharge(
-          List<MemberRechBalanceVO> memberRechBalanceVOList,
-          Integer discountType,
-          UserEquipment userEquipment,
-          UserCredential credential);
+      List<MemberRechBalanceVO> list, Integer discountType, UserEquipment userEquipment);
 }

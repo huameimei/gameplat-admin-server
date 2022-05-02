@@ -7,6 +7,7 @@ import java.math.BigDecimal;
 
 @Data
 public class GameReportVO implements Serializable {
+
   /** 平台 */
   private String platformCode;
 

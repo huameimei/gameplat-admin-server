@@ -20,20 +20,17 @@ import com.gameplat.model.entity.game.GameBetDailyReport;
 import com.gameplat.model.entity.game.GamePlatform;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import java.util.Date;
-import java.util.List;
-import javax.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
+import java.util.Date;
+import java.util.List;
 
 @Slf4j
-@Api("游戏日报表")
+@Api(tags = "游戏日报表")
 @RestController
 @RequestMapping("/api/admin/game/gameBetDailyReport")
 public class GameBetDailyReportController {
@@ -44,6 +41,7 @@ public class GameBetDailyReportController {
 
   @Autowired private GameBetRecordInfoService gameBetRecordInfoService;
 
+  @ApiOperation("查询")
   @GetMapping(value = "/queryPage")
   @PreAuthorize("hasAuthority('game:gameBetDailyReport:view')")
   public PageDtoVO<GameBetDailyReport> queryPage(
@@ -51,16 +49,14 @@ public class GameBetDailyReportController {
     return gameBetDailyReportService.queryPage(page, dto);
   }
 
-  // TODO 导出游戏投注日报表
-
-  /** 游戏平台维度数据统计 */
+  @ApiOperation("游戏平台维度数据统计")
   @GetMapping(value = "/queryGamePlatformReport")
   @PreAuthorize("hasAuthority('game:gamePlatformReport:view')")
   public List<GameReportVO> queryGamePlatformReport(GameBetDailyReportQueryDTO dto) {
     return gameBetDailyReportService.queryGamePlatformReport(dto);
   }
 
-  /** 游戏重新生成日报表 */
+  @ApiOperation("游戏重新生成日报表")
   @PostMapping(value = "/resetDayReport")
   @PreAuthorize("hasAuthority('game:gameBetDailyReport:reset')")
   public void resetDayReport(@RequestBody OperGameMemberDayReportDTO dto) {
@@ -104,8 +100,8 @@ public class GameBetDailyReportController {
       StringBuilder sb = new StringBuilder();
       sb.append("(");
       String[] split = dto.getGameType().split(",");
-      for (int i = 0; i < split.length; i++) {
-        sb.append("'" + split[i] + "'").append(",");
+      for (String s : split) {
+        sb.append("'" + s + "'").append(",");
       }
       sb.deleteCharAt(sb.toString().length() - 1);
       sb.append(")");

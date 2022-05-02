@@ -8,7 +8,7 @@ import java.math.BigDecimal;
 @Data
 public class PpMerchantEditDTO implements Serializable {
 
-  public Long id;
+  private Long id;
 
   private String name;
 

@@ -1,4 +1,4 @@
-package com.gameplat.admin.controller.open.thirdParty;
+package com.gameplat.admin.controller.open.payment;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -12,23 +12,22 @@ import com.gameplat.common.enums.SwitchStatusEnum;
 import com.gameplat.log.annotation.Log;
 import com.gameplat.log.enums.LogType;
 import com.gameplat.model.entity.pay.TpMerchant;
-import java.util.List;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
+@Api(tags = "第三方支付商户")
 @RestController
 @RequestMapping("/api/admin/thirdParty/tpMerchants")
 public class TpMerchantController {
 
   @Autowired private TpMerchantService tpMerchantService;
 
+  @ApiOperation("删除")
   @DeleteMapping("/remove/{id}")
   @PreAuthorize("hasAuthority('thirdParty:tpMerchants:remove')")
   @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.RECHARGE, desc = "'删除入款商户id=' + #id")
@@ -36,12 +35,14 @@ public class TpMerchantController {
     tpMerchantService.delete(id);
   }
 
+  @ApiOperation("根据ID查询")
   @GetMapping("/queryMerchant")
   @PreAuthorize("hasAuthority('thirdParty:tpMerchants:queryMerchant')")
   public TpMerchantPayTypeVO getTpMerchantById(Long id) {
     return tpMerchantService.getTpMerchantById(id);
   }
 
+  @ApiOperation("添加")
   @PostMapping("/add")
   @PreAuthorize("hasAuthority('thirdParty:tpMerchants:add')")
   @Log(
@@ -52,6 +53,7 @@ public class TpMerchantController {
     tpMerchantService.save(dto);
   }
 
+  @ApiOperation("修改")
   @PostMapping("/edit")
   @PreAuthorize("hasAuthority('thirdParty:tpMerchants:edit')")
   @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.RECHARGE, desc = "'修改入款商户id=' + #dto.id")
@@ -59,6 +61,7 @@ public class TpMerchantController {
     tpMerchantService.update(dto);
   }
 
+  @ApiOperation("编辑状态")
   @PostMapping("/editStatus")
   @PreAuthorize("hasAuthority('thirdParty:tpMerchants:editStatus')")
   @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.RECHARGE, desc = "'修改入款商户状态id=' + #id")
@@ -66,12 +69,14 @@ public class TpMerchantController {
     tpMerchantService.updateStatus(id, status);
   }
 
+  @ApiOperation("查询")
   @PostMapping("/page")
   @PreAuthorize("hasAuthority('thirdParty:tpMerchants:view')")
   public IPage<TpMerchantVO> getPage(Page<TpMerchant> page, Integer status, String name) {
     return tpMerchantService.queryPage(page, status, name);
   }
 
+  @ApiOperation("查询全部")
   @GetMapping("/queryAllMerchant")
   public List<TpMerchantVO> getAllMerchant() {
     return tpMerchantService.queryAllMerchant(SwitchStatusEnum.ENABLED.getValue());

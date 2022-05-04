@@ -534,7 +534,7 @@ public class ActivityQualificationServiceImpl
       qm.setAuditTime(new Date());
       qm.setActivityId(activityLobby.getId());
       qm.setActivityName(activityLobby.getTitle());
-      qm.setActivityType(activityLobby.getActivityType());
+      qm.setActivityType(ActivityInfoEnum.TypeEnum.RED_ENVELOPE.value());
       qm.setUserId(nameAndId.get(entry.getKey()));
       qm.setUsername(entry.getKey());
       qm.setApplyTime(new Date());

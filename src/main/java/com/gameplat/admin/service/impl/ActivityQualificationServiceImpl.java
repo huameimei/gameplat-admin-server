@@ -111,7 +111,8 @@ public class ActivityQualificationServiceImpl
         .eq(
             dto.getQualificationStatus() != null,
             ActivityQualification::getQualificationStatus,
-            dto.getQualificationStatus());
+            dto.getQualificationStatus())
+        .orderByDesc(ActivityQualification::getCreateTime);
     return queryChainWrapper.page(page).convert(activityQualificationConvert::toVo);
   }
 
@@ -486,6 +487,7 @@ public class ActivityQualificationServiceImpl
     //账号和会员id之间的映射
     Map<String, Long> nameAndId = new HashMap<>();
 
+    log.info("一共有{}人充值", list==null?0:list.size());
     for (Map<String, Object> map : list) {
       String dayTotalAmount = map.get("dayTotalAmount").toString();
       String account = map.get("account").toString();
@@ -500,7 +502,7 @@ public class ActivityQualificationServiceImpl
 
       //过滤不能层级内的充值
       if (userLevelsSet != null && userLevelsSet.contains(memberLevel)) {
-        log.info("账号={}在充值等级={}内充值={}不能参与资格统计", account, dayTotalAmount);
+        log.info("账号={}在充值等级={}内充值={}不能参与资格统计", account, memberLevel,dayTotalAmount);
         continue;
       }
 

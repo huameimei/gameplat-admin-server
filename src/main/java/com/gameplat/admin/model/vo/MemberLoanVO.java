@@ -33,7 +33,7 @@ public class MemberLoanVO implements Serializable {
   @ApiModelProperty("借呗额度")
   private BigDecimal loanMoney;
 
-  @ApiModelProperty("借款状态  0:借款中  1:未借款  2:已回收")
+  @ApiModelProperty("借款状态  0:未结清  1:已结清  2:已回收")
   private Integer loanStatus;
 
   @ApiModelProperty("欠款金额")
@@ -41,4 +41,10 @@ public class MemberLoanVO implements Serializable {
 
   @ApiModelProperty("借款时间")
   private Date loanTime;
+
+  @ApiModelProperty("欠款金额小计")
+  private BigDecimal subtotal;
+
+  @ApiModelProperty("欠款金额总计")
+  private BigDecimal total;
 }

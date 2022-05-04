@@ -152,23 +152,6 @@ public class MemberGrowthLevelServiceImpl
               .set(MemberInfo::getVipLevel, newLevel)
               .eq(MemberInfo::getMemberId, memberGrowthStatis.getMemberId());
           memberInfoService.update(wrapper);
-
-          // 更新借呗表额度
-          BigDecimal loanMoney =
-              this.lambdaQuery().eq(MemberGrowthLevel::getLevel, newLevel).one().getLoanMoney();
-
-          int money = loanMoney.compareTo(BigDecimal.ZERO);
-
-          if (money > 0 && list.get(0).getLevel() != 0) {
-            memberLoanService.editOrUpdate(
-                new MemberLoan() {
-                  {
-                    setLoanMoney(loanMoney);
-                    setMemberId(memberGrowthStatis.getMemberId());
-                    setAccount(memberGrowthStatis.getAccount());
-                  }
-                });
-          }
         }
       }
     }

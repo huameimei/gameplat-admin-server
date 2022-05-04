@@ -501,7 +501,7 @@ public class ActivityQualificationServiceImpl
       }
 
       //过滤不能层级内的充值
-      if (userLevelsSet != null && userLevelsSet.contains(memberLevel)) {
+      if (userLevelsSet != null && !userLevelsSet.contains(memberLevel)) {
         log.info("账号={}在充值等级={}内充值={}不能参与资格统计", account, memberLevel,dayTotalAmount);
         continue;
       }

@@ -75,10 +75,11 @@ public class ActivityInfoServiceImpl extends ServiceImpl<ActivityInfoMapper, Act
             ActivityInfo::getActivityLobbyId,
             dto.getActivityLobbyId())
         .eq(StringUtils.isNotBlank(dto.getCreateBy()), ActivityInfo::getCreateBy, dto.getCreateBy())
-        // 按排序sort正序排列
-        .orderByAsc(Lists.newArrayList(ActivityInfo::getSort))
         // 按照时间倒序排列
-        .orderByDesc(Lists.newArrayList(ActivityInfo::getCreateTime, ActivityInfo::getId));
+        .orderByDesc(Lists.newArrayList(ActivityInfo::getCreateTime, ActivityInfo::getId))
+        // 按排序sort正序排列
+        .orderByAsc(Lists.newArrayList(ActivityInfo::getSort));
+
     IPage<ActivityInfoVO> page1 = queryWrapper.page(page).convert(activityInfoConvert::toVo);
     if (CollectionUtils.isNotEmpty(page1.getRecords())) {
       for (ActivityInfoVO activityInfoVO : page1.getRecords()) {

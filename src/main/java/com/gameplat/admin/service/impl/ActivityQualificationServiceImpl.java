@@ -24,6 +24,8 @@ import com.gameplat.base.common.util.DateUtil;
 import com.gameplat.base.common.util.RandomUtil;
 import com.gameplat.base.common.util.StringUtils;
 import com.gameplat.common.enums.BooleanEnum;
+import com.gameplat.common.enums.MemberEnums;
+import com.gameplat.common.enums.RechargeStatus;
 import com.gameplat.model.entity.activity.ActivityDistribute;
 import com.gameplat.model.entity.activity.ActivityLobby;
 import com.gameplat.model.entity.activity.ActivityQualification;
@@ -109,7 +111,8 @@ public class ActivityQualificationServiceImpl
         .eq(
             dto.getQualificationStatus() != null,
             ActivityQualification::getQualificationStatus,
-            dto.getQualificationStatus());
+            dto.getQualificationStatus())
+        .orderByDesc(ActivityQualification::getCreateTime);
     return queryChainWrapper.page(page).convert(activityQualificationConvert::toVo);
   }
 
@@ -179,6 +182,16 @@ public class ActivityQualificationServiceImpl
           lobbyDiscount.sort(Comparator.comparingInt(ActivityLobbyDiscountDTO::getTargetValue));
           qm.setAwardDetail(JSON.parseArray(JSONObject.toJSONString(lobbyDiscount)).toJSONString());
           qm.setGetWay(activityLobbyDTO.getGetWay());
+          //如果是红包雨活动
+          if(activityLobbyDTO.getType().intValue()==2){
+            if(CollectionUtils.isEmpty(lobbyDiscount) || lobbyDiscount.size()>1){
+              throw new ServiceException("请选择一个优惠区间");
+            }
+            ActivityLobbyDiscountDTO temp=lobbyDiscount.get(0);
+            qm.setMinMoney( temp.getPresenterValue());
+            qm.setMaxMoney(temp.getWithdrawDml());
+            qm.setDrawNum(temp.getPresenterDml().intValue());
+          }
           manageList.add(qm);
         }
         if (CollectionUtils.isNotEmpty(manageList)) {
@@ -453,7 +466,7 @@ public class ActivityQualificationServiceImpl
    */
   private boolean checkDoRedEnvelope(ActivityLobbyVO activityLobby) {
     Date now = new Date();
-    if (!"1".equals(activityLobby.getStatus())) {
+    if (1!=activityLobby.getStatus()) {
       log.info("活动没有启用");
       return false;
     }
@@ -484,6 +497,7 @@ public class ActivityQualificationServiceImpl
     //账号和会员id之间的映射
     Map<String, Long> nameAndId = new HashMap<>();
 
+    log.info("一共有{}人充值", list==null?0:list.size());
     for (Map<String, Object> map : list) {
       String dayTotalAmount = map.get("dayTotalAmount").toString();
       String account = map.get("account").toString();
@@ -497,8 +511,8 @@ public class ActivityQualificationServiceImpl
       }
 
       //过滤不能层级内的充值
-      if (userLevelsSet != null && userLevelsSet.contains(memberLevel)) {
-        log.info("账号={}在充值等级={}内充值={}不能参与资格统计", account, dayTotalAmount);
+      if (userLevelsSet != null && !userLevelsSet.contains(memberLevel)) {
+        log.info("账号={}在充值等级={}内充值={}不能参与资格统计", account, memberLevel,dayTotalAmount);
         continue;
       }
 
@@ -519,13 +533,18 @@ public class ActivityQualificationServiceImpl
 
     List<ActivityQualification> needAdd=new ArrayList<>();
     for (Map.Entry<String, BigDecimal> entry : newMap.entrySet()) {
+      ActivityLobbyDiscountVO temp=getActivityLobbyDiscountVO(entry.getValue(),activityLobby.getLobbyDiscountList());
+      if(temp==null){
+        log.info("根据优惠规则没有找到对应配置信息account={},{}",entry.getKey(),temp.toString());
+        continue;
+      }
       ActivityQualification qm=new ActivityQualification();
       qm.setAuditRemark("红包雨活动资格自动审批,充值总额="+entry.getValue());
       qm.setAuditPerson("system");
       qm.setAuditTime(new Date());
       qm.setActivityId(activityLobby.getId());
       qm.setActivityName(activityLobby.getTitle());
-      qm.setActivityType(activityLobby.getActivityType());
+      qm.setActivityType(ActivityInfoEnum.TypeEnum.RED_ENVELOPE.value());
       qm.setUserId(nameAndId.get(entry.getKey()));
       qm.setUsername(entry.getKey());
       qm.setApplyTime(new Date());
@@ -541,11 +560,13 @@ public class ActivityQualificationServiceImpl
       qm.setQualificationStatus(BooleanEnum.YES.value());
       qm.setStatisItem(activityLobby.getStatisItem());
       qm.setGetWay(ActivityInfoEnum.GetWay.DIRECT_RELEASE.value());
-      qm.setDrawNum(getCount(entry.getValue(),activityLobby.getLobbyDiscountList()));
+      qm.setDrawNum(temp.getPresenterValue());
       //打码量是在抽奖时计算，这里不算
       qm.setWithdrawDml(0);
       //新增抽奖资格,使用次数为0
       qm.setEmployNum(0);
+      qm.setMinMoney(temp.getPresenterDml().intValue());
+      qm.setMaxMoney(temp.getWithdrawDml().intValue());
       needAdd.add(qm);
     }
 
@@ -554,18 +575,18 @@ public class ActivityQualificationServiceImpl
   }
 
   /**
-   * 根据充值金额获取抽奖次数
+   * 根据充值金额获取优惠区间
    * @param money
    * @param lobbyDiscountList
    * @return
    */
-  private Integer getCount(BigDecimal money, List<ActivityLobbyDiscountVO> lobbyDiscountList) {
+  private ActivityLobbyDiscountVO getActivityLobbyDiscountVO(BigDecimal money, List<ActivityLobbyDiscountVO> lobbyDiscountList) {
     if (CollectionUtils.isEmpty(lobbyDiscountList)) {
-      return 0;
+      return null;
     }
     //money<=0
     if (money == null || money.compareTo(BigDecimal.ZERO) == 0 || money.compareTo(BigDecimal.ZERO) == -1) {
-      return 0;
+      return null;
     }
     for (int i = 0; i < lobbyDiscountList.size(); i++) {
       ActivityLobbyDiscountVO temp = lobbyDiscountList.get(i);
@@ -573,17 +594,15 @@ public class ActivityQualificationServiceImpl
       BigDecimal targetValue = new BigDecimal(temp.getTargetValue());
       //money>=targetValue
       if (money.compareTo(targetValue) == 0 || money.compareTo(targetValue) == 1) {
-        //presenterValue: 抽奖次数
-        return temp.getPresenterValue();
+        return temp;
       }
       //如果充值金额第一条都不满足则返回第一条的抽奖次数
       if (i == 0 && money.compareTo(targetValue) == 1) {
-        //presenterValue: 抽奖次数
-        return temp.getPresenterValue();
+        return temp;
       }
     }
 
-    return 0;
+    return null;
   }
 
   /**
@@ -598,8 +617,8 @@ public class ActivityQualificationServiceImpl
   private List<Map<String, Object>> getRechargeOrder() {
     QueryWrapper<RechargeOrderHistory> rechargeOrderHistoryQueryWrapper = new QueryWrapper<>();
     rechargeOrderHistoryQueryWrapper.select("IFNULL(sum(amount),0) as dayTotalAmount,member_id as memberId,account,member_level as memberLevel")
-            .eq("member_type", "M")
-            .eq("status", 3)
+            .eq("member_type", MemberEnums.Type.MEMBER.value())
+            .eq("status", RechargeStatus.SUCCESS.getValue())
             .eq("point_flag", 1)
             .between("audit_time",
                     DateUtil.strToDate(LocalDate.now().plusDays(-1).toString() + EST4_BEGIN, DateUtil.YYYY_MM_DD_HH_MM_SS),

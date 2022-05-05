@@ -92,6 +92,7 @@ public class TenantSettingController {
      */
     @RequestMapping("/getStartImagePage")
     @ApiOperation("启动图配置列表查询")
+    @PreAuthorize("hasAuthority('banner:startImage:view')")
     public IPage<TenantSetting> getStartImagePage(
             PageDTO<TenantSetting> page, TenantSetting tenantSetting) {
         tenantSetting.setSettingType(TenantSettingEnum.START_UP_IMAGE.getCode());
@@ -103,6 +104,7 @@ public class TenantSettingController {
      */
     @RequestMapping("/insertStartImagePage")
     @ApiOperation("启动图配置新增/修改")
+    @PreAuthorize("hasAuthority('banner:startImage:edit')")
     public Result<Object> insertStartImagePage(@RequestBody TenantSetting tenantSetting) {
         tenantSetting.setSettingType(TenantSettingEnum.START_UP_IMAGE.getCode());
 
@@ -135,6 +137,7 @@ public class TenantSettingController {
      */
     @RequestMapping("/deleteStartImagePage")
     @ApiOperation("启动图配置删除")
+    @PreAuthorize("hasAuthority('banner:startImage:remove')")
     public Result<Object> deleteStartImagePage(@RequestParam(value = "id") int id) {
         TenantSetting tenantSetting = new TenantSetting();
         tenantSetting.setSettingType(TenantSettingEnum.START_UP_IMAGE.getCode());

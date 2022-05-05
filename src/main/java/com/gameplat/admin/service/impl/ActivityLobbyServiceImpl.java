@@ -549,6 +549,17 @@ public class ActivityLobbyServiceImpl extends ServiceImpl<ActivityLobbyMapper, A
 
   @Override
   public ActivityLobbyVO getActivityLobbyVOById(Long activityLobbyId) {
-    return baseMapper.getActivityLobbyVOById(activityLobbyId);
+    ActivityLobbyVO result = baseMapper.getActivityLobbyVOById(activityLobbyId);
+    if (CollectionUtils.isNotEmpty(result.getLobbyDiscountList())) {
+      List<ActivityLobbyDiscountVO> activityLobbyDiscountVOList = new ArrayList<>();
+      for (int i = 0; i < result.getLobbyDiscountList().size(); i++) {
+        Object o=result.getLobbyDiscountList().get(i);
+        if(o instanceof ActivityLobbyDiscount){
+          activityLobbyDiscountVOList.add(activityLobbyDiscountConvert.toVO(((ActivityLobbyDiscount) o)));
+        }
+      }
+      result.setLobbyDiscountList(activityLobbyDiscountVOList);
+    }
+    return result;
   }
 }

@@ -302,6 +302,12 @@
                 <profiles.active>kc102</profiles.active>
             </properties>
         </profile>
+        <profile>
+            <id>intl</id>
+            <properties>
+                <profiles.active>intl</profiles.active>
+            </properties>
+        </profile>
     </profiles>
 
     <build>

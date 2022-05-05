@@ -905,14 +905,6 @@ public class GameAdminServiceImpl implements GameAdminService {
     return member;
   }
 
-  private Member checkGameBalanceParam(GameKickOutDTO dto) {
-    Assert.notEmpty(dto.getAccount(), "会员账号不能为空");
-    Assert.notEmpty(dto.getPlatformCode(), "游戏平台编码不能为空");
-    Member member = memberService.getMemberAndFillGameAccount(dto.getAccount());
-    Assert.notNull(member, "会员账号不存在，请重新检查");
-    return member;
-  }
-
   @Override
   public void transferToGame(OperGameTransferRecordDTO record) throws Exception {
     String key = "self_" + record.getPlatformCode() + '_' + record.getAccount();
@@ -953,7 +945,9 @@ public class GameAdminServiceImpl implements GameAdminService {
 
   @Override
   public void kickOut(GameKickOutDTO dto) {
-    Member member = checkGameBalanceParam(dto);
+    Assert.notEmpty(dto.getAccount(), "会员账号不能为空");
+    Assert.notEmpty(dto.getPlatformCode(), "游戏平台编码不能为空");
+    Member member = memberService.getMemberAndFillGameAccount(dto.getAccount());
     GameApi gameApi = getGameApi(dto.getPlatformCode());
     GameBizBean gameBizBean = new GameBizBean();
     gameBizBean.setAccount(member.getAccount());
@@ -978,14 +972,16 @@ public class GameAdminServiceImpl implements GameAdminService {
     List<String> accountList = Arrays.asList(dto.getAccounts().split(","));
     List<GameKickOutVO> result = Collections.synchronizedList(new ArrayList<>());
     accountList.parallelStream().forEach(account -> {
-      Member member = memberService.getMemberAndFillGameAccount(account);
-      if (StringUtils.isNull(member)) {
+      Member member;
+      try {
+        member = memberService.getMemberAndFillGameAccount(account);
+      } catch (ServiceException e) {
         GameKickOutVO gameKickOutVO =
                 GameKickOutVO.builder()
                         .platformName(gamePlatform.getName())
                         .platformCode(gamePlatform.getCode())
                         .status(ResultStatusEnum.FAILED.getValue())
-                        .errorMsg("会员账号不存在，请重新检查")
+                        .errorMsg(e.getMessage())
                         .account(account)
                         .build();
         result.add(gameKickOutVO);

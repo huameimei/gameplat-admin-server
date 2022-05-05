@@ -426,21 +426,21 @@ public class LotteryManagerController {
 
   @PostMapping("/getBannerList")
   @ApiOperation("彩票banner配置--列表数据")
-  //  @PreAuthorize("hasAuthority('lottery:open:getOpenResult')")
+    @PreAuthorize("hasAuthority('lottery:open:getOpenResult')")
   public Object getBannerList(HttpServletRequest request) {
     return serviceHandler.serviceHandler(request);
   }
 
   @PostMapping("/updateBanner")
   @ApiOperation("彩票banner配置--修改数据/删除")
-  @PreAuthorize("hasAuthority('lottery:open:getOpenResult')")
+  @PreAuthorize("hasAuthority('lottery:open:editOpenResult')")
   public Object updateBanner(HttpServletRequest request, Integer id) {
     return serviceHandler.serviceHandler(request);
   }
 
   @PostMapping("/addBanner")
   @ApiOperation("彩票banner配置--添加数据")
-  @PreAuthorize("hasAuthority('lottery:open:getOpenResult')")
+  @PreAuthorize("hasAuthority('lottery:open:addOpenResult')")
   public Object addBanner(HttpServletRequest request, String lang) {
     return serviceHandler.serviceHandler(request);
   }

@@ -224,7 +224,7 @@ public class HGSportServiceImpl implements HGSportService {
 
   public Object doGetRequest(String apiUrl, HGSportDTO dto, String describe) {
     JSONObject configJson =
-            gameConfigService.queryGameConfigInfoByPlatCode(GamePlatformEnum.HG.getName());
+            gameConfigService.queryGameConfigInfoByPlatCode(GamePlatformEnum.HG.getCode());
     if (StringUtils.isNull(configJson)) {
       throw new ServiceException("未找到皇冠体育游戏配置");
     }
@@ -261,7 +261,7 @@ public class HGSportServiceImpl implements HGSportService {
 
   public Object doPostRequest(String apiUrl, HGSportDTO dto, String describe) {
     JSONObject configJson =
-            gameConfigService.queryGameConfigInfoByPlatCode(GamePlatformEnum.HG.getName());
+            gameConfigService.queryGameConfigInfoByPlatCode(GamePlatformEnum.HG.getCode());
     if (StringUtils.isNull(configJson)) {
       throw new ServiceException("未找到皇冠体育游戏配置");
     }

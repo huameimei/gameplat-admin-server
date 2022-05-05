@@ -182,6 +182,16 @@ public class ActivityQualificationServiceImpl
           lobbyDiscount.sort(Comparator.comparingInt(ActivityLobbyDiscountDTO::getTargetValue));
           qm.setAwardDetail(JSON.parseArray(JSONObject.toJSONString(lobbyDiscount)).toJSONString());
           qm.setGetWay(activityLobbyDTO.getGetWay());
+          //如果是红包雨活动
+          if(activityLobbyDTO.getType().intValue()==2){
+            if(CollectionUtils.isNotEmpty(lobbyDiscount) || lobbyDiscount.size()>1){
+              throw new ServiceException("请选择一个优惠区间");
+            }
+            ActivityLobbyDiscountDTO temp=lobbyDiscount.get(0);
+            qm.setMinMoney( temp.getPresenterValue());
+            qm.setMaxMoney(temp.getWithdrawDml());
+            qm.setDrawNum(temp.getPresenterDml().intValue());
+          }
           manageList.add(qm);
         }
         if (CollectionUtils.isNotEmpty(manageList)) {
@@ -534,7 +544,7 @@ public class ActivityQualificationServiceImpl
       qm.setAuditTime(new Date());
       qm.setActivityId(activityLobby.getId());
       qm.setActivityName(activityLobby.getTitle());
-      qm.setActivityType(activityLobby.getActivityType());
+      qm.setActivityType(ActivityInfoEnum.TypeEnum.RED_ENVELOPE.value());
       qm.setUserId(nameAndId.get(entry.getKey()));
       qm.setUsername(entry.getKey());
       qm.setApplyTime(new Date());

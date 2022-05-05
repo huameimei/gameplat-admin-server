@@ -397,19 +397,6 @@ public class MemberGrowthRecordServiceImpl
         MemberVO memberVo = memberService.queryList(new MemberQueryDTO() {{
             setId(memberId);
         }}).get(0);
-        //更新借呗表额度
-        BigDecimal loanMoney = growthLevelService.lambdaQuery()
-                .eq(MemberGrowthLevel::getLevel, afterLevel)
-                .one()
-                .getLoanMoney();
-        int money = loanMoney.compareTo(BigDecimal.ZERO);
-        if (money == 1) {
-            memberLoanService.editOrUpdate(new MemberLoan() {{
-                setLoanMoney(loanMoney);
-                setMemberId(memberId);
-                setAccount(memberVo.getAccount());
-            }});
-        }
         memberGrowthRecord.setCurrentLevel(afterLevel);
         // todo 5.记录成长值变动记录  重新更新 会员成长值汇总
         Long tempGrowth = changeFinalGrowth;

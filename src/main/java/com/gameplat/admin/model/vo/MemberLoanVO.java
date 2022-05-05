@@ -15,9 +15,6 @@ import java.util.Date;
 @Data
 public class MemberLoanVO implements Serializable {
 
-  @ApiModelProperty("主键")
-  private Long id;
-
   @ApiModelProperty("会员Id")
   private Long memberId;
 
@@ -41,10 +38,4 @@ public class MemberLoanVO implements Serializable {
 
   @ApiModelProperty("借款时间")
   private Date loanTime;
-
-  @ApiModelProperty("欠款金额小计")
-  private BigDecimal subtotal;
-
-  @ApiModelProperty("欠款金额总计")
-  private BigDecimal total;
 }

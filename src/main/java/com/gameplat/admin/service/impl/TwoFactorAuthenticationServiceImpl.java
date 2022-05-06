@@ -18,13 +18,12 @@ import dev.samstevens.totp.qr.QrDataFactory;
 import dev.samstevens.totp.qr.QrGenerator;
 import dev.samstevens.totp.secret.SecretGenerator;
 import dev.samstevens.totp.util.Utils;
+import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
-
-import java.util.Optional;
-import java.util.concurrent.TimeUnit;
 
 @Service
 public class TwoFactorAuthenticationServiceImpl implements TwoFactorAuthenticationService {
@@ -96,18 +95,17 @@ public class TwoFactorAuthenticationServiceImpl implements TwoFactorAuthenticati
   @Override
   public void verify2Fa(Long userId, String code) {
     Assert.isTrue(StringUtils.isNotEmpty(code), 10001, "安全码未填写!");
-
-    int retryCount =
-        Optional.ofNullable(redisTemplate.opsForValue().get(KEY_2FA_RETRY_COUNT)).orElse(0);
+    String retryKey = String.format("%s_%s", KEY_2FA_RETRY_COUNT, userId.toString());
+    int retryCount = Optional.ofNullable(redisTemplate.opsForValue().get(retryKey)).orElse(0);
     Assert.isTrue(retryCount < MAX_2FA_RETRY_COUNT, "安全码错误次数过多，请一小时后再试或联系客服！");
 
     String secret = Assert.notEmpty(userService.getSecret(userId), "认证失败，您还未绑定安全码！");
     if (!codeVerifier.isValidCode(secret, code)) {
-      redisTemplate.opsForValue().set(KEY_2FA_RETRY_COUNT, ++retryCount, 1, TimeUnit.HOURS);
+      redisTemplate.opsForValue().set(retryKey, ++retryCount, 1, TimeUnit.HOURS);
       throw new ServiceException("安全码错误，请重新输入!");
     }
 
     // 删除验证码错误次数
-    redisTemplate.delete(KEY_2FA_RETRY_COUNT);
+    redisTemplate.delete(retryKey);
   }
 }

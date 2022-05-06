@@ -14,7 +14,16 @@
             l.loan_time loanTime,
             IFNULL(l.loan_status, 1) loanStatus,
             IFNULL(l.overdraft_money, 0.0000) overdraftMoney
-        from member m
+        from
+            (select id,account,user_level,super_path
+                from member
+                <where>
+                    status = 1
+                    <if test="dto.account != null">
+                        AND account = #{dto.account}
+                    </if>
+                </where>
+            ) as m
             left join member_info i on m.id = i.member_id
             left join member_growth_level g on g.level = i.vip_level
             left join
@@ -22,10 +31,6 @@
                 SELECT id, loan_time, loan_status, overdraft_money, member_id FROM member_loan a
                 WHERE NOT EXISTS (select 1 from member_loan b where a.member_id = b.member_id and a.id &lt; b.id)) l ON i.member_id = l.member_id
         <where>
-            m.status = 1
-            <if test="dto.account != null">
-                AND m.account = #{dto.account}
-            </if>
             <if test="dto.vipLevel != null">
                 AND i.vip_level = #{dto.vipLevel}
             </if>

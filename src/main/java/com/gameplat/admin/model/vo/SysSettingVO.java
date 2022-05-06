@@ -1,6 +1,6 @@
 package com.gameplat.admin.model.vo;
 
-import com.gameplat.model.entity.setting.TenantSetting;
+import com.gameplat.model.entity.setting.SysSetting;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
@@ -10,7 +10,7 @@ import lombok.Data;
  * @date 2022/03/10
  */
 @Data
-public class TenantSettingVO extends TenantSetting {
+public class SysSettingVO extends SysSetting {
 
   /** 游戏参数 */
   private String gameParameters;

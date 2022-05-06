@@ -8,15 +8,15 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.gameplat.admin.cache.AdminCache;
 import com.gameplat.admin.constant.Constants;
-import com.gameplat.admin.enums.TenantSettingEnum;
+import com.gameplat.admin.enums.SysSettingEnum;
 import com.gameplat.admin.model.vo.ListSortConfigVO;
 import com.gameplat.admin.model.vo.SportConfigVO;
-import com.gameplat.admin.model.vo.TenantSettingVO;
-import com.gameplat.admin.service.TenantSettingService;
+import com.gameplat.admin.model.vo.SysSettingVO;
+import com.gameplat.admin.service.SysSettingService;
 import com.gameplat.base.common.enums.EnableEnum;
 import com.gameplat.base.common.web.Result;
 import com.gameplat.common.constant.CacheKey;
-import com.gameplat.model.entity.setting.TenantSetting;
+import com.gameplat.model.entity.setting.SysSetting;
 import com.gameplat.security.SecurityUserHolder;
 import com.gameplat.security.context.UserCredential;
 import io.swagger.annotations.ApiOperation;
@@ -42,10 +42,10 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequestMapping("/api/admin/setting")
-public class TenantSettingController {
+public class SysSettingController {
 
     @Autowired
-    private TenantSettingService tenantSettingService;
+    private SysSettingService sysSettingService;
 
     @Resource
     private AdminCache adminCache;
@@ -55,11 +55,11 @@ public class TenantSettingController {
      */
     @RequestMapping("/theme/list")
     @ApiOperation("租户主题列表查询")
-    public List<TenantSetting> getTenantThemeList() {
-        TenantSettingVO tenantSetting = new TenantSettingVO();
+    public List<SysSetting> getTenantThemeList() {
+        SysSettingVO tenantSetting = new SysSettingVO();
         tenantSetting.setSettingType(Constants.TEMPLATE_CONFIG_THEME);
         tenantSetting.setDisplay(EnableEnum.ENABLED.code());
-        return tenantSettingService.getTenantSetting(tenantSetting);
+        return sysSettingService.getTenantSetting(tenantSetting);
     }
 
     /**
@@ -69,7 +69,7 @@ public class TenantSettingController {
      */
     @RequestMapping("/navigation/list")
     @ApiOperation("租户导航列表查询")
-    public List<TenantSetting> getTenantNavList(TenantSettingVO setting) {
+    public List<SysSetting> getTenantNavList(SysSettingVO setting) {
         if (StringUtils.isEmpty(setting.getSettingType())) {
             setting.setSettingType(Constants.SETTING_APP_NAVIGATION);
         }
@@ -77,11 +77,11 @@ public class TenantSettingController {
             setting.setExtend4(setting.getTheme());
         }
         setting.setDisplay(EnableEnum.ENABLED.code());
-        List<TenantSetting> list = tenantSettingService.getTenantSetting(setting);
+        List<SysSetting> list = sysSettingService.getTenantSetting(setting);
         /* 查询到到导航栏为空，且传入的主题不为空，则为租户初使化对应主题的导航栏 */
         if (CollectionUtils.isEmpty(list) && StringUtils.isNotEmpty(setting.getTheme())) {
-            if (tenantSettingService.isExistTenantTheme(setting.getTheme())) {
-                tenantSettingService.initTenantNavigation(setting.getTheme(), setting.getSettingType());
+            if (sysSettingService.isExistTenantTheme(setting.getTheme())) {
+                sysSettingService.initTenantNavigation(setting.getTheme(), setting.getSettingType());
             }
         }
         return list;
@@ -93,10 +93,10 @@ public class TenantSettingController {
     @RequestMapping("/getStartImagePage")
     @ApiOperation("启动图配置列表查询")
     @PreAuthorize("hasAuthority('banner:startImage:view')")
-    public IPage<TenantSetting> getStartImagePage(
-            PageDTO<TenantSetting> page, TenantSetting tenantSetting) {
-        tenantSetting.setSettingType(TenantSettingEnum.START_UP_IMAGE.getCode());
-        return tenantSettingService.getStartImagePage(page, tenantSetting);
+    public IPage<SysSetting> getStartImagePage(
+            PageDTO<SysSetting> page, SysSetting sysSetting) {
+        sysSetting.setSettingType(SysSettingEnum.START_UP_IMAGE.getCode());
+        return sysSettingService.getStartImagePage(page, sysSetting);
     }
 
     /**
@@ -105,8 +105,8 @@ public class TenantSettingController {
     @RequestMapping("/insertStartImagePage")
     @ApiOperation("启动图配置新增/修改")
     @PreAuthorize("hasAuthority('banner:startImage:edit')")
-    public Result<Object> insertStartImagePage(@RequestBody TenantSetting tenantSetting) {
-        tenantSetting.setSettingType(TenantSettingEnum.START_UP_IMAGE.getCode());
+    public Result<Object> insertStartImagePage(@RequestBody SysSetting sysSetting) {
+        sysSetting.setSettingType(SysSettingEnum.START_UP_IMAGE.getCode());
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         Date date = null;
@@ -116,18 +116,18 @@ public class TenantSettingController {
             e.printStackTrace();
         }
 
-        if(ObjectUtil.isNull(tenantSetting.getId())){
-            tenantSetting.setCreateTime(date);
-        }else if(ObjectUtil.isNotNull(tenantSetting.getId())){
-            tenantSetting.setUpdateTime(date);
+        if(ObjectUtil.isNull(sysSetting.getId())){
+            sysSetting.setCreateTime(date);
+        }else if(ObjectUtil.isNotNull(sysSetting.getId())){
+            sysSetting.setUpdateTime(date);
         }
 
         UserCredential user = SecurityUserHolder.getCredential();
         if (user != null) {
-            tenantSetting.setCreateBy(user.getUsername());
-            tenantSetting.setUpdateBy(user.getUsername());
+            sysSetting.setCreateBy(user.getUsername());
+            sysSetting.setUpdateBy(user.getUsername());
         }
-        tenantSettingService.insertStartImagePage(tenantSetting);
+        sysSettingService.insertStartImagePage(sysSetting);
         adminCache.deleteByPrefix(CacheKey.getStartImgListKey());
         return Result.succeed();
     }
@@ -139,10 +139,10 @@ public class TenantSettingController {
     @ApiOperation("启动图配置删除")
     @PreAuthorize("hasAuthority('banner:startImage:remove')")
     public Result<Object> deleteStartImagePage(@RequestParam(value = "id") int id) {
-        TenantSetting tenantSetting = new TenantSetting();
-        tenantSetting.setSettingType(TenantSettingEnum.START_UP_IMAGE.getCode());
-        tenantSetting.setId(id);
-        tenantSettingService.deleteStartImagePage(tenantSetting);
+        SysSetting sysSetting = new SysSetting();
+        sysSetting.setSettingType(SysSettingEnum.START_UP_IMAGE.getCode());
+        sysSetting.setId(id);
+        sysSettingService.deleteStartImagePage(sysSetting);
         adminCache.deleteByPrefix(CacheKey.getStartImgListKey());
         return Result.succeed();
     }
@@ -152,13 +152,13 @@ public class TenantSettingController {
      */
     @RequestMapping("/getTenantSettings")
     @ApiOperation("获取租户设置信息")
-    public Result<Object> getTenantSettings(TenantSettingVO tenantSettingVO) {
+    public Result<Object> getTenantSettings(SysSettingVO tenantSettingVO) {
         // 查询租户主题
         if (Constants.TEMPLATE_CONFIG_THEME.equals(tenantSettingVO.getSettingType())) {
             tenantSettingVO.setDisplay(EnableEnum.ENABLED.code());
-            return Result.succeedData(tenantSettingService.getTenantSetting(tenantSettingVO));
+            return Result.succeedData(sysSettingService.getTenantSetting(tenantSettingVO));
         }
-        return Result.succeedData(tenantSettingService.getAppNavigation(tenantSettingVO));
+        return Result.succeedData(sysSettingService.getAppNavigation(tenantSettingVO));
     }
 
     /**
@@ -166,7 +166,7 @@ public class TenantSettingController {
      */
     @RequestMapping("/updateDisplayAndSort")
     @ApiOperation("修改显示与排序")
-    public Result updateDisplayAndSort(@RequestBody TenantSettingVO tenantSettingVO) {
+    public Result updateDisplayAndSort(@RequestBody SysSettingVO tenantSettingVO) {
         UserCredential user = SecurityUserHolder.getCredential();
         if (user != null) {
             tenantSettingVO.setUpdateBy(user.getUsername());
@@ -183,7 +183,7 @@ public class TenantSettingController {
         if (tenantSettingVO.getId() == null) {
             throw new ServiceException("id不允许为空");
         }
-        tenantSettingService.updateAppNavigation(tenantSettingVO);
+        sysSettingService.updateAppNavigation(tenantSettingVO);
         if (Constants.SQUARE_NAVIGATION.equals(tenantSettingVO.getSettingType())) {
             adminCache.deleteByPrefix(CacheKey.getSquareNavListKey());
         } else {
@@ -197,7 +197,7 @@ public class TenantSettingController {
      */
     @RequestMapping("/updatePersonalCenter")
     @ApiOperation("个人中心编辑")
-    public Result updatePersonalCenter(@RequestBody TenantSettingVO tenantSettingVO) {
+    public Result updatePersonalCenter(@RequestBody SysSettingVO tenantSettingVO) {
         UserCredential user = SecurityUserHolder.getCredential();
         if (user != null) {
             tenantSettingVO.setUpdateBy(user.getUsername());
@@ -214,7 +214,7 @@ public class TenantSettingController {
         if (tenantSettingVO.getId() == null) {
             throw new ServiceException("id不允许为空");
         }
-        tenantSettingService.updateAppNavigation(tenantSettingVO);
+        sysSettingService.updateAppNavigation(tenantSettingVO);
         adminCache.deleteByPrefix(CacheKey.getPersonCenterListKey());
         return Result.succeed();
     }
@@ -224,8 +224,8 @@ public class TenantSettingController {
      */
     @RequestMapping("/updateBatchTenantSort")
     @ApiOperation("批量修改排序")
-    public Result updateBatchTenantSetting(@RequestBody List<TenantSetting> tenantSettings) {
-        tenantSettingService.updateBatchTenantSetting(tenantSettings);
+    public Result updateBatchTenantSetting(@RequestBody List<SysSetting> sysSettings) {
+        sysSettingService.updateBatchTenantSetting(sysSettings);
         adminCache.deleteByPrefix(CacheKey.getTenantNavPrefixKey());
         return Result.succeed();
     }
@@ -236,7 +236,7 @@ public class TenantSettingController {
     @DeleteMapping("/delById")
     @ApiOperation("删除游戏浮窗类型")
     public Result remove(Integer id) {
-        tenantSettingService.deleteSysFloatById(id);
+        sysSettingService.deleteSysFloatById(id);
         adminCache.deleteByPrefix(CacheKey.getTenantFloatPrefixKey());
         return Result.succeed();
     }
@@ -246,13 +246,13 @@ public class TenantSettingController {
      */
     @RequestMapping("/updateSquareSwitch")
     @CacheEvict(cacheNames = Constants.TENANT_SQUARE_SWITCH, allEntries = true)
-    public Result updateSquareSwitch(TenantSettingVO tenantSetting) {
+    public Result updateSquareSwitch(SysSettingVO tenantSetting) {
         tenantSetting.setSettingType(Constants.SYSTEM_SETTING);
         tenantSetting.setSettingCode(Constants.SQUARE_SWITCH);
         if (org.apache.commons.lang3.StringUtils.isEmpty(tenantSetting.getSettingValue())) {
             return Result.failed("修改值不允许为空...");
         }
-        tenantSettingService.updateTenantSettingValue(tenantSetting);
+        sysSettingService.updateTenantSettingValue(tenantSetting);
         adminCache.deleteObject(CacheKey.getSquareEnableKey());
         return Result.succeed();
     }
@@ -262,10 +262,10 @@ public class TenantSettingController {
      */
     @RequestMapping("/getSquareSwitch")
     @PreAuthorize("hasAuthority('system:teant:..zgetSquareSwitch')")
-    public Result getSquareSwitch(TenantSettingVO sysTenantSetting) {
+    public Result getSquareSwitch(SysSettingVO sysTenantSetting) {
         sysTenantSetting.setSettingType(Constants.SYSTEM_SETTING);
         sysTenantSetting.setSettingCode(Constants.SQUARE_SWITCH);
-        List<TenantSetting> list = tenantSettingService.getTenantSetting(sysTenantSetting);
+        List<SysSetting> list = sysSettingService.getTenantSetting(sysTenantSetting);
         return Result.succeed(CollectionUtils.isNotEmpty(list) ? list.get(0) : null);
     }
 
@@ -274,7 +274,7 @@ public class TenantSettingController {
      */
     @RequestMapping("/getSportConfig")
     public Result getSportConfig() {
-        return Result.succeed(tenantSettingService.getSportConfig());
+        return Result.succeed(sysSettingService.getSportConfig());
     }
 
     /**
@@ -287,7 +287,7 @@ public class TenantSettingController {
             Result.failed("修改体育配置参数为空");
         }
         adminCache.deleteObject(CacheKey.getTenantListSortKey());
-        return Result.succeed(tenantSettingService.updateListSortConfig(listSortConfigVOS));
+        return Result.succeed(sysSettingService.updateListSortConfig(listSortConfigVOS));
     }
 
     /**
@@ -300,6 +300,6 @@ public class TenantSettingController {
             Result.failed("修改体育配置参数为空");
         }
         adminCache.deleteObject(CacheKey.getSportConfigKey());
-        return Result.succeed(tenantSettingService.updateSportConfig(sportConfigVo));
+        return Result.succeed(sysSettingService.updateSportConfig(sportConfigVo));
     }
 }

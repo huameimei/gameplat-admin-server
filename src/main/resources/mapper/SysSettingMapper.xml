@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.gameplat.admin.mapper.TenantSettingMapper">
+<mapper namespace="com.gameplat.admin.mapper.SysSettingMapper">
 
-    <resultMap type="com.gameplat.model.entity.setting.TenantSetting" id="sysTenantSettingResult">
+    <resultMap type="com.gameplat.model.entity.setting.SysSetting" id="sysTenantSettingResult">
         <result property="id" column="id"/>
         <result property="settingType" column="setting_type"/>
         <result property="settingCode" column="setting_code"/>
@@ -25,7 +25,7 @@
         <result property="updateTime" column="update_time"/>
     </resultMap>
 
-    <resultMap type="com.gameplat.admin.model.vo.TenantSettingVO" id="sysTenantSetting1Result" extends="sysTenantSettingResult">
+    <resultMap type="com.gameplat.admin.model.vo.SysSettingVO" id="sysTenantSetting1Result" extends="sysTenantSettingResult">
         <result property="zhCn" column="zhCn"/>
         <result property="inId" column="inId"/>
         <result property="enUs" column="enUs"/>
@@ -44,13 +44,13 @@
 
     <!--初使化租户对应主题的导航栏-->
     <insert id="initTenantNavigation" parameterType="int">
-        insert into tenant_setting(setting_type, setting_code, setting_label, setting_value, setting_desc, display, sort, file_path, picture_path, is_index, extend_1, extend_2, extend_3, extend_4, extend_5, create_time)
-        select setting_type, setting_code, setting_label, setting_value, setting_desc, display, sort, file_path, picture_path, is_index, extend_1, extend_2, extend_3, #{theme}, extend_5, create_time from tenant_setting t
+        insert into sys_setting(setting_type, setting_code, setting_label, setting_value, setting_desc, display, sort, file_path, picture_path, is_index, extend_1, extend_2, extend_3, extend_4, extend_5, create_time)
+        select setting_type, setting_code, setting_label, setting_value, setting_desc, display, sort, file_path, picture_path, is_index, extend_1, extend_2, extend_3, #{theme}, extend_5, create_time from sys_setting t
         where t.setting_type = #{settingType} and t.extend_4 = 'template'
-          and not exists(select null from tenant_setting where setting_type = t.setting_type and setting_code = t.setting_code and extend_4 = t.extend_4)
+          and not exists(select null from sys_setting where setting_type = t.setting_type and setting_code = t.setting_code and extend_4 = t.extend_4)
     </insert>
 
-    <select id="getBackendAppNavigationList" parameterType="com.gameplat.admin.model.vo.TenantSettingVO"
+    <select id="getBackendAppNavigationList" parameterType="com.gameplat.admin.model.vo.SysSettingVO"
             resultMap="sysTenantSetting1Result">
         select `id`,
         `setting_type`,
@@ -76,7 +76,7 @@
         `create_time`,
         `update_by`,
         `update_time`
-        from tenant_setting
+        from sys_setting
         <where>
             <if test='settingType != null and settingType != ""'>
             and setting_type = #{settingType}
@@ -104,7 +104,7 @@
     </select>
 
     <update id="updateIndex">
-        update tenant_setting
+        update sys_setting
         <set>
             <if test="isIndex != null">is_index = #{isIndex},</if>
         </set>
@@ -113,7 +113,7 @@
 
     <!--插入配置信息-->
     <insert id="insetGameList" parameterType="java.util.List">
-        INSERT INTO tenant_setting (
+        INSERT INTO sys_setting (
         `tenant`, `setting_type`, `setting_code`, `setting_label`, `setting_value`, `setting_desc`, `display`,
         `sort`, `file_path`, `picture_path`, `is_index`, `extend_1`, `extend_2`, `extend_3`, `extend_4`,`extend_5`,
         `update_time`
@@ -141,8 +141,8 @@
         </foreach>
     </insert>
 
-    <insert id="initSportConfig" parameterType="com.gameplat.model.entity.setting.TenantSetting">
-        INSERT INTO `tenant_setting`(`tenant`,
+    <insert id="initSportConfig" parameterType="com.gameplat.model.entity.setting.SysSetting">
+        INSERT INTO `sys_setting`(`tenant`,
                                          `setting_type`,
                                          `setting_code`,
                                          `setting_value`,
@@ -159,7 +159,7 @@
     </insert>
 
     <!--查询体育配置-->
-    <select id="getSportConfig" parameterType="com.gameplat.model.entity.setting.TenantSetting"
+    <select id="getSportConfig" parameterType="com.gameplat.model.entity.setting.SysSetting"
             resultMap="sysTenantSettingResult">
         select `id`,
                `setting_type`,
@@ -178,12 +178,12 @@
                `create_time`,
                `update_by`,
                `update_time`
-        from tenant_setting
+        from sys_setting
         where setting_type = 'sport_config' and setting_code = 'sportConfig';
     </select>
 
-    <update id="updateListSortConfig" parameterType="com.gameplat.model.entity.setting.TenantSetting">
-        update tenant_setting
+    <update id="updateListSortConfig" parameterType="com.gameplat.model.entity.setting.SysSetting">
+        update sys_setting
         <set>
             <if test='settingValue != null and settingValue != ""'>setting_value = #{settingValue},</if>
         </set>
@@ -191,8 +191,8 @@
     </update>
 
     <!--多条件查询租户设置列表-->
-    <select id="getTenantSetting" parameterType="com.gameplat.model.entity.setting.TenantSetting" resultMap="sysTenantSettingResult">
-        select * from tenant_setting
+    <select id="getTenantSetting" parameterType="com.gameplat.model.entity.setting.SysSetting" resultMap="sysTenantSettingResult">
+        select * from sys_setting
         <where>
             <if test='settingType != null and settingType != ""'>
                 and setting_type = #{settingType}
@@ -216,8 +216,8 @@
         order by sort ASC
     </select>
 
-    <update id="updateSportConfig" parameterType="com.gameplat.model.entity.setting.TenantSetting">
-        update tenant_setting
+    <update id="updateSportConfig" parameterType="com.gameplat.model.entity.setting.SysSetting">
+        update sys_setting
         <set>
             <if test='settingValue != null and settingValue != ""'>setting_value = #{settingValue},</if>
         </set>

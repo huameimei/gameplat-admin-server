@@ -1,6 +1,6 @@
 package com.gameplat.admin.enums;
 
-public enum TenantSettingEnum {
+public enum SysSettingEnum {
   TENANT_SETTING_NAV("app_navigation", "导航栏"),
   TENANT_SETTING_CENTER("personal_center", "个人中心"),
   IS_INTO_BET("into_bet", "是否注单"),
@@ -10,7 +10,7 @@ public enum TenantSettingEnum {
   private String code;
   private String desc;
 
-  TenantSettingEnum(String code, String desc) {
+  SysSettingEnum(String code, String desc) {
     this.code = code;
     this.desc = desc;
   }

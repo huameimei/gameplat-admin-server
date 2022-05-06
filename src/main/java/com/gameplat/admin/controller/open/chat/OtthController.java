@@ -46,7 +46,7 @@ public class OtthController {
   @Autowired private OtthService otthService;
   @Autowired private SysDomainService sysDomainService;
   @Autowired private ChatLeaderBoardService chatLeaderBoardService;
-  @Autowired private SysTenantSettingService sysTenantSettingService;
+  @Autowired private SysSettingService sysSettingService;
   @Autowired private ChatPushPlanService chatPushPlanService;
   //@Autowired private TenantConfig tenantConfig;
 
@@ -127,7 +127,7 @@ public class OtthController {
     JSONObject json = JSONObject.parseObject(body);
     Integer chatOpen = json.getInteger("chatOpen");
     String cpChatEnable = EnableEnum.DISABLED.match(chatOpen) ? "off" : "on";
-    sysTenantSettingService.updateChatEnable(cpChatEnable);
+    sysSettingService.updateChatEnable(cpChatEnable);
   }
 
   @SneakyThrows

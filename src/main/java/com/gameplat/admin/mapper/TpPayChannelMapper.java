@@ -6,10 +6,11 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.gameplat.admin.model.dto.TpPayChannelQueryDTO;
 import com.gameplat.admin.model.vo.TpPayChannelVO;
 import com.gameplat.model.entity.pay.TpPayChannel;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
 public interface TpPayChannelMapper extends BaseMapper<TpPayChannel> {
 
-  IPage<TpPayChannelVO> findTpPayChannelPage(Page<TpPayChannel> page, TpPayChannelQueryDTO dto);
+  IPage<TpPayChannelVO> findTpPayChannelPage(Page<TpPayChannel> page, @Param("dto") TpPayChannelQueryDTO dto);
 }

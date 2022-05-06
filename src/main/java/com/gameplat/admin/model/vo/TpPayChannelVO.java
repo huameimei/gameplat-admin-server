@@ -81,6 +81,8 @@ public class TpPayChannelVO implements Serializable {
   /** 风控值 */
   private String riskControlValue;
 
+  private String url;
+
   private String updateBy;
 
   @JsonSerialize(using = Date2LongSerializerUtils.class)

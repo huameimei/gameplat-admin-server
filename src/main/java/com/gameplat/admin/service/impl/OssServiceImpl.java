@@ -1,5 +1,6 @@
 package com.gameplat.admin.service.impl;
 
+import cn.hutool.core.util.RandomUtil;
 import com.gameplat.admin.service.AsyncSaveFileRecordService;
 import com.gameplat.admin.service.ConfigService;
 import com.gameplat.admin.service.OssService;
@@ -24,7 +25,8 @@ public class OssServiceImpl implements OssService {
 
   @Override
   public String upload(MultipartFile file) {
-    return this.upload(file, file.getOriginalFilename());
+    String fileName = System.currentTimeMillis() + RandomUtil.randomNumber() + "";
+    return this.upload(file, fileName);
   }
 
   @Override
@@ -34,7 +36,7 @@ public class OssServiceImpl implements OssService {
 
     String fileUrl = fileStorageStrategyContext
         .getProvider(fileConfig)
-        .upload(file.getInputStream(), file.getContentType(), file.getOriginalFilename());
+            .upload(file.getInputStream(), file.getContentType(), filename);
 
     // 异步保存文件记录
     String username = GlobalContextHolder.getContext().getUsername();

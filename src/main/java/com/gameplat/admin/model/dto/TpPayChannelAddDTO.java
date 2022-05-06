@@ -64,6 +64,10 @@ public class TpPayChannelAddDTO implements Serializable {
   private String riskControlValue;
 
   private Integer typeSubscript;
+  /**
+   * 图片地址
+   */
+  private String url;
 
   @Override
   public String toString() {

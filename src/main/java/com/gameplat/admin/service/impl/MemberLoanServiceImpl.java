@@ -102,7 +102,7 @@ public class MemberLoanServiceImpl extends ServiceImpl<MemberLoanMapper, MemberL
               .setVipLevel(memberInfo.getVipLevel())
               .setMemberBalance(overdraftMoney)
               .setLoanMoney(memberGrowthLevel.getLoanMoney())
-              .setLoanTime(new Date())
+              .setRepayTime(new Date())  //还款时间
               .setLoanStatus(1)
               .setOverdraftMoney(new BigDecimal(0.0000))
               .setType(3);

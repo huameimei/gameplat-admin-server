@@ -14,9 +14,6 @@ import java.math.BigDecimal;
 @Data
 public class MemberLoanSumVO implements Serializable {
 
-  @ApiModelProperty("欠款金额小计")
-  private BigDecimal subtotal;
-
   @ApiModelProperty("欠款金额总计")
   private BigDecimal total;
 }

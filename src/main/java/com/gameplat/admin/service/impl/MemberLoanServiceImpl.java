@@ -42,8 +42,6 @@ import java.util.List;
 public class MemberLoanServiceImpl extends ServiceImpl<MemberLoanMapper, MemberLoan>
     implements MemberLoanService {
 
-  @Autowired private MemberLoanConvert memberLoanConvert;
-
   @Autowired private MemberService memberService;
 
   @Autowired private MemberInfoService memberInfoService;
@@ -62,15 +60,13 @@ public class MemberLoanServiceImpl extends ServiceImpl<MemberLoanMapper, MemberL
 
     IPage<MemberLoanVO> memberLoanList = memberLoanMapper.page(page, dto);
 
+    BigDecimal total = memberLoanMapper.getTotalSum();
+
     LoanVO loanVO = new LoanVO();
     loanVO.setPage(memberLoanList);
-
-    //    BigDecimal subtotal = BigDecimal.ZERO;
-//    BigDecimal total = BigDecimal.ZERO;
-//    MemberLoanSumVO sum = new MemberLoanSumVO();
-//    sum.setSubtotal(subtotal);
-//    sum.setTotal(total);
-//    loanVO.setMemberLoanSumVO(sum);
+    loanVO.setMemberLoanSumVO(new MemberLoanSumVO(){{
+      setTotal(total);
+    }});
 
     return loanVO;
   }

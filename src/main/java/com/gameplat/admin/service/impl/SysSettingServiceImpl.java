@@ -1,5 +1,6 @@
 package com.gameplat.admin.service.impl;
 
+import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.nacos.common.utils.CollectionUtils;
@@ -11,19 +12,18 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.constant.Constants;
 import com.gameplat.admin.enums.ListSortTypeEnum;
 import com.gameplat.admin.feign.SportFeignClient;
-import com.gameplat.admin.mapper.TenantSettingMapper;
+import com.gameplat.admin.mapper.SysSettingMapper;
 import com.gameplat.admin.model.vo.*;
 import com.gameplat.admin.service.GameConfigService;
-import com.gameplat.admin.service.TenantSettingService;
+import com.gameplat.admin.service.SysSettingService;
 import com.gameplat.base.common.context.DyDataSourceContextHolder;
 import com.gameplat.base.common.context.StrategyContext;
 import com.gameplat.base.common.exception.ServiceException;
-import com.gameplat.model.entity.setting.TenantSetting;
+import com.gameplat.model.entity.setting.SysSetting;
 import com.gameplat.security.SecurityUserHolder;
 import com.gameplat.security.context.UserCredential;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,23 +33,46 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * @author james
- * @date 2022/3/10
+ * @author lily
+ * @description
+ * @date 2022/2/16
  */
-@Service
 @Slf4j
+@Service
 @Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)
-public class TenantSettingServiceImpl extends ServiceImpl<TenantSettingMapper, TenantSetting>
-        implements TenantSettingService {
+public class SysSettingServiceImpl extends ServiceImpl<SysSettingMapper, SysSetting> implements SysSettingService {
 
     @Resource
-    private TenantSettingMapper tenantSettingMapper;
+    private SysSettingMapper sysSettingMapper;
 
     @Resource
     private SportFeignClient sportFeignClient;
 
     @Resource
     private GameConfigService gameConfigService;
+
+    @Override
+    public void updateChatEnable(String cpChatEnable) {
+        SysSetting sportConfig = getSportConfigSetting();
+        JSONObject json = JSONObject.parseObject(sportConfig.getSettingValue());
+        json.remove("cpChatEnable");
+        json.put("cpChatEnable", cpChatEnable);
+
+        sportConfig.setSettingValue(json.toJSONString());
+        updateSportConfig(sportConfig);
+    }
+
+    @Override
+    public SysSetting getSportConfigSetting() {
+        return this.lambdaQuery().eq(SysSetting::getSettingType, "sport_config").one();
+    }
+
+    @Override
+    public void updateSportConfig(SysSetting sysSetting) {
+        LambdaUpdateWrapper<SysSetting> updateWrapper = new LambdaUpdateWrapper<>();
+        updateWrapper.eq(SysSetting::getSettingType, "sport_config").set(ObjectUtil.isNotEmpty(sysSetting.getSettingValue()), SysSetting::getSettingValue, sysSetting.getSettingValue());
+        update(updateWrapper);
+    }
 
     /**
      * 从当前访问线程中获取租户数据源标识设
@@ -62,31 +85,27 @@ public class TenantSettingServiceImpl extends ServiceImpl<TenantSettingMapper, T
     }
 
     @Override
-    public List<TenantSetting> getTenantSetting(TenantSettingVO query) {
-        LambdaQueryChainWrapper<TenantSetting> lambdaQuery = this.lambdaQuery();
+    public List<SysSetting> getTenantSetting(SysSettingVO query) {
+        LambdaQueryChainWrapper<SysSetting> lambdaQuery = this.lambdaQuery();
         if (StringUtils.isNotEmpty(query.getSettingType())) {
-            lambdaQuery.eq(TenantSetting::getSettingType, query.getSettingType());
+            lambdaQuery.eq(SysSetting::getSettingType, query.getSettingType());
         }
         if (StringUtils.isNotEmpty(query.getSettingCode())) {
-            lambdaQuery.eq(TenantSetting::getSettingCode, query.getSettingCode());
+            lambdaQuery.eq(SysSetting::getSettingCode, query.getSettingCode());
         }
         if (Objects.nonNull(query.getDisplay())) {
-            lambdaQuery.eq(TenantSetting::getDisplay, query.getDisplay());
+            lambdaQuery.eq(SysSetting::getDisplay, query.getDisplay());
         }
         if (StringUtils.isNotEmpty(query.getExtend4())) {
-            lambdaQuery.eq(TenantSetting::getExtend4, query.getExtend4());
+            lambdaQuery.eq(SysSetting::getExtend4, query.getExtend4());
         }
-        lambdaQuery.orderByAsc(TenantSetting::getSort);
+        lambdaQuery.orderByAsc(SysSetting::getSort);
         return lambdaQuery.list();
     }
 
     @Override
     public boolean isExistTenantTheme(String theme) {
-        return CollectionUtils.isNotEmpty(
-                this.lambdaQuery()
-                        .eq(TenantSetting::getSettingType, Constants.TEMPLATE_CONFIG_THEME)
-                        .eq(TenantSetting::getSettingCode, theme)
-                        .list());
+        return CollectionUtils.isNotEmpty(this.lambdaQuery().eq(SysSetting::getSettingType, Constants.TEMPLATE_CONFIG_THEME).eq(SysSetting::getSettingCode, theme).list());
     }
 
     @Override
@@ -95,55 +114,38 @@ public class TenantSettingServiceImpl extends ServiceImpl<TenantSettingMapper, T
     }
 
     @Override
-    public IPage<TenantSetting> getStartImagePage(
-            IPage<TenantSetting> page, TenantSetting tenantSetting) {
-        LambdaQueryWrapper<TenantSetting> queryWrapper = new LambdaQueryWrapper<TenantSetting>();
-        queryWrapper.eq(null != tenantSetting.getId(), TenantSetting::getId, tenantSetting.getId());
-        queryWrapper.eq(
-                null != tenantSetting.getDisplay(), TenantSetting::getDisplay, tenantSetting.getDisplay());
-        queryWrapper.eq(
-                StringUtils.isNotBlank(tenantSetting.getSettingType()),
-                TenantSetting::getSettingType,
-                tenantSetting.getSettingType());
-        queryWrapper.eq(
-                StringUtils.isNotBlank(tenantSetting.getSettingCode()),
-                TenantSetting::getSettingCode,
-                tenantSetting.getSettingCode());
-        queryWrapper.eq(
-                StringUtils.isNotBlank(tenantSetting.getSettingValue()),
-                TenantSetting::getSettingValue,
-                tenantSetting.getSettingValue());
-        queryWrapper.eq(
-                StringUtils.isNotBlank(tenantSetting.getSettingLabel()),
-                TenantSetting::getSettingLabel,
-                tenantSetting.getSettingLabel());
-        queryWrapper.orderByDesc(TenantSetting::getCreateTime);
+    public IPage<SysSetting> getStartImagePage(IPage<SysSetting> page, SysSetting sysSetting) {
+        LambdaQueryWrapper<SysSetting> queryWrapper = new LambdaQueryWrapper<SysSetting>();
+        queryWrapper.eq(null != sysSetting.getId(), SysSetting::getId, sysSetting.getId());
+        queryWrapper.eq(null != sysSetting.getDisplay(), SysSetting::getDisplay, sysSetting.getDisplay());
+        queryWrapper.eq(StringUtils.isNotBlank(sysSetting.getSettingType()), SysSetting::getSettingType, sysSetting.getSettingType());
+        queryWrapper.eq(StringUtils.isNotBlank(sysSetting.getSettingCode()), SysSetting::getSettingCode, sysSetting.getSettingCode());
+        queryWrapper.eq(StringUtils.isNotBlank(sysSetting.getSettingValue()), SysSetting::getSettingValue, sysSetting.getSettingValue());
+        queryWrapper.eq(StringUtils.isNotBlank(sysSetting.getSettingLabel()), SysSetting::getSettingLabel, sysSetting.getSettingLabel());
+        queryWrapper.orderByDesc(SysSetting::getCreateTime);
         return this.page(page, queryWrapper);
     }
 
     @Override
-    public void insertStartImagePage(TenantSetting tenantSetting) {
-        LambdaQueryWrapper<TenantSetting> queryWrapper = new LambdaQueryWrapper<TenantSetting>();
-        queryWrapper.eq(TenantSetting::getSettingType, tenantSetting.getSettingType());
-        queryWrapper.eq(TenantSetting::getDisplay, 1);
-        List<TenantSetting> list = this.list(queryWrapper);
-        if (null == tenantSetting.getId()) {
-            if (null != tenantSetting.getDisplay() && 1 == tenantSetting.getDisplay()) {
+    public void insertStartImagePage(SysSetting sysSetting) {
+        LambdaQueryWrapper<SysSetting> queryWrapper = new LambdaQueryWrapper<SysSetting>();
+        queryWrapper.eq(SysSetting::getSettingType, sysSetting.getSettingType());
+        queryWrapper.eq(SysSetting::getDisplay, 1);
+        List<SysSetting> list = this.list(queryWrapper);
+        if (null == sysSetting.getId()) {
+            if (null != sysSetting.getDisplay() && 1 == sysSetting.getDisplay()) {
                 if (!CollectionUtils.isEmpty(list) && list.size() > 2) {
                     throw new ServiceException("开启的图片/视频已达上线 (最多开启三个)");
                 }
             }
-            queryWrapper.eq(TenantSetting::getCreateTime, new Date());
+            queryWrapper.eq(SysSetting::getCreateTime, new Date());
             // 新增
-            this.save(tenantSetting);
+            this.save(sysSetting);
         } else {
             boolean flag = true;
-            if (!CollectionUtils.isEmpty(list)
-                    && list.size() > 2
-                    && null != tenantSetting.getDisplay()
-                    && 1 == tenantSetting.getDisplay()) {
-                for (TenantSetting e : list) {
-                    if (tenantSetting.getId().equals(e.getId())) {
+            if (!CollectionUtils.isEmpty(list) && list.size() > 2 && null != sysSetting.getDisplay() && 1 == sysSetting.getDisplay()) {
+                for (SysSetting e : list) {
+                    if (sysSetting.getId().equals(e.getId())) {
                         flag = false;
                         break;
                     }
@@ -152,78 +154,74 @@ public class TenantSettingServiceImpl extends ServiceImpl<TenantSettingMapper, T
                     throw new ServiceException("开启的图片/视频已达上线 (最多开启三个)");
                 }
             }
-            queryWrapper.eq(TenantSetting::getUpdateTime, new Date());
-            this.updateById(tenantSetting);
+            queryWrapper.eq(SysSetting::getUpdateTime, new Date());
+            this.updateById(sysSetting);
         }
     }
 
     @Override
-    public void deleteStartImagePage(TenantSetting tenantSetting) {
-        LambdaQueryWrapper<TenantSetting> queryWrapper = new LambdaQueryWrapper<TenantSetting>();
-        queryWrapper.eq(TenantSetting::getId, tenantSetting.getId());
-        queryWrapper.eq(TenantSetting::getSettingType, tenantSetting.getSettingType());
+    public void deleteStartImagePage(SysSetting sysSetting) {
+        LambdaQueryWrapper<SysSetting> queryWrapper = new LambdaQueryWrapper<SysSetting>();
+        queryWrapper.eq(SysSetting::getId, sysSetting.getId());
+        queryWrapper.eq(SysSetting::getSettingType, sysSetting.getSettingType());
         this.remove(queryWrapper);
     }
 
     @Override
-    public List<TenantSetting> getTenantSetting(TenantSetting tenantSetting) {
-        LambdaQueryWrapper<TenantSetting> queryWrapper = new LambdaQueryWrapper<TenantSetting>();
-        queryWrapper.eq(TenantSetting::getDisplay, tenantSetting.getDisplay());
-        queryWrapper.eq(TenantSetting::getSettingType, tenantSetting.getSettingType());
+    public List<SysSetting> getTenantSetting(SysSetting sysSetting) {
+        LambdaQueryWrapper<SysSetting> queryWrapper = new LambdaQueryWrapper<SysSetting>();
+        queryWrapper.eq(SysSetting::getDisplay, sysSetting.getDisplay());
+        queryWrapper.eq(SysSetting::getSettingType, sysSetting.getSettingType());
         return this.list(queryWrapper);
     }
 
     @Override
-    public List<TenantSetting> getAppNavigation(TenantSettingVO vo) {
+    public List<SysSetting> getAppNavigation(SysSettingVO vo) {
         if (vo.getSettingType().equals(Constants.TEMPLATE_CONFIG_THEME)) {
             // 查询主题模板只取租户开启的主题
             vo.setDisplay(1);
-        } else if (vo.getSettingType().equals(Constants.SETTING_H5_NAVIGATION)
-                || vo.getSettingType().equals(Constants.SETTING_APP_NAVIGATION)) {
+        } else if (vo.getSettingType().equals(Constants.SETTING_H5_NAVIGATION) || vo.getSettingType().equals(Constants.SETTING_APP_NAVIGATION)) {
             // 如果没传主题，传默认模板
             if (StringUtils.isBlank(vo.getExtend4())) {
                 vo.setTenant("default");
             }
         }
-        List<TenantSetting> list = tenantSettingMapper.getBackendAppNavigationList(vo);
+        List<SysSetting> list = sysSettingMapper.getBackendAppNavigationList(vo);
         if (list.isEmpty()) {
             // 如果查询为空，读取模板数据并插入返回
-            LambdaQueryWrapper<TenantSetting> queryWrapper = new LambdaQueryWrapper<TenantSetting>();
-            queryWrapper.eq(TenantSetting::getTenant, "default");
-            queryWrapper.eq(TenantSetting::getSettingType, vo.getSettingType());
+            LambdaQueryWrapper<SysSetting> queryWrapper = new LambdaQueryWrapper<SysSetting>();
+            queryWrapper.eq(SysSetting::getTenant, "default");
+            queryWrapper.eq(SysSetting::getSettingType, vo.getSettingType());
 
             list = this.list(queryWrapper);
-            list.forEach(
-                    x -> {
-                        x.setExtend4(vo.getExtend4());
-                        x.setTenant(getDBSuffix());
-                    });
+            list.forEach(x -> {
+                x.setExtend4(vo.getExtend4());
+                x.setTenant(getDBSuffix());
+            });
             if (!list.isEmpty()) {
-                tenantSettingMapper.insetGameList(list);
+                sysSettingMapper.insetGameList(list);
             }
-            list = tenantSettingMapper.getBackendAppNavigationList(vo);
+            list = sysSettingMapper.getBackendAppNavigationList(vo);
         }
         return list;
     }
 
     @Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)
     @Override
-    public void updateAppNavigation(TenantSettingVO vo) {
+    public void updateAppNavigation(SysSettingVO vo) {
         // 查询游戏必要code
-        if (Constants.SETTING_APP_NAVIGATION.equals(vo.getSettingType())
-                || Constants.SETTING_H5_NAVIGATION.equals(vo.getSettingType())) {
+        if (Constants.SETTING_APP_NAVIGATION.equals(vo.getSettingType()) || Constants.SETTING_H5_NAVIGATION.equals(vo.getSettingType())) {
             if (StringUtils.isNotBlank(vo.getExtend2())) {
-                GameKindVO gameList = tenantSettingMapper.getGameList(vo.getExtend2());
+                GameKindVO gameList = sysSettingMapper.getGameList(vo.getExtend2());
                 vo.setExtend3(JSON.toJSONString(gameList));
             }
         }
         // 广场导航栏选择一个首页后，其他选择的首页自动置为0
-        else if (Constants.SETTING_SQUARE_NAVIGATION.equals(vo.getSettingType())
-                && vo.getIsIndex() == 1) {
-            TenantSetting tenantSetting = new TenantSetting();
-            tenantSetting.setSettingType(Constants.SETTING_SQUARE_NAVIGATION);
-            tenantSetting.setIsIndex(0);
-            tenantSettingMapper.updateIndex(tenantSetting);
+        else if (Constants.SETTING_SQUARE_NAVIGATION.equals(vo.getSettingType()) && vo.getIsIndex() == 1) {
+            SysSetting sysSetting = new SysSetting();
+            sysSetting.setSettingType(Constants.SETTING_SQUARE_NAVIGATION);
+            sysSetting.setIsIndex(0);
+            sysSettingMapper.updateIndex(sysSetting);
         }
         HashMap<Object, Object> map = new HashMap<>(8);
         map.put("en-US", vo.getEnUs());
@@ -239,14 +237,14 @@ public class TenantSettingServiceImpl extends ServiceImpl<TenantSettingMapper, T
 
     @Override
 
-    public void updateBatchTenantSetting(List<TenantSetting> tenantSettings) {
-        if (tenantSettings == null || tenantSettings.isEmpty()) {
+    public void updateBatchTenantSetting(List<SysSetting> sysSettings) {
+        if (sysSettings == null || sysSettings.isEmpty()) {
             throw new ServiceException("数据错误");
         }
-        LambdaQueryWrapper<TenantSetting> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(TenantSetting::getId, tenantSettings.get(0).getId());
+        LambdaQueryWrapper<SysSetting> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(SysSetting::getId, sysSettings.get(0).getId());
         this.getOne(queryWrapper);
-        this.updateBatchById(tenantSettings);
+        this.updateBatchById(sysSettings);
     }
 
     @Override
@@ -255,19 +253,15 @@ public class TenantSettingServiceImpl extends ServiceImpl<TenantSettingMapper, T
     }
 
     @Override
-    public void updateTenantSettingValue(TenantSettingVO tenantSetting) {
-        LambdaUpdateWrapper<TenantSetting> updateWrapper = new LambdaUpdateWrapper<>();
-        updateWrapper
-                .eq(TenantSetting::getSettingType, tenantSetting.getSettingType())
-                .eq(TenantSetting::getSettingCode, tenantSetting.getSettingCode())
-                .set(TenantSetting::getSettingValue, tenantSetting.getSettingValue())
-                .set(TenantSetting::getUpdateTime, new Date());
+    public void updateTenantSettingValue(SysSettingVO tenantSetting) {
+        LambdaUpdateWrapper<SysSetting> updateWrapper = new LambdaUpdateWrapper<>();
+        updateWrapper.eq(SysSetting::getSettingType, tenantSetting.getSettingType()).eq(SysSetting::getSettingCode, tenantSetting.getSettingCode()).set(SysSetting::getSettingValue, tenantSetting.getSettingValue()).set(SysSetting::getUpdateTime, new Date());
         update(updateWrapper);
     }
 
     @Override
     public SportConfigValueVO getSportConfig() {
-        TenantSetting sportConfig = tenantSettingMapper.getSportConfig();
+        SysSetting sportConfig = sysSettingMapper.getSportConfig();
         SportConfigValueVO sportConfigValueVO = null;
         if (sportConfig != null && StringUtils.isNotEmpty(sportConfig.getSettingValue())) {
             String json = sportConfig.getSettingValue();
@@ -276,23 +270,23 @@ public class TenantSettingServiceImpl extends ServiceImpl<TenantSettingMapper, T
         //没数据则初始化数据
         if (sportConfigValueVO == null) {
             initSportConfig();
-            sportConfig = tenantSettingMapper.getSportConfig();
+            sportConfig = sysSettingMapper.getSportConfig();
             String json = sportConfig.getSettingValue();
             sportConfigValueVO = JSON.parseObject(json, SportConfigValueVO.class);
         }
         Integer scene = sportConfigValueVO.getScene();
         if (scene != null && scene == 6) {
-            TenantSetting tenantSetting;
-            List<TenantSetting> listSortConfigs = tenantSettingMapper.getTenantSetting(new TenantSetting() {{
+            SysSetting sysSetting;
+            List<SysSetting> listSortConfigs = sysSettingMapper.getTenantSetting(new SysSetting() {{
                 setSettingType(Constants.SPORT_CONFIG_TYPE);
                 setSettingCode(Constants.LIST_SORT_CODE);
             }});
             if (listSortConfigs.isEmpty()) {
-                tenantSetting = initListSortConfig();
+                sysSetting = initListSortConfig();
             } else {
-                tenantSetting = listSortConfigs.get(0);
+                sysSetting = listSortConfigs.get(0);
             }
-            String valueJson = tenantSetting.getSettingValue();
+            String valueJson = sysSetting.getSettingValue();
             List<ListSortConfigVO> list = JSON.parseArray(valueJson, ListSortConfigVO.class);
             list.sort(Comparator.comparingInt(ListSortConfigVO::getSort));
             sportConfigValueVO.setListSortConfigs(list);
@@ -310,9 +304,9 @@ public class TenantSettingServiceImpl extends ServiceImpl<TenantSettingMapper, T
             }
         }
         String settingValue = JSONObject.toJSONString(listSortConfigVOS);
-        TenantSetting tenantSetting = new TenantSetting();
-        tenantSetting.setSettingValue(settingValue);
-        return tenantSettingMapper.updateListSortConfig(tenantSetting);
+        SysSetting sysSetting = new SysSetting();
+        sysSetting.setSettingValue(settingValue);
+        return sysSettingMapper.updateListSortConfig(sysSetting);
     }
 
 
@@ -320,7 +314,7 @@ public class TenantSettingServiceImpl extends ServiceImpl<TenantSettingMapper, T
      * 初始化体育数据
      */
     private void initSportConfig() {
-        TenantSetting tenantSetting = new TenantSetting();
+        SysSetting sysSetting = new SysSetting();
         SportConfigValueVO sportConfigValueVo = new SportConfigValueVO();
         sportConfigValueVo.setH5ActivityImg("");
         sportConfigValueVo.setAppActivityImg("");
@@ -339,19 +333,20 @@ public class TenantSettingServiceImpl extends ServiceImpl<TenantSettingMapper, T
             log.info("球头配置初始化写入到体育服成功");
         }
         String settingValue = JSONObject.toJSONString(sportConfigValueVo);
-        tenantSetting.setSettingValue(settingValue);
-        tenantSetting.setSettingType(Constants.SPORT_CONFIG_TYPE);
-        tenantSetting.setSettingCode(Constants.SPORT_CONFIG_CODE);
-        tenantSetting.setSettingLabel(Constants.SPORT_CONFIG_DESC);
+        sysSetting.setSettingValue(settingValue);
+        sysSetting.setSettingType(Constants.SPORT_CONFIG_TYPE);
+        sysSetting.setSettingCode(Constants.SPORT_CONFIG_CODE);
+        sysSetting.setSettingLabel(Constants.SPORT_CONFIG_DESC);
         UserCredential userCredential = SecurityUserHolder.getCredential();
         if (userCredential != null) {
-            tenantSetting.setCreateBy(userCredential.getUsername());
+            sysSetting.setCreateBy(userCredential.getUsername());
         }
-        tenantSettingMapper.initSportConfig(tenantSetting);
+        sysSettingMapper.initSportConfig(sysSetting);
     }
 
     /**
      * 插入球头信息
+     *
      * @param sportConfigValueVo
      * @return
      */
@@ -360,8 +355,8 @@ public class TenantSettingServiceImpl extends ServiceImpl<TenantSettingMapper, T
             JSONObject config = gameConfigService.getGameConfig("SB");
             String tenant = "";
             log.info("体育服配置结果为{}", config);
-            if(config!=null){
-                tenant= config.getString("tenant");
+            if (config != null) {
+                tenant = config.getString("tenant");
             }
             Map<String, String> params = new HashMap<>(8);
             params.put("style", sportConfigValueVo.getStyle());
@@ -390,34 +385,34 @@ public class TenantSettingServiceImpl extends ServiceImpl<TenantSettingMapper, T
     /**
      * 初始化开关与排序列表数据
      */
-    private TenantSetting initListSortConfig() {
+    private SysSetting initListSortConfig() {
         ArrayList<ListSortConfigVO> list = new ArrayList<>();
-        list.add(new ListSortConfigVO(1, "导航", true,"备注:导航","navigation"));
-        list.add(new ListSortConfigVO(2, "banner", true,"备注:banner","banner"));
-        list.add(new ListSortConfigVO(3, "游戏列表", true,"备注:游戏列表","gameList"));
-        list.add(new ListSortConfigVO(4, "彩系列表", true,"备注:彩系列表", "lotteryList"));
-        list.add(new ListSortConfigVO(5, "中奖记录", true,"备注:中奖记录", "winList"));
+        list.add(new ListSortConfigVO(1, "导航", true, "备注:导航", "navigation"));
+        list.add(new ListSortConfigVO(2, "banner", true, "备注:banner", "banner"));
+        list.add(new ListSortConfigVO(3, "游戏列表", true, "备注:游戏列表", "gameList"));
+        list.add(new ListSortConfigVO(4, "彩系列表", true, "备注:彩系列表", "lotteryList"));
+        list.add(new ListSortConfigVO(5, "中奖记录", true, "备注:中奖记录", "winList"));
 
         String settingValue = JSONObject.toJSONString(list);
-        TenantSetting tenantSetting = new TenantSetting();
-        tenantSetting.setSettingValue(settingValue);
-        tenantSetting.setSettingType(Constants.SPORT_CONFIG_TYPE);
-        tenantSetting.setSettingCode(Constants.LIST_SORT_CODE);
-        tenantSetting.setSettingLabel(Constants.LIST_SORT_DESC);
+        SysSetting sysSetting = new SysSetting();
+        sysSetting.setSettingValue(settingValue);
+        sysSetting.setSettingType(Constants.SPORT_CONFIG_TYPE);
+        sysSetting.setSettingCode(Constants.LIST_SORT_CODE);
+        sysSetting.setSettingLabel(Constants.LIST_SORT_DESC);
         UserCredential userCredential = SecurityUserHolder.getCredential();
         if (userCredential != null) {
-            tenantSetting.setCreateBy(userCredential.getUsername());
+            sysSetting.setCreateBy(userCredential.getUsername());
         }
-        int i = tenantSettingMapper.initSportConfig(tenantSetting);
+        int i = sysSettingMapper.initSportConfig(sysSetting);
         if (i != 1) {
             throw new ServiceException("初始化数据异常");
         }
-        return tenantSetting;
+        return sysSetting;
     }
 
     @Override
     public int updateSportConfig(SportConfigVO sportConfigVo) {
-        TenantSetting tenantSetting = new TenantSetting();
+        SysSetting sysSetting = new SysSetting();
         SportConfigValueVO sportConfigValueVo = new SportConfigValueVO();
         sportConfigValueVo.setH5ActivityImg(sportConfigVo.getH5ActivityImg());
         sportConfigValueVo.setAppActivityImg(sportConfigVo.getAppActivityImg());
@@ -437,7 +432,7 @@ public class TenantSettingServiceImpl extends ServiceImpl<TenantSettingMapper, T
             log.info("球头配置写入到体育服成功");
         }
         String settingValue = JSONObject.toJSONString(sportConfigValueVo);
-        tenantSetting.setSettingValue(settingValue);
-        return tenantSettingMapper.updateSportConfig(tenantSetting);
+        sysSetting.setSettingValue(settingValue);
+        return sysSettingMapper.updateSportConfig(sysSetting);
     }
 }

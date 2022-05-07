@@ -162,7 +162,7 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
                 && MemberEnums.Type.MEMBER.match(dto.getMemberType()),
             RechargeOrder::getMemberType,
             MemberEnums.Type.MEMBER.value(),
-            MemberEnums.Type.PROMOTION.value())
+                MemberEnums.Type.AGENT.value())
         .eq(
             ObjectUtils.isNotEmpty(dto.getMemberType())
                 && MemberEnums.Type.PROMOTION.match(dto.getMemberType()),

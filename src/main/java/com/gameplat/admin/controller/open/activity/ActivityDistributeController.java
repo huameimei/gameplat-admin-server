@@ -19,6 +19,8 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
+import java.util.Map;
+
 /**
  * 活动分发管理
  *
@@ -51,10 +53,10 @@ public class ActivityDistributeController {
   @ApiOperation(value = "删除分发")
   @PostMapping("/delete")
   @PreAuthorize("hasAuthority('activity:distribute:remove')")
-  public void remove(@RequestBody String ids) {
-    if (StringUtils.isBlank(ids)) {
+  public void remove(@RequestBody Map<String, String> map) {
+    if (StringUtils.isBlank(map.get("ids"))) {
       throw new ServiceException("删除活动分发时，ids不能为空");
     }
-    activityDistributeService.updateDeleteStatus(ids);
+    activityDistributeService.updateDeleteStatus(map.get("ids"));
   }
 }

@@ -100,7 +100,7 @@ public class ActivityLobbyController {
   @ApiOperation(value = "删除活动大厅")
   @PostMapping("/delete")
   @PreAuthorize("hasAuthority('activity:lobby:remove')")
-  public void remove(@RequestBody String ids) {
+  public void remove(String ids) {
     if (StringUtils.isBlank(ids)) {
       throw new ServiceException("ids不能为空");
     }

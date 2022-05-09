@@ -19,6 +19,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 /** @Description : 平级分红方案 @Author : cc @Date : 2022/4/2 */
 @Api(tags = "平级分红方案")
 @Slf4j
@@ -93,7 +95,7 @@ public class RebatePlanController {
   /**
    * 删除
    *
-   * @param ids
+   * @param map
    */
   @ApiOperation(value = "平级分红->删除平级分红方案")
   @PostMapping("/remove")
@@ -101,9 +103,9 @@ public class RebatePlanController {
       module = ServiceName.ADMIN_SERVICE,
       type = LogType.AGENT,
       desc = "平级分红->删除平级分红方案，方案ID：#{#planId}")
-  public void remove(@RequestBody String ids) {
-    Assert.isTrue(StrUtil.isNotBlank(ids), "参数为空！");
-    String[] idArr = ids.split(",");
+  public void remove(@RequestBody Map<String, String> map) {
+    Assert.isTrue(StrUtil.isNotBlank(map.get("ids")), "参数为空！");
+    String[] idArr = map.get("ids").split(",");
     for (String id : idArr) {
       rebatePlanService.removeRebatePlan(Long.valueOf(id));
     }

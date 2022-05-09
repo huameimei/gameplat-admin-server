@@ -6,6 +6,8 @@ import com.gameplat.admin.model.dto.DividePeriodsDTO;
 import com.gameplat.admin.model.dto.DividePeriodsQueryDTO;
 import com.gameplat.admin.model.vo.DividePeriodsVO;
 import com.gameplat.admin.service.DividePeriodsService;
+import com.gameplat.base.common.exception.ServiceException;
+import com.gameplat.base.common.util.StringUtils;
 import com.gameplat.common.constant.ServiceName;
 import com.gameplat.log.annotation.Log;
 import com.gameplat.log.enums.LogType;
@@ -16,6 +18,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 /** @Description : 层层代分红期数 @Author : cc @Date : 2022/4/2 */
 @Api(tags = "分红期数")
@@ -68,13 +72,16 @@ public class DividePeriodsController {
   /**
    * 删除
    *
-   * @param ids
+   * @param map
    */
   @ApiOperation(value = "删除期数")
   @PostMapping("/delete")
   @PreAuthorize("hasAuthority('divide:periods:remove')")
-  public void remove(@RequestBody String ids) {
-    periodsService.delete(ids);
+  public void remove(@RequestBody Map<String, String> map) {
+    if (StringUtils.isBlank(map.get("ids"))) {
+      throw new ServiceException("ids不能为空");
+    }
+    periodsService.delete(map.get("ids"));
   }
 
   /**

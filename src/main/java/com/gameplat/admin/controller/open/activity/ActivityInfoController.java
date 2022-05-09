@@ -23,6 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -33,6 +34,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 活动管理
@@ -161,8 +163,9 @@ public class ActivityInfoController {
   @ApiOperation(value = "删除活动")
   @PostMapping("/delete")
   @PreAuthorize("hasAuthority('activity:info:remove')")
-  public void delete(@RequestBody @NotEmpty(message = "缺少参数") String ids) {
-    activityInfoService.delete(ids);
+  public void delete(@RequestBody Map<String, String> map) {
+    Assert.notNull(map.get("ids"), "id不能为空！");
+    activityInfoService.delete(map.get("ids"));
   }
 
   /**

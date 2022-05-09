@@ -34,14 +34,14 @@ public class MemberRemarkController {
   }
 
   @ApiOperation("删除会员备注")
-  @DeleteMapping("/delete/{id}")
+  @PostMapping("/delete/{id}")
   @PreAuthorize("hasAuthority('member:remark:remove')")
   public void deleteByRemarkId(@PathVariable Long id) {
     memberRemarkService.deleteById(id);
   }
 
   @ApiOperation("清空会员备注")
-  @DeleteMapping("/clean/{memberId}")
+  @PostMapping("/clean/{memberId}")
   @PreAuthorize("hasAuthority('member:remark:clean')")
   public void cleanByMemberId(@PathVariable Long memberId) {
     memberRemarkService.cleanByMemberId(memberId);

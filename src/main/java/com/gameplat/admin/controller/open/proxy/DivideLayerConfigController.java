@@ -94,7 +94,7 @@ public class DivideLayerConfigController {
    * @param ids
    */
   @ApiOperation(value = "删除分红配置")
-  @DeleteMapping("/delete")
+  @PostMapping("/delete")
   @PreAuthorize("hasAuthority('agent:bonusconfig:remove')")
   public void remove(@RequestBody String ids) {
     layerConfigService.remove(ids);

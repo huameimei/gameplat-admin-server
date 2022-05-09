@@ -42,14 +42,14 @@ public class ActivityDistributeController {
   }
 
   @ApiOperation(value = "修改结算状态")
-  @PutMapping("/updateStatus")
+  @PostMapping("/updateStatus")
   @PreAuthorize("hasAuthority('activity:distribute:updateStatus')")
   public void updateStatus(@RequestBody String ids) {
     activityDistributeService.updateStatus(ids);
   }
 
   @ApiOperation(value = "删除分发")
-  @DeleteMapping("/delete")
+  @PostMapping("/delete")
   @PreAuthorize("hasAuthority('activity:distribute:remove')")
   public void remove(@RequestBody String ids) {
     if (StringUtils.isBlank(ids)) {

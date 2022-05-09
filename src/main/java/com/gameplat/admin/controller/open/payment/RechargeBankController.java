@@ -28,7 +28,7 @@ public class RechargeBankController {
   @Autowired private SysDictDataService dictDataService;
 
   @ApiOperation("删除")
-  @DeleteMapping("/delete")
+  @PostMapping("/delete")
   @PreAuthorize("hasAuthority('thirdParty:rechBank:remove')")
   @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.WITHDRAW, desc = "'删除银行ids=' + #ids")
   public void remove(@RequestBody List<Long> ids) {
@@ -47,7 +47,7 @@ public class RechargeBankController {
   }
 
   @ApiOperation("修改")
-  @PutMapping("/edit")
+  @PostMapping("/edit")
   @PreAuthorize("hasAuthority('thirdParty:rechBank:edit')")
   @Log(
       module = ServiceName.ADMIN_SERVICE,

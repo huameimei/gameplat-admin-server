@@ -47,14 +47,14 @@ public class OpenBannerController {
   }
 
   @ApiOperation(value = "编辑banner")
-  @PutMapping("/edit")
+  @PostMapping("/edit")
   @PreAuthorize("hasAuthority('system:banner:edit')")
   public void edit(@Validated @RequestBody SysBannerInfoEditDTO dto) {
     sysBannerInfoService.edit(dto);
   }
 
   @ApiOperation(value = "删除banner")
-  @DeleteMapping("/delete")
+  @PostMapping("/delete")
   @PreAuthorize("hasAuthority('system:banner:remove')")
   public void delete(@RequestBody String ids) {
     Assert.notEmpty(ids, "ids不能为空");
@@ -62,7 +62,7 @@ public class OpenBannerController {
   }
 
   @ApiOperation(value = "修改banner状态")
-  @PutMapping("/updateStatus")
+  @PostMapping("/updateStatus")
   @PreAuthorize("hasAuthority('system:banner:edit')")
   public void updateStatus(@Validated @RequestBody SysBannerInfoUpdateStatusDTO dto) {
     sysBannerInfoService.updateStatus(dto);

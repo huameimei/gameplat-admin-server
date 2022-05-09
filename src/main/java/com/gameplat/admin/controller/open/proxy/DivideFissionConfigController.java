@@ -92,7 +92,7 @@ public class DivideFissionConfigController {
    * @param ids
    */
   @ApiOperation(value = "删除裂变分红配置")
-  @DeleteMapping("/delete")
+  @PostMapping("/delete")
   @PreAuthorize("hasAuthority('agent:bonusFissionconfig:remove')")
   public void remove(@RequestBody String ids) {
     if (StringUtils.isBlank(ids)) {

@@ -35,7 +35,7 @@ public class MemberLoanController {
     return memberLoanService.page(page, dto);
   }
 
-  @PutMapping("/recycle")
+  @PostMapping("/recycle")
   @ApiOperation(value = "欠款回收")
   @PreAuthorize("hasAuthority('member:loan:recycle')")
   public void recycle(String idList) {

@@ -44,7 +44,7 @@ public class OpenMemberGrowthLevelController {
   }
 
   @ApiOperation(value = "修改VIP配置")
-  @PutMapping("/update")
+  @PostMapping("/update")
   @PreAuthorize("hasAuthority('member:growthLevel:edit')")
   // @ApiParam(name = "修改VIP配置入参", value = "传入json格式", required = true)
   public void update(@Validated @RequestBody MemberGrowthConfigEditDto dto) {
@@ -59,7 +59,7 @@ public class OpenMemberGrowthLevelController {
 
   @ApiOperation(value = "后台批量修改VIP等级")
   @PreAuthorize("hasAuthority('member:growthLevel:edit')")
-  @PutMapping("/updateLevel")
+  @PostMapping("/updateLevel")
   public void batchUpdateLevel(@RequestBody JSONObject obj, HttpServletRequest request) {
     levelService.batchUpdateLevel(obj, request);
   }

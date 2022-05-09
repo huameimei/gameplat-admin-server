@@ -48,7 +48,7 @@ public class ActivityQualificationController {
   }
 
   @ApiOperation(value = "批量审核活动资格")
-  @PutMapping("/auditStatus")
+  @PostMapping("/auditStatus")
   @PreAuthorize("hasAuthority('activity:qualification:auditStatus')")
   public void auditStatus(@RequestBody ActivityQualificationAuditStatusDTO dto) {
     if (CollectionUtils.isEmpty(dto.getIdList())) {
@@ -58,21 +58,21 @@ public class ActivityQualificationController {
   }
 
   @ApiOperation(value = "更新活动资格状态")
-  @PutMapping("/updateQualificationStatus")
+  @PostMapping("/updateQualificationStatus")
   @PreAuthorize("hasAuthority('activity:qualification:updateQualificationStatus')")
   public void updateQualificationStatus(@RequestBody ActivityQualificationUpdateStatusDTO dto) {
     activityQualificationService.updateQualificationStatus(dto);
   }
 
   @ApiOperation(value = "删除活动资格")
-  @DeleteMapping("/delete")
+  @PostMapping("/delete")
   @PreAuthorize("hasAuthority('activity:qualification:remove')")
   public void delete(@RequestBody String ids) {
     activityQualificationService.delete(ids);
   }
 
   @ApiOperation(value = "资格检测")
-  @PutMapping("/checkQualification")
+  @PostMapping("/checkQualification")
   @PreAuthorize("hasAuthority('activity:qualification:checkQualification')")
   public Map<String, Object> checkQualification(@RequestBody ActivityQualificationCheckDTO dto) {
     return activityQualificationService.checkQualification(dto);

@@ -159,7 +159,7 @@ public class ActivityInfoController {
    * @param ids String
    */
   @ApiOperation(value = "删除活动")
-  @DeleteMapping("/delete")
+  @PostMapping("/delete")
   @PreAuthorize("hasAuthority('activity:info:remove')")
   public void delete(@RequestBody @NotEmpty(message = "缺少参数") String ids) {
     activityInfoService.delete(ids);

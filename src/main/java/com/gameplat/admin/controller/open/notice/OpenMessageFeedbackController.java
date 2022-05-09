@@ -44,7 +44,7 @@ public class OpenMessageFeedbackController {
   }
 
   @ApiOperation(value = "读反馈")
-  @PutMapping("/read")
+  @PostMapping("/read")
 //  @PreAuthorize("hasAuthority('notice:feedback:read')")
   public void updateMessage(Long id) {
     messageFeedbackService.updateMessage(id);
@@ -58,7 +58,7 @@ public class OpenMessageFeedbackController {
   }
 
   @ApiOperation(value = "删除意见反馈")
-  @DeleteMapping("/remove")
+  @PostMapping("/remove")
   @PreAuthorize("hasAuthority('notice:feedback:remove')")
   public void removeMessage(@RequestParam(name = "id") Long id) {
     messageFeedbackService.removeMessage(id);

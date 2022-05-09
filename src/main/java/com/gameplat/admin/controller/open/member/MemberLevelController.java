@@ -50,14 +50,14 @@ public class MemberLevelController {
   }
 
   @ApiOperation("修改")
-  @PutMapping("/update")
+  @PostMapping("/update")
   @PreAuthorize("hasAuthority('member:level:edit')")
   public void update(@RequestBody @Validated MemberLevelEditDTO dto) {
     memberLevelService.update(dto);
   }
 
   @ApiOperation("删除")
-  @DeleteMapping("/delete/{id}")
+  @PostMapping("/delete/{id}")
   @PreAuthorize("hasAuthority('member:level:remove')")
   public void delete(@PathVariable Long id) {
     memberLevelService.delete(id);

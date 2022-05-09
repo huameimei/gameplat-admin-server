@@ -42,7 +42,7 @@ public class OperAppVersionController {
   }
 
   @ApiOperation("删除发版信息")
-  @DeleteMapping("/removeVersionInfo")
+  @PostMapping("/removeVersionInfo")
   @PreAuthorize("hasAuthority('operator:package:remove')")
   public boolean removeVersionInfo(Integer id) {
     return sysService.removeSysPackageInfo(id);

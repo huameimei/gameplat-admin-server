@@ -37,7 +37,7 @@ public class LogoConfigController {
   }
 
   @ApiOperation("修改logo配置")
-  @PutMapping("/edit")
+  @PostMapping("/edit")
   @PreAuthorize("hasAuthority('member:logo:edit')")
   public void edit(@Validated GrowthLevelLogoEditDTO dto) {
     memberGrowthLevelService.updateLogo(dto);

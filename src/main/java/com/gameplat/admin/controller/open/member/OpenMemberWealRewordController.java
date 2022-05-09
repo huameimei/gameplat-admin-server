@@ -41,7 +41,7 @@ public class OpenMemberWealRewordController {
     return rewordService.findWealRewordList(page, dto);
   }
 
-  @PutMapping("/updateRemark")
+  @PostMapping("/updateRemark")
   @ApiOperation("修改vip福利记录备注")
   @PreAuthorize("hasAuthority('member:wealReword:edit')")
   public void updateRemark(Long id, String remark) {
@@ -50,7 +50,7 @@ public class OpenMemberWealRewordController {
 
   @SneakyThrows
   @ApiOperation("导出VIP福利记录列表")
-  @PutMapping(value = "/exportReword", produces = "application/vnd.ms-excel")
+  @PostMapping(value = "/exportReword", produces = "application/vnd.ms-excel")
   @PreAuthorize("hasAuthority('member:wealReword:export')")
   public void exportWealReword(MemberWealRewordDTO queryDTO, HttpServletResponse response) {
     List<MemberWealReword> list = rewordService.findList(queryDTO);

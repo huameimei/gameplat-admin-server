@@ -96,7 +96,7 @@ public class RebatePlanController {
    * @param ids
    */
   @ApiOperation(value = "平级分红->删除平级分红方案")
-  @DeleteMapping("/remove")
+  @PostMapping("/remove")
   @Log(
       module = ServiceName.ADMIN_SERVICE,
       type = LogType.AGENT,

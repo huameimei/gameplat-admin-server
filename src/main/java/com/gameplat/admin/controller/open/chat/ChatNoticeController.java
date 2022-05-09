@@ -42,14 +42,14 @@ public class ChatNoticeController {
   }
 
   @ApiOperation(value = "删")
-  @DeleteMapping("/remove/{id}")
+  @PostMapping("/remove/{id}")
   @PreAuthorize("hasAuthority('chat:notice:remove')")
   public void remove(@PathVariable Long id) {
     chatNoticeService.remove(id);
   }
 
   @ApiOperation(value = "改")
-  @PutMapping("/edit")
+  @PostMapping("/edit")
   @PreAuthorize("hasAuthority('chat:notice:edit')")
   public void edit(ChatNoticeEditDTO dto) {
     chatNoticeService.edit(dto);

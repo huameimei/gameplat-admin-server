@@ -47,7 +47,7 @@ public class OpenAuthIpController {
   }
 
   @ApiOperation("编辑")
-  @PutMapping("/edit")
+  @PostMapping("/edit")
   @PreAuthorize("hasAuthority('system:authIp:edit')")
   @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.ADMIN, desc = "'修改IP白名单 【'+#dto.ip+'】'")
   public void update(@RequestBody @Validated(Groups.UPDATE.class) OperAuthIpDTO dto) {
@@ -55,7 +55,7 @@ public class OpenAuthIpController {
   }
 
   @ApiOperation("删除")
-  @DeleteMapping("/delete")
+  @PostMapping("/delete")
   @PreAuthorize("hasAuthority('system:authIp:remove')")
   @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.ADMIN, desc = "'删除IP白名单 id='+#ids")
   public void remove(@RequestBody @NotEmpty(message = "缺少参数") String ids) {

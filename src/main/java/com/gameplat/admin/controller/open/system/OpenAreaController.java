@@ -42,28 +42,28 @@ public class OpenAreaController {
   }
 
   @ApiOperation("编辑")
-  @PutMapping("/edit")
+  @PostMapping("/edit")
   @PreAuthorize("hasAuthority('system:area:edit')")
   public void updateArea(@Validated @RequestBody SmsAreaEditDTO editDTO) {
     areaService.editSmsArea(editDTO);
   }
 
   @ApiOperation("删除")
-  @DeleteMapping("/delete/{id}")
+  @PostMapping("/delete/{id}")
   @PreAuthorize("hasAuthority('system:area:remove')")
   public void deleteById(@PathVariable Long id) {
     areaService.deleteAreaById(id);
   }
 
   @ApiOperation("改变状态")
-  @PutMapping("/changeStatus/{id}/{status}")
+  @PostMapping("/changeStatus/{id}/{status}")
   @PreAuthorize("hasAuthority('system:area:edit')")
   public void changeStatus(@PathVariable Long id, @PathVariable Integer status) {
     areaService.changeStatus(id, status);
   }
 
   @ApiOperation("设置默认区号")
-  @PutMapping("/setDefaultStatus/{id}/{status}")
+  @PostMapping("/setDefaultStatus/{id}/{status}")
   @PreAuthorize("hasAuthority('system:area:edit')")
   public void setDefaultStatus(@PathVariable Long id, @PathVariable Integer status) {
     areaService.setDefaultStatus(id, status);

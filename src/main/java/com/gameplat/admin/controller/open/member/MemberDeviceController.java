@@ -30,7 +30,7 @@ public class MemberDeviceController {
   }
 
   @ApiOperation("删除设备")
-  @DeleteMapping("/delete/{id}")
+  @PostMapping("/delete/{id}")
   @PreAuthorize("hasAuthority('member:device:delete')")
   public void delete(@PathVariable Long id) {
     memberDeviceService.delete(id);

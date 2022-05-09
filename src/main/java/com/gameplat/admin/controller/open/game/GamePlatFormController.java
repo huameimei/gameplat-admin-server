@@ -27,7 +27,7 @@ public class GamePlatFormController {
     return gamePlatformService.selectGamePlatformList(page, dto);
   }
 
-  @PutMapping("/edit")
+  @PostMapping("/edit")
   @PreAuthorize("hasAuthority('game:gamePlatform:edit')")
   public void updateLiveGame(@RequestBody OperGamePlatformDTO operGamePlatformDTO) {
     Assert.notNull(operGamePlatformDTO.getId(), "缺少参数");

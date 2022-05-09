@@ -50,7 +50,7 @@ public class OpenMenuController {
   }
 
   @ApiOperation("编辑")
-  @PutMapping("/edit")
+  @PostMapping("/edit")
   @PreAuthorize("hasAuthority('system:menu:edit')")
   public void update(@Validated(Groups.UPDATE.class) @RequestBody OperMenuDTO dto) {
     if (StringUtils.isBlank(dto.getMenuName())
@@ -62,7 +62,7 @@ public class OpenMenuController {
   }
 
   @ApiOperation("删除")
-  @DeleteMapping("/delete")
+  @PostMapping("/delete")
   @PreAuthorize("hasAuthority('system:menu:remove')")
   public void remove(@RequestBody List<Long> ids) {
     menuService.deleteMenuById(ids);

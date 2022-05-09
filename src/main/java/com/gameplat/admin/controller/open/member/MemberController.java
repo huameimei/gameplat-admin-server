@@ -99,7 +99,7 @@ public class MemberController {
   }
 
   @ApiOperation("编辑会员")
-  @PutMapping("/edit")
+  @PostMapping("/edit")
   @PreAuthorize("hasAuthority('member:edit')")
   @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.MEMBER, desc = "编辑会员信息")
   public void update(@Validated @RequestBody MemberEditDTO dto) {
@@ -107,7 +107,7 @@ public class MemberController {
   }
 
   @ApiOperation("启用会员")
-  @PutMapping("/enable")
+  @PostMapping("/enable")
   @PreAuthorize("hasAuthority('member:enable')")
   @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.MEMBER, desc = "启用会员")
   public void enable(@RequestBody List<Long> ids) {
@@ -115,7 +115,7 @@ public class MemberController {
   }
 
   @ApiOperation("禁用会员")
-  @PutMapping("/disable")
+  @PostMapping("/disable")
   @PreAuthorize("hasAuthority('member:disable')")
   @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.MEMBER, desc = "禁用会员")
   public void disable(@RequestBody List<Long> ids) {
@@ -153,7 +153,7 @@ public class MemberController {
   }
 
   @ApiOperation("更新会员联系方式")
-  @PutMapping("/updateContact")
+  @PostMapping("/updateContact")
   @PreAuthorize("hasAuthority('member:updateContact')")
   @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.MEMBER, desc = "修改会员#{dto.id}联系方式")
   public void updateContact(@Validated @RequestBody MemberContactUpdateDTO dto) {
@@ -161,7 +161,7 @@ public class MemberController {
   }
 
   @ApiOperation("重置会员登录密码")
-  @PutMapping("/resetPassword")
+  @PostMapping("/resetPassword")
   @PreAuthorize("hasAuthority('member:resetPassword')")
   @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.MEMBER, desc = "重置会员#{dto.id}登录密码")
   public void resetPassword(@Validated @RequestBody MemberPwdUpdateDTO dto) {
@@ -169,7 +169,7 @@ public class MemberController {
   }
 
   @ApiOperation("重置会员提现密码")
-  @PutMapping("/resetWithdrawPassword")
+  @PostMapping("/resetWithdrawPassword")
   @PreAuthorize("hasAuthority('member:resetWithdrawPassword')")
   @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.MEMBER, desc = "重置会员#{dto.id}提现密码")
   public void resetWithdrawPassword(@Validated @RequestBody MemberWithdrawPwdUpdateDTO dto) {
@@ -177,7 +177,7 @@ public class MemberController {
   }
 
   @ApiOperation("重置会员真实姓名")
-  @PutMapping("/resetRealName")
+  @PostMapping("/resetRealName")
   @PreAuthorize("hasAuthority('member:resetRealName')")
   @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.MEMBER, desc = "重置会员#{dto.id}真实姓名")
   public void resetRealName(@Validated @RequestBody MemberResetRealNameDTO dto) {
@@ -185,7 +185,7 @@ public class MemberController {
   }
 
   @ApiOperation("修改会员提现状态")
-  @PutMapping("/changeWithdrawFlag/{id}/{flag}")
+  @PostMapping("/changeWithdrawFlag/{id}/{flag}")
   @PreAuthorize("hasAuthority('member:changeWithdrawFlag')")
   @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.MEMBER, desc = "修改会员提现状态")
   public void changeWithdrawFlag(@PathVariable Long id, @PathVariable String flag) {

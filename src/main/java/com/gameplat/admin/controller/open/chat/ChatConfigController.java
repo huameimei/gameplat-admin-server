@@ -50,7 +50,7 @@ public class ChatConfigController {
   }
 
   @ApiOperation(value = "修改彩票下注分享配置")
-  @PutMapping("/editLottPushBet")
+  @PostMapping("/editLottPushBet")
   @PreAuthorize("hasAuthority('chat:lottPushBet:edit')")
   public void editLottPushBet(@RequestBody ChatPushCPBet chatPushCpBet) {
     // 获取额度转换配置
@@ -95,7 +95,7 @@ public class ChatConfigController {
   }
 
   @ApiOperation(value = "修改彩票中奖推送配置")
-  @PutMapping("/editPushLotteryWin")
+  @PostMapping("/editPushLotteryWin")
   @PreAuthorize("hasAuthority('chat:pushLotteryWin:edit')")
   public void editPushLotteryWin(@RequestBody PushLotteryWin pushLotteryWin) {
     // 获取额度转换配置
@@ -137,7 +137,7 @@ public class ChatConfigController {
   }
 
   @ApiOperation(value = "修改聊天室浮窗配置")
-  @PutMapping("/updateChatConfig")
+  @PostMapping("/updateChatConfig")
   @PreAuthorize("hasAuthority('chat:chatConfig:edit')")
   public void updateChatConfig(@RequestBody ChatConfig chatConfig) {
     // 获取额度转换配置

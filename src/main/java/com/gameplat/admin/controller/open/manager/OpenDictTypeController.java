@@ -37,14 +37,14 @@ public class OpenDictTypeController {
   }
 
   @ApiOperation("编辑")
-  @PutMapping("/edit")
+  @PostMapping("/edit")
   @PreAuthorize("hasAuthority('system:dict:edit')")
   public void update(@Validated(Groups.UPDATE.class) @RequestBody OperDictTypeDTO dto) {
     dictTypeService.editDictType(dto);
   }
 
   @ApiOperation("删除")
-  @DeleteMapping("/remove/{id}")
+  @PostMapping("/remove/{id}")
   @PreAuthorize("hasAuthority('system:dict:remove')")
   public void remove(@PathVariable Long id) {
     dictTypeService.removeDictTypeById(id);

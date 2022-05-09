@@ -40,14 +40,14 @@ public class GameRebateConfigController {
   }
 
   @ApiOperation("修改")
-  @PutMapping(value = "/update")
+  @PostMapping(value = "/update")
   @PreAuthorize("hasAuthority('game:gameRebateConfig:update')")
   public void update(@RequestBody OperGameRebateConfigDTO dto) {
     gameRebateConfigService.updateGameRebateConfig(dto);
   }
 
   @ApiOperation("根据ID删除")
-  @DeleteMapping(value = "/delete/{id}")
+  @PostMapping(value = "/delete/{id}")
   @PreAuthorize("hasAuthority('game:gameRebateConfig:remove')")
   public void delete(@PathVariable("id") Long id) {
     gameRebateConfigService.delete(id);

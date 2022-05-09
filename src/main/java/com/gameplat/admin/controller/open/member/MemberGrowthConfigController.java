@@ -35,7 +35,7 @@ public class MemberGrowthConfigController {
   }
 
   @ApiOperation("修改")
-  @PutMapping("/edit")
+  @PostMapping("/edit")
   @PreAuthorize("hasAuthority('member:growthConfig:edit')")
   public void update(@Validated MemberGrowthConfigEditDto dto) {
     memberGrowthConfigService.updateGrowthConfig(dto);

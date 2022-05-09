@@ -34,21 +34,21 @@ public class GameKindController {
   }
 
   @ApiOperation("编辑")
-  @PutMapping("/edit")
+  @PostMapping("/edit")
   @PreAuthorize("hasAuthority('game:gameKind:edit')")
   public void updateGameKind(@RequestBody OperGameKindDTO dto) {
     gameKindService.updateGameKind(dto);
   }
 
   @ApiOperation("游戏开关")
-  @PutMapping("/updateEnable")
+  @PostMapping("/updateEnable")
   @PreAuthorize("hasAuthority('game:gameKind:updateEnable')")
   public void updateEnable(@RequestBody OperGameKindDTO dto) {
     gameKindService.updateEnable(dto);
   }
 
   @ApiOperation("试玩开关")
-  @PutMapping("/updateDemoEnable")
+  @PostMapping("/updateDemoEnable")
   @PreAuthorize("hasAuthority('game:gameKind:updateDemoEnable')")
   public void updateDemoEnable(@RequestBody OperGameKindDTO dto) {
     if (dto.getDemoEnable() != GameDemoEnableEnum.ENABLE.getCode()

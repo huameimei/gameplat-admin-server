@@ -26,7 +26,7 @@ public class PayTypeController {
   @Autowired private PayTypeService payTypeService;
 
   @ApiOperation("删除")
-  @DeleteMapping("/remove/{id}")
+  @PostMapping("/remove/{id}")
   @PreAuthorize("hasAuthority('thirdParty:payTypes:remove')")
   @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.RECHARGE, desc = "'删除支付方式id=' + #id")
   public void remove(@PathVariable Long id) {

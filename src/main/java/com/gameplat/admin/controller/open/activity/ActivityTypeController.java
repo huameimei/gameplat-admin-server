@@ -77,7 +77,7 @@ public class ActivityTypeController {
   }
 
   @ApiOperation(value = "更新活动板块")
-  @PutMapping("/update")
+  @PostMapping("/update")
   @PreAuthorize("hasAuthority('activity:type:edit')")
   public void update(@Validated @RequestBody ActivityTypeUpdateDTO dto) {
     dto.setLanguage(LocaleContextHolder.getLocale().toLanguageTag());
@@ -93,7 +93,7 @@ public class ActivityTypeController {
   }
 
   @ApiOperation(value = "删除活动板块")
-  @DeleteMapping("/delete")
+  @PostMapping("/delete")
   @PreAuthorize("hasAuthority('activity:type:remove')")
   public void remove(@RequestBody String ids) {
     if (StringUtils.isBlank(ids)) {

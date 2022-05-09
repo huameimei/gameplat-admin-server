@@ -47,7 +47,7 @@ public class OpenQuickReplyController {
   }
 
   @ApiOperation("编辑")
-  @PutMapping("/edit")
+  @PostMapping("/edit")
   @PreAuthorize("hasAuthority('system:quickReply:edit')")
   @Log(
       module = ServiceName.ADMIN_SERVICE,
@@ -58,7 +58,7 @@ public class OpenQuickReplyController {
   }
 
   @ApiOperation("删除")
-  @DeleteMapping("/delete/{id}")
+  @PostMapping("/delete/{id}")
   @PreAuthorize("hasAuthority('system:quickReply:remove')")
   @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.ADMIN, desc = "'删除快捷回复配置 id='+#ids")
   public void remove(@PathVariable Long id) {

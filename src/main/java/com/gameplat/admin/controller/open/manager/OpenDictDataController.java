@@ -41,14 +41,14 @@ public class OpenDictDataController {
   }
 
   @ApiOperation("编辑")
-  @PutMapping("/edit")
+  @PostMapping("/edit")
   @PreAuthorize("hasAuthority('system:dict:edit')")
   public void update(@Validated(Groups.UPDATE.class) @RequestBody OperDictDataDTO dto) {
     dictDataService.updateDictData(dto);
   }
 
   @ApiOperation("删除")
-  @DeleteMapping("/delete/{ids}")
+  @PostMapping("/delete/{ids}")
   @PreAuthorize("hasAuthority('system:dict:remove')")
   public void remove(@PathVariable List<Long> ids) {
     dictDataService.deleteDictDataByIds(ids);

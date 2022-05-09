@@ -35,21 +35,21 @@ public class MemberBankController {
   }
 
   @ApiOperation("编辑")
-  @PutMapping("/edit")
+  @PostMapping("/edit")
   @PreAuthorize("hasAuthority('member:bank:edit')")
   public void edit(@Validated @RequestBody MemberBankEditDTO dto) {
     memberBankService.edit(dto);
   }
 
   @ApiOperation("删除")
-  @DeleteMapping("/remove/{id}")
+  @PostMapping("/remove/{id}")
   @PreAuthorize("hasAuthority('member:bank:remove')")
   public void remove(@PathVariable Long id) {
     memberBankService.removeById(id);
   }
 
   @ApiOperation("设置默认")
-  @PutMapping("/setDefault/{id}")
+  @PostMapping("/setDefault/{id}")
   @PreAuthorize("hasAuthority('member:bank:edit')")
   public void setDefault(@PathVariable Long id) {
     memberBankService.setDefault(id);

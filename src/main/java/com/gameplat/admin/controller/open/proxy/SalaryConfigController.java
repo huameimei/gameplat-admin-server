@@ -80,7 +80,7 @@ public class SalaryConfigController {
    * @param ids
    */
   @ApiOperation(value = "删除期数")
-  @DeleteMapping("/delete")
+  @PostMapping("/delete")
   @PreAuthorize("hasAuthority('salary:config:remove')")
   public void remove(@RequestBody String ids) {
     salaryConfigService.delete(ids);

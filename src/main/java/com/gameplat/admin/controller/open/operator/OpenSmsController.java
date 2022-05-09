@@ -38,7 +38,7 @@ public class OpenSmsController {
   }
 
   @ApiOperation("清空")
-  @DeleteMapping("/clean")
+  @PostMapping("/clean")
   @PreAuthorize("hasAuthority('system:sms:clean')")
   @Log(module = ServiceName.ADMIN_SERVICE, param = true, desc = "清空短信记录表")
   public void clean() {

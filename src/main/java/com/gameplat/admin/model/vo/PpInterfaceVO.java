@@ -1,10 +1,11 @@
 package com.gameplat.admin.model.vo;
 
-import com.baomidou.mybatisplus.extension.activerecord.Model;
 import lombok.Data;
 
+import java.io.Serializable;
+
 @Data
-public class PpInterfaceVO extends Model<PpInterfaceVO> {
+public class PpInterfaceVO implements Serializable {
 
   private Long id;
 

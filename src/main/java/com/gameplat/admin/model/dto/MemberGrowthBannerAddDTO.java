@@ -14,20 +14,20 @@ import java.io.Serializable;
 @Data
 public class MemberGrowthBannerAddDTO implements Serializable {
 
-  @ApiModelProperty(value = "终端: 0 WEB  1 H5  2 ANDRIOD  3 IOS")
+  @ApiModelProperty("终端: 0 WEB  1 H5  2 ANDRIOD  3 IOS")
   @NotNull(message = "终端类型不能为空")
   private Integer cilentType;
 
-  @ApiModelProperty(value = "页面使用位置: 0 H5 ANDRIOD IOS 对应福利中心轮播   2 对应VIP详情轮播    PC 1对应轮播")
+  @ApiModelProperty("页面使用位置: 0 H5 ANDRIOD IOS 对应福利中心轮播   2 对应VIP详情轮播    PC 1对应轮播")
   @NotNull(message = "页面使用位置类型不能为空")
   private Integer areaType;
 
-  @ApiModelProperty(value = "路径")
+  @ApiModelProperty("路径")
   private String src;
 
-  @ApiModelProperty(value = "排序值")
+  @ApiModelProperty("排序值")
   private Integer sort;
 
-  @ApiModelProperty(value = "备注")
+  @ApiModelProperty("备注")
   private String remark;
 }

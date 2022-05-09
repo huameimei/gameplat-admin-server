@@ -112,8 +112,7 @@ public class MemberBonusReportServiceImpl extends ServiceImpl<MemberBonusReportM
     ExportParams exportParams = new ExportParams("会员红利报表", "会员红利报表");
     response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename = vipWealReword.xls");
 
-    Workbook workbook = ExcelExportUtil.exportExcel(exportParams, MemberBonusReportVO.class, memberBonusReportVOList);
-    try {
+    try (Workbook workbook = ExcelExportUtil.exportExcel(exportParams, MemberBonusReportVO.class, memberBonusReportVOList)) {
       workbook.write(response.getOutputStream());
     } catch (IOException e) {
       log.error("会员红利报表导出IO异常", e);

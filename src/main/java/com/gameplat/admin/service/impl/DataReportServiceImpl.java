@@ -217,14 +217,6 @@ public class DataReportServiceImpl extends ServiceImpl<DataReportMapper, GameRec
     log.info("全部余额：{}", allBalance);
     accountReportVo.setGoodMoney(allBalance);
 
-    // 彩票可用额度
-    GameAmountControl lotteryInfo =
-        gameAmountControlService.findInfoByType(GameAmountControlTypeEnum.LOTTERY.type());
-    if (ObjectUtil.isNotNull(lotteryInfo)) {
-      accountReportVo.setLotteryQuota(lotteryInfo.getAmount().subtract(lotteryInfo.getUseAmount()));
-    } else {
-      accountReportVo.setLotteryQuota(BigDecimal.ZERO);
-    }
     // 游戏可用余额
     GameAmountControl gameInfo =
         gameAmountControlService.findInfoByType(GameAmountControlTypeEnum.LIVE.type());

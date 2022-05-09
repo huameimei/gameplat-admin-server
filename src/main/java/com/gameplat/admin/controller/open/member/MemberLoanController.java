@@ -16,9 +16,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
+ * 借呗相关
+ *
  * @author lily
- * @description
- * @date 2022/3/7
  */
 @Api(tags = "借呗")
 @Slf4j
@@ -29,7 +29,7 @@ public class MemberLoanController {
   @Autowired private MemberLoanService memberLoanService;
 
   @GetMapping("/page")
-  @ApiOperation(value = "查")
+  @ApiOperation(value = "获取借呗记录")
   @PreAuthorize("hasAuthority('member:loan:view')")
   public LoanVO page(PageDTO<MemberLoan> page, MemberLoanQueryDTO dto) {
     return memberLoanService.page(page, dto);

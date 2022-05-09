@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.gameplat.admin.model.dto.LiveDomainParamDTO;
 import com.gameplat.admin.service.ILiveDomainService;
 import com.gameplat.base.common.web.Result;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -14,11 +15,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-/**
- * @author aBen
- * @date 2022/1/6 0:02
- * @desc 皇冠体育
- */
+@Api(tags = "直播域名")
 @Slf4j
 @RestController
 @RequestMapping("/api/admin/sport/live")

@@ -10,6 +10,7 @@ import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
@@ -23,6 +24,7 @@ import com.gameplat.admin.model.dto.SpreadLinkInfoDTO;
 import com.gameplat.admin.model.dto.SpreadLinkInfoEditDTO;
 import com.gameplat.admin.model.vo.GameDivideVo;
 import com.gameplat.admin.model.vo.SpreadConfigVO;
+import com.gameplat.admin.service.ConfigService;
 import com.gameplat.admin.service.MemberService;
 import com.gameplat.admin.service.SpreadLinkInfoService;
 import com.gameplat.admin.service.SysDictDataService;
@@ -35,6 +37,7 @@ import com.gameplat.common.enums.DictDataEnum;
 import com.gameplat.common.enums.DictTypeEnum;
 import com.gameplat.common.enums.UserTypes;
 import com.gameplat.common.lang.Assert;
+import com.gameplat.common.model.bean.AgentBackendConfig;
 import com.gameplat.model.entity.member.Member;
 import com.gameplat.model.entity.proxy.DivideLayerConfig;
 import com.gameplat.model.entity.spread.SpreadLinkInfo;
@@ -51,11 +54,10 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.math.BigDecimal;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.text.MessageFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -77,6 +79,11 @@ public class SpreadLinkInfoServiceImpl extends ServiceImpl<SpreadLinkInfoMapper,
   @Autowired private DivideLayerConfigMapper layerConfigMapper;
 
   @Autowired private SysDictDataService sysDictDataService;
+
+  @Autowired private ConfigService configService;
+
+  @Autowired private SpreadLinkInfoMapper spreadLinkInfoMapper;
+
 
   private static final String STR_URL = "/r/";
 
@@ -120,12 +127,16 @@ public class SpreadLinkInfoServiceImpl extends ServiceImpl<SpreadLinkInfoMapper,
                             SpreadLinkInfo::getRegistCount)
                     .page(page)
                     .convert(spreadLinkInfoConvert::toVo);
-//    for (SpreadConfigVO obj : convert.getRecords()) {
-//      if (StrUtil.isNotBlank(obj.getExternalUrl()) && !obj.getExternalUrl().contains("?rc=")) {
-//        obj.setExternalUrl(
-//                MessageFormat.format("{0}/?rc={1}", obj.getExternalUrl(), obj.getCode()));
-//      }
-//    }
+    for (SpreadConfigVO obj : convert.getRecords()) {
+     String externalUrl = obj.getExternalUrl();
+      if (StrUtil.isNotBlank(externalUrl) && !obj.getExternalUrl().contains(STR_URL)) {
+        if ((externalUrl.lastIndexOf("/")+1) == externalUrl.length()){
+          externalUrl = externalUrl.substring(0, externalUrl.length() - 1);
+        }
+        obj.setRcDomain(
+                MessageFormat.format("{0}{1}{2}", externalUrl, STR_URL, obj.getCode()));
+      }
+    }
     return convert;
   }
 
@@ -191,30 +202,33 @@ public class SpreadLinkInfoServiceImpl extends ServiceImpl<SpreadLinkInfoMapper,
    */
   @Override
   public void add(SpreadLinkInfoAddDTO dto) {
-
-    //1 专属域名 0 公共域名    专属域名下代理账号不能为空
-    if (dto.getExclusiveFlag() == 1 ) {
+    //专属域名验证
+    if (dto.getExclusiveFlag() == 1){
       if (StrUtil.isBlank(dto.getAgentAccount()) ) {
         throw new ServiceException("代理账号不能为空！");
       }
-      if (StrUtil.isBlank(dto.getSourceDomain())) {
-        throw new ServiceException("来源域名不能为空！");
+      if (StrUtil.isBlank(dto.getSourceDomain())){
+        throw new ServiceException("请输入专属域名地址");
+      }
+      if(StrUtil.isBlank(dto.getExternalUrl())){
+        throw new ServiceException("请输入跳转域名地址");
+      }
+      if (StrUtil.isNotBlank(dto.getSourceDomain())) {
+        boolean exists =
+                this.lambdaQuery()
+                        .ne(SpreadLinkInfo::getAgentAccount, dto.getAgentAccount())
+                        .eq(SpreadLinkInfo::getExternalUrl, dto.getSourceDomain())
+                        .eq(SpreadLinkInfo::getExclusiveFlag, BooleanEnum.YES.value())
+                        .exists();
+        if (exists) {
+          throw new ServiceException("此专属域名已被使用！");
+        }
       }
     }
 
-    if (StrUtil.isBlank(dto.getExternalUrl())){
-      throw new ServiceException("推广地址不能为空！");
-    }
-
-    //默认域名不能重复
-    if (dto.getExclusiveFlag() == 2){
-      if (getLinkCount(dto.getExternalUrl()) > 0){
-        throw new ServiceException("默认推广域名重复");
-      }
-    }
     // 实体转换
     SpreadLinkInfo linkInfo = spreadLinkInfoConvert.toEntity(dto);
-    if (dto.getExclusiveFlag() != 2) {
+    if (StringUtils.isNotEmpty(linkInfo.getAgentAccount())) {
       // 校验账号的用户类型
       Member member =
               memberService
@@ -222,26 +236,13 @@ public class SpreadLinkInfoServiceImpl extends ServiceImpl<SpreadLinkInfoMapper,
                       .orElseThrow(() -> new ServiceException("代理账号不存在!"));
       Assert.isTrue(UserTypes.AGENT.value().equalsIgnoreCase(member.getUserType()), "账号类型不支持！");
     }
+    AgentBackendConfig agentBackendConfig = configService.get(DictTypeEnum.AGENT_BACKEND_CONFIG, AgentBackendConfig.class);
     // 推广码最少字符限制
-    SysDictData agentMinCodeNumData =
-            sysDictDataService.getDictData(
-                    DictTypeEnum.SYSTEM_PARAMETER_CONFIG.getValue(),
-                    DictDataEnum.AGENT_MIN_CODE_NUM.getLabel());
-    Integer agentMinCodeNum = 0;
-    if (agentMinCodeNumData != null) {
-      agentMinCodeNum = Convert.toInt(agentMinCodeNumData.getDictValue());
-    }
+    Integer agentMinCodeNum = Optional.ofNullable(agentBackendConfig.getMinSpreadLength()).orElse(0);
     // 代理推广码最大条数
-    SysDictData agentMaxSpreadNumData =
-            sysDictDataService.getDictData(
-                    DictTypeEnum.SYSTEM_PARAMETER_CONFIG.getValue(),
-                    DictDataEnum.AGENT_MAX_SPREAD_NUM.getLabel());
-    Integer agentMaxSpreadNum = 1;
-    if (agentMaxSpreadNumData != null) {
-      agentMaxSpreadNum = Convert.toInt(agentMaxSpreadNumData.getDictValue());
-    }
-    // 如果推广码为空  随机生成 4-20位
-    if (StrUtil.isBlank(linkInfo.getCode()) && dto.getExclusiveFlag() != 2) {
+    Integer agentMaxSpreadNum = Optional.ofNullable(agentBackendConfig.getMaxSpreadNum()).orElse(0);
+    // 如果推广码为空 并且推广地址为空  随机生成 4-20位
+    if (StrUtil.isBlank(linkInfo.getCode())) {
       linkInfo.setCode(
               RandomStringUtils.random(agentMinCodeNum == 0 ? 6 : agentMinCodeNum, true, true)
                       .toLowerCase());
@@ -251,11 +252,12 @@ public class SpreadLinkInfoServiceImpl extends ServiceImpl<SpreadLinkInfoMapper,
     if(!StrUtil.isBlank(linkInfo.getCode())) {
       this.checkCode(linkInfo.getCode(), agentMinCodeNum);
     }
-    // 校验此推广拥有几个推广码连接条数
-    Long count =
-            this.lambdaQuery().eq(SpreadLinkInfo::getAgentAccount, linkInfo.getAgentAccount()).count();
-    Assert.isTrue((count + 1) <= agentMaxSpreadNum, "单个代理账户不能超过" + agentMaxSpreadNum + "条推广码链接！");
-
+    if (agentMaxSpreadNum > 0) {
+      // 校验此推广拥有几个推广码连接条数
+      Long count =
+              this.lambdaQuery().eq(SpreadLinkInfo::getAgentAccount, linkInfo.getAgentAccount()).count();
+      Assert.isTrue((count + 1) <= agentMaxSpreadNum, "单个代理账户不能超过" + agentMaxSpreadNum + "条推广码链接！");
+    }
     // 当推广链接不为空时 需要校验 此推广链接地址是否被其它代理作为了专属域名
     if (StrUtil.isNotBlank(linkInfo.getExternalUrl())) {
       boolean exists =
@@ -268,7 +270,6 @@ public class SpreadLinkInfoServiceImpl extends ServiceImpl<SpreadLinkInfoMapper,
         throw new ServiceException("推广链接地址已被使用！");
       }
     }
-    linkInfo.setExternalUrl(linkInfo.getExternalUrl() + STR_URL + linkInfo.getCode());
     boolean saveResult = this.save(linkInfo);
     Assert.isTrue(saveResult, "创建失败！");
     if (saveResult
@@ -288,16 +289,21 @@ public class SpreadLinkInfoServiceImpl extends ServiceImpl<SpreadLinkInfoMapper,
   @Override
   public void update(SpreadLinkInfoEditDTO dto) {
     SpreadLinkInfo linkInfo = spreadLinkInfoConvert.toEntity(dto);
-    if (StrUtil.isBlank(linkInfo.getAgentAccount())) {
-      throw new ServiceException("代理账号不能为空！");
+//    if (StrUtil.isBlank(linkInfo.getAgentAccount())) {
+//      throw new ServiceException("代理账号不能为空！");
+//    }
+    if (StrUtil.isBlank(linkInfo.getCode())) {
+      throw new ServiceException("推广码不能为空！");
     }
-    // 校验账号的用户类型
-    Member member =
-            memberService
-                    .getByAccount(linkInfo.getAgentAccount())
-                    .orElseThrow(() -> new ServiceException("代理账号不存在!"));
-    Assert.isTrue(UserTypes.AGENT.value().equalsIgnoreCase(member.getUserType()), "账号类型不支持！");
-    linkInfo.setIsOpenDividePreset(dto.getIsOpenDividePreset());
+    if (StrUtil.isNotBlank(linkInfo.getAgentAccount())) {
+      // 校验账号的用户类型
+      Member member =
+              memberService
+                      .getByAccount(linkInfo.getAgentAccount())
+                      .orElseThrow(() -> new ServiceException("代理账号不存在!"));
+      Assert.isTrue(UserTypes.AGENT.value().equalsIgnoreCase(member.getUserType()), "账号类型不支持！");
+      linkInfo.setIsOpenDividePreset(dto.getIsOpenDividePreset());
+    }
 
     // 当推广链接不为空时 需要校验 此推广链接地址是否被其它代理作为了专属域名
     if (StrUtil.isNotBlank(linkInfo.getExternalUrl())) {
@@ -573,9 +579,11 @@ public class SpreadLinkInfoServiceImpl extends ServiceImpl<SpreadLinkInfoMapper,
    * 获取默认的推广链接信息
    */
   @Override
-  public List<SpreadConfigVO> getDefaultLink(){
-    List<SpreadConfigVO> collect = this.lambdaQuery().eq(SpreadLinkInfo::getExclusiveFlag, 2).list().stream().map(spreadLinkInfoConvert::toVo)
-            .collect(Collectors.toList());
-    return collect;
+  public List<Map<String, Object>> getDefaultLink(){
+    QueryWrapper<SpreadLinkInfo> queryWrapper = new QueryWrapper<>();
+    queryWrapper.select("DISTINCT external_url").eq("exclusive_flag",0);
+    List<Map<String, Object>> list = spreadLinkInfoMapper.selectMaps(queryWrapper);
+//    List<SpreadLinkInfo> list = spreadLinkInfoMapper.selectList(queryWrapper);
+    return list;
   }
 }

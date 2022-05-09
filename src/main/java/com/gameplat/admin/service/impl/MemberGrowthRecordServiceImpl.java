@@ -31,6 +31,7 @@ import com.gameplat.model.entity.message.Message;
 import com.gameplat.redis.redisson.DistributedLocker;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -65,6 +66,7 @@ public class MemberGrowthRecordServiceImpl
     private MemberGrowthRecordMapper memberGrowthRecordMapper;
 
     @Resource(name = "memberGrowthLevelServiceImpl")
+    @Lazy
     private MemberGrowthLevelService growthLevelService;
 
     @Autowired
@@ -89,6 +91,7 @@ public class MemberGrowthRecordServiceImpl
     private MessageMapper messageMapper;
 
     @Resource(name = "memberGrowthStatisServiceImpl")
+    @Lazy
     private MemberGrowthStatisService memberGrowthStatisService;
 
     @Autowired
@@ -394,19 +397,6 @@ public class MemberGrowthRecordServiceImpl
         MemberVO memberVo = memberService.queryList(new MemberQueryDTO() {{
             setId(memberId);
         }}).get(0);
-        //更新借呗表额度
-        BigDecimal loanMoney = growthLevelService.lambdaQuery()
-                .eq(MemberGrowthLevel::getLevel, afterLevel)
-                .one()
-                .getLoanMoney();
-        int money = loanMoney.compareTo(BigDecimal.ZERO);
-        if (money == 1) {
-            memberLoanService.editOrUpdate(new MemberLoan() {{
-                setLoanMoney(loanMoney);
-                setMemberId(memberId);
-                setAccount(memberVo.getAccount());
-            }});
-        }
         memberGrowthRecord.setCurrentLevel(afterLevel);
         // todo 5.记录成长值变动记录  重新更新 会员成长值汇总
         Long tempGrowth = changeFinalGrowth;

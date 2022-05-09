@@ -16,6 +16,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
+import java.time.LocalTime;
 import java.util.Map;
 
 /**
@@ -75,5 +76,18 @@ public class ActivityQualificationController {
   @PreAuthorize("hasAuthority('activity:qualification:checkQualification')")
   public Map<String, Object> checkQualification(@RequestBody ActivityQualificationCheckDTO dto) {
     return activityQualificationService.checkQualification(dto);
+  }
+
+  /**
+   * 批量生成红包资格
+   * @return
+   */
+  @ApiOperation(value = "手工生成红包雨资格")
+  @RequestMapping(value = "/addRedPacketQualification", method = RequestMethod.POST)
+  public void addRedPacketQualification()  {
+    if(LocalTime.now().isBefore(LocalTime.parse("13:00"))){
+      throw new ServiceException("不在允许操作时间范围之内,请在13点以后生成资格");
+    }
+    activityQualificationService.activityRedEnvelopeQualification();
   }
 }

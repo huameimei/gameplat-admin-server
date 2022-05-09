@@ -54,8 +54,8 @@ public class ActivityTypeController {
     if (StringUtils.isBlank(dto.getLanguage())) {
       dto.setLanguage(LocaleContextHolder.getLocale().toLanguageTag());
     }
-    if (StringUtils.isBlank(dto.getLanguage())) {
-      throw new ServiceException("语言language参数必传");
+    if (!dto.getLanguage().contains("zh-CN,en-US,in-ID,th-TH,vi-VN")) {
+      dto.setLanguage("zh-CN");
     }
     return activityTypeService.list(page, dto);
   }
@@ -115,7 +115,8 @@ public class ActivityTypeController {
     JSONObject jsonObject = JSONObject.parseObject(activityTypeConfig);
     JSONArray jsonArray = jsonObject.getJSONArray(language);
     if (CollectionUtils.isEmpty(jsonArray)) {
-      throw new ServiceException("语言【" + language + "】活动板块类型配置信息不存在");
+      // 默认中文
+      jsonArray = jsonObject.getJSONArray("zh-CN");
     }
 
     List<CodeDataVO> codeDataVOList = new ArrayList<>();

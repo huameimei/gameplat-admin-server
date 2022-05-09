@@ -11,8 +11,6 @@ public interface MemberLoanService extends IService<MemberLoan> {
   /** 分页查 */
   LoanVO page(PageDTO<MemberLoan> page, MemberLoanQueryDTO dto);
 
-  void editOrUpdate(MemberLoan memberLoan);
-
   /** 回收 */
   void recycle(String account);
 }

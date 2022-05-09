@@ -1,5 +1,6 @@
 package com.gameplat.admin.service.impl;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSONArray;
@@ -8,7 +9,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.gameplat.admin.config.TenantConfig;
+import com.gameplat.admin.config.SysTheme;
 import com.gameplat.admin.convert.ValidWithdrawConvert;
 import com.gameplat.admin.mapper.ValidWithdrawMapper;
 import com.gameplat.admin.model.bean.GameBetRecordSearchBuilder;
@@ -42,6 +43,7 @@ import org.springframework.util.Assert;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -59,19 +61,10 @@ public class ValidWithdrawServiceImpl extends ServiceImpl<ValidWithdrawMapper, V
 
   @Resource private IBaseElasticsearchService baseElasticsearchService;
 
-  @Resource private TenantConfig tenantConfig;
-
-  private static BigDecimal safetyGetDecimal(BigDecimal d) {
-    return Optional.ofNullable(d).orElse(BigDecimal.ZERO);
-  }
-
-  /** 直接取消指定小数点后的数据 int 返回小数点后的位数 num 要处理的数字 四舍五入 */
-  public static BigDecimal toFix(int digital, BigDecimal num) {
-    return num.setScale(digital, BigDecimal.ROUND_HALF_UP);
-  }
+  @Resource private SysTheme sysTheme;
 
   @Override
-  public void addRechargeOrder(RechargeOrder rechargeOrder) throws Exception {
+  public void addRechargeOrder(RechargeOrder rechargeOrder) {
     ValidWithdraw validWithdraw = new ValidWithdraw();
     validWithdraw.setMemberId(rechargeOrder.getMemberId());
     validWithdraw.setAccount(rechargeOrder.getAccount());
@@ -85,12 +78,12 @@ public class ValidWithdrawServiceImpl extends ServiceImpl<ValidWithdrawMapper, V
     validWithdraw.setRemark(rechargeOrder.getRemarks());
     validWithdraw.setCreateTime(new Date());
     deleteByUserId(rechargeOrder.getMemberId(), 1);
-    updateTypeByUserId(rechargeOrder.getMemberId(),validWithdraw.getCreateTime());
+    updateTypeByUserId(rechargeOrder.getMemberId(), validWithdraw.getCreateTime());
     this.save(validWithdraw);
   }
 
   @Override
-  public void remove(Long memberId, Date cashDate) throws Exception {
+  public void remove(Long memberId, Date cashDate) {
     // 申请提现至出款期间如果有新的充值，出款时直接删除申请提现之前的打码量，而不是更新status为1
     LambdaQueryWrapper<ValidWithdraw> query = Wrappers.lambdaQuery();
     query.eq(ValidWithdraw::getMemberId, memberId).gt(ValidWithdraw::getCreateTime, cashDate);
@@ -103,27 +96,6 @@ public class ValidWithdrawServiceImpl extends ServiceImpl<ValidWithdrawMapper, V
           .le(ValidWithdraw::getCreateTime, cashDate)
           .update();
     }
-  }
-
-  private void deleteByUserId(Long memberId, Integer status) throws Exception {
-    LambdaQueryWrapper<ValidWithdraw> query = Wrappers.lambdaQuery();
-    query.eq(ValidWithdraw::getMemberId, memberId).eq(ValidWithdraw::getStatus, status);
-    this.remove(query);
-  }
-
-  private void deleteByUserName(String member, Integer status) throws Exception {
-    LambdaQueryWrapper<ValidWithdraw> query = Wrappers.lambdaQuery();
-    query.eq(ValidWithdraw::getAccount, member).eq(ValidWithdraw::getStatus, status);
-    this.remove(query);
-  }
-
-  public void updateTypeByUserId(Long memberId,Date createTime) throws Exception {
-    this.lambdaUpdate()
-        .set(ValidWithdraw::getType, 1)
-        .set(ValidWithdraw::getEndTime, createTime)
-        .eq(ValidWithdraw::getMemberId, memberId)
-        .eq(ValidWithdraw::getType, 0)
-        .update(new ValidWithdraw());
   }
 
   @Override
@@ -143,17 +115,6 @@ public class ValidWithdrawServiceImpl extends ServiceImpl<ValidWithdrawMapper, V
     return save;
   }
 
-  public List<ValidWithdraw> queryByMemberIdAndAddTimeLessThanOrEqualToAndStatus(
-      String account, Integer status) {
-    return this.lambdaQuery()
-        .eq(ValidWithdraw::getAccount, account)
-        /* .le(ValidWithdraw::getCreateTime, maxTime)*/
-        .eq(ValidWithdraw::getStatus, status)
-        .orderByAsc(ValidWithdraw::getType)
-        .orderByDesc(ValidWithdraw::getId)
-        .list();
-  }
-
   @Override
   public ValidateDmlBeanVo validateByMemberId(
       MemberWithdrawLimit memberWithdrawLimit, String name, boolean ignoreOuted)
@@ -169,12 +130,113 @@ public class ValidWithdrawServiceImpl extends ServiceImpl<ValidWithdrawMapper, V
       validWithdraws =
           validWithdraws.stream().filter(v -> 0 == v.getStatus()).collect(Collectors.toList());
       return validateValidWithdraws(
-              name,
-              validWithdraws,
-              toFix(2, safetyGetDecimal(memberWithdrawLimit.getRelaxQuota())),
-              memberWithdrawLimit);
+          name,
+          validWithdraws,
+          toFix(2, safetyGetDecimal(memberWithdrawLimit.getRelaxQuota())),
+          memberWithdrawLimit);
     }
     return passAll(name, validWithdraws, memberWithdrawLimit.getRelaxQuota());
+  }
+
+  private static BigDecimal safetyGetDecimal(BigDecimal d) {
+    return Optional.ofNullable(d).orElse(BigDecimal.ZERO);
+  }
+
+  @Override
+  public void updateValidWithdraw(ValidWithdrawDto dto) {
+    // 更新会员信息和会员详情
+    Assert.isTrue(this.updateById(validWithdrawConvert.toEntity(dto)), "修改打码量信息失败!");
+  }
+
+  @Override
+  public void delValidWithdraw(String member) {
+    this.deleteByUserName(member, 0);
+  }
+
+  @Override
+  public void rollGameRebateDml(String remark) {
+    LambdaUpdateWrapper<ValidWithdraw> updateWrapper = Wrappers.lambdaUpdate();
+    updateWrapper
+        .eq(ValidWithdraw::getRemark, remark)
+        .set(ValidWithdraw::getDiscountMoney, 0)
+        .set(ValidWithdraw::getDiscountDml, 0);
+    validWithdrawMapper.update(null, updateWrapper);
+  }
+
+  /** 直接取消指定小数点后的数据 int 返回小数点后的位数 num 要处理的数字 四舍五入 */
+  private static BigDecimal toFix(int digital, BigDecimal num) {
+    return num.setScale(digital, RoundingMode.HALF_UP);
+  }
+
+  @Override
+  public void countAccountValidWithdraw(String username) {
+    List<ValidAccoutWithdrawVo> validWithdraw =
+        validWithdrawMapper.findAccountValidWithdraw(username);
+    if (CollUtil.isEmpty(validWithdraw)) {
+      return;
+    }
+    String indexName = ContextConstant.ES_INDEX.BET_RECORD_ + sysTheme.getTenantCode();
+    validWithdraw.forEach(
+        a -> {
+          GameVaildBetRecordQueryDTO dto =
+              new GameVaildBetRecordQueryDTO() {
+                {
+                  setAccount(a.getAccount());
+                  setBeginTime(a.getCreateTime());
+                  setEndTime(a.getEndTime());
+                  setState("1");
+                }
+              };
+          QueryBuilder builder = GameBetRecordSearchBuilder.buildBetRecordSearch(dto);
+          // todo betTime
+          SortBuilder<FieldSortBuilder> sortBuilder =
+              SortBuilders.fieldSort("betTime").order(SortOrder.DESC);
+          PageResponse<GameBetValidRecordVo> result =
+              baseElasticsearchService.search(
+                  builder, indexName, GameBetValidRecordVo.class, 0, 9999, sortBuilder);
+          if (StringUtils.isNotEmpty(result.getList())) {
+            ValidAccoutWithdrawVo validAccoutWithdrawVo = new ValidAccoutWithdrawVo();
+            validAccoutWithdrawVo.setId(a.getId());
+            // 会员一笔打码量的投注记录
+            List<GameBetValidRecordVo> gameBetValidRecordVoList = result.getList();
+            // 总有效投注额
+            BigDecimal vaildAmount =
+                gameBetValidRecordVoList.stream()
+                    .map(GameBetValidRecordVo::getValidAmount)
+                    .reduce(BigDecimal.ZERO, BigDecimal::add)
+                    .divide(Convert.toBigDecimal(1000), 2, RoundingMode.HALF_UP);
+            log.info("每笔总投注记录:{}", vaildAmount);
+            validAccoutWithdrawVo.setVaildAmount(vaildAmount);
+            // 根据游戏类型进行分类
+            Map<String, List<GameBetValidRecordVo>> map =
+                gameBetValidRecordVoList.stream()
+                    .collect(Collectors.groupingBy(GameBetValidRecordVo::getGameKind));
+            // 初始化投注内容
+            // 初始化投注内容
+            List<Object> vailList = new ArrayList<>();
+            map.keySet()
+                .forEach(
+                    b -> {
+                      JSONObject jsonObject = new JSONObject();
+                      List<GameBetValidRecordVo> list = map.get(b);
+                      // 添加一个游戏的详情（gameKind,gameName,betAmount）
+                      // 根据游戏类型进行分组
+                      BigDecimal betAmount =
+                          list.stream()
+                              .map(GameBetValidRecordVo::getValidAmount)
+                              .reduce(BigDecimal.ZERO, BigDecimal::add)
+                              .divide(Convert.toBigDecimal(1000), 2, RoundingMode.HALF_UP);
+                      String gameName = list.get(0).getGameName();
+                      jsonObject.put("vaildBetAmount", betAmount);
+                      jsonObject.put("gameKind", b);
+                      jsonObject.put("gameName", gameName);
+                      vailList.add(jsonObject);
+                    });
+            validAccoutWithdrawVo.setBetContext(JSONArray.toJSONString(vailList));
+
+            validWithdrawMapper.updateByBetId(validAccoutWithdrawVo);
+          }
+        });
   }
 
   private ValidateDmlBeanVo passAll(
@@ -186,13 +248,13 @@ public class ValidWithdrawServiceImpl extends ServiceImpl<ValidWithdrawMapper, V
     validateDmlBean.setRemainRequiredDml(BigDecimal.ZERO);
     validateDmlBean.setUsername(username);
     // 常态打码量
-    BigDecimal requireDML =
+    BigDecimal requireDml =
         validWithdraws.stream()
             .map(ValidWithdraw::getDmlClaim)
             .reduce(BigDecimal.ZERO, BigDecimal::add);
-    log.info("总共要求打码量：{}", requireDML);
+    log.info("总共要求打码量：{}", requireDml);
     // 要求打码量
-    validateDmlBean.setRequireDML(requireDML);
+    validateDmlBean.setRequireDML(requireDml);
     // 放宽额度
     log.info("放宽额度：{}", relaxQuota);
     validateDmlBean.setRelaxQuota(relaxQuota);
@@ -216,9 +278,7 @@ public class ValidWithdrawServiceImpl extends ServiceImpl<ValidWithdrawMapper, V
     // 需要扣除金额
     // validateDmlBean.setSumAllDeduct(sumAllDeduct);
     validateDmlBean.setYetWithdraw(BigDecimal.ZERO);
-    List<ValidWithdrawVO> validWithdrawVOS =
-        BeanUtils.mapList(validWithdraws, ValidWithdrawVO.class);
-    validateDmlBean.setRows(validWithdrawVOS);
+    validateDmlBean.setRows(BeanUtils.mapList(validWithdraws, ValidWithdrawVO.class));
     return validateDmlBean;
   }
 
@@ -229,13 +289,16 @@ public class ValidWithdrawServiceImpl extends ServiceImpl<ValidWithdrawMapper, V
    * @return ValidateDmlBeanVo
    */
   private ValidateDmlBeanVo validateValidWithdraws(
-          String username, List<ValidWithdraw> validWithdraws, BigDecimal relaxQuota, MemberWithdrawLimit memberWithdrawLimit) {
+      String username,
+      List<ValidWithdraw> validWithdraws,
+      BigDecimal relaxQuota,
+      MemberWithdrawLimit memberWithdrawLimit) {
     ValidateDmlBeanVo validateDmlBean = new ValidateDmlBeanVo();
     boolean allDmlPass = true;
     log.info("放宽额度：{}", relaxQuota);
     BigDecimal count = getCount(validWithdraws);
     log.info("打码量计算:{}", count);
-    if (count.compareTo(Convert.toBigDecimal(0)) == -1) {
+    if (count.compareTo(Convert.toBigDecimal(0)) < 0) {
       // 剩余打码量-放宽额度
       BigDecimal subtract = count.abs().subtract(relaxQuota);
       if (subtract.compareTo(Convert.toBigDecimal(0)) > -1) {
@@ -253,20 +316,20 @@ public class ValidWithdrawServiceImpl extends ServiceImpl<ValidWithdrawMapper, V
     }
     validateDmlBean.setUsername(username);
     // 常态打码量
-    BigDecimal requireDML =
-            validWithdraws.stream()
-                    .map(ValidWithdraw::getDmlClaim)
-                    .reduce(BigDecimal.ZERO, BigDecimal::add);
-    log.info("总共要求打码量：{}", requireDML);
+    BigDecimal requireDml =
+        validWithdraws.stream()
+            .map(ValidWithdraw::getDmlClaim)
+            .reduce(BigDecimal.ZERO, BigDecimal::add);
+    log.info("总共要求打码量：{}", requireDml);
     // 要求打码量
-    validateDmlBean.setRequireDML(requireDML);
+    validateDmlBean.setRequireDML(requireDml);
     // 放宽额度
     validateDmlBean.setRelaxQuota(relaxQuota);
 
     BigDecimal sumBetAmount =
-            validWithdraws.stream()
-                    .map(ValidWithdraw::getBetAmount)
-                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+        validWithdraws.stream()
+            .map(ValidWithdraw::getBetAmount)
+            .reduce(BigDecimal.ZERO, BigDecimal::add);
     log.info("总投注打码量：{}", sumBetAmount);
     // 有效投注额
     validateDmlBean.setSumAllDml(sumBetAmount);
@@ -275,47 +338,46 @@ public class ValidWithdrawServiceImpl extends ServiceImpl<ValidWithdrawMapper, V
 
     // 常态打码金额
     BigDecimal rechMoney =
-            validWithdraws.stream()
-                    .map(ValidWithdraw::getRechMoney)
-                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+        validWithdraws.stream()
+            .map(ValidWithdraw::getRechMoney)
+            .reduce(BigDecimal.ZERO, BigDecimal::add);
     log.info("总共需要常态打码量：{}", rechMoney);
 
     // 需要扣除金额提现手续费  0 只扣除优惠费用  1只收行政费用  2 不扣除全部费用 */
     Integer whetherDeductAdministrationCost =
-            memberWithdrawLimit.getWhetherDeductAdministrationCost();
+        memberWithdrawLimit.getWhetherDeductAdministrationCost();
     if (ObjectUtil.equal(whetherDeductAdministrationCost, 0)) {
       BigDecimal disAmount =
-              validWithdraws.stream()
-                      .map(ValidWithdraw::getDiscountDml)
-                      .reduce(BigDecimal.ZERO, BigDecimal::add);
+          validWithdraws.stream()
+              .map(ValidWithdraw::getDiscountDml)
+              .reduce(BigDecimal.ZERO, BigDecimal::add);
       log.info("扣除优惠费用：{}", disAmount);
       BigDecimal fixedBalance = memberWithdrawLimit.getFixedBalance();
       log.info("扣除优惠费用百分比：{}", fixedBalance);
-      BigDecimal deductAmount = disAmount.multiply(fixedBalance.divide(BigDecimal.valueOf(100)));
+      BigDecimal deductAmount =
+          disAmount.multiply(fixedBalance.divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP));
       log.info("扣除优惠金额：{}", deductAmount);
       validateDmlBean.setSumAllDeduct(deductAmount);
     } else if (ObjectUtil.equal(whetherDeductAdministrationCost, 1)) {
       BigDecimal moneyRatio = memberWithdrawLimit.getAdministrationCostDeductPayMoneyRatio();
       log.info("只收行政费用百分比：{}", moneyRatio);
       BigDecimal multiply =
-              validateDmlBean
-                      .getRemainRequiredDml()
-                      .multiply(moneyRatio.divide(BigDecimal.valueOf(100)));
+          validateDmlBean
+              .getRemainRequiredDml()
+              .multiply(moneyRatio.divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP));
       log.info("只收取行政费用：{}", multiply);
       validateDmlBean.setSumAllDeduct(multiply);
     } else if (ObjectUtil.equal(whetherDeductAdministrationCost, 2)) {
       validateDmlBean.setSumAllDeduct(BigDecimal.ZERO);
     }
     validateDmlBean.setYetWithdraw(BigDecimal.ZERO);
-    List<ValidWithdrawVO> validWithdrawVOS =
-            BeanUtils.mapList(validWithdraws, ValidWithdrawVO.class);
-    validateDmlBean.setRows(validWithdrawVOS);
+    validateDmlBean.setRows(BeanUtils.mapList(validWithdraws, ValidWithdrawVO.class));
     return validateDmlBean;
   }
 
-  public BigDecimal getCount(List<ValidWithdraw> validWithdrawList) {
+  private BigDecimal getCount(List<ValidWithdraw> validWithdrawList) {
     BigDecimal validAmount = new BigDecimal(0);
-    if (StringUtils.isNotEmpty(validWithdrawList)) {
+    if (CollUtil.isNotEmpty(validWithdrawList)) {
       for (ValidWithdraw validWithdraw : validWithdrawList) {
         BigDecimal difference = validWithdraw.getBetAmount().subtract(validWithdraw.getDmlClaim());
         validAmount =
@@ -330,96 +392,35 @@ public class ValidWithdrawServiceImpl extends ServiceImpl<ValidWithdrawMapper, V
     return validAmount;
   }
 
-  /** 计算打码量 */
-  @Override
-  public void countAccountValidWithdraw(String username) {
-    List<ValidAccoutWithdrawVo> validWithdraw =
-        validWithdrawMapper.findAccountValidWithdraw(username);
-    if (StringUtils.isEmpty(validWithdraw)) {
-      return;
-    }
-    String indexName = ContextConstant.ES_INDEX.BET_RECORD_ + tenantConfig.getTenantCode();
-    validWithdraw.forEach(
-        a -> {
-          GameVaildBetRecordQueryDTO dto =
-              new GameVaildBetRecordQueryDTO() {
-                {
-                  setAccount(a.getAccount());
-                  setBeginTime(a.getCreateTime());
-                  setEndTime(a.getEndTime());
-                  setState("1");
-                }
-              };
-          QueryBuilder builder = GameBetRecordSearchBuilder.buildBetRecordSearch(dto);
-          // todo betTime
-          SortBuilder<FieldSortBuilder> sortBuilder =
-              SortBuilders.fieldSort("betTime.keyword").order(SortOrder.DESC);
-          PageResponse<GameBetValidRecordVo> result =
-              baseElasticsearchService.search(
-                  builder, indexName, GameBetValidRecordVo.class, 0, 9999, sortBuilder);
-          if (StringUtils.isNotEmpty(result.getList())) {
-            ValidAccoutWithdrawVo validAccoutWithdrawVo = new ValidAccoutWithdrawVo();
-            validAccoutWithdrawVo.setId(a.getId());
-            // 会员一笔打码量的投注记录
-            List<GameBetValidRecordVo> gameBetValidRecordVoList = result.getList();
-            // 总有效投注额
-            BigDecimal vaildAmount =
-                gameBetValidRecordVoList.stream()
-                    .map(GameBetValidRecordVo::getValidAmount)
-                        .reduce(BigDecimal.ZERO, BigDecimal::add)
-                        .divide(Convert.toBigDecimal(1000));
-            log.info("每笔总投注记录:{}", vaildAmount);
-            validAccoutWithdrawVo.setVaildAmount(vaildAmount);
-            // 根据游戏类型进行分类
-            Map<String, List<GameBetValidRecordVo>> map =
-                gameBetValidRecordVoList.stream()
-                    .collect(Collectors.groupingBy(GameBetValidRecordVo::getGameKind));
-            // 初始化投注内容
-            // 初始化投注内容
-            List<Object> vailList = new ArrayList();
-            map.keySet()
-                .forEach(
-                    b -> {
-                      JSONObject jsonObject = new JSONObject();
-                      List<GameBetValidRecordVo> list = map.get(b);
-                      // 添加一个游戏的详情（gameKind,gameName,betAmount）
-                      // 根据游戏类型进行分组
-                      BigDecimal betAmount =
-                          list.stream()
-                              .map(GameBetValidRecordVo::getValidAmount)
-                                  .reduce(BigDecimal.ZERO, BigDecimal::add)
-                                  .divide(Convert.toBigDecimal(1000));
-                      String gameName = list.get(0).getGameName();
-                      jsonObject.put("vaildBetAmount", betAmount);
-                      jsonObject.put("gameKind", b);
-                      jsonObject.put("gameName", gameName);
-                      vailList.add(jsonObject);
-                    });
-            validAccoutWithdrawVo.setBetContext(JSONArray.toJSONString(vailList));
-
-            validWithdrawMapper.updateByBetId(validAccoutWithdrawVo);
-          }
-        });
+  private List<ValidWithdraw> queryByMemberIdAndAddTimeLessThanOrEqualToAndStatus(
+      String account, Integer status) {
+    return this.lambdaQuery()
+        .eq(ValidWithdraw::getAccount, account)
+        /* .le(ValidWithdraw::getCreateTime, maxTime)*/
+        .eq(ValidWithdraw::getStatus, status)
+        .orderByAsc(ValidWithdraw::getType)
+        .orderByDesc(ValidWithdraw::getId)
+        .list();
   }
 
-  @Override
-  public void updateValidWithdraw(ValidWithdrawDto dto) {
-    // 更新会员信息和会员详情
-    Assert.isTrue(this.updateById(validWithdrawConvert.toEntity(dto)), "修改打码量信息失败!");
+  private void deleteByUserId(Long memberId, Integer status) {
+    LambdaQueryWrapper<ValidWithdraw> query = Wrappers.lambdaQuery();
+    query.eq(ValidWithdraw::getMemberId, memberId).eq(ValidWithdraw::getStatus, status);
+    this.remove(query);
   }
 
-  @Override
-  public void delValidWithdraw(String member) throws Exception {
-    this.deleteByUserName(member, 0);
+  private void deleteByUserName(String member, Integer status) {
+    LambdaQueryWrapper<ValidWithdraw> query = Wrappers.lambdaQuery();
+    query.eq(ValidWithdraw::getAccount, member).eq(ValidWithdraw::getStatus, status);
+    this.remove(query);
   }
 
-  @Override
-  public void rollGameRebateDml(String remark) {
-    LambdaUpdateWrapper<ValidWithdraw> updateWrapper = Wrappers.lambdaUpdate();
-    updateWrapper
-        .eq(ValidWithdraw::getRemark, remark)
-        .set(ValidWithdraw::getDiscountMoney, 0)
-        .set(ValidWithdraw::getDiscountDml, 0);
-    validWithdrawMapper.update(null, updateWrapper);
+  private void updateTypeByUserId(Long memberId, Date createTime) {
+    this.lambdaUpdate()
+        .set(ValidWithdraw::getType, 1)
+        .set(ValidWithdraw::getEndTime, createTime)
+        .eq(ValidWithdraw::getMemberId, memberId)
+        .eq(ValidWithdraw::getType, 0)
+        .update(new ValidWithdraw());
   }
 }

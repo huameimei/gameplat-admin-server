@@ -1,5 +1,7 @@
 package com.gameplat.admin.service.impl;
 
+import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.date.DateUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -72,11 +74,14 @@ public class RebateReportServiceImpl extends ServiceImpl<RebateReportMapper, Reb
     for (RebateReport rebateReport : rebateReportPOList) {
       // 填充每个代理的 总下级代理数 总下级会员数
       QueryWrapper queryWrapper = new QueryWrapper();
-      queryWrapper.eq("user_type", MemberEnums.Type.MEMBER);
+      queryWrapper.eq("user_type", MemberEnums.Type.AGENT.value());
       queryWrapper.like("super_path", "/".concat(rebateReport.getAgentName()).concat("/"));
       rebateReport.setSubAgent(memberMapper.selectCount(queryWrapper).intValue());
-      queryWrapper.eq("user_type", MemberEnums.Type.AGENT);
-      rebateReport.setSubMember(memberMapper.selectCount(queryWrapper).intValue());
+
+      QueryWrapper queryWrapper2 = new QueryWrapper();
+      queryWrapper2.like("super_path", "/".concat(rebateReport.getAgentName()).concat("/"));
+      queryWrapper2.eq("user_type", MemberEnums.Type.MEMBER.value());
+      rebateReport.setSubMember(memberMapper.selectCount(queryWrapper2).intValue());
     }
     // 已结算的代理不再更新佣金报表
     List<String> agentNameList = rebateReportMapper.getSettlementAgent(countDate);
@@ -85,134 +90,146 @@ public class RebateReportServiceImpl extends ServiceImpl<RebateReportMapper, Reb
             .filter(rebateReportPO -> !agentNameList.contains(rebateReportPO.getAgentName()))
             .collect(Collectors.toList());
     rebateReportPOList = Collections.synchronizedList(rebateReportPOList);
-    rebateReportPOList.parallelStream()
-        .forEach(
-            rebateReportPO -> {
-              // 初始化
-              rebateReportPO.setCountDate(countDate);
-              rebateReportPO.setCreateBy("system");
-              rebateReportPO.setUpdateBy("system");
-              rebateReportPO.setCreateTime(DateUtil.parse(DateUtil.now(), "yyyy-MM-dd HH:mm:ss"));
-              rebateReportPO.setUpdateTime(DateUtil.parse(DateUtil.now(), "yyyy-MM-dd HH:mm:ss"));
-              // 实际佣金
-              BigDecimal actualCommission;
-              // 流水返利
-              BigDecimal turnoverRebate;
-              // 累计负盈利
-              BigDecimal lastNegativeProfit;
+    if (CollectionUtil.isNotEmpty(rebateReportPOList)) {
+      rebateReportPOList.parallelStream()
+          .forEach(
+              rebateReportPO -> {
+                // 初始化
+                rebateReportPO.setCountDate(countDate);
+                rebateReportPO.setCreateBy("system");
+                rebateReportPO.setUpdateBy("system");
+                rebateReportPO.setCreateTime(DateUtil.parse(DateUtil.now(), "yyyy-MM-dd HH:mm:ss"));
+                rebateReportPO.setUpdateTime(DateUtil.parse(DateUtil.now(), "yyyy-MM-dd HH:mm:ss"));
+                // 实际佣金
+                BigDecimal actualCommission;
+                // 流水返利
+                BigDecimal turnoverRebate;
+                // 累计负盈利
+                BigDecimal lastNegativeProfit;
 
-              // 佣金报表统计
-              // 1、统计下级有效会员
-              List<MemberReportVO> memberReportPOList =
-                  getMemberReport(rebateReportPO.getAgentId(), countDate);
-              Long efficientMember =
-                  memberReportPOList.stream()
-                      .filter(memberReportPO -> memberReportPO.getEfficient() == NumberConstant.ONE)
-                      .count();
-              rebateReportPO.setEfficientMember(efficientMember.intValue());
-              // 2、统计返水
-              BigDecimal waterAmount =
-                  memberReportPOList.stream()
-                      .map(MemberReportVO::getRebateAmount)
-                      .reduce(BigDecimal.ZERO, BigDecimal::add);
-              // 3、统计红利
-              BigDecimal dividendAmount =
-                  memberReportPOList.stream()
-                      .map(MemberReportVO::getDividendAmount)
-                      .reduce(BigDecimal.ZERO, BigDecimal::add);
-              // 4、统计公司总输赢
-              List<PlatformFeeVO> platformFeePOList =
-                  getPlatformFee(rebateReportPO.getAgentId(), countDate);
-              BigDecimal gameWin =
-                  platformFeePOList.stream()
-                      .map(PlatformFeeVO::getWinAmount)
-                      .reduce(BigDecimal.ZERO, BigDecimal::add);
-              rebateReportPO.setGameWin(gameWin);
-              // 5、统计平台费用
-              BigDecimal platformFee =
-                  platformFeePOList.stream()
-                      .map(PlatformFeeVO::getGameFee)
-                      .reduce(BigDecimal.ZERO, BigDecimal::add);
-              // 6、统计公司成本：公司成本 = 平台费用 + 红利 + 返水
-              BigDecimal totalCost = waterAmount.add(dividendAmount).add(platformFee);
-              rebateReportPO.setTotalCost(totalCost);
-              // 7、统计公司净盈利：公司净盈利 = 公司总输赢 - 公司成本
-              BigDecimal netProfit = gameWin.subtract(totalCost);
-              // 8、上月累计负盈利
-              MemberCommissionVO memberCommissionVO =
-                  rebateReportMapper.getMemberCommission(
-                      rebateReportPO.getAgentId(),
-                      DateUtil.format(
-                          DateUtil.offsetMonth(DateUtil.parse(countDate, "yyyy-MM"), -1),
-                          "yyyy-MM"));
-              if (Objects.isNull(memberCommissionVO)) {
-                lastNegativeProfit = BigDecimal.ZERO;
-              } else {
-                BigDecimal profitAmount =
-                    memberCommissionVO.getNegativeProfit().add(memberCommissionVO.getNetProfit());
-                lastNegativeProfit =
-                    profitAmount.compareTo(BigDecimal.ZERO) == -1 ? profitAmount : BigDecimal.ZERO;
-              }
+                // 佣金报表统计
+                // 1、统计下级有效会员
+                List<MemberReportVO> memberReportPOList =
+                    getMemberReport(rebateReportPO.getAgentId(), countDate);
+                Long efficientMember =
+                    memberReportPOList.stream()
+                        .filter(
+                            memberReportPO -> memberReportPO.getEfficient() == NumberConstant.ONE)
+                        .count();
+                rebateReportPO.setEfficientMember(efficientMember.intValue());
+                // 2、统计返水
+                BigDecimal waterAmount =
+                    memberReportPOList.stream()
+                        .map(MemberReportVO::getRebateAmount)
+                        .reduce(BigDecimal.ZERO, BigDecimal::add);
+                // 3、统计红利
+                BigDecimal dividendAmount =
+                    memberReportPOList.stream()
+                        .map(MemberReportVO::getDividendAmount)
+                        .reduce(BigDecimal.ZERO, BigDecimal::add);
+                // 4、统计公司总输赢
+                List<PlatformFeeVO> platformFeePOList =
+                    getPlatformFee(rebateReportPO.getAgentId(), countDate);
+                BigDecimal gameWin =
+                    platformFeePOList.stream()
+                        .map(PlatformFeeVO::getWinAmount)
+                        .reduce(BigDecimal.ZERO, BigDecimal::add);
+                rebateReportPO.setGameWin(gameWin);
+                // 5、统计平台费用
+                BigDecimal platformFee =
+                    platformFeePOList.stream()
+                        .map(PlatformFeeVO::getGameFee)
+                        .reduce(BigDecimal.ZERO, BigDecimal::add);
+                // 6、统计公司成本：公司成本 = 平台费用 + 红利 + 返水
+                BigDecimal totalCost = waterAmount.add(dividendAmount).add(platformFee);
+                rebateReportPO.setTotalCost(totalCost);
+                // 7、统计公司净盈利：公司净盈利 = 公司总输赢 - 公司成本
+                BigDecimal netProfit = gameWin.subtract(totalCost);
+                // 8、上月累计负盈利
+                MemberCommissionVO memberCommissionVO =
+                    rebateReportMapper.getMemberCommission(
+                        rebateReportPO.getAgentId(),
+                        DateUtil.format(
+                            DateUtil.offsetMonth(DateUtil.parse(countDate, "yyyy-MM"), -1),
+                            "yyyy-MM"));
+                if (Objects.isNull(memberCommissionVO)) {
+                  lastNegativeProfit = BigDecimal.ZERO;
+                } else {
+                  BigDecimal profitAmount =
+                      memberCommissionVO.getNegativeProfit().add(memberCommissionVO.getNetProfit());
+                  lastNegativeProfit =
+                      profitAmount.compareTo(BigDecimal.ZERO) == -1
+                          ? profitAmount
+                          : BigDecimal.ZERO;
+                }
 
-              // 计算实际佣金
-              // 1、获取分红配置
-              RebateConfig rebateConfigPO =
-                  rebateConfigService.getRebateConfigByParam(
-                      rebateReportPO.getPlanId(), netProfit, efficientMember.intValue());
-              BigDecimal agentProportion = rebateConfigPO.getLowerCommission();
-              BigDecimal turnoverProportion = rebateConfigPO.getTurnoverCommission();
-              // 2、下级代理佣金
-              BigDecimal subAgentCommission = BigDecimal.ZERO; // 逻辑需要补上
-              BigDecimal agentCommission =
-                  subAgentCommission
-                      .multiply(agentProportion)
-                      .setScale(2, BigDecimal.ROUND_HALF_UP);
-              // 3、下级会员佣金 = (公司净盈利 + 上月累计负盈利) * 佣金比例
-              BigDecimal memberProportion =
-                  rebateConfigPO.getCommission() == null
-                      ? BigDecimal.ZERO
-                      : rebateConfigPO.getCommission();
-              BigDecimal memberCommission =
-                  netProfit
-                      .add(lastNegativeProfit)
-                      .multiply(memberProportion)
-                      .setScale(2, BigDecimal.ROUND_HALF_UP);
-              // 4、流水返利 = 总计有效投注 * 返利占比
-              BigDecimal totalValidAmount =
-                  platformFeePOList.stream()
-                      .map(PlatformFeeVO::getValidAmount)
-                      .reduce(BigDecimal.ZERO, BigDecimal::add);
-              turnoverRebate =
-                  totalValidAmount
-                      .multiply(turnoverProportion)
-                      .setScale(2, BigDecimal.ROUND_HALF_UP);
-              // 5、调整金额
-              BigDecimal adjustmentAmount = BigDecimal.ZERO;
-              RebateReportDTO rebateReportDTO = new RebateReportDTO();
-              rebateReportDTO.setAgentName(agentName);
-              rebateReportDTO.setCountDate(countDate);
-              List<RebateReportVO> rebateReportVOS = getRebateReport(rebateReportDTO);
-              if (rebateReportVOS.size() == 1) {
-                adjustmentAmount = rebateReportVOS.get(0).getAdjustmentAmount();
-              }
-              if (memberCommission.compareTo(BigDecimal.ZERO) <= 0) {
-                // 下级会员佣金为负数或不满足佣金要求 实际佣金 = 下级代理佣金 + 流水返利 + 佣金调整
-                actualCommission = agentCommission.add(turnoverRebate).add(adjustmentAmount);
-              } else {
-                // 下级会员佣金为正数 实际佣金 = 下级会员佣金 + 下级代理佣金 + 流水返利 + 佣金调整
-                actualCommission =
-                    memberCommission.add(agentCommission).add(turnoverRebate).add(adjustmentAmount);
-              }
-              rebateReportPO.setMemberCommission(memberCommission);
-              rebateReportPO.setNegativeProfit(lastNegativeProfit);
-              rebateReportPO.setTurnoverRebate(turnoverRebate);
-              rebateReportPO.setConfigId(rebateConfigPO.getConfigId());
-              rebateReportPO.setRebateLevel(rebateConfigPO.getRebateLevel());
-              rebateReportPO.setMemberProportion(memberProportion);
-              rebateReportPO.setAgentProportion(agentProportion);
-              rebateReportPO.setTurnoverProportion(turnoverProportion);
-              rebateReportPO.setActualCommission(actualCommission);
-            });
+                // 计算实际佣金
+                // 1、获取分红配置
+                RebateConfig rebateConfigPO =
+                    rebateConfigService.getRebateConfigByParam(
+                        rebateReportPO.getPlanId(), netProfit, efficientMember.intValue());
+                if (BeanUtil.isEmpty(rebateConfigPO)) {
+                  return;
+                }
+                BigDecimal agentProportion = rebateConfigPO.getLowerCommission();
+                BigDecimal turnoverProportion = rebateConfigPO.getTurnoverCommission();
+                // 2、下级代理佣金
+                BigDecimal subAgentCommission = BigDecimal.ZERO; // 逻辑需要补上
+                BigDecimal agentCommission =
+                    subAgentCommission
+                        .multiply(agentProportion)
+                        .setScale(2, BigDecimal.ROUND_HALF_UP);
+                // 3、下级会员佣金 = (公司净盈利 + 上月累计负盈利) * 佣金比例
+                BigDecimal memberProportion =
+                    rebateConfigPO.getCommission() == null
+                        ? BigDecimal.ZERO
+                        : rebateConfigPO.getCommission();
+                BigDecimal memberCommission =
+                    netProfit
+                        .add(lastNegativeProfit)
+                        .multiply(memberProportion)
+                        .setScale(2, BigDecimal.ROUND_HALF_UP);
+                // 4、流水返利 = 总计有效投注 * 返利占比
+                BigDecimal totalValidAmount =
+                    platformFeePOList.stream()
+                        .map(PlatformFeeVO::getValidAmount)
+                        .reduce(BigDecimal.ZERO, BigDecimal::add);
+                turnoverRebate =
+                    totalValidAmount
+                        .multiply(turnoverProportion)
+                        .setScale(2, BigDecimal.ROUND_HALF_UP);
+                // 5、调整金额
+                BigDecimal adjustmentAmount = BigDecimal.ZERO;
+                RebateReportDTO rebateReportDTO = new RebateReportDTO();
+                rebateReportDTO.setAgentName(agentName);
+                rebateReportDTO.setCountDate(countDate);
+                List<RebateReportVO> rebateReportVOS = getRebateReport(rebateReportDTO);
+                if (rebateReportVOS.size() == 1) {
+                  adjustmentAmount = rebateReportVOS.get(0).getAdjustmentAmount();
+                }
+                if (memberCommission.compareTo(BigDecimal.ZERO) <= 0) {
+                  // 下级会员佣金为负数或不满足佣金要求 实际佣金 = 下级代理佣金 + 流水返利 + 佣金调整
+                  actualCommission = agentCommission.add(turnoverRebate).add(adjustmentAmount);
+                } else {
+                  // 下级会员佣金为正数 实际佣金 = 下级会员佣金 + 下级代理佣金 + 流水返利 + 佣金调整
+                  actualCommission =
+                      memberCommission
+                          .add(agentCommission)
+                          .add(turnoverRebate)
+                          .add(adjustmentAmount);
+                }
+                rebateReportPO.setMemberCommission(memberCommission);
+                rebateReportPO.setNegativeProfit(lastNegativeProfit);
+                rebateReportPO.setTurnoverRebate(turnoverRebate);
+                rebateReportPO.setConfigId(rebateConfigPO.getConfigId());
+                rebateReportPO.setRebateLevel(rebateConfigPO.getRebateLevel());
+                rebateReportPO.setMemberProportion(memberProportion);
+                rebateReportPO.setAgentProportion(agentProportion);
+                rebateReportPO.setTurnoverProportion(turnoverProportion);
+                rebateReportPO.setActualCommission(actualCommission);
+              });
+    }
+
     if (StringUtils.isNotEmpty(rebateReportPOList)) {
       rebateReportMapper.batchAddRebateReport(rebateReportPOList);
     }

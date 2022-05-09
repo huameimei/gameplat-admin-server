@@ -20,9 +20,9 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 
 /**
+ * vip福利发放
+ *
  * @author lily
- * @description vip福利发放
- * @date 2021/11/22
  */
 @Api(tags = "vip福利发放")
 @Slf4j

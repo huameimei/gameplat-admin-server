@@ -536,14 +536,30 @@ public class ActivityLobbyServiceImpl extends ServiceImpl<ActivityLobbyMapper, A
   @Override
   public List<ActivityLobbyVO> findAllLobbyList() {
     List<ActivityLobby> activityLobbies =
-        this.lambdaQuery().eq(ActivityLobby::getStatus, BooleanEnum.YES.value()).list();
+            this.lambdaQuery()
+                    .eq(ActivityLobby::getStatus, BooleanEnum.YES.value())
+                    .le(ActivityLobby::getStartTime, DateUtil.getNowTime())
+                    .ge(ActivityLobby::getEndTime, DateUtil.getNowTime())
+                    .list();
     if (CollectionUtils.isEmpty(activityLobbies)) {
       return new ArrayList<>();
     }
-    List<ActivityLobbyVO> lobbyList = new ArrayList<>(activityLobbies.size());
-    for (ActivityLobby activityLobby : activityLobbies) {
-      lobbyList.add(activityLobbyConvert.toVo(activityLobby));
+    return activityLobbies.stream().map(activityLobbyConvert::toVo).collect(Collectors.toList());
+  }
+
+  @Override
+  public ActivityLobbyVO getActivityLobbyVOById(Long activityLobbyId) {
+    ActivityLobbyVO result = baseMapper.getActivityLobbyVOById(activityLobbyId);
+    if (CollectionUtils.isNotEmpty(result.getLobbyDiscountList())) {
+      List<ActivityLobbyDiscountVO> activityLobbyDiscountVOList = new ArrayList<>();
+      for (int i = 0; i < result.getLobbyDiscountList().size(); i++) {
+        Object o=result.getLobbyDiscountList().get(i);
+        if(o instanceof ActivityLobbyDiscount){
+          activityLobbyDiscountVOList.add(activityLobbyDiscountConvert.toVO(((ActivityLobbyDiscount) o)));
+        }
+      }
+      result.setLobbyDiscountList(activityLobbyDiscountVOList);
     }
-    return lobbyList;
+    return result;
   }
 }

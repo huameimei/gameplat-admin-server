@@ -8,7 +8,7 @@ import java.util.Date;
 @Data
 public class RechargeOrderHistoryVO {
 
-  public Long id;
+  private Long id;
 
   private String account;
 

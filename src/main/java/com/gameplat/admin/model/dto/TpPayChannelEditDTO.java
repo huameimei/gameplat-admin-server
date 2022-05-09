@@ -67,6 +67,8 @@ public class TpPayChannelEditDTO implements Serializable {
 
   private Integer typeSubscript;
 
+  private String url;
+
   @Override
   public String toString() {
     return JSON.toJSONString(this);

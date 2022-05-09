@@ -57,7 +57,7 @@ public class ChatLeaderBoardServiceImpl extends ServiceImpl<ChatLeaderBoardMappe
   @Autowired private ChatLeaderBoardMapper chatLeaderBoardMapper;
   @Autowired private RedisTemplate<String, Object> redisTemplate;
   @Autowired private MemberService memberService;
-  @Autowired private TenantDomainService tenantDomainService;
+  @Autowired private SysDomainService sysDomainService;
 
   /** 创建聊天室排行榜 */
   @Override
@@ -260,7 +260,7 @@ public class ChatLeaderBoardServiceImpl extends ServiceImpl<ChatLeaderBoardMappe
   }
 
   public JSONArray getChatRoom(String proxy) throws ServiceException {
-    String chatDomain = tenantDomainService.getChatDomain();
+    String chatDomain = sysDomainService.getChatDomain();
     if (StringUtils.isBlank(chatDomain)) {
       throw new ServiceException("未配服务");
     }
@@ -280,7 +280,7 @@ public class ChatLeaderBoardServiceImpl extends ServiceImpl<ChatLeaderBoardMappe
   }
 
   public JSONArray getChatUser(String ids, String proxy) throws Exception {
-    String chatDomain = tenantDomainService.getChatDomain();
+    String chatDomain = sysDomainService.getChatDomain();
     if (StringUtils.isBlank(chatDomain)) {
       throw new ServiceException("未配服务");
     }

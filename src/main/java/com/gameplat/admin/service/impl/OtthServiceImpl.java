@@ -72,7 +72,7 @@ public class OtthServiceImpl implements OtthService {
 
   @Autowired private GameConfigService gameConfigService;
 
-  @Autowired private TenantDomainService tenantDomainService;
+  @Autowired private SysDomainService sysDomainService;
 
   @Autowired private RemoteLogService remoteLogService;
 
@@ -191,7 +191,7 @@ public class OtthServiceImpl implements OtthService {
 
   @Override
   public JSONArray getRoomInfoList() {
-    String chatDomain = tenantDomainService.getChatDomain();
+    String chatDomain = sysDomainService.getChatDomain();
     if (org.apache.commons.lang3.StringUtils.isBlank(chatDomain)) {
       throw new ServiceException("未配服务");
     }
@@ -212,7 +212,7 @@ public class OtthServiceImpl implements OtthService {
 
   @Override
   public void updateRoom(String body) {
-    String chatDomain = tenantDomainService.getChatDomain();
+    String chatDomain = sysDomainService.getChatDomain();
     if (org.apache.commons.lang3.StringUtils.isBlank(chatDomain)) {
       throw new ServiceException("未配服务");
     }
@@ -586,7 +586,7 @@ public class OtthServiceImpl implements OtthService {
   public ChatUserVO getChatUser(String account) {
     Member user =
         memberService.getByAccount(account).orElseThrow(() -> new ServiceException("用户不存在"));
-    String chatDomain = tenantDomainService.getChatDomain();
+    String chatDomain = sysDomainService.getChatDomain();
     if (org.apache.commons.lang3.StringUtils.isBlank(chatDomain)) {
       throw new ServiceException("未配服务");
     }
@@ -609,7 +609,7 @@ public class OtthServiceImpl implements OtthService {
   }
 
   private String getApiUrl(String url) throws ServiceException {
-    String chatDomain = tenantDomainService.getChatDomain();
+    String chatDomain = sysDomainService.getChatDomain();
     url = chatDomain + "/" + url.replace("_", "/");
     return url;
   }

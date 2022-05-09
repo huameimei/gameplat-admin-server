@@ -62,19 +62,12 @@ public class RebateExtendController {
 
   /**
    * 删除
-   *
-   * @param extendId
+   * @param extendPO
    */
   @ApiOperation("删除佣金调整记录")
   @PostMapping(value = "/remove")
-  public void removeReportExtend(@RequestParam Long extendId) {
-    RebateReportExtend reportExtendPO =
-        new RebateReportExtend() {
-          {
-            setExtendId(extendId);
-            setUpdateBy(SecurityUserHolder.getUsername());
-          }
-        };
-    rebateExtendService.removeReportExtend(reportExtendPO);
+  public void removeReportExtend(@RequestBody RebateReportExtend extendPO) {
+    extendPO.setUpdateBy(SecurityUserHolder.getUsername());
+    rebateExtendService.removeReportExtend(extendPO);
   }
 }

@@ -28,7 +28,6 @@ import java.util.List;
  * 现金流水
  *
  * @author lily
- * @date 2021/12/2
  */
 @Api(tags = "现金流水")
 @Slf4j
@@ -38,7 +37,7 @@ public class OpenMemberBillController {
 
   @Autowired private MemberBillService memberBillService;
 
-  @ApiOperation(value = "现金流水")
+  @ApiOperation("现金流水")
   @GetMapping("/pageList")
   @PreAuthorize("hasAuthority('funds:cash:view')")
   public IPage<MemberBillVO> queryPage(PageDTO<MemberBill> page, MemberBillDTO dto) {
@@ -47,7 +46,7 @@ public class OpenMemberBillController {
 
   @SneakyThrows
   @GetMapping(value = "/exportBill", produces = "application/vnd.ms-excel")
-  @ApiOperation(value = "导出现金流水列表")
+  @ApiOperation("导出现金流水列表")
   @PreAuthorize("hasAuthority('funds:cash:export')")
   public void exportSign(MemberBillDTO dto, HttpServletResponse response) {
     List<MemberBillVO> list = memberBillService.queryList(dto);
@@ -59,7 +58,7 @@ public class OpenMemberBillController {
   }
 
   @GetMapping("/tranTypes")
-  @ApiOperation(value = "账变类型")
+  @ApiOperation("账变类型")
   public List<TranTypeBean> findTranTypes() {
     return memberBillService.findTranTypes();
   }

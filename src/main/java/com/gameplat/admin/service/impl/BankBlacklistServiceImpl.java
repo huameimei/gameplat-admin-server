@@ -12,8 +12,8 @@ import com.gameplat.admin.mapper.BankBlacklistMapper;
 import com.gameplat.admin.model.dto.BankBlacklistQueryDTO;
 import com.gameplat.admin.model.dto.OperBankBlacklistDTO;
 import com.gameplat.admin.service.BankBlacklistService;
-import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.DateUtils;
+import com.gameplat.common.lang.Assert;
 import com.gameplat.model.entity.blacklist.BankBlacklist;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,25 +51,17 @@ public class BankBlacklistServiceImpl extends ServiceImpl<BankBlacklistMapper, B
 
   @Override
   public void update(OperBankBlacklistDTO dto) {
-    BankBlacklist bankBlacklist = bankBlacklistConvert.toEntity(dto);
-    if (!this.updateById(bankBlacklist)) {
-      throw new ServiceException("更新银行卡黑名单失败！");
-    }
+    Assert.isTrue(this.updateById(bankBlacklistConvert.toEntity(dto)), "更新银行卡黑名单失败！");
   }
 
   @Override
   public void save(OperBankBlacklistDTO dto) {
-    BankBlacklist bankBlacklist = bankBlacklistConvert.toEntity(dto);
-    if (!this.save(bankBlacklist)) {
-      throw new ServiceException("添加银行卡黑名单失败！");
-    }
+    Assert.isTrue(this.save(bankBlacklistConvert.toEntity(dto)), "添加银行卡黑名单失败！");
   }
 
   @Override
   public void delete(Long id) {
-    if (!this.removeById(id)) {
-      throw new ServiceException("删除银行卡黑名单失败！");
-    }
+    Assert.isTrue(this.removeById(id), "删除银行卡黑名单失败！");
   }
 
   @Override

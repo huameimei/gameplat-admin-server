@@ -20,4 +20,6 @@ public interface GameTransferRecordService extends IService<GameTransferRecord> 
   List<GameTransferRecord> findPlatformCodeList(Long id);
 
   void saveTransferRecord(GameTransferRecord transferRecord);
+
+  long findGameTransferFailRecord();
 }

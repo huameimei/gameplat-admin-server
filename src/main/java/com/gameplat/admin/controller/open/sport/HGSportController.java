@@ -2,17 +2,14 @@ package com.gameplat.admin.controller.open.sport;
 
 import com.gameplat.admin.model.dto.HGSportDTO;
 import com.gameplat.admin.service.HGSportService;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-/**
- * @author aBen
- * @date 2022/1/6 0:02
- * @desc 皇冠体育
- */
+@Api(tags = "皇冠体育")
 @Slf4j
 @RestController
 @RequestMapping("/api/admin/sport/hGSport")
@@ -50,7 +47,7 @@ public class HGSportController {
 
   @ApiOperation(value = "HG即时注单详情")
   @GetMapping("/queryHGCurBetOrder")
-//  @PreAuthorize("hasAuthority('sport:hGSport:queryHGCurBetOrder')")
+  //  @PreAuthorize("hasAuthority('sport:hGSport:queryHGCurBetOrder')")
   public Object queryHgCurBetOrder(HGSportDTO dto) {
     return hgSportService.queryHGCurBetOrder(dto);
   }

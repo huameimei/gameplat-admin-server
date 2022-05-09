@@ -1,6 +1,8 @@
 package com.gameplat.admin.model.dto;
 
 import java.io.Serializable;
+
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 @Data
@@ -43,9 +45,14 @@ public class GameBetRecordQueryDTO implements Serializable {
 
   private String userPaths;
 
-  private String superAccount;
+  private String proxyAccount;
+
+  /** 是否只查询直属下级 */
+  private Integer isDirectly;
 
   private String gameKindList;
 
   private String gameType;
+
+  private String gameCode;
 }

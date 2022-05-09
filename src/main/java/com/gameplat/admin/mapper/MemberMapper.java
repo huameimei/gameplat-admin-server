@@ -8,11 +8,13 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.gameplat.admin.model.dto.IpAnalysisDTO;
 import com.gameplat.admin.model.dto.MemberQueryDTO;
+import com.gameplat.admin.model.dto.UpdateLowerNumDTO;
 import com.gameplat.admin.model.vo.*;
 import com.gameplat.model.entity.member.Member;
-import java.util.List;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
+
+import java.util.List;
 
 public interface MemberMapper extends BaseMapper<Member> {
 
@@ -25,7 +27,10 @@ public interface MemberMapper extends BaseMapper<Member> {
   /**
    * 批量修改代理路径
    *
-   * @param member Member
+   * @param account String
+   * @param agentLevel Integer
+   * @param originSuperPath String
+   * @param superPath String
    */
   void batchUpdateSuperPathAndAgentLevel(
       @Param("account") String account,
@@ -40,6 +45,13 @@ public interface MemberMapper extends BaseMapper<Member> {
    * @param lowerNum int
    */
   void updateLowerNumByAccount(String account, int lowerNum);
+
+  /**
+   * 批量更新下级人数
+   *
+   * @param list List<UpdateLowerNumDTO>
+   */
+  void batchUpdateLowerNumByAccount(List<UpdateLowerNumDTO> list);
 
   /**
    * 根据会员账号获取会员详情
@@ -91,6 +103,8 @@ public interface MemberMapper extends BaseMapper<Member> {
   /** 获取代理线下的会员账号信息 */
   List<Member> getMemberListByAgentAccount(MemberQueryDTO memberQueryDTO);
 
-  MemberBalanceVO findMemberVip(@Param("username") String username, @Param("userlevel") String userlevel, @Param("vipGrade") String vipGrade);
-
+  MemberBalanceVO findMemberVip(
+      @Param("username") String username,
+      @Param("userlevel") String userlevel,
+      @Param("vipGrade") String vipGrade);
 }

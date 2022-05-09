@@ -1,8 +1,8 @@
 package com.gameplat.admin.controller.open.system;
 
-import com.gameplat.admin.model.dto.AgentContacaDTO;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.gameplat.admin.model.dto.AgentContactDTO;
 import com.gameplat.admin.model.dto.EmailTestDTO;
-import com.gameplat.admin.model.vo.AgentContacaVO;
 import com.gameplat.admin.service.ConfigService;
 import com.gameplat.admin.service.SysDictDataService;
 import com.gameplat.admin.service.SystemConfigService;
@@ -208,24 +208,25 @@ public class OpenSystemConfigController {
   }
 
   @ApiOperation(value = "代理联系方式地址列表")
-  @GetMapping("/agent/list")
-  @PreAuthorize("hasAuthority('system:agent:view')")
-  public List<AgentContacaVO> findAgentContacaList() {
-    return systemConfigService.findAgentContacaList();
+  @GetMapping("/agentContact")
+  @PreAuthorize("hasAuthority('system:config:agentContcat:view')")
+  public List<AgentContactConfig> getAgentContact() {
+    return configService.get(
+        DictDataEnum.AGENT_CONTACT, new TypeReference<List<AgentContactConfig>>() {});
   }
 
   @ApiOperation(value = "编辑、新增代理联系方式地址")
-  @PutMapping("/agent/edit")
-  @PreAuthorize("hasAuthority('system:agent:edit')")
-  public void updateAgentContact(@RequestBody AgentContacaDTO dto) {
-    systemConfigService.updateAgentContaca(dto);
+  @PutMapping("/agentContact/edit")
+  @PreAuthorize("hasAuthority('system:config:agentContcat:edit')")
+  public void updateAgentContact(@RequestBody AgentContactDTO dto) {
+    systemConfigService.updateAgentContact(dto);
   }
 
   @ApiOperation(value = "删除代理联系方式地址")
-  @DeleteMapping("/agent/del/{id}")
-  @PreAuthorize("hasAuthority('system:agent:remove')")
-  public void delAgentContaca(@PathVariable("id") Long id) {
-    systemConfigService.delAgentContaca(id);
+  @DeleteMapping("/agentContact/del/{id}")
+  @PreAuthorize("hasAuthority('system:config:agentContcat:remove')")
+  public void delAgentContact(@PathVariable("id") Long id) {
+    systemConfigService.delAgentContact(id);
   }
 
   @GetMapping("/list/{dictType}")

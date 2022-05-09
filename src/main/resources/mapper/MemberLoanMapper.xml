@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gameplat.admin.mapper.MemberLoanMapper">
+
+    <select id="page" resultType="com.gameplat.admin.model.vo.MemberLoanVO" parameterType = "com.gameplat.admin.model.dto.MemberLoanQueryDTO">
+        select
+            m.id memberId,
+            m.account,
+            m.user_level userLevel,
+            m.super_path superPath,
+            i.vip_level vipLevel,
+            i.balance memberBalance,
+            g.loan_money loanMoney,
+            l.loan_time loanTime,
+            IFNULL(l.loan_status, 1) loanStatus,
+            IFNULL(l.overdraft_money, 0.0000) overdraftMoney
+        from
+            (select id,account,user_level,super_path
+                from member
+                <where>
+                    status = 1
+                    <if test="dto.account != null">
+                        AND account = #{dto.account}
+                    </if>
+                </where>
+            ) as m
+            left join member_info i on m.id = i.member_id
+            left join member_growth_level g on g.level = i.vip_level
+            left join
+            (
+                SELECT id, loan_time, loan_status, overdraft_money, member_id FROM member_loan a
+                WHERE NOT EXISTS (select 1 from member_loan b where a.member_id = b.member_id and a.id &lt; b.id)) l ON i.member_id = l.member_id
+        <where>
+            <if test="dto.vipLevel != null">
+                AND i.vip_level = #{dto.vipLevel}
+            </if>
+            <if test="dto.minOverdraftMoney != null and dto.maxOverdraftMoney != null">
+                AND IFNULL(l.overdraft_money, 0.0000) BETWEEN #{dto.minOverdraftMoney} and #{dto.maxOverdraftMoney}
+            </if>
+            <if test="dto.beginLoanTime != null and dto.endLoanTime != null">
+                AND l.loan_time BETWEEN #{dto.beginLoanTime} and #{dto.endLoanTime}
+            </if>
+            <if test="dto.loanStatus != null">
+                AND IFNULL(l.loan_status, 1) = #{dto.loanStatus}
+            </if>
+        </where>
+    </select>
+
+
+    <select id="getNewRecord" resultType="com.gameplat.admin.model.vo.MemberLoanVO" >
+        SELECT
+        id,
+        loan_time,
+        loan_status,
+        overdraft_money,
+        member_id
+        FROM
+        member_loan a WHERE NOT EXISTS (select 1 from member_loan b where a.member_id = b.member_id and a.id &lt; b.id)
+        and member_id = #{memberId}
+    </select>
+
+    <select id="getTotalSum" resultType="java.math.BigDecimal">
+        SELECT
+        ifnull(sum( overdraft_money ), 0.00)  total
+        FROM
+        (
+        SELECT
+        id,
+        loan_time,
+        loan_status,
+        overdraft_money,
+        member_id
+        FROM
+        member_loan a WHERE NOT EXISTS (select 1 from member_loan b where a.member_id = b.member_id and a.id  &lt; b.id)
+        ) m
+    </select>
+</mapper>

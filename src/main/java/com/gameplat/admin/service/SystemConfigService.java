@@ -1,8 +1,7 @@
 package com.gameplat.admin.service;
 
-import com.gameplat.admin.model.dto.AgentContacaDTO;
+import com.gameplat.admin.model.dto.AgentContactDTO;
 import com.gameplat.admin.model.dto.EmailTestDTO;
-import com.gameplat.admin.model.vo.AgentContacaVO;
 import com.gameplat.model.entity.sys.SysDictData;
 
 import java.util.List;
@@ -10,11 +9,9 @@ import java.util.Map;
 
 public interface SystemConfigService {
 
-  List<AgentContacaVO> findAgentContacaList();
+  void updateAgentContact(AgentContactDTO agentContacaDTO);
 
-  void updateAgentContaca(AgentContacaDTO agentContacaDTO);
-
-  void delAgentContaca(Long id);
+  void delAgentContact(Long id);
 
   List<SysDictData> findList(String dictType);
 

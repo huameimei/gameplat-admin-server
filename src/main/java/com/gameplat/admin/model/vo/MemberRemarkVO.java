@@ -15,7 +15,7 @@ import java.util.Date;
 @NoArgsConstructor
 public class MemberRemarkVO implements Serializable {
 
-  public Long id;
+  private Long id;
 
   private Long memberId;
 

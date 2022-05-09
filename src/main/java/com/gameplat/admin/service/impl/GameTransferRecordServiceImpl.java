@@ -135,4 +135,17 @@ public class GameTransferRecordServiceImpl
       log.error("游戏转换插入数据:订单号=" + transferRecord.getOrderNo(), e);
     }
   }
+
+  @Override
+  public long findGameTransferFailRecord() {
+    // 失败的记录
+    return this.lambdaQuery()
+            .eq(GameTransferRecord::getStatus, GameTransferStatus.OUT.getValue())
+            .or()
+            .eq(GameTransferRecord::getStatus, GameTransferStatus.IN.getValue())
+            .or()
+            .eq(GameTransferRecord::getStatus, GameTransferStatus.IN_GAME_FAIL.getValue())
+            .or()
+            .count();
+  }
 }

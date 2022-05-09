@@ -1,5 +1,6 @@
 package com.gameplat.admin.service.impl;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.NumberUtil;
@@ -13,7 +14,7 @@ import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.component.MemberQueryCondition;
-import com.gameplat.admin.config.TenantConfig;
+import com.gameplat.admin.config.SysTheme;
 import com.gameplat.admin.constant.SystemConstant;
 import com.gameplat.admin.convert.MemberConvert;
 import com.gameplat.admin.mapper.MemberMapper;
@@ -52,21 +53,22 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
 
   private static final String DL_FORMAL_TYPE = "A";
 
-
   // 姓名
-  private final static String REALNAME_CODE = "([\\d\\D]{1})(.*)";
-  private final static String REALNAME_REPLACEMENT = "$1**";
+  private static final String REALNAME_CODE = "([\\d\\D]{1})(.*)";
+
+  private static final String REALNAME_REPLACEMENT = "$1**";
 
   // 手机号
-  private final static String PHONE_CODE = "(\\d{3})\\d{4}(\\d{4})";
-  private final static String PHONE_REPLACEMENT = "$1****$2";
+  private static final String PHONE_CODE = "(\\d{3})\\d{4}(\\d{4})";
 
-  //邮箱
-  private final static String EMAIL_CODE = "(\\w?)(\\w+)(\\w)(@\\w+\\.[a-z]+(\\.[a-z]+)?)";
-  private final static String EMAIL_REPLACEMENT = "$1****$3$4";
+  private static final String PHONE_REPLACEMENT = "$1****$2";
 
-  @Autowired(required = false)
-  private MemberMapper memberMapper;
+  // 邮箱
+  private static final String EMAIL_CODE = "(\\w?)(\\w+)(\\w)(@\\w+\\.[a-z]+(\\.[a-z]+)?)";
+
+  private static final String EMAIL_REPLACEMENT = "$1****$3$4";
+
+  @Autowired private MemberMapper memberMapper;
 
   @Autowired private MemberConvert memberConvert;
 
@@ -80,7 +82,7 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
 
   @Autowired private OnlineUserService onlineUserService;
 
-  @Autowired private TenantConfig tenantConfig;
+  @Autowired private SysTheme sysTheme;
 
   @Autowired private GameTransferInfoService gameTransferInfoService;
 
@@ -88,89 +90,15 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
 
   @Autowired private GameAdminService gameAdminService;
 
-  @Autowired(required = false)
-  private RedisTemplate<String, Integer> redisTemplate;
+  @Autowired private RedisTemplate<String, Integer> redisTemplate;
 
-  @Autowired
-  private MemberDayReportService memberDayReportService;
-
-  @Override
-  public IPage<MemberVO> queryPage(Page<Member> page, MemberQueryDTO dto) {
-    IPage<MemberVO> memberVOIPage =
-            memberMapper
-                    .queryPage(page, memberQueryCondition.builderQueryWrapper(dto))
-                    .convert(this::setOnlineStatus);
-
-    // 游戏数据
-    memberVOIPage.setRecords(gameData(memberVOIPage.getRecords()));
-    return memberVOIPage;
-  }
-
-  public List<MemberVO> gameData(List<MemberVO> list) {
-
-    if (StringUtils.isNotEmpty(list)) {
-      List<String> listAccount =
-              list.stream().map(MemberVO::getAccount).collect(Collectors.toList());
-      String account = getAccount(listAccount);
-      QueryWrapper<MemberDayReport> queryWrapper = new QueryWrapper<>();
-      queryWrapper.select("sum(win_amount) win_amount, sum(water_amount) water_amount,user_name");
-      queryWrapper.in("user_name", account.split(","));
-      queryWrapper.groupBy("user_name");
-      List<MemberDayReport> listMemberDayReport = memberDayReportService.list(queryWrapper);
-      if (StringUtils.isEmpty(listMemberDayReport)) {
-        return list;
-      }
-      list.stream()
-              .forEach(
-                      a -> {
-                        if (StringUtils.isNotEmpty(listMemberDayReport)) {
-                          BigDecimal winAmount =
-                                  listMemberDayReport.stream()
-                                          .filter(b -> a.getAccount().equalsIgnoreCase(b.getUserName()))
-                                          .map(MemberDayReport::getWinAmount)
-                                          .reduce(BigDecimal.ZERO, BigDecimal::add);
-                          BigDecimal waterAmount =
-                                  listMemberDayReport.stream()
-                                          .filter(b -> a.getAccount().equalsIgnoreCase(b.getUserName()))
-                                          .map(MemberDayReport::getWaterAmount)
-                                          .reduce(BigDecimal.ZERO, BigDecimal::add);
-                          a.setWaterAmount(waterAmount);
-                          a.setWinAmount(winAmount);
-                        }
-                        // 真实姓名隐藏
-                        if (StringUtils.isNotEmpty(a.getRealName())) {
-                          a.setRealName(hideRealName(a.getRealName()));
-                        }
-                      });
-    }
-    return list;
-  }
-
-  /**
-   * @param id 会员id
-   * @return
-   */
-  @Override
-  public MemberContactVo getMemberDateils(Long id) {
-    MemberInfoVO memberInfo = this.memberMapper.getMemberInfo(id);
-    if (memberInfo == null) {
-      throw new ServiceException("会员不存在");
-    }
-    return MemberContactVo.builder()
-            .email(memberInfo.getEmail())
-            .phone(memberInfo.getPhone())
-            .qq(memberInfo.getQq())
-            .realName(memberInfo.getRealName())
-            .wechat(memberInfo.getWechat())
-            .dialCode(memberInfo.getDialCode())
-            .build();
-  }
+  @Autowired private MemberDayReportService memberDayReportService;
 
   /**
    * 真实姓名
    *
-   * @param realName
-   * @return
+   * @param realName String
+   * @return String
    */
   private static String hideRealName(String realName) {
     return realName.replaceAll(REALNAME_CODE, REALNAME_REPLACEMENT);
@@ -179,8 +107,8 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
   /**
    * 手机号
    *
-   * @param phone
-   * @return
+   * @param phone String
+   * @return String
    */
   private static String desensitizedPhoneNumber(String phone) {
     if (phone.length() == 11) {
@@ -189,28 +117,8 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
       String substring = phone.substring(0, 3);
       int length = phone.length();
       String lastString = phone.substring(length - 2, length);
-      String str = substring + "****" + lastString;
-      return str;
+      return substring + "****" + lastString;
     }
-  }
-
-  /**
-   * 邮箱影藏
-   */
-  public static String getEmail(String email) {
-    return email.replaceAll(EMAIL_CODE, EMAIL_REPLACEMENT);
-  }
-
-  public String getAccount(List<String> listAccount) {
-    StringBuilder sb = new StringBuilder();
-    if (StringUtils.isNotEmpty(listAccount)) {
-      for (String s : listAccount) {
-        sb.append(s).append(",");
-      }
-    }
-    sb.deleteCharAt(sb.toString().length() - 1);
-    String str = sb.toString();
-    return str;
   }
 
   @Override
@@ -221,11 +129,9 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
         .convert(memberConvert::toVo);
   }
 
-  @Override
-  public IPage<MemberBalanceVO> findTGMemberBalance(Page<Member> page, MemberQueryDTO dto) {
-    return memberMapper
-        .queryPage(page, memberQueryCondition.builderQueryWrapper(dto))
-        .convert(memberConvert::toBalanceVo);
+  /** 邮箱影藏 */
+  private static String getEmail(String email) {
+    return email.replaceAll(EMAIL_CODE, EMAIL_REPLACEMENT);
   }
 
   @Override
@@ -468,8 +374,15 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
     this.updateRemark(Collections.singletonList(memberId), remark);
   }
 
-  public void preAddCheck(MemberAddDTO dto) {
-    Assert.isTrue(!this.isExist(dto.getAccount()), "用户名已存在!");
+  @Override
+  public IPage<MemberVO> queryPage(Page<Member> page, MemberQueryDTO dto) {
+    IPage<MemberVO> pageVo =
+        memberMapper
+            .queryPage(page, memberQueryCondition.builderQueryWrapper(dto))
+            .convert(this::setOnlineStatus);
+
+    this.setGameData(pageVo.getRecords());
+    return pageVo;
   }
 
   /**
@@ -518,56 +431,21 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
     memberMapper.updateLowerNumByAccount(parent.getAccount(), 1);
   }
 
-  /**
-   * 根据会员类型获取根代理
-   *
-   * @param userType String
-   * @return String
-   */
-  private String getMemberRoot(String userType) {
-    return MemberEnums.Type.TEST.match(userType)
-        ? SystemConstant.DEFAULT_TEST_ROOT
-        : SystemConstant.DEFAULT_WEB_ROOT;
-  }
-
-  /**
-   * 批量修改会员状态
-   *
-   * @param ids List
-   * @param status int
-   */
-  private void changeStatus(List<Long> ids, int status) {
-    Assert.notEmpty(ids, "会员ID不能为空");
-
-    Assert.isTrue(
-        this.lambdaUpdate()
-            .set(Member::getStatus, status)
-            .in(Member::getId, ids)
-            .update(new Member()),
-        "批量启用失败!");
-  }
-
   @Override
-  public Member getMemberAndFillGameAccount(String account) {
-    Member member = this.getByAccount(account).orElseThrow(() -> new ServiceException("会员信息不存在!"));
-    if (StringUtils.isBlank(member.getGameAccount())) {
-      Assert.notNull(tenantConfig.getTenantCode(), "平台编码未配置，请联系客服");
-      // 固定13位
-      StringBuffer gameAccount =
-          new StringBuffer(tenantConfig.getTenantCode()).append(member.getId());
-      String suffix = RandomUtil.randomString(13 - gameAccount.length());
-      member.setGameAccount(gameAccount.append(suffix).toString());
-      Assert.isTrue(this.updateById(member), "添加会员游戏账号信息!");
+  public MemberContactVo getMemberDetail(Long id) {
+    MemberInfoVO memberInfo = this.memberMapper.getMemberInfo(id);
+    if (memberInfo == null) {
+      throw new ServiceException("会员不存在");
     }
-    // 会员余额存在哪个游戏中
-    if (ObjectUtil.isNull(gameTransferInfoService.getInfoByMemberId(member.getId()))) {
-      GameTransferInfo gameTransferInfo = new GameTransferInfo();
-      gameTransferInfo.setPlatformCode(TransferTypesEnum.SELF.getCode());
-      gameTransferInfo.setAccount(member.getAccount());
-      gameTransferInfo.setMemberId(member.getId());
-      gameTransferInfoService.saveOrUpdate(gameTransferInfo);
-    }
-    return member;
+
+    return MemberContactVo.builder()
+        .email(memberInfo.getEmail())
+        .phone(memberInfo.getPhone())
+        .qq(memberInfo.getQq())
+        .realName(memberInfo.getRealName())
+        .wechat(memberInfo.getWechat())
+        .dialCode(memberInfo.getDialCode())
+        .build();
   }
 
   @Override
@@ -642,27 +520,6 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
     return this.getLotteryRebates(max, min);
   }
 
-  private List<Map<String, String>> getLotteryRebates(BigDecimal max, BigDecimal min) {
-    int base = 1800;
-    BigDecimal rebate = max, value;
-    String text;
-    DecimalFormat format = new DecimalFormat("0.00#");
-
-    List<Map<String, String>> rebates = new ArrayList<>();
-    while (rebate.compareTo(min) >= 0) {
-      Map<String, String> map = new HashMap<>();
-      value = rebate;
-      int baseData = base + value.multiply(BigDecimal.valueOf(20L)).intValue();
-      text = rebate.toString().concat("% ---- ").concat(Integer.toString(baseData));
-      map.put("value", format.format(value));
-      map.put("text", text);
-      rebates.add(map);
-      rebate = rebate.subtract(BigDecimal.valueOf(0.1)).setScale(2, RoundingMode.HALF_UP);
-    }
-
-    return rebates;
-  }
-
   @Override
   public void updateDaySalary(String ids, Integer state) {
     Assert.notNull(ids, "请选择需要修改日工资的账户！");
@@ -679,7 +536,54 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
   }
 
   @Override
-  public void updateTGClearMember(CleanAccountDTO dto) {
+  public IPage<MemberBalanceVO> findPromoteMemberBalance(Page<Member> page, MemberQueryDTO dto) {
+    dto.setUserType(MemberEnums.Type.PROMOTION.value());
+    return memberMapper
+        .queryPage(page, memberQueryCondition.builderQueryWrapper(dto))
+        .convert(memberConvert::toBalanceVo);
+  }
+
+  @Override
+  public void releaseLoginLimit(Long id) {
+    Member member = this.getById(id);
+    if (null != member) {
+      redisTemplate.delete(String.format(CachedKeys.MEMBER_PWD_ERROR_COUNT, member.getAccount()));
+    }
+  }
+
+  @Override
+  public MemberBalanceVO findMemberVip(String username, String level, String vipGrade) {
+    return memberMapper.findMemberVip(username, level, vipGrade);
+  }
+
+  private void preAddCheck(MemberAddDTO dto) {
+    Assert.isTrue(!this.isExist(dto.getAccount()), "用户名已存在!");
+  }
+
+  @Override
+  public Member getMemberAndFillGameAccount(String account) {
+    Member member = this.getByAccount(account).orElseThrow(() -> new ServiceException("会员信息不存在!"));
+    if (StringUtils.isBlank(member.getGameAccount())) {
+      Assert.notNull(sysTheme.getTenantCode(), "平台编码未配置，请联系客服");
+      // 固定13位
+      StringBuffer gameAccount = new StringBuffer(sysTheme.getTenantCode()).append(member.getId());
+      String suffix = RandomUtil.randomString(13 - gameAccount.length());
+      member.setGameAccount(gameAccount.append(suffix).toString());
+      Assert.isTrue(this.updateById(member), "添加会员游戏账号信息!");
+    }
+    // 会员余额存在哪个游戏中
+    if (ObjectUtil.isNull(gameTransferInfoService.getInfoByMemberId(member.getId()))) {
+      GameTransferInfo gameTransferInfo = new GameTransferInfo();
+      gameTransferInfo.setPlatformCode(TransferTypesEnum.SELF.getCode());
+      gameTransferInfo.setAccount(member.getAccount());
+      gameTransferInfo.setMemberId(member.getId());
+      gameTransferInfoService.saveOrUpdate(gameTransferInfo);
+    }
+    return member;
+  }
+
+  @Override
+  public void clearPromoteMemberBalance(CleanAccountDTO dto) {
     log.info("批量清理账号余额开始，操作人：{}，参数：{}", SecurityUserHolder.getUsername(), dto);
     List<Member> memberList = null;
     if (ObjectUtil.equals(dto.getIsCleanAll(), 0)) {
@@ -691,7 +595,7 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
         memberList =
             this.lambdaQuery()
                 .in(Member::getAccount, dto.getUserNames().split(","))
-                    .eq(Member::getUserType, MemberEnums.Type.PROMOTION.value())
+                .eq(Member::getUserType, MemberEnums.Type.PROMOTION.value())
                 .list();
       }
       if (StringUtils.isEmpty(memberList) || memberList.size() != userNames.length) {
@@ -719,24 +623,98 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
       throw new ServiceException("isCleanAll是错误的传参数据");
     }
     // 额度回收
-    memberList
-            .parallelStream()
+    memberList.parallelStream()
         .map(Member::getAccount)
         .forEach(gameAdminService::recyclingAmountByAccount);
     memberInfoService.updateClearGTMember(dto);
     log.info("批量清理账号余额结束，操作人：{}，参数：{}", SecurityUserHolder.getUsername(), dto);
   }
 
-  @Override
-  public void releaseLoginLimit(Long id) {
-    Member member = this.getById(id);
-    if (null != member) {
-      redisTemplate.delete(String.format(CachedKeys.MEMBER_PWD_ERROR_COUNT, member.getAccount()));
+  private List<Map<String, String>> getLotteryRebates(BigDecimal max, BigDecimal min) {
+    int base = 1800;
+    BigDecimal rebate = max, value;
+    String text;
+    DecimalFormat format = new DecimalFormat("0.00#");
+
+    List<Map<String, String>> rebates = new ArrayList<>();
+    while (rebate.compareTo(min) >= 0) {
+      Map<String, String> map = new HashMap<>();
+      value = rebate;
+      int baseData = base + value.multiply(BigDecimal.valueOf(20L)).intValue();
+      text = rebate.toString().concat("% ---- ").concat(Integer.toString(baseData));
+      map.put("value", format.format(value));
+      map.put("text", text);
+      rebates.add(map);
+      rebate = rebate.subtract(BigDecimal.valueOf(0.1)).setScale(2, RoundingMode.HALF_UP);
     }
+
+    return rebates;
   }
 
-  @Override
-  public MemberBalanceVO findMemberVip(String username, String level, String vipGrade) {
-    return memberMapper.findMemberVip(username, level, vipGrade);
+  private void setGameData(List<MemberVO> list) {
+    if (CollUtil.isEmpty(list)) {
+      return;
+    }
+
+    List<String> accounts = list.stream().map(MemberVO::getAccount).collect(Collectors.toList());
+    List<MemberDayReport> dayReports = this.getGameData(accounts);
+    if (CollUtil.isEmpty(dayReports)) {
+      return;
+    }
+
+    list.forEach(
+        a -> {
+          BigDecimal winAmount =
+              dayReports.stream()
+                  .filter(b -> a.getAccount().equalsIgnoreCase(b.getUserName()))
+                  .map(MemberDayReport::getWinAmount)
+                  .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+          BigDecimal waterAmount =
+              dayReports.stream()
+                  .filter(b -> a.getAccount().equalsIgnoreCase(b.getUserName()))
+                  .map(MemberDayReport::getWaterAmount)
+                  .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+          a.setWaterAmount(waterAmount);
+          a.setWinAmount(winAmount);
+        });
+  }
+
+  private List<MemberDayReport> getGameData(List<String> accounts) {
+    QueryWrapper<MemberDayReport> queryWrapper = new QueryWrapper<>();
+    queryWrapper.select("sum(win_amount) win_amount, sum(water_amount) water_amount,user_name");
+    queryWrapper.in("user_name", accounts);
+    queryWrapper.groupBy("user_name");
+    return memberDayReportService.list(queryWrapper);
+  }
+
+  /**
+   * 根据会员类型获取根代理
+   *
+   * @param userType String
+   * @return String
+   */
+  private String getMemberRoot(String userType) {
+    return MemberEnums.Type.TEST.match(userType)
+        ? SystemConstant.DEFAULT_TEST_ROOT
+        : SystemConstant.DEFAULT_WEB_ROOT;
+  }
+
+  /**
+   * 批量修改会员状态
+   *
+   * @param ids List
+   * @param status int
+   */
+  private void changeStatus(List<Long> ids, int status) {
+    Assert.notEmpty(ids, "会员ID不能为空");
+
+    Assert.isTrue(
+        this.lambdaUpdate()
+            .set(Member::getStatus, status)
+            .in(Member::getId, ids)
+            .update(new Member()),
+        "批量启用失败!");
   }
 }

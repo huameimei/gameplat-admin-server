@@ -1,12 +1,12 @@
 package com.gameplat.admin.model.vo;
 
-import com.baomidou.mybatisplus.extension.activerecord.Model;
 import lombok.Data;
 
+import java.io.Serializable;
 import java.util.List;
 
 @Data
-public class TpMerchantPayTypeVO extends Model<TpMerchantPayTypeVO> {
+public class TpMerchantPayTypeVO implements Serializable {
 
   private Long id;
 

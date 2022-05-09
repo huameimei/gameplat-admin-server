@@ -32,6 +32,23 @@ public class GameBetRecordSearchBuilder {
     if (StringUtils.isNotEmpty(dto.getGameType())) {
       builder.must(QueryBuilders.matchQuery("gameType", dto.getGameType()));
     }
+    if (StringUtils.isNotEmpty(dto.getGameCode())) {
+      builder.must(QueryBuilders.termQuery("gameCode", dto.getGameCode()));
+    }
+    if (StringUtils.isNotEmpty(dto.getSettle())) {
+      builder.must(QueryBuilders.matchQuery("settle", dto.getSettle()));
+    }
+    if (StringUtils.isNotEmpty(dto.getProxyAccount())) {
+      BoolQueryBuilder builder2 = QueryBuilders.boolQuery();
+      if (StringUtils.isNotNull(dto.getIsDirectly()) && dto.getIsDirectly() == 0) {
+        builder2.should(QueryBuilders.wildcardQuery("superPath", "*" + dto.getProxyAccount() + "*"));
+      } else {
+        // 默认只查询直属下级
+        builder2.should(QueryBuilders.termQuery("parentName", dto.getProxyAccount()));
+      }
+      builder2.should(QueryBuilders.termQuery("account", dto.getProxyAccount()));
+      builder.must(builder2);
+    }
     if (null != dto.getTimeType() && ObjectUtil.isNotNull(dto.getBeginTime())) {
       builder.must(
           QueryBuilders.rangeQuery(convertTimeType(dto.getTimeType()))
@@ -77,18 +94,18 @@ public class GameBetRecordSearchBuilder {
 
   /** 1 -- 投注时间, 2 -- 三方时间, 3 -- 结算时间, 4 -- 报表时间 */
   public static String convertTimeType(Integer timeType) {
-    String keyword = "betTime.keyword";
+    String keyword = "betTime";
     if (TimeTypeEnum.BET_TIME.getValue() == timeType) {
-      keyword = "betTime.keyword";
+      keyword = "betTime";
     }
     if (TimeTypeEnum.THIRD_TIME.getValue() == timeType) {
-      keyword = "amesTime.keyword";
+      keyword = "amesTime";
     }
     if (TimeTypeEnum.SETTLE_TIME.getValue() == timeType) {
-      keyword = "settleTime.keyword";
+      keyword = "settleTime";
     }
     if (TimeTypeEnum.STAT_TIME.getValue() == timeType) {
-      keyword = "statTime.keyword";
+      keyword = "statTime";
     }
     return keyword;
   }

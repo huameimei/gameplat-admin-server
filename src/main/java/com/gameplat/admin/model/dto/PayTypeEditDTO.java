@@ -7,7 +7,7 @@ import java.io.Serializable;
 @Data
 public class PayTypeEditDTO implements Serializable {
 
-  public Long id;
+  private Long id;
 
   private String name;
 

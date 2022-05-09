@@ -1,10 +1,14 @@
 package com.gameplat.admin.config;
 
-import java.util.concurrent.Executor;
-import java.util.concurrent.ThreadPoolExecutor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import org.springframework.security.concurrent.DelegatingSecurityContextRunnable;
+import org.springframework.security.task.DelegatingSecurityContextAsyncTaskExecutor;
+
+import java.util.concurrent.Executor;
+import java.util.concurrent.ThreadPoolExecutor;
 
 /**
  * 线程池配置
@@ -35,11 +39,13 @@ public class ThreadPoolConfig {
     taskExecutor.setThreadNamePrefix("default-task-executor-");
 
     taskExecutor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
+    taskExecutor.setTaskDecorator(DelegatingSecurityContextRunnable::new);
     taskExecutor.initialize();
     return taskExecutor;
   }
 
   @Bean("asyncGameExecutor")
+  @Primary
   public Executor asyncGameExecutor() {
     ThreadPoolTaskExecutor taskExecutor = new ThreadPoolTaskExecutor();
     taskExecutor.setCorePoolSize(CORE_POOL_SIZE);
@@ -50,7 +56,22 @@ public class ThreadPoolConfig {
     taskExecutor.setThreadNamePrefix("game-task-executor-");
 
     taskExecutor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
+    taskExecutor.setTaskDecorator(DelegatingSecurityContextRunnable::new);
     taskExecutor.initialize();
     return taskExecutor;
+  }
+
+  /**
+   * Spring security并发支持<br>
+   * 参见：<a
+   * href="https://github.com/spring-projects/spring-security/issues/6856#issuecomment-518787966">
+   * https://github.com/spring-projects/spring-security/issues/6856#issuecomment-518787966 </a>
+   *
+   * @param delegate ThreadPoolTaskExecutor
+   * @return DelegatingSecurityContextAsyncTaskExecutor
+   */
+  @Bean
+  public DelegatingSecurityContextAsyncTaskExecutor taskExecutor(ThreadPoolTaskExecutor delegate) {
+    return new DelegatingSecurityContextAsyncTaskExecutor(delegate);
   }
 }

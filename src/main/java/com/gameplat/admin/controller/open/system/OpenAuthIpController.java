@@ -6,8 +6,10 @@ import com.gameplat.admin.model.dto.AuthIpDTO;
 import com.gameplat.admin.model.dto.OperAuthIpDTO;
 import com.gameplat.admin.model.vo.AuthIpVo;
 import com.gameplat.admin.service.SysAuthIpService;
+import com.gameplat.base.common.util.StringUtils;
 import com.gameplat.common.constant.ServiceName;
 import com.gameplat.common.group.Groups;
+import com.gameplat.common.lang.Assert;
 import com.gameplat.log.annotation.Log;
 import com.gameplat.log.enums.LogType;
 import com.gameplat.model.entity.sys.SysAuthIp;
@@ -21,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.NotEmpty;
 import javax.websocket.server.PathParam;
+import java.util.Map;
 
 @Api(tags = "IP白名单")
 @Slf4j
@@ -58,8 +61,9 @@ public class OpenAuthIpController {
   @PostMapping("/delete")
   @PreAuthorize("hasAuthority('system:authIp:remove')")
   @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.ADMIN, desc = "'删除IP白名单 id='+#ids")
-  public void remove(@RequestBody @NotEmpty(message = "缺少参数") String ids) {
-    authIpService.deleteBatch(ids);
+  public void remove(@RequestBody @NotEmpty(message = "缺少参数") Map<String, String> map) {
+    Assert.notNull(map.get("ids"), "id不能为空！");
+    authIpService.deleteBatch(map.get("ids"));
   }
 
   @ApiOperation("检查唯一")

@@ -23,4 +23,7 @@ public class ActivityLobbyQueryDTO implements Serializable {
 
   @ApiModelProperty(value = "活动状态（0 关闭，1 开启，2 失效）")
   private Integer failure;
+
+  @ApiModelProperty(value = "活动类型")
+  private Integer type;
 }

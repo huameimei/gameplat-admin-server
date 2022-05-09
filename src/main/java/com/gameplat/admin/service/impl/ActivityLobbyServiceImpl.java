@@ -60,6 +60,7 @@ public class ActivityLobbyServiceImpl extends ServiceImpl<ActivityLobbyMapper, A
     queryWrapper
         .like(StringUtils.isNotBlank(dto.getTitle()), ActivityLobby::getTitle, dto.getTitle())
         .eq(dto.getStatus() != null, ActivityLobby::getStatus, dto.getStatus())
+            .eq(dto.getType()!=null,ActivityLobby::getType,dto.getType())
         .orderByDesc(Lists.newArrayList(ActivityLobby::getCreateTime, ActivityLobby::getId));
 
     IPage<ActivityLobbyVO> activityLobbyVOIPage =

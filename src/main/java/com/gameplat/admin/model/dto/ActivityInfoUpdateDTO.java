@@ -150,6 +150,9 @@ public class ActivityInfoUpdateDTO implements Serializable {
   @ApiModelProperty(value = "移动端列表图")
   private String appListPic;
 
+  @ApiModelProperty(value = "H5列表图")
+  private String h5ListPic;
+
   @ApiModelProperty(value = "Web端列表图")
   private String pcListPic;
 

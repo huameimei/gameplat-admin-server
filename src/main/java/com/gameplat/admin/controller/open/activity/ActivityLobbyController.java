@@ -160,4 +160,19 @@ public class ActivityLobbyController {
   public List<GameKindVO> getGameKindInBanner(String gameTypeCode) {
     return gameKindService.getGameKindInBanner(gameTypeCode);
   }
+
+  /**
+   * 活动详情
+   *
+   * @param id Long
+   * @return ActivityLobbyVO
+   */
+  @ApiOperation(value = "活动详情")
+  @GetMapping("/detail")
+  public ActivityLobbyVO detail(Long id) {
+    if (id == null || id == 0) {
+      throw new ServiceException("活动id不能为空");
+    }
+    return activityLobbyService.getActivityLobbyVOById(id);
+  }
 }

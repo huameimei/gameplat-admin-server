@@ -6,6 +6,7 @@ import com.gameplat.admin.model.dto.*;
 import com.gameplat.admin.model.vo.ActivityQualificationVO;
 import com.gameplat.admin.service.ActivityQualificationService;
 import com.gameplat.base.common.exception.ServiceException;
+import com.gameplat.base.common.util.StringUtils;
 import com.gameplat.model.entity.activity.ActivityQualification;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -67,8 +68,11 @@ public class ActivityQualificationController {
   @ApiOperation(value = "删除活动资格")
   @PostMapping("/delete")
   @PreAuthorize("hasAuthority('activity:qualification:remove')")
-  public void delete(@RequestBody String ids) {
-    activityQualificationService.delete(ids);
+  public void delete(@RequestBody Map<String, String> map) {
+    if (StringUtils.isEmpty(map.get("ids"))) {
+      throw new ServiceException("ids 不能为空");
+    }
+    activityQualificationService.delete(map.get("ids"));
   }
 
   @ApiOperation(value = "资格检测")

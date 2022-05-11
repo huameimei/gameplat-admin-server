@@ -191,6 +191,7 @@ public class ActivityQualificationServiceImpl
             qm.setMinMoney( temp.getPresenterValue());
             qm.setMaxMoney(temp.getWithdrawDml());
             qm.setDrawNum(temp.getPresenterDml().intValue());
+            qm.setActivityType(ActivityInfoEnum.TypeEnum.RED_ENVELOPE.value());
           }
           manageList.add(qm);
         }

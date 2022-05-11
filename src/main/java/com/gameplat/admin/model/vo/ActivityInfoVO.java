@@ -172,6 +172,9 @@ public class ActivityInfoVO implements Serializable {
   @ApiModelProperty("移动端列表图")
   private String appListPic;
 
+  @ApiModelProperty("H5列表图")
+  private String h5ListPic;
+
   /** Web端列表图 */
   @ApiModelProperty("Web端列表图")
   private String pcListPic;

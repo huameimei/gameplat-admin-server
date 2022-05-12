@@ -1,5 +1,6 @@
 package com.gameplat.admin.convert;
 
+import com.gameplat.admin.model.vo.GameBetRecordExportVO;
 import com.gameplat.admin.model.vo.GameBetRecordVO;
 import com.gameplat.model.entity.game.GameBetRecord;
 import org.mapstruct.Mapper;
@@ -13,4 +14,6 @@ import org.mapstruct.Mapper;
 public interface GameBetRecordConvert {
 
   GameBetRecordVO toVo(GameBetRecord betRecord);
+
+  GameBetRecordExportVO toExportVo(GameBetRecord betRecord);
 }

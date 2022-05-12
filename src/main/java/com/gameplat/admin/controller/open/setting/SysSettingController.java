@@ -233,7 +233,7 @@ public class SysSettingController {
     /**
      * 删除游戏浮窗类型
      */
-    @DeleteMapping("/delById")
+    @PostMapping("/delById")
     @ApiOperation("删除游戏浮窗类型")
     public Result remove(Integer id) {
         sysSettingService.deleteSysFloatById(id);

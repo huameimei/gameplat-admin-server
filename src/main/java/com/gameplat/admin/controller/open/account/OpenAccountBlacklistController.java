@@ -25,7 +25,7 @@ public class OpenAccountBlacklistController {
   @Autowired private AccountBlacklistService accountBlacklistService;
 
   @ApiOperation("删除")
-  @DeleteMapping("/del/{id}")
+  @PostMapping("/del/{id}")
   @PreAuthorize("hasAuthority('account:accountBlack:remove')")
   public void delete(@PathVariable Long id) {
     accountBlacklistService.delete(id);
@@ -47,7 +47,7 @@ public class OpenAccountBlacklistController {
   }
 
   @ApiOperation("编辑")
-  @PutMapping("/edit")
+  @PostMapping("/edit")
   @PreAuthorize("hasAuthority('account:accountBlack:edit')")
   public void edit(@RequestBody OperAccountBlacklistDTO dto) {
     accountBlacklistService.update(dto);

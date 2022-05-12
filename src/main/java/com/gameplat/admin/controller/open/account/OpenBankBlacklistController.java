@@ -22,7 +22,7 @@ public class OpenBankBlacklistController {
   @Autowired private BankBlacklistService bankBlacklistService;
 
   @ApiOperation("删除")
-  @DeleteMapping("/del/{id}")
+  @PostMapping("/del/{id}")
   @PreAuthorize("hasAuthority('account:bankBlack:remove')")
   public void delete(@PathVariable Long id) {
     bankBlacklistService.delete(id);
@@ -44,7 +44,7 @@ public class OpenBankBlacklistController {
   }
 
   @ApiOperation("编辑")
-  @PutMapping("/edit")
+  @PostMapping("/edit")
   @PreAuthorize("hasAuthority('account:bankBlack:edit')")
   public void edit(@RequestBody OperBankBlacklistDTO dto) {
     bankBlacklistService.update(dto);

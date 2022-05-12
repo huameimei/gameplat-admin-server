@@ -25,7 +25,7 @@ public class MemberWithdrawLimitController {
   @Autowired private SysDictDataService dictDataService;
 
   @ApiOperation("删除")
-  @DeleteMapping("/remove/{timesForWithdrawal}")
+  @PostMapping("/remove/{timesForWithdrawal}")
   @PreAuthorize("hasAuthority('thirdParty:memberWithdrawLimit:remove')")
   @Log(
       module = ServiceName.ADMIN_SERVICE,

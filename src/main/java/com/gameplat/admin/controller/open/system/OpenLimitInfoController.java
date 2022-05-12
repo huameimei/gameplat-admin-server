@@ -19,7 +19,7 @@ public class OpenLimitInfoController {
   @Autowired private LimitInfoService limitInfoService;
 
   @ApiOperation("添加/修改登录后台限制")
-  @PutMapping(value = "/add/adminLoginLimit")
+  @PostMapping(value = "/add/adminLoginLimit")
   @PreAuthorize("hasAuthority('system:limit:add:adminLoginLimit')")
   public void saveAdminLoginLimit(@RequestBody LimitInfoDTO dto) {
     limitInfoService.insertLimitInfo(dto);
@@ -33,7 +33,7 @@ public class OpenLimitInfoController {
   }
 
   @ApiOperation("添加/修改完善资料")
-  @PutMapping(value = "/add/editUserInfoLimit")
+  @PostMapping(value = "/add/editUserInfoLimit")
   @PreAuthorize("hasAuthority('system:limit:addUserInfoLimit')")
   public void saveEditUserInfoLimit(@RequestBody LimitInfoDTO dto) {
     limitInfoService.insertLimitInfo(dto);
@@ -47,7 +47,7 @@ public class OpenLimitInfoController {
   }
 
   @ApiOperation("添加/修改游戏额度转换限制")
-  @PutMapping(value = "/add/liveTransferLimit")
+  @PostMapping(value = "/add/liveTransferLimit")
   @PreAuthorize("hasAuthority('system:limit:addTransferLimit')")
   public void saveLiveTransferLimit(@RequestBody LimitInfoDTO dto) {
     limitInfoService.insertLimitInfo(dto);
@@ -61,7 +61,7 @@ public class OpenLimitInfoController {
   }
 
   @ApiOperation("添加/修改会员登录限制")
-  @PutMapping(value = "/add/memberLoginLimit")
+  @PostMapping(value = "/add/memberLoginLimit")
   @PreAuthorize("hasAuthority('system:limit:addLoginLimit')")
   public void saveMemberLoginLimit(@RequestBody LimitInfoDTO dto) {
     limitInfoService.insertLimitInfo(dto);
@@ -75,7 +75,7 @@ public class OpenLimitInfoController {
   }
 
   @ApiOperation("添加/修改会员充值限制")
-  @PutMapping(value = "/add/memberRechargeLimit")
+  @PostMapping(value = "/add/memberRechargeLimit")
   @PreAuthorize("hasAuthority('system:limit:addRechargeLimit')")
   public void saveMemberRechargeLimit(@RequestBody LimitInfoDTO dto) {
     limitInfoService.insertLimitInfo(dto);
@@ -89,7 +89,7 @@ public class OpenLimitInfoController {
   }
 
   @ApiOperation("添加/修改会员注册限制")
-  @PutMapping(value = "/add/memberRegistryLimit")
+  @PostMapping(value = "/add/memberRegistryLimit")
   @PreAuthorize("hasAuthority('system:limit:addRegistryLimit')")
   public void saveMemberRegistryLimit(@RequestBody LimitInfoDTO dto) {
     limitInfoService.insertLimitInfo(dto);
@@ -103,7 +103,7 @@ public class OpenLimitInfoController {
   }
 
   @ApiOperation("添加/修改会员提现限制")
-  @PutMapping(value = "/add/memberWithdrawLimit")
+  @PostMapping(value = "/add/memberWithdrawLimit")
   @PreAuthorize("hasAuthority('system:limit:addWithdrawLimit')")
   public void saveMemberWithdrawLimit(@RequestBody LimitInfoDTO dto) {
     limitInfoService.insertLimitInfo(dto);

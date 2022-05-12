@@ -78,7 +78,7 @@ public class MemberGoldCoinRecordController {
     return memberGrowthConfigService.getGoldCoinDesc();
   }
 
-  @PutMapping("/updateGoldCoinDesc")
+  @PostMapping("/updateGoldCoinDesc")
   @ApiOperation("后台修改金币说明配置")
   @PreAuthorize("hasAuthority('member:coin:edit')")
   public void updateGoldCoinDesc(GoldCoinDescUpdateDTO dto) {

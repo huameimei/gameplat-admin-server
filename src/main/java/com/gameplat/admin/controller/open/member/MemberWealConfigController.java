@@ -35,13 +35,13 @@ public class MemberWealConfigController {
   }
 
   @ApiOperation("删除权益配置")
-  @DeleteMapping("/remove/{id}")
+  @PostMapping("/remove/{id}")
   @PreAuthorize("hasAuthority('member:wealConfig:remove')")
   public void removeWealConfig(@PathVariable Long id) {
     memberWealConfigService.removeWealConfig(id);
   }
 
-  @PutMapping("/edit")
+  @PostMapping("/edit")
   @ApiOperation("修改权益配置")
   @PreAuthorize("hasAuthority('member:wealConfig:edit')")
   public void updateBanner(@Validated MemberWealConfigEditDTO dto) {

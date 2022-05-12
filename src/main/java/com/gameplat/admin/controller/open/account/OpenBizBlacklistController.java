@@ -28,7 +28,7 @@ public class OpenBizBlacklistController {
   @Autowired private BizBlacklistService bizBlacklistService;
 
   @ApiOperation("删除")
-  @DeleteMapping("/del/{id}")
+  @PostMapping("/del/{id}")
   @PreAuthorize("hasAuthority('account:bizBlack:remove')")
   public void delete(@PathVariable Long id) {
     bizBlacklistService.delete(id);
@@ -56,7 +56,7 @@ public class OpenBizBlacklistController {
   }
 
   @ApiOperation("编辑")
-  @PutMapping("/edit")
+  @PostMapping("/edit")
   @PreAuthorize("hasAuthority('account:bizBlack:edit')")
   public void edit(@RequestBody OperBizBlacklistDTO dto) {
     bizBlacklistService.update(dto);

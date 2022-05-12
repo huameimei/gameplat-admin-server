@@ -52,14 +52,14 @@ public class ChatRedEnvelopeController {
   }
 
   @ApiOperation(value = "删")
-  @DeleteMapping("/remove/{id}")
+  @PostMapping("/remove/{id}")
   @PreAuthorize("hasAuthority('chat:redEnvelope:remove')")
   public void remove(@PathVariable Integer id) {
     redEnvelopeService.remove(id);
   }
 
   @ApiOperation(value = "启用禁用")
-  @PutMapping("/enable")
+  @PostMapping("/enable")
   @PreAuthorize("hasAuthority('chat:redEnvelope:enable')")
   public void enable(@Validated ChatRedEnvelopeEditDTO dto) {
     redEnvelopeService.update(dto);

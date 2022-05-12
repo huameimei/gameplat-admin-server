@@ -89,15 +89,15 @@ public class DivideFissionConfigController {
   /**
    * 删除裂变分红配置
    *
-   * @param ids
+   * @param map
    */
   @ApiOperation(value = "删除裂变分红配置")
-  @DeleteMapping("/delete")
+  @PostMapping("/delete")
   @PreAuthorize("hasAuthority('agent:bonusFissionconfig:remove')")
-  public void remove(@RequestBody String ids) {
-    if (StringUtils.isBlank(ids)) {
+  public void remove(@RequestBody Map<String, String> map) {
+    if (StringUtils.isBlank(map.get("ids"))) {
       throw new ServiceException("ids不能为空");
     }
-    fissionConfigService.remove(ids);
+    fissionConfigService.remove(map.get("ids"));
   }
 }

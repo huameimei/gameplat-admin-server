@@ -28,7 +28,7 @@ public class PayAccountController {
   @Autowired private PayAccountService payAccountService;
 
   @ApiOperation("删除")
-  @DeleteMapping("/remove/{id}")
+  @PostMapping("/remove/{id}")
   @PreAuthorize("hasAuthority('thirdParty:payAccount:remove')")
   @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.RECHARGE, desc = "'删除收款值账户：' + #id")
   public void remove(@PathVariable Long id) {

@@ -25,7 +25,7 @@ public class DirectChargeController {
   }
 
   @ApiOperation("修改")
-  @PutMapping("/edit")
+  @PostMapping("/edit")
   @PreAuthorize("hasAuthority('finance:directCharge:edit')")
   public void update(@RequestBody DirectCharge directCharge) {
     SysDictData sysDictData = dictDataService.getDictData("system_config", "direct-charge");

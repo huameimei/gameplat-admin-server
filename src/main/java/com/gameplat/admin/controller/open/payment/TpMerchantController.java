@@ -28,7 +28,7 @@ public class TpMerchantController {
   @Autowired private TpMerchantService tpMerchantService;
 
   @ApiOperation("删除")
-  @DeleteMapping("/remove/{id}")
+  @PostMapping("/remove/{id}")
   @PreAuthorize("hasAuthority('thirdParty:tpMerchants:remove')")
   @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.RECHARGE, desc = "'删除入款商户id=' + #id")
   public void remove(@PathVariable Long id) {

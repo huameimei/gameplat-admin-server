@@ -6,6 +6,7 @@ import com.gameplat.admin.model.dto.*;
 import com.gameplat.admin.model.vo.ActivityQualificationVO;
 import com.gameplat.admin.service.ActivityQualificationService;
 import com.gameplat.base.common.exception.ServiceException;
+import com.gameplat.base.common.util.StringUtils;
 import com.gameplat.model.entity.activity.ActivityQualification;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -48,7 +49,7 @@ public class ActivityQualificationController {
   }
 
   @ApiOperation(value = "批量审核活动资格")
-  @PutMapping("/auditStatus")
+  @PostMapping("/auditStatus")
   @PreAuthorize("hasAuthority('activity:qualification:auditStatus')")
   public void auditStatus(@RequestBody ActivityQualificationAuditStatusDTO dto) {
     if (CollectionUtils.isEmpty(dto.getIdList())) {
@@ -58,21 +59,24 @@ public class ActivityQualificationController {
   }
 
   @ApiOperation(value = "更新活动资格状态")
-  @PutMapping("/updateQualificationStatus")
+  @PostMapping("/updateQualificationStatus")
   @PreAuthorize("hasAuthority('activity:qualification:updateQualificationStatus')")
   public void updateQualificationStatus(@RequestBody ActivityQualificationUpdateStatusDTO dto) {
     activityQualificationService.updateQualificationStatus(dto);
   }
 
   @ApiOperation(value = "删除活动资格")
-  @DeleteMapping("/delete")
+  @PostMapping("/delete")
   @PreAuthorize("hasAuthority('activity:qualification:remove')")
-  public void delete(@RequestBody String ids) {
-    activityQualificationService.delete(ids);
+  public void delete(@RequestBody Map<String, String> map) {
+    if (StringUtils.isEmpty(map.get("ids"))) {
+      throw new ServiceException("ids 不能为空");
+    }
+    activityQualificationService.delete(map.get("ids"));
   }
 
   @ApiOperation(value = "资格检测")
-  @PutMapping("/checkQualification")
+  @PostMapping("/checkQualification")
   @PreAuthorize("hasAuthority('activity:qualification:checkQualification')")
   public Map<String, Object> checkQualification(@RequestBody ActivityQualificationCheckDTO dto) {
     return activityQualificationService.checkQualification(dto);

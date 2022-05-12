@@ -36,7 +36,7 @@ public class ActivityRedPacketController {
   }
 
   @ApiOperation(value = "更新红包配置")
-  @PutMapping("/updateConfig")
+  @PostMapping("/updateConfig")
   @PreAuthorize("hasAuthority('activity:redpacket:updateConfig')")
   public void updateConfig(@RequestBody ActivityRedPacketConfigDTO dto) {
     activityRedPacketService.updateConfig(dto);
@@ -50,7 +50,7 @@ public class ActivityRedPacketController {
   }
 
   @ApiOperation(value = "更新转盘奖品配置")
-  @PutMapping("/updateTurntablePrizeConfig")
+  @PostMapping("/updateTurntablePrizeConfig")
   @PreAuthorize("hasAuthority('activity:redpacket:updateTurntablePrizeConfig')")
   public void updateTurntablePrizeConfig(@RequestBody ActivityTurntablePrizeConfigDTO dto) {
     if (dto.getPrizeId() == null) {

@@ -42,7 +42,7 @@ public class GameRebateReportController {
   }
 
   @ApiOperation("游戏返点更改")
-  @PutMapping(value = "/modify")
+  @PostMapping(value = "/modify")
   @PreAuthorize("hasAuthority('game:gameRebateReport:modify')")
   public void modify(@RequestBody OperGameRebateDetailDTO dto) {
     gameRebateReportService.modify(dto.getId(), dto.getRealRebateMoney(), dto.getRemark());

@@ -52,21 +52,21 @@ public class OpenSpreadLinkInfoController {
   }
 
   @ApiOperation("编辑")
-  @PutMapping("/edit")
+  @PostMapping("/edit")
   @PreAuthorize("hasAuthority('diffusion:spreadConfig:edit')")
   public void edit(@RequestBody SpreadLinkInfoEditDTO configEditDTO) {
     spreadLinkInfoService.update(configEditDTO);
   }
 
   @ApiOperation("删除")
-  @DeleteMapping("/delete/{id}")
+  @PostMapping("/delete/{id}")
   @PreAuthorize("hasAuthority('diffusion:spreadConfig:remove')")
   public void remove(@PathVariable Long id) {
     spreadLinkInfoService.deleteById(id);
   }
 
   @ApiOperation("批量删除")
-  @DeleteMapping("/batchDelete")
+  @PostMapping("/batchDelete")
   @PreAuthorize("hasAuthority('diffusion:spreadConfig:batchRemove')")
   public void batchRemove(@RequestBody List<Long> ids) {
     spreadLinkInfoService.batchDeleteByIds(ids);
@@ -87,14 +87,14 @@ public class OpenSpreadLinkInfoController {
   }
 
   @ApiOperation("批量启用")
-  @PutMapping("/batchEnableStatus")
+  @PostMapping("/batchEnableStatus")
   @PreAuthorize("hasAuthority('diffusion:spreadConfig:batchEnableStatus')")
   public void batchEnableStatus(@RequestBody List<Long> ids) {
     spreadLinkInfoService.batchEnableStatus(ids);
   }
 
   @ApiOperation("批量禁用")
-  @PutMapping("/batchDisableStatus")
+  @PostMapping("/batchDisableStatus")
   @PreAuthorize("hasAuthority('diffusion:spreadConfig:batchDisableStatus')")
   public void batchDisableStatus(@RequestBody List<Long> ids) {
     spreadLinkInfoService.batchDisableStatus(ids);

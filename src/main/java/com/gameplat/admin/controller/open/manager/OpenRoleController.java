@@ -53,7 +53,7 @@ public class OpenRoleController {
   }
 
   @ApiOperation("编辑")
-  @PutMapping("/edit")
+  @PostMapping("/edit")
   @PreAuthorize("hasAuthority('system:role:edit')")
   @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.ADMIN, desc = "'修改角色【'+#dto.roleName+'】'")
   public void update(@Validated(Groups.UPDATE.class) @RequestBody OperRoleDTO dto) {
@@ -61,7 +61,7 @@ public class OpenRoleController {
   }
 
   @ApiOperation("删除")
-  @DeleteMapping("/remove/{id}")
+  @PostMapping("/remove/{id}")
   @PreAuthorize("hasAuthority('system:role:remove')")
   @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.ADMIN, desc = "'删除角色id='+#id")
   public void remove(@PathVariable Long id) {
@@ -84,7 +84,7 @@ public class OpenRoleController {
   }
 
   @ApiOperation("修改默认")
-  @PutMapping("/changeDefault/{id}/{defaultFlag}")
+  @PostMapping("/changeDefault/{id}/{defaultFlag}")
   @PreAuthorize("hasAuthority('system:role:changeDefault')")
   public void changeDefault(@PathVariable Long id, Integer defaultFlag) {
     roleService.changeDefault(id, defaultFlag);

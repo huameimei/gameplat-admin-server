@@ -17,10 +17,7 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
@@ -41,7 +38,7 @@ public class OpenMemberWealRewordController {
     return rewordService.findWealRewordList(page, dto);
   }
 
-  @PutMapping("/updateRemark")
+  @PostMapping("/updateRemark")
   @ApiOperation("修改vip福利记录备注")
   @PreAuthorize("hasAuthority('member:wealReword:edit')")
   public void updateRemark(Long id, String remark) {
@@ -50,7 +47,7 @@ public class OpenMemberWealRewordController {
 
   @SneakyThrows
   @ApiOperation("导出VIP福利记录列表")
-  @PutMapping(value = "/exportReword", produces = "application/vnd.ms-excel")
+  @PostMapping(value = "/exportReword", produces = "application/vnd.ms-excel")
   @PreAuthorize("hasAuthority('member:wealReword:export')")
   public void exportWealReword(MemberWealRewordDTO queryDTO, HttpServletResponse response) {
     List<MemberWealReword> list = rewordService.findList(queryDTO);

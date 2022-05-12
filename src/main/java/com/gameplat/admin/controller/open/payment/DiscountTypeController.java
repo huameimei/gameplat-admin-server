@@ -27,7 +27,7 @@ public class DiscountTypeController {
   @Autowired private DiscountTypeService discountTypeService;
 
   @ApiOperation("删除")
-  @DeleteMapping("/remove/{id}")
+  @PostMapping("/remove/{id}")
   @PreAuthorize("hasAuthority('thirdParty:discountType:remove')")
   @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.RECHARGE, desc = "'删除：' + #id")
   public void remove(@PathVariable Long id) {

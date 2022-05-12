@@ -5,6 +5,8 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.gameplat.admin.model.dto.SalaryConfigDTO;
 import com.gameplat.admin.model.vo.SalaryConfigVO;
 import com.gameplat.admin.service.SalaryConfigService;
+import com.gameplat.base.common.exception.ServiceException;
+import com.gameplat.base.common.util.StringUtils;
 import com.gameplat.common.constant.ServiceName;
 import com.gameplat.log.annotation.Log;
 import com.gameplat.log.enums.LogType;
@@ -15,6 +17,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 /** @Description : 工资配置 @Author : cc @Date : 2022/4/2 */
 @Api(tags = "工资配置")
@@ -77,12 +81,15 @@ public class SalaryConfigController {
   /**
    * 删除
    *
-   * @param ids
+   * @param map
    */
   @ApiOperation(value = "删除期数")
-  @DeleteMapping("/delete")
+  @PostMapping("/delete")
   @PreAuthorize("hasAuthority('salary:config:remove')")
-  public void remove(@RequestBody String ids) {
-    salaryConfigService.delete(ids);
+  public void remove(@RequestBody Map<String, String> map) {
+    if (StringUtils.isBlank(map.get("ids"))) {
+      throw new ServiceException("ids不能为空");
+    }
+    salaryConfigService.delete(map.get("ids"));
   }
 }

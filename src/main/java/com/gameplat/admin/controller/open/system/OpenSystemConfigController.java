@@ -40,7 +40,7 @@ public class OpenSystemConfigController {
   }
 
   @ApiOperation("修改系统配置")
-  @PutMapping("/update/system")
+  @PostMapping("/update/system")
   @PreAuthorize("hasAuthority('system:config:update:system')")
   public void updateSystemConfig(@RequestBody Map<String, Object> param) {
     systemConfigService.updateConfig(DictTypeEnum.SYSTEM_PARAMETER_CONFIG.getValue(), param);
@@ -54,7 +54,7 @@ public class OpenSystemConfigController {
   }
 
   @ApiOperation("修改借呗配置")
-  @PutMapping("/update/loan")
+  @PostMapping("/update/loan")
   @PreAuthorize("hasAuthority('system:config:update:loan')")
   public void updateLoanConfig(@RequestBody Map<String, Object> param) {
     systemConfigService.updateConfig(DictTypeEnum.LOAN_CONFIG.getValue(), param);
@@ -68,7 +68,7 @@ public class OpenSystemConfigController {
   }
 
   @ApiOperation("修改余额宝配置")
-  @PutMapping("/update/yubao")
+  @PostMapping("/update/yubao")
   @PreAuthorize("hasAuthority('system:config:update:yubao')")
   public void updateYuBaoConfig(@RequestBody Map<String, Object> param) {
     systemConfigService.updateConfig(DictTypeEnum.YUBAO_CONFIG.getValue(), param);
@@ -82,7 +82,7 @@ public class OpenSystemConfigController {
   }
 
   @ApiOperation("修改短信配置")
-  @PutMapping("/update/sms")
+  @PostMapping("/update/sms")
   @PreAuthorize("hasAuthority('system:config:update:sms')")
   public void updateSmsConfig(@RequestBody List<SysDictData> dictDataList) {
     systemConfigService.updateConfig(DictTypeEnum.SMS_CONFIG.getValue(), dictDataList);
@@ -96,7 +96,7 @@ public class OpenSystemConfigController {
   }
 
   @ApiOperation("修改文件配置")
-  @PutMapping("/update/file")
+  @PostMapping("/update/file")
   @PreAuthorize("hasAuthority('system:config:update:file')")
   public void updateFileConfig(@RequestBody List<SysDictData> dictDataList) {
     systemConfigService.updateConfig(DictTypeEnum.FILE_CONFIG.getValue(), dictDataList);
@@ -110,7 +110,7 @@ public class OpenSystemConfigController {
   }
 
   @ApiOperation("修改验证码配置")
-  @PutMapping("/update/captcha")
+  @PostMapping("/update/captcha")
   @PreAuthorize("hasAuthority('system:config:update:captcha')")
   public void updateCaptchaConfig(@RequestBody List<SysDictData> dictDataList) {
     systemConfigService.updateConfig(
@@ -125,7 +125,7 @@ public class OpenSystemConfigController {
   }
 
   @ApiOperation("修改邮箱配置")
-  @PutMapping("/update/email")
+  @PostMapping("/update/email")
   @PreAuthorize("hasAuthority('system:config:update:email')")
   public void updateEmailConfig(@RequestBody Map<String, Object> param) {
     systemConfigService.updateConfig(DictTypeEnum.EMAIL_CONFIG.getValue(), param);
@@ -139,7 +139,7 @@ public class OpenSystemConfigController {
   }
 
   @ApiOperation("修改代理后台配置")
-  @PutMapping("/update/agentBackend")
+  @PostMapping("/update/agentBackend")
   @PreAuthorize("hasAuthority('system:config:update:agentBackend')")
   public void updateAgentBackendConfig(@RequestBody Map<String, Object> param) {
     systemConfigService.updateConfig(DictTypeEnum.AGENT_BACKEND_CONFIG.getValue(), param);
@@ -153,7 +153,7 @@ public class OpenSystemConfigController {
   }
 
   @ApiOperation("修改活动模板")
-  @PutMapping("/update/activityTemplate")
+  @PostMapping("/update/activityTemplate")
   @PreAuthorize("hasAuthority('system:config:update:activityTemplate')")
   public void updateActivityTemplateConfig(@RequestBody Map<String, Object> param) {
     systemConfigService.updateConfig(DictTypeEnum.ACTIVITY_TEMPLATE_CONFIG.getValue(), param);
@@ -167,7 +167,7 @@ public class OpenSystemConfigController {
   }
 
   @ApiOperation("修改红包模板配置")
-  @PutMapping("/update/readPacketTemplate")
+  @PostMapping("/update/readPacketTemplate")
   @PreAuthorize("hasAuthority('system:config:update:readPacketTemplate')")
   public void updateRedPacketTemplateConfig(@RequestBody Map<String, Object> param) {
     systemConfigService.updateConfig(DictTypeEnum.RED_PACKET_CONFIG.getValue(), param);
@@ -181,7 +181,7 @@ public class OpenSystemConfigController {
   }
 
   @ApiOperation("修改身份认证配置")
-  @PutMapping("/update/idAuth")
+  @PostMapping("/update/idAuth")
   @PreAuthorize("hasAuthority('system:config:update:idAuth')")
   public void updateIdAuth(@RequestBody Map<String, Object> param) {
     systemConfigService.updateConfig(DictTypeEnum.ID_AUTHENTICATION_CONFIG.getValue(), param);
@@ -195,7 +195,7 @@ public class OpenSystemConfigController {
   }
 
   @ApiOperation("修改维护时间配置")
-  @PutMapping("/update/maintain")
+  @PostMapping("/update/maintain")
   @PreAuthorize("hasAuthority('system:config:update:maintain')")
   public void updateMaintainConfig(@RequestBody Map<String, Object> param) {
     systemConfigService.updateConfig(DictTypeEnum.MAINTAIN_TIME_CONFIG.getValue(), param);
@@ -216,14 +216,14 @@ public class OpenSystemConfigController {
   }
 
   @ApiOperation(value = "编辑、新增代理联系方式地址")
-  @PutMapping("/agentContact/edit")
+  @PostMapping("/agentContact/edit")
   @PreAuthorize("hasAuthority('system:config:agentContcat:edit')")
   public void updateAgentContact(@RequestBody AgentContactDTO dto) {
     systemConfigService.updateAgentContact(dto);
   }
 
   @ApiOperation(value = "删除代理联系方式地址")
-  @DeleteMapping("/agentContact/del/{id}")
+  @PostMapping("/agentContact/del/{id}")
   @PreAuthorize("hasAuthority('system:config:agentContcat:remove')")
   public void delAgentContact(@PathVariable("id") Long id) {
     systemConfigService.delAgentContact(id);
@@ -235,7 +235,7 @@ public class OpenSystemConfigController {
     return systemConfigService.findList(dictType);
   }
 
-  @PutMapping("/update/{dictType}")
+  @PostMapping("/update/{dictType}")
   @PreAuthorize("hasAuthority('system:config:add')")
   public void updateConfig(
       @PathVariable String dictType, @RequestBody List<SysDictData> dictDataList) {

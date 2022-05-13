@@ -11,6 +11,7 @@ import com.gameplat.model.entity.game.GameBetDailyReport;
 import com.gameplat.model.entity.game.GamePlatform;
 import java.util.List;
 import java.util.Map;
+import javax.servlet.http.HttpServletResponse;
 
 public interface GameBetDailyReportService extends IService<GameBetDailyReport> {
 
@@ -36,4 +37,6 @@ public interface GameBetDailyReportService extends IService<GameBetDailyReport> 
 
   // 获取达到有效投注金额的会员账号
   List<String> getSatisfyBetAccount(String minBetAmount, String startTime, String endTime);
+
+  void exportGamePlatformReport(GameBetDailyReportQueryDTO dto, HttpServletResponse response);
 }

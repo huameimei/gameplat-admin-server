@@ -22,6 +22,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import java.util.Date;
 import java.util.List;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,6 +58,14 @@ public class GameBetDailyReportController {
   @PreAuthorize("hasAuthority('game:gamePlatformReport:view')")
   public List<GameReportVO> queryGamePlatformReport(GameBetDailyReportQueryDTO dto) {
     return gameBetDailyReportService.queryGamePlatformReport(dto);
+  }
+
+  @ApiOperation("游戏平台维度数据导出")
+  @GetMapping(value = "/exportGamePlatformReport")
+  @PreAuthorize("hasAuthority('game:gamePlatformReport:export')")
+  public void exportGamePlatformReport(
+      GameBetDailyReportQueryDTO dto, HttpServletResponse response) {
+    gameBetDailyReportService.exportGamePlatformReport(dto, response);
   }
 
   @ApiOperation("游戏重新生成日报表")

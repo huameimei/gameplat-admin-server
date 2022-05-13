@@ -78,7 +78,7 @@ public class ActivityLobbyController {
   }
 
   @ApiOperation(value = "修改活动大厅")
-  @PutMapping("/update")
+  @PostMapping("/update")
   @PreAuthorize("hasAuthority('activity:lobby:edit')")
   public void update(@RequestBody ActivityLobbyUpdateDTO dto) {
     if (dto.getId() == null || dto.getId() == 0) {
@@ -98,9 +98,9 @@ public class ActivityLobbyController {
   }
 
   @ApiOperation(value = "删除活动大厅")
-  @DeleteMapping("/delete")
+  @PostMapping("/delete")
   @PreAuthorize("hasAuthority('activity:lobby:remove')")
-  public void remove(@RequestBody String ids) {
+  public void remove(String ids) {
     if (StringUtils.isBlank(ids)) {
       throw new ServiceException("ids不能为空");
     }
@@ -108,7 +108,7 @@ public class ActivityLobbyController {
   }
 
   @ApiOperation(value = "更新活动大厅状态")
-  @PutMapping("/updateStatus")
+  @PostMapping("/updateStatus")
   @PreAuthorize("hasAuthority('activity:lobby:updateStatus')")
   public void updateStatus(@RequestBody ActivityLobbyUpdateStatusDTO dto) {
     if (dto.getId() == null || dto.getId() == 0) {
@@ -159,5 +159,20 @@ public class ActivityLobbyController {
   @PreAuthorize("hasAuthority('activity:lobby:gameList')")
   public List<GameKindVO> getGameKindInBanner(String gameTypeCode) {
     return gameKindService.getGameKindInBanner(gameTypeCode);
+  }
+
+  /**
+   * 活动详情
+   *
+   * @param id Long
+   * @return ActivityLobbyVO
+   */
+  @ApiOperation(value = "活动详情")
+  @GetMapping("/detail")
+  public ActivityLobbyVO detail(Long id) {
+    if (id == null || id == 0) {
+      throw new ServiceException("活动id不能为空");
+    }
+    return activityLobbyService.getActivityLobbyVOById(id);
   }
 }

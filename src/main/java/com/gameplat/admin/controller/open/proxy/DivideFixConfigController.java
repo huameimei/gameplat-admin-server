@@ -89,15 +89,15 @@ public class DivideFixConfigController {
   /**
    * 删除
    *
-   * @param ids
+   * @param map
    */
   @ApiOperation(value = "删除固定分红配置")
-  @DeleteMapping("/delete")
+  @PostMapping("/delete")
   @PreAuthorize("hasAuthority('agent:bonusFixconfig:remove')")
-  public void remove(@RequestBody String ids) {
-    if (StringUtils.isBlank(ids)) {
+  public void remove(@RequestBody Map<String, String> map) {
+    if (StringUtils.isBlank(map.get("ids"))) {
       throw new ServiceException("ids不能为空");
     }
-    fixConfigService.remove(ids);
+    fixConfigService.remove(map.get("ids"));
   }
 }

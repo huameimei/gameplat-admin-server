@@ -8,6 +8,7 @@ import com.gameplat.admin.service.GameBetRecordInfoService;
 import com.gameplat.common.game.GameResult;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import javax.servlet.http.HttpServletResponse;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,5 +40,13 @@ public class GameBetRecordController {
   @PreAuthorize("hasAuthority('game:gameBetRecord:gameResult')")
   public GameResult getGameResult(GameBetRecordQueryDTO dto) {
     return gameBetRecordInfoService.getGameResult(dto);
+  }
+
+  @SneakyThrows
+  @ApiOperation("导出游戏下注记录")
+  @GetMapping(value = "/exportReport")
+  @PreAuthorize("hasAuthority('game:gameBetRecord:export')")
+  public void exportReport(GameBetRecordQueryDTO dto, HttpServletResponse response) {
+    gameBetRecordInfoService.exportReport(dto, response);
   }
 }

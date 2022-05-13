@@ -14,10 +14,7 @@ import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
@@ -38,7 +35,7 @@ public class OpenSmsController {
   }
 
   @ApiOperation("清空")
-  @DeleteMapping("/clean")
+  @PostMapping("/clean")
   @PreAuthorize("hasAuthority('system:sms:clean')")
   @Log(module = ServiceName.ADMIN_SERVICE, param = true, desc = "清空短信记录表")
   public void clean() {

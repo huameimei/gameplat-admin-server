@@ -53,7 +53,7 @@ public class OpenGroupController {
   }
 
   @ApiOperation("编辑")
-  @PutMapping("/edit")
+  @PostMapping("/edit")
   @PreAuthorize("hasAuthority('system:grouping:edit')")
   @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.ADMIN, desc = "'修改分组['+#dto.roleName+']'")
   public void update(@Validated(Groups.UPDATE.class) @RequestBody OperRoleDTO dto) {
@@ -61,7 +61,7 @@ public class OpenGroupController {
   }
 
   @ApiOperation("根据ID删除分组")
-  @DeleteMapping("/delete/{id}")
+  @PostMapping("/delete/{id}")
   @PreAuthorize("hasAuthority('system:grouping:remove')")
   @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.ADMIN, desc = "'删除分组ids='+#ids")
   public void remove(@PathVariable Long id) {

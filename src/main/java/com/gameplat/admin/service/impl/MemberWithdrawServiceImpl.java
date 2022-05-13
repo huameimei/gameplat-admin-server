@@ -417,12 +417,12 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
         MemberWithdrawLimit withradLimit = limitInfoService.getWithradLimit();
         this.sendMessage(
             memberWithdraw.getAccount(),
-            SocketEnum.SOCKET_WITHDRAW_CANCEL,
+                SocketEnum.SOCKET_WITHDRAW_SUCCESS,
             withradLimit.getUserApplyLoanAfterHintsMessage());
       } else if (ObjectUtil.equals(cashStatus, WithdrawStatus.CANCELLED.getValue())) {
         this.sendMessage(
             memberWithdraw.getAccount(),
-            SocketEnum.SOCKET_WITHDRAW_SUCCESS,
+                SocketEnum.SOCKET_WITHDRAW_CANCEL,
             SocketEnum.SEND_WITHDRAW_FAIL_MESSAGE);
       }
     }

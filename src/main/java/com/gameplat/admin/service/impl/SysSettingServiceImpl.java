@@ -213,7 +213,12 @@ public class SysSettingServiceImpl extends ServiceImpl<SysSettingMapper, SysSett
         if (Constants.SETTING_APP_NAVIGATION.equals(vo.getSettingType()) || Constants.SETTING_H5_NAVIGATION.equals(vo.getSettingType())) {
             if (StringUtils.isNotBlank(vo.getExtend2())) {
                 GameKindVO gameList = sysSettingMapper.getGameList(vo.getExtend2());
-                vo.setExtend3(JSON.toJSONString(gameList));
+                JSONObject json = new JSONObject();
+                json.put("platformCode",gameList.getPlatformCode());
+                json.put("playCode",gameList.getCode());
+                json.put("gameType",gameList.getGameType());
+                json.put("demoEnable",gameList.getDemoEnable());
+                vo.setExtend3(json.toJSONString());
             }
         }
         // 广场导航栏选择一个首页后，其他选择的首页自动置为0

@@ -63,7 +63,7 @@ public class GameRebatePeriodController {
   }
 
   @ApiOperation("查询")
-  @PutMapping(value = "update")
+  @PostMapping(value = "update")
   @PreAuthorize("hasAuthority('game:gameRebatePeriod:update')")
   public void update(@RequestBody OperGameRebatePeriodDTO dto) {
     gameRebatePeriodService.updateGameRebatePeriod(dto);

@@ -47,14 +47,14 @@ public class ChatGifController {
   }
 
   @ApiOperation(value = "删")
-  @DeleteMapping("/remove/{id}")
+  @PostMapping("/remove/{id}")
   @PreAuthorize("hasAuthority('chat:gif:remove')")
   public void remove(@PathVariable Integer id) {
     chatGifService.remove(id);
   }
 
   @ApiOperation(value = "改")
-  @PutMapping("/edit")
+  @PostMapping("/edit")
   @PreAuthorize("hasAuthority('chat:gif:edit')")
   public void edit(ChatGifEditDTO dto) {
     chatGifService.edit(dto);

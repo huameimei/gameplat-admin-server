@@ -42,7 +42,7 @@ public class OpenSysFileManagerController {
   }
 
   @ApiOperation(value = "删除图片")
-  @DeleteMapping("/delete")
+  @PostMapping("/delete")
   @PreAuthorize("hasAuthority('system:file:delete')")
   public void delete(String ids) {
     sysFileManagerService.delete(ids);

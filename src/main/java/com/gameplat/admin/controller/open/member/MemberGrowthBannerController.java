@@ -37,13 +37,13 @@ public class MemberGrowthBannerController {
   }
 
   @ApiOperation("删除VIP banner图")
-  @DeleteMapping("/remove/{id}")
+  @PostMapping("/remove/{id}")
   @PreAuthorize("hasAuthority('member:banner:remove')")
   public void removeBanner(@PathVariable Long id) {
     memberGrowthBannerService.remove(id);
   }
 
-  @PutMapping("/edit")
+  @PostMapping("/edit")
   @ApiOperation("修改VIP banner图")
   @PreAuthorize("hasAuthority('member:banner:edit')")
   public void updateBanner(@Validated MemberGrowthBannerEditDTO dto) {

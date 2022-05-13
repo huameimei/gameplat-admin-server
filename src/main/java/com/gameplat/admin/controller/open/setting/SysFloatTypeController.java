@@ -34,7 +34,7 @@ public class SysFloatTypeController {
   }
 
   /** 新增游戏浮窗 */
-  @PutMapping("/insert")
+  @PostMapping("/insert")
   @ApiOperation("游戏浮窗新增")
   @CacheEvict(cacheNames = "TENANT_FLOAT_LIST", allEntries = true)
   public void add(@RequestBody SysFloatSetting sysFloatSetting) {

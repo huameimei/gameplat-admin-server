@@ -41,14 +41,14 @@ public class ChatPushPlanController {
   }
 
   @ApiOperation(value = "编辑")
-  @PutMapping("/edit")
+  @PostMapping("/edit")
   @PreAuthorize("hasAuthority('chat:pushPlan:edit')")
   public void edit(@Validated ChatPushPlanAddOrEditDTO dto) {
     chatPushPlanService.edit(dto);
   }
 
   @ApiOperation(value = "删")
-  @DeleteMapping("/remove/{id}")
+  @PostMapping("/remove/{id}")
   @PreAuthorize("hasAuthority('chat:pushPlan:remove')")
   public void remove(@PathVariable Long id) {
     chatPushPlanService.remove(id);

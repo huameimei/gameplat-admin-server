@@ -32,7 +32,7 @@ public class GameTypeController {
   }
 
   @ApiOperation("编辑")
-  @PutMapping("/edit")
+  @PostMapping("/edit")
   @PreAuthorize("hasAuthority('game:gameType:edit')")
   public void updateGameType(@RequestBody OperGameTypeDTO dto) {
     gameTypeService.updateGameType(dto);

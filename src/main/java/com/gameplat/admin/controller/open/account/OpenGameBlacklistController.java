@@ -22,7 +22,7 @@ public class OpenGameBlacklistController {
   @Autowired private GameBlacklistService gameBlacklistService;
 
   @ApiOperation("删除")
-  @DeleteMapping("/del/{id}")
+  @PostMapping("/del/{id}")
   @PreAuthorize("hasAuthority('account:gameBlack:remove')")
   public void delete(@PathVariable Long id) {
     gameBlacklistService.delete(id);
@@ -44,7 +44,7 @@ public class OpenGameBlacklistController {
   }
 
   @ApiOperation("编辑")
-  @PutMapping("/edit")
+  @PostMapping("/edit")
   @PreAuthorize("hasAuthority('account:gameBlack:edit')")
   public void edit(@RequestBody OperGameBlacklistDTO dto) {
     gameBlacklistService.update(dto);

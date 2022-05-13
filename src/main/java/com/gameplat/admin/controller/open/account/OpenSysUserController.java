@@ -58,7 +58,7 @@ public class OpenSysUserController {
   }
 
   @ApiOperation("编辑")
-  @PutMapping("/edit")
+  @PostMapping("/edit")
   @PreAuthorize("hasAuthority('account:subUser:edit')")
   @Log(
       module = ServiceName.ADMIN_SERVICE,
@@ -69,7 +69,7 @@ public class OpenSysUserController {
   }
 
   @ApiOperation("删除")
-  @DeleteMapping("/delete/{id}")
+  @PostMapping("/delete/{id}")
   @PreAuthorize("hasAuthority('account:subUser:remove')")
   @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.ADMIN, desc = "'删除后台账号id='+#id")
   public void remove(@PathVariable Long id) {
@@ -99,7 +99,7 @@ public class OpenSysUserController {
   }
 
   @ApiOperation("修改状态")
-  @PutMapping("/changeStatus/{id}/{status}")
+  @PostMapping("/changeStatus/{id}/{status}")
   @PreAuthorize("hasAuthority('account.subUser.enable')")
   @Log(
       module = ServiceName.ADMIN_SERVICE,

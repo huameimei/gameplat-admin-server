@@ -46,9 +46,9 @@ public class ActivityBlacklistController {
   }
 
   @ApiOperation(value = "删除活动黑名单")
-  @DeleteMapping("/delete")
+  @PostMapping("/delete")
   @PreAuthorize("hasAuthority('account:activityBlack:remove')")
-  public void remove(@RequestBody String ids) {
+  public void remove(String ids) {
     if (StringUtils.isBlank(ids)) {
       throw new ServiceException("ids不能为空");
     }

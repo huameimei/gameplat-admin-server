@@ -17,7 +17,6 @@ import com.gameplat.common.enums.DictTypeEnum;
 import com.gameplat.model.entity.sys.SysFileManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 
@@ -54,12 +53,6 @@ public class SysFileManagerServiceImpl extends ServiceImpl<SysFileManagerMapper,
 
   @Override
   public String upload(MultipartFile file) {
-    // 上传图片
-    FileConfig fileConfig = configService.getDefaultConfig(DictTypeEnum.FILE_CONFIG, FileConfig.class);
-    if (StringUtils.isNull(fileConfig)) {
-      throw new ServiceException("未找到文件配置");
-    }
-
     return ossService.upload(file);
   }
 

@@ -45,14 +45,14 @@ public class ValidWithdrawController {
 
   @ApiOperation(value = "调整单条打码量记录")
   @PreAuthorize("hasAuthority('funds:validWithdraw:edit')")
-  @PutMapping("/updateValidWithdraw")
+  @PostMapping("/updateValidWithdraw")
   public void updateValidWithdraw(@Validated @RequestBody ValidWithdrawDto dto) {
     validWithdrawService.updateValidWithdraw(dto);
   }
 
   @SneakyThrows
   @ApiOperation(value = "清除会员打码量记录")
-  @DeleteMapping("/delValidWithdraw")
+  @PostMapping("/delValidWithdraw")
   @PreAuthorize("hasAuthority('funds:validWithdraw:remove')")
   public void delValidWithdraw(@RequestParam("member") String member) {
     if (StringUtils.isEmpty(member)) {

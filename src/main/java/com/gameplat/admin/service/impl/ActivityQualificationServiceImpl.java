@@ -184,13 +184,15 @@ public class ActivityQualificationServiceImpl
           qm.setGetWay(activityLobbyDTO.getGetWay());
           //如果是红包雨活动
           if(activityLobbyDTO.getType().intValue()==2){
-            if(CollectionUtils.isEmpty(lobbyDiscount) || lobbyDiscount.size()>1){
+            ActivityLobbyDiscountDTO lobbyDiscountTemp=activityLobbyDTO.getLobbyDiscount();
+            if(lobbyDiscountTemp==null){
               throw new ServiceException("请选择一个优惠区间");
             }
             ActivityLobbyDiscountDTO temp=lobbyDiscount.get(0);
             qm.setMinMoney( temp.getPresenterValue());
             qm.setMaxMoney(temp.getWithdrawDml());
             qm.setDrawNum(temp.getPresenterDml().intValue());
+            qm.setActivityType(ActivityInfoEnum.TypeEnum.RED_ENVELOPE.value());
           }
           manageList.add(qm);
         }

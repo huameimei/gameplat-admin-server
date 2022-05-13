@@ -29,6 +29,7 @@ import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 活动板块、管理
@@ -77,7 +78,7 @@ public class ActivityTypeController {
   }
 
   @ApiOperation(value = "更新活动板块")
-  @PutMapping("/update")
+  @PostMapping("/update")
   @PreAuthorize("hasAuthority('activity:type:edit')")
   public void update(@Validated @RequestBody ActivityTypeUpdateDTO dto) {
     dto.setLanguage(LocaleContextHolder.getLocale().toLanguageTag());
@@ -93,13 +94,13 @@ public class ActivityTypeController {
   }
 
   @ApiOperation(value = "删除活动板块")
-  @DeleteMapping("/delete")
+  @PostMapping("/delete")
   @PreAuthorize("hasAuthority('activity:type:remove')")
-  public void remove(@RequestBody String ids) {
-    if (StringUtils.isBlank(ids)) {
+  public void remove(@RequestBody Map<String, String> map) {
+    if (StringUtils.isBlank(map.get("ids"))) {
       throw new ServiceException("ids不能为空");
     }
-    activityTypeService.remove(ids);
+    activityTypeService.remove(map.get("ids"));
   }
 
   @ApiOperation(value = "类型编码列表")

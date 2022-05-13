@@ -1,13 +1,13 @@
 package com.gameplat.admin.service.impl;
 
-import cn.hutool.core.util.RandomUtil;
 import com.gameplat.admin.service.AsyncSaveFileRecordService;
 import com.gameplat.admin.service.ConfigService;
 import com.gameplat.admin.service.OssService;
-import com.gameplat.base.common.context.GlobalContextHolder;
+import com.gameplat.admin.service.SysDomainService;
 import com.gameplat.common.compent.oss.FileStorageStrategyContext;
 import com.gameplat.common.compent.oss.config.FileConfig;
 import com.gameplat.common.enums.DictTypeEnum;
+import com.gameplat.security.SecurityUserHolder;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,30 +20,27 @@ public class OssServiceImpl implements OssService {
 
   @Autowired private FileStorageStrategyContext fileStorageStrategyContext;
 
-  @Autowired
-  private AsyncSaveFileRecordService asyncSaveFileRecordService;
+  @Autowired private AsyncSaveFileRecordService asyncSaveFileRecordService;
 
-  @Override
-  public String upload(MultipartFile file) {
-    String fileName = System.currentTimeMillis() + RandomUtil.randomNumber() + "";
-    return this.upload(file, fileName);
-  }
+  @Autowired private SysDomainService domainService;
 
   @Override
   @SneakyThrows
-  public String upload(MultipartFile file, String filename) {
-    FileConfig fileConfig = this.getConfig();
+  public String upload(MultipartFile file) {
+    FileConfig config = this.getConfig();
 
-    String fileUrl = fileStorageStrategyContext
-        .getProvider(fileConfig)
-            .upload(file.getInputStream(), file.getContentType(), filename);
+    String filename =
+        fileStorageStrategyContext
+            .getProvider(config)
+            .upload(file.getInputStream(), file.getContentType());
+
+    String accessUrl = domainService.getOssDomain().concat("/").concat(filename);
 
     // 异步保存文件记录
-    String username = GlobalContextHolder.getContext().getUsername();
-    Long fileSize = file.getSize();
-    asyncSaveFileRecordService.asyncSave(file, fileUrl, fileConfig.getProvider(), username, fileSize);
+    asyncSaveFileRecordService.asyncSave(
+        file, accessUrl, config.getProvider(), SecurityUserHolder.getUsername());
 
-    return fileUrl;
+    return accessUrl;
   }
 
   @Override

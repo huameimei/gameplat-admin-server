@@ -1,9 +1,11 @@
 package com.gameplat.admin;
 
+import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.gameplat.admin.model.vo.ActivityLobbyVO;
+import com.gameplat.admin.model.vo.ActivityRedPacketConfigVO;
 import com.gameplat.admin.service.ActivityLobbyService;
 import com.gameplat.admin.service.ActivityQualificationService;
 import com.gameplat.admin.service.RechargeOrderHistoryService;
@@ -87,4 +89,12 @@ public class AdminApplicationTests {
         ActivityLobbyVO test=activityLobbyService.getActivityLobbyVOById(activityLobbyId);
         log.info(test.toString());
     }
+
+    @Test
+    public void testJson(){
+        String redPacketConfig="{\"activityBalcklist\":\"xiaosheng,liming,jdkjsdksdjlakgdj laksgj oiqtl ;kjlkg jkhflhgurhi lkjfgs bgjhskb fgastwe\",\"dmlMultiple\":2,\"redenvelopeBeginTime\":\"14:00\",\"redenvelopeChat\":\"-1\",\"redenvelopeEndTime\":\"23:30\",\"redenvelopeIsAutoDistribute\":true,\"redenvelopeIsIpLimit\":\"true\",\"redenvelopeMoneyMax\":99999,\"redenvelopeMoneyMim\":1,\"rotarySwitchBeginTime\":\"12:00:00\",rotarySwitchEndTime\":\"23:00:00\",\"weekendRedenvelopeDay\":\"7,1\",\"weekendRedenvelopeId\":null}";
+        ActivityRedPacketConfigVO configVO =JSON.parseObject(redPacketConfig, ActivityRedPacketConfigVO.class);
+    }
+
+
 }

@@ -9,4 +9,6 @@ import com.gameplat.model.entity.setting.SysDomain;
 public interface SysDomainService extends IService<SysDomain> {
 
   String getChatDomain();
+
+  String getOssDomain();
 }

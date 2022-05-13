@@ -54,7 +54,7 @@ public class OpenMessageInfoController {
   }
 
   @ApiOperation(value = "删除消息")
-  @DeleteMapping("/remove")
+  @PostMapping("/remove")
   @PreAuthorize("hasAuthority('operator:message:remove')")
   public void remove(String ids) {
     messageInfoService.deleteBatchMessage(ids);

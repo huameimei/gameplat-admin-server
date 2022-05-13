@@ -46,7 +46,7 @@ public class OpenMemberGrowthRecordController {
     return memberGrowthRecordService.findRecordList(page, dto);
   }
 
-  @PutMapping("/editGrowth")
+  @PostMapping("/editGrowth")
   @ApiOperation(value = "修改单个会员成长值")
   @PreAuthorize("hasAuthority('member:growthRecord:edit')")
   public void editMemberGrowth(@RequestBody MemberGrowthChangeDto dto, HttpServletRequest request) {

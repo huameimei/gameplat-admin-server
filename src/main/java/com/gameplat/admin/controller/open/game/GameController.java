@@ -28,7 +28,7 @@ public class GameController {
   }
 
   @ApiOperation("编辑")
-  @PutMapping("/edit")
+  @PostMapping("/edit")
   @PreAuthorize("hasAuthority('game:game:edit')")
   public void updateGame(@RequestBody OperGameDTO operGameDTO) {
     gameService.updateGame(operGameDTO);

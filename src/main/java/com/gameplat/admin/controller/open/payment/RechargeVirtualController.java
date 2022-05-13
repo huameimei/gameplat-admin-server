@@ -35,7 +35,7 @@ public class RechargeVirtualController {
   }
 
   @ApiOperation("修改")
-  @PutMapping("/edit")
+  @PostMapping("/edit")
   @PreAuthorize("hasAuthority('thirdParty:rechVirtual:edit')")
   @Log(
       module = ServiceName.ADMIN_SERVICE,
@@ -53,7 +53,7 @@ public class RechargeVirtualController {
   }
 
   @ApiOperation("添加")
-  @PutMapping("/add")
+  @PostMapping("/add")
   @PreAuthorize("hasAuthority('thirdParty:rechVirtual:add')")
   @Log(
       module = ServiceName.ADMIN_SERVICE,
@@ -68,7 +68,7 @@ public class RechargeVirtualController {
   }
 
   @ApiOperation("删除")
-  @DeleteMapping("/delete/{id}")
+  @PostMapping("/delete/{id}")
   @PreAuthorize("hasAuthority('thirdParty:rechVirtual:remove')")
   @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.RECHARGE, desc = "'删除虚拟币id=' + #id")
   public void remove(@PathVariable Long id) {

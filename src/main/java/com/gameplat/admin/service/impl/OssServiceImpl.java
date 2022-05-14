@@ -3,7 +3,6 @@ package com.gameplat.admin.service.impl;
 import com.gameplat.admin.service.AsyncSaveFileRecordService;
 import com.gameplat.admin.service.ConfigService;
 import com.gameplat.admin.service.OssService;
-import com.gameplat.admin.service.SysDomainService;
 import com.gameplat.common.compent.oss.FileStorageStrategyContext;
 import com.gameplat.common.compent.oss.config.FileConfig;
 import com.gameplat.common.enums.DictTypeEnum;
@@ -22,8 +21,6 @@ public class OssServiceImpl implements OssService {
 
   @Autowired private AsyncSaveFileRecordService asyncSaveFileRecordService;
 
-  @Autowired private SysDomainService domainService;
-
   @Override
   @SneakyThrows
   public String upload(MultipartFile file) {
@@ -34,13 +31,16 @@ public class OssServiceImpl implements OssService {
             .getProvider(config)
             .upload(file.getInputStream(), file.getContentType());
 
-    String accessUrl = domainService.getOssDomain().concat("/").concat(filename);
-
     // 异步保存文件记录
+    String accessUrl = this.getAccessUrl(config, filename);
     asyncSaveFileRecordService.asyncSave(
         file, accessUrl, config.getProvider(), SecurityUserHolder.getUsername());
 
     return accessUrl;
+  }
+
+  private String getAccessUrl(FileConfig config, String filename) {
+    return config.getEndpoint().concat("/").concat(config.getBucket()).concat("/").concat(filename);
   }
 
   @Override

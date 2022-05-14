@@ -3,7 +3,6 @@ package com.gameplat.admin.service.impl;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.mapper.SysDomainMapper;
 import com.gameplat.admin.service.SysDomainService;
-import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.model.entity.setting.SysDomain;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -29,14 +28,5 @@ public class SysDomainServiceImpl extends ServiceImpl<SysDomainMapper, SysDomain
     } else {
       return chatDomain;
     }
-  }
-
-  @Override
-  public String getOssDomain() {
-    return lambdaQuery()
-        .eq(SysDomain::getDomainType, "oss_domain")
-        .oneOpt()
-        .map(SysDomain::getDomain)
-        .orElseThrow(() -> new ServiceException("OSS访问地址未配置"));
   }
 }

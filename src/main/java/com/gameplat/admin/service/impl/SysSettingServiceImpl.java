@@ -212,13 +212,16 @@ public class SysSettingServiceImpl extends ServiceImpl<SysSettingMapper, SysSett
         // 查询游戏必要code
         if (Constants.SETTING_APP_NAVIGATION.equals(vo.getSettingType()) || Constants.SETTING_SIX_NAVIGATION.equals(vo.getSettingType())) {
             if (StringUtils.isNotBlank(vo.getExtend2())) {
-                GameKindVO gameList = sysSettingMapper.getGameList(vo.getExtend2());
-                JSONObject json = new JSONObject();
-                json.put("platformCode",gameList.getPlatformCode());
-                json.put("playCode",gameList.getCode());
-                json.put("gameType",gameList.getGameType());
-                json.put("demoEnable",gameList.getDemoEnable());
-                vo.setExtend3(json.toJSONString());
+                GameKindVO game = sysSettingMapper.getGameList(vo.getExtend2());
+                if (game != null) {
+                    JSONObject json = new JSONObject();
+                    json.put("platformCode", game.getPlatformCode());
+                    /*json.put("playCode", game.getCode());*/
+                    json.put("playCode", "");
+                    json.put("gameType", game.getGameType());
+                    json.put("demoEnable", game.getDemoEnable());
+                    vo.setExtend3(json.toJSONString());
+                }
             }
         }
         // 广场导航栏选择一个首页后，其他选择的首页自动置为0

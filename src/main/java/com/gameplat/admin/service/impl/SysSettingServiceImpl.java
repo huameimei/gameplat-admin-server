@@ -216,8 +216,12 @@ public class SysSettingServiceImpl extends ServiceImpl<SysSettingMapper, SysSett
                 if (game != null) {
                     JSONObject json = new JSONObject();
                     json.put("platformCode", game.getPlatformCode());
-                    /*json.put("playCode", game.getCode());*/
-                    json.put("playCode", "");
+                    // 包含子游戏的 playCode不能为空，不包含二级子游戏,playCode必须为空
+                    if (game.getSubLevel() != null && game.getSubLevel() == 1) {
+                        json.put("playCode", game.getCode());
+                    } else {
+                        json.put("playCode", "");
+                    }
                     json.put("gameType", game.getGameType());
                     json.put("demoEnable", game.getDemoEnable());
                     vo.setExtend3(json.toJSONString());

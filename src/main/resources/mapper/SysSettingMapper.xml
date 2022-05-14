@@ -40,6 +40,7 @@
         <result property="enable" column="enable"/>
         <result property="gameType" column="gameType"/>
         <result property="enable" column="enable"/>
+        <result property="subLevel" column="subLevel"/>
     </resultMap>
 
     <!--初使化租户对应主题的导航栏-->
@@ -98,7 +99,8 @@
         select gk.code            as code,
                gk.game_type       as gameType,
                gk.platform_code   as platformCode,
-               gk.demo_enable     as demoEnable
+               gk.demo_enable     as demoEnable,
+               gk.sub_level       as subLevel
         from game_kind as gk
         WHERE gk.code = #{oneCode}
     </select>

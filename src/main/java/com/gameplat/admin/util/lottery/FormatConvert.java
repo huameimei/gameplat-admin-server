@@ -22,6 +22,7 @@ public class FormatConvert {
   public static JSONObject pageConvert(JSONObject convert) {
     JSONObject result = new JSONObject();
     Integer code = convert.getInteger("code");
+
     result.put("code", code);
     if (code == SUCCEED) {
       result.put("total", convert.getJSONObject("data").getInteger("totalCount"));

@@ -1,5 +1,7 @@
 package com.gameplat.admin.service.impl;
 
+import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.lang.UUID;
 import com.gameplat.admin.service.AsyncSaveFileRecordService;
 import com.gameplat.admin.service.ConfigService;
 import com.gameplat.admin.service.OssService;
@@ -25,18 +27,17 @@ public class OssServiceImpl implements OssService {
   @SneakyThrows
   public String upload(MultipartFile file) {
     FileConfig config = this.getConfig();
-
-    String filename =
+    String randomFilename = this.getRandomFilename(file);
+    String url =
         fileStorageStrategyContext
             .getProvider(config)
-            .upload(file.getInputStream(), file.getContentType());
+            .upload(file.getInputStream(), file.getContentType(), randomFilename);
 
     // 异步保存文件记录
-    String accessUrl = this.getAccessUrl(config, filename);
     asyncSaveFileRecordService.asyncSave(
-        file, accessUrl, config.getProvider(), SecurityUserHolder.getUsername());
+        file, url, config.getProvider(), SecurityUserHolder.getUsername());
 
-    return accessUrl;
+    return this.getAccessUrl(config, randomFilename);
   }
 
   private String getAccessUrl(FileConfig config, String filename) {
@@ -50,5 +51,9 @@ public class OssServiceImpl implements OssService {
 
   private FileConfig getConfig() {
     return configService.getDefaultConfig(DictTypeEnum.FILE_CONFIG, FileConfig.class);
+  }
+
+  private String getRandomFilename(MultipartFile file) {
+    return UUID.fastUUID() + "." + FileUtil.getSuffix(file.getOriginalFilename());
   }
 }

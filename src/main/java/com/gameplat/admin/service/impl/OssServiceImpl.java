@@ -42,7 +42,7 @@ public class OssServiceImpl implements OssService {
   }
 
   private String getAccessUrl(FileConfig config, String filename) {
-    return config.getAccessDomain().concat("/").concat(filename);
+    return config.getEndpoint().concat("/").concat(config.getBucket()).concat("/").concat(filename);
   }
 
   @Override

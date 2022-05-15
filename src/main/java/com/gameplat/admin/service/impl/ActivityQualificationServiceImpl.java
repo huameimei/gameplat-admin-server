@@ -184,11 +184,12 @@ public class ActivityQualificationServiceImpl
           qm.setGetWay(activityLobbyDTO.getGetWay());
           //如果是红包雨活动
           if(activityLobbyDTO.getType().intValue()==2){
-            ActivityLobbyDiscountDTO lobbyDiscountTemp=activityLobbyDTO.getLobbyDiscount();
-            if(lobbyDiscountTemp==null){
+            List<ActivityLobbyDiscountDTO> redPacketConditionList=activityLobbyDTO.getRedPacketConditionList();
+            if(CollectionUtils.isEmpty(redPacketConditionList)){
               throw new ServiceException("请选择一个优惠区间");
             }
-            ActivityLobbyDiscountDTO temp=lobbyDiscount.get(0);
+            //只能选择一个，如果传2个，就选第一个
+            ActivityLobbyDiscountDTO temp=redPacketConditionList.get(0);
             qm.setMinMoney( temp.getPresenterValue());
             qm.setMaxMoney(temp.getWithdrawDml());
             qm.setDrawNum(temp.getPresenterDml().intValue());

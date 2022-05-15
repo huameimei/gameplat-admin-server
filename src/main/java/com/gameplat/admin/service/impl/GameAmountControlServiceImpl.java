@@ -51,11 +51,14 @@ public class GameAmountControlServiceImpl
         gameAmountControl
             .getUseAmount()
             .divide(gameAmountControl.getAmount(), 4, BigDecimal.ROUND_HALF_UP);
-    NumberFormat percent = NumberFormat.getPercentInstance();
-    percent.setMaximumFractionDigits(4);
-    if (percentBigDecimal.compareTo(new BigDecimal("0.8000")) >= 0) {
+    if (percentBigDecimal
+            .multiply(new BigDecimal("100"))
+            .compareTo(new BigDecimal(gameAmountControl.getThreshold()))
+        >= 0) {
       gameAmountNotifyVO.setAmount(gameAmountControl.getAmount());
       gameAmountNotifyVO.setUseAmount(gameAmountControl.getUseAmount());
+      NumberFormat percent = NumberFormat.getPercentInstance();
+      percent.setMaximumFractionDigits(4);
       gameAmountNotifyVO.setPercent(percent.format(percentBigDecimal.doubleValue()));
       return gameAmountNotifyVO;
     }

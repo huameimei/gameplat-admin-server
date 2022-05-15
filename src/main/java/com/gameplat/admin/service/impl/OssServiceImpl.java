@@ -28,20 +28,21 @@ public class OssServiceImpl implements OssService {
   public String upload(MultipartFile file) {
     FileConfig config = this.getConfig();
     String randomFilename = this.getRandomFilename(file);
-    String url =
-        fileStorageStrategyContext
+    fileStorageStrategyContext
             .getProvider(config)
             .upload(file.getInputStream(), file.getContentType(), randomFilename);
 
+
+    String accessUrl = this.getAccessUrl(config, randomFilename);
     // 异步保存文件记录
     asyncSaveFileRecordService.asyncSave(
-        file, url, config.getProvider(), SecurityUserHolder.getUsername());
+        file, accessUrl, config.getProvider(), SecurityUserHolder.getUsername());
 
-    return this.getAccessUrl(config, randomFilename);
+    return accessUrl;
   }
 
   private String getAccessUrl(FileConfig config, String filename) {
-    return config.getEndpoint().concat("/").concat(config.getBucket()).concat("/").concat(filename);
+    return config.getAccessDomain().concat("/").concat(filename);
   }
 
   @Override

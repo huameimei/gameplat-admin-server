@@ -84,9 +84,6 @@ public class ActivityLobbyDTO implements Serializable {
   @ApiModelProperty(value = "ip黑名单")
   private String ipBlacklist;
 
-  @ApiModelProperty(value = "选中一个优惠等级-弃用")
-  private ActivityLobbyDiscountDTO lobbyDiscount;
-
   @ApiModelProperty(value = "活动大厅优惠")
   private List<ActivityLobbyDiscountDTO> lobbyDiscountList;
 

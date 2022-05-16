@@ -27,4 +27,9 @@ public class ActivityQualificationAddDTO implements Serializable {
   /** 活动红包信息 */
   @ApiModelProperty(value = "活动红包信息")
   private List<ActivityRedPacketDTO> activityRedPacketList;
+
+  /** 活动红包信息 */
+  @ApiModelProperty(value = "红包雨")
+  private List<ActivityLobbyDTO> memberRedPacketDTO;
+
 }

@@ -14,7 +14,17 @@ spring:
         namespace: ea9f2fb3-4fce-4cc9-a820-4508330af65b
         group: SERVICE_GROUP
         refresh-enabled: true
-        shared-dataids: redis.yml,spring-kafka-log.yml,spring-kafka-producer-config.yml,elasticsearch.yml
+        shared-configs:
+          - data-id: redis.yml
+            refresh: true
+          - data-id: injection-http-firewall.yml
+            refresh: true
+          - data-id: spring-kafka-log.yml
+            refresh: true
+          - data-id: spring-kafka-producer-config.yml
+            refresh: true
+          - data-id: elasticsearch.yml
+            refresh: true
       discovery:
         service: admin-server
         namespace: ${spring.cloud.nacos.config.namespace}

@@ -161,7 +161,7 @@ public class ActivityQualificationServiceImpl
           if(activityLobbyDTO.getActivityType() == null){
             throw new ServiceException("活动类型不能为空");
           }
-          qm.setActivityType(activityLobbyDTO.getActivityType());
+          qm.setActivityType(type);
           qm.setUserId(memberInfo.getId());
           qm.setUsername(username1);
           qm.setApplyTime(new Date());

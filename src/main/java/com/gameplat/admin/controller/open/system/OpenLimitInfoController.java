@@ -115,4 +115,18 @@ public class OpenLimitInfoController {
   public LimitInfo getMemberWithdrawLimit(String name) {
     return limitInfoService.getLimitInfo(name);
   }
+
+  @ApiOperation("添加/修改余额宝限制")
+  @PostMapping(value = "/add/yubaoLimit")
+  @PreAuthorize("hasAuthority('system:limit:addYubaoLimit')")
+  public void saveYubaoLimit(@RequestBody LimitInfoDTO dto) {
+    limitInfoService.insertLimitInfo(dto);
+  }
+
+  @ApiOperation("获取余额宝限制")
+  @GetMapping(value = "/get/yubaoLimit")
+  @PreAuthorize("hasAuthority('system:limit:viewYubaoLimit')")
+  public LimitInfo getYubaoLimit() {
+    return limitInfoService.getLimitInfo("yubaoLimit");
+  }
 }

@@ -1,9 +1,10 @@
 package com.gameplat.admin.service.impl;
 
+import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.lang.UUID;
 import com.gameplat.admin.service.AsyncSaveFileRecordService;
 import com.gameplat.admin.service.ConfigService;
 import com.gameplat.admin.service.OssService;
-import com.gameplat.admin.service.SysDomainService;
 import com.gameplat.common.compent.oss.FileStorageStrategyContext;
 import com.gameplat.common.compent.oss.config.FileConfig;
 import com.gameplat.common.enums.DictTypeEnum;
@@ -22,25 +23,26 @@ public class OssServiceImpl implements OssService {
 
   @Autowired private AsyncSaveFileRecordService asyncSaveFileRecordService;
 
-  @Autowired private SysDomainService domainService;
-
   @Override
   @SneakyThrows
   public String upload(MultipartFile file) {
     FileConfig config = this.getConfig();
-
-    String filename =
-        fileStorageStrategyContext
+    String randomFilename = this.getRandomFilename(file);
+    fileStorageStrategyContext
             .getProvider(config)
-            .upload(file.getInputStream(), file.getContentType());
+            .upload(file.getInputStream(), file.getContentType(), randomFilename);
 
-    String accessUrl = domainService.getOssDomain().concat("/").concat(filename);
 
+    String accessUrl = this.getAccessUrl(config, randomFilename);
     // 异步保存文件记录
     asyncSaveFileRecordService.asyncSave(
         file, accessUrl, config.getProvider(), SecurityUserHolder.getUsername());
 
     return accessUrl;
+  }
+
+  private String getAccessUrl(FileConfig config, String filename) {
+    return config.getEndpoint().concat("/").concat(config.getBucket()).concat("/").concat(filename);
   }
 
   @Override
@@ -50,5 +52,9 @@ public class OssServiceImpl implements OssService {
 
   private FileConfig getConfig() {
     return configService.getDefaultConfig(DictTypeEnum.FILE_CONFIG, FileConfig.class);
+  }
+
+  private String getRandomFilename(MultipartFile file) {
+    return UUID.fastUUID() + "." + FileUtil.getSuffix(file.getOriginalFilename());
   }
 }

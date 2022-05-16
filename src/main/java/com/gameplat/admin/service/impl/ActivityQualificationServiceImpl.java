@@ -132,7 +132,7 @@ public class ActivityQualificationServiceImpl
     } else {
       usernameList.add(username);
     }
-
+    List<ActivityQualification> manageList = new ArrayList<>();
     for (String username1 : usernameList) {
       MemberInfoVO memberInfo = memberService.getMemberInfo(username1);
       if (StringUtils.isNull(memberInfo)) {
@@ -144,7 +144,7 @@ public class ActivityQualificationServiceImpl
         if (CollectionUtils.isEmpty(activityLobbyList)) {
           throw new ServiceException("活动大厅数据不能为空");
         }
-        List<ActivityQualification> manageList = new ArrayList<>();
+
         ActivityQualification qm;
         for (ActivityLobbyDTO activityLobbyDTO : activityLobbyList) {
           List<ActivityLobbyDiscountDTO> lobbyDiscount = activityLobbyDTO.getLobbyDiscountList();
@@ -182,25 +182,53 @@ public class ActivityQualificationServiceImpl
           lobbyDiscount.sort(Comparator.comparingInt(ActivityLobbyDiscountDTO::getTargetValue));
           qm.setAwardDetail(JSON.parseArray(JSONObject.toJSONString(lobbyDiscount)).toJSONString());
           qm.setGetWay(activityLobbyDTO.getGetWay());
-          //如果是红包雨活动
-          if(activityLobbyDTO.getType().intValue()==2){
-            List<ActivityLobbyDiscountDTO> redPacketConditionList=activityLobbyDTO.getRedPacketConditionList();
-            if(CollectionUtils.isEmpty(redPacketConditionList)){
-              throw new ServiceException("请选择一个优惠区间");
-            }
-            //只能选择一个，如果传2个，就选第一个
-            ActivityLobbyDiscountDTO temp=redPacketConditionList.get(0);
-            qm.setMinMoney( temp.getPresenterValue());
-            qm.setMaxMoney(temp.getWithdrawDml());
-            qm.setDrawNum(temp.getPresenterDml().intValue());
-            qm.setActivityType(ActivityInfoEnum.TypeEnum.RED_ENVELOPE.value());
-          }
           manageList.add(qm);
         }
-        if (CollectionUtils.isNotEmpty(manageList)) {
-          this.saveBatch(manageList);
+      }else if(type==2){
+        //如果是红包雨活动
+        List<ActivityLobbyDTO> redPacketConditionList=dto.getMemberRedPacketDTO();
+        if(CollectionUtils.isEmpty(redPacketConditionList)){
+          throw new ServiceException("活动数据不对");
         }
+        //只能选择一个，如果传2个，就选第一个
+        ActivityLobbyDTO activityLobbyDTO=redPacketConditionList.get(0);
+
+        ActivityQualification qm = new ActivityQualification();
+        ActivityLobby activityLobby = activityLobbyConvert.toEntity(activityLobbyDTO);
+        String auditRemark =activityCommonService.getAuditRemark(activityLobby, "", "", null, null);
+        qm.setAuditRemark(auditRemark);
+        qm.setActivityId(activityLobbyDTO.getId());
+        qm.setActivityName(activityLobbyDTO.getTitle());
+        if(activityLobbyDTO.getActivityType() == null){
+          throw new ServiceException("活动类型不能为空");
+        }
+        qm.setUserId(memberInfo.getId());
+        qm.setUsername(username1);
+        qm.setApplyTime(new Date());
+        qm.setStatus(BooleanEnum.YES.value());
+        qm.setActivityStartTime(activityLobbyDTO.getStartTime());
+        qm.setActivityEndTime(activityLobbyDTO.getEndTime());
+        qm.setDeleteFlag(BooleanEnum.YES.value());
+        qm.setEmployNum(0);
+        qm.setQualificationActivityId(IdWorker.getIdStr());
+        qm.setQualificationStatus(BooleanEnum.YES.value());
+        qm.setStatisItem(activityLobbyDTO.getStatisItem());
+        qm.setGetWay(activityLobbyDTO.getGetWay());
+
+        List<ActivityLobbyDiscountDTO> list=activityLobbyDTO.getRedPacketConditionList();
+        if(CollectionUtils.isEmpty(list)){
+          throw new ServiceException("请选择一个优惠区间");
+        }
+        //只能选择一个，如果传2个，就选第一个
+        ActivityLobbyDiscountDTO temp=list.get(0);
+        qm.setMinMoney(temp.getPresenterValue());
+        qm.setMaxMoney(temp.getWithdrawDml());
+        qm.setDrawNum(temp.getPresenterDml().intValue());
+        qm.setActivityType(ActivityInfoEnum.TypeEnum.RED_ENVELOPE.value());
       }
+    }
+    if (CollectionUtils.isNotEmpty(manageList)) {
+      this.saveBatch(manageList);
     }
   }
 

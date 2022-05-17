@@ -467,7 +467,7 @@ public class ActivityQualificationServiceImpl
                 }
 
                 //获取允许参与活动的所有会员层级
-                String userLevels = activityLobby.getUserLevel();
+                String userLevels = activityLobby.getGraded();
                 if (StringUtils.isNotEmpty(userLevels)) {
                   userLevelsSet = Arrays.stream(userLevels.split(",")).collect(Collectors.toSet());
                 }

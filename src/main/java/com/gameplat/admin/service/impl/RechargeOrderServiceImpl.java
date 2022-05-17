@@ -500,20 +500,20 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
     messageInfo.setCreateTime(new Date());
     messageMapper.insert(messageInfo);
 
-    MessageDistribute messageDistribute = new MessageDistribute();
-    messageDistribute.setMessageId(messageInfo.getId());
-    messageDistribute.setUserId(rechargeOrder.getMemberId());
-    messageDistribute.setUserAccount(messageInfo.getLinkAccount());
-    messageDistribute.setRechargeLevel(Convert.toInt(rechargeOrder.getMemberLevel()));
-    messageDistribute.setVipLevel(
-        memberInfoService
-            .lambdaQuery()
-            .eq(MemberInfo::getMemberId, rechargeOrder.getMemberId())
-            .one()
-            .getVipLevel());
-    messageDistribute.setReadStatus(NumberConstant.ZERO);
-    messageDistribute.setCreateBy("system");
-    messageDistributeService.save(messageDistribute);
+//    MessageDistribute messageDistribute = new MessageDistribute();
+//    messageDistribute.setMessageId(messageInfo.getId());
+//    messageDistribute.setUserId(rechargeOrder.getMemberId());
+//    messageDistribute.setUserAccount(messageInfo.getLinkAccount());
+//    messageDistribute.setRechargeLevel(Convert.toInt(rechargeOrder.getMemberLevel()));
+//    messageDistribute.setVipLevel(
+//        memberInfoService
+//            .lambdaQuery()
+//            .eq(MemberInfo::getMemberId, rechargeOrder.getMemberId())
+//            .one()
+//            .getVipLevel());
+//    messageDistribute.setReadStatus(NumberConstant.ZERO);
+//    messageDistribute.setCreateBy("system");
+//    messageDistributeService.save(messageDistribute);
   }
 
   private void sendMessage(String account, String channel, String message) {

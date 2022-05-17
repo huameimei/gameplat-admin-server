@@ -221,7 +221,11 @@ public class DataReportServiceImpl extends ServiceImpl<DataReportMapper, GameRec
     GameAmountControl gameInfo =
         gameAmountControlService.findInfoByType(GameAmountControlTypeEnum.LIVE.type());
     if (ObjectUtil.isNotNull(gameInfo)) {
-      accountReportVo.setGameQuota(gameInfo.getAmount().subtract(gameInfo.getUseAmount()));
+      BigDecimal loseMoney = gameInfo.getUseAmount().subtract(gameInfo.getStartAmount());
+      if (loseMoney.compareTo(BigDecimal.ZERO) <= 0) {
+        loseMoney = BigDecimal.ZERO;
+      }
+      accountReportVo.setGameQuota(gameInfo.getAmount().subtract(loseMoney));
     } else {
       accountReportVo.setGameQuota(BigDecimal.ZERO);
     }

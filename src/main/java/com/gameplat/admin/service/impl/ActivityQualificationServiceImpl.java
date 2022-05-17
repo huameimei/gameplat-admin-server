@@ -161,7 +161,7 @@ public class ActivityQualificationServiceImpl
           if(activityLobbyDTO.getActivityType() == null){
             throw new ServiceException("活动类型不能为空");
           }
-          qm.setActivityType(activityLobbyDTO.getActivityType());
+          qm.setActivityType(type);
           qm.setUserId(memberInfo.getId());
           qm.setUsername(username1);
           qm.setApplyTime(new Date());
@@ -225,6 +225,7 @@ public class ActivityQualificationServiceImpl
         qm.setMaxMoney(temp.getWithdrawDml());
         qm.setDrawNum(temp.getPresenterDml().intValue());
         qm.setActivityType(ActivityInfoEnum.TypeEnum.RED_ENVELOPE.value());
+        manageList.add(qm);
       }
     }
     if (CollectionUtils.isNotEmpty(manageList)) {
@@ -466,7 +467,7 @@ public class ActivityQualificationServiceImpl
                 }
 
                 //获取允许参与活动的所有会员层级
-                String userLevels = activityLobby.getUserLevel();
+                String userLevels = activityLobby.getGraded();
                 if (StringUtils.isNotEmpty(userLevels)) {
                   userLevelsSet = Arrays.stream(userLevels.split(",")).collect(Collectors.toSet());
                 }

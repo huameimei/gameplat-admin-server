@@ -9,30 +9,14 @@ import com.gameplat.admin.model.dto.OperGameTransferRecordDTO;
 import com.gameplat.admin.model.vo.GameBalanceVO;
 import com.gameplat.admin.model.vo.GameKickOutVO;
 import com.gameplat.admin.model.vo.GameRecycleVO;
-import com.gameplat.admin.service.GameAdminService;
-import com.gameplat.admin.service.GameAmountControlService;
-import com.gameplat.admin.service.GameConfigService;
-import com.gameplat.admin.service.GamePlatformService;
-import com.gameplat.admin.service.GameTransferInfoService;
-import com.gameplat.admin.service.GameTransferRecordService;
-import com.gameplat.admin.service.MemberBillService;
-import com.gameplat.admin.service.MemberInfoService;
-import com.gameplat.admin.service.MemberService;
-import com.gameplat.admin.service.MessageInfoService;
+import com.gameplat.admin.service.*;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.DateUtil;
-import com.gameplat.base.common.util.StringUtils;
 import com.gameplat.common.constant.CacheKey;
-import com.gameplat.common.enums.GameAmountControlTypeEnum;
-import com.gameplat.common.enums.GamePlatformEnum;
-import com.gameplat.common.enums.GameTransferStatus;
+import com.gameplat.common.enums.*;
 import com.gameplat.common.enums.PushMessageEnum.MessageCategory;
 import com.gameplat.common.enums.PushMessageEnum.MessageType;
 import com.gameplat.common.enums.PushMessageEnum.UserRange;
-import com.gameplat.common.enums.ResultStatusEnum;
-import com.gameplat.common.enums.TranTypes;
-import com.gameplat.common.enums.TransferTypesEnum;
-import com.gameplat.common.enums.TrueFalse;
 import com.gameplat.common.game.GameBizBean;
 import com.gameplat.common.game.TransferResource;
 import com.gameplat.common.game.api.GameApi;
@@ -50,8 +34,15 @@ import com.gameplat.model.entity.member.MemberInfo;
 import com.gameplat.model.entity.message.Message;
 import com.gameplat.redis.api.RedisService;
 import com.gameplat.redis.redisson.DistributedLocker;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.lang.reflect.Array;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.*;
@@ -60,14 +51,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
-import javax.annotation.Resource;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Isolation;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
@@ -75,19 +58,33 @@ import org.springframework.transaction.annotation.Transactional;
 public class GameAdminServiceImpl implements GameAdminService {
 
   public static final String USER_GAME_BALANCE = "user_game_balance_";
+
   public static final String USER_GAME_KICKOUT = "user_game_kickOut_";
-  @Resource private ApplicationContext applicationContext;
-  @Resource private MemberInfoService memberInfoService;
-  @Resource private MemberBillService memberBillService;
-  @Resource private GameTransferRecordService gameTransferRecordService;
-  @Resource private MemberService memberService;
-  @Resource private GameTransferInfoService gameTransferInfoService;
-  @Resource private GameConfigService gameConfigService;
-  @Resource private MessageInfoService messageInfoService;
-  @Resource private GameAmountControlService gameAmountControlService;
-  @Resource private DistributedLocker distributedLocker;
-  @Resource private GamePlatformService gamePlatformService;
-  @Resource private Executor asyncGameExecutor;
+
+  @Autowired private ApplicationContext applicationContext;
+
+  @Autowired private MemberInfoService memberInfoService;
+
+  @Autowired private MemberBillService memberBillService;
+
+  @Autowired private GameTransferRecordService gameTransferRecordService;
+
+  @Lazy @Autowired private MemberService memberService;
+
+  @Autowired private GameTransferInfoService gameTransferInfoService;
+
+  @Autowired private GameConfigService gameConfigService;
+
+  @Autowired private MessageInfoService messageInfoService;
+
+  @Autowired private GameAmountControlService gameAmountControlService;
+
+  @Autowired private DistributedLocker distributedLocker;
+
+  @Autowired private GamePlatformService gamePlatformService;
+
+  @Autowired private Executor asyncGameExecutor;
+
   @Autowired private RedisService redisService;
 
   @Transactional(propagation = Propagation.NOT_SUPPORTED)
@@ -934,9 +931,9 @@ public class GameAdminServiceImpl implements GameAdminService {
         return new ArrayList();
       }
       List<CompletableFuture<GameKickOutVO>> futures =
-              this.batchGameKickOut(playedGamePlatform, member);
+          this.batchGameKickOut(playedGamePlatform, member);
       // 等待异步任务完成
-      CompletableFuture.allOf(futures.toArray(new CompletableFuture[]{})).join();
+      CompletableFuture.allOf(futures.toArray(new CompletableFuture[] {})).join();
       return futures.stream().map(this::getKickOutResult).collect(Collectors.toList());
     } finally {
       distributedLocker.unlock(key);
@@ -971,48 +968,49 @@ public class GameAdminServiceImpl implements GameAdminService {
     Assert.notNull(gamePlatform, "未找到游戏平台信息");
     List<String> accountList = Arrays.asList(dto.getAccounts().split(","));
     List<GameKickOutVO> result = Collections.synchronizedList(new ArrayList<>());
-    accountList.parallelStream().forEach(account -> {
-      Member member;
-      try {
-        member = memberService.getMemberAndFillGameAccount(account);
-      } catch (ServiceException e) {
-        GameKickOutVO gameKickOutVO =
-                GameKickOutVO.builder()
+    accountList.parallelStream()
+        .forEach(
+            account -> {
+              Member member;
+              try {
+                member = memberService.getMemberAndFillGameAccount(account);
+              } catch (ServiceException e) {
+                GameKickOutVO gameKickOutVO =
+                    GameKickOutVO.builder()
                         .platformName(gamePlatform.getName())
                         .platformCode(gamePlatform.getCode())
                         .status(ResultStatusEnum.FAILED.getValue())
                         .errorMsg(e.getMessage())
                         .account(account)
                         .build();
-        result.add(gameKickOutVO);
-        return;
-      }
-      GameKickOutVO gameKickOutVO = doGameKickOut(gamePlatform, member);
-      result.add(gameKickOutVO);
-    });
+                result.add(gameKickOutVO);
+                return;
+              }
+              GameKickOutVO gameKickOutVO = doGameKickOut(gamePlatform, member);
+              result.add(gameKickOutVO);
+            });
     return result;
   }
 
   private List<CompletableFuture<GameKickOutVO>> batchGameKickOut(
-          List<GamePlatform> playedGamePlatform, Member member) {
+      List<GamePlatform> playedGamePlatform, Member member) {
     return playedGamePlatform.stream()
-            .map(platform -> this.asyncGameKickOut(platform, member))
-            .collect(Collectors.toList());
+        .map(platform -> this.asyncGameKickOut(platform, member))
+        .collect(Collectors.toList());
   }
 
   private CompletableFuture<GameKickOutVO> asyncGameKickOut(GamePlatform platform, Member member) {
-    return CompletableFuture.supplyAsync(
-            () -> doGameKickOut(platform, member), asyncGameExecutor);
+    return CompletableFuture.supplyAsync(() -> doGameKickOut(platform, member), asyncGameExecutor);
   }
 
   private GameKickOutVO doGameKickOut(GamePlatform platform, Member member) {
     GameKickOutVO gameKickOutVO =
-            GameKickOutVO.builder()
-                    .platformName(platform.getName())
-                    .platformCode(platform.getCode())
-                    .status(ResultStatusEnum.SUCCESS.getValue()) // 默认成功
-                    .account(member.getAccount())
-                    .build();
+        GameKickOutVO.builder()
+            .platformName(platform.getName())
+            .platformCode(platform.getCode())
+            .status(ResultStatusEnum.SUCCESS.getValue()) // 默认成功
+            .account(member.getAccount())
+            .build();
     try {
       GameApi gameApi = getGameApi(platform.getCode());
       GameBizBean gameBizBean = new GameBizBean();

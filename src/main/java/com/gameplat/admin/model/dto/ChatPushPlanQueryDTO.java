@@ -1,7 +1,7 @@
 package com.gameplat.admin.model.dto;
 
 import com.baomidou.mybatisplus.annotation.TableName;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -13,15 +13,15 @@ public class ChatPushPlanQueryDTO implements Serializable {
 
   private static final long serialVersionUID = 1L;
 
-  @ApiModelProperty(value = "账号")
+  @Schema(description = "账号")
   private String account;
 
-  @ApiModelProperty(value = "聊天室id")
+  @Schema(description = "聊天室id")
   private Long roomId;
 
-  @ApiModelProperty(value = "房间名")
+  @Schema(description = "房间名")
   private String roomName;
 
-  @ApiModelProperty(value = "游戏id")
+  @Schema(description = "游戏id")
   private String gameId;
 }

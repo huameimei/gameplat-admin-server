@@ -21,10 +21,8 @@ public class AuthenticationFailureListener
   @Override
   public void onApplicationEvent(AuthenticationFailureBadCredentialsEvent event) {
     String username = event.getAuthentication().getName();
-    if (StringUtils.isEmpty(username)) {
-      return;
+    if (StringUtils.isNotEmpty(username)) {
+      adminCache.updateErrorPasswordCount(username);
     }
-
-    adminCache.updateErrorPasswordCount(username);
   }
 }

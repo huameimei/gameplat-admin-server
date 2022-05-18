@@ -1,6 +1,6 @@
 package com.gameplat.admin.model.dto;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import javax.validation.constraints.NotNull;
@@ -14,10 +14,10 @@ import java.io.Serializable;
 @Data
 public class ChatRedEnvelopeRecordQueryDTO implements Serializable {
 
-  @ApiModelProperty(value = "创建时间")
+  @Schema(description = "创建时间")
   private String createTime;
 
   @NotNull(message = "红包配置id不能为空")
-  @ApiModelProperty(value = "红包配置id")
+  @Schema(description = "红包配置id")
   private Integer redConfigId;
 }

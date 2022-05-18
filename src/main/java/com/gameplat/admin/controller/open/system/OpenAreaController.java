@@ -8,61 +8,59 @@ import com.gameplat.admin.model.dto.SmsAreaQueryDTO;
 import com.gameplat.admin.model.vo.SysSmsAreaVO;
 import com.gameplat.admin.service.SysSmsAreaService;
 import com.gameplat.model.entity.sys.SysSmsArea;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import lombok.extern.slf4j.Slf4j;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import springfox.documentation.annotations.ApiIgnore;
 
 /** 区号设置控制器 */
-@Slf4j
-@Api(tags = "区号设置API")
+@Tag(name = "区号设置API")
 @RestController
 @RequestMapping("/api/admin/system/smsArea")
 public class OpenAreaController {
 
   @Autowired private SysSmsAreaService areaService;
 
-  @ApiOperation("列表查询")
+  @Operation(summary = "列表查询")
   @GetMapping("/list")
   @PreAuthorize("hasAuthority('system:area:view')")
   public IPage<SysSmsAreaVO> findSmsAreaList(
-      @ApiIgnore PageDTO<SysSmsArea> page, SmsAreaQueryDTO queryDTO) {
+      @Parameter(hidden = true) PageDTO<SysSmsArea> page, SmsAreaQueryDTO queryDTO) {
     return areaService.findSmsAreaList(page, queryDTO);
   }
 
-  @ApiOperation("新增")
+  @Operation(summary = "新增")
   @PostMapping("/add")
   @PreAuthorize("hasAuthority('system:area:add')")
   public void saveArea(@Validated @RequestBody SmsAreaAddDTO addDTO) {
     areaService.addSmsArea(addDTO);
   }
 
-  @ApiOperation("编辑")
+  @Operation(summary = "编辑")
   @PostMapping("/edit")
   @PreAuthorize("hasAuthority('system:area:edit')")
   public void updateArea(@Validated @RequestBody SmsAreaEditDTO editDTO) {
     areaService.editSmsArea(editDTO);
   }
 
-  @ApiOperation("删除")
+  @Operation(summary = "删除")
   @PostMapping("/delete/{id}")
   @PreAuthorize("hasAuthority('system:area:remove')")
   public void deleteById(@PathVariable Long id) {
     areaService.deleteAreaById(id);
   }
 
-  @ApiOperation("改变状态")
+  @Operation(summary = "改变状态")
   @PostMapping("/changeStatus/{id}/{status}")
   @PreAuthorize("hasAuthority('system:area:edit')")
   public void changeStatus(@PathVariable Long id, @PathVariable Integer status) {
     areaService.changeStatus(id, status);
   }
 
-  @ApiOperation("设置默认区号")
+  @Operation(summary = "设置默认区号")
   @PostMapping("/setDefaultStatus/{id}/{status}")
   @PreAuthorize("hasAuthority('system:area:edit')")
   public void setDefaultStatus(@PathVariable Long id, @PathVariable Integer status) {

@@ -10,14 +10,14 @@ import com.gameplat.admin.service.ActivityDistributeService;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.StringUtils;
 import com.gameplat.model.entity.activity.ActivityDistribute;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.Map;
 
@@ -30,27 +30,27 @@ import java.util.Map;
 @Validated
 @RestController
 @RequestMapping("/api/admin/activity/distribute")
-@Api(tags = "活动分发管理")
+@Tag(name = "活动分发管理")
 public class ActivityDistributeController {
 
   @Autowired private ActivityDistributeService activityDistributeService;
 
-  @ApiOperation(value = "活动分发列表")
+  @Operation(summary = "活动分发列表")
   @GetMapping("/list")
   @PreAuthorize("hasAuthority('activity:distribute:view')")
   public PageExt<IPage<ActivityDistributeVO>, ActivityDistributeStatisticsVO> list(
-      @ApiIgnore PageDTO<ActivityDistribute> page, ActivityDistributeQueryDTO dto) {
+      @Parameter(hidden = true) PageDTO<ActivityDistribute> page, ActivityDistributeQueryDTO dto) {
     return activityDistributeService.list(page, dto);
   }
 
-  @ApiOperation(value = "修改结算状态")
+  @Operation(summary = "修改结算状态")
   @PostMapping("/updateStatus")
   @PreAuthorize("hasAuthority('activity:distribute:updateStatus')")
   public void updateStatus(@RequestBody String ids) {
     activityDistributeService.updateStatus(ids);
   }
 
-  @ApiOperation(value = "删除分发")
+  @Operation(summary = "删除分发")
   @PostMapping("/delete")
   @PreAuthorize("hasAuthority('activity:distribute:remove')")
   public void remove(@RequestBody Map<String, String> map) {

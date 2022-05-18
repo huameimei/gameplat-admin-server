@@ -1,6 +1,6 @@
 package com.gameplat.admin.model.dto;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -17,6 +17,6 @@ public class PayAccountQueryDTO implements Serializable {
 
   private Integer status;
 
-  @ApiModelProperty(value = "1:普通账户，2：vpi账户")
+  @Schema(description = "1:普通账户，2：vpi账户")
   private Integer type;
 }

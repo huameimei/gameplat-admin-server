@@ -23,8 +23,8 @@ import com.gameplat.log.enums.LogType;
 import com.gameplat.model.entity.recharge.RechargeOrder;
 import com.gameplat.redis.redisson.DistributedLocker;
 import com.gameplat.security.SecurityUserHolder;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,7 +37,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 @Slf4j
-@Api(tags = "充值订单")
+@Tag(name = "充值订单")
 @RestController
 @RequestMapping("/api/admin/finance/rechargeOrder")
 public class RechargeOrderController {
@@ -50,7 +50,7 @@ public class RechargeOrderController {
 
   @Autowired private DistributedLocker distributedLocker;
 
-  @ApiOperation("受理")
+  @Operation(summary = "受理")
   @PostMapping("/handle")
   @PreAuthorize("hasAuthority('finance:rechargeOrder:handle')")
   @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.RECHARGE, desc = "'受理订单：' + #id")
@@ -68,7 +68,7 @@ public class RechargeOrderController {
     }
   }
 
-  @ApiOperation("取消受理订单")
+  @Operation(summary = "取消受理订单")
   @PostMapping("/unHandle")
   @PreAuthorize("hasAuthority('finance:rechargeOrder:unHandle')")
   @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.RECHARGE, desc = "'取消受理订单：' + #id")
@@ -86,7 +86,7 @@ public class RechargeOrderController {
     }
   }
 
-  @ApiOperation("入款")
+  @Operation(summary = "入款")
   @PostMapping("/accept")
   @PreAuthorize("hasAuthority('finance:rechargeOrder:accept')")
   @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.RECHARGE, desc = "'入款订单：' + #id")
@@ -104,7 +104,7 @@ public class RechargeOrderController {
     }
   }
 
-  @ApiOperation("取消")
+  @Operation(summary = "取消")
   @PostMapping("/cancel")
   @PreAuthorize("hasAuthority('finance:rechargeOrder:cancel')")
   @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.RECHARGE, desc = "'取消订单：' + #id")
@@ -122,7 +122,7 @@ public class RechargeOrderController {
     }
   }
 
-  @ApiOperation("批量受理订单")
+  @Operation(summary = "批量受理订单")
   @PostMapping("/batchHandle")
   @PreAuthorize("hasAuthority('finance:rechargeOrder:handle')")
   @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.RECHARGE, desc = "'批量受理订单：' + #ids")
@@ -144,7 +144,7 @@ public class RechargeOrderController {
     }
   }
 
-  @ApiOperation("批量取消受理订单")
+  @Operation(summary = "批量取消受理订单")
   @PostMapping("/batchUnHandle")
   @PreAuthorize("hasAuthority('finance:rechargeOrder:unHandle')")
   @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.RECHARGE, desc = "'批量取消受理订单：' + #ids")
@@ -166,7 +166,7 @@ public class RechargeOrderController {
     }
   }
 
-  @ApiOperation("批量入款")
+  @Operation(summary = "批量入款")
   @PostMapping("/batchAccept")
   @PreAuthorize("hasAuthority('finance:rechargeOrder:accept')")
   @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.RECHARGE, desc = "'批量入款订单：' + #ids")
@@ -190,7 +190,7 @@ public class RechargeOrderController {
     }
   }
 
-  @ApiOperation("批量取消订单")
+  @Operation(summary = "批量取消订单")
   @PostMapping("/batchCancel")
   @PreAuthorize("hasAuthority('finance:rechargeOrder:cancel')")
   @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.RECHARGE, desc = "'批量取消订单：' + #ids")
@@ -214,7 +214,7 @@ public class RechargeOrderController {
     }
   }
 
-  @ApiOperation("修改优惠金额")
+  @Operation(summary = "修改优惠金额")
   @PostMapping("/editDiscount")
   @PreAuthorize("hasAuthority('finance:rechargeOrder:editDiscount')")
   @Log(
@@ -240,7 +240,7 @@ public class RechargeOrderController {
     }
   }
 
-  @ApiOperation("修改备注")
+  @Operation(summary = "修改备注")
   @PostMapping("/editRemarks")
   @PreAuthorize("hasAuthority('finance:rechargeOrder:editRemarks')")
   @Log(
@@ -251,7 +251,7 @@ public class RechargeOrderController {
     rechargeOrderService.updateRemarks(id, auditRemarks);
   }
 
-  @ApiOperation("受理")
+  @Operation(summary = "受理")
   @PostMapping("/page")
   @PreAuthorize("hasAuthority('finance:rechargeOrder:view')")
   public PageExt<RechargeOrderVO, SummaryVO> queryPage(
@@ -260,7 +260,7 @@ public class RechargeOrderController {
   }
 
   @SneakyThrows
-  @ApiOperation("人工入款")
+  @Operation(summary = "人工入款")
   @PostMapping("/manual")
   @PreAuthorize("hasAuthority('finance:rechargeOrder:manual')")
   @Log(
@@ -282,7 +282,7 @@ public class RechargeOrderController {
     }
   }
 
-  @ApiOperation(value = "获取未处理数据统计数据")
+  @Operation(summary = "获取未处理数据统计数据")
   @GetMapping("/withdraw_charge")
   public WithdrawChargeVO getTotal() {
     WithdrawChargeVO vo = new WithdrawChargeVO();
@@ -299,7 +299,7 @@ public class RechargeOrderController {
   }
 
   @SneakyThrows
-  @ApiOperation("人工入款批量充值")
+  @Operation(summary = "人工入款批量充值")
   @PostMapping("/fileUserNameRech")
   @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.RECHARGE, desc = "'人工入款批量充值")
   @PreAuthorize("hasAuthority('finance:rechargeOrder:batchFileRecharge')")
@@ -320,7 +320,7 @@ public class RechargeOrderController {
   }
 
   @SneakyThrows
-  @ApiOperation("人工入款文件批量充值")
+  @Operation(summary = "人工入款文件批量充值")
   @PostMapping("/fileRech")
   @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.RECHARGE, desc = "'人工入款文件批量充值")
   @PreAuthorize("hasAuthority('finance:rechargeOrder:batchRecharge')")

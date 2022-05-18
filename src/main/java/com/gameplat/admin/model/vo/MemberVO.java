@@ -3,7 +3,7 @@ package com.gameplat.admin.model.vo;
 import cn.afterturn.easypoi.excel.annotation.Excel;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.gameplat.admin.util.Date2LongSerializerUtils;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -31,7 +31,7 @@ public class MemberVO implements Serializable {
   private String realName;
 
   @Excel(name = "VIP等级", width = 8, isImportField = "true_st")
-  @ApiModelProperty(value = "VIP等级")
+  @Schema(description = "VIP等级")
   private Integer vipLevel;
 
   /** 会员备注 */
@@ -144,10 +144,10 @@ public class MemberVO implements Serializable {
 
   private String registerOs;
 
-  @ApiModelProperty(value = "当前会员成长值")
+  @Schema(description = "当前会员成长值")
   private Integer growth;
 
-  @ApiModelProperty(value = "玩家金币数")
+  @Schema(description = "玩家金币数")
   private Integer goldCoin;
 
   private Integer salaryFlag;

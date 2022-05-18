@@ -1,7 +1,6 @@
 package com.gameplat.admin.model.dto;
 
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -17,46 +16,45 @@ import java.io.Serializable;
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
-@ApiModel(value = "ActivityTypeUpdateDTO", description = "活动类型更新DTO")
 public class ActivityTypeUpdateDTO implements Serializable {
 
   private static final long serialVersionUID = 1L;
 
   @NotNull(message = "ID不能为空")
   @Min(value = 1, message = "id必须大于0")
-  @ApiModelProperty(value = "编号")
+  @Schema(description = "编号")
   private Long id;
 
   @NotBlank(message = "活动类型不能为空")
-  @ApiModelProperty(value = "活动类型")
+  @Schema(description = "活动类型")
   private String typeCode;
 
   @NotBlank(message = "活动类型名称不能为空")
-  @ApiModelProperty(value = "活动类型名称")
+  @Schema(description = "活动类型名称")
   private String typeName;
 
-  @ApiModelProperty(value = "备注")
+  @Schema(description = "备注")
   private String remark;
 
   @NotNull(message = "排序不能为空")
   @Min(value = 0, message = "排序必须大于0")
-  @ApiModelProperty(value = "排序")
+  @Schema(description = "排序")
   private Integer sort;
 
   @NotNull(message = "状态不能为空")
-  @ApiModelProperty(value = "状态,0 无效,1 有效")
+  @Schema(description = "状态,0 无效,1 有效")
   private Integer typeStatus;
 
   @NotNull(message = "浮窗状态不能为空")
-  @ApiModelProperty(value = "浮窗状态,0 无效,1 有效")
+  @Schema(description = "浮窗状态,0 无效,1 有效")
   private Integer floatStatus;
 
-  @ApiModelProperty(value = "浮窗logo")
+  @Schema(description = "浮窗logo")
   private String floatLogo;
 
-  @ApiModelProperty(value = "浮窗url")
+  @Schema(description = "浮窗url")
   private String floatUrl;
 
-  @ApiModelProperty(value = "语言")
+  @Schema(description = "语言")
   private String language;
 }

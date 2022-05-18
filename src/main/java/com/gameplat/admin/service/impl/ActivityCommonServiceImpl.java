@@ -19,10 +19,14 @@ import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.BeanUtils;
 import com.gameplat.base.common.util.RandomUtil;
 import com.gameplat.base.common.util.StringUtils;
-import com.gameplat.model.entity.activity.*;
+import com.gameplat.model.entity.activity.ActivityBlacklist;
+import com.gameplat.model.entity.activity.ActivityLobby;
+import com.gameplat.model.entity.activity.ActivityLobbyDiscount;
+import com.gameplat.model.entity.activity.ActivityQualification;
 import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -46,11 +50,9 @@ public class ActivityCommonServiceImpl implements ActivityCommonService {
 
   @Autowired private ActivityLobbyService activityLobbyService;
 
-  @Autowired private ActivityInfoService activityInfoService;
-
   @Autowired private ActivityBlacklistService activityBlacklistService;
 
-  @Autowired private ActivityQualificationService activityQualificationService;
+  @Lazy @Autowired private ActivityQualificationService activityQualificationService;
 
   @Autowired private ActivityLobbyDiscountService activityLobbyDiscountService;
 

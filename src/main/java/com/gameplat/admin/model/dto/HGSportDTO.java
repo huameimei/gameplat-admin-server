@@ -1,6 +1,6 @@
 package com.gameplat.admin.model.dto;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -11,52 +11,52 @@ public class HGSportDTO implements Serializable {
 
   private static final long serialVersionUID = -8970711682296680702L;
 
-  @ApiModelProperty(value = "false 未结算 true 结算")
+  @Schema(description = "false 未结算 true 结算")
   private Boolean isHistory;
 
-  @ApiModelProperty(value = "用户类型")
+  @Schema(description = "用户类型")
   private String userTypes;
 
-  @ApiModelProperty(value = "用户类型")
+  @Schema(description = "用户类型")
   private String userType;
 
-  @ApiModelProperty(value = "比赛时间")
+  @Schema(description = "比赛时间")
   private String gameDate;
 
-  @ApiModelProperty(value = "结算时间")
+  @Schema(description = "结算时间")
   private String startSettledDate;
 
-  @ApiModelProperty(value = "会员账号")
+  @Schema(description = "会员账号")
   private String userAccount;
 
-  @ApiModelProperty(value = "订单ID")
+  @Schema(description = "订单ID")
   private String orderId;
 
-  @ApiModelProperty(value = "联赛名")
+  @Schema(description = "联赛名")
   private String league;
 
-  @ApiModelProperty(value = "主队")
+  @Schema(description = "主队")
   private String teamH;
 
-  @ApiModelProperty(value = "客队")
+  @Schema(description = "客队")
   private String teamC;
 
-  @ApiModelProperty(value = "结算状态")
+  @Schema(description = "结算状态")
   private String settleStatus;
 
-  @ApiModelProperty(value = "是否模糊查询主队")
+  @Schema(description = "是否模糊查询主队")
   private Boolean queryLikeTeamH;
 
-  @ApiModelProperty(value = "是否模糊查询客队")
+  @Schema(description = "是否模糊查询客队")
   private Boolean queryLikeTeamC;
 
-  @ApiModelProperty(value = "是否模糊查询联赛")
+  @Schema(description = "是否模糊查询联赛")
   private Boolean queryLikeLeague;
 
-  @ApiModelProperty(value = "当前记录起始索引  默认0")
+  @Schema(description = "当前记录起始索引  默认0")
   private Integer current;
 
-  @ApiModelProperty(value = "每页显示记录数 默认10")
+  @Schema(description = "每页显示记录数 默认10")
   private Integer size;
 
   private String username;

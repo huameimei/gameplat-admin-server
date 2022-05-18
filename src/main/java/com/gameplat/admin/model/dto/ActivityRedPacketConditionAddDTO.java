@@ -1,7 +1,6 @@
 package com.gameplat.admin.model.dto;
 
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -14,41 +13,40 @@ import java.util.Date;
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
-@ApiModel(value = "ActivityRedPacketCondition对象")
 public class ActivityRedPacketConditionAddDTO implements Serializable {
 
   private static final long serialVersionUID = 1L;
 
-  @ApiModelProperty(value = "主键")
+  @Schema(description = "主键")
   private Long conditionId;
 
-  @ApiModelProperty(value = "红包id")
+  @Schema(description = "红包id")
   private Long redPacketId;
 
-  @ApiModelProperty(value = "充值金额")
+  @Schema(description = "充值金额")
   private Integer topUpMoney;
 
-  @ApiModelProperty(value = "抽奖次数")
+  @Schema(description = "抽奖次数")
   private Integer drawNum;
 
-  @ApiModelProperty(value = "红包雨最小金额")
+  @Schema(description = "红包雨最小金额")
   private Integer packetMinMoney;
 
-  @ApiModelProperty(value = "红包雨最大金额")
+  @Schema(description = "红包雨最大金额")
   private Integer packetMaxMoney;
 
-  @ApiModelProperty(value = "备注")
+  @Schema(description = "备注")
   private String remark;
 
-  @ApiModelProperty(value = "创建人")
+  @Schema(description = "创建人")
   private String createBy;
 
-  @ApiModelProperty(value = "创建时间")
+  @Schema(description = "创建时间")
   private Date createTime;
 
-  @ApiModelProperty(value = "更新人")
+  @Schema(description = "更新人")
   private String updateBy;
 
-  @ApiModelProperty(value = "更新时间")
+  @Schema(description = "更新时间")
   private Date updateTime;
 }

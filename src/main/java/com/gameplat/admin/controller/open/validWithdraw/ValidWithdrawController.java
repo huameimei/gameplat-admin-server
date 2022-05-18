@@ -8,11 +8,10 @@ import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.StringUtils;
 import com.gameplat.common.enums.LimitEnums;
 import com.gameplat.common.model.bean.limit.MemberWithdrawLimit;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -20,8 +19,7 @@ import org.springframework.web.bind.annotation.*;
 /**
  * @Author kb @Date 2022/2/20 14:54 @Version 1.0
  */
-@Api(tags = "打码量")
-@Slf4j
+@Tag(name = "打码量")
 @RestController
 @RequestMapping("/api/admin/validWithdraw")
 @RequiredArgsConstructor
@@ -31,7 +29,7 @@ public class ValidWithdrawController {
 
   private final LimitInfoService limitInfoService;
 
-  @ApiOperation("查询")
+  @Operation(summary = "查询")
   @GetMapping(value = "findVaildWithdraw")
   @PreAuthorize("hasAuthority('funds:validWithdraw:view')")
   public ValidateDmlBeanVo findVaildWithdraw(@RequestParam("username") String name) {
@@ -43,7 +41,7 @@ public class ValidWithdrawController {
     return validWithdrawService.validateByMemberId(memberWithdrawLimit, name, true);
   }
 
-  @ApiOperation(value = "调整单条打码量记录")
+  @Operation(summary = "调整单条打码量记录")
   @PreAuthorize("hasAuthority('funds:validWithdraw:edit')")
   @PostMapping("/updateValidWithdraw")
   public void updateValidWithdraw(@Validated @RequestBody ValidWithdrawDto dto) {
@@ -51,7 +49,7 @@ public class ValidWithdrawController {
   }
 
   @SneakyThrows
-  @ApiOperation(value = "清除会员打码量记录")
+  @Operation(summary = "清除会员打码量记录")
   @PostMapping("/delValidWithdraw")
   @PreAuthorize("hasAuthority('funds:validWithdraw:remove')")
   public void delValidWithdraw(@RequestParam("member") String member) {

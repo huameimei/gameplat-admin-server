@@ -17,6 +17,7 @@ import com.gameplat.model.entity.member.Member;
 import com.gameplat.model.entity.member.MemberRemark;
 import com.google.common.collect.Lists;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,7 +30,7 @@ import java.util.stream.Collectors;
 public class MemberRemarkServiceImpl extends ServiceImpl<MemberRemarkMapper, MemberRemark>
     implements MemberRemarkService {
 
-  @Autowired private MemberService memberService;
+  @Lazy @Autowired private MemberService memberService;
 
   @Autowired private MemberRemarkConvert memberRemarkConvert;
 

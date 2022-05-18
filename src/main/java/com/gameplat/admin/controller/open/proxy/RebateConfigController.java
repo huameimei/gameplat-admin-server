@@ -10,51 +10,30 @@ import com.gameplat.log.enums.LogType;
 import com.gameplat.model.entity.proxy.RebateConfig;
 import com.gameplat.security.SecurityUserHolder;
 import com.gameplat.security.context.UserCredential;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-/** @Description : 平级分红方案 @Author : cc @Date : 2022/4/2 */
-@Api(tags = "平级分红方案")
+/**
+ * @Description : 平级分红方案 @Author : cc @Date : 2022/4/2
+ */
+@Tag(name = "平级分红方案")
 @Slf4j
 @RestController
 @RequestMapping("/api/admin/same-level/plan-detail")
 public class RebateConfigController {
   @Autowired private RebateConfigService rebateConfigService;
 
-  /**
-   * 平级分红列表
-   *
-   * @param page
-   * @param dto
-   * @return
-   */
-  @ApiOperation(value = "查询平级分红方案列表")
+  @Operation(summary = "查询平级分红方案列表")
   @GetMapping("/list")
   public IPage<RebateConfigVO> list(PageDTO<RebateConfig> page, RebateConfig dto) {
     return rebateConfigService.queryPage(page, dto);
   }
 
-  /**
-   * 添加平级分红
-   *
-   * @param rebateConfigPO
-   */
-  @ApiOperation("平级分红->新增平级分红方案明细")
+  @Operation(summary = "平级分红->新增平级分红方案明细")
   @PostMapping(value = "/add")
-  @Log(
-      module = ServiceName.ADMIN_SERVICE,
-      type = LogType.AGENT,
-      desc =
-          "平级分红->新增平级分红方案明细，"
-              + "方案名称：#{#planName}，"
-              + "返佣等级：#{#rebateLevel}，"
-              + "公司净利润：#{#agentProfit}，"
-              + "有效会员数：#{#activityMember}，"
-              + "佣金比例：#{#commission*100}%，"
-              + "备注：#{#remark}")
   public void addRebateConfig(@RequestBody RebateConfig rebateConfigPO) {
     log.info("新增平级分红方案明细：rebateConfigPO={}", rebateConfigPO);
     UserCredential userCredential = SecurityUserHolder.getCredential();
@@ -62,12 +41,7 @@ public class RebateConfigController {
     rebateConfigService.addRebateConfig(rebateConfigPO);
   }
 
-  /**
-   * 编辑平级分红
-   *
-   * @param rebateConfigPO
-   */
-  @ApiOperation("平级分红->编辑平级分红方案明细")
+  @Operation(summary = "平级分红->编辑平级分红方案明细")
   @PostMapping(value = "/edit")
   @Log(
       module = ServiceName.ADMIN_SERVICE,
@@ -87,13 +61,7 @@ public class RebateConfigController {
     rebateConfigService.editRebateConfig(rebateConfigPO);
   }
 
-  /**
-   * 删除平级分红
-   *
-   * @param planId
-   * @param configIds
-   */
-  @ApiOperation("平级分红->删除平级分红方案明细")
+  @Operation(summary = "平级分红->删除平级分红方案明细")
   @PostMapping(value = "/remove")
   @Log(
       module = ServiceName.ADMIN_SERVICE,

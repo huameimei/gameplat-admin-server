@@ -1,6 +1,6 @@
 package com.gameplat.admin.model.dto;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -13,9 +13,9 @@ import java.io.Serializable;
 @Data
 public class GoldCoinDescUpdateDTO implements Serializable {
 
-  @ApiModelProperty("id")
+  @Schema(description = "id")
   private Integer id;
 
-  @ApiModelProperty("金币描述")
+  @Schema(description = "金币描述")
   private String goldCoinDesc;
 }

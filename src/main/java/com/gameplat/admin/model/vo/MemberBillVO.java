@@ -3,11 +3,12 @@ package com.gameplat.admin.model.vo;
 import cn.afterturn.easypoi.excel.annotation.Excel;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.gameplat.admin.util.Date2LongSerializerUtils;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Data;
+
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
-import lombok.Data;
 
 /**
  * @author lily
@@ -17,17 +18,17 @@ import lombok.Data;
 @Data
 public class MemberBillVO implements Serializable {
 
-  @ApiModelProperty(value = "主键")
+  @Schema(description = "主键")
   private Long id;
 
-  @ApiModelProperty(value = "用户编号")
+  @Schema(description = "用户编号")
   private Long memberId;
 
-  @ApiModelProperty(value = "账号")
+  @Schema(description = "账号")
   @Excel(name = "会员账号", width = 17, isImportField = "true_st")
   private String account;
 
-  @ApiModelProperty(value = "交易类型：TranTypes中值")
+  @Schema(description = "交易类型：TranTypes中值")
   @Excel(
       name = "账变类型",
       width = 16,
@@ -85,29 +86,29 @@ public class MemberBillVO implements Serializable {
       isImportField = "true_st")
   private Integer tranType;
 
-  @ApiModelProperty(value = "分表ID")
+  @Schema(description = "分表ID")
   private Integer tableIndex;
 
-  @ApiModelProperty(value = "订单号，关联其他业务订单号")
+  @Schema(description = "订单号，关联其他业务订单号")
   private String orderNo;
 
-  @ApiModelProperty(value = "交易金额")
+  @Schema(description = "交易金额")
   @Excel(name = "账变金额", width = 15, isImportField = "true_st")
   private BigDecimal amount;
 
-  @ApiModelProperty(value = "账变前的余额")
+  @Schema(description = "账变前的余额")
   @Excel(name = "账变前的余额", width = 15, isImportField = "true_st")
   private BigDecimal balance;
 
-  @ApiModelProperty(value = "账变内容")
+  @Schema(description = "账变内容")
   @Excel(name = "账变内容", width = 20, isImportField = "true_st")
   private String content;
 
-  @ApiModelProperty(value = "操作人")
+  @Schema(description = "操作人")
   @Excel(name = "操作人", width = 15, isImportField = "true_st")
   private String operator;
 
-  @ApiModelProperty(value = "添加时间")
+  @Schema(description = "添加时间")
   @Excel(name = "账变时间", width = 20, isImportField = "true_st", exportFormat = "yyyy-MM-dd HH:mm:ss")
   @JsonSerialize(using = Date2LongSerializerUtils.class)
   private Date createTime;

@@ -3,7 +3,7 @@ package com.gameplat.admin.model.vo;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.gameplat.admin.util.Date2LongSerializerUtils;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -37,7 +37,7 @@ public class PayAccountVO implements Serializable {
 
   private String url;
 
-  @ApiModelProperty(value = "状态: [0 - 启用, 1 - 禁用]")
+  @Schema(description = "状态: [0 - 启用, 1 - 禁用]")
   private Integer status;
 
   private Long rechargeTimes;
@@ -46,7 +46,7 @@ public class PayAccountVO implements Serializable {
 
   private String orderRemark;
 
-  @ApiModelProperty(value = "0:启用，1：关闭")
+  @Schema(description = "0:启用，1：关闭")
   private Integer orderRemarkStatus;
 
   private String type;
@@ -93,21 +93,21 @@ public class PayAccountVO implements Serializable {
   private String currencyType;
 
   /** 创建者 */
-  @ApiModelProperty(value = "创建者")
+  @Schema(description = "创建者")
   private String createBy;
 
   /** 创建时间 */
-  @ApiModelProperty(value = "创建时间")
+  @Schema(description = "创建时间")
   @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
   @JsonSerialize(using = Date2LongSerializerUtils.class)
   private Date createTime;
 
   /** 更新者 */
-  @ApiModelProperty(value = "更新者")
+  @Schema(description = "更新者")
   private String updateBy;
 
   /** 更新时间 */
-  @ApiModelProperty(value = "更新时间")
+  @Schema(description = "更新时间")
   @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
   @JsonSerialize(using = Date2LongSerializerUtils.class)
   private Date updateTime;

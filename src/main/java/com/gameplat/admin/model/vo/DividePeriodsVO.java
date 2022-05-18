@@ -3,7 +3,7 @@ package com.gameplat.admin.model.vo;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import com.gameplat.admin.util.Date2LongSerializerUtils;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -17,39 +17,39 @@ public class DividePeriodsVO implements Serializable {
 
   private static final long serialVersionUID = 7535872776555957753L;
 
-  @ApiModelProperty(value = "主键ID")
+  @Schema(description = "主键ID")
   @JsonSerialize(using = ToStringSerializer.class)
   private Long id;
 
-  @ApiModelProperty(value = "期数结算起始日期")
+  @Schema(description = "期数结算起始日期")
   private String startDate;
 
-  @ApiModelProperty(value = "期数结算截止日期")
+  @Schema(description = "期数结算截止日期")
   private String endDate;
 
-  @ApiModelProperty(value = "结算状态 1 未结算  2 已结算")
+  @Schema(description = "结算状态 1 未结算  2 已结算")
   private Integer settleStatus;
 
-  @ApiModelProperty(value = "派发状态 1 未派发  2 已派发")
+  @Schema(description = "派发状态 1 未派发  2 已派发")
   private Integer grantStatus;
 
-  @ApiModelProperty(value = "结算时业主开启的分红模式 1 固定比例  2 裂变  3 层层代 4 平级")
+  @Schema(description = "结算时业主开启的分红模式 1 固定比例  2 裂变  3 层层代 4 平级")
   private Integer divideType;
 
-  @ApiModelProperty(value = "创建时间")
+  @Schema(description = "创建时间")
   @JsonSerialize(using = Date2LongSerializerUtils.class)
   private Date createTime;
 
-  @ApiModelProperty(value = "创建时间")
+  @Schema(description = "创建时间")
   @JsonSerialize(using = Date2LongSerializerUtils.class)
   private Date updateTime;
 
-  @ApiModelProperty(value = "创建人")
+  @Schema(description = "创建人")
   private String createBy;
 
-  @ApiModelProperty(value = "更新人")
+  @Schema(description = "更新人")
   private String updateBy;
 
-  @ApiModelProperty(value = "备注")
+  @Schema(description = "备注")
   private String remark;
 }

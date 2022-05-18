@@ -5,8 +5,8 @@ import com.alibaba.fastjson.JSONObject;
 import com.gameplat.admin.model.dto.LiveDomainParamDTO;
 import com.gameplat.admin.service.ILiveDomainService;
 import com.gameplat.base.common.web.Result;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@Api(tags = "直播域名")
+@Tag(name = "直播域名")
 @Slf4j
 @RestController
 @RequestMapping("/api/admin/sport/live")
@@ -23,7 +23,7 @@ public class LiveDomainTrafficController {
 
   @Autowired private ILiveDomainService liveDomainService;
 
-  @ApiOperation(value = "直播域名查询")
+  @Operation(summary = "直播域名查询")
   @GetMapping("/getLiveDomainList")
   public Result<Object> getLiveDomainList(
       LiveDomainParamDTO param,
@@ -32,7 +32,7 @@ public class LiveDomainTrafficController {
     return Result.succeedData(liveDomainService.getLiveDomainList(param));
   }
 
-  @ApiOperation(value = "直播流量查询")
+  @Operation(summary = "直播流量查询")
   @GetMapping("/getLiveDomainTrafficData")
   public Result<Object> getLiveDomainTrafficData(
       LiveDomainParamDTO param,

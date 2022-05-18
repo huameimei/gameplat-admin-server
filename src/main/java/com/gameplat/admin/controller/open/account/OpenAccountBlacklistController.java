@@ -7,31 +7,29 @@ import com.gameplat.admin.model.dto.OperAccountBlacklistDTO;
 import com.gameplat.admin.service.AccountBlacklistService;
 import com.gameplat.common.enums.UserBlackGames;
 import com.gameplat.model.entity.blacklist.AccountBlacklist;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import lombok.extern.slf4j.Slf4j;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Api(tags = "账号黑名单管理")
-@Slf4j
+@Tag(name = "账号黑名单管理")
 @RestController
 @RequestMapping("/api/admin/account/accountBlack")
 public class OpenAccountBlacklistController {
 
   @Autowired private AccountBlacklistService accountBlacklistService;
 
-  @ApiOperation("删除")
+  @Operation(summary = "删除")
   @PostMapping("/del/{id}")
   @PreAuthorize("hasAuthority('account:accountBlack:remove')")
   public void delete(@PathVariable Long id) {
     accountBlacklistService.delete(id);
   }
 
-  @ApiOperation("查询")
+  @Operation(summary = "查询")
   @GetMapping("/list")
   @PreAuthorize("hasAuthority('account:accountBlack:view')")
   public IPage<AccountBlacklist> findList(
@@ -39,21 +37,21 @@ public class OpenAccountBlacklistController {
     return accountBlacklistService.selectAccountBlacklistList(page, dto);
   }
 
-  @ApiOperation("添加")
+  @Operation(summary = "添加")
   @PostMapping("/add")
   @PreAuthorize("hasAuthority('account:accountBlack:add')")
   public void add(@RequestBody OperAccountBlacklistDTO dto) {
     accountBlacklistService.save(dto);
   }
 
-  @ApiOperation("编辑")
+  @Operation(summary = "编辑")
   @PostMapping("/edit")
   @PreAuthorize("hasAuthority('account:accountBlack:edit')")
   public void edit(@RequestBody OperAccountBlacklistDTO dto) {
     accountBlacklistService.update(dto);
   }
 
-  @ApiOperation("获取黑名单类型")
+  @Operation(summary = "获取黑名单类型")
   @GetMapping("/getAccountBlackTypeList")
   public List<Object> getGameEnums() {
     return UserBlackGames.getEnum();

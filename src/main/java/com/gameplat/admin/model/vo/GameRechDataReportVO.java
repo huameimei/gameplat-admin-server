@@ -1,6 +1,6 @@
 package com.gameplat.admin.model.vo;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -12,52 +12,52 @@ import java.math.BigDecimal;
 @Data
 public class GameRechDataReportVO implements Serializable {
 
-  @ApiModelProperty(value = "充值总计金额")
+  @Schema(description = "充值总计金额")
   private BigDecimal allRechAmount;
 
-  @ApiModelProperty(value = "充值总计人数")
+  @Schema(description = "充值总计人数")
   private int allRechCount;
 
-  @ApiModelProperty(value = "转账汇款金额")
+  @Schema(description = "转账汇款金额")
   private BigDecimal bankMoney;
 
-  @ApiModelProperty(value = "转账汇款人数")
+  @Schema(description = "转账汇款人数")
   private int bankCount;
 
-  @ApiModelProperty(value = "在线支付金额")
+  @Schema(description = "在线支付金额")
   private BigDecimal onlineMoney;
 
-  @ApiModelProperty(value = "在线支付人数")
+  @Schema(description = "在线支付人数")
   private int onlineCount;
 
-  @ApiModelProperty(value = "人工充值金额")
+  @Schema(description = "人工充值金额")
   private BigDecimal handMoney;
 
-  @ApiModelProperty(value = "人工充值人数")
+  @Schema(description = "人工充值人数")
   private int handCount;
 
-  @ApiModelProperty(value = "首次充值金额")
+  @Schema(description = "首次充值金额")
   private BigDecimal firstRechMoney;
 
-  @ApiModelProperty(value = "首次充值笔数")
+  @Schema(description = "首次充值笔数")
   private int firstRechCount;
 
-  @ApiModelProperty(value = "二次充值金额")
+  @Schema(description = "二次充值金额")
   private BigDecimal secondRechMoney;
 
-  @ApiModelProperty(value = "二次充值笔数")
+  @Schema(description = "二次充值笔数")
   private int secondRechCount;
 
-  @ApiModelProperty(value = "不计积分充值金额")
+  @Schema(description = "不计积分充值金额")
   private BigDecimal exceptionRechAmount;
 
-  @ApiModelProperty(value = "不计积分充值人数")
+  @Schema(description = "不计积分充值人数")
   private int exceptionRechCount;
 
-  @ApiModelProperty(value = "虚拟币充值金额")
+  @Schema(description = "虚拟币充值金额")
   private BigDecimal virtualRechMoney;
 
-  @ApiModelProperty(value = "虚拟币充值人数")
+  @Schema(description = "虚拟币充值人数")
   private int virtualRechCount;
 
   public GameRechDataReportVO() {

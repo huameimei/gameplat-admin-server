@@ -1,7 +1,7 @@
 package com.gameplat.admin.model.dto;
 
 import com.gameplat.security.SecurityUserHolder;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import javax.validation.constraints.NotEmpty;
@@ -10,16 +10,16 @@ import java.io.Serializable;
 @Data
 public class SpreadUnionDTO implements Serializable {
 
-  @ApiModelProperty(value = "主键Id")
+  @Schema(description = "主键Id")
   private Long id;
 
-  @ApiModelProperty(value = "联盟名称")
+  @Schema(description = "联盟名称")
   private String unionName;
 
-  @ApiModelProperty(value = "代理账号")
+  @Schema(description = "代理账号")
   private String agentAccount;
 
-  @ApiModelProperty(value = "渠道类型")
+  @Schema(description = "渠道类型")
   private String channel;
 
   /** 日期 */

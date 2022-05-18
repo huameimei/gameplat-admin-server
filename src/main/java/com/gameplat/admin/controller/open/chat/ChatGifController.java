@@ -6,8 +6,8 @@ import com.gameplat.admin.model.dto.ChatGifEditDTO;
 import com.gameplat.admin.model.vo.ChatGifVO;
 import com.gameplat.admin.service.ChatGifService;
 import com.gameplat.model.entity.chart.ChatGif;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -18,42 +18,42 @@ import org.springframework.web.multipart.MultipartFile;
  * @description
  * @date 2022/2/13
  */
-@Api(tags = "聊天室Gif管理")
+@Tag(name = "聊天室Gif管理")
 @RestController
 @RequestMapping("/api/admin/chat/gif")
 public class ChatGifController {
 
   @Autowired private ChatGifService chatGifService;
 
-  @ApiOperation(value = "分页列表")
+  @Operation(summary = "分页列表")
   @GetMapping("/page")
   @PreAuthorize("hasAuthority('chat:gif:view')")
   public IPage<ChatGifVO> page(PageDTO<ChatGif> page, String name) {
     return chatGifService.page(page, name);
   }
 
-  @ApiOperation(value = "增/上传图片")
+  @Operation(summary = "增/上传图片")
   @PostMapping("/add")
   @PreAuthorize("hasAuthority('chat:gif:add')")
   public void add(@RequestPart MultipartFile file, String name) throws Exception {
     chatGifService.add(file, name);
   }
 
-  @ApiOperation(value = "上传图片")
+  @Operation(summary = "上传图片")
   @PostMapping("/upload")
   @PreAuthorize("hasAuthority('chat:gif:upload')")
   public String upload(@RequestPart MultipartFile file) throws Exception {
     return chatGifService.upload(file, null);
   }
 
-  @ApiOperation(value = "删")
+  @Operation(summary = "删")
   @PostMapping("/remove/{id}")
   @PreAuthorize("hasAuthority('chat:gif:remove')")
   public void remove(@PathVariable Integer id) {
     chatGifService.remove(id);
   }
 
-  @ApiOperation(value = "改")
+  @Operation(summary = "改")
   @PostMapping("/edit")
   @PreAuthorize("hasAuthority('chat:gif:edit')")
   public void edit(ChatGifEditDTO dto) {

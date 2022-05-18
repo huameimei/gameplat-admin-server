@@ -1,6 +1,6 @@
 package com.gameplat.admin.model.dto;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -13,12 +13,12 @@ import java.io.Serializable;
 @Data
 public class GameFinancialReportQueryDTO implements Serializable {
 
-  @ApiModelProperty(value = "统计月份")
+  @Schema(description = "统计月份")
   private String statisticsTime;
 
-  @ApiModelProperty(value = "游戏大类编码")
+  @Schema(description = "游戏大类编码")
   private String gameType;
 
-  @ApiModelProperty(value = "游戏平台编码")
+  @Schema(description = "游戏平台编码")
   private String platformCode;
 }

@@ -1,6 +1,6 @@
 package com.gameplat.admin.model.vo;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -12,33 +12,33 @@ public class AgentCommissionVO implements Serializable {
 
   private static final long serialVersionUID = 1L;
 
-  @ApiModelProperty(value = "统计月份")
+  @Schema(description = "统计月份")
   private String countDate;
 
-  @ApiModelProperty(value = "代理层级")
+  @Schema(description = "代理层级")
   private Integer levelNum;
 
-  @ApiModelProperty(value = "上级账号")
+  @Schema(description = "上级账号")
   private String parentName;
 
-  @ApiModelProperty(value = "代理账号")
+  @Schema(description = "代理账号")
   private String agentName;
 
-  @ApiModelProperty(value = "下级代理数")
+  @Schema(description = "下级代理数")
   private Integer subAgent;
 
-  @ApiModelProperty(value = "下级有效代理数")
+  @Schema(description = "下级有效代理数")
   private Integer efficientAgent;
 
-  @ApiModelProperty(value = "下级会员佣金")
+  @Schema(description = "下级会员佣金")
   private BigDecimal memberCommission;
 
-  @ApiModelProperty(value = "下级代理佣金")
+  @Schema(description = "下级代理佣金")
   private BigDecimal agentCommission;
 
-  @ApiModelProperty(value = "佣金方案")
+  @Schema(description = "佣金方案")
   private String planName;
 
-  @ApiModelProperty(value = "佣金等级")
+  @Schema(description = "佣金等级")
   private String rebateLevel;
 }

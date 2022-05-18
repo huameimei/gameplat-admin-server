@@ -37,6 +37,7 @@ import com.gameplat.model.entity.sys.SysUser;
 import com.gameplat.model.entity.sys.SysUserRole;
 import com.gameplat.security.SecurityUserHolder;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -66,7 +67,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
 
   @Autowired private RoleConvert roleConvert;
 
-  @Autowired OnlineUserService onlineUserService;
+  @Lazy @Autowired OnlineUserService onlineUserService;
 
   @Override
   public SysUser getByUsername(String username) {
@@ -231,7 +232,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
   @Override
   @SentinelResource(value = "changeStatus")
   public void changeStatus(Long id, Integer status) {
-//    Assert.isTrue(!id.equals(SecurityUserHolder.getUserId()), "不允许操作自己账号!");
+    //    Assert.isTrue(!id.equals(SecurityUserHolder.getUserId()), "不允许操作自己账号!");
     SysUser user = Assert.notNull(this.getById(id), "用户不存在!");
     user.setStatus(status);
 

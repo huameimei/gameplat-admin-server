@@ -6,8 +6,8 @@ import com.gameplat.admin.model.dto.MemberGrowthStatisDTO;
 import com.gameplat.admin.model.vo.MemberGrowthStatisVO;
 import com.gameplat.admin.service.MemberGrowthStatisService;
 import com.gameplat.model.entity.member.MemberGrowthStatis;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
  *
  * @author lily
  */
-@Api(tags = "VIP成长值汇总数据")
+@Tag(name = "VIP成长值汇总数据")
 @Slf4j
 @RestController
 @RequestMapping("/api/admin/member/growthStatis")
@@ -28,7 +28,7 @@ public class MemberGrowthStatisController {
 
   @Autowired private MemberGrowthStatisService memberGrowthStatisService;
 
-  @ApiOperation("查询")
+  @Operation(summary = "查询")
   @GetMapping("/page")
   @PreAuthorize("hasAuthority('member:growthStatis:view')")
   public IPage<MemberGrowthStatisVO> page(

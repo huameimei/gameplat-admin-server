@@ -1,33 +1,30 @@
 package com.gameplat.admin.model.vo;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
 
-/**
- * @Author kb @Date 2022/3/5 21:42 @Version 1.0
- */
 @Data
 public class GameDividendDataVo implements Serializable {
 
-  @ApiModelProperty(value = "优惠金额")
+  @Schema(description = "优惠金额")
   private BigDecimal disAcountAmount;
 
-  @ApiModelProperty(value = "彩金")
+  @Schema(description = "彩金")
   private BigDecimal jackpot;
 
-  @ApiModelProperty(value = "VIP红利")
+  @Schema(description = "VIP红利")
   private BigDecimal vipDividend;
 
-  @ApiModelProperty(value = "活动红利")
+  @Schema(description = "活动红利")
   private BigDecimal activityDividend;
 
-  @ApiModelProperty(value = "聊天室红包")
+  @Schema(description = "聊天室红包")
   private BigDecimal redEnvelope;
 
-  @ApiModelProperty(value = "红利")
+  @Schema(description = "红利")
   private BigDecimal allDividend;
 
   public GameDividendDataVo() {

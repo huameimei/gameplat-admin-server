@@ -12,8 +12,8 @@ import com.gameplat.common.constant.ServiceName;
 import com.gameplat.log.annotation.Log;
 import com.gameplat.log.enums.LogType;
 import com.gameplat.model.entity.proxy.DivideFissionConfig;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
@@ -21,8 +21,10 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
-/** @Description : 裂变分红模式 @Author : cc @Date : 2022/4/2 */
-@Api(tags = "裂变分红模式")
+/**
+ * @Description : 裂变分红模式 @Author : cc @Date : 2022/4/2
+ */
+@Tag(name = "裂变分红模式")
 @RestController
 @RequestMapping("/api/admin/divide/fission")
 public class DivideFissionConfigController {
@@ -55,7 +57,7 @@ public class DivideFissionConfigController {
    * @param dto
    */
   @PostMapping("/add")
-  @ApiOperation(value = "新增裂变分红配置")
+  @Operation(summary = "新增裂变分红配置")
   @PreAuthorize("hasAuthority('agent:bonusFissionconfig:add')")
   @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.AGENT, desc = "新增裂变分红配置")
   public void add(@Validated @RequestBody DivideConfigDTO dto) {
@@ -79,7 +81,7 @@ public class DivideFissionConfigController {
    * @param dto
    */
   @PostMapping("/edit")
-  @ApiOperation(value = "编辑裂变分红配置")
+  @Operation(summary = "编辑裂变分红配置")
   @PreAuthorize("hasAuthority('agent:bonusFissionconfig:edit')")
   @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.AGENT, desc = "编辑裂变分红配置")
   public void edit(@Validated @RequestBody DivideConfigDTO dto) {
@@ -91,7 +93,7 @@ public class DivideFissionConfigController {
    *
    * @param map
    */
-  @ApiOperation(value = "删除裂变分红配置")
+  @Operation(summary = "删除裂变分红配置")
   @PostMapping("/delete")
   @PreAuthorize("hasAuthority('agent:bonusFissionconfig:remove')")
   public void remove(@RequestBody Map<String, String> map) {

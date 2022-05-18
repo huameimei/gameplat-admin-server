@@ -1,6 +1,6 @@
 package com.gameplat.admin.model.dto;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -13,24 +13,24 @@ import java.io.Serializable;
 @Data
 public class MemberLoanQueryDTO implements Serializable {
 
-  @ApiModelProperty("会员账号")
+  @Schema(description = "会员账号")
   private String account;
 
-  @ApiModelProperty("VIP等级")
+  @Schema(description = "VIP等级")
   private Integer vipLevel;
 
-  @ApiModelProperty("欠款金额区间")
+  @Schema(description = "欠款金额区间")
   private Double minOverdraftMoney;
 
-  @ApiModelProperty("欠款金额区间")
+  @Schema(description = "欠款金额区间")
   private Double maxOverdraftMoney;
 
-  @ApiModelProperty("借款时间区间")
+  @Schema(description = "借款时间区间")
   private String beginLoanTime;
 
-  @ApiModelProperty("借款时间区间")
+  @Schema(description = "借款时间区间")
   private String endLoanTime;
 
-  @ApiModelProperty("借款状态  0:成功  1:失败  2:已回收")
+  @Schema(description = "借款状态  0:成功  1:失败  2:已回收")
   private Integer loanStatus;
 }

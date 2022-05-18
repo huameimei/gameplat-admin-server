@@ -5,8 +5,8 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.gameplat.admin.model.vo.MemberTransferRecordVO;
 import com.gameplat.admin.service.MemberTransferRecordService;
 import com.gameplat.model.entity.member.MemberTransferRecord;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-@Api(tags = "会员转代理记录")
+@Tag(name = "会员转代理记录")
 @RestController
 @RequestMapping("/api/admin/member/transfer/record")
 public class MemberTransferRecordController {
@@ -27,7 +27,7 @@ public class MemberTransferRecordController {
     return memberTransferRecordService.queryPage(page, type);
   }
 
-  @ApiOperation("获取转代理详情")
+  @Operation(summary = "获取转代理详情")
   @GetMapping("/getContent/{serialNo}")
   public List<String> getContent(@PathVariable String serialNo) {
     return memberTransferRecordService.getContent(serialNo, null, null);

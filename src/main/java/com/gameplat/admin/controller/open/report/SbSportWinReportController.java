@@ -3,18 +3,16 @@ package com.gameplat.admin.controller.open.report;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.gameplat.admin.enums.TimeTypeEnum;
 import com.gameplat.admin.model.dto.GameBetRecordQueryDTO;
-import com.gameplat.admin.model.dto.HgSportWinReportQueryDTO;
 import com.gameplat.admin.model.dto.SbSportWinReportQueryDTO;
 import com.gameplat.admin.model.vo.GameBetRecordVO;
 import com.gameplat.admin.model.vo.HgSportWinReportVO;
 import com.gameplat.admin.model.vo.PageDtoVO;
 import com.gameplat.admin.service.GameBetRecordInfoService;
-import com.gameplat.admin.service.HgSportWinReportService;
 import com.gameplat.admin.service.SbSportWinReportService;
 import com.gameplat.common.enums.GameKindEnum;
 import com.gameplat.common.enums.SettleStatusEnum;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -32,7 +30,7 @@ import java.util.List;
  * @desc 沙巴输赢报表
  */
 @Slf4j
-@Api(tags = "沙巴输赢报表")
+@Tag(name = "沙巴输赢报表")
 @RestController
 @RequestMapping("/api/admin/report/sb")
 public class SbSportWinReportController {
@@ -45,22 +43,23 @@ public class SbSportWinReportController {
 
   @GetMapping(value = "/findList")
   @PreAuthorize("hasAuthority('report:sb:view')")
-  @ApiOperation(value = "查询沙巴输赢报表")
+  @Operation(summary = "查询沙巴输赢报表")
   public List<HgSportWinReportVO> findList(@Valid SbSportWinReportQueryDTO queryDTO) {
     return sbSportWinReportService.findList(queryDTO);
   }
 
   @GetMapping(value = "/exportReport")
   @PreAuthorize("hasAuthority('report:sb:export')")
-  @ApiOperation(value = "导出沙巴输赢报表")
+  @Operation(summary = "导出沙巴输赢报表")
   public void exportReport(@Valid SbSportWinReportQueryDTO queryDTO, HttpServletResponse response) {
     sbSportWinReportService.exportReport(queryDTO, response);
   }
 
   @GetMapping(value = "/findDetail")
   @PreAuthorize("hasAuthority('report:sb:detail')")
-  @ApiOperation(value = "查询沙巴报表注单详情")
-  public PageDtoVO<GameBetRecordVO> findDetail(Page<GameBetRecordVO> page, GameBetRecordQueryDTO dto) {
+  @Operation(summary = "查询沙巴报表注单详情")
+  public PageDtoVO<GameBetRecordVO> findDetail(
+      Page<GameBetRecordVO> page, GameBetRecordQueryDTO dto) {
     dto.setGameKind(GameKindEnum.SB_SPORT.code());
     dto.setSettle(SettleStatusEnum.YES.getValue().toString());
     dto.setTimeType(TimeTypeEnum.STAT_TIME.getValue());

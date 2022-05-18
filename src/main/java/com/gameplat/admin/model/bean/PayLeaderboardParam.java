@@ -1,6 +1,6 @@
 package com.gameplat.admin.model.bean;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 /**
@@ -11,21 +11,21 @@ import lombok.Data;
  */
 @Data
 public class PayLeaderboardParam {
-    @ApiModelProperty("三方支付接口名称")
-    private String interfaceName;
+  @Schema(description = "三方支付接口名称")
+  private String interfaceName;
 
-    @ApiModelProperty("三方支付接口code")
-    private String interfaceCode;
+  @Schema(description = "三方支付接口code")
+  private String interfaceCode;
 
-    @ApiModelProperty("开始时间")
-    private String startTime;
+  @Schema(description = "开始时间")
+  private String startTime;
 
-    @ApiModelProperty("结束时间")
-    private String endTime;
+  @Schema(description = "结束时间")
+  private String endTime;
 
-    @ApiModelProperty("排行榜统计数量")
-    private Integer rankCount;
+  @Schema(description = "排行榜统计数量")
+  private Integer rankCount;
 
-    @ApiModelProperty("支付类型")
-    private String payTypeCode;
+  @Schema(description = "支付类型")
+  private String payTypeCode;
 }

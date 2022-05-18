@@ -1,6 +1,6 @@
 package com.gameplat.admin.model.vo;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -17,13 +17,13 @@ public class GameDataReportVO implements Serializable {
 
   private Map<String, List<GameBetDataReportVO>> list = new HashMap<>(10);
 
-  @ApiModelProperty(value = "输赢金额")
+  @Schema(description = "输赢金额")
   private BigDecimal allWinAmount;
 
-  @ApiModelProperty(value = "游戏人数")
+  @Schema(description = "游戏人数")
   private int allWinNum;
 
-  @ApiModelProperty(value = "返水总金额")
+  @Schema(description = "返水总金额")
   private BigDecimal allWaterAmount;
 
   public GameDataReportVO() {

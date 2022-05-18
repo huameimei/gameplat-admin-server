@@ -1,6 +1,6 @@
 package com.gameplat.admin.model.vo;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Data;
 
@@ -13,31 +13,21 @@ import java.io.Serializable;
 @Builder
 public class MemberContactVo implements Serializable {
 
-  /**
-   * 真实姓名
-   */
+  /** 真实姓名 */
   private String realName;
 
-  /**
-   * qq
-   */
+  /** qq */
   private String qq;
 
-  /**
-   * / 邮箱
-   */
+  /** / 邮箱 */
   private String email;
 
-  /**
-   * 手机号
-   */
+  /** 手机号 */
   private String phone;
 
-  /**
-   * 微信
-   */
+  /** 微信 */
   private String wechat;
 
-  @ApiModelProperty(value = "手机区号")
+  @Schema(description = "手机区号")
   private String dialCode;
 }

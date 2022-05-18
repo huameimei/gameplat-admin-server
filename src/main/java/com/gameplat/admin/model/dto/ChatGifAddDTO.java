@@ -1,6 +1,6 @@
 package com.gameplat.admin.model.dto;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -13,9 +13,9 @@ import java.io.Serializable;
 @Data
 public class ChatGifAddDTO implements Serializable {
 
-  @ApiModelProperty(value = "关键词")
+  @Schema(description = "关键词")
   private String name;
 
-  @ApiModelProperty(value = "图片地址")
+  @Schema(description = "图片地址")
   private String fileUrl;
 }

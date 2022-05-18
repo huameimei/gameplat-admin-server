@@ -12,8 +12,8 @@ import com.gameplat.admin.service.*;
 import com.gameplat.base.common.enums.EnableEnum;
 import com.gameplat.base.common.json.JsonUtils;
 import com.google.common.base.Joiner;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -35,7 +35,7 @@ import java.util.stream.Collectors;
  * @date 2022/2/16
  */
 @Slf4j
-@Api(tags = "聊天室侧滑菜单管理")
+@Tag(name = "聊天室侧滑菜单管理")
 @RestController
 @RequestMapping("/api/admin/chat")
 public class OtthController {
@@ -48,16 +48,16 @@ public class OtthController {
   @Autowired private ChatLeaderBoardService chatLeaderBoardService;
   @Autowired private SysSettingService sysSettingService;
   @Autowired private ChatPushPlanService chatPushPlanService;
-  //@Autowired private TenantConfig tenantConfig;
+  // @Autowired private TenantConfig tenantConfig;
 
-  @ApiOperation(value = "聊天室排行榜热任务")
+  @Operation(summary = "聊天室排行榜热任务")
   @GetMapping(value = "/chatLeaderBoardTask", produces = MediaType.APPLICATION_JSON_VALUE)
   public void get() {
     chatLeaderBoardService.creatLeaderBoard(null);
   }
 
   @SneakyThrows
-  @ApiOperation(value = "平台聊天室限制配置/聊天室成员管理/关键词管理/聊天室房间管理/角色管理/聊天室自定义消息管理")
+  @Operation(summary = "平台聊天室限制配置/聊天室成员管理/关键词管理/聊天室房间管理/角色管理/聊天室自定义消息管理")
   @PostMapping(value = "/{url}", produces = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("hasAuthority('chat:edit')")
   public String post(
@@ -82,7 +82,7 @@ public class OtthController {
     return otthService.otthProxyHttpPost(apiUrl, body, request, dbSuffix);
   }
 
-  @ApiOperation(value = "平台聊天室限制配置/聊天室成员管理/关键词管理/聊天室房间管理/角色管理/聊天室自定义消息管理")
+  @Operation(summary = "平台聊天室限制配置/聊天室成员管理/关键词管理/聊天室房间管理/角色管理/聊天室自定义消息管理")
   @GetMapping(value = "/{url}", produces = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("hasAuthority('chat:get')")
   public Object get(
@@ -99,14 +99,14 @@ public class OtthController {
     }
   }
 
-  @ApiOperation(value = "获取彩票游戏类型")
+  @Operation(summary = "获取彩票游戏类型")
   @GetMapping(value = "/getLottTypeList", produces = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("hasAuthority('chat:ottType:list')")
   public List<LotteryCodeVo> getLottTypeList() throws Exception {
     return otthService.getLottTypeList();
   }
 
-  @ApiOperation(value = "中奖推送接口")
+  @Operation(summary = "中奖推送接口")
   @PostMapping("/pushLotteryWin")
   @PreAuthorize("hasAuthority('chat:push')")
   public void pushLotteryWin(
@@ -114,14 +114,14 @@ public class OtthController {
     otthService.pushLotteryWin(lottWinVos, request);
   }
 
-  @ApiOperation(value = "分享彩票下注")
+  @Operation(summary = "分享彩票下注")
   @RequestMapping(value = "/cpbet", method = RequestMethod.POST)
   @PreAuthorize("hasAuthority('chat:share:bet')")
   public void cpbet(@RequestBody List<PushCPBetMessageReq> req, HttpServletRequest request) {
     otthService.cpbet(req, request);
   }
 
-  @ApiOperation(value = "修改平台聊天室开关")
+  @Operation(summary = "修改平台聊天室开关")
   @PreAuthorize("hasAuthority('chat:edit:flag')")
   private void updateChatEnable(String body) {
     JSONObject json = JSONObject.parseObject(body);
@@ -131,14 +131,14 @@ public class OtthController {
   }
 
   @SneakyThrows
-  @ApiOperation(value = "查找聊天室会员")
+  @Operation(summary = "查找聊天室会员")
   @PreAuthorize("hasAuthority('chat:room:member')")
   @RequestMapping(value = "/getChatUser", method = RequestMethod.GET)
   public ChatUserVO getChatUser(String account) {
     return otthService.getChatUser(account);
   }
 
-  @ApiOperation(value = "给游戏调用的更新游戏状态")
+  @Operation(summary = "给游戏调用的更新游戏状态")
   @PostMapping("updateGameStatus")
   @PreAuthorize("hasAuthority('chat:game:updateGameStatus')")
   public void updateGameStuats(String gameId, int gameStatus) {

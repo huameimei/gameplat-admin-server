@@ -7,9 +7,10 @@ import com.gameplat.admin.mapper.MemberRwReportMapper;
 import com.gameplat.admin.service.MemberRwReportService;
 import com.gameplat.base.common.util.DateUtil;
 import com.gameplat.base.common.util.StringUtils;
-import com.gameplat.common.enums.*;
+import com.gameplat.common.enums.CashEnum;
+import com.gameplat.common.enums.RechargeMode;
+import com.gameplat.common.enums.TrueFalse;
 import com.gameplat.common.util.Convert;
-import com.gameplat.common.util.UserDlUtil;
 import com.gameplat.model.entity.member.Member;
 import com.gameplat.model.entity.member.MemberRwReport;
 import com.gameplat.model.entity.member.MemberWithdraw;
@@ -80,11 +81,11 @@ public class MemberRwReportServiceImpl extends ServiceImpl<MemberRwReportMapper,
 
     // 计算虚拟币充值
     if (ObjectUtil.isNotEmpty(rechargeOrder.getCurrencyCount())
-            && rechargeOrder.getCurrencyCount().compareTo(BigDecimal.ZERO) == 1) {
+        && rechargeOrder.getCurrencyCount().compareTo(BigDecimal.ZERO) == 1) {
       report.setVirtualRechargeNumber(
-              report.getVirtualRechargeNumber().add(rechargeOrder.getCurrencyCount()));
+          report.getVirtualRechargeNumber().add(rechargeOrder.getCurrencyCount()));
       report.setVirtualRechargeMoney(
-              report.getVirtualRechargeMoney().add(rechargeOrder.getAmount()));
+          report.getVirtualRechargeMoney().add(rechargeOrder.getAmount()));
     }
 
     report.setMemberId(member.getId());
@@ -122,12 +123,16 @@ public class MemberRwReportServiceImpl extends ServiceImpl<MemberRwReportMapper,
             report.getFirstWithdrawMoney().add(memberWithdraw.getCashMoney()));
       }
       if (ObjectUtil.equals(memberWithdraw.getWithdrawType(), WithdrawTypeConstant.BTC)
-              || ObjectUtil.equals(memberWithdraw.getWithdrawType(), WithdrawTypeConstant.USDT)
-              || ObjectUtil.equals(memberWithdraw.getWithdrawType(), WithdrawTypeConstant.ETH)
-              || ObjectUtil.equals(memberWithdraw.getWithdrawType(), WithdrawTypeConstant.VIRTUAL)) {
-        BigDecimal count = StringUtils.isNotEmpty(memberWithdraw.getCurrencyCount()) ? Convert.toBigDecimal(memberWithdraw.getCurrencyCount()) : BigDecimal.ZERO;
+          || ObjectUtil.equals(memberWithdraw.getWithdrawType(), WithdrawTypeConstant.USDT)
+          || ObjectUtil.equals(memberWithdraw.getWithdrawType(), WithdrawTypeConstant.ETH)
+          || ObjectUtil.equals(memberWithdraw.getWithdrawType(), WithdrawTypeConstant.VIRTUAL)) {
+        BigDecimal count =
+            StringUtils.isNotEmpty(memberWithdraw.getCurrencyCount())
+                ? Convert.toBigDecimal(memberWithdraw.getCurrencyCount())
+                : BigDecimal.ZERO;
         report.setVirtualWithdrawNumber(report.getVirtualWithdrawNumber().add(count));
-        report.setVirtualWithdrawMoney(report.getVirtualWithdrawMoney().add(memberWithdraw.getCashMoney()));
+        report.setVirtualWithdrawMoney(
+            report.getVirtualWithdrawMoney().add(memberWithdraw.getCashMoney()));
       }
 
     } else {
@@ -180,7 +185,7 @@ public class MemberRwReportServiceImpl extends ServiceImpl<MemberRwReportMapper,
       report.setVirtualWithdrawNumber(BigDecimal.ZERO);
 
       String[] superPaths =
-          UserDlUtil.getDlAccount(
+          this.getDlAccount(
               StringUtils.isEmpty(member.getSuperPath())
                   ? "/webRoot/" + report.getAccount()
                   : member.getSuperPath());
@@ -200,5 +205,39 @@ public class MemberRwReportServiceImpl extends ServiceImpl<MemberRwReportMapper,
                 .eq(MemberRwReport::getStatTime, DateUtil.dateToYMD(statTime))
                 .one())
         .orElse(new MemberRwReport());
+  }
+
+  /**
+   * 用户代理路径
+   *
+   * @param userPaths String
+   * @return String
+   */
+  private String[] getDlAccount(String userPaths) {
+    String[] accounts = userPaths.substring(1).split("/");
+
+    // 总代理账号
+    String zdl = "";
+
+    // 大股东账号
+    String dgd = accounts[1];
+    String gd = "";
+    if (accounts.length > 2) {
+      // 股东账号
+      gd = accounts[2];
+    }
+
+    if (accounts.length > 3) {
+      // 总代理账号
+      zdl = accounts[3];
+    }
+
+    String dl = "";
+    if (accounts.length > 4) {
+      // 总代理账号
+      dl = accounts[4];
+    }
+
+    return new String[] {dgd, gd, zdl, dl};
   }
 }

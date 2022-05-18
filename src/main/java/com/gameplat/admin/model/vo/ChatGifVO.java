@@ -2,7 +2,7 @@ package com.gameplat.admin.model.vo;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -15,13 +15,13 @@ import java.io.Serializable;
 @Data
 public class ChatGifVO implements Serializable {
 
-  @ApiModelProperty(value = "主键")
+  @Schema(description = "主键")
   @TableId(value = "id", type = IdType.AUTO)
   private Integer id;
 
-  @ApiModelProperty(value = "关键词")
+  @Schema(description = "关键词")
   private String name;
 
-  @ApiModelProperty(value = "图片地址")
+  @Schema(description = "图片地址")
   private String fileUrl;
 }

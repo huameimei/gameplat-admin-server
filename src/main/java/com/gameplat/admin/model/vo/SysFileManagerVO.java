@@ -1,7 +1,7 @@
 package com.gameplat.admin.model.vo;
 
 import com.alibaba.fastjson.annotation.JSONField;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -13,37 +13,37 @@ import java.util.Date;
 @Data
 public class SysFileManagerVO implements Serializable {
 
-  @ApiModelProperty(value = "主键")
+  @Schema(description = "主键")
   private Long id;
 
-  @ApiModelProperty(value = "服务提供商")
+  @Schema(description = "服务提供商")
   private Integer serviceProvider;
 
-  @ApiModelProperty(value = "服务提供商")
+  @Schema(description = "服务提供商")
   private String providerName;
 
-  @ApiModelProperty(value = "原文件名")
+  @Schema(description = "原文件名")
   private String oldFileName;
 
-  @ApiModelProperty(value = "存储文件名")
+  @Schema(description = "存储文件名")
   private String storeFileName;
 
-  @ApiModelProperty(value = "图片地址")
+  @Schema(description = "图片地址")
   private String fileUrl;
 
-  @ApiModelProperty(value = "文件类型")
+  @Schema(description = "文件类型")
   private String fileType;
 
-  @ApiModelProperty(value = "文件大小")
+  @Schema(description = "文件大小")
   private String fileSize;
 
-  @ApiModelProperty(value = "上传状态（0：上传失败 1：上传成功）")
+  @Schema(description = "上传状态（0：上传失败 1：上传成功）")
   private Integer status;
 
-  @ApiModelProperty(value = "创建人")
+  @Schema(description = "创建人")
   private String createBy;
 
-  @ApiModelProperty(value = "创建时间")
+  @Schema(description = "创建时间")
   @JSONField(format = "unixtime")
   private Date createTime;
 }

@@ -1,7 +1,7 @@
 package com.gameplat.admin.model.vo;
 
 import com.baomidou.mybatisplus.annotation.TableName;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -18,115 +18,115 @@ public class MemberDayReportVo implements Serializable {
 
   private static final long serialVersionUID = 1L;
 
-  @ApiModelProperty(value = "统计日期")
+  @Schema(description = "统计日期")
   private Date countDate;
 
-  @ApiModelProperty(value = "会员账号")
+  @Schema(description = "会员账号")
   private String userName;
 
-  @ApiModelProperty(value = "代理账号")
+  @Schema(description = "代理账号")
   private String parentName;
 
-  @ApiModelProperty(value = "vip等级")
+  @Schema(description = "vip等级")
   private String vipLevel;
 
-  @ApiModelProperty(value = "用户层级")
+  @Schema(description = "用户层级")
   private String userLevel;
 
-  @ApiModelProperty(value = "代理 层级")
+  @Schema(description = "代理 层级")
   private Integer agentLevel;
 
-  @ApiModelProperty(value = "用户类型")
+  @Schema(description = "用户类型")
   private Integer userType;
 
-  @ApiModelProperty(value = "首存人数")
+  @Schema(description = "首存人数")
   private Integer firstRechargeNum;
 
-  @ApiModelProperty(value = "充值人数")
+  @Schema(description = "充值人数")
   private Integer rechargeNum;
 
-  @ApiModelProperty(value = "充值次数")
+  @Schema(description = "充值次数")
   private int rechargeCount;
 
-  @ApiModelProperty(value = "充值金额")
+  @Schema(description = "充值金额")
   private BigDecimal rechargeAmount;
 
-  @ApiModelProperty(value = "优惠金额")
+  @Schema(description = "优惠金额")
   private BigDecimal discountAmount;
 
-  @ApiModelProperty(value = "彩金")
+  @Schema(description = "彩金")
   private BigDecimal jackpotAmount;
 
-  @ApiModelProperty(value = "提现人数")
+  @Schema(description = "提现人数")
   private Integer withdrawNum;
 
-  @ApiModelProperty(value = "提现次数")
+  @Schema(description = "提现次数")
   private int withdrawCount;
 
-  @ApiModelProperty(value = "提现金额")
+  @Schema(description = "提现金额")
   private BigDecimal withdrawAmount;
 
-  @ApiModelProperty(value = "手续费")
+  @Schema(description = "手续费")
   private BigDecimal feeAmount;
 
-  @ApiModelProperty(value = "投注人数")
+  @Schema(description = "投注人数")
   private Integer betNum;
 
-  @ApiModelProperty(value = "红利人数")
+  @Schema(description = "红利人数")
   private Integer bonusNum;
 
-  @ApiModelProperty(value = "投注额")
+  @Schema(description = "投注额")
   private BigDecimal betAmount;
 
-  @ApiModelProperty(value = "有效投注额")
+  @Schema(description = "有效投注额")
   private BigDecimal validAmount;
 
-  @ApiModelProperty(value = "输赢金额")
+  @Schema(description = "输赢金额")
   private BigDecimal winAmount;
 
-  @ApiModelProperty(value = "返水金额")
+  @Schema(description = "返水金额")
   private BigDecimal waterAmount;
 
-  @ApiModelProperty(value = "首冲金额")
+  @Schema(description = "首冲金额")
   private BigDecimal firstRechargeAmount;
 
-  @ApiModelProperty(value = "首提金额")
+  @Schema(description = "首提金额")
   private BigDecimal firstWithdrawAmount;
 
-  @ApiModelProperty(value = "下级代理人数")
+  @Schema(description = "下级代理人数")
   private int agentNum;
 
-  @ApiModelProperty(value = "总下级代理人数")
+  @Schema(description = "总下级代理人数")
   private int agentTotalNum;
 
-  @ApiModelProperty(value = "下级会员人数")
+  @Schema(description = "下级会员人数")
   private int memberNum;
 
-  @ApiModelProperty(value = "总下级会员人数")
+  @Schema(description = "总下级会员人数")
   private int memberTotalNum;
 
-  @ApiModelProperty(value = "派彩金额")
+  @Schema(description = "派彩金额")
   private BigDecimal payOutAmount;
 
-  @ApiModelProperty(value = "红利金额")
+  @Schema(description = "红利金额")
   private BigDecimal bonusAmount;
 
-  @ApiModelProperty(value = "公司收入")
+  @Schema(description = "公司收入")
   private BigDecimal companyIncome;
 
-  @ApiModelProperty(value = "注册会员数")
+  @Schema(description = "注册会员数")
   private Integer registerNum;
 
-  @ApiModelProperty(value = "注册代理数")
+  @Schema(description = "注册代理数")
   private Integer registerAgentNum;
 
-  @ApiModelProperty(value = "VIP福利")
+  @Schema(description = "VIP福利")
   private BigDecimal vipRewordAmount;
 
-  @ApiModelProperty(value = "活动礼金")
+  @Schema(description = "活动礼金")
   private BigDecimal activityAmount;
 
-  @ApiModelProperty(value = "聊天室红包")
+  @Schema(description = "聊天室红包")
   private BigDecimal chatAmount;
 
   public MemberDayReportVo() {

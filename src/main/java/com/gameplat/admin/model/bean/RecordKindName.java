@@ -1,6 +1,6 @@
 package com.gameplat.admin.model.bean;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 /**
@@ -11,24 +11,24 @@ import lombok.Data;
 @Data
 public class RecordKindName {
 
-  @ApiModelProperty("键")
+  @Schema(description = "键")
   private String key;
 
-  @ApiModelProperty("值")
+  @Schema(description = "值")
   private String value;
 
-  @ApiModelProperty("en-Us")
+  @Schema(description = "en-Us")
   private String enUs;
 
-  @ApiModelProperty("in-ID")
+  @Schema(description = "in-ID")
   private String inID;
 
-  @ApiModelProperty("th-TH")
+  @Schema(description = "th-TH")
   private String thTH;
 
-  @ApiModelProperty("th-TH")
+  @Schema(description = "th-TH")
   private String viVN;
 
-  @ApiModelProperty("zh-CN")
+  @Schema(description = "zh-CN")
   private String zhCN;
 }

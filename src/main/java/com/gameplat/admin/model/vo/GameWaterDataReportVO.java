@@ -1,6 +1,6 @@
 package com.gameplat.admin.model.vo;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -12,10 +12,10 @@ import java.math.BigDecimal;
 @Data
 public class GameWaterDataReportVO implements Serializable {
 
-  @ApiModelProperty(value = "游戏类型")
+  @Schema(description = "游戏类型")
   private String gameType;
 
-  @ApiModelProperty(value = "返水金额")
+  @Schema(description = "返水金额")
   private BigDecimal waterAmount;
 
   public GameWaterDataReportVO() {

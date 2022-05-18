@@ -1,6 +1,6 @@
 package com.gameplat.admin.model.dto;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -12,18 +12,18 @@ import java.io.Serializable;
 public class MemberVipSignHistoryDTO implements Serializable {
   private static final long serialVersionUID = 1L;
 
-  @ApiModelProperty("主键")
+  @Schema(description = "主键")
   private Long id;
 
-  @ApiModelProperty("会员ID")
+  @Schema(description = "会员ID")
   private Long userId;
 
-  @ApiModelProperty("会员账号")
+  @Schema(description = "会员账号")
   private String userName;
 
-  @ApiModelProperty(value = "签到时间-开始")
+  @Schema(description = "签到时间-开始")
   private String signBeginTime;
 
-  @ApiModelProperty(value = "签到时间-结束")
+  @Schema(description = "签到时间-结束")
   private String signEndTime;
 }

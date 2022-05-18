@@ -1,10 +1,9 @@
 package com.gameplat.admin.model.dto;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.io.Serializable;
-import java.util.Date;
 
 /**
  * @Author bhf
@@ -14,22 +13,21 @@ import java.util.Date;
 @Data
 public class SysFileManagerQueryDTO implements Serializable {
 
-  @ApiModelProperty(value = "原文件名")
+  @Schema(description = "原文件名")
   private String oldFileName;
 
-  @ApiModelProperty(value = "存储文件名")
+  @Schema(description = "存储文件名")
   private String storeFileName;
 
-  @ApiModelProperty(value = "文件类型")
+  @Schema(description = "文件类型")
   private String fileType;
 
-  @ApiModelProperty(value = "上传者")
+  @Schema(description = "上传者")
   private String createBy;
 
-  @ApiModelProperty(value = "开始时间")
+  @Schema(description = "开始时间")
   private String startTime;
 
-  @ApiModelProperty(value = "结束时间")
+  @Schema(description = "结束时间")
   private String endTime;
-
 }

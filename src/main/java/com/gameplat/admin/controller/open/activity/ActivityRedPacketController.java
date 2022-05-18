@@ -6,8 +6,8 @@ import com.gameplat.admin.model.vo.ActivityRedPacketConfigVO;
 import com.gameplat.admin.model.vo.ActivityTurntablePrizeConfigVO;
 import com.gameplat.admin.service.ActivityRedPacketService;
 import com.gameplat.base.common.exception.ServiceException;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -23,33 +23,33 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequestMapping("/api/admin/activity/redpacket")
-@Api(tags = "活动红包配置")
+@Tag(name = "活动红包配置")
 public class ActivityRedPacketController {
 
   @Autowired private ActivityRedPacketService activityRedPacketService;
 
-  @ApiOperation(value = "获取红包配置")
+  @Operation(summary = "获取红包配置")
   @GetMapping("/getConfig")
   @PreAuthorize("hasAuthority('activity:redpacket:getConfig')")
   public ActivityRedPacketConfigVO getConfig() {
     return activityRedPacketService.getConfig();
   }
 
-  @ApiOperation(value = "更新红包配置")
+  @Operation(summary = "更新红包配置")
   @PostMapping("/updateConfig")
   @PreAuthorize("hasAuthority('activity:redpacket:updateConfig')")
   public void updateConfig(@RequestBody ActivityRedPacketConfigDTO dto) {
     activityRedPacketService.updateConfig(dto);
   }
 
-  @ApiOperation(value = "获取转盘奖品配置")
+  @Operation(summary = "获取转盘奖品配置")
   @GetMapping("/getTurntablePrizeConfig")
   @PreAuthorize("hasAuthority('activity:redpacket:getTurntablePrizeConfig')")
   public List<ActivityTurntablePrizeConfigVO> getTurntablePrizeConfig() {
     return activityRedPacketService.getTurntablePrizeConfig();
   }
 
-  @ApiOperation(value = "更新转盘奖品配置")
+  @Operation(summary = "更新转盘奖品配置")
   @PostMapping("/updateTurntablePrizeConfig")
   @PreAuthorize("hasAuthority('activity:redpacket:updateTurntablePrizeConfig')")
   public void updateTurntablePrizeConfig(@RequestBody ActivityTurntablePrizeConfigDTO dto) {

@@ -3,7 +3,7 @@ package com.gameplat.admin.model.vo;
 import cn.afterturn.easypoi.excel.annotation.Excel;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.gameplat.admin.util.Date2LongSerializerUtils;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -19,21 +19,21 @@ public class MemberVipSignStatisVO implements Serializable {
 
   private static final long serialVersionUID = 1L;
 
-  @ApiModelProperty("主键")
+  @Schema(description = "主键")
   private Long id;
 
-  @ApiModelProperty("主键")
+  @Schema(description = "主键")
   private Long userId;
 
-  @ApiModelProperty("会员账号")
+  @Schema(description = "会员账号")
   @Excel(name = "会员账号", width = 20, isImportField = "true_st")
   private String userName;
 
-  @ApiModelProperty("签到次数")
+  @Schema(description = "签到次数")
   @Excel(name = "总签到次数", width = 12, isImportField = "true_st")
   private Integer signCount;
 
-  @ApiModelProperty(value = "最后签到时间")
+  @Schema(description = "最后签到时间")
   @JsonSerialize(using = Date2LongSerializerUtils.class)
   @Excel(
       name = "最后签到时间",
@@ -43,7 +43,7 @@ public class MemberVipSignStatisVO implements Serializable {
       width = 22)
   private Date updateTime;
 
-  @ApiModelProperty(value = "创建时间")
+  @Schema(description = "创建时间")
   @JsonSerialize(using = Date2LongSerializerUtils.class)
   @Excel(
       name = "创建时间",

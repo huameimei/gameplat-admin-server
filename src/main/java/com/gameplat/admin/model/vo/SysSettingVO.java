@@ -1,7 +1,7 @@
 package com.gameplat.admin.model.vo;
 
 import com.gameplat.model.entity.setting.SysSetting;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 /**
@@ -26,11 +26,13 @@ public class SysSettingVO extends SysSetting {
 
   private String country;
 
-  @ApiModelProperty(value = "维护状态 0正常 1维护中")
+  @Schema(description = "维护状态 0正常 1维护中")
   private Integer status;
 
   private String zhCn;
+
   private String enUs;
+
   private String thTh;
   private String viVn;
   private String inId;

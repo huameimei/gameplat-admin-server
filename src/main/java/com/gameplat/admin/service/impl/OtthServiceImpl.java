@@ -20,7 +20,7 @@ import com.gameplat.base.common.log.SysLog;
 import com.gameplat.base.common.util.DateUtils;
 import com.gameplat.base.common.util.HttpRespBean;
 import com.gameplat.base.common.util.IPUtils;
-import com.gameplat.common.enums.ChatConfigEnum;
+import com.gameplat.common.enums.DictDataEnum;
 import com.gameplat.common.enums.TransferTypesEnum;
 import com.gameplat.common.util.HttpClient;
 import com.gameplat.common.util.HttpClientUtils;
@@ -53,20 +53,14 @@ import static com.alibaba.excel.util.DateUtils.DATE_FORMAT_10;
 @Service
 @Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)
 public class OtthServiceImpl implements OtthService {
+
   /** 聊天室彩票中奖推送设置 */
   public static final String CHAT_PUSH_CP_WIN = "CHAT_PUSH_CP_WIN";
+
   /** 聊天室彩票下注推送配置 */
   public static final String CHAT_PUSH_CP_BET = "CHAT_PUSH_CP_BET";
 
-  private static String IP_PCONLINE_URL = "http://whois.pconline.com.cn/ipJson.jsp";
-  private final String lottUrl = "/api-manage/chatRoom/getLottTypeList";
-  private final String Lott_CONFIG_URL = "/api-manage/chatRoom/updateChatRoomStatus";
-  // 聊天室下注推送策略
-  private final String CHAT_PUSH_SP_BET =
-      "{\"autoShare\":0,\"gameIds\":\"23,25,29,27,,33,131,70,173\",\"isOpen\":1,\"notPushAccount\":\"baozi\",\"notPushPlayCode\":\"\",\"onlyPushAccount\":0,\"pushAccount\":\"jeff13,sss111\",\"pushPlayCode\":\"\",\"rechCount\":0,\"rechMoney\":0.0,\"showHeel\":1,\"showHeelMinMoney\":20.0,\"todayRechMoney\":0.0,\"totalMoney\":0.0,\"validBetMoney\":0.0}";
-
-
-  @Autowired private ChatSideMenuService menuService;
+  private static final String IP_PCONLINE_URL = "http://whois.pconline.com.cn/ipJson.jsp";
 
   @Autowired private Executor asyncExecutor;
 
@@ -78,9 +72,11 @@ public class OtthServiceImpl implements OtthService {
 
   @Autowired private MemberService memberService;
 
-  @Autowired private RedisTemplate redisTemplate;
+  @Autowired private RedisTemplate<String, Object> redisTemplate;
 
   @Autowired private RechargeOrderService rechargeOrderService;
+
+  @Autowired private ConfigService configService;
 
   // 获取ip归属地
   protected static String getAddressByIpThird(String ip) {
@@ -107,9 +103,10 @@ public class OtthServiceImpl implements OtthService {
     String host = json.getString("host");
     String platform = json.getString("platform");
     String proxy = json.getString("proxy");
+    String lottUrl = "/api-manage/chatRoom/getLottTypeList";
     String url = host + "/" + lottUrl;
     List<LotteryCodeVo> list = new ArrayList<>();
-    String lotteryList = null;
+    String lotteryList;
     try {
       lotteryList = HttpClientUtils.doPost(url, "", getHeader(platform + ":" + proxy));
       JSONObject jsonObject = JSONObject.parseObject(lotteryList);
@@ -133,8 +130,7 @@ public class OtthServiceImpl implements OtthService {
   }
 
   public String getLottTenantCode() {
-    return getLottConfig()
-            .getString("proxy");
+    return getLottConfig().getString("proxy");
   }
 
   /** 获取头信息 */
@@ -152,7 +148,8 @@ public class OtthServiceImpl implements OtthService {
     String host = json.getString("host");
     String platform = json.getString("platform");
     String proxy = json.getString("proxy");
-    String url = host + "/" + Lott_CONFIG_URL;
+    String lott_CONFIG_URL = "/api-manage/chatRoom/updateChatRoomStatus";
+    String url = host + "/" + lott_CONFIG_URL;
     JSONObject jsonObjectNo = JSONObject.parseObject(body);
     String isOpen = jsonObjectNo.getString("chatOpen");
     Map<String, String> map = new HashMap<>();
@@ -234,7 +231,7 @@ public class OtthServiceImpl implements OtthService {
   public String otthProxyHttpPost(
       String apiUrl, String body, HttpServletRequest request, String proxy) {
 
-    //修改，从gameconfig获取租户标识
+    // 修改，从gameconfig获取租户标识
     proxy = getLottTenantCode();
 
     Header[] header =
@@ -286,16 +283,15 @@ public class OtthServiceImpl implements OtthService {
     }
 
     if (StringUtils.isNotBlank(result)) {
-      try{
+      try {
         JSONObject jsonObject = JSONObject.parseObject(result);
         Object code = jsonObject.get("code");
         if (code.equals("system_error") || code.equals("400")) {
           throw new ServiceException(jsonObject.getString("msg"));
         }
-      }catch (Exception e){
-        log.error(" 聊天室接口异常 {},{}",request,e);
+      } catch (Exception e) {
+        log.error(" 聊天室接口异常 {},{}", request, e);
       }
-
     }
 
     return result;
@@ -360,8 +356,7 @@ public class OtthServiceImpl implements OtthService {
         (PushLotteryWin)
             redisTemplate.opsForValue().get(String.format("%s_%s", dbSuffix, CHAT_PUSH_CP_WIN));
     if (pushLotteryWin == null) {
-      String chatConfig = menuService.queryChatConfig(ChatConfigEnum.CHAT_PUSH_CP_WIN);
-      pushLotteryWin = JSON.parseObject(chatConfig, PushLotteryWin.class);
+      pushLotteryWin = configService.get(DictDataEnum.CHAT_PUSH_CP_WIN, PushLotteryWin.class);
       if (pushLotteryWin != null) {
         redisTemplate
             .opsForValue()
@@ -427,21 +422,15 @@ public class OtthServiceImpl implements OtthService {
       throw new ServiceException("推送失败,获取不到租户标识");
     }
     // 获取分享配置
-    String chatConfig = menuService.queryChatConfig(ChatConfigEnum.CHAT_PUSH_CP_BET);
-    ChatPushCPBet config = JSON.parseObject(chatConfig, ChatPushCPBet.class);
+    ChatPushCPBet config = configService.get(DictDataEnum.CHAT_PUSH_CP_BET, ChatPushCPBet.class);
     if (config != null) {
       redisTemplate.opsForValue().set(String.format("%s_%s", dbSuffix, CHAT_PUSH_CP_BET), config);
     }
 
-    ChatPushCPBet finalConfig = config;
     req.forEach(
         x -> {
           x.setAccount(x.getAccount().replaceAll(dbSuffix, ""));
           Member user = memberService.getByAccount(x.getAccount()).get();
-          if (user == null) {
-            log.info("找不到用户:" + x.getAccount());
-            return;
-          }
           x.setUserId(user.getId());
         });
     // 过滤掉设置不推送的游戏
@@ -483,12 +472,12 @@ public class OtthServiceImpl implements OtthService {
                       if (todayMoney == null || todayMoney.getRechargeCount() == null) {
                         return false;
                       }
-                      return todayMoney.getRechargeCount() > finalConfig.getRechCount();
+                      return todayMoney.getRechargeCount() > config.getRechCount();
                     })
                 .collect(Collectors.toList());
       }
       if (req.isEmpty()) {
-        throw new ServiceException(String.format("充值次数未达到要求%d次", finalConfig.getRechCount()));
+        throw new ServiceException(String.format("充值次数未达到要求%d次", config.getRechCount()));
       }
       // 总充值金额过滤
       if (config.getRechMoney() != null && config.getRechMoney().compareTo(BigDecimal.ZERO) > 0) {
@@ -503,13 +492,12 @@ public class OtthServiceImpl implements OtthService {
                       if (todayMoney == null || todayMoney.getRechargeMoney() == null) {
                         return false;
                       }
-                      return todayMoney.getRechargeMoney().compareTo(finalConfig.getRechMoney())
-                          > 0;
+                      return todayMoney.getRechargeMoney().compareTo(config.getRechMoney()) > 0;
                     })
                 .collect(Collectors.toList());
       }
       if (req.isEmpty()) {
-        throw new ServiceException("总充值金额未达到要求" + finalConfig.getRechMoney() + "元");
+        throw new ServiceException("总充值金额未达到要求" + config.getRechMoney() + "元");
       }
       // 当日总充值金额过滤
       if (config.getTodayRechMoney() != null
@@ -528,16 +516,14 @@ public class OtthServiceImpl implements OtthService {
                       if (todayMoney == null || todayMoney.getRechargeMoney() == null) {
                         return false;
                       }
-                      return todayMoney
-                              .getRechargeMoney()
-                              .compareTo(finalConfig.getTodayRechMoney())
+                      return todayMoney.getRechargeMoney().compareTo(config.getTodayRechMoney())
                           > 0;
                     })
                 .collect(Collectors.toList());
       }
 
       if (req.isEmpty()) {
-        throw new ServiceException("今日充值金额不达标,还需要" + finalConfig.getTodayRechMoney() + "元");
+        throw new ServiceException("今日充值金额不达标,还需要" + config.getTodayRechMoney() + "元");
       }
 
       // 过滤只推送哪个玩法
@@ -579,8 +565,6 @@ public class OtthServiceImpl implements OtthService {
     }
     ;
   }
-
-
 
   @Override
   public ChatUserVO getChatUser(String account) {

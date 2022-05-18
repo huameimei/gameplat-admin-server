@@ -27,6 +27,7 @@ import com.gameplat.model.entity.sys.SysBannerInfo;
 import com.google.common.collect.Lists;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -50,7 +51,7 @@ public class ActivityInfoServiceImpl extends ServiceImpl<ActivityInfoMapper, Act
 
   @Autowired private SysBannerInfoService sysBannerInfoService;
 
-  @Autowired private ActivityTypeService activityTypeService;
+  @Lazy @Autowired private ActivityTypeService activityTypeService;
 
   @Autowired private ActivityLobbyService activityLobbyService;
 

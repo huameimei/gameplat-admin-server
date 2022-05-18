@@ -1,6 +1,6 @@
 package com.gameplat.admin.model.vo;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -13,57 +13,57 @@ import java.util.Date;
 @Data
 public class ValidWithdrawVO implements Serializable {
 
-  @ApiModelProperty("主键")
+  @Schema(description = "主键")
   private Long id;
 
-  @ApiModelProperty(value = "用户id")
+  @Schema(description = "用户id")
   private Long memberId;
 
-  @ApiModelProperty(value = "会员账号")
+  @Schema(description = "会员账号")
   private String account;
 
-  @ApiModelProperty(value = "充值记录ID(来源id)")
+  @Schema(description = "充值记录ID(来源id)")
   private String rechId;
 
-  @ApiModelProperty(value = "充值金额")
+  @Schema(description = "充值金额")
   private BigDecimal rechMoney;
 
-  @ApiModelProperty(value = "优惠金额")
+  @Schema(description = "优惠金额")
   private BigDecimal discountMoney;
 
-  @ApiModelProperty(value = "类型： 0表示最新一笔充值1表示其它")
+  @Schema(description = "类型： 0表示最新一笔充值1表示其它")
   private Integer type;
 
-  @ApiModelProperty(value = "创建时间")
+  @Schema(description = "创建时间")
   private Date createTime;
 
-  @ApiModelProperty(value = "修改时间")
+  @Schema(description = "修改时间")
   private Date updateTime;
 
-  @ApiModelProperty(value = "常态打码量")
+  @Schema(description = "常态打码量")
   private BigDecimal mormDml;
 
-  @ApiModelProperty(value = "优惠打码量")
+  @Schema(description = "优惠打码量")
   private BigDecimal discountDml;
 
-  @ApiModelProperty(value = "彩票打码量")
+  @Schema(description = "彩票打码量")
   private BigDecimal cpDml;
 
-  @ApiModelProperty(value = "体育打码量")
+  @Schema(description = "体育打码量")
   private BigDecimal sportsDml;
 
-  @ApiModelProperty(value = "真人打码量")
+  @Schema(description = "真人打码量")
   private BigDecimal videoDml;
 
-  @ApiModelProperty(value = "状态: 0正常,1表示已出款")
+  @Schema(description = "状态: 0正常,1表示已出款")
   private Integer status;
 
-  @ApiModelProperty(value = "备注")
+  @Schema(description = "备注")
   private String remark;
 
-  @ApiModelProperty(value = "截止时间")
+  @Schema(description = "截止时间")
   private Date endTime;
 
-  @ApiModelProperty(value = "投注内容")
+  @Schema(description = "投注内容")
   private String betContext;
 }

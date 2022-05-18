@@ -1,7 +1,7 @@
 package com.gameplat.admin.model.vo;
 
 import com.baomidou.mybatisplus.annotation.TableName;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -18,84 +18,84 @@ public class MemberGameDayReportVo implements Serializable {
 
   private static final long serialVersionUID = 1L;
 
-  @ApiModelProperty(value = "统计日期")
+  @Schema(description = "统计日期")
   private Date countDate;
 
-  @ApiModelProperty(value = "转账次数")
+  @Schema(description = "转账次数")
   private Integer bankCount;
 
-  @ApiModelProperty(value = "转账金额")
+  @Schema(description = "转账金额")
   private BigDecimal bankMoney;
 
-  @ApiModelProperty(value = "在线支付次数")
+  @Schema(description = "在线支付次数")
   private Integer onlineCount;
 
-  @ApiModelProperty(value = "在线支付总金额")
+  @Schema(description = "在线支付总金额")
   private BigDecimal onlineMoney;
 
-  @ApiModelProperty(value = "人工充值次数")
+  @Schema(description = "人工充值次数")
   private Integer handRechCount;
 
-  @ApiModelProperty(value = "人工充值总金额")
+  @Schema(description = "人工充值总金额")
   private BigDecimal handRechMoney;
 
-  @ApiModelProperty(value = "充值金额总额")
+  @Schema(description = "充值金额总额")
   private BigDecimal totailRechargeAmount;
 
-  @ApiModelProperty(value = "优惠金额")
+  @Schema(description = "优惠金额")
   private BigDecimal rechDiscount;
 
-  @ApiModelProperty(value = "其他优惠金额")
+  @Schema(description = "其他优惠金额")
   private BigDecimal otherDiscount;
 
-  @ApiModelProperty(value = "非正常入款")
+  @Schema(description = "非正常入款")
   private BigDecimal abnormalIncome;
 
-  @ApiModelProperty(value = "会员出款次数")
+  @Schema(description = "会员出款次数")
   private Integer withdrawCount;
 
-  @ApiModelProperty(value = "会员出款金额")
+  @Schema(description = "会员出款金额")
   private BigDecimal withdrawMoney;
 
-  @ApiModelProperty(value = "人工出款次数")
+  @Schema(description = "人工出款次数")
   private Integer handWithdrawCount;
 
-  @ApiModelProperty(value = "人工出款金额")
+  @Schema(description = "人工出款金额")
   private BigDecimal handWithdrawMoney;
 
-  @ApiModelProperty(value = "提现汇总金额")
+  @Schema(description = "提现汇总金额")
   private BigDecimal totailWithdrawAmount;
 
-  @ApiModelProperty(value = "手续费")
+  @Schema(description = "手续费")
   private BigDecimal counterFee;
 
-  @ApiModelProperty(value = "非正常出款金额")
+  @Schema(description = "非正常出款金额")
   private BigDecimal abnormalOutcome;
 
-  @ApiModelProperty(value = "彩票投注额")
+  @Schema(description = "彩票投注额")
   private BigDecimal lotteryValidAmount;
 
-  @ApiModelProperty(value = "彩票输赢")
+  @Schema(description = "彩票输赢")
   private BigDecimal lotteryWinAmount;
 
-  @ApiModelProperty(value = "体育投注额")
+  @Schema(description = "体育投注额")
   private BigDecimal sportValidAmount;
 
-  @ApiModelProperty(value = "体育输赢")
+  @Schema(description = "体育输赢")
   private BigDecimal sportWinAmount;
 
-  @ApiModelProperty(value = "真人投注额")
+  @Schema(description = "真人投注额")
   private BigDecimal realValidAmount;
 
-  @ApiModelProperty(value = "真人输赢")
+  @Schema(description = "真人输赢")
   private BigDecimal realWinAmount;
 
-  @ApiModelProperty(value = "真人返水")
+  @Schema(description = "真人返水")
   private BigDecimal realWaterAmount;
 
-  @ApiModelProperty(value = "游戏输赢汇总")
+  @Schema(description = "游戏输赢汇总")
   private BigDecimal totailGameWinAmout;
 
-  @ApiModelProperty(value = "充提总结余")
+  @Schema(description = "充提总结余")
   private BigDecimal totalRWAmount;
 }

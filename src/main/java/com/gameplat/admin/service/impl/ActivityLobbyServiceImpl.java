@@ -30,6 +30,7 @@ import com.gameplat.model.entity.activity.ActivityQualification;
 import com.google.common.collect.Lists;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -49,7 +50,7 @@ public class ActivityLobbyServiceImpl extends ServiceImpl<ActivityLobbyMapper, A
 
   @Autowired private ActivityLobbyDiscountService activityLobbyDiscountService;
 
-  @Autowired private ActivityQualificationService activityQualificationService;
+  @Lazy @Autowired private ActivityQualificationService activityQualificationService;
 
   @Autowired private ActivityDistributeService activityDistributeService;
 
@@ -60,7 +61,7 @@ public class ActivityLobbyServiceImpl extends ServiceImpl<ActivityLobbyMapper, A
     queryWrapper
         .like(StringUtils.isNotBlank(dto.getTitle()), ActivityLobby::getTitle, dto.getTitle())
         .eq(dto.getStatus() != null, ActivityLobby::getStatus, dto.getStatus())
-            .eq(dto.getType()!=null,ActivityLobby::getType,dto.getType())
+        .eq(dto.getType() != null, ActivityLobby::getType, dto.getType())
         .orderByDesc(Lists.newArrayList(ActivityLobby::getCreateTime, ActivityLobby::getId));
 
     IPage<ActivityLobbyVO> activityLobbyVOIPage =
@@ -537,11 +538,11 @@ public class ActivityLobbyServiceImpl extends ServiceImpl<ActivityLobbyMapper, A
   @Override
   public List<ActivityLobbyVO> findAllLobbyList() {
     List<ActivityLobby> activityLobbies =
-            this.lambdaQuery()
-                    .eq(ActivityLobby::getStatus, BooleanEnum.YES.value())
-                    .le(ActivityLobby::getStartTime, DateUtil.getNowTime())
-                    .ge(ActivityLobby::getEndTime, DateUtil.getNowTime())
-                    .list();
+        this.lambdaQuery()
+            .eq(ActivityLobby::getStatus, BooleanEnum.YES.value())
+            .le(ActivityLobby::getStartTime, DateUtil.getNowTime())
+            .ge(ActivityLobby::getEndTime, DateUtil.getNowTime())
+            .list();
     if (CollectionUtils.isEmpty(activityLobbies)) {
       return new ArrayList<>();
     }
@@ -554,9 +555,10 @@ public class ActivityLobbyServiceImpl extends ServiceImpl<ActivityLobbyMapper, A
     if (CollectionUtils.isNotEmpty(result.getLobbyDiscountList())) {
       List<ActivityLobbyDiscountVO> activityLobbyDiscountVOList = new ArrayList<>();
       for (int i = 0; i < result.getLobbyDiscountList().size(); i++) {
-        Object o=result.getLobbyDiscountList().get(i);
-        if(o instanceof ActivityLobbyDiscount){
-          activityLobbyDiscountVOList.add(activityLobbyDiscountConvert.toVO(((ActivityLobbyDiscount) o)));
+        Object o = result.getLobbyDiscountList().get(i);
+        if (o instanceof ActivityLobbyDiscount) {
+          activityLobbyDiscountVOList.add(
+              activityLobbyDiscountConvert.toVO(((ActivityLobbyDiscount) o)));
         }
       }
       result.setLobbyDiscountList(activityLobbyDiscountVOList);

@@ -1,6 +1,6 @@
 package com.gameplat.admin.model.dto;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -13,12 +13,12 @@ public class ActivityQualificationCheckDTO implements Serializable {
 
   private static final long serialVersionUID = -3594282509149807621L;
 
-  @ApiModelProperty(value = "用户账号")
+  @Schema(description = "用户账号")
   private String username;
 
-  @ApiModelProperty(value = "活动id")
+  @Schema(description = "活动id")
   private Long activityId;
 
-  @ApiModelProperty(value = "统计日期")
+  @Schema(description = "统计日期")
   private String countDate;
 }

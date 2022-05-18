@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -26,13 +27,9 @@ public class WebSecurityConfigurer extends WebSecurityConfigurerAdapter {
 
   @Autowired private URIAdapter adapter;
 
-  @Autowired private AuthenticationHandler authenticationHandler;
+  @Lazy @Autowired private JwtAuthorizationFilter jwtAuthorizationFilter;
 
-  @Autowired private AnonymousAuthenticationEntryPoint anonymousAuthenticationEntryPoint;
-
-  @Autowired private JwtAuthorizationFilter jwtAuthorizationFilter;
-
-  @Autowired private UserDetailsService userDetailsService;
+  @Lazy @Autowired private UserDetailsService userDetailsService;
 
   @Bean
   public PasswordEncoder passwordEncoder() {
@@ -63,8 +60,8 @@ public class WebSecurityConfigurer extends WebSecurityConfigurerAdapter {
         .userDetailsService(userDetailsService)
         .addFilterBefore(jwtAuthorizationFilter, UsernamePasswordAuthenticationFilter.class)
         .exceptionHandling()
-        .accessDeniedHandler(authenticationHandler)
-        .authenticationEntryPoint(anonymousAuthenticationEntryPoint)
+        .accessDeniedHandler(new AuthenticationHandler())
+        .authenticationEntryPoint(new AnonymousAuthenticationEntryPoint())
         .and()
         .headers()
         .frameOptions()

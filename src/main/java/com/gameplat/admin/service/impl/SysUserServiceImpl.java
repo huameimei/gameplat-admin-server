@@ -166,7 +166,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
   public void deleteUserById(Long id) {
     Assert.isFalse(id.equals(SecurityUserHolder.getUserId()), "不允许操作自己账号");
     SysUser user = this.getById(id);
-    Assert.isTrue(BooleanEnum.YES.match(user.getIsDefault()), "系统内置账号，不允许删除!");
+    Assert.isFalse(BooleanEnum.YES.match(user.getIsDefault()), "系统内置账号，不允许删除!");
 
     // 删除用户角色表
     userRoleMapper.deleteUserRole(new Long[] {id});

@@ -56,7 +56,8 @@ public class GameRebateReportServiceImpl
     extends ServiceImpl<GameRebateReportMapper, GameRebateReport>
     implements GameRebateReportService {
 
-  @Autowired private GameRebateConfigMapper gameRebateConfigMapper;
+  @Autowired(required = false)
+  private GameRebateConfigMapper gameRebateConfigMapper;
 
   @Autowired private MemberService memberService;
 
@@ -68,11 +69,14 @@ public class GameRebateReportServiceImpl
 
   @Autowired private GameBlacklistService gameBlacklistService;
 
-  @Autowired private GameRebateDetailMapper gameRebateDetailMapper;
+  @Autowired(required = false)
+  private GameRebateDetailMapper gameRebateDetailMapper;
 
-  @Autowired private GameBetDailyReportMapper gameBetDailyReportMapper;
+  @Autowired(required = false)
+  private GameBetDailyReportMapper gameBetDailyReportMapper;
 
-  @Autowired private GameRebateReportMapper gameRebateReportMapper;
+  @Autowired(required = false)
+  private GameRebateReportMapper gameRebateReportMapper;
 
   @Autowired private RedisService redisService;
 
@@ -377,7 +381,8 @@ public class GameRebateReportServiceImpl
     memberBillService.save(memberBill);
 
     // 修改账户余额
-    memberInfoService.updateBalanceWithRecharge(member.getId(), realRebateMoney, realRebateMoney);
+    memberInfoService.updateBalanceWithRecharge(
+            member.getId(), realRebateMoney, realRebateMoney, 0);
   }
 
   @Override

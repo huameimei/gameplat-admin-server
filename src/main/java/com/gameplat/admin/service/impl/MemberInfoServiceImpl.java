@@ -63,7 +63,7 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
 
   @Override
   @Retryable(value = Exception.class, backoff = @Backoff(delay = 300L, multiplier = 1.5))
-  public void updateBalanceWithRecharge(Long memberId, BigDecimal amount, BigDecimal totalAmount) {
+  public void updateBalanceWithRecharge(Long memberId, BigDecimal amount, BigDecimal totalAmount, Integer pointFlag) {
     if (BigDecimal.ZERO.compareTo(amount) > 0) {
       throw new ServiceException("金额不正确，金额必须大于等于0");
     }
@@ -72,22 +72,36 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
 
     // 计算变更后余额
     BigDecimal newBalance = this.getNewBalance(memberInfo.getBalance(), totalAmount);
+    MemberInfo entity = null;
+    //判断是否是计入积分
+    if (pointFlag == 1) {
+      entity =
+              MemberInfo.builder()
+                      .memberId(memberId)
+                      .balance(newBalance)
+                      .lastRechAmount(amount)
+                      .lastRechTime(new Date())
+                      .totalRechAmount(memberInfo.getTotalRechAmount().add(amount))
+                      .totalRechTimes(memberInfo.getTotalRechTimes() + 1)
+                      .version(memberInfo.getVersion())
+                      .build();
 
-    MemberInfo entity =
-        MemberInfo.builder()
-            .memberId(memberId)
-            .balance(newBalance)
-            .lastRechAmount(amount)
-            .lastRechTime(new Date())
-            .totalRechAmount(memberInfo.getTotalRechAmount().add(amount))
-            .totalRechTimes(memberInfo.getTotalRechTimes() + 1)
-            .version(memberInfo.getVersion())
-            .build();
-
-    // 如果是首次充值，则设置首冲信息
-    if (memberInfo.getTotalRechTimes() == 0) {
-      entity.setFirstRechTime(new Date());
-      entity.setFirstRechAmount(amount);
+      // 如果是首次充值，则设置首冲信息
+      if (memberInfo.getTotalRechTimes() == 0) {
+        entity.setFirstRechTime(new Date());
+        entity.setFirstRechAmount(amount);
+      }
+    } else {
+      entity =
+              MemberInfo.builder()
+                      .memberId(memberId)
+                      .balance(newBalance)
+                      .lastRechAmount(memberInfo.getLastRechAmount())
+                      .lastRechTime(memberInfo.getLastRechTime())
+                      .totalRechAmount(memberInfo.getTotalRechAmount())
+                      .totalRechTimes(memberInfo.getTotalRechTimes())
+                      .version(memberInfo.getVersion())
+                      .build();
     }
 
     if (!this.updateById(entity)) {
@@ -132,6 +146,29 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
             .build())) {
       log.error("更新会员:{}冻结余额失败，当前冻结余额：{}，更新冻结金额：{}", memberId, currentFreeze, amount);
       throw new ServiceException("更新会员冻结余额失败!");
+    }
+  }
+
+  @Override
+  @Retryable(value = Exception.class, backoff = @Backoff(delay = 500L, multiplier = 1.5))
+  public void updateUserWithTimes(Long memberId, BigDecimal amount, Integer pointFlag) {
+    MemberInfo memberInfo = this.getById(memberId);
+    if (pointFlag == 1) {
+      MemberInfo entity =
+              MemberInfo.builder()
+                      .memberId(memberId)
+                      .lastWithdrawTime(new Date())
+                      .lastWithdrawAmount(amount)
+                      .totalWithdrawAmount(memberInfo.getLastWithdrawAmount().add(amount))
+                      .totalWithdrawTimes(memberInfo.getTotalWithdrawTimes() + 1)
+                      .version(memberInfo.getVersion())
+                      .build();
+
+      // 如果是首次提现，则设置提现信息
+      if (memberInfo.getTotalWithdrawTimes() == 0) {
+        entity.setFirstWithdrawTime(new Date());
+        entity.setFirstWithdrawAmount(amount);
+      }
     }
   }
 

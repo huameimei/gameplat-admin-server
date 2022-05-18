@@ -23,7 +23,6 @@ import com.gameplat.admin.service.ValidWithdrawService;
 import com.gameplat.base.common.constant.ContextConstant;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.BeanUtils;
-import com.gameplat.base.common.util.StringUtils;
 import com.gameplat.common.model.bean.limit.MemberWithdrawLimit;
 import com.gameplat.elasticsearch.page.PageResponse;
 import com.gameplat.elasticsearch.service.IBaseElasticsearchService;
@@ -40,7 +39,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
-
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -194,7 +192,7 @@ public class ValidWithdrawServiceImpl extends ServiceImpl<ValidWithdrawMapper, V
           PageResponse<GameBetValidRecordVo> result =
               baseElasticsearchService.search(
                   builder, indexName, GameBetValidRecordVo.class, 0, 9999, sortBuilder);
-          if (StringUtils.isNotEmpty(result.getList())) {
+          if (ObjectUtil.isNotEmpty(result.getList())) {
             ValidAccoutWithdrawVo validAccoutWithdrawVo = new ValidAccoutWithdrawVo();
             validAccoutWithdrawVo.setId(a.getId());
             // 会员一笔打码量的投注记录
@@ -276,7 +274,6 @@ public class ValidWithdrawServiceImpl extends ServiceImpl<ValidWithdrawMapper, V
             .reduce(BigDecimal.ZERO, BigDecimal::add);
     log.info("总共需要常态打码量：{}", rechMoney);
     // 需要扣除金额
-    // validateDmlBean.setSumAllDeduct(sumAllDeduct);
     validateDmlBean.setYetWithdraw(BigDecimal.ZERO);
     validateDmlBean.setRows(BeanUtils.mapList(validWithdraws, ValidWithdrawVO.class));
     return validateDmlBean;

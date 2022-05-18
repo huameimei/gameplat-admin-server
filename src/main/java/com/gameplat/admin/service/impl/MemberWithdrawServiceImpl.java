@@ -367,6 +367,9 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
         }
         // 移除会员提现冻结金额
         memberInfoService.updateFreeze(member.getId(), memberWithdraw.getCashMoney().negate());
+        // 计算会员出款次数和金额
+        memberInfoService.updateUserWithTimes(
+                member.getId(), memberWithdraw.getCashMoney().negate(), memberWithdraw.getPointFlag());
       } else if (WithdrawStatus.CANCELLED.getValue() == cashStatus) { // 取消出款操作
         // 释放会员提现冻结金额
         memberInfoService.updateFreeze(member.getId(), memberWithdraw.getCashMoney().negate());

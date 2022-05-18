@@ -319,7 +319,10 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
 
     // 更新会员充值信息
     memberInfoService.updateBalanceWithRecharge(
-        memberInfo.getMemberId(), rechargeOrder.getPayAmount(), rechargeOrder.getTotalAmount());
+            memberInfo.getMemberId(),
+            rechargeOrder.getPayAmount(),
+            rechargeOrder.getTotalAmount(),
+            rechargeOrder.getPointFlag());
     // 判断充值是否计算积分
     if (TrueFalse.TRUE.getValue() != rechargeOrder.getPointFlag()) {
       log.info(

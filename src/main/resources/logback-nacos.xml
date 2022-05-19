@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration scan="true" scanPeriod="10 seconds">
     <springProperty name="APP_NAME" scope="context" source="spring.application.name"/>
-    <springProperty name="LOG_FILE_PATH" scope="context" source="logging.file.path" defaultValue="/logs"/>
+    <springProperty name="LOG_FILE_PATH" scope="context" source="logging.file.path" defaultValue="logs"/>
     <springProperty name="LOG_FILE_NAME" scope="context" source="logging.file.name"
                     defaultValue="${LOG_FILE_PATH}/${APP_NAME}.log"/>
     <springProperty name="LOG_MAX_FILESIZE" scope="context" source="logging.logback.rollingpolicy.max-file-size"

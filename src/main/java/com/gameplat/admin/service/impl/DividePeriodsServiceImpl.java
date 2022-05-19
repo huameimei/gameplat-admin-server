@@ -999,21 +999,7 @@ public class DividePeriodsServiceImpl extends ServiceImpl<DividePeriodsMapper, D
       memberBill.setRemark(sb);
       memberBill.setContent(sb);
       memberBillService.save(memberBill);
-      // 计算变更后余额
-      BigDecimal newBalance = memberInfo.getBalance().add(summary.getRealDivideAmount());
-      if (newBalance.compareTo(BigDecimal.ZERO) <= NumberConstant.ZERO) {
-        return;
-      }
-      MemberInfo entity =
-          MemberInfo.builder()
-              .memberId(member.getId())
-              .balance(newBalance)
-              .version(memberInfo.getVersion())
-              .build();
-      boolean b = memberInfoService.updateById(entity);
-      if (!b) {
-        log.error("会员{}期数派发钱包余额变更失败！", member.getAccount());
-      }
+      memberInfoService.updateBalance(member.getId(), summary.getRealDivideAmount());
     } catch (Exception e) {
       log.error(MessageFormat.format("会员{}分红账变, 失败原因：{}", member.getAccount(), e));
       // 释放资金锁

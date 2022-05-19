@@ -285,14 +285,14 @@
             <properties>
                 <profiles.active>sit</profiles.active>
                 <reversion>1.0.0</reversion>
-                <changelist>RC</changelist>
-                <gameplat-dependencies.version>1.0.0-RC</gameplat-dependencies.version>
-                <gameplat-common.version>1.0.0-RC</gameplat-common.version>
-                <gameplat-common-game.version>1.0.0-RC</gameplat-common-game.version>
-                <gameplat-model.version>1.0.0-RC</gameplat-model.version>
+                <changelist>SNAPSHOT</changelist>
+                <gameplat-dependencies.version>1.0.0-SNAPSHOT</gameplat-dependencies.version>
+                <gameplat-common.version>1.0.0-SNAPSHOT</gameplat-common.version>
+                <gameplat-common-game.version>1.0.0-SNAPSHOT</gameplat-common-game.version>
+                <gameplat-model.version>1.0.0-SNAPSHOT</gameplat-model.version>
             </properties>
             <repositories>
-                <!-- 仅在sit中，开启RC的仓库 -->
+                <!-- 仅在sit中，开启的仓库 -->
                 <repository>
                     <id>gameplat-snapshots</id>
                     <name>snapshot</name>
@@ -303,7 +303,7 @@
                     </snapshots>
                 </repository>
             </repositories>
-            <!-- 仅在sit中，配置RC的分发构建-->
+            <!-- 仅在sit中，配置的分发构建-->
             <distributionManagement>
                 <snapshotRepository>
                     <id>gameplat-snapshots</id>

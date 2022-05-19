@@ -294,9 +294,9 @@
             <repositories>
                 <!-- 仅在sit中，开启RC的仓库 -->
                 <repository>
-                    <id>gameplat-candidate</id>
-                    <name>candidate</name>
-                    <url>https://nexus.kg822.com/repository/gameplat-candidate/</url>
+                    <id>gameplat-snapshots</id>
+                    <name>snapshot</name>
+                    <url>https://nexus.kg822.com/repository/gameplat-snapshots/</url>
                     <snapshots>
                         <enabled>true</enabled>
                         <updatePolicy>always</updatePolicy>
@@ -306,9 +306,9 @@
             <!-- 仅在sit中，配置RC的分发构建-->
             <distributionManagement>
                 <snapshotRepository>
-                    <id>gameplat-candidate</id>
-                    <name>candidate</name>
-                    <url>https://nexus.kg822.com/repository/gameplat-candidate/</url>
+                    <id>gameplat-snapshots</id>
+                    <name>snapshot</name>
+                    <url>https://nexus.kg822.com/repository/gameplat-snapshots/</url>
                 </snapshotRepository>
             </distributionManagement>
         </profile>

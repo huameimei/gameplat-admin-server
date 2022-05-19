@@ -1,6 +1,8 @@
 package com.gameplat.admin.util;
 
+import cn.hutool.json.JSONUtil;
 import com.gameplat.admin.model.bean.SportGameConfig;
+import com.gameplat.admin.util.lottery.JsonUtil;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.RandomStringUtils;
@@ -25,7 +27,7 @@ public class SportRequestUtil implements Serializable {
    * @return 获取平台配置信息
    */
   public Map<String, Object> basePrams(Object param, SportGameConfig config, int pageType) {
-    Map<String, Object> paramMap = JSONUtil.transBean2Map(param);
+    Map<String, Object> paramMap = JsonUtil.transBean2Map(param);
     if (paramMap == null) {
       paramMap = new HashMap<>();
     }

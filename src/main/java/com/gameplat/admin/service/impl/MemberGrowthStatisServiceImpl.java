@@ -548,16 +548,11 @@ public class MemberGrowthStatisServiceImpl
                     validWithdrawService.saveValidWithdraw(validWithdraw);
 
                     synchronized (lockHelper) {
-
                         MemberInfo memberInfo = memberInfoService.lambdaQuery()
                                 .eq(MemberInfo::getMemberId, member.getId())
                                 .one();
                         BigDecimal afterBlance = memberInfo.getBalance();
-
-                        LambdaUpdateWrapper<MemberInfo> wrapper = new LambdaUpdateWrapper<>();
-                        wrapper.set(MemberInfo::getBalance, afterBlance.add(rewordAmount))
-                                .eq(MemberInfo::getMemberId, member.getId());
-                        memberInfoService.update(wrapper);
+            memberInfoService.updateBalance(member.getId(), rewordAmount);
 
                         // 添加流水记录
                         MemberBill memberBill = new MemberBill();

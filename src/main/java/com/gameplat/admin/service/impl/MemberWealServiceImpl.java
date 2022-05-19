@@ -429,10 +429,7 @@ public class MemberWealServiceImpl extends ServiceImpl<MemberWealMapper, MemberW
                                             .getBalance();
 
                                     //更新会员余额
-                                    LambdaUpdateWrapper<MemberInfo> wrapper = new LambdaUpdateWrapper<>();
-                                    wrapper.set(MemberInfo::getBalance, beforeBalance.add(item.getRewordAmount()))
-                                            .eq(MemberInfo::getMemberId, item.getUserId());
-                                    memberInfoService.update(wrapper);
+                                    memberInfoService.updateBalance(item.getUserId(), beforeBalance.add(item.getRewordAmount()));
 
                                     // 将通知消息去掉请领取
                                     content = content.replaceAll("，请领取", "");
@@ -567,12 +564,8 @@ public class MemberWealServiceImpl extends ServiceImpl<MemberWealMapper, MemberW
                 BigDecimal negate = reword.getRewordAmount().negate();
 
                 BigDecimal currentBalance = memberInfoService.getById(member.getId()).getBalance();
-
-                LambdaUpdateWrapper<MemberInfo> wrapper = new LambdaUpdateWrapper<>();
-                wrapper
-                        .set(MemberInfo::getBalance, currentBalance.add(negate))
-                        .eq(MemberInfo::getMemberId, member.getId());
-                memberInfoService.update(wrapper);
+                //修改余额
+                memberInfoService.updateBalance(member.getId(), currentBalance.add(negate));
 
                 // 添加流水记录
                 MemberBill memberBill = new MemberBill();

@@ -107,10 +107,8 @@ public class MemberLoanServiceImpl extends ServiceImpl<MemberLoanMapper, MemberL
       this.save(loan);
 
       // 3.修改账户余额
-      memberInfoService.update(
-          new LambdaUpdateWrapper<MemberInfo>()
-              .set(MemberInfo::getBalance, balance.subtract(overdraftMoney))
-              .eq(MemberInfo::getMemberId, memberLoan.getMemberId()));
+      memberInfoService.updateBalance(memberLoan.getMemberId(), balance.subtract(overdraftMoney));
+
 
       // 4.添加流水表
       MemberBill memberBill = new MemberBill();

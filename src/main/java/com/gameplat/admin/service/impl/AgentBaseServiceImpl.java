@@ -11,7 +11,6 @@ import com.gameplat.admin.service.MemberInfoService;
 import com.gameplat.admin.service.MemberService;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.snowflake.IdGeneratorSnowflake;
-import com.gameplat.common.constant.NumberConstant;
 import com.gameplat.common.enums.TranTypes;
 import com.gameplat.model.entity.member.Member;
 import com.gameplat.model.entity.member.MemberBill;
@@ -132,21 +131,6 @@ public class AgentBaseServiceImpl implements AgentBaseService {
       // 释放资金锁
       distributedLocker.unlock(lockKey);
     }
-
-    // 计算变更后余额
-    BigDecimal newBalance = memberInfo.getBalance().add(settleMoney);
-    if (newBalance.compareTo(BigDecimal.ZERO) < NumberConstant.ZERO) {
-      return;
-    }
-    MemberInfo entity =
-        MemberInfo.builder()
-            .memberId(member.getId())
-            .balance(newBalance)
-            .version(memberInfo.getVersion())
-            .build();
-    boolean b = memberInfoService.updateById(entity);
-    if (!b) {
-      log.error("代理账号{}平级方案分红钱包余额变更失败！", member.getAccount());
-    }
+    memberInfoService.updateBalance(member.getId(), settleMoney);
   }
 }

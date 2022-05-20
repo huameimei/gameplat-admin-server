@@ -2,7 +2,7 @@ package com.gameplat.admin.model.vo;
 
 import cn.afterturn.easypoi.excel.annotation.Excel;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.gameplat.admin.util.Date2LongSerializerUtils;
+import com.gameplat.common.util.Date2LongSerializerUtils;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 

@@ -2,6 +2,7 @@ package com.gameplat.admin.controller.open.setting;
 
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ObjectUtil;
+import com.alibaba.fastjson.JSON;
 import com.alibaba.nacos.common.utils.CollectionUtils;
 import com.aliyun.oss.ServiceException;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -9,15 +10,16 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.gameplat.admin.cache.AdminCache;
 import com.gameplat.admin.constant.Constants;
 import com.gameplat.admin.enums.SysSettingEnum;
-import com.gameplat.admin.model.vo.ListSortConfigVO;
-import com.gameplat.admin.model.vo.SportConfigVO;
-import com.gameplat.admin.model.vo.SportConfigValueVO;
-import com.gameplat.admin.model.vo.SysSettingVO;
+import com.gameplat.admin.model.vo.*;
+import com.gameplat.admin.service.SysDictDataService;
 import com.gameplat.admin.service.SysSettingService;
 import com.gameplat.base.common.enums.EnableEnum;
 import com.gameplat.base.common.web.Result;
 import com.gameplat.common.constant.CacheKey;
+import com.gameplat.common.enums.DictDataEnum;
+import com.gameplat.common.enums.DictTypeEnum;
 import com.gameplat.model.entity.setting.SysSetting;
+import com.gameplat.model.entity.sys.SysDictData;
 import com.gameplat.security.SecurityUserHolder;
 import com.gameplat.security.context.UserCredential;
 import io.swagger.v3.oas.annotations.Operation;
@@ -29,6 +31,7 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Resource;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -48,6 +51,9 @@ public class SysSettingController {
   @Autowired private SysSettingService sysSettingService;
 
   @Autowired private AdminCache adminCache;
+
+  @Resource
+  private SysDictDataService sysDictDataService;
 
   @Operation(summary = "租户主题列表查询")
   @GetMapping("/theme/list")
@@ -258,4 +264,39 @@ public class SysSettingController {
     adminCache.deleteObject(CacheKey.getSportConfigKey());
     sysSettingService.updateSportConfig(sportConfigVo);
   }
+
+  /**
+   * 修改色值设置
+   */
+  @RequestMapping("/updateColorDict")
+  public Result<Object> updateColorDict(@RequestBody AppChangeSkinColorVO appChangeSkinColorVO){
+    SysDictData sysDictData =
+            sysDictDataService.getDictData(
+                    DictTypeEnum.COLOR_TYPE.getValue(), DictDataEnum.APP_COLOR_TYPE.getLabel());
+    if (sysDictData == null || StringUtils.isBlank(sysDictData.getDictValue())) {
+      throw new com.gameplat.base.common.exception.ServiceException("色值配置没有数据，请先配置色值数据");
+    }
+    // 更新配置信息
+    sysDictData.setDictValue(JSON.toJSONString(appChangeSkinColorVO));
+    boolean result = sysDictDataService.updateById(sysDictData);
+    if (!result) {
+      throw new com.gameplat.base.common.exception.ServiceException("更新色值配置配置失败");
+    }
+    return Result.succeed(true);
+  }
+
+  /**
+   * 获取色值设置
+   */
+  @RequestMapping("/getColorDict")
+  public Result<Object> getColorDict(){
+    SysDictData sysDictData =
+            sysDictDataService.getDictData(
+                    DictTypeEnum.COLOR_TYPE.getValue(), DictDataEnum.APP_COLOR_TYPE.getLabel());
+    if (sysDictData == null ||StringUtils.isBlank(sysDictData.getDictValue())) {
+      throw new com.gameplat.base.common.exception.ServiceException("色值配置没有数据，请先配置色值数据");
+    }
+    return Result.succeedData(JSON.parseObject(sysDictData.getDictValue(),AppChangeSkinColorVO.class));
+  }
+
 }

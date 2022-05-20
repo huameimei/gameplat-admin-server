@@ -56,13 +56,13 @@ public class GameBarServiceImpl extends ServiceImpl<GameBarMapper, GameBar> impl
         }
       });
 
-      barList.forEach(x->{
-        list.forEach(y->{
-          if (!y.getGameType().equals(BAR_TYPE) && y.getCode().equals(x.getCode())){
-            x.getGameBarList().add(y);
-          }
-        });
-      });
+//      barList.forEach(x->{
+//        list.forEach(y->{
+//          if (!y.getGameType().equals(BAR_TYPE) && y.getCode().equals(x.getCode())){
+//            x.getGameBarList().add(y);
+//          }
+//        });
+//      });
 
       return barList;
     }
@@ -81,12 +81,12 @@ public class GameBarServiceImpl extends ServiceImpl<GameBarMapper, GameBar> impl
       dto.setUpdateBy(credential.getUsername());
       boolean update = this.lambdaUpdate()
               .set(ObjectUtils.isNotEmpty(dto.getName()), GameBar::getName, dto.getName())
-              .set(ObjectUtils.isNotEmpty(dto.getCode()), GameBar::getCode, dto.getCode())
-              .set(ObjectUtils.isNotEmpty(dto.getPcImg()), GameBar::getPcImg, dto.getPcImg())
-              .set(ObjectUtils.isNotEmpty(dto.getIsShow()), GameBar::getIsShow, dto.getIsShow())
+//              .set(ObjectUtils.isNotEmpty(dto.getCode()), GameBar::getCode, dto.getCode())
+//              .set(ObjectUtils.isNotEmpty(dto.getPcImg()), GameBar::getPcImg, dto.getPcImg())
+//              .set(ObjectUtils.isNotEmpty(dto.getIsShow()), GameBar::getIsShow, dto.getIsShow())
               .set(ObjectUtils.isNotEmpty(dto.getSort()), GameBar::getSort, dto.getSort())
               .set(ObjectUtils.isNotEmpty(dto.getGameImgConfig()), GameBar::getGameImgConfig, dto.getGameImgConfig())
-              .set(ObjectUtils.isNotEmpty(dto.getGameLogo()), GameBar::getGameLogo, dto.getGameLogo())
+//              .set(ObjectUtils.isNotEmpty(dto.getGameLogo()), GameBar::getGameLogo, dto.getGameLogo())
               .set(ObjectUtils.isNotEmpty(dto.getUpdateBy()), GameBar::getUpdateBy, dto.getUpdateBy())
               .set(GameBar::getUpdateTime, new Date())
               .eq(GameBar::getId, dto.getId())
@@ -106,7 +106,10 @@ public class GameBarServiceImpl extends ServiceImpl<GameBarMapper, GameBar> impl
   @SentinelResource(value = "editGameBar", fallback = "sentineFallBack")
   public void deleteGameBar(Long id) {
     LambdaQueryWrapper<GameBar> query = Wrappers.lambdaQuery();
-    query.eq(GameBar::getId, id).eq(GameBar::getCode, HOT_GAME);
+    query
+//            .eq(GameBar::getCode, HOT_GAME)
+            .eq(GameBar::getId, id)
+            ;
     GameBar gameBar = mapper.selectOne(query);
     if (gameBar == null){
       throw new ServiceException("异常的操作");
@@ -124,7 +127,7 @@ public class GameBarServiceImpl extends ServiceImpl<GameBarMapper, GameBar> impl
       GameBar one = this.lambdaQuery().eq(GameBar::getId, id).one();
       if (one != null){
         one.setId(null);
-        one.setCode(HOT_GAME);
+//        one.setCode(HOT_GAME);
         one.setCreateBy(SecurityUserHolder.getCredential().getUsername());
         this.save(one);
       }

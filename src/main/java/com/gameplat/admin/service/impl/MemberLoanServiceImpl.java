@@ -107,7 +107,7 @@ public class MemberLoanServiceImpl extends ServiceImpl<MemberLoanMapper, MemberL
       this.save(loan);
 
       // 3.修改账户余额
-      memberInfoService.updateBalance(memberLoan.getMemberId(), balance.subtract(overdraftMoney));
+      memberInfoService.updateBalance(memberLoan.getMemberId(), new BigDecimal(overdraftMoney.toString()).negate());
 
 
       // 4.添加流水表

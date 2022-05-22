@@ -429,7 +429,7 @@ public class MemberWealServiceImpl extends ServiceImpl<MemberWealMapper, MemberW
                                             .getBalance();
 
                                     //更新会员余额
-                                    memberInfoService.updateBalance(item.getUserId(), beforeBalance.add(item.getRewordAmount()));
+                                    memberInfoService.updateBalance(item.getUserId(), item.getRewordAmount());
 
                                     // 将通知消息去掉请领取
                                     content = content.replaceAll("，请领取", "");
@@ -565,7 +565,7 @@ public class MemberWealServiceImpl extends ServiceImpl<MemberWealMapper, MemberW
 
                 BigDecimal currentBalance = memberInfoService.getById(member.getId()).getBalance();
                 //修改余额
-                memberInfoService.updateBalance(member.getId(), currentBalance.add(negate));
+                memberInfoService.updateBalance(member.getId(),negate);
 
                 // 添加流水记录
                 MemberBill memberBill = new MemberBill();

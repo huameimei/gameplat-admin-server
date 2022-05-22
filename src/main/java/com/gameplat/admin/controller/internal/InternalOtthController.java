@@ -4,6 +4,7 @@ import com.gameplat.admin.model.dto.PushCPBetMessageReq;
 import com.gameplat.admin.model.vo.PushLottWinVo;
 import com.gameplat.admin.service.ActivityQualificationService;
 import com.gameplat.admin.service.ChatPushPlanService;
+import com.gameplat.admin.service.MemberYubaoService;
 import com.gameplat.admin.service.OtthService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
@@ -27,8 +28,9 @@ public class InternalOtthController {
 
   @Autowired private ChatPushPlanService chatPushPlanService;
 
-  @Autowired
-  private ActivityQualificationService activityQualificationService;
+  @Autowired private ActivityQualificationService activityQualificationService;
+
+  @Autowired private MemberYubaoService memberYubaoService;
 
   /** 分享彩票下注 */
   @RequestMapping(value = "/cpbet", method = RequestMethod.POST)
@@ -58,5 +60,13 @@ public class InternalOtthController {
   @PostMapping("activityRedEnvelopeQualification")
   public void activityRedEnvelopeQualification() {
     activityQualificationService.activityRedEnvelopeQualification();
+  }
+
+  /**
+   * 余额宝结算 work调用
+   */
+  @PostMapping("yubaoSettle")
+  public void yubaoSettle() {
+    memberYubaoService.settle();
   }
 }

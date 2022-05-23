@@ -2,7 +2,6 @@ package com.gameplat.admin.controller.open.activity;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
-import com.gameplat.admin.enums.ActivityInfoEnum;
 import com.gameplat.admin.model.dto.ActivityLobbyAddDTO;
 import com.gameplat.admin.model.dto.ActivityLobbyQueryDTO;
 import com.gameplat.admin.model.dto.ActivityLobbyUpdateDTO;
@@ -17,6 +16,7 @@ import com.gameplat.admin.service.SysDictDataService;
 import com.gameplat.base.common.enums.EnableEnum;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.StringUtils;
+import com.gameplat.common.enums.ActivityInfoEnum;
 import com.gameplat.common.enums.DictTypeEnum;
 import com.gameplat.model.entity.activity.ActivityLobby;
 import com.gameplat.model.entity.sys.SysDictData;

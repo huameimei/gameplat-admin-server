@@ -1,1 +1,1 @@
-${AnsiColor.BRIGHT_BLUE}:: 🤓 :: Running Spring Boot ${spring-boot.version} ::
+${AnsiColor.BRIGHT_BLUE}:: 🤓 :: Running ${spring.application.name} with Spring Boot Version: ${spring-boot.version}

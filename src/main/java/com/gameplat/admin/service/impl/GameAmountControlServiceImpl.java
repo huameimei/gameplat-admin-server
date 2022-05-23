@@ -47,6 +47,12 @@ public class GameAmountControlServiceImpl
         this.lambdaQuery()
             .eq(GameAmountControl::getType, GameAmountControlTypeEnum.LIVE.type())
             .one();
+    if (gameAmountControl == null) {
+      gameAmountNotifyVO.setAmount(BigDecimal.ZERO);
+      gameAmountNotifyVO.setUseAmount(BigDecimal.ZERO);
+      gameAmountNotifyVO.setPercent("0");
+      return gameAmountNotifyVO;
+    }
     // 下发当日输掉的先减掉
     BigDecimal sum = gameAmountControl.getUseAmount().subtract(gameAmountControl.getStartAmount());
     if (sum.compareTo(BigDecimal.ZERO) >= 0) {

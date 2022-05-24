@@ -82,12 +82,20 @@ public class MemberLoanServiceImpl extends ServiceImpl<MemberLoanMapper, MemberL
       MemberLoanVO memberLoan = memberLoanMapper.getNewRecord(id);
       // 当前账户欠款余额
       BigDecimal overdraftMoney = memberLoan.getOverdraftMoney();
+      //剩余欠款金额
+      BigDecimal afterOverdraftMoney = new BigDecimal(0.00);
       // 当前账户余额
       BigDecimal balance = memberInfo.getBalance();
-      // 1.判断当前余额是否比欠款金额多 是 回收  否 此账号回收失败，继续下个账号
+      //还款状态 0:未结清  1:已结清
+      Integer loanStatus = 1;
+      // 1.判断当前余额是否比欠款金额多
       if (balance.compareTo(overdraftMoney) < 0) {
-        log.info(member.getAccount() + " 余额不足，扣款失败!");
-        continue;
+        loanStatus = 0;
+        //剩余未还金额
+        afterOverdraftMoney = overdraftMoney.subtract(balance);
+        //扣除金额
+        overdraftMoney = balance;
+        balance = new BigDecimal(0.00);
       }
       // 2.添加member_loan表回收数据
       MemberLoan loan = new MemberLoan();
@@ -101,8 +109,8 @@ public class MemberLoanServiceImpl extends ServiceImpl<MemberLoanMapper, MemberL
           .setMemberBalance(overdraftMoney)
           .setLoanMoney(memberGrowthLevel.getLoanMoney())
           .setRepayTime(new Date()) // 还款时间
-          .setLoanStatus(1)
-          .setOverdraftMoney(new BigDecimal(0.0000))
+          .setLoanStatus(loanStatus)
+          .setOverdraftMoney(afterOverdraftMoney)
           .setType(3);
       this.save(loan);
 

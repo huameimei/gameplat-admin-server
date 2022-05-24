@@ -157,4 +157,9 @@ public class MemberVO implements Serializable {
 
   /** 返水金额 */
   private BigDecimal waterAmount = BigDecimal.ZERO;
+
+
+  private BigDecimal yubaoAmount;
+
+  private Date yubaoTime;
 }

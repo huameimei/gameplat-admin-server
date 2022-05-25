@@ -72,7 +72,8 @@ public class OtthController {
     // 聊天室修改平台开关特殊处理处理
     if (StringUtils.contains(url, API_PLAT_UPDATE)) {
       otthService.pushChatOpen(body);
-      updateChatEnable(body);
+      //不用去修改体育聊天室配置
+      //updateChatEnable(body);
     }
     // 聊天室房间管理特殊处理
     if (StringUtils.contains(url, API_ROOM_UPDATE)) {

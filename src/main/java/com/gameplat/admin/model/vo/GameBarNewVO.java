@@ -49,7 +49,7 @@ public class GameBarNewVO implements Serializable  {
    *   导航展示端  0 web  1 安卓，IOS  2 h5  3全部
    */
   @JsonInclude(JsonInclude.Include.NON_NULL)
-  private Integer clientType;
+  private String clientType;
 
   /**
    *   导航状态 0 关闭  1 开启"

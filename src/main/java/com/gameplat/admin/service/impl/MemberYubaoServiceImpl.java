@@ -17,6 +17,7 @@ import com.gameplat.admin.util.MoneyUtils;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.snowflake.IdGeneratorSnowflake;
 import com.gameplat.base.common.util.DateUtil;
+import com.gameplat.base.common.util.StringUtils;
 import com.gameplat.common.enums.LimitEnums;
 import com.gameplat.common.enums.TranTypes;
 import com.gameplat.common.model.bean.limit.YubaoLimit;
@@ -40,7 +41,7 @@ import java.util.Objects;
 @Service
 @Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)
 public class MemberYubaoServiceImpl extends ServiceImpl<MemberYubaoMapper, MemberYubao>
-    implements MemberYubaoService {
+        implements MemberYubaoService {
 
   @Autowired private LimitInfoService limitInfoService;
 
@@ -52,7 +53,12 @@ public class MemberYubaoServiceImpl extends ServiceImpl<MemberYubaoMapper, Membe
 
   @Override
   public void recycle(String account, Long memberId,Double money) {
-    MemberInfo extInfo = memberInfoService.getById(memberId);
+    if (memberId == null || memberId.longValue() <= 0) {
+      throw new ServiceException("会员id不正确");
+    }
+    QueryWrapper<MemberInfo> queryMemberInfo=new QueryWrapper<>();
+    queryMemberInfo.eq("member_id",memberId);
+    MemberInfo extInfo = memberInfoService.getOne(queryMemberInfo);
     if (extInfo == null) {
       throw new ServiceException("会员不存在");
     }
@@ -155,8 +161,15 @@ public class MemberYubaoServiceImpl extends ServiceImpl<MemberYubaoMapper, Membe
   @Override
   public IPage<MemberYubaoInterest> queryYubaoInterest(String account, String startDate, String endDate, PageDTO<MemberYubaoInterest> page) {
     LambdaQueryWrapper<MemberYubaoInterest> query = Wrappers.lambdaQuery();
-    query.eq(MemberYubaoInterest::getAccount,account);
-    query.between(MemberYubaoInterest::getDate,DateUtil.strToDate(startDate),DateUtil.strToDate(endDate));
+    if (StringUtils.isNotEmpty(account)) {
+      query.eq(MemberYubaoInterest::getAccount, account);
+    }
+    if(StringUtils.isNotEmpty(startDate)){
+      query.ge(MemberYubaoInterest::getDate,DateUtil.strToDate(startDate));
+    }
+    if(StringUtils.isNotEmpty(endDate)){
+      query.le(MemberYubaoInterest::getDate,DateUtil.strToDate(endDate));
+    }
     query.orderByDesc(MemberYubaoInterest::getId);
     return memberYubaoInterestMapper.selectPage(page, query);
   }

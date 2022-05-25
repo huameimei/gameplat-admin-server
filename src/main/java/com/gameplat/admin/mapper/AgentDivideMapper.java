@@ -38,7 +38,7 @@ public interface AgentDivideMapper {
    * @param agentName
    * @return
    */
-  IPage<AgentPlanVO> queryPage(PageDTO<AgentPlanVO> page, Integer divideType, String agentName);
+  IPage<AgentPlanVO> queryPage(PageDTO<AgentPlanVO> page, @Param("divideType") Integer divideType, @Param("agentName") String agentName);
 
   /**
    * 代理线绑定分红方案

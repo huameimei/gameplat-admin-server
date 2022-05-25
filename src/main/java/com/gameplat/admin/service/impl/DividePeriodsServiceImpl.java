@@ -151,11 +151,6 @@ public class DividePeriodsServiceImpl extends ServiceImpl<DividePeriodsMapper, D
     Assert.isTrue(this.save(saveObj), "添加失败！");
   }
 
-  /**
-   * 编辑
-   *
-   * @param dto
-   */
   @Override
   @SentinelResource("edit")
   public void edit(DividePeriodsDTO dto) {
@@ -167,11 +162,6 @@ public class DividePeriodsServiceImpl extends ServiceImpl<DividePeriodsMapper, D
     Assert.isTrue(this.updateById(editObj), "编辑失败！");
   }
 
-  /**
-   * 删除
-   *
-   * @param ids
-   */
   @Override
   @SentinelResource("delete")
   public void delete(String ids) {
@@ -195,11 +185,6 @@ public class DividePeriodsServiceImpl extends ServiceImpl<DividePeriodsMapper, D
     }
   }
 
-  /**
-   * 期数结算
-   *
-   * @param dto
-   */
   @Override
   @SentinelResource(value = "settle")
   public void settle(DividePeriodsDTO dto) {
@@ -228,11 +213,6 @@ public class DividePeriodsServiceImpl extends ServiceImpl<DividePeriodsMapper, D
     }
   }
 
-  /**
-   * 期数派发
-   *
-   * @param dto
-   */
   @Override
   @SentinelResource(value = "grant")
   public void grant(DividePeriodsDTO dto) {
@@ -280,11 +260,6 @@ public class DividePeriodsServiceImpl extends ServiceImpl<DividePeriodsMapper, D
     }
   }
 
-  /**
-   * 期数回收
-   *
-   * @param dto
-   */
   @Override
   @SentinelResource(value = "recycle")
   public void recycle(DividePeriodsDTO dto) {

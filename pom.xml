@@ -2,32 +2,16 @@
 <project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <groupId>com.gameplat</groupId>
+        <artifactId>gameplat-parent</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+    </parent>
+
     <modelVersion>4.0.0</modelVersion>
-    <groupId>com.gameplat</groupId>
     <artifactId>gameplat-admin-server</artifactId>
-    <version>${reversion}-${changelist}</version>
     <packaging>jar</packaging>
     <description>系统相关服务</description>
-
-    <properties>
-        <maven.compiler.source>8</maven.compiler.source>
-        <maven.compiler.target>8</maven.compiler.target>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <org.mapstruct.version>1.4.2.Final</org.mapstruct.version>
-        <lombok.version>1.18.22</lombok.version>
-    </properties>
-
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>com.gameplat</groupId>
-                <artifactId>gameplat-dependencies</artifactId>
-                <version>${gameplat-dependencies.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
 
     <dependencies>
         <dependency>
@@ -96,12 +80,6 @@
         </dependency>
 
         <dependency>
-            <groupId>com.gameplat</groupId>
-            <artifactId>gameplat-model</artifactId>
-            <version>${gameplat-model.version}</version>
-        </dependency>
-
-        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-websocket</artifactId>
         </dependency>
@@ -130,7 +108,6 @@
         <dependency>
             <groupId>net.sf.json-lib</groupId>
             <artifactId>json-lib</artifactId>
-            <version>2.4</version>
             <classifier>jdk15</classifier>
         </dependency>
 
@@ -142,14 +119,17 @@
 
         <dependency>
             <groupId>com.gameplat</groupId>
+            <artifactId>gameplat-model</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.gameplat</groupId>
             <artifactId>gameplat-common</artifactId>
-            <version>${gameplat-common.version}</version>
         </dependency>
 
         <dependency>
             <groupId>com.gameplat</groupId>
             <artifactId>gameplat-common-game</artifactId>
-            <version>${gameplat-common-game.version}</version>
         </dependency>
 
         <dependency>
@@ -183,7 +163,6 @@
         <dependency>
             <groupId>com.squareup.okhttp3</groupId>
             <artifactId>okhttp</artifactId>
-            <version>4.9.3</version>
         </dependency>
 
         <dependency>
@@ -194,13 +173,11 @@
         <dependency>
             <groupId>dev.samstevens.totp</groupId>
             <artifactId>totp-spring-boot-starter</artifactId>
-            <version>1.7.1</version>
         </dependency>
 
         <dependency>
             <groupId>org.jxls</groupId>
             <artifactId>jxls-poi</artifactId>
-            <version>1.0.15</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.jxls</groupId>
@@ -212,7 +189,6 @@
         <dependency>
             <groupId>net.sf.jxls</groupId>
             <artifactId>jxls-core</artifactId>
-            <version>1.0.6</version>
         </dependency>
 
         <dependency>
@@ -229,34 +205,10 @@
                 <profiles.active>dev</profiles.active>
                 <reversion>1.0.0</reversion>
                 <changelist>SNAPSHOT</changelist>
-                <gameplat-dependencies.version>1.0.0-SNAPSHOT</gameplat-dependencies.version>
-                <gameplat-common.version>1.0.0-SNAPSHOT</gameplat-common.version>
-                <gameplat-common-game.version>1.0.0-SNAPSHOT</gameplat-common-game.version>
-                <gameplat-model.version>1.0.0-SNAPSHOT</gameplat-model.version>
             </properties>
             <activation>
                 <activeByDefault>true</activeByDefault>
             </activation>
-            <repositories>
-                <!-- 仅在dev的profile中，开启SNAPSHOT的仓库 -->
-                <repository>
-                    <id>gameplat-snapshots</id>
-                    <name>snapshot</name>
-                    <url>https://nexus.kg822.com/repository/gameplat-snapshots/</url>
-                    <snapshots>
-                        <enabled>true</enabled>
-                        <updatePolicy>always</updatePolicy>
-                    </snapshots>
-                </repository>
-            </repositories>
-            <!-- 仅在dev的profile中，配置SNAPSHOT的分发构建-->
-            <distributionManagement>
-                <snapshotRepository>
-                    <id>gameplat-snapshots</id>
-                    <name>snapshot</name>
-                    <url>https://nexus.kg822.com/repository/gameplat-snapshots/</url>
-                </snapshotRepository>
-            </distributionManagement>
         </profile>
 
         <profile>
@@ -265,19 +217,7 @@
                 <profiles.active>prod</profiles.active>
                 <reversion>1.0.0</reversion>
                 <changelist>RELEASE</changelist>
-                <gameplat-dependencies.version>1.0.0-RELEASE</gameplat-dependencies.version>
-                <gameplat-common.version>1.0.0-RELEASE</gameplat-common.version>
-                <gameplat-common-game.version>1.0.0-RELEASE</gameplat-common-game.version>
-                <gameplat-model.version>1.0.0-RELEASE</gameplat-model.version>
             </properties>
-            <!-- 仅在prod中，配置RELEASE的分发构建-->
-            <distributionManagement>
-                <repository>
-                    <id>gameplat-releases</id>
-                    <name>releases</name>
-                    <url>https://nexus.kg822.com/repository/gameplat-releases/</url>
-                </repository>
-            </distributionManagement>
         </profile>
 
         <profile>
@@ -286,31 +226,7 @@
                 <profiles.active>sit</profiles.active>
                 <reversion>1.0.0</reversion>
                 <changelist>SNAPSHOT</changelist>
-                <gameplat-dependencies.version>1.0.0-SNAPSHOT</gameplat-dependencies.version>
-                <gameplat-common.version>1.0.0-SNAPSHOT</gameplat-common.version>
-                <gameplat-common-game.version>1.0.0-SNAPSHOT</gameplat-common-game.version>
-                <gameplat-model.version>1.0.0-SNAPSHOT</gameplat-model.version>
             </properties>
-            <repositories>
-                <!-- 仅在sit中，开启的仓库 -->
-                <repository>
-                    <id>gameplat-snapshots</id>
-                    <name>snapshot</name>
-                    <url>https://nexus.kg822.com/repository/gameplat-snapshots/</url>
-                    <snapshots>
-                        <enabled>true</enabled>
-                        <updatePolicy>always</updatePolicy>
-                    </snapshots>
-                </repository>
-            </repositories>
-            <!-- 仅在sit中，配置的分发构建-->
-            <distributionManagement>
-                <snapshotRepository>
-                    <id>gameplat-snapshots</id>
-                    <name>snapshot</name>
-                    <url>https://nexus.kg822.com/repository/gameplat-snapshots/</url>
-                </snapshotRepository>
-            </distributionManagement>
         </profile>
     </profiles>
 
@@ -348,57 +264,14 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
-                <version>2.6.3</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>repackage</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.10.1</version>
-                <configuration>
-                    <source>${maven.compiler.source}</source>
-                    <target>${maven.compiler.target}</target>
-                    <encoding>${project.build.sourceEncoding}</encoding>
-                    <annotationProcessorPaths>
-                        <path>
-                            <groupId>org.projectlombok</groupId>
-                            <artifactId>lombok</artifactId>
-                            <version>${lombok.version}</version>
-                        </path>
-                        <path>
-                            <groupId>org.mapstruct</groupId>
-                            <artifactId>mapstruct-processor</artifactId>
-                            <version>${org.mapstruct.version}</version>
-                        </path>
-                    </annotationProcessorPaths>
-                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>
-                <version>3.2.0</version>
-                <configuration>
-                    <encoding>${project.build.sourceEncoding}</encoding>
-                    <useDefaultDelimiters>false</useDefaultDelimiters>
-                    <delimiters>
-                        <delimiter>@</delimiter>
-                        <delimiter>${*}</delimiter>
-                        <delimiter>$[*]</delimiter>
-                    </delimiters>
-
-                    <!-- 过滤后缀不需要转码的文件后缀名.crt/.p8 -->
-                    <nonFilteredFileExtensions>
-                        <nonFilteredFileExtension>xlsx</nonFilteredFileExtension>
-                        <nonFilteredFileExtension>xls</nonFilteredFileExtension>
-                    </nonFilteredFileExtensions>
-
-                </configuration>
             </plugin>
         </plugins>
 

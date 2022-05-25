@@ -1,5 +1,6 @@
 package com.gameplat.admin.service.impl;
 
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.date.DateField;
 import cn.hutool.core.date.DateTime;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -8,7 +9,6 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.convert.ActivityLobbyConvert;
 import com.gameplat.admin.convert.ActivityLobbyDiscountConvert;
-import com.gameplat.admin.enums.ActivityInfoEnum;
 import com.gameplat.admin.mapper.ActivityLobbyMapper;
 import com.gameplat.admin.model.dto.*;
 import com.gameplat.admin.model.vo.ActivityLobbyDiscountVO;
@@ -21,6 +21,7 @@ import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.BeanUtils;
 import com.gameplat.base.common.util.DateUtil;
 import com.gameplat.base.common.util.StringUtils;
+import com.gameplat.common.enums.ActivityInfoEnum;
 import com.gameplat.common.enums.BooleanEnum;
 import com.gameplat.common.util.DateUtils;
 import com.gameplat.model.entity.activity.ActivityDistribute;
@@ -199,7 +200,7 @@ public class ActivityLobbyServiceImpl extends ServiceImpl<ActivityLobbyMapper, A
       }
     }
 
-    if (StringUtils.isEmpty(applyDateList)) {
+    if (CollectionUtil.isEmpty(applyDateList)) {
       throw new ServiceException("统计日期不在活动有效期内！");
     }
 
@@ -385,7 +386,7 @@ public class ActivityLobbyServiceImpl extends ServiceImpl<ActivityLobbyMapper, A
       }
     }
 
-    if (StringUtils.isEmpty(applyDateList)) {
+    if (CollectionUtil.isEmpty(applyDateList)) {
       throw new ServiceException("统计日期不在活动有效期内！");
     }
 
@@ -425,14 +426,14 @@ public class ActivityLobbyServiceImpl extends ServiceImpl<ActivityLobbyMapper, A
       }
     }
 
-    if (StringUtils.isNotEmpty(hasIdList)) {
+    if (CollectionUtil.isNotEmpty(hasIdList)) {
       allList.addAll(hasIdList);
     }
-    if (StringUtils.isNotEmpty(noIdList)) {
+    if (CollectionUtil.isNotEmpty(noIdList)) {
       allList.addAll(noIdList);
     }
 
-    if (StringUtils.isNotEmpty(allList)) {
+    if (CollectionUtil.isNotEmpty(allList)) {
       List<Integer> targetValueList =
           allList.stream().map(ActivityLobbyDiscount::getTargetValue).collect(Collectors.toList());
       long countTargetValue = targetValueList.stream().distinct().count();
@@ -494,7 +495,7 @@ public class ActivityLobbyServiceImpl extends ServiceImpl<ActivityLobbyMapper, A
       activityQualification.setStatus(BooleanEnum.YES.value());
       List<ActivityQualification> qualificationList =
           activityQualificationService.findQualificationList(activityQualification);
-      if (StringUtils.isNotEmpty(qualificationList)) {
+      if (CollectionUtil.isNotEmpty(qualificationList)) {
         throw new ServiceException("你要删除的活动中有未审核的会员资格记录");
       }
 
@@ -504,7 +505,7 @@ public class ActivityLobbyServiceImpl extends ServiceImpl<ActivityLobbyMapper, A
       activityDistribute.setStatus(BooleanEnum.YES.value());
       List<ActivityDistribute> distributeList =
           activityDistributeService.findActivityDistributeList(activityDistribute);
-      if (StringUtils.isNotEmpty(distributeList)) {
+      if (CollectionUtil.isNotEmpty(distributeList)) {
         throw new ServiceException("你要删除的活动中有未派发的会员派发记录");
       }
     }

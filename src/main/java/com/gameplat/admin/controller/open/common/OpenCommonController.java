@@ -48,8 +48,17 @@ public class OpenCommonController {
     response.setHeader(HttpHeaders.PRAGMA, "no-cache");
     response.setHeader(HttpHeaders.CACHE_CONTROL, "no-cache");
     response.setIntHeader(HttpHeaders.EXPIRES, 0);
+    return captchaService.getImage().createVCode(request, 1);
+  }
+
+  @GetMapping("/createVCode")
+  public Kaptcha createVCode(HttpServletRequest request, HttpServletResponse response) {
+    response.setHeader(HttpHeaders.PRAGMA, "no-cache");
+    response.setHeader(HttpHeaders.CACHE_CONTROL, "no-cache");
+    response.setIntHeader(HttpHeaders.EXPIRES, 0);
     return captchaService.getImage().create(request, 1);
   }
+
 
   @GetMapping("/menuList")
   public ArrayList<VueRouter<SysMenu>> menuList() {

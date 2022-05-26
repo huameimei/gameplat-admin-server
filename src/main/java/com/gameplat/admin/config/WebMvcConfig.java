@@ -68,7 +68,7 @@ public class WebMvcConfig extends WebMvcConfigurationAdapter {
 
   @Bean
   public RWLimitInterceptor rwLimitInterceptor() {
-    log.info("----初始化强制修改密码拦截器----");
+    log.info("----初始化充提验证谷歌码拦截器----");
     return new RWLimitInterceptor();
   }
 
@@ -112,7 +112,9 @@ public class WebMvcConfig extends WebMvcConfigurationAdapter {
 
     registry
             .addInterceptor(rwLimitInterceptor())
-            .addPathPatterns("/api/admin/finance/rechargeOrder/accept")
-            .excludePathPatterns("api/admin/finance/memberWithdraw/modifyCashStatus");
+            .addPathPatterns(
+                    "/api/admin/finance/rechargeOrder/accept",
+                    "/api/admin/finance/proxyPay/relProxyPay",
+                    "/api/admin/finance/memberWithdraw/modifyCashStatus");
   }
 }

@@ -2,6 +2,8 @@ package com.gameplat.admin.service.impl;
 
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.json.JSONArray;
+import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -25,6 +27,7 @@ import com.gameplat.admin.model.bean.ManualRechargeOrderBo;
 import com.gameplat.admin.model.bean.ProxyPayMerBean;
 import com.gameplat.admin.model.dto.MemberWithdrawDTO;
 import com.gameplat.admin.model.dto.MemberWithdrawQueryDTO;
+import com.gameplat.admin.model.vo.MemberWithdrawBankVo;
 import com.gameplat.admin.model.vo.MemberWithdrawVO;
 import com.gameplat.admin.model.vo.SummaryVO;
 import com.gameplat.admin.service.*;
@@ -129,20 +132,19 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
       }
     }
 
-    Map<String, String> banksMap =
-        JSONObject.parseObject(
-            JSONObject.parseObject(ppInterface.getLimtInfo()).getString("banks"), Map.class);
-
+    List<MemberWithdrawBankVo> bankVoList =
+            JSONUtil.toList(
+                    (JSONArray) JSONUtil.parseObj(ppInterface.getLimtInfo()).get("banks"),
+                    MemberWithdrawBankVo.class);
     // 模糊匹配银行名称
     boolean isBankName = true;
-    for (Map.Entry<String, String> entry : banksMap.entrySet()) {
-      if (StringUtils.contains(entry.getValue(), memberWithdraw.getBankName())
-          || StringUtils.contains(memberWithdraw.getBankName(), entry.getValue())) {
+    for (MemberWithdrawBankVo ex : bankVoList) {
+      if (StringUtils.contains(ex.getName(), memberWithdraw.getBankName())
+              || StringUtils.contains(memberWithdraw.getBankName(), ex.getName())) {
         isBankName = false;
         break;
       }
-
-      if (StringUtils.contains(entry.getValue(), "邮政")
+      if (StringUtils.contains(ex.getName(), "邮政")
           && StringUtils.contains(memberWithdraw.getBankName(), "邮政")) {
         isBankName = false;
         break;

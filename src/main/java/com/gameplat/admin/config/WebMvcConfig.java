@@ -66,6 +66,12 @@ public class WebMvcConfig extends WebMvcConfigurationAdapter {
     return new ForceChangePasswordInterceptor();
   }
 
+  @Bean
+  public RWLimitInterceptor rwLimitInterceptor() {
+    log.info("----初始化强制修改密码拦截器----");
+    return new RWLimitInterceptor();
+  }
+
   @Override
   public void configureContentNegotiation(ContentNegotiationConfigurer configurer) {
     configurer
@@ -103,5 +109,10 @@ public class WebMvcConfig extends WebMvcConfigurationAdapter {
         .addInterceptor(vipInterceptor())
         .addPathPatterns("api/admin/member/weal/**")
         .excludePathPatterns("api/admin/member/weal/list");
+
+    registry
+            .addInterceptor(rwLimitInterceptor())
+            .addPathPatterns("/api/admin/finance/rechargeOrder/accept")
+            .excludePathPatterns("api/admin/finance/memberWithdraw/modifyCashStatus");
   }
 }

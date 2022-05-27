@@ -5,14 +5,15 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.mapper.MemberYubaoInterestMapper;
 import com.gameplat.admin.mapper.MemberYubaoMapper;
-import com.gameplat.admin.service.LimitInfoService;
-import com.gameplat.admin.service.MemberBillService;
-import com.gameplat.admin.service.MemberInfoService;
-import com.gameplat.admin.service.MemberYubaoService;
+import com.gameplat.admin.model.dto.MemberReportDto;
+import com.gameplat.admin.model.vo.MemberGameDayReportVo;
+import com.gameplat.admin.model.vo.PageDtoVO;
+import com.gameplat.admin.service.*;
 import com.gameplat.admin.util.MoneyUtils;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.snowflake.IdGeneratorSnowflake;
@@ -50,6 +51,8 @@ public class MemberYubaoServiceImpl extends ServiceImpl<MemberYubaoMapper, Membe
   @Autowired private MemberYubaoInterestMapper memberYubaoInterestMapper;
 
   @Autowired private MemberBillService memberBillService;
+
+  @Autowired private GameMemberReportService gameMemberReportService;
 
   @Override
   public void recycle(String account, Long memberId,Double money) {
@@ -128,8 +131,8 @@ public class MemberYubaoServiceImpl extends ServiceImpl<MemberYubaoMapper, Membe
     }
     log.info("start settle yubao interest.");
     String baseRate =yubaoLimit.getBaseRateOfReturn().toString();
-    String activeRate = yubaoLimit.getActiveRateOfReturn().toString();
-    String activeDml = yubaoLimit.getActiveDml().toString();
+    double activeRate = yubaoLimit.getActiveRateOfReturn().doubleValue();
+    BigDecimal activeDml = yubaoLimit.getActiveDml();
 
     String settleDate = DateUtil.dateToYMD(new Date(System.currentTimeMillis() - 24 * 3600 * 1000));
     List<MemberYubao> yuBaoList = null;
@@ -177,10 +180,13 @@ public class MemberYubaoServiceImpl extends ServiceImpl<MemberYubaoMapper, Membe
   /**
    *  添加余额宝收益
    */
-  private void addYubaoInterest(MemberYubao yuBao, String settleDate, String baseRate, String activeRate, String activeDml)  {
-//    if (yuBaoDao.isSettleInterest(yuBao.getMemberId(), settleDate)) {
-//      return;
-//    }
+  private void addYubaoInterest(MemberYubao yuBao, String settleDate, String baseRate, double activeRate, BigDecimal activeDml)  {
+    Date date = DateUtil.getParseDate(settleDate);
+    //如果有计算过收益,则不计算
+    if (memberYubaoInterestMapper.isSettleInterest(yuBao.getMemberId(), DateUtil.getDateStart(date),DateUtil.getDateEnd(date))) {
+      log.info("账号={},memberId={},日期={},已产生收益",yuBao.getAccount(),yuBao.getMemberId(),settleDate);
+      return;
+    }
     MemberInfo extInfo = memberInfoService.getById(yuBao.getMemberId());
     if (extInfo == null) {
       return;
@@ -189,16 +195,28 @@ public class MemberYubaoServiceImpl extends ServiceImpl<MemberYubaoMapper, Membe
 //      log.info("黑名单用户不发放余额宝收益,account={},userId={}", extInfo.getAccount(), extInfo.getUserId());
 //      return;
 //    }
-    Date date = DateUtil.getParseDate(settleDate);
 
+    MemberReportDto dto=new MemberReportDto();
+    dto.setUsername(yuBao.getAccount());
+    dto.setType(0);
+    dto.setStartTime(DateUtil.getDateToString(date));
+    dto.setEndTime(DateUtil.getDateToString(date));
+    PageDtoVO<MemberGameDayReportVo> result= gameMemberReportService.findSumMemberGameDayReport(new Page<>(), dto);
 
+    MemberGameDayReportVo busDayReport=null;
+    if(result!=null){
+      List<MemberGameDayReportVo> list=result.getPage().getRecords();
+      if(CollectionUtils.isNotEmpty(list)){
+        busDayReport=list.get(0);
+      }
+    }
     double interestRate = Double.parseDouble(baseRate);
-//    if (busDayReport != null) {
-//      double totalBetMoney = busDayReport.getCpBetMoney() + busDayReport.getLiveBetMoney() + busDayReport.getSpBetMoney();
-//      if (totalBetMoney >= activeDml) {
-//        interestRate += activeRate;
-//      }
-//    }
+    if (busDayReport != null) {
+      BigDecimal totalBetMoney = busDayReport.getLotteryValidAmount().add(busDayReport.getSportValidAmount()).add(busDayReport.getRealValidAmount());
+      if (totalBetMoney.compareTo(activeDml) >=0 ) {
+        interestRate += activeRate;
+      }
+    }
     interestRate = interestRate * extInfo.getYubaoDegrade() / 100; // 降级
 
     interestRate = floor(interestRate, 4);

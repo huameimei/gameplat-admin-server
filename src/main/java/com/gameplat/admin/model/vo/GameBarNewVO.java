@@ -46,10 +46,23 @@ public class GameBarNewVO implements Serializable  {
   private String barLogo;
 
   /**
-   *   导航展示端  0 web  1 安卓，IOS  2 h5  3全部
+   *   导航展示端  0 web  1 安卓，IOS  2 h5
    */
   @JsonInclude(JsonInclude.Include.NON_NULL)
   private String clientType;
+
+  /**
+   * PC背景图
+   */
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  private String pcImg;
+
+
+  /**
+   * PC背景图
+   */
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  private Integer isEnableWater ;
 
   /**
    *   导航状态 0 关闭  1 开启"

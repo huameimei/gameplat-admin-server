@@ -43,7 +43,7 @@ public class GameBarNewDTO implements Serializable {
     private String pcImg;
 
     /**
-     * 游戏logo
+     * 导航Logo
      */
     private String barLogo;
 

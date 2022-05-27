@@ -20,14 +20,14 @@ public class GameBarNewController {
 
   @Operation(summary = "获取游戏导航列表")
   @GetMapping("/list")
-  @PreAuthorize("hasAuthority('game:bar:view')")
+//  @PreAuthorize("hasAuthority('game:bar:new:view')")
   public List<GameBarNewVO> gameBarList() {
     return service.gameBarNewList();
   }
 
   @Operation(summary = "编辑游戏导航列表")
   @PostMapping("/edit")
-  @PreAuthorize("hasAuthority('game:bar:edit')")
+//  @PreAuthorize("hasAuthority('game:bar:new:edit')")
   public void editGameBar(@RequestBody GameBarNewDTO dto) {
     service.editGameBarNew(dto);
   }

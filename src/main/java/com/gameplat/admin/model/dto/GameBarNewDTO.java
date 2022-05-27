@@ -6,7 +6,9 @@ import com.gameplat.security.SecurityUserHolder;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Data
 public class GameBarNewDTO implements Serializable {
@@ -35,6 +37,11 @@ public class GameBarNewDTO implements Serializable {
      * 排序
      */
     private Integer sort;
+
+    /**
+     * 0 导肮  1 一级游戏  2 二级游戏
+     */
+    private Integer barType;
 
 
     /**
@@ -73,4 +80,9 @@ public class GameBarNewDTO implements Serializable {
      * 更新人
      */
     private String updateBy  =  SecurityUserHolder.getCredential().getUsername();
+
+    /**
+     * 需要修改的数据Id集合
+     */
+    private List<Long> idList = new ArrayList<>();
 }

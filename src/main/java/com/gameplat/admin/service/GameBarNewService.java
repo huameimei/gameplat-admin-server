@@ -19,6 +19,12 @@ public interface GameBarNewService extends IService<GameBarNew> {
      */
     void editGameBarNew(GameBarNewDTO dto);
 
+
+    /**
+     * 修改导航栏配置
+     */
+    void editIsWater(GameBarNewDTO dto);
+
 //    /**
 //     * 修改导航栏配置
 //     */

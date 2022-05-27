@@ -107,6 +107,17 @@ public class GameBarNewServiceImpl extends ServiceImpl<GameBarNewMapper, GameBar
   }
 
 
+  @Override
+  @SentinelResource(value = "editGameBarNew", fallback = "sentineFallBack")
+  public void editIsWater(GameBarNewDTO dto) {
+      this.lambdaUpdate()
+              .set(ObjectUtils.isNotEmpty(dto.getIsEnableWater()),GameBarNew::getIsEnableWater,dto.getIsEnableWater())
+              .set(ObjectUtils.isNotEmpty(dto.getState()),GameBarNew::getState,dto.getState())
+              .in(GameBarNew::getId,dto.getIdList())
+              .update();
+  }
+
+
 //  /**
 //   * 清除热门中的游戏
 //   */

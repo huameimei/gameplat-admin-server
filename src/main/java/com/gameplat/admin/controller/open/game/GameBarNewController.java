@@ -32,6 +32,13 @@ public class GameBarNewController {
     service.editGameBarNew(dto);
   }
 
+  @Operation(summary = "批量设置返水，批量设置游戏是否展示")
+  @PostMapping("/editData")
+//  @PreAuthorize("hasAuthority('game:bar:new:edit')")
+  public void editIsWater(@RequestBody GameBarNewDTO dto) {
+    service.editIsWater(dto);
+  }
+
 //  @Operation(summary = "移除")
 //  @PostMapping("/delete")
 //  @PreAuthorize("hasAuthority('game:bar:remove')")

@@ -1,7 +1,6 @@
 package com.gameplat.admin.service.impl;
 
 import cn.hutool.core.date.DateUtil;
-import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -108,7 +107,7 @@ public class MemberLoanServiceImpl extends ServiceImpl<MemberLoanMapper, MemberL
           .setVipLevel(memberInfo.getVipLevel())
           .setMemberBalance(overdraftMoney)
           .setLoanMoney(memberGrowthLevel.getLoanMoney())
-          .setRepayTime(new Date()) // 还款时间
+          .setRepayTime(new Date())
           .setLoanStatus(loanStatus)
           .setOverdraftMoney(afterOverdraftMoney)
           .setType(3);
@@ -143,6 +142,21 @@ public class MemberLoanServiceImpl extends ServiceImpl<MemberLoanMapper, MemberL
       message.setStatus(1);
       message.setRemarks("借呗欠款回收");
       messageInfoService.save(message);
+    }
+  }
+
+  /** 判断是否有欠款 */
+  @Override
+  public Boolean getNewRecord(Long memberId) {
+    BigDecimal overdraftMoney = new BigDecimal("0.00");
+    MemberLoanVO record = memberLoanMapper.getNewRecord(memberId);
+    if(null != record){
+      overdraftMoney = record.getOverdraftMoney();
+    }
+    if(overdraftMoney.compareTo(new BigDecimal("0.0000")) > 0){
+      return true;
+    }else{
+      return false;
     }
   }
 }

@@ -2,7 +2,6 @@ package com.gameplat.admin.service.impl;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
-import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.convert.GamePlatformConvert;
@@ -58,7 +57,7 @@ public class GamePlatformServiceImpl extends ServiceImpl<GamePlatformMapper, Gam
   @Override
   public GamePlatform queryByCode(String platformCode) {
     return this.lambdaQuery()
-        .eq(StringUtils.isNotBlank(platformCode), GamePlatform::getCode, platformCode)
+        .eq(ObjectUtils.isNotEmpty(platformCode), GamePlatform::getCode, platformCode)
         .one();
   }
 }

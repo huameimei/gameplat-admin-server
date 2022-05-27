@@ -268,7 +268,9 @@ public class SysSettingController {
   /**
    * 修改色值设置
    */
+  @Operation(summary = "修改色值设置")
   @RequestMapping("/updateColorDict")
+  @PreAuthorize("hasAuthority('setting:limit:updateColorDict')")
   public Result<Object> updateColorDict(@RequestBody AppChangeSkinColorVO appChangeSkinColorVO){
     SysDictData sysDictData =
             sysDictDataService.getDictData(
@@ -288,7 +290,9 @@ public class SysSettingController {
   /**
    * 获取色值设置
    */
+  @Operation(summary = "获取色值设置")
   @RequestMapping("/getColorDict")
+  @PreAuthorize("hasAuthority('setting:limit:getColorDict')")
   public Result<Object> getColorDict(){
     SysDictData sysDictData =
             sysDictDataService.getDictData(

@@ -4,7 +4,6 @@ import cn.hutool.core.date.DateUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
-import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -35,34 +34,34 @@ public class GameTransferRecordServiceImpl
     extends ServiceImpl<GameTransferRecordMapper, GameTransferRecord>
     implements GameTransferRecordService {
 
-  @Autowired private GameTransferRecordMapper gameTransferRecordMapper;
+  @Autowired(required = false) private GameTransferRecordMapper gameTransferRecordMapper;
 
   @Override
   public PageDtoVO<GameTransferRecord> queryGameTransferRecord(
       Page<GameTransferRecord> page, GameTransferRecordQueryDTO dto) {
     PageDtoVO<GameTransferRecord> pageDtoVO = new PageDtoVO();
     QueryWrapper<GameTransferRecord> queryWrapper = Wrappers.query();
-    if (StringUtils.isNotBlank(dto.getAccount())) {
+    if (ObjectUtils.isNotEmpty(dto.getAccount())) {
       if (Boolean.TRUE.equals(dto.getAccountFuzzy())) {
         queryWrapper.like("account", dto.getAccount());
       } else {
         queryWrapper.eq("account", dto.getAccount());
       }
     }
-    queryWrapper.eq(StringUtils.isNotBlank(dto.getOrderNo()), "order_no", dto.getOrderNo());
+    queryWrapper.eq(ObjectUtils.isNotEmpty(dto.getOrderNo()), "order_no", dto.getOrderNo());
     queryWrapper.eq(
-        StringUtils.isNotBlank(dto.getPlatformCode()), "platform_code", dto.getPlatformCode());
+            ObjectUtils.isNotEmpty(dto.getPlatformCode()), "platform_code", dto.getPlatformCode());
     queryWrapper.eq(
         ObjectUtils.isNotNull(dto.getTransferType()), "transfer_type", dto.getTransferType());
     queryWrapper.eq(ObjectUtils.isNotNull(dto.getStatus()), "status", dto.getStatus());
     queryWrapper.eq(
         ObjectUtils.isNotNull(dto.getTransferStatus()), "transfer_status", dto.getTransferStatus());
-    if (StringUtils.isNotBlank(dto.getCreateTimeStart())) {
+    if (ObjectUtils.isNotEmpty(dto.getCreateTimeStart())) {
       queryWrapper.apply(
           "create_time >= STR_TO_DATE({0},'%Y-%m-%d %H:%i:%S')",
           DateUtil.beginOfDay(DateUtil.parse(dto.getCreateTimeStart())));
     }
-    if (StringUtils.isNotBlank(dto.getCreateTimeEnd())) {
+    if (ObjectUtils.isNotEmpty(dto.getCreateTimeEnd())) {
       queryWrapper.apply(
           "create_time <= STR_TO_DATE({0},'%Y-%m-%d %H:%i:%S')",
           DateUtil.endOfDay(DateUtil.parse(dto.getCreateTimeEnd())));
@@ -87,7 +86,7 @@ public class GameTransferRecordServiceImpl
   public void fillOrders(OperGameTransferRecordDTO dto) {
     UpdateWrapper<GameTransferRecord> updateWrapper = new UpdateWrapper();
     updateWrapper.set(ObjectUtils.isNotNull(dto.getStatus()), "status", dto.getStatus());
-    updateWrapper.set(StringUtils.isNotBlank(dto.getRemark()), "remark", dto.getRemark());
+    updateWrapper.set(ObjectUtils.isNotEmpty(dto.getRemark()), "remark", dto.getRemark());
     updateWrapper.in(
         "status",
         Lists.newArrayList(
@@ -104,8 +103,8 @@ public class GameTransferRecordServiceImpl
   public boolean findTransferRecordCount(GameTransferRecord dto) {
     QueryWrapper<GameTransferRecord> queryWrapper = Wrappers.query();
     queryWrapper.eq(
-        StringUtils.isNotBlank(dto.getPlatformCode()), "platform_code", dto.getPlatformCode());
-    queryWrapper.eq(StringUtils.isNotBlank(dto.getAccount()), "account", dto.getAccount());
+            ObjectUtils.isNotEmpty(dto.getPlatformCode()), "platform_code", dto.getPlatformCode());
+    queryWrapper.eq(ObjectUtils.isNotEmpty(dto.getAccount()), "account", dto.getAccount());
     return gameTransferRecordMapper.selectCount(queryWrapper) > 0;
   }
 

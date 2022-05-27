@@ -13,4 +13,7 @@ public interface MemberLoanService extends IService<MemberLoan> {
 
   /** 回收 */
   void recycle(String account);
+
+  /** 判断是否有欠款 */
+  Boolean getNewRecord(Long memberId);
 }

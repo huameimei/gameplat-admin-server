@@ -120,6 +120,7 @@
         <dependency>
             <groupId>com.gameplat</groupId>
             <artifactId>gameplat-model</artifactId>
+            <version>4.0.0-SNAPSHOT</version>
         </dependency>
 
         <dependency>

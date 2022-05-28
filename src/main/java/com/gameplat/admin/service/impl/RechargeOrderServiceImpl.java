@@ -32,20 +32,19 @@ import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.json.JsonUtils;
 import com.gameplat.base.common.snowflake.IdGeneratorSnowflake;
 import com.gameplat.base.common.util.DateUtil;
-import com.gameplat.common.constant.NumberConstant;
 import com.gameplat.common.constant.SocketEnum;
 import com.gameplat.common.enums.*;
 import com.gameplat.common.lang.Assert;
 import com.gameplat.common.model.bean.UserEquipment;
 import com.gameplat.common.model.bean.limit.MemberRechargeLimit;
 import com.gameplat.common.util.CNYUtils;
+import com.gameplat.message.model.MessagePayload;
 import com.gameplat.model.entity.DiscountType;
 import com.gameplat.model.entity.member.Member;
 import com.gameplat.model.entity.member.MemberBill;
 import com.gameplat.model.entity.member.MemberGrowthConfig;
 import com.gameplat.model.entity.member.MemberInfo;
 import com.gameplat.model.entity.message.Message;
-import com.gameplat.model.entity.message.MessageDistribute;
 import com.gameplat.model.entity.pay.PayAccount;
 import com.gameplat.model.entity.pay.TpMerchant;
 import com.gameplat.model.entity.pay.TpPayChannel;
@@ -522,14 +521,9 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
   }
 
   private void sendMessage(String account, String channel, String message) {
-    Map<String, String> map = new HashMap<>();
-    map.put("user", account);
-    map.put("channel", channel);
-    map.put("title", message);
-    log.info("充值成功=============>开始推送Socket消息,相关参数{}", map);
-    client.userSend(map);
-    log.info("充值成功=============>topic推送测试,相关参数{}", map);
-    client.topicSend(map);
+    MessagePayload messagePayload = MessagePayload.builder().channel(channel).title(message).build();
+    log.info("充值成功=============>开始推送Socket消息,相关参数{}", messagePayload);
+    client.sendToUser(account, messagePayload);
   }
 
   private int verifyMessage() {

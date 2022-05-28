@@ -6,6 +6,8 @@ import com.gameplat.admin.model.dto.MemberLoanQueryDTO;
 import com.gameplat.admin.model.vo.LoanVO;
 import com.gameplat.model.entity.member.MemberLoan;
 
+import java.math.BigDecimal;
+
 public interface MemberLoanService extends IService<MemberLoan> {
 
   /** 分页查 */
@@ -16,4 +18,6 @@ public interface MemberLoanService extends IService<MemberLoan> {
 
   /** 判断是否有欠款 */
   Boolean getNewRecord(Long memberId);
+
+  void repay(BigDecimal money, Long memberId);
 }

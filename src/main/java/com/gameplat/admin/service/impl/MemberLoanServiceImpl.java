@@ -98,18 +98,10 @@ public class MemberLoanServiceImpl extends ServiceImpl<MemberLoanMapper, MemberL
         //扣除金额
         overdraftMoney = balance;
         balance = new BigDecimal(0.00);
-        repay(balance, id);
-      }else{
-        List<MemberLoan> list = this.lambdaQuery()
-                .eq(MemberLoan::getMemberId, memberId)
-                .eq(MemberLoan::getType, 2)
-                .eq(MemberLoan::getLoanStatus, 0)
-                .list();
-        list.forEach(x -> this.updateById(new MemberLoan(){{
-                                              setMemberId(id);
-                                              setLoanStatus(1);
-                                          }}));
+
       }
+      repay(overdraftMoney, id);
+
       // 2.添加member_loan表回收数据
       MemberLoan loan = new MemberLoan();
       loan.setMemberId(id)
@@ -125,7 +117,8 @@ public class MemberLoanServiceImpl extends ServiceImpl<MemberLoanMapper, MemberL
           .setLoanStatus(loanStatus)
           .setOverdraftMoney(afterOverdraftMoney)
           .setOrderNo(orderNo)
-          .setType(3);
+          .setType(3)
+          .setLoanTime(memberLoanMapper.getRecentLoanTime(id));
       this.save(loan);
 
       // 3.修改账户余额

@@ -816,10 +816,8 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
 
   private void sendMessage(String account, String channel, String message) {
     MessagePayload payload = MessagePayload.builder().channel(channel).title(message).build();
-    log.info("充值成功=============>开始推送Socket消息,相关参数{}", payload);
+    log.info("提现成功=============>开始推送Socket消息,相关参数{}", payload);
     client.sendToUser(account, payload);
-    log.info("充值成功=============>topic推送测试,相关参数{}", payload);
-    client.send(payload);
   }
 
   private int verifyMessage() {

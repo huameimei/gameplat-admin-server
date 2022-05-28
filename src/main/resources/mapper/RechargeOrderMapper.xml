@@ -54,6 +54,33 @@
         account
     </select>
 
+
+    <select id="getWealVipRecharge" resultType="java.lang.String">
+        select st.account from member_growth_statis as st
+        left join (
+        SELECT
+        account userAccount,
+        sum(amount) rechargeMoney
+        FROM recharge_order
+        where 1 = 1 AND status = 3
+        <if test="startTime != null and startTime != ''">
+            AND create_time &gt;= #{startTime}
+        </if>
+        <if test="endTime != null and endTime != ''">
+            AND create_time &lt;= #{endTime}
+        </if>
+        GROUP BY member_id,account
+        ) as t on t.userAccount = st.account
+        inner join member_growth_level le on le.`level` = st.`vip_level`
+        where 1 = 1
+        <if test="type == 1">
+            and ifnull(t.rechargeMoney,0) >= le.week_recharge
+        </if>
+        <if test="type == 2">
+            and ifnull(t.rechargeMoney,0) >= le.month_recharge
+        </if>
+    </select>
+
     <select id="findRechargeInfo" resultType="com.gameplat.admin.model.bean.ActivityStatisticItem">
         SELECT
         a.member_id as userId,

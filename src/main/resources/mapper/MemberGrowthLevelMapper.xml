@@ -11,7 +11,11 @@
         <result property="limitGrowth" column="limit_growth"/>
         <result property="upReward" column="up_reward"/>
         <result property="weekWage" column="week_wage"/>
+        <result property="weekRecharge" column="week_recharge"/>
+        <result property="weekValid" column="week_valid"/>
         <result property="monthWage" column="month_wage"/>
+        <result property="monthRecharge" column="month_recharge"/>
+        <result property="monthValid" column="month_valid"/>
         <result property="birthGiftMoney" column="birth_gift_money"/>
         <result property="redEnvelope" column="red_envelope"/>
         <result property="createTime" column="create_time"/>
@@ -41,7 +45,11 @@
         limit_growth,
         up_reward,
         week_wage,
+        week_recharge,
+        week_valid,
         month_wage,
+        month_recharge,
+        month_valid,
         birth_gift_money,
         red_envelope,
         create_by,
@@ -85,7 +93,11 @@
                     <if test="item.limitGrowth != null">limit_growth = #{item.limitGrowth},</if>
                     <if test="item.upReward != null">up_reward = #{item.upReward},</if>
                     <if test="item.weekWage != null">week_wage = #{item.weekWage},</if>
+                    <if test="item.weekRecharge != null">week_recharge = #{item.weekRecharge},</if>
+                    <if test="item.weekValid != null">week_valid = #{item.weekValid},</if>
                     <if test="item.monthWage != null">month_wage = #{item.monthWage},</if>
+                    <if test="item.monthRecharge != null">month_recharge = #{item.monthRecharge},</if>
+                    <if test="item.monthValid != null">month_valid = #{item.monthValid},</if>
                     <if test="item.birthGiftMoney != null">birth_gift_money = #{item.birthGiftMoney},</if>
                     <if test="item.redEnvelope != null">red_envelope = #{item.redEnvelope},</if>
                     <if test="item.updateBy != null and item.updateBy != ''">update_by = #{item.updateBy},</if>

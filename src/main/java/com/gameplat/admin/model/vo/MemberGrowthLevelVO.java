@@ -37,8 +37,20 @@ public class MemberGrowthLevelVO {
   @Schema(description = "周俸禄")
   private BigDecimal weekWage;
 
+  @Schema(description = "周俸禄充值限制")
+  private BigDecimal weekRecharge;
+
+  @Schema(description = "周俸禄有效投注限制")
+  private BigDecimal weekValid;
+
   @Schema(description = "月俸禄")
   private BigDecimal monthWage;
+
+  @Schema(description = "月俸禄充值限制")
+  private BigDecimal monthRecharge;
+
+  @Schema(description = "月俸禄有效投注限制")
+  private BigDecimal monthValid;
 
   @Schema(description = "生日礼金")
   private BigDecimal birthGiftMoney;

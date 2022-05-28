@@ -70,4 +70,16 @@ public interface GameBetDailyReportMapper extends ExtBaseMapper<GameBetDailyRepo
           @Param("minBetAmount") String minBetAmount,
           @Param("startTime") String startTime,
           @Param("endTime") String endTime);
+
+  /**
+   * 获取达到有效投注金额的会员账号
+   *
+   * @param type
+   * @param startTime
+   * @param endTime
+   * @return
+   */
+  List<String> getWealVipValid(@Param("type") Integer type,
+                               @Param("startTime") String startTime,
+                               @Param("endTime") String endTime);
 }

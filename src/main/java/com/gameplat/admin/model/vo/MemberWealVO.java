@@ -26,6 +26,9 @@ public class MemberWealVO implements Serializable {
   @Schema(description = "类型 0：周俸禄  1：月俸禄  2：生日礼金 3：每月红包")
   private Integer type;
 
+  @Schema(description = "0：福利周期  1：VIP等级配置")
+  private Integer model;
+
   @Schema(description = "状态 0:未结算  1：未派发   2：已派发  3：已回收")
   private Integer status;
 

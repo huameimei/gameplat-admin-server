@@ -3,6 +3,13 @@ spring:
     name: admin-server
   profiles:
     active: @profiles.active@
+  websocket:
+    strategy: redis
+    endpoint: /websocket
+    broker: /topic1,/user
+    heartbeat: 10000,10000
+    userDestinationPrefix: /user
+    applicationDestinationPrefixes: /app
   cloud:
     nacos:
       config:

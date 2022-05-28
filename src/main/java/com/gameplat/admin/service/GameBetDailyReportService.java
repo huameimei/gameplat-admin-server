@@ -38,5 +38,7 @@ public interface GameBetDailyReportService extends IService<GameBetDailyReport> 
   // 获取达到有效投注金额的会员账号
   List<String> getSatisfyBetAccount(String minBetAmount, String startTime, String endTime);
 
+  List<String> getWealVipValid(Integer type, String startTime, String endTime);
+
   void exportGamePlatformReport(GameBetDailyReportQueryDTO dto, HttpServletResponse response);
 }

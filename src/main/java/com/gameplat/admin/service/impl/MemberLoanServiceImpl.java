@@ -125,7 +125,8 @@ public class MemberLoanServiceImpl extends ServiceImpl<MemberLoanMapper, MemberL
           .setLoanStatus(loanStatus)
           .setOverdraftMoney(afterOverdraftMoney)
           .setOrderNo(orderNo)
-          .setType(3);
+          .setType(3)
+          .setLoanTime(memberLoanMapper.getRecentLoanTime(id));
       this.save(loan);
 
       // 3.修改账户余额

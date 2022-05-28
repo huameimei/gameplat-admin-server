@@ -255,15 +255,17 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
   public void accept(Long id, String auditRemarks, boolean flag) {
     RechargeOrder rechargeOrder = this.getById(id);
     // 系统最高配置金额（充值金额  优惠金额）
-    String maxAmount = configService.getValue(MAX_RECHARGE_MONEY);
-    if (rechargeOrder.getAmount().compareTo(new BigDecimal(maxAmount)) > 0) {
-      throw new ServiceException("充值金额不能大于系统配置的最高金额：" + maxAmount);
-    }
+    if (!flag) {
+      String maxAmount = configService.getValue(MAX_RECHARGE_MONEY);
+      if (rechargeOrder.getAmount().compareTo(new BigDecimal(maxAmount)) > 0) {
+        throw new ServiceException("充值金额不能大于系统配置的最访问被拒绝，您没有权限访问该资源高金额：" + maxAmount);
+      }
 
-    String maxDiscount = configService.getValue(MAX_DISCOUNT_MONEY);
-    if (rechargeOrder.getDiscountAmount() != null) {
-      if (rechargeOrder.getDiscountAmount().compareTo(new BigDecimal(maxDiscount)) > 0) {
-        throw new ServiceException("充值优惠金额不能大于系统配置的最高金额：" + maxDiscount);
+      String maxDiscount = configService.getValue(MAX_DISCOUNT_MONEY);
+      if (rechargeOrder.getDiscountAmount() != null) {
+        if (rechargeOrder.getDiscountAmount().compareTo(new BigDecimal(maxDiscount)) > 0) {
+          throw new ServiceException("充值优惠金额不能大于系统配置的最高金额：" + maxDiscount);
+        }
       }
     }
     // 校验订单状态
@@ -519,9 +521,9 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
   }
 
   private void sendMessage(String account, String channel, String message) {
-    MessagePayload payload = MessagePayload.builder().channel(channel).title(message).build();
-    log.info("充值成功=============>开始推送Socket消息,相关参数{}", payload);
-    client.sendToUser(account, payload);
+    MessagePayload messagePayload = MessagePayload.builder().channel(channel).title(message).build();
+    log.info("充值成功=============>开始推送Socket消息,相关参数{}", messagePayload);
+    client.sendToUser(account, messagePayload);
   }
 
   private int verifyMessage() {

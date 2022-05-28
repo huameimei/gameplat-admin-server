@@ -11,6 +11,7 @@ import com.gameplat.admin.model.vo.MemberLoanSumVO;
 import com.gameplat.admin.model.vo.MemberLoanVO;
 import com.gameplat.admin.service.*;
 import com.gameplat.base.common.context.GlobalContextHolder;
+import com.gameplat.base.common.util.UUIDUtils;
 import com.gameplat.common.enums.TranTypes;
 import com.gameplat.model.entity.member.*;
 import com.gameplat.model.entity.message.Message;
@@ -23,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author lily
@@ -73,6 +75,7 @@ public class MemberLoanServiceImpl extends ServiceImpl<MemberLoanMapper, MemberL
     String[] split = idList.split(",");
 
     for (String memberId : split) {
+      String orderNo = UUIDUtils.getUUID();
       Long id = Long.parseLong(memberId);
       Member member = memberService.getById(id);
       MemberInfo memberInfo = memberInfoService.lambdaQuery().eq(MemberInfo::getMemberId, id).one();
@@ -95,6 +98,17 @@ public class MemberLoanServiceImpl extends ServiceImpl<MemberLoanMapper, MemberL
         //扣除金额
         overdraftMoney = balance;
         balance = new BigDecimal(0.00);
+        repay(balance, id);
+      }else{
+        List<MemberLoan> list = this.lambdaQuery()
+                .eq(MemberLoan::getMemberId, memberId)
+                .eq(MemberLoan::getType, 2)
+                .eq(MemberLoan::getLoanStatus, 0)
+                .list();
+        list.forEach(x -> this.updateById(new MemberLoan(){{
+                                              setMemberId(id);
+                                              setLoanStatus(1);
+                                          }}));
       }
       // 2.添加member_loan表回收数据
       MemberLoan loan = new MemberLoan();
@@ -110,6 +124,7 @@ public class MemberLoanServiceImpl extends ServiceImpl<MemberLoanMapper, MemberL
           .setRepayTime(new Date())
           .setLoanStatus(loanStatus)
           .setOverdraftMoney(afterOverdraftMoney)
+          .setOrderNo(orderNo)
           .setType(3);
       this.save(loan);
 
@@ -126,15 +141,16 @@ public class MemberLoanServiceImpl extends ServiceImpl<MemberLoanMapper, MemberL
       memberBill.setAmount(overdraftMoney);
       memberBill.setBalance(balance);
       memberBill.setContent(
-          "管理员:" + username + " 于 " + DateUtil.now() + "回收借呗欠款 " + overdraftMoney);
+          "管理员:" + username + " 于 " + DateUtil.now() + "回收借呗欠款 " + overdraftMoney+ " 元");
       memberBill.setRemark("回收欠款");
       memberBill.setOperator(username);
+      memberBill.setOrderNo(orderNo);
       memberBillService.save(memberBill);
 
       // 5.添加消息表
       Message message = new Message();
       message.setTitle("借呗欠款回收");
-      message.setContent("系统回收借呗欠款：" + overdraftMoney);
+      message.setContent("系统回收借呗欠款：" + overdraftMoney + " 元");
       message.setCategory(4);
       message.setPushRange(2);
       message.setLinkAccount(member.getAccount());
@@ -157,6 +173,63 @@ public class MemberLoanServiceImpl extends ServiceImpl<MemberLoanMapper, MemberL
       return true;
     }else{
       return false;
+    }
+  }
+
+  /** 还款 */
+  @Override
+  public void repay(BigDecimal money, Long memberId) {
+
+    //1.查询没有结清的数据
+    List<MemberLoan> remainMoneyList =
+            this.lambdaQuery()
+                    .eq(MemberLoan::getMemberId, memberId)
+                    .eq(MemberLoan::getLoanStatus, 0)
+                    .eq(MemberLoan::getType, 2)
+                    .list();
+
+    BigDecimal sub = new BigDecimal("0.00");
+    for (int i = 0; i < remainMoneyList.size(); i++) {
+      Integer loanStatus = 0;
+      MemberLoan memberLoan1 = remainMoneyList.get(i);
+      //未还金额
+      BigDecimal beforeRemainMoney = memberLoan1.getRemainMoney();
+      BigDecimal afterRemainMoney = new BigDecimal("0.00");
+      if(i == 0){
+        sub = beforeRemainMoney.subtract(money);
+        if(sub.compareTo(new BigDecimal("0.00")) > 0){
+          MemberLoan entity = new MemberLoan();
+          entity.setId(memberLoan1.getId());
+          entity.setRemainMoney(sub);
+          this.updateById(entity);
+          return;
+        }
+      }
+      if(i == 0){
+        afterRemainMoney = sub;
+      }else{
+        afterRemainMoney = beforeRemainMoney.add(sub);
+        sub = afterRemainMoney;
+      }
+
+      if(afterRemainMoney.compareTo(new BigDecimal("0.0000")) == 0){
+        loanStatus = 1;
+        MemberLoan entity = new MemberLoan();
+        entity.setId(memberLoan1.getId());
+        entity.setLoanStatus(loanStatus);
+        entity.setRemainMoney(afterRemainMoney);
+        this.updateById(entity);
+        return;
+      }
+      if(afterRemainMoney.compareTo(new BigDecimal("0.0000")) < 0){
+        loanStatus = 1;
+      }
+
+      MemberLoan entity = new MemberLoan();
+      entity.setId(memberLoan1.getId());
+      entity.setLoanStatus(loanStatus);
+      entity.setRemainMoney(afterRemainMoney);
+      this.updateById(entity);
     }
   }
 }

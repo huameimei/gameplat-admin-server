@@ -179,6 +179,8 @@ public class MemberWealServiceImpl extends ServiceImpl<MemberWealMapper, MemberW
         }
         // 福利类型
         Integer type = memberWeal.getType();
+        // 0 福利周期的充值打码限制   1 VIP等级配置中的充值打码配置
+        Integer wealModel = memberWeal.getModel();
         // 福利状态
         Integer status = memberWeal.getStatus();
         if (status != 0 && status != 1) {
@@ -191,29 +193,45 @@ public class MemberWealServiceImpl extends ServiceImpl<MemberWealMapper, MemberW
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         // 查找符合充值金额和打码量资格的会员
         List<String> rechargeAccountList = new ArrayList<>();
-        if (memberWeal.getMinRechargeAmount() != null
-                && memberWeal.getMinRechargeAmount().compareTo(new BigDecimal("0")) > 0) {
-            rechargeAccountList =
-                    rechargeOrderMapper.getSatisfyRechargeAccount(
-                            String.valueOf(memberWeal.getMinRechargeAmount()),
-                            formatter.format(memberWeal.getStartDate()),
-                            formatter.format(memberWeal.getEndDate()));
-        } else {
-            rechargeAccountList =
-                    memberSalaryInfoList.stream().map(MemberWealDetail::getUserName).collect(toList());
-        }
-
         // 获取达到有效投注金额的会员账号(游戏日报表)
         List<String> betAccountList = new ArrayList<>();
-        if (memberWeal.getMinBetAmount() != null
-                && memberWeal.getMinBetAmount().compareTo(new BigDecimal("0")) > 0) {
-            betAccountList = gameBetDailyReportService.getSatisfyBetAccount(
-                    String.valueOf(memberWeal.getMinBetAmount()),
+
+        // 如果是周俸禄或者是月俸禄   并且 福利配置是  VIP等级配置
+        if ((type == 1 || type == 2) && wealModel == 1) {
+            //查找符合充值金额和打码量资格的会员
+            rechargeAccountList = rechargeOrderMapper.getWealVipRecharge(
+                    type,
                     formatter.format(memberWeal.getStartDate()),
                     formatter.format(memberWeal.getEndDate()));
+            // 查打码量满足的
+            betAccountList = gameBetDailyReportService.getWealVipValid(
+                    type,
+                    formatter.format(memberWeal.getStartDate()),
+                    formatter.format(memberWeal.getEndDate())
+            );
         } else {
-            betAccountList =
-                    memberSalaryInfoList.stream().map(MemberWealDetail::getUserName).collect(toList());
+            if (memberWeal.getMinRechargeAmount() != null
+                    && memberWeal.getMinRechargeAmount().compareTo(new BigDecimal("0")) > 0) {
+                rechargeAccountList =
+                        rechargeOrderMapper.getSatisfyRechargeAccount(
+                                String.valueOf(memberWeal.getMinRechargeAmount()),
+                                formatter.format(memberWeal.getStartDate()),
+                                formatter.format(memberWeal.getEndDate()));
+            } else {
+                rechargeAccountList =
+                        memberSalaryInfoList.stream().map(MemberWealDetail::getUserName).collect(toList());
+            }
+
+            if (memberWeal.getMinBetAmount() != null
+                    && memberWeal.getMinBetAmount().compareTo(new BigDecimal("0")) > 0) {
+                betAccountList = gameBetDailyReportService.getSatisfyBetAccount(
+                        String.valueOf(memberWeal.getMinBetAmount()),
+                        formatter.format(memberWeal.getStartDate()),
+                        formatter.format(memberWeal.getEndDate()));
+            } else {
+                betAccountList =
+                        memberSalaryInfoList.stream().map(MemberWealDetail::getUserName).collect(toList());
+            }
         }
 
         // 取达到充值金额的会员账号&&达到有效投注金额的会员账号的交集

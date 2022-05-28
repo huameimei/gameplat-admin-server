@@ -22,6 +22,9 @@ public class MemberWealAddDTO implements Serializable {
   @Schema(description = "类型 0：周俸禄  1：月俸禄  2：生日礼金 3：每月红包")
   private Integer type;
 
+  @Schema(description = "0：福利周期  1：VIP等级配置")
+  private Integer model;
+
   @Schema(description = "周期  开始时间")
   @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", timezone = "UTC")
   private Date startDate;

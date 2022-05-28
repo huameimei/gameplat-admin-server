@@ -31,6 +31,17 @@ public interface RechargeOrderMapper extends BaseMapper<RechargeOrder> {
       @Param("endTime") String endTime);
 
   /**
+   * 获取充值金额达标的会员账号 VIP等级配置
+   *
+   * @param startTime
+   * @param endTime
+   * @return
+   */
+  List<String> getWealVipRecharge(@Param("type") Integer type,
+                                  @Param("startTime") String startTime,
+                                  @Param("endTime") String endTime);
+
+  /**
    * 查询用户累计充值和累计充值天数
    *
    * @param map

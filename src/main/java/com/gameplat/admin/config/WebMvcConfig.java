@@ -115,6 +115,8 @@ public class WebMvcConfig extends WebMvcConfigurationAdapter {
             .addPathPatterns(
                     "/api/admin/finance/rechargeOrder/accept",
                     "/api/admin/finance/proxyPay/relProxyPay",
-                    "/api/admin/finance/memberWithdraw/modifyCashStatus");
+                    "/api/admin/finance/memberWithdraw/modifyCashStatus",
+                    "api/admin/finance/rechargeOrder/batchAccept",
+                    "api/admin/finance/memberWithdraw/batchWithdraw");
   }
 }

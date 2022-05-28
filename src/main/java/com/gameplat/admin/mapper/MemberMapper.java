@@ -44,7 +44,7 @@ public interface MemberMapper extends BaseMapper<Member> {
    * @param account String
    * @param lowerNum int
    */
-  void updateLowerNumByAccount(String account, int lowerNum);
+  void updateLowerNumByAccount(@Param("account") String account, @Param("lowerNum")int lowerNum);
 
   /**
    * 批量更新下级人数

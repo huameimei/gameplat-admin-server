@@ -9,9 +9,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
+import org.springframework.security.web.method.annotation.AuthenticationPrincipalArgumentResolver;
+import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.ContentNegotiationConfigurer;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
+
+import java.util.List;
 
 @Slf4j
 @Configuration
@@ -73,6 +77,12 @@ public class WebMvcConfig extends WebMvcConfigurationAdapter {
   }
 
   @Override
+  protected void addArgumentResolvers(List<HandlerMethodArgumentResolver> argumentResolvers) {
+    argumentResolvers.add(new AuthenticationPrincipalArgumentResolver());
+    super.addArgumentResolvers(argumentResolvers);
+  }
+
+  @Override
   public void configureContentNegotiation(ContentNegotiationConfigurer configurer) {
     configurer
         .favorParameter(false)
@@ -111,12 +121,12 @@ public class WebMvcConfig extends WebMvcConfigurationAdapter {
         .excludePathPatterns("api/admin/member/weal/list");
 
     registry
-            .addInterceptor(rwLimitInterceptor())
-            .addPathPatterns(
-                    "/api/admin/finance/rechargeOrder/accept",
-                    "/api/admin/finance/proxyPay/relProxyPay",
-                    "/api/admin/finance/memberWithdraw/modifyCashStatus",
-                    "api/admin/finance/rechargeOrder/batchAccept",
-                    "api/admin/finance/memberWithdraw/batchWithdraw");
+        .addInterceptor(rwLimitInterceptor())
+        .addPathPatterns(
+            "/api/admin/finance/rechargeOrder/accept",
+            "/api/admin/finance/proxyPay/relProxyPay",
+            "/api/admin/finance/memberWithdraw/modifyCashStatus",
+            "api/admin/finance/rechargeOrder/batchAccept",
+            "api/admin/finance/memberWithdraw/batchWithdraw");
   }
 }

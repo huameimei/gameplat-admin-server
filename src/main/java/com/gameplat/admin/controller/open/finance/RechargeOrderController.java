@@ -127,7 +127,7 @@ public class RechargeOrderController {
   @PreAuthorize("hasAuthority('finance:rechargeOrder:handle')")
   @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.RECHARGE, desc = "'批量受理订单：' + #ids")
   public void batchHandle(@RequestParam List<Long> ids) {
-    if (CollUtil.isNotEmpty(ids)) {
+    if (CollUtil.isEmpty(ids)) {
       throw new ServiceException("ids不能为空");
     }
 
@@ -149,7 +149,7 @@ public class RechargeOrderController {
   @PreAuthorize("hasAuthority('finance:rechargeOrder:unHandle')")
   @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.RECHARGE, desc = "'批量取消受理订单：' + #ids")
   public void batchUnHandle(@RequestParam List<Long> ids) {
-    if (CollUtil.isNotEmpty(ids)) {
+    if (CollUtil.isEmpty(ids)) {
       throw new ServiceException("ids不能为空");
     }
 
@@ -171,7 +171,7 @@ public class RechargeOrderController {
   @PreAuthorize("hasAuthority('finance:rechargeOrder:accept')")
   @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.RECHARGE, desc = "'批量入款订单：' + #ids")
   public void batchAccept(@RequestParam List<Long> ids) {
-    if (CollUtil.isNotEmpty(ids)) {
+    if (CollUtil.isEmpty(ids)) {
       throw new ServiceException("ids不能为空");
     }
 
@@ -195,7 +195,7 @@ public class RechargeOrderController {
   @PreAuthorize("hasAuthority('finance:rechargeOrder:cancel')")
   @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.RECHARGE, desc = "'批量取消订单：' + #ids")
   public void batchCancel(@RequestParam List<Long> ids) {
-    if (CollUtil.isNotEmpty(ids)) {
+    if (CollUtil.isEmpty(ids)) {
       throw new ServiceException("ids不能为空");
     }
 

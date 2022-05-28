@@ -3,7 +3,7 @@ security:
     path:
       - /favicon.ico
       - /swagger-ui.html
-      - /v3/api-docs
+      - /v3/api-docs/**
       - /swagger-resources/**
       - /doc.html
       - /webjars/**

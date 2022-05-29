@@ -9,16 +9,14 @@ import com.gameplat.admin.model.dto.ActivityLobbyUpdateStatusDTO;
 import com.gameplat.admin.model.vo.ActivityLobbyVO;
 import com.gameplat.admin.model.vo.CodeDataVO;
 import com.gameplat.admin.model.vo.GameKindVO;
-import com.gameplat.admin.service.ActivityInfoService;
-import com.gameplat.admin.service.ActivityLobbyService;
-import com.gameplat.admin.service.GameKindService;
-import com.gameplat.admin.service.SysDictDataService;
+import com.gameplat.admin.service.*;
 import com.gameplat.base.common.enums.EnableEnum;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.StringUtils;
 import com.gameplat.common.enums.ActivityInfoEnum;
 import com.gameplat.common.enums.DictTypeEnum;
 import com.gameplat.model.entity.activity.ActivityLobby;
+import com.gameplat.model.entity.activity.ActivityTurntable;
 import com.gameplat.model.entity.sys.SysDictData;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -51,6 +49,8 @@ public class ActivityLobbyController {
   @Autowired private GameKindService gameKindService;
 
   @Autowired private ActivityInfoService activityInfoService;
+
+  @Autowired private ActivityTurntableService activityTurntableService;
 
   @Operation(summary = "活动大厅列表")
   @GetMapping("/list")
@@ -174,5 +174,46 @@ public class ActivityLobbyController {
       throw new ServiceException("活动id不能为空");
     }
     return activityLobbyService.getActivityLobbyVOById(id);
+  }
+
+  /**
+   * 查询转盘活动详情
+   * @param id
+   * @return ActivityTurntable
+   */
+  @Operation(summary = "查询转盘活动详情")
+  @GetMapping("/getActivityTurntableDetail")
+  @PreAuthorize("hasAuthority('activity:lobby:getActivityTurntableDetail')")
+  public ActivityTurntable getActivityTurntableDetail(Integer id) {
+    if (id == null || id <= 0) {
+      throw new ServiceException("转盘活动id不能为空");
+    }
+    return activityTurntableService.getById(id);
+  }
+
+  /**
+   * 查询转盘活动列表
+   * @param page
+   * @param dto
+   * @return
+   */
+  @Operation(summary = "查询转盘活动列表")
+  @GetMapping("/getActivityTurntableList")
+  @PreAuthorize("hasAuthority('activity:lobby:getActivityTurntableList')")
+  public IPage<ActivityTurntable> getActivityTurntableList(
+          @Parameter(hidden = true) PageDTO<ActivityTurntable> page, ActivityTurntable dto) {
+    return activityTurntableService.findActivityTurntableList(page, dto);
+  }
+
+  /**
+   * 更新转盘信息
+   * @param bean
+   * @return
+   */
+  @Operation(summary = "新增或更新转盘活动详情")
+  @PostMapping("/addActivityTurntable")
+  @PreAuthorize("hasAuthority('activity:lobby:addActivityTurntable')")
+  public boolean addActivityTurntable(ActivityTurntable bean) {
+    return activityTurntableService.addActivityTurntable(bean);
   }
 }

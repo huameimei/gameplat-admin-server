@@ -71,63 +71,66 @@ public class MemberLoanServiceImpl extends ServiceImpl<MemberLoanMapper, MemberL
 
   @Override
   public void recycle(String idList) {
-    String username = GlobalContextHolder.getContext().getUsername();
-    String[] split = idList.split(",");
+    for (String id : idList.split(",")) {
 
-    for (String memberId : split) {
-      String orderNo = UUIDUtils.getUUID();
-      Long id = Long.parseLong(memberId);
-      Member member = memberService.getById(id);
-      MemberInfo memberInfo = memberInfoService.lambdaQuery().eq(MemberInfo::getMemberId, id).one();
+      Long memberId = Long.parseLong(id);
+
+      MemberInfo memberInfo =
+              memberInfoService.lambdaQuery()
+                      .eq(MemberInfo::getMemberId, memberId)
+                      .one();
+
       MemberGrowthLevel memberGrowthLevel =
           memberGrowthLevelService.getLevel(memberInfo.getVipLevel());
-      MemberLoanVO memberLoan = memberLoanMapper.getNewRecord(id);
+
       // 当前账户欠款余额
-      BigDecimal overdraftMoney = memberLoan.getOverdraftMoney();
+      BigDecimal overdraftMoney =
+              memberLoanMapper.getNewRecord(memberId).getOverdraftMoney();
+
       //剩余欠款金额
       BigDecimal afterOverdraftMoney = new BigDecimal(0.00);
       // 当前账户余额
       BigDecimal balance = memberInfo.getBalance();
       //还款状态 0:未结清  1:已结清
       Integer loanStatus = 1;
-      // 1.判断当前余额是否比欠款金额多
+
       if (balance.compareTo(overdraftMoney) < 0) {
+        //余额比欠款少：标记为未结清   剩余欠款金额 = 原来欠款金额 - 余额
         loanStatus = 0;
-        //剩余未还金额
         afterOverdraftMoney = overdraftMoney.subtract(balance);
-        //扣除金额
-        overdraftMoney = balance;
         balance = new BigDecimal(0.00);
-
+        //回收金额
+        overdraftMoney = balance;
       }
-      repay(overdraftMoney, id);
 
-      // 2.添加member_loan表回收数据
-      MemberLoan loan = new MemberLoan();
-      loan.setMemberId(id)
-          .setAccount(member.getAccount())
-          .setUserLevel(member.getUserLevel())
-          .setSuperPath(member.getSuperPath())
-          .setParentId(member.getParentId())
-          .setParentName(member.getParentName())
-          .setVipLevel(memberInfo.getVipLevel())
-          .setMemberBalance(overdraftMoney)
-          .setLoanMoney(memberGrowthLevel.getLoanMoney())
-          .setRepayTime(new Date())
-          .setLoanStatus(loanStatus)
-          .setOverdraftMoney(afterOverdraftMoney)
-          .setOrderNo(orderNo)
-          .setType(3)
-          .setLoanTime(memberLoanMapper.getRecentLoanTime(id));
+      Member member = memberService.getById(memberId);
+      String orderNo = UUIDUtils.getUUID32();
+
+      MemberLoan loan =
+              new MemberLoan()
+                            .setMemberId(memberId)
+                            .setAccount(member.getAccount())
+                            .setUserLevel(member.getUserLevel())
+                            .setSuperPath(member.getSuperPath())
+                            .setParentId(member.getParentId())
+                            .setParentName(member.getParentName())
+                            .setVipLevel(memberInfo.getVipLevel())
+                            .setMemberBalance(overdraftMoney)
+                            .setLoanMoney(memberGrowthLevel.getLoanMoney())
+                            .setRepayTime(new Date())
+                            .setLoanStatus(loanStatus)
+                            .setOverdraftMoney(afterOverdraftMoney)
+                            .setOrderNo(orderNo)
+                            .setType(3)
+                            .setLoanTime(memberLoanMapper.getRecentLoanTime(memberId));
       this.save(loan);
 
       // 3.修改账户余额
-      memberInfoService.updateBalance(memberLoan.getMemberId(), new BigDecimal(overdraftMoney.toString()).negate());
+      memberInfoService.updateBalance(memberId, new BigDecimal(overdraftMoney.toString()).negate());
 
-
-      // 4.添加流水表
+      String username = GlobalContextHolder.getContext().getUsername();
       MemberBill memberBill = new MemberBill();
-      memberBill.setMemberId(memberLoan.getMemberId());
+      memberBill.setMemberId(memberId);
       memberBill.setAccount(member.getAccount());
       memberBill.setMemberPath(member.getSuperPath());
       memberBill.setTranType(TranTypes.LOAN_RECYCLE.getValue());
@@ -140,7 +143,6 @@ public class MemberLoanServiceImpl extends ServiceImpl<MemberLoanMapper, MemberL
       memberBill.setOrderNo(orderNo);
       memberBillService.save(memberBill);
 
-      // 5.添加消息表
       Message message = new Message();
       message.setTitle("借呗欠款回收");
       message.setContent("系统回收借呗欠款：" + overdraftMoney + " 元");
@@ -151,6 +153,8 @@ public class MemberLoanServiceImpl extends ServiceImpl<MemberLoanMapper, MemberL
       message.setStatus(1);
       message.setRemarks("借呗欠款回收");
       messageInfoService.save(message);
+
+      repay(overdraftMoney, memberId);
     }
   }
 
@@ -185,15 +189,26 @@ public class MemberLoanServiceImpl extends ServiceImpl<MemberLoanMapper, MemberL
     for (int i = 0; i < remainMoneyList.size(); i++) {
       Integer loanStatus = 0;
       MemberLoan memberLoan1 = remainMoneyList.get(i);
+      MemberLoan entity = new MemberLoan();
       //未还金额
       BigDecimal beforeRemainMoney = memberLoan1.getRemainMoney();
       BigDecimal afterRemainMoney = new BigDecimal("0.00");
       if(i == 0){
         sub = beforeRemainMoney.subtract(money);
-        if(sub.compareTo(new BigDecimal("0.00")) > 0){
-          MemberLoan entity = new MemberLoan();
+        if(sub.compareTo(new BigDecimal("0.00")) == 0){
+          loanStatus = 1;
           entity.setId(memberLoan1.getId());
           entity.setRemainMoney(sub);
+          entity.setRepayTime(new Date());
+          entity.setLoanStatus(loanStatus);
+          this.updateById(entity);
+          return;
+        }
+        if(sub.compareTo(new BigDecimal("0.00")) > 0){
+          entity.setId(memberLoan1.getId());
+          entity.setRemainMoney(sub);
+          entity.setRepayTime(new Date());
+          entity.setLoanStatus(loanStatus);
           this.updateById(entity);
           return;
         }
@@ -205,24 +220,29 @@ public class MemberLoanServiceImpl extends ServiceImpl<MemberLoanMapper, MemberL
         sub = afterRemainMoney;
       }
 
-      if(afterRemainMoney.compareTo(new BigDecimal("0.0000")) == 0){
+      if(afterRemainMoney.compareTo(new BigDecimal("0.0000")) < 0){
         loanStatus = 1;
-        MemberLoan entity = new MemberLoan();
         entity.setId(memberLoan1.getId());
         entity.setLoanStatus(loanStatus);
         entity.setRemainMoney(afterRemainMoney);
+        entity.setRepayTime(new Date());
+        this.updateById(entity);
+      }else if(afterRemainMoney.compareTo(new BigDecimal("0.0000")) == 0){
+        loanStatus = 1;
+        entity.setId(memberLoan1.getId());
+        entity.setLoanStatus(loanStatus);
+        entity.setRemainMoney(afterRemainMoney);
+        entity.setRepayTime(new Date());
+        this.updateById(entity);
+        return;
+      }else{
+        entity.setId(memberLoan1.getId());
+        entity.setLoanStatus(loanStatus);
+        entity.setRemainMoney(afterRemainMoney);
+        entity.setRepayTime(new Date());
         this.updateById(entity);
         return;
       }
-      if(afterRemainMoney.compareTo(new BigDecimal("0.0000")) < 0){
-        loanStatus = 1;
-      }
-
-      MemberLoan entity = new MemberLoan();
-      entity.setId(memberLoan1.getId());
-      entity.setLoanStatus(loanStatus);
-      entity.setRemainMoney(afterRemainMoney);
-      this.updateById(entity);
     }
   }
 }

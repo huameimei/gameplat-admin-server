@@ -210,7 +210,7 @@ public class MemberLoanServiceImpl extends ServiceImpl<MemberLoanMapper, MemberL
         sub = afterRemainMoney;
       }
 
-      if(afterRemainMoney.compareTo(new BigDecimal("0.0000")) <= 0){
+      if(afterRemainMoney.compareTo(new BigDecimal("0.0000")) < 0){
         loanStatus = 1;
         MemberLoan entity = new MemberLoan();
         entity.setId(memberLoan1.getId());
@@ -218,7 +218,6 @@ public class MemberLoanServiceImpl extends ServiceImpl<MemberLoanMapper, MemberL
         entity.setRemainMoney(afterRemainMoney);
         entity.setRepayTime(new Date());
         this.updateById(entity);
-        return;
       }else{
         MemberLoan entity = new MemberLoan();
         entity.setId(memberLoan1.getId());

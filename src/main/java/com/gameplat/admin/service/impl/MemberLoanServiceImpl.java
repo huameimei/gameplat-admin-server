@@ -125,8 +125,6 @@ public class MemberLoanServiceImpl extends ServiceImpl<MemberLoanMapper, MemberL
                             .setLoanTime(memberLoanMapper.getRecentLoanTime(memberId));
       this.save(loan);
 
-      repay(overdraftMoney, memberId);
-
       // 3.修改账户余额
       memberInfoService.updateBalance(memberId, new BigDecimal(overdraftMoney.toString()).negate());
 
@@ -155,6 +153,8 @@ public class MemberLoanServiceImpl extends ServiceImpl<MemberLoanMapper, MemberL
       message.setStatus(1);
       message.setRemarks("借呗欠款回收");
       messageInfoService.save(message);
+
+      repay(overdraftMoney, memberId);
     }
   }
 
@@ -189,16 +189,26 @@ public class MemberLoanServiceImpl extends ServiceImpl<MemberLoanMapper, MemberL
     for (int i = 0; i < remainMoneyList.size(); i++) {
       Integer loanStatus = 0;
       MemberLoan memberLoan1 = remainMoneyList.get(i);
+      MemberLoan entity = new MemberLoan();
       //未还金额
       BigDecimal beforeRemainMoney = memberLoan1.getRemainMoney();
       BigDecimal afterRemainMoney = new BigDecimal("0.00");
       if(i == 0){
         sub = beforeRemainMoney.subtract(money);
-        if(sub.compareTo(new BigDecimal("0.00")) > 0){
-          MemberLoan entity = new MemberLoan();
+        if(sub.compareTo(new BigDecimal("0.00")) == 0){
+          loanStatus = 1;
           entity.setId(memberLoan1.getId());
           entity.setRemainMoney(sub);
           entity.setRepayTime(new Date());
+          entity.setLoanStatus(loanStatus);
+          this.updateById(entity);
+          return;
+        }
+        if(sub.compareTo(new BigDecimal("0.00")) > 0){
+          entity.setId(memberLoan1.getId());
+          entity.setRemainMoney(sub);
+          entity.setRepayTime(new Date());
+          entity.setLoanStatus(loanStatus);
           this.updateById(entity);
           return;
         }
@@ -212,14 +222,20 @@ public class MemberLoanServiceImpl extends ServiceImpl<MemberLoanMapper, MemberL
 
       if(afterRemainMoney.compareTo(new BigDecimal("0.0000")) < 0){
         loanStatus = 1;
-        MemberLoan entity = new MemberLoan();
         entity.setId(memberLoan1.getId());
         entity.setLoanStatus(loanStatus);
         entity.setRemainMoney(afterRemainMoney);
         entity.setRepayTime(new Date());
         this.updateById(entity);
+      }else if(afterRemainMoney.compareTo(new BigDecimal("0.0000")) == 0){
+        loanStatus = 1;
+        entity.setId(memberLoan1.getId());
+        entity.setLoanStatus(loanStatus);
+        entity.setRemainMoney(afterRemainMoney);
+        entity.setRepayTime(new Date());
+        this.updateById(entity);
+        return;
       }else{
-        MemberLoan entity = new MemberLoan();
         entity.setId(memberLoan1.getId());
         entity.setLoanStatus(loanStatus);
         entity.setRemainMoney(afterRemainMoney);

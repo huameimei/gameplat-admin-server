@@ -5,7 +5,6 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -45,6 +44,7 @@ import com.gameplat.common.model.bean.Builder;
 import com.gameplat.common.model.bean.UserEquipment;
 import com.gameplat.common.model.bean.limit.MemberRechargeLimit;
 import com.gameplat.common.model.bean.limit.MemberWithdrawLimit;
+import com.gameplat.message.model.MessagePayload;
 import com.gameplat.model.entity.member.*;
 import com.gameplat.model.entity.message.Message;
 import com.gameplat.model.entity.message.MessageDistribute;
@@ -815,14 +815,9 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
   }
 
   private void sendMessage(String account, String channel, String message) {
-    Map<String, String> map = new HashMap<>();
-    map.put("user", account);
-    map.put("channel", channel);
-    map.put("title", message);
-    log.info("充值成功=============>开始推送Socket消息,相关参数{}", map);
-    client.userSend(map);
-    log.info("充值成功=============>topic推送测试,相关参数{}", map);
-    client.topicSend(map);
+    MessagePayload payload = MessagePayload.builder().channel(channel).title(message).build();
+    log.info("提现成功=============>开始推送Socket消息,相关参数{}", payload);
+    client.sendToUser(account, payload);
   }
 
   private int verifyMessage() {

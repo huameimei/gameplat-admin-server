@@ -44,8 +44,20 @@ public class MemberGrowthLevelEditDto implements Serializable {
   @Schema(description = "周俸禄", required = false)
   private BigDecimal weekWage;
 
+  @Schema(description = "周俸禄充值限制", required = false)
+  private BigDecimal weekRecharge;
+
+  @Schema(description = "周俸禄有效投注限制", required = false)
+  private BigDecimal weekValid;
+
   @Schema(description = "月俸禄", required = false)
   private BigDecimal monthWage;
+
+  @Schema(description = "月俸禄充值限制", required = false)
+  private BigDecimal monthRecharge;
+
+  @Schema(description = "月俸禄有效投注限制", required = false)
+  private BigDecimal monthValid;
 
   @Schema(description = "生日礼金", required = false)
   private BigDecimal birthGiftMoney;

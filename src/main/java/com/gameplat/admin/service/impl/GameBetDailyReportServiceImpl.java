@@ -369,6 +369,11 @@ public class GameBetDailyReportServiceImpl
   }
 
   @Override
+  public List<String> getWealVipValid(Integer type, String startTime, String endTime) {
+    return gameBetDailyReportMapper.getWealVipValid(type, startTime, endTime);
+  }
+
+  @Override
   public void exportGamePlatformReport(
       GameBetDailyReportQueryDTO dto, HttpServletResponse response) {
     log.info("请求导出游戏平台数据参数：{}", JSONUtil.toJsonStr(dto));

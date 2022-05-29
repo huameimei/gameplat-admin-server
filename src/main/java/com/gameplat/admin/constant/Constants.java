@@ -31,6 +31,10 @@ public interface Constants {
   String LIST_SORT_CODE = "listSort";
 
   String LIST_SORT_DESC = "体育配置场景6排序开关列表";
+  /**
+   * 色值设置
+   */
+  String COLOR_TYPE = "COLOR_TYPE";
 
   /**
    * 租户原体育场景6排序开关设置

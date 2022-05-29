@@ -126,7 +126,7 @@ public class WebMvcConfig extends WebMvcConfigurationAdapter {
             "/api/admin/finance/rechargeOrder/accept",
             "/api/admin/finance/proxyPay/relProxyPay",
             "/api/admin/finance/memberWithdraw/modifyCashStatus",
-            "api/admin/finance/rechargeOrder/batchAccept",
-            "api/admin/finance/memberWithdraw/batchWithdraw");
+                "/api/admin/finance/rechargeOrder/batchAccept",
+                "/api/admin/finance/memberWithdraw/batchWithdraw");
   }
 }

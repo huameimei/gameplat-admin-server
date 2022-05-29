@@ -1,8 +1,13 @@
 package com.gameplat.admin.controller.open.system;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.gameplat.admin.model.dto.AgentContactDTO;
+import com.gameplat.admin.model.dto.DictParamDTO;
+import com.gameplat.admin.model.dto.DirectChargeDto;
 import com.gameplat.admin.model.dto.EmailTestDTO;
+import com.gameplat.admin.model.vo.DirectChargeVo;
 import com.gameplat.admin.service.ConfigService;
 import com.gameplat.admin.service.SysDictDataService;
 import com.gameplat.admin.service.SystemConfigService;
@@ -24,11 +29,14 @@ import java.util.Map;
 @RequestMapping("/api/admin/system/config")
 public class OpenSystemConfigController {
 
-  @Autowired private SysDictDataService dictDataService;
+  @Autowired
+  private SysDictDataService dictDataService;
 
-  @Autowired private SystemConfigService systemConfigService;
+  @Autowired
+  private SystemConfigService systemConfigService;
 
-  @Autowired private ConfigService configService;
+  @Autowired
+  private ConfigService configService;
 
   @Operation(summary = "获取系统配置")
   @GetMapping("/system")
@@ -112,7 +120,7 @@ public class OpenSystemConfigController {
   @PreAuthorize("hasAuthority('system:config:update:captcha')")
   public void updateCaptchaConfig(@RequestBody List<SysDictData> dictDataList) {
     systemConfigService.updateConfig(
-        DictTypeEnum.VERIFICATION_CODE_CONFIG.getValue(), dictDataList);
+            DictTypeEnum.VERIFICATION_CODE_CONFIG.getValue(), dictDataList);
   }
 
   @Operation(summary = "获取邮箱配置")
@@ -210,7 +218,8 @@ public class OpenSystemConfigController {
   @PreAuthorize("hasAuthority('system:config:agentContcat:view')")
   public List<AgentContactConfig> getAgentContact() {
     return configService.get(
-        DictDataEnum.AGENT_CONTACT, new TypeReference<List<AgentContactConfig>>() {});
+            DictDataEnum.AGENT_CONTACT, new TypeReference<List<AgentContactConfig>>() {
+            });
   }
 
   @Operation(summary = "编辑、新增代理联系方式地址")
@@ -236,12 +245,35 @@ public class OpenSystemConfigController {
   @PostMapping("/update/{dictType}")
   @PreAuthorize("hasAuthority('system:config:add')")
   public void updateConfig(
-      @PathVariable String dictType, @RequestBody List<SysDictData> dictDataList) {
+          @PathVariable String dictType, @RequestBody List<SysDictData> dictDataList) {
     systemConfigService.updateConfig(dictType, dictDataList);
   }
 
   @PostMapping("/email/testSend")
   public void testSendEmail(@RequestBody EmailTestDTO dto) {
     systemConfigService.testSendEmail(dto);
+  }
+
+
+  @Operation(summary = "获取免提直冲限制")
+  @GetMapping(value = "/get/directCharge")
+  @PreAuthorize("hasAuthority('system:directCharge:get')")
+  public DirectChargeVo directCharge() {
+    String dictDataValue = dictDataService.getDictDataValue(DictDataEnum.DIRECT_CHARGE.getType().getValue(),
+            DictDataEnum.DIRECT_CHARGE.getLabel());
+    return JSON.parseObject(dictDataValue, DirectChargeVo.class);
+  }
+
+  @Operation(summary = "保存免提直冲")
+  @PostMapping(value = "/add/directCharge")
+  @PreAuthorize("hasAuthority('system:directCharge:add')")
+  public void addDirectCharge(@RequestBody DirectChargeDto directChargeDto) {
+    String directCharge = JSON.toJSONString(directChargeDto);
+    JSONObject jsonObject = new JSONObject();
+    jsonObject.put(DictDataEnum.DIRECT_CHARGE.getLabel(), directCharge);
+    DictParamDTO dictParamDTO = new DictParamDTO();
+    dictParamDTO.setJsonData(jsonObject);
+    dictParamDTO.setDictType(DictDataEnum.DIRECT_CHARGE.getType().getValue());
+    dictDataService.batchUpdateDictData(dictParamDTO);
   }
 }

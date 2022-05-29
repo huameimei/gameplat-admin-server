@@ -74,4 +74,8 @@
         member_loan a WHERE NOT EXISTS (select 1 from member_loan b where a.member_id = b.member_id and a.id  &lt; b.id)
         ) m
     </select>
+
+    <select id="getRecentLoanTime" resultType="java.util.Date" >
+        select max(loan_time) loanTime from member_loan where type = 2 and member_id = #{memberId}
+    </select>
 </mapper>

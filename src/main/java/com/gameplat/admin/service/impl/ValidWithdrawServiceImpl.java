@@ -225,7 +225,7 @@ public class ValidWithdrawServiceImpl extends ServiceImpl<ValidWithdrawMapper, V
                               .map(GameBetValidRecordVo::getValidAmount)
                               .reduce(BigDecimal.ZERO, BigDecimal::add)
                               .divide(Convert.toBigDecimal(1000), 2, RoundingMode.HALF_UP);
-                      String gameName = list.get(0).getGameName();
+                      String gameName = list.get(0).getGameKindName();
                       jsonObject.put("vaildBetAmount", betAmount);
                       jsonObject.put("gameKind", b);
                       jsonObject.put("gameName", gameName);

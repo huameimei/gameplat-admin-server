@@ -400,8 +400,9 @@ public class GameRebateReportServiceImpl
     GameRebateDetail gameRebateDetail = gameRebateDetailMapper.selectOne(query);
 
     Assert.notNull(gameRebateDetail.getStatus(), "返点记录状态异常");
-    Assert.isFalse(
-        GameRebateReportStatus.UNACCEPTED.match(gameRebateDetail.getStatus()), "返点记录已处理");
+    if (!GameRebateReportStatus.UNACCEPTED.match(gameRebateDetail.getStatus())) {
+      throw new ServiceException("返点记录已处理");
+    }
     Assert.notNull(gameRebateDetail.getMemberId(), "会员不存在!");
 
     gameRebateDetail.setStatus(status);

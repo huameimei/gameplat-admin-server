@@ -78,8 +78,7 @@ public class GameBetRecordSearchBuilder {
     if (StringUtils.isNotEmpty(dto.getState())) {
       builder.must(QueryBuilders.matchQuery("settle", dto.getState()));
     }
-    if (null != dto.getTimeType() && StringUtils.isNotBlank(dto.getBeginTime())) {
-
+    if (StringUtils.isNotBlank(dto.getBeginTime())) {
       builder.must(
           QueryBuilders.rangeQuery(convertTimeType(dto.getTimeType()))
               .from(date2TimeStamp(dto.getBeginTime()).getTime())

@@ -3,6 +3,7 @@ package com.gameplat.admin.service.impl;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.ObjectUtil;
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -174,6 +175,7 @@ public class ValidWithdrawServiceImpl extends ServiceImpl<ValidWithdrawMapper, V
       return;
     }
     String indexName = ContextConstant.ES_INDEX.BET_RECORD_ + sysTheme.getTenantCode();
+    log.info("数据标识：{}", indexName);
     validWithdraw.forEach(
         a -> {
           GameVaildBetRecordQueryDTO dto =
@@ -187,6 +189,7 @@ public class ValidWithdrawServiceImpl extends ServiceImpl<ValidWithdrawMapper, V
                 }
               };
           QueryBuilder builder = GameBetRecordSearchBuilder.buildBetRecordSearch(dto);
+          log.info("查询数据入参：{}", JSON.toJSONString(builder));
           // todo betTime
           SortBuilder<FieldSortBuilder> sortBuilder =
               SortBuilders.fieldSort("betTime").order(SortOrder.DESC);

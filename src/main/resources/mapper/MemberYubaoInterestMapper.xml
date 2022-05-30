@@ -10,6 +10,6 @@
     </update>
 
     <select id="isSettleInterest" resultType="java.lang.Boolean">
-        select count(1)>0 from member_yu_bao_interest where member_id=#{memberId} and (date between #{settleDate} and #{endDate})
+        select count(1)>0 from member_yu_bao_interest where member_id=#{memberId} and (date between #{startDate} and #{endDate})
     </select>
 </mapper>

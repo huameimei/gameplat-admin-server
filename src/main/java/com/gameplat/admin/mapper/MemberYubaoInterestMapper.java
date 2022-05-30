@@ -11,4 +11,6 @@ public interface MemberYubaoInterestMapper extends BaseMapper<MemberYubaoInteres
     void addYubaoInterest(@Param("yubaoId") Long yubaoId,@Param("memberId") Long memberId,@Param("money") double money);
 
     boolean isSettleInterest(@Param("memberId") Long memberId,@Param("startDate") Date startDate,@Param("endDate")Date endDate);
+
+    double getTotalYubaoInterest(@Param("memberId") Long memberId);
 }

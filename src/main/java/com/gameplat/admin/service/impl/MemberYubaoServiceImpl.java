@@ -151,7 +151,7 @@ public class MemberYubaoServiceImpl extends ServiceImpl<MemberYubaoMapper, Membe
       yuBaoList = this.page(page, queryWrapper).getRecords();
       for (MemberYubao yuBao : yuBaoList) {
         try {
-          addYubaoInterest(yuBao, settleDate, baseRate, activeRate, activeDml);
+          addYubaoInterest(yuBao, settleDate, baseRate, activeRate, activeDml,yubaoLimit);
         } catch (Exception e) {
           log.error("addYubaoInterest error:", e);
         }
@@ -180,7 +180,7 @@ public class MemberYubaoServiceImpl extends ServiceImpl<MemberYubaoMapper, Membe
   /**
    *  添加余额宝收益
    */
-  private void addYubaoInterest(MemberYubao yuBao, String settleDate, String baseRate, double activeRate, BigDecimal activeDml)  {
+  private void addYubaoInterest(MemberYubao yuBao, String settleDate, String baseRate, double activeRate, BigDecimal activeDml,YubaoLimit yubaoLimit)  {
     Date date = DateUtil.getParseDate(settleDate);
     //如果有计算过收益,则不计算
     if (memberYubaoInterestMapper.isSettleInterest(yuBao.getMemberId(), DateUtil.getDateStart(date),DateUtil.getDateEnd(date))) {
@@ -225,6 +225,23 @@ public class MemberYubaoServiceImpl extends ServiceImpl<MemberYubaoMapper, Membe
       log.info("ignore interestMoney < 0.01,account={}", yuBao.getAccount());
       return;
     }
+
+    //单笔收益上限
+    if(yubaoLimit!=null && yubaoLimit.getMaxSingleIncome()!=null && interestMoney>yubaoLimit.getMaxSingleIncome().doubleValue()){
+      log.info("账号={},日期={},单日收益上限,上限金额={},结算收益金额={}",yuBao.getAccount(),settleDate,yubaoLimit.getMaxSingleIncome().doubleValue(),interestMoney);
+      interestMoney=yubaoLimit.getMaxSingleIncome().doubleValue();
+    }
+
+    //总额收益上限
+    if(yubaoLimit!=null && yubaoLimit.getMaxTotalIncome()!=null){
+      //查询会员总收益
+      Double totalIncome=memberYubaoInterestMapper.getTotalYubaoInterest(yuBao.getMemberId());
+      if(totalIncome>=yubaoLimit.getMaxTotalIncome().doubleValue()){
+        log.info("账号={},日期={},总收益上限,上限金额={},结算收益金额={}",yuBao.getAccount(),settleDate,yubaoLimit.getMaxTotalIncome().doubleValue(),totalIncome);
+        return;
+      }
+    }
+
     // 添加收益金额
     memberYubaoInterestMapper.addYubaoInterest(yuBao.getId(),yuBao.getMemberId(), interestMoney);
 

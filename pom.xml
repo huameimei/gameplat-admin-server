@@ -256,6 +256,7 @@
                     <include>*.txt</include>
                     <include>*.xlsx</include>
                     <include>*.yml</include>
+                    <include>*.sql</include>
                 </includes>
             </resource>
         </resources>

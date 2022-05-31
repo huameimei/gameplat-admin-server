@@ -108,7 +108,7 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
   @Autowired(required = false)
   private MessageMapper messageMapper;
 
-  @Autowired private MessageDistributeService messageDistributeService;
+//  @Autowired private MessageDistributeService messageDistributeService;
   @Autowired private SysDictDataService sysDictDataService;
 
   @Autowired(required = false)
@@ -798,20 +798,20 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
     messageInfo.setCreateTime(new Date());
     messageMapper.insert(messageInfo);
 
-    MessageDistribute messageDistribute = new MessageDistribute();
-    messageDistribute.setMessageId(messageInfo.getId());
-    messageDistribute.setUserId(memberWithdraw.getMemberId());
-    messageDistribute.setUserAccount(messageInfo.getLinkAccount());
-    messageDistribute.setRechargeLevel(Convert.toInt(memberWithdraw.getMemberLevel()));
-    messageDistribute.setVipLevel(
-        memberInfoService
-            .lambdaQuery()
-            .eq(MemberInfo::getMemberId, memberWithdraw.getMemberId())
-            .one()
-            .getVipLevel());
-    messageDistribute.setReadStatus(NumberConstant.ZERO);
-    messageDistribute.setCreateBy("system");
-    messageDistributeService.save(messageDistribute);
+//    MessageDistribute messageDistribute = new MessageDistribute();
+//    messageDistribute.setMessageId(messageInfo.getId());
+//    messageDistribute.setUserId(memberWithdraw.getMemberId());
+//    messageDistribute.setUserAccount(messageInfo.getLinkAccount());
+//    messageDistribute.setRechargeLevel(Convert.toInt(memberWithdraw.getMemberLevel()));
+//    messageDistribute.setVipLevel(
+//        memberInfoService
+//            .lambdaQuery()
+//            .eq(MemberInfo::getMemberId, memberWithdraw.getMemberId())
+//            .one()
+//            .getVipLevel());
+//    messageDistribute.setReadStatus(NumberConstant.ZERO);
+//    messageDistribute.setCreateBy("system");
+//    messageDistributeService.save(messageDistribute);
   }
 
   private void sendMessage(String account, String channel, String message) {

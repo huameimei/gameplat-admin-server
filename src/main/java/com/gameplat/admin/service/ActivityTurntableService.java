@@ -9,4 +9,6 @@ public interface ActivityTurntableService extends IService<ActivityTurntable> {
     IPage<ActivityTurntable> findActivityTurntableList(PageDTO<ActivityTurntable> page, ActivityTurntable dto);
 
     boolean addActivityTurntable(ActivityTurntable bean);
+
+    void delete(String ids);
 }

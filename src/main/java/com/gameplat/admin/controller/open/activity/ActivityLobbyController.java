@@ -25,11 +25,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.util.Assert;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 用户活动大厅
@@ -213,7 +215,15 @@ public class ActivityLobbyController {
   @Operation(summary = "新增或更新转盘活动详情")
   @PostMapping("/addActivityTurntable")
   @PreAuthorize("hasAuthority('activity:lobby:addActivityTurntable')")
-  public boolean addActivityTurntable(ActivityTurntable bean) {
+  public boolean addActivityTurntable(@RequestBody ActivityTurntable bean) {
     return activityTurntableService.addActivityTurntable(bean);
+  }
+
+  @Operation(summary = "删除转盘活动")
+  @PostMapping("/removeActivityTurntable")
+  @PreAuthorize("hasAuthority('activity:info:removeActivityTurntable')")
+  public void removeActivityTurntable(@RequestBody Map<String, String> map) {
+    Assert.notNull(map.get("ids"), "id不能为空！");
+    activityTurntableService.delete(map.get("ids"));
   }
 }

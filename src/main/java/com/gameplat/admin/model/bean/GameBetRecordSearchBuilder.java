@@ -51,7 +51,7 @@ public class GameBetRecordSearchBuilder {
     }
     if (null != dto.getTimeType() && ObjectUtil.isNotNull(dto.getBeginTime())) {
       builder.must(
-          QueryBuilders.rangeQuery(convertTimeType(dto.getTimeType()))
+              QueryBuilders.rangeQuery(convertTimeTypes(dto.getTimeType()))
               .gte(DateUtil.date(Long.parseLong(dto.getBeginTime())).getTime())
               .lte(
                   dto.getEndTime() == null
@@ -80,7 +80,7 @@ public class GameBetRecordSearchBuilder {
     }
     if (StringUtils.isNotBlank(dto.getBeginTime())) {
       builder.must(
-          QueryBuilders.rangeQuery(convertTimeType(dto.getTimeType()))
+              QueryBuilders.rangeQuery(convertTimeTypes(dto.getTimeType()))
               .from(date2TimeStamp(dto.getBeginTime()).getTime())
               .to(
                   StringUtils.isNotEmpty(dto.getEndTime())
@@ -90,6 +90,28 @@ public class GameBetRecordSearchBuilder {
 
     return builder;
   }
+
+  /**
+   * 1 -- 投注时间, 2 -- 三方时间, 3 -- 结算时间, 4 -- 报表时间
+   */
+  public static String convertTimeTypes(Integer timeType) {
+    String keyword = "betTime";
+    if (TimeTypeEnum.BET_TIME.getValue() == timeType) {
+      keyword = "betTime";
+    }
+    if (TimeTypeEnum.THIRD_TIME.getValue() == timeType) {
+      keyword = "amesTime";
+    }
+    if (TimeTypeEnum.SETTLE_TIME.getValue() == timeType) {
+      keyword = "settleTime";
+    }
+    if (TimeTypeEnum.STAT_TIME.getValue() == timeType) {
+      keyword = "statTime";
+    }
+    return keyword;
+  }
+
+
 
   /** 1 -- 投注时间, 2 -- 三方时间, 3 -- 结算时间, 4 -- 报表时间 */
   public static String convertTimeType(Integer timeType) {

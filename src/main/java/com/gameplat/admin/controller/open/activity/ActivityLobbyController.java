@@ -31,7 +31,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * 用户活动大厅
@@ -203,8 +202,8 @@ public class ActivityLobbyController {
   @GetMapping("/getActivityTurntableList")
   @PreAuthorize("hasAuthority('activity:lobby:getActivityTurntableList')")
   public IPage<ActivityTurntable> getActivityTurntableList(
-          @Parameter(hidden = true) PageDTO<ActivityTurntable> page, ActivityTurntable dto) {
-    return activityTurntableService.findActivityTurntableList(page, dto);
+          @Parameter(hidden = true) PageDTO<ActivityTurntable> page, ActivityTurntable dto,String startDate,String endDate) {
+    return activityTurntableService.findActivityTurntableList(page, dto,startDate,endDate);
   }
 
   /**
@@ -222,8 +221,8 @@ public class ActivityLobbyController {
   @Operation(summary = "删除转盘活动")
   @PostMapping("/removeActivityTurntable")
   @PreAuthorize("hasAuthority('activity:info:removeActivityTurntable')")
-  public void removeActivityTurntable(@RequestBody Map<String, String> map) {
-    Assert.notNull(map.get("ids"), "id不能为空！");
-    activityTurntableService.delete(map.get("ids"));
+  public void removeActivityTurntable(String ids) {
+    Assert.notNull(ids, "id不能为空！");
+    activityTurntableService.delete(ids);
   }
 }

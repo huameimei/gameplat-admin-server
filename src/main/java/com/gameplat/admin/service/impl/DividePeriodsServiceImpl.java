@@ -112,7 +112,7 @@ public class DividePeriodsServiceImpl extends ServiceImpl<DividePeriodsMapper, D
 
   @Autowired private MessageMapper messageMapper;
 
-  @Autowired private MessageDistributeService messageDistributeService;
+//  @Autowired private MessageDistributeService messageDistributeService;
 
   @Autowired private RedissonClient redissonClient;
 
@@ -999,20 +999,20 @@ public class DividePeriodsServiceImpl extends ServiceImpl<DividePeriodsMapper, D
     message.setCreateBy(userCredential.getUsername());
     messageMapper.saveReturnId(message);
 
-    MessageDistribute messageDistribute = new MessageDistribute();
-    messageDistribute.setMessageId(message.getId());
-    messageDistribute.setUserId(member.getId());
-    messageDistribute.setUserAccount(member.getAccount());
-    messageDistribute.setRechargeLevel(member.getUserLevel());
-    messageDistribute.setVipLevel(
-        memberInfoService
-            .lambdaQuery()
-            .eq(MemberInfo::getMemberId, member.getId())
-            .one()
-            .getVipLevel());
-    messageDistribute.setReadStatus(NumberConstant.ZERO);
-    messageDistribute.setCreateBy(userCredential.getUsername());
-    messageDistributeService.save(messageDistribute);
+//    MessageDistribute messageDistribute = new MessageDistribute();
+//    messageDistribute.setMessageId(message.getId());
+//    messageDistribute.setUserId(member.getId());
+//    messageDistribute.setUserAccount(member.getAccount());
+//    messageDistribute.setRechargeLevel(member.getUserLevel());
+//    messageDistribute.setVipLevel(
+//        memberInfoService
+//            .lambdaQuery()
+//            .eq(MemberInfo::getMemberId, member.getId())
+//            .one()
+//            .getVipLevel());
+//    messageDistribute.setReadStatus(NumberConstant.ZERO);
+//    messageDistribute.setCreateBy(userCredential.getUsername());
+//    messageDistributeService.save(messageDistribute);
   }
 
   public void financialRecycle(

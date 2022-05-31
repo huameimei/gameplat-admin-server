@@ -98,7 +98,7 @@ public class SalaryPeriodsServiceImpl extends ServiceImpl<SalaryPeriodsMapper, S
 
   @Autowired private MessageMapper messageMapper;
 
-  @Autowired private MessageDistributeService messageDistributeService;
+//  @Autowired private MessageDistributeService messageDistributeService;
 
   /**
    * 分页列表
@@ -710,16 +710,16 @@ public class SalaryPeriodsServiceImpl extends ServiceImpl<SalaryPeriodsMapper, S
     message.setStatus(TrueFalse.TRUE.getValue());
     message.setCreateBy(operatorName);
     messageMapper.saveReturnId(message);
-
-    MessageDistribute messageDistribute = new MessageDistribute();
-    messageDistribute.setMessageId(message.getId());
-    messageDistribute.setUserId(member.getId());
-    messageDistribute.setUserAccount(member.getAccount());
-    messageDistribute.setRechargeLevel(member.getUserLevel());
-    messageDistribute.setVipLevel(memberInfoService.getById(member.getId()).getVipLevel());
-    messageDistribute.setReadStatus(TrueFalse.FALSE.getValue());
-    messageDistribute.setCreateBy(operatorName);
-    messageDistributeService.save(messageDistribute);
+//
+//    MessageDistribute messageDistribute = new MessageDistribute();
+//    messageDistribute.setMessageId(message.getId());
+//    messageDistribute.setUserId(member.getId());
+//    messageDistribute.setUserAccount(member.getAccount());
+//    messageDistribute.setRechargeLevel(member.getUserLevel());
+//    messageDistribute.setVipLevel(memberInfoService.getById(member.getId()).getVipLevel());
+//    messageDistribute.setReadStatus(TrueFalse.FALSE.getValue());
+//    messageDistribute.setCreateBy(operatorName);
+//    messageDistributeService.save(messageDistribute);
   }
 
   /**

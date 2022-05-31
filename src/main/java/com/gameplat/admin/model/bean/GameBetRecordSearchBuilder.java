@@ -93,18 +93,18 @@ public class GameBetRecordSearchBuilder {
 
   /** 1 -- 投注时间, 2 -- 三方时间, 3 -- 结算时间, 4 -- 报表时间 */
   public static String convertTimeType(Integer timeType) {
-    String keyword = "betTime";
+    String keyword = "betTime.keyword";
     if (TimeTypeEnum.BET_TIME.getValue() == timeType) {
-      keyword = "betTime";
+      keyword = "betTime.keyword";
     }
     if (TimeTypeEnum.THIRD_TIME.getValue() == timeType) {
-      keyword = "amesTime";
+      keyword = "amesTime.keyword";
     }
     if (TimeTypeEnum.SETTLE_TIME.getValue() == timeType) {
-      keyword = "settleTime";
+      keyword = "settleTime.keyword";
     }
     if (TimeTypeEnum.STAT_TIME.getValue() == timeType) {
-      keyword = "statTime";
+      keyword = "statTime.keyword";
     }
     return keyword;
   }

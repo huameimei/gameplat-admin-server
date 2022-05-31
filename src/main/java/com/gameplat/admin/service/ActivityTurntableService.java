@@ -6,7 +6,9 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.gameplat.model.entity.activity.ActivityTurntable;
 
 public interface ActivityTurntableService extends IService<ActivityTurntable> {
-    IPage<ActivityTurntable> findActivityTurntableList(PageDTO<ActivityTurntable> page, ActivityTurntable dto);
+    IPage<ActivityTurntable> findActivityTurntableList(PageDTO<ActivityTurntable> page, ActivityTurntable dto,String startDate,String endDate);
 
     boolean addActivityTurntable(ActivityTurntable bean);
+
+    void delete(String ids);
 }

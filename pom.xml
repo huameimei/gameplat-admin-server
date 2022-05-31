@@ -196,6 +196,12 @@
             <artifactId>spring-cloud-stream-test-support</artifactId>
             <scope>test</scope>
         </dependency>
+
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-core</artifactId>
+            <version>6.5.7</version>
+        </dependency>
     </dependencies>
 
     <profiles>
@@ -256,7 +262,7 @@
                     <include>*.txt</include>
                     <include>*.xlsx</include>
                     <include>*.yml</include>
-                    <include>*.sql</include>
+                    <include>db/migration/*.sql</include>
                 </includes>
             </resource>
         </resources>

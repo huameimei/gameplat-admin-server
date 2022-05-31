@@ -38,4 +38,7 @@ public class MemberLoanVO implements Serializable {
 
   @Schema(description = "借款时间")
   private Date loanTime;
+
+  @Schema(description = "操作类型")
+  private Integer type;
 }

@@ -12,6 +12,7 @@
             i.balance memberBalance,
             g.loan_money loanMoney,
             l.loan_time loanTime,
+            l.type,
             IFNULL(l.loan_status, 1) loanStatus,
             IFNULL(l.overdraft_money, 0.0000) overdraftMoney
         from

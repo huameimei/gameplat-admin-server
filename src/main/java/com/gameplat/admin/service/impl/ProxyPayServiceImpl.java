@@ -1,5 +1,6 @@
 package com.gameplat.admin.service.impl;
 
+import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
@@ -11,6 +12,7 @@ import com.gameplat.admin.feign.PaymentCenterFeign;
 import com.gameplat.admin.model.bean.AdminLimitInfo;
 import com.gameplat.admin.model.bean.ProxyPayMerBean;
 import com.gameplat.admin.model.bean.ReturnMessage;
+import com.gameplat.admin.model.vo.MemberWithdrawBankVo;
 import com.gameplat.admin.service.*;
 import com.gameplat.admin.util.MoneyUtils;
 import com.gameplat.base.common.exception.ServiceException;
@@ -89,30 +91,21 @@ public class ProxyPayServiceImpl implements ProxyPayService {
         return true;
       }
     }
-    Map<String, String> banksMap =
-        JSONObject.parseArray(ppInterface.getLimtInfo()).stream()
-            .filter(Objects::nonNull)
-            .collect(
-                Collectors.toMap(
-                    o -> {
-                      JSONObject o1 = (JSONObject) o;
-                      return o1.getString("code");
-                    },
-                    o -> {
-                      JSONObject o1 = (JSONObject) o;
-                      return o1.getString("name");
-                    }));
+    List<MemberWithdrawBankVo> bankVoList =
+            JSONUtil.toList(
+                    (JSONArray) JSONUtil.parseObj(ppInterface.getLimtInfo()).get("banks"),
+                    MemberWithdrawBankVo.class);
+    // 模糊匹配银行名称
     /** 模糊匹配银行名称 */
     boolean isBankName = true;
-    for (Map.Entry<String, String> entry : banksMap.entrySet()) {
-      if (StringUtils.contains(entry.getValue(), memberWithdraw.getBankName())
-          || StringUtils.contains(memberWithdraw.getBankName(), entry.getValue())) {
+    for (MemberWithdrawBankVo ex : bankVoList) {
+      if (StringUtils.contains(ex.getName(), memberWithdraw.getBankName())
+              || StringUtils.contains(memberWithdraw.getBankName(), ex.getName())) {
         isBankName = false;
         break;
       }
-
-      if (StringUtils.contains(entry.getValue(), "邮政")
-          && StringUtils.contains(memberWithdraw.getBankName(), "邮政")) {
+      if (StringUtils.contains(ex.getName(), "邮政")
+              && StringUtils.contains(memberWithdraw.getBankName(), "邮政")) {
         isBankName = false;
         break;
       }
@@ -439,31 +432,19 @@ public class ProxyPayServiceImpl implements ProxyPayService {
     }
 
     String bankCode = "";
-    String bankName = memberWithdraw.getBankName();
-    Map<String, String> banksMap =
-        JSONObject.parseArray(ppinterface.getLimtInfo()).stream()
-            .filter(Objects::nonNull)
-            .collect(
-                Collectors.toMap(
-                    o -> {
-                      JSONObject o1 = (JSONObject) o;
-                      return o1.getString("code");
-                    },
-                    o -> {
-                      JSONObject o1 = (JSONObject) o;
-                      return o1.getString("name");
-                    }));
-    for (Map.Entry<String, String> entry : banksMap.entrySet()) {
-      if (StringUtils.contains(entry.getValue(), bankName)
-          || StringUtils.contains(bankName, entry.getValue())) {
-        bankCode = entry.getKey();
+    List<MemberWithdrawBankVo> bankVoList =
+            JSONUtil.toList(
+                    (JSONArray) JSONUtil.parseObj(ppinterface.getLimtInfo()).get("banks"),
+                    MemberWithdrawBankVo.class);
+    for (MemberWithdrawBankVo ex : bankVoList) {
+      if (StringUtils.contains(ex.getName(), memberWithdraw.getBankName())
+              || StringUtils.contains(memberWithdraw.getBankName(), ex.getName())) {
+        bankCode = ex.getCode();
+        break;
       }
-      if (StringUtils.contains(entry.getValue(), "邮政") && StringUtils.contains(bankName, "邮政")) {
-        bankCode = entry.getKey();
-      }
-      // 处理银行名称模糊匹配无法正确设置对应code
-      if (StringUtils.equals(bankName, entry.getValue())) {
-        bankCode = entry.getKey();
+      if (StringUtils.contains(ex.getName(), "邮政")
+              && StringUtils.contains(memberWithdraw.getBankName(), "邮政")) {
+        bankCode = ex.getCode();
         break;
       }
     }

@@ -192,7 +192,7 @@ public class ValidWithdrawServiceImpl extends ServiceImpl<ValidWithdrawMapper, V
           log.info("查询数据入参：{}", JSON.toJSONString(builder));
           // todo betTime
           SortBuilder<FieldSortBuilder> sortBuilder =
-              SortBuilders.fieldSort("betTime").order(SortOrder.DESC);
+                  SortBuilders.fieldSort("betTime").order(SortOrder.DESC);
           PageResponse<GameBetValidRecordVo> result =
               baseElasticsearchService.search(
                   builder, indexName, GameBetValidRecordVo.class, 0, 9999, sortBuilder);

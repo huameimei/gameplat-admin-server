@@ -65,6 +65,14 @@ public class MemberController {
     return memberService.getMemberInfo(id);
   }
 
+
+  @Operation(summary = "会员详情")
+  @GetMapping("/dateils/{id}")
+  @PreAuthorize("hasAuthority('member:info:view')")
+  public MemberInfoVO getMemberDateils(@PathVariable Long id) {
+    return memberService.getMemberDateils(id);
+  }
+
   @Operation(summary = "会员联系方式")
   @GetMapping("/contact/{id}")
   @PreAuthorize("hasAuthority('member:contact:view')")

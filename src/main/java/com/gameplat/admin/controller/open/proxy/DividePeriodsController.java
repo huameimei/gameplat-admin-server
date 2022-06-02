@@ -53,7 +53,7 @@ public class DividePeriodsController {
   @PostMapping("/add")
   @Operation(summary = "新增期数")
   @PreAuthorize("hasAuthority('divide:periods:add')")
-  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.AGENT, desc = "新增期数")
+  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.AGENT, desc = "'新增期数'")
   public void add(@Validated @RequestBody DividePeriodsDTO dto) {
     periodsService.add(dto);
   }
@@ -66,7 +66,7 @@ public class DividePeriodsController {
   @PostMapping("/edit")
   @Operation(summary = "编辑期数")
   @PreAuthorize("hasAuthority('divide:periods:edit')")
-  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.AGENT, desc = "编辑期数")
+  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.AGENT, desc = "'编辑期数'")
   public void edit(@Validated @RequestBody DividePeriodsDTO dto) {
     periodsService.edit(dto);
   }
@@ -94,7 +94,7 @@ public class DividePeriodsController {
   @PostMapping("/settle")
   @Operation(summary = "期数结算")
   @PreAuthorize("hasAuthority('divide:periods:settle')")
-  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.AGENT, desc = "期数结算")
+  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.AGENT, desc = "'期数结算'")
   public void settle(@Validated @RequestBody DividePeriodsDTO dto) {
     periodsService.settle(dto);
   }
@@ -107,7 +107,7 @@ public class DividePeriodsController {
   @PostMapping("/grant")
   @Operation(summary = "期数派发")
   @PreAuthorize("hasAuthority('divide:periods:grant')")
-  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.AGENT, desc = "期数派发")
+  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.AGENT, desc = "'期数派发'")
   public void grant(@Validated @RequestBody DividePeriodsDTO dto) {
     periodsService.grant(dto);
   }
@@ -120,7 +120,7 @@ public class DividePeriodsController {
   @PostMapping("/recycle")
   @Operation(summary = "期数回收")
   @PreAuthorize("hasAuthority('divide:periods:recycle')")
-  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.AGENT, desc = "期数回收")
+  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.AGENT, desc = "'期数回收'")
   public void recycle(@Validated @RequestBody DividePeriodsDTO dto) {
     periodsService.recycle(dto);
   }

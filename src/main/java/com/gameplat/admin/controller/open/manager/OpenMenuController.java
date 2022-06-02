@@ -37,7 +37,7 @@ public class OpenMenuController {
   @Operation(summary = "添加")
   @PostMapping("/add")
   @PreAuthorize("hasAuthority('system:menu:add')")
-  @Log(module = ServiceName.ADMIN_SERVICE, desc = "添加菜单")
+  @Log(module = ServiceName.ADMIN_SERVICE, desc = "'添加菜单'")
   public void save(@Validated(Groups.INSERT.class) @RequestBody OperMenuDTO dto) {
     if (StringUtils.isBlank(dto.getMenuName())
         && !SysMenuEnums.TYPE.BUTTON.match(dto.getMenuType())) {

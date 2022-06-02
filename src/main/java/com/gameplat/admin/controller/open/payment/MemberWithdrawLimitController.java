@@ -40,7 +40,7 @@ public class MemberWithdrawLimitController {
   @Operation(summary = "添加/修改")
   @PostMapping("/addOrEdit")
   @PreAuthorize("hasAuthority('thirdParty:memberWithdrawLimit:add')")
-  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.WITHDRAW, desc = "新增或修改提现次数限制")
+  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.WITHDRAW, desc = "'新增或修改提现次数限制'")
   public void addOrEdit(@RequestBody UserWithdrawLimitInfo limitInfo) {
     String dictType = DictTypeEnum.USER_WITHDRAW_LIMIT.getValue();
     String dictLabel = DictDataEnum.WITHDRAW_LIMIT.getLabel() + limitInfo.getTimesForWithdrawal();

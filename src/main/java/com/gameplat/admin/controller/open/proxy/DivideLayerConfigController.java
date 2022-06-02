@@ -70,7 +70,7 @@ public class DivideLayerConfigController {
   @PostMapping("/add")
   @Operation(summary = "新增层层代分红配置")
   @PreAuthorize("hasAuthority('agent:bonusconfig:add')")
-  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.AGENT, desc = "新增层层代分红配置")
+  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.AGENT, desc = "'新增层层代分红配置'")
   public void add(@Validated @RequestBody DivideConfigDTO dto) {
     layerConfigService.add(dto.getUserName(), "zh-CN");
   }
@@ -83,7 +83,7 @@ public class DivideLayerConfigController {
   @PostMapping("/edit")
   @Operation(summary = "编辑层层代分红配置")
   @PreAuthorize("hasAuthority('agent:bonusconfig:edit')")
-  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.AGENT, desc = "新增层层代分红配置")
+  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.AGENT, desc = "'新增层层代分红配置'")
   public void edit(@Validated @RequestBody DivideConfigDTO dto) {
     layerConfigService.edit(dto, "zh-CN");
   }

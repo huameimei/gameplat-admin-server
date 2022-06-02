@@ -59,7 +59,7 @@ public class DivideFissionConfigController {
   @PostMapping("/add")
   @Operation(summary = "新增裂变分红配置")
   @PreAuthorize("hasAuthority('agent:bonusFissionconfig:add')")
-  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.AGENT, desc = "新增裂变分红配置")
+  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.AGENT, desc = "'新增裂变分红配置'")
   public void add(@Validated @RequestBody DivideConfigDTO dto) {
     fissionConfigService.add(dto.getUserName(), "zh-CN");
   }
@@ -83,7 +83,7 @@ public class DivideFissionConfigController {
   @PostMapping("/edit")
   @Operation(summary = "编辑裂变分红配置")
   @PreAuthorize("hasAuthority('agent:bonusFissionconfig:edit')")
-  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.AGENT, desc = "编辑裂变分红配置")
+  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.AGENT, desc = "'编辑裂变分红配置'")
   public void edit(@Validated @RequestBody DivideConfigDTO dto) {
     fissionConfigService.edit(dto, "zh-CN");
   }

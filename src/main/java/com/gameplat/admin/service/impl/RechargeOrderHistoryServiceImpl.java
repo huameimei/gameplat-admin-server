@@ -12,12 +12,18 @@ import com.gameplat.admin.mapper.RechargeOrderHistoryMapper;
 import com.gameplat.admin.model.dto.RechargeOrderHistoryQueryDTO;
 import com.gameplat.admin.model.vo.RechargeHistorySummaryVO;
 import com.gameplat.admin.model.vo.RechargeOrderHistoryVO;
+import com.gameplat.admin.model.vo.RechargeOrderReportVo;
 import com.gameplat.admin.service.RechargeOrderHistoryService;
 import com.gameplat.model.entity.recharge.RechargeOrderHistory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)
@@ -46,6 +52,23 @@ public class RechargeOrderHistoryServiceImpl
             ? RechargeOrderHistory::getCreateTime
             : RechargeOrderHistory::getAuditTime);
     return this.page(page, query).convert(rechargeOrderHistoryConvert::toVo);
+  }
+
+  @Override
+  public void rechReport(RechargeOrderHistoryQueryDTO dto, HttpServletRequest request, HttpServletResponse response) {
+    LambdaQueryWrapper<RechargeOrderHistory> query = buildSql(dto);
+    query.orderBy(
+            ObjectUtils.isNotEmpty(dto.getOrder()),
+            !ObjectUtils.isEmpty(dto.getOrder()) && "ASC".equals(dto.getOrder()),
+            "createTime".equals(dto.getOrderBy())
+                    ? RechargeOrderHistory::getCreateTime
+                    : RechargeOrderHistory::getAuditTime);
+    List<RechargeOrderReportVo> list =
+            this.list(query).stream()
+                    .map(rechargeOrderHistoryConvert::toRechVo)
+                    .collect(Collectors.toList());
+
+
   }
 
   @Override

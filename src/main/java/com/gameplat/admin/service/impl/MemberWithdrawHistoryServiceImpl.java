@@ -1,5 +1,7 @@
 package com.gameplat.admin.service.impl;
 
+import cn.afterturn.easypoi.excel.ExcelExportUtil;
+import cn.afterturn.easypoi.excel.entity.ExportParams;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -14,18 +16,30 @@ import com.gameplat.admin.mapper.MemberWithdrawHistoryMapper;
 import com.gameplat.admin.model.dto.MemberWithdrawHistoryQueryDTO;
 import com.gameplat.admin.model.vo.MemberWithdrawHistorySummaryVO;
 import com.gameplat.admin.model.vo.MemberWithdrawHistoryVO;
+import com.gameplat.admin.model.vo.MemberWithdrawReportVo;
+import com.gameplat.admin.model.vo.RechargeOrderReportVo;
 import com.gameplat.admin.service.MemberWithdrawHistoryService;
+import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.StringUtils;
 import com.gameplat.model.entity.member.MemberWithdrawHistory;
+import lombok.extern.log4j.Log4j2;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)
+@Log4j2
 public class MemberWithdrawHistoryServiceImpl
     extends ServiceImpl<MemberWithdrawHistoryMapper, MemberWithdrawHistory>
     implements MemberWithdrawHistoryService {
@@ -63,8 +77,35 @@ public class MemberWithdrawHistoryServiceImpl
   }
 
   @Override
+  public void withReport(
+          MemberWithdrawHistoryQueryDTO dto, HttpServletRequest request, HttpServletResponse response) {
+    LambdaQueryWrapper<MemberWithdrawHistory> query = buildSql(dto);
+    query.orderBy(
+            ObjectUtils.isNotEmpty(dto.getOrder()),
+            !ObjectUtils.isEmpty(dto.getOrder()) && "ASC".equals(dto.getOrder()),
+            "createTime".equals(dto.getOrderBy())
+                    ? MemberWithdrawHistory::getCreateTime
+                    : MemberWithdrawHistory::getOperatorTime);
+    List<MemberWithdrawReportVo> list =
+            this.list(query).stream()
+                    .map(userWithdrawHistoryConvert::toReportVo)
+                    .collect(Collectors.toList());
+    ExportParams exportParams = new ExportParams("出款数据", "出款数据");
+    exportParams.setMaxNum(10000);
+    try {
+      response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename = withReport.xls");
+      Workbook workbook =
+              ExcelExportUtil.exportExcel(exportParams, MemberWithdrawReportVo.class, list);
+      workbook.write(response.getOutputStream());
+    } catch (IOException e) {
+      log.info("导出出款记录报错", e);
+      throw new ServiceException("导出失败:" + e);
+    }
+  }
+
+  @Override
   public MemberWithdrawHistorySummaryVO findSumMemberWithdrawHistory(
-      MemberWithdrawHistoryQueryDTO dto) {
+          MemberWithdrawHistoryQueryDTO dto) {
     LambdaQueryWrapper<MemberWithdrawHistory> query = buildSql(dto);
     return memberWithdrawHistoryMapper.summaryMemberWithdrawHistory(query);
   }

@@ -1,5 +1,6 @@
 package com.gameplat.admin.model.vo;
 
+import cn.afterturn.easypoi.excel.annotation.Excel;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -9,6 +10,7 @@ import java.util.Date;
 public class RechargeOrderHistoryVO {
 
   private Long id;
+
 
   private String account;
 

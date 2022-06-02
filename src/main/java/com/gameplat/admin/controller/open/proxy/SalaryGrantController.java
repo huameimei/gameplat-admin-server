@@ -48,7 +48,7 @@ public class SalaryGrantController {
   @PostMapping("/change")
   @Operation(summary = "期数结算")
   @PreAuthorize("hasAuthority('salary:grant:change')")
-  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.AGENT, desc = "期数结算")
+  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.AGENT, desc = "'期数结算'")
   public void change(@Validated @RequestBody SalaryGrantDTO dto) {
     salaryGrantService.change(dto.getId(), dto.getSalaryAmount());
   }

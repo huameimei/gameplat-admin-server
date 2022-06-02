@@ -47,13 +47,13 @@ public class RebateConfigController {
       module = ServiceName.ADMIN_SERVICE,
       type = LogType.AGENT,
       desc =
-          "平级分红->编辑平级分红方案明细，"
-              + "方案名称：#{#planName}，"
-              + "返佣等级：#{#oldRebateLevel} -> #{#rebateLevel}，"
-              + "公司净利润：#{#oldAgentProfit} -> #{#agentProfit}，"
-              + "有效会员数：#{#oldActivityMember} -> #{#activityMember}，"
-              + "佣金比例：#{#oldCommission*100}% -> #{#commission*100}%，"
-              + "备注：#{#remark}")
+          "'平级分红->编辑平级分红方案明细，'"
+              + "'方案名称：' + #rebateConfigPO.planName + '，'"
+              + "'返佣等级：' + #rebateConfigPO.oldRebateLevel + ' -> ' + #rebateConfigPO.rebateLevel + '，'"
+              + "'公司净利润：' + #rebateConfigPO.oldAgentProfit + ' ->' + #rebateConfigPO.agentProfit + '，'"
+              + "'有效会员数：' + #rebateConfigPO.oldActivityMember + ' -> ' + #rebateConfigPO.activityMember + '，'"
+              + "'佣金比例：' + #rebateConfigPO.oldCommission*100 + '% -> ' + #rebateConfigPO.commission*100 + '%，'"
+              + "'备注：' + #rebateConfigPO.remark")
   public void editRebateConfig(@RequestBody RebateConfig rebateConfigPO) {
     log.info("编辑平级分红方案明细：rebateConfigPO={}", rebateConfigPO);
     UserCredential userCredential = SecurityUserHolder.getCredential();
@@ -66,7 +66,7 @@ public class RebateConfigController {
   @Log(
       module = ServiceName.ADMIN_SERVICE,
       type = LogType.AGENT,
-      desc = "平级分红->删除平级分红方案明细，方案ID：#{#planId}，方案明细ID：#{#configIds}")
+      desc = "'平级分红->删除平级分红方案明细，方案ID：' + #planId + '，方案明细ID：' + #configIds")
   public void removeRebateConfig(@RequestParam Long planId, @RequestParam String configIds) {
     rebateConfigService.removeRebateConfig(configIds, planId);
   }

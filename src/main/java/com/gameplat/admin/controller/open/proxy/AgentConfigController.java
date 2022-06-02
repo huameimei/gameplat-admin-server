@@ -54,7 +54,7 @@ public class AgentConfigController {
   @PostMapping("/edit")
   @Operation(summary = "编辑代配置")
   @PreAuthorize("hasAuthority('system:config:update:agent')")
-  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.AGENT, desc = "编辑层层代配置")
+  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.AGENT, desc = "'编辑层层代配置'")
   public void edit(@Validated @RequestBody Map<String, Object> params) {
     agentConfigService.edit(params);
   }

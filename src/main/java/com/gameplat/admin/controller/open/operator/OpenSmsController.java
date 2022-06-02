@@ -38,7 +38,7 @@ public class OpenSmsController {
   @Operation(summary = "清空")
   @PostMapping("/clean")
   @PreAuthorize("hasAuthority('system:sms:clean')")
-  @Log(module = ServiceName.ADMIN_SERVICE, param = true, desc = "清空短信记录表")
+  @Log(module = ServiceName.ADMIN_SERVICE, param = true, desc = "'清空短信记录表'")
   public void clean() {
     smsService.cleanSms();
   }

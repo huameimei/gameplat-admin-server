@@ -50,7 +50,7 @@ public class DivideFixConfigController {
   @PostMapping("/add")
   @Operation(summary = "新增固定比例分红配置")
   @PreAuthorize("hasAuthority('agent:bonusFixconfig:add')")
-  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.AGENT, desc = "新增固定比例分红配置")
+  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.AGENT, desc = "'新增固定比例分红配置'")
   public void add(@Validated @RequestBody DivideConfigDTO divideConfigDTO) {
     fixConfigService.add(divideConfigDTO.getUserName(), "zh-CN");
   }
@@ -64,7 +64,7 @@ public class DivideFixConfigController {
   @PostMapping("/edit")
   @Operation(summary = "编辑固定比例分红配置")
   @PreAuthorize("hasAuthority('agent:bonusFixconfig:edit')")
-  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.AGENT, desc = "新增固定比例分红配置")
+  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.AGENT, desc = "'新增固定比例分红配置'")
   public void edit(@Validated @RequestBody DivideConfigDTO dto) {
     fixConfigService.edit(dto, "zh-CN");
   }

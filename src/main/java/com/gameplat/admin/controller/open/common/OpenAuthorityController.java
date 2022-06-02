@@ -47,14 +47,14 @@ public class OpenAuthorityController {
 
   @Operation(summary = "账号登出")
   @PostMapping("/logout")
-  @LoginLog(isLogout = true, module = ServiceName.ADMIN_SERVICE, desc = "账号登出系统")
+  @LoginLog(isLogout = true, module = ServiceName.ADMIN_SERVICE, desc = "'账号登出系统'")
   public void logout() {
     authenticationService.logout();
   }
 
   @Operation(summary = "刷新TOKEN")
   @PostMapping("/refreshToken")
-  @Log(module = ServiceName.ADMIN_SERVICE, desc = "刷新token")
+  @Log(module = ServiceName.ADMIN_SERVICE, desc = "'刷新token'")
   public RefreshToken refreshToken(@RequestParam String refreshToken) {
     return authenticationService.refreshToken(refreshToken);
   }

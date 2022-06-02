@@ -36,7 +36,7 @@ public class OpenLogsController {
   @Operation(summary = "导出登录日志")
   @PostMapping("/login/export")
   @PreAuthorize("hasAuthority('operator:loginLogs:export')")
-  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.ADMIN, desc = "导出会员登录日志")
+  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.ADMIN, desc = "'导出会员登录日志'")
   public void loginExport(@RequestBody LogDTO logDTO, HttpServletResponse response) {
     List<MemberLogVO> logs = logService.loginExport(logDTO);
     EasyExcelUtil.downExcel("会员登录日志", logs, MemberLogVO.class, response);
@@ -52,7 +52,7 @@ public class OpenLogsController {
   @Operation(summary = "导出操作日志")
   @PostMapping("/oper/export")
   @PreAuthorize("hasAuthority('operator:operLogs:export')")
-  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.ADMIN, desc = "导出会员操作日志")
+  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.ADMIN, desc = "'导出会员操作日志'")
   public void operExport(@RequestBody LogDTO logDTO, HttpServletResponse response) {
     List<MemberLogVO> logs = logService.operExport(logDTO);
     EasyExcelUtil.downExcel("会员操作日志", logs, MemberLogVO.class, response);

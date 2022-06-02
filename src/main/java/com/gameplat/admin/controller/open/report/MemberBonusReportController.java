@@ -48,7 +48,7 @@ public class MemberBonusReportController {
   @GetMapping(value = "/exportReport")
   @Operation(summary = "导出会员红利报表")
   @PreAuthorize("hasAuthority('bonus:report:export')")
-  @Log(module = ServiceName.ADMIN_SERVICE, desc = "导出会员红利报表")
+  @Log(module = ServiceName.ADMIN_SERVICE, desc = "'导出会员红利报表'")
   public void exportReport(MemberBonusReportQueryDTO queryDTO, HttpServletResponse response) {
     if (StringUtils.isEmpty(queryDTO.getStartTime())
         || StringUtils.isEmpty(queryDTO.getEndTime())) {

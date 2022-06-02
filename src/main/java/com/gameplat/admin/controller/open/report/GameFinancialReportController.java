@@ -45,7 +45,7 @@ public class GameFinancialReportController {
   @Operation(summary = "初始化财务报表")
   @GetMapping("/initReportList")
   @PreAuthorize("hasAuthority('financial:report:init')")
-  @Log(module = ServiceName.ADMIN_SERVICE, desc = "初始化财务报表")
+  @Log(module = ServiceName.ADMIN_SERVICE, desc = "'初始化财务报表'")
   public void initReportList(@RequestParam String statisticsTime) {
     if (StringUtils.isEmpty(statisticsTime)) {
       statisticsTime = DateUtil.format(new Date(), "yyyy-MM");
@@ -56,7 +56,7 @@ public class GameFinancialReportController {
   @Operation(summary = "导出财务报表")
   @GetMapping("/exportReport")
   @PreAuthorize("hasAuthority('financial:report:export')")
-  @Log(module = ServiceName.ADMIN_SERVICE, desc = "导出财务报表")
+  @Log(module = ServiceName.ADMIN_SERVICE, desc = "'导出财务报表'")
   public void exportReport(@RequestParam String statisticsTime, HttpServletResponse response) {
     if (StringUtils.isEmpty(statisticsTime)) {
       statisticsTime = DateUtil.format(new Date(), "yyyy-MM");

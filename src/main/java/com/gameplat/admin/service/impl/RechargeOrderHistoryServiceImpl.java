@@ -1,5 +1,7 @@
 package com.gameplat.admin.service.impl;
 
+import cn.afterturn.easypoi.excel.ExcelExportUtil;
+import cn.afterturn.easypoi.excel.entity.ExportParams;
 import cn.hutool.core.date.DateUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -10,18 +12,22 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.convert.RechargeOrderHistoryConvert;
 import com.gameplat.admin.mapper.RechargeOrderHistoryMapper;
 import com.gameplat.admin.model.dto.RechargeOrderHistoryQueryDTO;
+import com.gameplat.admin.model.vo.GameReportVO;
 import com.gameplat.admin.model.vo.RechargeHistorySummaryVO;
 import com.gameplat.admin.model.vo.RechargeOrderHistoryVO;
 import com.gameplat.admin.model.vo.RechargeOrderReportVo;
 import com.gameplat.admin.service.RechargeOrderHistoryService;
 import com.gameplat.model.entity.recharge.RechargeOrderHistory;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -55,7 +61,8 @@ public class RechargeOrderHistoryServiceImpl
   }
 
   @Override
-  public void rechReport(RechargeOrderHistoryQueryDTO dto, HttpServletRequest request, HttpServletResponse response) {
+  public void rechReport(
+          RechargeOrderHistoryQueryDTO dto, HttpServletRequest request, HttpServletResponse response) {
     LambdaQueryWrapper<RechargeOrderHistory> query = buildSql(dto);
     query.orderBy(
             ObjectUtils.isNotEmpty(dto.getOrder()),
@@ -67,8 +74,14 @@ public class RechargeOrderHistoryServiceImpl
             this.list(query).stream()
                     .map(rechargeOrderHistoryConvert::toRechVo)
                     .collect(Collectors.toList());
-
-
+    ExportParams exportParams = new ExportParams("入款数据", "入款数据");
+    response.setHeader(
+            HttpHeaders.CONTENT_DISPOSITION, "attachment;filename = gamePlatformReport.xls");
+    try (Workbook workbook = ExcelExportUtil.exportExcel(exportParams, GameReportVO.class, list)) {
+      workbook.write(response.getOutputStream());
+    } catch (IOException e) {
+      log.error("导出游戏投注记录报错", e);
+    }
   }
 
   @Override

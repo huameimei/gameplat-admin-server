@@ -30,6 +30,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 用户活动大厅
@@ -100,11 +101,11 @@ public class ActivityLobbyController {
   @Operation(summary = "删除活动大厅")
   @PostMapping("/delete")
   @PreAuthorize("hasAuthority('activity:lobby:remove')")
-  public void remove(String ids) {
-    if (StringUtils.isBlank(ids)) {
+  public void remove(@RequestBody Map<String, String> map) {
+    if (StringUtils.isBlank(map.get("ids"))) {
       throw new ServiceException("ids不能为空");
     }
-    activityLobbyService.remove(ids);
+    activityLobbyService.remove(map.get("ids"));
   }
 
   @Operation(summary = "更新活动大厅状态")

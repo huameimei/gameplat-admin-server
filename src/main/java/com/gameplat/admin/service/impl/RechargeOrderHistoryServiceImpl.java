@@ -12,12 +12,11 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.convert.RechargeOrderHistoryConvert;
 import com.gameplat.admin.mapper.RechargeOrderHistoryMapper;
 import com.gameplat.admin.model.dto.RechargeOrderHistoryQueryDTO;
-import com.gameplat.admin.model.vo.GameReportVO;
-import com.gameplat.admin.model.vo.RechargeHistorySummaryVO;
-import com.gameplat.admin.model.vo.RechargeOrderHistoryVO;
-import com.gameplat.admin.model.vo.RechargeOrderReportVo;
+import com.gameplat.admin.model.vo.*;
 import com.gameplat.admin.service.RechargeOrderHistoryService;
+import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.model.entity.recharge.RechargeOrderHistory;
+import lombok.extern.log4j.Log4j2;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -33,6 +32,7 @@ import java.util.stream.Collectors;
 
 @Service
 @Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)
+@Log4j2
 public class RechargeOrderHistoryServiceImpl
     extends ServiceImpl<RechargeOrderHistoryMapper, RechargeOrderHistory>
     implements RechargeOrderHistoryService {
@@ -75,12 +75,15 @@ public class RechargeOrderHistoryServiceImpl
                     .map(rechargeOrderHistoryConvert::toRechVo)
                     .collect(Collectors.toList());
     ExportParams exportParams = new ExportParams("入款数据", "入款数据");
-    response.setHeader(
-            HttpHeaders.CONTENT_DISPOSITION, "attachment;filename = gamePlatformReport.xls");
-    try (Workbook workbook = ExcelExportUtil.exportExcel(exportParams, GameReportVO.class, list)) {
+    exportParams.setMaxNum(10000);
+    try {
+      response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename = rechReport.xls");
+      Workbook workbook =
+              ExcelExportUtil.exportExcel(exportParams, RechargeOrderReportVo.class, list);
       workbook.write(response.getOutputStream());
     } catch (IOException e) {
-      log.error("导出游戏投注记录报错", e);
+      log.info("导出入款记录报错", e);
+      throw new ServiceException("导出失败:" + e);
     }
   }
 

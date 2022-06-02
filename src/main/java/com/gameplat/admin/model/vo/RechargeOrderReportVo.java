@@ -3,8 +3,8 @@ package com.gameplat.admin.model.vo;
 import cn.afterturn.easypoi.excel.annotation.Excel;
 import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.gameplat.base.common.util.DateUtil;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -15,7 +15,6 @@ import java.util.Date;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
-@TableName("recharge_order_history")
 public class RechargeOrderReportVo implements Serializable {
 
 
@@ -46,7 +45,7 @@ public class RechargeOrderReportVo implements Serializable {
   @Schema(description = "所属上级路径")
   private String superPath;
 
-  @Excel(name = "充值方式", replace = "转账汇款_1,在线支付_2,人工充值_3", width = 20, isImportField = "true_st")
+  @Excel(name = "充值方式", replace = {"转账汇款_1", "在线支付_2", "人工充值_3"}, width = 20, isImportField = "true_st")
   @Schema(description = "充值方式: [1 - 转账汇款, 2 - 在线支付, 3 - 人工充值]")
   private Integer mode;
 
@@ -142,7 +141,7 @@ public class RechargeOrderReportVo implements Serializable {
   private Date rechargeTime;
 
   @Schema(description = "充值状态：1-未受理 2-受理中；3-已入款；4-已取消")
-  @Excel(name = "充值状态", replace = "未受理_1,受理中_2,已入款_3,已取消_4", width = 12, isImportField = "true_st")
+  @Excel(name = "充值状态", replace = {"未受理_1", "受理中_2", "已入款_3", "已取消_4"}, width = 12, isImportField = "true_st")
   private Integer status;
 
   @Schema(description = "备注信息")
@@ -154,9 +153,19 @@ public class RechargeOrderReportVo implements Serializable {
   private String acceptAccount;
 
   @Schema(description = "受理时间")
-  @Excel(name = "受理时间", width = 40, isImportField = "true_st")
   @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
   private Date acceptTime;
+
+
+  @Schema(description = "受理时间")
+  @Excel(name = "受理时间", width = 40, isImportField = "true_st")
+  private String acceptTimeStr;
+
+  private String getAccptTimeStr() {
+    return DateUtil.dateToStr(this.acceptTime, DateUtil.YYYY_MM_DD_HH_MM_SS);
+  }
+
+
 
   @TableField(fill = FieldFill.INSERT_UPDATE)
   @Schema(description = "审核人")
@@ -165,9 +174,17 @@ public class RechargeOrderReportVo implements Serializable {
 
   @TableField(fill = FieldFill.INSERT_UPDATE)
   @Schema(description = "审核时间")
-  @Excel(name = "审核时间", width = 40, isImportField = "true_st")
   @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
   private Date auditTime;
+
+
+  @Excel(name = "审核时间", width = 40, isImportField = "true_st")
+  private Date auditTimeStr;
+
+  private String getAuditTimeStr() {
+    return DateUtil.dateToStr(this.auditTime, DateUtil.YYYY_MM_DD_HH_MM_SS);
+  }
+
 
   @Schema(description = "审核备注")
   @Excel(name = "审核备注", width = 20, isImportField = "true_st")
@@ -220,6 +237,16 @@ public class RechargeOrderReportVo implements Serializable {
   @Schema(description = "创建时间")
   @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
   private Date createTime;
+  /**
+   * 创建时间
+   */
+  @Excel(name = "创建时间", width = 40, isImportField = "true_st")
+  private String createTimeStr;
+
+  private String getCreateTimeStr() {
+    return DateUtil.dateToStr(this.createTime, DateUtil.YYYY_MM_DD_HH_MM_SS);
+  }
+
 
   /**
    * 更新者

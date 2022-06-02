@@ -67,20 +67,12 @@ public class MemberWithdrawReportVo implements Serializable {
   private Integer cashStatus;
 
   @Schema(description = "受理人")
-  @Excel(name = "受理人", width = 20, isImportField = "true_st")
   private String acceptAccount;
 
   @Schema(description = "受理时间")
   @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
   private Date acceptTime;
 
-
-  @Excel(name = "受理时间", width = 40, isImportField = "true_st")
-  private String acceptTimeStr;
-
-  private String getAcceptTimeStr() {
-    return DateUtil.dateToStr(this.acceptTime, DateUtil.YYYY_MM_DD_HH_MM_SS);
-  }
 
   @TableField(fill = FieldFill.UPDATE)
   @Schema(description = "操作人(总管理后台审核的人)")

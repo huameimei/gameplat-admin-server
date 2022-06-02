@@ -149,22 +149,11 @@ public class RechargeOrderReportVo implements Serializable {
   private String remarks;
 
   @Schema(description = "受理人")
-  @Excel(name = "受理人", width = 20, isImportField = "true_st")
   private String acceptAccount;
 
   @Schema(description = "受理时间")
   @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
   private Date acceptTime;
-
-
-  @Schema(description = "受理时间")
-  @Excel(name = "受理时间", width = 40, isImportField = "true_st")
-  private String acceptTimeStr;
-
-  private String getAccptTimeStr() {
-    return DateUtil.dateToStr(this.acceptTime, DateUtil.YYYY_MM_DD_HH_MM_SS);
-  }
-
 
 
   @TableField(fill = FieldFill.INSERT_UPDATE)

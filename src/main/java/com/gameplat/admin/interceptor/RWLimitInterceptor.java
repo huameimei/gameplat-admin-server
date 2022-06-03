@@ -6,7 +6,8 @@ import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.common.enums.BooleanEnum;
 import com.gameplat.common.enums.LimitEnums;
 import com.gameplat.common.enums.WithdrawStatus;
-import com.gameplat.common.model.bean.limit.AdminLoginLimit;
+import com.gameplat.common.model.bean.limit.MemberRechargeLimit;
+import com.gameplat.common.model.bean.limit.MemberWithdrawLimit;
 import com.gameplat.common.util.Convert;
 import com.gameplat.security.SecurityUserHolder;
 import lombok.extern.log4j.Log4j2;
@@ -29,6 +30,17 @@ public class RWLimitInterceptor implements HandlerInterceptor {
    */
   private final static String WITH_URL = "api/admin/finance/memberWithdraw/modifyCashStatus";
 
+
+  /**
+   * 单个充值入款
+   */
+  private final static String RECH_URIL = "/api/admin/finance/rechargeOrder/accept";
+
+  /**
+   * 批量充值入款
+   */
+  private final static String RECH_BATCH_URIL = "/api/admin/finance/rechargeOrder/batchAccept";
+
   @Autowired private LimitInfoService limitService;
 
   @Autowired private TwoFactorAuthenticationService twoFactorAuthenticationService;
@@ -39,11 +51,16 @@ public class RWLimitInterceptor implements HandlerInterceptor {
           @NotNull HttpServletResponse response,
           @NotNull Object handler) {
 
-    if (rwLimitVerify(request)) {
-      AdminLoginLimit adminLoginLimit = limitService.get(LimitEnums.ADMIN_LOGIN_CONFIG);
-      log.info("后台账号验证限制：{}", adminLoginLimit);
-      // 验证验证码
-      this.checkCaptchaCode(adminLoginLimit.getGoogleAuthSwitch(), request);
+    //判断是否是充值谷歌限制
+    if (request.getRequestURI().contains(RECH_URIL) || request.getRequestURI().contains(RECH_BATCH_URIL)) {
+      MemberRechargeLimit memberRechargeLimit = limitService.get(LimitEnums.MEMBER_RECHARGE_LIMIT);
+      checkCaptchaCode(memberRechargeLimit.getRechGooGleLimit(), request);
+    } else {
+      //判断是否是提现谷歌限制
+      if (rwLimitVerify(request)) {
+        MemberWithdrawLimit memberWithdrawLimit = limitService.get(LimitEnums.MEMBER_WITHDRAW_LIMIT);
+        checkCaptchaCode(memberWithdrawLimit.getWithGooGleLimit(), request);
+      }
     }
     return true;
   }

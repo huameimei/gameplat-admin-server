@@ -113,7 +113,8 @@ public class WebMvcConfig extends WebMvcConfigurationAdapter {
             "/api/admin/profile/info",
             "/api/admin/profile/menuList",
             "/api/admin/auth/authCode",
-            "/api/admin/auth/bindSecret");
+                "/api/admin/auth/bindSecret",
+                "/api/admin/finance/rechargeOrder/withdraw_charge");
 
     registry
         .addInterceptor(vipInterceptor())

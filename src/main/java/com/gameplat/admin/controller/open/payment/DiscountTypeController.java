@@ -37,7 +37,7 @@ public class DiscountTypeController {
   @Operation(summary = "添加")
   @PostMapping("/add")
   @PreAuthorize("hasAuthority('thirdParty:discountType:add')")
-  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.RECHARGE, desc = "新增优惠类型")
+  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.RECHARGE, desc = "'新增优惠类型'")
   public void add(@RequestBody DiscountTypeAddDTO dto) {
     discountTypeService.save(dto);
   }
@@ -45,7 +45,7 @@ public class DiscountTypeController {
   @Operation(summary = "编辑")
   @PostMapping("/edit")
   @PreAuthorize("hasAuthority('thirdParty:discountType:edit')")
-  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.RECHARGE, desc = "修改优惠类型")
+  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.RECHARGE, desc = "'修改优惠类型'")
   public void edit(@RequestBody DiscountTypeEditDTO dto) {
     discountTypeService.update(dto);
   }
@@ -53,7 +53,7 @@ public class DiscountTypeController {
   @Operation(summary = "编辑状态")
   @PostMapping("/editStatus")
   @PreAuthorize("hasAuthority('thirdParty:discountType:editStatus')")
-  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.RECHARGE, desc = "'修改优惠状态：' + status")
+  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.RECHARGE, desc = "'修改优惠状态：' + #status")
   public void updateStatus(Long id, Integer status) {
     discountTypeService.updateStatus(id, status);
   }

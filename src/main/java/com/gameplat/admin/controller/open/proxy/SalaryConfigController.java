@@ -62,7 +62,7 @@ public class SalaryConfigController {
   @PostMapping("/add")
   @Operation(summary = "新增工资配置")
   @PreAuthorize("hasAuthority('salary:config:add')")
-  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.AGENT, desc = "新增工资配置")
+  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.AGENT, desc = "'新增工资配置'")
   public void add(@Validated @RequestBody SalaryConfigDTO dto) {
     salaryConfigService.add(dto);
   }
@@ -75,7 +75,7 @@ public class SalaryConfigController {
   @PostMapping("/edit")
   @Operation(summary = "编辑工资配置")
   @PreAuthorize("hasAuthority('salary:config:edit')")
-  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.AGENT, desc = "编辑工资配置")
+  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.AGENT, desc = "'编辑工资配置'")
   public void edit(@Validated @RequestBody SalaryConfigDTO dto) {
     salaryConfigService.edit(dto);
   }

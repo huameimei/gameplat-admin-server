@@ -65,6 +65,14 @@ public class MemberController {
     return memberService.getMemberInfo(id);
   }
 
+
+  @Operation(summary = "会员详情")
+  @GetMapping("/dateils/{id}")
+  @PreAuthorize("hasAuthority('member:info:view')")
+  public MemberInfoVO getMemberDateils(@PathVariable Long id) {
+    return memberService.getMemberDateils(id);
+  }
+
   @Operation(summary = "会员联系方式")
   @GetMapping("/contact/{id}")
   @PreAuthorize("hasAuthority('member:contact:view')")
@@ -83,7 +91,7 @@ public class MemberController {
   @Operation(summary = "添加会员")
   @PostMapping("/add")
   @PreAuthorize("hasAuthority('member:add')")
-  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.MEMBER, desc = "添加会员")
+  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.MEMBER, desc = "'添加会员'")
   public void add(@Validated @RequestBody MemberAddDTO dto, HttpServletRequest request) {
     String userAgentHeader = request.getHeader(Header.USER_AGENT.getValue());
     UserAgent userAgent = UserAgentUtil.parse(userAgentHeader);
@@ -101,7 +109,7 @@ public class MemberController {
   @Operation(summary = "编辑会员")
   @PostMapping("/edit")
   @PreAuthorize("hasAuthority('member:edit')")
-  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.MEMBER, desc = "编辑会员信息")
+  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.MEMBER, desc = "'编辑会员信息'")
   public void update(@Validated @RequestBody MemberEditDTO dto) {
     memberService.update(dto);
   }
@@ -109,7 +117,7 @@ public class MemberController {
   @Operation(summary = "启用会员")
   @PostMapping("/enable")
   @PreAuthorize("hasAuthority('member:enable')")
-  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.MEMBER, desc = "启用会员")
+  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.MEMBER, desc = "'启用会员'")
   public void enable(@RequestBody List<Long> ids) {
     memberService.enable(ids);
   }
@@ -117,7 +125,7 @@ public class MemberController {
   @Operation(summary = "禁用会员")
   @PostMapping("/disable")
   @PreAuthorize("hasAuthority('member:disable')")
-  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.MEMBER, desc = "禁用会员")
+  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.MEMBER, desc = "'禁用会员'")
   public void disable(@RequestBody List<Long> ids) {
     memberService.disable(ids);
   }
@@ -125,7 +133,7 @@ public class MemberController {
   @Operation(summary = "清空联系方式")
   @PostMapping("/clearContact")
   @PreAuthorize("hasAuthority('member:clearContact')")
-  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.MEMBER, desc = "清空联系方式")
+  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.MEMBER, desc = "'清空联系方式'")
   public void clearContact(@RequestBody MemberContactCleanDTO dto) {
     memberService.clearContact(dto);
   }
@@ -133,7 +141,7 @@ public class MemberController {
   @Operation(summary = "转代理")
   @PostMapping("/transform")
   @PreAuthorize("hasAuthority('member:transform')")
-  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.MEMBER, desc = "转代理")
+  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.MEMBER, desc = "'转代理'")
   public void transform(@RequestBody MemberTransformDTO dto) {
     memberTransferAgentService.transform(dto);
   }
@@ -141,7 +149,7 @@ public class MemberController {
   @Operation(summary = "恢复转代理数据")
   @PostMapping("/recover/transform/{serialNo}")
   @PreAuthorize("hasAuthority('member:recoverTransform')")
-  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.MEMBER, desc = "恢复转代理数据")
+  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.MEMBER, desc = "'恢复转代理数据'")
   public void recoverTransform(@PathVariable String serialNo) {
     memberTransferAgentService.recover(serialNo);
   }
@@ -149,13 +157,13 @@ public class MemberController {
   @Operation(summary = "根据账号获取会员信息")
   @PostMapping("/getByAccount/{account}")
   public void getByAccount(@PathVariable String account) {
-    memberService.getByAccount(account).orElseThrow(() -> new ServiceException("账号信息不存在！"));
+    memberService.getByAccount(account).orElseThrow(() -> new ServiceException("'账号信息不存在！'"));
   }
 
   @Operation(summary = "更新会员联系方式")
   @PostMapping("/updateContact")
   @PreAuthorize("hasAuthority('member:updateContact')")
-  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.MEMBER, desc = "修改会员#{dto.id}联系方式")
+  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.MEMBER, desc = "'修改会员'+#{dto.id}+'联系方式'")
   public void updateContact(@Validated @RequestBody MemberContactUpdateDTO dto) {
     memberService.updateContact(dto);
   }
@@ -163,7 +171,7 @@ public class MemberController {
   @Operation(summary = "重置会员登录密码")
   @PostMapping("/resetPassword")
   @PreAuthorize("hasAuthority('member:resetPassword')")
-  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.MEMBER, desc = "重置会员#{dto.id}登录密码")
+  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.MEMBER, desc = "'重置会员'+#{dto.id}+'登录密码'")
   public void resetPassword(@Validated @RequestBody MemberPwdUpdateDTO dto) {
     memberService.resetPassword(dto);
   }
@@ -171,7 +179,7 @@ public class MemberController {
   @Operation(summary = "重置会员提现密码")
   @PostMapping("/resetWithdrawPassword")
   @PreAuthorize("hasAuthority('member:resetWithdrawPassword')")
-  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.MEMBER, desc = "重置会员#{dto.id}提现密码")
+  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.MEMBER, desc = "'重置会员'+#{dto.id}+'提现密码'")
   public void resetWithdrawPassword(@Validated @RequestBody MemberWithdrawPwdUpdateDTO dto) {
     memberService.resetWithdrawPassword(dto);
   }
@@ -179,7 +187,7 @@ public class MemberController {
   @Operation(summary = "重置会员真实姓名")
   @PostMapping("/resetRealName")
   @PreAuthorize("hasAuthority('member:resetRealName')")
-  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.MEMBER, desc = "重置会员#{dto.id}真实姓名")
+  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.MEMBER, desc = "'重置会员'+#{dto.id}+'真实姓名'")
   public void resetRealName(@Validated @RequestBody MemberResetRealNameDTO dto) {
     memberService.resetRealName(dto);
   }
@@ -187,7 +195,7 @@ public class MemberController {
   @Operation(summary = "修改会员提现状态")
   @PostMapping("/changeWithdrawFlag/{id}/{flag}")
   @PreAuthorize("hasAuthority('member:changeWithdrawFlag')")
-  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.MEMBER, desc = "修改会员提现状态")
+  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.MEMBER, desc = "'修改会员提现状态'")
   public void changeWithdrawFlag(@PathVariable Long id, @PathVariable String flag) {
     memberService.changeWithdrawFlag(id, flag);
   }
@@ -196,7 +204,7 @@ public class MemberController {
   @Operation(summary = "导出会员列表")
   @PreAuthorize("hasAuthority('member:export')")
   @GetMapping(value = "/exportList", produces = "application/vnd.ms-excel")
-  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.MEMBER, desc = "导出会员列表")
+  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.MEMBER, desc = "'导出会员列表'")
   public void exportList(MemberQueryDTO dto, HttpServletResponse response) {
     List<MemberVO> member = memberService.queryList(dto);
     ExportParams exportParams = new ExportParams("会员账号列表导出", "会员账号列表");
@@ -224,7 +232,7 @@ public class MemberController {
   @Operation(summary = "批量更改日工资")
   @PostMapping("/updateDaySalary")
   @PreAuthorize("hasAuthority('member:updateDaySalary')")
-  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.MEMBER, desc = "修改会员工资状态")
+  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.MEMBER, desc = "'修改会员工资状态'")
   public void updateDaySalary(
       @RequestParam(required = true) String ids, @RequestParam Integer state) {
     memberService.updateDaySalary(ids, state);
@@ -245,7 +253,10 @@ public class MemberController {
   @Operation(summary = "清除推广会员余额")
   @PostMapping("clearPromoteMemberBalance")
   @PreAuthorize("hasAuthority('system:member:clearPromoteMemberBalance')")
-  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.MEMBER, desc = "清除推广会员#{dto.userNames}余额")
+  @Log(
+      module = ServiceName.ADMIN_SERVICE,
+      type = LogType.MEMBER,
+      desc = "'清除推广会员'+#{dto.userNames}+'余额'")
   public void clearPromoteMemberBalance(@RequestBody CleanAccountDTO dto) {
     Assert.notNull(dto.getIsCleanAll(), "是否清理全部不能为空！");
     Assert.notNull(dto.getUserType(), "会员类型不能为空！");
@@ -259,14 +270,14 @@ public class MemberController {
   @Operation(summary = "解除登录限制")
   @PostMapping("releaseLoginLimit/{id}")
   @PreAuthorize("hasAuthority('system:member:releaseLoginLimit')")
-  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.MEMBER, desc = "''解除会员#{id}登录限制'")
+  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.MEMBER, desc = "'解除会员'+#{id}+'登录限制'")
   public void releaseLoginLimit(@PathVariable Long id) {
     memberService.releaseLoginLimit(id);
   }
 
   @Operation(summary = "查看会员真实资料")
   @GetMapping("getMemberDetail/{id}")
-  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.MEMBER, desc = "查看会员真实资料#{id}")
+  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.MEMBER, desc = "'查看会员真实资料'+#{id}")
   @PreAuthorize("hasAuthority('system:member:contact:detail')")
   public MemberContactVo getMemberDetail(@PathVariable(required = true) long id) {
     return memberService.getMemberDetail(id);

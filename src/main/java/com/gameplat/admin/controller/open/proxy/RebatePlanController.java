@@ -57,12 +57,12 @@ public class RebatePlanController {
       module = ServiceName.ADMIN_SERVICE,
       type = LogType.AGENT,
       desc =
-          "平级分红->新增平级分红方案，"
-              + "方案名称：#{#planName}，"
-              + "下级分红提成：#{#lowerCommission*100}%，"
-              + "下下级分红提成：#{#subCommission*100}%，"
-              + "流水返利占比：#{#turnoverCommission*100}%，"
-              + "备注信息：#{#remark}")
+          "'平级分红->新增平级分红方案，'"
+              + "'方案名称：' + #rebatePlanPO.planName + '，'"
+              + "'下级分红提成：' + #rebatePlanPO.lowerCommission*100 + '%，'"
+              + "'下下级分红提成：' + #rebatePlanPO.subCommission*100 + '%，'"
+              + "'流水返利占比：' + #rebatePlanPO.turnoverCommission*100 + '%，'"
+              + "'备注信息：' + #rebatePlanPO.remark")
   public void addRebatePlan(@RequestBody RebatePlan rebatePlanPO) {
     log.info("新增平级分红方案：rebatePlanPO={}", rebatePlanPO);
     UserCredential userCredential = SecurityUserHolder.getCredential();
@@ -81,12 +81,12 @@ public class RebatePlanController {
       module = ServiceName.ADMIN_SERVICE,
       type = LogType.AGENT,
       desc =
-          "平级分红->编辑平级分红方案，"
-              + "方案名称：#{#oldPlanName} -> #{#planName}，"
-              + "下级分红提成：#{#oldLowerCommission*100}% -> #{#lowerCommission*100}%，"
-              + "下下级分红提成：#{#oldSubCommission*100}% -> #{#subCommission*100}%，"
-              + "流水返利占比：#{#oldTurnoverCommission*100}% -> #{#turnoverCommission*100}%，"
-              + "备注信息：#{#remark}")
+          "'平级分红->编辑平级分红方案，'"
+              + "'方案名称：' + #rebatePlanPO.oldPlanName + ' -> ' + #rebatePlanPO.planName + '，'"
+              + "'下级分红提成：' + #rebatePlanPO.oldLowerCommission*100 + '% ->' + #rebatePlanPO.lowerCommission*100 + '%，'"
+              + "'下下级分红提成：' + #rebatePlanPO.oldSubCommission*100 + '% ->' + #rebatePlanPO.subCommission*100 + '%，'"
+              + "'流水返利占比：' + #rebatePlanPO.oldTurnoverCommission*100 + '% -> ' + #rebatePlanPO.turnoverCommission*100 + '%，'"
+              + "'备注信息：' + #rebatePlanPO.remark")
   public void editRebatePlan(@RequestBody RebatePlan rebatePlanPO) {
     log.info("编辑平级分红方案：rebatePlanPO={}", rebatePlanPO);
     UserCredential userCredential = SecurityUserHolder.getCredential();
@@ -104,7 +104,7 @@ public class RebatePlanController {
   @Log(
       module = ServiceName.ADMIN_SERVICE,
       type = LogType.AGENT,
-      desc = "平级分红->删除平级分红方案，方案ID：#{#planId}")
+      desc = "'平级分红->删除平级分红方案，方案ID：' + #planId")
   public void remove(@RequestBody Map<String, String> map) {
     Assert.isTrue(StrUtil.isNotBlank(map.get("ids")), "参数为空！");
     String[] idArr = map.get("ids").split(",");

@@ -94,6 +94,17 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
 
   @Autowired private MemberDayReportService memberDayReportService;
 
+
+
+  @Override
+  public IPage<MessageDistributeVO> pageMessageDistribute(Page<Member> page, MemberQueryDTO dto) {
+    return memberMapper
+        .queryPage(page, memberQueryCondition.builderQueryWrapper(dto))
+        .convert(this::setOnlineStatus)
+        .convert(memberConvert::toVo);
+  }
+
+
   /**
    * 真实姓名
    *
@@ -121,18 +132,12 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
     }
   }
 
-  @Override
-  public IPage<MessageDistributeVO> pageMessageDistribute(Page<Member> page, MemberQueryDTO dto) {
-    return memberMapper
-        .queryPage(page, memberQueryCondition.builderQueryWrapper(dto))
-        .convert(this::setOnlineStatus)
-        .convert(memberConvert::toVo);
-  }
 
   /** 邮箱影藏 */
   private static String getEmail(String email) {
     return email.replaceAll(EMAIL_CODE, EMAIL_REPLACEMENT);
   }
+
 
   @Override
   public List<MemberVO> queryList(MemberQueryDTO dto) {
@@ -144,8 +149,14 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
     return memberMapper.getMemberInfo(id);
   }
 
+  /**
+   * 根据id获取详情
+   *
+   * @param id
+   * @return
+   */
   @Override
-  public MemberInfoVO getMemberInfo(Long id) {
+  public MemberInfoVO getMemberDateils(Long id) {
     MemberInfoVO memberInfo = memberMapper.getMemberInfo(id);
     // 真实姓名
     if (StringUtils.isNotEmpty(memberInfo.getRealName())) {
@@ -169,6 +180,12 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
     }
 
     return memberInfo;
+  }
+
+
+  @Override
+  public MemberInfoVO getMemberInfo(Long id) {
+    return memberMapper.getMemberInfo(id);
   }
 
   @Override

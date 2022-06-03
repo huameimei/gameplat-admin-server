@@ -51,7 +51,7 @@ public class OpenOnlineController {
   @Operation(summary = "踢出所有在线账号")
   @PostMapping("/kickAll")
   @PreAuthorize("hasAuthority('account:online:kickAll')")
-  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.ADMIN, desc = "踢出所有在线账号")
+  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.ADMIN, desc = "'踢出所有在线账号'")
   public void kickAll() {
     onlineUserService.kickAll();
   }

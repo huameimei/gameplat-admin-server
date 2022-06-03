@@ -38,7 +38,7 @@ public class ProxyMemberReportController {
   @GetMapping("/export")
   @Operation(summary = "代理报表导出")
   @PreAuthorize("hasAuthority('agent:report:export')")
-  @Log(module = ServiceName.ADMIN_SERVICE, desc = "代理报表导出")
+  @Log(module = ServiceName.ADMIN_SERVICE, desc = "'代理报表导出'")
   public void list(AgentReportQueryDTO dto, HttpServletResponse response) {
     memberDayReportService.exportAgentReport(dto, response);
   }

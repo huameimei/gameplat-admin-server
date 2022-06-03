@@ -52,7 +52,7 @@ public class SalaryPeriodsController {
   @PostMapping("/add")
   @Operation(summary = "新增工资期数")
   @PreAuthorize("hasAuthority('salary:periods:add')")
-  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.AGENT, desc = "新增工资配置")
+  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.AGENT, desc = "'新增工资配置'")
   public void add(@Validated @RequestBody SalaryPeriodsDTO dto) {
     salaryPeriodsService.add(dto);
   }
@@ -65,7 +65,7 @@ public class SalaryPeriodsController {
   @PostMapping("/edit")
   @Operation(summary = "编辑工资期数")
   @PreAuthorize("hasAuthority('salary:periods:edit')")
-  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.AGENT, desc = "编辑工资配置")
+  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.AGENT, desc = "'编辑工资配置'")
   public void edit(@Validated @RequestBody SalaryPeriodsDTO dto) {
     salaryPeriodsService.edit(dto);
   }
@@ -93,7 +93,7 @@ public class SalaryPeriodsController {
   @PostMapping("/settle")
   @Operation(summary = "期数结算")
   @PreAuthorize("hasAuthority('salary:periods:settle')")
-  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.AGENT, desc = "期数结算")
+  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.AGENT, desc = "'期数结算'")
   public void settle(@Validated @RequestBody SalaryPeriodsDTO dto) {
     salaryPeriodsService.settle(dto.getId());
   }
@@ -106,7 +106,7 @@ public class SalaryPeriodsController {
   @PostMapping("/grant")
   @Operation(summary = "期数派发")
   @PreAuthorize("hasAuthority('salary:periods:grant')")
-  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.AGENT, desc = "期数派发")
+  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.AGENT, desc = "'期数派发'")
   public void grant(@Validated @RequestBody SalaryPeriodsDTO dto) {
     salaryPeriodsService.grant(dto.getId());
   }
@@ -119,7 +119,7 @@ public class SalaryPeriodsController {
   @PostMapping("/recycle")
   @Operation(summary = "期数回收")
   @PreAuthorize("hasAuthority('salary:periods:recycle')")
-  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.AGENT, desc = "期数回收")
+  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.AGENT, desc = "'期数回收'")
   public void recycle(@Validated @RequestBody SalaryPeriodsDTO dto) {
     salaryPeriodsService.recycle(dto.getId());
   }

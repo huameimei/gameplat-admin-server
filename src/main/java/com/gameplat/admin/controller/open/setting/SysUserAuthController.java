@@ -25,7 +25,7 @@ public class SysUserAuthController {
   @Operation(summary = "保存用户认证")
   @PostMapping("edit")
   @PreAuthorize("hasAuthority('system:userAuth:edit')")
-  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.ADMIN, desc = "设置认证信息")
+  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.ADMIN, desc = "'设置认证信息'")
   public void save(@RequestBody SysUserAuthDto dto) {
     sysUserAuthService.save(dto);
   }

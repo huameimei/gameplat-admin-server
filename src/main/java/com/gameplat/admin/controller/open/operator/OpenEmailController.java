@@ -35,7 +35,7 @@ public class OpenEmailController {
   @Operation(summary = "清空")
   @PostMapping("/clean")
   @PreAuthorize("hasAuthority('logs:email:clean')")
-  @Log(module = ServiceName.ADMIN_SERVICE, desc = "清空邮件记录表")
+  @Log(module = ServiceName.ADMIN_SERVICE, desc = "'清空邮件记录表'")
   public void clean() {
     emailService.cleanEmail();
   }

@@ -377,6 +377,7 @@ public class ValidWithdrawServiceImpl extends ServiceImpl<ValidWithdrawMapper, V
   }
 
   private BigDecimal getCount(List<ValidWithdraw> validWithdrawList) {
+    validWithdrawList = validWithdrawList.stream().sorted(Comparator.comparing(ValidWithdraw::getId)).collect(Collectors.toList());
     BigDecimal validAmount = new BigDecimal(0);
     if (CollUtil.isNotEmpty(validWithdrawList)) {
       for (ValidWithdraw validWithdraw : validWithdrawList) {

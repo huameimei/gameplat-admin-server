@@ -36,6 +36,9 @@ public class MemberQueryCondition {
         .eq(ObjectUtils.isNotEmpty(dto.getPhone()), "t1.phone", dto.getPhone())
         .eq(ObjectUtils.isNotEmpty(dto.getQq()), "t1.qq", dto.getQq())
         .eq(ObjectUtils.isNotEmpty(dto.getUserLevel()), "t1.user_level", dto.getUserLevel())
+            .ne(dto.getAccount(), "webRoot")
+            .ne(dto.getAccount(), "testRoot")
+            .ne(dto.getAccount(), "appRoot")
         .func(
             ObjectUtils.isNotEmpty(dto.getAgentLevel()),
             q ->

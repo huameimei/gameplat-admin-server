@@ -26,6 +26,7 @@ import com.gameplat.base.common.util.StringUtils;
 import com.gameplat.common.constant.CachedKeys;
 import com.gameplat.common.enums.MemberEnums;
 import com.gameplat.common.enums.TransferTypesEnum;
+import com.gameplat.common.enums.UserTypes;
 import com.gameplat.common.lang.Assert;
 import com.gameplat.model.entity.game.GameTransferInfo;
 import com.gameplat.model.entity.member.Member;
@@ -686,7 +687,10 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
     boolean flag = false;
     if (ObjectUtil.isEmpty(
             authorities.stream()
-                    .filter(ex -> ex.getAuthority().equalsIgnoreCase(ROLES))
+                    .filter(
+                            ex ->
+                                    ex.getAuthority().equalsIgnoreCase(ROLES)
+                                            || UserTypes.ADMIN.value().equals(credential.getUserType()))
                     .collect(Collectors.toList()))) {
       flag = true;
     }

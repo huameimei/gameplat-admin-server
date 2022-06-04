@@ -81,7 +81,7 @@ public class OpenLimitInfoController {
 
   @Operation(summary = "获取会员充值限制")
   @GetMapping(value = "/get/memberRechargeLimit")
-  @PreAuthorize("hasAuthority('system:limit:viewRechargeLimit')")
+  //@PreAuthorize("hasAuthority('system:limit:viewRechargeLimit')")
   public LimitInfo getMemberRechargeLimit(String name) {
     return limitInfoService.getLimitInfo(name);
   }
@@ -109,7 +109,7 @@ public class OpenLimitInfoController {
 
   @Operation(summary = "获取会员提现限制")
   @GetMapping(value = "/get/memberWithdrawLimit")
-  @PreAuthorize("hasAuthority('system:limit:viewWithdrawLimit')")
+  //@PreAuthorize("hasAuthority('system:limit:viewWithdrawLimit')")
   public LimitInfo getMemberWithdrawLimit(String name) {
     return limitInfoService.getLimitInfo(name);
   }

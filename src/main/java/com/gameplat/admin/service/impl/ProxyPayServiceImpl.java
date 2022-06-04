@@ -219,6 +219,13 @@ public class ProxyPayServiceImpl implements ProxyPayService {
           .update();
     }
     memberWithdrawService.updateById(memberWithdraw);
+
+    // 移除会员提现冻结金额
+    memberInfoService.updateFreeze(memberInfo.getMemberId(), memberWithdraw.getCashMoney().negate());
+    // 计算会员出款次数和金额
+    memberInfoService.updateUserWithTimes(
+            memberInfo.getMemberId(), memberWithdraw.getCashMoney().negate(), memberWithdraw.getPointFlag());
+
     /** 不需要异步通知，直接将状态改成第三方出款完成 */
     if (0 != ppInterface.getAsynNotifyStatus()) {
       updateStatus(
@@ -341,11 +348,6 @@ public class ProxyPayServiceImpl implements ProxyPayService {
     PpMerchant ppMerchant = ppMerchantService.getById(memberWithdraw.getPpMerchantId());
     updatePpMerchant(ppMerchant, memberWithdraw.getCashMoney());
     log.info("第三方出款成功,出款商户为:{} ,出款订单信息为：{}", memberWithdraw.getPpMerchantName(), memberWithdraw);
-    // 移除会员提现冻结金额
-    memberInfoService.updateFreeze(info.getId(), memberWithdraw.getCashMoney().negate());
-    // 计算会员出款次数和金额
-    memberInfoService.updateUserWithTimes(
-            info.getId(), memberWithdraw.getCashMoney().negate(), memberWithdraw.getPointFlag());
     return result.getData().getResponseMsg();
   }
 

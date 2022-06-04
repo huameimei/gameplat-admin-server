@@ -169,6 +169,7 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
         entity.setFirstWithdrawTime(new Date());
         entity.setFirstWithdrawAmount(amount);
       }
+      this.updateById(entity);
     }
   }
 

@@ -259,7 +259,7 @@ public class OpenSystemConfigController {
   @GetMapping(value = "/get/directCharge")
   @PreAuthorize("hasAuthority('system:directCharge:get')")
   public DirectChargeVo directCharge() {
-    String dictDataValue = dictDataService.getDictDataValue(DictDataEnum.DIRECT_CHARGE.getType().getValue(),
+    String dictDataValue = dictDataService.getDirectChargeValue(DictDataEnum.DIRECT_CHARGE.getType().getValue(),
             DictDataEnum.DIRECT_CHARGE.getLabel());
     return JSON.parseObject(dictDataValue, DirectChargeVo.class);
   }

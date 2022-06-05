@@ -34,6 +34,8 @@ public interface SysDictDataService extends IService<SysDictData> {
 
   String getDictDataValue(String dictType, String dictLabel);
 
+  String getDirectChargeValue(String dictType, String dictLabel);
+
   void insertDictData(OperDictDataDTO operDictDataDTO);
 
   void insertBank(OperDictDataDTO dto);

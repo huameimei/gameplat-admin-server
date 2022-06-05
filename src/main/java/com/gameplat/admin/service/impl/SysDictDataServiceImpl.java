@@ -119,6 +119,21 @@ public class SysDictDataServiceImpl extends ServiceImpl<SysDictDataMapper, SysDi
         .orElse(null);
   }
 
+
+  @Override
+  public String getDirectChargeValue(String dictType, String dictLabel) {
+    return this.lambdaQuery()
+            .eq(SysDictData::getStatus, EnableEnum.ENABLED.code())
+            .eq(SysDictData::getDictType, dictType)
+            .eq(SysDictData::getDictLabel, dictLabel)
+            .oneOpt()
+            .map(SysDictData::getDictValue)
+            .orElse(null);
+  }
+
+
+
+
   @Override
   @SentinelResource(value = "getDictList")
   public List<SysDictData> getDictList(SysDictData dictData) {

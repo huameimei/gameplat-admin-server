@@ -159,7 +159,7 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
                       .memberId(memberId)
                       .lastWithdrawTime(new Date())
                       .lastWithdrawAmount(amount)
-                      .totalWithdrawAmount(memberInfo.getLastWithdrawAmount().add(amount))
+                      .totalWithdrawAmount(memberInfo.getTotalWithdrawAmount().add(amount))
                       .totalWithdrawTimes(memberInfo.getTotalWithdrawTimes() + 1)
                       .version(memberInfo.getVersion())
                       .build();
@@ -169,6 +169,7 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
         entity.setFirstWithdrawTime(new Date());
         entity.setFirstWithdrawAmount(amount);
       }
+      this.updateById(entity);
     }
   }
 

@@ -159,7 +159,7 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
                       .memberId(memberId)
                       .lastWithdrawTime(new Date())
                       .lastWithdrawAmount(amount)
-                      .totalWithdrawAmount(memberInfo.getLastWithdrawAmount().add(amount))
+                      .totalWithdrawAmount(memberInfo.getTotalWithdrawAmount().add(amount))
                       .totalWithdrawTimes(memberInfo.getTotalWithdrawTimes() + 1)
                       .version(memberInfo.getVersion())
                       .build();

@@ -103,7 +103,7 @@ public class MemberYubaoServiceImpl extends ServiceImpl<MemberYubaoMapper, Membe
     memberBill.setMemberId(memberId);
     memberBill.setAccount(account);
     memberBill.setMemberPath("");
-    memberBill.setTranType(TranTypes.YUBAO_IN.getValue());
+    memberBill.setTranType(TranTypes.YUBAO_OUT.getValue());
     memberBill.setOrderNo(String.valueOf(IdGeneratorSnowflake.getInstance().nextId()));
     memberBill.setAmount(new BigDecimal(money));
     memberBill.setBalance(extInfo.getBalance());

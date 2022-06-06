@@ -485,7 +485,7 @@ public class SpreadLinkInfoServiceImpl extends ServiceImpl<SpreadLinkInfoMapper,
   @Override
   public List<Map<String, Object>> getDefaultLink() {
     QueryWrapper<SpreadLinkInfo> queryWrapper = new QueryWrapper<>();
-    queryWrapper.select("DISTINCT external_url").eq("exclusive_flag", 0);
+    queryWrapper.select("DISTINCT external_url").eq("exclusive_flag", 0).ne("external_url", null);
     return spreadLinkInfoMapper.selectMaps(queryWrapper);
   }
 }

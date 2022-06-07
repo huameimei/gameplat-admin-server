@@ -239,7 +239,7 @@ public class SpreadLinkInfoServiceImpl extends ServiceImpl<SpreadLinkInfoMapper,
       boolean exists =
           this.lambdaQuery()
               .ne(SpreadLinkInfo::getAgentAccount, linkInfo.getAgentAccount())
-              .eq(SpreadLinkInfo::getExternalUrl, linkInfo.getExternalUrl())
+              .eq(SpreadLinkInfo::getSourceDomain, linkInfo.getExternalUrl())
               .eq(SpreadLinkInfo::getExclusiveFlag, BooleanEnum.YES.value())
               .exists();
       if (exists) {
@@ -281,7 +281,7 @@ public class SpreadLinkInfoServiceImpl extends ServiceImpl<SpreadLinkInfoMapper,
       boolean exists =
           this.lambdaQuery()
               .ne(SpreadLinkInfo::getAgentAccount, linkInfo.getAgentAccount())
-              .eq(SpreadLinkInfo::getExternalUrl, linkInfo.getExternalUrl())
+              .eq(SpreadLinkInfo::getSourceDomain, linkInfo.getExternalUrl())
               .eq(SpreadLinkInfo::getExclusiveFlag, BooleanEnum.YES.value())
               .exists();
       if (exists) {

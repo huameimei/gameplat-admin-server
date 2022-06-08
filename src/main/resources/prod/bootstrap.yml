@@ -38,7 +38,7 @@ spring:
             refresh: true
       discovery:
         service: admin-server
-        namespace: prod
+        namespace: ea9f2fb3-4fce-4cc9-a820-4508330af65b
         group: SERVICE_GROUP
         server-addr: ${NACOS_SERVER_ADDR:localhost}
         username: nacos

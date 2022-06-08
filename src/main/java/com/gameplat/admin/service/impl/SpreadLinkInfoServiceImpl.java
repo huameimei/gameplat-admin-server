@@ -239,7 +239,7 @@ public class SpreadLinkInfoServiceImpl extends ServiceImpl<SpreadLinkInfoMapper,
       boolean exists =
           this.lambdaQuery()
               .ne(SpreadLinkInfo::getAgentAccount, linkInfo.getAgentAccount())
-              .eq(SpreadLinkInfo::getExternalUrl, linkInfo.getExternalUrl())
+              .eq(SpreadLinkInfo::getSourceDomain, linkInfo.getExternalUrl())
               .eq(SpreadLinkInfo::getExclusiveFlag, BooleanEnum.YES.value())
               .exists();
       if (exists) {
@@ -281,7 +281,7 @@ public class SpreadLinkInfoServiceImpl extends ServiceImpl<SpreadLinkInfoMapper,
       boolean exists =
           this.lambdaQuery()
               .ne(SpreadLinkInfo::getAgentAccount, linkInfo.getAgentAccount())
-              .eq(SpreadLinkInfo::getExternalUrl, linkInfo.getExternalUrl())
+              .eq(SpreadLinkInfo::getSourceDomain, linkInfo.getExternalUrl())
               .eq(SpreadLinkInfo::getExclusiveFlag, BooleanEnum.YES.value())
               .exists();
       if (exists) {
@@ -485,7 +485,7 @@ public class SpreadLinkInfoServiceImpl extends ServiceImpl<SpreadLinkInfoMapper,
   @Override
   public List<Map<String, Object>> getDefaultLink() {
     QueryWrapper<SpreadLinkInfo> queryWrapper = new QueryWrapper<>();
-    queryWrapper.select("DISTINCT external_url").eq("exclusive_flag", 0);
+    queryWrapper.select("DISTINCT external_url").eq("exclusive_flag", 0).isNotNull("external_url");
     return spreadLinkInfoMapper.selectMaps(queryWrapper);
   }
 }

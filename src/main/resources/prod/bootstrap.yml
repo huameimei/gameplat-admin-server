@@ -22,7 +22,7 @@ spring:
         username: nacos
         password: aMN9Lezssd3dsDadYrss
         file-extension: yml
-        namespace: prod-${profile}
+        namespace: prod-${NACOS_CONFIG_NAMESPACE}
         group: SERVICE_GROUP
         refresh-enabled: true
         shared-configs:

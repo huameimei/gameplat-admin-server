@@ -18,11 +18,11 @@ spring:
     nacos:
       config:
         enabled: true
-        server-addr: ${NACOS_SERVER_ADDR:localhost}
+        server-addr: 192.168.15.244:8848,192.168.15.245:8848,192.168.15.246:8848
         username: nacos
         password: t1KMNoXowYr2DK9L
         file-extension: yml
-        namespace: ea9f2fb3-4fce-4cc9-a820-4508330af65b
+        namespace: prod-${profile}
         group: SERVICE_GROUP
         refresh-enabled: true
         shared-configs:
@@ -38,8 +38,8 @@ spring:
             refresh: true
       discovery:
         service: admin-server
-        namespace: ${spring.cloud.nacos.config.namespace}
+        namespace: prod
         group: SERVICE_GROUP
-        server-addr: ${spring.cloud.nacos.config.server-addr}
-        username: ${spring.cloud.nacos.config.username}
-        password: ${spring.cloud.nacos.config.password}
+        server-addr: ${NACOS_SERVER_ADDR:localhost}
+        username: nacos
+        password: t1KMNoXowYr2DK9L

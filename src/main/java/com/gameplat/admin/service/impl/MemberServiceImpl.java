@@ -745,7 +745,7 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
    * @return String
    */
   private String getMemberRoot(String userType) {
-    return MemberEnums.Type.TEST.match(userType)
+    return MemberEnums.Type.TEST.match(userType) || MemberEnums.Type.PROMOTION.match(userType)
         ? SystemConstant.DEFAULT_TEST_ROOT
         : SystemConstant.DEFAULT_WEB_ROOT;
   }

@@ -187,7 +187,7 @@ public class MemberTransferAgentServiceImpl implements MemberTransferAgentServic
     List<String> accounts = this.splitSuperPath(superPath);
     // 仅转移下级，新代理线下级人数增加M个；转移全部，新代理线下级人数增加M+1个
     Map<String, Integer> map = new HashMap<>(accounts.size());
-    accounts.forEach(account -> map.put(account, Boolean.TRUE.equals(excludeSelf) ? m : m + 1));
+    accounts.forEach(account -> map.put(account, Boolean.FALSE.equals(excludeSelf) ? m : m + 1));
     return map;
   }
 
@@ -202,7 +202,6 @@ public class MemberTransferAgentServiceImpl implements MemberTransferAgentServic
   private Map<String, Integer> getOriginLineLowNum(Member source, Boolean excludeSelf, int m) {
     List<String> accounts = this.splitSuperPath(source.getSuperPath());
     // 转移全部时，删除自身
-    // accounts.removeIf(e -> Boolean.TRUE.equals(excludeSelf) && e.equals(source.getAccount()));
 
     accounts = CollUtil.removeWithAddIf(new ArrayList<>(), e -> Boolean.TRUE.equals(excludeSelf) && e.equals(source.getAccount()));
 

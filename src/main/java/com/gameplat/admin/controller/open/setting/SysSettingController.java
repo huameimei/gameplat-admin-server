@@ -274,12 +274,7 @@ public class SysSettingController {
   @Operation(summary = "修改色值设置")
   @RequestMapping("/updateColorDict")
   @PreAuthorize("hasAuthority('setting:limit:updateColorDict')")
-  @CacheInvalidateContainer({
-          @CacheInvalidate(name = CachedKeys.DICT_DATA_CACHE, key = "#DictTypeEnum.COLOR_TYPE.getValue()"),
-          @CacheInvalidate(
-                  name = CachedKeys.DICT_DATA_CACHE,
-                  key = "#DictTypeEnum.COLOR_TYPE.getValue() + ':' + #DictDataEnum.APP_COLOR_TYPE.getLabel()")
-  })
+  @CacheInvalidate(name = CachedKeys.DICT_DATA_CACHE, key = "COLOR_TYPE")
   public Result<Object> updateColorDict(@RequestBody AppChangeSkinColorVO appChangeSkinColorVO){
     SysDictData sysDictData =
             sysDictDataService.getDictData(

@@ -18,7 +18,7 @@ spring:
     nacos:
       config:
         enabled: true
-        server-addr: 192.168.15.244:8848,192.168.15.245:8848,192.168.15.246:8848
+        server-addr: ${ConfigServerAddr}
         username: nacos
         password: aMN9Lezssd3dsDadYrss
         file-extension: yml

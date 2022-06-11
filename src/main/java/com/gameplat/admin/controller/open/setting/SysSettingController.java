@@ -18,6 +18,7 @@ import com.gameplat.admin.service.SysSettingService;
 import com.gameplat.base.common.enums.EnableEnum;
 import com.gameplat.base.common.web.Result;
 import com.gameplat.common.constant.CacheKey;
+import com.gameplat.common.constant.CachedKeys;
 import com.gameplat.common.enums.DictDataEnum;
 import com.gameplat.common.enums.DictTypeEnum;
 import com.gameplat.model.entity.setting.SysSetting;

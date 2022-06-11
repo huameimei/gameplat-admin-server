@@ -161,7 +161,7 @@ public class ActivityLobbyServiceImpl extends ServiceImpl<ActivityLobbyMapper, A
     // 如果统计周期是每周X，需要判断活动的结束时间是不是每周X
     else if (dto.getStatisDate()
         == ActivityInfoEnum.StatisItem.SINGLE_DAY_DEPOSIT_AMOUNT.getValue()) { // 4 每周X
-      if (DateTime.of(dto.getEndTime()).dayOfWeek() != dto.getDetailDate()) {
+      if ((DateTime.of(dto.getEndTime()).dayOfWeek() - 1) != dto.getDetailDate()) {
         throw new ServiceException(
             "统计日期选择"
                 + ActivityInfoEnum.DetailDateEnum.getWeek(dto.getDetailDate())

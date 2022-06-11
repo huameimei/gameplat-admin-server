@@ -151,6 +151,13 @@
         UPDATE member SET lower_num = lower_num + #{lowerNum} WHERE account = #{account}
     </update>
 
+    <update id="batchUpdateLowerNumByAccount">
+        <foreach collection="list" item="item" separator=";">
+            UPDATE member SET lower_num = lower_num + #{item.lowerNum} WHERE account = #{item.account}
+        </foreach>
+    </update>
+
+
     <select id="getMemberInfoByAccount" parameterType="java.lang.String" resultType="com.gameplat.admin.model.vo.MemberInfoVO">
         SELECT t1.id,
                t1.account,

@@ -4,6 +4,8 @@ import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.nacos.common.utils.CollectionUtils;
+import com.alicp.jetcache.anno.CacheInvalidate;
+import com.alicp.jetcache.anno.CacheInvalidateContainer;
 import com.aliyun.oss.ServiceException;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
@@ -271,6 +273,12 @@ public class SysSettingController {
   @Operation(summary = "修改色值设置")
   @RequestMapping("/updateColorDict")
   @PreAuthorize("hasAuthority('setting:limit:updateColorDict')")
+  @CacheInvalidateContainer({
+          @CacheInvalidate(name = CachedKeys.DICT_DATA_CACHE, key = "#DictTypeEnum.COLOR_TYPE.getValue()"),
+          @CacheInvalidate(
+                  name = CachedKeys.DICT_DATA_CACHE,
+                  key = "#DictTypeEnum.COLOR_TYPE.getValue() + ':' + #DictDataEnum.APP_COLOR_TYPE.getLabel()")
+  })
   public Result<Object> updateColorDict(@RequestBody AppChangeSkinColorVO appChangeSkinColorVO){
     SysDictData sysDictData =
             sysDictDataService.getDictData(

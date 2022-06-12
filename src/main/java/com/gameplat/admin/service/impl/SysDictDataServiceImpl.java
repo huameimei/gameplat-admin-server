@@ -121,6 +121,12 @@ public class SysDictDataServiceImpl extends ServiceImpl<SysDictDataMapper, SysDi
 
 
   @Override
+  @CacheInvalidate(name = CachedKeys.DICT_DATA_CACHE, key = "#dictType + ':' + #dictLabel")
+  public void removeDictDataCache(String dictType, String dictLabel) {
+  }
+
+
+  @Override
   public String getDirectChargeValue(String dictType, String dictLabel) {
     return this.lambdaQuery()
             .eq(SysDictData::getStatus, EnableEnum.ENABLED.code())

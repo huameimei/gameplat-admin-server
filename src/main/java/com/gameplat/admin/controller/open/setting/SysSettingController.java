@@ -4,8 +4,6 @@ import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.nacos.common.utils.CollectionUtils;
-import com.alicp.jetcache.anno.CacheInvalidate;
-import com.alicp.jetcache.anno.CacheInvalidateContainer;
 import com.aliyun.oss.ServiceException;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
@@ -18,7 +16,6 @@ import com.gameplat.admin.service.SysSettingService;
 import com.gameplat.base.common.enums.EnableEnum;
 import com.gameplat.base.common.web.Result;
 import com.gameplat.common.constant.CacheKey;
-import com.gameplat.common.constant.CachedKeys;
 import com.gameplat.common.enums.DictDataEnum;
 import com.gameplat.common.enums.DictTypeEnum;
 import com.gameplat.model.entity.setting.SysSetting;
@@ -273,8 +270,6 @@ public class SysSettingController {
    */
   @Operation(summary = "修改色值设置")
   @RequestMapping("/updateColorDict")
-  @PreAuthorize("hasAuthority('setting:limit:updateColorDict')")
-  @CacheEvict(cacheNames = CachedKeys.DICT_DATA_CACHE, allEntries = true)
   public Result<Object> updateColorDict(@RequestBody AppChangeSkinColorVO appChangeSkinColorVO){
     SysDictData sysDictData =
             sysDictDataService.getDictData(
@@ -284,7 +279,7 @@ public class SysSettingController {
     }
     // 更新配置信息
     sysDictData.setDictValue(JSON.toJSONString(appChangeSkinColorVO));
-    adminCache.deleteObject(CachedKeys.DICT_DATA_CACHE+Constants.COLOR_TYPE);
+    sysDictDataService.removeDictDataCache(DictTypeEnum.COLOR_TYPE.getValue(),DictDataEnum.APP_COLOR_TYPE.getLabel());
     boolean result = sysDictDataService.updateById(sysDictData);
     if (!result) {
       throw new com.gameplat.base.common.exception.ServiceException("更新色值配置配置失败");

@@ -589,7 +589,7 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
 
     if (!StringUtil.isBlank(levels)) {
       String[] levelArr = levels.split(",");
-      boolean contains = Arrays.asList(levelArr).contains(memberWithdraw.getMemberLevel());
+      boolean contains = Arrays.asList(levelArr).contains(memberWithdraw.getMemberLevel() + "");
       if (contains) {
         if (pointFlag == 1) {
           discountAmount =

@@ -34,4 +34,11 @@ public interface GameKindService extends IService<GameKind> {
   List<GameKind> queryGameKindListByPlatformCode(String platformCode);
 
   List<GameKind> getList();
+
+  /**
+   * 获取未关闭的一级游戏列表
+   *
+   * @return List
+   */
+  List<GameKind> queryUnDownGameKindList();
 }

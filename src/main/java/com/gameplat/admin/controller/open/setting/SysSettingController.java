@@ -274,7 +274,7 @@ public class SysSettingController {
   @Operation(summary = "修改色值设置")
   @RequestMapping("/updateColorDict")
   @PreAuthorize("hasAuthority('setting:limit:updateColorDict')")
-  @CacheInvalidate(name = CachedKeys.DICT_DATA_CACHE, key = "COLOR_TYPE")
+  @CacheEvict(cacheNames = CachedKeys.DICT_DATA_CACHE, allEntries = true)
   public Result<Object> updateColorDict(@RequestBody AppChangeSkinColorVO appChangeSkinColorVO){
     SysDictData sysDictData =
             sysDictDataService.getDictData(
@@ -284,6 +284,7 @@ public class SysSettingController {
     }
     // 更新配置信息
     sysDictData.setDictValue(JSON.toJSONString(appChangeSkinColorVO));
+    adminCache.deleteObject(CachedKeys.DICT_DATA_CACHE+Constants.COLOR_TYPE);
     boolean result = sysDictDataService.updateById(sysDictData);
     if (!result) {
       throw new com.gameplat.base.common.exception.ServiceException("更新色值配置配置失败");

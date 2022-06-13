@@ -2,6 +2,7 @@ package com.gameplat.admin.model.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Date;
 import lombok.Data;
 
@@ -26,7 +27,7 @@ public class OperGameKindDTO implements Serializable {
   private Integer sort;
 
   /** 返水最高比例 */
-  private Integer rebateRate;
+  private BigDecimal rebateRate;
 
   /** 维护开始时间 */
   @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")

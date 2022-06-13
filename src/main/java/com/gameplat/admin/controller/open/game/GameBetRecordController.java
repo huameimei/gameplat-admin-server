@@ -6,8 +6,8 @@ import com.gameplat.admin.model.vo.GameBetRecordVO;
 import com.gameplat.admin.model.vo.PageDtoVO;
 import com.gameplat.admin.service.GameBetRecordInfoService;
 import com.gameplat.common.game.GameResult;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +16,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@Api(tags = "游戏注单记录")
+import javax.servlet.http.HttpServletResponse;
+
+@Tag(name = "游戏注单记录")
 @Slf4j
 @RestController
 @RequestMapping("/api/admin/game/gameBetRecord")
@@ -24,8 +26,7 @@ public class GameBetRecordController {
 
   @Autowired private GameBetRecordInfoService gameBetRecordInfoService;
 
-  @SneakyThrows
-  @ApiOperation("查询")
+  @Operation(summary = "查询")
   @GetMapping(value = "/queryPage")
   @PreAuthorize("hasAuthority('game:gameBetRecord:view')")
   public PageDtoVO<GameBetRecordVO> queryPage(
@@ -34,10 +35,18 @@ public class GameBetRecordController {
   }
 
   @SneakyThrows
-  @ApiOperation("查询游戏结果")
+  @Operation(summary = "查询游戏结果")
   @GetMapping(value = "/getGameResult")
   @PreAuthorize("hasAuthority('game:gameBetRecord:gameResult')")
   public GameResult getGameResult(GameBetRecordQueryDTO dto) {
     return gameBetRecordInfoService.getGameResult(dto);
+  }
+
+  @SneakyThrows
+  @Operation(summary = "导出游戏下注记录")
+  @GetMapping(value = "/exportReport")
+  @PreAuthorize("hasAuthority('game:gameBetRecord:export')")
+  public void exportReport(GameBetRecordQueryDTO dto, HttpServletResponse response) {
+    gameBetRecordInfoService.exportReport(dto, response);
   }
 }

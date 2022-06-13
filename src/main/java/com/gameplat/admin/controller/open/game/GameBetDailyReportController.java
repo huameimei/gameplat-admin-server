@@ -18,19 +18,20 @@ import com.gameplat.base.common.util.DateUtil;
 import com.gameplat.base.common.util.StringUtils;
 import com.gameplat.model.entity.game.GameBetDailyReport;
 import com.gameplat.model.entity.game.GamePlatform;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.util.Date;
 import java.util.List;
 
 @Slf4j
-@Api(tags = "游戏日报表")
+@Tag(name = "游戏日报表")
 @RestController
 @RequestMapping("/api/admin/game/gameBetDailyReport")
 public class GameBetDailyReportController {
@@ -41,7 +42,7 @@ public class GameBetDailyReportController {
 
   @Autowired private GameBetRecordInfoService gameBetRecordInfoService;
 
-  @ApiOperation("查询")
+  @Operation(summary = "查询")
   @GetMapping(value = "/queryPage")
   @PreAuthorize("hasAuthority('game:gameBetDailyReport:view')")
   public PageDtoVO<GameBetDailyReport> queryPage(
@@ -49,14 +50,22 @@ public class GameBetDailyReportController {
     return gameBetDailyReportService.queryPage(page, dto);
   }
 
-  @ApiOperation("游戏平台维度数据统计")
+  @Operation(summary = "游戏平台维度数据统计")
   @GetMapping(value = "/queryGamePlatformReport")
   @PreAuthorize("hasAuthority('game:gamePlatformReport:view')")
   public List<GameReportVO> queryGamePlatformReport(GameBetDailyReportQueryDTO dto) {
     return gameBetDailyReportService.queryGamePlatformReport(dto);
   }
 
-  @ApiOperation("游戏重新生成日报表")
+  @Operation(summary = "游戏平台维度数据导出")
+  @GetMapping(value = "/exportGamePlatformReport")
+  @PreAuthorize("hasAuthority('game:gamePlatformReport:export')")
+  public void exportGamePlatformReport(
+      GameBetDailyReportQueryDTO dto, HttpServletResponse response) {
+    gameBetDailyReportService.exportGamePlatformReport(dto, response);
+  }
+
+  @Operation(summary = "游戏重新生成日报表")
   @PostMapping(value = "/resetDayReport")
   @PreAuthorize("hasAuthority('game:gameBetDailyReport:reset')")
   public void resetDayReport(@RequestBody OperGameMemberDayReportDTO dto) {
@@ -69,7 +78,7 @@ public class GameBetDailyReportController {
     gameBetDailyReportService.saveGameBetDailyReport(dto.getStatTime(), gamePlatform);
   }
 
-  @ApiOperation("查询游戏数据统计")
+  @Operation(summary = "查询游戏数据统计")
   @GetMapping(value = "/queryReport")
   @PreAuthorize("hasAuthority('game:gameReport:view')")
   public List<GameReportVO> queryReport(GameBetDailyReportQueryDTO dto) {
@@ -84,7 +93,7 @@ public class GameBetDailyReportController {
     return gameBetDailyReportService.queryReportList(dto);
   }
 
-  @ApiOperation("查询投注日报表记录")
+  @Operation(summary = "查询投注日报表记录")
   @GetMapping(value = "/queryBetReport")
   public PageDtoVO<GameBetReportVO> queryBetReport(
       Page<GameBetDailyReportQueryDTO> page, GameBetDailyReportQueryDTO dto) {
@@ -126,7 +135,7 @@ public class GameBetDailyReportController {
     return gameBetDailyReportService.queryBetReportList(page, dto);
   }
 
-  @ApiOperation(value = "获取会员投注记录")
+  @Operation(summary = "获取会员投注记录")
   @GetMapping("findUserGameBetRecord")
   @PreAuthorize("hasAuthority('game:gameReport:view')")
   public PageDtoVO<GameBetRecordVO> findUserGameBetRecord(

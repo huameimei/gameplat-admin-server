@@ -3,7 +3,6 @@ package com.gameplat.admin.controller.open.activity;
 import com.alibaba.fastjson.JSONArray;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
-import com.gameplat.admin.enums.ActivityInfoEnum;
 import com.gameplat.admin.model.dto.ActivityInfoAddDTO;
 import com.gameplat.admin.model.dto.ActivityInfoQueryDTO;
 import com.gameplat.admin.model.dto.ActivityInfoUpdateDTO;
@@ -15,24 +14,26 @@ import com.gameplat.admin.service.ConfigService;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.DateUtil;
 import com.gameplat.base.common.util.StringUtils;
+import com.gameplat.common.enums.ActivityInfoEnum;
 import com.gameplat.common.enums.DictDataEnum;
 import com.gameplat.model.entity.activity.ActivityInfo;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import springfox.documentation.annotations.ApiIgnore;
 
-import javax.validation.constraints.NotEmpty;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 活动管理
@@ -40,7 +41,7 @@ import java.util.List;
  * @author kenvin
  */
 @Slf4j
-@Api(tags = "活动发布管理")
+@Tag(name = "活动发布管理")
 @Validated
 @RestController
 @RequestMapping("/api/admin/activity/info")
@@ -50,28 +51,15 @@ public class ActivityInfoController {
 
   @Autowired private ConfigService configService;
 
-  /**
-   * 活动列表
-   *
-   * @param page PageDTO
-   * @param dto ActivityInfoQueryDTO
-   * @return IPage
-   */
-  @ApiOperation(value = "活动列表")
+  @Operation(summary = "活动列表")
   @GetMapping("/list")
   @PreAuthorize("hasAuthority('activity:info:view')")
   public IPage<ActivityInfoVO> list(
-      @ApiIgnore PageDTO<ActivityInfo> page, ActivityInfoQueryDTO dto) {
+      @Parameter(hidden = true) PageDTO<ActivityInfo> page, ActivityInfoQueryDTO dto) {
     return activityInfoService.list(page, dto);
   }
 
-  /**
-   * 活动详情
-   *
-   * @param id Long
-   * @return ActivityInfoVO
-   */
-  @ApiOperation(value = "活动详情")
+  @Operation(summary = "活动详情")
   @GetMapping("/detail")
   @PreAuthorize("hasAuthority('activity:info:detail')")
   public ActivityInfoVO detail(Long id) {
@@ -81,12 +69,7 @@ public class ActivityInfoController {
     return activityInfoService.detail(id);
   }
 
-  /**
-   * 新增活动
-   *
-   * @param activityInfoAddDTO
-   */
-  @ApiOperation(value = "新增活动")
+  @Operation(summary = "新增活动")
   @PostMapping("/add")
   @PreAuthorize("hasAuthority('activity:info:add')")
   public void add(@RequestBody ActivityInfoAddDTO activityInfoAddDTO) {
@@ -100,15 +83,6 @@ public class ActivityInfoController {
     activityInfoService.add(activityInfoAddDTO);
   }
 
-  /**
-   * 活动验证
-   *
-   * @param validStatus
-   * @param endTime
-   * @param beginTime
-   * @param activityLobbyId
-   * @param id
-   */
   private void checkActivityInfo(
       Integer validStatus, String endTime, String beginTime, Long activityLobbyId, Long id) {
     if (validStatus == ActivityInfoEnum.ValidStatus.TIME_LIMIT.value()) {
@@ -122,12 +96,7 @@ public class ActivityInfoController {
     }
   }
 
-  /**
-   * 编辑活动
-   *
-   * @param activityInfoUpdateDTO
-   */
-  @ApiOperation(value = "编辑活动")
+  @Operation(summary = "编辑活动")
   @PostMapping("/update")
   @PreAuthorize("hasAuthority('activity:info:edit')")
   public void update(@RequestBody ActivityInfoUpdateDTO activityInfoUpdateDTO) {
@@ -141,36 +110,22 @@ public class ActivityInfoController {
     activityInfoService.update(activityInfoUpdateDTO);
   }
 
-  /**
-   * 修改活动排序
-   *
-   * @param dto ActivityInfoUpdateSortDTO
-   */
-  @ApiOperation(value = "修改活动排序")
+  @Operation(summary = "修改活动排序")
   @PostMapping("/updateSort")
   @PreAuthorize("hasAuthority('activity:info:updateSort')")
   public void updateSort(@Validated @RequestBody ActivityInfoUpdateSortDTO dto) {
     activityInfoService.updateSort(dto);
   }
 
-  /**
-   * 删除活动
-   *
-   * @param ids String
-   */
-  @ApiOperation(value = "删除活动")
-  @DeleteMapping("/delete")
+  @Operation(summary = "删除活动")
+  @PostMapping("/delete")
   @PreAuthorize("hasAuthority('activity:info:remove')")
-  public void delete(@RequestBody @NotEmpty(message = "缺少参数") String ids) {
-    activityInfoService.delete(ids);
+  public void delete(@RequestBody Map<String, String> map) {
+    Assert.notNull(map.get("ids"), "id不能为空！");
+    activityInfoService.delete(map.get("ids"));
   }
 
-  /**
-   * 获取全部活动
-   *
-   * @return List
-   */
-  @ApiOperation(value = "获取全部活动")
+  @Operation(summary = "获取全部活动")
   @GetMapping("/getAllActivity")
   @PreAuthorize("hasAuthority('activity:info:getAllActivity')")
   public List<ActivityInfoVO> getAllActivity() {
@@ -201,12 +156,7 @@ public class ActivityInfoController {
     return result;
   }
 
-  /**
-   * 活动排序值列表
-   *
-   * @return List
-   */
-  @ApiOperation(value = "活动排序值列表")
+  @Operation(summary = "活动排序值列表")
   @GetMapping("/sortList")
   @PreAuthorize("hasAuthority('activity:info:sortList')")
   public List<ValueDataVO> sortList() {

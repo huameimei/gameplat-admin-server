@@ -9,6 +9,7 @@ import com.gameplat.model.entity.member.MemberLoan;
 import org.apache.ibatis.annotations.Param;
 
 import java.math.BigDecimal;
+import java.util.Date;
 
 public interface MemberLoanMapper extends BaseMapper<MemberLoan> {
 
@@ -17,4 +18,7 @@ public interface MemberLoanMapper extends BaseMapper<MemberLoan> {
     BigDecimal getTotalSum();
 
     MemberLoanVO getNewRecord(Long memberId);
+
+    /** 获取最近一次借款时间 */
+    Date getRecentLoanTime(Long memberId);
 }

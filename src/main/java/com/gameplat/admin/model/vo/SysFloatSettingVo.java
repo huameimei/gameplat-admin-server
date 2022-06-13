@@ -1,15 +1,13 @@
 package com.gameplat.admin.model.vo;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.io.Serializable;
 import java.util.Date;
 
-/**
- * @Author key @Date 2022/3/10 游戏浮窗对象 sys_float_setting
- */
+/** 游戏浮窗对象 */
 @Data
 public class SysFloatSettingVo implements Serializable {
   private static final long serialVersionUID = 1L;
@@ -31,16 +29,17 @@ public class SysFloatSettingVo implements Serializable {
 
   /** 跳转地址 */
   private String jumpUrl;
+
   /** 图片地址 */
   private String iconPath;
 
   /** 创建时间 */
-  @ApiModelProperty(value = "创建时间")
+  @Schema(description = "创建时间")
   @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
   private Date createTime;
 
   /** 更新时间 */
-  @ApiModelProperty(value = "更新时间")
+  @Schema(description = "更新时间")
   @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
   private Date updateTime;
 }

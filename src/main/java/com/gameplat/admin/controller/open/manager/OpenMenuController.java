@@ -11,9 +11,8 @@ import com.gameplat.common.group.Groups;
 import com.gameplat.common.lang.Assert;
 import com.gameplat.log.annotation.Log;
 import com.gameplat.model.entity.sys.SysMenu;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import lombok.extern.slf4j.Slf4j;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
@@ -21,22 +20,21 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Api(tags = "菜单管理")
-@Slf4j
+@Tag(name = "菜单管理")
 @RestController
 @RequestMapping("/api/admin/manager/menu")
 public class OpenMenuController {
 
   @Autowired private SysMenuService menuService;
 
-  @ApiOperation("查询")
+  @Operation(summary = "查询")
   @GetMapping("/list")
   @PreAuthorize("hasAuthority('system:menu:view')")
   public List<SysMenu> list(MenuDTO dto) {
     return menuService.selectMenuList(dto);
   }
 
-  @ApiOperation("添加")
+  @Operation(summary = "添加")
   @PostMapping("/add")
   @PreAuthorize("hasAuthority('system:menu:add')")
   @Log(module = ServiceName.ADMIN_SERVICE, desc = "添加菜单")
@@ -49,8 +47,8 @@ public class OpenMenuController {
     menuService.insertMenu(dto);
   }
 
-  @ApiOperation("编辑")
-  @PutMapping("/edit")
+  @Operation(summary = "编辑")
+  @PostMapping("/edit")
   @PreAuthorize("hasAuthority('system:menu:edit')")
   public void update(@Validated(Groups.UPDATE.class) @RequestBody OperMenuDTO dto) {
     if (StringUtils.isBlank(dto.getMenuName())
@@ -61,14 +59,14 @@ public class OpenMenuController {
     menuService.updateMenu(dto);
   }
 
-  @ApiOperation("删除")
-  @DeleteMapping("/delete")
+  @Operation(summary = "删除")
+  @PostMapping("/delete")
   @PreAuthorize("hasAuthority('system:menu:remove')")
   public void remove(@RequestBody List<Long> ids) {
     menuService.deleteMenuById(ids);
   }
 
-  @ApiOperation("检查菜单名称是否唯一")
+  @Operation(summary = "检查菜单名称是否唯一")
   @GetMapping("/checkMenuNameUnique")
   public boolean checkMenuNameUnique(OperMenuDTO dto) {
     Assert.notNull(dto.getParentId(), "缺少参数");

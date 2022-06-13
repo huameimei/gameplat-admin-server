@@ -1,6 +1,6 @@
 package com.gameplat.admin.model.dto;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import javax.validation.constraints.NotEmpty;
@@ -14,21 +14,20 @@ import java.io.Serializable;
 @Data
 public class SbSportWinReportQueryDTO implements Serializable {
 
-  @ApiModelProperty(value = "会员账号")
+  @Schema(description = "会员账号")
   private String memberAccount;
 
-  @ApiModelProperty(value = "代理账号")
+  @Schema(description = "代理账号")
   private String proxyAccount;
 
-  @ApiModelProperty(value = "是否只查询直属下级")
+  @Schema(description = "是否只查询直属下级")
   private Integer isDirectly;
 
-  @ApiModelProperty(value = "开始时间")
+  @Schema(description = "开始时间")
   @NotEmpty(message = "开始时间不能为空")
   private String beginTime;
 
-  @ApiModelProperty(value = "结束时间")
+  @Schema(description = "结束时间")
   @NotEmpty(message = "结束时间不能为空")
   private String endTime;
-
 }

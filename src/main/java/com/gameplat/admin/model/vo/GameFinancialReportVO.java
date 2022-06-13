@@ -1,8 +1,7 @@
 package com.gameplat.admin.model.vo;
 
 import com.alibaba.fastjson.annotation.JSONField;
-import com.fasterxml.jackson.annotation.JsonFormat;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -17,58 +16,58 @@ import java.util.Date;
 @Data
 public class GameFinancialReportVO implements Serializable {
 
-  @ApiModelProperty(value = "主键ID")
+  @Schema(description = "主键ID")
   private Long id;
 
-  @ApiModelProperty(value = "统计日期（年月）")
+  @Schema(description = "统计日期（年月）")
   private String statisticsTime;
 
-  @ApiModelProperty(value = "租户标识")
+  @Schema(description = "租户标识")
   private String customerCode;
 
-  @ApiModelProperty(value = "游戏大类编码")
+  @Schema(description = "游戏大类编码")
   private String gameType;
 
-  @ApiModelProperty(value = "游戏大类名字")
+  @Schema(description = "游戏大类名字")
   private String gameTypeName;
 
-  @ApiModelProperty(value = "游戏大类Id")
+  @Schema(description = "游戏大类Id")
   private Integer gameTypeId;
 
-  @ApiModelProperty(value = "游戏平台编码")
+  @Schema(description = "游戏平台编码")
   private String platformCode;
 
-  @ApiModelProperty(value = "游戏平台名字")
+  @Schema(description = "游戏平台名字")
   private String platformName;
 
-  @ApiModelProperty(value = "一级游戏编码")
+  @Schema(description = "一级游戏编码")
   private String gameKind;
 
-  @ApiModelProperty(value = "一级游戏名称")
+  @Schema(description = "一级游戏名称")
   private String gameName;
 
-  @ApiModelProperty(value = "有效投注额")
+  @Schema(description = "有效投注额")
   private BigDecimal validAmount;
 
-  @ApiModelProperty(value = "输赢金额")
+  @Schema(description = "输赢金额")
   private BigDecimal winAmount;
 
-  @ApiModelProperty(value = "上月输赢金额")
+  @Schema(description = "上月输赢金额")
   private BigDecimal lastWinAmount = BigDecimal.ZERO;
 
-  @ApiModelProperty(value = "累计输赢金额")
+  @Schema(description = "累计输赢金额")
   private BigDecimal accumulateWinAmount;
 
-  @ApiModelProperty(value = "统计开始时间")
+  @Schema(description = "统计开始时间")
   private String startTime;
 
-  @ApiModelProperty(value = "统计结束时间")
+  @Schema(description = "统计结束时间")
   private String endTime;
 
-  @ApiModelProperty(value = "创建时间")
+  @Schema(description = "创建时间")
   @JSONField(format = "unixtime")
   private Date createTime;
 
-  @ApiModelProperty(value = "创建人")
+  @Schema(description = "创建人")
   private String createBy;
 }

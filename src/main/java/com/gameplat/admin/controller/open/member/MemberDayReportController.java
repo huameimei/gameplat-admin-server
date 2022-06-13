@@ -13,8 +13,8 @@ import com.gameplat.admin.model.vo.PageDtoVO;
 import com.gameplat.admin.service.GameMemberReportService;
 import com.gameplat.base.common.util.DateUtil;
 import com.gameplat.base.common.util.StringUtils;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -30,7 +30,7 @@ import java.util.List;
  *
  * @author lily
  */
-@Api(tags = "会员日报表")
+@Tag(name = "会员日报表")
 @Slf4j
 @RestController
 @RequestMapping("/api/admin/member/dayReport")
@@ -42,13 +42,13 @@ public class MemberDayReportController {
   @Autowired private GameMemberReportService gameMemberReportService;
 
   @GetMapping("/list")
-  @ApiOperation("查询会员日报列表")
+  @Operation(summary = "查询会员日报列表")
   @PreAuthorize("hasAuthority('member:dayReport:list')")
   public List<DayReportVO> findList(DayReportDTO dto) {
     return memberBusDayReportMapper.findList(dto);
   }
 
-  @ApiOperation("会员日报表")
+  @Operation(summary = "会员日报表")
   @GetMapping("memberGameDayReport")
   @PreAuthorize("hasAuthority('member:dayReport:view')")
   public PageDtoVO<MemberGameDayReportVo> queryBetReport(
@@ -65,7 +65,7 @@ public class MemberDayReportController {
     return gameMemberReportService.findSumMemberGameDayReport(page, dto);
   }
 
-  @ApiOperation("投注分析")
+  @Operation(summary = "投注分析")
   @GetMapping("findMemberbetAnalysis")
   @PreAuthorize("hasAuthority('member:dayReport:betAnalysis')")
   public MemberbetAnalysisVo findMemberbetAnalysis(MemberbetAnalysisdto dto) {

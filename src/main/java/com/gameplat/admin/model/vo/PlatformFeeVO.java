@@ -1,6 +1,6 @@
 package com.gameplat.admin.model.vo;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -12,24 +12,24 @@ public class PlatformFeeVO implements Serializable {
 
   private static final long serialVersionUID = 1L;
 
-  @ApiModelProperty(value = "统计月份")
+  @Schema(description = "统计月份")
   private String countMonth;
 
-  @ApiModelProperty(value = "游戏名称")
+  @Schema(description = "游戏名称")
   private String gameName;
 
-  @ApiModelProperty(value = "游戏编码")
+  @Schema(description = "游戏编码")
   private String gameCode;
 
-  @ApiModelProperty(value = "游戏盈利")
+  @Schema(description = "游戏盈利")
   private BigDecimal winAmount;
 
-  @ApiModelProperty(value = "有效投注")
+  @Schema(description = "有效投注")
   private BigDecimal validAmount;
 
-  @ApiModelProperty(value = "收费比例")
+  @Schema(description = "收费比例")
   private BigDecimal reportRate;
 
-  @ApiModelProperty(value = "游戏费用")
+  @Schema(description = "游戏费用")
   private BigDecimal gameFee;
 }

@@ -14,8 +14,8 @@ import com.gameplat.admin.service.ChatRedEnvelopeService;
 import com.gameplat.model.entity.chart.ChatRedEnvelope;
 import com.gameplat.model.entity.chart.ChatRedEnvelopeDraw;
 import com.gameplat.model.entity.chart.ChatRedEnvelopeRecord;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.*;
  * @description 红包管理
  * @date 2022/2/15
  */
-@Api(tags = "聊天室红包管理")
+@Tag(name = "聊天室红包管理")
 @RestController
 @RequestMapping("/api/admin/chat/redEnvelope")
 public class ChatRedEnvelopeController {
@@ -37,35 +37,35 @@ public class ChatRedEnvelopeController {
 
   @Autowired private ChatRedEnvelopeRecordService chatRedEnvelopeRecordService;
 
-  @ApiOperation(value = "分页列表")
+  @Operation(summary = "分页列表")
   @GetMapping("/page")
   @PreAuthorize("hasAuthority('chat:redEnvelope:view')")
   public IPage<ChatRedEnvelopeVO> page(PageDTO<ChatRedEnvelope> page, ChatRedEnvelopeQueryDTO dto) {
     return redEnvelopeService.page(page, dto);
   }
 
-  @ApiOperation(value = "增")
+  @Operation(summary = "增")
   @PostMapping("/add")
   @PreAuthorize("hasAuthority('chat:redEnvelope:add')")
   public void add(@Validated ChatRedEnvelopeAddDTO dto) {
     redEnvelopeService.add(dto);
   }
 
-  @ApiOperation(value = "删")
-  @DeleteMapping("/remove/{id}")
+  @Operation(summary = "删")
+  @PostMapping("/remove/{id}")
   @PreAuthorize("hasAuthority('chat:redEnvelope:remove')")
   public void remove(@PathVariable Integer id) {
     redEnvelopeService.remove(id);
   }
 
-  @ApiOperation(value = "启用禁用")
-  @PutMapping("/enable")
+  @Operation(summary = "启用禁用")
+  @PostMapping("/enable")
   @PreAuthorize("hasAuthority('chat:redEnvelope:enable')")
   public void enable(@Validated ChatRedEnvelopeEditDTO dto) {
     redEnvelopeService.update(dto);
   }
 
-  @ApiOperation(value = "红包记录详情")
+  @Operation(summary = "红包记录详情")
   @GetMapping("/getRedEnvelopeRecord")
   @PreAuthorize("hasAuthority('chat:redEnvelopeRecord:view')")
   public IPage<ChatRedEnvelopeRecord> page(
@@ -73,7 +73,7 @@ public class ChatRedEnvelopeController {
     return chatRedEnvelopeRecordService.page(page, dto);
   }
 
-  @ApiOperation(value = "红包领取记录详情")
+  @Operation(summary = "红包领取记录详情")
   @GetMapping("/getRedEnvelopeDraw")
   @PreAuthorize("hasAuthority('chat:redEnvelopeDraw:view')")
   public IPage<ChatRedEnvelopeDrawVO> page(

@@ -6,9 +6,9 @@ import com.gameplat.admin.model.dto.GameBetRecordQueryDTO;
 import com.gameplat.admin.model.vo.GameBetRecordVO;
 import com.gameplat.admin.model.vo.PageDtoVO;
 import com.gameplat.common.game.GameResult;
-
 import java.util.List;
 import java.util.Map;
+import javax.servlet.http.HttpServletResponse;
 
 public interface GameBetRecordInfoService {
 
@@ -18,4 +18,6 @@ public interface GameBetRecordInfoService {
   GameResult getGameResult(GameBetRecordQueryDTO dto) throws Exception;
 
   List<ActivityStatisticItem> xjAssignMatchDml(Map map);
+
+  void exportReport(GameBetRecordQueryDTO dto, HttpServletResponse response);
 }

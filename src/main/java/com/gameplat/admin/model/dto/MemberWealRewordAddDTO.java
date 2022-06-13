@@ -1,6 +1,6 @@
 package com.gameplat.admin.model.dto;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -15,54 +15,54 @@ import java.util.Date;
 @Data
 public class MemberWealRewordAddDTO implements Serializable {
 
-  @ApiModelProperty("用户ID")
+  @Schema(description = "用户ID")
   private Long userId;
 
-  @ApiModelProperty("用户账号")
+  @Schema(description = "用户账号")
   private String userName;
 
-  @ApiModelProperty("状态： 0：待审核   1：未领取  2：已完成  3:已失效")
+  @Schema(description = "状态： 0：待审核   1：未领取  2：已完成  3:已失效")
   private Integer status;
 
-  @ApiModelProperty("会员类型")
+  @Schema(description = "会员类型")
   private String userType;
 
-  @ApiModelProperty("上级账号")
+  @Schema(description = "上级账号")
   private String parentName;
 
-  @ApiModelProperty("上级id")
+  @Schema(description = "上级id")
   private Long parentId;
 
-  @ApiModelProperty("代理路由")
+  @Schema(description = "代理路由")
   private String agentPath;
 
-  @ApiModelProperty("老等级")
+  @Schema(description = "老等级")
   private Integer oldLevel;
 
-  @ApiModelProperty("当前等级")
+  @Schema(description = "当前等级")
   private Integer currentLevel;
 
-  @ApiModelProperty("派发金额")
+  @Schema(description = "派发金额")
   private BigDecimal rewordAmount;
 
-  @ApiModelProperty("提现打码量")
+  @Schema(description = "提现打码量")
   private BigDecimal withdrawDml;
 
-  @ApiModelProperty("类型：0 升级奖励  1：周俸禄  2：月俸禄  3：生日礼金  4：每月红包")
+  @Schema(description = "类型：0 升级奖励  1：周俸禄  2：月俸禄  3：生日礼金  4：每月红包")
   private Integer type;
 
-  @ApiModelProperty(value = "领取时间")
+  @Schema(description = "领取时间")
   private Date drawTime;
 
-  @ApiModelProperty(value = "失效时间")
+  @Schema(description = "失效时间")
   private Date invalidTime;
 
-  @ApiModelProperty(value = "流水号")
+  @Schema(description = "流水号")
   private String serialNumber;
 
-  @ApiModelProperty(value = "活动标题")
+  @Schema(description = "活动标题")
   private String activityTitle;
 
-  @ApiModelProperty(value = "备注")
+  @Schema(description = "备注")
   private String remark;
 }

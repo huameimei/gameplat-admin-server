@@ -9,8 +9,8 @@ import com.gameplat.admin.service.MemberGrowthConfigService;
 import com.gameplat.admin.service.MemberGrowthLevelService;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.security.SecurityUserHolder;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -27,7 +27,7 @@ import java.util.List;
  * @author lily
  */
 @Slf4j
-@Api(tags = "VIP等级配置")
+@Tag(name = "VIP等级配置")
 @RestController
 @RequestMapping("/api/admin/member/growthLevel")
 public class OpenMemberGrowthLevelController {
@@ -36,15 +36,15 @@ public class OpenMemberGrowthLevelController {
 
   @Autowired private MemberGrowthConfigService configService;
 
-  @ApiOperation(value = "VIP配置和VIP等级列表/查询logo配置列表")
+  @Operation(summary = "VIP配置和VIP等级列表/查询logo配置列表")
   @GetMapping("/config")
   //  @PreAuthorize("hasAuthority('member:growthLevel:config')")
   public MemberConfigLevelVO getLevelConfig() {
     return levelService.getLevelConfig();
   }
 
-  @ApiOperation(value = "修改VIP配置")
-  @PutMapping("/update")
+  @Operation(summary = "修改VIP配置")
+  @PostMapping("/update")
   @PreAuthorize("hasAuthority('member:growthLevel:edit')")
   // @ApiParam(name = "修改VIP配置入参", value = "传入json格式", required = true)
   public void update(@Validated @RequestBody MemberGrowthConfigEditDto dto) {
@@ -57,14 +57,14 @@ public class OpenMemberGrowthLevelController {
     configService.updateGrowthConfig(dto);
   }
 
-  @ApiOperation(value = "后台批量修改VIP等级")
+  @Operation(summary = "后台批量修改VIP等级")
   @PreAuthorize("hasAuthority('member:growthLevel:edit')")
-  @PutMapping("/updateLevel")
+  @PostMapping("/updateLevel")
   public void batchUpdateLevel(@RequestBody JSONObject obj, HttpServletRequest request) {
     levelService.batchUpdateLevel(obj, request);
   }
 
-  @ApiOperation(value = "VIP等级列表")
+  @Operation(summary = "VIP等级列表")
   @GetMapping("/vipList")
   //  @PreAuthorize("hasAuthority('member:growthLevel:config')")
   public List<MemberGrowthLevelVO> vipList() {

@@ -6,8 +6,8 @@ import com.gameplat.admin.model.dto.MemberWealConfigAddDTO;
 import com.gameplat.admin.model.dto.MemberWealConfigEditDTO;
 import com.gameplat.admin.service.MemberWealConfigService;
 import com.gameplat.model.entity.member.MemberWealConfig;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
  * @author lily
  */
 @Slf4j
-@Api(tags = "VIP权益配置")
+@Tag(name = "VIP权益配置")
 @RestController
 @RequestMapping("/api/admin/member/wealConfig")
 public class MemberWealConfigController {
@@ -28,28 +28,28 @@ public class MemberWealConfigController {
   @Autowired private MemberWealConfigService memberWealConfigService;
 
   @PostMapping("/add")
-  @ApiOperation("新增权益配置")
+  @Operation(summary = "新增权益配置")
   @PreAuthorize("hasAuthority('member:wealConfig:add')")
   public void addWealConfig(@Validated MemberWealConfigAddDTO dto) {
     memberWealConfigService.addWealConfig(dto);
   }
 
-  @ApiOperation("删除权益配置")
-  @DeleteMapping("/remove/{id}")
+  @Operation(summary = "删除权益配置")
+  @PostMapping("/remove/{id}")
   @PreAuthorize("hasAuthority('member:wealConfig:remove')")
   public void removeWealConfig(@PathVariable Long id) {
     memberWealConfigService.removeWealConfig(id);
   }
 
-  @PutMapping("/edit")
-  @ApiOperation("修改权益配置")
+  @PostMapping("/edit")
+  @Operation(summary = "修改权益配置")
   @PreAuthorize("hasAuthority('member:wealConfig:edit')")
   public void updateBanner(@Validated MemberWealConfigEditDTO dto) {
     memberWealConfigService.updateWealConfig(dto);
   }
 
   @GetMapping("/page")
-  @ApiOperation("查询权益列表")
+  @Operation(summary = "查询权益列表")
   @PreAuthorize("hasAuthority('member:wealConfig:view')")
   public IPage<MemberWealConfig> page(PageDTO<MemberWealConfig> page) {
     return memberWealConfigService.page(page);

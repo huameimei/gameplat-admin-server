@@ -6,15 +6,16 @@ import com.gameplat.admin.model.dto.*;
 import com.gameplat.admin.model.vo.ActivityQualificationVO;
 import com.gameplat.admin.service.ActivityQualificationService;
 import com.gameplat.base.common.exception.ServiceException;
+import com.gameplat.base.common.util.StringUtils;
 import com.gameplat.model.entity.activity.ActivityQualification;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import springfox.documentation.annotations.ApiIgnore;
 
 import java.time.LocalTime;
 import java.util.Map;
@@ -27,28 +28,29 @@ import java.util.Map;
 @Slf4j
 @RestController
 @RequestMapping("/api/admin/activity/qualification")
-@Api(tags = "活动资格管理")
+@Tag(name = "活动资格管理")
 public class ActivityQualificationController {
 
   @Autowired private ActivityQualificationService activityQualificationService;
 
-  @ApiOperation(value = "活动资格列表")
+  @Operation(summary = "活动资格列表")
   @GetMapping("/list")
   @PreAuthorize("hasAuthority('activity:qualification:view')")
   public IPage<ActivityQualificationVO> list(
-      @ApiIgnore PageDTO<ActivityQualification> page, ActivityQualificationQueryDTO dto) {
+      @Parameter(hidden = true) PageDTO<ActivityQualification> page,
+      ActivityQualificationQueryDTO dto) {
     return activityQualificationService.list(page, dto);
   }
 
-  @ApiOperation(value = "新增活动资格")
+  @Operation(summary = "新增活动资格")
   @PostMapping("/add")
   @PreAuthorize("hasAuthority('activity:qualification:add')")
   public void add(@RequestBody ActivityQualificationAddDTO dto) {
     activityQualificationService.add(dto);
   }
 
-  @ApiOperation(value = "批量审核活动资格")
-  @PutMapping("/auditStatus")
+  @Operation(summary = "批量审核活动资格")
+  @PostMapping("/auditStatus")
   @PreAuthorize("hasAuthority('activity:qualification:auditStatus')")
   public void auditStatus(@RequestBody ActivityQualificationAuditStatusDTO dto) {
     if (CollectionUtils.isEmpty(dto.getIdList())) {
@@ -57,22 +59,25 @@ public class ActivityQualificationController {
     activityQualificationService.auditStatus(dto);
   }
 
-  @ApiOperation(value = "更新活动资格状态")
-  @PutMapping("/updateQualificationStatus")
+  @Operation(summary = "更新活动资格状态")
+  @PostMapping("/updateQualificationStatus")
   @PreAuthorize("hasAuthority('activity:qualification:updateQualificationStatus')")
   public void updateQualificationStatus(@RequestBody ActivityQualificationUpdateStatusDTO dto) {
     activityQualificationService.updateQualificationStatus(dto);
   }
 
-  @ApiOperation(value = "删除活动资格")
-  @DeleteMapping("/delete")
+  @Operation(summary = "删除活动资格")
+  @PostMapping("/delete")
   @PreAuthorize("hasAuthority('activity:qualification:remove')")
-  public void delete(@RequestBody String ids) {
-    activityQualificationService.delete(ids);
+  public void delete(@RequestBody Map<String, String> map) {
+    if (StringUtils.isEmpty(map.get("ids"))) {
+      throw new ServiceException("ids 不能为空");
+    }
+    activityQualificationService.delete(map.get("ids"));
   }
 
-  @ApiOperation(value = "资格检测")
-  @PutMapping("/checkQualification")
+  @Operation(summary = "资格检测")
+  @PostMapping("/checkQualification")
   @PreAuthorize("hasAuthority('activity:qualification:checkQualification')")
   public Map<String, Object> checkQualification(@RequestBody ActivityQualificationCheckDTO dto) {
     return activityQualificationService.checkQualification(dto);
@@ -80,12 +85,13 @@ public class ActivityQualificationController {
 
   /**
    * 批量生成红包资格
+   *
    * @return
    */
-  @ApiOperation(value = "手工生成红包雨资格")
+  @Operation(summary = "手工生成红包雨资格")
   @RequestMapping(value = "/addRedPacketQualification", method = RequestMethod.POST)
-  public void addRedPacketQualification()  {
-    if(LocalTime.now().isBefore(LocalTime.parse("13:00"))){
+  public void addRedPacketQualification() {
+    if (LocalTime.now().isBefore(LocalTime.parse("13:00"))) {
       throw new ServiceException("不在允许操作时间范围之内,请在13点以后生成资格");
     }
     activityQualificationService.activityRedEnvelopeQualification();

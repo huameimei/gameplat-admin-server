@@ -1,5 +1,10 @@
 package com.gameplat.admin.service.impl;
 
+import cn.afterturn.easypoi.excel.ExcelExportUtil;
+import cn.afterturn.easypoi.excel.entity.ExportParams;
+import cn.hutool.core.date.DatePattern;
+import cn.hutool.core.date.DateUtil;
+import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.gameplat.admin.config.SysTheme;
@@ -7,10 +12,12 @@ import com.gameplat.admin.convert.GameBetRecordConvert;
 import com.gameplat.admin.model.bean.ActivityStatisticItem;
 import com.gameplat.admin.model.bean.GameBetRecordSearchBuilder;
 import com.gameplat.admin.model.dto.GameBetRecordQueryDTO;
+import com.gameplat.admin.model.vo.GameBetRecordExportVO;
 import com.gameplat.admin.model.vo.GameBetRecordVO;
 import com.gameplat.admin.model.vo.PageDtoVO;
 import com.gameplat.admin.service.GameBetRecordInfoService;
 import com.gameplat.admin.service.GameConfigService;
+import com.gameplat.admin.service.GameKindService;
 import com.gameplat.base.common.constant.ContextConstant;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.common.enums.GamePlatformEnum;
@@ -22,21 +29,28 @@ import com.gameplat.common.util.MathUtils;
 import com.gameplat.elasticsearch.page.PageResponse;
 import com.gameplat.elasticsearch.service.IBaseElasticsearchService;
 import com.gameplat.model.entity.game.GameBetRecord;
-
+import com.gameplat.model.entity.game.GameKind;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.stream.Collectors;
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.HttpAsyncResponseConsumerFactory;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
+import org.elasticsearch.client.core.CountRequest;
+import org.elasticsearch.client.core.CountResponse;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.search.aggregations.Aggregation;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
@@ -49,6 +63,8 @@ import org.elasticsearch.search.sort.SortBuilders;
 import org.elasticsearch.search.sort.SortOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
@@ -70,6 +86,8 @@ public class GameBetRecordInfoServiceImpl implements GameBetRecordInfoService {
   @Autowired private SysTheme sysTheme;
 
   @Resource private RestHighLevelClient restHighLevelClient;
+
+  @Autowired private GameKindService gameKindService;
 
   @Transactional(propagation = Propagation.NOT_SUPPORTED)
   public GameApi getGameApi(String platformCode) {
@@ -179,5 +197,80 @@ public class GameBetRecordInfoServiceImpl implements GameBetRecordInfoService {
   @Override
   public List<ActivityStatisticItem> xjAssignMatchDml(Map map) {
     return new ArrayList<>();
+  }
+
+  @Override
+  public void exportReport(GameBetRecordQueryDTO dto, HttpServletResponse response) {
+    log.info("请求导出下注记录数据参数：{}", JSONUtil.toJsonStr(dto));
+    QueryBuilder builder = GameBetRecordSearchBuilder.buildBetRecordSearch(dto);
+    String indexName = ContextConstant.ES_INDEX.BET_RECORD_ + sysTheme.getTenantCode();
+    try {
+      // 统计条数
+      CountRequest countRequest = new CountRequest(indexName);
+      countRequest.query(builder);
+      RequestOptions.Builder optionsBuilder = RequestOptions.DEFAULT.toBuilder();
+      optionsBuilder.setHttpAsyncResponseConsumerFactory(
+          new HttpAsyncResponseConsumerFactory.HeapBufferedResponseConsumerFactory(31457280));
+      CountResponse countResponse = restHighLevelClient.count(countRequest, optionsBuilder.build());
+      long sumCount = countResponse.getCount();
+      log.info("导出下注数据总条数为：{}", sumCount);
+      if (sumCount > 0) {
+        SortBuilder<FieldSortBuilder> sortBuilder =
+            SortBuilders.fieldSort(GameBetRecordSearchBuilder.convertTimeType(dto.getTimeType()))
+                .order(SortOrder.DESC);
+        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+        searchSourceBuilder.query(builder);
+        searchSourceBuilder.sort(sortBuilder);
+        searchSourceBuilder.size((int) sumCount);
+        SearchRequest searchRequest = new SearchRequest(indexName);
+        searchRequest.source(searchSourceBuilder);
+        log.info("exportReport DSL语句为：{}", searchRequest.source().toString());
+        List<GameBetRecord> resultList =
+            baseElasticsearchService.searchDocList(
+                indexName, searchSourceBuilder, GameBetRecord.class);
+        Map<String, String> gameKindMap =
+            gameKindService.list().stream()
+                .collect(Collectors.toMap(GameKind::getCode, GameKind::getName));
+
+        List<GameBetRecordExportVO> list =
+            resultList.stream()
+                .map(gameBetRecordConvert::toExportVo)
+                .peek(
+                    item -> {
+                      item.setGameName(geti18nText(item.getGameName()));
+                      item.setGameKind(gameKindMap.get(item.getGameKind()));
+                      item.setBetTime(
+                          DateUtil.date(Long.parseLong(item.getBetTime()))
+                              .toString(DatePattern.NORM_DATETIME_FORMAT));
+                      item.setSettleTime(
+                          DateUtil.date(Long.parseLong(item.getSettleTime()))
+                              .toString(DatePattern.NORM_DATETIME_FORMAT));
+                      item.setStatTime(
+                          DateUtil.date(Long.parseLong(item.getStatTime()))
+                              .toString(DatePattern.NORM_DATETIME_FORMAT));
+                    })
+                .collect(Collectors.toList());
+        ExportParams exportParams = new ExportParams("游戏投注记录", "游戏投注记录");
+        response.setHeader(
+            HttpHeaders.CONTENT_DISPOSITION, "attachment;filename = gameBetRecord.xls");
+        Workbook workbook =
+            ExcelExportUtil.exportExcel(exportParams, GameBetRecordExportVO.class, list);
+        workbook.write(response.getOutputStream());
+      }
+    } catch (IOException e) {
+      log.error(e.getMessage());
+      throw new ServiceException("导出游戏投注记录失败");
+    }
+  }
+
+  private String geti18nText(String value) {
+    Locale locale = LocaleContextHolder.getLocale();
+    JSONObject jsonObject = JSONUtil.parseObj(value);
+    String str = jsonObject.getStr(locale.toLanguageTag());
+    // 如果浏览器语言不在5种语言内，则默认返回中文
+    if (com.gameplat.base.common.util.StringUtils.isEmpty(str)) {
+      str = jsonObject.getStr("zh-CN");
+    }
+    return str;
   }
 }

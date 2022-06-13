@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.mapper.SysFileManagerMapper;
 import com.gameplat.admin.service.AsyncSaveFileRecordService;
 import com.gameplat.common.compent.oss.FileStorageEnum;
-import com.gameplat.common.util.OssUtils;
+import com.gameplat.common.util.FileUtils;
 import com.gameplat.model.entity.sys.SysFileManager;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.scheduling.annotation.Async;
@@ -19,26 +19,28 @@ import java.util.Objects;
  * @desc
  */
 @Service
-public class AsyncSaveFileRecordServiceImpl extends ServiceImpl<SysFileManagerMapper, SysFileManager>
-        implements AsyncSaveFileRecordService {
+public class AsyncSaveFileRecordServiceImpl
+    extends ServiceImpl<SysFileManagerMapper, SysFileManager>
+    implements AsyncSaveFileRecordService {
 
-  private static final int SUCCEED  = 1;
-
-  private static final int FAIL  = 0;
+  private static final int SUCCEED = 1;
 
   @Override
   @Async
-  public void asyncSave(MultipartFile file, String fileUrl, Integer serviceProvider, String uploadBy, Long fileSize) {
-    //获取文件类型
-    String fileType = Objects.requireNonNull(file.getOriginalFilename()).substring(file.getOriginalFilename().lastIndexOf("."));
+  public void asyncSave(
+      MultipartFile file, String fileUrl, Integer serviceProvider, String uploadBy) {
+    // 获取文件类型
+    String fileType =
+        Objects.requireNonNull(file.getOriginalFilename())
+            .substring(file.getOriginalFilename().lastIndexOf("."));
     SysFileManager sysFileManager = new SysFileManager();
     sysFileManager.setServiceProvider(serviceProvider);
     sysFileManager.setProviderName(FileStorageEnum.valueOf(serviceProvider).getDesc());
     sysFileManager.setOldFileName(file.getOriginalFilename());
     sysFileManager.setStoreFileName(FilenameUtils.getName(fileUrl));
     sysFileManager.setFileUrl(fileUrl);
-    sysFileManager.setFileType(OssUtils.getFileType(fileType));
-    sysFileManager.setFileSize(OssUtils.getSize(fileSize));
+    sysFileManager.setFileType(FileUtils.getFileType(fileType));
+    sysFileManager.setFileSize(FileUtils.getSize(file.getSize()));
     sysFileManager.setStatus(SUCCEED);
     sysFileManager.setCreateBy(uploadBy);
     this.save(sysFileManager);

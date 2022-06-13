@@ -1,37 +1,31 @@
 package com.gameplat.admin.model.dto;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.io.Serializable;
 
-/**
- * @author aBen
- * @date 2022/3/17 0:45
- * @desc
- */
 @Data
 public class MemberBonusReportQueryDTO implements Serializable {
 
-  @ApiModelProperty(value = "会员账号")
+  @Schema(description = "会员账号")
   private String userName;
 
-  @ApiModelProperty(value = "代理账号")
+  @Schema(description = "代理账号")
   private String superAccount;
 
-  @ApiModelProperty(value = "是否只查询直属下级 0否1是")
+  @Schema(description = "是否只查询直属下级 0否1是")
   private String flag;
 
-  @ApiModelProperty(value = "结束时间")
+  @Schema(description = "结束时间")
   private String startTime;
 
-  @ApiModelProperty(value = "开始时间")
+  @Schema(description = "开始时间")
   private String endTime;
 
-  @ApiModelProperty(value = "分页大小")
+  @Schema(description = "分页大小")
   private Integer pageSize;
 
-  @ApiModelProperty(value = "起始下标")
+  @Schema(description = "起始下标")
   private Integer from;
-
 }

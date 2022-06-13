@@ -1,7 +1,6 @@
 package com.gameplat.admin.service.impl;
 
 import cn.hutool.core.util.ObjectUtil;
-import com.alibaba.excel.util.StringUtils;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
@@ -21,9 +20,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Objects;
+
 /**
  * @author lily
- * @description
  * @date 2022/2/16
  */
 @Slf4j
@@ -79,7 +79,7 @@ public class ChatPushPlanServiceImpl extends ServiceImpl<ChatPushPlanMapper, Cha
 
   @Override
   public void edit(ChatPushPlanAddOrEditDTO dto) {
-    if (StringUtils.isEmpty(dto.getId())) {
+    if (null == dto.getId()) {
       throw new ServiceException("id不能为空！");
     }
     ChatPushPlan one =
@@ -89,7 +89,7 @@ public class ChatPushPlanServiceImpl extends ServiceImpl<ChatPushPlanMapper, Cha
                 setId(dto.getId());
               }
             });
-    if (StringUtils.isEmpty(one)) {
+    if (Objects.isNull(one)) {
       throw new ServiceException("此id不存在！");
     }
     if (one.getGameStatus() != 1) {
@@ -101,7 +101,7 @@ public class ChatPushPlanServiceImpl extends ServiceImpl<ChatPushPlanMapper, Cha
 
   @Override
   public void remove(Long id) {
-    if (StringUtils.isEmpty(id)) {
+    if (null == id) {
       throw new ServiceException("id不能为空！");
     }
     removeById(id);

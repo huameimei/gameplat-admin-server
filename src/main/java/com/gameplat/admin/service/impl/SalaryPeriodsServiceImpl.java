@@ -686,21 +686,7 @@ public class SalaryPeriodsServiceImpl extends ServiceImpl<SalaryPeriodsMapper, S
       memberBill.setRemark(sb);
       memberBill.setContent(sb);
       memberBillService.save(memberBill);
-      // 计算变更后余额
-      BigDecimal newBalance = memberInfo.getBalance().add(salaryGrant.getSalaryAmount());
-      if (newBalance.compareTo(BigDecimal.ZERO) <= 0) {
-        return;
-      }
-      MemberInfo entity =
-          MemberInfo.builder()
-              .memberId(member.getId())
-              .balance(newBalance)
-              .version(memberInfo.getVersion())
-              .build();
-      boolean b = memberInfoService.updateById(entity);
-      if (!b) {
-        log.error("会员{}期数工资派发钱包余额变更失败！", member.getAccount());
-      }
+      memberInfoService.updateBalance(member.getId(), salaryGrant.getSalaryAmount());
     } catch (Exception e) {
       log.error(MessageFormat.format("会员{}工资账变, 失败原因：{}", member.getAccount(), e));
       // 释放资金锁

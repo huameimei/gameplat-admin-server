@@ -3,7 +3,9 @@ package com.gameplat.admin.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.core.util.ZipUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -18,7 +20,6 @@ import com.gameplat.admin.util.JxlsExcelUtils;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.UUIDUtils;
 import com.gameplat.common.model.bean.AgentConfig;
-import com.gameplat.common.util.ZipUtils;
 import com.gameplat.model.entity.member.MemberDayReport;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -247,9 +248,11 @@ public class MemberDayReportServiceImpl extends ServiceImpl<MemberDayReportMappe
           }
         }
       }
+
       OutputStream out = response.getOutputStream();
-      ZipUtils.zipDir(out, dir);
-      ZipUtils.del(dir);
+      File zipFile = ZipUtil.zip(dir);
+      FileUtil.del(dir);
+      out.write(FileUtil.readBytes(zipFile));
       out.flush();
     } catch (Exception e) {
       throw new ServiceException("代理报表导出IO错误:{}", e);

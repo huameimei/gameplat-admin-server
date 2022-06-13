@@ -4,7 +4,6 @@ import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSON;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gameplat.admin.model.dto.MessageDistributeDTO;
-import com.gameplat.admin.model.dto.MessageFeedbackAddDTO;
 import com.gameplat.admin.model.vo.MessageFeedbackVO;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.elasticsearch.service.IBaseElasticsearchService;
@@ -23,8 +22,8 @@ import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.client.indices.CreateIndexRequest;
 import org.elasticsearch.client.indices.CreateIndexResponse;
-import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.common.xcontent.XContentType;
+import org.elasticsearch.core.TimeValue;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.rest.RestStatus;
@@ -62,7 +61,6 @@ public class ElasticSearchDemoService {
     } catch (IOException e) {
       e.printStackTrace();
     }
-    log.info("创建索引：{}, index");
   }
 
   /** 添加数据 */

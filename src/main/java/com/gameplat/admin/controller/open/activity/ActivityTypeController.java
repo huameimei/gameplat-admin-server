@@ -16,8 +16,9 @@ import com.gameplat.base.common.util.StringUtils;
 import com.gameplat.common.enums.BooleanEnum;
 import com.gameplat.common.enums.DictDataEnum;
 import com.gameplat.model.entity.activity.ActivityType;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,10 +26,10 @@ import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 活动板块、管理
@@ -37,7 +38,7 @@ import java.util.List;
  * @since 2020-08-17
  */
 @Slf4j
-@Api(tags = "活动板块管理")
+@Tag(name = "活动板块管理")
 @RestController
 @RequestMapping("/api/admin/activity/type")
 public class ActivityTypeController {
@@ -46,11 +47,11 @@ public class ActivityTypeController {
 
   @Autowired private ConfigService configService;
 
-  @ApiOperation(value = "活动板块列表")
+  @Operation(summary = "活动板块列表")
   @GetMapping("/list")
   @PreAuthorize("hasAuthority('activity:type:view')")
   public IPage<ActivityTypeVO> list(
-      @ApiIgnore PageDTO<ActivityType> page, ActivityTypeQueryDTO dto) {
+      @Parameter(hidden = true) PageDTO<ActivityType> page, ActivityTypeQueryDTO dto) {
     if (StringUtils.isBlank(dto.getLanguage())) {
       dto.setLanguage(LocaleContextHolder.getLocale().toLanguageTag());
     }
@@ -60,7 +61,7 @@ public class ActivityTypeController {
     return activityTypeService.list(page, dto);
   }
 
-  @ApiOperation(value = "新增活动板块")
+  @Operation(summary = "新增活动板块")
   @PostMapping("/add")
   @PreAuthorize("hasAuthority('activity:type:add')")
   public void add(@Validated @RequestBody ActivityTypeAddDTO dto) {
@@ -76,8 +77,8 @@ public class ActivityTypeController {
     activityTypeService.add(dto);
   }
 
-  @ApiOperation(value = "更新活动板块")
-  @PutMapping("/update")
+  @Operation(summary = "更新活动板块")
+  @PostMapping("/update")
   @PreAuthorize("hasAuthority('activity:type:edit')")
   public void update(@Validated @RequestBody ActivityTypeUpdateDTO dto) {
     dto.setLanguage(LocaleContextHolder.getLocale().toLanguageTag());
@@ -92,17 +93,17 @@ public class ActivityTypeController {
     activityTypeService.update(dto);
   }
 
-  @ApiOperation(value = "删除活动板块")
-  @DeleteMapping("/delete")
+  @Operation(summary = "删除活动板块")
+  @PostMapping("/delete")
   @PreAuthorize("hasAuthority('activity:type:remove')")
-  public void remove(@RequestBody String ids) {
-    if (StringUtils.isBlank(ids)) {
+  public void remove(@RequestBody Map<String, String> map) {
+    if (StringUtils.isBlank(map.get("ids"))) {
       throw new ServiceException("ids不能为空");
     }
-    activityTypeService.remove(ids);
+    activityTypeService.remove(map.get("ids"));
   }
 
-  @ApiOperation(value = "类型编码列表")
+  @Operation(summary = "类型编码列表")
   @GetMapping("/typeCodeList")
   @PreAuthorize("hasAuthority('activity:type:typeCodeList')")
   public List<CodeDataVO> typeCodeList() {
@@ -127,7 +128,7 @@ public class ActivityTypeController {
     return codeDataVOList;
   }
 
-  @ApiOperation(value = "活动板块查询所有列表")
+  @Operation(summary = "活动板块查询所有列表")
   @GetMapping("/listAll")
   @PreAuthorize("hasAuthority('activity:type:listAll')")
   public List<ActivityTypeVO> listAll() {

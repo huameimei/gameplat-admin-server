@@ -51,7 +51,7 @@ public class GameBetRecordSearchBuilder {
     }
     if (null != dto.getTimeType() && ObjectUtil.isNotNull(dto.getBeginTime())) {
       builder.must(
-          QueryBuilders.rangeQuery(convertTimeType(dto.getTimeType()))
+              QueryBuilders.rangeQuery(convertTimeType(dto.getTimeType()))
               .gte(DateUtil.date(Long.parseLong(dto.getBeginTime())).getTime())
               .lte(
                   dto.getEndTime() == null
@@ -78,10 +78,9 @@ public class GameBetRecordSearchBuilder {
     if (StringUtils.isNotEmpty(dto.getState())) {
       builder.must(QueryBuilders.matchQuery("settle", dto.getState()));
     }
-    if (null != dto.getTimeType() && StringUtils.isNotBlank(dto.getBeginTime())) {
-
+    if (StringUtils.isNotBlank(dto.getBeginTime())) {
       builder.must(
-          QueryBuilders.rangeQuery(convertTimeType(dto.getTimeType()))
+              QueryBuilders.rangeQuery(convertTimeType(dto.getTimeType()))
               .from(date2TimeStamp(dto.getBeginTime()).getTime())
               .to(
                   StringUtils.isNotEmpty(dto.getEndTime())
@@ -92,7 +91,9 @@ public class GameBetRecordSearchBuilder {
     return builder;
   }
 
-  /** 1 -- 投注时间, 2 -- 三方时间, 3 -- 结算时间, 4 -- 报表时间 */
+  /**
+   * 1 -- 投注时间, 2 -- 三方时间, 3 -- 结算时间, 4 -- 报表时间
+   */
   public static String convertTimeType(Integer timeType) {
     String keyword = "betTime";
     if (TimeTypeEnum.BET_TIME.getValue() == timeType) {
@@ -109,6 +110,7 @@ public class GameBetRecordSearchBuilder {
     }
     return keyword;
   }
+
 
   /**
    * 22 * 日期格式字符串转换成时间戳 23 * @param date 字符串日期 24 * @param format 如：yyyy-MM-dd HH:mm:ss 25 * @return

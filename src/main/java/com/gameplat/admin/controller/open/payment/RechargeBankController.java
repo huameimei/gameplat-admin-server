@@ -11,8 +11,8 @@ import com.gameplat.common.group.Groups;
 import com.gameplat.log.annotation.Log;
 import com.gameplat.log.enums.LogType;
 import com.gameplat.model.entity.sys.SysDictData;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
@@ -20,22 +20,22 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Api(tags = "银行卡")
+@Tag(name = "银行卡")
 @RestController
 @RequestMapping("/api/admin/thirdParty/rechBank")
 public class RechargeBankController {
 
   @Autowired private SysDictDataService dictDataService;
 
-  @ApiOperation("删除")
-  @DeleteMapping("/delete")
+  @Operation(summary = "删除")
+  @PostMapping("/delete")
   @PreAuthorize("hasAuthority('thirdParty:rechBank:remove')")
   @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.WITHDRAW, desc = "'删除银行ids=' + #ids")
   public void remove(@RequestBody List<Long> ids) {
     dictDataService.deleteDictDataByIds(ids);
   }
 
-  @ApiOperation("添加")
+  @Operation(summary = "添加")
   @PostMapping("/add")
   @PreAuthorize("hasAuthority('thirdParty:rechBank:add')")
   @Log(
@@ -46,8 +46,8 @@ public class RechargeBankController {
     dictDataService.insertBank(dictData);
   }
 
-  @ApiOperation("修改")
-  @PutMapping("/edit")
+  @Operation(summary = "修改")
+  @PostMapping("/edit")
   @PreAuthorize("hasAuthority('thirdParty:rechBank:edit')")
   @Log(
       module = ServiceName.ADMIN_SERVICE,
@@ -57,7 +57,7 @@ public class RechargeBankController {
     dictDataService.updateDictData(dictData);
   }
 
-  @ApiOperation("编辑状态")
+  @Operation(summary = "编辑状态")
   @PostMapping("/editStatus")
   @PreAuthorize("hasAuthority('thirdParty:rechBank:editStatus')")
   @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.WITHDRAW, desc = "'修改银行状态id=' + #id")
@@ -65,14 +65,14 @@ public class RechargeBankController {
     dictDataService.updateStatus(id, status);
   }
 
-  @ApiOperation("查询")
+  @Operation(summary = "查询")
   @GetMapping("/list")
   @PreAuthorize("hasAuthority('thirdParty:rechBank:view')")
   public IPage<DictDataVo> list(PageDTO<SysDictData> page, SysDictDataDTO dto) {
     return dictDataService.selectDictDataList(page, dto);
   }
 
-  @ApiOperation("获取全部")
+  @Operation(summary = "获取全部")
   @GetMapping("/getAllBank")
   //  @PreAuthorize("hasAuthority('thirdParty:rechBank:getAllBank')")
   public List<SysDictData> getAllBank() {

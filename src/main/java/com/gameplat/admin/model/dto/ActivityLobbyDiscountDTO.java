@@ -1,7 +1,6 @@
 package com.gameplat.admin.model.dto;
 
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -11,29 +10,28 @@ import java.math.BigDecimal;
 /** 活动大厅打折信息 @Author: lyq @Date: 2020/8/20 14:28 @Description: */
 @Data
 @EqualsAndHashCode(callSuper = false)
-@ApiModel(value = "ActivityLobbyDiscountDTO", description = "活动大厅打折信息")
 public class ActivityLobbyDiscountDTO implements Serializable {
 
   private static final long serialVersionUID = 2027127567683724890L;
 
-  @ApiModelProperty(value = "大厅优惠id")
+  @Schema(description = "大厅优惠id")
   private Long lobbyDiscountId;
 
-  @ApiModelProperty(value = "活动大厅id")
+  @Schema(description = "活动大厅id")
   private Long lobbyId;
 
-  @ApiModelProperty(value = "优惠url")
+  @Schema(description = "优惠url")
   private String discountUrl;
 
-  @ApiModelProperty(value = "目标值")
+  @Schema(description = "目标值")
   private Integer targetValue;
 
-  @ApiModelProperty(value = "赠送值")
+  @Schema(description = "赠送值")
   private Integer presenterValue;
 
-  @ApiModelProperty(value = "赠送打码")
+  @Schema(description = "赠送打码")
   private BigDecimal presenterDml;
 
-  @ApiModelProperty(value = "提现打码")
+  @Schema(description = "提现打码")
   private Integer withdrawDml;
 }

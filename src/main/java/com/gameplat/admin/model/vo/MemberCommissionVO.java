@@ -1,6 +1,6 @@
 package com.gameplat.admin.model.vo;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -12,15 +12,15 @@ public class MemberCommissionVO implements Serializable {
 
   private static final long serialVersionUID = 1L;
 
-  @ApiModelProperty(value = "累计上月")
+  @Schema(description = "累计上月")
   private BigDecimal negativeProfit;
 
-  @ApiModelProperty(value = "公司净盈利")
+  @Schema(description = "公司净盈利")
   private BigDecimal netProfit;
 
-  @ApiModelProperty(value = "佣金比例")
+  @Schema(description = "佣金比例")
   private BigDecimal memberProportion;
 
-  @ApiModelProperty(value = "佣金")
+  @Schema(description = "佣金")
   private BigDecimal memberCommission;
 }

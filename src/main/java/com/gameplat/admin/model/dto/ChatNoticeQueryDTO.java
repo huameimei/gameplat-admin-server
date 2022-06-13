@@ -1,6 +1,6 @@
 package com.gameplat.admin.model.dto;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -13,9 +13,9 @@ import java.io.Serializable;
 @Data
 public class ChatNoticeQueryDTO implements Serializable {
 
-  @ApiModelProperty(value = "公告标题")
+  @Schema(description = "公告标题")
   private String noticeTitle;
 
-  @ApiModelProperty(value = "状态")
+  @Schema(description = "状态")
   private Integer status;
 }

@@ -3,6 +3,7 @@ package com.gameplat.admin.service.impl;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.ObjectUtil;
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -23,7 +24,6 @@ import com.gameplat.admin.service.ValidWithdrawService;
 import com.gameplat.base.common.constant.ContextConstant;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.BeanUtils;
-import com.gameplat.base.common.util.StringUtils;
 import com.gameplat.common.model.bean.limit.MemberWithdrawLimit;
 import com.gameplat.elasticsearch.page.PageResponse;
 import com.gameplat.elasticsearch.service.IBaseElasticsearchService;
@@ -40,7 +40,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
-
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -176,6 +175,7 @@ public class ValidWithdrawServiceImpl extends ServiceImpl<ValidWithdrawMapper, V
       return;
     }
     String indexName = ContextConstant.ES_INDEX.BET_RECORD_ + sysTheme.getTenantCode();
+    log.info("数据标识：{}", indexName);
     validWithdraw.forEach(
         a -> {
           GameVaildBetRecordQueryDTO dto =
@@ -185,16 +185,18 @@ public class ValidWithdrawServiceImpl extends ServiceImpl<ValidWithdrawMapper, V
                   setBeginTime(a.getCreateTime());
                   setEndTime(a.getEndTime());
                   setState("1");
+                  setTimeType(3);
                 }
               };
           QueryBuilder builder = GameBetRecordSearchBuilder.buildBetRecordSearch(dto);
+          log.info("查询数据入参：{}", JSON.toJSONString(builder));
           // todo betTime
           SortBuilder<FieldSortBuilder> sortBuilder =
-              SortBuilders.fieldSort("betTime").order(SortOrder.DESC);
+                  SortBuilders.fieldSort("betTime").order(SortOrder.DESC);
           PageResponse<GameBetValidRecordVo> result =
               baseElasticsearchService.search(
                   builder, indexName, GameBetValidRecordVo.class, 0, 9999, sortBuilder);
-          if (StringUtils.isNotEmpty(result.getList())) {
+          if (ObjectUtil.isNotEmpty(result.getList())) {
             ValidAccoutWithdrawVo validAccoutWithdrawVo = new ValidAccoutWithdrawVo();
             validAccoutWithdrawVo.setId(a.getId());
             // 会员一笔打码量的投注记录
@@ -226,7 +228,7 @@ public class ValidWithdrawServiceImpl extends ServiceImpl<ValidWithdrawMapper, V
                               .map(GameBetValidRecordVo::getValidAmount)
                               .reduce(BigDecimal.ZERO, BigDecimal::add)
                               .divide(Convert.toBigDecimal(1000), 2, RoundingMode.HALF_UP);
-                      String gameName = list.get(0).getGameName();
+                      String gameName = list.get(0).getGameKindName();
                       jsonObject.put("vaildBetAmount", betAmount);
                       jsonObject.put("gameKind", b);
                       jsonObject.put("gameName", gameName);
@@ -276,7 +278,6 @@ public class ValidWithdrawServiceImpl extends ServiceImpl<ValidWithdrawMapper, V
             .reduce(BigDecimal.ZERO, BigDecimal::add);
     log.info("总共需要常态打码量：{}", rechMoney);
     // 需要扣除金额
-    // validateDmlBean.setSumAllDeduct(sumAllDeduct);
     validateDmlBean.setYetWithdraw(BigDecimal.ZERO);
     validateDmlBean.setRows(BeanUtils.mapList(validWithdraws, ValidWithdrawVO.class));
     return validateDmlBean;
@@ -376,6 +377,7 @@ public class ValidWithdrawServiceImpl extends ServiceImpl<ValidWithdrawMapper, V
   }
 
   private BigDecimal getCount(List<ValidWithdraw> validWithdrawList) {
+    validWithdrawList = validWithdrawList.stream().sorted(Comparator.comparing(ValidWithdraw::getId)).collect(Collectors.toList());
     BigDecimal validAmount = new BigDecimal(0);
     if (CollUtil.isNotEmpty(validWithdrawList)) {
       for (ValidWithdraw validWithdraw : validWithdrawList) {

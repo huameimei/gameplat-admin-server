@@ -148,8 +148,8 @@ public class MemberGrowthStatisServiceImpl
      */
     @Override
     public Integer dealUpLevel(Long afterGrowth, MemberGrowthConfig memberGrowthConfig) {
-        // todo 1.先获取所有成长值等级
-        Integer limitLevel = Optional.ofNullable(memberGrowthConfig.getLimitLevel()).orElse(50);
+    // 1.先获取所有成长值等级
+    Integer limitLevel = Optional.ofNullable(memberGrowthConfig.getLimitLevel()).orElse(50);
 
         List<MemberGrowthLevelVO> levels = growthLevelService.findList(limitLevel);
 
@@ -206,9 +206,9 @@ public class MemberGrowthStatisServiceImpl
     @Override
     public void changeGrowth(MemberGrowthChangeDto dto) {
 
-        //判断是否开启了VIP
-        //todo 2.获取成长值配置
-        MemberGrowthConfig growthConfig = memberGrowthConfigService.getOneConfig();
+    // 判断是否开启了VIP
+    // 2.获取成长值配置
+    MemberGrowthConfig growthConfig = memberGrowthConfigService.getOneConfig();
 
         if (growthConfig.getIsEnableVip() == 0) {
             log.info("成长值计算失败-未开启VIP");
@@ -226,8 +226,8 @@ public class MemberGrowthStatisServiceImpl
         //变动的成长值
         Long changeGrowth = dto.getChangeGrowth();
 
-        //todo 1.获取用户成长值汇总数据
-        MemberGrowthStatis memberGrowthStatis = this.findOrInsert(memberId, member.getAccount());
+    // 1.获取用户成长值汇总数据
+    MemberGrowthStatis memberGrowthStatis = this.findOrInsert(memberId, member.getAccount());
         //变动前成长值
         Long oldGrowth = memberGrowthStatis.getVipGrowth();
 
@@ -239,8 +239,8 @@ public class MemberGrowthStatisServiceImpl
         //玩家金币记录
         MemberGoldCoinRecord savaGoldCoinRecord = new MemberGoldCoinRecord();
 
-        //todo 3.按变动类型执行不同逻辑
-        if (type == GrowthChangeEnum.recharge.getCode()) {
+    // 3.按变动类型执行不同逻辑
+    if (type == GrowthChangeEnum.recharge.getCode()) {
             //判断是否开启了充值
             if (growthConfig.getIsEnableRecharge() == EnableEnum.ENABLED.code()) {
                 //获取充值 成长值 兑换比例
@@ -390,15 +390,15 @@ public class MemberGrowthStatisServiceImpl
         //当前的成长值等级
         Integer beforeLevel = memberGrowthStatis.getVipLevel();
 
-        //todo 4.通过变动后的最新成长值 执行 增加成长值升级
-        if (memberGrowthStatis.getVipGrowth() < 0L) {
+    // 4.通过变动后的最新成长值 执行 增加成长值升级
+    if (memberGrowthStatis.getVipGrowth() < 0L) {
             memberGrowthStatis.setVipGrowth(0L);
         }
         Integer afterLevel = this.dealUpLevel(memberGrowthStatis.getVipGrowth(), growthConfig);
         memberGrowthStatis.setVipLevel(afterLevel);
 
-        //todo 5.记录成长值变动记录  重新更新 会员成长值汇总
-        Long tempGrowth = changeFinalGrowth;
+    // 5.记录成长值变动记录  重新更新 会员成长值汇总
+    Long tempGrowth = changeFinalGrowth;
         //添加成长值变动记录
         saveRecord.setUserId(memberId);
         saveRecord.setUserName(member.getAccount());
@@ -416,8 +416,8 @@ public class MemberGrowthStatisServiceImpl
         log.info("VIP成长值汇总数据" + memberGrowthStatis);
         this.insertOrUpdate(memberGrowthStatis);
 
-        //todo 6.传入变动前和变动后的等级 处理发放升级奖励
-        if (beforeLevel.compareTo(afterLevel) < 0) {
+    // 6.传入变动前和变动后的等级 处理发放升级奖励
+    if (beforeLevel.compareTo(afterLevel) < 0) {
             this.dealPayUpReword(beforeLevel, afterLevel, growthConfig, member);
 
             //VIP变动更新会员vip
@@ -548,16 +548,11 @@ public class MemberGrowthStatisServiceImpl
                     validWithdrawService.saveValidWithdraw(validWithdraw);
 
                     synchronized (lockHelper) {
-
                         MemberInfo memberInfo = memberInfoService.lambdaQuery()
                                 .eq(MemberInfo::getMemberId, member.getId())
                                 .one();
                         BigDecimal afterBlance = memberInfo.getBalance();
-
-                        LambdaUpdateWrapper<MemberInfo> wrapper = new LambdaUpdateWrapper<>();
-                        wrapper.set(MemberInfo::getBalance, afterBlance.add(rewordAmount))
-                                .eq(MemberInfo::getMemberId, member.getId());
-                        memberInfoService.update(wrapper);
+            memberInfoService.updateBalance(member.getId(), rewordAmount);
 
                         // 添加流水记录
                         MemberBill memberBill = new MemberBill();

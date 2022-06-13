@@ -11,37 +11,37 @@ import com.gameplat.common.enums.SwitchStatusEnum;
 import com.gameplat.log.annotation.Log;
 import com.gameplat.log.enums.LogType;
 import com.gameplat.model.entity.pay.PpMerchant;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Api(tags = "代付商户")
+@Tag(name = "代付商户")
 @RestController
 @RequestMapping("/api/admin/thirdParty/ppMerchants")
 public class PpMerchantController {
 
   @Autowired private PpMerchantService ppMerchantService;
 
-  @ApiOperation("删除")
-  @DeleteMapping("/remove/{id}")
+  @Operation(summary = "删除")
+  @PostMapping("/remove/{id}")
   @PreAuthorize("hasAuthority('thirdParty:ppMerchants:remove')")
   @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.WITHDRAW, desc = "'删除出款商户id=' + #id")
   public void remove(@PathVariable Long id) {
     ppMerchantService.delete(id);
   }
 
-  @ApiOperation("根据ID查询")
+  @Operation(summary = "根据ID查询")
   @GetMapping("/queryMerchant")
   @PreAuthorize("hasAuthority('thirdParty:ppMerchants:queryMerchant')")
   public PpMerchantVO getPpMerchantById(Long id) {
     return ppMerchantService.getPpMerchantById(id);
   }
 
-  @ApiOperation("添加")
+  @Operation(summary = "添加")
   @PostMapping("/add")
   @PreAuthorize("hasAuthority('thirdParty:ppMerchants:add')")
   @Log(
@@ -52,7 +52,7 @@ public class PpMerchantController {
     ppMerchantService.save(dto);
   }
 
-  @ApiOperation("修改")
+  @Operation(summary = "修改")
   @PostMapping("/edit")
   @PreAuthorize("hasAuthority('thirdParty:ppMerchants:edit')")
   @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.WITHDRAW, desc = "'修改出款商户id=' + #dto.id")
@@ -60,7 +60,7 @@ public class PpMerchantController {
     ppMerchantService.update(dto);
   }
 
-  @ApiOperation("编辑状态")
+  @Operation(summary = "编辑状态")
   @PostMapping("/editStatus")
   @PreAuthorize("hasAuthority('thirdParty:ppMerchants:editStatus')")
   @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.WITHDRAW, desc = "'修改出款商户状态id=' + #id")
@@ -68,14 +68,14 @@ public class PpMerchantController {
     ppMerchantService.updateStatus(id, status);
   }
 
-  @ApiOperation("查询")
+  @Operation(summary = "查询")
   @PostMapping("/page")
   @PreAuthorize("hasAuthority('thirdParty:ppMerchants:view')")
   public IPage<PpMerchantVO> getPage(Page<PpMerchant> page, Integer status, String name) {
     return ppMerchantService.queryPage(page, status, name);
   }
 
-  @ApiOperation("获取全部商户")
+  @Operation(summary = "获取全部商户")
   @GetMapping("/queryAllMerchant")
   //  @PreAuthorize("hasAuthority('thirdParty:ppMerchants:queryAllMerchant')")
   public List<PpMerchant> getAllMerchant() {

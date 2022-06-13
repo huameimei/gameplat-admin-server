@@ -22,7 +22,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
-
 import javax.annotation.Resource;
 import java.util.Date;
 import java.util.List;
@@ -111,7 +110,7 @@ public class GameKindServiceImpl extends ServiceImpl<GameKindMapper, GameKind>
   public List<GameKind> queryGameKindListByPlatformCode(String platformCode) {
     return this.lambdaQuery()
         .eq(
-            com.baomidou.mybatisplus.core.toolkit.StringUtils.isNotBlank(platformCode),
+            ObjectUtils.isNotEmpty(platformCode),
             GameKind::getPlatformCode,
             platformCode)
         .list();

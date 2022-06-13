@@ -30,6 +30,8 @@ public interface MemberService extends IService<Member> {
 
   MemberInfoVO getMemberInfo(Long id);
 
+  MemberInfoVO getMemberDateils(Long id);
+
   Member getById(Long id);
 
   Optional<Member> getByAccount(String account);

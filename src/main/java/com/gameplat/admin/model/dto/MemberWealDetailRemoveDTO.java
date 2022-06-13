@@ -1,6 +1,6 @@
 package com.gameplat.admin.model.dto;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -15,9 +15,9 @@ public class MemberWealDetailRemoveDTO implements Serializable {
 
   private static final long serialVersionUID = 1L;
 
-  @ApiModelProperty(value = "福利表主键")
+  @Schema(description = "福利表主键")
   private Long wealId;
 
-  @ApiModelProperty(value = "会员id")
+  @Schema(description = "会员id")
   private Long userId;
 }

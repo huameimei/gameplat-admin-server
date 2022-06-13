@@ -1,6 +1,6 @@
 package com.gameplat.admin.model.vo;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -14,6 +14,6 @@ import java.math.BigDecimal;
 @Data
 public class MemberLoanSumVO implements Serializable {
 
-  @ApiModelProperty("欠款金额总计")
+  @Schema(description = "欠款金额总计")
   private BigDecimal total;
 }

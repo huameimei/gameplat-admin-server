@@ -11,8 +11,8 @@ import com.gameplat.admin.service.MemberGrowthConfigService;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.model.entity.member.MemberGoldCoinRecord;
 import com.gameplat.model.entity.member.MemberGrowthConfig;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -26,7 +26,7 @@ import org.springframework.web.multipart.MultipartFile;
  *
  * @author lily
  */
-@Api(tags = "VIP金币明细")
+@Tag(name = "VIP金币明细")
 @Slf4j
 @RestController
 @RequestMapping("/api/admin/member/coin")
@@ -37,7 +37,7 @@ public class MemberGoldCoinRecordController {
   @Autowired private MemberGrowthConfigService memberGrowthConfigService;
 
   @GetMapping("/page")
-  @ApiOperation("分页查询VIP金币明细")
+  @Operation(summary = "分页查询VIP金币明细")
   @PreAuthorize("hasAuthority('member:coin:view')")
   public IPage<MemberGoldCoinRecordVO> page(
       PageDTO<MemberGoldCoinRecord> page, MemberGoldCoinRecordQueryDTO dto) {
@@ -46,7 +46,7 @@ public class MemberGoldCoinRecordController {
 
   /** 增 */
   @PostMapping("/add")
-  @ApiOperation("后台添加VIP金币明细")
+  @Operation(summary = "后台添加VIP金币明细")
   @PreAuthorize("hasAuthority('member:coin:add')")
   public void add(String account, Integer amount) {
     log.info("系统增加金币：" + account + ",金币数：" + amount);
@@ -60,7 +60,7 @@ public class MemberGoldCoinRecordController {
     memberGoldCoinRecordService.addGoldCoin(accountArray, amount);
   }
 
-  @ApiOperation("上传文件修改会员金币数量")
+  @Operation(summary = "上传文件修改会员金币数量")
   @SneakyThrows
   @PostMapping("/importAddGoldCoin")
   @PreAuthorize("hasAuthority('member:coin:add')")
@@ -73,13 +73,13 @@ public class MemberGoldCoinRecordController {
   }
 
   @GetMapping("/goldCoinDescList")
-  @ApiOperation("后台获取金币说明配置")
+  @Operation(summary = "后台获取金币说明配置")
   public MemberGrowthConfig goldCoinDesc() {
     return memberGrowthConfigService.getGoldCoinDesc();
   }
 
-  @PutMapping("/updateGoldCoinDesc")
-  @ApiOperation("后台修改金币说明配置")
+  @PostMapping("/updateGoldCoinDesc")
+  @Operation(summary = "后台修改金币说明配置")
   @PreAuthorize("hasAuthority('member:coin:edit')")
   public void updateGoldCoinDesc(GoldCoinDescUpdateDTO dto) {
     if (dto.getId() == null) {

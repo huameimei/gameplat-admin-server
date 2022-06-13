@@ -2,7 +2,7 @@ package com.gameplat.admin.model.vo;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -17,25 +17,25 @@ public class ActivityLobbyDiscountVO implements Serializable {
   private static final long serialVersionUID = -3883439363075850398L;
 
   @JsonSerialize(using = ToStringSerializer.class)
-  @ApiModelProperty(value = "大厅优惠id")
+  @Schema(description = "大厅优惠id")
   private Long lobbyDiscountId;
 
   @JsonSerialize(using = ToStringSerializer.class)
-  @ApiModelProperty(value = "活动大厅id")
+  @Schema(description = "活动大厅id")
   private Long lobbyId;
 
-  @ApiModelProperty(value = "优惠url")
+  @Schema(description = "优惠url")
   private String discountUrl;
 
-  @ApiModelProperty(value = "目标值")
+  @Schema(description = "目标值")
   private Integer targetValue;
 
-  @ApiModelProperty(value = "赠送值")
+  @Schema(description = "赠送值")
   private Integer presenterValue;
 
-  @ApiModelProperty(value = "赠送打码")
+  @Schema(description = "赠送打码")
   private BigDecimal presenterDml;
 
-  @ApiModelProperty(value = "提现打码")
+  @Schema(description = "提现打码")
   private BigDecimal withdrawDml;
 }

@@ -1,6 +1,6 @@
 package com.gameplat.admin.model.dto;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -15,18 +15,18 @@ public class DayReportDTO implements Serializable {
 
   private static final long serialVersionUID = 7169928923640880406L;
 
-  @ApiModelProperty(value = "会员id")
+  @Schema(description = "会员id")
   private Long memberId;
 
-  @ApiModelProperty(value = "会员账号(精确)")
+  @Schema(description = "会员账号(精确)")
   private String account;
 
-  @ApiModelProperty(value = "会员所属上级路径")
+  @Schema(description = "会员所属上级路径")
   private String superPath;
 
-  @ApiModelProperty(value = "开始时间")
+  @Schema(description = "开始时间")
   private String beginDate;
 
-  @ApiModelProperty(value = "结束时间")
+  @Schema(description = "结束时间")
   private String endDate;
 }

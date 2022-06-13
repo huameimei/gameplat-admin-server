@@ -1,5 +1,6 @@
 package com.gameplat.admin.service.impl;
 
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.date.DateField;
 import cn.hutool.core.date.DatePattern;
@@ -8,7 +9,6 @@ import cn.hutool.core.util.NumberUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
-import com.gameplat.admin.enums.ActivityInfoEnum;
 import com.gameplat.admin.enums.GameTypeEnum;
 import com.gameplat.admin.mapper.RechargeOrderMapper;
 import com.gameplat.admin.model.bean.ActivityStatisticItem;
@@ -19,10 +19,15 @@ import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.BeanUtils;
 import com.gameplat.base.common.util.RandomUtil;
 import com.gameplat.base.common.util.StringUtils;
-import com.gameplat.model.entity.activity.*;
+import com.gameplat.common.enums.ActivityInfoEnum;
+import com.gameplat.model.entity.activity.ActivityBlacklist;
+import com.gameplat.model.entity.activity.ActivityLobby;
+import com.gameplat.model.entity.activity.ActivityLobbyDiscount;
+import com.gameplat.model.entity.activity.ActivityQualification;
 import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -46,11 +51,9 @@ public class ActivityCommonServiceImpl implements ActivityCommonService {
 
   @Autowired private ActivityLobbyService activityLobbyService;
 
-  @Autowired private ActivityInfoService activityInfoService;
-
   @Autowired private ActivityBlacklistService activityBlacklistService;
 
-  @Autowired private ActivityQualificationService activityQualificationService;
+  @Lazy @Autowired private ActivityQualificationService activityQualificationService;
 
   @Autowired private ActivityLobbyDiscountService activityLobbyDiscountService;
 
@@ -339,7 +342,7 @@ public class ActivityCommonServiceImpl implements ActivityCommonService {
             .lambdaQuery()
             .eq(ActivityLobbyDiscount::getLobbyId, activityLobby.getId())
             .list();
-    if (StringUtils.isEmpty(lobbyDiscounts)) {
+    if (CollectionUtil.isEmpty(lobbyDiscounts)) {
       // 活动优惠列表信息异常
       throw new ServiceException("活动优惠列表信息异常");
     }
@@ -497,7 +500,7 @@ public class ActivityCommonServiceImpl implements ActivityCommonService {
     map.put("bonusDate", startTime.substring(0, 10));
     map.put("matchId", memberActivityLobby.getMatchId());
     List<ActivityStatisticItem> userAssignMatchDmlList = liveBetRecordService.xjAssignMatchDml(map);
-    if (StringUtils.isEmpty(userAssignMatchDmlList)) {
+    if (CollectionUtil.isEmpty(userAssignMatchDmlList)) {
       // 您没有该场比赛的投注记录
       throw new ServiceException("E035");
     }
@@ -575,7 +578,7 @@ public class ActivityCommonServiceImpl implements ActivityCommonService {
 
     List<ActivityStatisticItem> memberGameReportInfoList =
         liveMemberDayReportService.getGameReportInfo(map);
-    if (StringUtils.isEmpty(memberGameReportInfoList)) {
+    if (CollectionUtil.isEmpty(memberGameReportInfoList)) {
       throw new ServiceException("您在活动统计期间,对于指定的游戏,没有有效的投注金额");
     }
 
@@ -669,7 +672,7 @@ public class ActivityCommonServiceImpl implements ActivityCommonService {
 
     List<ActivityStatisticItem> memberGameReportInfoList =
         liveMemberDayReportService.getGameReportInfo(map);
-    if (StringUtils.isEmpty(memberGameReportInfoList)) {
+    if (CollectionUtil.isEmpty(memberGameReportInfoList)) {
       throw new ServiceException("您在活动统计期间,对于指定的游戏,没有有效的投注金额");
     }
 
@@ -754,7 +757,7 @@ public class ActivityCommonServiceImpl implements ActivityCommonService {
 
     List<ActivityStatisticItem> memberGameReportInfoList =
         liveMemberDayReportService.getGameReportInfo(map);
-    if (StringUtils.isEmpty(memberGameReportInfoList)) {
+    if (CollectionUtil.isEmpty(memberGameReportInfoList)) {
       throw new ServiceException("您在活动统计期间,对于指定的游戏,累计打码金额未达到活动最低标准");
     }
 
@@ -835,7 +838,7 @@ public class ActivityCommonServiceImpl implements ActivityCommonService {
 
     List<ActivityStatisticItem> memberGameReportInfoList =
         liveMemberDayReportService.getGameReportInfo(map);
-    if (StringUtils.isEmpty(memberGameReportInfoList)) {
+    if (CollectionUtil.isEmpty(memberGameReportInfoList)) {
       // 您在活动统计期间,对于指定的游戏,没有有效的投注金额
       throw new ServiceException("您在活动统计期间,对于指定的游戏,没有有效的投注金额");
     }
@@ -959,7 +962,7 @@ public class ActivityCommonServiceImpl implements ActivityCommonService {
       Date countDate) {
     String errorMsg = null;
     // 查询统计周期内的会员游戏日报表汇总数据(打码量)
-    Map map = new HashMap<>();
+    Map<String, Object> map = new HashMap<>();
     if (memberInfo != null) {
       map.put("userNameList", Lists.newArrayList(memberInfo.getAccount()));
     }
@@ -972,7 +975,7 @@ public class ActivityCommonServiceImpl implements ActivityCommonService {
         DateUtil.format(memberActivityLobby.getEndTime(), DatePattern.NORM_DATE_PATTERN));
     List<ActivityStatisticItem> statisticUserInfoList =
         rechargeOrderService.findAllFirstRechargeAmount(map);
-    if (StringUtils.isEmpty(statisticUserInfoList)) {
+    if (CollectionUtil.isEmpty(statisticUserInfoList)) {
       throw new ServiceException("您在活动统计期间没有有效的充值金额");
     }
 
@@ -1007,7 +1010,7 @@ public class ActivityCommonServiceImpl implements ActivityCommonService {
       // 先将所有会员打码量都赋值为0
       statisticUserInfo.setValidAmount(BigDecimal.ZERO);
       // 如果部分会员有打码量金额,则赋值实际的打码量金额
-      if (StringUtils.isNotEmpty(memberGameReportInfoList)) {
+      if (CollectionUtil.isNotEmpty(memberGameReportInfoList)) {
         // 组装会员信息
         for (ActivityStatisticItem memberDayReportVO : memberGameReportInfoList) {
           if (statisticUserInfo.getUserName().equals(memberDayReportVO.getUserName())) {
@@ -1072,7 +1075,7 @@ public class ActivityCommonServiceImpl implements ActivityCommonService {
     map.put("payType", memberActivityLobby.getPayType());
     List<ActivityStatisticItem> statisticUserInfoList =
         rechargeOrderMapper.findFirstRechargeAmount(map);
-    if (StringUtils.isEmpty(statisticUserInfoList)) {
+    if (CollectionUtil.isEmpty(statisticUserInfoList)) {
       throw new ServiceException("您在活动统计期间没有有效的充值金额");
     }
 
@@ -1092,7 +1095,7 @@ public class ActivityCommonServiceImpl implements ActivityCommonService {
       // 先将所有会员打码量都赋值为0
       statisticUserInfo.setValidAmount(BigDecimal.ZERO);
       // 如果部分会员有打码量金额,则赋值实际的打码量金额
-      if (StringUtils.isNotEmpty(memberGameReportInfoList)) {
+      if (CollectionUtil.isNotEmpty(memberGameReportInfoList)) {
         // 组装会员信息
         for (ActivityStatisticItem memberDayReportVO : memberGameReportInfoList) {
           if (statisticUserInfo.getUserName().equals(memberDayReportVO.getUserName())) {
@@ -1159,7 +1162,7 @@ public class ActivityCommonServiceImpl implements ActivityCommonService {
 
     List<ActivityStatisticItem> statisticUserInfoList =
         rechargeOrderService.findRechargeDateList(map);
-    if (StringUtils.isEmpty(statisticUserInfoList)) {
+    if (CollectionUtil.isEmpty(statisticUserInfoList)) {
       throw new ServiceException("您在活动统计期间没有有效的充值金额");
     }
 
@@ -1179,7 +1182,7 @@ public class ActivityCommonServiceImpl implements ActivityCommonService {
       // 先将所有会员打码量都赋值为0
       statisticUserInfo.setValidAmount(BigDecimal.ZERO);
       // 如果部分会员有打码量金额,则赋值实际的打码量金额
-      if (StringUtils.isNotEmpty(memberGameReportInfoList)) {
+      if (CollectionUtil.isNotEmpty(memberGameReportInfoList)) {
         // 组装会员信息
         for (ActivityStatisticItem memberDayReportVO : memberGameReportInfoList) {
           if (statisticUserInfo.getUserName().equals(memberDayReportVO.getUserName())) {
@@ -1279,7 +1282,7 @@ public class ActivityCommonServiceImpl implements ActivityCommonService {
     map.put("payType", memberActivityLobby.getPayType());
     map.put("rechargeValidAmount", memberActivityLobby.getRechargeValidAmount());
     List<ActivityStatisticItem> statisticUserInfoList = rechargeOrderMapper.findRechargeInfo(map);
-    if (StringUtils.isEmpty(statisticUserInfoList)) {
+    if (CollectionUtil.isEmpty(statisticUserInfoList)) {
       throw new ServiceException("您在活动统计期间没有有效的充值金额");
     }
 
@@ -1299,7 +1302,7 @@ public class ActivityCommonServiceImpl implements ActivityCommonService {
       // 先将所有会员打码量都赋值为0
       statisticUserInfo.setValidAmount(BigDecimal.ZERO);
       // 如果部分会员有打码量金额,则赋值实际的打码量金额
-      if (StringUtils.isNotEmpty(memberGameReportInfoList)) {
+      if (CollectionUtil.isNotEmpty(memberGameReportInfoList)) {
         // 组装会员信息
         for (ActivityStatisticItem memberDayReportVO : memberGameReportInfoList) {
           if (statisticUserInfo.getUserName().equals(memberDayReportVO.getUserName())) {
@@ -1423,7 +1426,7 @@ public class ActivityCommonServiceImpl implements ActivityCommonService {
     map.put("endTime", endTime);
     map.put("payType", memberActivityLobby.getPayType());
     List<ActivityStatisticItem> statisticUserInfoList = rechargeOrderMapper.findRechargeInfo(map);
-    if (StringUtils.isEmpty(statisticUserInfoList)) {
+    if (CollectionUtil.isEmpty(statisticUserInfoList)) {
       // 您在活动统计期间没有有效的充值金额
       throw new ServiceException("您在活动统计期间没有有效的充值金额");
     }
@@ -1444,7 +1447,7 @@ public class ActivityCommonServiceImpl implements ActivityCommonService {
       // 先将所有会员打码量都赋值为0
       statisticUserInfo.setValidAmount(BigDecimal.ZERO);
       // 如果部分会员有打码量金额,则赋值实际的打码量金额
-      if (StringUtils.isNotEmpty(memberGameReportInfoList)) {
+      if (CollectionUtil.isNotEmpty(memberGameReportInfoList)) {
         // 组装会员信息
         for (ActivityStatisticItem memberDayReportVO : memberGameReportInfoList) {
           if (statisticUserInfo.getUserName().equals(memberDayReportVO.getUserName())) {

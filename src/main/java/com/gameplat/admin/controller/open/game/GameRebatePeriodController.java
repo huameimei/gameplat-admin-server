@@ -19,8 +19,8 @@ import com.gameplat.model.entity.game.GameRebateDetail;
 import com.gameplat.model.entity.game.GameRebatePeriod;
 import com.gameplat.model.entity.game.GameRebateReport;
 import com.gameplat.redis.redisson.DistributedLocker;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,8 +31,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-@Api(tags = "会员返水预设")
 @Slf4j
+@Tag(name = "会员返水预设")
 @RestController
 @RequestMapping("/api/admin/game/gameRebatePeriod/")
 public class GameRebatePeriodController {
@@ -47,7 +47,7 @@ public class GameRebatePeriodController {
 
   @Autowired private DistributedLocker distributedLocker;
 
-  @ApiOperation("查询")
+  @Operation(summary = "查询")
   @GetMapping(value = "queryAll")
   @PreAuthorize("hasAuthority('game:gameRebatePeriod:view')")
   public IPage<GameRebatePeriodVO> queryGameRebatePeriod(
@@ -55,28 +55,28 @@ public class GameRebatePeriodController {
     return gameRebatePeriodService.queryGameRebatePeriod(page, dto);
   }
 
-  @ApiOperation("查询")
+  @Operation(summary = "查询")
   @PostMapping(value = "add")
   @PreAuthorize("hasAuthority('game:gameRebatePeriod:add')")
   public void add(@RequestBody OperGameRebatePeriodDTO dto) {
     gameRebatePeriodService.addGameRebatePeriod(dto);
   }
 
-  @ApiOperation("查询")
-  @PutMapping(value = "update")
+  @Operation(summary = "查询")
+  @PostMapping(value = "update")
   @PreAuthorize("hasAuthority('game:gameRebatePeriod:update')")
   public void update(@RequestBody OperGameRebatePeriodDTO dto) {
     gameRebatePeriodService.updateGameRebatePeriod(dto);
   }
 
-  @ApiOperation("删除期数")
+  @Operation(summary = "删除期数")
   @PostMapping(value = "delete")
   @PreAuthorize("hasAuthority('game:gameRebatePeriod:remove')")
   public void delete(@RequestBody OperGameRebatePeriodDTO dto) {
     gameRebatePeriodService.deleteGameRebatePeriod(dto.getId(), dto.getOnly());
   }
 
-  @ApiOperation("结算")
+  @Operation(summary = "结算")
   @PostMapping(value = "settle")
   @PreAuthorize("hasAuthority('game:gameRebatePeriod:settle')")
   public void settle(@RequestBody OperGameRebatePeriodDTO dto) {
@@ -99,7 +99,7 @@ public class GameRebatePeriodController {
     }
   }
 
-  @ApiOperation("发放")
+  @Operation(summary = "发放")
   @PostMapping(value = "batchAccept")
   @PreAuthorize("hasAuthority('game:gameRebatePeriod:batchAccept')")
   public void accept(@RequestBody OperGameRebatePeriodDTO dto) {
@@ -160,7 +160,7 @@ public class GameRebatePeriodController {
     }
   }
 
-  @ApiOperation("回收")
+  @Operation(summary = "回收")
   @PostMapping(value = "rollBack")
   @PreAuthorize("hasAuthority('game:gameRebatePeriod:rollBack')")
   public void rollBack(@RequestBody OperGameRebatePeriodDTO dto) {
@@ -174,9 +174,9 @@ public class GameRebatePeriodController {
   }
 
   @Async
+  // fixme 内部调用无法代理，推荐移动至其他类中
   public void asyncAndRollBackSingleTask(String taskName, OperGameRebatePeriodDTO dto)
       throws ServiceException {
-    // fixme 内部调用无法代理，推荐移动至其他类中
     log.info("异步回收任务执行：{}", taskName);
     try {
       distributedLocker.lock(GAME_REBATE_PAY_REDIS_LOCK, TimeUnit.SECONDS, 300);

@@ -1,7 +1,10 @@
 package com.gameplat.admin.service.impl;
 
+import cn.afterturn.easypoi.excel.ExcelExportUtil;
+import cn.afterturn.easypoi.excel.entity.ExportParams;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.date.DateTime;
+import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
@@ -17,6 +20,7 @@ import com.gameplat.admin.model.vo.GameReportVO;
 import com.gameplat.admin.model.vo.MemberInfoVO;
 import com.gameplat.admin.model.vo.PageDtoVO;
 import com.gameplat.admin.service.GameBetDailyReportService;
+import com.gameplat.admin.service.GamePlatformService;
 import com.gameplat.admin.service.MemberService;
 import com.gameplat.base.common.constant.ContextConstant;
 import com.gameplat.base.common.exception.ServiceException;
@@ -41,7 +45,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import javax.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.HttpAsyncResponseConsumerFactory;
@@ -58,6 +64,7 @@ import org.elasticsearch.search.aggregations.metrics.ParsedSum;
 import org.elasticsearch.search.aggregations.metrics.SumAggregationBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -73,6 +80,7 @@ public class GameBetDailyReportServiceImpl
   @Autowired private MemberService memberService;
   @Autowired private GameBetDailyReportMapper gameBetDailyReportMapper;
   @Autowired private SysTheme sysTheme;
+  @Autowired private GamePlatformService gamePlatformService;
 
   @Override
   public PageDtoVO queryPage(Page<GameBetDailyReport> page, GameBetDailyReportQueryDTO dto) {
@@ -143,9 +151,7 @@ public class GameBetDailyReportServiceImpl
     DateTime beginTime = cn.hutool.core.date.DateUtil.beginOfDay(statDate);
     DateTime endTime = cn.hutool.core.date.DateUtil.endOfDay(statDate);
     builder.filter(
-        QueryBuilders.rangeQuery("settleTime")
-            .gte(beginTime.getTime())
-            .lte(endTime.getTime()));
+        QueryBuilders.rangeQuery("settleTime").gte(beginTime.getTime()).lte(endTime.getTime()));
 
     // 统计条数
     CountRequest countRequest =
@@ -187,7 +193,7 @@ public class GameBetDailyReportServiceImpl
             new SearchRequest(ContextConstant.ES_INDEX.BET_RECORD_ + sysTheme.getTenantCode());
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
         TermsAggregationBuilder accountGroup =
-            AggregationBuilders.terms("accountGroup").field("account.keyword").size((int)sumCount);
+            AggregationBuilders.terms("accountGroup").field("account.keyword").size((int) sumCount);
         TermsAggregationBuilder gameKindGroup =
             AggregationBuilders.terms("gameKindGroup").field("gameKind.keyword");
 
@@ -360,5 +366,36 @@ public class GameBetDailyReportServiceImpl
   public List<String> getSatisfyBetAccount(String minBetAmount, String startTime, String endTime) {
 
     return gameBetDailyReportMapper.getSatisfyBetAccount(minBetAmount, startTime, endTime);
+  }
+
+  @Override
+  public List<String> getWealVipValid(Integer type, String startTime, String endTime) {
+    return gameBetDailyReportMapper.getWealVipValid(type, startTime, endTime);
+  }
+
+  @Override
+  public void exportGamePlatformReport(
+      GameBetDailyReportQueryDTO dto, HttpServletResponse response) {
+    log.info("请求导出游戏平台数据参数：{}", JSONUtil.toJsonStr(dto));
+    List<GameReportVO> gamePlatformReportList = this.queryGamePlatformReport(dto);
+    Map<String, String> gamePlatformMap =
+        gamePlatformService.list().stream()
+            .collect(Collectors.toMap(GamePlatform::getCode, GamePlatform::getName));
+    gamePlatformReportList.forEach(
+        item -> {
+          item.setPlatformName(gamePlatformMap.get(item.getPlatformCode()));
+        });
+
+    ExportParams exportParams =
+        new ExportParams(
+            String.format("%s至%s游戏平台数据", dto.getBeginTime(), dto.getEndTime()), "游戏平台数据");
+    response.setHeader(
+        HttpHeaders.CONTENT_DISPOSITION, "attachment;filename = gamePlatformReport.xls");
+    try (Workbook workbook =
+        ExcelExportUtil.exportExcel(exportParams, GameReportVO.class, gamePlatformReportList)) {
+      workbook.write(response.getOutputStream());
+    } catch (IOException e) {
+      log.error("导出游戏投注记录报错", e);
+    }
   }
 }

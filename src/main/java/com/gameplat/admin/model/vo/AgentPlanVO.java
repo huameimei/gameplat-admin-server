@@ -1,6 +1,6 @@
 package com.gameplat.admin.model.vo;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -11,48 +11,48 @@ public class AgentPlanVO implements Serializable {
 
   private static final long serialVersionUID = 1L;
 
-  @ApiModelProperty(value = "代理ID")
+  @Schema(description = "代理ID")
   private Long agentId;
 
-  @ApiModelProperty(value = "代理账号")
+  @Schema(description = "代理账号")
   private String agentName;
 
-  @ApiModelProperty(value = "上级代理ID")
+  @Schema(description = "上级代理ID")
   private Long parentId;
 
-  @ApiModelProperty(value = "上级代理账号")
+  @Schema(description = "上级代理账号")
   private String parentName;
 
-  @ApiModelProperty(value = "代理关系")
+  @Schema(description = "代理关系")
   private String agentPath;
 
-  @ApiModelProperty(value = "状态（0禁用 1启用）")
+  @Schema(description = "状态（0禁用 1启用）")
   private Integer status;
 
-  @ApiModelProperty(value = "代理层级")
+  @Schema(description = "代理层级")
   private Integer levelNum;
 
-  @ApiModelProperty(value = "下级会员数")
+  @Schema(description = "下级会员数")
   private Integer subMember;
 
-  @ApiModelProperty(value = "下级代理数")
+  @Schema(description = "下级代理数")
   private Integer subAgent;
 
-  @ApiModelProperty(value = "分红方案")
+  @Schema(description = "分红方案")
   private Integer divideType;
 
-  @ApiModelProperty(value = "方案ID")
+  @Schema(description = "方案ID")
   private Long planId;
 
-  @ApiModelProperty(value = "方案名称")
+  @Schema(description = "方案名称")
   private String planName;
 
-  @ApiModelProperty(value = "更新人")
+  @Schema(description = "更新人")
   private String updateBy;
 
-  @ApiModelProperty(value = "更新时间")
+  @Schema(description = "更新时间")
   private String updateTime;
 
-  @ApiModelProperty(value = "备注信息")
+  @Schema(description = "备注信息")
   private String remark;
 }

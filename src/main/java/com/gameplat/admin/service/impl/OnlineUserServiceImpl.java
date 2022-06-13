@@ -11,7 +11,10 @@ import com.gameplat.admin.model.bean.PageExt;
 import com.gameplat.admin.model.dto.OnlineUserDTO;
 import com.gameplat.admin.model.vo.MemberInfoVO;
 import com.gameplat.admin.model.vo.OnlineUserVo;
-import com.gameplat.admin.service.*;
+import com.gameplat.admin.service.ConfigService;
+import com.gameplat.admin.service.MemberService;
+import com.gameplat.admin.service.OnlineUserService;
+import com.gameplat.admin.service.SysUserService;
 import com.gameplat.base.common.enums.ClientType;
 import com.gameplat.base.common.util.CollectorUtils;
 import com.gameplat.base.common.util.StringUtils;
@@ -22,6 +25,7 @@ import com.gameplat.security.context.UserCredential;
 import com.gameplat.security.manager.JwtTokenAuthenticationManager;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
@@ -42,7 +46,7 @@ public class OnlineUserServiceImpl implements OnlineUserService {
 
   @Autowired private ConfigService configService;
 
-  @Autowired private MemberService memberService;
+  @Lazy @Autowired private MemberService memberService;
 
   @Autowired private RedisTemplate<String, Object> redisTemplate;
 
@@ -123,7 +127,6 @@ public class OnlineUserServiceImpl implements OnlineUserService {
           this.countClientType(onlineCount, user.getClientType());
           // 统计会员数量
           this.countUserType(onlineCount, warningAccounts, user);
-
         });
 
     return onlineCount;

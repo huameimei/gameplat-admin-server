@@ -2,8 +2,8 @@ package com.gameplat.admin.model.vo;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
-import com.gameplat.admin.util.Date2LongSerializerUtils;
-import io.swagger.annotations.ApiModelProperty;
+import com.gameplat.common.util.Date2LongSerializerUtils;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.util.Date;
@@ -14,34 +14,34 @@ import java.util.Date;
 @Data
 public class ActivitySendVO {
 
-  @ApiModelProperty(value = "活动Id")
+  @Schema(description = "活动Id")
   private String activityId;
 
-  @ApiModelProperty(value = "开始时间")
+  @Schema(description = "开始时间")
   @JsonSerialize(using = Date2LongSerializerUtils.class)
   private Date startDate;
 
-  @ApiModelProperty(value = "结束时间")
+  @Schema(description = "结束时间")
   @JsonSerialize(using = Date2LongSerializerUtils.class)
   private Date endDate;
 
   @JsonSerialize(using = ToStringSerializer.class)
-  @ApiModelProperty(value = "用户Id")
+  @Schema(description = "用户Id")
   private Long userId;
 
-  @ApiModelProperty(value = "用户名")
+  @Schema(description = "用户名")
   private String userName;
 
-  @ApiModelProperty(value = "首充金额")
+  @Schema(description = "首充金额")
   private String firstAmount;
 
-  @ApiModelProperty(value = "用户充值金额")
+  @Schema(description = "用户充值金额")
   private String amount;
 
-  @ApiModelProperty(value = "用户充值金额(用于计算)")
+  @Schema(description = "用户充值金额(用于计算)")
   private Double cumulativeAmount;
 
-  @ApiModelProperty(value = "充值时间")
+  @Schema(description = "充值时间")
   @JsonSerialize(using = Date2LongSerializerUtils.class)
   private Date payTime;
 }

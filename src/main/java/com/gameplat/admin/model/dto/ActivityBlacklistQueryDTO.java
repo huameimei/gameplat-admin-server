@@ -1,6 +1,6 @@
 package com.gameplat.admin.model.dto;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -14,12 +14,12 @@ import java.io.Serializable;
 @Data
 public class ActivityBlacklistQueryDTO implements Serializable {
 
-  @ApiModelProperty(value = "活动ID")
+  @Schema(description = "活动ID")
   private Long activityId;
 
-  @ApiModelProperty(value = "限制内容")
+  @Schema(description = "限制内容")
   private String limitedContent;
 
-  @ApiModelProperty(value = "限制类型 1会员账号  2 ip地址")
+  @Schema(description = "限制类型 1会员账号  2 ip地址")
   private Integer limitedType;
 }

@@ -7,22 +7,39 @@ spring:
     name: admin-server
   profiles:
     active: @profiles.active@
+  websocket:
+    strategy: redis
+    endpoint: /websocket
+    broker: /topic1,/user
+    heartbeat: 10000,10000
+    userDestinationPrefix: /user
+    applicationDestinationPrefixes: /app
   cloud:
     nacos:
       config:
         enabled: true
+        server-addr: ${ConfigServerAddr}
+        username: nacos
+        password: aMN9Lezssd3dsDadYrss
+        file-extension: yml
+        namespace: prod-${NACOS_CONFIG_NAMESPACE}
+        group: SERVICE_GROUP
+        refresh-enabled: true
+        shared-configs:
+          - data-id: redis.yml
+            refresh: true
+          - data-id: injection-http-firewall.yml
+            refresh: true
+          - data-id: spring-kafka-log.yml
+            refresh: true
+          - data-id: spring-kafka-producer-config.yml
+            refresh: true
+          - data-id: elasticsearch.yml
+            refresh: true
+      discovery:
+        service: admin-server
+        namespace: ea9f2fb3-4fce-4cc9-a820-4508330af65b
+        group: SERVICE_GROUP
         server-addr: ${NACOS_SERVER_ADDR:localhost}
         username: nacos
         password: t1KMNoXowYr2DK9L
-        file-extension: yml
-        namespace: ea9f2fb3-4fce-4cc9-a820-4508330af65b
-        group: SERVICE_GROUP
-        refresh-enabled: true
-        shared-dataids: redis.yml,spring-kafka-log.yml,spring-kafka-producer-config.yml,elasticsearch.yml
-      discovery:
-        service: admin-server
-        namespace: ${spring.cloud.nacos.config.namespace}
-        group: SERVICE_GROUP
-        server-addr: ${spring.cloud.nacos.config.server-addr}
-        username: ${spring.cloud.nacos.config.username}
-        password: ${spring.cloud.nacos.config.password}

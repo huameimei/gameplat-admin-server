@@ -10,8 +10,8 @@ import com.gameplat.admin.service.MemberWealService;
 import com.gameplat.common.lang.Assert;
 import com.gameplat.model.entity.member.MemberWeal;
 import com.gameplat.model.entity.member.MemberWealDetail;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -24,7 +24,7 @@ import javax.servlet.http.HttpServletRequest;
  *
  * @author lily
  */
-@Api(tags = "vip福利发放")
+@Tag(name = "vip福利发放")
 @Slf4j
 @RestController
 @RequestMapping("/api/admin/member/weal")
@@ -35,35 +35,35 @@ public class OpenMemberWealController {
   @Autowired private MemberWealDetailService memberWealDetailService;
 
   @GetMapping("/list")
-  @ApiOperation(value = "查询福利发放记录列表")
+  @Operation(summary = "查询福利发放记录列表")
   @PreAuthorize("hasAuthority('member:weal:view')")
   public IPage<MemberWealVO> listWeal(PageDTO<MemberWeal> page, MemberWealDTO dto) {
     return wealService.findMemberWealList(page, dto);
   }
 
   @PostMapping("/add")
-  @ApiOperation(value = "新增福利发放")
+  @Operation(summary = "新增福利发放")
   @PreAuthorize("hasAuthority('member:weal:add')")
   public void addMemberWeal(@RequestBody MemberWealAddDTO dto) {
     wealService.addMemberWeal(dto);
   }
 
-  @PutMapping("/edit")
-  @ApiOperation(value = "修改福利发放")
+  @PostMapping("/edit")
+  @Operation(summary = "修改福利发放")
   @PreAuthorize("hasAuthority('member:weal:edit')")
   public void updateWeal(@RequestBody MemberWealEditDTO dto) {
     wealService.updateMemberWeal(dto);
   }
 
-  @ApiOperation(value = "删除福利发放")
-  @DeleteMapping("/remove")
+  @Operation(summary = "删除福利发放")
+  @PostMapping("/remove")
   @PreAuthorize("hasAuthority('member:weal:remove')")
   public void removeWeal(Long id) {
     wealService.deleteMemberWeal(id);
   }
 
-  @PutMapping("/settle")
-  @ApiOperation(value = "福利结算")
+  @PostMapping("/settle")
+  @Operation(summary = "福利结算")
   @PreAuthorize("hasAuthority('member:weal:settle')")
   public void settleWeal(@RequestBody MemberWealSettleDTO settleDTO) {
     Assert.notNull(settleDTO.getId(), "id不能为空");
@@ -71,7 +71,7 @@ public class OpenMemberWealController {
   }
 
   @PostMapping("/distribute")
-  @ApiOperation(value = "福利派发")
+  @Operation(summary = "福利派发")
   @PreAuthorize("hasAuthority('member:weal:distribute')")
   public void distributeSalary(@RequestBody MemberWeal dto, HttpServletRequest request) {
     Assert.notNull(dto.getId(), "id不能为空");
@@ -79,7 +79,7 @@ public class OpenMemberWealController {
   }
 
   @PostMapping("/recycle")
-  @ApiOperation(value = "福利回收")
+  @Operation(summary = "福利回收")
   @PreAuthorize("hasAuthority('member:weal:recycle')")
   public void recycleSalary(@RequestBody MemberWeal dto, HttpServletRequest request) {
     Assert.notNull(dto.getId(), "id不能为空");
@@ -87,7 +87,7 @@ public class OpenMemberWealController {
   }
 
   @GetMapping("/details")
-  @ApiOperation(value = "详情")
+  @Operation(summary = "详情")
   @PreAuthorize("hasAuthority('member:weal:details')")
   public IPage<MemberWealDetailVO> getDetails(
       PageDTO<MemberWealDetail> page, MemberWealDetailDTO dto) {
@@ -95,15 +95,15 @@ public class OpenMemberWealController {
     return memberWealDetailService.findWealDetailList(page, dto);
   }
 
-  @DeleteMapping("/delete")
-  @ApiOperation(value = "删除会员俸禄")
+  @PostMapping("/delete")
+  @Operation(summary = "删除会员俸禄")
   @PreAuthorize("hasAuthority('member:weal:removeMember')")
   public void deleteByUserId(Long id) {
     memberWealDetailService.deleteById(id);
   }
 
-  @PutMapping("/updateRewordAmount")
-  @ApiOperation(value = "修改会员俸禄")
+  @PostMapping("/updateRewordAmount")
+  @Operation(summary = "修改会员俸禄")
   @PreAuthorize("hasAuthority('member:weal:editMember')")
   public void editRewordAmount(@RequestBody MemberWealDetailEditDTO dto) {
     memberWealDetailService.editRewordAmount(dto.getId(), dto.getRewordAmount());

@@ -8,8 +8,8 @@ import com.gameplat.admin.model.dto.MemberGrowthBannerQueryDTO;
 import com.gameplat.admin.model.vo.MemberGrowthBannerVO;
 import com.gameplat.admin.service.MemberGrowthBannerService;
 import com.gameplat.model.entity.member.MemberGrowthBanner;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.*;
  *
  * @author lily
  */
-@Api(tags = "VIP轮播图配置")
+@Tag(name = "VIP轮播图配置")
 @Slf4j
 @RestController
 @RequestMapping("/api/admin/member/banner")
@@ -30,28 +30,28 @@ public class MemberGrowthBannerController {
   @Autowired private MemberGrowthBannerService memberGrowthBannerService;
 
   @PostMapping("/add")
-  @ApiOperation("新增banner图")
+  @Operation(summary = "新增banner图")
   @PreAuthorize("hasAuthority('member:banner:add')")
   public void addBanner(@Validated MemberGrowthBannerAddDTO dto) {
     memberGrowthBannerService.addBanner(dto);
   }
 
-  @ApiOperation("删除VIP banner图")
-  @DeleteMapping("/remove/{id}")
+  @Operation(summary = "删除VIP banner图")
+  @PostMapping("/remove/{id}")
   @PreAuthorize("hasAuthority('member:banner:remove')")
   public void removeBanner(@PathVariable Long id) {
     memberGrowthBannerService.remove(id);
   }
 
-  @PutMapping("/edit")
-  @ApiOperation("修改VIP banner图")
+  @PostMapping("/edit")
+  @Operation(summary = "修改VIP banner图")
   @PreAuthorize("hasAuthority('member:banner:edit')")
   public void updateBanner(@Validated MemberGrowthBannerEditDTO dto) {
     memberGrowthBannerService.updateBanner(dto);
   }
 
   @GetMapping("/page")
-  @ApiOperation("VIP banner图列表")
+  @Operation(summary = "VIP banner图列表")
   @PreAuthorize("hasAuthority('member:banner:view')")
   public IPage<MemberGrowthBannerVO> findTrendsList(
       PageDTO<MemberGrowthBanner> page, MemberGrowthBannerQueryDTO dto) {

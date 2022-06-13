@@ -1,7 +1,6 @@
 package com.gameplat.admin.model.dto;
 
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import javax.validation.constraints.NotNull;
@@ -15,175 +14,174 @@ import java.util.Date;
  * @date 2021/11/21
  */
 @Data
-@ApiModel(value = "修改VIP配置入参", description = "修改VIP配置入参")
 public class MemberGrowthConfigEditDto implements Serializable {
 
-  @ApiModelProperty(value = "主键", required = true)
+  @Schema(description = "主键", required = true)
   @NotNull(message = "编号不能为空")
   private Long id;
 
-  @ApiModelProperty(value = "是否开启VIP功能 1：开启   0：关闭")
+  @Schema(description = "是否开启VIP功能 1：开启   0：关闭")
   private Integer isEnableVip;
 
-  @ApiModelProperty(value = "是否开启充值计算 1：开启   0：关闭")
+  @Schema(description = "是否开启充值计算 1：开启   0：关闭")
   private Integer isEnableRecharge;
 
-  @ApiModelProperty(value = "是否开启打码量计算 1：开启   0：关闭")
+  @Schema(description = "是否开启打码量计算 1：开启   0：关闭")
   private Integer isEnableDama;
 
-  @ApiModelProperty(value = "是否开启签到计算 1：开启   0：关闭")
+  @Schema(description = "是否开启签到计算 1：开启   0：关闭")
   private Integer isEnableSign;
 
-  @ApiModelProperty(value = "开始签到最少充值金额")
+  @Schema(description = "开始签到最少充值金额")
   private BigDecimal signMinRechargeAmount;
 
-  @ApiModelProperty(value = "同IP最多签到用户数")
+  @Schema(description = "同IP最多签到用户数")
   private Integer signIpLimitCount;
 
-  @ApiModelProperty(value = "是否发放升级奖励")
+  @Schema(description = "是否发放升级奖励")
   private Integer isPayUpReword;
 
-  @ApiModelProperty(value = "是否自动派发升级奖励:1：是  0：否")
+  @Schema(description = "是否自动派发升级奖励:1：是  0：否")
   private Integer isAutoPayReword;
 
-  @ApiModelProperty(value = "未领取失效周期(天)")
+  @Schema(description = "未领取失效周期(天)")
   private String receiveLimitCycle;
 
-  @ApiModelProperty(value = "充值金额成长值兑换比例")
+  @Schema(description = "充值金额成长值兑换比例")
   private BigDecimal rechageRate;
 
-  @ApiModelProperty(value = "打码量兑换成长值比例")
+  @Schema(description = "打码量兑换成长值比例")
   private BigDecimal damaRate;
 
-  @ApiModelProperty(value = "每日签到奖励成长值")
+  @Schema(description = "每日签到奖励成长值")
   private Long signEveryDayGrowth;
 
-  @ApiModelProperty(value = "每日签到奖励成长值")
+  @Schema(description = "每日签到奖励成长值")
   private Long bindBankGrowth;
 
-  @ApiModelProperty(value = "每日签到最少充值金额")
+  @Schema(description = "每日签到最少充值金额")
   private BigDecimal signDayMinRechargeAmount;
 
-  @ApiModelProperty(value = "签到最大成长值")
+  @Schema(description = "签到最大成长值")
   private Long signMaxGrowth;
 
-  @ApiModelProperty(value = "是否重复发放升级奖励")
+  @Schema(description = "是否重复发放升级奖励")
   private Integer isRepeatPayUpReword;
 
-  @ApiModelProperty(value = "最高等级配置")
+  @Schema(description = "最高等级配置")
   private Integer limitLevel;
 
-  @ApiModelProperty(value = "保级周期")
+  @Schema(description = "保级周期")
   private Integer demoteCycle;
 
-  @ApiModelProperty(value = "更新人", hidden = true)
+  @Schema(description = "更新人", hidden = true)
   private String updateBy;
 
-  @ApiModelProperty(value = "语言", hidden = true)
+  @Schema(description = "语言", hidden = true)
   private String language;
 
-  @ApiModelProperty("完善用户资料奖励成长值")
+  @Schema(description = "完善用户资料奖励成长值")
   private Long perfectUserInfoGrowth;
 
-  @ApiModelProperty("所需完善用户的资料列")
+  @Schema(description = "所需完善用户的资料列")
   private String perfectUserInfoField;
 
-  @ApiModelProperty("VIP经验值描述")
+  @Schema(description = "VIP经验值描述")
   private String growthDesc;
 
-  @ApiModelProperty("其它提示")
+  @Schema(description = "其它提示")
   private String otherDesc;
 
-  @ApiModelProperty("轮播图  多张用,分割")
+  @Schema(description = "轮播图  多张用,分割")
   private String carousel;
 
-  @ApiModelProperty(value = "创建人")
+  @Schema(description = "创建人")
   private String createBy;
 
-  @ApiModelProperty(value = "创建时间")
+  @Schema(description = "创建时间")
   private Date createTime;
 
-  @ApiModelProperty(value = "更新时间")
+  @Schema(description = "更新时间")
   private Date updateTime;
 
-  @ApiModelProperty(value = "备注")
+  @Schema(description = "备注")
   private String remark;
 
-  @ApiModelProperty("VIP经验值描述 en-US")
+  @Schema(description = "VIP经验值描述 en-US")
   private String growthDescEn;
 
-  @ApiModelProperty("VIP经验值描述 th-TH")
+  @Schema(description = "VIP经验值描述 th-TH")
   private String growthDescTh;
 
-  @ApiModelProperty("VIP经验值描述 in-ID")
+  @Schema(description = "VIP经验值描述 in-ID")
   private String growthDescIn;
 
-  @ApiModelProperty("VIP经验值描述 vi-VN")
+  @Schema(description = "VIP经验值描述 vi-VN")
   private String growthDescVi;
 
-  @ApiModelProperty("其它提示 en-US")
+  @Schema(description = "其它提示 en-US")
   private String otherDescEn;
 
-  @ApiModelProperty("其它提示 th-TH")
+  @Schema(description = "其它提示 th-TH")
   private String otherDescTh;
 
-  @ApiModelProperty("其它提示 in-ID")
+  @Schema(description = "其它提示 in-ID")
   private String otherDescIn;
 
-  @ApiModelProperty("其它提示 vi-VN")
+  @Schema(description = "其它提示 vi-VN")
   private String otherDescVi;
 
-  @ApiModelProperty("移动端VIP图片")
+  @Schema(description = "移动端VIP图片")
   private String mobileVipImage;
 
-  @ApiModelProperty("WEB端VIP图片")
+  @Schema(description = "WEB端VIP图片")
   private String webVipImage;
 
-  @ApiModelProperty("移动端达成背景图片")
+  @Schema(description = "移动端达成背景图片")
   private String mobileReachBackImage;
 
-  @ApiModelProperty("移动端未达成背景图片")
+  @Schema(description = "移动端未达成背景图片")
   private String mobileUnreachBackImage;
 
-  @ApiModelProperty("移动端达成VIP图片")
+  @Schema(description = "移动端达成VIP图片")
   private String mobileReachVipImage;
 
-  @ApiModelProperty("移动端未达成VIP图片")
+  @Schema(description = "移动端未达成VIP图片")
   private String mobileUnreachVipImage;
 
-  @ApiModelProperty("WEB端达成VIP图片")
+  @Schema(description = "WEB端达成VIP图片")
   private String webReachVipImage;
 
-  @ApiModelProperty("WEB端未达成VIP图片")
+  @Schema(description = "WEB端未达成VIP图片")
   private String webUnreachVipImage;
 
-  @ApiModelProperty("金币成长值比例")
+  @Schema(description = "金币成长值比例")
   private BigDecimal coinRatio;
 
-  @ApiModelProperty("金币最大获取数")
+  @Schema(description = "金币最大获取数")
   private Integer maxCoin;
 
-  @ApiModelProperty("金币最大获取数")
+  @Schema(description = "金币最大获取数")
   private Integer dailyMaxCoin;
 
-  @ApiModelProperty("金币成长值速率")
+  @Schema(description = "金币成长值速率")
   private Double coinRate;
 
-  @ApiModelProperty("金币描述")
+  @Schema(description = "金币描述")
   private String goldCoinDesc;
 
-  @ApiModelProperty("是否开启借呗")
+  @Schema(description = "是否开启借呗")
   private String isMemberLoan;
 
-  @ApiModelProperty("是否开启借款")
+  @Schema(description = "是否开启借款")
   private Integer isLoanMoney;
 
-  @ApiModelProperty("单日借款上限")
+  @Schema(description = "单日借款上限")
   private Integer dayLendLimit;
 
-  @ApiModelProperty("单日还款上限")
+  @Schema(description = "单日还款上限")
   private Integer dayReturnLimit;
 
-  @ApiModelProperty("单次最低还款金额")
+  @Schema(description = "单次最低还款金额")
   private BigDecimal lowerMoney;
 }

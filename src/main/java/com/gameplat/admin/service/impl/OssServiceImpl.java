@@ -1,13 +1,14 @@
 package com.gameplat.admin.service.impl;
 
-import cn.hutool.core.util.RandomUtil;
+import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.lang.UUID;
 import com.gameplat.admin.service.AsyncSaveFileRecordService;
 import com.gameplat.admin.service.ConfigService;
 import com.gameplat.admin.service.OssService;
-import com.gameplat.base.common.context.GlobalContextHolder;
 import com.gameplat.common.compent.oss.FileStorageStrategyContext;
 import com.gameplat.common.compent.oss.config.FileConfig;
 import com.gameplat.common.enums.DictTypeEnum;
+import com.gameplat.security.SecurityUserHolder;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,30 +21,28 @@ public class OssServiceImpl implements OssService {
 
   @Autowired private FileStorageStrategyContext fileStorageStrategyContext;
 
-  @Autowired
-  private AsyncSaveFileRecordService asyncSaveFileRecordService;
-
-  @Override
-  public String upload(MultipartFile file) {
-    String fileName = System.currentTimeMillis() + RandomUtil.randomNumber() + "";
-    return this.upload(file, fileName);
-  }
+  @Autowired private AsyncSaveFileRecordService asyncSaveFileRecordService;
 
   @Override
   @SneakyThrows
-  public String upload(MultipartFile file, String filename) {
-    FileConfig fileConfig = this.getConfig();
+  public String upload(MultipartFile file) {
+    FileConfig config = this.getConfig();
+    String randomFilename = this.getRandomFilename(file);
+    fileStorageStrategyContext
+            .getProvider(config)
+            .upload(file.getInputStream(), file.getContentType(), randomFilename);
 
-    String fileUrl = fileStorageStrategyContext
-        .getProvider(fileConfig)
-            .upload(file.getInputStream(), file.getContentType(), filename);
 
+    String accessUrl = this.getAccessUrl(config, randomFilename);
     // 异步保存文件记录
-    String username = GlobalContextHolder.getContext().getUsername();
-    Long fileSize = file.getSize();
-    asyncSaveFileRecordService.asyncSave(file, fileUrl, fileConfig.getProvider(), username, fileSize);
+    asyncSaveFileRecordService.asyncSave(
+        file, accessUrl, config.getProvider(), SecurityUserHolder.getUsername());
 
-    return fileUrl;
+    return accessUrl;
+  }
+
+  private String getAccessUrl(FileConfig config, String filename) {
+    return config.getEndpoint().concat("/").concat(config.getBucket()).concat("/").concat(filename);
   }
 
   @Override
@@ -53,5 +52,9 @@ public class OssServiceImpl implements OssService {
 
   private FileConfig getConfig() {
     return configService.getDefaultConfig(DictTypeEnum.FILE_CONFIG, FileConfig.class);
+  }
+
+  private String getRandomFilename(MultipartFile file) {
+    return UUID.fastUUID() + "." + FileUtil.getSuffix(file.getOriginalFilename());
   }
 }

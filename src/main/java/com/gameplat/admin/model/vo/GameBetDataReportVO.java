@@ -1,6 +1,6 @@
 package com.gameplat.admin.model.vo;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -12,25 +12,25 @@ import java.math.BigDecimal;
 @Data
 public class GameBetDataReportVO implements Serializable {
 
-  @ApiModelProperty(value = "游戏类型")
+  @Schema(description = "游戏类型")
   private String gameType;
 
-  @ApiModelProperty(value = "投注金额")
+  @Schema(description = "投注金额")
   private BigDecimal betAmount;
 
-  @ApiModelProperty(value = "有效投注金额")
+  @Schema(description = "有效投注金额")
   private BigDecimal validAmount;
 
-  @ApiModelProperty(value = "输赢金额")
+  @Schema(description = "输赢金额")
   private BigDecimal winAmount;
 
-  @ApiModelProperty(value = "派彩金额")
+  @Schema(description = "派彩金额")
   private BigDecimal payoutAmount;
 
-  @ApiModelProperty(value = "返水金额")
+  @Schema(description = "返水金额")
   private BigDecimal waterAmount;
 
-  @ApiModelProperty(value = "游戏人数")
+  @Schema(description = "游戏人数")
   private int gameNum;
 
   public GameBetDataReportVO() {

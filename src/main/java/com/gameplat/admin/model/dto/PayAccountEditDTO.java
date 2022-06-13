@@ -1,6 +1,6 @@
 package com.gameplat.admin.model.dto;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -33,10 +33,10 @@ public class PayAccountEditDTO implements Serializable {
 
   private String url;
 
-  @ApiModelProperty(value = "1:普通账户，2：vpi账户")
+  @Schema(description = "1:普通账户，2：vpi账户")
   private Integer type;
 
-  @ApiModelProperty(value = "状态: [0 - 启用, 1 - 禁用]")
+  @Schema(description = "状态: [0 - 启用, 1 - 禁用]")
   private Integer status;
 
   private Long rechargeTimes;
@@ -45,7 +45,7 @@ public class PayAccountEditDTO implements Serializable {
 
   private String orderRemark;
 
-  @ApiModelProperty(value = "0:启用，1：关闭")
+  @Schema(description = "0:启用，1：关闭")
   private Integer orderRemarkStatus;
 
   private String limitInfo;

@@ -12,15 +12,19 @@ import com.gameplat.log.enums.LogType;
 import com.gameplat.model.entity.proxy.RebatePlan;
 import com.gameplat.security.SecurityUserHolder;
 import com.gameplat.security.context.UserCredential;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-/** @Description : 平级分红方案 @Author : cc @Date : 2022/4/2 */
-@Api(tags = "平级分红方案")
+import java.util.Map;
+
+/**
+ * @Description : 平级分红方案 @Author : cc @Date : 2022/4/2
+ */
+@Tag(name = "平级分红方案")
 @Slf4j
 @RestController
 @RequestMapping("/api/admin/same-level/plan")
@@ -35,7 +39,7 @@ public class RebatePlanController {
    * @param dto
    * @return
    */
-  @ApiOperation(value = "查询平级分红方案列表")
+  @Operation(summary = "查询平级分红方案列表")
   @GetMapping("/list")
   public IPage<RebatePlanVO> list(PageDTO<RebatePlan> page, RebatePlan dto) {
     return rebatePlanService.queryPage(page, dto);
@@ -46,7 +50,7 @@ public class RebatePlanController {
    *
    * @param rebatePlanPO
    */
-  @ApiOperation("平级分红->新增平级分红方案")
+  @Operation(summary = "平级分红->新增平级分红方案")
   @PostMapping(value = "/add")
   @PreAuthorize("hasAuthority('system:plan:add')")
   @Log(
@@ -71,7 +75,7 @@ public class RebatePlanController {
    *
    * @param rebatePlanPO
    */
-  @ApiOperation("平级分红->编辑平级分红方案")
+  @Operation(summary = "平级分红->编辑平级分红方案")
   @PostMapping(value = "/edit")
   @Log(
       module = ServiceName.ADMIN_SERVICE,
@@ -93,17 +97,17 @@ public class RebatePlanController {
   /**
    * 删除
    *
-   * @param ids
+   * @param map
    */
-  @ApiOperation(value = "平级分红->删除平级分红方案")
-  @DeleteMapping("/remove")
+  @Operation(summary = "平级分红->删除平级分红方案")
+  @PostMapping("/remove")
   @Log(
       module = ServiceName.ADMIN_SERVICE,
       type = LogType.AGENT,
       desc = "平级分红->删除平级分红方案，方案ID：#{#planId}")
-  public void remove(@RequestBody String ids) {
-    Assert.isTrue(StrUtil.isNotBlank(ids), "参数为空！");
-    String[] idArr = ids.split(",");
+  public void remove(@RequestBody Map<String, String> map) {
+    Assert.isTrue(StrUtil.isNotBlank(map.get("ids")), "参数为空！");
+    String[] idArr = map.get("ids").split(",");
     for (String id : idArr) {
       rebatePlanService.removeRebatePlan(Long.valueOf(id));
     }

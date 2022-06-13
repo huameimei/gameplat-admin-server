@@ -2,8 +2,8 @@ package com.gameplat.admin.model.vo;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
-import com.gameplat.admin.util.Date2LongSerializerUtils;
-import io.swagger.annotations.ApiModelProperty;
+import com.gameplat.common.util.Date2LongSerializerUtils;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -20,24 +20,24 @@ public class ActivityBlacklistVO implements Serializable {
 
   private static final long serialVersionUID = 7535872776555957753L;
 
-  @ApiModelProperty(value = "主键ID")
+  @Schema(description = "主键ID")
   @JsonSerialize(using = ToStringSerializer.class)
   private Long id;
 
-  @ApiModelProperty(value = "活动ID")
+  @Schema(description = "活动ID")
   @JsonSerialize(using = ToStringSerializer.class)
   private Long activityId;
 
-  @ApiModelProperty(value = "限制内容")
+  @Schema(description = "限制内容")
   private String limitedContent;
 
-  @ApiModelProperty(value = "限制类型 1会员账号  2 ip地址")
+  @Schema(description = "限制类型 1会员账号  2 ip地址")
   private Integer limitedType;
 
-  @ApiModelProperty(value = "创建人")
+  @Schema(description = "创建人")
   private String createBy;
 
-  @ApiModelProperty(value = "创建时间")
+  @Schema(description = "创建时间")
   @JsonSerialize(using = Date2LongSerializerUtils.class)
   private Date createTime;
 }

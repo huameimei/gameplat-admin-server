@@ -1,6 +1,6 @@
 package com.gameplat.admin.model.dto;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import javax.validation.constraints.AssertTrue;
@@ -15,18 +15,18 @@ import java.io.Serializable;
 @AssertTrue
 public class MemberGoldCoinRecordQueryDTO implements Serializable {
 
-  @ApiModelProperty(value = "订单号")
+  @Schema(description = "订单号")
   private Long memberId;
 
-  @ApiModelProperty(value = "玩家名字")
+  @Schema(description = "玩家名字")
   private String account;
 
-  @ApiModelProperty(value = "来源类型（待定）1 获取成长值、2 爆料扣款")
+  @Schema(description = "来源类型（待定）1 获取成长值、2 爆料扣款")
   private Integer sourceType;
 
-  @ApiModelProperty(value = "开始时间")
+  @Schema(description = "开始时间")
   private String startTime;
 
-  @ApiModelProperty(value = "结束时间")
+  @Schema(description = "结束时间")
   private String endTime;
 }

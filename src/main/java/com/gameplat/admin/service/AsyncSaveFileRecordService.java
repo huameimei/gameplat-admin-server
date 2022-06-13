@@ -9,5 +9,5 @@ import org.springframework.web.multipart.MultipartFile;
  */
 public interface AsyncSaveFileRecordService {
 
-  void asyncSave(MultipartFile file, String fileUrl, Integer serviceProvider, String uploadBy, Long fileSize);
+  void asyncSave(MultipartFile file, String fileUrl, Integer serviceProvider, String uploadBy);
 }

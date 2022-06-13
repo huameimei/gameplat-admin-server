@@ -180,7 +180,7 @@ public class SysSettingServiceImpl extends ServiceImpl<SysSettingMapper, SysSett
         if (vo.getSettingType().equals(Constants.TEMPLATE_CONFIG_THEME)) {
             // 查询主题模板只取租户开启的主题
             vo.setDisplay(1);
-        } else if (vo.getSettingType().equals(Constants.SETTING_H5_NAVIGATION) || vo.getSettingType().equals(Constants.SETTING_APP_NAVIGATION)) {
+        } else if (vo.getSettingType().equals(Constants.SETTING_APP_NAVIGATION)) {
             // 如果没传主题，传默认模板
             if (StringUtils.isBlank(vo.getExtend4())) {
                 vo.setTenant("default");
@@ -210,10 +210,22 @@ public class SysSettingServiceImpl extends ServiceImpl<SysSettingMapper, SysSett
     @Override
     public void updateAppNavigation(SysSettingVO vo) {
         // 查询游戏必要code
-        if (Constants.SETTING_APP_NAVIGATION.equals(vo.getSettingType()) || Constants.SETTING_H5_NAVIGATION.equals(vo.getSettingType())) {
+        if (Constants.SETTING_APP_NAVIGATION.equals(vo.getSettingType()) || Constants.SETTING_SIX_NAVIGATION.equals(vo.getSettingType())) {
             if (StringUtils.isNotBlank(vo.getExtend2())) {
-                GameKindVO gameList = sysSettingMapper.getGameList(vo.getExtend2());
-                vo.setExtend3(JSON.toJSONString(gameList));
+                GameKindVO game = sysSettingMapper.getGameList(vo.getExtend2());
+                if (game != null) {
+                    JSONObject json = new JSONObject();
+                    json.put("platformCode", game.getPlatformCode());
+                    // 包含子游戏的 playCode不能为空，不包含二级子游戏,playCode必须为空
+                    if (game.getSubLevel() != null && game.getSubLevel() == 1) {
+                        json.put("playCode", game.getCode());
+                    } else {
+                        json.put("playCode", "");
+                    }
+                    json.put("gameType", game.getGameType());
+                    json.put("demoEnable", game.getDemoEnable());
+                    vo.setExtend3(json.toJSONString());
+                }
             }
         }
         // 广场导航栏选择一个首页后，其他选择的首页自动置为0

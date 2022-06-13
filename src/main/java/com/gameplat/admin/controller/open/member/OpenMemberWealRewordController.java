@@ -9,8 +9,8 @@ import com.gameplat.admin.model.dto.MemberWealRewordDTO;
 import com.gameplat.admin.model.vo.MemberWealRewordVO;
 import com.gameplat.admin.service.MemberWealRewordService;
 import com.gameplat.model.entity.member.MemberWealReword;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -18,14 +18,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
-@Api(tags = "VIP福利记录")
+@Tag(name = "VIP福利记录")
 @Slf4j
 @RestController
 @RequestMapping("/api/admin/member/wealReword")
@@ -34,23 +34,23 @@ public class OpenMemberWealRewordController {
   @Autowired private MemberWealRewordService rewordService;
 
   @GetMapping("/list")
-  @ApiOperation("vip福利记录列表")
+  @Operation(summary = "vip福利记录列表")
   @PreAuthorize("hasAuthority('member:wealReword:view')")
   public IPage<MemberWealRewordVO> listWealReword(
       PageDTO<MemberWealReword> page, MemberWealRewordDTO dto) {
     return rewordService.findWealRewordList(page, dto);
   }
 
-  @PutMapping("/updateRemark")
-  @ApiOperation("修改vip福利记录备注")
+  @PostMapping("/updateRemark")
+  @Operation(summary = "修改vip福利记录备注")
   @PreAuthorize("hasAuthority('member:wealReword:edit')")
   public void updateRemark(Long id, String remark) {
     rewordService.updateRemark(id, remark);
   }
 
   @SneakyThrows
-  @ApiOperation("导出VIP福利记录列表")
-  @PutMapping(value = "/exportReword", produces = "application/vnd.ms-excel")
+  @Operation(summary = "导出VIP福利记录列表")
+  @PostMapping(value = "/exportReword", produces = "application/vnd.ms-excel")
   @PreAuthorize("hasAuthority('member:wealReword:export')")
   public void exportWealReword(MemberWealRewordDTO queryDTO, HttpServletResponse response) {
     List<MemberWealReword> list = rewordService.findList(queryDTO);

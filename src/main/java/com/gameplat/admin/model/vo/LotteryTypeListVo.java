@@ -1,6 +1,6 @@
 package com.gameplat.admin.model.vo;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.util.List;
@@ -9,12 +9,12 @@ import java.util.List;
 @Data
 public class LotteryTypeListVo {
 
-  @ApiModelProperty(value = "彩系编码", required = true)
+  @Schema(description = "彩系编码", required = true)
   private String groupCode;
 
-  @ApiModelProperty(value = "彩系名称", required = true)
+  @Schema(description = "彩系名称", required = true)
   private String groupName;
 
-  @ApiModelProperty(value = "彩种列表", required = true)
+  @Schema(description = "彩种列表", required = true)
   private List<LotteryCodeVo> data;
 }

@@ -1,6 +1,6 @@
 package com.gameplat.admin.model.dto;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -10,27 +10,27 @@ import java.math.BigDecimal;
  */
 @Data
 public class MemberGrowthChangeDto {
-  @ApiModelProperty(required = true, value = "会员id")
+  @Schema(required = true, description = "会员id")
   private Long userId;
 
-  @ApiModelProperty("会员账号")
+  @Schema(description = "会员账号")
   private String userName;
 
-  @ApiModelProperty("此次变动成长值")
+  @Schema(description = "此次变动成长值")
   private Long changeGrowth;
 
-  @ApiModelProperty(required = true, value = "类型：0:充值  1: 2:投注打码量 3:后台修改 4:完善资料 5：绑定银行卡")
+  @Schema(required = true, description = "类型：0:充值  1: 2:投注打码量 3:后台修改 4:完善资料 5：绑定银行卡")
   private Integer type;
 
-  @ApiModelProperty("变动原因")
+  @Schema(description = "变动原因")
   private String remark;
 
-  @ApiModelProperty("变动游戏分类")
+  @Schema(description = "变动游戏分类")
   private String kindCode;
 
-  @ApiModelProperty("变动游戏分类名称")
+  @Schema(description = "变动游戏分类名称")
   private String kindName;
 
-  @ApiModelProperty("变动倍数")
+  @Schema(description = "变动倍数")
   private BigDecimal changeMult;
 }

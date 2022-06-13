@@ -12,8 +12,8 @@ import com.gameplat.admin.service.MemberGrowthStatisService;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.common.lang.Assert;
 import com.gameplat.model.entity.member.MemberGrowthRecord;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -28,7 +28,7 @@ import javax.servlet.http.HttpServletRequest;
  * @author lily
  */
 @Slf4j
-@Api(tags = "VIP成长记录")
+@Tag(name = "VIP成长记录")
 @RestController
 @RequestMapping("/api/admin/member/growthRecord")
 public class OpenMemberGrowthRecordController {
@@ -38,7 +38,7 @@ public class OpenMemberGrowthRecordController {
   @Autowired private MemberGrowthStatisService memberGrowthStatisService;
 
   @GetMapping("/list")
-  @ApiOperation(value = "查询成长值记录列表")
+  @Operation(summary = "查询成长值记录列表")
   @PreAuthorize("hasAuthority('member:growthRecord:view')")
   public IPage<MemberGrowthRecordVO> listWealGrowthRecord(
       PageDTO<MemberGrowthRecord> page, MemberGrowthRecordDTO dto) {
@@ -46,8 +46,8 @@ public class OpenMemberGrowthRecordController {
     return memberGrowthRecordService.findRecordList(page, dto);
   }
 
-  @PutMapping("/editGrowth")
-  @ApiOperation(value = "修改单个会员成长值")
+  @PostMapping("/editGrowth")
+  @Operation(summary = "修改单个会员成长值")
   @PreAuthorize("hasAuthority('member:growthRecord:edit')")
   public void editMemberGrowth(@RequestBody MemberGrowthChangeDto dto, HttpServletRequest request) {
     log.info("单个会员成长值变动：MemberGrowthRecord={}", dto);
@@ -62,7 +62,7 @@ public class OpenMemberGrowthRecordController {
   }
 
   @GetMapping("/getBar")
-  @ApiOperation(value = "进度条")
+  @Operation(summary = "进度条")
   @PreAuthorize("hasAuthority('member:growthRecord:view')")
   public GrowthScaleVO progressBar(Integer level, Long memberId) {
     Assert.isTrue(ObjectUtils.isNotNull(level) && ObjectUtils.isNotNull(memberId), "参数不全!");

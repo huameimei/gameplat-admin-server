@@ -45,6 +45,11 @@ public class GameBetValidRecordVo implements Serializable {
   /** 游戏编码 */
   private String gameCode;
 
+  /**
+   * 游戏分类名称
+   */
+  private String gameKindName;
+
   /** 游戏名称 */
   private String gameName;
 

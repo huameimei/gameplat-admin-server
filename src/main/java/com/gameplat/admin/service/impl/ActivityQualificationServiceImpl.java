@@ -233,6 +233,7 @@ public class ActivityQualificationServiceImpl
     qm.setQualificationStatus(BooleanEnum.YES.value());
     qm.setStatisItem(activityLobbyDTO.getStatisItem());
     qm.setGetWay(activityLobbyDTO.getGetWay());
+    qm.setSoleIdentifier(RandomUtil.generateOrderCode());
 
     List<ActivityLobbyDiscountDTO> list=activityLobbyDTO.getRedPacketConditionList();
     if(CollectionUtils.isEmpty(list)){
@@ -275,6 +276,7 @@ public class ActivityQualificationServiceImpl
     qm.setQualificationStatus(BooleanEnum.YES.value());
     qm.setStatisItem(activityLobbyDTO.getStatisItem());
     qm.setGetWay(activityLobbyDTO.getGetWay());
+    qm.setSoleIdentifier(RandomUtil.generateOrderCode());
 
     List<ActivityLobbyDiscountDTO> list=activityLobbyDTO.getRedPacketConditionList();
     if(CollectionUtils.isEmpty(list)){

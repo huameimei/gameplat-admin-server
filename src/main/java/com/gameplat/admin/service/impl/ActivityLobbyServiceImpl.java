@@ -3,6 +3,7 @@ package com.gameplat.admin.service.impl;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.date.DateField;
 import cn.hutool.core.date.DateTime;
+import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
@@ -553,7 +554,7 @@ public class ActivityLobbyServiceImpl extends ServiceImpl<ActivityLobbyMapper, A
   @Override
   public ActivityLobbyVO getActivityLobbyVOById(Long activityLobbyId) {
     ActivityLobbyVO result = baseMapper.getActivityLobbyVOById(activityLobbyId);
-    if (CollectionUtils.isNotEmpty(result.getLobbyDiscountList())) {
+    if (ObjectUtil.isNotEmpty(result) && CollectionUtils.isNotEmpty(result.getLobbyDiscountList())) {
       List<ActivityLobbyDiscountVO> activityLobbyDiscountVOList = new ArrayList<>();
       for (int i = 0; i < result.getLobbyDiscountList().size(); i++) {
         Object o = result.getLobbyDiscountList().get(i);

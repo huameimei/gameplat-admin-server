@@ -205,7 +205,7 @@ public class MemberTransferAgentServiceImpl implements MemberTransferAgentServic
 
     // 仅转移下级，自身下级人数归零，原代理线下级人数减少M个；转移全部，其他代理线会员人数减少M+1个
     Map<String, Integer> map = new HashMap<>(accounts.size());
-    accounts.forEach(account -> map.put(account, Boolean.TRUE.equals(excludeSelf) ? -m : -(m + 1)));
+    accounts.forEach(account -> map.put(account, Boolean.FALSE.equals(excludeSelf) ? -m : -(m + 1)));
     return map;
   }
 

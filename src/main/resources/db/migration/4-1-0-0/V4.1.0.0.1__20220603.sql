@@ -58,3 +58,34 @@ CREATE TABLE `member_transfer_record` (
   KEY `idx_bak_type` (`type`) USING BTREE,
   KEY `idx_bak_batch_id` (`serial_no`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=60 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC COMMENT='会员转代理/层级记录表';
+
+INSERT INTO `gameplat_center`.`sys_dict_data` (`id`, `dict_name`, `dict_label`, `dict_value`, `dict_type`, `dict_sort`, `css_class`, `list_class`, `is_visible`, `is_default`, `status`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (668, '', 'DIRECT_CHARGE', '{\"auditRemarks\":\"余额审核中！！！\",\"discountDmlMultiple\":1,\"discountPercentage\":3,\"discountType\":\"8080\",\"dmlFlag\":1,\"levels\":\"1,2,3,100,200,300,500,600,5,888,666,0\",\"normalDmlMultiple\":4,\"pointFlag\":1,\"remarks\":\"测试一下充值回复\",\"skipAuditing\":1}', 'SYSTEM_PARAMETER_CONFIG', 0, '', '', 1, 'N', 1, 'steve', '2022-06-01 19:00:39', 'steve', '2022-06-01 19:00:39', '');
+
+INSERT INTO `gameplat_center`.`sys_menu` (`menu_id`, `menu_name`, `title`, `parent_id`, `parent_name`, `menu_sort`, `url`, `component`, `path`, `menu_type`, `status`, `perms`, `icon`, `visible`, `i_frame`, `cache_flag`, `target`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (901020632, '', '视图', 60108, '', 1, '', '', '', 'F', 1, 'member:loan:view', '', 0, 0, 1, '', 'steve', '2022-05-21 18:06:54', '', NULL, '');
+INSERT INTO `gameplat_center`.`sys_menu` (`menu_id`, `menu_name`, `title`, `parent_id`, `parent_name`, `menu_sort`, `url`, `component`, `path`, `menu_type`, `status`, `perms`, `icon`, `visible`, `i_frame`, `cache_flag`, `target`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (901020633, '', '批量回收', 60108, '', 2, '', '', '', 'F', 1, 'member:loan:recycle', '', 0, 0, 1, '', 'steve', '2022-05-21 18:07:11', '', NULL, '');
+
+INSERT INTO `gameplat_center`.`sys_menu` (`menu_id`, `menu_name`, `title`, `parent_id`, `parent_name`, `menu_sort`, `url`, `component`, `path`, `menu_type`, `status`, `perms`, `icon`, `visible`, `i_frame`, `cache_flag`, `target`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (60108, 'borrow', '借呗借款', 601, '', 8, '', 'recharge-manage/borrow/index', '/recharge-manage/borrow', 'C', 1, '', 'config', 0, 0, 1, '', 'steve', '2022-05-21 17:55:12', 'steve', '2022-05-21 18:03:09', '');
+INSERT INTO `gameplat_center`.`sys_menu` (`menu_id`, `menu_name`, `title`, `parent_id`, `parent_name`, `menu_sort`, `url`, `component`, `path`, `menu_type`, `status`, `perms`, `icon`, `visible`, `i_frame`, `cache_flag`, `target`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (60109, 'yubao-interest', '余额宝收益', 601, '', 9, '', 'recharge-manage/yubao-interest/index', '/recharge-manage/yubao-interest', 'C', 1, '', 'gold', 0, 0, 1, '', 'steve', '2022-05-24 18:57:56', '', NULL, '');
+
+INSERT INTO `gameplat_center`.`sys_menu` (`menu_id`, `menu_name`, `title`, `parent_id`, `parent_name`, `menu_sort`, `url`, `component`, `path`, `menu_type`, `status`, `perms`, `icon`, `visible`, `i_frame`, `cache_flag`, `target`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (901020630, '', '获取免提直充限制', 60105, '', 7, '', '', '', 'F', 1, 'system:directCharge:get', '', 0, 0, 1, '', 'steve', '2022-06-11 19:33:35', '', NULL, '');
+INSERT INTO `gameplat_center`.`sys_menu` (`menu_id`, `menu_name`, `title`, `parent_id`, `parent_name`, `menu_sort`, `url`, `component`, `path`, `menu_type`, `status`, `perms`, `icon`, `visible`, `i_frame`, `cache_flag`, `target`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`) VALUES (901020631, '', '保存免提直充', 60105, '', 8, '', '', '', 'F', 1, 'system:directCharge:add', '', 0, 0, 1, '', 'steve', '2022-06-11 19:34:03', '', NULL, '');
+INSERT INTO `gameplat_center`.`sys_role_menu` (`role_Id`, `menu_Id`) VALUES (7, 901020632);
+INSERT INTO `gameplat_center`.`sys_role_menu` (`role_Id`, `menu_Id`) VALUES (7, 60108);
+INSERT INTO `gameplat_center`.`sys_role_menu` (`role_Id`, `menu_Id`) VALUES (7, 60109);
+INSERT INTO `gameplat_center`.`sys_role_menu` (`role_Id`, `menu_Id`) VALUES (7, 901020630);
+INSERT INTO `gameplat_center`.`sys_role_menu` (`role_Id`, `menu_Id`) VALUES (8, 901020632);
+INSERT INTO `gameplat_center`.`sys_role_menu` (`role_Id`, `menu_Id`) VALUES (8, 60108);
+INSERT INTO `gameplat_center`.`sys_role_menu` (`role_Id`, `menu_Id`) VALUES (8, 60109);
+INSERT INTO `gameplat_center`.`sys_role_menu` (`role_Id`, `menu_Id`) VALUES (8, 901020630);
+INSERT INTO `gameplat_center`.`sys_role_menu` (`role_Id`, `menu_Id`) VALUES (9, 901020632);
+INSERT INTO `gameplat_center`.`sys_role_menu` (`role_Id`, `menu_Id`) VALUES (9, 60108);
+INSERT INTO `gameplat_center`.`sys_role_menu` (`role_Id`, `menu_Id`) VALUES (9, 60109);
+INSERT INTO `gameplat_center`.`sys_role_menu` (`role_Id`, `menu_Id`) VALUES (9, 901020630);
+
+
+INSERT INTO `gameplat_center`.`sys_role_menu` (`role_Id`, `menu_Id`) VALUES (1, 901020632);
+INSERT INTO `gameplat_center`.`sys_role_menu` (`role_Id`, `menu_Id`) VALUES (1, 901020633);
+INSERT INTO `gameplat_center`.`sys_role_menu` (`role_Id`, `menu_Id`) VALUES (1, 60108);
+INSERT INTO `gameplat_center`.`sys_role_menu` (`role_Id`, `menu_Id`) VALUES (1, 60109);
+INSERT INTO `gameplat_center`.`sys_role_menu` (`role_Id`, `menu_Id`) VALUES (1, 901020630);
+INSERT INTO `gameplat_center`.`sys_role_menu` (`role_Id`, `menu_Id`) VALUES (1, 901020631);

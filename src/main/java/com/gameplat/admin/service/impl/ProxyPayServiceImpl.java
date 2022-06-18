@@ -202,7 +202,8 @@ public class ProxyPayServiceImpl implements ProxyPayService {
         paymentCenterFeign.onlineProxyPay(
             context, memberWithdraw.getPpInterface(), memberWithdraw.getPpInterfaceName());
     log.info("代付请求中心响应{}", resultStr);
-    if (!Objects.equals(ProxyPayStatusEnum.PAY_SUCCESS.getName(), resultStr)) {
+    Result<ProxyPayBackResult> result = JSONUtil.toBean(resultStr, Result.class);
+    if (!Objects.equals(ProxyPayStatusEnum.PAY_SUCCESS.getName(), result.getData())) {
       throw new ServiceException("请求代付失败！！！请立即联系第三方核实再出款！！！");
     }
     /*Result<ProxyPayBackResult> result = JSONUtil.toBean(resultStr, Result.class);

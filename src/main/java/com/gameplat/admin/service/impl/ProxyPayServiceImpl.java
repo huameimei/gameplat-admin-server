@@ -201,13 +201,16 @@ public class ProxyPayServiceImpl implements ProxyPayService {
     String resultStr =
         paymentCenterFeign.onlineProxyPay(
             context, memberWithdraw.getPpInterface(), memberWithdraw.getPpInterfaceName());
-    Result<ProxyPayBackResult> result = JSONUtil.toBean(resultStr, Result.class);
     log.info("代付请求中心响应{}", resultStr);
+    if (!Objects.equals(ProxyPayStatusEnum.PAY_SUCCESS.getName(), resultStr)) {
+      throw new ServiceException("请求代付失败！！！请立即联系第三方核实再出款！！！");
+    }
+    /*Result<ProxyPayBackResult> result = JSONUtil.toBean(resultStr, Result.class);
     if (!result.isSucceed() || 0 != result.getCode()) {
       throw new ServiceException("请求代付返回结果提示:" + result.getMessage() + "！！！请立即联系第三方核实再出款！！！");
     }
     ProxyPayBackResult proxyPayBackResult = result.getData();
-    /** 设置虚拟货币真实出款汇率、数量 */
+    *//** 设置虚拟货币真实出款汇率、数量 *//*
     if (null != proxyPayBackResult && null != proxyPayBackResult.getApproveCurrencyRate()
         || null != proxyPayBackResult.getApproveCurrencyCount()) {
       memberWithdrawService
@@ -217,7 +220,7 @@ public class ProxyPayServiceImpl implements ProxyPayService {
               MemberWithdraw::getApproveCurrencyCount, proxyPayBackResult.getApproveCurrencyCount())
           .eq(MemberWithdraw::getId, memberWithdraw.getId())
           .update();
-    }
+    }*/
     memberWithdrawService.updateById(memberWithdraw);
 
     // 移除会员提现冻结金额

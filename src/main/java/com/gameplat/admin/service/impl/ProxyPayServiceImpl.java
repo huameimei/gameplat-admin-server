@@ -171,7 +171,7 @@ public class ProxyPayServiceImpl implements ProxyPayService {
     // 封装第三方代付接口调用信息
     ProxyDispatchContext context = new ProxyDispatchContext();
     String asyncUrl =
-        asyncCallbackUrl + "/api/admin/finance/asyncCallback/onlineProxyPayAsyncCallback";
+        asyncCallbackUrl + "api/internal/admin/finance/asyncCallback/onlineProxyPayAsyncCallback";
     context.setAsyncCallbackUrl(asyncUrl + "/" + memberWithdraw.getCashOrderNo());
     context.setSysPath(sysPath);
     // 设置第三方接口信息
@@ -307,8 +307,9 @@ public class ProxyPayServiceImpl implements ProxyPayService {
             proxyCallbackContext, beanName, memberWithdraw.getPpInterfaceName());
     Result<ProxyPayBackResult> result = JSONUtil.toBean(resultStr, Result.class);
     log.info("代付查询请求中心响应{}", result);
-    if (!result.isSucceed() || 200 != result.getCode()) {
-      throw new ServiceException("第三方代付异步回调异常:" + result.getMessage() + "！！！请立即联系第三方核实再出款！！！");
+    ProxyPayBackResult proxyPayBackResult = JSONObject.parseObject(JSONObject.toJSONString(result.getData()), ProxyPayBackResult.class);
+    if (!result.isSucceed() || 0 != result.getCode()) {
+      throw new ServiceException("第三方代付异步回调异常:" + proxyPayBackResult.getMessage() + "！！！请立即联系第三方核实再出款！！！");
     }
     if (memberWithdraw.getCashStatus() == WithdrawStatus.CANCELLED.getValue()
         || memberWithdraw.getCashStatus() == WithdrawStatus.REFUSE.getValue()
@@ -319,8 +320,8 @@ public class ProxyPayServiceImpl implements ProxyPayService {
           "第三方出款订单"
               + memberWithdraw.getCashOrderNo()
               + "已经被处理了,响应第三方需要的信息:"
-              + result.getData().getResponseMsg());
-      return result.getData().getResponseMsg();
+              + proxyPayBackResult.getResponseMsg());
+      return proxyPayBackResult.getResponseMsg();
     }
 
     Member info = memberService.getById(memberWithdraw.getMemberId());

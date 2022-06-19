@@ -23,10 +23,7 @@ import com.gameplat.basepay.pay.bean.NameValuePair;
 import com.gameplat.basepay.proxypay.thirdparty.ProxyCallbackContext;
 import com.gameplat.basepay.proxypay.thirdparty.ProxyDispatchContext;
 import com.gameplat.basepay.proxypay.thirdparty.ProxyPayBackResult;
-import com.gameplat.common.enums.BooleanEnum;
-import com.gameplat.common.enums.SwitchStatusEnum;
-import com.gameplat.common.enums.UserTypes;
-import com.gameplat.common.enums.WithdrawStatus;
+import com.gameplat.common.enums.*;
 import com.gameplat.common.model.bean.limit.MemberRechargeLimit;
 import com.gameplat.model.entity.member.Member;
 import com.gameplat.model.entity.member.MemberInfo;
@@ -45,7 +42,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -170,8 +166,14 @@ public class ProxyPayServiceImpl implements ProxyPayService {
 
     // 封装第三方代付接口调用信息
     ProxyDispatchContext context = new ProxyDispatchContext();
+    MemberRechargeLimit rechargeLimit = this.limitInfoService.get(LimitEnums.MEMBER_RECHARGE_LIMIT);
+    String callbackDomain = rechargeLimit.getCallbackDomain();
+    String domain = StringUtils.isNotEmpty(callbackDomain) ? callbackDomain : asyncCallbackUrl;
+    if(!domain.endsWith("/")){
+      domain += "/";
+    }
     String asyncUrl =
-        asyncCallbackUrl + "api/internal/admin/finance/asyncCallback/onlineProxyPayAsyncCallback";
+            domain + "api/internal/admin/finance/asyncCallback/onlineProxyPayAsyncCallback";
     context.setAsyncCallbackUrl(asyncUrl + "/" + memberWithdraw.getCashOrderNo());
     context.setSysPath(sysPath);
     // 设置第三方接口信息

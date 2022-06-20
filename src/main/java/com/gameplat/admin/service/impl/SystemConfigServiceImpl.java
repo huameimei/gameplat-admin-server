@@ -24,8 +24,8 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -83,7 +83,6 @@ public class SystemConfigServiceImpl implements SystemConfigService {
 
   @Override
   public void delAgentContact(Long id) {
-    List<AgentContacaConfig> list = new ArrayList<>();
 
     SysDictData dictData =
         dictDataService.getDictData(
@@ -95,11 +94,8 @@ public class SystemConfigServiceImpl implements SystemConfigService {
             .map(c -> JsonUtils.parse(c, new TypeReference<List<AgentContacaConfig>>() {}))
             .orElse(Collections.emptyList());
     if (CollectionUtils.isNotEmpty(contactList)) {
-      for (AgentContacaConfig config : contactList) {
-        if (!config.getId().equals(id)) {
-          list.add(config);
-        }
-      }
+      List<AgentContacaConfig> list =
+              contactList.stream().filter(ex -> ex.getId() != id).collect(Collectors.toList());
       dictDataService.updateDictData(
           OperDictDataDTO.builder()
               .id(dictData.getId())

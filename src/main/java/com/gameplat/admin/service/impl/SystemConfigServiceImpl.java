@@ -16,6 +16,7 @@ import com.gameplat.common.constant.CachedKeys;
 import com.gameplat.common.enums.DefaultEnums;
 import com.gameplat.common.enums.DictDataEnum;
 import com.gameplat.common.enums.DictTypeEnum;
+import com.gameplat.common.util.Convert;
 import com.gameplat.model.entity.AgentContacaConfig;
 import com.gameplat.model.entity.sys.SysDictData;
 import lombok.extern.slf4j.Slf4j;
@@ -95,7 +96,7 @@ public class SystemConfigServiceImpl implements SystemConfigService {
             .orElse(Collections.emptyList());
     if (CollectionUtils.isNotEmpty(contactList)) {
       List<AgentContacaConfig> list =
-              contactList.stream().filter(ex -> !ex.getId().equals(id)).collect(Collectors.toList());
+              contactList.stream().filter(ex -> !Convert.toStr(ex.getId()).equals(Convert.toStr(id))).collect(Collectors.toList());
       dictDataService.updateDictData(
           OperDictDataDTO.builder()
               .id(dictData.getId())

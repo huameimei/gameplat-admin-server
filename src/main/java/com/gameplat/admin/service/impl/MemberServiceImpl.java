@@ -319,6 +319,7 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
     Assert.isTrue(
         this.lambdaUpdate()
             .set(Member::getPassword, password)
+                .set(Member::getRegisterType, MemberEnums.RegisterType.ONLINE.value())
             .eq(Member::getId, member.getId())
             .update(new Member()),
         "重置会员密码失败!");

@@ -314,7 +314,7 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
   @Override
   public void resetPassword(MemberPwdUpdateDTO dto) {
     Member member = this.getById(dto.getId());
-    String password = passwordService.encode(dto.getPassword(), member.getAccount());
+    String password = passwordService.encode(dto.getPassword(), member.getAccount().toLowerCase());
 
     Assert.isTrue(
         this.lambdaUpdate()

@@ -78,7 +78,7 @@ public class SysDictDataServiceImpl extends ServiceImpl<SysDictDataMapper, SysDi
 
   @Override
   @SentinelResource(value = "getDictDataByType")
-  @CacheInvalidate(name = CachedKeys.DICT_DATA_CACHE, key = "#dictType")
+  @Cached(name = CachedKeys.DICT_DATA_CACHE, key = "#dictType")
   public List<SysDictData> getDictDataByType(String dictType) {
     return this.lambdaQuery()
         .eq(SysDictData::getStatus, EnableEnum.ENABLED.code())
@@ -88,7 +88,7 @@ public class SysDictDataServiceImpl extends ServiceImpl<SysDictDataMapper, SysDi
 
   @Override
   @SentinelResource(value = "getDictDataByTypes")
-  @CacheInvalidate(name = CachedKeys.DICT_DATA_CACHE, key = "#dictTypes")
+  @Cached(name = CachedKeys.DICT_DATA_CACHE, key = "#dictTypes")
   public List<SysDictData> getDictDataByTypes(List<String> dictTypes) {
     return this.lambdaQuery()
         .eq(SysDictData::getStatus, EnableEnum.ENABLED.code())
@@ -108,7 +108,7 @@ public class SysDictDataServiceImpl extends ServiceImpl<SysDictDataMapper, SysDi
 
   @Override
   @SentinelResource(value = "getDictDataValue")
-  @CacheInvalidate(name = CachedKeys.DICT_DATA_CACHE, key = "#dictType + ':' + #dictLabel")
+  @Cached(name = CachedKeys.DICT_DATA_CACHE, key = "#dictType + ':' + #dictLabel")
   public String getDictDataValue(String dictType, String dictLabel) {
     return this.lambdaQuery()
         .eq(SysDictData::getStatus, EnableEnum.ENABLED.code())

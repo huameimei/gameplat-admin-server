@@ -95,7 +95,7 @@ public class SystemConfigServiceImpl implements SystemConfigService {
             .orElse(Collections.emptyList());
     if (CollectionUtils.isNotEmpty(contactList)) {
       List<AgentContacaConfig> list =
-              contactList.stream().filter(ex -> ex.getId() != id).collect(Collectors.toList());
+              contactList.stream().filter(ex -> !ex.getId().equals(id)).collect(Collectors.toList());
       dictDataService.updateDictData(
           OperDictDataDTO.builder()
               .id(dictData.getId())

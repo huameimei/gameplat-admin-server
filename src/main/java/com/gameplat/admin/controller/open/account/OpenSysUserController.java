@@ -10,9 +10,9 @@ import com.gameplat.admin.model.vo.RoleVo;
 import com.gameplat.admin.model.vo.UserVo;
 import com.gameplat.admin.service.SysUserService;
 import com.gameplat.base.common.util.DateUtil;
+import com.gameplat.common.constant.CachedKeys;
 import com.gameplat.common.constant.ServiceName;
 import com.gameplat.common.group.Groups;
-import com.gameplat.common.util.Convert;
 import com.gameplat.log.annotation.Log;
 import com.gameplat.log.enums.LogType;
 import com.gameplat.model.entity.sys.SysUser;
@@ -38,7 +38,7 @@ public class OpenSysUserController {
 
   @Autowired private SysUserService userService;
 
-  @Autowired
+  @Autowired(required = false)
   private RedisTemplate<String, Integer> redisTemplate;
 
 
@@ -118,17 +118,18 @@ public class OpenSysUserController {
     userService.changeStatus(id, status);
   }
 
-
   @Operation(summary = "解除登录密码限制")
   @PostMapping("releaseSysUserLimit/{id}")
   @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.MEMBER, desc = "'解除登录密码限制'+#{id}")
   @PreAuthorize("hasAuthority('account:subUser:releaseSysUserLimit')")
   public void releaseWithLimit(@PathVariable(required = true) long id) {
+    SysUser byId = userService.getById(id);
     String retryKey = String.format("%s_%s", KEY_2FA_RETRY_COUNT, id);
     log.info("操作人：{}", SecurityUserHolder.getUsername());
     boolean remove = redisTemplate.delete(retryKey);
     log.info("解除登录密码限制：{}", remove);
+    String keyUsername = String.format(CachedKeys.ADMIN_PWD_ERROR_COUNT, byId.getUserName());
+    boolean removeUsername = redisTemplate.delete(keyUsername);
+    log.info("解除登录密码限制Username：{}", removeUsername);
   }
-
-
 }

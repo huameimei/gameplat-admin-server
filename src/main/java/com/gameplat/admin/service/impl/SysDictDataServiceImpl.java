@@ -195,18 +195,28 @@ public class SysDictDataServiceImpl extends ServiceImpl<SysDictDataMapper, SysDi
 
   @Override
   @SentinelResource(value = "updateDictData")
-  @CacheInvalidateContainer({
-    @CacheInvalidate(name = CachedKeys.DICT_DATA_CACHE, key = "#dto.dictType"),
-    @CacheInvalidate(
-        name = CachedKeys.DICT_DATA_CACHE,
-        key = "#dto.dictType + ':' + #dto.dictLabel")
-  })
   public void updateDictData(OperDictDataDTO dto) {
     SysDictData dictData = dictDataConvert.toEntity(dto);
     if (!this.updateById(dictData)) {
       throw new ServiceException("修改失败!");
     }
+    jetCacheDataLabel(dto);
+    jetCacheData(dto);
   }
+
+
+  @CacheInvalidate(
+          name = CachedKeys.DICT_DATA_CACHE,
+          key = "#dto.dictType + ':' + #dto.dictLabel")
+  public void jetCacheDataLabel(OperDictDataDTO dto) {
+  }
+
+
+  @CacheInvalidate(name = CachedKeys.DICT_DATA_CACHE, key = "#dto.dictType")
+  public void jetCacheData(OperDictDataDTO dto) {
+  }
+
+
 
   @Override
   @SentinelResource(value = "deleteDictDataByIds")

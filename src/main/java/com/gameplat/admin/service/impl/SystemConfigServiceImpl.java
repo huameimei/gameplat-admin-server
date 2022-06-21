@@ -1,5 +1,7 @@
 package com.gameplat.admin.service.impl;
 
+import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.util.RandomUtil;
 import com.alicp.jetcache.anno.CacheInvalidate;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
@@ -65,13 +67,15 @@ public class SystemConfigServiceImpl implements SystemConfigService {
         }
       }
       if (!flag) {
-        agentContacaConfig.setId(IdWorker.getId());
+        long id = System.currentTimeMillis();
+        agentContacaConfig.setId(id);
         agentContacaConfig.setCreateBy(GlobalContextHolder.getContext().getUsername());
         agentContacaConfig.setCreateTime(String.valueOf(System.currentTimeMillis()));
         list.add(agentContacaConfig);
       }
     } else {
-      agentContacaConfig.setId(IdWorker.getId());
+      long id = System.currentTimeMillis();
+      agentContacaConfig.setId(id);
       agentContacaConfig.setCreateBy(GlobalContextHolder.getContext().getUsername());
       agentContacaConfig.setCreateTime(String.valueOf(System.currentTimeMillis()));
       list.add(agentContacaConfig);

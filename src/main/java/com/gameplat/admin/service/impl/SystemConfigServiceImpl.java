@@ -70,20 +70,25 @@ public class SystemConfigServiceImpl implements SystemConfigService {
         agentContacaConfig.setCreateTime(String.valueOf(System.currentTimeMillis()));
         list.add(agentContacaConfig);
       }
-
-      // 修改
-      dictDataService.updateDictData(
-          OperDictDataDTO.builder()
-              .id(dictData.getId())
-              .dictLabel(dictData.getDictLabel())
-              .dictType(dictData.getDictType())
-              .dictValue(JsonUtils.toJson(list))
-              .build());
+    } else {
+      agentContacaConfig.setId(IdWorker.getId());
+      agentContacaConfig.setCreateBy(GlobalContextHolder.getContext().getUsername());
+      agentContacaConfig.setCreateTime(String.valueOf(System.currentTimeMillis()));
+      list.add(agentContacaConfig);
     }
+
+    // 修改
+    dictDataService.updateDictData(
+            OperDictDataDTO.builder()
+                    .id(dictData.getId())
+                    .dictLabel(dictData.getDictLabel())
+                    .dictType(dictData.getDictType())
+                    .dictValue(JsonUtils.toJson(list))
+                    .build());
   }
 
   @Override
-  public void delAgentContact(Long id) {
+  public void delAgentContact(String id) {
 
     SysDictData dictData =
         dictDataService.getDictData(
@@ -97,7 +102,7 @@ public class SystemConfigServiceImpl implements SystemConfigService {
     if (CollectionUtils.isNotEmpty(contactList)) {
       log.info("删除前的数据大小：{}，删除id：{}", contactList.size(), id);
       List<AgentContacaConfig> list =
-              contactList.stream().filter(ex -> !Convert.toStr(ex.getId()).equals(Convert.toStr(id))).collect(Collectors.toList());
+              contactList.stream().filter(ex -> !Convert.toStr(ex.getId()).equals(id)).collect(Collectors.toList());
       log.info("删除后的数据大小：{}，删除id：{}", list.size(), id);
       dictDataService.updateDictData(
           OperDictDataDTO.builder()

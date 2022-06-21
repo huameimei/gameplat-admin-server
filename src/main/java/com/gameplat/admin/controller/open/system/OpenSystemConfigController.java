@@ -232,7 +232,7 @@ public class OpenSystemConfigController {
   @Operation(summary = "删除代理联系方式地址")
   @PostMapping("/agentContact/del/{id}")
   @PreAuthorize("hasAuthority('system:config:agentContcat:remove')")
-  public void delAgentContact(@PathVariable("id") Long id) {
+  public void delAgentContact(@PathVariable("id") String id) {
     systemConfigService.delAgentContact(id);
   }
 

@@ -95,8 +95,10 @@ public class SystemConfigServiceImpl implements SystemConfigService {
             .map(c -> JsonUtils.parse(c, new TypeReference<List<AgentContacaConfig>>() {}))
             .orElse(Collections.emptyList());
     if (CollectionUtils.isNotEmpty(contactList)) {
+      log.info("删除前的数据大小：{}，删除id：{}", contactList.size(), id);
       List<AgentContacaConfig> list =
               contactList.stream().filter(ex -> !Convert.toStr(ex.getId()).equals(Convert.toStr(id))).collect(Collectors.toList());
+      log.info("删除后的数据大小：{}，删除id：{}", list.size(), id);
       dictDataService.updateDictData(
           OperDictDataDTO.builder()
               .id(dictData.getId())

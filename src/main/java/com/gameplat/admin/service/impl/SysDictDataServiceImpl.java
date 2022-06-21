@@ -29,7 +29,9 @@ import com.gameplat.base.common.json.JsonUtils;
 import com.gameplat.common.constant.CachedKeys;
 import com.gameplat.common.enums.DictTypeEnum;
 import com.gameplat.model.entity.sys.SysDictData;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -45,10 +47,15 @@ import java.util.Map;
  */
 @Service
 @Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)
+@Log4j2
 public class SysDictDataServiceImpl extends ServiceImpl<SysDictDataMapper, SysDictData>
     implements SysDictDataService {
 
   @Autowired private DictDataConvert dictDataConvert;
+
+
+  @Autowired
+  private RedisTemplate<String, Integer> redisTemplate;
 
   @Override
   @SentinelResource(value = "selectDictDataList")
@@ -205,15 +212,17 @@ public class SysDictDataServiceImpl extends ServiceImpl<SysDictDataMapper, SysDi
   }
 
 
-  @CacheInvalidate(
-          name = CachedKeys.DICT_DATA_CACHE,
-          key = "#dto.dictType + ':' + #dto.dictLabel")
   public void jetCacheDataLabel(OperDictDataDTO dto) {
+    String key = CachedKeys.DICT_DATA_CACHE + dto.getDictType() + ":" + dto.getDictLabel();
+    Boolean delete = redisTemplate.delete(key);
+    log.info("删除结果：{}", delete);
   }
 
 
-  @CacheInvalidate(name = CachedKeys.DICT_DATA_CACHE, key = "#dto.dictType")
   public void jetCacheData(OperDictDataDTO dto) {
+    String key = CachedKeys.DICT_DATA_CACHE + dto.getDictType();
+    Boolean delete = redisTemplate.delete(key);
+    log.info("删除结果：{}", delete);
   }
 
 

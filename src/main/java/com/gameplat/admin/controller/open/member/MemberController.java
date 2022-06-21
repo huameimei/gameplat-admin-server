@@ -6,6 +6,8 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.http.Header;
 import cn.hutool.http.useragent.UserAgent;
 import cn.hutool.http.useragent.UserAgentUtil;
+import com.alicp.jetcache.Cache;
+import com.alicp.jetcache.anno.CreateCache;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.gameplat.admin.model.dto.*;
@@ -20,21 +22,24 @@ import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.ip.IpAddressParser;
 import com.gameplat.base.common.util.BeanUtils;
 import com.gameplat.base.common.util.ServletUtils;
+import com.gameplat.common.constant.CachedKeys;
 import com.gameplat.common.constant.ServiceName;
 import com.gameplat.common.lang.Assert;
+import com.gameplat.common.util.Convert;
 import com.gameplat.log.annotation.Log;
 import com.gameplat.log.enums.LogType;
 import com.gameplat.model.entity.member.Member;
+import com.gameplat.security.SecurityUserHolder;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.SneakyThrows;
+import lombok.extern.log4j.Log4j2;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
@@ -43,6 +48,7 @@ import java.util.Map;
 @Tag(name = "会员管理")
 @RestController
 @RequestMapping("/api/admin/member/")
+@Log4j2
 public class MemberController {
 
   @Autowired private MemberService memberService;
@@ -50,6 +56,10 @@ public class MemberController {
   @Autowired private MemberTransferAgentService memberTransferAgentService;
 
   @Autowired private GameAdminService gameAdminService;
+
+  @CreateCache(name = CachedKeys.MEMBER_FUND_PWD_ERR_COUNT, expire = -1)
+
+  private Cache<String, Integer> memberFundPwdErrCount;
 
   @Operation(summary = "会员列表")
   @GetMapping("/list")
@@ -281,5 +291,16 @@ public class MemberController {
   @PreAuthorize("hasAuthority('system:member:contact:detail')")
   public MemberContactVo getMemberDetail(@PathVariable(required = true) long id) {
     return memberService.getMemberDetail(id);
+  }
+
+
+  @Operation(summary = "解除提现密码限制")
+  @PostMapping("releaseWithLimit/{id}")
+  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.MEMBER, desc = "'解除提现密码限制'+#{id}")
+  @PreAuthorize("hasAuthority('system:member:releaseWithLimit')")
+  public void releaseWithLimit(@PathVariable(required = true) long id) {
+    log.info("操作人：{}", SecurityUserHolder.getUsername());
+    boolean remove = memberFundPwdErrCount.remove(Convert.toStr(id));
+    log.info("解除提现密码限制：{}", remove);
   }
 }

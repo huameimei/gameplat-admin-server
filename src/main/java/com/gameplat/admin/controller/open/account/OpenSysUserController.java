@@ -12,12 +12,16 @@ import com.gameplat.admin.service.SysUserService;
 import com.gameplat.base.common.util.DateUtil;
 import com.gameplat.common.constant.ServiceName;
 import com.gameplat.common.group.Groups;
+import com.gameplat.common.util.Convert;
 import com.gameplat.log.annotation.Log;
 import com.gameplat.log.enums.LogType;
 import com.gameplat.model.entity.sys.SysUser;
+import com.gameplat.security.SecurityUserHolder;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -27,9 +31,16 @@ import java.util.List;
 @Tag(name = "子账号管理")
 @RestController
 @RequestMapping("/api/admin/account/subUser")
+@Log4j2
 public class OpenSysUserController {
 
+  private static final String KEY_2FA_RETRY_COUNT = "KEY_2FA_RETRY_COUNT";
+
   @Autowired private SysUserService userService;
+
+  @Autowired
+  private RedisTemplate<String, Integer> redisTemplate;
+
 
   @Operation(summary = "查询")
   @GetMapping("/list")
@@ -106,4 +117,18 @@ public class OpenSysUserController {
   public void changeStatus(@PathVariable Long id, @PathVariable Integer status) {
     userService.changeStatus(id, status);
   }
+
+
+  @Operation(summary = "解除登录密码限制")
+  @PostMapping("releaseSysUserLimit/{id}")
+  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.MEMBER, desc = "'解除登录密码限制'+#{id}")
+  @PreAuthorize("hasAuthority('account:subUser:releaseSysUserLimit')")
+  public void releaseWithLimit(@PathVariable(required = true) long id) {
+    String retryKey = String.format("%s_%s", KEY_2FA_RETRY_COUNT, id);
+    log.info("操作人：{}", SecurityUserHolder.getUsername());
+    boolean remove = redisTemplate.delete(retryKey);
+    log.info("解除登录密码限制：{}", remove);
+  }
+
+
 }

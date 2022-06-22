@@ -19,6 +19,9 @@ public interface DataReportService {
 
   GameAccountDataReportVo findMemberReport(Page<AccountReportVo> page, GameRWDataReportDto dto);
 
+
+  YuBaoReportDataVo findYubaoReportData(Page<AccountReportVo> page, GameRWDataReportDto dto);
+
   GameDividendDataVo findDividendtDataReport(GameRWDataReportDto dto);
 
   PageDtoVO<AccountReportVo> findAccountReport(Page<AccountReportVo> page, GameRWDataReportDto dto);
@@ -26,4 +29,6 @@ public interface DataReportService {
   List<ThreeRechReportVo> findThreeRech(GameRWDataReportDto dto);
 
   GameProxyDataVo findProxyData(GameRWDataReportDto dto);
+
+  PageDtoVO<GameRWDataVo> findRwData(Page<GameRWDataVo> page, GameRWDataReportDto dto);
 }

@@ -583,7 +583,14 @@
         info.rebate rebate,
         a.amount amount,
         m.create_time regTime
-        from (SELECT
+        from (
+
+        select b.amount,
+        b.account,
+        b.parent_account,
+        b.member_id
+        from (
+        SELECT
         <if test="dto.type != null">
             <if test="dto.type == 1">
                 sum( first_rech_money ) amount,
@@ -634,7 +641,7 @@
                 </if>
             </if>
         </where>
-        GROUP BY account
+        GROUP BY account) b where b.amount > 0
         <if test="dto.current != null">
             limit #{dto.current},#{dto.size}
         </if>
@@ -649,7 +656,21 @@
         count(a.account)
         from (
         SELECT
-        account
+        account,
+        <if test="type != null">
+            <if test="type == 1">
+                sum( first_rech_money ) amount
+            </if>
+            <if test="type == 2">
+                (sum( bank_money + online_money + hand_rech_money ) - sum( first_rech_money )) amount
+            </if>
+            <if test="type == 3">
+                sum( first_withdraw_money ) amount
+            </if>
+            <if test="type == 4">
+                sum( withdraw_money + hand_withdraw_money - first_withdraw_money ) amount
+            </if>
+        </if>
         FROM
         member_rw_report
         <where>
@@ -670,6 +691,6 @@
             <include refid="whereSql"/>
         </where>
         GROUP BY account
-        ) a
+        ) a where a.amount > 0
     </select>
 </mapper>

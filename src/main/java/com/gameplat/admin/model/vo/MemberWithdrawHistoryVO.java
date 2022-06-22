@@ -73,4 +73,6 @@ public class MemberWithdrawHistoryVO {
   private String acceptAccount;
 
   private Date acceptTime;
+
+  private String currencyProtocol;
 }

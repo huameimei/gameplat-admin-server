@@ -23,10 +23,7 @@ import com.gameplat.basepay.pay.bean.NameValuePair;
 import com.gameplat.basepay.proxypay.thirdparty.ProxyCallbackContext;
 import com.gameplat.basepay.proxypay.thirdparty.ProxyDispatchContext;
 import com.gameplat.basepay.proxypay.thirdparty.ProxyPayBackResult;
-import com.gameplat.common.enums.BooleanEnum;
-import com.gameplat.common.enums.SwitchStatusEnum;
-import com.gameplat.common.enums.UserTypes;
-import com.gameplat.common.enums.WithdrawStatus;
+import com.gameplat.common.enums.*;
 import com.gameplat.common.model.bean.limit.MemberRechargeLimit;
 import com.gameplat.model.entity.member.Member;
 import com.gameplat.model.entity.member.MemberInfo;
@@ -45,7 +42,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -170,8 +166,14 @@ public class ProxyPayServiceImpl implements ProxyPayService {
 
     // 封装第三方代付接口调用信息
     ProxyDispatchContext context = new ProxyDispatchContext();
+    MemberRechargeLimit rechargeLimit = this.limitInfoService.get(LimitEnums.MEMBER_RECHARGE_LIMIT);
+    String callbackDomain = rechargeLimit.getCallbackDomain();
+    String domain = StringUtils.isNotEmpty(callbackDomain) ? callbackDomain : asyncCallbackUrl;
+    if(!domain.endsWith("/")){
+      domain += "/";
+    }
     String asyncUrl =
-        asyncCallbackUrl + "/api/admin/finance/asyncCallback/onlineProxyPayAsyncCallback";
+            domain + "api/internal/admin/finance/asyncCallback/onlineProxyPayAsyncCallback";
     context.setAsyncCallbackUrl(asyncUrl + "/" + memberWithdraw.getCashOrderNo());
     context.setSysPath(sysPath);
     // 设置第三方接口信息
@@ -206,8 +208,7 @@ public class ProxyPayServiceImpl implements ProxyPayService {
     if (!Objects.equals(ProxyPayStatusEnum.PAY_SUCCESS.getName(), result.getData())) {
       throw new ServiceException("请求代付失败！！！请立即联系第三方核实再出款！！！");
     }
-    /*Result<ProxyPayBackResult> result = JSONUtil.toBean(resultStr, Result.class);
-    if (!result.isSucceed() || 0 != result.getCode()) {
+    /*if (!result.isSucceed() || 0 != result.getCode()) {
       throw new ServiceException("请求代付返回结果提示:" + result.getMessage() + "！！！请立即联系第三方核实再出款！！！");
     }
     ProxyPayBackResult proxyPayBackResult = result.getData();
@@ -308,8 +309,9 @@ public class ProxyPayServiceImpl implements ProxyPayService {
             proxyCallbackContext, beanName, memberWithdraw.getPpInterfaceName());
     Result<ProxyPayBackResult> result = JSONUtil.toBean(resultStr, Result.class);
     log.info("代付查询请求中心响应{}", result);
-    if (!result.isSucceed() || 200 != result.getCode()) {
-      throw new ServiceException("第三方代付异步回调异常:" + result.getMessage() + "！！！请立即联系第三方核实再出款！！！");
+    ProxyPayBackResult proxyPayBackResult = JSONObject.parseObject(JSONObject.toJSONString(result.getData()), ProxyPayBackResult.class);
+    if (!result.isSucceed() || 0 != result.getCode()) {
+      throw new ServiceException("第三方代付异步回调异常:" + proxyPayBackResult.getMessage() + "！！！请立即联系第三方核实再出款！！！");
     }
     if (memberWithdraw.getCashStatus() == WithdrawStatus.CANCELLED.getValue()
         || memberWithdraw.getCashStatus() == WithdrawStatus.REFUSE.getValue()
@@ -320,8 +322,8 @@ public class ProxyPayServiceImpl implements ProxyPayService {
           "第三方出款订单"
               + memberWithdraw.getCashOrderNo()
               + "已经被处理了,响应第三方需要的信息:"
-              + result.getData().getResponseMsg());
-      return result.getData().getResponseMsg();
+              + proxyPayBackResult.getResponseMsg());
+      return proxyPayBackResult.getResponseMsg();
     }
 
     Member info = memberService.getById(memberWithdraw.getMemberId());

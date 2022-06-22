@@ -1,5 +1,7 @@
 package com.gameplat.admin.service.impl;
 
+import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.util.RandomUtil;
 import com.alicp.jetcache.anno.CacheInvalidate;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
@@ -16,6 +18,7 @@ import com.gameplat.common.constant.CachedKeys;
 import com.gameplat.common.enums.DefaultEnums;
 import com.gameplat.common.enums.DictDataEnum;
 import com.gameplat.common.enums.DictTypeEnum;
+import com.gameplat.common.util.Convert;
 import com.gameplat.model.entity.AgentContacaConfig;
 import com.gameplat.model.entity.sys.SysDictData;
 import lombok.extern.slf4j.Slf4j;
@@ -24,8 +27,8 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -64,26 +67,32 @@ public class SystemConfigServiceImpl implements SystemConfigService {
         }
       }
       if (!flag) {
-        agentContacaConfig.setId(IdWorker.getId());
+        long id = System.currentTimeMillis();
+        agentContacaConfig.setId(id);
         agentContacaConfig.setCreateBy(GlobalContextHolder.getContext().getUsername());
         agentContacaConfig.setCreateTime(String.valueOf(System.currentTimeMillis()));
         list.add(agentContacaConfig);
       }
-
-      // 修改
-      dictDataService.updateDictData(
-          OperDictDataDTO.builder()
-              .id(dictData.getId())
-              .dictLabel(dictData.getDictLabel())
-              .dictType(dictData.getDictType())
-              .dictValue(JsonUtils.toJson(list))
-              .build());
+    } else {
+      long id = System.currentTimeMillis();
+      agentContacaConfig.setId(id);
+      agentContacaConfig.setCreateBy(GlobalContextHolder.getContext().getUsername());
+      agentContacaConfig.setCreateTime(String.valueOf(System.currentTimeMillis()));
+      list.add(agentContacaConfig);
     }
+
+    // 修改
+    dictDataService.updateDictData(
+            OperDictDataDTO.builder()
+                    .id(dictData.getId())
+                    .dictLabel(dictData.getDictLabel())
+                    .dictType(dictData.getDictType())
+                    .dictValue(JsonUtils.toJson(list))
+                    .build());
   }
 
   @Override
-  public void delAgentContact(Long id) {
-    List<AgentContacaConfig> list = new ArrayList<>();
+  public void delAgentContact(String id) {
 
     SysDictData dictData =
         dictDataService.getDictData(
@@ -95,11 +104,10 @@ public class SystemConfigServiceImpl implements SystemConfigService {
             .map(c -> JsonUtils.parse(c, new TypeReference<List<AgentContacaConfig>>() {}))
             .orElse(Collections.emptyList());
     if (CollectionUtils.isNotEmpty(contactList)) {
-      for (AgentContacaConfig config : contactList) {
-        if (!config.getId().equals(id)) {
-          list.add(config);
-        }
-      }
+      log.info("删除前的数据大小：{}，删除id：{}", contactList.size(), id);
+      List<AgentContacaConfig> list =
+              contactList.stream().filter(ex -> !Convert.toStr(ex.getId()).equals(id)).collect(Collectors.toList());
+      log.info("删除后的数据大小：{}，删除id：{}", list.size(), id);
       dictDataService.updateDictData(
           OperDictDataDTO.builder()
               .id(dictData.getId())

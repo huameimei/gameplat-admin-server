@@ -98,7 +98,7 @@
 
     <update id="updateShowPosition">
         update sys_float_type
-    SET show_position = #{showPosition}
+        SET show_position = #{showPosition}
         where os_type = 'mobile'
     </update>
 </mapper>

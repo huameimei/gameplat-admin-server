@@ -215,8 +215,7 @@ public class SysSettingController {
   }
 
   @Operation(summary = "广场开关")
-  @PostMapping("/updateSquareSwitch")
-  @CacheEvict(cacheNames = Constants.TENANT_SQUARE_SWITCH, allEntries = true)
+  @RequestMapping(value = "/updateSquareSwitch", method = {RequestMethod.GET, RequestMethod.POST})
   public void updateSquareSwitch(SysSettingVO tenantSetting) {
     tenantSetting.setSettingType(Constants.SYSTEM_SETTING);
     tenantSetting.setSettingCode(Constants.SQUARE_SWITCH);

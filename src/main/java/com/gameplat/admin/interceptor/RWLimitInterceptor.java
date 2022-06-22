@@ -54,12 +54,16 @@ public class RWLimitInterceptor implements HandlerInterceptor {
     //判断是否是充值谷歌限制
     if (request.getRequestURI().contains(RECH_URIL) || request.getRequestURI().contains(RECH_BATCH_URIL)) {
       MemberRechargeLimit memberRechargeLimit = limitService.get(LimitEnums.MEMBER_RECHARGE_LIMIT);
-      checkCaptchaCode(memberRechargeLimit.getRechGooGleLimit(), request);
+      if (ObjectUtil.isNotEmpty(memberRechargeLimit.getRechGooGleLimit())) {
+        checkCaptchaCode(memberRechargeLimit.getRechGooGleLimit(), request);
+      }
     } else {
       //判断是否是提现谷歌限制
       if (rwLimitVerify(request)) {
         MemberWithdrawLimit memberWithdrawLimit = limitService.get(LimitEnums.MEMBER_WITHDRAW_LIMIT);
-        checkCaptchaCode(memberWithdrawLimit.getWithGooGleLimit(), request);
+        if (ObjectUtil.isNotEmpty(memberWithdrawLimit.getWithGooGleLimit())) {
+          checkCaptchaCode(memberWithdrawLimit.getWithGooGleLimit(), request);
+        }
       }
     }
     return true;

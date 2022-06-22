@@ -37,7 +37,7 @@ public class OpenBannerController {
   @PreAuthorize("hasAuthority('system:banner:view')")
   public IPage<SysBannerInfoVO> list(
       @Parameter(hidden = true) PageDTO<SysBannerInfo> page, Integer type) {
-    return sysBannerInfoService.list(page, LocaleContextHolder.getLocale().toLanguageTag(), type);
+    return sysBannerInfoService.list(page, "zh-CN", type);
   }
 
   @Operation(summary = "新增banner")

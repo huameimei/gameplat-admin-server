@@ -11,7 +11,7 @@ public interface SystemConfigService {
 
   void updateAgentContact(AgentContactDTO agentContacaDTO);
 
-  void delAgentContact(Long id);
+  void delAgentContact(String id);
 
   List<SysDictData> findList(String dictType);
 

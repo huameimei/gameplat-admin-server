@@ -314,11 +314,12 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
   @Override
   public void resetPassword(MemberPwdUpdateDTO dto) {
     Member member = this.getById(dto.getId());
-    String password = passwordService.encode(dto.getPassword(), member.getAccount());
+    String password = passwordService.encode(dto.getPassword(), member.getAccount().toLowerCase());
 
     Assert.isTrue(
         this.lambdaUpdate()
             .set(Member::getPassword, password)
+                .set(Member::getRegisterType, MemberEnums.RegisterType.ONLINE.value())
             .eq(Member::getId, member.getId())
             .update(new Member()),
         "重置会员密码失败!");

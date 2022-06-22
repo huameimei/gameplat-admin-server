@@ -111,5 +111,7 @@ public interface DataReportMapper extends BaseMapper<GameRechDataReportVO> {
 
   Page<GameRWDataVo> findRwData(Page<GameRWDataVo> page, @Param("dto") GameRWDataReportDto dto);
 
+  List<GameRWDataVo> findRechWithData(@Param("dto") GameRWDataReportDto dto);
+
   Integer findRwDataNum(GameRWDataReportDto dto);
 }

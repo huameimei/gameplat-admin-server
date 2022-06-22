@@ -37,8 +37,4 @@ public class GameRWDataReportDto implements Serializable {
   @Schema(description = "起始下标")
   private Integer size;
 
-  private Integer getCurrent() {
-    return (this.current - 1) * size;
-  }
-
 }

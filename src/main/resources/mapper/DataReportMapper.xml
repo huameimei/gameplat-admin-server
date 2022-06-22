@@ -560,6 +560,90 @@
     </select>
 
 
+    <select id="findRechWithData" parameterType="com.gameplat.admin.model.dto.GameRWDataReportDto"
+            resultType="com.gameplat.admin.model.vo.GameRWDataVo">
+
+        select
+        a.account account,
+        m.real_name realName,
+        le.level_name levelName,
+        a.parent_account parentName,
+        (
+        CASE
+        m.user_type
+        WHEN 'M' THEN
+        CONCAT(m.agent_level,"级会员")
+        WHEN 'A' THEN
+        CONCAT(m.agent_level,"级代理")
+        ELSE CONCAT(m.agent_level,"级推广")
+        END
+        ) agentLevel,
+        m.`status` state,
+        info.limit_lot_flag limitLotFlag,
+        info.rebate rebate,
+        a.amount amount,
+        m.create_time regTime
+        from (SELECT
+        <if test="dto.type != null">
+            <if test="dto.type == 1">
+                sum( first_rech_money ) amount,
+            </if>
+            <if test="dto.type == 2">
+                (sum( bank_money + online_money + hand_rech_money ) - sum( first_rech_money )) amount,
+            </if>
+            <if test="dto.type == 3">
+                sum( first_withdraw_money ) amount,
+            </if>
+            <if test="dto.type == 4">
+                sum( withdraw_money + hand_withdraw_money - first_withdraw_money ) amount,
+            </if>
+        </if>
+        account,
+        parent_account,
+        member_id
+        FROM
+        member_rw_report
+        <where>
+            stat_time BETWEEN #{dto.startTime} and #{dto.endTime}
+            <if test="dto.account != null and dto.account != ''">
+                and account = #{dto.account}
+            </if>
+            <if test="dto.superAccount != null and dto.superAccount != null">
+                <choose>
+                    <when test="dto.flag != null and dto.flag == 1">
+                        AND parent_account = #{dto.superAccount}
+                    </when>
+                    <otherwise>
+                        AND super_path like concat('%',#{dto.superAccount},'%')
+                    </otherwise>
+                </choose>
+            </if>
+
+            <if test="dto.type != null">
+                <if test="dto.type == 1">
+                    and first_rech_money > 0
+                </if>
+                <if test="dto.type == 2">
+                    and (bank_money > 0 or online_money > 0 or hand_rech_money> 0)
+                </if>
+                <if test="dto.type == 3">
+                    and first_withdraw_money > 0
+                </if>
+                <if test="dto.type == 4">
+                    and (withdraw_money > 0 or hand_withdraw_money > 0)
+                </if>
+            </if>
+        </where>
+        GROUP BY account
+        <if test="dto.current != null">
+            limit #{dto.current},#{dto.size}
+        </if>
+        ) a LEFT JOIN member m on a.account = m.account
+        LEFT JOIN member_info info on a.member_id = info.member_id
+        LEFT JOIN member_level le on m.user_level = le.level_value
+    </select>
+
+
     <select id="findRwDataNum" parameterType="com.gameplat.admin.model.dto.GameRWDataReportDto" resultType="integer">
         select
         count(a.account)

@@ -20,7 +20,6 @@
         FROM
             member_rw_report
             <where>
-                (bank_money > 0 or online_money > 0 or hand_rech_money > 0)
                 <include refid="whereSql" />
             </where>
 
@@ -133,7 +132,6 @@
         FROM
         member_rw_report
         <where>
-            (withdraw_money>0 or hand_withdraw_money > 0)
             <include refid="whereSql" />
         </where>
     </select>

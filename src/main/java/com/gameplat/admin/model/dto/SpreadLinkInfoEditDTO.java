@@ -36,4 +36,9 @@ public class SpreadLinkInfoEditDTO {
   private BigDecimal discountAmount;
 
   private Integer isOpenDividePreset;
+
+  /**
+   * 专属域名地址
+   */
+  private String sourceDomain;
 }

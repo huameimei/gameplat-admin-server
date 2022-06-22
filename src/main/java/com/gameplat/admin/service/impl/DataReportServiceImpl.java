@@ -341,10 +341,14 @@ public class DataReportServiceImpl extends ServiceImpl<DataReportMapper, GameRec
 
   @Override
   public PageDtoVO<GameRWDataVo> findRwData(Page<GameRWDataVo> page, GameRWDataReportDto dto) {
+    Integer current = (dto.getCurrent() - 1) * dto.getSize();
+    dto.setCurrent(current);
     Page<GameRWDataVo> rwData = dataReportMapper.findRwData(page, dto);
+    List<GameRWDataVo> list = dataReportMapper.findRechWithData(dto);
     Integer rwDataNum = dataReportMapper.findRwDataNum(dto);
     PageDtoVO<GameRWDataVo> pageDtoVO = new PageDtoVO<>();
     pageDtoVO.setPage(rwData);
+    pageDtoVO.getPage().setRecords(list);
     pageDtoVO.getPage().setTotal(rwDataNum);
     return pageDtoVO;
   }

@@ -32,10 +32,10 @@ public class GameRWDataReportDto implements Serializable {
   private String type;
 
   @Schema(description = "分页大小")
-  private Integer current = 10;
+  private Integer current;
 
   @Schema(description = "起始下标")
-  private Integer size = 1;
+  private Integer size;
 
   private Integer getCurrent() {
     return (this.current - 1) * size;

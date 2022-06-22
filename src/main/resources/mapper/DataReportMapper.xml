@@ -551,8 +551,8 @@
             </if>
         </where>
         GROUP BY account
-        <if test="dto.pageSize != null">
-            limit #{dto.pageNum},#{dto.pageSize}
+        <if test="dto.current != null">
+            limit #{dto.current},#{dto.size}
         </if>
         ) a LEFT JOIN member m on a.account = m.account
         LEFT JOIN member_info info on a.member_id = info.member_id

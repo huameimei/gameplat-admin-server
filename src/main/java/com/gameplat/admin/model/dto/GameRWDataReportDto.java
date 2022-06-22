@@ -1,5 +1,6 @@
 package com.gameplat.admin.model.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -24,4 +25,20 @@ public class GameRWDataReportDto implements Serializable {
 
   /** 结束日期 */
   private String endTime;
+
+  /**
+   * 充值提现  首次二次  1 充值首次  2 充值二次  3 提现首次  4 提现二次
+   */
+  private String type;
+
+  @Schema(description = "分页大小")
+  private Integer current = 10;
+
+  @Schema(description = "起始下标")
+  private Integer size = 1;
+
+  private Integer getCurrent() {
+    return (this.current - 1) * size;
+  }
+
 }

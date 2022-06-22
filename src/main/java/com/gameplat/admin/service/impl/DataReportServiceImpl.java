@@ -4,22 +4,15 @@ import cn.hutool.core.convert.Convert;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSON;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.mapper.DataReportMapper;
+import com.gameplat.admin.mapper.MemberInfoMapper;
 import com.gameplat.admin.model.dto.GameRWDataReportDto;
-import com.gameplat.admin.model.vo.AccountReportVo;
-import com.gameplat.admin.model.vo.GameAccountDataReportVo;
-import com.gameplat.admin.model.vo.GameBetDataReportVO;
-import com.gameplat.admin.model.vo.GameDataReportVO;
-import com.gameplat.admin.model.vo.GameDividendDataVo;
-import com.gameplat.admin.model.vo.GameProxyDataVo;
-import com.gameplat.admin.model.vo.GameRechDataReportVO;
-import com.gameplat.admin.model.vo.GameWaterDataReportVO;
-import com.gameplat.admin.model.vo.GameWithDataReportVO;
-import com.gameplat.admin.model.vo.PageDtoVO;
-import com.gameplat.admin.model.vo.ThreeRechReportVo;
+import com.gameplat.admin.model.vo.*;
 import com.gameplat.admin.service.DataReportService;
 import com.gameplat.admin.service.GameAmountControlService;
 import com.gameplat.admin.service.RechargeOrderService;
@@ -33,6 +26,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import com.gameplat.model.entity.member.MemberInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -92,6 +87,10 @@ public class DataReportServiceImpl extends ServiceImpl<DataReportMapper, GameRec
   private DataReportMapper dataReportMapper;
 
   @Autowired private GameAmountControlService gameAmountControlService;
+
+
+  @Autowired
+  private MemberInfoMapper memberInfoMapper;
 
   @Override
   public GameRechDataReportVO findRechReport(GameRWDataReportDto dto) {
@@ -233,6 +232,23 @@ public class DataReportServiceImpl extends ServiceImpl<DataReportMapper, GameRec
   }
 
   @Override
+  public YuBaoReportDataVo findYubaoReportData(
+          Page<AccountReportVo> page, GameRWDataReportDto dto) {
+    YuBaoReportDataVo vo = new YuBaoReportDataVo();
+    QueryWrapper<MemberInfo> query = Wrappers.query();
+    query.select("sum(yubao_amount) yubao_amount ");
+    query.eq(ObjectUtil.isNotEmpty(dto.getAccount()), "account", dto.getAccount());
+    query.between("date", dto.getStartTime(), dto.getEndTime());
+    MemberInfo memberInfo = this.memberInfoMapper.selectOne(query);
+    BigDecimal yubaoAmount = memberInfo.getYubaoAmount();
+    vo.setYuBaoIncome(yubaoAmount);
+    return null;
+  }
+
+
+
+
+  @Override
   public GameDividendDataVo findDividendtDataReport(GameRWDataReportDto dto) {
     GameDividendDataVo gameDividendDataVo = new GameDividendDataVo();
     // 优惠金额、彩金
@@ -321,5 +337,15 @@ public class DataReportServiceImpl extends ServiceImpl<DataReportMapper, GameRec
         });
 
     return gameProxyDataVo;
+  }
+
+  @Override
+  public PageDtoVO<GameRWDataVo> findRwData(Page<GameRWDataVo> page, GameRWDataReportDto dto) {
+    Page<GameRWDataVo> rwData = dataReportMapper.findRwData(page, dto);
+    Integer rwDataNum = dataReportMapper.findRwDataNum(dto);
+    PageDtoVO<GameRWDataVo> pageDtoVO = new PageDtoVO<>();
+    pageDtoVO.setPage(rwData);
+    pageDtoVO.getPage().setTotal(rwDataNum);
+    return pageDtoVO;
   }
 }

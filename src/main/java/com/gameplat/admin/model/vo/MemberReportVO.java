@@ -1,6 +1,6 @@
 package com.gameplat.admin.model.vo;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -12,36 +12,36 @@ public class MemberReportVO implements Serializable {
 
   private static final long serialVersionUID = 1L;
 
-  @ApiModelProperty(value = "统计月份")
+  @Schema(description = "统计月份")
   private String countMonth;
 
-  @ApiModelProperty(value = "父级ID")
+  @Schema(description = "父级ID")
   private Long parentId;
 
-  @ApiModelProperty(value = "父级账号")
+  @Schema(description = "父级账号")
   private String parentName;
 
-  @ApiModelProperty(value = "账号ID")
+  @Schema(description = "账号ID")
   private Long userId;
 
-  @ApiModelProperty(value = "账号")
+  @Schema(description = "账号")
   private String userName;
 
-  @ApiModelProperty(value = "代理结构")
+  @Schema(description = "代理结构")
   private String agentPath;
 
-  @ApiModelProperty(value = "充值金额")
+  @Schema(description = "充值金额")
   private BigDecimal rechargeAmount;
 
-  @ApiModelProperty(value = "有效投注金额")
+  @Schema(description = "有效投注金额")
   private BigDecimal validAmount;
 
-  @ApiModelProperty(value = "返水")
+  @Schema(description = "返水")
   private BigDecimal rebateAmount;
 
-  @ApiModelProperty(value = "红利")
+  @Schema(description = "红利")
   private BigDecimal dividendAmount;
 
-  @ApiModelProperty(value = "是否有效：1有效会员 0无效会员")
+  @Schema(description = "是否有效：1有效会员 0无效会员")
   private Integer efficient;
 }

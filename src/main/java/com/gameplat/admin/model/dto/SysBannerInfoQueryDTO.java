@@ -1,6 +1,6 @@
 package com.gameplat.admin.model.dto;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -14,6 +14,6 @@ import java.io.Serializable;
 public class SysBannerInfoQueryDTO implements Serializable {
 
   /** 语种 */
-  @ApiModelProperty("语种")
+  @Schema(description = "语种")
   private String language;
 }

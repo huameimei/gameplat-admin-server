@@ -1,6 +1,6 @@
 package com.gameplat.admin.model.vo;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -10,40 +10,40 @@ import java.util.Date;
 @Data
 public class SpreadUnionVO implements Serializable {
 
-  @ApiModelProperty(value = "主键")
+  @Schema(description = "主键")
   private Long id;
 
-  @ApiModelProperty(value = "联盟名称")
+  @Schema(description = "联盟名称")
   private String unionName;
 
-  @ApiModelProperty(value = "代理账号")
+  @Schema(description = "代理账号")
   private String agentAccount;
 
-  @ApiModelProperty(value = "渠道类型")
+  @Schema(description = "渠道类型")
   private String channel;
 
-  @ApiModelProperty(value = "代理等级")
+  @Schema(description = "代理等级")
   private Integer agentLevel;
 
-  @ApiModelProperty(value = "创建时间")
+  @Schema(description = "创建时间")
   private Date createTime;
 
-  @ApiModelProperty(value = "更新时间")
+  @Schema(description = "更新时间")
   private Date updateTime;
 
-  @ApiModelProperty(value = "创建人")
+  @Schema(description = "创建人")
   private String createBy;
 
-  @ApiModelProperty(value = "更新人")
+  @Schema(description = "更新人")
   private String updateBy;
 
-  @ApiModelProperty(value = "联运收益")
+  @Schema(description = "联运收益")
   private BigDecimal income;
 
-  @ApiModelProperty(value = "充值金额")
+  @Schema(description = "充值金额")
   private BigDecimal rechargeAmount;
 
-  @ApiModelProperty(value = "提现金额")
+  @Schema(description = "提现金额")
   private BigDecimal withdrawAmount;
 
   private Integer count;

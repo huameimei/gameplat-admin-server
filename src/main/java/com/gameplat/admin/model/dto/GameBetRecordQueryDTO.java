@@ -1,9 +1,8 @@
 package com.gameplat.admin.model.dto;
 
-import java.io.Serializable;
-
-import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+
+import java.io.Serializable;
 
 @Data
 public class GameBetRecordQueryDTO implements Serializable {

@@ -405,5 +405,33 @@
         where validAmount >= #{minBetAmount}
     </select>
 
+    <!--获取达到有效投注金额的会员账号-->
+    <select id="getWealVipValid" resultType="java.lang.String">
+        select st.account from member_growth_statis as st
+        left join (
+        SELECT
+        s.account userName,
+        sum( m.valid_amount ) validAmount
+        FROM game_bet_daily_report as m inner join member as s on s.id = m.member_id
+        <where>
+            <if test="startTime != null and startTime != ''">
+                AND m.stat_time &gt;= #{startTime}
+            </if>
+            <if test="endTime != null and endTime != ''">
+                AND m.stat_time &lt;= #{endTime}
+            </if>
+        </where>
+        GROUP BY s.account
+        ) as t on t.userName = st.account
+        inner join member_growth_level le on le.`level` = st.`vip_level`
+        where 1 = 1
+        <if test="type == 1">
+            and ifnull(t.validAmount,0) >= le.week_valid
+        </if>
+        <if test="type == 2">
+            and ifnull(t.validAmount,0) >= le.month_valid
+        </if>
+    </select>
+
 
 </mapper>

@@ -1,7 +1,6 @@
 package com.gameplat.admin.model.dto;
 
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import javax.validation.constraints.NotNull;
@@ -15,52 +14,63 @@ import java.util.Date;
  * @date 2021/11/21
  */
 @Data
-@ApiModel(value = "修改VIP等级入参", description = "修改VIP等级入参")
 public class MemberGrowthLevelEditDto implements Serializable {
 
-  @ApiModelProperty(value = "主键", name = "id", required = true)
+  @Schema(description = "主键", name = "id", required = true)
   @NotNull(message = "编号不能为空")
   private Long id;
 
-  @ApiModelProperty(value = "等级", required = false)
+  @Schema(description = "等级", required = false)
   private Integer level;
 
-  @ApiModelProperty(value = "等级名称", required = false)
+  @Schema(description = "等级名称", required = false)
   private String levelName;
 
-  @ApiModelProperty(value = "晋升下级所需成长值", required = false)
+  @Schema(description = "晋升下级所需成长值", required = false)
   private Long growth;
 
-  @ApiModelProperty(value = "保级成长值", required = false)
+  @Schema(description = "保级成长值", required = false)
   private Long limitGrowth;
 
-  @ApiModelProperty(value = "每日金币上限", required = false)
+  @Schema(description = "每日金币上限", required = false)
   private Integer dailyMaxCoin;
 
-  @ApiModelProperty(value = "借呗额度", required = false)
+  @Schema(description = "借呗额度", required = false)
   private BigDecimal loanMoney;
 
-  @ApiModelProperty(value = "升级奖励", required = false)
+  @Schema(description = "升级奖励", required = false)
   private BigDecimal upReward;
 
-  @ApiModelProperty(value = "周俸禄", required = false)
+  @Schema(description = "周俸禄", required = false)
   private BigDecimal weekWage;
 
-  @ApiModelProperty(value = "月俸禄", required = false)
+  @Schema(description = "周俸禄充值限制", required = false)
+  private BigDecimal weekRecharge;
+
+  @Schema(description = "周俸禄有效投注限制", required = false)
+  private BigDecimal weekValid;
+
+  @Schema(description = "月俸禄", required = false)
   private BigDecimal monthWage;
 
-  @ApiModelProperty(value = "生日礼金", required = false)
+  @Schema(description = "月俸禄充值限制", required = false)
+  private BigDecimal monthRecharge;
+
+  @Schema(description = "月俸禄有效投注限制", required = false)
+  private BigDecimal monthValid;
+
+  @Schema(description = "生日礼金", required = false)
   private BigDecimal birthGiftMoney;
 
-  @ApiModelProperty(value = "每月红包", required = false)
+  @Schema(description = "每月红包", required = false)
   private BigDecimal redEnvelope;
 
-  @ApiModelProperty(value = "更新人", required = false)
+  @Schema(description = "更新人", required = false)
   private String updateBy;
 
-  @ApiModelProperty(value = "更新时间", required = false)
+  @Schema(description = "更新时间", required = false)
   private Date updateTime;
 
-  @ApiModelProperty(value = "语言", required = false)
+  @Schema(description = "语言", required = false)
   private String language;
 }

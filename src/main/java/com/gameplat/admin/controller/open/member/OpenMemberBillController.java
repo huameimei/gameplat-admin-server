@@ -9,8 +9,8 @@ import com.gameplat.admin.model.vo.MemberBillVO;
 import com.gameplat.admin.service.MemberBillService;
 import com.gameplat.common.model.bean.TranTypeBean;
 import com.gameplat.model.entity.member.MemberBill;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -29,7 +29,7 @@ import java.util.List;
  *
  * @author lily
  */
-@Api(tags = "现金流水")
+@Tag(name = "现金流水")
 @Slf4j
 @RestController
 @RequestMapping("/api/admin/funds/cash")
@@ -37,7 +37,7 @@ public class OpenMemberBillController {
 
   @Autowired private MemberBillService memberBillService;
 
-  @ApiOperation("现金流水")
+  @Operation(summary = "现金流水")
   @GetMapping("/pageList")
   @PreAuthorize("hasAuthority('funds:cash:view')")
   public IPage<MemberBillVO> queryPage(PageDTO<MemberBill> page, MemberBillDTO dto) {
@@ -46,7 +46,7 @@ public class OpenMemberBillController {
 
   @SneakyThrows
   @GetMapping(value = "/exportBill", produces = "application/vnd.ms-excel")
-  @ApiOperation("导出现金流水列表")
+  @Operation(summary = "导出现金流水列表")
   @PreAuthorize("hasAuthority('funds:cash:export')")
   public void exportSign(MemberBillDTO dto, HttpServletResponse response) {
     List<MemberBillVO> list = memberBillService.queryList(dto);
@@ -58,7 +58,7 @@ public class OpenMemberBillController {
   }
 
   @GetMapping("/tranTypes")
-  @ApiOperation("账变类型")
+  @Operation(summary = "账变类型")
   public List<TranTypeBean> findTranTypes() {
     return memberBillService.findTranTypes();
   }

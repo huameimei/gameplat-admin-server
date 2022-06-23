@@ -96,6 +96,7 @@ public class IdempotentKeyUtils {
    * @param str String
    * @return String
    */
+  @Deprecated
   public static String md5(String str) {
     StringBuilder stringBuilder = new StringBuilder();
     try {

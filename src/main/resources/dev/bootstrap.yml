@@ -3,6 +3,13 @@ spring:
     name: admin-server
   profiles:
     active: @profiles.active@
+  websocket:
+    strategy: redis
+    endpoint: /websocket
+    broker: /topic1,/user
+    heartbeat: 10000,10000
+    userDestinationPrefix: /user
+    applicationDestinationPrefixes: /app
   cloud:
     nacos:
       config:
@@ -14,7 +21,17 @@ spring:
         namespace: dev
         group: SERVICE_GROUP
         refresh-enabled: true
-        shared-dataids: redis.yml,spring-kafka-log.yml,spring-kafka-producer-config.yml,elasticsearch.yml
+        shared-configs:
+          - data-id: redis.yml
+            refresh: true
+          - data-id: injection-http-firewall.yml
+            refresh: true
+          - data-id: spring-kafka-log.yml
+            refresh: true
+          - data-id: spring-kafka-producer-config.yml
+            refresh: true
+          - data-id: elasticsearch.yml
+            refresh: true
       discovery:
         service: ${USERDOMAIN:gameplat}-admin-server
         namespace: ${spring.cloud.nacos.config.namespace}

@@ -47,20 +47,28 @@ public class GameAmountControlServiceImpl
         this.lambdaQuery()
             .eq(GameAmountControl::getType, GameAmountControlTypeEnum.LIVE.type())
             .one();
-    BigDecimal percentBigDecimal =
-        gameAmountControl
-            .getUseAmount()
-            .divide(gameAmountControl.getAmount(), 4, BigDecimal.ROUND_HALF_UP);
-    if (percentBigDecimal
-            .multiply(new BigDecimal("100"))
-            .compareTo(new BigDecimal(gameAmountControl.getThreshold()))
-        >= 0) {
-      gameAmountNotifyVO.setAmount(gameAmountControl.getAmount());
-      gameAmountNotifyVO.setUseAmount(gameAmountControl.getUseAmount());
-      NumberFormat percent = NumberFormat.getPercentInstance();
-      percent.setMaximumFractionDigits(4);
-      gameAmountNotifyVO.setPercent(percent.format(percentBigDecimal.doubleValue()));
+    if (gameAmountControl == null) {
+      gameAmountNotifyVO.setAmount(BigDecimal.ZERO);
+      gameAmountNotifyVO.setUseAmount(BigDecimal.ZERO);
+      gameAmountNotifyVO.setPercent("0");
       return gameAmountNotifyVO;
+    }
+    // 下发当日输掉的先减掉
+    BigDecimal sum = gameAmountControl.getUseAmount().subtract(gameAmountControl.getStartAmount());
+    if (sum.compareTo(BigDecimal.ZERO) >= 0) {
+      BigDecimal percentBigDecimal =
+          sum.divide(gameAmountControl.getAmount(), 4, BigDecimal.ROUND_HALF_UP);
+      if (percentBigDecimal
+              .multiply(new BigDecimal("100"))
+              .compareTo(new BigDecimal(gameAmountControl.getThreshold()))
+          >= 0) {
+        gameAmountNotifyVO.setAmount(gameAmountControl.getAmount());
+        gameAmountNotifyVO.setUseAmount(gameAmountControl.getUseAmount());
+        NumberFormat percent = NumberFormat.getPercentInstance();
+        percent.setMaximumFractionDigits(4);
+        gameAmountNotifyVO.setPercent(percent.format(percentBigDecimal.doubleValue()));
+        return gameAmountNotifyVO;
+      }
     }
     return null;
   }

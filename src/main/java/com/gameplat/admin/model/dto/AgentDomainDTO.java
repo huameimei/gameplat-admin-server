@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.gameplat.security.SecurityUserHolder;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.util.Date;
@@ -30,7 +30,7 @@ public class AgentDomainDTO {
   private Integer status;
 
   @TableField(fill = FieldFill.INSERT)
-  @ApiModelProperty(value = "创建者")
+  @Schema(description = "创建者")
   private String createBy = SecurityUserHolder.getCredential().getUsername();
 
   /** 创建时间 */

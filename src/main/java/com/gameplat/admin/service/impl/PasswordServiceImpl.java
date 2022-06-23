@@ -5,8 +5,8 @@ import cn.hutool.crypto.asymmetric.KeyType;
 import cn.hutool.crypto.asymmetric.RSA;
 import cn.hutool.crypto.digest.MD5;
 import com.gameplat.admin.service.PasswordService;
+import com.gameplat.security.config.SecurityProperties;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -15,8 +15,7 @@ public class PasswordServiceImpl implements PasswordService {
 
   @Autowired private PasswordEncoder passwordEncoder;
 
-  @Value("${security.rsa.privateKey}")
-  private String privateKey;
+  @Autowired private SecurityProperties securityProperties;
 
   @Override
   public String encode(String password) {
@@ -32,7 +31,8 @@ public class PasswordServiceImpl implements PasswordService {
 
   @Override
   public String decrypt(String password) {
-    return new RSA(privateKey, null).decryptStr(password, KeyType.PrivateKey);
+    return new RSA(securityProperties.getPassword().getPrivateKey(), null)
+        .decryptStr(password, KeyType.PrivateKey);
   }
 
   @Override

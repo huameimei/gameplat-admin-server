@@ -1,17 +1,19 @@
 package com.gameplat.admin.controller.open.setting;
 
 import com.alibaba.fastjson.JSON;
+import com.gameplat.admin.cache.AdminCache;
 import com.gameplat.admin.model.vo.SysFloatTypeVo;
 import com.gameplat.admin.service.SysFloatTypeService;
+import com.gameplat.common.constant.CacheKey;
 import com.gameplat.model.entity.setting.SysFloatSetting;
 import com.gameplat.model.entity.setting.SysFloatType;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 系统消息
@@ -22,11 +24,14 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/admin/open/float")
 public class SysFloatTypeController {
+
+  @Autowired private AdminCache adminCache;
+
   @Autowired private SysFloatTypeService sysFloatTypeService;
 
   /** 查询游戏浮窗类型列表 */
   @GetMapping("/query")
-  @ApiOperation("游戏浮窗类型列表查询")
+  @Operation(summary = "游戏浮窗类型列表查询")
   public List<SysFloatTypeVo> list(SysFloatTypeVo sysFloatTypeVo) {
     SysFloatTypeVo sysFloatTypeVo1 = new SysFloatTypeVo();
     sysFloatTypeVo1.setOsType(sysFloatTypeVo.getOsType());
@@ -35,43 +40,42 @@ public class SysFloatTypeController {
 
   /** 新增游戏浮窗 */
   @PostMapping("/insert")
-  @ApiOperation("游戏浮窗新增")
-  @CacheEvict(cacheNames = "TENANT_FLOAT_LIST", allEntries = true)
+  @Operation(summary = "游戏浮窗新增")
   public void add(@RequestBody SysFloatSetting sysFloatSetting) {
     sysFloatTypeService.insertSysFloat(sysFloatSetting);
+    adminCache.deleteByPrefix(CacheKey.getTenantFloatPrefixKey());
   }
 
   /** 编辑游戏浮窗 */
-  // @PreAuthorize("@ss.hasPermi('kg:type:remove')")
   @PostMapping("/update")
-  @ApiOperation("游戏浮窗编辑")
-  @CacheEvict(cacheNames = "TENANT_FLOAT_LIST", allEntries = true)
+  @Operation(summary = "游戏浮窗编辑")
   public void update(@RequestBody SysFloatSetting sysFloatSetting) {
     sysFloatTypeService.updateFloat(sysFloatSetting);
+    adminCache.deleteByPrefix(CacheKey.getTenantFloatPrefixKey());
   }
 
   /** 批量编辑排序 */
-  // @PreAuthorize("@ss.hasPermi('kg:type:remove')")
   @PostMapping("/updateBatch")
-  @ApiOperation("批量编辑排序")
-  @CacheEvict(cacheNames = "TENANT_FLOAT_LIST", allEntries = true)
+  @Operation(summary = "批量编辑排序")
   public void updateBatch(@RequestBody List<SysFloatSetting> sysFloatSettings) {
     sysFloatTypeService.updateBatch(sysFloatSettings);
+    adminCache.deleteByPrefix(CacheKey.getTenantFloatPrefixKey());
   }
 
   /** 编辑游戏浮窗类型 */
   @PostMapping("/updateFloatType")
-  @ApiOperation("游戏浮窗类型编辑")
-  @CacheEvict(cacheNames = "TENANT_FLOAT_LIST", allEntries = true)
+  @Operation(summary = "游戏浮窗类型编辑")
   public void updateFloatType(@RequestBody SysFloatType sysFloatType) {
     sysFloatTypeService.updateFloatType(sysFloatType);
+    adminCache.deleteByPrefix(CacheKey.getTenantFloatPrefixKey());
   }
 
   /** 编辑游戏浮窗类型 */
   @PostMapping("/showPosition")
-  @ApiOperation("游戏浮窗类型编辑")
-  @CacheEvict(cacheNames = "TENANT_FLOAT_LIST", allEntries = true)
-  public void showPosition(@RequestBody List<String> showPositionList) {
-    sysFloatTypeService.updateShowPosition(JSON.toJSONString(showPositionList));
+  @Operation(summary = "游戏浮窗类型编辑")
+  public void showPosition(@RequestBody Map<String, List<String>> showPosition) {
+    if (showPosition != null && showPosition.get("midArr") != null) {
+      sysFloatTypeService.updateShowPosition(JSON.toJSONString(showPosition.get("midArr")));
+    }
   }
 }

@@ -1,6 +1,6 @@
 package com.gameplat.admin.model.vo;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -12,12 +12,12 @@ import java.math.BigDecimal;
 @Data
 public class ThreeRechReportVo implements Serializable {
 
-  @ApiModelProperty(value = "第三方接口编码")
+  @Schema(description = "第三方接口编码")
   private String tpInterfaceCode;
 
-  @ApiModelProperty(value = "第三方接口名称")
+  @Schema(description = "第三方接口名称")
   private String tpInterfaceName;
 
-  @ApiModelProperty(value = "充值金额")
+  @Schema(description = "充值金额")
   private BigDecimal amount;
 }

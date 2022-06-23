@@ -20,6 +20,7 @@ import com.gameplat.model.entity.member.MemberBill;
 import com.gameplat.model.entity.member.MemberWealReword;
 import com.gameplat.redis.redisson.DistributedLocker;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -46,7 +47,7 @@ public class ActivityDistributeWayService
 
   @Autowired private MemberInfoService memberInfoService;
 
-  @Autowired private ActivityQualificationService activityQualificationService;
+  @Lazy @Autowired private ActivityQualificationService activityQualificationService;
 
   @Autowired private ValidWithdrawService validWithdrawService;
 

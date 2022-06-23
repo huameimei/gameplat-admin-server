@@ -1,6 +1,6 @@
 package com.gameplat.admin.model.dto;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import javax.validation.constraints.Min;
@@ -21,15 +21,15 @@ public class ActivityBlacklistAddDTO implements Serializable {
 
   @NotNull(message = "活动ID不能为空")
   @Min(value = 1, message = "活动ID必须大于0")
-  @ApiModelProperty(value = "活动ID")
+  @Schema(description = "活动ID")
   private Long activityId;
 
   @NotBlank(message = "限制内容不能为空")
-  @ApiModelProperty(value = "限制内容")
+  @Schema(description = "限制内容")
   private String limitedContent;
 
   @NotNull(message = "限制类型不能为空")
   @Min(value = 1, message = "限制类型必须大于0")
-  @ApiModelProperty(value = "限制类型 1会员账号  2 ip地址")
+  @Schema(description = "限制类型 1会员账号  2 ip地址")
   private Integer limitedType;
 }

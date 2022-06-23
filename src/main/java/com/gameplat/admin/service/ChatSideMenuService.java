@@ -1,7 +1,6 @@
 package com.gameplat.admin.service;
 
 import com.gameplat.admin.model.vo.ChatSideMenuVO;
-import com.gameplat.common.enums.ChatConfigEnum;
 
 import java.util.List;
 
@@ -13,6 +12,4 @@ public interface ChatSideMenuService {
 
   /** 修改侧边栏 */
   void edit(String config);
-
-  String queryChatConfig(ChatConfigEnum dataEnum);
 }

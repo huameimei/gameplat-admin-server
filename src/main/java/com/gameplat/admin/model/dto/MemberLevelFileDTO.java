@@ -1,6 +1,6 @@
 package com.gameplat.admin.model.dto;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -13,6 +13,6 @@ import java.io.Serializable;
 @Data
 public class MemberLevelFileDTO implements Serializable {
 
-  @ApiModelProperty(value = "会员账号")
+  @Schema(description = "会员账号")
   private String account;
 }

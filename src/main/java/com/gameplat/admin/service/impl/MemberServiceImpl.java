@@ -26,16 +26,19 @@ import com.gameplat.base.common.util.StringUtils;
 import com.gameplat.common.constant.CachedKeys;
 import com.gameplat.common.enums.MemberEnums;
 import com.gameplat.common.enums.TransferTypesEnum;
+import com.gameplat.common.enums.UserTypes;
 import com.gameplat.common.lang.Assert;
 import com.gameplat.model.entity.game.GameTransferInfo;
 import com.gameplat.model.entity.member.Member;
 import com.gameplat.model.entity.member.MemberDayReport;
 import com.gameplat.model.entity.member.MemberInfo;
 import com.gameplat.security.SecurityUserHolder;
+import com.gameplat.security.context.UserCredential;
 import com.google.common.collect.Lists;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -68,7 +71,11 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
 
   private static final String EMAIL_REPLACEMENT = "$1****$3$4";
 
-  @Autowired private MemberMapper memberMapper;
+  private static final String ROLES = "system:member:contact:detail";
+
+
+  @Autowired(required = false)
+  private MemberMapper memberMapper;
 
   @Autowired private MemberConvert memberConvert;
 
@@ -90,9 +97,22 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
 
   @Autowired private GameAdminService gameAdminService;
 
-  @Autowired private RedisTemplate<String, Integer> redisTemplate;
+  @Autowired(required = false)
+  private RedisTemplate<String, Integer> redisTemplate;
 
   @Autowired private MemberDayReportService memberDayReportService;
+
+
+
+
+  @Override
+  public IPage<MessageDistributeVO> pageMessageDistribute(Page<Member> page, MemberQueryDTO dto) {
+    return memberMapper
+        .queryPage(page, memberQueryCondition.builderQueryWrapper(dto))
+        .convert(this::setOnlineStatus)
+        .convert(memberConvert::toVo);
+  }
+
 
   /**
    * 真实姓名
@@ -121,18 +141,12 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
     }
   }
 
-  @Override
-  public IPage<MessageDistributeVO> pageMessageDistribute(Page<Member> page, MemberQueryDTO dto) {
-    return memberMapper
-        .queryPage(page, memberQueryCondition.builderQueryWrapper(dto))
-        .convert(this::setOnlineStatus)
-        .convert(memberConvert::toVo);
-  }
 
   /** 邮箱影藏 */
   private static String getEmail(String email) {
     return email.replaceAll(EMAIL_CODE, EMAIL_REPLACEMENT);
   }
+
 
   @Override
   public List<MemberVO> queryList(MemberQueryDTO dto) {
@@ -144,8 +158,14 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
     return memberMapper.getMemberInfo(id);
   }
 
+  /**
+   * 根据id获取详情
+   *
+   * @param id
+   * @return
+   */
   @Override
-  public MemberInfoVO getMemberInfo(Long id) {
+  public MemberInfoVO getMemberDateils(Long id) {
     MemberInfoVO memberInfo = memberMapper.getMemberInfo(id);
     // 真实姓名
     if (StringUtils.isNotEmpty(memberInfo.getRealName())) {
@@ -169,6 +189,12 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
     }
 
     return memberInfo;
+  }
+
+
+  @Override
+  public MemberInfoVO getMemberInfo(Long id) {
+    return memberMapper.getMemberInfo(id);
   }
 
   @Override
@@ -288,11 +314,12 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
   @Override
   public void resetPassword(MemberPwdUpdateDTO dto) {
     Member member = this.getById(dto.getId());
-    String password = passwordService.encode(dto.getPassword(), member.getAccount());
+    String password = passwordService.encode(dto.getPassword(), member.getAccount().toLowerCase());
 
     Assert.isTrue(
         this.lambdaUpdate()
             .set(Member::getPassword, password)
+                .set(Member::getRegisterType, MemberEnums.RegisterType.ONLINE.value())
             .eq(Member::getId, member.getId())
             .update(new Member()),
         "重置会员密码失败!");
@@ -656,14 +683,37 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
       return;
     }
 
-    List<String> accounts = list.stream().map(MemberVO::getAccount).collect(Collectors.toList());
-    List<MemberDayReport> dayReports = this.getGameData(accounts);
-    if (CollUtil.isEmpty(dayReports)) {
-      return;
+    UserCredential credential = SecurityUserHolder.getCredential();
+    Collection<? extends GrantedAuthority> authorities = credential.getAuthorities();
+    boolean flag = false;
+    if (ObjectUtil.isEmpty(
+            authorities.stream()
+                    .filter(
+                            ex ->
+                                    ex.getAuthority().equalsIgnoreCase(ROLES)
+                                            || UserTypes.ADMIN.value().equals(credential.getUserType()))
+                    .collect(Collectors.toList()))) {
+      flag = true;
     }
 
+    List<String> accounts = list.stream().map(MemberVO::getAccount).collect(Collectors.toList());
+    List<MemberDayReport> dayReports = this.getGameData(accounts);
+    boolean finalFlag = flag;
     list.forEach(
         a -> {
+          if (finalFlag && ObjectUtil.isNotNull(a.getRealName())) {
+            a.setRealName(hideRealName(a.getRealName()));
+          }
+
+          if (ObjectUtil.isNull(
+                  authorities.stream()
+                          .filter(ex -> ex.getAuthority().equals(ROLES))
+                          .collect(Collectors.toList()))) {
+            a.setRealName(hideRealName(a.getRealName()));
+          }
+          if (CollUtil.isEmpty(dayReports)) {
+            return;
+          }
           BigDecimal winAmount =
               dayReports.stream()
                   .filter(b -> a.getAccount().equalsIgnoreCase(b.getUserName()))
@@ -696,7 +746,7 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
    * @return String
    */
   private String getMemberRoot(String userType) {
-    return MemberEnums.Type.TEST.match(userType)
+    return MemberEnums.Type.TEST.match(userType) || MemberEnums.Type.PROMOTION.match(userType)
         ? SystemConstant.DEFAULT_TEST_ROOT
         : SystemConstant.DEFAULT_WEB_ROOT;
   }

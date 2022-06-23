@@ -3,7 +3,7 @@ package com.gameplat.admin.model.dto;
 import com.gameplat.admin.model.vo.FissionConfigLevelVo;
 import com.gameplat.admin.model.vo.FissionDivideConfigVo;
 import com.gameplat.admin.model.vo.GameDivideVo;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -21,57 +21,57 @@ import java.util.Map;
 @NoArgsConstructor
 public class DivideConfigDTO {
 
-  @ApiModelProperty(value = "修改的分红参数")
+  @Schema(description = "修改的分红参数")
   Map<String, List<GameDivideVo>> ownerConfigMap;
 
-  @ApiModelProperty(value = "修改的分红参数")
+  @Schema(description = "修改的分红参数")
   Map<String, List<GameDivideVo>> ownerFixConfigMap;
 
-  @ApiModelProperty(value = "修改的裂变模式分红map参数")
+  @Schema(description = "修改的裂变模式分红map参数")
   Map<String, List<FissionDivideConfigVo>> ownerFissionConfigMap;
 
-  @ApiModelProperty(value = "编号")
+  @Schema(description = "编号")
   private Long id;
 
-  @ApiModelProperty(value = "代理ID")
+  @Schema(description = "代理ID")
   private Long userId;
 
-  @ApiModelProperty(value = "代理账号")
+  @Schema(description = "代理账号")
   private String userName;
 
-  @ApiModelProperty(value = "代理账号")
+  @Schema(description = "代理账号")
   private String agentName;
 
-  @ApiModelProperty(value = "上级账号")
+  @Schema(description = "上级账号")
   private String parentName;
 
-  @ApiModelProperty(value = "分红配置")
+  @Schema(description = "分红配置")
   private String divideConfig;
 
-  @ApiModelProperty(value = "创建时间")
+  @Schema(description = "创建时间")
   private Date createTime;
 
-  @ApiModelProperty(value = "创建人")
+  @Schema(description = "创建人")
   private String createBy;
 
-  @ApiModelProperty(value = "更新时间")
+  @Schema(description = "更新时间")
   private Date updateTime;
 
-  @ApiModelProperty(value = "更新人")
+  @Schema(description = "更新人")
   private String updateBy;
 
-  @ApiModelProperty(value = "是否只查询下级")
+  @Schema(description = "是否只查询下级")
   private Integer isOnlyQueryChild;
 
-  @ApiModelProperty(value = "查询下级属性  1 只查直属下级  2 查询所有下级")
+  @Schema(description = "查询下级属性  1 只查直属下级  2 查询所有下级")
   private Integer queryChild;
 
-  @ApiModelProperty(value = "裂变模式周期配置")
+  @Schema(description = "裂变模式周期配置")
   private List<FissionConfigLevelVo> fissionConfigLevelVos = new ArrayList<>();
 
-  @ApiModelProperty(value = "周期配置")
+  @Schema(description = "周期配置")
   private String recycleConfig;
 
-  @ApiModelProperty(value = "周期外分红点")
+  @Schema(description = "周期外分红点")
   private BigDecimal outRecycleConfig;
 }

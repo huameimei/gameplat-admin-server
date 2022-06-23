@@ -2,8 +2,7 @@ package com.gameplat.admin.model.dto;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -17,54 +16,53 @@ import java.util.Date;
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
-@ApiModel(value = "ActivityPrize对象", description = "活动奖品表")
 public class ActivityPrizeDTO implements Serializable {
 
   private static final long serialVersionUID = 1L;
 
-  @ApiModelProperty(value = "主键")
+  @Schema(description = "主键")
   @TableId(value = "id", type = IdType.AUTO)
   private Long id;
 
-  @ApiModelProperty(value = "奖品id")
+  @Schema(description = "奖品id")
   private Long activityPrizeId;
 
-  @ApiModelProperty(value = "活动id")
+  @Schema(description = "活动id")
   private Long activityId;
 
-  @ApiModelProperty(value = "活动类型（1红包雨，2转盘）")
+  @Schema(description = "活动类型（1红包雨，2转盘）")
   private Integer type;
 
-  @ApiModelProperty(value = "中奖概率")
+  @Schema(description = "中奖概率")
   private Integer prizeChance;
 
-  @ApiModelProperty(value = "奖品库存")
+  @Schema(description = "奖品库存")
   private Integer prizeRepertory;
 
-  @ApiModelProperty(value = "赠送数量")
+  @Schema(description = "赠送数量")
   private Integer giveAmount;
 
-  @ApiModelProperty(value = "一批次发放总数量")
+  @Schema(description = "一批次发放总数量")
   private Integer onceTotalNum;
 
-  @ApiModelProperty(value = "创建人")
+  @Schema(description = "创建人")
   private String createBy;
 
-  @ApiModelProperty(value = "创建时间")
+  @Schema(description = "创建时间")
   private Date createTime;
 
-  @ApiModelProperty(value = "更新人")
+  @Schema(description = "更新人")
   private String updateBy;
 
-  @ApiModelProperty(value = "更新时间")
+  @Schema(description = "更新时间")
   private Date updateTime;
 
-  @ApiModelProperty(value = "备注")
+  @Schema(description = "备注")
   private String remark;
 
-  @ApiModelProperty(value = "是否组合（0否，1是）")
+  @Schema(description = "是否组合（0否，1是）")
   private Integer isGroup;
 
-  @ApiModelProperty(value = "活动组合id")
+  @Schema(description = "活动组合id")
   private Long groupId;
 }

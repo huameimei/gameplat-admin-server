@@ -1,6 +1,6 @@
 package com.gameplat.admin.model.vo;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -12,12 +12,12 @@ public class GameWinVO implements Serializable {
 
   private static final long serialVersionUID = 1L;
 
-  @ApiModelProperty(value = "统计月份")
+  @Schema(description = "统计月份")
   private String countMonth;
 
-  @ApiModelProperty(value = "总计游戏盈利")
+  @Schema(description = "总计游戏盈利")
   private BigDecimal totalWinAmount;
 
-  @ApiModelProperty(value = "总计有效投注")
+  @Schema(description = "总计有效投注")
   private BigDecimal totalValidAmount;
 }

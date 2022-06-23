@@ -17,8 +17,8 @@ import com.gameplat.model.entity.member.MemberWithdraw;
 import com.gameplat.model.entity.pay.PpMerchant;
 import com.gameplat.redis.redisson.DistributedLocker;
 import com.gameplat.security.SecurityUserHolder;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RLock;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,8 +31,8 @@ import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
 import java.util.List;
 
-@Api(tags = "会员提现")
 @Slf4j
+@Tag(name = "会员提现")
 @RestController
 @RequestMapping("/api/admin/finance/memberWithdraw")
 public class MemberWithdrawController {
@@ -41,7 +41,7 @@ public class MemberWithdrawController {
 
   @Autowired private DistributedLocker distributedLocker;
 
-  @ApiOperation("修改提现状态")
+  @Operation(summary = "修改提现状态")
   @PostMapping("/modifyCashStatus")
   @PreAuthorize("hasAuthority('finance:memberWithdraw:modifyCashStatus')")
   @Log(
@@ -64,7 +64,7 @@ public class MemberWithdrawController {
     }
   }
 
-  @ApiOperation("批量受理")
+  @Operation(summary = "批量受理")
   @PostMapping("/batchHandle")
   @PreAuthorize("hasAuthority('finance:memberWithdraw:batchHandle')")
   @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.WITHDRAW, desc = "'批量受理订单:' + #list")
@@ -89,7 +89,7 @@ public class MemberWithdrawController {
     }
   }
 
-  @ApiOperation("批量取消")
+  @Operation(summary = "批量取消")
   @PostMapping("/batchUnHandle")
   @PreAuthorize("hasAuthority('finance:memberWithdraw:batchUnHandle')")
   @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.WITHDRAW, desc = "'批量取消受理订单:' + #list")
@@ -114,7 +114,7 @@ public class MemberWithdrawController {
     }
   }
 
-  @ApiOperation("批量出款")
+  @Operation(summary = "批量出款")
   @PostMapping("/batchWithdraw")
   @PreAuthorize("hasAuthority('finance:memberWithdraw:batchWithdraw')")
   @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.WITHDRAW, desc = "'批量出款订单:' + #list")
@@ -139,7 +139,7 @@ public class MemberWithdrawController {
     }
   }
 
-  @ApiOperation("编辑优惠")
+  @Operation(summary = "编辑优惠")
   @PostMapping("/editDiscount")
   @PreAuthorize("hasAuthority('finance:memberWithdraw:editDiscount')")
   @Log(
@@ -160,7 +160,7 @@ public class MemberWithdrawController {
     }
   }
 
-  @ApiOperation("编辑备注")
+  @Operation(summary = "编辑备注")
   @PostMapping("/editRemarks")
   @PreAuthorize("hasAuthority('finance:memberWithdraw:editRemarks')")
   @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.WITHDRAW, desc = "'修改备注为:' + #remarks")
@@ -168,21 +168,21 @@ public class MemberWithdrawController {
     userWithdrawService.updateRemarks(id, remarks);
   }
 
-  @ApiOperation("查询")
+  @Operation(summary = "查询")
   @PostMapping("/page")
   @PreAuthorize("hasAuthority('finance:memberWithdraw:view')")
   public IPage<MemberWithdrawVO> queryPage(Page<MemberWithdraw> page, MemberWithdrawQueryDTO dto) {
     return userWithdrawService.findPage(page, dto);
   }
 
-  @ApiOperation("获取可用的商户")
+  @Operation(summary = "获取可用的商户")
   @PostMapping("/queryAvailableMerchant")
   @PreAuthorize("hasAuthority('finance:memberWithdraw:queryAvailableMerchant')")
   public List<PpMerchant> queryAvailableMerchant(Long id) {
     return userWithdrawService.queryProxyMerchant(id);
   }
 
-  @ApiOperation("添加")
+  @Operation(summary = "添加")
   @PostMapping("/save")
   @PreAuthorize("hasAuthority('finance:memberWithdraw:save')")
   @Log(

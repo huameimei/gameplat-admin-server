@@ -1,8 +1,8 @@
 package com.gameplat.admin.model.vo;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.gameplat.admin.util.Date2LongSerializerUtils;
-import io.swagger.annotations.ApiModelProperty;
+import com.gameplat.common.util.Date2LongSerializerUtils;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -16,89 +16,101 @@ import java.util.Date;
 @Data
 public class MemberGrowthLevelVO {
 
-  @ApiModelProperty("主键")
+  @Schema(description = "主键")
   private Long id;
 
-  @ApiModelProperty("等级")
+  @Schema(description = "等级")
   private Integer level;
 
-  @ApiModelProperty("等级名称")
+  @Schema(description = "等级名称")
   private String levelName;
 
-  @ApiModelProperty("成长值")
+  @Schema(description = "成长值")
   private Long growth;
 
-  @ApiModelProperty("等级保级成长值")
+  @Schema(description = "等级保级成长值")
   private Long limitGrowth;
 
-  @ApiModelProperty("升级奖励")
+  @Schema(description = "升级奖励")
   private BigDecimal upReward;
 
-  @ApiModelProperty("周俸禄")
+  @Schema(description = "周俸禄")
   private BigDecimal weekWage;
 
-  @ApiModelProperty("月俸禄")
+  @Schema(description = "周俸禄充值限制")
+  private BigDecimal weekRecharge;
+
+  @Schema(description = "周俸禄有效投注限制")
+  private BigDecimal weekValid;
+
+  @Schema(description = "月俸禄")
   private BigDecimal monthWage;
 
-  @ApiModelProperty("生日礼金")
+  @Schema(description = "月俸禄充值限制")
+  private BigDecimal monthRecharge;
+
+  @Schema(description = "月俸禄有效投注限制")
+  private BigDecimal monthValid;
+
+  @Schema(description = "生日礼金")
   private BigDecimal birthGiftMoney;
 
-  @ApiModelProperty("红包")
+  @Schema(description = "红包")
   private BigDecimal redEnvelope;
 
-  @ApiModelProperty("借呗额度")
+  @Schema(description = "借呗额度")
   private BigDecimal creditMoney;
 
-  @ApiModelProperty(value = "创建人")
+  @Schema(description = "创建人")
   private String createBy;
 
-  @ApiModelProperty(value = "创建时间")
+  @Schema(description = "创建时间")
   @JsonSerialize(using = Date2LongSerializerUtils.class)
   private Date createTime;
 
-  @ApiModelProperty(value = "更新人")
+  @Schema(description = "更新人")
   private String updateBy;
 
-  @ApiModelProperty(value = "更新时间")
+  @Schema(description = "更新时间")
   @JsonSerialize(using = Date2LongSerializerUtils.class)
   private Date updateTime;
 
-  @ApiModelProperty(value = "备注")
+  @Schema(description = "备注")
   private String remark;
 
-  @ApiModelProperty("移动端VIP图片")
+  @Schema(description = "移动端VIP图片")
   private String mobileVipImage;
 
-  @ApiModelProperty("WEB端VIP图片")
+  @Schema(description = "WEB端VIP图片")
   private String webVipImage;
 
-  @ApiModelProperty("移动端达成背景图片")
+  @Schema(description = "移动端达成背景图片")
   private String mobileReachBackImage;
 
-  @ApiModelProperty("移动端未达成背景图片")
+  @Schema(description = "移动端未达成背景图片")
   private String mobileUnreachBackImage;
 
-  @ApiModelProperty("移动端达成VIP图片")
+  @Schema(description = "移动端达成VIP图片")
   private String mobileReachVipImage;
 
-  @ApiModelProperty("移动端未达成VIP图片")
+  @Schema(description = "移动端未达成VIP图片")
   private String mobileUnreachVipImage;
 
-  @ApiModelProperty("WEB端达成VIP图片")
+  @Schema(description = "WEB端达成VIP图片")
   private String webReachVipImage;
 
-  @ApiModelProperty("WEB端未达成VIP图片")
+  @Schema(description = "WEB端未达成VIP图片")
   private String webUnreachVipImage;
 
-  @ApiModelProperty("金币成长值比例")
+  @Schema(description = "金币成长值比例")
   private BigDecimal coinRatio;
 
-  @ApiModelProperty("金币最大获取数")
+  @Schema(description = "金币最大获取数")
   private Integer maxCoin;
 
-  @ApiModelProperty("每日金币上限")
+  @Schema(description = "每日金币上限")
   private Integer dailyMaxCoin;
 
-  @ApiModelProperty("借呗额度")
+  @Schema(description = "借呗额度")
   private BigDecimal loanMoney;
 }

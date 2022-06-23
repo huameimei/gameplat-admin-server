@@ -30,6 +30,7 @@ import com.gameplat.model.entity.message.MessageDistribute;
 import com.gameplat.model.entity.sys.SysDictData;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,7 +42,7 @@ import java.util.stream.Collectors;
 /**
  * 个人消息、站内信
  *
- * @author admin
+ * @author kenvin
  */
 @Service
 @Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)
@@ -52,7 +53,7 @@ public class MessageInfoServiceImpl extends ServiceImpl<MessageMapper, Message>
 
   @Autowired private SysDictDataService sysDictDataService;
 
-  @Autowired private MemberService memberService;
+  @Lazy @Autowired private MemberService memberService;
 
   @Autowired private MessageDistributeService messageDistributeService;
 
@@ -149,11 +150,11 @@ public class MessageInfoServiceImpl extends ServiceImpl<MessageMapper, Message>
 
   @Override
   public void insertMessage(MessageInfoAddDTO dto) {
-    if (dto.getShowType() != null && dto.getShowType() == 3){
-      if (StringUtils.isEmpty(dto.getPcImage())){
+    if (dto.getShowType() != null && dto.getShowType() == 3) {
+      if (StringUtils.isEmpty(dto.getPcImage())) {
         throw new ServiceException("请上传PC弹窗图片");
       }
-      if (StringUtils.isEmpty(dto.getAppImage())){
+      if (StringUtils.isEmpty(dto.getAppImage())) {
         throw new ServiceException("请上传APP弹窗图片");
       }
     }
@@ -181,21 +182,21 @@ public class MessageInfoServiceImpl extends ServiceImpl<MessageMapper, Message>
       throw new ServiceException("选择消息类型为图片弹窗，web端和移动端图片不能为空");
     }
 
-    if(dto.getEndTime() != null){
+    if (dto.getEndTime() != null) {
       SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
       Date endDate = null;
       Date now = null;
-      try{
+      try {
         endDate = sdf.parse(dto.getEndTime());
         now = sdf.parse(DateUtil.now());
-      }catch (Exception e){
+      } catch (Exception e) {
         e.printStackTrace();
       }
       int i = endDate.compareTo(now);
 
-      if( i > 0){
+      if (i > 0) {
         dto.setStatus(1);
-      }else{
+      } else {
         dto.setStatus(0);
       }
     }

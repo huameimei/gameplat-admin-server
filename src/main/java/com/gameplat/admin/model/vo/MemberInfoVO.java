@@ -1,6 +1,6 @@
 package com.gameplat.admin.model.vo;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -116,7 +116,7 @@ public class MemberInfoVO implements Serializable {
 
   private Integer tableIndex;
 
-  @ApiModelProperty(value = "玩家金币数")
+  @Schema(description = "玩家金币数")
   private Integer goldCoin;
 
   private Integer salaryFlag;

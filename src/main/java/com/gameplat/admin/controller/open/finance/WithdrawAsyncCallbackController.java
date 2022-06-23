@@ -17,7 +17,7 @@ import java.util.*;
 import java.util.stream.Stream;
 
 @RestController
-@RequestMapping("/api/admin/finance/asyncCallback")
+@RequestMapping("/api/internal/admin/finance/asyncCallback")
 public class WithdrawAsyncCallbackController {
 
   @Autowired private ProxyPayService proxyPayService;

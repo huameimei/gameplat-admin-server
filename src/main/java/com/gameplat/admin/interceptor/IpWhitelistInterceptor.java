@@ -11,7 +11,7 @@ import com.gameplat.common.model.bean.limit.AdminLoginLimit;
 import com.gameplat.model.entity.sys.SysAuthIp;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
+import org.springframework.web.servlet.HandlerInterceptor;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -22,7 +22,7 @@ import java.util.List;
  *
  * @author robben
  */
-public class IpWhitelistInterceptor extends HandlerInterceptorAdapter {
+public class IpWhitelistInterceptor implements HandlerInterceptor {
 
   @Autowired private SysAuthIpService authIpService;
 
@@ -32,11 +32,10 @@ public class IpWhitelistInterceptor extends HandlerInterceptorAdapter {
   public boolean preHandle(
       @NotNull HttpServletRequest request,
       @NotNull HttpServletResponse response,
-      @NotNull Object handler)
-      throws Exception {
+      @NotNull Object handler) {
     AdminLoginLimit limit = Assert.notNull(commonService.getLoginLimit(), "登录配置信息未配置");
     this.checkIpWhiteList(limit.getIpWhiteListSwitch(), IPUtils.getIpAddress(request));
-    return super.preHandle(request, response, handler);
+    return true;
   }
 
   /**

@@ -12,6 +12,7 @@
             i.balance memberBalance,
             g.loan_money loanMoney,
             l.loan_time loanTime,
+            l.type,
             IFNULL(l.loan_status, 1) loanStatus,
             IFNULL(l.overdraft_money, 0.0000) overdraftMoney
         from
@@ -28,7 +29,7 @@
             left join member_growth_level g on g.level = i.vip_level
             left join
             (
-                SELECT id, loan_time, loan_status, overdraft_money, member_id FROM member_loan a
+                SELECT id, loan_time, loan_status, overdraft_money, member_id, type FROM member_loan a
                 WHERE NOT EXISTS (select 1 from member_loan b where a.member_id = b.member_id and a.id &lt; b.id)) l ON i.member_id = l.member_id
         <where>
             <if test="dto.vipLevel != null">
@@ -73,5 +74,9 @@
         FROM
         member_loan a WHERE NOT EXISTS (select 1 from member_loan b where a.member_id = b.member_id and a.id  &lt; b.id)
         ) m
+    </select>
+
+    <select id="getRecentLoanTime" resultType="java.util.Date" >
+        select max(loan_time) loanTime from member_loan where type = 2 and member_id = #{memberId}
     </select>
 </mapper>

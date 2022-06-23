@@ -13,10 +13,10 @@ import com.gameplat.admin.service.MemberVipSignHistoryService;
 import com.gameplat.admin.service.MemberVipSignStatisService;
 import com.gameplat.model.entity.member.MemberVipSignHistory;
 import com.gameplat.model.entity.member.MemberVipSignStatis;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.SneakyThrows;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -33,8 +33,7 @@ import java.util.List;
  *
  * @author lily
  */
-@Api(tags = "VIP会员签到汇总")
-@Slf4j
+@Tag(name = "VIP会员签到汇总")
 @RestController
 @RequestMapping("/api/admin/member/sign")
 public class OpenMemberVipSignStatisController {
@@ -44,16 +43,16 @@ public class OpenMemberVipSignStatisController {
   @Autowired private MemberVipSignHistoryService memberVipSignHistoryService;
 
   @GetMapping("/list")
-  @ApiOperation(value = "查询VIP会员签到记录列表")
+  @Operation(summary = "查询VIP会员签到记录列表")
   @PreAuthorize("hasAuthority('member:sign:view')")
   public IPage<MemberVipSignStatisVO> querySignList(
-      PageDTO<MemberVipSignStatis> page, MemberVipSignStatisDTO dto) {
+      @Parameter(hidden = true) PageDTO<MemberVipSignStatis> page, MemberVipSignStatisDTO dto) {
     return signStatisService.findSignListPage(page, dto);
   }
 
   @SneakyThrows
   @GetMapping(value = "/exportSign", produces = "application/vnd.ms-excel")
-  @ApiOperation(value = "导出VIP签到记录列表")
+  @Operation(summary = "导出VIP签到记录列表")
   @PreAuthorize("hasAuthority('member:sign:export')")
   public void exportSign(MemberVipSignStatisDTO queryDTO, HttpServletResponse response) {
     List<MemberVipSignStatis> list = signStatisService.findSignList(queryDTO);
@@ -68,7 +67,7 @@ public class OpenMemberVipSignStatisController {
   }
 
   @GetMapping("/history")
-  @ApiOperation(value = "会员签到记录")
+  @Operation(summary = "会员签到记录")
   @PreAuthorize("hasAuthority('member:sign:history')")
   public IPage<MemberVipSignHistoryVO> getHistoryList(
       PageDTO<MemberVipSignHistory> page, MemberVipSignHistoryDTO dto) {

@@ -29,7 +29,9 @@ import com.gameplat.base.common.json.JsonUtils;
 import com.gameplat.common.constant.CachedKeys;
 import com.gameplat.common.enums.DictTypeEnum;
 import com.gameplat.model.entity.sys.SysDictData;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -45,10 +47,15 @@ import java.util.Map;
  */
 @Service
 @Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)
+@Log4j2
 public class SysDictDataServiceImpl extends ServiceImpl<SysDictDataMapper, SysDictData>
     implements SysDictDataService {
 
   @Autowired private DictDataConvert dictDataConvert;
+
+
+  @Autowired
+  private RedisTemplate<String, Integer> redisTemplate;
 
   @Override
   @SentinelResource(value = "selectDictDataList")
@@ -78,7 +85,7 @@ public class SysDictDataServiceImpl extends ServiceImpl<SysDictDataMapper, SysDi
 
   @Override
   @SentinelResource(value = "getDictDataByType")
-  @Cached(name = CachedKeys.DICT_DATA_CACHE, key = "#dictType", expire = 3600)
+  @Cached(name = CachedKeys.DICT_DATA_CACHE, key = "#dictType")
   public List<SysDictData> getDictDataByType(String dictType) {
     return this.lambdaQuery()
         .eq(SysDictData::getStatus, EnableEnum.ENABLED.code())
@@ -88,7 +95,7 @@ public class SysDictDataServiceImpl extends ServiceImpl<SysDictDataMapper, SysDi
 
   @Override
   @SentinelResource(value = "getDictDataByTypes")
-  @Cached(name = CachedKeys.DICT_DATA_CACHE, key = "#dictTypes", expire = 3600)
+  @Cached(name = CachedKeys.DICT_DATA_CACHE, key = "#dictTypes")
   public List<SysDictData> getDictDataByTypes(List<String> dictTypes) {
     return this.lambdaQuery()
         .eq(SysDictData::getStatus, EnableEnum.ENABLED.code())
@@ -108,7 +115,7 @@ public class SysDictDataServiceImpl extends ServiceImpl<SysDictDataMapper, SysDi
 
   @Override
   @SentinelResource(value = "getDictDataValue")
-  @Cached(name = CachedKeys.DICT_DATA_CACHE, key = "#dictType + ':' + #dictLabel", expire = 7200)
+  @Cached(name = CachedKeys.DICT_DATA_CACHE, key = "#dictType + ':' + #dictLabel")
   public String getDictDataValue(String dictType, String dictLabel) {
     return this.lambdaQuery()
         .eq(SysDictData::getStatus, EnableEnum.ENABLED.code())
@@ -118,6 +125,27 @@ public class SysDictDataServiceImpl extends ServiceImpl<SysDictDataMapper, SysDi
         .map(SysDictData::getDictValue)
         .orElse(null);
   }
+
+
+  @Override
+  @CacheInvalidate(name = CachedKeys.DICT_DATA_CACHE, key = "#dictType + ':' + #dictLabel")
+  public void removeDictDataCache(String dictType, String dictLabel) {
+  }
+
+
+  @Override
+  public String getDirectChargeValue(String dictType, String dictLabel) {
+    return this.lambdaQuery()
+            .eq(SysDictData::getStatus, EnableEnum.ENABLED.code())
+            .eq(SysDictData::getDictType, dictType)
+            .eq(SysDictData::getDictLabel, dictLabel)
+            .oneOpt()
+            .map(SysDictData::getDictValue)
+            .orElse(null);
+  }
+
+
+
 
   @Override
   @SentinelResource(value = "getDictList")
@@ -174,18 +202,30 @@ public class SysDictDataServiceImpl extends ServiceImpl<SysDictDataMapper, SysDi
 
   @Override
   @SentinelResource(value = "updateDictData")
-  @CacheInvalidateContainer({
-    @CacheInvalidate(name = CachedKeys.DICT_DATA_CACHE, key = "#dto.dictType"),
-    @CacheInvalidate(
-        name = CachedKeys.DICT_DATA_CACHE,
-        key = "#dto.dictType + ':' + #dto.dictLabel")
-  })
   public void updateDictData(OperDictDataDTO dto) {
     SysDictData dictData = dictDataConvert.toEntity(dto);
     if (!this.updateById(dictData)) {
       throw new ServiceException("修改失败!");
     }
+    jetCacheDataLabel(dto);
+    jetCacheData(dto);
   }
+
+
+  public void jetCacheDataLabel(OperDictDataDTO dto) {
+    String key = CachedKeys.DICT_DATA_CACHE + dto.getDictType() + ":" + dto.getDictLabel();
+    Boolean delete = redisTemplate.delete(key);
+    log.info("删除结果：{}", delete);
+  }
+
+
+  public void jetCacheData(OperDictDataDTO dto) {
+    String key = CachedKeys.DICT_DATA_CACHE + dto.getDictType();
+    Boolean delete = redisTemplate.delete(key);
+    log.info("删除结果：{}", delete);
+  }
+
+
 
   @Override
   @SentinelResource(value = "deleteDictDataByIds")

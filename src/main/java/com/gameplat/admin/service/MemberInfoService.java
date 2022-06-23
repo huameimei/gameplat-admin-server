@@ -24,7 +24,7 @@ public interface MemberInfoService extends IService<MemberInfo> {
    * @param memberId Long
    * @param amount 金额，正数
    */
-  void updateBalanceWithRecharge(Long memberId, BigDecimal amount, BigDecimal totalAmount);
+  void updateBalanceWithRecharge(Long memberId, BigDecimal amount, BigDecimal totalAmount, Integer pointFlag);
 
   /**
    * 更新余额<br>
@@ -51,6 +51,9 @@ public interface MemberInfoService extends IService<MemberInfo> {
    * @param amount 金额，正数
    */
   void updateFreeze(Long memberId, BigDecimal amount);
+
+
+  void updateUserWithTimes(Long memberId, BigDecimal amount, Integer pointFlag);
 
   /**
    * 获取用户下级最大投注返点

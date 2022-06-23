@@ -1,6 +1,6 @@
 package com.gameplat.admin.model.vo;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -119,15 +119,15 @@ public class SportConfigVO {
   private String viewState;
   private String eventValidation;
 
-  @ApiModelProperty(value = "版型选择")
+  @Schema(description = "版型选择")
   private String style;
 
-  @ApiModelProperty(value = "球头显示规则")
+  @Schema(description = "球头显示规则")
   private String ballHeadRule;
 
-  @ApiModelProperty(value = "体育球类导航")
+  @Schema(description = "体育球类导航")
   private String sportBallNavigation;
 
-  @ApiModelProperty(value = "体育联赛导航")
+  @Schema(description = "体育联赛导航")
   private String sportLeagueNavigation;
 }

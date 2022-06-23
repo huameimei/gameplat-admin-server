@@ -5,7 +5,6 @@ import cn.hutool.crypto.SecureUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.gameplat.admin.context.JSONObjectContext;
 import com.gameplat.admin.convert.ChatGifConvert;
 import com.gameplat.admin.mapper.ChatGifMapper;
 import com.gameplat.admin.model.dto.ChatGifEditDTO;
@@ -18,7 +17,6 @@ import com.gameplat.base.common.util.StringUtils;
 import com.gameplat.common.compent.oss.config.FileConfig;
 import com.gameplat.common.enums.DictTypeEnum;
 import com.gameplat.common.lang.Assert;
-import com.gameplat.common.util.FileUtils;
 import com.gameplat.model.entity.chart.ChatGif;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -30,7 +28,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
 
 /**
@@ -65,20 +62,8 @@ public class ChatGifServiceImpl extends ServiceImpl<ChatGifMapper, ChatGif>
   public void add(MultipartFile file, String name) {
     ChatGif chatGif = new ChatGif();
     String url = upload(file, chatGif);
-    File file1 = new File(file.getOriginalFilename());
     try {
-      FileUtils.copyInputStreamToFile(file.getInputStream(), file1);
-    } catch (IOException e) {
-      log.info("异常原因", e);
-    }
-    // 会在本地产生临时文件，用完后需要删除
-    if (file1.exists()) {
-      file1.delete();
-    }
-    BufferedImage bufferedImage = null;
-    try {
-      // 通过MultipartFile得到InputStream，从而得到BufferedImage
-      bufferedImage = ImageIO.read(file.getInputStream());
+      BufferedImage bufferedImage = ImageIO.read(file.getInputStream());
       if (bufferedImage != null) {
         chatGif.setHeight(bufferedImage.getHeight());
         chatGif.setWidth(bufferedImage.getWidth());
@@ -87,22 +72,12 @@ public class ChatGifServiceImpl extends ServiceImpl<ChatGifMapper, ChatGif>
       log.info("异常原因", e);
       throw new ServiceException("此图片已破损");
     }
+
     chatGif.setName(name);
-    if (bufferedImage != null) {
-      chatGif.setHeight(bufferedImage.getHeight());
-      chatGif.setWidth(bufferedImage.getWidth());
-    }
     chatGif.setStoreFileName(file.getOriginalFilename());
     chatGif.setFileUrl(url);
     chatGif.setMd5(SecureUtil.md5(file.getInputStream()));
-
-    // 如果是异步上传，如果响应时间太长，request关闭，也就获取不到请求头的token，也就拿不到LoginAppUser对象
-    // 所以需要在异步线程将上传人加入到本地线程，在保存上传记录时，上传者从本地线程中拿值
-    String userName = JSONObjectContext.getJSONObjectContext("userName");
-    if (StringUtils.isNotEmpty(userName)) {
-      chatGif.setCreateBy(userName);
-    }
-    save(chatGif);
+    Assert.isTrue(this.save(chatGif), "保存图片失败!");
   }
 
   @Override

@@ -1,14 +1,12 @@
 package com.gameplat.admin.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
-import com.alicp.jetcache.anno.Cached;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.mapper.GameConfigMapper;
 import com.gameplat.admin.service.GameConfigService;
 import com.gameplat.base.common.util.StringUtils;
-import com.gameplat.common.constant.CachedKeys;
 import com.gameplat.model.entity.game.GameConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,7 +21,7 @@ public class GameConfigServiceImpl extends ServiceImpl<GameConfigMapper, GameCon
   @Autowired private GameConfigMapper gameConfigMapper;
 
   @Override
-  @Cached(name = CachedKeys.GAME_CONFIG_CACHE, key = "#platCode", expire = 7200)
+  //@Cached(name = CachedKeys.GAME_CONFIG_CACHE, key = "#platCode", expire = 7200)
   public JSONObject queryGameConfigInfoByPlatCode(String platCode) {
     LambdaQueryWrapper<GameConfig> queryWrapper = Wrappers.lambdaQuery();
     queryWrapper.eq(GameConfig::getPlatformCode, platCode);

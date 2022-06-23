@@ -1,8 +1,8 @@
 package com.gameplat.admin.model.vo;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.gameplat.admin.util.Date2LongSerializerUtils;
-import io.swagger.annotations.ApiModelProperty;
+import com.gameplat.common.util.Date2LongSerializerUtils;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -18,25 +18,25 @@ public class MemberGoldCoinRecordVO implements Serializable {
 
   private Integer id;
 
-  @ApiModelProperty(value = "来源类型（待定）1 获取成长值、2 爆料扣款")
+  @Schema(description = "来源类型（待定）1 获取成长值、2 爆料扣款")
   private Integer sourceType;
 
-  @ApiModelProperty(value = "账号")
+  @Schema(description = "账号")
   private String account;
 
-  @ApiModelProperty(value = "变动前金币数")
+  @Schema(description = "变动前金币数")
   private Integer beforeBalance;
 
-  @ApiModelProperty(value = "变动金币数")
+  @Schema(description = "变动金币数")
   private Integer amount;
 
-  @ApiModelProperty(value = "变动后金币数")
+  @Schema(description = "变动后金币数")
   private Integer afterBalance;
 
-  @ApiModelProperty(value = "创建时间")
+  @Schema(description = "创建时间")
   @JsonSerialize(using = Date2LongSerializerUtils.class)
   private Date createTime;
 
-  @ApiModelProperty(value = "备注")
+  @Schema(description = "备注")
   private String remark;
 }

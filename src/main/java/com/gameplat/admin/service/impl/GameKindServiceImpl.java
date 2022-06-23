@@ -15,6 +15,7 @@ import com.gameplat.base.common.enums.EnableEnum;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.StringUtils;
 import com.gameplat.common.enums.GameDemoEnableEnum;
+import com.gameplat.common.enums.GameKindStatusEnum;
 import com.gameplat.common.lang.Assert;
 import com.gameplat.model.entity.game.GameKind;
 import com.google.common.collect.Lists;
@@ -22,7 +23,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
-
 import javax.annotation.Resource;
 import java.util.Date;
 import java.util.List;
@@ -110,15 +110,19 @@ public class GameKindServiceImpl extends ServiceImpl<GameKindMapper, GameKind>
   @Override
   public List<GameKind> queryGameKindListByPlatformCode(String platformCode) {
     return this.lambdaQuery()
-        .eq(
-            com.baomidou.mybatisplus.core.toolkit.StringUtils.isNotBlank(platformCode),
-            GameKind::getPlatformCode,
-            platformCode)
+        .eq(ObjectUtils.isNotEmpty(platformCode), GameKind::getPlatformCode, platformCode)
         .list();
   }
 
   @Override
   public List<GameKind> getList() {
     return this.lambdaQuery().eq(GameKind::getEnable, EnableEnum.ENABLED.code()).list();
+  }
+
+  @Override
+  public List<GameKind> queryUnDownGameKindList() {
+    return this.lambdaQuery().list().stream()
+        .filter(kind -> !kind.getStatus().equals(GameKindStatusEnum.REMOVED.getCode()))
+        .collect(Collectors.toList());
   }
 }

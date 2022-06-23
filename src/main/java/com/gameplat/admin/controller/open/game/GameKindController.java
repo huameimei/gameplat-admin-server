@@ -9,8 +9,8 @@ import com.gameplat.admin.service.GameKindService;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.common.enums.GameDemoEnableEnum;
 import com.gameplat.model.entity.game.GameKind;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -19,35 +19,35 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-@Api(tags = "游戏分类")
+@Tag(name = "游戏分类")
 @RestController
 @RequestMapping("/api/admin/game/gameKind")
 public class GameKindController {
 
   @Autowired private GameKindService gameKindService;
 
-  @ApiOperation("查询")
+  @Operation(summary = "查询")
   @GetMapping("/list")
   @PreAuthorize("hasAuthority('game:gameKind:view')")
   public IPage<GameKindVO> selectGameKindList(PageDTO<GameKind> page, GameKindQueryDTO dto) {
     return gameKindService.selectGameKindList(page, dto);
   }
 
-  @ApiOperation("编辑")
+  @Operation(summary = "编辑")
   @PostMapping("/edit")
   @PreAuthorize("hasAuthority('game:gameKind:edit')")
   public void updateGameKind(@RequestBody OperGameKindDTO dto) {
     gameKindService.updateGameKind(dto);
   }
 
-  @ApiOperation("游戏开关")
+  @Operation(summary = "游戏开关")
   @PostMapping("/updateEnable")
   @PreAuthorize("hasAuthority('game:gameKind:updateEnable')")
   public void updateEnable(@RequestBody OperGameKindDTO dto) {
     gameKindService.updateEnable(dto);
   }
 
-  @ApiOperation("试玩开关")
+  @Operation(summary = "试玩开关")
   @PostMapping("/updateDemoEnable")
   @PreAuthorize("hasAuthority('game:gameKind:updateDemoEnable')")
   public void updateDemoEnable(@RequestBody OperGameKindDTO dto) {
@@ -58,10 +58,10 @@ public class GameKindController {
     gameKindService.updateDemoEnable(dto);
   }
 
-  @ApiOperation("获取全部")
+  @Operation(summary = "获取全部")
   @GetMapping(value = "/queryGameKindList")
   @PreAuthorize("hasAuthority('game:gameKind:view')")
   public List<GameKind> queryGameKindList() {
-    return Optional.ofNullable(gameKindService.query().list()).orElse(Collections.emptyList());
+    return Optional.ofNullable(gameKindService.queryUnDownGameKindList()).orElse(Collections.emptyList());
   }
 }

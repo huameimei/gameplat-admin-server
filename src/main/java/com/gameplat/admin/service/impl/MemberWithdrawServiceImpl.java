@@ -2,8 +2,9 @@ package com.gameplat.admin.service.impl;
 
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.json.JSONArray;
+import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -25,6 +26,7 @@ import com.gameplat.admin.model.bean.ManualRechargeOrderBo;
 import com.gameplat.admin.model.bean.ProxyPayMerBean;
 import com.gameplat.admin.model.dto.MemberWithdrawDTO;
 import com.gameplat.admin.model.dto.MemberWithdrawQueryDTO;
+import com.gameplat.admin.model.vo.MemberWithdrawBankVo;
 import com.gameplat.admin.model.vo.MemberWithdrawVO;
 import com.gameplat.admin.model.vo.SummaryVO;
 import com.gameplat.admin.service.*;
@@ -42,6 +44,7 @@ import com.gameplat.common.model.bean.Builder;
 import com.gameplat.common.model.bean.UserEquipment;
 import com.gameplat.common.model.bean.limit.MemberRechargeLimit;
 import com.gameplat.common.model.bean.limit.MemberWithdrawLimit;
+import com.gameplat.message.model.MessagePayload;
 import com.gameplat.model.entity.member.*;
 import com.gameplat.model.entity.message.Message;
 import com.gameplat.model.entity.message.MessageDistribute;
@@ -105,7 +108,7 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
   @Autowired(required = false)
   private MessageMapper messageMapper;
 
-  @Autowired private MessageDistributeService messageDistributeService;
+//  @Autowired private MessageDistributeService messageDistributeService;
   @Autowired private SysDictDataService sysDictDataService;
 
   @Autowired(required = false)
@@ -129,20 +132,19 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
       }
     }
 
-    Map<String, String> banksMap =
-        JSONObject.parseObject(
-            JSONObject.parseObject(ppInterface.getLimtInfo()).getString("banks"), Map.class);
-
+    List<MemberWithdrawBankVo> bankVoList =
+            JSONUtil.toList(
+                    (JSONArray) JSONUtil.parseObj(ppInterface.getLimtInfo()).get("banks"),
+                    MemberWithdrawBankVo.class);
     // 模糊匹配银行名称
     boolean isBankName = true;
-    for (Map.Entry<String, String> entry : banksMap.entrySet()) {
-      if (StringUtils.contains(entry.getValue(), memberWithdraw.getBankName())
-          || StringUtils.contains(memberWithdraw.getBankName(), entry.getValue())) {
+    for (MemberWithdrawBankVo ex : bankVoList) {
+      if (StringUtils.contains(ex.getName(), memberWithdraw.getBankName())
+              || StringUtils.contains(memberWithdraw.getBankName(), ex.getName())) {
         isBankName = false;
         break;
       }
-
-      if (StringUtils.contains(entry.getValue(), "邮政")
+      if (StringUtils.contains(ex.getName(), "邮政")
           && StringUtils.contains(memberWithdraw.getBankName(), "邮政")) {
         isBankName = false;
         break;
@@ -367,6 +369,9 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
         }
         // 移除会员提现冻结金额
         memberInfoService.updateFreeze(member.getId(), memberWithdraw.getCashMoney().negate());
+        // 计算会员出款次数和金额
+        memberInfoService.updateUserWithTimes(
+                member.getId(), memberWithdraw.getCashMoney().negate(), memberWithdraw.getPointFlag());
       } else if (WithdrawStatus.CANCELLED.getValue() == cashStatus) { // 取消出款操作
         // 释放会员提现冻结金额
         memberInfoService.updateFreeze(member.getId(), memberWithdraw.getCashMoney().negate());
@@ -584,7 +589,7 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
 
     if (!StringUtil.isBlank(levels)) {
       String[] levelArr = levels.split(",");
-      boolean contains = Arrays.asList(levelArr).contains(memberWithdraw.getMemberLevel());
+      boolean contains = Arrays.asList(levelArr).contains(memberWithdraw.getMemberLevel() + "");
       if (contains) {
         if (pointFlag == 1) {
           discountAmount =
@@ -793,31 +798,26 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
     messageInfo.setCreateTime(new Date());
     messageMapper.insert(messageInfo);
 
-    MessageDistribute messageDistribute = new MessageDistribute();
-    messageDistribute.setMessageId(messageInfo.getId());
-    messageDistribute.setUserId(memberWithdraw.getMemberId());
-    messageDistribute.setUserAccount(messageInfo.getLinkAccount());
-    messageDistribute.setRechargeLevel(Convert.toInt(memberWithdraw.getMemberLevel()));
-    messageDistribute.setVipLevel(
-        memberInfoService
-            .lambdaQuery()
-            .eq(MemberInfo::getMemberId, memberWithdraw.getMemberId())
-            .one()
-            .getVipLevel());
-    messageDistribute.setReadStatus(NumberConstant.ZERO);
-    messageDistribute.setCreateBy("system");
-    messageDistributeService.save(messageDistribute);
+//    MessageDistribute messageDistribute = new MessageDistribute();
+//    messageDistribute.setMessageId(messageInfo.getId());
+//    messageDistribute.setUserId(memberWithdraw.getMemberId());
+//    messageDistribute.setUserAccount(messageInfo.getLinkAccount());
+//    messageDistribute.setRechargeLevel(Convert.toInt(memberWithdraw.getMemberLevel()));
+//    messageDistribute.setVipLevel(
+//        memberInfoService
+//            .lambdaQuery()
+//            .eq(MemberInfo::getMemberId, memberWithdraw.getMemberId())
+//            .one()
+//            .getVipLevel());
+//    messageDistribute.setReadStatus(NumberConstant.ZERO);
+//    messageDistribute.setCreateBy("system");
+//    messageDistributeService.save(messageDistribute);
   }
 
   private void sendMessage(String account, String channel, String message) {
-    Map<String, String> map = new HashMap<>();
-    map.put("user", account);
-    map.put("channel", channel);
-    map.put("title", message);
-    log.info("充值成功=============>开始推送Socket消息,相关参数{}", map);
-    client.userSend(map);
-    log.info("充值成功=============>topic推送测试,相关参数{}", map);
-    client.topicSend(map);
+    MessagePayload payload = MessagePayload.builder().channel(channel).title(message).build();
+    log.info("提现成功=============>开始推送Socket消息,相关参数{}", payload);
+    client.sendToUser(account, payload);
   }
 
   private int verifyMessage() {

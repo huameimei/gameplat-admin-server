@@ -4,7 +4,7 @@ import cn.afterturn.easypoi.excel.annotation.Excel;
 import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -37,7 +37,7 @@ public class AgentDomainVO implements Serializable {
   private Integer status;
 
   @TableField(fill = FieldFill.INSERT)
-  @ApiModelProperty(value = "创建者")
+  @Schema(description = "创建者")
   @Excel(name = "创建者", width = 20, isImportField = "true_st")
   private String createBy;
 

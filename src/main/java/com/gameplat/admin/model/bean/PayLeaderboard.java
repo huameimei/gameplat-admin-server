@@ -1,6 +1,6 @@
 package com.gameplat.admin.model.bean;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -13,30 +13,30 @@ import java.math.BigDecimal;
  */
 @Data
 public class PayLeaderboard {
-    @ApiModelProperty("三方接口名称")
-    private String interfaceName;
+  @Schema(description = "三方接口名称")
+  private String interfaceName;
 
-    @ApiModelProperty("三方接口名称")
-    private String interfaceCode;
+  @Schema(description = "三方接口名称")
+  private String interfaceCode;
 
-    @ApiModelProperty("使用平台数")
-    private Integer interfaceUseNum;
+  @Schema(description = "使用平台数")
+  private Integer interfaceUseNum;
 
-    @ApiModelProperty("自动成功率")
-    private BigDecimal autoSuccessRate;
+  @Schema(description = "自动成功率")
+  private BigDecimal autoSuccessRate;
 
-    @ApiModelProperty("自动成功订单数")
-    private Integer autoSuccessOrderNum;
+  @Schema(description = "自动成功订单数")
+  private Integer autoSuccessOrderNum;
 
-    @ApiModelProperty("成功单数")
-    private Integer successOrderNum;
+  @Schema(description = "成功单数")
+  private Integer successOrderNum;
 
-    @ApiModelProperty("总单数")
-    private Integer totalOrderNum;
+  @Schema(description = "总单数")
+  private Integer totalOrderNum;
 
-    @ApiModelProperty("自动金额")
-    private String autoSuccessAmount;
+  @Schema(description = "自动金额")
+  private String autoSuccessAmount;
 
-    @ApiModelProperty("总金额")
-    private Integer totalAmount;
+  @Schema(description = "总金额")
+  private Integer totalAmount;
 }

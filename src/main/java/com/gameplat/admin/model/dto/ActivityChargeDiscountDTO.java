@@ -1,6 +1,6 @@
 package com.gameplat.admin.model.dto;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -17,15 +17,15 @@ public class ActivityChargeDiscountDTO implements Serializable {
   /** */
   private static final long serialVersionUID = 1L;
 
-  @ApiModelProperty(value = "主键")
+  @Schema(description = "主键")
   private Long discountId;
 
-  @ApiModelProperty(value = "每日首冲id")
+  @Schema(description = "每日首冲id")
   private Long chargeId;
 
-  @ApiModelProperty(value = "是否组合（0否，1是）")
+  @Schema(description = "是否组合（0否，1是）")
   private Integer isGroup;
 
-  @ApiModelProperty(value = "活动组合id")
+  @Schema(description = "活动组合id")
   private Integer groupId;
 }

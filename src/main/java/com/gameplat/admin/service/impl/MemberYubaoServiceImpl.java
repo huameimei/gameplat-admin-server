@@ -5,52 +5,63 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.mapper.MemberYubaoInterestMapper;
 import com.gameplat.admin.mapper.MemberYubaoMapper;
-import com.gameplat.admin.service.ConfigService;
-import com.gameplat.admin.service.MemberInfoService;
-import com.gameplat.admin.service.MemberYubaoService;
+import com.gameplat.admin.model.dto.MemberReportDto;
+import com.gameplat.admin.model.vo.MemberGameDayReportVo;
+import com.gameplat.admin.model.vo.PageDtoVO;
+import com.gameplat.admin.service.*;
 import com.gameplat.admin.util.MoneyUtils;
 import com.gameplat.base.common.exception.ServiceException;
+import com.gameplat.base.common.snowflake.IdGeneratorSnowflake;
 import com.gameplat.base.common.util.DateUtil;
-import com.gameplat.common.enums.DictTypeEnum;
-import com.gameplat.common.exception.BusinessException;
-import com.gameplat.common.model.bean.YubaoConfig;
+import com.gameplat.base.common.util.StringUtils;
+import com.gameplat.common.enums.LimitEnums;
+import com.gameplat.common.enums.TranTypes;
+import com.gameplat.common.model.bean.limit.YubaoLimit;
+import com.gameplat.model.entity.member.MemberBill;
 import com.gameplat.model.entity.member.MemberInfo;
 import com.gameplat.model.entity.member.MemberYubao;
 import com.gameplat.model.entity.member.MemberYubaoInterest;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
+import java.util.Objects;
 
 @Slf4j
 @Service
 @Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)
 public class MemberYubaoServiceImpl extends ServiceImpl<MemberYubaoMapper, MemberYubao>
-    implements MemberYubaoService {
+        implements MemberYubaoService {
 
-  @Resource
-  private ConfigService configService;
+  @Autowired private LimitInfoService limitInfoService;
 
-  @Resource
-  private MemberInfoService memberInfoService;
+  @Autowired private MemberInfoService memberInfoService;
 
-  @Resource
-  private MemberYubaoInterestMapper memberYubaoInterestMapper;
+  @Autowired private MemberYubaoInterestMapper memberYubaoInterestMapper;
+
+  @Autowired private MemberBillService memberBillService;
+
+  @Autowired private GameMemberReportService gameMemberReportService;
 
   @Override
   public void recycle(String account, Long memberId,Double money) {
-    MemberInfo extInfo = memberInfoService.getById(memberId);
+    if (memberId == null || memberId.longValue() <= 0) {
+      throw new ServiceException("会员id不正确");
+    }
+    QueryWrapper<MemberInfo> queryMemberInfo=new QueryWrapper<>();
+    queryMemberInfo.eq("member_id",memberId);
+    MemberInfo extInfo = memberInfoService.getOne(queryMemberInfo);
     if (extInfo == null) {
       throw new ServiceException("会员不存在");
     }
@@ -81,31 +92,47 @@ public class MemberYubaoServiceImpl extends ServiceImpl<MemberYubaoMapper, Membe
         break;
       }
     }
-//    yuBaoDao.updateYubaoMoney(transferOutList);
-//    yuBaoDao.updateUserExtMoney(user.getUserId(), money, ext.getMoney());
+    this.baseMapper.updateYubaoList(transferOutList);
+    this.baseMapper.updateYubaoMoney(memberId, -money, extInfo.getBalance());
 
-//    String yubaoBalance = MoneyUtils.toYuanStr(BigDecimal.valueOf(ext.getYubaoMoney())
-//            .subtract(BigDecimal.valueOf(money)).doubleValue());
-//    String content = "转出余额宝，转出前余额宝余额：" + MoneyUtils.toYuanStr(ext.getYubaoMoney())
-//            + "元，转出后余额宝余额：" + yubaoBalance + "元";
-//    billService.add(user, ext.getMoney(), "", TranTypes.YUBAO_OUT.getValue(), money, content, null);
+    String yubaoBalance = MoneyUtils.toYuanStr(extInfo.getYubaoAmount().subtract(BigDecimal.valueOf(money)));
+    String content = "转出余额宝，转出前余额宝余额：" + MoneyUtils.toYuanStr(extInfo.getYubaoAmount()) + "元，转出后余额宝余额：" + yubaoBalance + "元";
+
+    // 添加流水记录
+    MemberBill memberBill = new MemberBill();
+    memberBill.setMemberId(memberId);
+    memberBill.setAccount(account);
+    memberBill.setMemberPath("");
+    memberBill.setTranType(TranTypes.YUBAO_OUT.getValue());
+    memberBill.setOrderNo(String.valueOf(IdGeneratorSnowflake.getInstance().nextId()));
+    memberBill.setAmount(new BigDecimal(money));
+    memberBill.setBalance(extInfo.getBalance());
+    memberBill.setOperator(account);
+    memberBill.setRemark(content);
+    memberBill.setContent(content);
+    memberBillService.save(memberBill);
   }
 
   @Override
   public void settle() {
     long startTime = System.currentTimeMillis();
 
-    YubaoConfig yubaoConfig= configService.get(DictTypeEnum.YUBAO_CONFIG, YubaoConfig.class);
+    YubaoLimit yubaoLimit=limitInfoService.getLimitInfo(LimitEnums.YUBAO_LIMIT, YubaoLimit.class).orElseThrow(() -> new ServiceException("余额宝配置信息不存在!"));
 
-    double isOpen = yubaoConfig.getYubaoIsOpen();
-    if (isOpen != 1) {
+    boolean isOpen = Objects.equals(yubaoLimit.getOpenSwitch(),1);
+    if (!isOpen) {
       log.info("yubao is closed.");
       return;
     }
+    boolean incomeSwitch = Objects.equals(yubaoLimit.getIncomeSwitch(),1);
+    if (!incomeSwitch) {
+      log.info("余额宝计算收益是关闭的");
+      return;
+    }
     log.info("start settle yubao interest.");
-    String baseRate =yubaoConfig.getYubaoBaseRate();
-    String activeRate = yubaoConfig.getYubaoActiveRate();
-    String activeDml = yubaoConfig.getYubaoActiveDml();
+    String baseRate =yubaoLimit.getBaseRateOfReturn().toString();
+    double activeRate = yubaoLimit.getActiveRateOfReturn().doubleValue();
+    BigDecimal activeDml = yubaoLimit.getActiveDml();
 
     String settleDate = DateUtil.dateToYMD(new Date(System.currentTimeMillis() - 24 * 3600 * 1000));
     List<MemberYubao> yuBaoList = null;
@@ -124,7 +151,7 @@ public class MemberYubaoServiceImpl extends ServiceImpl<MemberYubaoMapper, Membe
       yuBaoList = this.page(page, queryWrapper).getRecords();
       for (MemberYubao yuBao : yuBaoList) {
         try {
-          addYubaoInterest(yuBao, settleDate, baseRate, activeRate, activeDml);
+          addYubaoInterest(yuBao, settleDate, baseRate, activeRate, activeDml,yubaoLimit);
         } catch (Exception e) {
           log.error("addYubaoInterest error:", e);
         }
@@ -137,8 +164,15 @@ public class MemberYubaoServiceImpl extends ServiceImpl<MemberYubaoMapper, Membe
   @Override
   public IPage<MemberYubaoInterest> queryYubaoInterest(String account, String startDate, String endDate, PageDTO<MemberYubaoInterest> page) {
     LambdaQueryWrapper<MemberYubaoInterest> query = Wrappers.lambdaQuery();
-    query.eq(MemberYubaoInterest::getAccount,account);
-    query.between(MemberYubaoInterest::getDate,DateUtil.strToDate(startDate),DateUtil.strToDate(endDate));
+    if (StringUtils.isNotEmpty(account)) {
+      query.eq(MemberYubaoInterest::getAccount, account);
+    }
+    if(StringUtils.isNotEmpty(startDate)){
+      query.ge(MemberYubaoInterest::getDate,DateUtil.strToDate(startDate));
+    }
+    if(StringUtils.isNotEmpty(endDate)){
+      query.le(MemberYubaoInterest::getDate,DateUtil.strToDate(endDate));
+    }
     query.orderByDesc(MemberYubaoInterest::getId);
     return memberYubaoInterestMapper.selectPage(page, query);
   }
@@ -146,10 +180,13 @@ public class MemberYubaoServiceImpl extends ServiceImpl<MemberYubaoMapper, Membe
   /**
    *  添加余额宝收益
    */
-  private void addYubaoInterest(MemberYubao yuBao, String settleDate, String baseRate, String activeRate, String activeDml) throws BusinessException {
-//    if (yuBaoDao.isSettleInterest(yuBao.getMemberId(), settleDate)) {
-//      return;
-//    }
+  private void addYubaoInterest(MemberYubao yuBao, String settleDate, String baseRate, double activeRate, BigDecimal activeDml,YubaoLimit yubaoLimit)  {
+    Date date = DateUtil.getParseDate(settleDate);
+    //如果有计算过收益,则不计算
+    if (memberYubaoInterestMapper.isSettleInterest(yuBao.getMemberId(), DateUtil.getDateStart(date),DateUtil.getDateEnd(date))) {
+      log.info("账号={},memberId={},日期={},已产生收益",yuBao.getAccount(),yuBao.getMemberId(),settleDate);
+      return;
+    }
     MemberInfo extInfo = memberInfoService.getById(yuBao.getMemberId());
     if (extInfo == null) {
       return;
@@ -158,16 +195,28 @@ public class MemberYubaoServiceImpl extends ServiceImpl<MemberYubaoMapper, Membe
 //      log.info("黑名单用户不发放余额宝收益,account={},userId={}", extInfo.getAccount(), extInfo.getUserId());
 //      return;
 //    }
-    Date date = DateUtil.getParseDate(settleDate);
 
+    MemberReportDto dto=new MemberReportDto();
+    dto.setUsername(yuBao.getAccount());
+    dto.setType(0);
+    dto.setStartTime(DateUtil.getDateToString(date));
+    dto.setEndTime(DateUtil.getDateToString(date));
+    PageDtoVO<MemberGameDayReportVo> result= gameMemberReportService.findSumMemberGameDayReport(new Page<>(), dto);
 
+    MemberGameDayReportVo busDayReport=null;
+    if(result!=null){
+      List<MemberGameDayReportVo> list=result.getPage().getRecords();
+      if(CollectionUtils.isNotEmpty(list)){
+        busDayReport=list.get(0);
+      }
+    }
     double interestRate = Double.parseDouble(baseRate);
-//    if (busDayReport != null) {
-//      double totalBetMoney = busDayReport.getCpBetMoney() + busDayReport.getLiveBetMoney() + busDayReport.getSpBetMoney();
-//      if (totalBetMoney >= activeDml) {
-//        interestRate += activeRate;
-//      }
-//    }
+    if (busDayReport != null) {
+      BigDecimal totalBetMoney = busDayReport.getLotteryValidAmount().add(busDayReport.getSportValidAmount()).add(busDayReport.getRealValidAmount());
+      if (totalBetMoney.compareTo(activeDml) >=0 ) {
+        interestRate += activeRate;
+      }
+    }
     interestRate = interestRate * extInfo.getYubaoDegrade() / 100; // 降级
 
     interestRate = floor(interestRate, 4);
@@ -176,8 +225,25 @@ public class MemberYubaoServiceImpl extends ServiceImpl<MemberYubaoMapper, Membe
       log.info("ignore interestMoney < 0.01,account={}", yuBao.getAccount());
       return;
     }
+
+    //单笔收益上限
+    if(yubaoLimit!=null && yubaoLimit.getMaxSingleIncome()!=null && interestMoney>yubaoLimit.getMaxSingleIncome().doubleValue()){
+      log.info("账号={},日期={},单日收益上限,上限金额={},结算收益金额={}",yuBao.getAccount(),settleDate,yubaoLimit.getMaxSingleIncome().doubleValue(),interestMoney);
+      interestMoney=yubaoLimit.getMaxSingleIncome().doubleValue();
+    }
+
+    //总额收益上限
+    if(yubaoLimit!=null && yubaoLimit.getMaxTotalIncome()!=null){
+      //查询会员总收益
+      Double totalIncome=memberYubaoInterestMapper.getTotalYubaoInterest(yuBao.getMemberId());
+      if(totalIncome>=yubaoLimit.getMaxTotalIncome().doubleValue()){
+        log.info("账号={},日期={},总收益上限,上限金额={},结算收益金额={}",yuBao.getAccount(),settleDate,yubaoLimit.getMaxTotalIncome().doubleValue(),totalIncome);
+        return;
+      }
+    }
+
     // 添加收益金额
-//    yuBaoDao.addYubaoInterest(yuBao, interestMoney);
+    memberYubaoInterestMapper.addYubaoInterest(yuBao.getId(),yuBao.getMemberId(), interestMoney);
 
     // 添加收益记录
     MemberYubaoInterest yuBaoInterest = new MemberYubaoInterest();

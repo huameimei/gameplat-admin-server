@@ -9,8 +9,8 @@ import com.gameplat.log.enums.LogType;
 import com.gameplat.redis.redisson.DistributedLocker;
 import com.gameplat.security.SecurityUserHolder;
 import com.gameplat.security.context.UserCredential;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -22,8 +22,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 
-@Api(tags = "第三方代付")
 @Slf4j
+@Tag(name = "第三方代付")
 @RestController
 @RequestMapping("/api/admin/finance/proxyPay")
 public class ProxyPayController {
@@ -32,7 +32,7 @@ public class ProxyPayController {
 
   @Autowired private DistributedLocker distributedLocker;
 
-  @ApiOperation("代付")
+  @Operation(summary = "代付")
   @SneakyThrows
   @PostMapping("/relProxyPay")
   @PreAuthorize("hasAuthority('finance:memberWithdraw:relProxyPay')")
@@ -41,7 +41,7 @@ public class ProxyPayController {
       type = LogType.WITHDRAW,
       desc = "'第三方代付出款商户:'#ppMerchantId + ',订单id:' #id ")
   public void proxyPay(Long id, Long ppMerchantId, HttpServletRequest request) {
-    String sysPath = request.getSession().getServletContext().getRealPath("");
+    String sysPath = request.getServletContext().getRealPath("");
 
     String urL = ServletUtils.getRequestDomain(request);
     String scheme = request.getHeader("X-Forwarded-Scheme");
@@ -65,7 +65,7 @@ public class ProxyPayController {
     }
   }
 
-  @ApiOperation("查询订单")
+  @Operation(summary = "查询订单")
   @PostMapping("/queryProxyOrder")
   @PreAuthorize("hasAuthority('finance:memberWithdraw:queryProxyOrder')")
   public ReturnMessage queryProxyOrder(Long id, Long ppMerchantId) throws Exception {

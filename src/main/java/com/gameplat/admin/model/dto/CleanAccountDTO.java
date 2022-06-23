@@ -1,6 +1,6 @@
 package com.gameplat.admin.model.dto;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -14,15 +14,15 @@ import java.util.List;
 @Data
 public class CleanAccountDTO implements Serializable {
 
-  @ApiModelProperty(value = "单个/多个会员账号(以逗号分隔)")
+  @Schema(description = "单个/多个会员账号(以逗号分隔)")
   private String userNames;
 
-  @ApiModelProperty(value = "账号类型 2会员 4推广")
+  @Schema(description = "账号类型 2会员 4推广")
   private Integer userType;
 
-  @ApiModelProperty(value = "是否清除全部 0否1是")
+  @Schema(description = "是否清除全部 0否1是")
   private Integer isCleanAll;
 
-  @ApiModelProperty(value = "会员账号集合")
+  @Schema(description = "会员账号集合")
   private List<String> userNameList;
 }

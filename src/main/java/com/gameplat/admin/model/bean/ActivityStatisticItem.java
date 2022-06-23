@@ -1,6 +1,6 @@
 package com.gameplat.admin.model.bean;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -16,55 +16,55 @@ import java.util.List;
 @Data
 public class ActivityStatisticItem implements Serializable {
 
-  @ApiModelProperty(value = "会员ID")
+  @Schema(description = "会员ID")
   private Long userId;
 
-  @ApiModelProperty(value = "会员账号")
+  @Schema(description = "会员账号")
   private String userName;
 
-  @ApiModelProperty(value = "充值时间")
+  @Schema(description = "充值时间")
   private Date rechargeTime;
 
-  @ApiModelProperty(value = "充值时间集合")
+  @Schema(description = "充值时间集合")
   private List<Date> rechargeTimeList;
 
-  @ApiModelProperty(value = "充值时间字符串")
+  @Schema(description = "充值时间字符串")
   private String rechargeTimes;
 
-  @ApiModelProperty(value = "充值金额")
+  @Schema(description = "充值金额")
   private BigDecimal rechargeAmount;
 
-  @ApiModelProperty(value = "累计充值金额")
+  @Schema(description = "累计充值金额")
   private BigDecimal accumulativeRechargeAmount;
 
-  @ApiModelProperty(value = "有效投注额")
+  @Schema(description = "有效投注额")
   private BigDecimal validAmount;
 
-  @ApiModelProperty(value = "连续充值天数")
+  @Schema(description = "连续充值天数")
   private Integer seriesRechargeNum;
 
-  @ApiModelProperty(value = "累计充值天数")
+  @Schema(description = "累计充值天数")
   private Integer accumulativeRechargeNum;
 
-  @ApiModelProperty(value = "首充金额")
+  @Schema(description = "首充金额")
   private BigDecimal firstRechargeAmount;
 
-  @ApiModelProperty(value = "累计游戏打码量")
+  @Schema(description = "累计游戏打码量")
   private BigDecimal cumulativeGameDml;
 
-  @ApiModelProperty(value = "累计游戏打码天数")
+  @Schema(description = "累计游戏打码天数")
   private Integer cumulativeGameDmDays;
 
-  @ApiModelProperty(value = "游戏统计时间集合")
+  @Schema(description = "游戏统计时间集合")
   private List<Date> gameCountDateList;
 
-  @ApiModelProperty(value = "游戏统计时间字符串")
+  @Schema(description = "游戏统计时间字符串")
   private String gameCountDates;
 
-  @ApiModelProperty(value = "游戏输赢金额")
+  @Schema(description = "游戏输赢金额")
   private BigDecimal gameWinAmount;
 
-  @ApiModelProperty(value = "是否新用户 1是 2否")
+  @Schema(description = "是否新用户 1是 2否")
   private Integer isNewUser;
 
   public ActivityStatisticItem() {

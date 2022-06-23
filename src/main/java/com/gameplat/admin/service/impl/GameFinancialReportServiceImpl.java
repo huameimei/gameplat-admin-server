@@ -2,6 +2,8 @@ package com.gameplat.admin.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.util.ZipUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -23,7 +25,6 @@ import com.gameplat.base.common.util.Converts;
 import com.gameplat.base.common.util.StringUtils;
 import com.gameplat.base.common.util.UUIDUtils;
 import com.gameplat.common.enums.*;
-import com.gameplat.common.util.ZipUtils;
 import com.gameplat.model.entity.report.GameFinancialReport;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
@@ -213,8 +214,9 @@ public class GameFinancialReportServiceImpl
       }
 
       OutputStream out = response.getOutputStream();
-      ZipUtils.zipDir(out, dir);
-      ZipUtils.del(dir);
+      File zipFile = ZipUtil.zip(dir);
+      FileUtil.del(dir);
+      out.write(FileUtil.readBytes(zipFile));
       out.flush();
     } catch (IOException e) {
       log.error("财务报表导出IO错误", e);

@@ -12,8 +12,8 @@ import com.gameplat.common.constant.ServiceName;
 import com.gameplat.log.annotation.Log;
 import com.gameplat.log.enums.LogType;
 import com.gameplat.model.entity.proxy.DividePeriods;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
@@ -21,8 +21,10 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
-/** @Description : 层层代分红期数 @Author : cc @Date : 2022/4/2 */
-@Api(tags = "分红期数")
+/**
+ * @Description : 层层代分红期数 @Author : cc @Date : 2022/4/2
+ */
+@Tag(name = "分红期数")
 @RestController
 @RequestMapping("/api/admin/divide/periods")
 public class DividePeriodsController {
@@ -36,7 +38,7 @@ public class DividePeriodsController {
    * @param dto
    * @return
    */
-  @ApiOperation(value = "期数列表")
+  @Operation(summary = "期数列表")
   @GetMapping("/list")
   @PreAuthorize("hasAuthority('divide:periods:view')")
   public IPage<DividePeriodsVO> list(PageDTO<DividePeriods> page, DividePeriodsQueryDTO dto) {
@@ -49,9 +51,9 @@ public class DividePeriodsController {
    * @param dto
    */
   @PostMapping("/add")
-  @ApiOperation(value = "新增期数")
+  @Operation(summary = "新增期数")
   @PreAuthorize("hasAuthority('divide:periods:add')")
-  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.AGENT, desc = "新增期数")
+  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.AGENT, desc = "'新增期数'")
   public void add(@Validated @RequestBody DividePeriodsDTO dto) {
     periodsService.add(dto);
   }
@@ -62,9 +64,9 @@ public class DividePeriodsController {
    * @param dto
    */
   @PostMapping("/edit")
-  @ApiOperation(value = "编辑期数")
+  @Operation(summary = "编辑期数")
   @PreAuthorize("hasAuthority('divide:periods:edit')")
-  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.AGENT, desc = "编辑期数")
+  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.AGENT, desc = "'编辑期数'")
   public void edit(@Validated @RequestBody DividePeriodsDTO dto) {
     periodsService.edit(dto);
   }
@@ -74,7 +76,7 @@ public class DividePeriodsController {
    *
    * @param map
    */
-  @ApiOperation(value = "删除期数")
+  @Operation(summary = "删除期数")
   @PostMapping("/delete")
   @PreAuthorize("hasAuthority('divide:periods:remove')")
   public void remove(@RequestBody Map<String, String> map) {
@@ -90,9 +92,9 @@ public class DividePeriodsController {
    * @param dto
    */
   @PostMapping("/settle")
-  @ApiOperation(value = "期数结算")
+  @Operation(summary = "期数结算")
   @PreAuthorize("hasAuthority('divide:periods:settle')")
-  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.AGENT, desc = "期数结算")
+  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.AGENT, desc = "'期数结算'")
   public void settle(@Validated @RequestBody DividePeriodsDTO dto) {
     periodsService.settle(dto);
   }
@@ -103,9 +105,9 @@ public class DividePeriodsController {
    * @param dto
    */
   @PostMapping("/grant")
-  @ApiOperation(value = "期数派发")
+  @Operation(summary = "期数派发")
   @PreAuthorize("hasAuthority('divide:periods:grant')")
-  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.AGENT, desc = "期数派发")
+  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.AGENT, desc = "'期数派发'")
   public void grant(@Validated @RequestBody DividePeriodsDTO dto) {
     periodsService.grant(dto);
   }
@@ -116,9 +118,9 @@ public class DividePeriodsController {
    * @param dto
    */
   @PostMapping("/recycle")
-  @ApiOperation(value = "期数回收")
+  @Operation(summary = "期数回收")
   @PreAuthorize("hasAuthority('divide:periods:recycle')")
-  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.AGENT, desc = "期数回收")
+  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.AGENT, desc = "'期数回收'")
   public void recycle(@Validated @RequestBody DividePeriodsDTO dto) {
     periodsService.recycle(dto);
   }

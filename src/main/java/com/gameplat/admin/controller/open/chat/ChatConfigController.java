@@ -8,48 +8,47 @@ import com.gameplat.admin.model.bean.PushLotteryWin;
 import com.gameplat.admin.service.OtthService;
 import com.gameplat.admin.service.SysDictDataService;
 import com.gameplat.base.common.exception.ServiceException;
-import com.gameplat.common.enums.ChatConfigEnum;
+import com.gameplat.common.enums.DictDataEnum;
 import com.gameplat.common.util.HttpClientUtils;
 import com.gameplat.model.entity.sys.SysDictData;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.http.Header;
 import org.apache.http.message.BasicHeader;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 
 /**
+ * 聊天室配置
+ *
  * @author lily
- * @description 聊天室配置
- * @date 2022/2/15
  */
-@Api(tags = "聊天配置")
+@Tag(name = "聊天配置")
 @RestController
 @RequestMapping("/api/admin/chat/config")
 public class ChatConfigController {
 
   private static final String lottUrl = "/api-manage/chatRoom/updateChatRoomStatus";
-  private static final String DICT_DATA_CACHE = "dict:data:";
-  @Autowired private SysDictDataService dictDataService;
-  @Autowired private OtthService otthService;
-  @Autowired private RedisTemplate<String, Object> redisTemplate;
 
-  @ApiOperation(value = "查看彩票下注分享配置")
+  @Autowired private SysDictDataService dictDataService;
+
+  @Autowired private OtthService otthService;
+
+  @Operation(summary = "查看彩票下注分享配置")
   @GetMapping("/getLottPushBet")
   @PreAuthorize("hasAuthority('chat:lottPushBet:view')")
   public ChatPushCPBet getLottPushBet() {
     String chatConfig =
         dictDataService.getDictDataValue(
-            ChatConfigEnum.CHAT_PUSH_CP_BET.getType().getValue(),
-            ChatConfigEnum.CHAT_PUSH_CP_BET.getLabel());
+            DictDataEnum.CHAT_PUSH_CP_BET.getType().getValue(),
+            DictDataEnum.CHAT_PUSH_CP_BET.getLabel());
     return JSON.parseObject(chatConfig, ChatPushCPBet.class);
   }
 
-  @ApiOperation(value = "修改彩票下注分享配置")
+  @Operation(summary = "修改彩票下注分享配置")
   @PostMapping("/editLottPushBet")
   @PreAuthorize("hasAuthority('chat:lottPushBet:edit')")
   public void editLottPushBet(@RequestBody ChatPushCPBet chatPushCpBet) {
@@ -76,25 +75,25 @@ public class ChatConfigController {
     dictDataService.updateByTypeAndLabel(
         new SysDictData() {
           {
-            setDictType(ChatConfigEnum.CHAT_PUSH_CP_BET.getType().getValue());
-            setDictLabel(ChatConfigEnum.CHAT_PUSH_CP_BET.getLabel());
+            setDictType(DictDataEnum.CHAT_PUSH_CP_BET.getType().getValue());
+            setDictLabel(DictDataEnum.CHAT_PUSH_CP_BET.getLabel());
             setDictValue(JSON.toJSONString(chatPushCpBet));
           }
         });
   }
 
-  @ApiOperation(value = "查看彩票中奖推送配置")
+  @Operation(summary = "查看彩票中奖推送配置")
   @GetMapping("/getPushLotteryWin")
   @PreAuthorize("hasAuthority('chat:pushLotteryWin:view')")
   public PushLotteryWin getPushLotteryWin() {
     String chatConfig =
         dictDataService.getDictDataValue(
-            ChatConfigEnum.CHAT_PUSH_CP_WIN.getType().getValue(),
-            ChatConfigEnum.CHAT_PUSH_CP_WIN.getLabel());
+            DictDataEnum.CHAT_PUSH_CP_WIN.getType().getValue(),
+            DictDataEnum.CHAT_PUSH_CP_WIN.getLabel());
     return JSON.parseObject(chatConfig, PushLotteryWin.class);
   }
 
-  @ApiOperation(value = "修改彩票中奖推送配置")
+  @Operation(summary = "修改彩票中奖推送配置")
   @PostMapping("/editPushLotteryWin")
   @PreAuthorize("hasAuthority('chat:pushLotteryWin:edit')")
   public void editPushLotteryWin(@RequestBody PushLotteryWin pushLotteryWin) {
@@ -118,25 +117,25 @@ public class ChatConfigController {
     dictDataService.updateByTypeAndLabel(
         new SysDictData() {
           {
-            setDictType(ChatConfigEnum.CHAT_PUSH_CP_WIN.getType().getValue());
-            setDictLabel(ChatConfigEnum.CHAT_PUSH_CP_WIN.getLabel());
+            setDictType(DictDataEnum.CHAT_PUSH_CP_WIN.getType().getValue());
+            setDictLabel(DictDataEnum.CHAT_PUSH_CP_WIN.getLabel());
             setDictValue(JSON.toJSONString(pushLotteryWin));
           }
         });
   }
 
-  @ApiOperation(value = "查看聊天室浮窗配置")
+  @Operation(summary = "查看聊天室浮窗配置")
   @GetMapping("/getChatConfig")
   @PreAuthorize("hasAuthority('chat:chatConfig:view')")
   public ChatConfig getChatConfig() {
     String chatConfig =
         dictDataService.getDictDataValue(
-            ChatConfigEnum.CHAT_ROOM_CONFIG.getType().getValue(),
-            ChatConfigEnum.CHAT_ROOM_CONFIG.getLabel());
+            DictDataEnum.CHAT_ROOM_CONFIG.getType().getValue(),
+            DictDataEnum.CHAT_ROOM_CONFIG.getLabel());
     return JSON.parseObject(chatConfig, ChatConfig.class);
   }
 
-  @ApiOperation(value = "修改聊天室浮窗配置")
+  @Operation(summary = "修改聊天室浮窗配置")
   @PostMapping("/updateChatConfig")
   @PreAuthorize("hasAuthority('chat:chatConfig:edit')")
   public void updateChatConfig(@RequestBody ChatConfig chatConfig) {
@@ -159,8 +158,8 @@ public class ChatConfigController {
     dictDataService.updateByTypeAndLabel(
         new SysDictData() {
           {
-            setDictType(ChatConfigEnum.CHAT_ROOM_CONFIG.getType().getValue());
-            setDictLabel(ChatConfigEnum.CHAT_ROOM_CONFIG.getLabel());
+            setDictType(DictDataEnum.CHAT_ROOM_CONFIG.getType().getValue());
+            setDictLabel(DictDataEnum.CHAT_ROOM_CONFIG.getLabel());
             setDictValue(JSON.toJSONString(chatConfig));
           }
         });

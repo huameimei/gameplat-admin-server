@@ -16,9 +16,8 @@ import com.gameplat.common.model.vo.UserLogVO;
 import com.gameplat.log.annotation.Log;
 import com.gameplat.log.enums.LogType;
 import com.gameplat.model.entity.sys.SysMenu;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import lombok.extern.slf4j.Slf4j;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.validation.annotation.Validated;
@@ -31,8 +30,7 @@ import java.util.ArrayList;
  *
  * @author three
  */
-@Slf4j
-@Api("个人信息")
+@Tag(name = "个人信息")
 @RestController
 @RequestMapping("/api/admin/profile")
 public class OpenProFileController {
@@ -43,26 +41,26 @@ public class OpenProFileController {
 
   @Autowired private SysLogService logService;
 
-  @ApiOperation("获取用户信息")
+  @Operation(summary = "获取用户信息")
   @GetMapping("/info")
   public ProfileVO userInfo(Authentication authentication) {
     return userCenterService.current(authentication.getName());
   }
 
-  @ApiOperation("保存用户个性配置")
+  @Operation(summary = "保存用户个性配置")
   @PostMapping("/update")
   @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.ADMIN, desc = "'修改个人资料'")
   public void update(@Validated @RequestBody UserInfoDTO dto) {
     userCenterService.update(dto);
   }
 
-  @ApiOperation("系统菜单列表")
+  @Operation(summary = "系统菜单列表")
   @GetMapping("/menuList")
   public ArrayList<VueRouter<SysMenu>> menuList(Authentication authentication) {
     return permissionService.getMenuList(authentication.getName());
   }
 
-  @ApiOperation("修改密码")
+  @Operation(summary = "修改密码")
   @PostMapping("/changePassword")
   @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.ADMIN, desc = "'修改个人密码'")
   public void changePassword(String oldPassWord, String newPassWord) {
@@ -80,7 +78,7 @@ public class OpenProFileController {
     userCenterService.changePassword(changePassword);
   }
 
-  @ApiOperation("获取日志")
+  @Operation(summary = "获取日志")
   @GetMapping("/operLogList")
   public IPage<UserLogVO> operLogList(Authentication authentication, LogDTO logDTO) {
     logDTO.setUserName(authentication.getName());

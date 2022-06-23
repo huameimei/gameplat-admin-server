@@ -1,6 +1,6 @@
 package com.gameplat.admin.model.dto;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -14,36 +14,36 @@ public class MemberWealRewordDTO implements Serializable {
 
   private static final long serialVersionUID = 1L;
 
-  @ApiModelProperty("用户ID")
+  @Schema(description = "用户ID")
   private Long userId;
 
-  @ApiModelProperty("用户账号")
+  @Schema(description = "用户账号")
   private String userName;
 
-  @ApiModelProperty("状态： 0：待审核   1：未领取  2：已完成  3:已失效")
+  @Schema(description = "状态： 0：待审核   1：未领取  2：已完成  3:已失效")
   private Integer status;
 
-  @ApiModelProperty(value = "流水号")
+  @Schema(description = "流水号")
   private String serialNumber;
 
-  @ApiModelProperty("类型：0 升级奖励  1：周俸禄  2：月俸禄  3：生日礼金  4：每月红包")
+  @Schema(description = "类型：0 升级奖励  1：周俸禄  2：月俸禄  3：生日礼金  4：每月红包")
   private Integer type;
 
-  @ApiModelProperty("开始时间")
+  @Schema(description = "开始时间")
   private String startTime;
 
-  @ApiModelProperty("结束时间")
+  @Schema(description = "结束时间")
   private String endTime;
 
-  @ApiModelProperty("vip等级")
+  @Schema(description = "vip等级")
   private Integer vipLevel;
 
-  @ApiModelProperty(value = "代理账号")
+  @Schema(description = "代理账号")
   private String superAccount;
 
-  @ApiModelProperty(value = "是否只查询直属下级 0否1是")
+  @Schema(description = "是否只查询直属下级 0否1是")
   private String flag;
 
-  @ApiModelProperty("用户账号集合")
+  @Schema(description = "用户账号集合")
   private List<String> userNameList;
 }

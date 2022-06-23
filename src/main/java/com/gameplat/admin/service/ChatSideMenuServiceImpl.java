@@ -4,7 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.gameplat.admin.model.vo.ChatSideMenuVO;
 import com.gameplat.admin.model.vo.LotteryCodeVo;
 import com.gameplat.base.common.util.StringUtils;
-import com.gameplat.common.enums.ChatConfigEnum;
+import com.gameplat.common.enums.DictDataEnum;
 import com.gameplat.model.entity.sys.SysDictData;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,8 +37,8 @@ public class ChatSideMenuServiceImpl implements ChatSideMenuService {
     // 获取聊天室侧边菜单默认配置字典数据
     SysDictData sideMenu =
         dictDataService.getDictData(
-            ChatConfigEnum.CHAT_ROOM_SIDE_MENU.getType().getValue(),
-            ChatConfigEnum.CHAT_ROOM_SIDE_MENU.getLabel());
+            DictDataEnum.CHAT_ROOM_SIDE_MENU.getType().getValue(),
+            DictDataEnum.CHAT_ROOM_SIDE_MENU.getLabel());
     // 初始化菜单
     List<ChatSideMenuVO> initMenu = JSON.parseArray(sideMenu.getDictValue(), ChatSideMenuVO.class);
     List<LotteryCodeVo> gameAll = new ArrayList<>();
@@ -60,8 +60,8 @@ public class ChatSideMenuServiceImpl implements ChatSideMenuService {
     // 获取聊天室侧边菜单配置字典数据
     SysDictData setting =
         dictDataService.getDictData(
-            ChatConfigEnum.CHAT_ROOM_SETTING_MENU.getType().getValue(),
-            ChatConfigEnum.CHAT_ROOM_SETTING_MENU.getLabel());
+            DictDataEnum.CHAT_ROOM_SETTING_MENU.getType().getValue(),
+            DictDataEnum.CHAT_ROOM_SETTING_MENU.getLabel());
     if (StringUtils.isNoneBlank(setting.getDictValue()) && setting.getDictValue() != "[]") {
       List<ChatSideMenuVO> settingMenuList =
           JSON.parseArray(setting.getDictValue(), ChatSideMenuVO.class);
@@ -114,13 +114,13 @@ public class ChatSideMenuServiceImpl implements ChatSideMenuService {
   @Override
   public void edit(String config) {
     List<ChatSideMenuVO> settingMenuList = JSON.parseArray(config, ChatSideMenuVO.class);
-        settingMenuList =
-            settingMenuList.stream().filter(x -> x.getOpen() == 1).collect(Collectors.toList());
+    settingMenuList =
+        settingMenuList.stream().filter(x -> x.getOpen() == 1).collect(Collectors.toList());
     String initDoc =
         dictDataService
             .getDictData(
-                ChatConfigEnum.CHAT_ROOM_SIDE_MENU.getType().getValue(),
-                ChatConfigEnum.CHAT_ROOM_SIDE_MENU.getLabel())
+                DictDataEnum.CHAT_ROOM_SIDE_MENU.getType().getValue(),
+                DictDataEnum.CHAT_ROOM_SIDE_MENU.getLabel())
             .getDictValue();
     List<ChatSideMenuVO> initMenu = JSON.parseArray(initDoc, ChatSideMenuVO.class);
     List<String> menuNames =
@@ -141,15 +141,10 @@ public class ChatSideMenuServiceImpl implements ChatSideMenuService {
     dictDataService.updateByTypeAndLabel(
         new SysDictData() {
           {
-            setDictType(ChatConfigEnum.CHAT_ROOM_SETTING_MENU.getType().getValue());
-            setDictLabel(ChatConfigEnum.CHAT_ROOM_SETTING_MENU.getLabel());
+            setDictType(DictDataEnum.CHAT_ROOM_SETTING_MENU.getType().getValue());
+            setDictLabel(DictDataEnum.CHAT_ROOM_SETTING_MENU.getLabel());
             setDictValue(jsonObj);
           }
         });
-  }
-
-  @Override
-  public String queryChatConfig(ChatConfigEnum dataEnum) {
-    return dictDataService.getDictDataValue(dataEnum.getType().getValue(), dataEnum.getLabel());
   }
 }

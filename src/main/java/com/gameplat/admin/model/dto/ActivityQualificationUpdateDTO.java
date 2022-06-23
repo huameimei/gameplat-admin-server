@@ -1,6 +1,6 @@
 package com.gameplat.admin.model.dto;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -14,103 +14,103 @@ public class ActivityQualificationUpdateDTO implements Serializable {
 
   private static final long serialVersionUID = -3594282509149807621L;
 
-  @ApiModelProperty(value = "资格id")
+  @Schema(description = "资格id")
   private Long qualificationId;
 
-  @ApiModelProperty(value = "资格id")
+  @Schema(description = "资格id")
   private Long id;
 
   /** 1 活动大厅 2 红包雨 */
-  @ApiModelProperty(value = "活动类型，1 活动大厅")
+  @Schema(description = "活动类型，1 活动大厅")
   private Integer type;
 
-  @ApiModelProperty(value = "活动名称")
+  @Schema(description = "活动名称")
   private String activityName;
 
-  @ApiModelProperty(value = "活动类型（1 活动大厅，2 红包雨，3 转盘）")
+  @Schema(description = "活动类型（1 活动大厅，2 红包雨，3 转盘）")
   private Integer activityType;
 
-  @ApiModelProperty(value = "活动ID")
+  @Schema(description = "活动ID")
   private Long activityId;
 
-  @ApiModelProperty(value = "用户id")
+  @Schema(description = "用户id")
   private Long userId;
 
-  @ApiModelProperty(value = "会员账号")
+  @Schema(description = "会员账号")
   private String username;
 
-  @ApiModelProperty(value = "申请时间")
+  @Schema(description = "申请时间")
   private Date applyTime;
 
-  @ApiModelProperty(value = "申请开始时间")
+  @Schema(description = "申请开始时间")
   private String applyStartTime;
 
-  @ApiModelProperty(value = "申请结束时间")
+  @Schema(description = "申请结束时间")
   private String applyEndTime;
 
-  @ApiModelProperty(value = "审核人")
+  @Schema(description = "审核人")
   private String auditPerson;
 
-  @ApiModelProperty(value = "审核时间")
+  @Schema(description = "审核时间")
   private Date auditTime;
 
-  @ApiModelProperty(value = "审核备注")
+  @Schema(description = "审核备注")
   private String auditRemark;
 
-  @ApiModelProperty(value = "状态（0 无效，1 申请中，2 已审核）")
+  @Schema(description = "状态（0 无效，1 申请中，2 已审核）")
   private Integer status;
 
-  @ApiModelProperty(value = "活动开始时间")
+  @Schema(description = "活动开始时间")
   private Date activityStartTime;
 
-  @ApiModelProperty(value = "活动结束时间")
+  @Schema(description = "活动结束时间")
   private Date activityEndTime;
 
-  @ApiModelProperty(value = "资格状态（0 禁用，1 启用）")
+  @Schema(description = "资格状态（0 禁用，1 启用）")
   private Integer qualificationStatus;
 
-  @ApiModelProperty(value = "截止时间")
+  @Schema(description = "截止时间")
   private Date abortTime;
 
-  @ApiModelProperty(value = "总抽奖次数")
+  @Schema(description = "总抽奖次数")
   private Integer drawNum;
 
-  @ApiModelProperty(value = "使用次数")
+  @Schema(description = "使用次数")
   private Integer employNum;
 
-  @ApiModelProperty(value = "最小金额")
+  @Schema(description = "最小金额")
   private Integer minMoney;
 
-  @ApiModelProperty(value = "最大金额")
+  @Schema(description = "最大金额")
   private Integer maxMoney;
 
-  @ApiModelProperty(value = "删除（0 已删除，1 未删除）")
+  @Schema(description = "删除（0 已删除，1 未删除）")
   private Integer deleteFlag;
 
-  @ApiModelProperty(value = "使用时间")
+  @Schema(description = "使用时间")
   private Date employTime;
 
-  @ApiModelProperty(value = "统计项目")
+  @Schema(description = "统计项目")
   private Integer statisItem;
 
-  @ApiModelProperty(value = "提现打码量")
+  @Schema(description = "提现打码量")
   private Integer withdrawDml;
 
-  @ApiModelProperty(value = "奖励详情")
+  @Schema(description = "奖励详情")
   private String awardDetail;
 
-  @ApiModelProperty(value = "领取方式（1 直接发放，2 福利中心）")
+  @Schema(description = "领取方式（1 直接发放，2 福利中心）")
   private Integer getWay;
 
-  @ApiModelProperty(value = "页面大小")
+  @Schema(description = "页面大小")
   private Integer pageSize;
 
-  @ApiModelProperty(value = "第几页")
+  @Schema(description = "第几页")
   private Integer pageNum;
 
-  @ApiModelProperty(value = "统计开始时间")
+  @Schema(description = "统计开始时间")
   private Date statisStartTime;
 
-  @ApiModelProperty(value = "统计结束时间")
+  @Schema(description = "统计结束时间")
   private Date statisEndTime;
 }

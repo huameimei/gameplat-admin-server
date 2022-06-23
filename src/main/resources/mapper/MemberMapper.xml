@@ -39,7 +39,9 @@
                t2.total_withdraw_amount,
                t2.total_withdraw_times,
                t2.gold_coin goldCoin,
-               t2.salary_flag salaryFlag
+               t2.salary_flag salaryFlag,
+               t2.yubao_amount yubaoAmount,
+               t2.yubao_time yubaoTime
         FROM member t1
                  LEFT JOIN member_info t2 ON t1.id = t2.member_id
             ${ew.customSqlSegment}
@@ -148,6 +150,13 @@
     <update id="updateLowerNumByAccount">
         UPDATE member SET lower_num = lower_num + #{lowerNum} WHERE account = #{account}
     </update>
+
+    <update id="batchUpdateLowerNumByAccount">
+        <foreach collection="list" item="item" separator=";">
+            UPDATE member SET lower_num = lower_num + #{item.lowerNum} WHERE account = #{item.account}
+        </foreach>
+    </update>
+
 
     <select id="getMemberInfoByAccount" parameterType="java.lang.String" resultType="com.gameplat.admin.model.vo.MemberInfoVO">
         SELECT t1.id,

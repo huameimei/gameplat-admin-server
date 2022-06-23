@@ -62,6 +62,13 @@ public class MemberWithdrawVO {
 
   private Date acceptTime;
 
-  // 是否是银行卡黑名单(0-否 1-是)
+  /**
+   * 是否是银行卡黑名单(0-否 1-是)
+   */
   private Integer isBankBlacklist;
+
+  /**
+   * 虚拟货币协议
+   */
+  private String currencyProtocol;
 }

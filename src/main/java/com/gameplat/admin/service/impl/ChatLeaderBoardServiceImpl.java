@@ -11,7 +11,7 @@ import com.gameplat.admin.model.vo.ChatLeaderBoardVO;
 import com.gameplat.admin.service.*;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.HttpRespBean;
-import com.gameplat.common.enums.ChatConfigEnum;
+import com.gameplat.common.enums.DictDataEnum;
 import com.gameplat.common.util.HttpClient;
 import com.gameplat.common.util.HttpClientUtils;
 import com.gameplat.model.entity.chart.ChatLeaderBoard;
@@ -46,17 +46,21 @@ import static java.util.Arrays.asList;
 public class ChatLeaderBoardServiceImpl extends ServiceImpl<ChatLeaderBoardMapper, ChatLeaderBoard>
     implements ChatLeaderBoardService {
 
-  /** 聊天室彩票下注推送配置 */
-  public static final String CHAT_PUSH_CP_BET = "CHAT_PUSH_CP_BET";
   /** 聊天室排行榜 */
   public static final String CHAT_LEADER_BOARD = "CHAT_LEADER_BOARD";
 
   private static final String LOTT_URL = "/api-manage/chatRoom/getAccountWinAndLoses";
+
   @Autowired private GameConfigService gameConfigService;
-  @Autowired private ChatSideMenuService chatSideMenuService;
+
+  @Autowired private ConfigService configService;
+
   @Autowired private ChatLeaderBoardMapper chatLeaderBoardMapper;
+
   @Autowired private RedisTemplate<String, Object> redisTemplate;
+
   @Autowired private MemberService memberService;
+
   @Autowired private SysDomainService sysDomainService;
 
   /** 创建聊天室排行榜 */
@@ -123,17 +127,20 @@ public class ChatLeaderBoardServiceImpl extends ServiceImpl<ChatLeaderBoardMappe
                   (ChatPushCPBet)
                       redisTemplate
                           .opsForValue()
-                          .get(String.format("%s_%s", proxy, CHAT_PUSH_CP_BET));
+                          .get(
+                              String.format(
+                                  "%s_%s", proxy, DictDataEnum.CHAT_PUSH_CP_BET.getLabel()));
 
               int totalCount = 30;
 
               if (chatPushCPBet == null) {
-                String chatConfig =
-                    chatSideMenuService.queryChatConfig(ChatConfigEnum.CHAT_PUSH_CP_BET);
-                chatPushCPBet = JSON.parseObject(chatConfig, ChatPushCPBet.class);
+                chatPushCPBet =
+                    configService.get(DictDataEnum.CHAT_PUSH_CP_BET, ChatPushCPBet.class);
                 redisTemplate
                     .opsForValue()
-                    .set(String.format("%s_%s", proxy, CHAT_PUSH_CP_BET), chatPushCPBet);
+                    .set(
+                        String.format("%s_%s", proxy, DictDataEnum.CHAT_PUSH_CP_BET.getLabel()),
+                        chatPushCPBet);
               }
 
               if (chatPushCPBet != null) {

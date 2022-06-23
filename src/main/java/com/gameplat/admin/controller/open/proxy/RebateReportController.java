@@ -15,8 +15,8 @@ import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.BeanUtils;
 import com.gameplat.base.common.util.StringUtils;
 import com.gameplat.common.constant.NumberConstant;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.Cleanup;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -33,14 +33,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-@Api(tags = "平级分红方案佣金报表")
 @Slf4j
+@Tag(name = "平级分红方案佣金报表")
 @RestController
 @RequestMapping("/api/admin/same-level/report")
 public class RebateReportController {
+
   @Autowired private RebateReportService rebateReportService;
 
-  @ApiOperation(value = "平级分红报表")
+  @Operation(summary = "平级分红报表")
   @GetMapping("/list")
   @PreAuthorize("hasAuthority('dividend:report:list')")
   public IPage<RebateReportVO> list(PageDTO<AgentPlanVO> page, RebateReportDTO rebateReportDTO) {
@@ -70,7 +71,7 @@ public class RebateReportController {
     return rebateReportService.queryPage(page, rebateReportDTO);
   }
 
-  @ApiOperation("导出")
+  @Operation(summary = "导出")
   @GetMapping(value = "/export")
   @PreAuthorize("hasAuthority('dividend:report:export')")
   public void export(
@@ -121,7 +122,7 @@ public class RebateReportController {
     }
   }
 
-  @ApiOperation("更新佣金报表")
+  @Operation(summary = "更新佣金报表")
   @PostMapping(value = "/updateReport")
   @PreAuthorize("hasAuthority('dividend:report:edit')")
   public void updateReport(
@@ -129,14 +130,14 @@ public class RebateReportController {
     rebateReportService.updateRebateReport(countDate, agentName);
   }
 
-  @ApiOperation(value = "查询会员报表")
+  @Operation(summary = "查询会员报表")
   @GetMapping("/memberList")
   public IPage<MemberReportVO> memberList(
       PageDTO<MemberReportVO> page, @RequestParam Long agentId, @RequestParam String countDate) {
     return rebateReportService.pageMemberReport(page, agentId, countDate);
   }
 
-  @ApiOperation(value = "查询公司总输赢")
+  @Operation(summary = "查询公司总输赢")
   @GetMapping("/gameWin")
   public PageDtoVO<PlatformFeeVO> gameWin(
       PageDTO<PlatformFeeVO> page, @RequestParam Long agentId, @RequestParam String countDate) {
@@ -151,7 +152,7 @@ public class RebateReportController {
     return pageDtoVO;
   }
 
-  //  @ApiOperation(value = "查询公司总成本")
+  //  @Operation(summary = "查询公司总成本")
   //  @GetMapping("/totalCost")
   //  public PageDtoVO<CompanyCostVO> totalCost(
   //          PageDTO<MemberReportVO> page, @RequestParam Long agentId, @RequestParam String
@@ -166,7 +167,7 @@ public class RebateReportController {
   //    return pageDtoVO;
   //  }
 
-  @ApiOperation(value = "查询公司总成本")
+  @Operation(summary = "查询公司总成本")
   @GetMapping("/totalCost")
   public Map<String, Object> totalCost(@RequestParam Long agentId, @RequestParam String countDate) {
     Map<String, Object> returnMap = new HashMap<>();
@@ -177,7 +178,7 @@ public class RebateReportController {
     return returnMap;
   }
 
-  @ApiOperation("下级会员佣金")
+  @Operation(summary = "下级会员佣金")
   @GetMapping(value = "/memberCommission")
   public MemberCommissionVO memberCommission(
       @RequestParam Long agentId, @RequestParam String countDate) {
@@ -185,7 +186,7 @@ public class RebateReportController {
     return rebateReportService.getMemberCommission(agentId, countDate);
   }
 
-  @ApiOperation("下级代理佣金")
+  @Operation(summary = "下级代理佣金")
   @GetMapping(value = "/agentCommission")
   public PageDtoVO<AgentCommissionVO> agentCommission(
       PageDTO<AgentCommissionVO> page, @RequestParam Long agentId, @RequestParam String countDate) {
@@ -203,7 +204,7 @@ public class RebateReportController {
     return pageDtoVO;
   }
 
-  @ApiOperation("风控审核")
+  @Operation(summary = "风控审核")
   @PostMapping(value = "/riskControlAudit")
   @PreAuthorize("hasAuthority('dividend:report:riskControlAudit')")
   public void riskControlAudit(@RequestParam Long reportId) {
@@ -211,7 +212,7 @@ public class RebateReportController {
     rebateReportService.reviewOrSettlement(NumberConstant.ONE, reportId);
   }
 
-  @ApiOperation("财务审核")
+  @Operation(summary = "财务审核")
   @PostMapping(value = "/financialAudit")
   @PreAuthorize("hasAuthority('dividend:report:financialAudit')")
   public void financialAudit(@RequestParam Long reportId) {
@@ -219,7 +220,7 @@ public class RebateReportController {
     rebateReportService.reviewOrSettlement(NumberConstant.TWO, reportId);
   }
 
-  @ApiOperation("结算")
+  @Operation(summary = "结算")
   @PostMapping(value = "/settlement")
   @PreAuthorize("hasAuthority('dividend:report:settlement')")
   public void settlement(@RequestParam Long reportId) {
@@ -227,7 +228,7 @@ public class RebateReportController {
     rebateReportService.reviewOrSettlement(NumberConstant.THREE, reportId);
   }
 
-  @ApiOperation("批量风控审核")
+  @Operation(summary = "批量风控审核")
   @PostMapping(value = "/batchRiskControlAudit")
   @PreAuthorize("hasAuthority('dividend:report:batchRiskControlAudit')")
   public void batchRiskControlAudit(@RequestParam String countDate) {
@@ -235,7 +236,7 @@ public class RebateReportController {
     rebateReportService.batchReviewOrSettlement(NumberConstant.ZERO, countDate);
   }
 
-  @ApiOperation("批量财务审核")
+  @Operation(summary = "批量财务审核")
   @PostMapping(value = "/batchFinancialAudit")
   @PreAuthorize("hasAuthority('dividend:report:batchFinancialAudit')")
   public void batchFinancialAudit(@RequestParam String countDate) {
@@ -243,7 +244,7 @@ public class RebateReportController {
     rebateReportService.batchReviewOrSettlement(NumberConstant.ONE, countDate);
   }
 
-  @ApiOperation("批量结算")
+  @Operation(summary = "批量结算")
   @PostMapping(value = "/batchSettlement")
   @PreAuthorize("hasAuthority('dividend:report:batchSettlement')")
   public void batchSettlement(@RequestParam String countDate) {

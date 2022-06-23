@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gameplat.admin.mapper.MemberYubaoMapper">
+
+    <update id="updateYubaoMoney">
+        UPDATE member_info
+        set balance=balance - #{money}, yubao_amount=yubao_amount + #{money}, yubao_time=now()
+        WHERE member_id = #{memberId} and balance=#{balance}
+    </update>
+
+    <update id="updateYubaoList">
+        <foreach collection="transferOutList" item="item" index="index">
+            update member_yu_bao set money=#{item.money} where id=#{item.id};
+        </foreach>
+    </update>
+</mapper>

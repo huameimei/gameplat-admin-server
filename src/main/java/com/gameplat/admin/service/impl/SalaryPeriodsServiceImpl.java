@@ -98,7 +98,7 @@ public class SalaryPeriodsServiceImpl extends ServiceImpl<SalaryPeriodsMapper, S
 
   @Autowired private MessageMapper messageMapper;
 
-  @Autowired private MessageDistributeService messageDistributeService;
+//  @Autowired private MessageDistributeService messageDistributeService;
 
   /**
    * 分页列表
@@ -686,21 +686,7 @@ public class SalaryPeriodsServiceImpl extends ServiceImpl<SalaryPeriodsMapper, S
       memberBill.setRemark(sb);
       memberBill.setContent(sb);
       memberBillService.save(memberBill);
-      // 计算变更后余额
-      BigDecimal newBalance = memberInfo.getBalance().add(salaryGrant.getSalaryAmount());
-      if (newBalance.compareTo(BigDecimal.ZERO) <= 0) {
-        return;
-      }
-      MemberInfo entity =
-          MemberInfo.builder()
-              .memberId(member.getId())
-              .balance(newBalance)
-              .version(memberInfo.getVersion())
-              .build();
-      boolean b = memberInfoService.updateById(entity);
-      if (!b) {
-        log.error("会员{}期数工资派发钱包余额变更失败！", member.getAccount());
-      }
+      memberInfoService.updateBalance(member.getId(), salaryGrant.getSalaryAmount());
     } catch (Exception e) {
       log.error(MessageFormat.format("会员{}工资账变, 失败原因：{}", member.getAccount(), e));
       // 释放资金锁
@@ -724,16 +710,16 @@ public class SalaryPeriodsServiceImpl extends ServiceImpl<SalaryPeriodsMapper, S
     message.setStatus(TrueFalse.TRUE.getValue());
     message.setCreateBy(operatorName);
     messageMapper.saveReturnId(message);
-
-    MessageDistribute messageDistribute = new MessageDistribute();
-    messageDistribute.setMessageId(message.getId());
-    messageDistribute.setUserId(member.getId());
-    messageDistribute.setUserAccount(member.getAccount());
-    messageDistribute.setRechargeLevel(member.getUserLevel());
-    messageDistribute.setVipLevel(memberInfoService.getById(member.getId()).getVipLevel());
-    messageDistribute.setReadStatus(TrueFalse.FALSE.getValue());
-    messageDistribute.setCreateBy(operatorName);
-    messageDistributeService.save(messageDistribute);
+//
+//    MessageDistribute messageDistribute = new MessageDistribute();
+//    messageDistribute.setMessageId(message.getId());
+//    messageDistribute.setUserId(member.getId());
+//    messageDistribute.setUserAccount(member.getAccount());
+//    messageDistribute.setRechargeLevel(member.getUserLevel());
+//    messageDistribute.setVipLevel(memberInfoService.getById(member.getId()).getVipLevel());
+//    messageDistribute.setReadStatus(TrueFalse.FALSE.getValue());
+//    messageDistribute.setCreateBy(operatorName);
+//    messageDistributeService.save(messageDistribute);
   }
 
   /**

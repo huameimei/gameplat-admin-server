@@ -1,6 +1,6 @@
 package com.gameplat.admin.model.dto;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -18,45 +18,45 @@ public class MessageDistributeDTO implements Serializable {
 
   private static final long serialVersionUID = 1L;
 
-  @ApiModelProperty(value = "主键")
+  @Schema(description = "主键")
   private Long id;
 
-  @ApiModelProperty(value = "消息id")
+  @Schema(description = "消息id")
   private Long messageId;
 
-  @ApiModelProperty(value = "用户id")
+  @Schema(description = "用户id")
   private Long userId;
 
-  @ApiModelProperty(value = "用户账号")
+  @Schema(description = "用户账号")
   private String userAccount;
 
-  @ApiModelProperty(value = "充值层级")
+  @Schema(description = "充值层级")
   private Integer rechargeLevel;
 
-  @ApiModelProperty(value = "VIP等级")
+  @Schema(description = "VIP等级")
   private Integer vipLevel;
 
-  @ApiModelProperty(value = "代理层级")
+  @Schema(description = "代理层级")
   private String agentLevel;
 
-  @ApiModelProperty(value = "阅读状态：0 未读  1 已读")
+  @Schema(description = "阅读状态：0 未读  1 已读")
   private Integer readStatus;
 
-  @ApiModelProperty(value = "发送移除标识")
+  @Schema(description = "发送移除标识")
   private Integer sendRemoveFlag;
 
-  @ApiModelProperty(value = "接收移除标识")
+  @Schema(description = "接收移除标识")
   private Integer acceptRemoveFlag;
 
-  @ApiModelProperty(value = "创建人")
+  @Schema(description = "创建人")
   private String createBy;
 
-  @ApiModelProperty(value = "创建时间")
+  @Schema(description = "创建时间")
   private Date createTime;
 
-  @ApiModelProperty(value = "更新人")
+  @Schema(description = "更新人")
   private String updateBy;
 
-  @ApiModelProperty(value = "更新时间")
+  @Schema(description = "更新时间")
   private Date updateTime;
 }

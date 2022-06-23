@@ -1,8 +1,7 @@
 package com.gameplat.admin.model.dto;
 
 import com.gameplat.base.common.util.DateUtil;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.dozer.Mapping;
@@ -19,73 +18,72 @@ import java.util.List;
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
-@ApiModel(value = "MemberRedPacket对象", description = "红包雨")
 public class ActivityRedPacketDTO implements Serializable {
 
   private static final long serialVersionUID = 1L;
 
-  @ApiModelProperty(value = "页面大小")
+  @Schema(description = "页面大小")
   private Integer pageSize;
 
-  @ApiModelProperty(value = "第几页")
+  @Schema(description = "第几页")
   private Integer pageNum;
 
-  @ApiModelProperty(value = "主键")
+  @Schema(description = "主键")
   private Long[] ids;
 
-  @ApiModelProperty(value = "主键")
+  @Schema(description = "主键")
   @Mapping(value = "packetId")
   private Long packetId;
 
-  @ApiModelProperty(value = "红包时间(周一到周日)")
+  @Schema(description = "红包时间(周一到周日)")
   private String weekTime;
 
-  @ApiModelProperty(value = "开始时间")
+  @Schema(description = "开始时间")
   private Date beginTime;
 
-  @ApiModelProperty(value = "结束时间")
+  @Schema(description = "结束时间")
   private Date endTime;
 
-  @ApiModelProperty(value = "状态 0下线 1上线")
+  @Schema(description = "状态 0下线 1上线")
   private Integer status;
 
-  @ApiModelProperty(value = "红包雨标题")
+  @Schema(description = "红包雨标题")
   private String realTitle;
 
-  @ApiModelProperty(value = "红包雨位置")
+  @Schema(description = "红包雨位置")
   private String realLocation;
 
-  @ApiModelProperty(value = "频率")
+  @Schema(description = "频率")
   private String frequency;
 
-  @ApiModelProperty(value = "持续时长")
+  @Schema(description = "持续时长")
   private String duration;
 
-  @ApiModelProperty(value = "红包类型（1红包雨，2运营红包）")
+  @Schema(description = "红包类型（1红包雨，2运营红包）")
   private Integer packetType;
 
-  @ApiModelProperty(value = "红包总个数")
+  @Schema(description = "红包总个数")
   private Integer packetTotalNum;
 
-  @ApiModelProperty(value = "用户抽红包总次数限制")
+  @Schema(description = "用户抽红包总次数限制")
   private Integer packetDrawLimit;
 
-  @ApiModelProperty(value = "启动时间(时分秒)")
+  @Schema(description = "启动时间(时分秒)")
   private String startTime;
 
-  @ApiModelProperty(value = "终止时间(时分秒)")
+  @Schema(description = "终止时间(时分秒)")
   private String stopTime;
 
-  @ApiModelProperty(value = "被删除的红包条件列表")
+  @Schema(description = "被删除的红包条件列表")
   private Long[] deleteConditionId;
 
-  @ApiModelProperty(value = "被删除的奖品列表")
+  @Schema(description = "被删除的奖品列表")
   private Long[] deleteIdList;
 
-  @ApiModelProperty(value = "红包条件")
+  @Schema(description = "红包条件")
   private List<ActivityRedPacketConditionDTO> redPacketCondition;
 
-  @ApiModelProperty(value = "奖品列表")
+  @Schema(description = "奖品列表")
   private List<ActivityPrizeDTO> activityPrize;
 
   public void setBeginTime(String beginTime) {

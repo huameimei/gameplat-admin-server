@@ -10,8 +10,8 @@ import com.gameplat.common.constant.ServiceName;
 import com.gameplat.log.annotation.Log;
 import com.gameplat.log.enums.LogType;
 import com.gameplat.model.entity.proxy.DivideLayerConfig;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
-@Api(tags = "层层代分红模式")
+@Tag(name = "层层代分红模式")
 @RestController
 @RequestMapping("/api/admin/divide/layer")
 public class DivideLayerConfigController {
@@ -68,9 +68,9 @@ public class DivideLayerConfigController {
    * @param dto
    */
   @PostMapping("/add")
-  @ApiOperation(value = "新增层层代分红配置")
+  @Operation(summary = "新增层层代分红配置")
   @PreAuthorize("hasAuthority('agent:bonusconfig:add')")
-  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.AGENT, desc = "新增层层代分红配置")
+  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.AGENT, desc = "'新增层层代分红配置'")
   public void add(@Validated @RequestBody DivideConfigDTO dto) {
     layerConfigService.add(dto.getUserName(), "zh-CN");
   }
@@ -81,9 +81,9 @@ public class DivideLayerConfigController {
    * @param dto
    */
   @PostMapping("/edit")
-  @ApiOperation(value = "编辑层层代分红配置")
+  @Operation(summary = "编辑层层代分红配置")
   @PreAuthorize("hasAuthority('agent:bonusconfig:edit')")
-  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.AGENT, desc = "新增层层代分红配置")
+  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.AGENT, desc = "'新增层层代分红配置'")
   public void edit(@Validated @RequestBody DivideConfigDTO dto) {
     layerConfigService.edit(dto, "zh-CN");
   }
@@ -93,7 +93,7 @@ public class DivideLayerConfigController {
    *
    * @param ids
    */
-  @ApiOperation(value = "删除分红配置")
+  @Operation(summary = "删除分红配置")
   @PostMapping("/delete")
   @PreAuthorize("hasAuthority('agent:bonusconfig:remove')")
   public void remove(@RequestBody String ids) {

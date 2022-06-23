@@ -1,6 +1,6 @@
 package com.gameplat.admin.model.dto;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -16,21 +16,21 @@ public class ActivityRedPacketConditionDTO implements Serializable {
   /** */
   private static final long serialVersionUID = 1L;
 
-  @ApiModelProperty(value = "主键")
+  @Schema(description = "主键")
   private Long conditionId;
 
-  @ApiModelProperty(value = "红包id")
+  @Schema(description = "红包id")
   private Long redPacketId;
 
-  @ApiModelProperty(value = "充值金额")
+  @Schema(description = "充值金额")
   private Integer topUpMoney;
 
-  @ApiModelProperty(value = "抽奖次数")
+  @Schema(description = "抽奖次数")
   private Integer drawNum;
 
-  @ApiModelProperty(value = "红包雨最小金额")
+  @Schema(description = "红包雨最小金额")
   private Integer packetMinMoney;
 
-  @ApiModelProperty(value = "红包雨最大金额")
+  @Schema(description = "红包雨最大金额")
   private Integer packetMaxMoney;
 }

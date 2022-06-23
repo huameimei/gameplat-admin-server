@@ -1,6 +1,6 @@
 package com.gameplat.admin.model.vo;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -14,19 +14,18 @@ import java.math.BigDecimal;
 @Data
 public class TotalMemberWealRewordVO implements Serializable {
 
-  @ApiModelProperty("升级奖励")
+  @Schema(description = "升级奖励")
   private BigDecimal totalUpRewardAmount;
 
-  @ApiModelProperty("周俸禄")
+  @Schema(description = "周俸禄")
   private BigDecimal totalWeekWageAmount;
 
-  @ApiModelProperty("月俸禄")
+  @Schema(description = "月俸禄")
   private BigDecimal totalMonthWageAmount;
 
-  @ApiModelProperty("生日礼金")
+  @Schema(description = "生日礼金")
   private BigDecimal totalBirthGiftMoneyAmount;
 
-  @ApiModelProperty("每月红包")
+  @Schema(description = "每月红包")
   private BigDecimal totalMonthRedEnvelopeAmount;
-
 }

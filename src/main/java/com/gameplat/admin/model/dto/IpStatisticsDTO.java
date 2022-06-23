@@ -1,6 +1,6 @@
 package com.gameplat.admin.model.dto;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 /**
@@ -11,18 +11,18 @@ import lombok.Data;
 @Data
 public class IpStatisticsDTO {
 
-  @ApiModelProperty(value = "IP地址")
+  @Schema(description = "IP地址")
   private String loginIp;
 
-  @ApiModelProperty(value = "次数")
+  @Schema(description = "次数")
   private String frequency;
 
-  @ApiModelProperty(value = "分析类型")
+  @Schema(description = "分析类型")
   private Integer type;
 
-  @ApiModelProperty(value = "开始时间")
+  @Schema(description = "开始时间")
   private String beginTime;
 
-  @ApiModelProperty(value = "结束时间")
+  @Schema(description = "结束时间")
   private String endTime;
 }

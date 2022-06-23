@@ -13,7 +13,6 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.convert.ActivityLobbyConvert;
 import com.gameplat.admin.convert.ActivityQualificationConvert;
-import com.gameplat.admin.enums.ActivityInfoEnum;
 import com.gameplat.admin.mapper.ActivityQualificationMapper;
 import com.gameplat.admin.model.dto.*;
 import com.gameplat.admin.model.vo.*;
@@ -23,6 +22,7 @@ import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.DateUtil;
 import com.gameplat.base.common.util.RandomUtil;
 import com.gameplat.base.common.util.StringUtils;
+import com.gameplat.common.enums.ActivityInfoEnum;
 import com.gameplat.common.enums.BooleanEnum;
 import com.gameplat.common.enums.MemberEnums;
 import com.gameplat.common.enums.RechargeStatus;
@@ -132,76 +132,163 @@ public class ActivityQualificationServiceImpl
     } else {
       usernameList.add(username);
     }
-
+    List<ActivityQualification> manageList = new ArrayList<>();
     for (String username1 : usernameList) {
       MemberInfoVO memberInfo = memberService.getMemberInfo(username1);
       if (StringUtils.isNull(memberInfo)) {
         throw new ServiceException("用户【" + username1 + "】不存在,请检查");
       }
-      // 1 活动大厅  2 红包雨
-      if (type == 1) {
-        List<ActivityLobbyDTO> activityLobbyList = dto.getActivityLobbyList();
-        if (CollectionUtils.isEmpty(activityLobbyList)) {
-          throw new ServiceException("活动大厅数据不能为空");
-        }
-        List<ActivityQualification> manageList = new ArrayList<>();
-        ActivityQualification qm;
-        for (ActivityLobbyDTO activityLobbyDTO : activityLobbyList) {
-          List<ActivityLobbyDiscountDTO> lobbyDiscount = activityLobbyDTO.getLobbyDiscountList();
-          if (activityLobbyDTO.getMultipleHandsel() == 0 && lobbyDiscount.size() > 1) {
-            throw new ServiceException("【" + activityLobbyDTO.getTitle() + "】，没有开启多重彩金");
-          }
-          qm = new ActivityQualification();
-          ActivityLobby activityLobby = activityLobbyConvert.toEntity(activityLobbyDTO);
-          String auditRemark =
-              activityCommonService.getAuditRemark(activityLobby, "", "", null, null);
-          qm.setAuditRemark(auditRemark);
-          qm.setActivityId(activityLobbyDTO.getId());
-          qm.setActivityName(activityLobbyDTO.getTitle());
-          if(activityLobbyDTO.getActivityType() == null){
-            throw new ServiceException("活动类型不能为空");
-          }
-          qm.setActivityType(activityLobbyDTO.getActivityType());
-          qm.setUserId(memberInfo.getId());
-          qm.setUsername(username1);
-          qm.setApplyTime(new Date());
-          qm.setStatus(BooleanEnum.YES.value());
-          qm.setActivityStartTime(activityLobbyDTO.getStartTime());
-          qm.setActivityEndTime(activityLobbyDTO.getEndTime());
-          qm.setDeleteFlag(BooleanEnum.YES.value());
-          qm.setDrawNum(1);
-          qm.setEmployNum(0);
-          qm.setQualificationActivityId(IdWorker.getIdStr());
-          qm.setQualificationStatus(BooleanEnum.YES.value());
-          qm.setStatisItem(activityLobbyDTO.getStatisItem());
-          qm.setMaxMoney(
-              lobbyDiscount.stream().mapToInt(ActivityLobbyDiscountDTO::getPresenterValue).sum());
-          qm.setWithdrawDml(
-              lobbyDiscount.stream().mapToInt(ActivityLobbyDiscountDTO::getWithdrawDml).sum());
-          qm.setSoleIdentifier(RandomUtil.generateOrderCode());
-          lobbyDiscount.sort(Comparator.comparingInt(ActivityLobbyDiscountDTO::getTargetValue));
-          qm.setAwardDetail(JSON.parseArray(JSONObject.toJSONString(lobbyDiscount)).toJSONString());
-          qm.setGetWay(activityLobbyDTO.getGetWay());
-          //如果是红包雨活动
-          if(activityLobbyDTO.getType().intValue()==2){
-            List<ActivityLobbyDiscountDTO> redPacketConditionList=activityLobbyDTO.getRedPacketConditionList();
-            if(CollectionUtils.isEmpty(redPacketConditionList)){
-              throw new ServiceException("请选择一个优惠区间");
-            }
-            //只能选择一个，如果传2个，就选第一个
-            ActivityLobbyDiscountDTO temp=redPacketConditionList.get(0);
-            qm.setMinMoney( temp.getPresenterValue());
-            qm.setMaxMoney(temp.getWithdrawDml());
-            qm.setDrawNum(temp.getPresenterDml().intValue());
-            qm.setActivityType(ActivityInfoEnum.TypeEnum.RED_ENVELOPE.value());
-          }
-          manageList.add(qm);
-        }
-        if (CollectionUtils.isNotEmpty(manageList)) {
-          this.saveBatch(manageList);
-        }
+      // 1 活动大厅  2 红包雨  4 转盘活动
+      switch (type){
+        case 1:
+          addActivityLobbyQualification(dto,memberInfo,manageList);
+          break;
+        case 2:
+          addRedPacketQualification(dto,memberInfo,manageList);
+          break;
+        case 4:
+          addActivityTurntableQualification(dto,memberInfo,manageList);
+          break;
+        default:
+          throw new ServiceException("活动类型不对");
       }
     }
+    if (CollectionUtils.isNotEmpty(manageList)) {
+      this.saveBatch(manageList);
+    }
+  }
+
+  private void addActivityLobbyQualification(ActivityQualificationAddDTO dto,MemberInfoVO memberInfo,List<ActivityQualification> manageList){
+    List<ActivityLobbyDTO> activityLobbyList = dto.getActivityLobbyList();
+    if (CollectionUtils.isEmpty(activityLobbyList)) {
+      throw new ServiceException("活动大厅数据不能为空");
+    }
+
+    ActivityQualification qm;
+    for (ActivityLobbyDTO activityLobbyDTO : activityLobbyList) {
+      List<ActivityLobbyDiscountDTO> lobbyDiscount = activityLobbyDTO.getLobbyDiscountList();
+      if (activityLobbyDTO.getMultipleHandsel() == 0 && lobbyDiscount.size() > 1) {
+        throw new ServiceException("【" + activityLobbyDTO.getTitle() + "】，没有开启多重彩金");
+      }
+      qm = new ActivityQualification();
+      ActivityLobby activityLobby = activityLobbyConvert.toEntity(activityLobbyDTO);
+      String auditRemark =
+              activityCommonService.getAuditRemark(activityLobby, "", "", null, null);
+      qm.setAuditRemark(auditRemark);
+      qm.setActivityId(activityLobbyDTO.getId());
+      qm.setActivityName(activityLobbyDTO.getTitle());
+      if(activityLobbyDTO.getActivityType() == null){
+        throw new ServiceException("活动类型不能为空");
+      }
+      qm.setActivityType(dto.getType());
+      qm.setUserId(memberInfo.getId());
+      qm.setUsername(memberInfo.getAccount());
+      qm.setApplyTime(new Date());
+      qm.setStatus(BooleanEnum.YES.value());
+      qm.setActivityStartTime(activityLobbyDTO.getStartTime());
+      qm.setActivityEndTime(activityLobbyDTO.getEndTime());
+      qm.setDeleteFlag(BooleanEnum.YES.value());
+      qm.setDrawNum(1);
+      qm.setEmployNum(0);
+      qm.setQualificationActivityId(IdWorker.getIdStr());
+      qm.setQualificationStatus(BooleanEnum.YES.value());
+      qm.setStatisItem(activityLobbyDTO.getStatisItem());
+      qm.setMaxMoney(lobbyDiscount.stream().mapToInt(ActivityLobbyDiscountDTO::getPresenterValue).sum());
+      qm.setWithdrawDml(lobbyDiscount.stream().mapToInt(ActivityLobbyDiscountDTO::getWithdrawDml).sum());
+      qm.setSoleIdentifier(RandomUtil.generateOrderCode());
+      lobbyDiscount.sort(Comparator.comparingInt(ActivityLobbyDiscountDTO::getTargetValue));
+      qm.setAwardDetail(JSON.parseArray(JSONObject.toJSONString(lobbyDiscount)).toJSONString());
+      qm.setGetWay(activityLobbyDTO.getGetWay());
+      manageList.add(qm);
+    }
+  }
+
+  private void addRedPacketQualification(ActivityQualificationAddDTO dto,MemberInfoVO memberInfo,List<ActivityQualification> manageList){
+    //如果是红包雨活动
+    List<ActivityLobbyDTO> redPacketConditionList=dto.getMemberRedPacketDTO();
+    if(CollectionUtils.isEmpty(redPacketConditionList)){
+      throw new ServiceException("活动数据不对");
+    }
+    //只能选择一个，如果传2个，就选第一个
+    ActivityLobbyDTO activityLobbyDTO=redPacketConditionList.get(0);
+
+    ActivityQualification qm = new ActivityQualification();
+    ActivityLobby activityLobby = activityLobbyConvert.toEntity(activityLobbyDTO);
+    String auditRemark =activityCommonService.getAuditRemark(activityLobby, "", "", null, null);
+    qm.setAuditRemark(auditRemark);
+    qm.setActivityId(activityLobbyDTO.getId());
+    qm.setActivityName(activityLobbyDTO.getTitle());
+    if(activityLobbyDTO.getActivityType() == null){
+      throw new ServiceException("活动类型不能为空");
+    }
+    qm.setUserId(memberInfo.getId());
+    qm.setUsername(memberInfo.getAccount());
+    qm.setApplyTime(new Date());
+    qm.setStatus(BooleanEnum.YES.value());
+    qm.setActivityStartTime(activityLobbyDTO.getStartTime());
+    qm.setActivityEndTime(activityLobbyDTO.getEndTime());
+    qm.setDeleteFlag(BooleanEnum.YES.value());
+    qm.setEmployNum(0);
+    qm.setQualificationActivityId(IdWorker.getIdStr());
+    qm.setQualificationStatus(BooleanEnum.YES.value());
+    qm.setStatisItem(activityLobbyDTO.getStatisItem());
+    qm.setGetWay(activityLobbyDTO.getGetWay());
+    qm.setSoleIdentifier(RandomUtil.generateOrderCode());
+
+    List<ActivityLobbyDiscountDTO> list=activityLobbyDTO.getRedPacketConditionList();
+    if(CollectionUtils.isEmpty(list)){
+      throw new ServiceException("请选择一个优惠区间");
+    }
+    //只能选择一个，如果传2个，就选第一个
+    ActivityLobbyDiscountDTO temp=list.get(0);
+    qm.setMinMoney(temp.getPresenterValue());
+    qm.setMaxMoney(temp.getWithdrawDml());
+    qm.setDrawNum(temp.getPresenterDml().intValue());
+    qm.setActivityType(ActivityInfoEnum.TypeEnum.RED_ENVELOPE.value());
+    manageList.add(qm);
+  }
+
+  private void addActivityTurntableQualification(ActivityQualificationAddDTO dto,MemberInfoVO memberInfo,List<ActivityQualification> manageList){
+    if(dto==null || CollectionUtils.isEmpty(dto.getMemberRedPacketDTO())){
+      throw new ServiceException("活动数据不对");
+    }
+    //只能选择一个，如果传2个，就选第一个
+    ActivityLobbyDTO activityLobbyDTO=dto.getMemberRedPacketDTO().get(0);
+
+    ActivityQualification qm = new ActivityQualification();
+    ActivityLobby activityLobby = activityLobbyConvert.toEntity(activityLobbyDTO);
+    String auditRemark =activityCommonService.getAuditRemark(activityLobby, "", "", null, null);
+    qm.setAuditRemark(auditRemark);
+    qm.setActivityId(activityLobbyDTO.getId());
+    qm.setActivityName(activityLobbyDTO.getTitle());
+    if(activityLobbyDTO.getActivityType() == null){
+      throw new ServiceException("活动类型不能为空");
+    }
+    qm.setUserId(memberInfo.getId());
+    qm.setUsername(memberInfo.getAccount());
+    qm.setApplyTime(new Date());
+    qm.setStatus(BooleanEnum.YES.value());
+    qm.setActivityStartTime(activityLobbyDTO.getStartTime());
+    qm.setActivityEndTime(activityLobbyDTO.getEndTime());
+    qm.setDeleteFlag(BooleanEnum.YES.value());
+    qm.setEmployNum(0);
+    qm.setQualificationActivityId(IdWorker.getIdStr());
+    qm.setQualificationStatus(BooleanEnum.YES.value());
+    qm.setStatisItem(activityLobbyDTO.getStatisItem());
+    qm.setGetWay(activityLobbyDTO.getGetWay());
+    qm.setSoleIdentifier(RandomUtil.generateOrderCode());
+
+    List<ActivityLobbyDiscountDTO> list=activityLobbyDTO.getRedPacketConditionList();
+    if(CollectionUtils.isEmpty(list)){
+      throw new ServiceException("请选择一个优惠区间");
+    }
+    //只能选择一个，如果传2个，就选第一个
+    ActivityLobbyDiscountDTO temp=list.get(0);
+    qm.setMinMoney(temp.getPresenterValue());
+    qm.setMaxMoney(temp.getWithdrawDml());
+    qm.setDrawNum(temp.getPresenterDml().intValue());
+    qm.setActivityType(4);
+    manageList.add(qm);
   }
 
   @Override
@@ -438,7 +525,7 @@ public class ActivityQualificationServiceImpl
                 }
 
                 //获取允许参与活动的所有会员层级
-                String userLevels = activityLobby.getUserLevel();
+                String userLevels = activityLobby.getGraded();
                 if (StringUtils.isNotEmpty(userLevels)) {
                   userLevelsSet = Arrays.stream(userLevels.split(",")).collect(Collectors.toSet());
                 }

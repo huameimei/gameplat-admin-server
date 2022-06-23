@@ -1,5 +1,6 @@
 package com.gameplat.admin.service.impl;
 
+import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
@@ -11,6 +12,7 @@ import com.gameplat.admin.feign.PaymentCenterFeign;
 import com.gameplat.admin.model.bean.AdminLimitInfo;
 import com.gameplat.admin.model.bean.ProxyPayMerBean;
 import com.gameplat.admin.model.bean.ReturnMessage;
+import com.gameplat.admin.model.vo.MemberWithdrawBankVo;
 import com.gameplat.admin.service.*;
 import com.gameplat.admin.util.MoneyUtils;
 import com.gameplat.base.common.exception.ServiceException;
@@ -21,10 +23,7 @@ import com.gameplat.basepay.pay.bean.NameValuePair;
 import com.gameplat.basepay.proxypay.thirdparty.ProxyCallbackContext;
 import com.gameplat.basepay.proxypay.thirdparty.ProxyDispatchContext;
 import com.gameplat.basepay.proxypay.thirdparty.ProxyPayBackResult;
-import com.gameplat.common.enums.BooleanEnum;
-import com.gameplat.common.enums.SwitchStatusEnum;
-import com.gameplat.common.enums.UserTypes;
-import com.gameplat.common.enums.WithdrawStatus;
+import com.gameplat.common.enums.*;
 import com.gameplat.common.model.bean.limit.MemberRechargeLimit;
 import com.gameplat.model.entity.member.Member;
 import com.gameplat.model.entity.member.MemberInfo;
@@ -43,7 +42,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -89,30 +87,21 @@ public class ProxyPayServiceImpl implements ProxyPayService {
         return true;
       }
     }
-    Map<String, String> banksMap =
-        JSONObject.parseArray(ppInterface.getLimtInfo()).stream()
-            .filter(Objects::nonNull)
-            .collect(
-                Collectors.toMap(
-                    o -> {
-                      JSONObject o1 = (JSONObject) o;
-                      return o1.getString("code");
-                    },
-                    o -> {
-                      JSONObject o1 = (JSONObject) o;
-                      return o1.getString("name");
-                    }));
+    List<MemberWithdrawBankVo> bankVoList =
+            JSONUtil.toList(
+                    (JSONArray) JSONUtil.parseObj(ppInterface.getLimtInfo()).get("banks"),
+                    MemberWithdrawBankVo.class);
+    // 模糊匹配银行名称
     /** 模糊匹配银行名称 */
     boolean isBankName = true;
-    for (Map.Entry<String, String> entry : banksMap.entrySet()) {
-      if (StringUtils.contains(entry.getValue(), memberWithdraw.getBankName())
-          || StringUtils.contains(memberWithdraw.getBankName(), entry.getValue())) {
+    for (MemberWithdrawBankVo ex : bankVoList) {
+      if (StringUtils.contains(ex.getName(), memberWithdraw.getBankName())
+              || StringUtils.contains(memberWithdraw.getBankName(), ex.getName())) {
         isBankName = false;
         break;
       }
-
-      if (StringUtils.contains(entry.getValue(), "邮政")
-          && StringUtils.contains(memberWithdraw.getBankName(), "邮政")) {
+      if (StringUtils.contains(ex.getName(), "邮政")
+              && StringUtils.contains(memberWithdraw.getBankName(), "邮政")) {
         isBankName = false;
         break;
       }
@@ -177,8 +166,14 @@ public class ProxyPayServiceImpl implements ProxyPayService {
 
     // 封装第三方代付接口调用信息
     ProxyDispatchContext context = new ProxyDispatchContext();
+    MemberRechargeLimit rechargeLimit = this.limitInfoService.get(LimitEnums.MEMBER_RECHARGE_LIMIT);
+    String callbackDomain = rechargeLimit.getCallbackDomain();
+    String domain = StringUtils.isNotEmpty(callbackDomain) ? callbackDomain : asyncCallbackUrl;
+    if(!domain.endsWith("/")){
+      domain += "/";
+    }
     String asyncUrl =
-        asyncCallbackUrl + "/api/admin/finance/asyncCallback/onlineProxyPayAsyncCallback";
+            domain + "api/internal/admin/finance/asyncCallback/onlineProxyPayAsyncCallback";
     context.setAsyncCallbackUrl(asyncUrl + "/" + memberWithdraw.getCashOrderNo());
     context.setSysPath(sysPath);
     // 设置第三方接口信息
@@ -208,13 +203,16 @@ public class ProxyPayServiceImpl implements ProxyPayService {
     String resultStr =
         paymentCenterFeign.onlineProxyPay(
             context, memberWithdraw.getPpInterface(), memberWithdraw.getPpInterfaceName());
-    Result<ProxyPayBackResult> result = JSONUtil.toBean(resultStr, Result.class);
     log.info("代付请求中心响应{}", resultStr);
-    if (!result.isSucceed() || 0 != result.getCode()) {
+    Result<ProxyPayBackResult> result = JSONUtil.toBean(resultStr, Result.class);
+    if (!Objects.equals(ProxyPayStatusEnum.PAY_SUCCESS.getName(), result.getData())) {
+      throw new ServiceException("请求代付失败！！！请立即联系第三方核实再出款！！！");
+    }
+    /*if (!result.isSucceed() || 0 != result.getCode()) {
       throw new ServiceException("请求代付返回结果提示:" + result.getMessage() + "！！！请立即联系第三方核实再出款！！！");
     }
     ProxyPayBackResult proxyPayBackResult = result.getData();
-    /** 设置虚拟货币真实出款汇率、数量 */
+    *//** 设置虚拟货币真实出款汇率、数量 *//*
     if (null != proxyPayBackResult && null != proxyPayBackResult.getApproveCurrencyRate()
         || null != proxyPayBackResult.getApproveCurrencyCount()) {
       memberWithdrawService
@@ -224,8 +222,15 @@ public class ProxyPayServiceImpl implements ProxyPayService {
               MemberWithdraw::getApproveCurrencyCount, proxyPayBackResult.getApproveCurrencyCount())
           .eq(MemberWithdraw::getId, memberWithdraw.getId())
           .update();
-    }
+    }*/
     memberWithdrawService.updateById(memberWithdraw);
+
+    // 移除会员提现冻结金额
+    memberInfoService.updateFreeze(memberInfo.getMemberId(), memberWithdraw.getCashMoney().negate());
+    // 计算会员出款次数和金额
+    memberInfoService.updateUserWithTimes(
+            memberInfo.getMemberId(), memberWithdraw.getCashMoney().negate(), memberWithdraw.getPointFlag());
+
     /** 不需要异步通知，直接将状态改成第三方出款完成 */
     if (0 != ppInterface.getAsynNotifyStatus()) {
       updateStatus(
@@ -304,8 +309,9 @@ public class ProxyPayServiceImpl implements ProxyPayService {
             proxyCallbackContext, beanName, memberWithdraw.getPpInterfaceName());
     Result<ProxyPayBackResult> result = JSONUtil.toBean(resultStr, Result.class);
     log.info("代付查询请求中心响应{}", result);
-    if (!result.isSucceed() || 200 != result.getCode()) {
-      throw new ServiceException("第三方代付异步回调异常:" + result.getMessage() + "！！！请立即联系第三方核实再出款！！！");
+    ProxyPayBackResult proxyPayBackResult = JSONObject.parseObject(JSONObject.toJSONString(result.getData()), ProxyPayBackResult.class);
+    if (!result.isSucceed() || 0 != result.getCode()) {
+      throw new ServiceException("第三方代付异步回调异常:" + proxyPayBackResult.getMessage() + "！！！请立即联系第三方核实再出款！！！");
     }
     if (memberWithdraw.getCashStatus() == WithdrawStatus.CANCELLED.getValue()
         || memberWithdraw.getCashStatus() == WithdrawStatus.REFUSE.getValue()
@@ -316,8 +322,8 @@ public class ProxyPayServiceImpl implements ProxyPayService {
           "第三方出款订单"
               + memberWithdraw.getCashOrderNo()
               + "已经被处理了,响应第三方需要的信息:"
-              + result.getData().getResponseMsg());
-      return result.getData().getResponseMsg();
+              + proxyPayBackResult.getResponseMsg());
+      return proxyPayBackResult.getResponseMsg();
     }
 
     Member info = memberService.getById(memberWithdraw.getMemberId());
@@ -439,31 +445,19 @@ public class ProxyPayServiceImpl implements ProxyPayService {
     }
 
     String bankCode = "";
-    String bankName = memberWithdraw.getBankName();
-    Map<String, String> banksMap =
-        JSONObject.parseArray(ppinterface.getLimtInfo()).stream()
-            .filter(Objects::nonNull)
-            .collect(
-                Collectors.toMap(
-                    o -> {
-                      JSONObject o1 = (JSONObject) o;
-                      return o1.getString("code");
-                    },
-                    o -> {
-                      JSONObject o1 = (JSONObject) o;
-                      return o1.getString("name");
-                    }));
-    for (Map.Entry<String, String> entry : banksMap.entrySet()) {
-      if (StringUtils.contains(entry.getValue(), bankName)
-          || StringUtils.contains(bankName, entry.getValue())) {
-        bankCode = entry.getKey();
+    List<MemberWithdrawBankVo> bankVoList =
+            JSONUtil.toList(
+                    (JSONArray) JSONUtil.parseObj(ppinterface.getLimtInfo()).get("banks"),
+                    MemberWithdrawBankVo.class);
+    for (MemberWithdrawBankVo ex : bankVoList) {
+      if (StringUtils.contains(ex.getName(), memberWithdraw.getBankName())
+              || StringUtils.contains(memberWithdraw.getBankName(), ex.getName())) {
+        bankCode = ex.getCode();
+        break;
       }
-      if (StringUtils.contains(entry.getValue(), "邮政") && StringUtils.contains(bankName, "邮政")) {
-        bankCode = entry.getKey();
-      }
-      // 处理银行名称模糊匹配无法正确设置对应code
-      if (StringUtils.equals(bankName, entry.getValue())) {
-        bankCode = entry.getKey();
+      if (StringUtils.contains(ex.getName(), "邮政")
+              && StringUtils.contains(memberWithdraw.getBankName(), "邮政")) {
+        bankCode = ex.getCode();
         break;
       }
     }

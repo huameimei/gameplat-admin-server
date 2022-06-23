@@ -1,6 +1,6 @@
 package com.gameplat.admin.model.vo;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -12,27 +12,27 @@ import java.util.Date;
 @Data
 public class MemberDeviceVO implements Serializable {
 
-  @ApiModelProperty(value = "主键")
+  @Schema(description = "主键")
   private Long id;
 
-  @ApiModelProperty(value = "会员账号")
+  @Schema(description = "会员账号")
   private String username;
 
-  @ApiModelProperty(value = "设备名称")
+  @Schema(description = "设备名称")
   private String deviceName;
 
-  @ApiModelProperty(value = "设备唯一标识")
+  @Schema(description = "设备唯一标识")
   private String deviceClientId;
 
-  @ApiModelProperty(value = "用户代理")
+  @Schema(description = "用户代理")
   private String deviceUserAgent;
 
-  @ApiModelProperty(value = "操作系统")
+  @Schema(description = "操作系统")
   private String deviceOsType;
 
-  @ApiModelProperty(value = "IP地址")
+  @Schema(description = "IP地址")
   private String ip;
 
-  @ApiModelProperty(value = "上次登录时间")
+  @Schema(description = "上次登录时间")
   private Date lastLoginTime;
 }

@@ -66,6 +66,14 @@ public class DataReportController {
     return dataReportService.findMemberReport(page, dto);
   }
 
+  @Operation(summary = "余额宝数据")
+  @GetMapping("findYuBaoDataReport")
+  public Object findYuBaoDataReport(@Parameter(hidden = true) Page<AccountReportVo> page, GameRWDataReportDto dto) {
+    return dataReportService.findYubaoReportData(page, dto);
+  }
+
+
+
   /** 红利 = 充值优惠 + 彩金 + VIP红利 + 活动红利 + 聊天室红包 VIP红利 = 周俸禄 + 月俸禄 + 升级奖励 + 生日礼金 + 每月红包 活动红利 = 活动彩金 */
   @Operation(summary = "红利数据统计")
   @GetMapping("findDividendtDataReport")
@@ -99,6 +107,17 @@ public class DataReportController {
     editGameRwDataReportSecondDto(dto);
     return dataReportService.findProxyData(dto);
   }
+
+
+  @Operation(summary = "首次二次充提")
+  @GetMapping("findRwData")
+  public PageDtoVO<GameRWDataVo> findRwData(Page<GameRWDataVo> page, GameRWDataReportDto dto) {
+    editGameRwDataReportDto(dto);
+    return dataReportService.findRwData(page, dto);
+  }
+
+
+
 
   private String getAccountSuperPath(String account) {
     return memberService.getSupperPath(account).orElseThrow(() -> new ServiceException("代理账号不存在"));

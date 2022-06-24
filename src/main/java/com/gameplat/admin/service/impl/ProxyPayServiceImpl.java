@@ -436,6 +436,9 @@ public class ProxyPayServiceImpl implements ProxyPayService {
     context.setProxyOrderNo(memberWithdraw.getCashOrderNo());
     context.setOrderTime(memberWithdraw.getCreateTime());
     context.setUserAccount(memberWithdraw.getAccount());
+    if(StringUtils.isNotEmpty(memberWithdraw.getRealName())){
+      context.setUserRealName(memberWithdraw.getRealName());
+    }
   }
 
   private String getProxyPayBankCode(

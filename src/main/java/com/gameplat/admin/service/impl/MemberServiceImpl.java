@@ -476,6 +476,14 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
   }
 
   @Override
+  public void batchLevel(MemberLevelBatchDTO dto) {
+    this.lambdaUpdate()
+            .set(Member::getUserLevel, dto.getLevel())
+            .in(Member::getId, dto.getIds())
+            .update();
+  }
+
+  @Override
   public Integer getMaxLevel() {
     return memberMapper.getMaxLevel();
   }

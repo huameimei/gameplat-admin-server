@@ -303,4 +303,15 @@ public class MemberController {
     boolean remove = memberFundPwdErrCount.remove(Convert.toStr(id));
     log.info("解除提现密码限制：{}", remove);
   }
+
+
+  @Operation(summary = "批量转层级")
+  @PostMapping("batchLevel")
+  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.MEMBER, desc = "'批量转层级'+#{dto.level}")
+  @PreAuthorize("hasAuthority('system:member:batchLevel')")
+  public void batchLevel(@RequestBody MemberLevelBatchDTO dto) {
+    log.info("批量操作人：{}", SecurityUserHolder.getUsername());
+    memberService.batchLevel(dto);
+  }
+
 }

@@ -169,4 +169,6 @@ public interface MemberService extends IService<Member> {
   MemberBalanceVO findMemberVip(String username, String level, String vipGrade);
 
   MemberContactVo getMemberDetail(Long id);
+
+  void batchLevel(MemberLevelBatchDTO dto);
 }

@@ -423,6 +423,7 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
     if (manualRechargeOrderBo.isSkipAuditing()) {
       String auditRemarks =
           StringUtils.isBlank(manualRechargeOrderBo.getAuditRemarks()) ? null : "直接入款";
+      rechargeOrder.setAcceptAccount(SecurityUserHolder.getUsername());
       accept(rechargeOrder.getId(), auditRemarks, false);
     }
   }

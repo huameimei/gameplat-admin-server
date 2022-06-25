@@ -59,11 +59,11 @@ public class MessageInfoEditDTO implements Serializable {
   @Schema(description = "关联账号")
   private String linkAccount;
 
-  @NotNull(message = "开始时间不能为空")
+  //@NotNull(message = "开始时间不能为空")
   @Schema(description = "开始时间")
   private String beginTime;
 
-  @NotNull(message = "结束时间不能为空")
+  //@NotNull(message = "结束时间不能为空")
   @Schema(description = "结束时间")
   private String endTime;
 

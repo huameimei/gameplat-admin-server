@@ -423,7 +423,6 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
     if (manualRechargeOrderBo.isSkipAuditing()) {
       String auditRemarks =
           StringUtils.isBlank(manualRechargeOrderBo.getAuditRemarks()) ? null : "直接入款";
-      rechargeOrder.setAcceptAccount(SecurityUserHolder.getUsername());
       accept(rechargeOrder.getId(), auditRemarks, false);
     }
   }
@@ -596,6 +595,7 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
             && !userCredential.isSuperAdmin();
     if (toCheck) {
       if (RechargeStatus.HANDLED.getValue() != rechargeOrder.getStatus()
+              && ObjectUtil.isNotEmpty(rechargeOrder.getAuditorAccount())
           && !userCredential.getUsername().equals(rechargeOrder.getAuditorAccount())) {
         throw new ServiceException("您无权操作此订单:" + rechargeOrder.getOrderNo());
       }

@@ -25,6 +25,7 @@ import com.gameplat.basepay.proxypay.thirdparty.ProxyDispatchContext;
 import com.gameplat.basepay.proxypay.thirdparty.ProxyPayBackResult;
 import com.gameplat.common.enums.*;
 import com.gameplat.common.model.bean.limit.MemberRechargeLimit;
+import com.gameplat.common.model.bean.limit.MemberWithdrawLimit;
 import com.gameplat.model.entity.member.Member;
 import com.gameplat.model.entity.member.MemberInfo;
 import com.gameplat.model.entity.member.MemberWithdraw;
@@ -166,8 +167,8 @@ public class ProxyPayServiceImpl implements ProxyPayService {
 
     // 封装第三方代付接口调用信息
     ProxyDispatchContext context = new ProxyDispatchContext();
-    MemberRechargeLimit rechargeLimit = this.limitInfoService.get(LimitEnums.MEMBER_RECHARGE_LIMIT);
-    String callbackDomain = rechargeLimit.getCallbackDomain();
+    MemberWithdrawLimit withdrawLimit = this.limitInfoService.get(LimitEnums.MEMBER_WITHDRAW_LIMIT);
+    String callbackDomain = withdrawLimit.getCallbackDomain();
     String domain = StringUtils.isNotEmpty(callbackDomain) ? callbackDomain : asyncCallbackUrl;
     if(!domain.endsWith("/")){
       domain += "/";

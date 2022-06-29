@@ -15,6 +15,5 @@ public class MemberPwdUpdateDTO implements Serializable {
   @NotEmpty(message = "登录密码不能为空")
   private String password;
 
-  @NotEmpty(message = "备注不能为空")
   private String remark;
 }

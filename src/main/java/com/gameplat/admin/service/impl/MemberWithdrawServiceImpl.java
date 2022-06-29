@@ -132,6 +132,13 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
       }
     }
 
+    /** 虚拟币出款不过滤三方 */
+    if (!WithdrawTypeConstant.DIRECT.equals(memberWithdraw.getWithdrawType())
+            || !WithdrawTypeConstant.BANK.equals(memberWithdraw.getWithdrawType())) {
+      log.info("代付商户虚拟币，过滤此商户，商户名称为：" + ppMerchant.getName());
+      return false;
+    }
+
     List<MemberWithdrawBankVo> bankVoList =
             JSONUtil.toList(
                     (JSONArray) JSONUtil.parseObj(ppInterface.getLimtInfo()).get("banks"),

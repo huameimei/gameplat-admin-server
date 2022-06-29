@@ -595,6 +595,7 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
             && !userCredential.isSuperAdmin();
     if (toCheck) {
       if (RechargeStatus.HANDLED.getValue() != rechargeOrder.getStatus()
+              && ObjectUtil.isNotEmpty(rechargeOrder.getAuditorAccount())
           && !userCredential.getUsername().equals(rechargeOrder.getAuditorAccount())) {
         throw new ServiceException("您无权操作此订单:" + rechargeOrder.getOrderNo());
       }

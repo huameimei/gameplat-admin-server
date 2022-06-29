@@ -20,6 +20,6 @@ public interface MessageFeignClient {
 
   /** 广播模式socket消息推送 */
   @Async
-  @PostMapping(value = "/api/internal/msg/topic", consumes = MediaType.APPLICATION_JSON_VALUE)
+  @PostMapping(value = "/api/internal/msg/sendAll", consumes = MediaType.APPLICATION_JSON_VALUE)
   void send(@RequestBody MessagePayload payload);
 }

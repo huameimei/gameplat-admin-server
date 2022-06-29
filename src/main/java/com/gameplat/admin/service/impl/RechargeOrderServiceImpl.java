@@ -990,6 +990,7 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
             return;
           }
 
+
           log.info("会员：{},充值金额:{}", a, dto.getAmount());
           dto.setAccount(memberVip.getAccount());
           ManualRechargeOrderBo manualRechargeOrderBo = new ManualRechargeOrderBo();

@@ -140,7 +140,7 @@
     <select id="batchUpdateSuperPathAndAgentLevel">
         UPDATE member
         SET super_path = REPLACE(super_path, #{originSuperPath}, #{superPath}),
-        agent_level = (agent_level - #{agentLevel})
+        agent_level = (agent_level - #{agentLevel} + 1)
         WHERE super_path LIKE CONCAT(#{originSuperPath}, '%')
         <if test="null != account and '' != account">
             AND account != #{account}

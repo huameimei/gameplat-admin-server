@@ -96,7 +96,7 @@ public class ProxyPayServiceImpl implements ProxyPayService {
     // 模糊匹配银行名称
     /** 模糊匹配银行名称 */
     boolean isBankName = true;
-    if (!memberWithdraw.getWithdrawType().equals(WithdrawTypeConstant.BANK)) {
+    if (!WithdrawTypeConstant.BANK.equals(memberWithdraw.getWithdrawType())) {
       isBankName = false;
     }
     for (MemberWithdrawBankVo ex : bankVoList) {

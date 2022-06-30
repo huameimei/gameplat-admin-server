@@ -23,6 +23,7 @@
         <result property="createTime" column="create_time"/>
         <result property="updateBy" column="update_by"/>
         <result property="updateTime" column="update_time"/>
+        <result property="jumpUrl" column="jump_url"/>
     </resultMap>
 
     <resultMap type="com.gameplat.admin.model.vo.SysSettingVO" id="sysTenantSetting1Result" extends="sysTenantSettingResult">
@@ -75,6 +76,7 @@
         `extend_5`,
         `create_by`,
         `create_time`,
+        `jump_url`,
         `update_by`,
         `update_time`
         from sys_setting

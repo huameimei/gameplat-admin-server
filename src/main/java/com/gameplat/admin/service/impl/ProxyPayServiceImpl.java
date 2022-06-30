@@ -23,6 +23,7 @@ import com.gameplat.basepay.pay.bean.NameValuePair;
 import com.gameplat.basepay.proxypay.thirdparty.ProxyCallbackContext;
 import com.gameplat.basepay.proxypay.thirdparty.ProxyDispatchContext;
 import com.gameplat.basepay.proxypay.thirdparty.ProxyPayBackResult;
+import com.gameplat.common.constant.WithdrawTypeConstant;
 import com.gameplat.common.enums.*;
 import com.gameplat.common.model.bean.limit.MemberRechargeLimit;
 import com.gameplat.common.model.bean.limit.MemberWithdrawLimit;
@@ -95,6 +96,9 @@ public class ProxyPayServiceImpl implements ProxyPayService {
     // 模糊匹配银行名称
     /** 模糊匹配银行名称 */
     boolean isBankName = true;
+    if (!memberWithdraw.getWithdrawType().equals(WithdrawTypeConstant.BANK)) {
+      isBankName = false;
+    }
     for (MemberWithdrawBankVo ex : bankVoList) {
       if (StringUtils.contains(ex.getName(), memberWithdraw.getBankName())
               || StringUtils.contains(memberWithdraw.getBankName(), ex.getName())) {

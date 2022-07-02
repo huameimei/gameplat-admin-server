@@ -295,6 +295,7 @@ public class ProxyPayServiceImpl implements ProxyPayService {
       Map<String, String> callbackParameters,
       String requestBody)
       throws Exception {
+    log.info("出款回调订单号={}", orderNo);
     MemberWithdraw memberWithdraw =
         memberWithdrawService.lambdaQuery().eq(MemberWithdraw::getCashOrderNo, orderNo).one();
     /** 校验体现订单信息 */
@@ -312,8 +313,8 @@ public class ProxyPayServiceImpl implements ProxyPayService {
     String resultStr =
         paymentCenterFeign.asyncCallbackProxyPay(
             proxyCallbackContext, beanName, memberWithdraw.getPpInterfaceName());
-    Result<ProxyPayBackResult> result = JSONUtil.toBean(resultStr, Result.class);
-    log.info("代付查询请求中心响应{}", result);
+    log.info("代付查询请求中心响应{}", resultStr);
+    Result result = JSONUtil.toBean(resultStr, Result.class);
     ProxyPayBackResult proxyPayBackResult = JSONObject.parseObject(JSONObject.toJSONString(result.getData()), ProxyPayBackResult.class);
     if (!result.isSucceed() || 0 != result.getCode()) {
       throw new ServiceException("第三方代付异步回调异常:" + proxyPayBackResult.getMessage() + "！！！请立即联系第三方核实再出款！！！");
@@ -337,13 +338,13 @@ public class ProxyPayServiceImpl implements ProxyPayService {
     }
 
     int orignCashStatus = memberWithdraw.getCashStatus();
-    if (!result.getData().isSuccess()) {
+    if (!proxyPayBackResult.isSuccess()) {
       /** 第三方出款失败，将代付状态改变 */
       memberWithdraw.setApproveReason("第三方出款失败");
       memberWithdraw.setProxyPayDesc("第三方出款失败");
       updateStatus(memberWithdraw, orignCashStatus, ProxyPayStatusEnum.PAY_FAIL.getCode());
       log.info("第三方出款订单 ：{} ！出款失败信息： {}", memberWithdraw.getCashOrderNo(), result.getMessage());
-      return result.getData().getResponseMsg();
+      return proxyPayBackResult.getResponseMsg();
     }
 
     /** 第三方出款成功 */
@@ -359,7 +360,7 @@ public class ProxyPayServiceImpl implements ProxyPayService {
     PpMerchant ppMerchant = ppMerchantService.getById(memberWithdraw.getPpMerchantId());
     updatePpMerchant(ppMerchant, memberWithdraw.getCashMoney());
     log.info("第三方出款成功,出款商户为:{} ,出款订单信息为：{}", memberWithdraw.getPpMerchantName(), memberWithdraw);
-    return result.getData().getResponseMsg();
+    return proxyPayBackResult.getResponseMsg();
   }
 
   /** 开启出入款订单是否允许其他账户操作配置 校验非超管账号是否原受理人 */

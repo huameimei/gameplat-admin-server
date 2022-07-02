@@ -237,7 +237,7 @@ public class MemberWealServiceImpl extends ServiceImpl<MemberWealMapper, MemberW
         // 取达到充值金额的会员账号&&达到有效投注金额的会员账号的交集
         List<String> intersectionList =
                 rechargeAccountList.stream().filter(betAccountList::contains).collect(toList());
-        if (type == 2) {
+        if (type == 3) {
             // 生日礼金
             // 过滤每个会员的生日是否在周期内
             if (CollectionUtil.isNotEmpty(intersectionList)) {

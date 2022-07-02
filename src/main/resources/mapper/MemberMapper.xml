@@ -474,4 +474,8 @@
         </if>
     </select>
 
+    <select id="getUserLevel" resultType="integer" parameterType="string">
+        select IFNULL(max(user_level),-999) from member where account = #{account}
+    </select>
+
 </mapper>

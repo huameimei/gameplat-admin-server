@@ -172,7 +172,8 @@ public class ProxyPayServiceImpl implements ProxyPayService {
     // 封装第三方代付接口调用信息
     ProxyDispatchContext context = new ProxyDispatchContext();
     MemberWithdrawLimit withdrawLimit = this.limitInfoService.get(LimitEnums.MEMBER_WITHDRAW_LIMIT);
-    String callbackDomain = withdrawLimit.getCallbackDomain();
+    //    String callbackDomain = withdrawLimit.getCallbackDomain();
+    String callbackDomain = "";
     String domain = StringUtils.isNotEmpty(callbackDomain) ? callbackDomain : asyncCallbackUrl;
     if(!domain.endsWith("/")){
       domain += "/";

@@ -107,4 +107,6 @@ public interface MemberMapper extends BaseMapper<Member> {
       @Param("username") String username,
       @Param("userlevel") String userlevel,
       @Param("vipGrade") String vipGrade);
+
+  Integer getUserLevel(@Param("account") String account);
 }

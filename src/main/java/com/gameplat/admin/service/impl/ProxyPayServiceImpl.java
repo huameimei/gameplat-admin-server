@@ -172,8 +172,8 @@ public class ProxyPayServiceImpl implements ProxyPayService {
     // 封装第三方代付接口调用信息
     ProxyDispatchContext context = new ProxyDispatchContext();
     MemberWithdrawLimit withdrawLimit = this.limitInfoService.get(LimitEnums.MEMBER_WITHDRAW_LIMIT);
-    //String callbackDomain = withdrawLimit.getCallbackDomain();
-    String domain = null;//StringUtils.isNotEmpty(callbackDomain) ? callbackDomain : asyncCallbackUrl;
+    String callbackDomain = withdrawLimit.getCallbackDomain();
+    String domain = StringUtils.isNotEmpty(callbackDomain) ? callbackDomain : asyncCallbackUrl;
     if(!domain.endsWith("/")){
       domain += "/";
     }
@@ -301,9 +301,6 @@ public class ProxyPayServiceImpl implements ProxyPayService {
     if (memberWithdraw == null) {
       throw new ServiceException("充值订单不存在或订单已处理");
     }
-    memberWithdraw.setPpInterface("GoPayProxyPay");
-    memberWithdraw.setPpMerchantId(1488L);
-    memberWithdraw.setPpInterfaceName("GoPayProxyPay");
     String beanName = getProxyInterfaceCode(memberWithdraw);
     ProxyCallbackContext proxyCallbackContext = getProxyCallbackContent(memberWithdraw);
     proxyCallbackContext.setUrl(url);

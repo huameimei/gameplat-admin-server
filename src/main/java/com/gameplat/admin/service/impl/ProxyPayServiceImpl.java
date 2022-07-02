@@ -314,7 +314,7 @@ public class ProxyPayServiceImpl implements ProxyPayService {
             proxyCallbackContext, beanName, memberWithdraw.getPpInterfaceName());
     log.info("代付查询请求中心响应{}", resultStr);
     Result result = JSONUtil.toBean(resultStr, Result.class);
-    ProxyPayBackResult proxyPayBackResult = JSONObject.parseObject(result.getData().toString(), ProxyPayBackResult.class);
+    ProxyPayBackResult proxyPayBackResult = JSONObject.parseObject(JSONObject.toJSONString(result.getData()), ProxyPayBackResult.class);
     if (!result.isSucceed() || 0 != result.getCode()) {
       throw new ServiceException("第三方代付异步回调异常:" + proxyPayBackResult.getMessage() + "！！！请立即联系第三方核实再出款！！！");
     }

@@ -295,6 +295,7 @@ public class ProxyPayServiceImpl implements ProxyPayService {
       Map<String, String> callbackParameters,
       String requestBody)
       throws Exception {
+    log.info("出款回调订单号={}", orderNo);
     MemberWithdraw memberWithdraw =
         memberWithdrawService.lambdaQuery().eq(MemberWithdraw::getCashOrderNo, orderNo).one();
     /** 校验体现订单信息 */

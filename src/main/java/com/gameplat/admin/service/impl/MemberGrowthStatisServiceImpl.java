@@ -5,13 +5,17 @@ import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.RandomUtil;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.gameplat.admin.constant.TrueFalse;
 import com.gameplat.admin.convert.MemberGrowthStatisConvert;
+import com.gameplat.admin.enums.BlacklistConstant;
 import com.gameplat.admin.enums.PushMessageEnum;
+import com.gameplat.admin.mapper.BizBlacklistMapper;
 import com.gameplat.admin.mapper.MemberGrowthStatisMapper;
 import com.gameplat.admin.mapper.MessageMapper;
 import com.gameplat.admin.model.bean.ActivityMemberInfo;
@@ -26,6 +30,7 @@ import com.gameplat.common.enums.BooleanEnum;
 import com.gameplat.common.enums.GrowthChangeEnum;
 import com.gameplat.common.enums.TranTypes;
 import com.gameplat.model.entity.ValidWithdraw;
+import com.gameplat.model.entity.blacklist.BizBlacklist;
 import com.gameplat.model.entity.member.*;
 import com.gameplat.model.entity.message.Message;
 import lombok.extern.slf4j.Slf4j;
@@ -98,6 +103,8 @@ public class MemberGrowthStatisServiceImpl
 
     @Autowired
     private MemberInfoService memberInfoService;
+
+  @Autowired private BizBlacklistMapper blacklistMapper;
 
     public static final Object lockHelper = new Object();
 
@@ -464,19 +471,10 @@ public class MemberGrowthStatisServiceImpl
      */
     @Override
     public void dealPayUpReword(Integer beforeLevel, Integer afterLevel, MemberGrowthConfig growthConfig, Member member) {
-        // 查询用户是否在黑名单中
-        List<MemberBlackList> memberBlackList =
-                memberBlackListService.findMemberBlackList(
-                        new MemberBlackList() {
-                            {
-                                setUserAccount(member.getAccount());
-                            }
-                        });
-
+    boolean blackFlag = this.checkBizBlack(member);
         String content = "VIP等级升级";
-
-        //判断是否发放奖励 并且是否在黑名单中
-        if (BooleanEnum.YES.match(growthConfig.getIsPayUpReword()) && memberBlackList.size() <= 0) {
+    // 判断是否发放奖励 并且是否在黑名单中
+    if (BooleanEnum.YES.match(growthConfig.getIsPayUpReword()) && blackFlag) {
 
             BigDecimal rewordAmount = new BigDecimal("0");
 
@@ -642,4 +640,40 @@ public class MemberGrowthStatisServiceImpl
         cal.set(Calendar.MILLISECOND, 0);
         return (cal.getTimeInMillis() - System.currentTimeMillis()) / 1000;
     }
+
+  public boolean checkBizBlack(Member member) {
+    // 获取业务 分红黑名单 集合
+    QueryWrapper<BizBlacklist> queryBizWrapper = new QueryWrapper<>();
+    queryBizWrapper.like(
+        "types", BlacklistConstant.BizBlacklistType.LEVEL_UPGRADE_REWARD.getValue());
+    List<BizBlacklist> bizBlacklists = blacklistMapper.selectList(queryBizWrapper);
+    // 会员账号业务黑名单
+    List<BizBlacklist> accountBlackList =
+        bizBlacklists.stream()
+            .filter(item -> item.getTargetType() == TrueFalse.FALSE.getValue())
+            .collect(Collectors.toList());
+    // 用户层级业务黑名单
+    List<BizBlacklist> userLevelBlackList =
+        bizBlacklists.stream()
+            .filter(item -> item.getTargetType() == TrueFalse.TRUE.getValue())
+            .collect(Collectors.toList());
+    List<String> accountBlacks = new ArrayList<>();
+    List<String> userLevelBlacks = new ArrayList<>();
+
+    if (CollectionUtil.isNotEmpty(accountBlackList)) {
+      accountBlacks =
+          accountBlackList.stream().map(BizBlacklist::getTarget).collect(Collectors.toList());
+    }
+    if (CollectionUtil.isNotEmpty(userLevelBlackList)) {
+      userLevelBlacks =
+          userLevelBlackList.stream().map(BizBlacklist::getTarget).collect(Collectors.toList());
+    }
+    boolean blackFlag = true;
+    if (accountBlacks.contains(member.getAccount())
+        || userLevelBlacks.contains(member.getUserLevel().toString())) {
+      blackFlag = false;
+      log.info("用户：{}被加入业主黑名单", member.getAccount());
+    }
+    return blackFlag;
+  }
 }

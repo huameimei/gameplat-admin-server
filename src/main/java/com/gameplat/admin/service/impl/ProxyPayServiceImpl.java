@@ -172,8 +172,8 @@ public class ProxyPayServiceImpl implements ProxyPayService {
     // 封装第三方代付接口调用信息
     ProxyDispatchContext context = new ProxyDispatchContext();
     MemberWithdrawLimit withdrawLimit = this.limitInfoService.get(LimitEnums.MEMBER_WITHDRAW_LIMIT);
-    String callbackDomain = withdrawLimit.getCallbackDomain();
-    String domain = StringUtils.isNotEmpty(callbackDomain) ? callbackDomain : asyncCallbackUrl;
+    //String callbackDomain = withdrawLimit.getCallbackDomain();
+    String domain = null;//StringUtils.isNotEmpty(callbackDomain) ? callbackDomain : asyncCallbackUrl;
     if(!domain.endsWith("/")){
       domain += "/";
     }
@@ -301,6 +301,9 @@ public class ProxyPayServiceImpl implements ProxyPayService {
     if (memberWithdraw == null) {
       throw new ServiceException("充值订单不存在或订单已处理");
     }
+    memberWithdraw.setPpInterface("GoPayProxyPay");
+    memberWithdraw.setPpMerchantId(1488L);
+    memberWithdraw.setPpInterfaceName("GoPayProxyPay");
     String beanName = getProxyInterfaceCode(memberWithdraw);
     ProxyCallbackContext proxyCallbackContext = getProxyCallbackContent(memberWithdraw);
     proxyCallbackContext.setUrl(url);
@@ -312,9 +315,9 @@ public class ProxyPayServiceImpl implements ProxyPayService {
     String resultStr =
         paymentCenterFeign.asyncCallbackProxyPay(
             proxyCallbackContext, beanName, memberWithdraw.getPpInterfaceName());
-    Result<ProxyPayBackResult> result = JSONUtil.toBean(resultStr, Result.class);
-    log.info("代付查询请求中心响应{}", result);
-    ProxyPayBackResult proxyPayBackResult = JSONObject.parseObject(JSONObject.toJSONString(result.getData()), ProxyPayBackResult.class);
+    log.info("代付查询请求中心响应{}", resultStr);
+    Result result = JSONUtil.toBean(resultStr, Result.class);
+    ProxyPayBackResult proxyPayBackResult = JSONObject.parseObject(result.getData().toString(), ProxyPayBackResult.class);
     if (!result.isSucceed() || 0 != result.getCode()) {
       throw new ServiceException("第三方代付异步回调异常:" + proxyPayBackResult.getMessage() + "！！！请立即联系第三方核实再出款！！！");
     }
@@ -337,13 +340,13 @@ public class ProxyPayServiceImpl implements ProxyPayService {
     }
 
     int orignCashStatus = memberWithdraw.getCashStatus();
-    if (!result.getData().isSuccess()) {
+    if (!proxyPayBackResult.isSuccess()) {
       /** 第三方出款失败，将代付状态改变 */
       memberWithdraw.setApproveReason("第三方出款失败");
       memberWithdraw.setProxyPayDesc("第三方出款失败");
       updateStatus(memberWithdraw, orignCashStatus, ProxyPayStatusEnum.PAY_FAIL.getCode());
       log.info("第三方出款订单 ：{} ！出款失败信息： {}", memberWithdraw.getCashOrderNo(), result.getMessage());
-      return result.getData().getResponseMsg();
+      return proxyPayBackResult.getResponseMsg();
     }
 
     /** 第三方出款成功 */
@@ -359,7 +362,7 @@ public class ProxyPayServiceImpl implements ProxyPayService {
     PpMerchant ppMerchant = ppMerchantService.getById(memberWithdraw.getPpMerchantId());
     updatePpMerchant(ppMerchant, memberWithdraw.getCashMoney());
     log.info("第三方出款成功,出款商户为:{} ,出款订单信息为：{}", memberWithdraw.getPpMerchantName(), memberWithdraw);
-    return result.getData().getResponseMsg();
+    return proxyPayBackResult.getResponseMsg();
   }
 
   /** 开启出入款订单是否允许其他账户操作配置 校验非超管账号是否原受理人 */

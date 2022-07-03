@@ -58,4 +58,7 @@ public class SysFloatTypeVo implements Serializable {
   private List<SysFloatSettingVo> settingList;
 
   private List<String> showPositionList;
+
+  /** 终端 */
+  private String terminal;
 }

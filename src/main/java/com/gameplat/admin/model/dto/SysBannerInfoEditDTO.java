@@ -81,4 +81,7 @@ public class SysBannerInfoEditDTO implements Serializable {
   /** banner标题 */
   @Schema(description = "banner标题")
   private String title;
+
+  @Schema(description = "游戏配置")
+  private String gameConfig;
 }

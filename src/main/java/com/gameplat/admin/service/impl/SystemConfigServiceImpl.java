@@ -1,10 +1,8 @@
 package com.gameplat.admin.service.impl;
 
-import cn.hutool.core.date.DateUtil;
-import cn.hutool.core.util.RandomUtil;
+import cn.hutool.core.util.ObjectUtil;
 import com.alicp.jetcache.anno.CacheInvalidate;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
-import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.gameplat.admin.convert.AgentContacaConfigConvert;
 import com.gameplat.admin.model.dto.AgentContactDTO;
@@ -44,16 +42,17 @@ public class SystemConfigServiceImpl implements SystemConfigService {
     SysDictData dictData =
         dictDataService.getDictData(
             DictTypeEnum.AGENT_CONTACT_CONFIG.getValue(), DictDataEnum.AGENT_CONTACT.getLabel());
-
-    List<AgentContacaConfig> contactList =
-        Optional.of(dictData)
-            .map(SysDictData::getDictValue)
-            .map(c -> JsonUtils.parse(c, new TypeReference<List<AgentContacaConfig>>() {}))
-            .orElse(Collections.emptyList());
-
+    List<AgentContacaConfig> contactList = null;
+    if (ObjectUtil.isNotEmpty(dictData)) {
+      contactList =
+              Optional.of(dictData)
+                      .map(SysDictData::getDictValue)
+                      .map(c -> JsonUtils.parse(c, new TypeReference<List<AgentContacaConfig>>() {
+                      }))
+                      .orElse(Collections.emptyList());
+    }
     AgentContacaConfig agentContacaConfig = agentContacaConfigConvert.toEntity(dto);
     List<AgentContacaConfig> list = new ArrayList<>();
-
     boolean flag = false;
     if (CollectionUtils.isNotEmpty(contactList)) {
       for (AgentContacaConfig config : contactList) {

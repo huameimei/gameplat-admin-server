@@ -43,7 +43,7 @@ public class SystemConfigServiceImpl implements SystemConfigService {
         dictDataService.getDictData(
             DictTypeEnum.AGENT_CONTACT_CONFIG.getValue(), DictDataEnum.AGENT_CONTACT.getLabel());
     List<AgentContacaConfig> contactList = null;
-    if (ObjectUtil.isNotEmpty(dictData) && ObjectUtil.isEmpty(dictData.getDictValue())) {
+    if (ObjectUtil.isNotEmpty(dictData) && ObjectUtil.isNotEmpty(dictData.getDictValue())) {
       contactList =
               Optional.of(dictData)
                       .map(SysDictData::getDictValue)

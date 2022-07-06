@@ -20,7 +20,7 @@ public interface DataReportService {
   GameAccountDataReportVo findMemberReport(Page<AccountReportVo> page, GameRWDataReportDto dto);
 
 
-  YuBaoReportDataVo findYubaoReportData(Page<AccountReportVo> page, GameRWDataReportDto dto);
+  PageDtoVO findYubaoReportData(Page<YuBaoMemberBalanceVo> page, GameRWDataReportDto dto);
 
   GameDividendDataVo findDividendtDataReport(GameRWDataReportDto dto);
 

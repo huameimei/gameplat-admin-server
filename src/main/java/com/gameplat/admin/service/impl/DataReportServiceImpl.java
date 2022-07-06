@@ -232,21 +232,21 @@ public class DataReportServiceImpl extends ServiceImpl<DataReportMapper, GameRec
   }
 
   @Override
-  public YuBaoReportDataVo findYubaoReportData(
-          Page<AccountReportVo> page, GameRWDataReportDto dto) {
+  public PageDtoVO findYubaoReportData(Page<YuBaoMemberBalanceVo> page, GameRWDataReportDto dto) {
     YuBaoReportDataVo vo = new YuBaoReportDataVo();
     QueryWrapper<MemberInfo> query = Wrappers.query();
     query.select("sum(yubao_amount) yubao_amount ");
-    query.eq(ObjectUtil.isNotEmpty(dto.getAccount()), "account", dto.getAccount());
-    query.between("date", dto.getStartTime(), dto.getEndTime());
     MemberInfo memberInfo = this.memberInfoMapper.selectOne(query);
+    Map<String, BigDecimal> map = new HashMap<>();
+    map.put("yubaoAmount", memberInfo.getYubaoAmount());
     BigDecimal yubaoAmount = memberInfo.getYubaoAmount();
     vo.setYuBaoIncome(yubaoAmount);
-    return null;
+    Page<YuBaoReportDataVo> yuBaoBalance = memberInfoMapper.findYuBaoBalance(page, dto);
+    PageDtoVO pageDtoVO = new PageDtoVO();
+    pageDtoVO.setPage(yuBaoBalance);
+    pageDtoVO.setOtherData(map);
+    return pageDtoVO;
   }
-
-
-
 
   @Override
   public GameDividendDataVo findDividendtDataReport(GameRWDataReportDto dto) {

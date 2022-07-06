@@ -37,4 +37,9 @@ public class GameRWDataReportDto implements Serializable {
   @Schema(description = "起始下标")
   private Integer size;
 
+  /**
+   * 会员状态
+   */
+  private String state;
+
 }

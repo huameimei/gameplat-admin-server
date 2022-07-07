@@ -68,11 +68,10 @@ public class DataReportController {
 
   @Operation(summary = "余额宝数据")
   @GetMapping("findYuBaoDataReport")
-  public Object findYuBaoDataReport(@Parameter(hidden = true) Page<AccountReportVo> page, GameRWDataReportDto dto) {
+  public PageDtoVO findYuBaoDataReport(
+          @Parameter(hidden = true) Page<YuBaoMemberBalanceVo> page, GameRWDataReportDto dto) {
     return dataReportService.findYubaoReportData(page, dto);
   }
-
-
 
   /** 红利 = 充值优惠 + 彩金 + VIP红利 + 活动红利 + 聊天室红包 VIP红利 = 周俸禄 + 月俸禄 + 升级奖励 + 生日礼金 + 每月红包 活动红利 = 活动彩金 */
   @Operation(summary = "红利数据统计")

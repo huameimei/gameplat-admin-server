@@ -70,7 +70,7 @@ public interface MemberMapper extends BaseMapper<Member> {
   List<Member> getListByAgentAccout(String agentAccount);
 
   /** 根据用户名查生日信息 */
-  List<Member> findByUserNameList(List<String> userNames);
+  List<Member> findByUserNameList(@Param("userNames") List<String> userNames);
 
   /**
    * 根据账号查询投注日报表所需数据
@@ -107,4 +107,6 @@ public interface MemberMapper extends BaseMapper<Member> {
       @Param("username") String username,
       @Param("userlevel") String userlevel,
       @Param("vipGrade") String vipGrade);
+
+  Integer getUserLevel(@Param("account") String account);
 }

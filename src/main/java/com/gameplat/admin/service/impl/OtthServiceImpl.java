@@ -15,6 +15,7 @@ import com.gameplat.admin.model.vo.*;
 import com.gameplat.admin.service.*;
 import com.gameplat.base.common.context.DyDataSourceContextHolder;
 import com.gameplat.base.common.context.GlobalContextHolder;
+import com.gameplat.base.common.enums.ResultCode;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.log.SysLog;
 import com.gameplat.base.common.util.DateUtils;
@@ -605,7 +606,7 @@ public class OtthServiceImpl implements OtthService {
     if (respBean.getStatus() == 200) {
       String respBody = respBean.getRespBody();
       if (StringUtils.isBlank(respBody)) {
-        return new Object();
+        return ResultCode.SUCCESS.message();
       }
       return JSON.parse(respBody);
     } else {

@@ -85,7 +85,6 @@ public class SysDictDataServiceImpl extends ServiceImpl<SysDictDataMapper, SysDi
 
   @Override
   @SentinelResource(value = "getDictDataByType")
-  @Cached(name = CachedKeys.DICT_DATA_CACHE, key = "#dictType")
   public List<SysDictData> getDictDataByType(String dictType) {
     return this.lambdaQuery()
         .eq(SysDictData::getStatus, EnableEnum.ENABLED.code())
@@ -95,7 +94,6 @@ public class SysDictDataServiceImpl extends ServiceImpl<SysDictDataMapper, SysDi
 
   @Override
   @SentinelResource(value = "getDictDataByTypes")
-  @Cached(name = CachedKeys.DICT_DATA_CACHE, key = "#dictTypes")
   public List<SysDictData> getDictDataByTypes(List<String> dictTypes) {
     return this.lambdaQuery()
         .eq(SysDictData::getStatus, EnableEnum.ENABLED.code())
@@ -115,7 +113,6 @@ public class SysDictDataServiceImpl extends ServiceImpl<SysDictDataMapper, SysDi
 
   @Override
   @SentinelResource(value = "getDictDataValue")
-  @Cached(name = CachedKeys.DICT_DATA_CACHE, key = "#dictType + ':' + #dictLabel")
   public String getDictDataValue(String dictType, String dictLabel) {
     return this.lambdaQuery()
         .eq(SysDictData::getStatus, EnableEnum.ENABLED.code())

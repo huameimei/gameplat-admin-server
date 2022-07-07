@@ -140,7 +140,7 @@
     <select id="batchUpdateSuperPathAndAgentLevel">
         UPDATE member
         SET super_path = REPLACE(super_path, #{originSuperPath}, #{superPath}),
-        agent_level = (agent_level - #{agentLevel})
+        agent_level = (agent_level - #{agentLevel} + 1)
         WHERE super_path LIKE CONCAT(#{originSuperPath}, '%')
         <if test="null != account and '' != account">
             AND account != #{account}
@@ -472,6 +472,10 @@
         <if test="userlevel != null and userlevel != ''">
             AND user_level = #{userlevel}
         </if>
+    </select>
+
+    <select id="getUserLevel" resultType="integer" parameterType="string">
+        select IFNULL(max(user_level),-999) from member where account = #{account}
     </select>
 
 </mapper>

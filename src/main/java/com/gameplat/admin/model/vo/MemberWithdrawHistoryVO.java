@@ -62,6 +62,8 @@ public class MemberWithdrawHistoryVO {
 
   private BigDecimal approveMoney;
 
+  private String approveReason;
+
   private Long ppMerchantId;
 
   private String cashReason;

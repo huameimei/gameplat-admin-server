@@ -386,8 +386,13 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
                 member.getId(), memberWithdraw.getCashMoney().negate(), memberWithdraw.getPointFlag());
       } else if (WithdrawStatus.CANCELLED.getValue() == cashStatus) { // 取消出款操作
         if (ObjectUtil.isNotEmpty(cashReason)) {
-          memberWithdraw.setCashReason(cashReason);
-          updateRemarks(id, cashReason);
+          memberWithdraw.setApproveReason(cashReason);
+          if (null == cashReason) {
+            throw new ServiceException("备注信息不能为空!");
+          }
+          LambdaUpdateWrapper<MemberWithdraw> update = Wrappers.lambdaUpdate();
+          update.set(MemberWithdraw::getApproveReason, cashReason).eq(MemberWithdraw::getId, id);
+          this.update(new MemberWithdraw(), update);
         }
         // 释放会员提现冻结金额
         memberInfoService.updateFreeze(member.getId(), memberWithdraw.getCashMoney().negate());

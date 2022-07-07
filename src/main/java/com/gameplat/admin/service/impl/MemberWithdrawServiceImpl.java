@@ -386,6 +386,7 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
                 member.getId(), memberWithdraw.getCashMoney().negate(), memberWithdraw.getPointFlag());
       } else if (WithdrawStatus.CANCELLED.getValue() == cashStatus) { // 取消出款操作
         if (ObjectUtil.isNotEmpty(cashReason)) {
+          memberWithdraw.setCashReason(cashReason);
           updateRemarks(id, cashReason);
         }
         // 释放会员提现冻结金额

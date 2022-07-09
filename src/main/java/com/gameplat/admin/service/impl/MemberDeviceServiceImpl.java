@@ -31,6 +31,8 @@ public class MemberDeviceServiceImpl extends ServiceImpl<MemberDeviceMapper, Mem
             ObjectUtil.isNotEmpty(queryDTO.getDeviceClientId()),
             MemberDevice::getDeviceClientId,
             queryDTO.getDeviceClientId())
+            .groupBy(MemberDevice::getDeviceClientId)
+            .groupBy(MemberDevice::getUsername)
         .page(page)
         .convert(memberDeviceConvert::toVo);
   }

@@ -473,6 +473,32 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
     return null;
   }
 
+  @Override
+  public List<ActivityStatisticItem> findAllTwoRechargeAmount(Map<String, Object> map) {
+    String startTime = (String) map.get("startTime");
+    String endTime = (String) map.get("endTime");
+    // 查询出包含历史记录在内会员的二次成功充值订单
+    map.remove("startTime");
+    map.remove("endTime");
+    List<ActivityStatisticItem> twoRechargeOrderList =
+            rechargeOrderMapper.findTwoRechargeAmount(map);
+    if (CollectionUtils.isNotEmpty(twoRechargeOrderList)) {
+      for (ActivityStatisticItem twoRechargeOrder : twoRechargeOrderList) {
+        // 判断该订单的充值时间是否在活动的有效期内
+        if (cn.hutool.core.date.DateUtil.isIn(
+                twoRechargeOrder.getRechargeTime(),
+                cn.hutool.core.date.DateUtil.parseDate(startTime),
+                cn.hutool.core.date.DateUtil.parseDate(endTime))) {
+          twoRechargeOrder.setIsNewUser(1);
+        } else {
+          twoRechargeOrder.setIsNewUser(2);
+        }
+      }
+      return twoRechargeOrderList;
+    }
+    return null;
+  }
+
   /** 根据会员和最后修改时间获取充值次数、充值金额、充值优惠、其它优惠 */
   @Override
   public MemberActivationVO getRechargeInfoByNameAndUpdateTime(

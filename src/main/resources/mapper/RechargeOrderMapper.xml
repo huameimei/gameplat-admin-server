@@ -215,6 +215,51 @@
         ORDER BY audit_time,id
     </select>
 
+    <select id="findTwoRechargeAmount" resultType="com.gameplat.admin.model.bean.ActivityStatisticItem">
+        SELECT
+        member_id userId,
+        account userName,
+        DATE_FORMAT(audit_time,'%Y-%m-%d') AS rechargeTime,
+        amount AS twoRechargeAmount
+        FROM
+        (
+        SELECT
+        DENSE_RANK() over ( PARTITION BY account ORDER BY audit_time ) AS rankk,
+        account,
+        amount,
+        member_id,
+        audit_time
+        FROM
+        recharge_order
+        <where>
+            AND status = 3
+            <if test="userIdList != null and userIdList.size > 0">
+                AND member_id IN
+                <foreach collection="userIdList" index="index" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="userNameList != null and userNameList.size > 0">
+                AND account IN
+                <foreach collection="userNameList" index="index" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="payType != null and payType != ''">
+                AND mode IN (${payType})
+            </if>
+            <if test="startTime != null and startTime != ''">
+                AND audit_time <![CDATA[>= ]]> #{startTime}
+            </if>
+            <if test="endTime != null and endTime != ''">
+                AND audit_time <![CDATA[<= ]]> #{endTime}
+            </if>
+        </where>
+        ) AS a
+        WHERE
+        a.rankk = 2
+    </select>
+
     <!--根据会员和时间获取充值次数、充值金额、充值优惠、其它优惠-->
     <select id="getRechargeInfoByNameAndUpdateTime" resultType="com.gameplat.admin.model.vo.MemberActivationVO">
         SELECT sum( rechargeCount ), sum( rechargeMoney ), sum( rechargeDiscounts )

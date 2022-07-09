@@ -133,4 +133,7 @@ public class ActivityLobbyDTO implements Serializable {
 
   @Schema(description = "申请日期集合")
   private String applyDateList;
+
+  @Schema(description = "奖励计算类型")
+  private Integer rewardCalculateType;
 }

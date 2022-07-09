@@ -283,7 +283,12 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
   }
 
   @Override
-  public void modify(Long id, Integer cashStatus, Integer curStatus, UserEquipment userEquipment) {
+  public void modify(
+          Long id,
+          Integer cashStatus,
+          Integer curStatus,
+          UserEquipment userEquipment,
+          String cashReason) {
     if (null == id || null == cashStatus || null == curStatus || cashStatus.equals(curStatus)) {
       throw new ServiceException("错误的参数.");
     }
@@ -380,6 +385,15 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
         memberInfoService.updateUserWithTimes(
                 member.getId(), memberWithdraw.getCashMoney().negate(), memberWithdraw.getPointFlag());
       } else if (WithdrawStatus.CANCELLED.getValue() == cashStatus) { // 取消出款操作
+        if (ObjectUtil.isNotEmpty(cashReason)) {
+          memberWithdraw.setApproveReason(cashReason);
+          if (null == cashReason) {
+            throw new ServiceException("备注信息不能为空!");
+          }
+          LambdaUpdateWrapper<MemberWithdraw> update = Wrappers.lambdaUpdate();
+          update.set(MemberWithdraw::getApproveReason, cashReason).eq(MemberWithdraw::getId, id);
+          this.update(new MemberWithdraw(), update);
+        }
         // 释放会员提现冻结金额
         memberInfoService.updateFreeze(member.getId(), memberWithdraw.getCashMoney().negate());
         // 释放会员提现金额
@@ -424,14 +438,15 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
     // 新增消息
     if (ObjectUtil.equals(cashStatus, WithdrawStatus.SUCCESS.getValue())
         || ObjectUtil.equals(cashStatus, WithdrawStatus.CANCELLED.getValue())) {
-      this.addMessageInfo(memberWithdraw, WithdrawStatus.SUCCESS.getValue());
       if (ObjectUtil.equals(WithdrawStatus.SUCCESS.getValue(), cashStatus)) {
+        this.addMessageInfo(memberWithdraw, WithdrawStatus.SUCCESS.getValue());
         MemberWithdrawLimit withradLimit = limitInfoService.getWithradLimit();
         this.sendMessage(
             memberWithdraw.getAccount(),
                 SocketEnum.SOCKET_WITHDRAW_SUCCESS,
             withradLimit.getUserApplyLoanAfterHintsMessage());
       } else if (ObjectUtil.equals(cashStatus, WithdrawStatus.CANCELLED.getValue())) {
+        this.addMessageInfo(memberWithdraw, WithdrawStatus.CANCELLED.getValue());
         this.sendMessage(
             memberWithdraw.getAccount(),
                 SocketEnum.SOCKET_WITHDRAW_CANCEL,
@@ -442,8 +457,12 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
 
   @Override
   public void batchModify(
-      List<MemberWithdrawDTO> dtoList, WithdrawStatus status, UserEquipment equipment) {
-    dtoList.forEach(e -> modify(e.getId(), status.getValue(), e.getCurStatus(), equipment));
+          List<MemberWithdrawDTO> dtoList,
+          WithdrawStatus status,
+          UserEquipment equipment,
+          String cashReason) {
+    dtoList.forEach(
+            e -> modify(e.getId(), status.getValue(), e.getCurStatus(), equipment, cashReason));
   }
 
   /** 过滤不符合规则的第三方出款商户 */

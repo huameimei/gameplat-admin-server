@@ -1,6 +1,7 @@
 package com.gameplat.admin.controller.open.finance;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.json.JSONUtil;
 import com.alibaba.excel.EasyExcel;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.gameplat.admin.model.bean.*;
@@ -302,16 +303,19 @@ public class RechargeOrderController {
       @RequestPart(value = "file", required = false) MultipartFile file,
       ManualRechargeOrderDto dto,
       HttpServletRequest request) {
-
+    log.info("入参：{}", JSONUtil.parse(dto));
     // 开始批量解析文件
-    MemberRechBatchListener memberRechBatchListener = new MemberRechBatchListener();
-    EasyExcel.read(file.getInputStream(), RechargeMemberFileBean.class, memberRechBatchListener)
-            .sheet()
-            .doRead();
-    List<RechargeMemberFileBean> strAccount = memberRechBatchListener.getVoList();
-    log.info("会员账号数据：{}", strAccount.size());
-    if (CollUtil.isEmpty(strAccount)) {
-      return;
+    List<RechargeMemberFileBean> strAccount = null;
+    if (file != null) {
+      MemberRechBatchListener memberRechBatchListener = new MemberRechBatchListener();
+      EasyExcel.read(file.getInputStream(), RechargeMemberFileBean.class, memberRechBatchListener)
+              .sheet()
+              .doRead();
+      strAccount = memberRechBatchListener.getVoList();
+      log.info("会员账号数据：{}", strAccount.size());
+      if (CollUtil.isEmpty(strAccount)) {
+        return;
+      }
     }
     UserEquipment clientInfo = UserEquipment.create(request);
     rechargeOrderService.batchMemberRecharge(clientInfo, strAccount, dto);

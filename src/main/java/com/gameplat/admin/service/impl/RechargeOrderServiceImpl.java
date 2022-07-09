@@ -982,15 +982,30 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
       UserEquipment clientInfo,
       List<RechargeMemberFileBean> strAccount,
       ManualRechargeOrderDto dto) {
-    strAccount.forEach(
+    List<RechargeMemberFileBean> strAccountList = new ArrayList<>();
+    // 根据vip 等级获取账号
+    if (ObjectUtil.isNotEmpty(dto.getLevel()) || ObjectUtil.isNotEmpty(dto.getVip())) {
+      List<RechargeMemberFileBean> accountStr =
+              memberService.findMemberRechVip(dto.getLevel(), dto.getVip());
+      if (ObjectUtil.isNotEmpty(accountStr)) {
+        strAccountList.addAll(accountStr);
+      }
+    }
+    if (ObjectUtil.isNotEmpty(strAccount)) {
+      strAccountList.addAll(strAccount);
+    }
+    if (ObjectUtil.isEmpty(strAccountList)) {
+      return;
+    }
+
+    strAccountList = strAccountList.stream().distinct().collect(Collectors.toList());
+
+    strAccountList.forEach(
         a -> {
-          MemberBalanceVO memberVip =
-              memberService.findMemberVip(a.getUsername(), dto.getLevel(), dto.getVip());
+          MemberBalanceVO memberVip = memberService.findMemberVip(a.getUsername());
           if (memberVip == null || StringUtils.isEmpty(memberVip.getAccount())) {
             return;
           }
-
-
           log.info("会员：{},充值金额:{}", a, dto.getAmount());
           dto.setAccount(memberVip.getAccount());
           ManualRechargeOrderBo manualRechargeOrderBo = new ManualRechargeOrderBo();

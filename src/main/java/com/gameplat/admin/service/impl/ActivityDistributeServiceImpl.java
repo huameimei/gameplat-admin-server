@@ -183,7 +183,7 @@ public class ActivityDistributeServiceImpl
       wealReword.setUserId(activityDistribute.getUserId());
       wealReword.setUserName(activityDistribute.getUsername());
       wealReword.setRewordAmount(activityDistribute.getDiscountsMoney());
-      wealReword.setWithdrawDml(new BigDecimal(activityDistribute.getWithdrawDml()));
+      wealReword.setWithdrawDml(activityDistribute.getWithdrawDml());
       wealReword.setType(5); // 5 活动大厅奖励
       wealReword.setSerialNumber(activityDistribute.getDistributeId().toString());
       wealReword.setActivityTitle(activityDistribute.getActivityName());

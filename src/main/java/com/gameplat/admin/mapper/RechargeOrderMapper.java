@@ -65,6 +65,14 @@ public interface RechargeOrderMapper extends BaseMapper<RechargeOrder> {
    */
   List<ActivityStatisticItem> findFirstRechargeAmount(Map<String, Object> map);
 
+  /**
+   * 统计二充金额
+   *
+   * @param map
+   * @return
+   */
+  List<ActivityStatisticItem> findTwoRechargeAmount(Map<String, Object> map);
+
   /** 根据会员和最后修改时间获取充值次数、充值金额、充值优惠、其它优惠 */
   MemberActivationVO getRechargeInfoByNameAndUpdateTime(MemberActivationDTO memberActivationDTO);
 

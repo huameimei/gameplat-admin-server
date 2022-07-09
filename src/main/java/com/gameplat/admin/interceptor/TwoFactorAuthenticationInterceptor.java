@@ -1,12 +1,9 @@
 package com.gameplat.admin.interceptor;
 
-import com.fasterxml.jackson.databind.cfg.HandlerInstantiator;
 import com.gameplat.admin.service.TwoFactorAuthenticationService;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.servlet.HandlerInterceptor;
-import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 

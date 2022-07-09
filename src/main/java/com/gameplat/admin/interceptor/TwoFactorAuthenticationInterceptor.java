@@ -1,8 +1,10 @@
 package com.gameplat.admin.interceptor;
 
+import com.fasterxml.jackson.databind.cfg.HandlerInstantiator;
 import com.gameplat.admin.service.TwoFactorAuthenticationService;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
 import javax.servlet.http.HttpServletRequest;
@@ -13,7 +15,7 @@ import javax.servlet.http.HttpServletResponse;
  *
  * @author robben
  */
-public class TwoFactorAuthenticationInterceptor extends HandlerInterceptorAdapter {
+public class TwoFactorAuthenticationInterceptor implements HandlerInterceptor {
 
   @Autowired private TwoFactorAuthenticationService twoFactorAuthenticationService;
 
@@ -24,6 +26,6 @@ public class TwoFactorAuthenticationInterceptor extends HandlerInterceptorAdapte
       @NotNull Object handler)
       throws Exception {
     twoFactorAuthenticationService.isEnabled2Fa();
-    return super.preHandle(request, response, handler);
+    return true;
   }
 }

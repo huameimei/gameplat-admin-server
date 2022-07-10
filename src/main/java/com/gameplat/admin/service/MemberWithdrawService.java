@@ -22,10 +22,18 @@ public interface MemberWithdrawService extends IService<MemberWithdraw> {
 
   void updateRemarks(Long id, String remarks);
 
-  void modify(Long id, Integer cashStatus, Integer curStatus, UserEquipment userEquipment);
+  void modify(
+          Long id,
+          Integer cashStatus,
+          Integer curStatus,
+          UserEquipment userEquipment,
+          String cashReason);
 
   void batchModify(
-      List<MemberWithdrawDTO> dtoList, WithdrawStatus cashStatus, UserEquipment userEquipment);
+          List<MemberWithdrawDTO> dtoList,
+          WithdrawStatus cashStatus,
+          UserEquipment userEquipment,
+          String cashReason);
 
   List<PpMerchant> queryProxyMerchant(Long id);
 

@@ -41,7 +41,6 @@ public class MemberWithdrawHistoryController {
 
   @Operation(summary = "统计会员提现")
   @PostMapping("/findSumMemberWithdrawHistory")
-  @PreAuthorize("hasAuthority('finance:memberWithdrawHistory:findSumMemberWithdrawHistory')")
   public MemberWithdrawHistorySummaryVO findSumMemberWithdrawHistory(
       MemberWithdrawHistoryQueryDTO dto) {
     return userWithdrawHistoryService.findSumMemberWithdrawHistory(dto);

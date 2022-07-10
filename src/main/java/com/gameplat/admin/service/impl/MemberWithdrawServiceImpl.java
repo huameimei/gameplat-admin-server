@@ -351,8 +351,6 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
     memberWithdraw.setMemberLevel(member.getUserLevel());
     memberWithdraw.setCashStatus(cashStatus);
     memberWithdraw.setApproveReason(approveReason);
-    memberWithdraw.setOperatorAccount(credential.getUsername());
-    memberWithdraw.setOperatorTime(new Date());
     // 修改订单状态
     updateWithdraw(memberWithdraw, origCashStatus);
     boolean toFinishCurrentOrder =
@@ -360,11 +358,17 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
             || WithdrawStatus.CANCELLED.getValue() == cashStatus
             || WithdrawStatus.REFUSE.getValue() == cashStatus);
     if (WithdrawStatus.HANDLED.getValue() == cashStatus) {
+      memberWithdraw.setOperatorAccount(credential.getUsername());
+      memberWithdraw.setOperatorTime(new Date());
       log.info("提现订单受理中 ，订单号为：{}", memberWithdraw.getCashOrderNo());
     } else if (WithdrawStatus.UNHANDLED.getValue() == cashStatus) {
+      memberWithdraw.setAcceptAccount(credential.getUsername());
+      memberWithdraw.setAcceptTime(new Date());
       log.info("放弃受理提现订单,订单号为：{}", memberWithdraw.getCashOrderNo());
     } else if (Objects.equals(
         ProxyPayStatusEnum.PAY_PROGRESS.getCode(), memberWithdraw.getProxyPayStatus())) {
+      memberWithdraw.setAcceptAccount(credential.getUsername());
+      memberWithdraw.setAcceptTime(new Date());
       log.info("提现订单 第三方出款中 ，订单号为：{}", memberWithdraw.getCashOrderNo());
     } else if (toFinishCurrentOrder) {
       if (WithdrawStatus.SUCCESS.getValue() == cashStatus) {
@@ -755,7 +759,7 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
       if (toCheck) {
         if (!Objects.equals(WithdrawStatus.UNHANDLED.getValue(), memberWithdraw.getCashStatus())
             && !StringUtils.equalsIgnoreCase(
-                userCredential.getUsername(), memberWithdraw.getOperatorAccount())) {
+                userCredential.getUsername(), memberWithdraw.getAcceptAccount())) {
           throw new ServiceException("您无权操作此订单:" + memberWithdraw.getCashOrderNo());
         }
       }

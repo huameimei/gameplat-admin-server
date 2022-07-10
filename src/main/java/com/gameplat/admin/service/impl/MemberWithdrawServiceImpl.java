@@ -357,11 +357,11 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
         (WithdrawStatus.SUCCESS.getValue() == cashStatus
             || WithdrawStatus.CANCELLED.getValue() == cashStatus
             || WithdrawStatus.REFUSE.getValue() == cashStatus);
-    if (WithdrawStatus.HANDLED.getValue() == cashStatus) {
-      memberWithdraw.setOperatorAccount(credential.getUsername());
-      memberWithdraw.setOperatorTime(new Date());
+    if (Objects.equals(WithdrawStatus.HANDLED.getValue(), cashStatus)) {
+      memberWithdraw.setAcceptAccount(credential.getUsername());
+      memberWithdraw.setAcceptTime(new Date());
       log.info("提现订单受理中 ，订单号为：{}", memberWithdraw.getCashOrderNo());
-    } else if (WithdrawStatus.UNHANDLED.getValue() == cashStatus) {
+    } else if (Objects.equals(WithdrawStatus.UNHANDLED.getValue(), cashStatus)) {
       memberWithdraw.setAcceptAccount(credential.getUsername());
       memberWithdraw.setAcceptTime(new Date());
       log.info("放弃受理提现订单,订单号为：{}", memberWithdraw.getCashOrderNo());
@@ -371,6 +371,8 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
       memberWithdraw.setAcceptTime(new Date());
       log.info("提现订单 第三方出款中 ，订单号为：{}", memberWithdraw.getCashOrderNo());
     } else if (toFinishCurrentOrder) {
+      memberWithdraw.setOperatorAccount(credential.getUsername());
+      memberWithdraw.setOperatorTime(new Date());
       if (WithdrawStatus.SUCCESS.getValue() == cashStatus) {
         // 添加會員出入款的報表記錄,如果是推广用户，则不计入报表
         if (!UserTypes.PROMOTION.value().equals(member.getUserType())) {
@@ -389,6 +391,8 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
         memberInfoService.updateUserWithTimes(
                 member.getId(), memberWithdraw.getCashMoney().negate(), memberWithdraw.getPointFlag());
       } else if (WithdrawStatus.CANCELLED.getValue() == cashStatus) { // 取消出款操作
+        memberWithdraw.setOperatorAccount(credential.getUsername());
+        memberWithdraw.setOperatorTime(new Date());
         if (ObjectUtil.isNotEmpty(cashReason)) {
           memberWithdraw.setApproveReason(cashReason);
           if (null == cashReason) {

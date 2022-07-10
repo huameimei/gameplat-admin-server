@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Constants;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
+import com.gameplat.admin.model.bean.RechargeMemberFileBean;
 import com.gameplat.admin.model.dto.IpAnalysisDTO;
 import com.gameplat.admin.model.dto.MemberQueryDTO;
 import com.gameplat.admin.model.dto.UpdateLowerNumDTO;
@@ -104,9 +105,15 @@ public interface MemberMapper extends BaseMapper<Member> {
   List<Member> getMemberListByAgentAccount(MemberQueryDTO memberQueryDTO);
 
   MemberBalanceVO findMemberVip(
-      @Param("username") String username,
-      @Param("userlevel") String userlevel,
-      @Param("vipGrade") String vipGrade);
+          @Param("username") String username);
+
+
+  List<RechargeMemberFileBean> findMemberRechVip(
+          @Param("vipGrade") String vipGrade);
+
+  List<RechargeMemberFileBean> findMemberRechLevel(
+          @Param("userlevel") String userlevel);
+
 
   Integer getUserLevel(@Param("account") String account);
 }

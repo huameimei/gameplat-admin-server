@@ -48,8 +48,11 @@ public class SysFileManagerServiceImpl extends ServiceImpl<SysFileManagerMapper,
             .like(StringUtils.isNotEmpty(queryDTO.getFileType()), SysFileManager::getFileType, queryDTO.getFileType())
             .ge(StringUtils.isNotEmpty(queryDTO.getStartTime()), SysFileManager::getCreateTime, queryDTO.getStartTime())
             .le(StringUtils.isNotEmpty(queryDTO.getEndTime()), SysFileManager::getCreateTime, queryDTO.getEndTime())
+            .orderByDesc(SysFileManager::getCreateTime)
             .page(page).convert(sysFileManagerConvert::toVo);
   }
+
+
 
   @Override
   public String upload(MultipartFile file) {

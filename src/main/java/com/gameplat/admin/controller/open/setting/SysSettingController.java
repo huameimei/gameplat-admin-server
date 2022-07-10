@@ -209,6 +209,7 @@ public class SysSettingController {
 
   @PostMapping("/delById")
   @Operation(summary = "删除游戏浮窗类型")
+  @PreAuthorize("hasAuthority('setting:gamefloat:del')")
   public void remove(Integer id) {
     sysSettingService.deleteSysFloatById(id);
     adminCache.deleteByPrefix(CacheKey.getTenantFloatPrefixKey());
@@ -244,6 +245,7 @@ public class SysSettingController {
 
   /** 修改体育配置排序开关列表 */
   @PostMapping("/updateListSortConfig")
+  @PreAuthorize("hasAuthority('setting:sportconfig:editlist')")
   @CacheEvict(cacheNames = Constants.TENANT_LIST_SORT, allEntries = true)
   public void updateListSortConfig(@RequestBody List<ListSortConfigVO> listSortConfigVOS) {
     if (listSortConfigVOS == null || listSortConfigVOS.isEmpty()) {
@@ -255,6 +257,7 @@ public class SysSettingController {
 
   @Operation(summary = "修改体育配置")
   @PostMapping("/updateSportConfig")
+  @PreAuthorize("hasAuthority('setting:sportconfig:edit')")
   @CacheEvict(cacheNames = Constants.TENANT_SPORT_CONFIG, allEntries = true)
   public void updateSportConfig(@RequestBody SportConfigVO sportConfigVo) {
     if (sportConfigVo == null) {

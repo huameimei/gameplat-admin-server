@@ -283,7 +283,12 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
   }
 
   @Override
-  public void modify(Long id, Integer cashStatus, Integer curStatus, UserEquipment userEquipment) {
+  public void modify(
+          Long id,
+          Integer cashStatus,
+          Integer curStatus,
+          UserEquipment userEquipment,
+          String cashReason) {
     if (null == id || null == cashStatus || null == curStatus || cashStatus.equals(curStatus)) {
       throw new ServiceException("错误的参数.");
     }
@@ -346,22 +351,30 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
     memberWithdraw.setMemberLevel(member.getUserLevel());
     memberWithdraw.setCashStatus(cashStatus);
     memberWithdraw.setApproveReason(approveReason);
-    memberWithdraw.setOperatorAccount(credential.getUsername());
-    memberWithdraw.setOperatorTime(new Date());
-    // 修改订单状态
-    updateWithdraw(memberWithdraw, origCashStatus);
     boolean toFinishCurrentOrder =
         (WithdrawStatus.SUCCESS.getValue() == cashStatus
             || WithdrawStatus.CANCELLED.getValue() == cashStatus
             || WithdrawStatus.REFUSE.getValue() == cashStatus);
-    if (WithdrawStatus.HANDLED.getValue() == cashStatus) {
+    if (Objects.equals(WithdrawStatus.HANDLED.getValue(), cashStatus)) {
+      memberWithdraw.setAcceptAccount(credential.getUsername());
+      memberWithdraw.setAcceptTime(new Date());
+      updateWithdraw(memberWithdraw, origCashStatus);
       log.info("提现订单受理中 ，订单号为：{}", memberWithdraw.getCashOrderNo());
-    } else if (WithdrawStatus.UNHANDLED.getValue() == cashStatus) {
+    } else if (Objects.equals(WithdrawStatus.UNHANDLED.getValue(), cashStatus)) {
+      memberWithdraw.setAcceptAccount(credential.getUsername());
+      memberWithdraw.setAcceptTime(new Date());
+      updateWithdraw(memberWithdraw, origCashStatus);
       log.info("放弃受理提现订单,订单号为：{}", memberWithdraw.getCashOrderNo());
     } else if (Objects.equals(
         ProxyPayStatusEnum.PAY_PROGRESS.getCode(), memberWithdraw.getProxyPayStatus())) {
+      memberWithdraw.setAcceptAccount(credential.getUsername());
+      memberWithdraw.setAcceptTime(new Date());
+      updateWithdraw(memberWithdraw, origCashStatus);
       log.info("提现订单 第三方出款中 ，订单号为：{}", memberWithdraw.getCashOrderNo());
     } else if (toFinishCurrentOrder) {
+      memberWithdraw.setOperatorAccount(credential.getUsername());
+      memberWithdraw.setOperatorTime(new Date());
+      updateWithdraw(memberWithdraw, origCashStatus);
       if (WithdrawStatus.SUCCESS.getValue() == cashStatus) {
         // 添加會員出入款的報表記錄,如果是推广用户，则不计入报表
         if (!UserTypes.PROMOTION.value().equals(member.getUserType())) {
@@ -380,6 +393,15 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
         memberInfoService.updateUserWithTimes(
                 member.getId(), memberWithdraw.getCashMoney().negate(), memberWithdraw.getPointFlag());
       } else if (WithdrawStatus.CANCELLED.getValue() == cashStatus) { // 取消出款操作
+        if (ObjectUtil.isNotEmpty(cashReason)) {
+          memberWithdraw.setApproveReason(cashReason);
+          if (null == cashReason) {
+            throw new ServiceException("备注信息不能为空!");
+          }
+          LambdaUpdateWrapper<MemberWithdraw> update = Wrappers.lambdaUpdate();
+          update.set(MemberWithdraw::getApproveReason, cashReason).eq(MemberWithdraw::getId, id);
+          this.update(new MemberWithdraw(), update);
+        }
         // 释放会员提现冻结金额
         memberInfoService.updateFreeze(member.getId(), memberWithdraw.getCashMoney().negate());
         // 释放会员提现金额
@@ -419,19 +441,21 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
         memberInfoService.updateFreeze(member.getId(), memberWithdraw.getCashMoney().negate());
       }
       // 新增出款记录
-      insertWithdrawHistory(memberWithdraw);
+      MemberWithdraw withdraw = this.getById(id);
+      insertWithdrawHistory(withdraw);
     }
     // 新增消息
     if (ObjectUtil.equals(cashStatus, WithdrawStatus.SUCCESS.getValue())
         || ObjectUtil.equals(cashStatus, WithdrawStatus.CANCELLED.getValue())) {
-      this.addMessageInfo(memberWithdraw, WithdrawStatus.SUCCESS.getValue());
       if (ObjectUtil.equals(WithdrawStatus.SUCCESS.getValue(), cashStatus)) {
+        this.addMessageInfo(memberWithdraw, WithdrawStatus.SUCCESS.getValue());
         MemberWithdrawLimit withradLimit = limitInfoService.getWithradLimit();
         this.sendMessage(
             memberWithdraw.getAccount(),
                 SocketEnum.SOCKET_WITHDRAW_SUCCESS,
             withradLimit.getUserApplyLoanAfterHintsMessage());
       } else if (ObjectUtil.equals(cashStatus, WithdrawStatus.CANCELLED.getValue())) {
+        this.addMessageInfo(memberWithdraw, WithdrawStatus.CANCELLED.getValue());
         this.sendMessage(
             memberWithdraw.getAccount(),
                 SocketEnum.SOCKET_WITHDRAW_CANCEL,
@@ -442,8 +466,12 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
 
   @Override
   public void batchModify(
-      List<MemberWithdrawDTO> dtoList, WithdrawStatus status, UserEquipment equipment) {
-    dtoList.forEach(e -> modify(e.getId(), status.getValue(), e.getCurStatus(), equipment));
+          List<MemberWithdrawDTO> dtoList,
+          WithdrawStatus status,
+          UserEquipment equipment,
+          String cashReason) {
+    dtoList.forEach(
+            e -> modify(e.getId(), status.getValue(), e.getCurStatus(), equipment, cashReason));
   }
 
   /** 过滤不符合规则的第三方出款商户 */
@@ -708,6 +736,8 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
     LambdaUpdateWrapper<MemberWithdraw> update = Wrappers.lambdaUpdate();
     update
         .set(MemberWithdraw::getCashStatus, memberWithdraw.getCashStatus())
+            .set(MemberWithdraw::getAcceptAccount, memberWithdraw.getAcceptAccount())
+            .set(MemberWithdraw::getAcceptTime, memberWithdraw.getAcceptTime())
         .set(MemberWithdraw::getApproveReason, memberWithdraw.getCashReason())
         .set(MemberWithdraw::getOperatorAccount, memberWithdraw.getOperatorAccount())
         .set(MemberWithdraw::getOperatorTime, memberWithdraw.getOperatorTime())
@@ -736,7 +766,7 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
       if (toCheck) {
         if (!Objects.equals(WithdrawStatus.UNHANDLED.getValue(), memberWithdraw.getCashStatus())
             && !StringUtils.equalsIgnoreCase(
-                userCredential.getUsername(), memberWithdraw.getOperatorAccount())) {
+                userCredential.getUsername(), memberWithdraw.getAcceptAccount())) {
           throw new ServiceException("您无权操作此订单:" + memberWithdraw.getCashOrderNo());
         }
       }

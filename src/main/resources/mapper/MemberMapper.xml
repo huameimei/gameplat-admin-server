@@ -449,17 +449,29 @@
 
     <select id="findMemberVip" resultType="com.gameplat.admin.model.vo.MemberBalanceVO">
         SELECT
-        m.id id,
-        m.account account,
-        m.nickname nickname,
-        m.real_name realName,
-        m.user_level userLevel,
-        m.user_type userType,
-        fo.balance balance,
-        fo.vip_level vipLevel,
-        m.parent_name parentName,
-        m.super_path superPath,
-        m.parent_id parentId
+            m.id id,
+            m.account account,
+            m.nickname nickname,
+            m.real_name realName,
+            m.user_level userLevel,
+            m.user_type userType,
+            fo.balance balance,
+            fo.vip_level vipLevel,
+            m.parent_name parentName,
+            m.super_path superPath,
+            m.parent_id parentId
+        FROM
+          member m
+        INNER JOIN member_info fo
+        on m.id = fo.member_id
+        WHERE
+          m.account = #{username}
+
+    </select>
+
+    <select id="findMemberRechVip" resultType="com.gameplat.admin.model.bean.RechargeMemberFileBean">
+        SELECT
+        m.account username
         FROM
         member m
         INNER JOIN member_info fo
@@ -467,11 +479,21 @@
         <if test="vipGrade != null and vipGrade != ''">
             AND fo.vip_level = #{vipGrade}
         </if>
-        WHERE
-        m.account = #{username}
-        <if test="userlevel != null and userlevel != ''">
-            AND user_level = #{userlevel}
-        </if>
+    </select>
+
+
+    <select id="findMemberRechLevel" resultType="com.gameplat.admin.model.bean.RechargeMemberFileBean">
+        SELECT
+        m.account username
+        FROM
+        member m
+        INNER JOIN member_info fo
+        on m.id = fo.member_id
+        <where>
+            <if test="userlevel != null and userlevel != ''">
+                AND user_level = #{userlevel}
+            </if>
+        </where>
     </select>
 
     <select id="getUserLevel" resultType="integer" parameterType="string">

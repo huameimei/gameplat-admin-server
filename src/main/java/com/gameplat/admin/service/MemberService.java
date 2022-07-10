@@ -3,6 +3,7 @@ package com.gameplat.admin.service;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.gameplat.admin.model.bean.RechargeMemberFileBean;
 import com.gameplat.admin.model.dto.*;
 import com.gameplat.admin.model.vo.*;
 import com.gameplat.model.entity.member.Member;
@@ -166,7 +167,10 @@ public interface MemberService extends IService<Member> {
   /**
    * 根据会员账号 层级  vip 等级去查询会员
    */
-  MemberBalanceVO findMemberVip(String username, String level, String vipGrade);
+  MemberBalanceVO findMemberVip(String username);
+
+
+  List<RechargeMemberFileBean> findMemberRechVip(String level, String vipGrade);
 
   MemberContactVo getMemberDetail(Long id);
 

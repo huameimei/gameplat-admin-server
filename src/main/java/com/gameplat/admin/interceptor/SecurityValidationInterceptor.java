@@ -5,7 +5,7 @@ import com.gameplat.base.common.util.IPUtils;
 import com.gameplat.security.SecurityUserHolder;
 import com.gameplat.security.context.UserCredential;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
+import org.springframework.web.servlet.HandlerInterceptor;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -15,7 +15,7 @@ import javax.servlet.http.HttpServletResponse;
  *
  * @author robben
  */
-public class SecurityValidationInterceptor extends HandlerInterceptorAdapter {
+public class SecurityValidationInterceptor implements HandlerInterceptor {
 
   @Override
   public boolean preHandle(

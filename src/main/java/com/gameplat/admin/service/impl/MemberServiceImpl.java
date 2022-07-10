@@ -18,6 +18,7 @@ import com.gameplat.admin.config.SysTheme;
 import com.gameplat.admin.constant.SystemConstant;
 import com.gameplat.admin.convert.MemberConvert;
 import com.gameplat.admin.mapper.MemberMapper;
+import com.gameplat.admin.model.bean.RechargeMemberFileBean;
 import com.gameplat.admin.model.dto.*;
 import com.gameplat.admin.model.vo.*;
 import com.gameplat.admin.service.*;
@@ -587,9 +588,29 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
   }
 
   @Override
-  public MemberBalanceVO findMemberVip(String username, String level, String vipGrade) {
-    return memberMapper.findMemberVip(username, level, vipGrade);
+  public MemberBalanceVO findMemberVip(String username) {
+    return memberMapper.findMemberVip(username);
   }
+
+
+  @Override
+  public List<RechargeMemberFileBean> findMemberRechVip(String level, String vipGrade) {
+    List<RechargeMemberFileBean> list = new ArrayList<>();
+    if (ObjectUtil.isNotEmpty(vipGrade)) {
+      List<RechargeMemberFileBean> memberRechVip = memberMapper.findMemberRechVip(vipGrade);
+      if (ObjectUtil.isNotEmpty(memberRechVip)) {
+        list.addAll(memberRechVip);
+      }
+    }
+    if (ObjectUtil.isNotEmpty(vipGrade)) {
+      List<RechargeMemberFileBean> memberRechLevel = memberMapper.findMemberRechLevel(level);
+      if (ObjectUtil.isNotEmpty(memberRechLevel)) {
+        list.addAll(memberRechLevel);
+      }
+    }
+    return list.stream().distinct().collect(Collectors.toList());
+  }
+
 
   private void preAddCheck(MemberAddDTO dto) {
     Assert.isTrue(!this.isExist(dto.getAccount()), "用户名已存在!");

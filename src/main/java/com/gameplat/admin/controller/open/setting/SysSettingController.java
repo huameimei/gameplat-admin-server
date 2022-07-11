@@ -136,6 +136,7 @@ public class SysSettingController {
   }
 
   @GetMapping("/getTenantSettings")
+  @PreAuthorize("hasAuthority('setting:tenant:view')")
   @Operation(summary = "获取租户设置信息")
   public Result<Object> getTenantSettings(SysSettingVO tenantSettingVO) {
     // 查询租户主题
@@ -147,6 +148,7 @@ public class SysSettingController {
   }
 
   @PostMapping("/updateDisplayAndSort")
+  @PreAuthorize("hasAuthority('setting:float:edit')")
   @Operation(summary = "修改显示与排序")
   public void updateDisplayAndSort(@RequestBody SysSettingVO tenantSettingVO) {
     UserCredential user = SecurityUserHolder.getCredential();
@@ -174,6 +176,7 @@ public class SysSettingController {
   }
 
   @PostMapping("/updatePersonalCenter")
+  @PreAuthorize("hasAuthority('setting:personalCenter:edit')")
   @Operation(summary = "个人中心编辑")
   public void updatePersonalCenter(@RequestBody SysSettingVO tenantSettingVO) {
     UserCredential user = SecurityUserHolder.getCredential();
@@ -201,6 +204,7 @@ public class SysSettingController {
   }
 
   @PostMapping("/updateBatchTenantSort")
+  @PreAuthorize("hasAuthority('setting:float:save')")
   @Operation(summary = "批量修改排序")
   public void updateBatchTenantSetting(@RequestBody List<SysSetting> sysSettings) {
     sysSettingService.updateBatchTenantSetting(sysSettings);
@@ -209,13 +213,13 @@ public class SysSettingController {
 
   @PostMapping("/delById")
   @Operation(summary = "删除游戏浮窗类型")
-  @PreAuthorize("hasAuthority('setting:gamefloat:del')")
   public void remove(Integer id) {
     sysSettingService.deleteSysFloatById(id);
     adminCache.deleteByPrefix(CacheKey.getTenantFloatPrefixKey());
   }
 
   @Operation(summary = "广场开关")
+  @PreAuthorize("hasAuthority('setting:square:switch')")
   @RequestMapping(value = "/updateSquareSwitch", method = {RequestMethod.GET, RequestMethod.POST})
   public void updateSquareSwitch(SysSettingVO tenantSetting) {
     tenantSetting.setSettingType(Constants.SYSTEM_SETTING);
@@ -229,7 +233,6 @@ public class SysSettingController {
 
   @Operation(summary = "获取广场的开关")
   @GetMapping("/getSquareSwitch")
-  @PreAuthorize("hasAuthority('system:teant:..zgetSquareSwitch')")
   public SysSetting getSquareSwitch(SysSettingVO sysTenantSetting) {
     sysTenantSetting.setSettingType(Constants.SYSTEM_SETTING);
     sysTenantSetting.setSettingCode(Constants.SQUARE_SWITCH);
@@ -245,7 +248,6 @@ public class SysSettingController {
 
   /** 修改体育配置排序开关列表 */
   @PostMapping("/updateListSortConfig")
-  @PreAuthorize("hasAuthority('setting:sportconfig:editlist')")
   @CacheEvict(cacheNames = Constants.TENANT_LIST_SORT, allEntries = true)
   public void updateListSortConfig(@RequestBody List<ListSortConfigVO> listSortConfigVOS) {
     if (listSortConfigVOS == null || listSortConfigVOS.isEmpty()) {
@@ -257,7 +259,7 @@ public class SysSettingController {
 
   @Operation(summary = "修改体育配置")
   @PostMapping("/updateSportConfig")
-  @PreAuthorize("hasAuthority('setting:sportconfig:edit')")
+  @PreAuthorize("hasAuthority('setting:sportConfig:edit')")
   @CacheEvict(cacheNames = Constants.TENANT_SPORT_CONFIG, allEntries = true)
   public void updateSportConfig(@RequestBody SportConfigVO sportConfigVo) {
     if (sportConfigVo == null) {

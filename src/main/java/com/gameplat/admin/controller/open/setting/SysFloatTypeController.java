@@ -41,6 +41,7 @@ public class SysFloatTypeController {
 
   /** 新增游戏浮窗 */
   @PostMapping("/insert")
+  @PreAuthorize("hasAuthority('setting:float:add')")
   @Operation(summary = "游戏浮窗新增")
   public void add(@RequestBody SysFloatSetting sysFloatSetting) {
     sysFloatTypeService.insertSysFloat(sysFloatSetting);
@@ -58,7 +59,7 @@ public class SysFloatTypeController {
 
   /** 批量编辑排序 */
   @PostMapping("/updateBatch")
-  @PreAuthorize("hasAuthority('setting:floatsort:edit')")
+  @PreAuthorize("hasAuthority('setting:floatsort:save')")
   @Operation(summary = "批量编辑排序")
   public void updateBatch(@RequestBody List<SysFloatSetting> sysFloatSettings) {
     sysFloatTypeService.updateBatch(sysFloatSettings);
@@ -67,7 +68,7 @@ public class SysFloatTypeController {
 
   /** 编辑游戏浮窗类型 */
   @PostMapping("/updateFloatType")
-  @PreAuthorize("hasAuthority('setting:floattype:edit')")
+  @PreAuthorize("hasAuthority('setting:floatType:edit')")
   @Operation(summary = "游戏浮窗类型编辑")
   public void updateFloatType(@RequestBody SysFloatType sysFloatType) {
     sysFloatTypeService.updateFloatType(sysFloatType);
@@ -76,7 +77,7 @@ public class SysFloatTypeController {
 
   /** 编辑游戏浮窗类型 */
   @PostMapping("/showPosition")
-  @PreAuthorize("hasAuthority('setting:gamefloat:edit')")
+  @PreAuthorize("hasAuthority('setting:showPosition:save')")
   @Operation(summary = "游戏浮窗类型编辑")
   public void showPosition(@RequestBody Map<String, List<String>> showPosition) {
     if (showPosition != null && showPosition.get("midArr") != null) {

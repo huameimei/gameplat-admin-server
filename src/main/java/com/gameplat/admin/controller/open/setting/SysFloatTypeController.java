@@ -59,7 +59,7 @@ public class SysFloatTypeController {
 
   /** 批量编辑排序 */
   @PostMapping("/updateBatch")
-  @PreAuthorize("hasAuthority('setting:floatsort:save')")
+  @PreAuthorize("hasAuthority('setting:floatSort:save')")
   @Operation(summary = "批量编辑排序")
   public void updateBatch(@RequestBody List<SysFloatSetting> sysFloatSettings) {
     sysFloatTypeService.updateBatch(sysFloatSettings);

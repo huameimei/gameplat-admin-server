@@ -88,7 +88,7 @@ public class SysSettingController {
   @Operation(summary = "启动图配置列表查询")
   @PreAuthorize("hasAuthority('banner:startImage:view')")
   public IPage<SysSetting> getStartImagePage(
-      @Parameter(hidden = true) PageDTO<SysSetting> page, SysSetting sysSetting) {
+          @Parameter(hidden = true) PageDTO<SysSetting> page, SysSetting sysSetting) {
     sysSetting.setSettingType(SysSettingEnum.START_UP_IMAGE.getCode());
     return sysSettingService.getStartImagePage(page, sysSetting);
   }
@@ -148,7 +148,7 @@ public class SysSettingController {
   }
 
   @PostMapping("/updateDisplayAndSort")
-  @PreAuthorize("hasAuthority('setting:float:edit')")
+  @PreAuthorize("hasAuthority('setting:config:edit')")
   @Operation(summary = "修改显示与排序")
   public void updateDisplayAndSort(@RequestBody SysSettingVO tenantSettingVO) {
     UserCredential user = SecurityUserHolder.getCredential();
@@ -159,9 +159,9 @@ public class SysSettingController {
       throw new ServiceException("导航栏类型不允许为空");
     }
     if (tenantSettingVO.getDisplay() != null
-        && tenantSettingVO.getIsIndex() != null
-        && tenantSettingVO.getDisplay() == 0
-        && tenantSettingVO.getIsIndex() == 1) {
+            && tenantSettingVO.getIsIndex() != null
+            && tenantSettingVO.getDisplay() == 0
+            && tenantSettingVO.getIsIndex() == 1) {
       throw new ServiceException("关闭的导航栏不能设置默认首页");
     }
     if (tenantSettingVO.getId() == null) {
@@ -189,9 +189,9 @@ public class SysSettingController {
     }
 
     if (tenantSettingVO.getDisplay() != null
-        && tenantSettingVO.getIsIndex() != null
-        && tenantSettingVO.getDisplay() == 0
-        && tenantSettingVO.getIsIndex() == 1) {
+            && tenantSettingVO.getIsIndex() != null
+            && tenantSettingVO.getDisplay() == 0
+            && tenantSettingVO.getIsIndex() == 1) {
       throw new ServiceException("关闭的导航栏不能设置默认首页");
     }
 
@@ -204,7 +204,7 @@ public class SysSettingController {
   }
 
   @PostMapping("/updateBatchTenantSort")
-  @PreAuthorize("hasAuthority('setting:float:save')")
+  @PreAuthorize("hasAuthority('setting:sort:save')")
   @Operation(summary = "批量修改排序")
   public void updateBatchTenantSetting(@RequestBody List<SysSetting> sysSettings) {
     sysSettingService.updateBatchTenantSetting(sysSettings);

@@ -212,6 +212,7 @@ public class SysSettingController {
   }
 
   @PostMapping("/delById")
+  @PreAuthorize("hasAuthority('setting:float:del')")
   @Operation(summary = "删除游戏浮窗类型")
   public void remove(Integer id) {
     sysSettingService.deleteSysFloatById(id);

@@ -148,7 +148,7 @@ public class SysSettingController {
   }
 
   @PostMapping("/updateDisplayAndSort")
-  @PreAuthorize("hasAuthority('setting:float:edit')")
+  @PreAuthorize("hasAuthority('setting:config:edit')")
   @Operation(summary = "修改显示与排序")
   public void updateDisplayAndSort(@RequestBody SysSettingVO tenantSettingVO) {
     UserCredential user = SecurityUserHolder.getCredential();
@@ -204,7 +204,7 @@ public class SysSettingController {
   }
 
   @PostMapping("/updateBatchTenantSort")
-  @PreAuthorize("hasAuthority('setting:float:save')")
+  @PreAuthorize("hasAuthority('setting:sort:save')")
   @Operation(summary = "批量修改排序")
   public void updateBatchTenantSetting(@RequestBody List<SysSetting> sysSettings) {
     sysSettingService.updateBatchTenantSetting(sysSettings);

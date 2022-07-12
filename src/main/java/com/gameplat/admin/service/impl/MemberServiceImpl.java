@@ -101,9 +101,13 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
   @Autowired(required = false)
   private RedisTemplate<String, Integer> redisTemplate;
 
+  @Autowired(required = false)
+  private RedisTemplate<String, Object> redisTemplateObj;
+
   @Autowired private MemberDayReportService memberDayReportService;
 
 
+  private static final String MEMBER_TOKEN_PREFIX = "token:web:";
 
 
   @Override
@@ -229,6 +233,8 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
 
   @Override
   public void update(MemberEditDTO dto) {
+    Member member = this.getById(dto.getId());
+
     MemberInfo memberInfo =
         MemberInfo.builder()
             .memberId(dto.getId())
@@ -240,7 +246,24 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
     Assert.isTrue(
         this.updateById(memberConvert.toEntity(dto)) && memberInfoService.updateById(memberInfo),
         "修改会员信息失败!");
+
+    // 获取会员状态
+    Integer status = dto.getStatus();
+    if (status != null) {
+      // 如果状态是冻结，则需要更新redis里的会员信息
+      if (MemberEnums.Status.FROZEN.match(status)) {
+        UserCredential userCredential = (UserCredential) redisTemplateObj.opsForValue().get(MEMBER_TOKEN_PREFIX + member.getAccount());
+        if (userCredential != null) {
+          userCredential.setStatus(status);
+          redisTemplateObj.opsForValue().set(MEMBER_TOKEN_PREFIX + member.getAccount(), userCredential);
+        }
+        // 如果状态是禁用，则需要踢线操作
+      } else if (MemberEnums.Status.DISABLED.match(status)) {
+        redisTemplateObj.delete(MEMBER_TOKEN_PREFIX + member.getAccount());
+      }
+    }
   }
+
 
   @Override
   public void enable(List<Long> ids) {

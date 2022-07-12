@@ -250,8 +250,8 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
     // 获取会员状态
     Integer status = dto.getStatus();
     if (status != null) {
-      // 如果状态是冻结，则需要更新redis里的会员信息
-      if (MemberEnums.Status.FROZEN.match(status)) {
+      // 如果状态是正常或冻结，则需要更新redis里的会员信息
+      if (MemberEnums.Status.FROZEN.match(status) || MemberEnums.Status.ENABlED.match(status)) {
         UserCredential userCredential = (UserCredential) redisTemplateObj.opsForValue().get(MEMBER_TOKEN_PREFIX + member.getAccount());
         if (userCredential != null) {
           userCredential.setStatus(status);

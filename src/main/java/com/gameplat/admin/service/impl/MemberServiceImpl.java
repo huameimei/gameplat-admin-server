@@ -35,6 +35,7 @@ import com.gameplat.model.entity.member.MemberDayReport;
 import com.gameplat.model.entity.member.MemberInfo;
 import com.gameplat.security.SecurityUserHolder;
 import com.gameplat.security.context.UserCredential;
+import com.gameplat.security.manager.JwtTokenAuthenticationManager;
 import com.google.common.collect.Lists;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -103,7 +104,8 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
 
   @Autowired private MemberDayReportService memberDayReportService;
 
-
+  @Autowired
+  private JwtTokenAuthenticationManager tokenAuthenticationManager;
 
 
   @Override
@@ -229,6 +231,8 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
 
   @Override
   public void update(MemberEditDTO dto) {
+    Member member = this.getById(dto.getId());
+
     MemberInfo memberInfo =
         MemberInfo.builder()
             .memberId(dto.getId())
@@ -240,7 +244,21 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
     Assert.isTrue(
         this.updateById(memberConvert.toEntity(dto)) && memberInfoService.updateById(memberInfo),
         "修改会员信息失败!");
+
+    // 获取会员状态
+    Integer status = dto.getStatus();
+    // 如果状态是冻结或者禁用，则需要踢线操作
+    if(status != null){
+      if(MemberEnums.Status.FROZEN.match(status)){
+        UserCredential userCredential = tokenAuthenticationManager.getCredentialCacheByUsername(member.getAccount());
+        userCredential.setStatus(status);
+        tokenAuthenticationManager.storeToken(userCredential);
+      } else if(MemberEnums.Status.DISABLED.match(status)){
+        tokenAuthenticationManager.removeToken(member.getAccount());
+      }
+    }
   }
+
 
   @Override
   public void enable(List<Long> ids) {

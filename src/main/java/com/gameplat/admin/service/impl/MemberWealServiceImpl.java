@@ -496,6 +496,10 @@ public class MemberWealServiceImpl extends ServiceImpl<MemberWealMapper, MemberW
                                 messageMapper.saveReturnId(message);
 
                                 // 添加奖励记录
+                                memberWealReword.setParentId(member.getParentId());
+                                memberWealReword.setParentName(member.getParentName());
+                                memberWealReword.setAgentPath(member.getSuperPath());
+                                memberWealReword.setUserType(member.getUserType());
                                 wealRewordService.insertMemberWealReword(memberWealReword);
                                 // 修改福利详情状态 为已完成
                                 wealDetailService.updateByWealStatus(item.getWealId(), 2);

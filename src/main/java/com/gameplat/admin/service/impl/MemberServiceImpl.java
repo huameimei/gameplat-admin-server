@@ -102,10 +102,13 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
   @Autowired(required = false)
   private RedisTemplate<String, Integer> redisTemplate;
 
+  @Autowired(required = false)
+  private RedisTemplate<String, Object> redisTemplateObj;
+
   @Autowired private MemberDayReportService memberDayReportService;
 
-  @Autowired
-  private JwtTokenAuthenticationManager tokenAuthenticationManager;
+
+  private static final String MEMBER_TOKEN_PREFIX = "token:web:";
 
 
   @Override
@@ -247,14 +250,17 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
 
     // 获取会员状态
     Integer status = dto.getStatus();
-    // 如果状态是冻结或者禁用，则需要踢线操作
-    if(status != null){
-      if(MemberEnums.Status.FROZEN.match(status)){
-        UserCredential userCredential = tokenAuthenticationManager.getCredentialCacheByUsername(member.getAccount());
-        userCredential.setStatus(status);
-        tokenAuthenticationManager.storeToken(userCredential);
-      } else if(MemberEnums.Status.DISABLED.match(status)){
-        tokenAuthenticationManager.removeToken(member.getAccount());
+    if (status != null) {
+      // 如果状态是冻结，则需要更新redis里的会员信息
+      if (MemberEnums.Status.FROZEN.match(status)) {
+        UserCredential userCredential = (UserCredential) redisTemplateObj.opsForValue().get(MEMBER_TOKEN_PREFIX + member.getAccount());
+        if (userCredential != null) {
+          userCredential.setStatus(status);
+          redisTemplateObj.opsForValue().set(MEMBER_TOKEN_PREFIX + member.getAccount(), userCredential);
+        }
+        // 如果状态是禁用，则需要踢线操作
+      } else if (MemberEnums.Status.DISABLED.match(status)) {
+        redisTemplateObj.delete(MEMBER_TOKEN_PREFIX + member.getAccount());
       }
     }
   }

@@ -14,10 +14,10 @@ public class MemberWealRewordEnums {
     COMPLETED(2, "已完成"),
     EXPIRED(3, "已失效"),
     UPGRADE_REWARD(46, "升级奖励"),
-    WEEK_WEAL(0, "周俸禄"),
-    MONTH_WEAL(1, "月俸禄"),
-    BIRTH_WEAL(2, "生日礼金"),
-    RED_MONTH_WEAL(3, "每月红包");
+    WEEK_WEAL(1, "周俸禄"),
+    MONTH_WEAL(2, "月俸禄"),
+    BIRTH_WEAL(3, "生日礼金"),
+    RED_MONTH_WEAL(4, "每月红包");
 
     private int value;
     private String desc;

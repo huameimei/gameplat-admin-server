@@ -252,7 +252,7 @@
             <id>prod</id>
             <properties>
                 <profiles.active>prod</profiles.active>
-                <profiles.revision>4.1.2-RELEASE</profiles.revision>
+                <profiles.revision>4.1.1.1-RELEASE</profiles.revision>
                 <reversion>1.0.0</reversion>
                 <changelist>RELEASE</changelist>
             </properties>

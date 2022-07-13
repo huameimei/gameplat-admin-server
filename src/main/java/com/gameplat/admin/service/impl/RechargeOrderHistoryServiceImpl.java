@@ -170,33 +170,21 @@ public class RechargeOrderHistoryServiceImpl
         .eq(
             ObjectUtils.isNotEmpty(dto.getOrderNo()),
             RechargeOrderHistory::getOrderNo,
-            dto.getOrderNo())
-        .le(
-            ObjectUtils.isNotNull(dto.getAuditTime()),
-            RechargeOrderHistory::getAuditTime,
-            dto.getAuditTime());
+                dto.getOrderNo());
     if (ObjectUtils.isNotEmpty(dto.getAuditorAccounts())) {
       query.in(RechargeOrderHistory::getAuditorAccount, dto.getAuditorAccounts().split(","));
     }
     if (ObjectUtils.isEmpty(dto.getOrderBy()) || dto.getOrderBy().equals("createTime")) {
-      query
-          .ge(
+      query.between(
               ObjectUtils.isNotEmpty(dto.getBeginDatetime()),
               RechargeOrderHistory::getCreateTime,
-              dto.getBeginDatetime())
-          .le(
-              ObjectUtils.isNotEmpty(dto.getEndDatetime()),
-              RechargeOrderHistory::getCreateTime,
+              dto.getBeginDatetime(),
               dto.getEndDatetime());
     } else {
-      query
-          .ge(
+      query.between(
               ObjectUtils.isNotEmpty(dto.getBeginDatetime()),
               RechargeOrderHistory::getAuditTime,
-              dto.getBeginDatetime())
-          .le(
-              ObjectUtils.isNotEmpty(dto.getEndDatetime()),
-              RechargeOrderHistory::getAuditTime,
+              dto.getBeginDatetime(),
               dto.getEndDatetime());
     }
     if (ObjectUtils.isNotEmpty(dto.getAccounts())) {

@@ -8,22 +8,31 @@ import com.gameplat.admin.mapper.MemberMapper;
 import com.gameplat.admin.model.dto.MemberTransBackupDTO;
 import com.gameplat.admin.model.dto.MemberTransformDTO;
 import com.gameplat.admin.model.dto.UpdateLowerNumDTO;
+import com.gameplat.admin.service.GameConfigService;
 import com.gameplat.admin.service.MemberService;
 import com.gameplat.admin.service.MemberTransferAgentService;
 import com.gameplat.admin.service.MemberTransferRecordService;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.json.JsonUtils;
 import com.gameplat.base.common.util.StringUtils;
+import com.gameplat.common.enums.GamePlatformEnum;
+import com.gameplat.common.enums.TransferTypesEnum;
+import com.gameplat.common.game.GameBizBean;
+import com.gameplat.common.game.api.GameApi;
 import com.gameplat.common.lang.Assert;
 import com.gameplat.model.entity.member.Member;
 import com.gameplat.model.entity.member.MemberTransferRecord;
 import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -38,6 +47,10 @@ public class MemberTransferAgentServiceImpl implements MemberTransferAgentServic
 
   @Autowired private MemberTransferRecordService memberTransferRecordService;
 
+  @Autowired private ApplicationContext applicationContext;
+
+  @Autowired private GameConfigService gameConfigService;
+
   @Override
   public void transform(MemberTransformDTO dto) {
     Member source = memberService.getById(dto.getId());
@@ -48,9 +61,41 @@ public class MemberTransferAgentServiceImpl implements MemberTransferAgentServic
 
     // 检查条件
     this.preCheck(source, target, dto.getExcludeSelf());
-
     // 转移
     this.doTransform(source, target, dto.getExcludeSelf(), dto.getSerialNo());
+    // 更新彩票代理结构
+    this.changeKgLotteryProxy(source, target);
+  }
+
+  @Transactional(propagation = Propagation.NOT_SUPPORTED)
+  public GameApi getGameApi(String platformCode) {
+    GameApi api =
+      applicationContext.getBean(platformCode.toLowerCase() + GameApi.SUFFIX, GameApi.class);
+    TransferTypesEnum tt = TransferTypesEnum.get(platformCode);
+    // 1代表是否额度转换
+    if (tt == null || tt.getType() != 1) {
+      throw new ServiceException("游戏未接入");
+    }
+    return api;
+  }
+
+  private static final String backslash = "/";
+
+  /**
+   * 异步更新彩票代理结构
+   */
+  @Async
+  public void changeKgLotteryProxy(Member source, Member target) {
+
+    String superPath = target.getSuperPath().concat(source.getAccount()).concat(backslash);
+    GameApi gameApi = getGameApi(GamePlatformEnum.KGNL.getCode());
+    GameBizBean gameBizBean = GameBizBean.builder()
+      .account(source.getAccount())
+      .platformCode(GamePlatformEnum.KGNL.getCode())
+      .superPath(superPath)
+      .config(gameConfigService.getGameConfig(GamePlatformEnum.KGNL.getCode())).build();
+    gameApi.changeGameProxy(gameBizBean);
+
   }
 
   @Override

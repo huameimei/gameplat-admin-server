@@ -64,7 +64,7 @@ public class MemberTransferAgentServiceImpl implements MemberTransferAgentServic
     // 转移
     this.doTransform(source, target, dto.getExcludeSelf(), dto.getSerialNo());
     // 更新彩票代理结构
-    this.changeKgLotteryProxy();
+    this.changeKgLotteryProxy(source, target);
   }
 
   @Transactional(propagation = Propagation.NOT_SUPPORTED)
@@ -79,18 +79,21 @@ public class MemberTransferAgentServiceImpl implements MemberTransferAgentServic
     return api;
   }
 
+  private static final String backslash = "/";
+
   /**
    * 异步更新彩票代理结构
    */
   @Async
-  public void changeKgLotteryProxy() {
+  public void changeKgLotteryProxy(Member source, Member target) {
 
+    String superPath = target.getSuperPath().concat(source.getAccount()).concat(backslash);
     GameApi gameApi = getGameApi(GamePlatformEnum.KGNL.getCode());
-    GameBizBean gameBizBean =
-      GameBizBean.builder()
-      .config(gameConfigService.getGameConfig(GamePlatformEnum.KGNL.getCode()))
+    GameBizBean gameBizBean = GameBizBean.builder()
+      .account(source.getAccount())
       .platformCode(GamePlatformEnum.KGNL.getCode())
-      .build();
+      .superPath(superPath)
+      .config(gameConfigService.getGameConfig(GamePlatformEnum.KGNL.getCode())).build();
     gameApi.changeGameProxy(gameBizBean);
 
   }

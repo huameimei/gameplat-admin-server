@@ -375,8 +375,8 @@ public class ProxyPayServiceImpl implements ProxyPayService {
               && !userCredential.isSuperAdmin();
       if (toCheck) {
         if (!Objects.equals(WithdrawStatus.UNHANDLED.getValue(), memberWithdraw.getCashStatus())
-            && !StringUtils.equalsIgnoreCase(
-                userCredential.getUsername(), memberWithdraw.getOperatorAccount())) {
+                && !StringUtils.equalsIgnoreCase(
+                userCredential.getUsername(), memberWithdraw.getAcceptAccount())) {
           throw new ServiceException("您无权操作此订单:" + memberWithdraw.getCashOrderNo());
         }
       }

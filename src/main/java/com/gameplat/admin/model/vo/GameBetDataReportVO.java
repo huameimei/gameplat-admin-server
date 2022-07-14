@@ -41,8 +41,4 @@ public class GameBetDataReportVO implements Serializable {
     this.waterAmount = BigDecimal.ZERO;
     this.gameNum = 0;
   }
-
-  public BigDecimal getWinAmount() {
-    return this.winAmount.negate();
-  }
 }

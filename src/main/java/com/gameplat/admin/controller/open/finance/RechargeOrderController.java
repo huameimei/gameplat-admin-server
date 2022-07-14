@@ -1,21 +1,17 @@
 package com.gameplat.admin.controller.open.finance;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.json.JSONUtil;
+import com.alibaba.excel.EasyExcel;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.gameplat.admin.model.bean.ManualRechargeOrderBo;
-import com.gameplat.admin.model.bean.PageExt;
-import com.gameplat.admin.model.bean.RechargeMemberFileBean;
+import com.gameplat.admin.model.bean.*;
 import com.gameplat.admin.model.dto.ManualRechargeOrderDto;
 import com.gameplat.admin.model.dto.RechargeOrderQueryDTO;
-import com.gameplat.admin.model.vo.MemberRechBalanceVO;
-import com.gameplat.admin.model.vo.RechargeOrderVO;
-import com.gameplat.admin.model.vo.SummaryVO;
-import com.gameplat.admin.model.vo.WithdrawChargeVO;
+import com.gameplat.admin.model.vo.*;
 import com.gameplat.admin.service.GameTransferRecordService;
 import com.gameplat.admin.service.MemberWithdrawService;
 import com.gameplat.admin.service.RechargeOrderService;
 import com.gameplat.base.common.exception.ServiceException;
-import com.gameplat.base.common.util.EasyExcelUtil;
 import com.gameplat.common.constant.ServiceName;
 import com.gameplat.common.model.bean.UserEquipment;
 import com.gameplat.log.annotation.Log;
@@ -307,13 +303,19 @@ public class RechargeOrderController {
       @RequestPart(value = "file", required = false) MultipartFile file,
       ManualRechargeOrderDto dto,
       HttpServletRequest request) {
-
+    log.info("入参：{}", JSONUtil.parse(dto));
     // 开始批量解析文件
-    List<RechargeMemberFileBean> strAccount =
-        EasyExcelUtil.readExcel(file.getInputStream(), RechargeMemberFileBean.class);
-    log.info("会员账号数据：{}", strAccount.size());
-    if (CollUtil.isEmpty(strAccount)) {
-      return;
+    List<RechargeMemberFileBean> strAccount = null;
+    if (file != null) {
+      MemberRechBatchListener memberRechBatchListener = new MemberRechBatchListener();
+      EasyExcel.read(file.getInputStream(), RechargeMemberFileBean.class, memberRechBatchListener)
+              .sheet()
+              .doRead();
+      strAccount = memberRechBatchListener.getVoList();
+      log.info("会员账号数据：{}", strAccount.size());
+      if (CollUtil.isEmpty(strAccount)) {
+        return;
+      }
     }
     UserEquipment clientInfo = UserEquipment.create(request);
     rechargeOrderService.batchMemberRecharge(clientInfo, strAccount, dto);
@@ -328,14 +330,15 @@ public class RechargeOrderController {
       @RequestPart(value = "file", required = false) MultipartFile file,
       @RequestParam Integer discountType,
       HttpServletRequest request) {
-
     // 开始批量解析文件
-    List<MemberRechBalanceVO> memberRechBalanceVOList =
-        EasyExcelUtil.readExcel(file.getInputStream(), MemberRechBalanceVO.class);
-    log.info("批量上传数据：{}", memberRechBalanceVOList.size());
+    MemberRechListener memberRechListener = new MemberRechListener();
+    EasyExcel.read(file.getInputStream(), MemberRechBalanceVO.class, memberRechListener)
+            .sheet()
+            .doRead();
+    List<MemberRechBalanceVO> voList = memberRechListener.getVoList();
+    log.info("批量上传数据：{}", voList.size());
 
     UserEquipment userEquipment = UserEquipment.create(request);
-    rechargeOrderService.batchFileMemberRecharge(
-        memberRechBalanceVOList, discountType, userEquipment);
+    rechargeOrderService.batchFileMemberRecharge(voList, discountType, userEquipment);
   }
 }

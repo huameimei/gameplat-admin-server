@@ -88,7 +88,7 @@ public class SysSettingController {
   @Operation(summary = "启动图配置列表查询")
   @PreAuthorize("hasAuthority('banner:startImage:view')")
   public IPage<SysSetting> getStartImagePage(
-      @Parameter(hidden = true) PageDTO<SysSetting> page, SysSetting sysSetting) {
+          @Parameter(hidden = true) PageDTO<SysSetting> page, SysSetting sysSetting) {
     sysSetting.setSettingType(SysSettingEnum.START_UP_IMAGE.getCode());
     return sysSettingService.getStartImagePage(page, sysSetting);
   }
@@ -136,6 +136,7 @@ public class SysSettingController {
   }
 
   @GetMapping("/getTenantSettings")
+  @PreAuthorize("hasAuthority('setting:tenant:view')")
   @Operation(summary = "获取租户设置信息")
   public Result<Object> getTenantSettings(SysSettingVO tenantSettingVO) {
     // 查询租户主题
@@ -147,6 +148,7 @@ public class SysSettingController {
   }
 
   @PostMapping("/updateDisplayAndSort")
+  @PreAuthorize("hasAuthority('setting:config:edit')")
   @Operation(summary = "修改显示与排序")
   public void updateDisplayAndSort(@RequestBody SysSettingVO tenantSettingVO) {
     UserCredential user = SecurityUserHolder.getCredential();
@@ -157,9 +159,9 @@ public class SysSettingController {
       throw new ServiceException("导航栏类型不允许为空");
     }
     if (tenantSettingVO.getDisplay() != null
-        && tenantSettingVO.getIsIndex() != null
-        && tenantSettingVO.getDisplay() == 0
-        && tenantSettingVO.getIsIndex() == 1) {
+            && tenantSettingVO.getIsIndex() != null
+            && tenantSettingVO.getDisplay() == 0
+            && tenantSettingVO.getIsIndex() == 1) {
       throw new ServiceException("关闭的导航栏不能设置默认首页");
     }
     if (tenantSettingVO.getId() == null) {
@@ -174,6 +176,7 @@ public class SysSettingController {
   }
 
   @PostMapping("/updatePersonalCenter")
+  @PreAuthorize("hasAuthority('setting:personalCenter:edit')")
   @Operation(summary = "个人中心编辑")
   public void updatePersonalCenter(@RequestBody SysSettingVO tenantSettingVO) {
     UserCredential user = SecurityUserHolder.getCredential();
@@ -186,9 +189,9 @@ public class SysSettingController {
     }
 
     if (tenantSettingVO.getDisplay() != null
-        && tenantSettingVO.getIsIndex() != null
-        && tenantSettingVO.getDisplay() == 0
-        && tenantSettingVO.getIsIndex() == 1) {
+            && tenantSettingVO.getIsIndex() != null
+            && tenantSettingVO.getDisplay() == 0
+            && tenantSettingVO.getIsIndex() == 1) {
       throw new ServiceException("关闭的导航栏不能设置默认首页");
     }
 
@@ -201,6 +204,7 @@ public class SysSettingController {
   }
 
   @PostMapping("/updateBatchTenantSort")
+  @PreAuthorize("hasAuthority('setting:sort:save')")
   @Operation(summary = "批量修改排序")
   public void updateBatchTenantSetting(@RequestBody List<SysSetting> sysSettings) {
     sysSettingService.updateBatchTenantSetting(sysSettings);
@@ -208,6 +212,7 @@ public class SysSettingController {
   }
 
   @PostMapping("/delById")
+  @PreAuthorize("hasAuthority('setting:float:del')")
   @Operation(summary = "删除游戏浮窗类型")
   public void remove(Integer id) {
     sysSettingService.deleteSysFloatById(id);
@@ -215,6 +220,7 @@ public class SysSettingController {
   }
 
   @Operation(summary = "广场开关")
+  @PreAuthorize("hasAuthority('setting:square:switch')")
   @RequestMapping(value = "/updateSquareSwitch", method = {RequestMethod.GET, RequestMethod.POST})
   public void updateSquareSwitch(SysSettingVO tenantSetting) {
     tenantSetting.setSettingType(Constants.SYSTEM_SETTING);
@@ -228,7 +234,6 @@ public class SysSettingController {
 
   @Operation(summary = "获取广场的开关")
   @GetMapping("/getSquareSwitch")
-  @PreAuthorize("hasAuthority('system:teant:..zgetSquareSwitch')")
   public SysSetting getSquareSwitch(SysSettingVO sysTenantSetting) {
     sysTenantSetting.setSettingType(Constants.SYSTEM_SETTING);
     sysTenantSetting.setSettingCode(Constants.SQUARE_SWITCH);
@@ -255,6 +260,7 @@ public class SysSettingController {
 
   @Operation(summary = "修改体育配置")
   @PostMapping("/updateSportConfig")
+  @PreAuthorize("hasAuthority('setting:sportConfig:edit')")
   @CacheEvict(cacheNames = Constants.TENANT_SPORT_CONFIG, allEntries = true)
   public void updateSportConfig(@RequestBody SportConfigVO sportConfigVo) {
     if (sportConfigVo == null) {

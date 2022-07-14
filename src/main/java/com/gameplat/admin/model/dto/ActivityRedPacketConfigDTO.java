@@ -61,4 +61,7 @@ public class ActivityRedPacketConfigDTO implements Serializable {
 
   @Schema(description = "是否自动派发红包")
   private Boolean redenvelopeIsAutoDistribute;
+
+  @Schema(description = "红包雨默认图片")
+  private String pic;
 }

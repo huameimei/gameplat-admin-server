@@ -600,6 +600,9 @@ public class OtthServiceImpl implements OtthService {
   }
 
   private Object handleResponse(HttpRespBean respBean, HttpServletResponse response) {
+    if (Objects.equals(respBean.getStatus() ,-1) && "".equals(respBean.getRespBody())){
+      return "操作成功" ;
+    }
     if (respBean.getStatus() == 200) {
       String respBody = respBean.getRespBody();
       if (StringUtils.isBlank(respBody)) {

@@ -10,6 +10,7 @@ import com.gameplat.model.entity.setting.SysFloatType;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -40,6 +41,7 @@ public class SysFloatTypeController {
 
   /** 新增游戏浮窗 */
   @PostMapping("/insert")
+  @PreAuthorize("hasAuthority('setting:float:add')")
   @Operation(summary = "游戏浮窗新增")
   public void add(@RequestBody SysFloatSetting sysFloatSetting) {
     sysFloatTypeService.insertSysFloat(sysFloatSetting);
@@ -48,6 +50,7 @@ public class SysFloatTypeController {
 
   /** 编辑游戏浮窗 */
   @PostMapping("/update")
+  @PreAuthorize("hasAuthority('setting:float:edit')")
   @Operation(summary = "游戏浮窗编辑")
   public void update(@RequestBody SysFloatSetting sysFloatSetting) {
     sysFloatTypeService.updateFloat(sysFloatSetting);
@@ -56,6 +59,7 @@ public class SysFloatTypeController {
 
   /** 批量编辑排序 */
   @PostMapping("/updateBatch")
+  @PreAuthorize("hasAuthority('setting:floatSort:save')")
   @Operation(summary = "批量编辑排序")
   public void updateBatch(@RequestBody List<SysFloatSetting> sysFloatSettings) {
     sysFloatTypeService.updateBatch(sysFloatSettings);
@@ -64,6 +68,7 @@ public class SysFloatTypeController {
 
   /** 编辑游戏浮窗类型 */
   @PostMapping("/updateFloatType")
+  @PreAuthorize("hasAuthority('setting:floatType:edit')")
   @Operation(summary = "游戏浮窗类型编辑")
   public void updateFloatType(@RequestBody SysFloatType sysFloatType) {
     sysFloatTypeService.updateFloatType(sysFloatType);
@@ -72,6 +77,7 @@ public class SysFloatTypeController {
 
   /** 编辑游戏浮窗类型 */
   @PostMapping("/showPosition")
+  @PreAuthorize("hasAuthority('setting:showPosition:save')")
   @Operation(summary = "游戏浮窗类型编辑")
   public void showPosition(@RequestBody Map<String, List<String>> showPosition) {
     if (showPosition != null && showPosition.get("midArr") != null) {

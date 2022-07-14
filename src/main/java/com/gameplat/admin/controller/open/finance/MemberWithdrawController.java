@@ -49,13 +49,18 @@ public class MemberWithdrawController {
       type = LogType.WITHDRAW,
       desc = "'修改提款订单状态为:' + #cashStatus")
   public void modifyCashStatus(
-      Long id, Integer cashStatus, Integer curStatus, HttpServletRequest request, Long memberId) {
+          Long id,
+          Integer cashStatus,
+          Integer curStatus,
+          HttpServletRequest request,
+          Long memberId,
+          String cashReason) {
     UserEquipment clientInfo = UserEquipment.create(request);
     String lockKey = "member_rw_" + memberId;
     RLock lock = distributedLocker.lock(lockKey);
 
     try {
-      userWithdrawService.modify(id, cashStatus, curStatus, clientInfo);
+      userWithdrawService.modify(id, cashStatus, curStatus, clientInfo, cashReason);
     } catch (Exception e) {
       log.error(e.getMessage(), e);
       throw e;
@@ -79,7 +84,7 @@ public class MemberWithdrawController {
 
     try {
       List<MemberWithdrawDTO> dtoList = JSONUtil.toList(list, MemberWithdrawDTO.class);
-      userWithdrawService.batchModify(dtoList, WithdrawStatus.HANDLED, clientInfo);
+      userWithdrawService.batchModify(dtoList, WithdrawStatus.HANDLED, clientInfo, null);
       return "成功受理" + dtoList.size() + "条订单";
     } catch (Exception e) {
       log.error(e.getMessage(), e);
@@ -93,7 +98,7 @@ public class MemberWithdrawController {
   @PostMapping("/batchUnHandle")
   @PreAuthorize("hasAuthority('finance:memberWithdraw:batchUnHandle')")
   @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.WITHDRAW, desc = "'批量取消受理订单:' + #list")
-  public String batchModifyCashStatus(String list, HttpServletRequest request) {
+  public String batchModifyCashStatus(String list, HttpServletRequest request, String cashReason) {
     if (null == list) {
       throw new ServiceException("批量取消受理请求参数为空");
     }
@@ -104,7 +109,7 @@ public class MemberWithdrawController {
 
     try {
       List<MemberWithdrawDTO> dtoList = JSONUtil.toList(list, MemberWithdrawDTO.class);
-      userWithdrawService.batchModify(dtoList, WithdrawStatus.UNHANDLED, clientInfo);
+      userWithdrawService.batchModify(dtoList, WithdrawStatus.UNHANDLED, clientInfo, cashReason);
       return "成功取消受理" + dtoList.size() + "条订单";
     } catch (Exception e) {
       log.error(e.getMessage(), e);
@@ -129,7 +134,7 @@ public class MemberWithdrawController {
 
     try {
       List<MemberWithdrawDTO> dtoList = JSONUtil.toList(list, MemberWithdrawDTO.class);
-      userWithdrawService.batchModify(dtoList, WithdrawStatus.SUCCESS, clientInfo);
+      userWithdrawService.batchModify(dtoList, WithdrawStatus.SUCCESS, clientInfo, null);
       return "成功出款" + dtoList.size() + "条订单";
     } catch (Exception e) {
       log.error(e.getMessage(), e);

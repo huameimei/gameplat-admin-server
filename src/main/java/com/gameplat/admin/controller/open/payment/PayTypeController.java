@@ -6,6 +6,7 @@ import com.gameplat.admin.model.dto.PayTypeAddDTO;
 import com.gameplat.admin.model.dto.PayTypeEditDTO;
 import com.gameplat.admin.model.vo.PayTypeVO;
 import com.gameplat.admin.service.PayTypeService;
+import com.gameplat.common.constant.CachedKeys;
 import com.gameplat.common.constant.ServiceName;
 import com.gameplat.log.annotation.Log;
 import com.gameplat.log.enums.LogType;
@@ -13,6 +14,7 @@ import com.gameplat.model.entity.pay.PayType;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -56,6 +58,7 @@ public class PayTypeController {
 
   @Operation(summary = "添加")
   @PostMapping("/add")
+  @CacheEvict(cacheNames = CachedKeys.PAY_TYPE,allEntries = true)
   @PreAuthorize("hasAuthority('thirdParty:payTypes:add')")
   @Log(
       module = ServiceName.ADMIN_SERVICE,
@@ -67,6 +70,7 @@ public class PayTypeController {
 
   @Operation(summary = "编辑")
   @PostMapping("/edit")
+  @CacheEvict(cacheNames = CachedKeys.PAY_TYPE,allEntries = true)
   @PreAuthorize("hasAuthority('thirdParty:payTypes:edit')")
   @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.RECHARGE, desc = "'修改支付方式id=' + #dto.id")
   public void edit(@RequestBody PayTypeEditDTO dto) {
@@ -75,6 +79,7 @@ public class PayTypeController {
 
   @Operation(summary = "修改状态")
   @PostMapping("/editStatus")
+  @CacheEvict(cacheNames = CachedKeys.PAY_TYPE,allEntries = true)
   @PreAuthorize("hasAuthority('thirdParty:payTypes:editStatus')")
   @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.RECHARGE, desc = "'修改支付方式状态id=' + #id")
   public void updateStatus(Long id, Integer status) {

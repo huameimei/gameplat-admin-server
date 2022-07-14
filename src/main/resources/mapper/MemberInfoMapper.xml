@@ -79,4 +79,43 @@
         and a.user_id = #{memberId}
         and a.remark != "未达到保底系统降级"
     </select>
+
+
+    <select id="findYuBaoBalance" parameterType="com.gameplat.admin.model.dto.GameRWDataReportDto"
+            resultType="com.gameplat.admin.model.vo.YuBaoMemberBalanceVo">
+        SELECT
+        a.account account,
+        a.real_name realName,
+        info.balance balance,
+        info.rebate rebate,
+        le.level_name levelName,
+        a.parent_name parentName,
+        a.create_time createTime,
+        a.`STATUS` state,
+        info.yubao_amount yuBaoBalance,
+        ( CASE info.limit_lot_flag WHEN 1 THEN '是' ELSE '否'
+        END
+        ) limitLotFlag
+        FROM
+        (
+        SELECT
+        id,
+        account,
+        real_name,
+        parent_name,
+        create_time,
+        user_level,
+        user_type,
+        STATUS
+        FROM
+        member
+        WHERE
+        account NOT IN ( 'appRoot', 'webRoot', 'testRoot' )
+        <if test="dto.state != null and dto.state != ''">
+            and status = #{dto.state}
+        </if>
+        ) a
+        LEFT JOIN member_info info ON a.id = info.member_id
+        LEFT JOIN member_level le ON a.user_level = le.level_value
+    </select>
 </mapper>

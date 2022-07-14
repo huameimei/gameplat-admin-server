@@ -14,7 +14,7 @@ import java.util.Date;
 public class SysFileManagerVO implements Serializable {
 
   @Schema(description = "主键")
-  private Long id;
+  private String id;
 
   @Schema(description = "服务提供商")
   private Integer serviceProvider;

@@ -6,13 +6,16 @@ import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.RandomUtil;
-import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import cn.hutool.core.util.StrUtil;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.gameplat.admin.constant.TrueFalse;
 import com.gameplat.admin.convert.MemberWealConvert;
 import com.gameplat.admin.convert.MessageInfoConvert;
+import com.gameplat.admin.enums.BlacklistConstant;
 import com.gameplat.admin.enums.LanguageEnum;
 import com.gameplat.admin.enums.MemberWealRewordEnums;
 import com.gameplat.admin.enums.PushMessageEnum;
@@ -27,6 +30,7 @@ import com.gameplat.common.enums.BooleanEnum;
 import com.gameplat.common.enums.TranTypes;
 import com.gameplat.common.lang.Assert;
 import com.gameplat.model.entity.ValidWithdraw;
+import com.gameplat.model.entity.blacklist.BizBlacklist;
 import com.gameplat.model.entity.member.*;
 import com.gameplat.model.entity.message.Message;
 import lombok.extern.slf4j.Slf4j;
@@ -35,6 +39,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
+
 import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -43,6 +48,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
+
 import static com.gameplat.common.enums.TranTypes.*;
 import static java.util.stream.Collectors.toList;
 
@@ -107,6 +113,8 @@ public class MemberWealServiceImpl extends ServiceImpl<MemberWealMapper, MemberW
 
     @Autowired
     private GameBetDailyReportService gameBetDailyReportService;
+
+  @Autowired private BizBlacklistMapper blacklistMapper;
 
     @Override
     public IPage<MemberWealVO> findMemberWealList(IPage<MemberWeal> page, MemberWealDTO queryDTO) {
@@ -237,7 +245,7 @@ public class MemberWealServiceImpl extends ServiceImpl<MemberWealMapper, MemberW
         // 取达到充值金额的会员账号&&达到有效投注金额的会员账号的交集
         List<String> intersectionList =
                 rechargeAccountList.stream().filter(betAccountList::contains).collect(toList());
-        if (type == 2) {
+        if (type == 3) {
             // 生日礼金
             // 过滤每个会员的生日是否在周期内
             if (CollectionUtil.isNotEmpty(intersectionList)) {
@@ -281,24 +289,7 @@ public class MemberWealServiceImpl extends ServiceImpl<MemberWealMapper, MemberW
         List<MemberWealDetail> list = new ArrayList<>();
 
         if (CollectionUtil.isNotEmpty(finalIntersectionList)) {
-            // 过滤黑名单
-            List<String> blackList = new ArrayList<>();
-            List<MemberBlackList> memberBlackList =
-                    blackListService.findMemberBlackList(new MemberBlackList());
-            if (CollectionUtil.isNotEmpty(memberBlackList)) {
-                blackList =
-                        memberBlackList.stream()
-                                .map(memberBlack -> memberBlack.getUserAccount())
-                                .collect(Collectors.toList());
-            }
-            if (CollectionUtil.isNotEmpty(blackList)) {
-                for (String userAccount : blackList) {
-                    finalIntersectionList =
-                            finalIntersectionList.stream()
-                                    .filter(item1 -> !item1.getUserName().equalsIgnoreCase(userAccount))
-                                    .collect(Collectors.toList());
-                }
-            }
+      finalIntersectionList = this.checkBizBlacks(type, finalIntersectionList);
             // 装配福利详情等字段
             int totalUserCount = 0;
             BigDecimal totalPayMoney = new BigDecimal("0");
@@ -505,6 +496,10 @@ public class MemberWealServiceImpl extends ServiceImpl<MemberWealMapper, MemberW
                                 messageMapper.saveReturnId(message);
 
                                 // 添加奖励记录
+                                memberWealReword.setParentId(member.getParentId());
+                                memberWealReword.setParentName(member.getParentName());
+                                memberWealReword.setAgentPath(member.getSuperPath());
+                                memberWealReword.setUserType(member.getUserType());
                                 wealRewordService.insertMemberWealReword(memberWealReword);
                                 // 修改福利详情状态 为已完成
                                 wealDetailService.updateByWealStatus(item.getWealId(), 2);
@@ -645,5 +640,59 @@ public class MemberWealServiceImpl extends ServiceImpl<MemberWealMapper, MemberW
       return WEEK_WEAL_RECYCLE;
     }
     return WEEK_WEAL_RECYCLE;
+  }
+
+  public List<MemberWealDetail> checkBizBlacks(
+      Integer wealType, List<MemberWealDetail> finalIntersectionList) {
+    // 获取业务 分红黑名单 集合
+    QueryWrapper<BizBlacklist> queryBizWrapper = new QueryWrapper<>();
+    String bizBlackTypes = "";
+    if (wealType == 0) {
+      bizBlackTypes = BlacklistConstant.BizBlacklistType.LEVEL_UPGRADE_REWARD.getValue();
+    } else if (wealType == 1) {
+      bizBlackTypes = BlacklistConstant.BizBlacklistType.LEVEL_WAGE_WEEK.getValue();
+    } else if (wealType == 2) {
+      bizBlackTypes = BlacklistConstant.BizBlacklistType.LEVEL_WAGE_MONTH.getValue();
+    }
+    if (StrUtil.isNotBlank(bizBlackTypes)) {
+      queryBizWrapper.like("types", bizBlackTypes);
+      List<BizBlacklist> bizBlacklists = blacklistMapper.selectList(queryBizWrapper);
+      // 会员账号业务黑名单
+      List<BizBlacklist> accountBlackList =
+          bizBlacklists.stream()
+              .filter(item -> item.getTargetType() == TrueFalse.FALSE.getValue())
+              .collect(Collectors.toList());
+      // 用户层级业务黑名单
+      List<BizBlacklist> userLevelBlackList =
+          bizBlacklists.stream()
+              .filter(item -> item.getTargetType() == TrueFalse.TRUE.getValue())
+              .collect(Collectors.toList());
+      List<String> accountBlacks = new ArrayList<>();
+      List<String> userLevelBlacks = new ArrayList<>();
+
+      if (CollectionUtil.isNotEmpty(accountBlackList)) {
+        accountBlacks =
+            accountBlackList.stream().map(BizBlacklist::getTarget).collect(Collectors.toList());
+        List<String> finalAccountBlacks = accountBlacks;
+        finalIntersectionList.removeIf(e -> finalAccountBlacks.contains(e.getUserName()));
+      }
+      if (CollectionUtil.isNotEmpty(userLevelBlackList)) {
+        userLevelBlacks =
+            userLevelBlackList.stream().map(BizBlacklist::getTarget).collect(Collectors.toList());
+        for (int i = 0; i <= finalIntersectionList.size() - 1; i++) {
+          MemberWealDetail memberWealDetail = finalIntersectionList.get(i);
+          Integer userLevel = memberMapper.getUserLevel(memberWealDetail.getUserName());
+          if (userLevel == -999) {
+            continue;
+          }
+          boolean fl = userLevelBlacks.contains(userLevel.toString());
+          if (fl == true) {
+            finalIntersectionList.remove(i);
+          }
+        }
+      }
+    }
+
+    return finalIntersectionList;
   }
 }

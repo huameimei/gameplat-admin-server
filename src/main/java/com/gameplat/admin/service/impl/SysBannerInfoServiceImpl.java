@@ -48,7 +48,7 @@ public class SysBannerInfoServiceImpl extends ServiceImpl<SysBannerInfoMapper, S
   @Override
   public boolean saveSysBannerInfo(SysBannerInfo sysBannerInfo) {
     validBannerInfo(sysBannerInfo);
-    return this.save(sysBannerInfo);
+    return this.updateById(sysBannerInfo);
   }
 
   @Override

@@ -219,13 +219,13 @@
       </if>
       <where>
         <if test="userNameList != null and userNameList.size > 0">
-          AND a.user_name in
+          AND a.account in
           <foreach collection="userNameList" index="index" item="item" open="(" close=")" separator=",">
             #{item}
           </foreach>
         </if>
       </where>
-      GROUP BY a.user_name
+      GROUP BY a.account
     </select>
 
   <select id="findGameDmlDateList" resultType="com.gameplat.admin.model.bean.ActivityStatisticItem">

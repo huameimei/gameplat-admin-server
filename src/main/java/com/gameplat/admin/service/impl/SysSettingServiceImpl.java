@@ -210,7 +210,8 @@ public class SysSettingServiceImpl extends ServiceImpl<SysSettingMapper, SysSett
     @Override
     public void updateAppNavigation(SysSettingVO vo) {
         // 查询游戏必要code
-        if (Constants.SETTING_APP_NAVIGATION.equals(vo.getSettingType()) || Constants.SETTING_SIX_NAVIGATION.equals(vo.getSettingType())) {
+        if (Constants.SETTING_APP_NAVIGATION.equals(vo.getSettingType()) || Constants.SETTING_SIX_NAVIGATION.equals(vo.getSettingType())||
+        Constants.SETTING_WEB_NAVIGATION.equals(vo.getSettingType())) {
             if (StringUtils.isNotBlank(vo.getExtend2())) {
                 GameKindVO game = sysSettingMapper.getGameList(vo.getExtend2());
                 if (game != null) {

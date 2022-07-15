@@ -14,6 +14,7 @@
         <result property="showPosition"    column="show_position"    />
         <result property="createTime"    column="create_time"    />
         <result property="updateTime"    column="update_time"    />
+        <result property="terminal"    column="terminal"    />
     </resultMap>
 
     <resultMap type="com.gameplat.admin.model.vo.SysFloatTypeVo" id="SysFloatTypeVo" extends="SysFloatTypeResult">
@@ -30,6 +31,7 @@
         <result property="iconPath"    column="icon_path"    />
         <result property="createTime"    column="create_time_float"    />
         <result property="updateTime"    column="update_time_float"    />
+        <result property="terminal"    column="terminal"    />
     </resultMap>
 
     <select id="selectSysFloatTypeList" parameterType="com.gameplat.admin.model.vo.SysFloatTypeVo" resultMap="SysFloatTypeVo">
@@ -52,7 +54,8 @@
         sfs.update_time as update_time_float,
         sfs.whether_open as setting_whether_open,
         sfs.can_drag,
-        sfs.icon_path
+        sfs.icon_path,
+        sfs.terminal
         FROM
         sys_float_type sft
         LEFT JOIN sys_float_setting sfs ON sft.id = sfs.type_id
@@ -67,8 +70,8 @@
 
     <insert id="insertSysFloatSetting" parameterType="com.gameplat.model.entity.setting.SysFloatSetting">
         INSERT INTO `sys_float_setting` (`type_id`, `float_index`, `whether_open`, `can_drag`,
-                                                            `jump_url`, `icon_path`, `create_time`, `update_time`)
-        VALUES (#{typeId}, #{floatIndex},#{whetherOpen},#{canDrag}, #{jumpUrl}, #{iconPath},
+                                                            `jump_url`, `icon_path`,`terminal`, `create_time`, `update_time`)
+        VALUES (#{typeId}, #{floatIndex},#{whetherOpen},#{canDrag}, #{jumpUrl}, #{iconPath},#{terminal},
                 now(), now());
     </insert>
 
@@ -80,6 +83,7 @@
             <if test="canDrag != null ">can_drag = #{canDrag},</if>
             <if test='jumpUrl != null  and jumpUrl != ""'>jump_url = #{jumpUrl},</if>
             <if test="updateTime != null ">update_time = now(),</if>
+            <if test='terminal != null  and terminal != ""'>terminal = #{terminal},</if>
             icon_path = #{iconPath},
         </trim>
         where id = #{id}

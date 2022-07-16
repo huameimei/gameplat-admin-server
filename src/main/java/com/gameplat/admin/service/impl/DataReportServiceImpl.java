@@ -43,6 +43,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class DataReportServiceImpl extends ServiceImpl<DataReportMapper, GameRechDataReportVO>
     implements DataReportService {
 
+  private final String all_recharge_amount = "f";
+
   // 转账出款
   private final String bank_count = "a";
   // 在线支付
@@ -120,6 +122,9 @@ public class DataReportServiceImpl extends ServiceImpl<DataReportMapper, GameRec
           }
           if (exception_recharge_amount.equalsIgnoreCase(Convert.toStr(a.get("rechCode")))) {
             rechReport.setExceptionRechCount(Convert.toInt(a.get("rechNum")));
+          }
+          if (all_recharge_amount.equalsIgnoreCase(Convert.toStr(a.get("rechCode")))) {
+            rechReport.setAllRechCount(Convert.toInt(a.get("rechNum")));
           }
         });
     return rechReport;

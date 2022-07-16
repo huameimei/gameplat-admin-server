@@ -172,7 +172,15 @@
         WHERE
           virtual_withdraw_number > 0
           <include refid="whereSql" />
-
+        UNION ALL
+        SELECT
+        'e' withCode,
+        count( DISTINCT account ) withNum
+        FROM
+        member_rw_report
+        WHERE
+        (withdraw_money > 0 or hand_withdraw_money > 0)
+        <include refid="whereSql"/>
     </select>
 
     <!--游戏数据 -->

@@ -63,6 +63,9 @@ public class DataReportServiceImpl extends ServiceImpl<DataReportMapper, GameRec
   // 虚拟币出款
   private final String virtual_withdraw_number = "d";
 
+  private final String withdraw_all_number = "e";
+
+
   // '类型：0 升级奖励  1：周俸禄  2：月俸禄  3：生日礼金 4：每月红包'
   private final String upgrade = "0";
 
@@ -89,7 +92,7 @@ public class DataReportServiceImpl extends ServiceImpl<DataReportMapper, GameRec
   @Autowired private GameAmountControlService gameAmountControlService;
 
 
-  @Autowired
+  @Autowired(required = false)
   private MemberInfoMapper memberInfoMapper;
 
   @Override
@@ -143,6 +146,9 @@ public class DataReportServiceImpl extends ServiceImpl<DataReportMapper, GameRec
           }
           if (virtual_withdraw_number.equalsIgnoreCase(Convert.toStr(a.get("withCode")))) {
             withReport.setVirtualWithdCount(Convert.toInt(a.get("withNum")));
+          }
+          if (withdraw_all_number.equalsIgnoreCase(Convert.toStr(a.get("withCode")))) {
+            withReport.setAllWithCount(Convert.toInt(a.get("withNum")));
           }
         });
     return withReport;

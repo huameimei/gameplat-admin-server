@@ -2,6 +2,7 @@ package com.gameplat.admin.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.gameplat.model.entity.proxy.SalaryConfig;
+import org.apache.ibatis.annotations.Param;
 
 /** @Description : 工资配置 @Author : cc @Date : 2022/4/2 */
 public interface SalaryConfigMapper extends BaseMapper<SalaryConfig> {
@@ -12,5 +13,5 @@ public interface SalaryConfigMapper extends BaseMapper<SalaryConfig> {
    * @param kindCode
    * @return
    */
-  SalaryConfig getConfig(Integer agentLevel, String kindCode);
+  SalaryConfig getConfig(@Param("agentLevel") Integer agentLevel, @Param("kindCode") String kindCode);
 }

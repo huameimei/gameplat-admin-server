@@ -179,7 +179,7 @@
         FROM
         member_rw_report
         WHERE
-        withdraw_money > 0 or hand_withdraw_money > 0
+        (withdraw_money > 0 or hand_withdraw_money > 0)
         <include refid="whereSql"/>
     </select>
 

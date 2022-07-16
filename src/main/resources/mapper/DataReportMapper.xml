@@ -109,6 +109,15 @@
         WHERE
           exception_recharge_amount > 0
           <include refid="whereSql" />
+        UNION ALL
+        SELECT
+        'f' rechCode,
+        count( DISTINCT account ) rechNum
+        FROM
+        member_rw_report
+        WHERE
+        (bank_money > 0 or online_money > 0 or hand_rech_money > 0)
+        <include refid="whereSql"/>
     </select>
 
 

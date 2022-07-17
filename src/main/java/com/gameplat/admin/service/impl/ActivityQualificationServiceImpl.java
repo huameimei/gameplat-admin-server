@@ -625,7 +625,7 @@ public class ActivityQualificationServiceImpl
     for (Map.Entry<String, BigDecimal> entry : newMap.entrySet()) {
       ActivityLobbyDiscountVO temp=getActivityLobbyDiscountVO(entry.getValue(),activityLobby.getLobbyDiscountList());
       if(temp==null){
-        log.info("根据优惠规则没有找到对应配置信息account={},{}",entry.getKey(),temp.toString());
+        log.info("根据优惠规则没有找到对应配置信息account={},{}",entry.getKey(),temp);
         continue;
       }
       ActivityQualification qm=new ActivityQualification();

@@ -12,6 +12,7 @@ public interface Constants {
   String SETTING_LANGUAGE = "tenant_language";
   String SETTING_APP_NAVIGATION = "app_navigation";
   String SETTING_SIX_NAVIGATION = "six_navigation";
+  String SETTING_WEB_NAVIGATION = "web_navigation";
   String SETTING_SQUARE_NAVIGATION = "square_navigation";
   String SYSTEM_SETTING = "system_setting";
   String SPORT_CONFIG_TYPE = "sport_config";

@@ -43,6 +43,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class DataReportServiceImpl extends ServiceImpl<DataReportMapper, GameRechDataReportVO>
     implements DataReportService {
 
+  private final String all_recharge_amount = "f";
+
   // 转账出款
   private final String bank_count = "a";
   // 在线支付
@@ -62,6 +64,9 @@ public class DataReportServiceImpl extends ServiceImpl<DataReportMapper, GameRec
   private final String exception_withdraw_amount = "c";
   // 虚拟币出款
   private final String virtual_withdraw_number = "d";
+
+  private final String withdraw_all_number = "e";
+
 
   // '类型：0 升级奖励  1：周俸禄  2：月俸禄  3：生日礼金 4：每月红包'
   private final String upgrade = "0";
@@ -89,7 +94,7 @@ public class DataReportServiceImpl extends ServiceImpl<DataReportMapper, GameRec
   @Autowired private GameAmountControlService gameAmountControlService;
 
 
-  @Autowired
+  @Autowired(required = false)
   private MemberInfoMapper memberInfoMapper;
 
   @Override
@@ -118,6 +123,9 @@ public class DataReportServiceImpl extends ServiceImpl<DataReportMapper, GameRec
           if (exception_recharge_amount.equalsIgnoreCase(Convert.toStr(a.get("rechCode")))) {
             rechReport.setExceptionRechCount(Convert.toInt(a.get("rechNum")));
           }
+          if (all_recharge_amount.equalsIgnoreCase(Convert.toStr(a.get("rechCode")))) {
+            rechReport.setAllRechCount(Convert.toInt(a.get("rechNum")));
+          }
         });
     return rechReport;
   }
@@ -143,6 +151,9 @@ public class DataReportServiceImpl extends ServiceImpl<DataReportMapper, GameRec
           }
           if (virtual_withdraw_number.equalsIgnoreCase(Convert.toStr(a.get("withCode")))) {
             withReport.setVirtualWithdCount(Convert.toInt(a.get("withNum")));
+          }
+          if (withdraw_all_number.equalsIgnoreCase(Convert.toStr(a.get("withCode")))) {
+            withReport.setAllWithCount(Convert.toInt(a.get("withNum")));
           }
         });
     return withReport;

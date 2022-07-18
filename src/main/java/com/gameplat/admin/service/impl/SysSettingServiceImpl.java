@@ -179,7 +179,6 @@ public class SysSettingServiceImpl extends ServiceImpl<SysSettingMapper, SysSett
     @Override
     public List<SysSetting> getAppNavigation(SysSettingVO vo) {
         if (vo.getSettingType().equals(Constants.SETTING_APP_NAVIGATION)) {
-            vo.setDisplay(EnableEnum.ENABLED.code());
             vo.setExtend4(null);//app导航栏不再分主题
         }
         return sysSettingMapper.getBackendAppNavigationList(vo);

@@ -108,6 +108,7 @@ public class ValidWithdrawServiceImpl extends ServiceImpl<ValidWithdrawMapper, V
     if (save > 0) {
       if (validWithdraw1 != null) {
         validWithdraw1.setUpdateTime(new Date());
+        validWithdraw1.setEndTime(new Date());
         validWithdrawMapper.updateByUserId(validWithdraw1);
       }
     }

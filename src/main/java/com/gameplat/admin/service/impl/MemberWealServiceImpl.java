@@ -214,8 +214,8 @@ public class MemberWealServiceImpl extends ServiceImpl<MemberWealMapper, MemberW
             // 查打码量满足的
             betAccountList = gameBetDailyReportService.getWealVipValid(
                     type,
-                    formatter.format(memberWeal.getStartDate()),
-                    formatter.format(memberWeal.getEndDate())
+                    DateUtil.parse(formatter.format(memberWeal.getStartDate()),"yyyy-MM-dd").toDateStr(),
+                    DateUtil.parse(formatter.format(memberWeal.getEndDate()),"yyyy-MM-dd").toDateStr()
             );
         } else {
             if (memberWeal.getMinRechargeAmount() != null
@@ -234,8 +234,9 @@ public class MemberWealServiceImpl extends ServiceImpl<MemberWealMapper, MemberW
                     && memberWeal.getMinBetAmount().compareTo(new BigDecimal("0")) > 0) {
                 betAccountList = gameBetDailyReportService.getSatisfyBetAccount(
                         String.valueOf(memberWeal.getMinBetAmount()),
-                        formatter.format(memberWeal.getStartDate()),
-                        formatter.format(memberWeal.getEndDate()));
+                        DateUtil.parse(formatter.format(memberWeal.getStartDate()),"yyyy-MM-dd").toDateStr(),
+                        DateUtil.parse(formatter.format(memberWeal.getEndDate()),"yyyy-MM-dd").toDateStr()
+                );
             } else {
                 betAccountList =
                         memberSalaryInfoList.stream().map(MemberWealDetail::getUserName).collect(toList());
@@ -496,6 +497,10 @@ public class MemberWealServiceImpl extends ServiceImpl<MemberWealMapper, MemberW
                                 messageMapper.saveReturnId(message);
 
                                 // 添加奖励记录
+                                memberWealReword.setParentId(member.getParentId());
+                                memberWealReword.setParentName(member.getParentName());
+                                memberWealReword.setAgentPath(member.getSuperPath());
+                                memberWealReword.setUserType(member.getUserType());
                                 wealRewordService.insertMemberWealReword(memberWealReword);
                                 // 修改福利详情状态 为已完成
                                 wealDetailService.updateByWealStatus(item.getWealId(), 2);

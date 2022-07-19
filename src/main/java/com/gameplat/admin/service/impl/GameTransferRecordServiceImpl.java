@@ -143,8 +143,6 @@ public class GameTransferRecordServiceImpl
             .or()
             .eq(GameTransferRecord::getStatus, GameTransferStatus.IN.getValue())
             .or()
-            .eq(GameTransferRecord::getStatus, GameTransferStatus.IN_GAME_FAIL.getValue())
-            .or()
             .count();
   }
 }

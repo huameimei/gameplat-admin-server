@@ -10,6 +10,7 @@ import com.gameplat.common.compent.oss.config.FileConfig;
 import com.gameplat.common.enums.DictTypeEnum;
 import com.gameplat.security.SecurityUserHolder;
 import lombok.SneakyThrows;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -35,14 +36,16 @@ public class OssServiceImpl implements OssService {
 
     String accessUrl = this.getAccessUrl(config, randomFilename);
     // 异步保存文件记录
-    asyncSaveFileRecordService.asyncSave(
-        file, accessUrl, config.getProvider(), SecurityUserHolder.getUsername());
-
+    asyncSaveFileRecordService.asyncSave(file, accessUrl, config.getProvider(), SecurityUserHolder.getUsername());
     return accessUrl;
   }
 
   private String getAccessUrl(FileConfig config, String filename) {
-    return config.getEndpoint().concat("/").concat(config.getBucket()).concat("/").concat(filename);
+    if (StringUtils.isNotEmpty(config.getAccessDomain())) {
+      return config.getAccessDomain().concat("/").concat(config.getBucket()).concat("/").concat(filename);
+    } else {
+      return config.getEndpoint().concat("/").concat(config.getBucket()).concat("/").concat(filename);
+    }
   }
 
   @Override

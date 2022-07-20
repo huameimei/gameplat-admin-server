@@ -37,7 +37,7 @@ public class ChatNoticeController {
   @Operation(summary = "增")
   @PostMapping("/add")
   @PreAuthorize("hasAuthority('chat:notice:add')")
-  public void add(@Validated ChatNoticeAddDTO dto) {
+  public void add(@RequestBody ChatNoticeAddDTO dto) {
     chatNoticeService.add(dto);
   }
 

@@ -103,4 +103,27 @@
             JSON_UNQUOTE(json_extract(divide_config,CONCAT('$.',concat('"', concat(#{code},'"')))))
         from divide_layer_config where user_name = #{userName}
     </select>
+
+    <delete id="batchDelConfigTrans">
+        delete from divide_fix_config where user_name in (
+        select account from member where super_path LIKE CONCAT(#{originSuperPath}, '%')
+        <if test="null != account and '' != account">
+            AND account != #{account}
+        </if>
+        );
+
+        delete from divide_fission_config where user_name in (
+        select account from member where super_path LIKE CONCAT(#{originSuperPath}, '%')
+        <if test="null != account and '' != account">
+            AND account != #{account}
+        </if>
+        );
+
+        delete from divide_layer_config where user_name in (
+        select account from member where super_path LIKE CONCAT(#{originSuperPath}, '%')
+        <if test="null != account and '' != account">
+            AND account != #{account}
+        </if>
+        );
+    </delete>
 </mapper>

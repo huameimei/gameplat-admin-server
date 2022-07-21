@@ -166,7 +166,7 @@ public class ActivityQualificationServiceImpl
 
     ActivityQualification qm;
     for (ActivityLobbyDTO activityLobbyDTO : activityLobbyList) {
-      List<ActivityLobbyDiscountDTO> lobbyDiscount = activityLobbyDTO.getLobbyDiscountList();
+      List<ActivityLobbyDiscountDTO> lobbyDiscount = activityLobbyDTO.getLobbyDiscount();
       if (activityLobbyDTO.getMultipleHandsel() == 0 && lobbyDiscount.size() > 1) {
         throw new ServiceException("【" + activityLobbyDTO.getTitle() + "】，没有开启多重彩金");
       }

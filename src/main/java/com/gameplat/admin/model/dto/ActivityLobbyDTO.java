@@ -83,6 +83,9 @@ public class ActivityLobbyDTO implements Serializable {
   private String ipBlacklist;
 
   @Schema(description = "活动大厅优惠")
+  private List<ActivityLobbyDiscountDTO> lobbyDiscount;
+
+  @Schema(description = "活动大厅优惠")
   private List<ActivityLobbyDiscountDTO> lobbyDiscountList;
 
   @Schema(description = "选中一个优惠等级")

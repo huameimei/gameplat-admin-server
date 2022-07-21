@@ -5,6 +5,7 @@
     <select id="queryPage" resultType="com.gameplat.admin.model.vo.MemberVO">
         SELECT t1.id,
                t1.account,
+               t1.game_account,
                t1.nickname,
                t1.user_level,
                t1.agent_level,

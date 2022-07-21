@@ -109,6 +109,15 @@
         WHERE
           exception_recharge_amount > 0
           <include refid="whereSql" />
+        UNION ALL
+        SELECT
+        'f' rechCode,
+        count( DISTINCT account ) rechNum
+        FROM
+        member_rw_report
+        WHERE
+        (bank_money > 0 or online_money > 0 or hand_rech_money > 0)
+        <include refid="whereSql"/>
     </select>
 
 
@@ -172,7 +181,15 @@
         WHERE
           virtual_withdraw_number > 0
           <include refid="whereSql" />
-
+        UNION ALL
+        SELECT
+        'e' withCode,
+        count( DISTINCT account ) withNum
+        FROM
+        member_rw_report
+        WHERE
+        (withdraw_money > 0 or hand_withdraw_money > 0)
+        <include refid="whereSql"/>
     </select>
 
     <!--游戏数据 -->

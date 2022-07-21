@@ -25,4 +25,9 @@ public class MemberTransformDTO implements Serializable {
 
   /** 不包含本身 */
   private Boolean excludeSelf;
+
+  /**
+   * 是否转移数据  true 转移 默认false
+   */
+  private Boolean transferWithData = false;
 }

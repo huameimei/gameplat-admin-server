@@ -139,12 +139,12 @@
     </select>
 
     <select id="batchUpdateSuperPathAndAgentLevel">
-        UPDATE member
-        SET super_path = REPLACE(super_path, #{originSuperPath}, #{superPath}),
-        agent_level = (agent_level - #{agentLevel} + 1)
-        WHERE super_path LIKE CONCAT(#{originSuperPath}, '%')
+        UPDATE member as m,member_info as mi
+        SET m.super_path = REPLACE(m.super_path, #{originSuperPath}, #{superPath}),
+        m.agent_level = (m.agent_level - #{agentLevel} + 1), mi.rebate = #{rebate}
+        WHERE m.super_path LIKE CONCAT(#{originSuperPath}, '%') and m.id = mi.member_id
         <if test="null != account and '' != account">
-            AND account != #{account}
+            AND m.account != #{account}
         </if>
     </select>
 
@@ -501,4 +501,8 @@
         select IFNULL(max(user_level),-999) from member where account = #{account}
     </select>
 
+    <select id="queryAgentInfo" parameterType="string" resultType="com.gameplat.admin.model.vo.AgentInfoVo">
+        select account as account, parent_id as parentId, parent_name as parentName, super_path as agentPath
+        from member where account = #{account}
+    </select>
 </mapper>

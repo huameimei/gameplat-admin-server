@@ -18,6 +18,7 @@ import com.gameplat.admin.service.GameConfigService;
 import com.gameplat.admin.service.SysSettingService;
 import com.gameplat.base.common.context.DyDataSourceContextHolder;
 import com.gameplat.base.common.context.StrategyContext;
+import com.gameplat.base.common.enums.EnableEnum;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.model.entity.setting.SysSetting;
 import com.gameplat.security.SecurityUserHolder;
@@ -177,33 +178,10 @@ public class SysSettingServiceImpl extends ServiceImpl<SysSettingMapper, SysSett
 
     @Override
     public List<SysSetting> getAppNavigation(SysSettingVO vo) {
-        if (vo.getSettingType().equals(Constants.TEMPLATE_CONFIG_THEME)) {
-            // 查询主题模板只取租户开启的主题
-            vo.setDisplay(1);
-        } else if (vo.getSettingType().equals(Constants.SETTING_APP_NAVIGATION)) {
-            // 如果没传主题，传默认模板
-            if (StringUtils.isBlank(vo.getExtend4())) {
-                vo.setTenant("default");
-            }
+        if (vo.getSettingType().equals(Constants.SETTING_APP_NAVIGATION)) {
+            vo.setExtend4(null);//app导航栏不再分主题
         }
-        List<SysSetting> list = sysSettingMapper.getBackendAppNavigationList(vo);
-        if (list.isEmpty()) {
-            // 如果查询为空，读取模板数据并插入返回
-            LambdaQueryWrapper<SysSetting> queryWrapper = new LambdaQueryWrapper<SysSetting>();
-            queryWrapper.eq(SysSetting::getTenant, "default");
-            queryWrapper.eq(SysSetting::getSettingType, vo.getSettingType());
-
-            list = this.list(queryWrapper);
-            list.forEach(x -> {
-                x.setExtend4(vo.getExtend4());
-                x.setTenant(getDBSuffix());
-            });
-            if (!list.isEmpty()) {
-                sysSettingMapper.insetGameList(list);
-            }
-            list = sysSettingMapper.getBackendAppNavigationList(vo);
-        }
-        return list;
+        return sysSettingMapper.getBackendAppNavigationList(vo);
     }
 
     @Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)

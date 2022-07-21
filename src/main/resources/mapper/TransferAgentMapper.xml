@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gameplat.admin.mapper.TransferAgentMapper">
+    <update id="transferActivityRecord">
+		update activity_distribute as ac, member as m set
+		ac.parent_id = m.parent_id, ac.parent_name = m.parent_name, ac.agent_path = m.super_path
+		where ac.agent_path LIKE CONCAT(#{originSuperPath}, '%') and ac.username = m.account
+		<if test="null != account and '' != account">
+			AND ac.username != #{account}
+		</if>
+	</update>
+
+	<update id="transferGameReport">
+		update game_bet_daily_report as gb, member as m set
+		gb.super_id = m.parent_id, gb.super_account = m.parent_name, gb.user_paths = m.super_path
+		where gb.user_paths LIKE CONCAT(#{originSuperPath}, '%') and gb.account = m.account
+		<if test="null != account and '' != account">
+			AND gb.account != #{account}
+		</if>
+	</update>
+
+	<update id="transferMemberReport">
+		update member_day_report as md, member as m set
+		md.parent_id = m.parent_id, md.parent_name = m.parent_name, md.agent_path = m.super_path
+		where md.agent_path LIKE CONCAT(#{originSuperPath}, '%') and md.user_name = m.account
+		<if test="null != account and '' != account">
+			AND md.user_name != #{account}
+		</if>
+	</update>
+
+	<update id="transferMemberBill">
+		update member_bill as mb, member as m set
+		mb.member_path = m.super_path
+		where mb.member_path LIKE CONCAT(#{originSuperPath}, '%') and mb.account = m.account
+		<if test="null != account and '' != account">
+			AND mb.account != #{account}
+		</if>
+	</update>
+
+	<update id="transferRechargeRecord">
+		update recharge_order as ro, member as m set
+		ro.super_id = m.parent_id, ro.super_account = m.parent_name, ro.super_path = m.super_path
+		where ro.super_path LIKE CONCAT(#{originSuperPath}, '%') and ro.account = m.account
+		<if test="null != account and '' != account">
+			AND ro.account != #{account}
+		</if>
+	</update>
+
+	<update id="transferWithdrawRecord">
+		update member_withdraw as mw, member as m set
+		mw.super_id = m.parent_id, mw.super_name = m.parent_name, mw.super_path = m.super_path
+		where mw.super_path LIKE CONCAT(#{originSuperPath}, '%') and mw.account = m.account
+		<if test="null != account and '' != account">
+			AND mw.account != #{account}
+		</if>
+	</update>
+
+	<update id="transferGameRebateReport">
+		update game_rebate_report as rr, member as m set
+		rr.super_account = m.parent_name, rr.user_paths = m.super_path
+		where rr.user_paths LIKE CONCAT(#{originSuperPath}, '%') and rr.account = m.account
+		<if test="null != account and '' != account">
+			AND rr.account != #{account}
+		</if>
+	</update>
+
+	<update id="transferWealRecord">
+		update member_weal_reword as wr, member as m set
+		wr.parent_id = m.parent_id, wr.parent_name = m.parent_name, wr.agent_path = m.super_path
+		where wr.agent_path LIKE CONCAT(#{originSuperPath}, '%') and wr.user_name = m.account
+		<if test="null != account and '' != account">
+			AND wr.user_name != #{account}
+		</if>
+	</update>
+</mapper>

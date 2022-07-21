@@ -166,7 +166,7 @@ public class ActivityQualificationServiceImpl
 
     ActivityQualification qm;
     for (ActivityLobbyDTO activityLobbyDTO : activityLobbyList) {
-      List<ActivityLobbyDiscountDTO> lobbyDiscount = activityLobbyDTO.getLobbyDiscountList();
+      List<ActivityLobbyDiscountDTO> lobbyDiscount = activityLobbyDTO.getLobbyDiscount();
       if (activityLobbyDTO.getMultipleHandsel() == 0 && lobbyDiscount.size() > 1) {
         throw new ServiceException("【" + activityLobbyDTO.getTitle() + "】，没有开启多重彩金");
       }
@@ -642,7 +642,7 @@ public class ActivityQualificationServiceImpl
     for (Map.Entry<String, BigDecimal> entry : newMap.entrySet()) {
       ActivityLobbyDiscountVO temp=getActivityLobbyDiscountVO(entry.getValue(),activityLobby.getLobbyDiscountList());
       if(temp==null){
-        log.info("根据优惠规则没有找到对应配置信息account={},{}",entry.getKey(),temp.toString());
+        log.info("根据优惠规则没有找到对应配置信息account={},{}",entry.getKey(),temp);
         continue;
       }
       ActivityQualification qm=new ActivityQualification();

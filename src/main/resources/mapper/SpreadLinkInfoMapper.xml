@@ -78,4 +78,13 @@
             and sl.divide_config is not null
              ) tmp
     </select>
+
+    <update id="dealDivide">
+        update spread_link_info as sl, member as m
+        set sl.rebate = #{rebate}, sl.is_open_divide_preset = 0, sl.divide_config = null
+        where sl.agent_account = m.account and m.super_path LIKE CONCAT(#{originSuperPath}, '%')
+        <if test="null != account and '' != account">
+            AND m.account != #{account}
+        </if>
+    </update>
 </mapper>

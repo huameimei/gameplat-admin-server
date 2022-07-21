@@ -23,4 +23,8 @@ public interface SpreadLinkInfoMapper extends BaseMapper<SpreadLinkInfo> {
   Integer countTeamLinkInfo(@Param("agentAccount") String agentAccount);
 
   BigDecimal getlinkMaxDivideRatio(@Param("userName") String userName, @Param("code") String code);
+
+  Integer dealDivide(@Param("account") String account,
+                     @Param("originSuperPath") String originSuperPath,
+                     @Param("rebate") BigDecimal rebate);
 }

@@ -275,6 +275,15 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
   @Override
   public void disable(List<Long> ids) {
     this.changeStatus(ids, MemberEnums.Status.DISABLED.value());
+
+    // 查询所有需要禁用的会员账号
+    List<Member> memberList = this.lambdaQuery().in(Member::getId, ids).list();
+
+    // 对每个禁用的会员账号踢线处理
+    for(Member member : memberList){
+      redisTemplateObj.delete(MEMBER_TOKEN_PREFIX + member.getAccount());
+    }
+
     // TODO 查询是否有进入第三方游戏，第三方游戏踢线并回收额度
   }
 

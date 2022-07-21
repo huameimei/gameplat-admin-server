@@ -22,6 +22,9 @@ public class MemberVO implements Serializable {
   @Excel(name = "会员账号", width = 20, isImportField = "true_st")
   private String account;
 
+  /** 游戏账号 */
+  private String gameAccount;
+
   /** 会员昵称 */
   @Excel(name = "会员昵称", width = 20, isImportField = "true_st")
   private String nickname;

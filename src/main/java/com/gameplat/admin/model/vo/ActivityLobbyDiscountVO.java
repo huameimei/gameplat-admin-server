@@ -28,10 +28,10 @@ public class ActivityLobbyDiscountVO implements Serializable {
   private String discountUrl;
 
   @Schema(description = "目标值")
-  private Integer targetValue;
+  private Long targetValue;
 
   @Schema(description = "赠送值")
-  private Integer presenterValue;
+  private BigDecimal presenterValue;
 
   @Schema(description = "赠送打码")
   private BigDecimal presenterDml;

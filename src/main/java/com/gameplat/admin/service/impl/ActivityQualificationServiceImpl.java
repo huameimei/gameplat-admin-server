@@ -166,7 +166,7 @@ public class ActivityQualificationServiceImpl
 
     ActivityQualification qm;
     for (ActivityLobbyDTO activityLobbyDTO : activityLobbyList) {
-      List<ActivityLobbyDiscountDTO> lobbyDiscount = activityLobbyDTO.getLobbyDiscountList();
+      List<ActivityLobbyDiscountDTO> lobbyDiscount = activityLobbyDTO.getLobbyDiscount();
       if (activityLobbyDTO.getMultipleHandsel() == 0 && lobbyDiscount.size() > 1) {
         throw new ServiceException("【" + activityLobbyDTO.getTitle() + "】，没有开启多重彩金");
       }
@@ -193,10 +193,27 @@ public class ActivityQualificationServiceImpl
       qm.setQualificationActivityId(IdWorker.getIdStr());
       qm.setQualificationStatus(BooleanEnum.YES.value());
       qm.setStatisItem(activityLobbyDTO.getStatisItem());
-      qm.setMaxMoney(lobbyDiscount.stream().mapToInt(ActivityLobbyDiscountDTO::getPresenterValue).sum());
-      qm.setWithdrawDml(lobbyDiscount.stream().mapToInt(ActivityLobbyDiscountDTO::getWithdrawDml).sum());
+      BigDecimal maxMoney = BigDecimal.ZERO;
+      BigDecimal withdrawDml = BigDecimal.ZERO;
+      //如果是1则是固定金额
+      if(activityLobby.getRewardCalculateType() == 1){
+        maxMoney = lobbyDiscount.stream().map(ActivityLobbyDiscountDTO::getPresenterValue).reduce(BigDecimal::add).get();
+        withdrawDml =lobbyDiscount.stream().map(ActivityLobbyDiscountDTO::getWithdrawDml).reduce(BigDecimal::add).get();
+        //如果是2则是百分比金额
+      } else if(activityLobby.getRewardCalculateType() == 2){
+        for(ActivityLobbyDiscountDTO item : lobbyDiscount){
+          BigDecimal presentMoney = new BigDecimal(item.getTargetValue()).multiply(item.getPresenterValue().divide(new BigDecimal("100")));
+          BigDecimal presentDml = presentMoney.multiply(item.getWithdrawDml());
+          item.setPresenterValue(presentMoney);
+          item.setWithdrawDml(presentDml);
+          maxMoney = maxMoney.add(presentMoney);
+          withdrawDml = withdrawDml.add(presentDml);
+        }
+      }
+      qm.setMaxMoney(maxMoney);
+      qm.setWithdrawDml(withdrawDml);
       qm.setSoleIdentifier(RandomUtil.generateOrderCode());
-      lobbyDiscount.sort(Comparator.comparingInt(ActivityLobbyDiscountDTO::getTargetValue));
+      lobbyDiscount.sort(Comparator.comparingLong(ActivityLobbyDiscountDTO::getTargetValue));
       qm.setAwardDetail(JSON.parseArray(JSONObject.toJSONString(lobbyDiscount)).toJSONString());
       qm.setGetWay(activityLobbyDTO.getGetWay());
       manageList.add(qm);
@@ -650,13 +667,13 @@ public class ActivityQualificationServiceImpl
       qm.setQualificationStatus(BooleanEnum.YES.value());
       qm.setStatisItem(activityLobby.getStatisItem());
       qm.setGetWay(ActivityInfoEnum.GetWay.DIRECT_RELEASE.value());
-      qm.setDrawNum(temp.getPresenterValue());
+      qm.setDrawNum(temp.getPresenterValue().intValue());
       //打码量是在抽奖时计算，这里不算
-      qm.setWithdrawDml(0);
+      qm.setWithdrawDml(BigDecimal.ZERO);
       //新增抽奖资格,使用次数为0
       qm.setEmployNum(0);
-      qm.setMinMoney(temp.getPresenterDml().intValue());
-      qm.setMaxMoney(temp.getWithdrawDml().intValue());
+      qm.setMinMoney(temp.getPresenterDml());
+      qm.setMaxMoney(temp.getWithdrawDml());
       needAdd.add(qm);
     }
 

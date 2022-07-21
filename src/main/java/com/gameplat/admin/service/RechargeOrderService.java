@@ -57,6 +57,8 @@ public interface RechargeOrderService extends IService<RechargeOrder> {
    */
   List<ActivityStatisticItem> findAllFirstRechargeAmount(Map<String, Object> map);
 
+  List<ActivityStatisticItem> findAllTwoRechargeAmount(Map<String, Object> map);
+
   /** 根据会员和最后修改时间获取充值次数、充值金额、充值优惠、其它优惠 */
   MemberActivationVO getRechargeInfoByNameAndUpdateTime(MemberActivationDTO dto);
 

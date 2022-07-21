@@ -66,6 +66,9 @@ public class ActivityTypeController {
   @PreAuthorize("hasAuthority('activity:type:add')")
   public void add(@Validated @RequestBody ActivityTypeAddDTO dto) {
     dto.setLanguage(LocaleContextHolder.getLocale().toLanguageTag());
+    if (!dto.getLanguage().contains("zh-CN,en-US,in-ID,th-TH,vi-VN")) {
+      dto.setLanguage("zh-CN");
+    }
     if (dto.getFloatStatus() != null && dto.getFloatStatus() != 0) {
       if (StringUtils.isBlank(dto.getFloatLogo())) {
         throw new ServiceException("开启浮窗开关，浮窗图片不能为空");
@@ -82,6 +85,9 @@ public class ActivityTypeController {
   @PreAuthorize("hasAuthority('activity:type:edit')")
   public void update(@Validated @RequestBody ActivityTypeUpdateDTO dto) {
     dto.setLanguage(LocaleContextHolder.getLocale().toLanguageTag());
+    if (!dto.getLanguage().contains("zh-CN,en-US,in-ID,th-TH,vi-VN")) {
+      dto.setLanguage("zh-CN");
+    }
     if (dto.getFloatStatus() != null && dto.getFloatStatus() != BooleanEnum.NO.value()) {
       if (StringUtils.isBlank(dto.getFloatLogo())) {
         throw new ServiceException("开启浮窗开关，浮窗图片不能为空");

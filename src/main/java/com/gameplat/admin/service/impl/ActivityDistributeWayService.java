@@ -109,7 +109,7 @@ public class ActivityDistributeWayService
               "会员:{0},活动派发:{1},受理成功",
               activityDistribute.getUsername(), activityDistribute.getDiscountsMoney());
       if (NumberUtil.isGreater(
-          new BigDecimal(activityDistribute.getWithdrawDml()), BigDecimal.ZERO)) {
+          activityDistribute.getWithdrawDml(), BigDecimal.ZERO)) {
         // 新增打码量记录
         ValidWithdraw validWithdraw = new ValidWithdraw();
         validWithdraw.setAccount(activityDistribute.getUsername());
@@ -118,7 +118,7 @@ public class ActivityDistributeWayService
         validWithdraw.setRechMoney(
             activityDistribute.getDiscountsMoney().setScale(2, RoundingMode.HALF_UP));
         validWithdraw.setMormDml(
-            new BigDecimal(activityDistribute.getWithdrawDml()).setScale(2, RoundingMode.HALF_UP));
+            activityDistribute.getWithdrawDml().setScale(2, RoundingMode.HALF_UP));
 
         validWithdraw.setType(0);
         validWithdraw.setStatus(BooleanEnum.NO.value());

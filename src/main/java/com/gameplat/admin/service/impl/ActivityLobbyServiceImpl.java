@@ -37,6 +37,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -209,7 +210,7 @@ public class ActivityLobbyServiceImpl extends ServiceImpl<ActivityLobbyMapper, A
     List<ActivityLobbyDiscount> activityLobbyDiscounts =
         BeanUtils.mapList(dto.getLobbyDiscountList(), ActivityLobbyDiscount.class);
 
-    List<Integer> targetValueList =
+    List<Long> targetValueList =
         activityLobbyDiscounts.stream()
             .map(ActivityLobbyDiscount::getTargetValue)
             .collect(Collectors.toList());
@@ -218,7 +219,7 @@ public class ActivityLobbyServiceImpl extends ServiceImpl<ActivityLobbyMapper, A
       throw new ServiceException("奖励赠送列表中,设定的目标值不能重复");
     }
 
-    List<Integer> presenterValueList =
+    List<BigDecimal> presenterValueList =
         activityLobbyDiscounts.stream()
             .map(ActivityLobbyDiscount::getPresenterValue)
             .collect(Collectors.toList());
@@ -435,14 +436,14 @@ public class ActivityLobbyServiceImpl extends ServiceImpl<ActivityLobbyMapper, A
     }
 
     if (CollectionUtil.isNotEmpty(allList)) {
-      List<Integer> targetValueList =
+      List<Long> targetValueList =
           allList.stream().map(ActivityLobbyDiscount::getTargetValue).collect(Collectors.toList());
       long countTargetValue = targetValueList.stream().distinct().count();
       if (targetValueList.size() != countTargetValue) {
         throw new ServiceException("奖励赠送列表目标数值不能重复");
       }
 
-      List<Integer> presenterValueList =
+      List<BigDecimal> presenterValueList =
           lobbyDiscountList.stream()
               .map(ActivityLobbyDiscountDTO::getPresenterValue)
               .collect(Collectors.toList());
@@ -458,7 +459,7 @@ public class ActivityLobbyServiceImpl extends ServiceImpl<ActivityLobbyMapper, A
         || dto.getStatisItem()
             == ActivityInfoEnum.StatisItem.CONSECUTIVE_GAME_DML_DAYS.getValue()) {
       for (ActivityLobbyDiscountDTO activityLobbyDiscountDTO : lobbyDiscountList) {
-        if (activityLobbyDiscountDTO.getTargetValue() < 2) {
+        if (activityLobbyDiscountDTO.getTargetValue() < 2L) {
           throw new ServiceException("奖励赠送列表中,设定的目标天数最小值为2");
         }
       }

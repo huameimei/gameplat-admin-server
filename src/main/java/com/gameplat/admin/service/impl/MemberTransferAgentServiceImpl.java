@@ -253,6 +253,9 @@ public class MemberTransferAgentServiceImpl implements MemberTransferAgentServic
     // 8.VIP福利记录
     Integer integer7 = transferAgentMapper.transferWealRecord(account, originSuperPath);
     log.info("转移VIP福利记录完毕{}条", integer7);
+    // 9.充提记录
+    Integer integer8 = transferAgentMapper.transferWealRecord(account, originSuperPath);
+    log.info("转移充提记录完毕{}条", integer8);
     log.info("转移代理基础数据完毕--旧的代理路径{}---新的代理路径{}", originSuperPath, newSuperPath);
     // 9.转移ES注单
     this.transferEsBetRecord(originSuperPath);

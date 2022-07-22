@@ -94,7 +94,7 @@ public class MemberTransferAgentServiceImpl implements MemberTransferAgentServic
     // 转移
     this.doTransform(source, target, dto.getExcludeSelf(), dto.getSerialNo(), dto.getTransferWithData());
     // 更新彩票代理结构
-    this.changeKgLotteryProxy(source, target);
+    //    this.changeKgLotteryProxy(source, target);
   }
 
   @Transactional(propagation = Propagation.NOT_SUPPORTED)

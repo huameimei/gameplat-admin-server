@@ -44,6 +44,15 @@
 		<if test="null != account and '' != account">
 			AND ro.account != #{account}
 		</if>
+		;
+
+		update recharge_order_history as roh, member as m set
+		roh.super_id = m.parent_id, roh.super_account = m.parent_name, roh.super_path = m.super_path
+		where roh.super_path LIKE CONCAT(#{originSuperPath}, '%') and roh.account = m.account
+		<if test="null != account and '' != account">
+			AND roh.account != #{account}
+		</if>
+		;
 	</update>
 
 	<update id="transferWithdrawRecord">
@@ -53,6 +62,14 @@
 		<if test="null != account and '' != account">
 			AND mw.account != #{account}
 		</if>
+		;
+		update member_withdraw_history as mwh, member as m set
+		mwh.super_id = m.parent_id, mwh.super_name = m.parent_name, mwh.super_path = m.super_path
+		where mwh.super_path LIKE CONCAT(#{originSuperPath}, '%') and mwh.account = m.account
+		<if test="null != account and '' != account">
+			AND mwh.account != #{account}
+		</if>
+		;
 	</update>
 
 	<update id="transferGameRebateReport">

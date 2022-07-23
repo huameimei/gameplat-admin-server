@@ -254,6 +254,9 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
   @Override
   public void disableAccount(String account) {
     SysUser user = this.getByUsername(account);
+    if (user == null) {
+      throw new ServiceException("用户名不存在，请联系管理员!");
+    }
     this.changeStatus(user.getUserId(), EnableEnum.DISABLED.code());
   }
 

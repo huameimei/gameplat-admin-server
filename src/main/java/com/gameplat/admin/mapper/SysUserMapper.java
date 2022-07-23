@@ -27,4 +27,6 @@ public interface SysUserMapper extends BaseMapper<SysUser> {
    * @return 用户对象信息
    */
   SysUser selectUserByUserName(String userName);
+
+  Integer resetGoogleSecret(@Param("userId") Long userId);
 }

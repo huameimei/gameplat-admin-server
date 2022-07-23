@@ -215,8 +215,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser>
   @SentinelResource(value = "resetGoogleSecret")
   public void resetGoogleSecret(Long id) {
     SysUser user = Assert.notNull(this.getById(id), "用户不存在!");
-    user.setSafeCode(null);
-    Assert.isTrue(this.updateById(user), "重置安全码失败!");
+    Integer integer = userMapper.resetGoogleSecret(id);
   }
 
   @Override

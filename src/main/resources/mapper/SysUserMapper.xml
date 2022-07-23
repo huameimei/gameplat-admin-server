@@ -93,4 +93,8 @@
         <include refid="selectUserVo"/>
         where u.user_id = #{userId}
     </select>
+
+    <update id="resetGoogleSecret">
+        update `sys_user` set safe_code = '' where user_id = #{userId}
+    </update>
 </mapper>

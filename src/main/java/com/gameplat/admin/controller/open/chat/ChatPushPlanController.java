@@ -36,7 +36,7 @@ public class ChatPushPlanController {
   @Operation(summary = "增")
   @PostMapping("/add")
   @PreAuthorize("hasAuthority('chat:pushPlan:add')")
-  public void add(@Validated @RequestBody  ChatPushPlanAddOrEditDTO dto) {
+  public void add(@Validated @RequestBody ChatPushPlanAddOrEditDTO dto) {
     chatPushPlanService.add(dto);
   }
 

@@ -36,14 +36,14 @@ public class ChatPushPlanController {
   @Operation(summary = "增")
   @PostMapping("/add")
   @PreAuthorize("hasAuthority('chat:pushPlan:add')")
-  public void add(@Validated ChatPushPlanAddOrEditDTO dto) {
+  public void add(@Validated @RequestBody  ChatPushPlanAddOrEditDTO dto) {
     chatPushPlanService.add(dto);
   }
 
   @Operation(summary = "编辑")
   @PostMapping("/edit")
   @PreAuthorize("hasAuthority('chat:pushPlan:edit')")
-  public void edit(@Validated ChatPushPlanAddOrEditDTO dto) {
+  public void edit(@Validated @RequestBody  ChatPushPlanAddOrEditDTO dto) {
     chatPushPlanService.edit(dto);
   }
 

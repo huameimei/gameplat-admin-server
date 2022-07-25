@@ -2,6 +2,7 @@ package com.gameplat.admin.controller.open.validwithdraw;
 
 import cn.hutool.core.util.ObjectUtil;
 import com.gameplat.admin.model.dto.ValidWithdrawDto;
+import com.gameplat.admin.model.dto.ValidWithdrawOperateDto;
 import com.gameplat.admin.model.vo.ValidateDmlBeanVo;
 import com.gameplat.admin.service.LimitInfoService;
 import com.gameplat.admin.service.ValidWithdrawService;
@@ -53,7 +54,7 @@ public class ValidWithdrawController {
   @Operation(summary = "调整会员打码量")
   @PreAuthorize("hasAuthority('funds:validWithdraw:operate')")
   @PostMapping("/operateValidWithdraw")
-  public void operateValidWithdraw(@Validated @RequestBody ValidWithdrawDto dto) {
+  public void operateValidWithdraw(@Validated @RequestBody ValidWithdrawOperateDto dto) {
     if (StringUtils.isBlank(dto.getUsername())) {
       throw new ServiceException("用户名不能为空！");
     }

@@ -10,19 +10,10 @@ import java.math.BigDecimal;
  * @Author kb @Date 2022/2/24 17:13 @Version 1.0
  */
 @Data
-public class ValidWithdrawDto implements Serializable {
-
-  /** 打码量id */
-  @NotNull(message = "id 不能为空")
-  private Long id;
+public class ValidWithdrawOperateDto implements Serializable {
 
   /** 常态打码量 */
-  @NotNull(message = "常态打码量不能为空")
   private BigDecimal mormDml;
-
-  /** 优惠打码量 */
-  @NotNull(message = "优惠打码量不能为空")
-  private BigDecimal discountDml;
 
   /** 备注 */
   private String remark;

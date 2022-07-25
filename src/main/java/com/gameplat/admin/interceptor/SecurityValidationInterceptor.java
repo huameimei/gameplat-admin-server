@@ -4,9 +4,11 @@ import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.IPUtils;
 import com.gameplat.security.SecurityUserHolder;
 import com.gameplat.security.context.UserCredential;
+import com.gameplat.security.manager.JwtTokenAuthenticationManager;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.web.servlet.HandlerInterceptor;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -17,6 +19,9 @@ import javax.servlet.http.HttpServletResponse;
  */
 public class SecurityValidationInterceptor implements HandlerInterceptor {
 
+  @Resource
+  private JwtTokenAuthenticationManager manager;
+
   @Override
   public boolean preHandle(
       @NotNull HttpServletRequest request,
@@ -25,6 +30,7 @@ public class SecurityValidationInterceptor implements HandlerInterceptor {
     UserCredential credential = SecurityUserHolder.getCredential();
     String requestIp = IPUtils.getIpAddress(request);
     if (!credential.getLoginIp().equals(requestIp)) {
+      manager.logout();
       throw new ServiceException("IP发生变更，您已被迫下线!");
     }
     return true;

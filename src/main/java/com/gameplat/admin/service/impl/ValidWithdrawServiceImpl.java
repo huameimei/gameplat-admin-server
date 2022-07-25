@@ -161,6 +161,9 @@ public class ValidWithdrawServiceImpl extends ServiceImpl<ValidWithdrawMapper, V
   public void operateValidWithdraw(ValidWithdrawOperateDto dto) {
 
     SysUser sysUser = sysUserService.getByUsername(dto.getUsername());
+    if (ObjectUtils.isEmpty(sysUser)) {
+      throw new ServiceException("会员名不存在！");
+    }
     dto.setUserId(sysUser.getUserId());
     // 获取会员现有有效打码量记录
     List<ValidWithdraw> validWithdraws =

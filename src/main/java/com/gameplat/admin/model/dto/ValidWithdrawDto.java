@@ -13,7 +13,6 @@ import java.math.BigDecimal;
 public class ValidWithdrawDto implements Serializable {
 
   /** 打码量id */
-  @NotNull(message = "id 不能为空")
   private Long id;
 
   /** 常态打码量 */

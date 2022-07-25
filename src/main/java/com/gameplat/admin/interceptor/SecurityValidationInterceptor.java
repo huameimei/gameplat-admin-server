@@ -20,7 +20,7 @@ import javax.servlet.http.HttpServletResponse;
 public class SecurityValidationInterceptor implements HandlerInterceptor {
 
   @Resource
-  private JwtTokenAuthenticationManager manager;
+  private JwtTokenAuthenticationManager jwtManager;
 
   @Override
   public boolean preHandle(
@@ -30,7 +30,7 @@ public class SecurityValidationInterceptor implements HandlerInterceptor {
     UserCredential credential = SecurityUserHolder.getCredential();
     String requestIp = IPUtils.getIpAddress(request);
     if (!credential.getLoginIp().equals(requestIp)) {
-      manager.logout();
+      jwtManager.logout();
       throw new ServiceException("IP发生变更，您已被迫下线!");
     }
     return true;

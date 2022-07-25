@@ -1,5 +1,6 @@
 package com.gameplat.admin.controller.open.validwithdraw;
 
+import cn.hutool.core.util.ObjectUtil;
 import com.gameplat.admin.model.dto.ValidWithdrawDto;
 import com.gameplat.admin.model.vo.ValidateDmlBeanVo;
 import com.gameplat.admin.service.LimitInfoService;
@@ -12,6 +13,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -46,6 +48,19 @@ public class ValidWithdrawController {
   @PostMapping("/updateValidWithdraw")
   public void updateValidWithdraw(@Validated @RequestBody ValidWithdrawDto dto) {
     validWithdrawService.updateValidWithdraw(dto);
+  }
+
+  @Operation(summary = "调整会员打码量")
+  @PreAuthorize("hasAuthority('funds:validWithdraw:operate')")
+  @PostMapping("/operateValidWithdraw")
+  public void operateValidWithdraw(@Validated @RequestBody ValidWithdrawDto dto) {
+    if (StringUtils.isBlank(dto.getUsername())) {
+      throw new ServiceException("用户名不能为空！");
+    }
+    if (ObjectUtils.isEmpty(dto.getMormDml())) {
+      throw new ServiceException("调整打码量不能为空！");
+    }
+    validWithdrawService.operateValidWithdraw(dto);
   }
 
   @SneakyThrows

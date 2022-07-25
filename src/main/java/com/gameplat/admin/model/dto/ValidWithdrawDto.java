@@ -19,10 +19,18 @@ public class ValidWithdrawDto implements Serializable {
   /** 常态打码量 */
   @NotNull(message = "常态打码量不能为空")
   private BigDecimal mormDml;
+
   /** 优惠打码量 */
   @NotNull(message = "优惠打码量不能为空")
   private BigDecimal discountDml;
 
   /** 备注 */
   private String remark;
+
+  /** 会员账号 */
+  private String username;
+
+  /** 用户id */
+  private Long userId;
+
 }

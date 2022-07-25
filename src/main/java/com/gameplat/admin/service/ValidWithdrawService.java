@@ -32,4 +32,6 @@ public interface ValidWithdrawService extends IService<ValidWithdraw> {
    * @param remark String
    */
   void rollGameRebateDml(String remark);
+
+  void operateValidWithdraw(ValidWithdrawDto dto);
 }

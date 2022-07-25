@@ -17,6 +17,7 @@ import com.gameplat.admin.mapper.ValidWithdrawMapper;
 import com.gameplat.admin.model.bean.GameBetRecordSearchBuilder;
 import com.gameplat.admin.model.dto.GameVaildBetRecordQueryDTO;
 import com.gameplat.admin.model.dto.ValidWithdrawDto;
+import com.gameplat.admin.model.dto.ValidWithdrawOperateDto;
 import com.gameplat.admin.model.vo.GameBetValidRecordVo;
 import com.gameplat.admin.model.vo.ValidAccoutWithdrawVo;
 import com.gameplat.admin.model.vo.ValidWithdrawVO;
@@ -157,7 +158,7 @@ public class ValidWithdrawServiceImpl extends ServiceImpl<ValidWithdrawMapper, V
   }
 
   @Override
-  public void operateValidWithdraw(ValidWithdrawDto dto) {
+  public void operateValidWithdraw(ValidWithdrawOperateDto dto) {
 
     SysUser sysUser = sysUserService.getByUsername(dto.getUsername());
     dto.setUserId(sysUser.getUserId());

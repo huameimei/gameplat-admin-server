@@ -1,6 +1,7 @@
 package com.gameplat.admin.convert;
 
 import com.gameplat.admin.model.dto.ValidWithdrawDto;
+import com.gameplat.admin.model.dto.ValidWithdrawOperateDto;
 import com.gameplat.model.entity.ValidWithdraw;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -14,5 +15,5 @@ public interface ValidWithdrawConvert {
   @Mappings({
     @Mapping(source = "userId", target = "memberId")
   })
-  ValidWithdraw toValidWithdraw(ValidWithdrawDto dto);
+  ValidWithdraw toValidWithdraw(ValidWithdrawOperateDto dto);
 }

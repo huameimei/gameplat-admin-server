@@ -1,6 +1,7 @@
 package com.gameplat.admin.service.impl;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSON;
@@ -20,6 +21,8 @@ import com.gameplat.admin.model.vo.GameBetValidRecordVo;
 import com.gameplat.admin.model.vo.ValidAccoutWithdrawVo;
 import com.gameplat.admin.model.vo.ValidWithdrawVO;
 import com.gameplat.admin.model.vo.ValidateDmlBeanVo;
+import com.gameplat.admin.service.SysUserAuthService;
+import com.gameplat.admin.service.SysUserService;
 import com.gameplat.admin.service.ValidWithdrawService;
 import com.gameplat.base.common.constant.ContextConstant;
 import com.gameplat.base.common.exception.ServiceException;
@@ -29,7 +32,9 @@ import com.gameplat.elasticsearch.page.PageResponse;
 import com.gameplat.elasticsearch.service.IBaseElasticsearchService;
 import com.gameplat.model.entity.ValidWithdraw;
 import com.gameplat.model.entity.recharge.RechargeOrder;
+import com.gameplat.model.entity.sys.SysUser;
 import lombok.extern.log4j.Log4j2;
+import org.apache.commons.lang3.ObjectUtils;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.search.sort.FieldSortBuilder;
 import org.elasticsearch.search.sort.SortBuilder;
@@ -61,6 +66,9 @@ public class ValidWithdrawServiceImpl extends ServiceImpl<ValidWithdrawMapper, V
   @Resource private IBaseElasticsearchService baseElasticsearchService;
 
   @Resource private SysTheme sysTheme;
+
+  @Resource
+  private SysUserService sysUserService;
 
   @Override
   public void addRechargeOrder(RechargeOrder rechargeOrder) {
@@ -146,6 +154,39 @@ public class ValidWithdrawServiceImpl extends ServiceImpl<ValidWithdrawMapper, V
   public void updateValidWithdraw(ValidWithdrawDto dto) {
     // 更新会员信息和会员详情
     Assert.isTrue(this.updateById(validWithdrawConvert.toEntity(dto)), "修改打码量信息失败!");
+  }
+
+  @Override
+  public void operateValidWithdraw(ValidWithdrawDto dto) {
+
+    SysUser sysUser = sysUserService.getByUsername(dto.getUsername());
+    dto.setUserId(sysUser.getUserId());
+    // 获取会员现有有效打码量记录
+    List<ValidWithdraw> validWithdraws =
+      this.queryByMemberIdAndAddTimeLessThanOrEqualToAndStatus(dto.getUsername(), 0);
+
+    // true 增加打码量 false减少打码量
+    boolean isAdd = dto.getMormDml().compareTo(BigDecimal.ZERO) > 0;
+
+    // 如果是没有任何有效打码量记录的会员
+    if (CollectionUtil.isEmpty(validWithdraws)) {
+      if (!isAdd) {
+        throw new ServiceException("会员无需调减打码量！");
+      }
+      // 创建一条有效打码量记录
+      Assert.isTrue(this.save(validWithdrawConvert.toValidWithdraw(dto)), "调整会员打码量失败!");
+      return;
+    }
+    // 如果有一条以上打码量记录, 调增打码量
+    ValidWithdraw validWithdraw = validWithdraws.stream()
+      .filter(Objects::nonNull)
+      .filter(o ->o.getStatus().equals(0))
+      .findFirst().orElse(null);
+    if (ObjectUtils.isEmpty(validWithdraw)) {
+      throw new ServiceException("有效打码量记录数据异常！");
+    }
+    validWithdraw.setMormDml(dto.getMormDml().add(validWithdraw.getMormDml()));
+    this.updateById(validWithdraw);
   }
 
   @Override
@@ -399,7 +440,6 @@ public class ValidWithdrawServiceImpl extends ServiceImpl<ValidWithdrawMapper, V
       String account, Integer status) {
     return this.lambdaQuery()
         .eq(ValidWithdraw::getAccount, account)
-        /* .le(ValidWithdraw::getCreateTime, maxTime)*/
         .eq(ValidWithdraw::getStatus, status)
         .orderByAsc(ValidWithdraw::getType)
         .orderByDesc(ValidWithdraw::getId)

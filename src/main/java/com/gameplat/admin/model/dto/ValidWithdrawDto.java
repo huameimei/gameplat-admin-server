@@ -20,7 +20,6 @@ public class ValidWithdrawDto implements Serializable {
   private BigDecimal mormDml;
 
   /** 优惠打码量 */
-  @NotNull(message = "优惠打码量不能为空")
   private BigDecimal discountDml;
 
   /** 备注 */

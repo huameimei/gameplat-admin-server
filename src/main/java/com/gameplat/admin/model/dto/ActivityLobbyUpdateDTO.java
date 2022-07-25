@@ -153,4 +153,7 @@ public class ActivityLobbyUpdateDTO implements Serializable {
 
   @Schema(description = "目标值")
   private String targetValue;
+
+  @Schema(description = "奖励计算类型 1固定金额 2百分比金额")
+  private Integer rewardCalculateType;
 }

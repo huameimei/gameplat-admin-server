@@ -15,6 +15,7 @@ import com.gameplat.model.entity.member.Member;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 public interface MemberMapper extends BaseMapper<Member> {
@@ -37,7 +38,8 @@ public interface MemberMapper extends BaseMapper<Member> {
       @Param("account") String account,
       @Param("originSuperPath") String originSuperPath,
       @Param("superPath") String superPath,
-      @Param("agentLevel") Integer agentLevel);
+      @Param("agentLevel") Integer agentLevel,
+      @Param("rebate") BigDecimal rebate);
 
   /**
    * 更新下级人数
@@ -116,4 +118,6 @@ public interface MemberMapper extends BaseMapper<Member> {
 
 
   Integer getUserLevel(@Param("account") String account);
+
+  AgentInfoVo queryAgentInfo(@Param("account") String account);
 }

@@ -4,14 +4,13 @@ import cn.hutool.core.collection.CollUtil;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.gameplat.admin.constant.SystemConstant;
 import com.gameplat.admin.enums.MemberBackupEnums;
+import com.gameplat.admin.mapper.DivideLayerConfigMapper;
 import com.gameplat.admin.mapper.MemberMapper;
+import com.gameplat.admin.mapper.SpreadLinkInfoMapper;
 import com.gameplat.admin.model.dto.MemberTransBackupDTO;
 import com.gameplat.admin.model.dto.MemberTransformDTO;
 import com.gameplat.admin.model.dto.UpdateLowerNumDTO;
-import com.gameplat.admin.service.GameConfigService;
-import com.gameplat.admin.service.MemberService;
-import com.gameplat.admin.service.MemberTransferAgentService;
-import com.gameplat.admin.service.MemberTransferRecordService;
+import com.gameplat.admin.service.*;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.json.JsonUtils;
 import com.gameplat.base.common.util.StringUtils;
@@ -32,7 +31,7 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -51,6 +50,14 @@ public class MemberTransferAgentServiceImpl implements MemberTransferAgentServic
 
   @Autowired private GameConfigService gameConfigService;
 
+  @Autowired private MemberInfoService memberInfoService;
+
+  @Autowired private DivideLayerConfigMapper layerConfigMapper;
+
+  @Autowired private SpreadLinkInfoMapper spreadLinkInfoMapper;
+
+  @Autowired private TransferAgentService transferAgentService;
+
   @Override
   public void transform(MemberTransformDTO dto) {
     Member source = memberService.getById(dto.getId());
@@ -62,9 +69,9 @@ public class MemberTransferAgentServiceImpl implements MemberTransferAgentServic
     // 检查条件
     this.preCheck(source, target, dto.getExcludeSelf());
     // 转移
-    this.doTransform(source, target, dto.getExcludeSelf(), dto.getSerialNo());
+    this.doTransform(source, target, dto.getExcludeSelf(), dto.getSerialNo(), dto.getTransferWithData());
     // 更新彩票代理结构
-    this.changeKgLotteryProxy(source, target);
+    //    this.changeKgLotteryProxy(source, target);
   }
 
   @Transactional(propagation = Propagation.NOT_SUPPORTED)
@@ -131,7 +138,7 @@ public class MemberTransferAgentServiceImpl implements MemberTransferAgentServic
    * @param target 目标代理
    */
   private void doTransform(Member source, Member target) {
-    this.doTransform(source, target, false, null);
+    this.doTransform(source, target, false, null, false);
   }
 
   /**
@@ -142,7 +149,7 @@ public class MemberTransferAgentServiceImpl implements MemberTransferAgentServic
    * @param excludeSelf 是否包含会员本身
    * @param serialNo 流水号存在时备份
    */
-  private void doTransform(Member source, Member target, Boolean excludeSelf, String serialNo) {
+  private void doTransform(Member source, Member target, Boolean excludeSelf, String serialNo, Boolean transferWithData) {
     // 流水号不为空时添加记录
     if (StringUtils.isNotEmpty(serialNo)) {
       this.addTransferAgentRecord(serialNo, source, target.getAccount(), excludeSelf);
@@ -161,11 +168,36 @@ public class MemberTransferAgentServiceImpl implements MemberTransferAgentServic
     // 更新代理路径和代理/会员等级
     String newSuperPath = target.getSuperPath().concat(source.getAccount()).concat("/");
     int agentLevel = source.getAgentLevel() - target.getAgentLevel();
+    BigDecimal userRebate = memberInfoService.findUserRebate(target.getAccount());
+
+    // 批量删除 分红配置  推广分红预设 修改彩票返点
+    this.delDivideConfig(excludeSelf ? source.getAccount() : null, source.getSuperPath(), userRebate);
+
     memberMapper.batchUpdateSuperPathAndAgentLevel(
-        excludeSelf ? source.getAccount() : null, source.getSuperPath(), newSuperPath, agentLevel);
+        excludeSelf ? source.getAccount() : null, source.getSuperPath(), newSuperPath, agentLevel, userRebate);
+
+    // 是否转移数据
+    if (transferWithData) {
+      transferAgentService.transferData(
+          excludeSelf ? source.getAccount() : null, source.getSuperPath(), newSuperPath);
+    }
 
     // 更新下级人数
     this.updateLowerNum(source, target.getSuperPath(), excludeSelf);
+  }
+
+  /**
+   * 转代理时 删除被转移账号的分红配置 推广链接的推广配置
+   * @param account
+   * @param originSuperPath
+   * @param rebate
+   */
+  public void delDivideConfig(String account, String originSuperPath, BigDecimal rebate) {
+    log.info("账号：{},旧的代理路径:{}", account, originSuperPath);
+    Integer delCount = layerConfigMapper.batchDelConfigTrans(account, originSuperPath);
+    log.info("清空分红配置成功:{}条,开始清空修改推广链接的分红预设和彩票代理返点", delCount);
+    Integer updateCount = spreadLinkInfoMapper.dealDivide(account, originSuperPath, rebate);
+    log.info("修改推广码链接成功:{}条", updateCount);
   }
 
   private void preCheck(Member source, Member target, Boolean excludeSelf) {

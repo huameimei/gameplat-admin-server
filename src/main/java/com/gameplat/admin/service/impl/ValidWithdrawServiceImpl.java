@@ -186,7 +186,7 @@ public class ValidWithdrawServiceImpl extends ServiceImpl<ValidWithdrawMapper, V
                   setBeginTime(a.getCreateTime());
                   setEndTime(a.getEndTime());
                   setState("1");
-                  setTimeType(3);
+                  setTimeType(1);
                 }
               };
           QueryBuilder builder = GameBetRecordSearchBuilder.buildBetRecordSearch(dto);

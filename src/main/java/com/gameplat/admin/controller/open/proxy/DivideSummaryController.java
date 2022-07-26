@@ -52,6 +52,7 @@ public class DivideSummaryController {
 
   @Operation(summary = "删除分红汇总")
   @PostMapping("/remove")
+  @PreAuthorize("hasAuthority('divide:periods:remove')")
   public void removePeriods(@RequestBody DivideSummary del) {
     if (del.getId() == null) {
       throw new ServiceException("参数缺失");

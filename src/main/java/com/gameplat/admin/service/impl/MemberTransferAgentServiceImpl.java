@@ -133,6 +133,7 @@ public class MemberTransferAgentServiceImpl implements MemberTransferAgentServic
    */
   @Override
   public void changeToAgent(Long memberId) {
+    Assert.notNull(memberId, "参数缺失");
     // 校验账号类型
     Member member = memberService.getById(memberId);
     Assert.notNull(member, "会员信息不存在！");

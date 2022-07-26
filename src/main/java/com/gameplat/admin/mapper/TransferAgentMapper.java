@@ -31,4 +31,6 @@ public interface TransferAgentMapper {
 
   Integer transferRwRecord(
       @Param("account") String account, @Param("originSuperPath") String originSuperPath);
+
+  Integer changeToAgent(@Param("account") String account, @Param("memberId") Long memberId);
 }

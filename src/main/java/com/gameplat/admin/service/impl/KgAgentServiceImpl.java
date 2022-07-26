@@ -8,9 +8,11 @@ import com.gameplat.common.enums.TransferTypesEnum;
 import com.gameplat.common.game.GameBizBean;
 import com.gameplat.common.game.api.GameApi;
 import com.gameplat.model.entity.member.Member;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,6 +21,8 @@ import org.springframework.transaction.annotation.Transactional;
  * @author: francis
  * @create: 2022-07-26 21:12
  **/
+@Service
+@Slf4j
 public class KgAgentServiceImpl implements KgAgentService {
 
   private static final String backslash = "/";

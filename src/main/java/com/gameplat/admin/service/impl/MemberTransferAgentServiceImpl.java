@@ -15,6 +15,7 @@ import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.json.JsonUtils;
 import com.gameplat.base.common.util.StringUtils;
 import com.gameplat.common.enums.GamePlatformEnum;
+import com.gameplat.common.enums.MemberEnums;
 import com.gameplat.common.enums.TransferTypesEnum;
 import com.gameplat.common.game.GameBizBean;
 import com.gameplat.common.game.api.GameApi;
@@ -123,6 +124,30 @@ public class MemberTransferAgentServiceImpl implements MemberTransferAgentServic
 
     // 更新最后恢复时间
     memberTransferRecordService.updateBatchById(records);
+  }
+
+  /**
+   * 会员转变成代理账号
+   *
+   * @param memberId
+   */
+  @Override
+  public void changeToAgent(Long memberId) {
+    // 校验账号类型
+    Member member = memberService.getById(memberId);
+    Assert.notNull(member, "会员信息不存在！");
+    Assert.isFalse(MemberEnums.Type.MEMBER.equals(member.getUserType()), "非会员账号类型");
+    // 修改会员类型
+    // 修改相关表的用户类型
+    // divideDetail userType
+    // game_bet_daily_report user_type
+    // member_day_report user_type
+    // member_weal_reword user_type
+    // member_withdraw member_type
+    // member_withdraw_history member_type
+    // recharge_order member_type
+    // recharge_order_history member_type
+    // salary_grant user_type
   }
 
   private Member getMemberByAccount(String account, String errorMessage) {

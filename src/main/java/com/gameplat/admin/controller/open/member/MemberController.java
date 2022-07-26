@@ -323,6 +323,6 @@ public class MemberController {
       type = LogType.MEMBER,
       desc = "'会员' + #{dto.id} + '转变成代理'")
   public void changeToAgent(@RequestBody MemberTransformDTO dto) {
-    memberTransferAgentService.changeToAgent(dto);
+    memberTransferAgentService.changeToAgent(dto.getId());
   }
 }

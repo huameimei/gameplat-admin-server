@@ -21,4 +21,8 @@ public class MemberLiveReportDto {
   private String orderColumn;
   /** 排序方式 */
   private String sortType;
+
+  private Integer pSize;
+  private Integer from;
+  private String exportKey;
 }

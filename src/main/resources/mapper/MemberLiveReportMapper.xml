@@ -173,4 +173,350 @@
         ) final
         ORDER BY ${dto.orderColumn} ${dto.sortType}
     </select>
+
+    <select id="list" resultType="com.gameplat.admin.model.vo.MemberLiveReportExportVo">
+        select
+        *,
+        (
+        final.winAmount*-1 - final.waterAmount - final.vipRewordAmount
+        - final.activityAmount - final.chatAmount - final.backWaterAmount - final.realDivideAmount
+        - final.salaryAmount - final.rechDiscount - final.otherDiscount
+        ) as companyWin,
+        (
+        final.realTmpValidAmount + final.eGameValidAmount + final.eSportValidAmount +
+        final.hunterValidAmount + final.chessValidAmount
+        ) as realValidAmount,
+        (
+        final.realTmpWinAmount + final.eGameWinAmount + final.eSportWinAmount
+        + final.hunterWinAmount + final.chessWinAmount
+        ) as realWinAmount,
+        concat(
+        IF(final.userType = 'M' || final.userType = 'P' || final.userType = 'T',
+        '',
+        CONCAT(IF(final.agentLevel = 0,'1',final.agentLevel),'级')
+        ),final.uType
+        ) AS memberTypeLevel
+        from (
+        SELECT
+        mdr.user_name AS account,
+        m.real_name AS realName,
+        m.user_level AS userLevel,
+        mi.balance AS balance,
+        m.create_time AS registerTime,
+        IF(m.user_type = 'A','代理',IF(m.user_type = 'M','会员',IF(m.user_type = 'P', '推广', '测试' ))) AS uType,
+        m.user_type as userType,
+        m.agent_level as agentLevel,
+        mdr.agent_path AS agentPath,
+        mdr.parent_name AS parentName,
+        IFNULL( rw.rechargeMoney, 0 ) AS rechargeMoney,
+        IFNULL( rw.rechargeCount, 0 ) AS rechargeCount,
+        IFNULL( rw.rechDiscount, 0 ) AS rechDiscount,
+        IFNULL( rw.otherDiscount, 0 ) AS otherDiscount,
+        mi.last_rech_time AS lastRechTime,
+        IFNULL( rw.withdrawMoney, 0 ) AS withdrawMoney,
+        IFNULL( rw.withdrawCount, 0 ) AS withdrawCount,
+        IFNULL( rw.counterFee, 0 ) AS counterFee,
+        IFNULL( sum( lrr.backWaterAmount ), 0 ) AS backWaterAmount,
+        IFNULL( sum( divi.realDivideAmount ), 0 ) AS realDivideAmount,
+        IFNULL( sum( sa.salaryAmount ), 0 ) AS salaryAmount,
+
+        IFNULL( sum( mdr.lottery_valid_amount ), 0 ) AS lotteryValidAmount,
+        IFNULL( sum( mdr.lottery_win_amount ), 0 ) AS lotteryWinAmount,
+        IFNULL( sum( mdr.sport_valid_amount ), 0 ) AS sportValidAmount,
+        IFNULL( sum( mdr.sport_win_amount ), 0 ) AS sportWinAmount,
+
+        IFNULL( sum( mdr.real_valid_amount ), 0 ) AS realTmpValidAmount,
+        IFNULL( sum( mdr.eGame_valid_amount ), 0 ) AS eGameValidAmount,
+        IFNULL( sum( mdr.eSport_valid_amount ), 0 ) AS eSportValidAmount,
+        IFNULL( sum( mdr.hunter_valid_amount ), 0 ) AS hunterValidAmount,
+        IFNULL( sum( mdr.chess_valid_amount ), 0 ) AS chessValidAmount,
+
+        IFNULL( sum( mdr.real_win_amount ), 0 ) AS realTmpWinAmount,
+        IFNULL( sum( mdr.eGame_win_amount ), 0 ) AS eGameWinAmount,
+        IFNULL( sum( mdr.eSport_win_amount ), 0 ) AS eSportWinAmount,
+        IFNULL( sum( mdr.hunter_win_amount ), 0 ) AS hunterWinAmount,
+        IFNULL( sum( mdr.chess_win_amount ), 0 ) AS chessWinAmount,
+
+        IFNULL( sum( mdr.valid_amount ), 0 ) AS validAmount,
+        IFNULL( sum( mdr.win_amount ), 0 ) AS winAmount,
+        IFNULL( sum( mdr.water_amount ), 0 ) AS waterAmount,
+        IFNULL( sum( mdr.vip_reword_amount ), 0 ) AS vipRewordAmount,
+        IFNULL( sum( mdr.activity_amount ), 0 ) AS activityAmount,
+        IFNULL( sum( mdr.chat_amount ), 0 ) AS chatAmount
+        FROM
+        `member_day_report` AS mdr
+        INNER JOIN member AS m ON mdr.user_name = m.account
+        INNER JOIN member_info AS mi ON mi.member_id = m.id
+        LEFT JOIN (
+        SELECT
+        account,
+        (
+        IFNULL( SUM( bank_money ), 0 )+ IFNULL( SUM( vip_money ), 0 )+ IFNULL( SUM( online_money ), 0 )+ IFNULL( SUM(
+        hand_rech_money ), 0 )
+        ) AS rechargeMoney,
+        (
+        IFNULL( SUM( bank_count ), 0 ) + IFNULL( SUM( vip_count ), 0 ) + IFNULL( SUM( online_count ), 0 ) + IFNULL( SUM(
+        hand_rech_count ), 0 )
+        ) AS rechargeCount,
+        IFNULL( SUM( rech_discount ), 0 ) AS rechDiscount,
+        IFNULL( SUM( other_discount ), 0 ) AS otherDiscount,
+        IFNULL( SUM( withdraw_money ), 0 ) AS withdrawMoney,
+        IFNULL( SUM( withdraw_count ), 0 ) AS withdrawCount,
+        IFNULL( SUM( counter_fee ), 0 ) AS counterFee
+        FROM member_rw_report
+        where 1 = 1
+        <if test="dto.account != null and dto.account != ''">
+            and account = #{dto.account}
+        </if>
+        <if test="dto.startDate != null and dto.startDate != ''">
+            AND date_format(stat_time, '%y-%m-%d' ) <![CDATA[>= ]]> date_format(#{dto.startDate},'%y-%m-%d')
+        </if>
+        <if test="dto.endDate != null and dto.endDate != ''">
+            AND date_format(stat_time, '%y-%m-%d' ) <![CDATA[<= ]]> date_format(#{dto.endDate},'%y-%m-%d' )
+        </if>
+        GROUP BY account
+        ) AS rw ON rw.account = mdr.user_name
+        LEFT JOIN (
+        SELECT account, IFNULL( sum( real_divide_amount ), 0 ) AS realDivideAmount FROM divide_summary
+        where 1 = 1
+        <if test="dto.account != null and dto.account != ''">
+            and account = #{dto.account}
+        </if>
+        <if test="dto.startDate != null and dto.startDate != ''">
+            AND date_format(create_time, '%y-%m-%d' ) <![CDATA[>= ]]> date_format(#{dto.startDate},'%y-%m-%d')
+        </if>
+        <if test="dto.endDate != null and dto.endDate != ''">
+            AND date_format(create_time, '%y-%m-%d' ) <![CDATA[<= ]]> date_format(#{dto.endDate},'%y-%m-%d' )
+        </if>
+        GROUP BY account
+        ) AS divi ON divi.account = mdr.user_name
+        LEFT JOIN (
+        SELECT user_name, IFNULL( sum( back_water_amount ), 0 ) AS backWaterAmount FROM lottery_rebate_report
+        where 1 = 1
+        <if test="dto.account != null and dto.account != ''">
+            and user_name = #{dto.account}
+        </if>
+        <if test="dto.startDate != null and dto.startDate != ''">
+            AND date_format(create_time, '%y-%m-%d' ) <![CDATA[>= ]]> date_format(#{dto.startDate},'%y-%m-%d')
+        </if>
+        <if test="dto.endDate != null and dto.endDate != ''">
+            AND date_format(create_time, '%y-%m-%d' ) <![CDATA[<= ]]> date_format(#{dto.endDate},'%y-%m-%d' )
+        </if>
+        GROUP BY user_name
+        ) AS lrr ON lrr.user_name = mdr.user_name
+        LEFT JOIN (
+        SELECT account, IFNULL( sum( salary_amount ), 0 ) AS salaryAmount FROM salary_grant
+        where 1 = 1
+        <if test="dto.account != null and dto.account != ''">
+            and account = #{dto.account}
+        </if>
+        <if test="dto.startDate != null and dto.startDate != ''">
+            AND date_format(create_time, '%y-%m-%d' ) <![CDATA[>= ]]> date_format(#{dto.startDate},'%y-%m-%d')
+        </if>
+        <if test="dto.endDate != null and dto.endDate != ''">
+            AND date_format(create_time, '%y-%m-%d' ) <![CDATA[<= ]]> date_format(#{dto.endDate},'%y-%m-%d' )
+        </if>
+        GROUP BY account
+        ) AS sa ON sa.account = mdr.user_name
+        where 1 = 1
+        <if test="dto.account != null and dto.account != ''">
+            and mdr.user_name = #{dto.account}
+        </if>
+        <if test="dto.userLevel != null">
+            and m.user_level = #{dto.userLevel}
+        </if>
+        <if test="dto.parentName != null and dto.parentName != ''">
+            <choose>
+                <when test="dto.isDirect != null and dto.isDirect == true">
+                    and mdr.parent_name = #{dto.parentName}
+                </when>
+                <otherwise>
+                    and mdr.agent_path like concat('%/',#{dto.parentName},'%')
+                </otherwise>
+            </choose>
+        </if>
+        <if test="dto.startDate != null and dto.startDate != ''">
+            AND date_format(mdr.count_date, '%y-%m-%d' ) <![CDATA[>= ]]> date_format(#{dto.startDate},'%y-%m-%d')
+        </if>
+        <if test="dto.endDate != null and dto.endDate != ''">
+            AND date_format(mdr.count_date, '%y-%m-%d' ) <![CDATA[<= ]]> date_format(#{dto.endDate},'%y-%m-%d' )
+        </if>
+        GROUP BY mdr.user_name
+        ) final
+        ORDER BY ${dto.orderColumn} ${dto.sortType}
+    </select>
+
+    <select id="exportCount" resultType="java.lang.Integer">
+        select count(*) from (
+        select
+        *,
+        (
+        final.winAmount*-1 - final.waterAmount - final.vipRewordAmount
+        - final.activityAmount - final.chatAmount - final.backWaterAmount - final.realDivideAmount
+        - final.salaryAmount - final.rechDiscount - final.otherDiscount
+        ) as companyWin,
+        (
+        final.realTmpValidAmount + final.eGameValidAmount + final.eSportValidAmount +
+        final.hunterValidAmount + final.chessValidAmount
+        ) as realValidAmount,
+        (
+        final.realTmpWinAmount + final.eGameWinAmount + final.eSportWinAmount
+        + final.hunterWinAmount + final.chessWinAmount
+        ) as realWinAmount,
+        concat(
+        IF(final.userType = 'M' || final.userType = 'P' || final.userType = 'T',
+        '',
+        CONCAT(IF(final.agentLevel = 0,'1',final.agentLevel),'级')
+        ),final.uType
+        ) AS memberTypeLevel
+        from (
+        SELECT
+        mdr.user_name AS account,
+        m.real_name AS realName,
+        m.user_level AS userLevel,
+        mi.balance AS balance,
+        m.create_time AS registerTime,
+        IF(m.user_type = 'A','代理',IF(m.user_type = 'M','会员',IF(m.user_type = 'P', '推广', '测试' ))) AS uType,
+        m.user_type as userType,
+        m.agent_level as agentLevel,
+        mdr.agent_path AS agentPath,
+        mdr.parent_name AS parentName,
+        IFNULL( rw.rechargeMoney, 0 ) AS rechargeMoney,
+        IFNULL( rw.rechargeCount, 0 ) AS rechargeCount,
+        IFNULL( rw.rechDiscount, 0 ) AS rechDiscount,
+        IFNULL( rw.otherDiscount, 0 ) AS otherDiscount,
+        mi.last_rech_time AS lastRechTime,
+        IFNULL( rw.withdrawMoney, 0 ) AS withdrawMoney,
+        IFNULL( rw.withdrawCount, 0 ) AS withdrawCount,
+        IFNULL( rw.counterFee, 0 ) AS counterFee,
+        IFNULL( sum( lrr.backWaterAmount ), 0 ) AS backWaterAmount,
+        IFNULL( sum( divi.realDivideAmount ), 0 ) AS realDivideAmount,
+        IFNULL( sum( sa.salaryAmount ), 0 ) AS salaryAmount,
+
+        IFNULL( sum( mdr.lottery_valid_amount ), 0 ) AS lotteryValidAmount,
+        IFNULL( sum( mdr.lottery_win_amount ), 0 ) AS lotteryWinAmount,
+        IFNULL( sum( mdr.sport_valid_amount ), 0 ) AS sportValidAmount,
+        IFNULL( sum( mdr.sport_win_amount ), 0 ) AS sportWinAmount,
+
+        IFNULL( sum( mdr.real_valid_amount ), 0 ) AS realTmpValidAmount,
+        IFNULL( sum( mdr.eGame_valid_amount ), 0 ) AS eGameValidAmount,
+        IFNULL( sum( mdr.eSport_valid_amount ), 0 ) AS eSportValidAmount,
+        IFNULL( sum( mdr.hunter_valid_amount ), 0 ) AS hunterValidAmount,
+        IFNULL( sum( mdr.chess_valid_amount ), 0 ) AS chessValidAmount,
+
+        IFNULL( sum( mdr.real_win_amount ), 0 ) AS realTmpWinAmount,
+        IFNULL( sum( mdr.eGame_win_amount ), 0 ) AS eGameWinAmount,
+        IFNULL( sum( mdr.eSport_win_amount ), 0 ) AS eSportWinAmount,
+        IFNULL( sum( mdr.hunter_win_amount ), 0 ) AS hunterWinAmount,
+        IFNULL( sum( mdr.chess_win_amount ), 0 ) AS chessWinAmount,
+
+        IFNULL( sum( mdr.valid_amount ), 0 ) AS validAmount,
+        IFNULL( sum( mdr.win_amount ), 0 ) AS winAmount,
+        IFNULL( sum( mdr.water_amount ), 0 ) AS waterAmount,
+        IFNULL( sum( mdr.vip_reword_amount ), 0 ) AS vipRewordAmount,
+        IFNULL( sum( mdr.activity_amount ), 0 ) AS activityAmount,
+        IFNULL( sum( mdr.chat_amount ), 0 ) AS chatAmount
+        FROM
+        `member_day_report` AS mdr
+        INNER JOIN member AS m ON mdr.user_name = m.account
+        INNER JOIN member_info AS mi ON mi.member_id = m.id
+        LEFT JOIN (
+        SELECT
+        account,
+        (
+        IFNULL( SUM( bank_money ), 0 )+ IFNULL( SUM( vip_money ), 0 )+ IFNULL( SUM( online_money ), 0 )+ IFNULL( SUM(
+        hand_rech_money ), 0 )
+        ) AS rechargeMoney,
+        (
+        IFNULL( SUM( bank_count ), 0 ) + IFNULL( SUM( vip_count ), 0 ) + IFNULL( SUM( online_count ), 0 ) + IFNULL( SUM(
+        hand_rech_count ), 0 )
+        ) AS rechargeCount,
+        IFNULL( SUM( rech_discount ), 0 ) AS rechDiscount,
+        IFNULL( SUM( other_discount ), 0 ) AS otherDiscount,
+        IFNULL( SUM( withdraw_money ), 0 ) AS withdrawMoney,
+        IFNULL( SUM( withdraw_count ), 0 ) AS withdrawCount,
+        IFNULL( SUM( counter_fee ), 0 ) AS counterFee
+        FROM member_rw_report
+        where 1 = 1
+        <if test="dto.account != null and dto.account != ''">
+            and account = #{dto.account}
+        </if>
+        <if test="dto.startDate != null and dto.startDate != ''">
+            AND date_format(stat_time, '%y-%m-%d' ) <![CDATA[>= ]]> date_format(#{dto.startDate},'%y-%m-%d')
+        </if>
+        <if test="dto.endDate != null and dto.endDate != ''">
+            AND date_format(stat_time, '%y-%m-%d' ) <![CDATA[<= ]]> date_format(#{dto.endDate},'%y-%m-%d' )
+        </if>
+        GROUP BY account
+        ) AS rw ON rw.account = mdr.user_name
+        LEFT JOIN (
+        SELECT account, IFNULL( sum( real_divide_amount ), 0 ) AS realDivideAmount FROM divide_summary
+        where 1 = 1
+        <if test="dto.account != null and dto.account != ''">
+            and account = #{dto.account}
+        </if>
+        <if test="dto.startDate != null and dto.startDate != ''">
+            AND date_format(create_time, '%y-%m-%d' ) <![CDATA[>= ]]> date_format(#{dto.startDate},'%y-%m-%d')
+        </if>
+        <if test="dto.endDate != null and dto.endDate != ''">
+            AND date_format(create_time, '%y-%m-%d' ) <![CDATA[<= ]]> date_format(#{dto.endDate},'%y-%m-%d' )
+        </if>
+        GROUP BY account
+        ) AS divi ON divi.account = mdr.user_name
+        LEFT JOIN (
+        SELECT user_name, IFNULL( sum( back_water_amount ), 0 ) AS backWaterAmount FROM lottery_rebate_report
+        where 1 = 1
+        <if test="dto.account != null and dto.account != ''">
+            and user_name = #{dto.account}
+        </if>
+        <if test="dto.startDate != null and dto.startDate != ''">
+            AND date_format(create_time, '%y-%m-%d' ) <![CDATA[>= ]]> date_format(#{dto.startDate},'%y-%m-%d')
+        </if>
+        <if test="dto.endDate != null and dto.endDate != ''">
+            AND date_format(create_time, '%y-%m-%d' ) <![CDATA[<= ]]> date_format(#{dto.endDate},'%y-%m-%d' )
+        </if>
+        GROUP BY user_name
+        ) AS lrr ON lrr.user_name = mdr.user_name
+        LEFT JOIN (
+        SELECT account, IFNULL( sum( salary_amount ), 0 ) AS salaryAmount FROM salary_grant
+        where 1 = 1
+        <if test="dto.account != null and dto.account != ''">
+            and account = #{dto.account}
+        </if>
+        <if test="dto.startDate != null and dto.startDate != ''">
+            AND date_format(create_time, '%y-%m-%d' ) <![CDATA[>= ]]> date_format(#{dto.startDate},'%y-%m-%d')
+        </if>
+        <if test="dto.endDate != null and dto.endDate != ''">
+            AND date_format(create_time, '%y-%m-%d' ) <![CDATA[<= ]]> date_format(#{dto.endDate},'%y-%m-%d' )
+        </if>
+        GROUP BY account
+        ) AS sa ON sa.account = mdr.user_name
+        where 1 = 1
+        <if test="dto.account != null and dto.account != ''">
+            and mdr.user_name = #{dto.account}
+        </if>
+        <if test="dto.userLevel != null">
+            and m.user_level = #{dto.userLevel}
+        </if>
+        <if test="dto.parentName != null and dto.parentName != ''">
+            <choose>
+                <when test="dto.isDirect != null and dto.isDirect == true">
+                    and mdr.parent_name = #{dto.parentName}
+                </when>
+                <otherwise>
+                    and mdr.agent_path like concat('%/',#{dto.parentName},'%')
+                </otherwise>
+            </choose>
+        </if>
+        <if test="dto.startDate != null and dto.startDate != ''">
+            AND date_format(mdr.count_date, '%y-%m-%d' ) <![CDATA[>= ]]> date_format(#{dto.startDate},'%y-%m-%d')
+        </if>
+        <if test="dto.endDate != null and dto.endDate != ''">
+            AND date_format(mdr.count_date, '%y-%m-%d' ) <![CDATA[<= ]]> date_format(#{dto.endDate},'%y-%m-%d' )
+        </if>
+        GROUP BY mdr.user_name
+        ) final
+        ORDER BY ${dto.orderColumn} ${dto.sortType}
+        ) as total
+    </select>
 </mapper>

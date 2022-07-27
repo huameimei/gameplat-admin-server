@@ -1,5 +1,7 @@
 package com.gameplat.admin.service.impl;
 
+import cn.afterturn.easypoi.excel.ExcelExportUtil;
+import cn.afterturn.easypoi.excel.entity.ExportParams;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.json.JSONUtil;
@@ -38,14 +40,19 @@ import com.gameplat.model.entity.recharge.RechargeOrder;
 import com.gameplat.redis.api.RedisService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.text.MessageFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -470,5 +477,29 @@ public class GameRebateReportServiceImpl
       dto.setAccount(null);
     }
     return gameRebateReportMapper.queryGameReport(dto);
+  }
+
+  @Override
+  public void exportGameReport(GameRebateStatisQueryDTO dto, HttpServletResponse response) throws Exception {
+
+    if (StringUtils.isNotBlank(dto.getSuperAccount())) {
+      Member member = memberService.getByAccount(dto.getSuperAccount()).orElse(null);
+      if (ObjectUtils.isEmpty(member)) {
+        throw new Exception("用户不存在");
+      }
+      dto.setUserPaths(member.getSuperPath());
+      dto.setAccount(StringUtils.EMPTY);
+    }
+    List<GameReportVO> list = gameRebateReportMapper.queryGameReport(dto);
+    String title = MessageFormat.format("{0}至{1}游戏交收数据", dto.getBeginTime(), dto.getEndTime());
+    ExportParams exportParams = new ExportParams(title, "游戏交收数据");
+    response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename = gameReport.xls");
+
+    try (Workbook workbook = ExcelExportUtil.exportExcel(exportParams, GameReportVO.class, list)) {
+      workbook.write(response.getOutputStream());
+    } catch (IOException e) {
+      log.error("请求导出游戏交收数据报错", e);
+    }
+
   }
 }

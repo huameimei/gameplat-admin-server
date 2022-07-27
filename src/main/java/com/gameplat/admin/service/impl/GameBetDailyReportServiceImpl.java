@@ -27,6 +27,7 @@ import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.DateUtil;
 import com.gameplat.base.common.util.DateUtils;
 import com.gameplat.base.common.util.StringUtils;
+import com.gameplat.common.enums.GameKindEnum;
 import com.gameplat.common.enums.SettleStatusEnum;
 import com.gameplat.common.enums.UserTypes;
 import com.gameplat.common.lang.Assert;
@@ -294,6 +295,22 @@ public class GameBetDailyReportServiceImpl
   }
 
   @Override
+  public void exportGameKindReport(GameBetDailyReportQueryDTO dto, HttpServletResponse response) {
+
+    log.info("请求导出游戏大类数据，请求参数{}", dto);
+    List<GameReportVO> result = gameBetDailyReportMapper.queryReportList(dto);
+    String title = String.format("%s至%s游戏大类数据", dto.getBeginTime(), dto.getEndTime());
+    ExportParams exportParams = new ExportParams(title, "游戏大类数据");
+    response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename = gameKindReport.xls");
+
+    try (Workbook workbook = ExcelExportUtil.exportExcel(exportParams, GameReportVO.class, result)) {
+      workbook.write(response.getOutputStream());
+    } catch (IOException e) {
+      log.error("请求导出游戏投注日报表报错", e);
+    }
+  }
+
+  @Override
   public PageDtoVO<GameBetReportVO> queryBetReportList(
       Page<GameBetDailyReportQueryDTO> page, GameBetDailyReportQueryDTO dto) {
     Page<GameBetReportVO> gameBetReportVOPage =
@@ -398,4 +415,38 @@ public class GameBetDailyReportServiceImpl
       log.error("导出游戏投注记录报错", e);
     }
   }
+
+  @Override
+  public void exportGameBetDailyReport(HttpServletResponse response, GameBetDailyReportQueryDTO dto) throws Exception {
+    log.info("请求导出游戏投注日报表参数：{}", dto);
+    if (StringUtils.isNotBlank(dto.getSuperAccount())) {
+      Member member = memberService.getByAccount(dto.getSuperAccount()).orElse(null);
+      if (ObjectUtils.isEmpty(member)) {
+        throw new Exception("用户不存在");
+      }
+      dto.setUserPaths(member.getSuperPath());
+      // 是否代理账号
+      if (UserTypes.AGENT.value().equals(member.getUserType())) {
+        dto.setAccount(null);
+      }
+    }
+    QueryWrapper<GameBetDailyReport> queryWrapper = Wrappers.query();
+    fillQueryWrapper(dto, queryWrapper);
+    queryWrapper.orderByDesc(Lists.newArrayList("stat_time", "id"));
+
+    List<GameBetDailyReport> result = gameBetDailyReportMapper.selectList(queryWrapper);
+    result.forEach(o -> o.setGameKindName(GameKindEnum.getDescByCode(o.getGameKind())));
+    String title = String.format("%s至%s游戏投注日报表数据", dto.getBeginTime(), dto.getEndTime());
+    ExportParams exportParams = new ExportParams(title, "游戏平台数据");
+    response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename = gameBetDailyReport.xls");
+
+    try (Workbook workbook = ExcelExportUtil.exportExcel(exportParams, GameBetDailyReport.class, result)) {
+      workbook.write(response.getOutputStream());
+    } catch (IOException e) {
+      log.error("请求导出游戏投注日报表报错", e);
+    }
+  }
+
+
+
 }

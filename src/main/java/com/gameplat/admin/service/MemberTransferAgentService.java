@@ -13,4 +13,11 @@ public interface MemberTransferAgentService {
    * @param serialNo 流水号
    */
   void recover(String serialNo);
+
+  /**
+   * 会员转变成代理账号
+   *
+   * @param memberId
+   */
+  void changeToAgent(Long memberId);
 }

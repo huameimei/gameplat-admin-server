@@ -7,6 +7,7 @@ import com.gameplat.admin.enums.MemberBackupEnums;
 import com.gameplat.admin.mapper.DivideLayerConfigMapper;
 import com.gameplat.admin.mapper.MemberMapper;
 import com.gameplat.admin.mapper.SpreadLinkInfoMapper;
+import com.gameplat.admin.mapper.TransferAgentMapper;
 import com.gameplat.admin.model.dto.MemberTransBackupDTO;
 import com.gameplat.admin.model.dto.MemberTransformDTO;
 import com.gameplat.admin.model.dto.UpdateLowerNumDTO;
@@ -15,6 +16,7 @@ import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.json.JsonUtils;
 import com.gameplat.base.common.util.StringUtils;
 import com.gameplat.common.enums.GamePlatformEnum;
+import com.gameplat.common.enums.MemberEnums;
 import com.gameplat.common.enums.TransferTypesEnum;
 import com.gameplat.common.game.GameBizBean;
 import com.gameplat.common.game.api.GameApi;
@@ -57,6 +59,8 @@ public class MemberTransferAgentServiceImpl implements MemberTransferAgentServic
   @Autowired private SpreadLinkInfoMapper spreadLinkInfoMapper;
 
   @Autowired private TransferAgentService transferAgentService;
+
+  @Autowired private TransferAgentMapper transferAgentMapper;
 
   @Override
   public void transform(MemberTransformDTO dto) {
@@ -123,6 +127,41 @@ public class MemberTransferAgentServiceImpl implements MemberTransferAgentServic
 
     // 更新最后恢复时间
     memberTransferRecordService.updateBatchById(records);
+  }
+
+  /**
+   * 会员转变成代理账号
+   *
+   * @param memberId
+   */
+  @Override
+  public void changeToAgent(Long memberId) {
+    Assert.notNull(memberId, "参数缺失");
+    // 校验账号类型
+    Member member = memberService.getById(memberId);
+    Assert.notNull(member, "会员信息不存在！");
+    Assert.isFalse(MemberEnums.Type.MEMBER.equals(member.getUserType()), "非会员账号类型");
+    String parentName = member.getParentName();
+    Integer agentLevel = 1;
+    if (!SystemConstant.DEFAULT_WEB_ROOT.equalsIgnoreCase(parentName)
+        && !SystemConstant.DEFAULT_TEST_ROOT.equalsIgnoreCase(parentName)
+        && !SystemConstant.DEFAULT_WAP_ROOT.equalsIgnoreCase(parentName)) {
+      Member parent =
+          memberService
+              .getByAccount(parentName)
+              .orElseThrow(() -> new ServiceException("上级账号！".concat(parentName).concat("不存在")));
+      agentLevel = parent.getAgentLevel() + 1;
+    }
+    log.info("会员{},{}开始转变成代理", memberId, member.getAccount());
+    boolean update =
+        memberService
+            .lambdaUpdate()
+            .set(Member::getUserType, MemberEnums.Type.AGENT.value())
+            .set(Member::getAgentLevel, agentLevel)
+            .eq(Member::getId, memberId)
+            .update();
+    // 修改相关表userType
+    Integer integer = transferAgentMapper.changeToAgent(member.getAccount(), memberId);
   }
 
   private Member getMemberByAccount(String account, String errorMessage) {

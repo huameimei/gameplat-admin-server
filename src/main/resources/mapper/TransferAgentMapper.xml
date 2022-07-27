@@ -98,4 +98,16 @@
 			AND rw.account != #{account}
 		</if>
 	</update>
+
+	<update id="changeToAgent">
+		update game_bet_daily_report set user_type = 'A' where account = #{account};
+		update member_day_report set user_type = 5 where user_name = #{account};
+		update member_weal_reword set user_type = 'A' where user_name = #{account};
+		update member_withdraw set member_type = 'A' where account = #{account};
+		update member_withdraw_history set member_type = 'A' where account = #{account};
+		update recharge_order set member_type = 'A' where account = #{account};
+		update recharge_order_history set member_type = 'A' where account = #{account};
+		update salary_grant set user_type = 'A' where account = #{account};
+		update divide_detail set user_type = 'A' where user_name = #{account};
+	</update>
 </mapper>

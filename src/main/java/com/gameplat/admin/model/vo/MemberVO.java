@@ -33,6 +33,10 @@ public class MemberVO implements Serializable {
   @Excel(name = "真实姓名", width = 15, isImportField = "true_st")
   private String realName;
 
+  /** 真实姓名 */
+  @Excel(name = "手机号", width = 18, isImportField = "true_st")
+  private String phone;
+
   @Excel(name = "VIP等级", width = 8, isImportField = "true_st")
   @Schema(description = "VIP等级")
   private Integer vipLevel;

@@ -31,7 +31,7 @@
         distinct member_id as memberId,
         account,
         real_name as fullName,
-        ip_address as loginAddress,
+        ip_address as ipAddress,
         (select count(distinct member_id,  COALESCE(ip_address,'null')) from member_withdraw_history where 1=1 and ip_address = loginAddress) as ipCount,
         account_money money
         from member_withdraw_history

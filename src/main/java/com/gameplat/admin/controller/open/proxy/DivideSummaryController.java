@@ -5,14 +5,13 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.gameplat.admin.model.dto.DivideSummaryQueryDTO;
 import com.gameplat.admin.model.vo.DivideSummaryVO;
 import com.gameplat.admin.service.DivideSummaryService;
+import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.model.entity.proxy.DivideSummary;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * @Description : 层层代分红汇总 @Author : cc @Date : 2022/4/2
@@ -49,5 +48,15 @@ public class DivideSummaryController {
   @PreAuthorize("hasAuthority('divide:summary:max')")
   public Integer getMaxLevel(DivideSummaryQueryDTO dto) {
     return summaryService.getMaxLevel(dto);
+  }
+
+  @Operation(summary = "删除分红汇总")
+  @PostMapping("/remove")
+  @PreAuthorize("hasAuthority('divide:periods:remove')")
+  public void removePeriods(@RequestBody DivideSummary del) {
+    if (del.getId() == null) {
+      throw new ServiceException("参数缺失");
+    }
+    boolean b = summaryService.removeById(del.getId());
   }
 }

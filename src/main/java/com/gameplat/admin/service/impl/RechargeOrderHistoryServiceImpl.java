@@ -119,7 +119,7 @@ public class RechargeOrderHistoryServiceImpl
             dto.getStatus())
         .in(
             ObjectUtils.isNotEmpty(dto.getPayAccountOwnerList()),
-            RechargeOrderHistory::getPayAccountOwner,
+                RechargeOrderHistory::getPayAccountAccount,
             dto.getPayAccountOwnerList())
         .eq(
             ObjectUtils.isNotEmpty(dto.getTpMerchantId()),

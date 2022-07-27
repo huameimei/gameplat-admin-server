@@ -45,9 +45,9 @@ public class MemberWithdrawHistoryServiceImpl
     implements MemberWithdrawHistoryService {
 
   /** 提现会员、代理 */
-  private final String WITH_FORMAL_TYPE = "HY";
+  private final String WITH_FORMAL_TYPE = "M";
   /** 提现推广 */
-  private final String WITH_TEST_TYPE = "VHY";
+  private final String WITH_TEST_TYPE = "P";
   /** 查询会员类型 */
   private final String RECH_FORMAL_TYPE_QUERY = "M,A";
 

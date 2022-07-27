@@ -399,7 +399,12 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
             throw new ServiceException("备注信息不能为空!");
           }
           LambdaUpdateWrapper<MemberWithdraw> update = Wrappers.lambdaUpdate();
-          update.set(MemberWithdraw::getApproveReason, cashReason).eq(MemberWithdraw::getId, id);
+          update
+                  .set(MemberWithdraw::getApproveReason, cashReason)
+                  .set(MemberWithdraw::getOperatorTime, new Date())
+                  .set(MemberWithdraw::getOperatorAccount, credential.getUsername())
+                  .eq(MemberWithdraw::getId, id);
+
           this.update(new MemberWithdraw(), update);
         }
         // 释放会员提现冻结金额

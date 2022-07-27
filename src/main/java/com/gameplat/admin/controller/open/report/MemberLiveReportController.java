@@ -55,7 +55,7 @@ public class MemberLiveReportController {
       throws IOException {
     log.info("会员活跃度导出的操作人：{}", SecurityUserHolder.getUsername());
     Integer count = memberLiveReportService.exportCount(dto);
-    if (count > 5L) {
+    if (count > 500000) {
       throw new ServerException("单次导出最大数量不能超过500000条!");
     }
     memberLiveReportService.export(dto, count, response);

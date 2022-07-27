@@ -19,6 +19,7 @@ public class GameReportVO implements Serializable {
   private String gameTypeCode;
 
   /** 游戏大类名称 */
+  @Excel(name = "游戏大类", width = 20)
   private String gameTypeName;
 
   /** 会员人数 */

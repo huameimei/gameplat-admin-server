@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
 @Tag(name = "游戏返水报表")
@@ -60,5 +61,12 @@ public class GameRebateReportController {
   @PreAuthorize("hasAuthority('game:gameRebateReport:list')")
   public List<GameReportVO> queryGameReport(GameRebateStatisQueryDTO dto) {
     return gameRebateReportService.queryGameReport(dto);
+  }
+
+  @Operation(summary = "游戏交收数据统计导出")
+  @GetMapping(value = "/exportGameReport")
+  @PreAuthorize("hasAuthority('game:gameRebateReport:export')")
+  public void exportGameReport(GameRebateStatisQueryDTO dto, HttpServletResponse response) throws Exception {
+    gameRebateReportService.exportGameReport(dto, response);
   }
 }

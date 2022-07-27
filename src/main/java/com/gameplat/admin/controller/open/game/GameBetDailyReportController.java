@@ -27,6 +27,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 
@@ -48,6 +49,13 @@ public class GameBetDailyReportController {
   public PageDtoVO<GameBetDailyReport> queryPage(
       Page<GameBetDailyReport> page, GameBetDailyReportQueryDTO dto) {
     return gameBetDailyReportService.queryPage(page, dto);
+  }
+
+  @Operation(summary = "游戏投注日报表导出")
+  @GetMapping(value = "/exportGameBetDailyReport")
+  @PreAuthorize("hasAuthority('game:gameBetDailyReport:export')")
+  public void exportGameBetDailyReport(HttpServletResponse response, GameBetDailyReportQueryDTO dto) throws Exception {
+    gameBetDailyReportService.exportGameBetDailyReport(response, dto);
   }
 
   @Operation(summary = "游戏平台维度数据统计")
@@ -91,6 +99,21 @@ public class GameBetDailyReportController {
       dto.setEndTime(endTime);
     }
     return gameBetDailyReportService.queryReportList(dto);
+  }
+
+  @Operation(summary = "游戏大类数据导出")
+  @GetMapping(value = "/exportGameKindReport")
+  @PreAuthorize("hasAuthority('game:gameKindReport:export')")
+  public void exportGameKindReport(GameBetDailyReportQueryDTO dto, HttpServletResponse response) {
+    if (StringUtils.isBlank(dto.getBeginTime())) {
+      String beginTime = DateUtil.getDateToString(new Date());
+      dto.setBeginTime(beginTime);
+    }
+    if (StringUtils.isBlank(dto.getEndTime())) {
+      String endTime = DateUtil.getDateToString(new Date());
+      dto.setEndTime(endTime);
+    }
+    gameBetDailyReportService.exportGameKindReport(dto, response);
   }
 
   @Operation(summary = "查询投注日报表记录")
@@ -145,4 +168,15 @@ public class GameBetDailyReportController {
     gameBetRecordQueryDTO.setTimeType(1);
     return gameBetRecordInfoService.queryPageBetRecord(page, gameBetRecordQueryDTO);
   }
+
+  @Operation(summary = "导出会员游戏报表")
+  @GetMapping("exportUserGameBetRecord")
+  @PreAuthorize("hasAuthority('game:gameReport:export')")
+  public void exportUserGameBetRecord(@Valid UserGameBetRecordDto dto, HttpServletResponse response) throws IOException {
+    GameBetRecordQueryDTO gameBetRecordQueryDTO = new GameBetRecordQueryDTO();
+    BeanUtil.copyProperties(dto, gameBetRecordQueryDTO);
+    gameBetRecordQueryDTO.setTimeType(1);
+    gameBetRecordInfoService.exportUserGameBetRecord(gameBetRecordQueryDTO, response);
+  }
+
 }

@@ -133,7 +133,7 @@
         <dependency>
             <groupId>com.gameplat</groupId>
             <artifactId>gameplat-common-game</artifactId>
-            <version>${project.version}</version>
+            <version>4.1.0-RELEASE</version>
         </dependency>
 
         <dependency>

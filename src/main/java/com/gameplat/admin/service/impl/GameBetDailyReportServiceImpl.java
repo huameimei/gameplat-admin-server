@@ -15,15 +15,13 @@ import com.gameplat.admin.config.SysTheme;
 import com.gameplat.admin.mapper.GameBetDailyReportMapper;
 import com.gameplat.admin.model.bean.ActivityStatisticItem;
 import com.gameplat.admin.model.dto.GameBetDailyReportQueryDTO;
-import com.gameplat.admin.model.vo.GameBetReportVO;
-import com.gameplat.admin.model.vo.GameReportVO;
-import com.gameplat.admin.model.vo.MemberInfoVO;
-import com.gameplat.admin.model.vo.PageDtoVO;
+import com.gameplat.admin.model.vo.*;
 import com.gameplat.admin.service.GameBetDailyReportService;
 import com.gameplat.admin.service.GamePlatformService;
 import com.gameplat.admin.service.MemberService;
 import com.gameplat.base.common.constant.ContextConstant;
 import com.gameplat.base.common.exception.ServiceException;
+import com.gameplat.base.common.util.BeanUtils;
 import com.gameplat.base.common.util.DateUtil;
 import com.gameplat.base.common.util.DateUtils;
 import com.gameplat.base.common.util.StringUtils;
@@ -47,6 +45,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletResponse;
+
+import jodd.bean.BeanCopy;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.elasticsearch.action.search.SearchRequest;
@@ -435,7 +435,10 @@ public class GameBetDailyReportServiceImpl
     queryWrapper.orderByDesc(Lists.newArrayList("stat_time", "id"));
 
     List<GameBetDailyReport> result = gameBetDailyReportMapper.selectList(queryWrapper);
-    result.forEach(o -> o.setGameKindName(GameKindEnum.getDescByCode(o.getGameKind())));
+
+    List<GameBetDailyReportVO> reportVOList = new ArrayList<>();
+    BeanUtils.copyBeanProp(reportVOList, result);
+    reportVOList.forEach(o -> o.setGameKindName(GameKindEnum.getDescByCode(o.getGameKind())));
     String title = String.format("%s至%s游戏投注日报表数据", dto.getBeginTime(), dto.getEndTime());
     ExportParams exportParams = new ExportParams(title, "游戏平台数据");
     response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename = gameBetDailyReport.xls");

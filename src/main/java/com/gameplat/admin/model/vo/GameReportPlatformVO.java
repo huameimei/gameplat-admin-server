@@ -7,13 +7,13 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 
 @Data
-public class GameSettlementReportVO implements Serializable {
+public class GameReportPlatformVO implements Serializable {
 
   /** 平台 */
   private String platformCode;
 
   /** 平台 */
-  @Excel(name = "游戏平台", width = 20, orderNum = "1")
+  @Excel(name = "平台", width = 20, orderNum = "1")
   private String platformName;
 
   /** 游戏大类 */
@@ -39,7 +39,7 @@ public class GameSettlementReportVO implements Serializable {
   private BigDecimal validAmount;
 
   /** 中奖金额 */
-  @Excel(name = "游戏输赢", width = 20, orderNum = "7")
+  @Excel(name = "会员输赢", width = 20, orderNum = "7")
   private BigDecimal winAmount;
 
   /** 返水金额 */

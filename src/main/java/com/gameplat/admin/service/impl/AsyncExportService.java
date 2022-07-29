@@ -52,7 +52,12 @@ public class AsyncExportService {
       workbook.write(bos);
       byte[] barray = bos.toByteArray();
       InputStream is = new ByteArrayInputStream(barray);
-      MultipartFile file = new MockMultipartFile("file", "用户活跃度导出.xlsx", "xlsx", is);
+      MultipartFile file =
+          new MockMultipartFile(
+              "file",
+              "用户活跃度导出.xlsx",
+              "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+              is);
 
       // 上传到文件服务器供租户下载
       log.info("上传会员列表开始{}", System.currentTimeMillis());

@@ -8,5 +8,14 @@ import com.gameplat.model.entity.setting.SysDomain;
  */
 public interface SysDomainService extends IService<SysDomain> {
 
+  /**
+   * 获取聊天室域名
+   * @return
+   */
   String getChatDomain();
+  /**
+   * 获取图片存储域名
+   * @return
+   */
+  String getImageDomain();
 }

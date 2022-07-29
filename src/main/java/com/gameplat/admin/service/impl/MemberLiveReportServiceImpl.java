@@ -89,11 +89,11 @@ public class MemberLiveReportServiceImpl
 
   @Override
   public void export(MemberLiveReportDto dto, Integer memberSum, HttpServletResponse response) {
-    Integer count = memberSum / 10000;
-    if (memberSum > count * 10000) {
+    Integer count = memberSum / 10;
+    if (memberSum > count * 10) {
       count++;
     }
-    if (memberSum <= 50000) {
+    if (memberSum <= 10) {
       ExcelBatchExportService batchService = new ExcelBatchExportService();
       Workbook workbook = null;
       ExportParams exportParams = new ExportParams(null, "Sheet1");

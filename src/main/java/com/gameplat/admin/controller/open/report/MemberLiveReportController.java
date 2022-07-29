@@ -37,19 +37,20 @@ public class MemberLiveReportController {
   @PreAuthorize("hasAuthority('member:liveReport:list')")
   public Page<MemberLiveReportVo> list(PageDTO<MemberLiveReportDto> page, MemberLiveReportDto dto) {
     log.info("会员活跃度查询：{}", JSONUtil.toJsonStr(dto));
-    if (StringUtils.isEmpty(dto.getStartDate())) {
+    if (StringUtils.isEmpty(dto.getStartTime())) {
       String beginTime = DateUtil.getDateToString(new Date());
-      dto.setStartDate(beginTime);
+      dto.setStartTime(beginTime);
     }
-    if (StringUtils.isEmpty(dto.getEndDate())) {
+    if (StringUtils.isEmpty(dto.getEndTime())) {
       String endTime = DateUtil.getDateToString(new Date());
-      dto.setEndDate(endTime);
+      dto.setEndTime(endTime);
     }
     return memberLiveReportService.queryPage(page, dto);
   }
 
   @Operation(summary = "导出会员活跃度报表")
   @PostMapping("/export")
+  @PreAuthorize("hasAuthority('member:liveReport:export')")
   @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.AGENT, desc = "'导出会员活跃度报表'")
   public void memberListExport(@RequestBody MemberLiveReportDto dto, HttpServletResponse response)
       throws IOException {

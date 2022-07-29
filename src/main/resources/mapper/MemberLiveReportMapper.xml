@@ -6,7 +6,7 @@
         select
         *,
         (
-        final.winAmount*-1 - final.waterAmount - final.vipRewordAmount
+        (final.winAmount*-1) + final.counterFee - final.waterAmount - final.vipRewordAmount
         - final.activityAmount - final.chatAmount - final.backWaterAmount - final.realDivideAmount
         - final.salaryAmount - final.rechDiscount - final.otherDiscount
         ) as companyWin,
@@ -96,11 +96,11 @@
         <if test="dto.account != null and dto.account != ''">
             and account = #{dto.account}
         </if>
-        <if test="dto.startDate != null and dto.startDate != ''">
-            AND date_format(stat_time, '%y-%m-%d' ) <![CDATA[>= ]]> date_format(#{dto.startDate},'%y-%m-%d')
+        <if test="dto.startTime != null and dto.startTime != ''">
+            AND date_format(stat_time, '%y-%m-%d' ) <![CDATA[>= ]]> date_format(#{dto.startTime},'%y-%m-%d')
         </if>
-        <if test="dto.endDate != null and dto.endDate != ''">
-            AND date_format(stat_time, '%y-%m-%d' ) <![CDATA[<= ]]> date_format(#{dto.endDate},'%y-%m-%d' )
+        <if test="dto.endTime != null and dto.endTime != ''">
+            AND date_format(stat_time, '%y-%m-%d' ) <![CDATA[<= ]]> date_format(#{dto.endTime},'%y-%m-%d' )
         </if>
         GROUP BY account
         ) AS rw ON rw.account = mdr.user_name
@@ -110,11 +110,11 @@
         <if test="dto.account != null and dto.account != ''">
             and account = #{dto.account}
         </if>
-        <if test="dto.startDate != null and dto.startDate != ''">
-            AND date_format(create_time, '%y-%m-%d' ) <![CDATA[>= ]]> date_format(#{dto.startDate},'%y-%m-%d')
+        <if test="dto.startTime != null and dto.startTime != ''">
+            AND date_format(create_time, '%y-%m-%d' ) <![CDATA[>= ]]> date_format(#{dto.startTime},'%y-%m-%d')
         </if>
-        <if test="dto.endDate != null and dto.endDate != ''">
-            AND date_format(create_time, '%y-%m-%d' ) <![CDATA[<= ]]> date_format(#{dto.endDate},'%y-%m-%d' )
+        <if test="dto.endTime != null and dto.endTime != ''">
+            AND date_format(create_time, '%y-%m-%d' ) <![CDATA[<= ]]> date_format(#{dto.endTime},'%y-%m-%d' )
         </if>
         GROUP BY account
         ) AS divi ON divi.account = mdr.user_name
@@ -124,11 +124,11 @@
         <if test="dto.account != null and dto.account != ''">
             and user_name = #{dto.account}
         </if>
-        <if test="dto.startDate != null and dto.startDate != ''">
-            AND date_format(create_time, '%y-%m-%d' ) <![CDATA[>= ]]> date_format(#{dto.startDate},'%y-%m-%d')
+        <if test="dto.startTime != null and dto.startTime != ''">
+            AND date_format(create_time, '%y-%m-%d' ) <![CDATA[>= ]]> date_format(#{dto.startTime},'%y-%m-%d')
         </if>
-        <if test="dto.endDate != null and dto.endDate != ''">
-            AND date_format(create_time, '%y-%m-%d' ) <![CDATA[<= ]]> date_format(#{dto.endDate},'%y-%m-%d' )
+        <if test="dto.endTime != null and dto.endTime != ''">
+            AND date_format(create_time, '%y-%m-%d' ) <![CDATA[<= ]]> date_format(#{dto.endTime},'%y-%m-%d' )
         </if>
         GROUP BY user_name
         ) AS lrr ON lrr.user_name = mdr.user_name
@@ -138,11 +138,11 @@
         <if test="dto.account != null and dto.account != ''">
             and account = #{dto.account}
         </if>
-        <if test="dto.startDate != null and dto.startDate != ''">
-            AND date_format(create_time, '%y-%m-%d' ) <![CDATA[>= ]]> date_format(#{dto.startDate},'%y-%m-%d')
+        <if test="dto.startTime != null and dto.startTime != ''">
+            AND date_format(create_time, '%y-%m-%d' ) <![CDATA[>= ]]> date_format(#{dto.startTime},'%y-%m-%d')
         </if>
-        <if test="dto.endDate != null and dto.endDate != ''">
-            AND date_format(create_time, '%y-%m-%d' ) <![CDATA[<= ]]> date_format(#{dto.endDate},'%y-%m-%d' )
+        <if test="dto.endTime != null and dto.endTime != ''">
+            AND date_format(create_time, '%y-%m-%d' ) <![CDATA[<= ]]> date_format(#{dto.endTime},'%y-%m-%d' )
         </if>
         GROUP BY account
         ) AS sa ON sa.account = mdr.user_name
@@ -163,11 +163,11 @@
                 </otherwise>
             </choose>
         </if>
-        <if test="dto.startDate != null and dto.startDate != ''">
-            AND date_format(mdr.count_date, '%y-%m-%d' ) <![CDATA[>= ]]> date_format(#{dto.startDate},'%y-%m-%d')
+        <if test="dto.startTime != null and dto.startTime != ''">
+            AND date_format(mdr.count_date, '%y-%m-%d' ) <![CDATA[>= ]]> date_format(#{dto.startTime},'%y-%m-%d')
         </if>
-        <if test="dto.endDate != null and dto.endDate != ''">
-            AND date_format(mdr.count_date, '%y-%m-%d' ) <![CDATA[<= ]]> date_format(#{dto.endDate},'%y-%m-%d' )
+        <if test="dto.endTime != null and dto.endTime != ''">
+            AND date_format(mdr.count_date, '%y-%m-%d' ) <![CDATA[<= ]]> date_format(#{dto.endTime},'%y-%m-%d' )
         </if>
         GROUP BY mdr.user_name
         ) final
@@ -178,7 +178,7 @@
         select
         *,
         (
-        final.winAmount*-1 - final.waterAmount - final.vipRewordAmount
+        (final.winAmount*-1) + final.counterFee - final.waterAmount - final.vipRewordAmount
         - final.activityAmount - final.chatAmount - final.backWaterAmount - final.realDivideAmount
         - final.salaryAmount - final.rechDiscount - final.otherDiscount
         ) as companyWin,
@@ -268,11 +268,11 @@
         <if test="dto.account != null and dto.account != ''">
             and account = #{dto.account}
         </if>
-        <if test="dto.startDate != null and dto.startDate != ''">
-            AND date_format(stat_time, '%y-%m-%d' ) <![CDATA[>= ]]> date_format(#{dto.startDate},'%y-%m-%d')
+        <if test="dto.startTime != null and dto.startTime != ''">
+            AND date_format(stat_time, '%y-%m-%d' ) <![CDATA[>= ]]> date_format(#{dto.startTime},'%y-%m-%d')
         </if>
-        <if test="dto.endDate != null and dto.endDate != ''">
-            AND date_format(stat_time, '%y-%m-%d' ) <![CDATA[<= ]]> date_format(#{dto.endDate},'%y-%m-%d' )
+        <if test="dto.endTime != null and dto.endTime != ''">
+            AND date_format(stat_time, '%y-%m-%d' ) <![CDATA[<= ]]> date_format(#{dto.endTime},'%y-%m-%d' )
         </if>
         GROUP BY account
         ) AS rw ON rw.account = mdr.user_name
@@ -282,11 +282,11 @@
         <if test="dto.account != null and dto.account != ''">
             and account = #{dto.account}
         </if>
-        <if test="dto.startDate != null and dto.startDate != ''">
-            AND date_format(create_time, '%y-%m-%d' ) <![CDATA[>= ]]> date_format(#{dto.startDate},'%y-%m-%d')
+        <if test="dto.startTime != null and dto.startTime != ''">
+            AND date_format(create_time, '%y-%m-%d' ) <![CDATA[>= ]]> date_format(#{dto.startTime},'%y-%m-%d')
         </if>
-        <if test="dto.endDate != null and dto.endDate != ''">
-            AND date_format(create_time, '%y-%m-%d' ) <![CDATA[<= ]]> date_format(#{dto.endDate},'%y-%m-%d' )
+        <if test="dto.endTime != null and dto.endTime != ''">
+            AND date_format(create_time, '%y-%m-%d' ) <![CDATA[<= ]]> date_format(#{dto.endTime},'%y-%m-%d' )
         </if>
         GROUP BY account
         ) AS divi ON divi.account = mdr.user_name
@@ -296,11 +296,11 @@
         <if test="dto.account != null and dto.account != ''">
             and user_name = #{dto.account}
         </if>
-        <if test="dto.startDate != null and dto.startDate != ''">
-            AND date_format(create_time, '%y-%m-%d' ) <![CDATA[>= ]]> date_format(#{dto.startDate},'%y-%m-%d')
+        <if test="dto.startTime != null and dto.startTime != ''">
+            AND date_format(create_time, '%y-%m-%d' ) <![CDATA[>= ]]> date_format(#{dto.startTime},'%y-%m-%d')
         </if>
-        <if test="dto.endDate != null and dto.endDate != ''">
-            AND date_format(create_time, '%y-%m-%d' ) <![CDATA[<= ]]> date_format(#{dto.endDate},'%y-%m-%d' )
+        <if test="dto.endTime != null and dto.endTime != ''">
+            AND date_format(create_time, '%y-%m-%d' ) <![CDATA[<= ]]> date_format(#{dto.endTime},'%y-%m-%d' )
         </if>
         GROUP BY user_name
         ) AS lrr ON lrr.user_name = mdr.user_name
@@ -310,11 +310,11 @@
         <if test="dto.account != null and dto.account != ''">
             and account = #{dto.account}
         </if>
-        <if test="dto.startDate != null and dto.startDate != ''">
-            AND date_format(create_time, '%y-%m-%d' ) <![CDATA[>= ]]> date_format(#{dto.startDate},'%y-%m-%d')
+        <if test="dto.startTime != null and dto.startTime != ''">
+            AND date_format(create_time, '%y-%m-%d' ) <![CDATA[>= ]]> date_format(#{dto.startTime},'%y-%m-%d')
         </if>
-        <if test="dto.endDate != null and dto.endDate != ''">
-            AND date_format(create_time, '%y-%m-%d' ) <![CDATA[<= ]]> date_format(#{dto.endDate},'%y-%m-%d' )
+        <if test="dto.endTime != null and dto.endTime != ''">
+            AND date_format(create_time, '%y-%m-%d' ) <![CDATA[<= ]]> date_format(#{dto.endTime},'%y-%m-%d' )
         </if>
         GROUP BY account
         ) AS sa ON sa.account = mdr.user_name
@@ -335,11 +335,11 @@
                 </otherwise>
             </choose>
         </if>
-        <if test="dto.startDate != null and dto.startDate != ''">
-            AND date_format(mdr.count_date, '%y-%m-%d' ) <![CDATA[>= ]]> date_format(#{dto.startDate},'%y-%m-%d')
+        <if test="dto.startTime != null and dto.startTime != ''">
+            AND date_format(mdr.count_date, '%y-%m-%d' ) <![CDATA[>= ]]> date_format(#{dto.startTime},'%y-%m-%d')
         </if>
-        <if test="dto.endDate != null and dto.endDate != ''">
-            AND date_format(mdr.count_date, '%y-%m-%d' ) <![CDATA[<= ]]> date_format(#{dto.endDate},'%y-%m-%d' )
+        <if test="dto.endTime != null and dto.endTime != ''">
+            AND date_format(mdr.count_date, '%y-%m-%d' ) <![CDATA[<= ]]> date_format(#{dto.endTime},'%y-%m-%d' )
         </if>
         GROUP BY mdr.user_name
         ) final
@@ -351,7 +351,7 @@
         select
         *,
         (
-        final.winAmount*-1 - final.waterAmount - final.vipRewordAmount
+        (final.winAmount*-1) + final.counterFee - final.waterAmount - final.vipRewordAmount
         - final.activityAmount - final.chatAmount - final.backWaterAmount - final.realDivideAmount
         - final.salaryAmount - final.rechDiscount - final.otherDiscount
         ) as companyWin,
@@ -441,11 +441,11 @@
         <if test="dto.account != null and dto.account != ''">
             and account = #{dto.account}
         </if>
-        <if test="dto.startDate != null and dto.startDate != ''">
-            AND date_format(stat_time, '%y-%m-%d' ) <![CDATA[>= ]]> date_format(#{dto.startDate},'%y-%m-%d')
+        <if test="dto.startTime != null and dto.startTime != ''">
+            AND date_format(stat_time, '%y-%m-%d' ) <![CDATA[>= ]]> date_format(#{dto.startTime},'%y-%m-%d')
         </if>
-        <if test="dto.endDate != null and dto.endDate != ''">
-            AND date_format(stat_time, '%y-%m-%d' ) <![CDATA[<= ]]> date_format(#{dto.endDate},'%y-%m-%d' )
+        <if test="dto.endTime != null and dto.endTime != ''">
+            AND date_format(stat_time, '%y-%m-%d' ) <![CDATA[<= ]]> date_format(#{dto.endTime},'%y-%m-%d' )
         </if>
         GROUP BY account
         ) AS rw ON rw.account = mdr.user_name
@@ -455,11 +455,11 @@
         <if test="dto.account != null and dto.account != ''">
             and account = #{dto.account}
         </if>
-        <if test="dto.startDate != null and dto.startDate != ''">
-            AND date_format(create_time, '%y-%m-%d' ) <![CDATA[>= ]]> date_format(#{dto.startDate},'%y-%m-%d')
+        <if test="dto.startTime != null and dto.startTime != ''">
+            AND date_format(create_time, '%y-%m-%d' ) <![CDATA[>= ]]> date_format(#{dto.startTime},'%y-%m-%d')
         </if>
-        <if test="dto.endDate != null and dto.endDate != ''">
-            AND date_format(create_time, '%y-%m-%d' ) <![CDATA[<= ]]> date_format(#{dto.endDate},'%y-%m-%d' )
+        <if test="dto.endTime != null and dto.endTime != ''">
+            AND date_format(create_time, '%y-%m-%d' ) <![CDATA[<= ]]> date_format(#{dto.endTime},'%y-%m-%d' )
         </if>
         GROUP BY account
         ) AS divi ON divi.account = mdr.user_name
@@ -469,11 +469,11 @@
         <if test="dto.account != null and dto.account != ''">
             and user_name = #{dto.account}
         </if>
-        <if test="dto.startDate != null and dto.startDate != ''">
-            AND date_format(create_time, '%y-%m-%d' ) <![CDATA[>= ]]> date_format(#{dto.startDate},'%y-%m-%d')
+        <if test="dto.startTime != null and dto.startTime != ''">
+            AND date_format(create_time, '%y-%m-%d' ) <![CDATA[>= ]]> date_format(#{dto.startTime},'%y-%m-%d')
         </if>
-        <if test="dto.endDate != null and dto.endDate != ''">
-            AND date_format(create_time, '%y-%m-%d' ) <![CDATA[<= ]]> date_format(#{dto.endDate},'%y-%m-%d' )
+        <if test="dto.endTime != null and dto.endTime != ''">
+            AND date_format(create_time, '%y-%m-%d' ) <![CDATA[<= ]]> date_format(#{dto.endTime},'%y-%m-%d' )
         </if>
         GROUP BY user_name
         ) AS lrr ON lrr.user_name = mdr.user_name
@@ -483,11 +483,11 @@
         <if test="dto.account != null and dto.account != ''">
             and account = #{dto.account}
         </if>
-        <if test="dto.startDate != null and dto.startDate != ''">
-            AND date_format(create_time, '%y-%m-%d' ) <![CDATA[>= ]]> date_format(#{dto.startDate},'%y-%m-%d')
+        <if test="dto.startTime != null and dto.startTime != ''">
+            AND date_format(create_time, '%y-%m-%d' ) <![CDATA[>= ]]> date_format(#{dto.startTime},'%y-%m-%d')
         </if>
-        <if test="dto.endDate != null and dto.endDate != ''">
-            AND date_format(create_time, '%y-%m-%d' ) <![CDATA[<= ]]> date_format(#{dto.endDate},'%y-%m-%d' )
+        <if test="dto.endTime != null and dto.endTime != ''">
+            AND date_format(create_time, '%y-%m-%d' ) <![CDATA[<= ]]> date_format(#{dto.endTime},'%y-%m-%d' )
         </if>
         GROUP BY account
         ) AS sa ON sa.account = mdr.user_name
@@ -508,11 +508,11 @@
                 </otherwise>
             </choose>
         </if>
-        <if test="dto.startDate != null and dto.startDate != ''">
-            AND date_format(mdr.count_date, '%y-%m-%d' ) <![CDATA[>= ]]> date_format(#{dto.startDate},'%y-%m-%d')
+        <if test="dto.startTime != null and dto.startTime != ''">
+            AND date_format(mdr.count_date, '%y-%m-%d' ) <![CDATA[>= ]]> date_format(#{dto.startTime},'%y-%m-%d')
         </if>
-        <if test="dto.endDate != null and dto.endDate != ''">
-            AND date_format(mdr.count_date, '%y-%m-%d' ) <![CDATA[<= ]]> date_format(#{dto.endDate},'%y-%m-%d' )
+        <if test="dto.endTime != null and dto.endTime != ''">
+            AND date_format(mdr.count_date, '%y-%m-%d' ) <![CDATA[<= ]]> date_format(#{dto.endTime},'%y-%m-%d' )
         </if>
         GROUP BY mdr.user_name
         ) final

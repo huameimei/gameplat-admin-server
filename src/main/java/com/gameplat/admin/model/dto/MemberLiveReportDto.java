@@ -14,9 +14,9 @@ public class MemberLiveReportDto {
   /** 用户充值层级 */
   private Integer userLevel;
   /** 开始日期 */
-  private String startDate;
+  private String startTime;
   /** 结束日期 */
-  private String endDate;
+  private String endTime;
   /** 排序字段 */
   private String orderColumn;
   /** 排序方式 */

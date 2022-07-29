@@ -304,7 +304,11 @@ public class GameBetDailyReportServiceImpl
     response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename = gameKindReport.xls");
 
     List<GameKindReportVO> kindReportList = new ArrayList<>();
-    BeanUtils.copyProperties(result, kindReportList);
+    result.forEach(o ->{
+      GameKindReportVO reportVO = new GameKindReportVO();
+      BeanUtils.copyProperties(o, reportVO);
+      kindReportList.add(reportVO);
+    });
 
     try (Workbook workbook = ExcelExportUtil.exportExcel(exportParams, GameKindReportVO.class, kindReportList)) {
       workbook.write(response.getOutputStream());
@@ -440,8 +444,12 @@ public class GameBetDailyReportServiceImpl
     List<GameBetDailyReport> result = gameBetDailyReportMapper.selectList(queryWrapper);
 
     List<GameBetDailyReportVO> reportVOList = new ArrayList<>();
-    org.springframework.beans.BeanUtils.copyProperties(result, reportVOList);
-    reportVOList.forEach(o -> o.setGameKindName(GameKindEnum.getDescByCode(o.getGameKind())));
+    result.forEach(o ->{
+      GameBetDailyReportVO reportVO = new GameBetDailyReportVO();
+      org.springframework.beans.BeanUtils.copyProperties(o, reportVO);
+      reportVO.setGameKindName(GameKindEnum.getDescByCode(o.getGameKind()));
+      reportVOList.add(reportVO);
+    });
     String title = String.format("%s至%s游戏投注日报表数据", dto.getBeginTime(), dto.getEndTime());
     ExportParams exportParams = new ExportParams(title, "游戏平台数据");
     response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename = gameBetDailyReport.xls");

@@ -410,7 +410,7 @@ public class GameBetDailyReportServiceImpl
     gamePlatformReportList.forEach(o ->{
       GameReportPlatformVO reportPlatform = new GameReportPlatformVO();
       BeanUtils.copyProperties(o, reportPlatform);
-      o.setPlatformName(gamePlatformMap.get(o.getPlatformCode()));
+      reportPlatform.setPlatformName(gamePlatformMap.get(o.getPlatformCode()));
       reportPlatforms.add(reportPlatform);
     });
 

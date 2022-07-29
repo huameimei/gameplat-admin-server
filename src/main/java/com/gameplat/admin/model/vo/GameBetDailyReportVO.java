@@ -21,7 +21,7 @@ public class GameBetDailyReportVO implements Serializable {
   private Long memberId;
 
   /** 账号 */
-  @Excel(name = "会员账号", width = 20)
+  @Excel(name = "会员账号", width = 20, orderNum = "2")
   private String account;
 
   /** 用户真实姓名 */
@@ -45,21 +45,22 @@ public class GameBetDailyReportVO implements Serializable {
   /** 游戏子类型 */
   private String gameKind;
 
-  @Excel(name = "游戏平台", width = 20)
+  @Excel(name = "游戏平台", width = 20, orderNum = "3")
   private String gameKindName;
 
   /** 游戏大类 */
   private String gameType;
 
   /** 投注金额 */
-  @Excel(name = "投注金额", width = 20)
+  @Excel(name = "投注金额", width = 20, orderNum = "4")
   private BigDecimal betAmount;
 
   /** 有效投注额 */
+  @Excel(name = "有效投注金额", width = 20, orderNum = "5")
   private BigDecimal validAmount;
 
   /** 中奖金额 */
-  @Excel(name = "中奖金额", width = 20)
+  @Excel(name = "中奖金额", width = 20, orderNum = "6")
   private BigDecimal winAmount;
 
   /** 下注笔数 */
@@ -69,7 +70,7 @@ public class GameBetDailyReportVO implements Serializable {
 
   /** 统计时间(年月日) */
   @JsonFormat(pattern = "yyyy-MM-dd")
-  @Excel(name = "统计日期", width = 20)
+  @Excel(name = "统计日期", width = 20, orderNum = "1")
   private String statTime;
 
   /** 创建时间 */

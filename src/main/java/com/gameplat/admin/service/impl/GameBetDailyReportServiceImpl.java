@@ -405,10 +405,14 @@ public class GameBetDailyReportServiceImpl
     Map<String, String> gamePlatformMap =
         gamePlatformService.list().stream()
             .collect(Collectors.toMap(GamePlatform::getCode, GamePlatform::getName));
-    gamePlatformReportList.forEach(
-        item -> {
-          item.setPlatformName(gamePlatformMap.get(item.getPlatformCode()));
-        });
+
+    List<GameReportPlatformVO> reportPlatforms = new ArrayList<>();
+    gamePlatformReportList.forEach(o ->{
+      GameReportPlatformVO reportPlatform = new GameReportPlatformVO();
+      BeanUtils.copyProperties(o, reportPlatform);
+      o.setPlatformName(gamePlatformMap.get(o.getPlatformCode()));
+      reportPlatforms.add(reportPlatform);
+    });
 
     ExportParams exportParams =
         new ExportParams(
@@ -416,7 +420,7 @@ public class GameBetDailyReportServiceImpl
     response.setHeader(
         HttpHeaders.CONTENT_DISPOSITION, "attachment;filename = gamePlatformReport.xls");
     try (Workbook workbook =
-        ExcelExportUtil.exportExcel(exportParams, GameReportVO.class, gamePlatformReportList)) {
+        ExcelExportUtil.exportExcel(exportParams, GameReportPlatformVO.class, reportPlatforms)) {
       workbook.write(response.getOutputStream());
     } catch (IOException e) {
       log.error("导出游戏投注记录报错", e);

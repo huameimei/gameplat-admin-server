@@ -495,7 +495,11 @@ public class GameRebateReportServiceImpl
     response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename = gameReport.xls");
 
     List<GameSettlementReportVO> settlementReports = new ArrayList<>();
-    BeanUtils.copyProperties(list, settlementReports);
+    list.forEach(o ->{
+      GameSettlementReportVO settlementReport = new GameSettlementReportVO();
+      BeanUtils.copyProperties(o, settlementReport);
+      settlementReports.add(settlementReport);
+    });
     log.info("游戏交收报表导出{}条数据", settlementReports.size());
     settlementReports.forEach(o -> o.setPlatformName(GamePlatformEnum.getName(o.getPlatformCode())));
 

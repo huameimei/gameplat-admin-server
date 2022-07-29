@@ -20,14 +20,12 @@ import com.gameplat.admin.mapper.GameRebateDetailMapper;
 import com.gameplat.admin.mapper.GameRebateReportMapper;
 import com.gameplat.admin.model.dto.GameRebateReportQueryDTO;
 import com.gameplat.admin.model.dto.GameRebateStatisQueryDTO;
-import com.gameplat.admin.model.vo.GameMemberDayReportVO;
-import com.gameplat.admin.model.vo.GameReportVO;
-import com.gameplat.admin.model.vo.MemberInfoVO;
-import com.gameplat.admin.model.vo.PageDtoVO;
+import com.gameplat.admin.model.vo.*;
 import com.gameplat.admin.service.*;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.json.JsonUtils;
 import com.gameplat.common.enums.GameBlacklistTypeEnum;
+import com.gameplat.common.enums.GamePlatformEnum;
 import com.gameplat.common.enums.LimitEnums;
 import com.gameplat.common.enums.TranTypes;
 import com.gameplat.common.lang.Assert;
@@ -495,7 +493,11 @@ public class GameRebateReportServiceImpl
     ExportParams exportParams = new ExportParams(title, "游戏交收数据");
     response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename = gameReport.xls");
 
-    try (Workbook workbook = ExcelExportUtil.exportExcel(exportParams, GameReportVO.class, list)) {
+    List<GameSettlementReportVO> settlementReports = new ArrayList<>();
+    BeanUtils.copyProperties(list, settlementReports);
+    settlementReports.forEach(o -> o.setPlatformName(GamePlatformEnum.getName(o.getPlatformCode())));
+
+    try (Workbook workbook = ExcelExportUtil.exportExcel(exportParams, GameSettlementReportVO.class, settlementReports)) {
       workbook.write(response.getOutputStream());
     } catch (IOException e) {
       log.error("请求导出游戏交收数据报错", e);

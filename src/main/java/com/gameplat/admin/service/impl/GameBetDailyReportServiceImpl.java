@@ -21,7 +21,6 @@ import com.gameplat.admin.service.GamePlatformService;
 import com.gameplat.admin.service.MemberService;
 import com.gameplat.base.common.constant.ContextConstant;
 import com.gameplat.base.common.exception.ServiceException;
-import com.gameplat.base.common.util.BeanUtils;
 import com.gameplat.base.common.util.DateUtil;
 import com.gameplat.base.common.util.DateUtils;
 import com.gameplat.base.common.util.StringUtils;
@@ -64,6 +63,7 @@ import org.elasticsearch.search.aggregations.bucket.terms.TermsAggregationBuilde
 import org.elasticsearch.search.aggregations.metrics.ParsedSum;
 import org.elasticsearch.search.aggregations.metrics.SumAggregationBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
@@ -303,7 +303,10 @@ public class GameBetDailyReportServiceImpl
     ExportParams exportParams = new ExportParams(title, "游戏大类数据");
     response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename = gameKindReport.xls");
 
-    try (Workbook workbook = ExcelExportUtil.exportExcel(exportParams, GameReportVO.class, result)) {
+    List<GameKindReportVO> kindReportList = new ArrayList<>();
+    BeanUtils.copyProperties(result, kindReportList);
+
+    try (Workbook workbook = ExcelExportUtil.exportExcel(exportParams, GameKindReportVO.class, kindReportList)) {
       workbook.write(response.getOutputStream());
     } catch (IOException e) {
       log.error("请求导出游戏投注日报表报错", e);
@@ -437,7 +440,7 @@ public class GameBetDailyReportServiceImpl
     List<GameBetDailyReport> result = gameBetDailyReportMapper.selectList(queryWrapper);
 
     List<GameBetDailyReportVO> reportVOList = new ArrayList<>();
-    BeanUtils.copyBeanProp(reportVOList, result);
+    org.springframework.beans.BeanUtils.copyProperties(result, reportVOList);
     reportVOList.forEach(o -> o.setGameKindName(GameKindEnum.getDescByCode(o.getGameKind())));
     String title = String.format("%s至%s游戏投注日报表数据", dto.getBeginTime(), dto.getEndTime());
     ExportParams exportParams = new ExportParams(title, "游戏平台数据");

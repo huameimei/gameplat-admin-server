@@ -21,6 +21,7 @@ import com.gameplat.model.entity.game.GamePlatform;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -174,7 +175,7 @@ public class GameBetDailyReportController {
   @PreAuthorize("hasAuthority('game:gameReport:export')")
   public void exportUserGameBetRecord(@Valid UserGameBetRecordDto dto, HttpServletResponse response) throws IOException {
     GameBetRecordQueryDTO gameBetRecordQueryDTO = new GameBetRecordQueryDTO();
-    BeanUtil.copyProperties(dto, gameBetRecordQueryDTO);
+    BeanUtils.copyProperties(dto, gameBetRecordQueryDTO);
     gameBetRecordQueryDTO.setTimeType(1);
     gameBetRecordInfoService.exportUserGameBetRecord(gameBetRecordQueryDTO, response);
   }

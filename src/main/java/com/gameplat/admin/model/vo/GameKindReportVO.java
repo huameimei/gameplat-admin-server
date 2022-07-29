@@ -9,7 +9,7 @@ import java.math.BigDecimal;
 @Data
 public class GameKindReportVO implements Serializable {
 
-  /** 平台 */
+  /** 平台 4*/
   private String platformCode;
 
   /** 平台 */
@@ -43,7 +43,6 @@ public class GameKindReportVO implements Serializable {
   private BigDecimal winAmount;
 
   /** 返水金额 */
-  @Excel(name = "返水金额", width = 20)
   private BigDecimal rebateMoney;
 
   /** 公司输赢 */

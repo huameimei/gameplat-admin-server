@@ -489,12 +489,14 @@ public class GameRebateReportServiceImpl
       dto.setAccount(StringUtils.EMPTY);
     }
     List<GameReportVO> list = gameRebateReportMapper.queryGameReport(dto);
+    log.info("游戏交收报表查出{}条数据", list.size());
     String title = MessageFormat.format("{0}至{1}游戏交收数据", dto.getBeginTime(), dto.getEndTime());
     ExportParams exportParams = new ExportParams(title, "游戏交收数据");
     response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename = gameReport.xls");
 
     List<GameSettlementReportVO> settlementReports = new ArrayList<>();
     BeanUtils.copyProperties(list, settlementReports);
+    log.info("游戏交收报表导出{}条数据", settlementReports.size());
     settlementReports.forEach(o -> o.setPlatformName(GamePlatformEnum.getName(o.getPlatformCode())));
 
     try (Workbook workbook = ExcelExportUtil.exportExcel(exportParams, GameSettlementReportVO.class, settlementReports)) {

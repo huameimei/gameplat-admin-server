@@ -446,7 +446,7 @@ public class GameBetDailyReportServiceImpl
     ExportParams exportParams = new ExportParams(title, "游戏平台数据");
     response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename = gameBetDailyReport.xls");
 
-    try (Workbook workbook = ExcelExportUtil.exportExcel(exportParams, GameBetDailyReport.class, result)) {
+    try (Workbook workbook = ExcelExportUtil.exportExcel(exportParams, GameBetDailyReportVO.class, reportVOList)) {
       workbook.write(response.getOutputStream());
     } catch (IOException e) {
       log.error("请求导出游戏投注日报表报错", e);

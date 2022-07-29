@@ -15,10 +15,7 @@ import com.gameplat.admin.config.SysTheme;
 import com.gameplat.admin.mapper.GameBetDailyReportMapper;
 import com.gameplat.admin.model.bean.ActivityStatisticItem;
 import com.gameplat.admin.model.dto.GameBetDailyReportQueryDTO;
-import com.gameplat.admin.model.vo.GameBetReportVO;
-import com.gameplat.admin.model.vo.GameReportVO;
-import com.gameplat.admin.model.vo.MemberInfoVO;
-import com.gameplat.admin.model.vo.PageDtoVO;
+import com.gameplat.admin.model.vo.*;
 import com.gameplat.admin.service.GameBetDailyReportService;
 import com.gameplat.admin.service.GamePlatformService;
 import com.gameplat.admin.service.MemberService;
@@ -27,6 +24,7 @@ import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.DateUtil;
 import com.gameplat.base.common.util.DateUtils;
 import com.gameplat.base.common.util.StringUtils;
+import com.gameplat.common.enums.GameKindEnum;
 import com.gameplat.common.enums.SettleStatusEnum;
 import com.gameplat.common.enums.UserTypes;
 import com.gameplat.common.lang.Assert;
@@ -46,6 +44,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletResponse;
+
+import jodd.bean.BeanCopy;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.elasticsearch.action.search.SearchRequest;
@@ -63,6 +63,7 @@ import org.elasticsearch.search.aggregations.bucket.terms.TermsAggregationBuilde
 import org.elasticsearch.search.aggregations.metrics.ParsedSum;
 import org.elasticsearch.search.aggregations.metrics.SumAggregationBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
@@ -294,6 +295,29 @@ public class GameBetDailyReportServiceImpl
   }
 
   @Override
+  public void exportGameKindReport(GameBetDailyReportQueryDTO dto, HttpServletResponse response) {
+
+    log.info("请求导出游戏大类数据，请求参数{}", dto);
+    List<GameReportVO> result = gameBetDailyReportMapper.queryReportList(dto);
+    String title = String.format("%s至%s游戏大类数据", dto.getBeginTime(), dto.getEndTime());
+    ExportParams exportParams = new ExportParams(title, "游戏大类数据");
+    response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename = gameKindReport.xls");
+
+    List<GameKindReportVO> kindReportList = new ArrayList<>();
+    result.forEach(o ->{
+      GameKindReportVO reportVO = new GameKindReportVO();
+      BeanUtils.copyProperties(o, reportVO);
+      kindReportList.add(reportVO);
+    });
+
+    try (Workbook workbook = ExcelExportUtil.exportExcel(exportParams, GameKindReportVO.class, kindReportList)) {
+      workbook.write(response.getOutputStream());
+    } catch (IOException e) {
+      log.error("请求导出游戏投注日报表报错", e);
+    }
+  }
+
+  @Override
   public PageDtoVO<GameBetReportVO> queryBetReportList(
       Page<GameBetDailyReportQueryDTO> page, GameBetDailyReportQueryDTO dto) {
     Page<GameBetReportVO> gameBetReportVOPage =
@@ -398,4 +422,45 @@ public class GameBetDailyReportServiceImpl
       log.error("导出游戏投注记录报错", e);
     }
   }
+
+  @Override
+  public void exportGameBetDailyReport(HttpServletResponse response, GameBetDailyReportQueryDTO dto) throws Exception {
+    log.info("请求导出游戏投注日报表参数：{}", dto);
+    if (StringUtils.isNotBlank(dto.getSuperAccount())) {
+      Member member = memberService.getByAccount(dto.getSuperAccount()).orElse(null);
+      if (ObjectUtils.isEmpty(member)) {
+        throw new Exception("用户不存在");
+      }
+      dto.setUserPaths(member.getSuperPath());
+      // 是否代理账号
+      if (UserTypes.AGENT.value().equals(member.getUserType())) {
+        dto.setAccount(null);
+      }
+    }
+    QueryWrapper<GameBetDailyReport> queryWrapper = Wrappers.query();
+    fillQueryWrapper(dto, queryWrapper);
+    queryWrapper.orderByDesc(Lists.newArrayList("stat_time", "id"));
+
+    List<GameBetDailyReport> result = gameBetDailyReportMapper.selectList(queryWrapper);
+
+    List<GameBetDailyReportVO> reportVOList = new ArrayList<>();
+    result.forEach(o ->{
+      GameBetDailyReportVO reportVO = new GameBetDailyReportVO();
+      org.springframework.beans.BeanUtils.copyProperties(o, reportVO);
+      reportVO.setGameKindName(GameKindEnum.getDescByCode(o.getGameKind()));
+      reportVOList.add(reportVO);
+    });
+    String title = String.format("%s至%s游戏投注日报表数据", dto.getBeginTime(), dto.getEndTime());
+    ExportParams exportParams = new ExportParams(title, "游戏平台数据");
+    response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename = gameBetDailyReport.xls");
+
+    try (Workbook workbook = ExcelExportUtil.exportExcel(exportParams, GameBetDailyReportVO.class, reportVOList)) {
+      workbook.write(response.getOutputStream());
+    } catch (IOException e) {
+      log.error("请求导出游戏投注日报表报错", e);
+    }
+  }
+
+
+
 }

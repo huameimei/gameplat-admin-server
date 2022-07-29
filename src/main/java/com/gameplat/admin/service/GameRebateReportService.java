@@ -9,6 +9,8 @@ import com.gameplat.admin.model.vo.PageDtoVO;
 import com.gameplat.model.entity.game.GameRebateDetail;
 import com.gameplat.model.entity.game.GameRebatePeriod;
 import com.gameplat.model.entity.game.GameRebateReport;
+
+import javax.servlet.http.HttpServletResponse;
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -33,4 +35,6 @@ public interface GameRebateReportService extends IService<GameRebateReport> {
   List<GameRebateReport> queryDetail(GameRebateReportQueryDTO dto);
 
   List<GameReportVO> queryGameReport(GameRebateStatisQueryDTO dto);
+
+  void exportGameReport(GameRebateStatisQueryDTO dto, HttpServletResponse response) throws Exception;
 }

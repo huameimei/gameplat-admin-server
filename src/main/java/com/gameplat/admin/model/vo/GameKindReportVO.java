@@ -1,18 +1,18 @@
 package com.gameplat.admin.model.vo;
 
 import cn.afterturn.easypoi.excel.annotation.Excel;
-import java.io.Serializable;
-import java.math.BigDecimal;
 import lombok.Data;
 
+import java.io.Serializable;
+import java.math.BigDecimal;
+
 @Data
-public class GameReportVO implements Serializable {
+public class GameKindReportVO implements Serializable {
 
   /** 平台 */
   private String platformCode;
 
   /** 平台 */
-  @Excel(name = "平台名称", width = 20)
   private String platformName;
 
   /** 游戏大类 */

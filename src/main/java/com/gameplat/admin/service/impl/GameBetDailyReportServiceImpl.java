@@ -307,6 +307,7 @@ public class GameBetDailyReportServiceImpl
     result.forEach(o ->{
       GameKindReportVO reportVO = new GameKindReportVO();
       BeanUtils.copyProperties(o, reportVO);
+      reportVO.setCompanyAmount(reportVO.getCompanyAmount().negate());
       kindReportList.add(reportVO);
     });
 

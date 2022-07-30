@@ -330,7 +330,7 @@ public class GameAdminServiceImpl implements GameAdminService {
     MemberInfo memberInfo = memberInfoService.getById(member.getId());
     if (transferType) {
       // 自动转换 直接amount就是会员余额
-      amount = memberInfo.getBalance();
+      amount = memberInfo.getBalance().setScale(2, RoundingMode.DOWN);
       if (amount.compareTo(BigDecimal.ZERO) > 0) {
         log.info("会员余额为" + amount);
         return;
@@ -479,7 +479,7 @@ public class GameAdminServiceImpl implements GameAdminService {
             .account(member.getAccount())
             .config(gameConfigService.queryGameConfigInfoByPlatCode(transferIn))
             .build();
-    BigDecimal balance = gameApi.getBalance(gameBizBean);
+    BigDecimal balance = gameApi.getBalance(gameBizBean).setScale(2, RoundingMode.DOWN);
     // 自动转动实际上回收的是在第三方游戏的所有余额
     if (transferType) {
       amount = balance;

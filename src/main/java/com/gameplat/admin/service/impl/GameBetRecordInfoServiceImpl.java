@@ -307,12 +307,6 @@ public class GameBetRecordInfoServiceImpl implements GameBetRecordInfoService {
                 item.setGameName(geti18nText(item.getGameName()));
                 item.setGameKind(gameKindMap.get(item.getGameKind()));
                 item.setBetTime(DateUtil.date(Long.parseLong(item.getBetTime())).toString(DatePattern.NORM_DATETIME_FORMAT));
-                if (Objects.isNull(item.getSettleTime()) || Objects.isNull(item.getStatTime())) {
-                  item.setSettleTime(null);
-                  item.setStatTime(null);
-                } else {
-                  item.setSettleTime(DateUtil.date(Long.parseLong(item.getSettleTime())).toString(DatePattern.NORM_DATETIME_FORMAT));
-                }
                 if (!Objects.isNull(item.getSettleTime())) {
                   item.setSettleTime(DateUtil.date(Long.parseLong(item.getSettleTime())).toString(DatePattern.NORM_DATETIME_FORMAT));
                   item.setStatTime(DateUtil.date(Long.parseLong(item.getStatTime())).toString(DatePattern.NORM_DATETIME_FORMAT));

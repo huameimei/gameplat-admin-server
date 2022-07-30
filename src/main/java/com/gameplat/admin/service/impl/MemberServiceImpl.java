@@ -35,7 +35,6 @@ import com.gameplat.model.entity.member.MemberDayReport;
 import com.gameplat.model.entity.member.MemberInfo;
 import com.gameplat.security.SecurityUserHolder;
 import com.gameplat.security.context.UserCredential;
-import com.gameplat.security.manager.JwtTokenAuthenticationManager;
 import com.google.common.collect.Lists;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -485,7 +484,8 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
     member.setParentName(parent.getAccount());
     member.setSuperPath(parent.getSuperPath().concat(member.getAccount()).concat("/"));
 
-    if (MemberEnums.Type.AGENT.match(member.getUserType())) {
+    if (MemberEnums.Type.AGENT.match(member.getUserType())
+        || MemberEnums.Type.PROMOTION.match(member.getUserType())) {
       member.setAgentLevel(parent.getAgentLevel() + 1);
     }
 

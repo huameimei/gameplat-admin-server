@@ -25,6 +25,7 @@ import com.gameplat.base.common.util.DateUtil;
 import com.gameplat.base.common.util.DateUtils;
 import com.gameplat.base.common.util.StringUtils;
 import com.gameplat.common.enums.GameKindEnum;
+import com.gameplat.common.enums.GamePlatformEnum;
 import com.gameplat.common.enums.SettleStatusEnum;
 import com.gameplat.common.enums.UserTypes;
 import com.gameplat.common.lang.Assert;
@@ -412,6 +413,7 @@ public class GameBetDailyReportServiceImpl
       GameReportPlatformVO reportPlatform = new GameReportPlatformVO();
       BeanUtils.copyProperties(o, reportPlatform);
       reportPlatform.setPlatformName(gamePlatformMap.get(o.getPlatformCode()));
+      reportPlatform.setCompanyAmount(reportPlatform.getCompanyAmount().negate());
       reportPlatforms.add(reportPlatform);
     });
 
@@ -453,6 +455,7 @@ public class GameBetDailyReportServiceImpl
       GameBetDailyReportVO reportVO = new GameBetDailyReportVO();
       org.springframework.beans.BeanUtils.copyProperties(o, reportVO);
       reportVO.setGameKindName(GameKindEnum.getDescByCode(o.getGameKind()));
+      reportVO.setPlatformName(GamePlatformEnum.getName(o.getPlatformCode()));
       reportVOList.add(reportVO);
     });
     String title = String.format("%s至%s游戏投注日报表数据", dto.getBeginTime(), dto.getEndTime());

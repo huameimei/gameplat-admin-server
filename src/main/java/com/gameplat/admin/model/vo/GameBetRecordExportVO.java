@@ -13,11 +13,10 @@ public class GameBetRecordExportVO implements Serializable {
   private String account;
 
   /** 游戏分类 */
-  @Excel(name = "游戏类别", width = 30, orderNum = "3")
   private String gameKind;
 
   /** 单号 */
-  @Excel(name = "单号", width = 40, orderNum = "2")
+  @Excel(name = "订单号", width = 40, orderNum = "2")
   private String billNo;
 
   /** 游戏名称 */

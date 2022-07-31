@@ -12,8 +12,10 @@ import com.gameplat.admin.convert.GameBetRecordConvert;
 import com.gameplat.admin.model.bean.ActivityStatisticItem;
 import com.gameplat.admin.model.bean.GameBetRecordSearchBuilder;
 import com.gameplat.admin.model.dto.GameBetRecordQueryDTO;
+import com.gameplat.admin.model.dto.UserGameBetRecordDto;
 import com.gameplat.admin.model.vo.GameBetRecordExportVO;
 import com.gameplat.admin.model.vo.GameBetRecordVO;
+import com.gameplat.admin.model.vo.GameReportVO;
 import com.gameplat.admin.model.vo.PageDtoVO;
 import com.gameplat.admin.service.GameBetRecordInfoService;
 import com.gameplat.admin.service.GameConfigService;
@@ -32,11 +34,7 @@ import com.gameplat.model.entity.game.GameBetRecord;
 import com.gameplat.model.entity.game.GameKind;
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
@@ -261,6 +259,71 @@ public class GameBetRecordInfoServiceImpl implements GameBetRecordInfoService {
       log.error(e.getMessage());
       throw new ServiceException("导出游戏投注记录失败");
     }
+  }
+
+  private static final Integer startIndex = 1;
+
+  private static final Integer endIndex = 10000;
+
+  @Override
+  public void exportUserGameBetRecord(GameBetRecordQueryDTO dto, HttpServletResponse response) throws IOException {
+
+    log.info("请求会员游戏报表参数：{}", dto);
+    QueryBuilder builder = GameBetRecordSearchBuilder.buildBetRecordSearch(dto);
+    String indexName = ContextConstant.ES_INDEX.BET_RECORD_ + sysTheme.getTenantCode();
+    // 统计条数
+    CountRequest countRequest = new CountRequest(indexName);
+    try {
+      countRequest.query(builder);
+      RequestOptions.Builder optionsBuilder = RequestOptions.DEFAULT.toBuilder();
+      optionsBuilder.setHttpAsyncResponseConsumerFactory(
+        new HttpAsyncResponseConsumerFactory.HeapBufferedResponseConsumerFactory(31457280));
+      CountResponse countResponse = restHighLevelClient.count(countRequest, optionsBuilder.build());
+      long sumCount = countResponse.getCount();
+      log.info("导出会员游戏报表总条数为: {}", sumCount);
+      if (sumCount > 0) {
+        SortBuilder<FieldSortBuilder> sortBuilder =
+          SortBuilders.fieldSort(GameBetRecordSearchBuilder.convertTimeType(dto.getTimeType()))
+            .order(SortOrder.DESC);
+        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+        searchSourceBuilder.query(builder);
+        searchSourceBuilder.sort(sortBuilder);
+        searchSourceBuilder.size((int) sumCount);
+        SearchRequest searchRequest = new SearchRequest(indexName);
+        searchRequest.source(searchSourceBuilder);
+        log.info("会员游戏报表 DSL语句为：{}", searchRequest.source().toString());
+        List<GameBetRecord> resultList =
+          baseElasticsearchService.searchDocList(
+            indexName, searchSourceBuilder, GameBetRecord.class);
+        Map<String, String> gameKindMap =
+          gameKindService.list().stream()
+            .collect(Collectors.toMap(GameKind::getCode, GameKind::getName));
+
+        List<GameBetRecordExportVO> list =
+          resultList.stream()
+            .map(gameBetRecordConvert::toExportVo)
+            .peek(
+              item -> {
+                item.setGameName(geti18nText(item.getGameName()));
+                item.setGameKind(gameKindMap.get(item.getGameKind()));
+                item.setBetTime(DateUtil.date(Long.parseLong(item.getBetTime())).toString(DatePattern.NORM_DATETIME_FORMAT));
+                if (!Objects.isNull(item.getSettleTime())) {
+                  item.setSettleTime(DateUtil.date(Long.parseLong(item.getSettleTime())).toString(DatePattern.NORM_DATETIME_FORMAT));
+                  item.setStatTime(DateUtil.date(Long.parseLong(item.getStatTime())).toString(DatePattern.NORM_DATETIME_FORMAT));
+                }
+              })
+            .collect(Collectors.toList());
+        String title = String.format("%s至%s会员游戏报表", dto.getBeginTime(), dto.getEndTime());
+        ExportParams exportParams = new ExportParams(title, "会员游戏报表");
+        response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename = userGameBetRecord.xls");
+        Workbook workbook = ExcelExportUtil.exportExcel(exportParams, GameBetRecordExportVO.class, list);
+        workbook.write(response.getOutputStream());
+      }
+    } catch (IOException e) {
+      log.error("导出会员游戏报表报错", e);
+      throw new ServiceException("导出会员游戏报表失败");
+    }
+
   }
 
   private String geti18nText(String value) {

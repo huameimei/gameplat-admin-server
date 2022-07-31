@@ -129,7 +129,7 @@ public class ActivityInfoServiceImpl extends ServiceImpl<ActivityInfoMapper, Act
     }
 
     //只保存相对路径
-    checkActiveUrl(activityInfo);
+   // checkActiveUrl(activityInfo);
     if (this.saveActivityInfo(activityInfo)) {
       if (null != activityInfo.getId() && activityInfo.getId() > 0) {
         // 保存活动显示的图片
@@ -228,7 +228,7 @@ public class ActivityInfoServiceImpl extends ServiceImpl<ActivityInfoMapper, Act
   @Override
   public void update(ActivityInfoUpdateDTO dto) {
     ActivityInfo activityInfo = activityInfoConvert.toEntity(dto);
-    checkActiveUrl(activityInfo);
+    //checkActiveUrl(activityInfo);
     activityInfo.setLanguage(LocaleContextHolder.getLocale().toLanguageTag());
     if (!this.saveActivityInfo(activityInfo)) {
       throw new ServiceException("修改组合活动失败！");

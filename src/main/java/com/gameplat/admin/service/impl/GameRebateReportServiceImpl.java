@@ -24,6 +24,7 @@ import com.gameplat.admin.model.vo.*;
 import com.gameplat.admin.service.*;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.json.JsonUtils;
+import com.gameplat.base.common.snowflake.IdGeneratorSnowflake;
 import com.gameplat.common.enums.GameBlacklistTypeEnum;
 import com.gameplat.common.enums.GamePlatformEnum;
 import com.gameplat.common.enums.LimitEnums;
@@ -375,6 +376,7 @@ public class GameRebateReportServiceImpl
     memberBill.setAmount(realRebateMoney);
     memberBill.setBalance(member.getBalance());
     memberBill.setRemark(remark);
+    memberBill.setOrderNo(String.valueOf(IdGeneratorSnowflake.getInstance().nextId()));
     memberBill.setContent(
         String.format(
             "游戏返点派发：用户 %s 于 %s 收到返点金额 %.3f 元，最新余额 %.3f 元。",

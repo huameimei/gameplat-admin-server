@@ -57,6 +57,8 @@ public class ActivityInfoServiceImpl extends ServiceImpl<ActivityInfoMapper, Act
 
   @Autowired private ConfigService configService;
 
+  @Autowired private SysDomainService sysDomainService;
+
   @Override
   public IPage<ActivityInfoVO> list(PageDTO<ActivityInfo> page, ActivityInfoQueryDTO dto) {
     LambdaQueryChainWrapper<ActivityInfo> queryWrapper = this.lambdaQuery();
@@ -82,6 +84,7 @@ public class ActivityInfoServiceImpl extends ServiceImpl<ActivityInfoMapper, Act
         .orderByAsc(Lists.newArrayList(ActivityInfo::getSort));
 
     IPage<ActivityInfoVO> page1 = queryWrapper.page(page).convert(activityInfoConvert::toVo);
+    // String imgUrl = sysDomainService.getImageDomain();
     if (CollectionUtils.isNotEmpty(page1.getRecords())) {
       for (ActivityInfoVO activityInfoVO : page1.getRecords()) {
         // 查询类型
@@ -92,10 +95,12 @@ public class ActivityInfoServiceImpl extends ServiceImpl<ActivityInfoMapper, Act
         }
         // 活动大厅名称
         ActivityLobby activityLobby =
-            activityLobbyService.getById(activityInfoVO.getActivityLobbyId());
+                activityLobbyService.getById(activityInfoVO.getActivityLobbyId());
         if (activityLobby != null) {
           activityInfoVO.setActivityLobbyName(activityLobby.getTitle());
         }
+        //处理数据展示全路径
+        // getAllActiveUrl(activityInfoVO,imgUrl);
       }
     }
     return page1;
@@ -103,9 +108,12 @@ public class ActivityInfoServiceImpl extends ServiceImpl<ActivityInfoMapper, Act
 
   @Override
   public ActivityInfoVO detail(Long id) {
-    return Optional.ofNullable(this.getById(id))
-        .map(activityInfoConvert::toVo)
-        .orElseThrow(() -> new ServiceException("该活动不存在"));
+    // String imgUrl = sysDomainService.getImageDomain();
+    ActivityInfoVO rst=Optional.ofNullable(this.getById(id))
+            .map(activityInfoConvert::toVo)
+            .orElseThrow(() -> new ServiceException("该活动不存在"));
+    // return getAllActiveUrl(rst,imgUrl);
+    return rst;
   }
 
   @Override
@@ -120,6 +128,8 @@ public class ActivityInfoServiceImpl extends ServiceImpl<ActivityInfoMapper, Act
       }
     }
 
+    //只保存相对路径
+   // checkActiveUrl(activityInfo);
     if (this.saveActivityInfo(activityInfo)) {
       if (null != activityInfo.getId() && activityInfo.getId() > 0) {
         // 保存活动显示的图片
@@ -186,8 +196,11 @@ public class ActivityInfoServiceImpl extends ServiceImpl<ActivityInfoMapper, Act
 
     List<ActivityInfoVO> activityInfoVOList = new ArrayList<>();
     if (CollectionUtils.isNotEmpty(activityInfoList)) {
+      // String imgUrl = sysDomainService.getImageDomain();
       for (ActivityInfo activityInfo1 : activityInfoList) {
         ActivityInfoVO activityInfoVO = activityInfoConvert.toVo(activityInfo1);
+        //处理数据展示全路径
+        // getAllActiveUrl(activityInfoVO,imgUrl);
         ActivityType activityType = activityTypeMap.get(activityInfo1.getType());
         if (activityType != null) {
           activityInfoVO.setTypeCode(activityType.getTypeCode());
@@ -215,6 +228,7 @@ public class ActivityInfoServiceImpl extends ServiceImpl<ActivityInfoMapper, Act
   @Override
   public void update(ActivityInfoUpdateDTO dto) {
     ActivityInfo activityInfo = activityInfoConvert.toEntity(dto);
+    //checkActiveUrl(activityInfo);
     activityInfo.setLanguage(LocaleContextHolder.getLocale().toLanguageTag());
     if (!this.saveActivityInfo(activityInfo)) {
       throw new ServiceException("修改组合活动失败！");
@@ -282,5 +296,73 @@ public class ActivityInfoServiceImpl extends ServiceImpl<ActivityInfoMapper, Act
     } else {
       return unBoundLobbyList;
     }
+  }
+
+  /**
+   * 检查url格式 只存绝对路径
+   * @param activityInfo
+   * @return
+   */
+  public ActivityInfo checkActiveUrl(ActivityInfo activityInfo) {
+    if(StringUtils.isNotEmpty(activityInfo.getAppListPic())&&activityInfo.getAppListPic().startsWith("http")){
+      activityInfo.setAppListPic(subStringUrl(activityInfo.getAppListPic()));
+    }
+
+    if(StringUtils.isNotEmpty(activityInfo.getAppPopupPic())&&activityInfo.getAppPopupPic().startsWith("http")){
+      activityInfo.setAppPopupPic(subStringUrl(activityInfo.getAppPopupPic()));
+    }
+
+    if(StringUtils.isNotEmpty(activityInfo.getH5ListPic())&&activityInfo.getH5ListPic().startsWith("http")){
+      activityInfo.setH5ListPic((subStringUrl(activityInfo.getH5ListPic())));
+    }
+
+    if(StringUtils.isNotEmpty(activityInfo.getPcListPic())&&activityInfo.getPcListPic().startsWith("http")){
+      activityInfo.setPcListPic((subStringUrl(activityInfo.getPcListPic())));
+    }
+
+    if(StringUtils.isNotEmpty(activityInfo.getPcPopupPic())&&activityInfo.getPcPopupPic().startsWith("http")){
+      activityInfo.setPcPopupPic((subStringUrl(activityInfo.getPcPopupPic())));
+    }
+    return activityInfo;
+  }
+
+  /**
+   * 截取链接
+   * @param url
+   * @return
+   */
+  public String subStringUrl(String url) {
+    for (int i = 0; i < 3; i++) {
+      url = url.substring(url.indexOf("/") + 1);
+    }
+    return url;
+  }
+
+  /**
+   * 展示全路径
+   * @param activityInfo
+   * @return
+   */
+  public ActivityInfoVO getAllActiveUrl(ActivityInfoVO activityInfo,String imgUrl) {
+    if(!StringUtils.isNotEmpty(activityInfo.getAppListPic())&&activityInfo.getAppListPic().startsWith("http")){
+      activityInfo.setAppListPic(imgUrl+"/"+ activityInfo.getAppListPic());
+    }
+
+    if(!StringUtils.isNotEmpty(activityInfo.getAppPopupPic())&&activityInfo.getAppPopupPic().startsWith("http")){
+      activityInfo.setAppPopupPic(imgUrl+"/"+activityInfo.getAppPopupPic());
+    }
+
+    if(!StringUtils.isNotEmpty(activityInfo.getH5ListPic())&&activityInfo.getH5ListPic().startsWith("http")){
+      activityInfo.setH5ListPic(imgUrl+"/"+activityInfo.getH5ListPic());
+    }
+
+    if(!StringUtils.isNotEmpty(activityInfo.getPcListPic())&&activityInfo.getPcListPic().startsWith("http")){
+      activityInfo.setPcListPic(imgUrl+"/"+activityInfo.getPcListPic());
+    }
+
+    if(!StringUtils.isNotEmpty(activityInfo.getPcPopupPic())&&activityInfo.getPcPopupPic().startsWith("http")){
+      activityInfo.setPcPopupPic(imgUrl+"/"+activityInfo.getPcPopupPic());
+    }
+    return activityInfo;
   }
 }

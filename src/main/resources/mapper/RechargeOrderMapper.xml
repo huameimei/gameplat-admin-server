@@ -65,7 +65,7 @@
        r.update_by,
        r.update_time,
        r.currency,
-       m.remark
+       m.remark as userRemark
        FROM recharge_order r
        LEFT JOIN member m ON r.member_id = m.id
        ${ew.customSqlSegment}

@@ -695,6 +695,8 @@ public class ActivityQualificationServiceImpl
     if (money == null || money.compareTo(BigDecimal.ZERO) == 0 || money.compareTo(BigDecimal.ZERO) == -1) {
       return null;
     }
+    //根据目标值倒序排列
+    lobbyDiscountList.sort(Comparator.comparingLong(ActivityLobbyDiscountVO::getTargetValue).reversed());
     for (int i = 0; i < lobbyDiscountList.size(); i++) {
       ActivityLobbyDiscountVO temp = lobbyDiscountList.get(i);
       //targetValue: 充值金额
@@ -703,12 +705,7 @@ public class ActivityQualificationServiceImpl
       if (money.compareTo(targetValue) == 0 || money.compareTo(targetValue) == 1) {
         return temp;
       }
-      //如果充值金额第一条都不满足则返回第一条的抽奖次数
-      if (i == 0 && money.compareTo(targetValue) == 1) {
-        return temp;
-      }
     }
-
     return null;
   }
 

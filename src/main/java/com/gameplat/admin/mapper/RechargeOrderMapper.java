@@ -2,14 +2,21 @@ package com.gameplat.admin.mapper;
 
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Constants;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.gameplat.admin.component.RechargeOrderQueryCondition;
 import com.gameplat.admin.model.bean.ActivityStatisticItem;
 import com.gameplat.admin.model.bean.PayLeaderboard;
 import com.gameplat.admin.model.bean.PayLeaderboardParam;
 import com.gameplat.admin.model.dto.MemberActivationDTO;
 import com.gameplat.admin.model.vo.MemberActivationVO;
+import com.gameplat.admin.model.vo.RechargeOrderVO;
 import com.gameplat.admin.model.vo.SalaryRechargeVO;
+import com.gameplat.model.entity.member.Member;
 import com.gameplat.model.entity.recharge.RechargeOrder;
 import com.gameplat.model.entity.spread.SpreadUnion;
 import org.apache.ibatis.annotations.Param;
@@ -20,6 +27,9 @@ import java.util.List;
 import java.util.Map;
 
 public interface RechargeOrderMapper extends BaseMapper<RechargeOrder> {
+
+
+
 
   @Select("select sum(pay_amount) from recharge_order ${ew.customSqlSegment}")
   BigDecimal summaryRechargeOrder(@Param(Constants.WRAPPER) Wrapper<RechargeOrder> wrapper);
@@ -97,4 +107,6 @@ public interface RechargeOrderMapper extends BaseMapper<RechargeOrder> {
    * @return
    */
   List<ActivityStatisticItem> findFirstRechargeOrderList(Map<String, Object> map);
+
+  IPage<RechargeOrderVO> findPage(Page<RechargeOrder> page, @Param(Constants.WRAPPER)QueryWrapper<RechargeOrder> wrapper);
 }

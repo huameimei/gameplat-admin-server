@@ -11,6 +11,7 @@ public class RechargeOrderHistoryVO {
 
   private Long id;
 
+  private String userRemark;
 
   private String account;
 

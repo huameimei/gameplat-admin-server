@@ -12,6 +12,6 @@ import java.util.List;
  * @date 2020-08-14 14:50:01
  */
 public interface ActivityLobbyDiscountMapper extends BaseMapper<ActivityLobbyDiscount> {
-    @Select("select * from activity_lobby_discount where lobby_id = #{activityLobbyId}")
+    @Select("select * from activity_lobby_discount where lobby_id = #{activityLobbyId} order by target_value desc")
     List<ActivityLobbyDiscount> selectByActivityLobbyId(Long activityLobbyId);
 }

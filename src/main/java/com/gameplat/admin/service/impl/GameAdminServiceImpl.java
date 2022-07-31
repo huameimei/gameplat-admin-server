@@ -584,7 +584,7 @@ public class GameAdminServiceImpl implements GameAdminService {
     Assert.notEmpty(account, "会员账号不能为空");
     Member member = memberService.getMemberAndFillGameAccount(account);
     Assert.notNull(member, "会员账号不存在，请重新检查");
-    log.error("{}一键回收游戏平台额度操作频繁", account);
+    log.error("{}一键回收游戏平台额度操作", account);
     String key = USER_GAME_BALANCE + member.getId();
     distributedLocker.lock(key, TimeUnit.SECONDS, 300);
     try {
@@ -661,7 +661,7 @@ public class GameAdminServiceImpl implements GameAdminService {
     Assert.notNull(member, "会员账号不存在，请重新检查");
     String key = USER_GAME_BALANCE + member.getId();
     distributedLocker.lock(key, TimeUnit.SECONDS, 300);
-    log.info("{}一键回收游戏平台额度操作:", account);
+    log.info("{}一键查询游戏平台额度操作:", account);
     try {
       List<GamePlatform> playedGamePlatform = this.getPlayedPlatform(member.getId());
       if (CollectionUtil.isEmpty(playedGamePlatform)) {

@@ -1,8 +1,10 @@
 package com.gameplat.admin.controller.open.account;
 
+import com.alibaba.nacos.common.utils.Objects;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.gameplat.admin.model.dto.OnlineUserDTO;
+import com.gameplat.admin.model.vo.GameBalanceVO;
 import com.gameplat.admin.model.vo.MemberInfoVO;
 import com.gameplat.admin.model.vo.OnlineUserVo;
 import com.gameplat.admin.service.GameAdminService;
@@ -20,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Tag(name = "在线会员")
@@ -61,11 +64,18 @@ public class OpenOnlineController {
   @PreAuthorize("hasAuthority('account:online:balance')")
   public Map<String, BigDecimal> allBalance(@PathVariable(value = "account") String account) {
     Assert.notNull(account, "请输入会员！");
-    gameAdminService.recyclingAmountByAccount(account);
     MemberInfoVO memberInfo = memberService.getMemberInfo(account);
     Assert.notNull(memberInfo, "会员不存在！");
+    // 查询游戏总余额
+    List<GameBalanceVO> gameBalanceVOList = gameAdminService.selectGameBalanceByAccount(account);
+    BigDecimal gameTotalBalance = BigDecimal.ZERO;
+    if (Objects.nonNull(gameBalanceVOList)) {
+      gameTotalBalance = gameBalanceVOList.stream().map(GameBalanceVO::getBalance).reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+    // 总余额
+    BigDecimal allBalance = gameTotalBalance.add(memberInfo.getBalance());
     Map<String, BigDecimal> map = new HashMap<>();
-    map.put("allBalance", memberInfo.getBalance());
+    map.put("allBalance", allBalance);
     return map;
   }
 }

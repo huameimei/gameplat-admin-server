@@ -330,7 +330,7 @@ public class GameAdminServiceImpl implements GameAdminService {
     MemberInfo memberInfo = memberInfoService.getById(member.getId());
     if (transferType) {
       // 自动转换 直接amount就是会员余额
-      amount = memberInfo.getBalance();
+      amount = memberInfo.getBalance().setScale(2, RoundingMode.DOWN);
       if (amount.compareTo(BigDecimal.ZERO) > 0) {
         log.info("会员余额为" + amount);
         return;
@@ -479,7 +479,7 @@ public class GameAdminServiceImpl implements GameAdminService {
             .account(member.getAccount())
             .config(gameConfigService.queryGameConfigInfoByPlatCode(transferIn))
             .build();
-    BigDecimal balance = gameApi.getBalance(gameBizBean);
+    BigDecimal balance = gameApi.getBalance(gameBizBean).setScale(2, RoundingMode.DOWN);
     // 自动转动实际上回收的是在第三方游戏的所有余额
     if (transferType) {
       amount = balance;
@@ -584,7 +584,7 @@ public class GameAdminServiceImpl implements GameAdminService {
     Assert.notEmpty(account, "会员账号不能为空");
     Member member = memberService.getMemberAndFillGameAccount(account);
     Assert.notNull(member, "会员账号不存在，请重新检查");
-    log.error("{}一键回收游戏平台额度操作频繁", account);
+    log.error("{}一键回收游戏平台额度操作", account);
     String key = USER_GAME_BALANCE + member.getId();
     distributedLocker.lock(key, TimeUnit.SECONDS, 300);
     try {
@@ -661,11 +661,12 @@ public class GameAdminServiceImpl implements GameAdminService {
     Assert.notNull(member, "会员账号不存在，请重新检查");
     String key = USER_GAME_BALANCE + member.getId();
     distributedLocker.lock(key, TimeUnit.SECONDS, 300);
-    log.info("{}一键回收游戏平台额度操作:", account);
+    log.info("{}一键查询游戏平台额度操作:", account);
     try {
       List<GamePlatform> playedGamePlatform = this.getPlayedPlatform(member.getId());
       if (CollectionUtil.isEmpty(playedGamePlatform)) {
-        throw new ServiceException("游戏平台额度转换通道维护中");
+        // throw new ServiceException("游戏平台额度转换通道维护中");
+        return new ArrayList<>();
       }
       List<CompletableFuture<GameBalanceVO>> futures =
           this.batchQueryBalance(playedGamePlatform, member);

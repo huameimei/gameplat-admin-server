@@ -84,7 +84,7 @@ public class ActivityInfoServiceImpl extends ServiceImpl<ActivityInfoMapper, Act
         .orderByAsc(Lists.newArrayList(ActivityInfo::getSort));
 
     IPage<ActivityInfoVO> page1 = queryWrapper.page(page).convert(activityInfoConvert::toVo);
-    String imgUrl = sysDomainService.getImageDomain();
+    // String imgUrl = sysDomainService.getImageDomain();
     if (CollectionUtils.isNotEmpty(page1.getRecords())) {
       for (ActivityInfoVO activityInfoVO : page1.getRecords()) {
         // 查询类型
@@ -100,7 +100,7 @@ public class ActivityInfoServiceImpl extends ServiceImpl<ActivityInfoMapper, Act
           activityInfoVO.setActivityLobbyName(activityLobby.getTitle());
         }
         //处理数据展示全路径
-        getAllActiveUrl(activityInfoVO,imgUrl);
+        // getAllActiveUrl(activityInfoVO,imgUrl);
       }
     }
     return page1;
@@ -108,11 +108,12 @@ public class ActivityInfoServiceImpl extends ServiceImpl<ActivityInfoMapper, Act
 
   @Override
   public ActivityInfoVO detail(Long id) {
-    String imgUrl = sysDomainService.getImageDomain();
+    // String imgUrl = sysDomainService.getImageDomain();
     ActivityInfoVO rst=Optional.ofNullable(this.getById(id))
             .map(activityInfoConvert::toVo)
             .orElseThrow(() -> new ServiceException("该活动不存在"));
-    return getAllActiveUrl(rst,imgUrl);
+    // return getAllActiveUrl(rst,imgUrl);
+    return rst;
   }
 
   @Override
@@ -195,11 +196,11 @@ public class ActivityInfoServiceImpl extends ServiceImpl<ActivityInfoMapper, Act
 
     List<ActivityInfoVO> activityInfoVOList = new ArrayList<>();
     if (CollectionUtils.isNotEmpty(activityInfoList)) {
-      String imgUrl = sysDomainService.getImageDomain();
+      // String imgUrl = sysDomainService.getImageDomain();
       for (ActivityInfo activityInfo1 : activityInfoList) {
         ActivityInfoVO activityInfoVO = activityInfoConvert.toVo(activityInfo1);
         //处理数据展示全路径
-        getAllActiveUrl(activityInfoVO,imgUrl);
+        // getAllActiveUrl(activityInfoVO,imgUrl);
         ActivityType activityType = activityTypeMap.get(activityInfo1.getType());
         if (activityType != null) {
           activityInfoVO.setTypeCode(activityType.getTypeCode());

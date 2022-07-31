@@ -42,25 +42,28 @@ public class GameBetDailyReportVO implements Serializable {
   /** 游戏平台 */
   private String platformCode;
 
+  @Excel(name = "游戏平台", width = 20, orderNum = "3")
+  private String platformName;
+
   /** 游戏子类型 */
   private String gameKind;
 
-  @Excel(name = "游戏平台", width = 20, orderNum = "3")
+  @Excel(name = "游戏类别", width = 20, orderNum = "4")
   private String gameKindName;
 
   /** 游戏大类 */
   private String gameType;
 
   /** 投注金额 */
-  @Excel(name = "投注金额", width = 20, orderNum = "4")
+  @Excel(name = "投注金额", width = 20, orderNum = "5")
   private BigDecimal betAmount;
 
   /** 有效投注额 */
-  @Excel(name = "有效投注金额", width = 20, orderNum = "5")
+  @Excel(name = "有效投注金额", width = 20, orderNum = "6")
   private BigDecimal validAmount;
 
   /** 中奖金额 */
-  @Excel(name = "中奖金额", width = 20, orderNum = "6")
+  @Excel(name = "中奖金额", width = 20, orderNum = "7")
   private BigDecimal winAmount;
 
   /** 下注笔数 */

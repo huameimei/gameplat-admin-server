@@ -54,6 +54,8 @@ public class RechargeOrderVO {
 
   private String remarks;
 
+  private String userRemark;
+
   private String acceptAccount;
 
   private Date acceptTime;

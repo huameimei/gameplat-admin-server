@@ -13,6 +13,7 @@ import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.gameplat.admin.component.RechargeOrderQueryCondition;
 import com.gameplat.admin.constant.BuildInDiscountType;
 import com.gameplat.admin.constant.RechargeMode;
 import com.gameplat.admin.constant.TrueFalse;
@@ -125,80 +126,19 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
 
   @Autowired private SysDictDataService sysDictDataService;
 
+  @Autowired private RechargeOrderQueryCondition rechargeCondition;
+
   @Autowired(required = false)
   private MessageFeignClient client;
 
   @Override
   public PageExt<RechargeOrderVO, SummaryVO> findPage(
       Page<RechargeOrder> page, RechargeOrderQueryDTO dto) {
-    LambdaQueryWrapper<RechargeOrder> query = Wrappers.lambdaQuery();
-    query
-        .in(ObjectUtils.isNotNull(dto.getModeList()), RechargeOrder::getMode, dto.getModeList())
-        .in(
-            ObjectUtils.isNotNull(dto.getStatusList()),
-            RechargeOrder::getStatus,
-            dto.getStatusList())
-        .eq(
-            ObjectUtils.isNotEmpty(dto.getPointFlag()),
-            RechargeOrder::getPointFlag,
-            dto.getPointFlag())
-        .in(
-            ObjectUtils.isNotNull(dto.getPayAccountList()),
-            RechargeOrder::getPayAccountAccount,
-            dto.getPayAccountList())
-        .eq(
-            ObjectUtils.isNotEmpty(dto.getTpMerchantId()),
-            RechargeOrder::getTpMerchantId,
-            dto.getTpMerchantId())
-        .ge(
-            ObjectUtils.isNotEmpty(dto.getAmountFrom()),
-            RechargeOrder::getAmount,
-            dto.getAmountFrom())
-        .le(ObjectUtils.isNotEmpty(dto.getAmountTo()), RechargeOrder::getAmount, dto.getAmountTo())
-        .eq(ObjectUtils.isNotEmpty(dto.getAccount()), RechargeOrder::getAccount, dto.getAccount())
-        .in(
-            ObjectUtils.isNotEmpty(dto.getMemberType())
-                && MemberEnums.Type.MEMBER.match(dto.getMemberType()),
-            RechargeOrder::getMemberType,
-            MemberEnums.Type.MEMBER.value(),
-                MemberEnums.Type.AGENT.value())
-        .eq(
-            ObjectUtils.isNotEmpty(dto.getMemberType())
-                && MemberEnums.Type.PROMOTION.match(dto.getMemberType()),
-            RechargeOrder::getMemberType,
-            dto.getMemberType())
-        .eq(ObjectUtils.isNotEmpty(dto.getOrderNo()), RechargeOrder::getOrderNo, dto.getOrderNo())
-        .eq(
-            ObjectUtils.isNotEmpty(dto.getSuperAccount()),
-            RechargeOrder::getSuperAccount,
-            dto.getSuperAccount())
-        .ge(
-            ObjectUtils.isNotEmpty(dto.getCreateTimeFrom()),
-            RechargeOrder::getCreateTime,
-            dto.getCreateTimeFrom())
-        .le(
-            ObjectUtils.isNotEmpty(dto.getCreateTimeTo()),
-            RechargeOrder::getCreateTime,
-            dto.getCreateTimeTo())
-        .in(
-            ObjectUtils.isNotNull(dto.getMemberLevelList()),
-            RechargeOrder::getMemberLevel,
-            dto.getMemberLevelList());
-    if (dto.isFullNameFuzzy()) {
-      query.like(
-          ObjectUtils.isNotEmpty(dto.getFullName()), RechargeOrder::getNickname, dto.getFullName());
-    } else {
-      query.eq(
-          ObjectUtils.isNotEmpty(dto.getFullName()), RechargeOrder::getNickname, dto.getFullName());
-    }
-    query.orderBy(
-        ObjectUtils.isNotEmpty(dto.getOrder()),
-        !ObjectUtils.isEmpty(dto.getOrder()) && dto.getOrder().equals("ASC"),
-        RechargeOrder::getCreateTime);
-    IPage<RechargeOrderVO> data = this.page(page, query).convert(rechargeOrderConvert::toVo);
+
+    IPage<RechargeOrderVO> data = rechargeOrderMapper.findPage(page, rechargeCondition.builderQueryWrapper(dto));
     // 统计受理充值订单总金额、未受理充值订单总金额
     SummaryVO summaryVO = amountSum(dto);
-    return new PageExt<RechargeOrderVO, SummaryVO>(data, summaryVO);
+    return new PageExt<>(data, summaryVO);
   }
 
   @Override

@@ -3,6 +3,76 @@
 <mapper namespace="com.gameplat.admin.mapper.RechargeOrderHistoryMapper">
 
 
+    <select id="findPage" resultType="com.gameplat.admin.model.vo.RechargeOrderHistoryVO">
+        select
+        r.id,
+        r.fk,
+        r.sys_user_id,
+        r.member_id,
+        r.account,
+        r.nickname,
+        r.member_level,
+        r.balance,
+        r.super_id,
+        r.super_account,
+        r.super_path,
+        r.mode,
+        r.order_no,
+        r.pay_type,
+        r.pay_type_name,
+        r.pay_account_id,
+        r.pay_account_account,
+        r.pay_account_owner,
+        r.pay_account_bank_name,
+        r.tp_interface_code,
+        r.tp_interface_name,
+        r.tp_merchant_id,
+        r.tp_merchant_name,
+        r.tp_pay_channel_id,
+        r.tp_pay_channel_name,
+        r.tp_order_no,
+        r.amount,
+        r.pay_amount,
+        r.discount_amount,
+        r.discount_recharge_flag,
+        r.discount_type,
+        r.total_amount,
+        r.point_flag,
+        r.dml_flag,
+        r.normal_dml,
+        r.discount_dml,
+        r.recharge_person,
+        r.recharge_time,
+        r.status,
+        r.remarks,
+        r.accept_account,
+        r.accept_time,
+        r.auditor_account,
+        r.audit_time,
+        r.audit_remarks,
+        r.browser,
+        r.os,
+        r.ip_address,
+        r.user_agent,
+        r.domain,
+        r.sub_pay_type,
+        r.member_type,
+        r.currency_rate,
+        r.currency_count,
+        r.currency_trance_id,
+        r.order_expire_time,
+        r.create_by,
+        r.create_time,
+        r.update_by,
+        r.update_time,
+        r.currency
+        m.remark as userRemark
+        from recharge_order_history as r
+        left join member as m
+        on r.member_id = m.id
+        ${ew.customSqlSegment}
+    </select>
+
     <select id="findIp" parameterType="com.gameplat.admin.model.dto.QueryIpStatReportDTO"
             resultType="com.gameplat.admin.model.vo.IpStatisticsVO">
         select

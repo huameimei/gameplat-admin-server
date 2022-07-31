@@ -4,9 +4,11 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.gameplat.admin.model.dto.RechargeOrderHistoryQueryDTO;
 import com.gameplat.admin.model.dto.RechargeOrderQueryDTO;
 import com.gameplat.common.enums.MemberEnums;
 import com.gameplat.model.entity.recharge.RechargeOrder;
+import com.gameplat.model.entity.recharge.RechargeOrderHistory;
 import org.springframework.stereotype.Component;
 
 /**
@@ -16,6 +18,124 @@ import org.springframework.stereotype.Component;
  **/
 @Component
 public class RechargeOrderQueryCondition {
+
+  private final String RECH_TEST_TYPE = "P";
+  private final String RECH_FORMAL_TYPE_QUERY = "M,A";
+  private final String RECH_FORMAL_TYPE = "M";
+
+  public QueryWrapper<RechargeOrderHistory> builderHistoryQueryWrapper(RechargeOrderHistoryQueryDTO dto) {
+
+    QueryWrapper<RechargeOrderHistory> query = Wrappers.query();
+    query
+      .in(
+        ObjectUtils.isNotNull(dto.getModeList()),
+        "r.mode",
+        dto.getModeList())
+      .eq(
+        ObjectUtils.isNotEmpty(dto.getPointFlag()),
+        "r.point_flag",
+        dto.getPointFlag())
+      .in(
+        ObjectUtils.isNotEmpty(dto.getDiscountTypes()),
+        "r.discount_type",
+        dto.getDiscountTypes())
+      .in(
+        ObjectUtils.isNotNull(dto.getPayTypeList()),
+        "r.pay_type",
+        dto.getPayTypeList())
+      .eq(
+        ObjectUtils.isNotEmpty(dto.getStatus()),
+        "r.status",
+        dto.getStatus())
+      .in(
+        ObjectUtils.isNotEmpty(dto.getPayAccountOwnerList()),
+        "r.pay_account_account",
+        dto.getPayAccountOwnerList())
+      .eq(
+        ObjectUtils.isNotEmpty(dto.getTpMerchantId()),
+        "r.tp_merchant_id",
+        dto.getTpMerchantId())
+      .ge(
+        ObjectUtils.isNotEmpty(dto.getAmountFrom()),
+        "r.amount",
+        dto.getAmountFrom())
+      .le(
+        ObjectUtils.isNotEmpty(dto.getAmountTo()),
+        "r.amount",
+        dto.getAmountTo())
+      .in(
+        ObjectUtils.isNotEmpty(dto.getMemberType())
+          && dto.getMemberType().equalsIgnoreCase(RECH_FORMAL_TYPE),
+        "r.member_type",
+        (Object) RECH_FORMAL_TYPE_QUERY.split(","))
+      .eq(
+        ObjectUtils.isNotEmpty(dto.getMemberType())
+          && dto.getMemberType().equalsIgnoreCase(RECH_TEST_TYPE),
+        "r.member_type",
+        dto.getMemberType())
+      .in(
+        ObjectUtils.isNotNull(dto.getMemberLevelList()),
+        "r.member_level",
+        dto.getMemberLevelList())
+      .eq(
+        ObjectUtils.isNotEmpty(dto.getOrderNo()),
+        "r.order_no",
+        dto.getOrderNo())
+      .eq(
+        ObjectUtils.isNotEmpty(dto.getSuperAccount()),
+        "r.super_account",
+        dto.getSuperAccount())
+      .like(
+        ObjectUtils.isNotEmpty(dto.getRemarks()),
+        "r.remarks",
+        dto.getRemarks())
+      .like(
+        ObjectUtils.isNotEmpty(dto.getAuditRemarks()),
+        "r.audit_remarks",
+        dto.getAuditRemarks())
+      .eq(
+        ObjectUtils.isNotEmpty(dto.getOrderNo()),
+        "r.order_no",
+        dto.getOrderNo());
+    if (ObjectUtils.isNotEmpty(dto.getAuditorAccounts())) {
+      query.in("r.auditor_account", (Object) dto.getAuditorAccounts().split(","));
+    }
+    if (ObjectUtils.isEmpty(dto.getOrderBy()) || dto.getOrderBy().equals("createTime")) {
+      query.between(
+        ObjectUtils.isNotEmpty(dto.getBeginDatetime()),
+        "r.create_time",
+        dto.getBeginDatetime(),
+        dto.getEndDatetime());
+    } else {
+      query.between(
+        ObjectUtils.isNotEmpty(dto.getBeginDatetime()),
+        "r.audit_time",
+        dto.getBeginDatetime(),
+        dto.getEndDatetime());
+    }
+    if (ObjectUtils.isNotEmpty(dto.getAccounts())) {
+      query.in("r.account", (Object) dto.getAccounts().split(","));
+    }
+    if (dto.isSuperPathLike()) {
+      query.like(
+        ObjectUtils.isNotEmpty(dto.getSuperAccount()),
+        "r.super_account",
+        dto.getSuperAccount());
+    } else {
+      query.eq(
+        ObjectUtils.isNotEmpty(dto.getSuperAccount()),
+        "r.super_account",
+        dto.getSuperAccount());
+    }
+    query.orderBy(
+      ObjectUtils.isNotEmpty(dto.getOrder()),
+      !ObjectUtils.isEmpty(dto.getOrder()) && "ASC".equals(dto.getOrder()),
+      "createTime".equals(dto.getOrderBy())
+        ? "r.create_time"
+        : "r.audit_time");
+    return query;
+
+  }
 
   public QueryWrapper<RechargeOrder> builderQueryWrapper(RechargeOrderQueryDTO dto) {
 

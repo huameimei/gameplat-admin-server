@@ -10,6 +10,8 @@ public class MemberWithdrawHistoryVO {
 
   private String cashOrderNo;
 
+  private String userRemark;
+
   private String account;
 
   private String realName;

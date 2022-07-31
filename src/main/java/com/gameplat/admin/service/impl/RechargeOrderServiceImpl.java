@@ -136,6 +136,7 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
       Page<RechargeOrder> page, RechargeOrderQueryDTO dto) {
 
     IPage<RechargeOrderVO> data = rechargeOrderMapper.findPage(page, rechargeCondition.builderQueryWrapper(dto));
+    log.info("findPage查询数据{}", data);
     // 统计受理充值订单总金额、未受理充值订单总金额
     SummaryVO summaryVO = amountSum(dto);
     return new PageExt<>(data, summaryVO);

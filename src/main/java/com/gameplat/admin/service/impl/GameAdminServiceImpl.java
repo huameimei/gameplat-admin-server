@@ -665,7 +665,8 @@ public class GameAdminServiceImpl implements GameAdminService {
     try {
       List<GamePlatform> playedGamePlatform = this.getPlayedPlatform(member.getId());
       if (CollectionUtil.isEmpty(playedGamePlatform)) {
-        throw new ServiceException("游戏平台额度转换通道维护中");
+        // throw new ServiceException("游戏平台额度转换通道维护中");
+        return new ArrayList<>();
       }
       List<CompletableFuture<GameBalanceVO>> futures =
           this.batchQueryBalance(playedGamePlatform, member);

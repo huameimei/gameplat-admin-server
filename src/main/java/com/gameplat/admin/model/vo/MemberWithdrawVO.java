@@ -10,6 +10,8 @@ public class MemberWithdrawVO {
 
   private Long id;
 
+  private String userRemark;
+
   private String cashOrderNo;
 
   private String account;

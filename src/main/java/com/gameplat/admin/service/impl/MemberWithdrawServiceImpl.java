@@ -6,12 +6,14 @@ import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.gameplat.admin.component.WithdrawQueryCondition;
 import com.gameplat.admin.constant.WithdrawTypeConstant;
 import com.gameplat.admin.convert.MemberWithdrawConvert;
 import com.gameplat.admin.enums.BlacklistConstant.BizBlacklistType;
@@ -28,6 +30,7 @@ import com.gameplat.admin.model.dto.MemberWithdrawDTO;
 import com.gameplat.admin.model.dto.MemberWithdrawQueryDTO;
 import com.gameplat.admin.model.vo.MemberWithdrawBankVo;
 import com.gameplat.admin.model.vo.MemberWithdrawVO;
+import com.gameplat.admin.model.vo.RechargeOrderHistoryVO;
 import com.gameplat.admin.model.vo.SummaryVO;
 import com.gameplat.admin.service.*;
 import com.gameplat.admin.util.MoneyUtils;
@@ -164,87 +167,14 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
     return false;
   }
 
+  @Autowired
+  private WithdrawQueryCondition condition;
+
   @Override
   public IPage<MemberWithdrawVO> findPage(Page<MemberWithdraw> page, MemberWithdrawQueryDTO dto) {
-    LambdaQueryWrapper<MemberWithdraw> query = Wrappers.lambdaQuery();
-    query
-        .in(
-            ObjectUtils.isNotNull(dto.getBankNameList()),
-            MemberWithdraw::getBankName,
-            dto.getBankNameList())
-        .eq(
-            ObjectUtils.isNotEmpty(dto.getSuperName()),
-            MemberWithdraw::getSuperName,
-            dto.getSuperName())
-        .eq(
-            ObjectUtils.isNotEmpty(dto.getBankCard()),
-            MemberWithdraw::getBankCard,
-            dto.getBankCard())
-        .eq(ObjectUtils.isNotEmpty(dto.getAccount()), MemberWithdraw::getAccount, dto.getAccount())
-        .ge(
-            ObjectUtils.isNotEmpty(dto.getCashMoneyFrom()),
-            MemberWithdraw::getCashMoney,
-            dto.getCashMoneyFrom())
-        .le(
-            ObjectUtils.isNotEmpty(dto.getCashMoneyFromTo()),
-            MemberWithdraw::getCashMoney,
-            dto.getCashMoneyFromTo())
-        .eq(
-            ObjectUtils.isNotEmpty(dto.getMemberType()),
-            MemberWithdraw::getMemberType,
-            dto.getMemberType())
-        .eq(
-            ObjectUtils.isNotEmpty(dto.getCashOrderNo()),
-            MemberWithdraw::getCashOrderNo,
-            dto.getCashOrderNo())
-        .eq(
-            ObjectUtils.isNotEmpty(dto.getOperatorAccount()),
-            MemberWithdraw::getOperatorAccount,
-            dto.getOperatorAccount())
-        .ge(
-            ObjectUtils.isNotNull(dto.getCreateTimeFrom()),
-            MemberWithdraw::getCreateTime,
-            dto.getCreateTimeFrom())
-        .le(
-            ObjectUtils.isNotNull(dto.getCreateTimeTo()),
-            MemberWithdraw::getCreateTime,
-            dto.getCreateTimeTo())
-        .in(
-            ObjectUtils.isNotNull(dto.getMemberLevelList()),
-            MemberWithdraw::getMemberLevel,
-            dto.getMemberLevelList());
-    if (ObjectUtils.isNotNull(dto.getRechargeStatusList())
-        && dto.getRechargeStatusList().size() > 0) {
-      query
-          .eq(
-              dto.getRechargeStatusList().contains(3L),
-              MemberWithdraw::getWithdrawType,
-              WithdrawTypeConstant.BANK)
-          .eq(
-              dto.getRechargeStatusList().contains(5L),
-              MemberWithdraw::getWithdrawType,
-              WithdrawTypeConstant.DIRECT)
-          .notIn(
-              dto.getRechargeStatusList().contains(4L),
-              MemberWithdraw::getWithdrawType,
-              WithdrawTypeConstant.BANK,
-              WithdrawTypeConstant.MANUAL,
-              WithdrawTypeConstant.DIRECT)
-          .gt(dto.getRechargeStatusList().contains(6L), MemberWithdraw::getCounterFee, 0);
-    }
-    if (ObjectUtils.isNotNull(dto.getCashStatusList())) {
-      query.in(MemberWithdraw::getCashStatus, dto.getCashStatusList());
-    } else {
-      query.le(MemberWithdraw::getCashStatus, WithdrawStatus.HANDLED.getValue());
-    }
-
-    query.orderBy(
-        ObjectUtils.isNotEmpty(dto.getOrder()),
-        Pages.isAsc(dto.getOrder()),
-        MemberWithdraw::getCreateTime);
-
+    QueryWrapper<MemberWithdraw> queryWrapper = condition.buildQuerySql(dto);
     // 统计受理订单总金额、未受理订单总金额
-    return Pages.of(this.page(page, query).convert(userWithdrawConvert::toVo), amountSum());
+    return Pages.of(memberWithdrawMapper.findPage(page, queryWrapper), amountSum());
   }
 
   @Override

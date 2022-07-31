@@ -65,7 +65,7 @@
         r.create_time,
         r.update_by,
         r.update_time,
-        r.currency
+        r.currency,
         m.remark as userRemark
         from recharge_order_history as r
         left join member as m

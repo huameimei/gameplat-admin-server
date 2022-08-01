@@ -82,58 +82,56 @@ public class TransferAgentServiceImpl implements TransferAgentService {
   public void transferEsBetRecord(String originSuperPath) {
     List<GameBetRecord> resultList = new ArrayList();
     try {
-      String tenantCode = sysTheme.getTenantCode();
-      String indexName = ContextConstant.ES_INDEX.BET_RECORD_ + tenantCode;
-      BoolQueryBuilder builder = QueryBuilders.boolQuery();
-      builder.should(QueryBuilders.matchPhraseQuery("superPath", "*" + originSuperPath + "*"));
-      SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
-      searchSourceBuilder.query(builder);
-      SearchRequest searchRequest = new SearchRequest(indexName);
-      searchRequest.source(searchSourceBuilder);
-      log.info("转代理查询用户注单 DSL语句为：{}", searchRequest.source().toString());
-      resultList =
-          baseElasticsearchService.searchDocList(
-              indexName, searchSourceBuilder, GameBetRecord.class);
-      log.info("转代理获取到的转移的用户注册：{}", resultList.size());
-      if (CollectionUtil.isNotEmpty(resultList)) {
-        log.info("开始更新ES注单记录的代理路径");
-        Map<String, AgentInfoVo> agentInfoVoMap = new HashMap<>();
-        List<BetRecord> listRecord = new ArrayList<>();
-        for (GameBetRecord gameBetRecord : resultList) {
-          if (StrUtil.isBlank(gameBetRecord.getAccount())) {
-            continue;
-          }
-          AgentInfoVo agentInfoVo = agentInfoVoMap.get(gameBetRecord.getAccount());
-          if (BeanUtil.isEmpty(agentInfoVo)) {
-            AgentInfoVo queryInfo = memberMapper.queryAgentInfo(gameBetRecord.getAccount());
-            if (BeanUtil.isEmpty(queryInfo)) {
+      do {
+        String tenantCode = sysTheme.getTenantCode();
+        String indexName = ContextConstant.ES_INDEX.BET_RECORD_ + tenantCode;
+        BoolQueryBuilder builder = QueryBuilders.boolQuery();
+        builder.should(QueryBuilders.matchPhraseQuery("superPath", "*" + originSuperPath + "*"));
+        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+        searchSourceBuilder.query(builder);
+        SearchRequest searchRequest = new SearchRequest(indexName);
+        searchRequest.source(searchSourceBuilder);
+        log.info("转代理查询用户注单 DSL语句为：{}", searchRequest.source().toString());
+        resultList =
+            baseElasticsearchService.searchDocList(
+                indexName, searchSourceBuilder, GameBetRecord.class);
+        log.info("转代理获取到的转移的用户注册：{}", resultList.size());
+        if (CollectionUtil.isNotEmpty(resultList)) {
+          log.info("开始更新ES注单记录的代理路径");
+          Map<String, AgentInfoVo> agentInfoVoMap = new HashMap<>();
+          List<BetRecord> listRecord = new ArrayList<>();
+          for (GameBetRecord gameBetRecord : resultList) {
+            if (StrUtil.isBlank(gameBetRecord.getAccount())) {
               continue;
             }
-            agentInfoVoMap.put(gameBetRecord.getAccount(), queryInfo);
-            gameBetRecord.setParentName(queryInfo.getParentName());
-            gameBetRecord.setSuperPath(queryInfo.getAgentPath());
-          } else {
-            gameBetRecord.setParentName(agentInfoVo.getParentName());
-            gameBetRecord.setSuperPath(agentInfoVo.getAgentPath());
+            AgentInfoVo agentInfoVo = agentInfoVoMap.get(gameBetRecord.getAccount());
+            if (BeanUtil.isEmpty(agentInfoVo)) {
+              AgentInfoVo queryInfo = memberMapper.queryAgentInfo(gameBetRecord.getAccount());
+              if (BeanUtil.isEmpty(queryInfo)) {
+                continue;
+              }
+              agentInfoVoMap.put(gameBetRecord.getAccount(), queryInfo);
+              gameBetRecord.setParentName(queryInfo.getParentName());
+              gameBetRecord.setSuperPath(queryInfo.getAgentPath());
+            } else {
+              gameBetRecord.setParentName(agentInfoVo.getParentName());
+              gameBetRecord.setSuperPath(agentInfoVo.getAgentPath());
+            }
+
+            BetRecord betRecord = new BetRecord();
+            BeanUtil.copyProperties(gameBetRecord, betRecord);
+            listRecord.add(betRecord);
           }
 
-          BetRecord betRecord = new BetRecord();
-          BeanUtil.copyProperties(gameBetRecord, betRecord);
-          listRecord.add(betRecord);
+          if (CollectionUtil.isNotEmpty(listRecord)) {
+            elasticsearchTemplate.save(
+                listRecord, IndexCoordinates.of(ContextConstant.ES_INDEX.BET_RECORD_ + tenantCode));
+          }
         }
-
-        if (CollectionUtil.isNotEmpty(listRecord)) {
-          elasticsearchTemplate.save(
-              listRecord, IndexCoordinates.of(ContextConstant.ES_INDEX.BET_RECORD_ + tenantCode));
-        }
-      }
+      } while (CollectionUtil.isNotEmpty(resultList));
     } catch (Exception e) {
       log.info("转移代理更新注单代理路径失败{}", e);
       return;
-    }
-
-    if (CollectionUtil.isNotEmpty(resultList)) {
-      this.transferEsBetRecord(originSuperPath);
     }
   }
 }

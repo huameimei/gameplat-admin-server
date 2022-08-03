@@ -170,19 +170,8 @@ public class RechargeOrderController {
     if (CollUtil.isEmpty(ids)) {
       throw new ServiceException("ids不能为空");
     }
-
-    String lockKey = "member_rw_single";
-    distributedLocker.lock(lockKey);
-
-    try {
-      for (Long id : ids) {
-        rechargeOrderService.accept(id, null, true);
-      }
-    } catch (Exception e) {
-      log.error(e.getMessage(), e);
-      throw e;
-    } finally {
-      distributedLocker.unlock(lockKey);
+    for (Long id : ids) {
+      rechargeOrderService.accept(id, null, true);
     }
   }
 

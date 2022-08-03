@@ -608,7 +608,8 @@ public class SalaryPeriodsServiceImpl extends ServiceImpl<SalaryPeriodsMapper, S
         }
 
         // 计算工资
-        BigDecimal finalSalaryAmount;
+        BigDecimal finalSalaryAmount = BigDecimal.ZERO;
+        log.info("工资结算日志：{},{},{}", salaryType, salaryAmount, totalValidAmount);
         if (salaryType == 1) { // 百分比 --- 有效投注 * 百分比
           finalSalaryAmount =
               salaryAmount
@@ -617,6 +618,7 @@ public class SalaryPeriodsServiceImpl extends ServiceImpl<SalaryPeriodsMapper, S
         } else { // 定额
           finalSalaryAmount = salaryAmount;
         }
+        log.info("工资结算日志计算工资：{},{}", finalSalaryAmount, salaryAmountLimit);
 
         // 是否超过了 工资上限
         if (salaryAmountLimit.compareTo(BigDecimal.ZERO) > 0) {
@@ -626,6 +628,7 @@ public class SalaryPeriodsServiceImpl extends ServiceImpl<SalaryPeriodsMapper, S
                   : finalSalaryAmount;
         }
         saveObj.setSalaryAmount(finalSalaryAmount); // 工资接内
+        log.info("工资结算日志计算工资2：{}", finalSalaryAmount);
 
         saveObj.setReachStatus(
             isReach
@@ -633,6 +636,7 @@ public class SalaryPeriodsServiceImpl extends ServiceImpl<SalaryPeriodsMapper, S
                 : DivideStatusEnum.SALARY_REACH_STATUS_UNREACH.getValue());
         saveObj.setGrantStatus(DivideStatusEnum.SALARY_GRANT_STATUS_UNGRANT.getValue());
         SalaryGrant grantSaveObj = salaryGrantConvert.toEntity(saveObj);
+        log.info("工资结算日志计算工资3：{}", grantSaveObj.getSalaryAmount());
         // 添加工资派发统计
         int grantSaveCount = salaryGrantMapper.insert(grantSaveObj);
       }

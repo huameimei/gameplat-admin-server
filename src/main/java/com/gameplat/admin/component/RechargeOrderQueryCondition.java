@@ -1,15 +1,17 @@
 package com.gameplat.admin.component;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.gameplat.admin.model.dto.RechargeOrderHistoryQueryDTO;
 import com.gameplat.admin.model.dto.RechargeOrderQueryDTO;
+import com.gameplat.base.common.util.StringUtils;
 import com.gameplat.common.enums.MemberEnums;
 import com.gameplat.model.entity.recharge.RechargeOrder;
 import com.gameplat.model.entity.recharge.RechargeOrderHistory;
 import org.springframework.stereotype.Component;
+
+import java.util.Arrays;
 
 /**
  * @description:
@@ -114,7 +116,7 @@ public class RechargeOrderQueryCondition {
         dto.getEndDatetime());
     }
     if (ObjectUtils.isNotEmpty(dto.getAccounts())) {
-      query.in("r.account", (Object) dto.getAccounts().split(","));
+      query.in("r.account", Arrays.asList(StringUtils.split(dto.getAccounts(), ",")));
     }
     if (dto.isSuperPathLike()) {
       query.like(

@@ -114,7 +114,7 @@ public class RechargeOrderQueryCondition {
         dto.getEndDatetime());
     }
     if (ObjectUtils.isNotEmpty(dto.getAccounts())) {
-      query.in("r.account", (Object) dto.getAccounts().split(","));
+      query.in("r.account", dto.getAccounts().split(","));
     }
     if (dto.isSuperPathLike()) {
       query.like(

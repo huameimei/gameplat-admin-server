@@ -36,7 +36,6 @@ import com.gameplat.model.entity.member.Member;
 import com.gameplat.model.entity.member.MemberBill;
 import com.gameplat.model.entity.member.MemberInfo;
 import com.gameplat.model.entity.message.Message;
-import com.gameplat.model.entity.message.MessageDistribute;
 import com.gameplat.model.entity.proxy.SalaryConfig;
 import com.gameplat.model.entity.proxy.SalaryGrant;
 import com.gameplat.model.entity.proxy.SalaryPeriods;
@@ -52,7 +51,6 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.text.MessageFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -609,17 +607,12 @@ public class SalaryPeriodsServiceImpl extends ServiceImpl<SalaryPeriodsMapper, S
 
         // 计算工资
         BigDecimal finalSalaryAmount = BigDecimal.ZERO;
-        log.info("工资结算日志：{},{},{}", salaryType, salaryAmount, totalValidAmount);
         if (salaryType == 1) { // 百分比 --- 有效投注 * 百分比
           finalSalaryAmount =
-              salaryAmount
-                  .divide(new BigDecimal("100"), RoundingMode.HALF_EVEN)
-                  .multiply(totalValidAmount);
+              salaryAmount.divide(new BigDecimal("100")).setScale(4).multiply(totalValidAmount);
         } else { // 定额
           finalSalaryAmount = salaryAmount;
         }
-        log.info("工资结算日志计算工资：{},{}", finalSalaryAmount, salaryAmountLimit);
-
         // 是否超过了 工资上限
         if (salaryAmountLimit.compareTo(BigDecimal.ZERO) > 0) {
           finalSalaryAmount =
@@ -628,7 +621,6 @@ public class SalaryPeriodsServiceImpl extends ServiceImpl<SalaryPeriodsMapper, S
                   : finalSalaryAmount;
         }
         saveObj.setSalaryAmount(finalSalaryAmount); // 工资接内
-        log.info("工资结算日志计算工资2：{}", finalSalaryAmount);
 
         saveObj.setReachStatus(
             isReach
@@ -636,7 +628,6 @@ public class SalaryPeriodsServiceImpl extends ServiceImpl<SalaryPeriodsMapper, S
                 : DivideStatusEnum.SALARY_REACH_STATUS_UNREACH.getValue());
         saveObj.setGrantStatus(DivideStatusEnum.SALARY_GRANT_STATUS_UNGRANT.getValue());
         SalaryGrant grantSaveObj = salaryGrantConvert.toEntity(saveObj);
-        log.info("工资结算日志计算工资3：{}", grantSaveObj.getSalaryAmount());
         // 添加工资派发统计
         int grantSaveCount = salaryGrantMapper.insert(grantSaveObj);
       }

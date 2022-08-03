@@ -64,4 +64,7 @@ public class ActivityRedPacketConfigDTO implements Serializable {
 
   @Schema(description = "红包雨默认图片")
   private String pic;
+
+  @Schema(description = "是否允许代理参加")
+  private Integer isAllowProxyJoin;
 }

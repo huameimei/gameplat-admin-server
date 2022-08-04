@@ -111,4 +111,7 @@ public class PayAccountVO implements Serializable {
   @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
   @JsonSerialize(using = Date2LongSerializerUtils.class)
   private Date updateTime;
+
+  /** 存款银行卡显示开关  1-是 0-否*/
+  private Integer bankAccountSwitch;
 }

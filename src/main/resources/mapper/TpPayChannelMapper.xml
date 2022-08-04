@@ -23,6 +23,7 @@
         <result property="createTime" column="create_time"/>
         <result property="updateBy" column="update_by"/>
         <result property="updateTime" column="update_time"/>
+        <result property="bankAccountSwitch" column="bank_account_switch"/>
     </resultMap>
 
     <resultMap type="com.gameplat.admin.model.vo.TpPayChannelVO" id="TpPayChannelVOMap" extends="TpPayChannelMap">
@@ -62,7 +63,7 @@
         c.pay_channel_tip,t.pay_type AS payType, t.name AS tpPayTypeName,
         i.id AS tpInterfaceId, m.name AS tpMerchantName,c.id,c.merchant_id,
         p.name AS payTypeName,i.name AS interfaceName,c.tp_pay_type,c.type_subscript,
-        c.update_by,c.update_time,c.url
+        c.update_by,c.update_time,c.url,c.bank_account_switch
         FROM tp_pay_channel c
         LEFT JOIN tp_merchant m ON m.id = c.merchant_id
         LEFT JOIN tp_interface i ON i.code = m.tp_interface_code

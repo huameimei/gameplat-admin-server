@@ -510,7 +510,7 @@ public class ActivityQualificationServiceImpl
 
       //判断红包雨活动ID是否有配置
       ActivityRedPacketConfigVO config = activityRedPacketService.getConfig();
-
+      Integer isAllowProxyJoin = config.getIsAllowProxyJoin() != null ? config.getIsAllowProxyJoin(): 0;
       if (config == null) {
         log.info("红包雨配置信息为空,需要在后台配置");
       } else {
@@ -528,7 +528,7 @@ public class ActivityQualificationServiceImpl
           } else {
             //检查活动是否ok
             if (checkDoRedEnvelope(activityLobby)) {
-              List<Map<String, Object>> rechargeOrderList = getRechargeOrder();
+              List<Map<String, Object>> rechargeOrderList = getRechargeOrder(isAllowProxyJoin);
 
               if (CollectionUtils.isEmpty(rechargeOrderList)) {
                 log.info("没有满足条件的充值记录");
@@ -695,6 +695,8 @@ public class ActivityQualificationServiceImpl
     if (money == null || money.compareTo(BigDecimal.ZERO) == 0 || money.compareTo(BigDecimal.ZERO) == -1) {
       return null;
     }
+    //根据目标值倒序排列
+    lobbyDiscountList.sort(Comparator.comparingLong(ActivityLobbyDiscountVO::getTargetValue).reversed());
     for (int i = 0; i < lobbyDiscountList.size(); i++) {
       ActivityLobbyDiscountVO temp = lobbyDiscountList.get(i);
       //targetValue: 充值金额
@@ -703,12 +705,7 @@ public class ActivityQualificationServiceImpl
       if (money.compareTo(targetValue) == 0 || money.compareTo(targetValue) == 1) {
         return temp;
       }
-      //如果充值金额第一条都不满足则返回第一条的抽奖次数
-      if (i == 0 && money.compareTo(targetValue) == 1) {
-        return temp;
-      }
     }
-
     return null;
   }
 
@@ -721,10 +718,10 @@ public class ActivityQualificationServiceImpl
    * 5.时间以审核时间为准
    * @return
    */
-  private List<Map<String, Object>> getRechargeOrder() {
+  private List<Map<String, Object>> getRechargeOrder(Integer isAllowProxyJoin) {
     QueryWrapper<RechargeOrderHistory> rechargeOrderHistoryQueryWrapper = new QueryWrapper<>();
     rechargeOrderHistoryQueryWrapper.select("IFNULL(sum(amount),0) as dayTotalAmount,member_id as memberId,account,member_level as memberLevel")
-            .eq("member_type", MemberEnums.Type.MEMBER.value())
+            .and(wrapper -> wrapper.eq("member_type", MemberEnums.Type.MEMBER.value()).or().eq(isAllowProxyJoin == 1,"member_type", MemberEnums.Type.AGENT.value()))
             .eq("status", RechargeStatus.SUCCESS.getValue())
             .eq("point_flag", 1)
             .between("audit_time",

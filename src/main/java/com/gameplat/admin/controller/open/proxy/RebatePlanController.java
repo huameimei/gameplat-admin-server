@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.core.toolkit.Assert;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.gameplat.admin.model.vo.RebatePlanVO;
 import com.gameplat.admin.service.RebatePlanService;
+import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.common.constant.ServiceName;
 import com.gameplat.log.annotation.Log;
 import com.gameplat.log.enums.LogType;
@@ -67,6 +68,15 @@ public class RebatePlanController {
     log.info("新增平级分红方案：rebatePlanPO={}", rebatePlanPO);
     UserCredential userCredential = SecurityUserHolder.getCredential();
     rebatePlanPO.setCreateBy(userCredential.getUsername());
+
+    Long count =
+        rebatePlanService
+            .lambdaQuery()
+            .eq(RebatePlan::getPlanName, rebatePlanPO.getPlanName())
+            .count();
+    if (count > 0) {
+      throw new ServiceException("方案名称重复！");
+    }
     rebatePlanService.addRebatePlan(rebatePlanPO);
   }
 

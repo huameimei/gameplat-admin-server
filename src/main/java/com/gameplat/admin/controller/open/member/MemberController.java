@@ -318,10 +318,7 @@ public class MemberController {
   @Operation(summary = "会员转成代理")
   @PostMapping("/changeToAgent")
   @PreAuthorize("hasAuthority('member:changeToAgent')")
-  @Log(
-      module = ServiceName.ADMIN_SERVICE,
-      type = LogType.MEMBER,
-      desc = "'会员' + #{dto.id} + '转变成代理'")
+  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.MEMBER, desc = "'会员转变成代理'")
   public void changeToAgent(@RequestBody MemberTransformDTO dto) {
     memberTransferAgentService.changeToAgent(dto.getId());
   }

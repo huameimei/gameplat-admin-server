@@ -69,6 +69,9 @@ public class TpPayChannelAddDTO implements Serializable {
    */
   private String url;
 
+  /** 存款银行卡显示开关  1-是 0-否*/
+  private Integer bankAccountSwitch;
+
   @Override
   public String toString() {
     return JSON.toJSONString(this);

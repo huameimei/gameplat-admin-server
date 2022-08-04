@@ -12,6 +12,8 @@ import com.gameplat.admin.model.vo.GameKindVO;
 import com.gameplat.admin.service.*;
 import com.gameplat.base.common.enums.EnableEnum;
 import com.gameplat.base.common.exception.ServiceException;
+import com.gameplat.base.common.util.DateUtil;
+import com.gameplat.base.common.util.DateUtils;
 import com.gameplat.base.common.util.StringUtils;
 import com.gameplat.common.enums.ActivityInfoEnum;
 import com.gameplat.common.enums.DictTypeEnum;
@@ -29,7 +31,9 @@ import org.springframework.util.Assert;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -92,8 +96,14 @@ public class ActivityLobbyController {
         throw new ServiceException("天数相关的活动类型不支持百分比计算");
       }
     }
+
+    if(DateUtil.daysBetween(dto.getStartTime(), dto.getEndTime()) > 1825){
+      throw new ServiceException("活动有效期的开始时间和结束时间最大不能超过5年间隔");
+    }
     activityLobbyService.add(dto);
   }
+
+
 
   @Operation(summary = "修改活动大厅")
   @PostMapping("/update")
@@ -123,6 +133,10 @@ public class ActivityLobbyController {
               || dto.getStatisItem() == ActivityInfoEnum.StatisItem.CONSECUTIVE_GAME_DML_DAYS.getValue()) {
         throw new ServiceException("天数相关的活动类型不支持百分比计算");
       }
+    }
+
+    if(DateUtil.daysBetween(dto.getStartTime(), dto.getEndTime()) > 1825){
+      throw new ServiceException("活动有效期的开始时间和结束时间最大不能超过5年间隔");
     }
     activityLobbyService.update(dto);
   }

@@ -36,7 +36,6 @@ import com.gameplat.model.entity.member.Member;
 import com.gameplat.model.entity.member.MemberBill;
 import com.gameplat.model.entity.member.MemberInfo;
 import com.gameplat.model.entity.message.Message;
-import com.gameplat.model.entity.message.MessageDistribute;
 import com.gameplat.model.entity.proxy.SalaryConfig;
 import com.gameplat.model.entity.proxy.SalaryGrant;
 import com.gameplat.model.entity.proxy.SalaryPeriods;
@@ -52,7 +51,6 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.text.MessageFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -608,16 +606,13 @@ public class SalaryPeriodsServiceImpl extends ServiceImpl<SalaryPeriodsMapper, S
         }
 
         // 计算工资
-        BigDecimal finalSalaryAmount;
+        BigDecimal finalSalaryAmount = BigDecimal.ZERO;
         if (salaryType == 1) { // 百分比 --- 有效投注 * 百分比
           finalSalaryAmount =
-              salaryAmount
-                  .divide(new BigDecimal("100"), RoundingMode.HALF_EVEN)
-                  .multiply(totalValidAmount);
+              salaryAmount.divide(new BigDecimal("100")).setScale(4).multiply(totalValidAmount);
         } else { // 定额
           finalSalaryAmount = salaryAmount;
         }
-
         // 是否超过了 工资上限
         if (salaryAmountLimit.compareTo(BigDecimal.ZERO) > 0) {
           finalSalaryAmount =

@@ -636,7 +636,7 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
         list.addAll(memberRechVip);
       }
     }
-    if (ObjectUtil.isNotEmpty(vipGrade)) {
+    if (ObjectUtil.isNotEmpty(level)) {
       List<RechargeMemberFileBean> memberRechLevel = memberMapper.findMemberRechLevel(level);
       if (ObjectUtil.isNotEmpty(memberRechLevel)) {
         list.addAll(memberRechLevel);

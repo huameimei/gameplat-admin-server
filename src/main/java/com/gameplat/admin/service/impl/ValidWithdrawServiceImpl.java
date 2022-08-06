@@ -18,10 +18,8 @@ import com.gameplat.admin.model.bean.GameBetRecordSearchBuilder;
 import com.gameplat.admin.model.dto.GameVaildBetRecordQueryDTO;
 import com.gameplat.admin.model.dto.ValidWithdrawDto;
 import com.gameplat.admin.model.dto.ValidWithdrawOperateDto;
-import com.gameplat.admin.model.vo.GameBetValidRecordVo;
-import com.gameplat.admin.model.vo.ValidAccoutWithdrawVo;
-import com.gameplat.admin.model.vo.ValidWithdrawVO;
-import com.gameplat.admin.model.vo.ValidateDmlBeanVo;
+import com.gameplat.admin.model.vo.*;
+import com.gameplat.admin.service.MemberService;
 import com.gameplat.admin.service.SysUserAuthService;
 import com.gameplat.admin.service.SysUserService;
 import com.gameplat.admin.service.ValidWithdrawService;
@@ -70,6 +68,8 @@ public class ValidWithdrawServiceImpl extends ServiceImpl<ValidWithdrawMapper, V
 
   @Resource
   private SysUserService sysUserService;
+
+  @Autowired private MemberService memberService;
 
   @Override
   public void addRechargeOrder(RechargeOrder rechargeOrder) {
@@ -160,11 +160,11 @@ public class ValidWithdrawServiceImpl extends ServiceImpl<ValidWithdrawMapper, V
   @Override
   public void operateValidWithdraw(ValidWithdrawOperateDto dto) {
 
-    SysUser sysUser = sysUserService.getByUsername(dto.getUsername());
-    if (ObjectUtils.isEmpty(sysUser)) {
+    MemberInfoVO memberInfo = memberService.getMemberInfo(dto.getUsername());
+    if (ObjectUtils.isEmpty(memberInfo)) {
       throw new ServiceException("会员名不存在！");
     }
-    dto.setUserId(sysUser.getUserId());
+    dto.setUserId(memberInfo.getId());
     // 获取会员现有有效打码量记录
     List<ValidWithdraw> validWithdraws =
       this.queryByMemberIdAndAddTimeLessThanOrEqualToAndStatus(dto.getUsername(), 0);

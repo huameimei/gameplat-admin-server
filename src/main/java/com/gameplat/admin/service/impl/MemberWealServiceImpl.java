@@ -654,6 +654,10 @@ public class MemberWealServiceImpl extends ServiceImpl<MemberWealMapper, MemberW
       bizBlackTypes = BlacklistConstant.BizBlacklistType.LEVEL_WAGE_WEEK.getValue();
     } else if (wealType == 2) {
       bizBlackTypes = BlacklistConstant.BizBlacklistType.LEVEL_WAGE_MONTH.getValue();
+    } else if (wealType == 3) {
+      bizBlackTypes = BlacklistConstant.BizBlacklistType.LEVEL_BIRTH.getValue();
+    } else if (wealType == 4) {
+      bizBlackTypes = BlacklistConstant.BizBlacklistType.LEVEL_RED_ENV.getValue();
     }
     if (StrUtil.isNotBlank(bizBlackTypes)) {
       queryBizWrapper.like("types", bizBlackTypes);

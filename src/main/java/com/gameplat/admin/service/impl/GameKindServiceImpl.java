@@ -77,6 +77,11 @@ public class GameKindServiceImpl extends ServiceImpl<GameKindMapper, GameKind>
     }
     new Thread(() -> {
       GameKind gameDB = this.getById(operGameKindDTO.getId());
+      //当租户的游戏状态为维护时，要避免出现维护起止时间为空的情况
+      if (gameDB.getEnable() == 0) {
+        gameDB.setMaintenanceTimeStart(gameDB.getMaintenanceTimeStart() == null ? new Date() : gameDB.getMaintenanceTimeStart());
+        gameDB.setMaintenanceTimeEnd(gameDB.getMaintenanceTimeEnd() == null ? new Date() : gameDB.getMaintenanceTimeEnd());
+      }
       this.processNativeSportMaintain(gameDB, sysTheme.getTenantCode());
     }).start();
   }

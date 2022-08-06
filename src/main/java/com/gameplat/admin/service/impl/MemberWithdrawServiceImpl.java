@@ -784,20 +784,6 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
     messageInfo.setCreateTime(new Date());
     messageMapper.insert(messageInfo);
 
-//    MessageDistribute messageDistribute = new MessageDistribute();
-//    messageDistribute.setMessageId(messageInfo.getId());
-//    messageDistribute.setUserId(memberWithdraw.getMemberId());
-//    messageDistribute.setUserAccount(messageInfo.getLinkAccount());
-//    messageDistribute.setRechargeLevel(Convert.toInt(memberWithdraw.getMemberLevel()));
-//    messageDistribute.setVipLevel(
-//        memberInfoService
-//            .lambdaQuery()
-//            .eq(MemberInfo::getMemberId, memberWithdraw.getMemberId())
-//            .one()
-//            .getVipLevel());
-//    messageDistribute.setReadStatus(NumberConstant.ZERO);
-//    messageDistribute.setCreateBy("system");
-//    messageDistributeService.save(messageDistribute);
   }
 
   private void sendMessage(String account, String channel, String message) {
@@ -820,7 +806,7 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
     if (ObjectUtil.equals(3, state)) {
       context = "您于" + dateStr + "提现的" + money.setScale(2, RoundingMode.CEILING) + "已提现成功。";
     } else {
-      context = "您于" + date + "提现的" + money.setScale(2, RoundingMode.CEILING) + "已失败。";
+      context = "您于" + dateStr + "提现的" + money.setScale(2, RoundingMode.CEILING) + "已失败。";
     }
     return context;
   }

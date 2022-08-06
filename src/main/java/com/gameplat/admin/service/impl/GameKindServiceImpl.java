@@ -76,12 +76,13 @@ public class GameKindServiceImpl extends ServiceImpl<GameKindMapper, GameKind>
       throw new ServiceException("更新游戏分类信息失败!");
     }
     new Thread(() -> {
+      GameKind gameDB = this.getById(gameKind.getId());
       //当租户的游戏状态为维护时，要避免出现维护起止时间为空的情况
-      if (gameKind.getEnable() == 0) {
-        gameKind.setMaintenanceTimeStart(gameKind.getMaintenanceTimeStart() == null ? new Date() : gameKind.getMaintenanceTimeStart());
-        gameKind.setMaintenanceTimeEnd(gameKind.getMaintenanceTimeEnd() == null ? new Date() : gameKind.getMaintenanceTimeEnd());
+      if (gameDB.getEnable() == 0) {
+        gameDB.setMaintenanceTimeStart(gameDB.getMaintenanceTimeStart() == null ? new Date() : gameDB.getMaintenanceTimeStart());
+        gameDB.setMaintenanceTimeEnd(gameDB.getMaintenanceTimeEnd() == null ? new Date() : gameDB.getMaintenanceTimeEnd());
       }
-      this.processNativeSportMaintain(gameKind, sysTheme.getTenantCode());
+      this.processNativeSportMaintain(gameDB, sysTheme.getTenantCode());
     }).start();
   }
 

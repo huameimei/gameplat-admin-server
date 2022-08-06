@@ -76,6 +76,11 @@ public class GameKindServiceImpl extends ServiceImpl<GameKindMapper, GameKind>
       throw new ServiceException("更新游戏分类信息失败!");
     }
     new Thread(() -> {
+      try {
+        Thread.sleep(200);
+      } catch (InterruptedException e) {
+        e.printStackTrace();
+      }
       GameKind gameDB = this.getById(gameKind.getId());
       //当租户的游戏状态为维护时，要避免出现维护起止时间为空的情况
       if (gameDB.getEnable() == 0) {

@@ -40,10 +40,6 @@ public class MemberRwReportServiceImpl extends ServiceImpl<MemberRwReportMapper,
     BigDecimal amount = rechargeOrder.getPayAmount();
     if (rechargeOrder.getPointFlag() == TrueFalse.TRUE.getValue()
         && BigDecimal.ZERO.compareTo(amount) < 0) {
-      if (null != rechargeOrder.getCurrencyCount()) {
-        report.setVirtualRechargeMoney(amount);
-        report.setVirtualRechargeNumber(rechargeOrder.getCurrencyCount());
-      }
       // 计算积分且充值金额大于 0 累加充值次数
       if (rechargeOrder.getMode() == RechargeMode.TRANSFER.getValue()) {
         report.setBankCount(report.getBankCount() + 1);

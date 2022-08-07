@@ -29,6 +29,7 @@ import com.gameplat.common.util.OssFileHandler;
 import com.gameplat.common.util.OssUtil;
 import com.gameplat.model.entity.game.GameKind;
 import com.google.common.collect.Lists;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -39,6 +40,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)
 public class GameKindServiceImpl extends ServiceImpl<GameKindMapper, GameKind>
@@ -82,6 +84,10 @@ public class GameKindServiceImpl extends ServiceImpl<GameKindMapper, GameKind>
         e.printStackTrace();
       }
       GameKind gameDB = this.getById(gameKind.getId());
+      gameDB.setTemplateEnable(gameDB.getTemplateEnable()!=null ? gameDB.getTemplateEnable() : 1);
+      gameDB.setEnable(operGameKindDTO.getEnable() != null ? operGameKindDTO.getEnable() : 1);
+      gameDB.setMaintenanceTimeStart(operGameKindDTO.getMaintenanceTimeStart());
+      gameDB.setMaintenanceTimeEnd(operGameKindDTO.getMaintenanceTimeEnd());
       //当租户的游戏状态为维护时，要避免出现维护起止时间为空的情况
       if (gameDB.getEnable() == 0) {
         gameDB.setMaintenanceTimeStart(gameDB.getMaintenanceTimeStart() == null ? new Date() : gameDB.getMaintenanceTimeStart());
@@ -170,6 +176,7 @@ public class GameKindServiceImpl extends ServiceImpl<GameKindMapper, GameKind>
 
         String fileName = String.format("%s.json", Encryption.encrypByMD5(tenant));
         String maintainUrl = String.format("%s/maintain/%s", ossProperty.getForeignUrl(), fileName);
+        log.info("------------------------------{}", maintainUrl);
         if (OssUtil.isExist(maintainUrl)) {
           MaintainVO maintain = OssUtil.readOssFile(maintainUrl);
           MaintainSportVO sport = new MaintainSportVO();

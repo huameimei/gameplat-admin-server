@@ -65,10 +65,6 @@ public class WithdrawQueryCondition {
         "w.cash_money",
         dto.getCashMoneyFromTo())
       .eq(
-        ObjectUtils.isNotEmpty(dto.getMemberType()),
-        "w.member_type",
-        dto.getMemberType())
-      .eq(
         ObjectUtils.isNotEmpty(dto.getCashOrderNo()),
         "w.cash_order_no",
         dto.getCashOrderNo())
@@ -158,7 +154,7 @@ public class WithdrawQueryCondition {
       .in(
         ObjectUtils.isNotEmpty(dto.getMemberType())
           && dto.getMemberType().equalsIgnoreCase(WITH_FORMAL_TYPE),
-        "w.cash_money",
+              "w.member_type",
         RECH_FORMAL_TYPE_QUERY.split(","))
       .eq(
         ObjectUtils.isNotEmpty(dto.getMemberType())

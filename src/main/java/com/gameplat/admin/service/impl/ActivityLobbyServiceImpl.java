@@ -29,6 +29,7 @@ import com.gameplat.model.entity.activity.ActivityDistribute;
 import com.gameplat.model.entity.activity.ActivityLobby;
 import com.gameplat.model.entity.activity.ActivityLobbyDiscount;
 import com.gameplat.model.entity.activity.ActivityQualification;
+import com.gameplat.security.SecurityUserHolder;
 import com.google.common.collect.Lists;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -264,13 +265,15 @@ public class ActivityLobbyServiceImpl extends ServiceImpl<ActivityLobbyMapper, A
     if (activityLobbyOrigin == null) {
       throw new ServiceException("该活动大厅不存在！");
     }
-    // 判断活动是否已上线
-    if (activityLobbyOrigin.getStatus() == BooleanEnum.YES.value()
+    // 判断活动是否已上线(只允许dev001修改活动)
+    if (!SecurityUserHolder.getUsername().equals("dev001")) {
+      if (activityLobbyOrigin.getStatus() == BooleanEnum.YES.value()
         || activityLobbyOrigin.getStatus() == BooleanEnum.NO.value()) {
-      boolean b = DateUtils.compareCurrentDate(activityLobbyOrigin.getStartTime());
-      boolean endTime = DateUtils.compareCurrentDate(activityLobbyOrigin.getEndTime());
-      if (!b && endTime) {
-        throw new ServiceException("活动进行中，不可修改！");
+        boolean b = DateUtils.compareCurrentDate(activityLobbyOrigin.getStartTime());
+        boolean endTime = DateUtils.compareCurrentDate(activityLobbyOrigin.getEndTime());
+        if (!b && endTime) {
+          throw new ServiceException("活动进行中，不可修改！");
+        }
       }
     }
 

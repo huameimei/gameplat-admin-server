@@ -243,6 +243,13 @@
             </activation>
         </profile>
         <profile>
+            <id>local-sit</id>
+            <properties>
+                <profiles.active>local-sit</profiles.active>
+                <profiles.revision>4.1.0-SNAPSHOT</profiles.revision>
+            </properties>
+        </profile>
+        <profile>
             <id>sit</id>
             <properties>
                 <profiles.active>sit</profiles.active>

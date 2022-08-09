@@ -48,6 +48,10 @@ public class BlacklistConstant {
 
     LEVEL_WAGE_MONTH("LEVEL_WAGE_MONTH", "月俸禄"),
 
+    LEVEL_BIRTH("LEVEL_BIRTH", "生日礼金"),
+
+    LEVEL_RED_ENV("LEVEL_RED_ENV", "每月红包"),
+
     RECHARGE_GROWTH("RECHARGE_GROWTH", "充值成长值"),
 
     LEVEL_UPGRADE_REWARD("LEVEL_UPGRADE_REWARD", "升级奖励"),

@@ -29,6 +29,7 @@ import com.gameplat.model.entity.activity.ActivityDistribute;
 import com.gameplat.model.entity.activity.ActivityLobby;
 import com.gameplat.model.entity.activity.ActivityLobbyDiscount;
 import com.gameplat.model.entity.activity.ActivityQualification;
+import com.gameplat.security.SecurityUserHolder;
 import com.google.common.collect.Lists;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,6 +57,8 @@ public class ActivityLobbyServiceImpl extends ServiceImpl<ActivityLobbyMapper, A
   @Lazy @Autowired private ActivityQualificationService activityQualificationService;
 
   @Autowired private ActivityDistributeService activityDistributeService;
+
+  private static final String superAdmin = "dev001";
 
   @Override
   public IPage<ActivityLobbyVO> findActivityLobbyList(
@@ -128,12 +131,12 @@ public class ActivityLobbyServiceImpl extends ServiceImpl<ActivityLobbyMapper, A
     }
 
     if (dto.getStatisDate()
-        == ActivityInfoEnum.StatisItem.CUMULATIVE_RECHARGE_AMOUNT.getValue()) { // 1 每日
+        == ActivityInfoEnum.StatisDate.DAILY.getValue()) { // 1 每日
       applyDateList.add("每天");
     }
     // 如果统计周期是每周，需要判断活动的结束时间是不是周日
     else if (dto.getStatisDate()
-        == ActivityInfoEnum.StatisItem.CUMULATIVE_RECHARGE_DAYS.getValue()) { // 2 每周
+        == ActivityInfoEnum.StatisDate.WEEKLY.getValue()) { // 2 每周
       if (DateUtils.getWeekNumOfDate(dto.getEndTime()) != 7) {
         throw new ServiceException("统计日期选择每周，活动的结束日期应该为某周的星期天");
       }
@@ -141,7 +144,7 @@ public class ActivityLobbyServiceImpl extends ServiceImpl<ActivityLobbyMapper, A
     }
     // 如果统计周期是每月，需要判断活动的结束时间是不是某月的最后一天
     else if (dto.getStatisDate()
-        == ActivityInfoEnum.StatisItem.CONTINUOUS_RECHARGE_DAYS.getValue()) { // 3 每月
+        == ActivityInfoEnum.StatisDate.PER_MONTH.getValue()) { // 3 每月
       if (!DateUtils.isSameDate(
           cn.hutool.core.date.DateUtil.endOfMonth(dto.getEndTime()), dto.getEndTime())) {
         throw new ServiceException("统计日期选择每月，活动的结束日期应该为某月的最后一天");
@@ -162,7 +165,7 @@ public class ActivityLobbyServiceImpl extends ServiceImpl<ActivityLobbyMapper, A
     }
     // 如果统计周期是每周X，需要判断活动的结束时间是不是每周X
     else if (dto.getStatisDate()
-        == ActivityInfoEnum.StatisItem.SINGLE_DAY_DEPOSIT_AMOUNT.getValue()) { // 4 每周X
+        == ActivityInfoEnum.StatisDate.SPECIFY_DAY_WEEK.getValue()) { // 4 每周X
       if ((DateTime.of(dto.getEndTime()).dayOfWeek() - 1) != dto.getDetailDate()) {
         throw new ServiceException(
             "统计日期选择"
@@ -174,7 +177,7 @@ public class ActivityLobbyServiceImpl extends ServiceImpl<ActivityLobbyMapper, A
     }
     // 如果统计周期是每月X，需要判断活动的结束时间是不是每月X
     else if (dto.getStatisDate()
-        == ActivityInfoEnum.StatisItem.FIRST_DEPOSIT_AMOUNT.getValue()) { // 5 每月X日
+        == ActivityInfoEnum.StatisDate.DAY_OF_THE_MONTH.getValue()) { // 5 每月X日
       if (Integer.parseInt(String.format("%td", dto.getEndTime())) != dto.getDetailDate()) {
         throw new ServiceException(
             "统计日期选择每月" + dto.getDetailDate() + "号" + ",活动的结束日期那天应该为" + dto.getDetailDate() + "号");
@@ -264,13 +267,15 @@ public class ActivityLobbyServiceImpl extends ServiceImpl<ActivityLobbyMapper, A
     if (activityLobbyOrigin == null) {
       throw new ServiceException("该活动大厅不存在！");
     }
-    // 判断活动是否已上线
-    if (activityLobbyOrigin.getStatus() == BooleanEnum.YES.value()
+    // 判断活动是否已上线(只允许dev001修改活动)
+    if (!superAdmin.equals(SecurityUserHolder.getUsername())) {
+      if (activityLobbyOrigin.getStatus() == BooleanEnum.YES.value()
         || activityLobbyOrigin.getStatus() == BooleanEnum.NO.value()) {
-      boolean b = DateUtils.compareCurrentDate(activityLobbyOrigin.getStartTime());
-      boolean endTime = DateUtils.compareCurrentDate(activityLobbyOrigin.getEndTime());
-      if (!b && endTime) {
-        throw new ServiceException("活动进行中，不可修改！");
+        boolean b = DateUtils.compareCurrentDate(activityLobbyOrigin.getStartTime());
+        boolean endTime = DateUtils.compareCurrentDate(activityLobbyOrigin.getEndTime());
+        if (!b && endTime) {
+          throw new ServiceException("活动进行中，不可修改！");
+        }
       }
     }
 
@@ -351,7 +356,7 @@ public class ActivityLobbyServiceImpl extends ServiceImpl<ActivityLobbyMapper, A
     }
     // 如果统计周期是每周X，需要判断活动的结束时间是不是每周X
     else if (dto.getStatisDate() == ActivityInfoEnum.StatisDate.SPECIFY_DAY_WEEK.getValue()) {
-      if (DateTime.of(dto.getEndTime()).dayOfWeek() == dto.getDetailDate()) {
+      if ((DateTime.of(dto.getEndTime()).dayOfWeek() - 1) == dto.getDetailDate()) {
         throw new ServiceException(
             "统计日期选择"
                 + ActivityInfoEnum.DetailDateEnum.getWeek(dto.getDetailDate())

@@ -13,6 +13,7 @@ import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.gameplat.admin.component.RechargeOrderQueryCondition;
 import com.gameplat.admin.constant.BuildInDiscountType;
 import com.gameplat.admin.constant.RechargeMode;
 import com.gameplat.admin.constant.TrueFalse;
@@ -32,6 +33,7 @@ import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.json.JsonUtils;
 import com.gameplat.base.common.snowflake.IdGeneratorSnowflake;
 import com.gameplat.base.common.util.DateUtil;
+import com.gameplat.common.constant.CachedKeys;
 import com.gameplat.common.constant.SocketEnum;
 import com.gameplat.common.enums.*;
 import com.gameplat.common.lang.Assert;
@@ -53,11 +55,13 @@ import com.gameplat.model.entity.recharge.RechargeOrderHistory;
 import com.gameplat.model.entity.spread.SpreadUnion;
 import com.gameplat.model.entity.sys.SysDictData;
 import com.gameplat.model.entity.sys.SysUser;
+import com.gameplat.redis.redisson.DistributedLocker;
 import com.gameplat.security.SecurityUserHolder;
 import com.gameplat.security.context.UserCredential;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.redisson.api.RLock;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -125,80 +129,22 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
 
   @Autowired private SysDictDataService sysDictDataService;
 
+  @Autowired private RechargeOrderQueryCondition rechargeCondition;
+
   @Autowired(required = false)
   private MessageFeignClient client;
+
+  @Autowired
+  private DistributedLocker distributedLocker;
 
   @Override
   public PageExt<RechargeOrderVO, SummaryVO> findPage(
       Page<RechargeOrder> page, RechargeOrderQueryDTO dto) {
-    LambdaQueryWrapper<RechargeOrder> query = Wrappers.lambdaQuery();
-    query
-        .in(ObjectUtils.isNotNull(dto.getModeList()), RechargeOrder::getMode, dto.getModeList())
-        .in(
-            ObjectUtils.isNotNull(dto.getStatusList()),
-            RechargeOrder::getStatus,
-            dto.getStatusList())
-        .eq(
-            ObjectUtils.isNotEmpty(dto.getPointFlag()),
-            RechargeOrder::getPointFlag,
-            dto.getPointFlag())
-        .in(
-            ObjectUtils.isNotNull(dto.getPayAccountList()),
-            RechargeOrder::getPayAccountAccount,
-            dto.getPayAccountList())
-        .eq(
-            ObjectUtils.isNotEmpty(dto.getTpMerchantId()),
-            RechargeOrder::getTpMerchantId,
-            dto.getTpMerchantId())
-        .ge(
-            ObjectUtils.isNotEmpty(dto.getAmountFrom()),
-            RechargeOrder::getAmount,
-            dto.getAmountFrom())
-        .le(ObjectUtils.isNotEmpty(dto.getAmountTo()), RechargeOrder::getAmount, dto.getAmountTo())
-        .eq(ObjectUtils.isNotEmpty(dto.getAccount()), RechargeOrder::getAccount, dto.getAccount())
-        .in(
-            ObjectUtils.isNotEmpty(dto.getMemberType())
-                && MemberEnums.Type.MEMBER.match(dto.getMemberType()),
-            RechargeOrder::getMemberType,
-            MemberEnums.Type.MEMBER.value(),
-                MemberEnums.Type.AGENT.value())
-        .eq(
-            ObjectUtils.isNotEmpty(dto.getMemberType())
-                && MemberEnums.Type.PROMOTION.match(dto.getMemberType()),
-            RechargeOrder::getMemberType,
-            dto.getMemberType())
-        .eq(ObjectUtils.isNotEmpty(dto.getOrderNo()), RechargeOrder::getOrderNo, dto.getOrderNo())
-        .eq(
-            ObjectUtils.isNotEmpty(dto.getSuperAccount()),
-            RechargeOrder::getSuperAccount,
-            dto.getSuperAccount())
-        .ge(
-            ObjectUtils.isNotEmpty(dto.getCreateTimeFrom()),
-            RechargeOrder::getCreateTime,
-            dto.getCreateTimeFrom())
-        .le(
-            ObjectUtils.isNotEmpty(dto.getCreateTimeTo()),
-            RechargeOrder::getCreateTime,
-            dto.getCreateTimeTo())
-        .in(
-            ObjectUtils.isNotNull(dto.getMemberLevelList()),
-            RechargeOrder::getMemberLevel,
-            dto.getMemberLevelList());
-    if (dto.isFullNameFuzzy()) {
-      query.like(
-          ObjectUtils.isNotEmpty(dto.getFullName()), RechargeOrder::getNickname, dto.getFullName());
-    } else {
-      query.eq(
-          ObjectUtils.isNotEmpty(dto.getFullName()), RechargeOrder::getNickname, dto.getFullName());
-    }
-    query.orderBy(
-        ObjectUtils.isNotEmpty(dto.getOrder()),
-        !ObjectUtils.isEmpty(dto.getOrder()) && dto.getOrder().equals("ASC"),
-        RechargeOrder::getCreateTime);
-    IPage<RechargeOrderVO> data = this.page(page, query).convert(rechargeOrderConvert::toVo);
+
+    IPage<RechargeOrderVO> data = rechargeOrderMapper.findPage(page, rechargeCondition.builderQueryWrapper(dto));
     // 统计受理充值订单总金额、未受理充值订单总金额
     SummaryVO summaryVO = amountSum(dto);
-    return new PageExt<RechargeOrderVO, SummaryVO>(data, summaryVO);
+    return new PageExt<>(data, summaryVO);
   }
 
   @Override
@@ -254,113 +200,120 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
   @Override
   public void accept(Long id, String auditRemarks, boolean flag) {
     RechargeOrder rechargeOrder = this.getById(id);
-    // 系统最高配置金额（充值金额  优惠金额）
-    if (!flag) {
-      String maxAmount = configService.getValue(MAX_RECHARGE_MONEY);
-      if (rechargeOrder.getAmount().compareTo(new BigDecimal(maxAmount)) > 0) {
-        throw new ServiceException("充值金额不能大于系统配置的最访问被拒绝，您没有权限访问该资源高金额：" + maxAmount);
-      }
+    String lock_key = String.format(CachedKeys.MEMBER_FINANCE, rechargeOrder.getAccount());
+    RLock lock = distributedLocker.lock(lock_key);
+    try {
 
-      String maxDiscount = configService.getValue(MAX_DISCOUNT_MONEY);
-      if (rechargeOrder.getDiscountAmount() != null) {
-        if (rechargeOrder.getDiscountAmount().compareTo(new BigDecimal(maxDiscount)) > 0) {
-          throw new ServiceException("充值优惠金额不能大于系统配置的最高金额：" + maxDiscount);
+      // 系统最高配置金额（充值金额  优惠金额）
+      if (!flag) {
+        String maxAmount = configService.getValue(MAX_RECHARGE_MONEY);
+        if (rechargeOrder.getAmount().compareTo(new BigDecimal(maxAmount)) > 0) {
+          throw new ServiceException("充值金额不能大于系统配置的最访问被拒绝，您没有权限访问该资源高金额：" + maxAmount);
+        }
+
+        String maxDiscount = configService.getValue(MAX_DISCOUNT_MONEY);
+        if (rechargeOrder.getDiscountAmount() != null) {
+          if (rechargeOrder.getDiscountAmount().compareTo(new BigDecimal(maxDiscount)) > 0) {
+            throw new ServiceException("充值优惠金额不能大于系统配置的最高金额：" + maxDiscount);
+          }
         }
       }
-    }
-    // 校验订单状态
-    verifyRechargeOrderForAuditing(rechargeOrder);
-    // 校验已处理订单是否允许其他账户操作
-    crossAccountCheck(rechargeOrder);
-    // 校验审核流程
-    if (flag) {
-      rechargeProcess(rechargeOrder);
-    }
-    // 校验会员账户状态
-    Member member = memberService.getById(rechargeOrder.getMemberId());
-    MemberInfo memberInfo = memberInfoService.getById(rechargeOrder.getMemberId());
-    verifyUser(member, memberInfo, rechargeOrder.getMode() == RechargeMode.TRANSFER.getValue());
+      // 校验订单状态
+      verifyRechargeOrderForAuditing(rechargeOrder);
+      // 校验已处理订单是否允许其他账户操作
+      crossAccountCheck(rechargeOrder);
+      // 校验审核流程
+      if (flag) {
+        rechargeProcess(rechargeOrder);
+      }
+      // 校验会员账户状态
+      Member member = memberService.getById(rechargeOrder.getMemberId());
+      MemberInfo memberInfo = memberInfoService.getById(rechargeOrder.getMemberId());
+      verifyUser(member, memberInfo, rechargeOrder.getMode() == RechargeMode.TRANSFER.getValue());
 
-    // 校验子账号当日存款审核额度
-    SysUser sysUser = sysUserService.getByUsername(SecurityUserHolder.getUsername());
-    AdminLimitInfo adminLimitInfo = JsonUtils.parse(sysUser.getLimitInfo(), AdminLimitInfo.class);
-    if (null != sysUser && StringUtils.equals(UserTypes.SUBUSER.value(), sysUser.getUserType())) {
-      checkZzhRechargeAmountAudit(
-          sysUser.getUserName(),
-          adminLimitInfo,
-          rechargeOrder.getMode(),
-          rechargeOrder.getTotalAmount());
-    }
+      // 校验子账号当日存款审核额度
+      SysUser sysUser = sysUserService.getByUsername(SecurityUserHolder.getUsername());
+      AdminLimitInfo adminLimitInfo = JsonUtils.parse(sysUser.getLimitInfo(), AdminLimitInfo.class);
+      if (null != sysUser && StringUtils.equals(UserTypes.SUBUSER.value(), sysUser.getUserType())) {
+        checkZzhRechargeAmountAudit(
+                sysUser.getUserName(),
+                adminLimitInfo,
+                rechargeOrder.getMode(),
+                rechargeOrder.getTotalAmount());
+      }
 
-    // 重新校验首充优惠
-    recalculateDiscountAmount(rechargeOrder, memberInfo.getTotalRechTimes() > 0);
+      // 重新校验首充优惠
+      recalculateDiscountAmount(rechargeOrder, memberInfo.getTotalRechTimes() > 0);
 
-    // 更新订单状态
-    rechargeOrder.setAuditorAccount(sysUser.getUserName());
-    rechargeOrder.setAuditTime(new Date());
-    if (null != auditRemarks) {
-      rechargeOrder.setAuditRemarks(auditRemarks);
-    }
-    rechargeOrder.setStatus(RechargeStatus.SUCCESS.getValue());
-    updateRechargeOrder(rechargeOrder);
-    // 更新充提报表
-    // 过滤 推广账号 充值
-    if (!UserTypes.PROMOTION.value().equals(member.getUserType())) {
-      memberRwReportService.addRecharge(member, memberInfo.getTotalRechTimes(), rechargeOrder);
-    }
+      // 更新订单状态
+      rechargeOrder.setAuditorAccount(sysUser.getUserName());
+      rechargeOrder.setAuditTime(new Date());
+      if (null != auditRemarks) {
+        rechargeOrder.setAuditRemarks(auditRemarks);
+      }
+      rechargeOrder.setStatus(RechargeStatus.SUCCESS.getValue());
+      updateRechargeOrder(rechargeOrder);
+      // 更新充提报表
+      // 过滤 推广账号 充值
+      if (!UserTypes.PROMOTION.value().equals(member.getUserType())) {
+        memberRwReportService.addRecharge(member, memberInfo.getTotalRechTimes(), rechargeOrder);
+      }
 
-    if (rechargeOrder.getDmlFlag() == TrueFalse.TRUE.getValue()) {
-      // 计算打码量
-      validWithdrawService.addRechargeOrder(rechargeOrder);
-    }
-    // 添加会员账变
-    addUserBill(rechargeOrder, member, memberInfo.getBalance(), sysUser.getUserName());
-    // 更新充值金额累积
-    updateRechargeMoney(rechargeOrder, member.getUserType());
+      if (rechargeOrder.getDmlFlag() == TrueFalse.TRUE.getValue()) {
+        // 计算打码量
+        validWithdrawService.addRechargeOrder(rechargeOrder);
+      }
+      // 添加会员账变
+      addUserBill(rechargeOrder, member, memberInfo.getBalance(), sysUser.getUserName());
+      // 更新充值金额累积
+      updateRechargeMoney(rechargeOrder, member.getUserType());
 
-    // 更新会员充值信息
-    memberInfoService.updateBalanceWithRecharge(
-            memberInfo.getMemberId(),
-            rechargeOrder.getPayAmount(),
-            rechargeOrder.getTotalAmount(),
-            rechargeOrder.getPointFlag());
-    // 判断充值是否计算积分
-    if (TrueFalse.TRUE.getValue() != rechargeOrder.getPointFlag()) {
-      log.info(
-          "充值不增加成长值 account={}，orderNo={},pointFlag={}",
-          rechargeOrder.getAccount(),
-          rechargeOrder.getOrderNo(),
-          rechargeOrder.getPointFlag());
-      return;
-    }
+      // 更新会员充值信息
+      memberInfoService.updateBalanceWithRecharge(
+              memberInfo.getMemberId(),
+              rechargeOrder.getPayAmount(),
+              rechargeOrder.getTotalAmount(),
+              rechargeOrder.getPointFlag());
+      // 判断充值是否计算积分
+      if (TrueFalse.TRUE.getValue() != rechargeOrder.getPointFlag()) {
+        log.info(
+                "充值不增加成长值 account={}，orderNo={},pointFlag={}",
+                rechargeOrder.getAccount(),
+                rechargeOrder.getOrderNo(),
+                rechargeOrder.getPointFlag());
+        return;
+      }
 
-    // 兑换成长值
-    MemberGrowthConfig memberGrowthConfig = memberGrowthConfigService.getOneConfig();
-    if (memberGrowthConfig.getIsEnableVip() == TrueFalse.FALSE.getValue()) {
-      log.info(
-          "会员充值兑换成长值失败-未开启VIP功能开关: account={}，orderNo={},pointFlag={}",
-          rechargeOrder.getAccount(),
-          rechargeOrder.getOrderNo(),
-          rechargeOrder.getPointFlag());
-      return;
-    }
-    if (memberGrowthConfig.getIsEnableRecharge() == TrueFalse.FALSE.getValue()) {
-      log.info(
-          "会员充值兑换成长值失败-未开启充值成长计算开关： account={}，orderNo={},pointFlag={}",
-          rechargeOrder.getAccount(),
-          rechargeOrder.getOrderNo(),
-          rechargeOrder.getPointFlag());
-      return;
-    }
-    MemberGrowthChangeDto memberGrowthChangeDto = new MemberGrowthChangeDto();
-    memberGrowthChangeDto.setUserId(rechargeOrder.getMemberId());
-    memberGrowthChangeDto.setUserName(rechargeOrder.getAccount());
-    memberGrowthChangeDto.setType(GrowthChangeEnum.recharge.getCode());
-    memberGrowthChangeDto.setChangeGrowth(
-        memberGrowthConfig.getRechageRate().multiply(rechargeOrder.getAmount()).longValue());
-    memberGrowthChangeDto.setRemark("人工充值成长值变动");
+      // 兑换成长值
+      MemberGrowthConfig memberGrowthConfig = memberGrowthConfigService.getOneConfig();
+      if (memberGrowthConfig.getIsEnableVip() == TrueFalse.FALSE.getValue()) {
+        log.info(
+                "会员充值兑换成长值失败-未开启VIP功能开关: account={}，orderNo={},pointFlag={}",
+                rechargeOrder.getAccount(),
+                rechargeOrder.getOrderNo(),
+                rechargeOrder.getPointFlag());
+        return;
+      }
+      if (memberGrowthConfig.getIsEnableRecharge() == TrueFalse.FALSE.getValue()) {
+        log.info(
+                "会员充值兑换成长值失败-未开启充值成长计算开关： account={}，orderNo={},pointFlag={}",
+                rechargeOrder.getAccount(),
+                rechargeOrder.getOrderNo(),
+                rechargeOrder.getPointFlag());
+        return;
+      }
+      MemberGrowthChangeDto memberGrowthChangeDto = new MemberGrowthChangeDto();
+      memberGrowthChangeDto.setUserId(rechargeOrder.getMemberId());
+      memberGrowthChangeDto.setUserName(rechargeOrder.getAccount());
+      memberGrowthChangeDto.setType(GrowthChangeEnum.recharge.getCode());
+      memberGrowthChangeDto.setChangeGrowth(
+              memberGrowthConfig.getRechageRate().multiply(rechargeOrder.getAmount()).longValue());
+      memberGrowthChangeDto.setRemark("人工充值成长值变动");
 
-    memberGrowthStatisService.changeGrowth(memberGrowthChangeDto);
+      memberGrowthStatisService.changeGrowth(memberGrowthChangeDto);
+    } finally {
+      distributedLocker.unlock(lock);
+    }
 
     // 入款成功 添加 消息  mode   在线 转账支付
     if (ObjectUtil.equals(RechargeMode.TRANSFER.getValue(), rechargeOrder.getMode())

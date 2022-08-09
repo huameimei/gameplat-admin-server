@@ -510,7 +510,7 @@ public class ActivityQualificationServiceImpl
 
       //判断红包雨活动ID是否有配置
       ActivityRedPacketConfigVO config = activityRedPacketService.getConfig();
-
+      Integer isAllowProxyJoin = config.getIsAllowProxyJoin() != null ? config.getIsAllowProxyJoin(): 0;
       if (config == null) {
         log.info("红包雨配置信息为空,需要在后台配置");
       } else {
@@ -528,7 +528,7 @@ public class ActivityQualificationServiceImpl
           } else {
             //检查活动是否ok
             if (checkDoRedEnvelope(activityLobby)) {
-              List<Map<String, Object>> rechargeOrderList = getRechargeOrder();
+              List<Map<String, Object>> rechargeOrderList = getRechargeOrder(isAllowProxyJoin);
 
               if (CollectionUtils.isEmpty(rechargeOrderList)) {
                 log.info("没有满足条件的充值记录");
@@ -718,10 +718,10 @@ public class ActivityQualificationServiceImpl
    * 5.时间以审核时间为准
    * @return
    */
-  private List<Map<String, Object>> getRechargeOrder() {
+  private List<Map<String, Object>> getRechargeOrder(Integer isAllowProxyJoin) {
     QueryWrapper<RechargeOrderHistory> rechargeOrderHistoryQueryWrapper = new QueryWrapper<>();
     rechargeOrderHistoryQueryWrapper.select("IFNULL(sum(amount),0) as dayTotalAmount,member_id as memberId,account,member_level as memberLevel")
-            .eq("member_type", MemberEnums.Type.MEMBER.value())
+            .and(wrapper -> wrapper.eq("member_type", MemberEnums.Type.MEMBER.value()).or().eq(isAllowProxyJoin == 1,"member_type", MemberEnums.Type.AGENT.value()))
             .eq("status", RechargeStatus.SUCCESS.getValue())
             .eq("point_flag", 1)
             .between("audit_time",

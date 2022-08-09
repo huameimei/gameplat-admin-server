@@ -71,7 +71,6 @@ public class VersionControlServiceImpl extends ServiceImpl<VersionControlMapper,
     update.set(
         ObjectUtils.isNotNull(dto.getUrlType()), VersionControl::getUrlType, dto.getUrlType());
     update.set(
-        ObjectUtils.isNotNull(dto.getIosEnterpriseSing()),
         VersionControl::getIosEnterpriseSing,
         dto.getIosEnterpriseSing());
     update.set(

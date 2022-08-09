@@ -43,3 +43,11 @@ spring:
         server-addr: ${NACOS_SERVER_ADDR:localhost}
         username: nacos
         password: t1KMNoXowYr2DK9L
+
+oss:
+  endPoint: "http://oss-cn-hongkong.aliyuncs.com"
+  accessKeyId: "LTAI5tSEoN1kJ5EqgaxX6dWF"
+  accessKeySecret: "gSR2V54bsqp6TmaCJqYC9YIVNTLakS"
+  bucketName: "gameplat-config-new"
+  foreignUrl: "https://gameplat-config-new.oss-cn-hongkong.aliyuncs.com"
+  proxyUrl: "https://maintain2.abcsport8.com"

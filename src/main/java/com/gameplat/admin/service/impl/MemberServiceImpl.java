@@ -748,6 +748,7 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
 
     UserCredential credential = SecurityUserHolder.getCredential();
     Collection<? extends GrantedAuthority> authorities = credential.getAuthorities();
+    log.info("权限列表={}", authorities);
     boolean flag = false;
     if (ObjectUtil.isEmpty(
             authorities.stream()
@@ -757,6 +758,7 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
                                             || UserTypes.ADMIN.value().equals(credential.getUserType()))
                     .collect(Collectors.toList()))) {
       flag = true;
+      log.info("flag1111={}", flag);
     }
 
     List<String> accounts = list.stream().map(MemberVO::getAccount).collect(Collectors.toList());
@@ -772,6 +774,7 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
                   authorities.stream()
                           .filter(ex -> ex.getAuthority().equals(ROLES))
                           .collect(Collectors.toList()))) {
+            log.info("flag2222={}", finalFlag);
             a.setRealName(hideRealName(a.getRealName()));
           }
           if (CollUtil.isEmpty(dayReports)) {

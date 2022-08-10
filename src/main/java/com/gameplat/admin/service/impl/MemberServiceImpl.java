@@ -749,13 +749,9 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
     UserCredential credential = SecurityUserHolder.getCredential();
     Collection<? extends GrantedAuthority> authorities = credential.getAuthorities();
     boolean flag = false;
-    if (ObjectUtil.isEmpty(
-            authorities.stream()
-                    .filter(
-                            ex ->
-                                    ex.getAuthority().equalsIgnoreCase(ROLES)
-                                            || UserTypes.ADMIN.value().equals(credential.getUserType()))
-                    .collect(Collectors.toList()))) {
+    // 无权限并且不为管理员
+    if (ObjectUtil.isEmpty(authorities.stream().filter(ex -> ex.getAuthority().equalsIgnoreCase(ROLES)).collect(Collectors.toList()))
+                                            && !UserTypes.ADMIN.value().equals(credential.getUserType())) {
       flag = true;
     }
 
@@ -765,13 +761,6 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
     list.forEach(
         a -> {
           if (finalFlag && ObjectUtil.isNotNull(a.getRealName())) {
-            a.setRealName(hideRealName(a.getRealName()));
-          }
-
-          if (ObjectUtil.isNull(
-                  authorities.stream()
-                          .filter(ex -> ex.getAuthority().equals(ROLES))
-                          .collect(Collectors.toList()))) {
             a.setRealName(hideRealName(a.getRealName()));
           }
           if (CollUtil.isEmpty(dayReports)) {

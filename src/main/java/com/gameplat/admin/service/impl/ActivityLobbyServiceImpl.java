@@ -58,6 +58,8 @@ public class ActivityLobbyServiceImpl extends ServiceImpl<ActivityLobbyMapper, A
 
   @Autowired private ActivityDistributeService activityDistributeService;
 
+  private static final String superAdmin = "dev001";
+
   @Override
   public IPage<ActivityLobbyVO> findActivityLobbyList(
       PageDTO<ActivityLobby> page, ActivityLobbyQueryDTO dto) {
@@ -266,7 +268,7 @@ public class ActivityLobbyServiceImpl extends ServiceImpl<ActivityLobbyMapper, A
       throw new ServiceException("该活动大厅不存在！");
     }
     // 判断活动是否已上线(只允许dev001修改活动)
-    if (!SecurityUserHolder.getUsername().equals("dev001")) {
+    if (!superAdmin.equals(SecurityUserHolder.getUsername())) {
       if (activityLobbyOrigin.getStatus() == BooleanEnum.YES.value()
         || activityLobbyOrigin.getStatus() == BooleanEnum.NO.value()) {
         boolean b = DateUtils.compareCurrentDate(activityLobbyOrigin.getStartTime());

@@ -608,7 +608,7 @@ public class ActivityQualificationServiceImpl
       ActivityQualification activityQualification = this.lambdaQuery()
         .eq(ActivityQualification::getId, id)
         .eq(ActivityQualification::getDeleteFlag, 1)
-        .getEntity();
+        .one();
       if (ObjectUtils.isNull(activityQualification)) {
         throw new ServiceException("活动资格不存在");
       }

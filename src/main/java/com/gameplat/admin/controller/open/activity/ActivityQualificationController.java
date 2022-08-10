@@ -1,6 +1,7 @@
 package com.gameplat.admin.controller.open.activity;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.gameplat.admin.model.dto.*;
 import com.gameplat.admin.model.vo.ActivityQualificationVO;
@@ -95,5 +96,18 @@ public class ActivityQualificationController {
       throw new ServiceException("不在允许操作时间范围之内,请在13点以后生成资格");
     }
     activityQualificationService.activityRedEnvelopeQualification();
+  }
+
+  @Operation(summary = "批量拒绝活动资格")
+  @PostMapping("/refuse")
+  @PreAuthorize("hasAuthority('activity:qualification:refuse')")
+  public void refuse(@RequestBody ActivityQualificationRefuseDTO dto) {
+    if (CollectionUtils.isEmpty(dto.getIdList())) {
+      throw new ServiceException("id不能为空");
+    }
+    if (ObjectUtils.isEmpty(dto.getRefuseReason())) {
+      throw new ServiceException("请填写拒绝理由");
+    }
+    activityQualificationService.refuse(dto);
   }
 }

@@ -178,7 +178,13 @@ public class ValidWithdrawServiceImpl extends ServiceImpl<ValidWithdrawMapper, V
         throw new ServiceException("会员无需调减打码量！");
       }
       // 创建一条有效打码量记录
-      Assert.isTrue(this.save(validWithdrawConvert.toValidWithdraw(dto)), "调整会员打码量失败!");
+      ValidWithdraw vo = validWithdrawConvert.toValidWithdraw(dto);
+      vo.setRechMoney(BigDecimal.ZERO);
+      vo.setDiscountMoney(BigDecimal.ZERO);
+      vo.setCreateTime(new Date());
+      vo.setType(0);
+      vo.setStatus(0);
+      Assert.isTrue(this.save(vo), "调整会员打码量失败!");
       return;
     }
     // 如果有一条以上打码量记录, 调增打码量

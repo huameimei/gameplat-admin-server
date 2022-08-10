@@ -16,7 +16,7 @@ public class ValidWithdrawOperateDto implements Serializable {
   private BigDecimal mormDml;
 
   /** 备注 */
-  private String remark;
+  private String remarks;
 
   /** 会员账号 */
   private String username;

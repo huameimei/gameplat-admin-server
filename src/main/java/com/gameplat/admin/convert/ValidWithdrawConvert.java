@@ -13,7 +13,9 @@ public interface ValidWithdrawConvert {
   ValidWithdraw toEntity(ValidWithdrawDto dto);
 
   @Mappings({
-    @Mapping(source = "userId", target = "memberId")
+    @Mapping(source = "userId", target = "memberId"),
+    @Mapping(source = "username", target = "account"),
+    @Mapping(source = "remarks", target = "remark")
   })
   ValidWithdraw toValidWithdraw(ValidWithdrawOperateDto dto);
 }

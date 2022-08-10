@@ -195,6 +195,7 @@ public class ValidWithdrawServiceImpl extends ServiceImpl<ValidWithdrawMapper, V
     if (ObjectUtils.isEmpty(validWithdraw)) {
       throw new ServiceException("有效打码量记录数据异常！");
     }
+    validWithdraw.setRemark(dto.getRemarks());
     validWithdraw.setMormDml(dto.getMormDml().add(validWithdraw.getMormDml()));
     this.updateById(validWithdraw);
   }

@@ -41,4 +41,8 @@ public interface GameBetDailyReportService extends IService<GameBetDailyReport> 
   List<String> getWealVipValid(Integer type, String startTime, String endTime);
 
   void exportGamePlatformReport(GameBetDailyReportQueryDTO dto, HttpServletResponse response);
+
+  void exportGameBetDailyReport(HttpServletResponse response, GameBetDailyReportQueryDTO dto) throws Exception;
+
+  void exportGameKindReport(GameBetDailyReportQueryDTO dto, HttpServletResponse response);
 }

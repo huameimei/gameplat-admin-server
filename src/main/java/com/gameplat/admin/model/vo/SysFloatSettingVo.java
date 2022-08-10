@@ -42,4 +42,7 @@ public class SysFloatSettingVo implements Serializable {
   @Schema(description = "更新时间")
   @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
   private Date updateTime;
+
+  /** 终端  h5 ios android*/
+  private String terminal;
 }

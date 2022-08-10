@@ -3,6 +3,63 @@
 <mapper namespace="com.gameplat.admin.mapper.MemberWithdrawHistoryMapper">
 
 
+    <select id="findPage" resultType="com.gameplat.admin.model.vo.MemberWithdrawHistoryVO">
+        select  w.id,
+                w.cash_order_no,
+                w.member_id,
+                w.account,
+                w.real_name,
+                w.account_money,
+                w.cash_money,
+                w.bank_name,
+                w.bank_card,
+                w.bank_address,
+                w.cash_mode,
+                w.cash_reason,
+                w.cash_status,
+                w.create_time,
+                w.accept_account,
+                w.accept_time,
+                w.operator_account,
+                w.operator_time,
+                w.approve_reason,
+                w.approve_money,
+                w.risk_opraccount,
+                w.risk_oprtime,
+                w.risk_status,
+                w.counter_fee,
+                w.member_level,
+                w.super_id,
+                w.super_name,
+                w.super_path,
+                w.fk,
+                w.police_flag,
+                w.browser,
+                w.mac_os,
+                w.ip_address,
+                w.user_agent,
+                w.proxy_pay_status,
+                w.proxy_pay_desc,
+                w.point_flag,
+                w.pp_interface,
+                w.pp_interface_name,
+                w.pp_merchant_id,
+                w.pp_merchant_name,
+                w.member_memo,
+                w.member_type,
+                w.withdraw_type,
+                w.currency_rate,
+                w.currency_count,
+                w.currency_protocol,
+                w.approve_currency_rate,
+                w.approve_currency_count,
+                m.remark as userRemark
+        from member_withdraw_history as w
+        left join member as m
+        on w.member_id = m.id
+        ${ew.customSqlSegment}
+    </select>
+
    <select id="findIp" parameterType="com.gameplat.admin.model.dto.QueryIpStatReportDTO" resultType="com.gameplat.admin.model.vo.IpStatisticsVO">
        select
                ip_address as loginIp,
@@ -31,8 +88,8 @@
         distinct member_id as memberId,
         account,
         real_name as fullName,
-        ip_address as loginAddress,
-        (select count(distinct member_id,  COALESCE(ip_address,'null')) from member_withdraw_history where 1=1 and ip_address = loginAddress) as ipCount,
+        ip_address as ipAddress,
+        (select count(distinct member_id,  COALESCE(ip_address,'null')) from member_withdraw_history where 1=1 and ip_address = ipAddress) as ipCount,
         account_money money
         from member_withdraw_history
         WHERE 1 = 1

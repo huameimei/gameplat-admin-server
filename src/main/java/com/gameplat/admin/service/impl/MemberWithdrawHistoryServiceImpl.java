@@ -4,11 +4,13 @@ import cn.afterturn.easypoi.excel.ExcelExportUtil;
 import cn.afterturn.easypoi.excel.entity.ExportParams;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.gameplat.admin.component.WithdrawQueryCondition;
 import com.gameplat.admin.constant.WithdrawTypeConstant;
 import com.gameplat.admin.convert.MemberWithdrawHistoryConvert;
 import com.gameplat.admin.enums.OprateMode;
@@ -45,9 +47,9 @@ public class MemberWithdrawHistoryServiceImpl
     implements MemberWithdrawHistoryService {
 
   /** 提现会员、代理 */
-  private final String WITH_FORMAL_TYPE = "HY";
+  private final String WITH_FORMAL_TYPE = "M";
   /** 提现推广 */
-  private final String WITH_TEST_TYPE = "VHY";
+  private final String WITH_TEST_TYPE = "P";
   /** 查询会员类型 */
   private final String RECH_FORMAL_TYPE_QUERY = "M,A";
 
@@ -62,18 +64,16 @@ public class MemberWithdrawHistoryServiceImpl
   /***提现审核时间 */
   private static final String ORDER_OPERATOR = "operatorTime";
 
+  @Autowired
+  private WithdrawQueryCondition withdrawQueryCondition;
+
   @Override
   public IPage<MemberWithdrawHistoryVO> findPage(
       Page<MemberWithdrawHistory> page, MemberWithdrawHistoryQueryDTO dto) {
-    LambdaQueryWrapper<MemberWithdrawHistory> query = buildSql(dto);
-    query.orderBy(
-        ObjectUtils.isNotEmpty(dto.getOrder()),
-        !ObjectUtils.isEmpty(dto.getOrder()) && "ASC".equals(dto.getOrder()),
-        "createTime".equals(dto.getOrderBy())
-            ? MemberWithdrawHistory::getCreateTime
-            : MemberWithdrawHistory::getOperatorTime);
 
-    return this.page(page, query).convert(userWithdrawHistoryConvert::toVo);
+    QueryWrapper<MemberWithdrawHistory> query = withdrawQueryCondition.buildHistoryQuerySql(dto);
+    return memberWithdrawHistoryMapper.findPage(page, query);
+
   }
 
   @Override

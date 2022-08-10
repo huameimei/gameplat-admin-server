@@ -109,6 +109,15 @@
         WHERE
           exception_recharge_amount > 0
           <include refid="whereSql" />
+        UNION ALL
+        SELECT
+        'f' rechCode,
+        count( DISTINCT account ) rechNum
+        FROM
+        member_rw_report
+        WHERE
+        (bank_money > 0 or online_money > 0 or hand_rech_money > 0)
+        <include refid="whereSql"/>
     </select>
 
 
@@ -172,7 +181,15 @@
         WHERE
           virtual_withdraw_number > 0
           <include refid="whereSql" />
-
+        UNION ALL
+        SELECT
+        'e' withCode,
+        count( DISTINCT account ) withNum
+        FROM
+        member_rw_report
+        WHERE
+        (withdraw_money > 0 or hand_withdraw_money > 0)
+        <include refid="whereSql"/>
     </select>
 
     <!--游戏数据 -->
@@ -298,9 +315,11 @@
 
 
 
-    <select id="findReportMemberAllBalance" parameterType="com.gameplat.admin.model.dto.GameRWDataReportDto" resultType="BIGDECIMAL" >
-        select CONVERT(sum(info.balance),DECIMAL(22,2)) from member m  INNER  join member_info info on m.id = info.member_id and info.balance > 0 where m.account != 'webRoot' and user_type in ('M','A')
-        <if test="account != null and account != ''" >
+    <select id="findReportMemberAllBalance" parameterType="com.gameplat.admin.model.dto.GameRWDataReportDto"
+            resultType="java.math.BigDecimal">
+        select CONVERT(sum(info.balance),DECIMAL(22,2)) from member m INNER join member_info info on m.id =
+        info.member_id and info.balance > 0 where m.account != 'webRoot' and user_type in ('M','A')
+        <if test="account != null and account != ''">
             and account = #{account}
         </if>
         <if test="superAccount != null and superAccount != null">
@@ -332,15 +351,15 @@
     </select>
 
     <!--vip彩金 -->
-    <select id="findDividendDataReport" resultType="BIGDECIMAL">
+    <select id="findDividendDataReport" resultType="java.math.BigDecimal">
         select
-            ifnull(sum(reword_amount),0) rewordAmount
+        ifnull(sum(reword_amount),0) rewordAmount
         from member_weal_reword
         where
-            status = 2 and type != 5
-            and user_type in ('M','A')
-            and draw_time BETWEEN #{startTime} and #{endTime}
-        <if test="account != null and account != ''" >
+        status = 2 and type != 5
+        and user_type in ('M','A')
+        and draw_time BETWEEN #{startTime} and #{endTime}
+        <if test="account != null and account != ''">
             and user_name = #{account}
         </if>
         <if test="superAccount != null and superAccount != null">
@@ -355,17 +374,17 @@
         </if>
     </select>
 
-    <select id="findActivityDataReport" resultType="BIGDECIMAL">
+    <select id="findActivityDataReport" resultType="java.math.BigDecimal">
         select
         ifnull(sum(discounts_money),0) discounts_money
         from activity_distribute
-         where
-            status = 2
-           and settlement_time BETWEEN #{startTime} and #{endTime}
-            <if test="account != null and account != ''" >
-                and username = #{account}
-            </if>
-            <if test="superAccount != null and superAccount != null">
+        where
+        status = 2
+        and settlement_time BETWEEN #{startTime} and #{endTime}
+        <if test="account != null and account != ''">
+            and username = #{account}
+        </if>
+        <if test="superAccount != null and superAccount != null">
                 <choose>
                     <when test="flag != null and flag == 1">
                         AND parent_name = #{superAccount}
@@ -377,22 +396,22 @@
             </if>
     </select>
 
-    <select id="findRedDataReport" resultType="BIGDECIMAL">
+    <select id="findRedDataReport" resultType="java.math.BigDecimal">
         select
-          ifnull(sum(draw_money),0) draw_money
+        ifnull(sum(cd.draw_money),0) draw_money
         from
-          chat_red_envelope_draw
-        where status = 2 and draw_time between #{startTime} and #{endTime}
-            <if test="account != null and account != ''" >
-                and nickname = #{account}
-            </if>
-            <if test="superAccount != null and superAccount != null">
-                <choose>
+        chat_red_envelope_draw as cd inner join member as m on m.id = cd.user_id
+        where cd.status = 2 and cd.draw_time between #{startTime} and #{endTime}
+        <if test="account != null and account != ''">
+            and cd.nickname = #{account}
+        </if>
+        <if test="superAccount != null and superAccount != null">
+            <choose>
                     <when test="flag != null and flag == 1">
-                        AND parent_name = #{superAccount}
+                        AND m.parent_name = #{superAccount}
                     </when>
                     <otherwise>
-                        AND agent_path like concat('%',#{superAccount},'%')
+                        AND m.super_path like concat('%',#{superAccount},'%')
                     </otherwise>
                 </choose>
             </if>

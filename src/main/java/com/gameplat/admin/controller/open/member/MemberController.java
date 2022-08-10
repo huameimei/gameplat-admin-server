@@ -40,6 +40,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
@@ -314,4 +315,11 @@ public class MemberController {
     memberService.batchLevel(dto);
   }
 
+  @Operation(summary = "会员转成代理")
+  @PostMapping("/changeToAgent")
+  @PreAuthorize("hasAuthority('member:changeToAgent')")
+  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.MEMBER, desc = "'会员转变成代理'")
+  public void changeToAgent(@RequestBody MemberTransformDTO dto) {
+    memberTransferAgentService.changeToAgent(dto.getId());
+  }
 }

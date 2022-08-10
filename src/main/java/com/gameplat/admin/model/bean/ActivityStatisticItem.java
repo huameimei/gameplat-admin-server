@@ -49,6 +49,9 @@ public class ActivityStatisticItem implements Serializable {
   @Schema(description = "首充金额")
   private BigDecimal firstRechargeAmount;
 
+  @Schema(description = "二充金额")
+  private BigDecimal twoRechargeAmount;
+
   @Schema(description = "累计游戏打码量")
   private BigDecimal cumulativeGameDml;
 
@@ -66,6 +69,9 @@ public class ActivityStatisticItem implements Serializable {
 
   @Schema(description = "是否新用户 1是 2否")
   private Integer isNewUser;
+
+  @Schema(description = "计算基数")
+  private BigDecimal calculateValue;
 
   public ActivityStatisticItem() {
     this.rechargeAmount = new BigDecimal(0);

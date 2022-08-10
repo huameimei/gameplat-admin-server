@@ -1,6 +1,7 @@
 package com.gameplat.admin.service.impl;
 
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.constant.WithdrawTypeConstant;
 import com.gameplat.admin.mapper.MemberRwReportMapper;
@@ -16,6 +17,7 @@ import com.gameplat.model.entity.member.MemberRwReport;
 import com.gameplat.model.entity.member.MemberWithdraw;
 import com.gameplat.model.entity.recharge.RechargeOrder;
 import jodd.util.StringUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,19 +28,18 @@ import java.util.Optional;
 
 @Service
 @Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)
+@Slf4j
 public class MemberRwReportServiceImpl extends ServiceImpl<MemberRwReportMapper, MemberRwReport>
     implements MemberRwReportService {
 
   @Override
   public void addRecharge(Member member, Integer rechargeCount, RechargeOrder rechargeOrder) {
+    log.info("充值订单数据：{}", JSONUtil.toJsonStr(rechargeOrder));
     MemberRwReport report = getOrCreateReportUserRw(member, rechargeOrder.getAuditTime());
+    log.info("充值报表数据：{}", JSONUtil.toJsonStr(report));
     BigDecimal amount = rechargeOrder.getPayAmount();
     if (rechargeOrder.getPointFlag() == TrueFalse.TRUE.getValue()
         && BigDecimal.ZERO.compareTo(amount) < 0) {
-      if (null != rechargeOrder.getCurrencyCount()) {
-        report.setVirtualRechargeMoney(amount);
-        report.setVirtualRechargeNumber(rechargeOrder.getCurrencyCount());
-      }
       // 计算积分且充值金额大于 0 累加充值次数
       if (rechargeOrder.getMode() == RechargeMode.TRANSFER.getValue()) {
         report.setBankCount(report.getBankCount() + 1);
@@ -76,6 +77,12 @@ public class MemberRwReportServiceImpl extends ServiceImpl<MemberRwReportMapper,
         && rechargeOrder.getDiscountRechargeFlag() == TrueFalse.TRUE.getValue()) {
       report.setRechDiscount(report.getRechDiscount().add(rechargeOrder.getDiscountAmount()));
     } else {
+      if (ObjectUtil.isEmpty(report.getOtherDiscount())) {
+        report.setOtherDiscount(BigDecimal.ZERO);
+      }
+      if (ObjectUtil.isEmpty(rechargeOrder.getDiscountAmount())) {
+        rechargeOrder.setDiscountAmount(BigDecimal.ZERO);
+      }
       report.setOtherDiscount(report.getOtherDiscount().add(rechargeOrder.getDiscountAmount()));
     }
 

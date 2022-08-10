@@ -2,6 +2,7 @@ package com.gameplat.admin.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.gameplat.admin.model.dto.ValidWithdrawDto;
+import com.gameplat.admin.model.dto.ValidWithdrawOperateDto;
 import com.gameplat.admin.model.vo.ValidateDmlBeanVo;
 import com.gameplat.common.model.bean.limit.MemberWithdrawLimit;
 import com.gameplat.model.entity.ValidWithdraw;
@@ -32,4 +33,6 @@ public interface ValidWithdrawService extends IService<ValidWithdraw> {
    * @param remark String
    */
   void rollGameRebateDml(String remark);
+
+  void operateValidWithdraw(ValidWithdrawOperateDto dto);
 }

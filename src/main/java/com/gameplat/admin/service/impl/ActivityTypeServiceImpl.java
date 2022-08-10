@@ -132,6 +132,7 @@ public class ActivityTypeServiceImpl extends ServiceImpl<ActivityTypeMapper, Act
         this.lambdaQuery()
             .eq(ActivityType::getTypeStatus, BooleanEnum.YES.value())
             .eq(ActivityType::getLanguage, language)
+            .ne(ActivityType::getTypeCode, "all")
             .list();
 
     List<ActivityTypeVO> activityTypeVOList = new ArrayList<>();

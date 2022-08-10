@@ -56,7 +56,7 @@ public class AgentConfigServiceImpl implements AgentConfigService {
         JSONUtil.toBean(layerPresetValue, new TypeReference<Map<String, JSONObject>>() {}, true);
 
     Map<String, List<GameDivideVo>> tmpMap = new TreeMap<>();
-    gameTypeList.forEach(e -> tmpMap.put(e.getDictLabel(), getGameDivideVo(e.getDictType(), map)));
+    gameTypeList.forEach(e -> tmpMap.put(e.getDictLabel(), getGameDivideVo(e.getDictValue(), map)));
     return tmpMap;
   }
 
@@ -74,7 +74,7 @@ public class AgentConfigServiceImpl implements AgentConfigService {
         JSONUtil.toBean(fixPresetValue, new TypeReference<Map<String, JSONObject>>() {}, true);
 
     Map<String, List<GameDivideVo>> tmpMap = new TreeMap<>();
-    gameTypeList.forEach(e -> tmpMap.put(e.getDictLabel(), getGameDivideVo(e.getDictType(), map)));
+    gameTypeList.forEach(e -> tmpMap.put(e.getDictLabel(), getGameDivideVo(e.getDictValue(), map)));
     return tmpMap;
   }
 

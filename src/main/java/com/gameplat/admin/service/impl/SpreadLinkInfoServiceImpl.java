@@ -206,7 +206,10 @@ public class SpreadLinkInfoServiceImpl extends ServiceImpl<SpreadLinkInfoMapper,
           memberService
               .getByAccount(linkInfo.getAgentAccount())
               .orElseThrow(() -> new ServiceException("代理账号不存在!"));
-      Assert.isTrue(UserTypes.AGENT.value().equalsIgnoreCase(member.getUserType()), "账号类型不支持！");
+      Assert.isTrue(
+          UserTypes.AGENT.value().equalsIgnoreCase(member.getUserType())
+              || UserTypes.PROMOTION.value().equalsIgnoreCase(member.getUserType()),
+          "账号类型不支持！");
     }
     AgentBackendConfig agentBackendConfig =
         configService.get(DictTypeEnum.AGENT_BACKEND_CONFIG, AgentBackendConfig.class);
@@ -272,7 +275,10 @@ public class SpreadLinkInfoServiceImpl extends ServiceImpl<SpreadLinkInfoMapper,
           memberService
               .getByAccount(linkInfo.getAgentAccount())
               .orElseThrow(() -> new ServiceException("代理账号不存在!"));
-      Assert.isTrue(UserTypes.AGENT.value().equalsIgnoreCase(member.getUserType()), "账号类型不支持！");
+      Assert.isTrue(
+          UserTypes.AGENT.value().equalsIgnoreCase(member.getUserType())
+              || UserTypes.PROMOTION.value().equalsIgnoreCase(member.getUserType()),
+          "账号类型不支持！");
       linkInfo.setIsOpenDividePreset(dto.getIsOpenDividePreset());
     }
 

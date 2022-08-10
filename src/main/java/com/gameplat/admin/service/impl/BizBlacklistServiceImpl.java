@@ -56,6 +56,7 @@ public class BizBlacklistServiceImpl extends ServiceImpl<BizBlacklistMapper, Biz
     if (ObjectUtils.isNotEmpty(dto.getStatus())) {
       queryWrapper.eq(BizBlacklist::getStatus, dto.getStatus());
     }
+    queryWrapper.orderByDesc(BizBlacklist::getCreateTime);
     return bizBlacklistMapper.selectPage(page, queryWrapper);
   }
 

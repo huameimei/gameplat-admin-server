@@ -4,11 +4,13 @@ import cn.afterturn.easypoi.excel.ExcelExportUtil;
 import cn.afterturn.easypoi.excel.entity.ExportParams;
 import cn.hutool.core.date.DateUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.gameplat.admin.component.RechargeOrderQueryCondition;
 import com.gameplat.admin.convert.RechargeOrderHistoryConvert;
 import com.gameplat.admin.mapper.RechargeOrderHistoryMapper;
 import com.gameplat.admin.model.dto.RechargeOrderHistoryQueryDTO;
@@ -47,17 +49,16 @@ public class RechargeOrderHistoryServiceImpl
   @Autowired(required = false)
   private RechargeOrderHistoryMapper rechargeOrderHistoryMapper;
 
+  @Autowired
+  private RechargeOrderQueryCondition rechargeOrderQueryCondition;
+
   @Override
   public IPage<RechargeOrderHistoryVO> findPage(
       Page<RechargeOrderHistory> page, RechargeOrderHistoryQueryDTO dto) {
-    LambdaQueryWrapper<RechargeOrderHistory> query = buildSql(dto);
-    query.orderBy(
-        ObjectUtils.isNotEmpty(dto.getOrder()),
-        !ObjectUtils.isEmpty(dto.getOrder()) && "ASC".equals(dto.getOrder()),
-        "createTime".equals(dto.getOrderBy())
-            ? RechargeOrderHistory::getCreateTime
-            : RechargeOrderHistory::getAuditTime);
-    return this.page(page, query).convert(rechargeOrderHistoryConvert::toVo);
+
+    QueryWrapper<RechargeOrderHistory> queryWrapper = rechargeOrderQueryCondition.builderHistoryQueryWrapper(dto);
+    return rechargeOrderHistoryMapper.findPage(page, queryWrapper);
+
   }
 
   @Override
@@ -119,7 +120,7 @@ public class RechargeOrderHistoryServiceImpl
             dto.getStatus())
         .in(
             ObjectUtils.isNotEmpty(dto.getPayAccountOwnerList()),
-            RechargeOrderHistory::getPayAccountOwner,
+                RechargeOrderHistory::getPayAccountAccount,
             dto.getPayAccountOwnerList())
         .eq(
             ObjectUtils.isNotEmpty(dto.getTpMerchantId()),

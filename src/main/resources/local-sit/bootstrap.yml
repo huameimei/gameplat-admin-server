@@ -1,0 +1,49 @@
+spring:
+  application:
+    name: admin-server
+  profiles:
+    active: @profiles.active@
+  websocket:
+    strategy: redis
+    endpoint: /websocket
+    broker: /topic1,/user
+    heartbeat: 10000,10000
+    userDestinationPrefix: /user
+    applicationDestinationPrefixes: /app
+  cloud:
+    nacos:
+      config:
+        enabled: true
+        server-addr: 185.167.14.92:8848
+        username: nacos
+        password: qsaw12!@
+        file-extension: yml
+        namespace: 9e4aa348-0463-4a08-bdf3-405e2e6d6806
+        group: SERVICE_GROUP
+        refresh-enabled: true
+        shared-configs:
+          - data-id: redis.yml
+            refresh: true
+          - data-id: injection-http-firewall.yml
+            refresh: true
+          - data-id: spring-kafka-log.yml
+            refresh: true
+          - data-id: spring-kafka-producer-config.yml
+            refresh: true
+          - data-id: elasticsearch.yml
+            refresh: true
+      discovery:
+        service: ${spring.application.name}
+        namespace: ${spring.cloud.nacos.config.namespace}
+        group: SERVICE_GROUP
+        server-addr: ${spring.cloud.nacos.config.server-addr}
+        username: ${spring.cloud.nacos.config.username}
+        password: ${spring.cloud.nacos.config.password}
+
+oss:
+  endPoint: "http://oss-cn-hongkong.aliyuncs.com"
+  accessKeyId: "LTAI5tSEoN1kJ5EqgaxX6dWF"
+  accessKeySecret: "gSR2V54bsqp6TmaCJqYC9YIVNTLakS"
+  bucketName: "gameplat-config-new"
+  foreignUrl: "https://gameplat-config-new.oss-cn-hongkong.aliyuncs.com"
+  proxyUrl: "https://maintain2.abcsport8.com"

@@ -38,10 +38,10 @@
         <where>
             c.current_level != 0
             and d.`level` != 0
-            <if test="type != null and type == 0">
+            <if test="type != null and type == 1">
                 AND d.week_wage > 0
             </if>
-            <if test="type != null and type == 1">
+            <if test="type != null and type == 2">
                 AND d.month_wage > 0
             </if>
         </where>

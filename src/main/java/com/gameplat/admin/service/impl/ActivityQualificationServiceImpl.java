@@ -7,12 +7,14 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
+import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.convert.ActivityLobbyConvert;
 import com.gameplat.admin.convert.ActivityQualificationConvert;
+import com.gameplat.admin.enums.PushMessageEnum;
 import com.gameplat.admin.mapper.ActivityQualificationMapper;
 import com.gameplat.admin.model.dto.*;
 import com.gameplat.admin.model.vo.*;
@@ -30,11 +32,13 @@ import com.gameplat.model.entity.activity.ActivityDistribute;
 import com.gameplat.model.entity.activity.ActivityLobby;
 import com.gameplat.model.entity.activity.ActivityQualification;
 import com.gameplat.model.entity.recharge.RechargeOrderHistory;
+import com.gameplat.security.SecurityUserHolder;
 import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -67,6 +71,8 @@ public class ActivityQualificationServiceImpl
   @Autowired private RechargeOrderHistoryService rechargeOrderHistoryService;
 
   @Autowired private ActivityLobbyService activityLobbyService;
+
+  @Autowired private MessageInfoService messageInfoService;
 
   private static final String EST4_BEGIN = " 12:00:00";
 
@@ -166,7 +172,7 @@ public class ActivityQualificationServiceImpl
 
     ActivityQualification qm;
     for (ActivityLobbyDTO activityLobbyDTO : activityLobbyList) {
-      List<ActivityLobbyDiscountDTO> lobbyDiscount = activityLobbyDTO.getLobbyDiscountList();
+      List<ActivityLobbyDiscountDTO> lobbyDiscount = activityLobbyDTO.getLobbyDiscount();
       if (activityLobbyDTO.getMultipleHandsel() == 0 && lobbyDiscount.size() > 1) {
         throw new ServiceException("【" + activityLobbyDTO.getTitle() + "】，没有开启多重彩金");
       }
@@ -193,10 +199,27 @@ public class ActivityQualificationServiceImpl
       qm.setQualificationActivityId(IdWorker.getIdStr());
       qm.setQualificationStatus(BooleanEnum.YES.value());
       qm.setStatisItem(activityLobbyDTO.getStatisItem());
-      qm.setMaxMoney(lobbyDiscount.stream().mapToInt(ActivityLobbyDiscountDTO::getPresenterValue).sum());
-      qm.setWithdrawDml(lobbyDiscount.stream().mapToInt(ActivityLobbyDiscountDTO::getWithdrawDml).sum());
+      BigDecimal maxMoney = BigDecimal.ZERO;
+      BigDecimal withdrawDml = BigDecimal.ZERO;
+      //如果是1则是固定金额
+      if(activityLobby.getRewardCalculateType() == 1){
+        maxMoney = lobbyDiscount.stream().map(ActivityLobbyDiscountDTO::getPresenterValue).reduce(BigDecimal::add).get();
+        withdrawDml =lobbyDiscount.stream().map(ActivityLobbyDiscountDTO::getWithdrawDml).reduce(BigDecimal::add).get();
+        //如果是2则是百分比金额
+      } else if(activityLobby.getRewardCalculateType() == 2){
+        for(ActivityLobbyDiscountDTO item : lobbyDiscount){
+          BigDecimal presentMoney = new BigDecimal(item.getTargetValue()).multiply(item.getPresenterValue().divide(new BigDecimal("100")));
+          BigDecimal presentDml = presentMoney.multiply(item.getWithdrawDml());
+          item.setPresenterValue(presentMoney);
+          item.setWithdrawDml(presentDml);
+          maxMoney = maxMoney.add(presentMoney);
+          withdrawDml = withdrawDml.add(presentDml);
+        }
+      }
+      qm.setMaxMoney(maxMoney);
+      qm.setWithdrawDml(withdrawDml);
       qm.setSoleIdentifier(RandomUtil.generateOrderCode());
-      lobbyDiscount.sort(Comparator.comparingInt(ActivityLobbyDiscountDTO::getTargetValue));
+      lobbyDiscount.sort(Comparator.comparingLong(ActivityLobbyDiscountDTO::getTargetValue));
       qm.setAwardDetail(JSON.parseArray(JSONObject.toJSONString(lobbyDiscount)).toJSONString());
       qm.setGetWay(activityLobbyDTO.getGetWay());
       manageList.add(qm);
@@ -292,6 +315,7 @@ public class ActivityQualificationServiceImpl
   }
 
   @Override
+  @Transactional(rollbackFor = Exception.class)
   public void auditStatus(ActivityQualificationAuditStatusDTO dto) {
     List<ActivityQualification> qualificationManageStatusList =
         this.lambdaQuery().in(ActivityQualification::getId, dto.getIdList()).list();
@@ -311,6 +335,26 @@ public class ActivityQualificationServiceImpl
       }
       // 更新数据
       qualification.setStatus(ActivityInfoEnum.QualificationStatus.AUDITED.value());
+      String remark = "";
+      if (ObjectUtils.isNotNull(dto.getAdjustAmount())
+        && qualification.getMaxMoney().compareTo(dto.getAdjustAmount()) != 0) {
+        if(qualification.getActivityType() != 1){
+          throw new ServiceException("您选择的资格数据有非活动大厅类型的数据，目前只支持大厅类型的资格可以调整优惠金额");
+        }
+        qualification.setMaxMoney(dto.getAdjustAmount());
+        remark = remark + "，调整优惠金额：" + dto.getAdjustAmount();
+      }
+      if (ObjectUtils.isNotNull(dto.getAdjustDml())
+        && qualification.getWithdrawDml().compareTo(dto.getAdjustDml()) != 0) {
+        if(qualification.getActivityType() != 1){
+          throw new ServiceException("您选择的资格数据有非活动大厅类型的数据，目前只支持大厅类型的资格可以调整优惠打码量");
+        }
+        qualification.setWithdrawDml(dto.getAdjustDml());
+        remark = remark + "，调整优惠打码量：" + dto.getAdjustDml();
+      }
+      if (ObjectUtils.isNotEmpty(remark)) {
+        qualification.setRemark("操作人：" + SecurityUserHolder.getUsername() + remark);
+      }
       qualification.setAuditPerson(GlobalContextHolder.getContext().getUsername());
       qualification.setAuditTime(new Date());
     }
@@ -337,10 +381,18 @@ public class ActivityQualificationServiceImpl
           ad.setStatus(BooleanEnum.YES.value());
           //                ad.setDisabled(1);
           ad.setDeleteFlag(BooleanEnum.YES.value());
-          ad.setDiscountsMoney(NumberUtil.toBigDecimal(activityQualification.getMaxMoney()));
           ad.setQualificationActivityId(activityQualification.getQualificationActivityId());
           ad.setStatisItem(activityQualification.getStatisItem());
-          ad.setWithdrawDml(activityQualification.getWithdrawDml());
+          if (ObjectUtils.isNull(dto.getAdjustAmount())) {
+            ad.setDiscountsMoney(activityQualification.getMaxMoney());
+          } else {
+            ad.setDiscountsMoney(dto.getAdjustAmount());
+          }
+          if (ObjectUtils.isNull(dto.getAdjustDml())) {
+            ad.setWithdrawDml(activityQualification.getWithdrawDml());
+          } else {
+            ad.setWithdrawDml(dto.getAdjustDml());
+          }
           ad.setSoleIdentifier(activityQualification.getSoleIdentifier());
           ad.setStatisStartTime(activityQualification.getStatisStartTime());
           ad.setStatisEndTime(activityQualification.getStatisEndTime());
@@ -493,7 +545,7 @@ public class ActivityQualificationServiceImpl
 
       //判断红包雨活动ID是否有配置
       ActivityRedPacketConfigVO config = activityRedPacketService.getConfig();
-
+      Integer isAllowProxyJoin = config.getIsAllowProxyJoin() != null ? config.getIsAllowProxyJoin(): 0;
       if (config == null) {
         log.info("红包雨配置信息为空,需要在后台配置");
       } else {
@@ -511,7 +563,7 @@ public class ActivityQualificationServiceImpl
           } else {
             //检查活动是否ok
             if (checkDoRedEnvelope(activityLobby)) {
-              List<Map<String, Object>> rechargeOrderList = getRechargeOrder();
+              List<Map<String, Object>> rechargeOrderList = getRechargeOrder(isAllowProxyJoin);
 
               if (CollectionUtils.isEmpty(rechargeOrderList)) {
                 log.info("没有满足条件的充值记录");
@@ -546,6 +598,42 @@ public class ActivityQualificationServiceImpl
       log.info("生成当天红包雨资格结束,消耗：{}ms", System.currentTimeMillis() - start);
     } catch (Exception e) {
       log.error("生成当天红包雨资格异常", e);
+    }
+  }
+
+  @Override
+  @Transactional(rollbackFor = Exception.class)
+  public void refuse(ActivityQualificationRefuseDTO dto) {
+    for (Long id : dto.getIdList()) {
+      ActivityQualification activityQualification = this.lambdaQuery()
+        .eq(ActivityQualification::getId, id)
+        .eq(ActivityQualification::getDeleteFlag, 1)
+        .one();
+      if (ObjectUtils.isNull(activityQualification)) {
+        throw new ServiceException("活动资格不存在");
+      }
+      if (activityQualification.getActivityType() != 1) {
+        throw new ServiceException("只有活动大厅类型的资格可以拒绝，转盘和红包雨等暂不支持拒绝");
+      }
+      if (activityQualification.getStatus() == ActivityInfoEnum.QualificationStatus.AUDITED.value()) {
+        throw new ServiceException("该活动资格已经审核通过，不能拒绝");
+      }
+
+      this.removeById(id);
+
+      // 通知 发个人消息
+      MessageInfoAddDTO message = new MessageInfoAddDTO();
+      message.setContent(dto.getRefuseReason());
+      message.setTitle(activityQualification.getActivityName() + ",活动资格被拒绝");
+      message.setPushRange(PushMessageEnum.UserRange.SOME_MEMBERS.getValue());
+      message.setLinkAccount(activityQualification.getUsername());
+      message.setCategory(PushMessageEnum.MessageCategory.SYS_SEND.getValue());
+      message.setPosition(PushMessageEnum.Location.LOCATION_DEF.getValue());
+      message.setShowType(PushMessageEnum.MessageShowType.SHOW_DEF.value());
+      message.setPopsCount(PushMessageEnum.PopCount.POP_COUNT_DEF.getValue());
+      message.setType(PushMessageEnum.MessageType.SYSTEM_INFORMATION.value());
+      message.setCreateBy(SecurityUserHolder.getUsername());
+      messageInfoService.insertMessage(message);
     }
   }
 
@@ -625,7 +713,7 @@ public class ActivityQualificationServiceImpl
     for (Map.Entry<String, BigDecimal> entry : newMap.entrySet()) {
       ActivityLobbyDiscountVO temp=getActivityLobbyDiscountVO(entry.getValue(),activityLobby.getLobbyDiscountList());
       if(temp==null){
-        log.info("根据优惠规则没有找到对应配置信息account={},{}",entry.getKey(),temp.toString());
+        log.info("根据优惠规则没有找到对应配置信息account={},{}",entry.getKey(),temp);
         continue;
       }
       ActivityQualification qm=new ActivityQualification();
@@ -650,13 +738,13 @@ public class ActivityQualificationServiceImpl
       qm.setQualificationStatus(BooleanEnum.YES.value());
       qm.setStatisItem(activityLobby.getStatisItem());
       qm.setGetWay(ActivityInfoEnum.GetWay.DIRECT_RELEASE.value());
-      qm.setDrawNum(temp.getPresenterValue());
+      qm.setDrawNum(temp.getPresenterValue().intValue());
       //打码量是在抽奖时计算，这里不算
-      qm.setWithdrawDml(0);
+      qm.setWithdrawDml(BigDecimal.ZERO);
       //新增抽奖资格,使用次数为0
       qm.setEmployNum(0);
-      qm.setMinMoney(temp.getPresenterDml().intValue());
-      qm.setMaxMoney(temp.getWithdrawDml().intValue());
+      qm.setMinMoney(temp.getPresenterDml());
+      qm.setMaxMoney(temp.getWithdrawDml());
       needAdd.add(qm);
     }
 
@@ -678,6 +766,8 @@ public class ActivityQualificationServiceImpl
     if (money == null || money.compareTo(BigDecimal.ZERO) == 0 || money.compareTo(BigDecimal.ZERO) == -1) {
       return null;
     }
+    //根据目标值倒序排列
+    lobbyDiscountList.sort(Comparator.comparingLong(ActivityLobbyDiscountVO::getTargetValue).reversed());
     for (int i = 0; i < lobbyDiscountList.size(); i++) {
       ActivityLobbyDiscountVO temp = lobbyDiscountList.get(i);
       //targetValue: 充值金额
@@ -686,12 +776,7 @@ public class ActivityQualificationServiceImpl
       if (money.compareTo(targetValue) == 0 || money.compareTo(targetValue) == 1) {
         return temp;
       }
-      //如果充值金额第一条都不满足则返回第一条的抽奖次数
-      if (i == 0 && money.compareTo(targetValue) == 1) {
-        return temp;
-      }
     }
-
     return null;
   }
 
@@ -704,10 +789,10 @@ public class ActivityQualificationServiceImpl
    * 5.时间以审核时间为准
    * @return
    */
-  private List<Map<String, Object>> getRechargeOrder() {
+  private List<Map<String, Object>> getRechargeOrder(Integer isAllowProxyJoin) {
     QueryWrapper<RechargeOrderHistory> rechargeOrderHistoryQueryWrapper = new QueryWrapper<>();
     rechargeOrderHistoryQueryWrapper.select("IFNULL(sum(amount),0) as dayTotalAmount,member_id as memberId,account,member_level as memberLevel")
-            .eq("member_type", MemberEnums.Type.MEMBER.value())
+            .and(wrapper -> wrapper.eq("member_type", MemberEnums.Type.MEMBER.value()).or().eq(isAllowProxyJoin == 1,"member_type", MemberEnums.Type.AGENT.value()))
             .eq("status", RechargeStatus.SUCCESS.getValue())
             .eq("point_flag", 1)
             .between("audit_time",

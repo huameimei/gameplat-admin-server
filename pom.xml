@@ -94,6 +94,7 @@
         <dependency>
             <groupId>cn.afterturn</groupId>
             <artifactId>easypoi-spring-boot-starter</artifactId>
+            <version>4.1.2</version>
         </dependency>
 
         <dependency>
@@ -222,11 +223,11 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
-
-        <!--sleuth-->
         <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-sleuth</artifactId>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-test</artifactId>
+            <version>5.2.8.RELEASE</version>
+            <scope>compile</scope>
         </dependency>
     </dependencies>
 
@@ -240,6 +241,13 @@
             <activation>
                 <activeByDefault>true</activeByDefault>
             </activation>
+        </profile>
+        <profile>
+            <id>local-sit</id>
+            <properties>
+                <profiles.active>local-sit</profiles.active>
+                <profiles.revision>4.1.0-SNAPSHOT</profiles.revision>
+            </properties>
         </profile>
         <profile>
             <id>sit</id>

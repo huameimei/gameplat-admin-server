@@ -148,6 +148,7 @@ public class PpMerchantServiceImpl extends ServiceImpl<PpMerchantMapper, PpMerch
   public List<PpMerchant> queryAllMerchant(Integer status) {
     LambdaQueryWrapper<PpMerchant> query = Wrappers.lambdaQuery();
     query.eq(PpMerchant::getStatus, status);
+    query.orderByAsc(PpMerchant::getSort);
     return this.list(query);
   }
 

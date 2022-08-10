@@ -71,4 +71,13 @@ public interface DivideLayerConfigMapper extends BaseMapper<DivideLayerConfig> {
    * @return
    */
   String getConfigByGameCode(@Param("userName") String userName, @Param("code") String code);
+
+  /**
+   * 转代理时 删除被转移账号的分红配置 推广链接的推广配置
+   * @param account String
+   * @param originSuperPath String
+   */
+  Integer batchDelConfigTrans(
+          @Param("account") String account,
+          @Param("originSuperPath") String originSuperPath);
 }

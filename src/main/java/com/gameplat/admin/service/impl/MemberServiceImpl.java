@@ -35,7 +35,6 @@ import com.gameplat.model.entity.member.MemberDayReport;
 import com.gameplat.model.entity.member.MemberInfo;
 import com.gameplat.security.SecurityUserHolder;
 import com.gameplat.security.context.UserCredential;
-import com.gameplat.security.manager.JwtTokenAuthenticationManager;
 import com.google.common.collect.Lists;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -275,6 +274,15 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
   @Override
   public void disable(List<Long> ids) {
     this.changeStatus(ids, MemberEnums.Status.DISABLED.value());
+
+    // 查询所有需要禁用的会员账号
+    List<Member> memberList = this.lambdaQuery().in(Member::getId, ids).list();
+
+    // 对每个禁用的会员账号踢线处理
+    for(Member member : memberList){
+      redisTemplateObj.delete(MEMBER_TOKEN_PREFIX + member.getAccount());
+    }
+
     // TODO 查询是否有进入第三方游戏，第三方游戏踢线并回收额度
   }
 
@@ -476,7 +484,8 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
     member.setParentName(parent.getAccount());
     member.setSuperPath(parent.getSuperPath().concat(member.getAccount()).concat("/"));
 
-    if (MemberEnums.Type.AGENT.match(member.getUserType())) {
+    if (MemberEnums.Type.AGENT.match(member.getUserType())
+        || MemberEnums.Type.PROMOTION.match(member.getUserType())) {
       member.setAgentLevel(parent.getAgentLevel() + 1);
     }
 
@@ -627,7 +636,7 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
         list.addAll(memberRechVip);
       }
     }
-    if (ObjectUtil.isNotEmpty(vipGrade)) {
+    if (ObjectUtil.isNotEmpty(level)) {
       List<RechargeMemberFileBean> memberRechLevel = memberMapper.findMemberRechLevel(level);
       if (ObjectUtil.isNotEmpty(memberRechLevel)) {
         list.addAll(memberRechLevel);
@@ -740,13 +749,9 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
     UserCredential credential = SecurityUserHolder.getCredential();
     Collection<? extends GrantedAuthority> authorities = credential.getAuthorities();
     boolean flag = false;
-    if (ObjectUtil.isEmpty(
-            authorities.stream()
-                    .filter(
-                            ex ->
-                                    ex.getAuthority().equalsIgnoreCase(ROLES)
-                                            || UserTypes.ADMIN.value().equals(credential.getUserType()))
-                    .collect(Collectors.toList()))) {
+    // 无权限并且不为管理员
+    if (ObjectUtil.isEmpty(authorities.stream().filter(ex -> ex.getAuthority().equalsIgnoreCase(ROLES)).collect(Collectors.toList()))
+                                            && !UserTypes.ADMIN.value().equals(credential.getUserType())) {
       flag = true;
     }
 
@@ -756,13 +761,6 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
     list.forEach(
         a -> {
           if (finalFlag && ObjectUtil.isNotNull(a.getRealName())) {
-            a.setRealName(hideRealName(a.getRealName()));
-          }
-
-          if (ObjectUtil.isNull(
-                  authorities.stream()
-                          .filter(ex -> ex.getAuthority().equals(ROLES))
-                          .collect(Collectors.toList()))) {
             a.setRealName(hideRealName(a.getRealName()));
           }
           if (CollUtil.isEmpty(dayReports)) {

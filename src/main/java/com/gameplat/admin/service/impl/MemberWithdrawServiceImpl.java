@@ -6,12 +6,14 @@ import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.gameplat.admin.component.WithdrawQueryCondition;
 import com.gameplat.admin.constant.WithdrawTypeConstant;
 import com.gameplat.admin.convert.MemberWithdrawConvert;
 import com.gameplat.admin.enums.BlacklistConstant.BizBlacklistType;
@@ -28,6 +30,7 @@ import com.gameplat.admin.model.dto.MemberWithdrawDTO;
 import com.gameplat.admin.model.dto.MemberWithdrawQueryDTO;
 import com.gameplat.admin.model.vo.MemberWithdrawBankVo;
 import com.gameplat.admin.model.vo.MemberWithdrawVO;
+import com.gameplat.admin.model.vo.RechargeOrderHistoryVO;
 import com.gameplat.admin.model.vo.SummaryVO;
 import com.gameplat.admin.service.*;
 import com.gameplat.admin.util.MoneyUtils;
@@ -36,6 +39,7 @@ import com.gameplat.base.common.json.JsonUtils;
 import com.gameplat.base.common.snowflake.IdGeneratorSnowflake;
 import com.gameplat.base.common.util.DateUtil;
 import com.gameplat.base.common.util.StringUtils;
+import com.gameplat.common.constant.CachedKeys;
 import com.gameplat.common.constant.NumberConstant;
 import com.gameplat.common.constant.SocketEnum;
 import com.gameplat.common.enums.*;
@@ -52,12 +56,14 @@ import com.gameplat.model.entity.pay.PpInterface;
 import com.gameplat.model.entity.pay.PpMerchant;
 import com.gameplat.model.entity.sys.SysDictData;
 import com.gameplat.model.entity.sys.SysUser;
+import com.gameplat.redis.redisson.DistributedLocker;
 import com.gameplat.security.SecurityUserHolder;
 import com.gameplat.security.context.UserCredential;
 import jodd.util.StringUtil;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
+import org.redisson.api.RLock;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -114,6 +120,9 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
   @Autowired(required = false)
   private MessageFeignClient client;
 
+  @Autowired
+  private DistributedLocker distributedLocker;
+
   private static boolean verifyPpMerchant(
       MemberWithdraw memberWithdraw, PpMerchant ppMerchant, PpInterface ppInterface) {
     ProxyPayMerBean proxyPayMerBean = ProxyPayMerBean.conver2Bean(ppMerchant.getMerLimits());
@@ -164,87 +173,14 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
     return false;
   }
 
+  @Autowired
+  private WithdrawQueryCondition condition;
+
   @Override
   public IPage<MemberWithdrawVO> findPage(Page<MemberWithdraw> page, MemberWithdrawQueryDTO dto) {
-    LambdaQueryWrapper<MemberWithdraw> query = Wrappers.lambdaQuery();
-    query
-        .in(
-            ObjectUtils.isNotNull(dto.getBankNameList()),
-            MemberWithdraw::getBankName,
-            dto.getBankNameList())
-        .eq(
-            ObjectUtils.isNotEmpty(dto.getSuperName()),
-            MemberWithdraw::getSuperName,
-            dto.getSuperName())
-        .eq(
-            ObjectUtils.isNotEmpty(dto.getBankCard()),
-            MemberWithdraw::getBankCard,
-            dto.getBankCard())
-        .eq(ObjectUtils.isNotEmpty(dto.getAccount()), MemberWithdraw::getAccount, dto.getAccount())
-        .ge(
-            ObjectUtils.isNotEmpty(dto.getCashMoneyFrom()),
-            MemberWithdraw::getCashMoney,
-            dto.getCashMoneyFrom())
-        .le(
-            ObjectUtils.isNotEmpty(dto.getCashMoneyFromTo()),
-            MemberWithdraw::getCashMoney,
-            dto.getCashMoneyFromTo())
-        .eq(
-            ObjectUtils.isNotEmpty(dto.getMemberType()),
-            MemberWithdraw::getMemberType,
-            dto.getMemberType())
-        .eq(
-            ObjectUtils.isNotEmpty(dto.getCashOrderNo()),
-            MemberWithdraw::getCashOrderNo,
-            dto.getCashOrderNo())
-        .eq(
-            ObjectUtils.isNotEmpty(dto.getOperatorAccount()),
-            MemberWithdraw::getOperatorAccount,
-            dto.getOperatorAccount())
-        .ge(
-            ObjectUtils.isNotNull(dto.getCreateTimeFrom()),
-            MemberWithdraw::getCreateTime,
-            dto.getCreateTimeFrom())
-        .le(
-            ObjectUtils.isNotNull(dto.getCreateTimeTo()),
-            MemberWithdraw::getCreateTime,
-            dto.getCreateTimeTo())
-        .in(
-            ObjectUtils.isNotNull(dto.getMemberLevelList()),
-            MemberWithdraw::getMemberLevel,
-            dto.getMemberLevelList());
-    if (ObjectUtils.isNotNull(dto.getRechargeStatusList())
-        && dto.getRechargeStatusList().size() > 0) {
-      query
-          .eq(
-              dto.getRechargeStatusList().contains(3L),
-              MemberWithdraw::getWithdrawType,
-              WithdrawTypeConstant.BANK)
-          .eq(
-              dto.getRechargeStatusList().contains(5L),
-              MemberWithdraw::getWithdrawType,
-              WithdrawTypeConstant.DIRECT)
-          .notIn(
-              dto.getRechargeStatusList().contains(4L),
-              MemberWithdraw::getWithdrawType,
-              WithdrawTypeConstant.BANK,
-              WithdrawTypeConstant.MANUAL,
-              WithdrawTypeConstant.DIRECT)
-          .gt(dto.getRechargeStatusList().contains(6L), MemberWithdraw::getCounterFee, 0);
-    }
-    if (ObjectUtils.isNotNull(dto.getCashStatusList())) {
-      query.in(MemberWithdraw::getCashStatus, dto.getCashStatusList());
-    } else {
-      query.le(MemberWithdraw::getCashStatus, WithdrawStatus.HANDLED.getValue());
-    }
-
-    query.orderBy(
-        ObjectUtils.isNotEmpty(dto.getOrder()),
-        Pages.isAsc(dto.getOrder()),
-        MemberWithdraw::getCreateTime);
-
+    QueryWrapper<MemberWithdraw> queryWrapper = condition.buildQuerySql(dto);
     // 统计受理订单总金额、未受理订单总金额
-    return Pages.of(this.page(page, query).convert(userWithdrawConvert::toVo), amountSum());
+    return Pages.of(memberWithdrawMapper.findPage(page, queryWrapper), amountSum());
   }
 
   @Override
@@ -372,73 +308,86 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
       updateWithdraw(memberWithdraw, origCashStatus);
       log.info("提现订单 第三方出款中 ，订单号为：{}", memberWithdraw.getCashOrderNo());
     } else if (toFinishCurrentOrder) {
-      memberWithdraw.setOperatorAccount(credential.getUsername());
-      memberWithdraw.setOperatorTime(new Date());
-      updateWithdraw(memberWithdraw, origCashStatus);
-      if (WithdrawStatus.SUCCESS.getValue() == cashStatus) {
-        // 添加會員出入款的報表記錄,如果是推广用户，则不计入报表
-        if (!UserTypes.PROMOTION.value().equals(member.getUserType())) {
-          memberRwReportService.addWithdraw(
-              member, memberInfo.getTotalWithdrawTimes(), memberWithdraw);
-        }
-        // 删除出款验证打码量记录的数据
-        validWithdrawService.remove(memberWithdraw.getMemberId(), memberWithdraw.getCreateTime());
-        // 免提直充
-        if (isDirect) {
-          this.directCharge(memberWithdraw, credential, userEquipment);
-        }
-        // 移除会员提现冻结金额
-        memberInfoService.updateFreeze(member.getId(), memberWithdraw.getCashMoney().negate());
-        // 计算会员出款次数和金额
-        memberInfoService.updateUserWithTimes(
-                member.getId(), memberWithdraw.getCashMoney().negate(), memberWithdraw.getPointFlag());
-      } else if (WithdrawStatus.CANCELLED.getValue() == cashStatus) { // 取消出款操作
-        if (ObjectUtil.isNotEmpty(cashReason)) {
-          memberWithdraw.setApproveReason(cashReason);
-          if (null == cashReason) {
-            throw new ServiceException("备注信息不能为空!");
+      String lock_key = String.format(CachedKeys.MEMBER_FINANCE, memberWithdraw.getAccount());
+      RLock lock = distributedLocker.lock(lock_key);
+      try {
+        memberWithdraw.setOperatorAccount(credential.getUsername());
+        memberWithdraw.setOperatorTime(new Date());
+        updateWithdraw(memberWithdraw, origCashStatus);
+        if (WithdrawStatus.SUCCESS.getValue() == cashStatus) {
+          // 添加會員出入款的報表記錄,如果是推广用户，则不计入报表
+          if (!UserTypes.PROMOTION.value().equals(member.getUserType())) {
+            memberRwReportService.addWithdraw(
+                    member, memberInfo.getTotalWithdrawTimes(), memberWithdraw);
           }
-          LambdaUpdateWrapper<MemberWithdraw> update = Wrappers.lambdaUpdate();
-          update.set(MemberWithdraw::getApproveReason, cashReason).eq(MemberWithdraw::getId, id);
-          this.update(new MemberWithdraw(), update);
+          // 删除出款验证打码量记录的数据
+          validWithdrawService.remove(memberWithdraw.getMemberId(), memberWithdraw.getCreateTime());
+          // 免提直充
+          if (isDirect) {
+            this.directCharge(memberWithdraw, credential, userEquipment);
+          }
+          // 移除会员提现冻结金额
+          memberInfoService.updateFreeze(member.getId(), memberWithdraw.getCashMoney().negate());
+          // 计算会员出款次数和金额
+          memberInfoService.updateUserWithTimes(
+                  member.getId(),
+                  memberWithdraw.getCashMoney().negate(),
+                  memberWithdraw.getPointFlag());
+        } else if (WithdrawStatus.CANCELLED.getValue() == cashStatus) { // 取消出款操作
+          if (ObjectUtil.isNotEmpty(cashReason)) {
+            memberWithdraw.setApproveReason(cashReason);
+            if (null == cashReason) {
+              throw new ServiceException("备注信息不能为空!");
+            }
+            LambdaUpdateWrapper<MemberWithdraw> update = Wrappers.lambdaUpdate();
+            update
+                    .set(MemberWithdraw::getApproveReason, cashReason)
+                    .set(MemberWithdraw::getOperatorTime, new Date())
+                    .set(MemberWithdraw::getOperatorAccount, credential.getUsername())
+                    .eq(MemberWithdraw::getId, id);
+
+            this.update(new MemberWithdraw(), update);
+          }
+          // 释放会员提现冻结金额
+          memberInfoService.updateFreeze(member.getId(), memberWithdraw.getCashMoney().negate());
+          // 释放会员提现金额
+          memberInfoService.updateBalance(member.getId(), memberWithdraw.getCashMoney());
+          String billContent =
+                  String.format(
+                          "管理员于%s向用户%s提现失败退回%.3f元,账户余额变更为:%.3f元",
+                          DateUtil.getNowTime(),
+                          member.getAccount(),
+                          memberWithdraw.getCashMoney(),
+                          (memberInfo.getBalance().add(memberWithdraw.getCashMoney())));
+          MemberBill bill = new MemberBill();
+          bill.setBalance(memberInfo.getBalance());
+          bill.setOrderNo(memberWithdraw.getCashOrderNo());
+          bill.setTranType(TranTypes.WITHDRAW_FAIL.getValue());
+          bill.setAmount(memberWithdraw.getCashMoney());
+          bill.setContent(billContent);
+          bill.setOperator(credential.getUsername());
+          memberBillService.save(member, bill);
+        } else if (WithdrawStatus.REFUSE.getValue() == cashStatus) {
+          String content =
+                  String.format(
+                          "您于%s提交的取现订单被没收，订单号为%s，金额：%s",
+                          DateUtil.getDateToString(
+                                  memberWithdraw.getCreateTime(), DateUtil.YYYY_MM_DD_HH_MM_SS),
+                          memberWithdraw.getCashOrderNo(),
+                          memberWithdraw.getCashMoney());
+          MemberBill bill = new MemberBill();
+          bill.setBalance(memberInfo.getBalance());
+          bill.setOrderNo(memberWithdraw.getCashOrderNo());
+          bill.setTranType(TranTypes.WITHDRAW_FAIL.getValue());
+          bill.setAmount(BigDecimal.ZERO);
+          bill.setContent(content);
+          bill.setOperator(credential.getUsername());
+          memberBillService.save(member, bill);
+          // 移除会员提现冻结金额
+          memberInfoService.updateFreeze(member.getId(), memberWithdraw.getCashMoney().negate());
         }
-        // 释放会员提现冻结金额
-        memberInfoService.updateFreeze(member.getId(), memberWithdraw.getCashMoney().negate());
-        // 释放会员提现金额
-        memberInfoService.updateBalance(member.getId(), memberWithdraw.getCashMoney());
-        String billContent =
-            String.format(
-                "管理员于%s向用户%s提现失败退回%.3f元,账户余额变更为:%.3f元",
-                DateUtil.getNowTime(),
-                member.getAccount(),
-                memberWithdraw.getCashMoney(),
-                (memberInfo.getBalance().add(memberWithdraw.getCashMoney())));
-        MemberBill bill = new MemberBill();
-        bill.setBalance(memberInfo.getBalance());
-        bill.setOrderNo(memberWithdraw.getCashOrderNo());
-        bill.setTranType(TranTypes.WITHDRAW_FAIL.getValue());
-        bill.setAmount(memberWithdraw.getCashMoney());
-        bill.setContent(billContent);
-        bill.setOperator(credential.getUsername());
-        memberBillService.save(member, bill);
-      } else if (WithdrawStatus.REFUSE.getValue() == cashStatus) {
-        String content =
-            String.format(
-                "您于%s提交的取现订单被没收，订单号为%s，金额：%s",
-                DateUtil.getDateToString(
-                    memberWithdraw.getCreateTime(), DateUtil.YYYY_MM_DD_HH_MM_SS),
-                memberWithdraw.getCashOrderNo(),
-                memberWithdraw.getCashMoney());
-        MemberBill bill = new MemberBill();
-        bill.setBalance(memberInfo.getBalance());
-        bill.setOrderNo(memberWithdraw.getCashOrderNo());
-        bill.setTranType(TranTypes.WITHDRAW_FAIL.getValue());
-        bill.setAmount(BigDecimal.ZERO);
-        bill.setContent(content);
-        bill.setOperator(credential.getUsername());
-        memberBillService.save(member, bill);
-        // 移除会员提现冻结金额
-        memberInfoService.updateFreeze(member.getId(), memberWithdraw.getCashMoney().negate());
+      } finally {
+        distributedLocker.unlock(lock);
       }
       // 新增出款记录
       MemberWithdraw withdraw = this.getById(id);
@@ -835,20 +784,6 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
     messageInfo.setCreateTime(new Date());
     messageMapper.insert(messageInfo);
 
-//    MessageDistribute messageDistribute = new MessageDistribute();
-//    messageDistribute.setMessageId(messageInfo.getId());
-//    messageDistribute.setUserId(memberWithdraw.getMemberId());
-//    messageDistribute.setUserAccount(messageInfo.getLinkAccount());
-//    messageDistribute.setRechargeLevel(Convert.toInt(memberWithdraw.getMemberLevel()));
-//    messageDistribute.setVipLevel(
-//        memberInfoService
-//            .lambdaQuery()
-//            .eq(MemberInfo::getMemberId, memberWithdraw.getMemberId())
-//            .one()
-//            .getVipLevel());
-//    messageDistribute.setReadStatus(NumberConstant.ZERO);
-//    messageDistribute.setCreateBy("system");
-//    messageDistributeService.save(messageDistribute);
   }
 
   private void sendMessage(String account, String channel, String message) {
@@ -871,7 +806,7 @@ public class MemberWithdrawServiceImpl extends ServiceImpl<MemberWithdrawMapper,
     if (ObjectUtil.equals(3, state)) {
       context = "您于" + dateStr + "提现的" + money.setScale(2, RoundingMode.CEILING) + "已提现成功。";
     } else {
-      context = "您于" + date + "提现的" + money.setScale(2, RoundingMode.CEILING) + "已失败。";
+      context = "您于" + dateStr + "提现的" + money.setScale(2, RoundingMode.CEILING) + "已失败。";
     }
     return context;
   }

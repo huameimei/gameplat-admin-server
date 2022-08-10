@@ -33,12 +33,12 @@ public class ActivityLobbyAddDTO implements Serializable {
 
   @NotNull(message = "开始时间不能为空")
   @Schema(description = "开始时间")
-  @JsonFormat(pattern = DateUtil.YYYY_MM_DD_HH_MM_SS)
+  @JsonFormat(pattern = DateUtil.YYYY_MM_DD_HH_MM_SS,timezone = "GMT+8")
   private Date startTime;
 
   @NotNull(message = "结束时间不能为空")
   @Schema(description = "结束时间")
-  @JsonFormat(pattern = DateUtil.YYYY_MM_DD_HH_MM_SS)
+  @JsonFormat(pattern = DateUtil.YYYY_MM_DD_HH_MM_SS,timezone = "GMT+8")
   private Date endTime;
 
   @Schema(description = "活动板块")
@@ -153,4 +153,7 @@ public class ActivityLobbyAddDTO implements Serializable {
 
   @Schema(description = "目标值")
   private String targetValue;
+
+  @Schema(description = "奖励计算类型 1固定金额 2百分比金额")
+  private Integer rewardCalculateType;
 }

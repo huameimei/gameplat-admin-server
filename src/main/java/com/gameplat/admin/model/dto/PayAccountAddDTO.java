@@ -86,4 +86,7 @@ public class PayAccountAddDTO implements Serializable {
 
   /** 虚拟货币类型 */
   private String currencyType;
+
+  /** 存款银行卡显示开关  1-是 0-否*/
+  private Integer bankAccountSwitch;
 }

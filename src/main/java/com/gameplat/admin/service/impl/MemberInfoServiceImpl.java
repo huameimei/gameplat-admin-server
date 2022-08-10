@@ -1,5 +1,6 @@
 package com.gameplat.admin.service.impl;
 
+import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.mapper.MemberInfoMapper;
 import com.gameplat.admin.model.dto.CleanAccountDTO;
@@ -75,6 +76,11 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
     MemberInfo entity = null;
     //判断是否是计入积分
     if (pointFlag == 1) {
+      //判断金额是否是充值金额
+      Integer totalRechTimes = memberInfo.getTotalRechTimes();
+      if (ObjectUtil.isNotEmpty(amount) && amount.compareTo(BigDecimal.ZERO) == 1) {
+        totalRechTimes = memberInfo.getTotalRechTimes() + 1;
+      }
       entity =
               MemberInfo.builder()
                       .memberId(memberId)
@@ -82,7 +88,7 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
                       .lastRechAmount(amount)
                       .lastRechTime(new Date())
                       .totalRechAmount(memberInfo.getTotalRechAmount().add(amount))
-                      .totalRechTimes(memberInfo.getTotalRechTimes() + 1)
+                      .totalRechTimes(totalRechTimes)
                       .version(memberInfo.getVersion())
                       .build();
 

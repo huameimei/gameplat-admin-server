@@ -1,5 +1,7 @@
 package com.gameplat.admin.service.impl;
 
+import cn.afterturn.easypoi.excel.ExcelExportUtil;
+import cn.afterturn.easypoi.excel.entity.ExportParams;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.json.JSONUtil;
@@ -18,14 +20,13 @@ import com.gameplat.admin.mapper.GameRebateDetailMapper;
 import com.gameplat.admin.mapper.GameRebateReportMapper;
 import com.gameplat.admin.model.dto.GameRebateReportQueryDTO;
 import com.gameplat.admin.model.dto.GameRebateStatisQueryDTO;
-import com.gameplat.admin.model.vo.GameMemberDayReportVO;
-import com.gameplat.admin.model.vo.GameReportVO;
-import com.gameplat.admin.model.vo.MemberInfoVO;
-import com.gameplat.admin.model.vo.PageDtoVO;
+import com.gameplat.admin.model.vo.*;
 import com.gameplat.admin.service.*;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.json.JsonUtils;
+import com.gameplat.base.common.snowflake.IdGeneratorSnowflake;
 import com.gameplat.common.enums.GameBlacklistTypeEnum;
+import com.gameplat.common.enums.GamePlatformEnum;
 import com.gameplat.common.enums.LimitEnums;
 import com.gameplat.common.enums.TranTypes;
 import com.gameplat.common.lang.Assert;
@@ -38,14 +39,19 @@ import com.gameplat.model.entity.recharge.RechargeOrder;
 import com.gameplat.redis.api.RedisService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.text.MessageFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -370,6 +376,7 @@ public class GameRebateReportServiceImpl
     memberBill.setAmount(realRebateMoney);
     memberBill.setBalance(member.getBalance());
     memberBill.setRemark(remark);
+    memberBill.setOrderNo(String.valueOf(IdGeneratorSnowflake.getInstance().nextId()));
     memberBill.setContent(
         String.format(
             "游戏返点派发：用户 %s 于 %s 收到返点金额 %.3f 元，最新余额 %.3f 元。",
@@ -470,5 +477,39 @@ public class GameRebateReportServiceImpl
       dto.setAccount(null);
     }
     return gameRebateReportMapper.queryGameReport(dto);
+  }
+
+  @Override
+  public void exportGameReport(GameRebateStatisQueryDTO dto, HttpServletResponse response) throws Exception {
+
+    if (StringUtils.isNotBlank(dto.getSuperAccount())) {
+      Member member = memberService.getByAccount(dto.getSuperAccount()).orElse(null);
+      if (ObjectUtils.isEmpty(member)) {
+        throw new Exception("用户不存在");
+      }
+      dto.setUserPaths(member.getSuperPath());
+      dto.setAccount(StringUtils.EMPTY);
+    }
+    List<GameReportVO> list = gameRebateReportMapper.queryGameReport(dto);
+    log.info("游戏交收报表查出{}条数据", list.size());
+    String title = MessageFormat.format("{0}至{1}游戏交收数据", dto.getBeginTime(), dto.getEndTime());
+    ExportParams exportParams = new ExportParams(title, "游戏交收数据");
+    response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename = gameReport.xls");
+
+    List<GameSettlementReportVO> settlementReports = new ArrayList<>();
+    list.forEach(o ->{
+      GameSettlementReportVO settlementReport = new GameSettlementReportVO();
+      BeanUtils.copyProperties(o, settlementReport);
+      settlementReports.add(settlementReport);
+    });
+    log.info("游戏交收报表导出{}条数据", settlementReports.size());
+    settlementReports.forEach(o -> o.setPlatformName(GamePlatformEnum.getName(o.getPlatformCode())));
+
+    try (Workbook workbook = ExcelExportUtil.exportExcel(exportParams, GameSettlementReportVO.class, settlementReports)) {
+      workbook.write(response.getOutputStream());
+    } catch (IOException e) {
+      log.error("请求导出游戏交收数据报错", e);
+    }
+
   }
 }

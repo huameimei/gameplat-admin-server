@@ -336,14 +336,16 @@ public class ActivityQualificationServiceImpl
       // 更新数据
       qualification.setStatus(ActivityInfoEnum.QualificationStatus.AUDITED.value());
       String remark = "";
-      if (ObjectUtils.isNotNull(dto.getAdjustAmount())) {
+      if (ObjectUtils.isNotNull(dto.getAdjustAmount())
+        && qualification.getMaxMoney().compareTo(dto.getAdjustAmount()) != 0) {
         if(qualification.getActivityType() != 1){
           throw new ServiceException("您选择的资格数据有非活动大厅类型的数据，目前只支持大厅类型的资格可以调整优惠金额");
         }
         qualification.setMaxMoney(dto.getAdjustAmount());
         remark = remark + "，调整优惠金额：" + dto.getAdjustAmount();
       }
-      if (ObjectUtils.isNotNull(dto.getAdjustDml())) {
+      if (ObjectUtils.isNotNull(dto.getAdjustDml())
+        && qualification.getWithdrawDml().compareTo(dto.getAdjustDml()) != 0) {
         if(qualification.getActivityType() != 1){
           throw new ServiceException("您选择的资格数据有非活动大厅类型的数据，目前只支持大厅类型的资格可以调整优惠打码量");
         }

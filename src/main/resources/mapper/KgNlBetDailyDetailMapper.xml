@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gameplat.admin.mapper.KgNlBetDailyDetailMapper">
+
+    <select id="findWinReportData" resultType="com.gameplat.admin.model.vo.KgNlWinReportVO">
+        SELECT
+        gameName,
+        gameCode,
+        userCount,
+        betCount,
+        betAmount,
+        validAmount,
+        winAmount,
+        betCount,
+        betAmount - Winamount  sendPrizeAmount,
+        ROUND(betAmount / usercount, 2)  averageBetAmount
+        FROM(
+        select
+        b.lottery_name gameName,
+        a.game_code gameCode,
+        count(distinct(a.account)) userCount,
+        IFNUll(sum(a.bet_count), 0) betCount,
+        IFNUll(sum(a.bet_amount), 0) betAmount,
+        IFNUll(sum(a.valid_amount), 0) validAmount,
+        IFNUll(sum(a.win_amount), 0) winAmount,
+        count(distinct(account)) betCount,
+        from kgnl_bet_daily_detail a
+        left join kgnl_lottery_map b on a.game_code = b.lottery_code
+        <where>
+            <if test="memberAccount != null and memberAccount != ''">
+                AND a.account = #{memberAccount}
+            </if>
+        </where>
+        <if test="proxyAccount != null and proxyAccount != ''">
+            <choose>
+                <when test="isDirectly == null or isDirectly == 0">
+                    and (a.super_path like concat('%/',#{proxyAccount},'/%') or a.account = #{proxyAccount})
+                </when>
+                <otherwise>
+                    and (a.super_account = #{proxyAccount} or a.account = #{proxyAccount})
+                </otherwise>
+            </choose>
+        </if>
+        <if test="lottType != null">
+            AND a.lott_type = #{lottType}
+        </if>
+        <if test="gameCode != null and gameCode != ''">
+            AND a.game_code = #{gameCode}
+        </if>
+       group by a.game_code ) c
+        <if test="orderByField != null and orderByField != '' and orderBySort != null and orderBySort != ''">
+            ORDER BY ${orderByField} ${orderBySort}
+        </if>
+    </select>
+
+</mapper>

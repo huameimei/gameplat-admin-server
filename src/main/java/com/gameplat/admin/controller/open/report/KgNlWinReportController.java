@@ -44,7 +44,7 @@ public class KgNlWinReportController {
 
   @GetMapping(value = "/findList")
   @PreAuthorize("hasAuthority('report:kgnl:view')")
-  @Operation(summary = "查询皇冠输赢报表")
+  @Operation(summary = "查询KG新彩票输赢报表")
   public List<KgNlWinReportVO> findList(@Valid KgNlWinReportQueryDTO queryDTO) {
     return kgNlWinReportService.findList(queryDTO);
   }

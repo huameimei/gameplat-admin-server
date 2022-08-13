@@ -11,9 +11,13 @@
         betAmount,
         validAmount,
         winAmount,
-        betCount,
         betAmount - Winamount  sendPrizeAmount,
-        ROUND(betAmount / usercount, 2)  averageBetAmount
+        ROUND(betAmount / usercount, 2)  averageBetAmount,
+        #{account} account,
+        #{proxyAccount} proxyAccount,
+        #{isDirectly} isDirectly,
+        #{beginTime} beginTime,
+        #{endTime} endTime
         FROM(
         select
         b.lottery_name gameName,
@@ -22,31 +26,36 @@
         IFNUll(sum(a.bet_count), 0) betCount,
         IFNUll(sum(a.bet_amount), 0) betAmount,
         IFNUll(sum(a.valid_amount), 0) validAmount,
-        IFNUll(sum(a.win_amount), 0) winAmount,
-        count(distinct(account)) betCount,
+        IFNUll(sum(a.win_amount), 0) winAmount
         from kgnl_bet_daily_detail a
         left join kgnl_lottery_map b on a.game_code = b.lottery_code
         <where>
-            <if test="memberAccount != null and memberAccount != ''">
-                AND a.account = #{memberAccount}
+            <if test="account != null and account != ''">
+                AND a.account = #{account}
+            </if>
+            <if test="proxyAccount != null and proxyAccount != ''">
+                <choose>
+                    <when test="isDirectly == null or isDirectly == 0">
+                        and (a.super_path like concat('%/',#{proxyAccount},'/%') or a.account = #{proxyAccount})
+                    </when>
+                    <otherwise>
+                        and (a.super_account = #{proxyAccount} or a.account = #{proxyAccount})
+                    </otherwise>
+                </choose>
+            </if>
+            <if test="lottType != null">
+                AND a.lott_type = #{lottType}
+            </if>
+            <if test="gameCode != null and gameCode != ''">
+                AND a.game_code = #{gameCode}
+            </if>
+            <if test="beginTime != null and beginTime != ''">
+                AND a.stat_time <![CDATA[ >= ]]> #{beginTime}
+            </if>
+            <if test="endTime != null and endTime != ''">
+                AND a.stat_time <![CDATA[ <= ]]> #{endTime}
             </if>
         </where>
-        <if test="proxyAccount != null and proxyAccount != ''">
-            <choose>
-                <when test="isDirectly == null or isDirectly == 0">
-                    and (a.super_path like concat('%/',#{proxyAccount},'/%') or a.account = #{proxyAccount})
-                </when>
-                <otherwise>
-                    and (a.super_account = #{proxyAccount} or a.account = #{proxyAccount})
-                </otherwise>
-            </choose>
-        </if>
-        <if test="lottType != null">
-            AND a.lott_type = #{lottType}
-        </if>
-        <if test="gameCode != null and gameCode != ''">
-            AND a.game_code = #{gameCode}
-        </if>
        group by a.game_code ) c
         <if test="orderByField != null and orderByField != '' and orderBySort != null and orderBySort != ''">
             ORDER BY ${orderByField} ${orderBySort}

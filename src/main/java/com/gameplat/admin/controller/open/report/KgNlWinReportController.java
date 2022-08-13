@@ -1,5 +1,6 @@
 package com.gameplat.admin.controller.open.report;
 
+import com.alibaba.excel.util.DateUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.gameplat.admin.enums.TimeTypeEnum;
 import com.gameplat.admin.model.dto.GameBetRecordQueryDTO;
@@ -9,6 +10,7 @@ import com.gameplat.admin.model.vo.KgNlWinReportVO;
 import com.gameplat.admin.model.vo.PageDtoVO;
 import com.gameplat.admin.service.GameBetRecordInfoService;
 import com.gameplat.admin.service.KgNlWinReportService;
+import com.gameplat.base.common.util.DateUtil;
 import com.gameplat.common.enums.GameKindEnum;
 import com.gameplat.common.enums.SettleStatusEnum;
 import io.swagger.v3.oas.annotations.Operation;
@@ -64,8 +66,10 @@ public class KgNlWinReportController {
     dto.setGameKind(GameKindEnum.KGNL_LOTTERY.code());
     dto.setSettle(SettleStatusEnum.YES.getValue().toString());
     dto.setTimeType(TimeTypeEnum.STAT_TIME.getValue());
-    dto.setBeginTime(dto.getBeginTime() + " 00:00:00");
-    dto.setEndTime(dto.getEndTime() + "23:59:59");
+    dto.setBeginTime(String.valueOf(
+      DateUtil.strToDate(dto.getBeginTime() + " 00:00:00", "yyyy-MM-dd HH:mm:ss").getTime()));
+    dto.setEndTime(String.valueOf(
+      DateUtil.strToDate(dto.getEndTime() + " 23:59:59", "yyyy-MM-dd HH:mm:ss").getTime()));
     return gameBetRecordInfoService.queryPageBetRecord(page, dto);
   }
 }

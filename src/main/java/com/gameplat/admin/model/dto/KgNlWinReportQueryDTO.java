@@ -9,7 +9,7 @@ import java.io.Serializable;
 public class KgNlWinReportQueryDTO implements Serializable {
 
   @Schema(description = "会员账号")
-  private String memberAccount;
+  private String account;
 
   @Schema(description = "代理账号")
   private String proxyAccount;
@@ -24,7 +24,7 @@ public class KgNlWinReportQueryDTO implements Serializable {
   private String gameCode;
 
   @Schema(description = "开始时间")
-  private String startTime;
+  private String beginTime;
 
   @Schema(description = "结束时间")
   private String endTime;

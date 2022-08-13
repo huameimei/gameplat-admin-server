@@ -46,7 +46,7 @@ public class KgNlWinReportVO implements Serializable {
   private BigDecimal averageBetAmount = BigDecimal.ZERO;
 
   @Schema(description = "会员账号")
-  private String memberAccount;
+  private String account;
 
   @Schema(description = "代理账号")
   private String proxyAccount;
@@ -55,9 +55,9 @@ public class KgNlWinReportVO implements Serializable {
   private Integer isDirectly;
 
   @Schema(description = "开始时间")
-  private Long beginTime;
+  private String beginTime;
 
   @Schema(description = "结束时间")
-  private Long endTime;
+  private String endTime;
 
 }

@@ -981,4 +981,14 @@
         ) as a inner join member b on a.agent_name = b.account
         where b.user_type = 'A'
     </select>
+
+    <select id="getMemberDayReport" resultMap="BaseResultMap">
+        select * from member_day_report
+        where count_date = #{dateStr} and user_name = #{account}
+    </select>
+
+    <update id="updateWaterAmount">
+        update member_day_report set water_amount = #{waterAmount}
+        where count_date = #{dateStr} and user_name = #{account}
+    </update>
 </mapper>

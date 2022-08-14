@@ -2,6 +2,7 @@ package com.gameplat.admin.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.StrUtil;
@@ -13,6 +14,7 @@ import com.gameplat.admin.mapper.GameMemberReportMapper;
 import com.gameplat.admin.mapper.MemberDayReportMapper;
 import com.gameplat.admin.model.dto.AgentReportQueryDTO;
 import com.gameplat.admin.model.vo.MemberDayReportVo;
+import com.gameplat.admin.model.vo.MemberInfoVO;
 import com.gameplat.admin.model.vo.PageDtoVO;
 import com.gameplat.admin.service.AgentConfigService;
 import com.gameplat.admin.service.MemberDayReportService;
@@ -256,6 +258,33 @@ public class MemberDayReportServiceImpl extends ServiceImpl<MemberDayReportMappe
       out.flush();
     } catch (Exception e) {
       throw new ServiceException("代理报表导出IO错误:{}", e);
+    }
+  }
+
+  @Override
+  public void addUpdateWaterAmount(
+      MemberInfoVO member, BigDecimal realRebateMoney, String statTime) {
+    String toDateStr = StrUtil.isNotBlank(statTime) ? statTime : DateTime.now().toDateStr();
+    String account = member.getAccount();
+    MemberDayReport memberDayReport = memberReportMapper.getMemberDayReport(account, toDateStr);
+    if (BeanUtil.isNotEmpty(memberDayReport)) {
+      BigDecimal waterAmount = memberDayReport.getWaterAmount();
+      waterAmount = waterAmount == null ? BigDecimal.ZERO : waterAmount;
+      memberReportMapper.updateWaterAmount(account, toDateStr, realRebateMoney.add(waterAmount));
+    } else {
+      MemberDayReport saveObj = new MemberDayReport();
+      saveObj.setCountDate(DateUtil.parse(toDateStr, "yyyy-MM-dd"));
+      saveObj.setUserId(member.getId());
+      saveObj.setUserName(member.getAccount());
+      saveObj.setParentId(member.getParentId() == null ? 1L : member.getParentId().longValue());
+      saveObj.setParentName(member.getParentName());
+      String userType = member.getUserType();
+      saveObj.setUserType(userType.equalsIgnoreCase("A") ? 5 : 2);
+      saveObj.setAgentPath(member.getSuperPath());
+      saveObj.setWaterAmount(realRebateMoney);
+      saveObj.setUserLevel(member.getUserLevel() == null ? "1" : member.getUserLevel().toString());
+      saveObj.setVipLevel(member.getVipLevel() == null ? "0" : member.getVipLevel().toString());
+      memberReportMapper.insert(saveObj);
     }
   }
 }

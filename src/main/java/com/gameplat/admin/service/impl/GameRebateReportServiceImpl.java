@@ -88,6 +88,8 @@ public class GameRebateReportServiceImpl
 
   @Autowired private LimitInfoService limitInfoService;
 
+  @Autowired private MemberDayReportService memberDayReportService;
+
   @Override
   public PageDtoVO<GameRebateDetail> queryPage(
       Page<GameRebateDetail> page, GameRebateReportQueryDTO dto) {
@@ -339,7 +341,8 @@ public class GameRebateReportServiceImpl
   }
 
   @Override
-  public void accept(Long periodId, Long memberId, BigDecimal realRebateMoney, String remark)
+  public void accept(
+      Long periodId, Long memberId, BigDecimal realRebateMoney, String remark, String statTime)
       throws Exception {
     verifyAndUpdate(memberId, periodId, GameRebateReportStatus.ACCEPTED.getValue(), remark);
     LimitInfo limitInfo = limitInfoService.getLimitInfo(LimitEnums.MEMBER_WITHDRAW_LIMIT.getName());
@@ -390,6 +393,9 @@ public class GameRebateReportServiceImpl
     // 修改账户余额
     memberInfoService.updateBalanceWithRecharge(
             member.getId(), realRebateMoney, realRebateMoney, 0);
+
+    // 填充会员日报
+    memberDayReportService.addUpdateWaterAmount(member, realRebateMoney, statTime);
   }
 
   @Override

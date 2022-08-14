@@ -131,7 +131,8 @@ public class GameRebatePeriodController {
               dto.getId(),
               gameRebateDetail.getMemberId(),
               gameRebateDetail.getRealRebateMoney(),
-              gameRebateDetail.getPeriodName() + "-游戏返水");
+              gameRebateDetail.getPeriodName() + "-游戏返水",
+              statTime);
         } catch (Exception e) {
           log.error("派发异常: " + JSONUtil.toJsonStr(gameRebateDetail));
           throw new RuntimeException("派发异常", e);

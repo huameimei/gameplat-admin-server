@@ -143,4 +143,12 @@ public interface GameMemberReportMapper extends BaseMapper<MemberDayReport> {
       @Param("agentName") String agentName,
       @Param("startDate") String startDate,
       @Param("endDate") String endDate);
+
+  MemberDayReport getMemberDayReport(
+      @Param("account") String account, @Param("dateStr") String dateStr);
+
+  Integer updateWaterAmount(
+      @Param("account") String account,
+      @Param("dateStr") String dateStr,
+      @Param("waterAmount") BigDecimal waterAmount);
 }

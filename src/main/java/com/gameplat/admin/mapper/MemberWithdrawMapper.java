@@ -23,7 +23,7 @@ public interface MemberWithdrawMapper extends BaseMapper<MemberWithdraw> {
     "w.risk_opraccount, w.risk_oprtime, w.risk_status, w.approve_reason, w.approve_money, w.counter_fee, w.member_level, w.super_id," +
     "w.super_name, w.super_path, w.fk, w.police_flag, w.browser, w.mac_os, w.ip_address, w.user_agent, w.proxy_pay_status, w.proxy_pay_desc, " +
     "w.point_flag, w.pp_interface, w.pp_interface_name, w.pp_merchant_id, w.pp_merchant_name, w.member_memo, w.member_type, w.withdraw_type," +
-    "w.currency_rate, w.currency_count, w.currency_protocol, w.approve_currency_rate, w.approve_currency_count, w.is_bank_blacklist, m.remark " +
+    "w.currency_rate, w.currency_count, w.currency_protocol, w.approve_currency_rate, w.approve_currency_count, w.is_bank_blacklist, m.remark as userRemark " +
     " from member_withdraw as w left join member as m on w.member_id = m.id ${ew.customSqlSegment}")
   IPage<MemberWithdrawVO> findPage(Page<MemberWithdraw> page, @Param(Constants.WRAPPER) QueryWrapper<MemberWithdraw> queryWrapper);
 }

@@ -21,8 +21,20 @@ public class KgNlWinReportVO implements Serializable {
   private Integer lottType;
 
   @Schema(description = "彩票类型名字")
-  @Excel(name = "彩票类型名字", width = 15, isImportField = "true_st")
+  @Excel(name = "彩票类型", width = 15, isImportField = "true_st")
   private String lottTypeName;
+
+  @Schema(description = "会员账号")
+  @Excel(name = "会员账号", width = 15, isColumnHidden = true, isImportField = "true_st")
+  private String account;
+
+  @Schema(description = "代理账号")
+  @Excel(name = "代理账号", width = 15, isColumnHidden = true, isImportField = "true_st")
+  private String proxyAccount;
+
+  @Schema(description = "是否只包含直属下级")
+  @Excel(name = "直属下级", width = 15, isColumnHidden = true, isImportField = "true_st")
+  private String isDirectlyStr;
 
   @Schema(description = "投注人数")
   @Excel(name = "投注人数", width = 15, isImportField = "true_st")
@@ -51,18 +63,6 @@ public class KgNlWinReportVO implements Serializable {
   @Schema(description = "人均投注金额")
   @Excel(name = "人均投注金额", width = 15, isImportField = "true_st")
   private BigDecimal averageBetAmount = BigDecimal.ZERO;
-
-  @Schema(description = "会员账号")
-  @Excel(name = "会员账号", width = 15, isColumnHidden = true, isImportField = "true_st")
-  private String account;
-
-  @Schema(description = "代理账号")
-  @Excel(name = "代理账号", width = 15, isColumnHidden = true, isImportField = "true_st")
-  private String proxyAccount;
-
-  @Schema(description = "是否包含直属下级")
-  @Excel(name = "直属下级", width = 15, isColumnHidden = true, isImportField = "true_st")
-  private String isDirectlyStr;
 
   @Schema(description = "是否包含直属下级")
   private Integer isDirectly;

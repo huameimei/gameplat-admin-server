@@ -58,6 +58,10 @@ public class KgNlWinReportServiceImpl implements KgNlWinReportService {
     } catch (IOException e) {
       log.error("彩票输赢报表导出IO异常", e);
     }
+
+    EasyPoiUtil.hiddenColumn("account", true, KgNlWinReportVO.class);
+    EasyPoiUtil.hiddenColumn("proxyAccount", true, KgNlWinReportVO.class);
+    EasyPoiUtil.hiddenColumn("isDirectlyStr", true, KgNlWinReportVO.class);
   }
 
 }

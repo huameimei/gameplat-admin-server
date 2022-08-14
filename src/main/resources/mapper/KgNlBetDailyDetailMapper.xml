@@ -5,6 +5,8 @@
     <select id="findWinReportData" resultType="com.gameplat.admin.model.vo.KgNlWinReportVO">
         SELECT
         gameName,
+        lottType,
+        case when lottType = 1 then '官彩' when lottType = 2 then '私彩' when lottType = 3 then '香港彩' end lottTypeName,
         gameCode,
         userCount,
         betCount,
@@ -15,12 +17,14 @@
         ROUND(betAmount / usercount, 2)  averageBetAmount,
         #{account} account,
         #{proxyAccount} proxyAccount,
+        case when #{isDirectly} = 0 then '否' when #{isDirectly} = 1 then '是' end isDirectlyStr,
         #{isDirectly} isDirectly,
         #{beginTime} beginTime,
         #{endTime} endTime
         FROM(
         select
         b.lottery_name gameName,
+        b.lottery_type lottType,
         a.game_code gameCode,
         count(distinct(a.account)) userCount,
         IFNUll(sum(a.bet_count), 0) betCount,

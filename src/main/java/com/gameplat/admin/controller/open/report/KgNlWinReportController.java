@@ -1,6 +1,6 @@
 package com.gameplat.admin.controller.open.report;
 
-import com.alibaba.excel.util.DateUtils;
+import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.gameplat.admin.enums.TimeTypeEnum;
 import com.gameplat.admin.model.dto.GameBetRecordQueryDTO;
@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -44,10 +45,17 @@ public class KgNlWinReportController {
   @Autowired
   private GameBetRecordInfoService gameBetRecordInfoService;
 
+
   @GetMapping(value = "/findList")
   @PreAuthorize("hasAuthority('report:kgnl:view')")
   @Operation(summary = "查询KG新彩票输赢报表")
   public List<KgNlWinReportVO> findList(@Valid KgNlWinReportQueryDTO queryDTO) {
+    if (ObjectUtils.isEmpty(queryDTO.getBeginTime())) {
+      queryDTO.setBeginTime(DateUtil.formatDateToStr(DateUtil.addDate(new Date(), -2), DateUtil.YYYY_MM_DD));
+    }
+    if (ObjectUtils.isEmpty(queryDTO.getEndTime())) {
+      queryDTO.setEndTime(DateUtil.formatDateToStr(new Date(), DateUtil.YYYY_MM_DD));
+    }
     return kgNlWinReportService.findList(queryDTO);
   }
 
@@ -55,6 +63,12 @@ public class KgNlWinReportController {
   @PreAuthorize("hasAuthority('report:kgnl:export')")
   @Operation(summary = "导出KG新彩票输赢报表")
   public void exportReport(@Valid KgNlWinReportQueryDTO queryDTO, HttpServletResponse response) {
+    if (ObjectUtils.isEmpty(queryDTO.getBeginTime())) {
+      queryDTO.setBeginTime(DateUtil.formatDateToStr(DateUtil.addDate(new Date(), -2), DateUtil.YYYY_MM_DD));
+    }
+    if (ObjectUtils.isEmpty(queryDTO.getEndTime())) {
+      queryDTO.setEndTime(DateUtil.formatDateToStr(new Date(), DateUtil.YYYY_MM_DD));
+    }
     kgNlWinReportService.exportReport(queryDTO, response);
   }
 

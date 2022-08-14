@@ -15,7 +15,7 @@ public class KgNlWinReportQueryDTO implements Serializable {
   private String proxyAccount;
 
   @Schema(description = "是否只查询直属下级")
-  private Integer isDirectly;
+  private Integer isDirectly = 1;
 
   @Schema(description = "彩种类型 1官彩 2私彩 3六合彩")
   private Integer lottType;

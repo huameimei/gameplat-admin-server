@@ -1,5 +1,8 @@
 package com.gameplat.admin.controller.open.proxy;
 
+import cn.hutool.core.util.StrUtil;
+import cn.hutool.json.JSONObject;
+import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.gameplat.admin.model.dto.DivideConfigDTO;
@@ -97,6 +100,9 @@ public class DivideLayerConfigController {
   @PostMapping("/delete")
   @PreAuthorize("hasAuthority('agent:bonusconfig:remove')")
   public void remove(@RequestBody String ids) {
-    layerConfigService.remove(ids);
+    if (StrUtil.isNotBlank(ids)) {
+      JSONObject jsonObject = JSONUtil.parseObj(ids);
+      layerConfigService.remove(jsonObject.getStr("ids"));
+    }
   }
 }

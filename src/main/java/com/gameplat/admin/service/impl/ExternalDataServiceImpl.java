@@ -29,7 +29,6 @@ public class ExternalDataServiceImpl implements ExternalDataService {
         try {
             List<ExternalDataVo> paramlist = EasyExcelUtil.readExcel(file.getInputStream(), ExternalDataVo.class);
             log.info("共需导入{}条数据", paramlist.size());
-
         } catch (IOException ioException) {
             ioException.printStackTrace();
         }

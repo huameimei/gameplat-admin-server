@@ -6,7 +6,7 @@
         SELECT
         gameName,
         lottType,
-        case when lottType = 1 then '官彩' when lottType = 2 then '私彩' when lottType = 3 then '香港彩' end lottTypeName,
+        case when lottType = 1 then '官方彩' when lottType = 2 then '自营彩' when lottType = 3 then '六合彩' end lottTypeName,
         gameCode,
         userCount,
         betCount,
@@ -40,7 +40,7 @@
             <if test="proxyAccount != null and proxyAccount != ''">
                 <choose>
                     <when test="isDirectly == null or isDirectly == 0">
-                        and (a.super_path like concat('%/',#{proxyAccount},'/%') or a.account = #{proxyAccount})
+                        and (a.user_paths like concat('%/',#{proxyAccount},'/%') or a.account = #{proxyAccount})
                     </when>
                     <otherwise>
                         and (a.super_account = #{proxyAccount} or a.account = #{proxyAccount})

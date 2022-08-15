@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gameplat.admin.mapper.KgNlBetDailyDetailMapper">
+
+    <select id="findWinReportData" resultType="com.gameplat.admin.model.vo.KgNlWinReportVO">
+        SELECT
+        gameName,
+        lottType,
+        case when lottType = 1 then '官方彩' when lottType = 2 then '自营彩' when lottType = 3 then '六合彩' end lottTypeName,
+        gameCode,
+        userCount,
+        betCount,
+        betAmount,
+        validAmount,
+        winAmount,
+        betAmount - Winamount sendPrizeAmount,
+        ROUND(betAmount / usercount, 2) averageBetAmount,
+        #{account} account,
+        #{proxyAccount} proxyAccount,
+        case when #{isDirectly} = 0 then '否' when #{isDirectly} = 1 then '是' end isDirectlyStr,
+        #{isDirectly} isDirectly,
+        #{beginTime} beginTime,
+        #{endTime} endTime
+        FROM(
+        select
+        b.lottery_name gameName,
+        b.lottery_type lottType,
+        a.game_code gameCode,
+        count(distinct(a.account)) userCount,
+        IFNUll(sum(a.bet_count), 0) betCount,
+        IFNUll(sum(a.bet_amount), 0) betAmount,
+        IFNUll(sum(a.valid_amount), 0) validAmount,
+        IFNUll(sum(a.win_amount), 0) winAmount
+        from kgnl_bet_daily_detail a
+        left join kgnl_lottery_map b on a.game_code = b.lottery_code
+        <where>
+            <if test="account != null and account != ''">
+                AND a.account = #{account}
+            </if>
+            <if test="proxyAccount != null and proxyAccount != ''">
+                <choose>
+                    <when test="isDirectly == null or isDirectly == 0">
+                        and (a.user_paths like concat('%/',#{proxyAccount},'/%') or a.account = #{proxyAccount})
+                    </when>
+                    <otherwise>
+                        and (a.super_account = #{proxyAccount} or a.account = #{proxyAccount})
+                    </otherwise>
+                </choose>
+            </if>
+            <if test="lottType != null">
+                AND a.lott_type = #{lottType}
+            </if>
+            <if test="gameCode != null and gameCode != ''">
+                AND a.game_code = #{gameCode}
+            </if>
+            <if test="beginTime != null and beginTime != ''">
+                AND a.stat_time <![CDATA[ >= ]]> #{beginTime}
+            </if>
+            <if test="endTime != null and endTime != ''">
+                AND a.stat_time <![CDATA[ <= ]]> #{endTime}
+            </if>
+        </where>
+        group by a.game_code ) c
+        <if test="orderByField != null and orderByField != '' and orderBySort != null and orderBySort != ''">
+            ORDER BY ${orderByField} ${orderBySort}
+        </if>
+    </select>
+
+    <select id="findDetailPage" resultType="com.gameplat.admin.model.vo.KgNlBetDailyDetailVO">
+        select
+        b.lottery_name gameCodeName,
+        a.account account,
+        a.game_code gameCode,
+        IFNUll(sum(a.bet_amount), 0) betAmount,
+        IFNUll(sum(a.valid_amount), 0) validAmount,
+        IFNUll(sum(a.win_amount), 0) winAmount
+        from kgnl_bet_daily_detail a
+        left join kgnl_lottery_map b on a.game_code = b.lottery_code
+        <where>
+            <if test="dto.account != null and dto.account != ''">
+                AND a.account = #{dto.account}
+            </if>
+            <if test="dto.proxyAccount != null and dto.proxyAccount != ''">
+                <choose>
+                    <when test="dto.isDirectly == null or dto.isDirectly == 0">
+                        and (a.user_paths like concat('%/',#{dto.proxyAccount},'/%') or a.account = #{dto.proxyAccount})
+                    </when>
+                    <otherwise>
+                        and (a.super_account = #{dto.proxyAccount} or a.account = #{dto.proxyAccount})
+                    </otherwise>
+                </choose>
+            </if>
+            <if test="dto.lottType != null">
+                AND a.lott_type = #{dto.lottType}
+            </if>
+            <if test="dto.gameCode != null and dto.gameCode != ''">
+                AND a.game_code = #{dto.gameCode}
+            </if>
+            <if test="dto.beginTime != null and dto.beginTime != ''">
+                AND a.stat_time <![CDATA[ >= ]]> #{dto.beginTime}
+            </if>
+            <if test="dto.endTime != null and dto.endTime != ''">
+                AND a.stat_time <![CDATA[ <= ]]> #{dto.endTime}
+            </if>
+        </where>
+        group by a.account
+    </select>
+
+    <select id="findDetailList" resultType="com.gameplat.admin.model.vo.KgNlBetDailyDetailVO">
+        select
+        gameCodeName,
+        account,
+        gameCode,
+        betCount,
+        betAmount,
+        validAmount,
+        winAmount,
+        betAmount - Winamount sendPrizeAmount
+        from
+        (
+        select
+        b.lottery_name gameCodeName,
+        a.account account,
+        a.game_code gameCode,
+        IFNUll(sum(a.bet_count), 0) betCount,
+        IFNUll(sum(a.bet_amount), 0) betAmount,
+        IFNUll(sum(a.valid_amount), 0) validAmount,
+        IFNUll(sum(a.win_amount), 0) winAmount
+        from kgnl_bet_daily_detail a
+        left join kgnl_lottery_map b on a.game_code = b.lottery_code
+        <where>
+            <if test="account != null and account != ''">
+                AND a.account = #{account}
+            </if>
+            <if test="proxyAccount != null and proxyAccount != ''">
+                <choose>
+                    <when test="isDirectly == null or isDirectly == 0">
+                        and (a.user_paths like concat('%/',#{proxyAccount},'/%') or a.account = #{proxyAccount})
+                    </when>
+                    <otherwise>
+                        and (a.super_account = #{proxyAccount} or a.account = #{proxyAccount})
+                    </otherwise>
+                </choose>
+            </if>
+            <if test="lottType != null">
+                AND a.lott_type = #{lottType}
+            </if>
+            <if test="gameCode != null and gameCode != ''">
+                AND a.game_code = #{gameCode}
+            </if>
+            <if test="beginTime != null and beginTime != ''">
+                AND a.stat_time <![CDATA[ >= ]]> #{beginTime}
+            </if>
+            <if test="endTime != null and endTime != ''">
+                AND a.stat_time <![CDATA[ <= ]]> #{endTime}
+            </if>
+        </where>
+        group by a.account) c
+    </select>
+
+    <select id="findTotalData" resultType="com.gameplat.model.entity.game.KgNlBetDailyDetail">
+        select
+        IFNUll(sum(a.bet_amount), 0) betAmount,
+        IFNUll(sum(a.valid_amount), 0) validAmount,
+        IFNUll(sum(a.win_amount), 0) winAmount
+        from kgnl_bet_daily_detail a
+        <where>
+            <if test="account != null and account != ''">
+                AND a.account = #{account}
+            </if>
+            <if test="proxyAccount != null and proxyAccount != ''">
+                <choose>
+                    <when test="isDirectly == null or isDirectly == 0">
+                        and (a.user_paths like concat('%/',#{proxyAccount},'/%') or a.account = #{proxyAccount})
+                    </when>
+                    <otherwise>
+                        and (a.super_account = #{proxyAccount} or a.account = #{proxyAccount})
+                    </otherwise>
+                </choose>
+            </if>
+            <if test="lottType != null">
+                AND a.lott_type = #{lottType}
+            </if>
+            <if test="gameCode != null and gameCode != ''">
+                AND a.game_code = #{gameCode}
+            </if>
+            <if test="beginTime != null and beginTime != ''">
+                AND a.stat_time <![CDATA[ >= ]]> #{beginTime}
+            </if>
+            <if test="endTime != null and endTime != ''">
+                AND a.stat_time <![CDATA[ <= ]]> #{endTime}
+            </if>
+        </where>
+    </select>
+</mapper>

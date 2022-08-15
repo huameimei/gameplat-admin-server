@@ -92,7 +92,7 @@ public class AgentConfigServiceImpl implements AgentConfigService {
 
     Map<String, JSONObject> map =
         JSONUtil.toBean(fissionPresetValue, new TypeReference<Map<String, JSONObject>>() {}, true);
-    log.info("变成妈怕、后的参数：{}", map);
+    log.info("变成后的参数：{}", map);
     gameTypeList.forEach(
         gameType -> {
           List<FissionDivideConfigVo> divideLevels =

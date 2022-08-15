@@ -33,6 +33,6 @@ public class ExternalDataVo implements Serializable {
   private String rechAmount;
   private Integer withCount;
   private String withAmount;
-  private String firstRechAmount;
-  private String firstWithAmount;
+  //  private String firstRechAmount;
+  //  private String firstWithAmount;
 }

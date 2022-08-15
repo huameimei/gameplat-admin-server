@@ -6,7 +6,7 @@
         SELECT
         gameName,
         lottType,
-        case when lottType = 1 then '官彩' when lottType = 2 then '私彩' when lottType = 3 then '香港彩' end lottTypeName,
+        case when lottType = 1 then '官方彩' when lottType = 2 then '自营彩' when lottType = 3 then '六合彩' end lottTypeName,
         gameCode,
         userCount,
         betCount,

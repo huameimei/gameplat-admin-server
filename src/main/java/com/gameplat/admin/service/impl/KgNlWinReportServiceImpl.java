@@ -1,11 +1,13 @@
 package com.gameplat.admin.service.impl;
 
 import cn.afterturn.easypoi.excel.ExcelExportUtil;
-import cn.afterturn.easypoi.excel.annotation.Excel;
 import cn.afterturn.easypoi.excel.entity.ExportParams;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.gameplat.admin.model.dto.KgNlWinReportQueryDTO;
+import com.gameplat.admin.model.vo.KgNlBetDailyDetailVO;
 import com.gameplat.admin.model.vo.KgNlWinReportVO;
+import com.gameplat.admin.model.vo.PageDtoVO;
 import com.gameplat.admin.service.KgNlBetDailyDetailService;
 import com.gameplat.admin.service.KgNlWinReportService;
 import com.gameplat.admin.util.EasyPoiUtil;
@@ -17,11 +19,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Proxy;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author aBen
@@ -62,6 +60,16 @@ public class KgNlWinReportServiceImpl implements KgNlWinReportService {
     EasyPoiUtil.hiddenColumn("account", true, KgNlWinReportVO.class);
     EasyPoiUtil.hiddenColumn("proxyAccount", true, KgNlWinReportVO.class);
     EasyPoiUtil.hiddenColumn("isDirectlyStr", true, KgNlWinReportVO.class);
+  }
+
+  @Override
+  public PageDtoVO<KgNlBetDailyDetailVO> findUserDetail(Page<KgNlBetDailyDetailVO> page, KgNlWinReportQueryDTO dto) {
+    return kgNlBetDailyDetailService.findDetailPage(page, dto);
+  }
+
+  @Override
+  public void exportUserDetail(KgNlWinReportQueryDTO queryDTO, HttpServletResponse response) {
+    kgNlBetDailyDetailService.exportDetail(response, queryDTO);
   }
 
 }

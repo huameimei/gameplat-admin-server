@@ -92,7 +92,7 @@ public class AgentConfigServiceImpl implements AgentConfigService {
 
     Map<String, JSONObject> map =
         JSONUtil.toBean(fissionPresetValue, new TypeReference<Map<String, JSONObject>>() {}, true);
-
+    log.info("变成后的参数：{}", map);
     gameTypeList.forEach(
         gameType -> {
           List<FissionDivideConfigVo> divideLevels =
@@ -102,6 +102,7 @@ public class AgentConfigServiceImpl implements AgentConfigService {
                   .collect(Collectors.toList());
           fissionPresetValueMap.put(gameType.getDictLabel(), divideLevels);
         });
+    log.info("返回的值:{}", fissionPresetValueMap);
 
     // 周期预设
     List<FissionDivideLevelVo> recyclePresetValueList =
@@ -186,24 +187,24 @@ public class AgentConfigServiceImpl implements AgentConfigService {
 
     Map<String, JSONObject> saveMap = new HashMap<>();
 
-    gameKindService
-        .getList()
-        .forEach(
-            gameKind -> {
-              SysDictData sysDictData = dictMap.get(gameKind.getGameType()).get(0);
-              if (Objects.nonNull(sysDictData)) {
-                FissionDivideConfigVo saveVo = new FissionDivideConfigVo();
-                saveVo.setLiveGameName(sysDictData.getDictLabel());
-                saveVo.setLiveGameCode(sysDictData.getDictValue());
-                saveVo.setCode(gameKind.getCode());
-                saveVo.setName(gameKind.getName());
-                // 默认 投注额
-                saveVo.setSettleType(2);
-                saveVo.setAmountRatio(BigDecimal.ZERO);
-                saveMap.put(gameKind.getCode(), JSONUtil.parseObj(saveVo));
-              }
-            });
-
+    List<GameKind> list = gameKindService.getList();
+    log.info("获取到的游戏:{}", list);
+    list.forEach(
+        gameKind -> {
+          SysDictData sysDictData = dictMap.get(gameKind.getGameType()).get(0);
+          if (Objects.nonNull(sysDictData)) {
+            FissionDivideConfigVo saveVo = new FissionDivideConfigVo();
+            saveVo.setLiveGameName(sysDictData.getDictLabel());
+            saveVo.setLiveGameCode(sysDictData.getDictValue());
+            saveVo.setCode(gameKind.getCode());
+            saveVo.setName(gameKind.getName());
+            // 默认 投注额
+            saveVo.setSettleType(2);
+            saveVo.setAmountRatio(BigDecimal.ZERO);
+            saveMap.put(gameKind.getCode(), JSONUtil.parseObj(saveVo));
+          }
+        });
+    log.info("格式话后的数据:{}", saveMap);
     return JSONUtil.toJsonStr(saveMap);
   }
 

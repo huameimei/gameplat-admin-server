@@ -1,5 +1,6 @@
 package com.gameplat.admin.controller.open.game;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -166,7 +167,7 @@ public class GameRebatePeriodController {
   @PreAuthorize("hasAuthority('game:gameRebatePeriod:rollBack')")
   public void rollBack(@RequestBody OperGameRebatePeriodDTO dto) {
     GameRebatePeriod rebatePeriod = gameRebatePeriodService.getById(dto.getId());
-    Assert.isNull(rebatePeriod, "游戏返水期号不存在");
+    Assert.isTrue(BeanUtil.isNotEmpty(rebatePeriod), "游戏返水期号不存在");
     if (rebatePeriod.getStatus() != GameRebatePeriodStatus.ACCEPTED.getValue()) {
       throw new ServiceException("期号状态不是派发状态,不能进入回收操作");
     }

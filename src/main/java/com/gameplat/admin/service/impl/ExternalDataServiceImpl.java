@@ -14,7 +14,6 @@ import com.gameplat.admin.service.ExternalDataService;
 import com.gameplat.base.common.util.EasyExcelUtil;
 import com.gameplat.common.enums.MemberEnums;
 import com.gameplat.model.entity.member.*;
-import com.gameplat.security.SecurityUserHolder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
@@ -61,7 +60,7 @@ public class ExternalDataServiceImpl implements ExternalDataService {
    */
   @Override
   @Async
-  public void dealData(String username, MultipartFile file, HttpServletRequest request) {
+  public void dealData(String createBy, MultipartFile file, HttpServletRequest request) {
     // 1. 解析Excel
     try {
       List<ExternalDataVo> paramlist =
@@ -74,8 +73,6 @@ public class ExternalDataServiceImpl implements ExternalDataService {
       String webRootAgentPath = webRoot.getSuperPath();
       webRootAgentPath =
           webRootAgentPath.endsWith("/") ? webRootAgentPath : webRootAgentPath.concat("/");
-
-      String createBy = SecurityUserHolder.getUsername();
 
       List<MemberGrowthLevel> memberGrowthLevels =
           memberGrowthLevelMapper.selectList(new QueryWrapper<>());
@@ -109,6 +106,7 @@ public class ExternalDataServiceImpl implements ExternalDataService {
               continue;
             }
             Member saveMember = new Member();
+            externalDataVo.setAccount(externalDataVo.getAccount().toLowerCase());
             saveMember.setAccount(externalDataVo.getAccount());
             saveMember.setRegisterType(6);
             saveMember.setStatus(1);

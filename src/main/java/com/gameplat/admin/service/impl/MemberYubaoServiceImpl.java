@@ -238,11 +238,11 @@ public class MemberYubaoServiceImpl extends ServiceImpl<MemberYubaoMapper, Membe
     if(yubaoLimit!=null && yubaoLimit.getMaxTotalIncome()!=null){
       //查询会员总收益
       Double totalIncome=memberYubaoInterestMapper.getTotalYubaoInterest(yuBao.getMemberId());
-      if(totalIncome>=yubaoLimit.getMaxTotalIncome().doubleValue()){
-        log.info("账号={},日期={},总收益上限,上限金额={},结算收益金额={}",yuBao.getAccount(),settleDate,yubaoLimit.getMaxTotalIncome().doubleValue(),totalIncome);
-        return;
-      }
+    if(totalIncome>=yubaoLimit.getMaxTotalIncome().doubleValue()){
+      log.info("账号={},日期={},总收益上限,上限金额={},结算收益金额={}",yuBao.getAccount(),settleDate,yubaoLimit.getMaxTotalIncome().doubleValue(),totalIncome);
+      return;
     }
+  }
 
     // 添加收益金额
     memberYubaoInterestMapper.addYubaoInterest(yuBao.getId(),yuBao.getMemberId(), interestMoney);

@@ -292,9 +292,9 @@ public class ActivityCommonServiceImpl implements ActivityCommonService {
     Long count =
         activityQualificationService
             .lambdaQuery()
-            .eq(ActivityQualification::getActivityId, activityLobby.getId())
-            .eq(ActivityQualification::getActivityType, activityLobby.getActivityType())
-            .eq(ActivityQualification::getUserId, memberInfo.getId())
+            .eq(ActivityQualification::getActivityId, query.getActivityId())
+            .eq(ActivityQualification::getActivityType, query.getActivityType())
+            .eq(ActivityQualification::getUserId, query.getUserId())
             .eq(
                 StringUtils.isNotBlank(query.getSoleIdentifier()),
                 ActivityQualification::getSoleIdentifier,

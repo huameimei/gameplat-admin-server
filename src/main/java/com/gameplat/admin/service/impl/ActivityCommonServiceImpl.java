@@ -788,7 +788,7 @@ public class ActivityCommonServiceImpl implements ActivityCommonService {
       Date countDate) {
     String errorMsg = null;
     Map<String, Object> map = new HashMap<>();
-    if (memberInfo == null) {
+    if (memberInfo != null) {
       map.put("userNameList", Lists.newArrayList(memberInfo.getAccount()));
     }
     map.put("startTime", startTime);

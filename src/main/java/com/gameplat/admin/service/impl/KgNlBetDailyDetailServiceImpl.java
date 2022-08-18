@@ -16,6 +16,7 @@ import com.gameplat.admin.model.vo.KgNlWinReportVO;
 import com.gameplat.admin.model.vo.PageDtoVO;
 import com.gameplat.admin.service.KgNlBetDailyDetailService;
 import com.gameplat.admin.service.MemberService;
+import com.gameplat.admin.util.ListUtils;
 import com.gameplat.base.common.constant.ContextConstant;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.common.enums.GameKindEnum;
@@ -31,6 +32,8 @@ import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.HttpAsyncResponseConsumerFactory;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
+import org.elasticsearch.client.core.CountRequest;
+import org.elasticsearch.client.core.CountResponse;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
@@ -106,58 +109,66 @@ public class KgNlBetDailyDetailServiceImpl extends ServiceImpl<KgNlBetDailyDetai
   @Override
   public void assembleKgNlBetDailyDetail(List<String> dayList, List<String> accountList, String platformCode) {
     String tenant = sysTheme.getTenantCode();
-    List<KgNlBetDailyDetail> assembleList = Collections.synchronizedList(new ArrayList<>());
-
     for (String day : dayList) {
+      List<KgNlBetDailyDetail> assembleList = new ArrayList<>();
       DateTime parseTime = cn.hutool.core.date.DateUtil.parse(day, "yyyy-MM-dd");
       long beginTime = cn.hutool.core.date.DateUtil.beginOfDay(parseTime).getTime();
       long endTime = cn.hutool.core.date.DateUtil.endOfDay(parseTime).getTime();
 
       log.info("{}~{}KG新彩票投注日明细汇总开始执行，会员：{}，租户：{}，游戏平台：{}",
         beginTime, endTime, accountList, tenant, platformCode);
-
-      BoolQueryBuilder builder = QueryBuilders.boolQuery();
-      builder.must(QueryBuilders.termQuery("tenant.keyword", tenant));
-      if (CollectionUtil.isNotEmpty(accountList)) {
-        builder.must(QueryBuilders.termsQuery("account.keyword", accountList));
-      }
-      builder.must(QueryBuilders.termQuery("platformCode.keyword", platformCode));
-      builder.must(QueryBuilders.termQuery("gameKind.keyword", GameKindEnum.KGNL_LOTTERY.code()));
-      builder.must(QueryBuilders.termQuery("settle", SettleStatusEnum.YES.getValue()));
-      builder.must(QueryBuilders.rangeQuery("settleTime").gte(beginTime).lte(endTime));
-
-      SearchRequest searchRequest =
-        new SearchRequest(ContextConstant.ES_INDEX.BET_RECORD_ + tenant);
-      SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
-      TermsAggregationBuilder accountGroup =
-        AggregationBuilders.terms("accountGroup").field("account.keyword");
-      TermsAggregationBuilder gameCodeGroup =
-        AggregationBuilders.terms("gameCodeGroup").field("gameCode.keyword").size(200000);
-
-      SumAggregationBuilder sumBetAmount =
-        AggregationBuilders.sum("betAmount").field("betAmount");
-      SumAggregationBuilder sumValidAmount =
-        AggregationBuilders.sum("validAmount").field("validAmount");
-      SumAggregationBuilder sumWinAmount =
-        AggregationBuilders.sum("winAmount").field("winAmount");
-      SumAggregationBuilder sumLoseWin =
-        AggregationBuilders.sum("loseWin").field("loseWin");
-
-      gameCodeGroup.subAggregation(sumBetAmount);
-      gameCodeGroup.subAggregation(sumValidAmount);
-      gameCodeGroup.subAggregation(sumWinAmount);
-      gameCodeGroup.subAggregation(sumLoseWin);
-      accountGroup.subAggregation(gameCodeGroup);
-
-      searchSourceBuilder.size(0);
-      searchSourceBuilder.query(builder);
-      searchSourceBuilder.aggregation(accountGroup);
-      searchRequest.source(searchSourceBuilder);
-
       try {
+        BoolQueryBuilder builder = QueryBuilders.boolQuery();
+        builder.must(QueryBuilders.termQuery("tenant.keyword", tenant));
+        if (CollectionUtil.isNotEmpty(accountList)) {
+          builder.must(QueryBuilders.termsQuery("account.keyword", accountList));
+        }
+        builder.must(QueryBuilders.termQuery("platformCode.keyword", platformCode));
+        builder.must(QueryBuilders.termQuery("gameKind.keyword", GameKindEnum.KGNL_LOTTERY.code()));
+        builder.must(QueryBuilders.termQuery("settle", SettleStatusEnum.YES.getValue()));
+        builder.must(QueryBuilders.rangeQuery("settleTime").gte(beginTime).lte(endTime));
+
+        // 统计条数
+        CountRequest countRequest =
+          new CountRequest(ContextConstant.ES_INDEX.BET_RECORD_ + sysTheme.getTenantCode());
+        countRequest.query(builder);
         RequestOptions.Builder optionsBuilder = RequestOptions.DEFAULT.toBuilder();
         optionsBuilder.setHttpAsyncResponseConsumerFactory(
           new HttpAsyncResponseConsumerFactory.HeapBufferedResponseConsumerFactory(31457280));
+        CountResponse countResponse = restHighLevelClient.count(countRequest, optionsBuilder.build());
+        long sumCount = countResponse.getCount();
+        if (sumCount <= 0) {
+          continue;
+        }
+
+        SearchRequest searchRequest =
+          new SearchRequest(ContextConstant.ES_INDEX.BET_RECORD_ + tenant);
+        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+        TermsAggregationBuilder accountGroup =
+          AggregationBuilders.terms("accountGroup").field("account.keyword").size((int) sumCount);
+        TermsAggregationBuilder gameCodeGroup =
+          AggregationBuilders.terms("gameCodeGroup").field("gameCode.keyword");
+
+        SumAggregationBuilder sumBetAmount =
+          AggregationBuilders.sum("betAmount").field("betAmount");
+        SumAggregationBuilder sumValidAmount =
+          AggregationBuilders.sum("validAmount").field("validAmount");
+        SumAggregationBuilder sumWinAmount =
+          AggregationBuilders.sum("winAmount").field("winAmount");
+        SumAggregationBuilder sumLoseWin =
+          AggregationBuilders.sum("loseWin").field("loseWin");
+
+        gameCodeGroup.subAggregation(sumBetAmount);
+        gameCodeGroup.subAggregation(sumValidAmount);
+        gameCodeGroup.subAggregation(sumWinAmount);
+        gameCodeGroup.subAggregation(sumLoseWin);
+        accountGroup.subAggregation(gameCodeGroup);
+
+        searchSourceBuilder.size(0);
+        searchSourceBuilder.query(builder);
+        searchSourceBuilder.aggregation(accountGroup);
+        searchRequest.source(searchSourceBuilder);
+
         SearchResponse search =
           restHighLevelClient.search(searchRequest, optionsBuilder.build());
         Terms terms = search.getAggregations().get("accountGroup");
@@ -211,15 +222,18 @@ public class KgNlBetDailyDetailServiceImpl extends ServiceImpl<KgNlBetDailyDetai
             assembleList.add(report);
           }
         }
-      } catch (IOException e) {
-        e.printStackTrace();
+        log.info("{}~{}KG新彩票投注日明细汇总，执行结束。。。", beginTime, endTime);
+      } catch (Exception e) {
+        log.info("KG新彩票投注日明细汇总异常，异常原因：", e);
       }
-      log.info("{}~{}KG新彩票投注日明细汇总，执行结束。。。", beginTime, endTime);
-    }
-
-    if (CollectionUtil.isNotEmpty(assembleList)) {
-      log.info("KG新彩票投注日明细异步入库开始(结算时间),共{}条", assembleList.size());
-      kgNlBetDailyDetailMapper.batchInsertKgNlBetDailyDetail(assembleList);
+      if (CollectionUtil.isNotEmpty(assembleList)) {
+        log.info("{}~{}KG新彩票投注日明细异步入库开始(结算时间),共{}条", beginTime, endTime, assembleList.size());
+        List<List<KgNlBetDailyDetail>> splitList = ListUtils.splitListBycapacity(assembleList, 500);
+        for (List<KgNlBetDailyDetail> list : splitList) {
+          log.info("{}~{}KG新彩票投注日明细分批入库,共{}条", beginTime, endTime, list.size());
+          kgNlBetDailyDetailMapper.batchInsertKgNlBetDailyDetail(list);
+        }
+      }
     }
   }
 }

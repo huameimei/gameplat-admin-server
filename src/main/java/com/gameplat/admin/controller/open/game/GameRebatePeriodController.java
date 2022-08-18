@@ -200,7 +200,6 @@ public class GameRebatePeriodController {
               gameRebateDetail.getRemark());
         } catch (Exception e) {
           log.error("回收异常: " + JSONUtil.toJsonStr(gameRebateDetail));
-          throw new RuntimeException("回收异常", e);
         }
       }
       // 更新状态

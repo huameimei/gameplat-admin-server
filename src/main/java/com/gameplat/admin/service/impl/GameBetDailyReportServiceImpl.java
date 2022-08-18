@@ -334,36 +334,40 @@ public class GameBetDailyReportServiceImpl
   @Override
   public List<ActivityStatisticItem> getGameReportInfo(Map map) {
     List<ActivityStatisticItem> activityStatisticItemVOList =
-        gameBetDailyReportMapper.getGameReportInfo(map);
+      gameBetDailyReportMapper.getGameReportInfo(map);
     // 连续体育打码天数和连续彩票打码天数需要返回活动期间内用户的打码日期集合，用于后续业务计算最大的连续打码天数
     if (map.get("statisItem") != null && StringUtils.isNotEmpty(activityStatisticItemVOList)) {
       if ((Integer) map.get("statisItem") == 8) {
         List<ActivityStatisticItem> gameDmlDateList =
-            gameBetDailyReportMapper.findGameDmlDateList(map);
-        if (StringUtils.isNotEmpty(gameDmlDateList)) {
-          // 将逗号分隔的日期String转成List<Date>
-          for (ActivityStatisticItem gameDmlDate : gameDmlDateList) {
-            if (StringUtils.isNotEmpty(gameDmlDate.getGameCountDates())) {
-              List<String> dateList = Arrays.asList(gameDmlDate.getGameCountDates().split(","));
-              // 去重
-              List<String> list = dateList.stream().distinct().collect(Collectors.toList());
-              Collections.sort(list);
-              List<Date> dates = new ArrayList<>();
-              for (String date : list) {
-                dates.add(DateUtil.strToDate(date, DateUtil.YYYY_MM_DD));
-              }
-              gameDmlDate.setGameCountDateList(dates);
+          gameBetDailyReportMapper.findGameDmlDateList(map);
+        if (ObjectUtils.isEmpty(gameDmlDateList)) {
+          throw new ServiceException("没有有效的充值天数");
+        }
+        // 将逗号分隔的日期String转成List<Date>
+        for (ActivityStatisticItem gameDmlDate : gameDmlDateList) {
+          if (StringUtils.isNotEmpty(gameDmlDate.getGameCountDates())) {
+            List<String> dateList = Arrays.asList(gameDmlDate.getGameCountDates().split(","));
+            // 去重
+            List<String> list = dateList.stream().distinct().collect(Collectors.toList());
+            Collections.sort(list);
+            List<Date> dates = new ArrayList<>();
+            for (String date : list) {
+              dates.add(DateUtil.strToDate(date, DateUtil.YYYY_MM_DD));
             }
+            gameDmlDate.setGameCountDateList(dates);
           }
         }
 
-        for (ActivityStatisticItem activityStatisticItemVO : activityStatisticItemVOList) {
-          for (ActivityStatisticItem gameDmlDate : gameDmlDateList) {
+        for (ActivityStatisticItem gameDmlDate : gameDmlDateList) {
+          for (ActivityStatisticItem activityStatisticItemVO : activityStatisticItemVOList) {
             if (activityStatisticItemVO.getUserName().equals(gameDmlDate.getUserName())) {
               activityStatisticItemVO.setGameCountDateList(gameDmlDate.getGameCountDateList());
             }
           }
         }
+
+        activityStatisticItemVOList = activityStatisticItemVOList.stream().filter(item ->
+          ObjectUtils.isNotEmpty(item.getGameCountDateList())).collect(Collectors.toList());
       }
     }
     return activityStatisticItemVOList;

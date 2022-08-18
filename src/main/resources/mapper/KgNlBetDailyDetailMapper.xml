@@ -48,7 +48,7 @@
                 </choose>
             </if>
             <if test="lottType != null">
-                AND a.lott_type = #{lottType}
+                AND b.lottery_type = #{lottType}
             </if>
             <if test="gameCode != null and gameCode != ''">
                 AND a.game_code = #{gameCode}
@@ -91,7 +91,7 @@
                 </choose>
             </if>
             <if test="dto.lottType != null">
-                AND a.lott_type = #{dto.lottType}
+                AND b.lottery_type = #{dto.lottType}
             </if>
             <if test="dto.gameCode != null and dto.gameCode != ''">
                 AND a.game_code = #{dto.gameCode}
@@ -143,7 +143,7 @@
                 </choose>
             </if>
             <if test="lottType != null">
-                AND a.lott_type = #{lottType}
+                AND b.lottery_type = #{lottType}
             </if>
             <if test="gameCode != null and gameCode != ''">
                 AND a.game_code = #{gameCode}
@@ -179,7 +179,7 @@
                 </choose>
             </if>
             <if test="lottType != null">
-                AND a.lott_type = #{lottType}
+                AND b.lottery_type = #{lottType}
             </if>
             <if test="gameCode != null and gameCode != ''">
                 AND a.game_code = #{gameCode}
@@ -192,4 +192,26 @@
             </if>
         </where>
     </select>
+
+    <!-- 插入投注日报表 -->
+    <insert id="batchInsertKgNlBetDailyDetail">
+        INSERT INTO kgnl_bet_daily_detail
+        (member_id,account,real_name,super_id,super_account,user_paths,platform_code,game_kind,game_type,bet_amount,
+        valid_amount,win_amount,bet_count,win_count,stat_time,game_code,user_type,create_time
+        ) VALUES
+        <foreach collection="list" item="item" index="index" separator=",">
+            ( #{item.memberId}, #{item.account},#{item.realName},#{item.superId},#{item.superAccount},#{item.userPaths},
+            #{item.platformCode},#{item.gameKind},#{item.gameType},#{item.betAmount},
+            #{item.validAmount},#{item.winAmount},#{item.betCount},
+            #{item.winCount},#{item.statTime},#{item.gameCode},#{item.userType},sysdate()
+            )
+        </foreach>
+        ON duplicate KEY UPDATE
+        bet_amount = VALUES(bet_amount),
+        valid_amount = VALUES(valid_amount),
+        win_amount = VALUES(win_amount),
+        bet_count = VALUES(bet_count),
+        win_count = VALUES(win_count),
+        update_time = sysdate()
+    </insert>
 </mapper>

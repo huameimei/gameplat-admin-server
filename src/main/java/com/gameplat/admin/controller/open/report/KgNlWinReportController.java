@@ -11,6 +11,7 @@ import com.gameplat.admin.model.vo.KgNlWinReportVO;
 import com.gameplat.admin.model.vo.PageDtoVO;
 import com.gameplat.admin.service.GameBetRecordInfoService;
 import com.gameplat.admin.service.KgNlWinReportService;
+import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.DateUtil;
 import com.gameplat.common.enums.GameKindEnum;
 import com.gameplat.common.enums.GameTypeEnum;
@@ -22,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletResponse;
@@ -118,5 +120,14 @@ public class KgNlWinReportController {
     dto.setEndTime(String.valueOf(
       DateUtil.strToDate(dto.getEndTime() + " 23:59:59", "yyyy-MM-dd HH:mm:ss").getTime()));
     gameBetRecordInfoService.exportReport(dto, response);
+  }
+
+  @GetMapping(value = "/initReport")
+  @Operation(summary = "初始化KG彩票输赢报表")
+  public void initReport(@RequestParam("days") String days, @RequestParam(value = "accounts", required = false)  String accounts){
+    if(ObjectUtils.isEmpty(days)){
+      throw new ServiceException("时间不能为空");
+    }
+    kgNlWinReportService.initReport(days, accounts);
   }
 }

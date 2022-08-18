@@ -150,7 +150,7 @@ public class KgNlBetDailyDetailServiceImpl extends ServiceImpl<KgNlBetDailyDetai
       gameCodeGroup.subAggregation(sumLoseWin);
       accountGroup.subAggregation(gameCodeGroup);
 
-      searchSourceBuilder.size(0);
+      searchSourceBuilder.size(200000);
       searchSourceBuilder.query(builder);
       searchSourceBuilder.aggregation(accountGroup);
       searchRequest.source(searchSourceBuilder);

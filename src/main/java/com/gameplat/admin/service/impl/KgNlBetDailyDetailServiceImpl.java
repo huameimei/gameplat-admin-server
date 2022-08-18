@@ -109,9 +109,8 @@ public class KgNlBetDailyDetailServiceImpl extends ServiceImpl<KgNlBetDailyDetai
   @Override
   public void assembleKgNlBetDailyDetail(List<String> dayList, List<String> accountList, String platformCode) {
     String tenant = sysTheme.getTenantCode();
-    List<KgNlBetDailyDetail> assembleList = Collections.synchronizedList(new ArrayList<>());
-
     for (String day : dayList) {
+      List<KgNlBetDailyDetail> assembleList = new ArrayList<>();
       DateTime parseTime = cn.hutool.core.date.DateUtil.parse(day, "yyyy-MM-dd");
       long beginTime = cn.hutool.core.date.DateUtil.beginOfDay(parseTime).getTime();
       long endTime = cn.hutool.core.date.DateUtil.endOfDay(parseTime).getTime();
@@ -227,15 +226,13 @@ public class KgNlBetDailyDetailServiceImpl extends ServiceImpl<KgNlBetDailyDetai
       } catch (Exception e) {
         log.info("KG新彩票投注日明细汇总异常，异常原因：", e);
       }
-
-    }
-
-    if (CollectionUtil.isNotEmpty(assembleList)) {
-      log.info("KG新彩票投注日明细异步入库开始(结算时间),共{}条", assembleList.size());
-      List<List<KgNlBetDailyDetail>> splitList = ListUtils.splitListBycapacity(assembleList, 500);
-      for(List<KgNlBetDailyDetail> list : splitList){
-        log.info("KG新彩票投注日明细分批入库,共{}条", list.size());
-        kgNlBetDailyDetailMapper.batchInsertKgNlBetDailyDetail(list);
+      if (CollectionUtil.isNotEmpty(assembleList)) {
+        log.info("{}~{}KG新彩票投注日明细异步入库开始(结算时间),共{}条", beginTime, endTime, assembleList.size());
+        List<List<KgNlBetDailyDetail>> splitList = ListUtils.splitListBycapacity(assembleList, 500);
+        for (List<KgNlBetDailyDetail> list : splitList) {
+          log.info("{}~{}KG新彩票投注日明细分批入库,共{}条", beginTime, endTime, list.size());
+          kgNlBetDailyDetailMapper.batchInsertKgNlBetDailyDetail(list);
+        }
       }
     }
   }

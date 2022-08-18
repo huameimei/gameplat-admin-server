@@ -95,6 +95,7 @@ public class TransferAgentServiceImpl implements TransferAgentService {
         resultList =
             baseElasticsearchService.searchDocList(
                 indexName, searchSourceBuilder, GameBetRecord.class);
+        log.info("转代理变更前数据={}", resultList);
         log.info("转代理获取到的转移的用户注册：{}", resultList.size());
         if (CollectionUtil.isNotEmpty(resultList)) {
           log.info("开始更新ES注单记录的代理路径");
@@ -127,6 +128,7 @@ public class TransferAgentServiceImpl implements TransferAgentService {
             elasticsearchTemplate.save(
                 listRecord, IndexCoordinates.of(ContextConstant.ES_INDEX.BET_RECORD_ + tenantCode));
           }
+          log.info("转代理变更后数据={}", baseElasticsearchService.searchDocList(indexName, searchSourceBuilder, GameBetRecord.class));
         }
       } while (CollectionUtil.isNotEmpty(resultList));
     } catch (Exception e) {

@@ -130,9 +130,9 @@ public class KgNlBetDailyDetailServiceImpl extends ServiceImpl<KgNlBetDailyDetai
         new SearchRequest(ContextConstant.ES_INDEX.BET_RECORD_ + tenant);
       SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
       TermsAggregationBuilder accountGroup =
-        AggregationBuilders.terms("accountGroup").field("account.keyword");
+        AggregationBuilders.terms("accountGroup").field("account.keyword").size(10000);
       TermsAggregationBuilder gameCodeGroup =
-        AggregationBuilders.terms("gameCodeGroup").field("gameCode.keyword").size(200000);
+        AggregationBuilders.terms("gameCodeGroup").field("gameCode.keyword");
 
       SumAggregationBuilder sumBetAmount =
         AggregationBuilders.sum("betAmount").field("betAmount");

@@ -1,6 +1,8 @@
 package com.gameplat.admin.service.impl;
 
 import cn.hutool.core.util.NumberUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.constant.MemberServiceKeyConstant;
 import com.gameplat.admin.enums.ActivityDistributeEnum;
@@ -11,6 +13,7 @@ import com.gameplat.admin.model.dto.MessageInfoAddDTO;
 import com.gameplat.admin.model.vo.MemberInfoVO;
 import com.gameplat.admin.service.*;
 import com.gameplat.base.common.exception.ServiceException;
+import com.gameplat.common.constant.CachedKeys;
 import com.gameplat.common.enums.BooleanEnum;
 import com.gameplat.common.enums.TranTypes;
 import com.gameplat.model.entity.ValidWithdraw;
@@ -60,9 +63,7 @@ public class ActivityDistributeWayService
   @Transactional(rollbackFor = Throwable.class)
   public void directRelease(ActivityDistribute activityDistribute, MemberWealReword wealReword) {
     // 账户资金锁
-    String lockKey =
-        MessageFormat.format(
-            MemberServiceKeyConstant.MEMBER_FINANCIAL_LOCK, activityDistribute.getUsername());
+    String lockKey = String.format(CachedKeys.MEMBER_FINANCE, activityDistribute.getUsername());
     try {
       // 获取资金锁（等待6秒，租期120秒）
       boolean flag = distributedLocker.tryLock(lockKey, TimeUnit.SECONDS, 6, 120);
@@ -115,17 +116,19 @@ public class ActivityDistributeWayService
         validWithdraw.setAccount(activityDistribute.getUsername());
         validWithdraw.setMemberId(activityDistribute.getUserId());
         validWithdraw.setRechId(sourceId);
-        validWithdraw.setRechMoney(
+        validWithdraw.setDiscountMoney(
             activityDistribute.getDiscountsMoney().setScale(2, RoundingMode.HALF_UP));
-        validWithdraw.setMormDml(
+        validWithdraw.setDiscountDml(
             activityDistribute.getWithdrawDml().setScale(2, RoundingMode.HALF_UP));
+        validWithdraw.setMormDml(BigDecimal.ZERO);
 
         validWithdraw.setType(0);
         validWithdraw.setStatus(BooleanEnum.NO.value());
 
-        validWithdraw.setDiscountMoney(BigDecimal.ZERO);
+        validWithdraw.setRechMoney(BigDecimal.ZERO);
         validWithdraw.setRemark(getDistributeRemark(activityDistribute));
-
+        deleteByUserId(activityDistribute.getUserId());
+        updateTypeByUserId(activityDistribute.getUserId(), validWithdraw.getCreateTime());
         validWithdrawService.save(validWithdraw);
       }
 
@@ -246,5 +249,20 @@ public class ActivityDistributeWayService
           .append("。");
     }
     return str.toString();
+  }
+
+  private void deleteByUserId(Long memberId) {
+    LambdaQueryWrapper<ValidWithdraw> query = Wrappers.lambdaQuery();
+    query.eq(ValidWithdraw::getMemberId, memberId).eq(ValidWithdraw::getStatus, 1);
+    this.validWithdrawService.remove(query);
+  }
+
+  private void updateTypeByUserId(Long memberId, Date createTime) {
+    this.validWithdrawService.lambdaUpdate()
+      .set(ValidWithdraw::getType, 1)
+      .set(ValidWithdraw::getEndTime, createTime)
+      .eq(ValidWithdraw::getMemberId, memberId)
+      .eq(ValidWithdraw::getType, 0)
+      .update(new ValidWithdraw());
   }
 }

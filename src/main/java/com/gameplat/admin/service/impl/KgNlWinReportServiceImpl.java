@@ -11,6 +11,7 @@ import com.gameplat.admin.model.vo.PageDtoVO;
 import com.gameplat.admin.service.KgNlBetDailyDetailService;
 import com.gameplat.admin.service.KgNlWinReportService;
 import com.gameplat.admin.util.EasyPoiUtil;
+import com.gameplat.common.enums.GamePlatformEnum;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.http.HttpHeaders;
@@ -19,6 +20,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -70,6 +72,16 @@ public class KgNlWinReportServiceImpl implements KgNlWinReportService {
   @Override
   public void exportUserDetail(KgNlWinReportQueryDTO queryDTO, HttpServletResponse response) {
     kgNlBetDailyDetailService.exportDetail(response, queryDTO);
+  }
+
+  @Override
+  public void initReport(String days, String accounts) {
+    List<String> dayList = Arrays.asList(days.split(","));
+    List<String> accountList = null;
+    if (ObjectUtils.isNotEmpty(accounts)) {
+      accountList = Arrays.asList(accounts.split(","));
+    }
+    kgNlBetDailyDetailService.assembleKgNlBetDailyDetail(dayList, accountList, GamePlatformEnum.KGNL.getCode());
   }
 
 }

@@ -21,4 +21,11 @@ public interface KgNlBetDailyDetailMapper extends BaseMapper<KgNlBetDailyDetail>
   List<KgNlBetDailyDetailVO> findDetailList(KgNlWinReportQueryDTO dto);
 
   KgNlBetDailyDetail findTotalData(KgNlWinReportQueryDTO dto);
+
+  /**
+   * 插入投注日报表
+   *
+   * @param list List
+   */
+  void batchInsertKgNlBetDailyDetail(@Param("list") List<KgNlBetDailyDetail> list);
 }

@@ -91,7 +91,7 @@
                 </choose>
             </if>
             <if test="lottType != null">
-                AND b.lottery_type = #{lottType}
+                AND b.lottery_type = #{dto.lottType}
             </if>
             <if test="dto.gameCode != null and dto.gameCode != ''">
                 AND a.game_code = #{dto.gameCode}

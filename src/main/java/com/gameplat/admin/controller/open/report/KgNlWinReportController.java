@@ -124,7 +124,7 @@ public class KgNlWinReportController {
 
   @GetMapping(value = "/initReport")
   @Operation(summary = "初始化KG彩票输赢报表")
-  public void initReport(@RequestParam("days") String days, @RequestParam("accounts")  String accounts){
+  public void initReport(@RequestParam("days") String days, @RequestParam(value = "accounts", required = false)  String accounts){
     if(ObjectUtils.isEmpty(days)){
       throw new ServiceException("时间不能为空");
     }

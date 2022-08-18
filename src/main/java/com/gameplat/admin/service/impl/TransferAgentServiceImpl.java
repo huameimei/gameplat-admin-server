@@ -126,7 +126,7 @@ public class TransferAgentServiceImpl implements TransferAgentService {
             elasticsearchTemplate.save(
                 listRecord, IndexCoordinates.of(ContextConstant.ES_INDEX.BET_RECORD_ + tenantCode));
           }
-          Thread.sleep(200);
+          Thread.sleep(250);
         }
       } while (CollectionUtil.isNotEmpty(resultList));
     } catch (Exception e) {

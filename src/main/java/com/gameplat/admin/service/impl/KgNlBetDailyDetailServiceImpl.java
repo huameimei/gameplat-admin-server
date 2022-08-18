@@ -132,8 +132,7 @@ public class KgNlBetDailyDetailServiceImpl extends ServiceImpl<KgNlBetDailyDetai
       TermsAggregationBuilder accountGroup =
         AggregationBuilders.terms("accountGroup").field("account.keyword");
       TermsAggregationBuilder gameCodeGroup =
-        AggregationBuilders.terms("gameCodeGroup").field("gameCode.keyword");
-
+        AggregationBuilders.terms("gameCodeGroup").field("gameCode.keyword").size(200000);
 
       SumAggregationBuilder sumBetAmount =
         AggregationBuilders.sum("betAmount").field("betAmount");
@@ -150,7 +149,7 @@ public class KgNlBetDailyDetailServiceImpl extends ServiceImpl<KgNlBetDailyDetai
       gameCodeGroup.subAggregation(sumLoseWin);
       accountGroup.subAggregation(gameCodeGroup);
 
-      searchSourceBuilder.size(200000);
+      searchSourceBuilder.size(0);
       searchSourceBuilder.query(builder);
       searchSourceBuilder.aggregation(accountGroup);
       searchRequest.source(searchSourceBuilder);

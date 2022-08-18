@@ -7,9 +7,11 @@ import com.gameplat.admin.model.vo.KgNlBetDailyDetailVO;
 import com.gameplat.admin.model.vo.KgNlWinReportVO;
 import com.gameplat.admin.model.vo.PageDtoVO;
 import com.gameplat.model.entity.game.KgNlBetDailyDetail;
+import com.gameplat.model.entity.member.Member;
 
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author aBen
@@ -23,4 +25,6 @@ public interface KgNlBetDailyDetailService extends IService<KgNlBetDailyDetail> 
   PageDtoVO<KgNlBetDailyDetailVO> findDetailPage(Page<KgNlBetDailyDetailVO> page, KgNlWinReportQueryDTO dto);
 
   void exportDetail(HttpServletResponse response, KgNlWinReportQueryDTO dto);
+
+  void assembleKgNlBetDailyDetail(List<String> dayList, List<String> memberList, String platformCode);
 }

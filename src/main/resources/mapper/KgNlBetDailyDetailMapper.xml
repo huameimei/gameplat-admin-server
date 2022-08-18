@@ -90,7 +90,7 @@
                     </otherwise>
                 </choose>
             </if>
-            <if test="lottType != null">
+            <if test="dto.lottType != null">
                 AND b.lottery_type = #{dto.lottType}
             </if>
             <if test="dto.gameCode != null and dto.gameCode != ''">

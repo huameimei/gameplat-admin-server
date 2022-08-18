@@ -127,6 +127,7 @@ public class TransferAgentServiceImpl implements TransferAgentService {
                 listRecord, IndexCoordinates.of(ContextConstant.ES_INDEX.BET_RECORD_ + tenantCode));
           }
         }
+        Thread.sleep(30000);
       } while (CollectionUtil.isNotEmpty(resultList));
     } catch (Exception e) {
       log.info("转移代理更新注单代理路径失败{}", e);

@@ -3,11 +3,9 @@ package com.gameplat.admin.service.impl;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.lang.UUID;
 import com.gameplat.admin.service.AsyncSaveFileRecordService;
-import com.gameplat.admin.service.ConfigService;
 import com.gameplat.admin.service.OssService;
 import com.gameplat.common.compent.oss.FileStorageStrategyContext;
 import com.gameplat.common.compent.oss.config.FileConfig;
-import com.gameplat.common.enums.DictTypeEnum;
 import com.gameplat.security.SecurityUserHolder;
 import lombok.SneakyThrows;
 import org.apache.commons.lang.StringUtils;
@@ -15,19 +13,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.annotation.Resource;
+
 @Service
 public class OssServiceImpl implements OssService {
-
-  @Autowired private ConfigService configService;
 
   @Autowired private FileStorageStrategyContext fileStorageStrategyContext;
 
   @Autowired private AsyncSaveFileRecordService asyncSaveFileRecordService;
 
+  @Resource
+  private FileConfig config;
+
   @Override
   @SneakyThrows
   public String upload(MultipartFile file) {
-    FileConfig config = this.getConfig();
     String randomFilename = this.getRandomFilename(file);
     fileStorageStrategyContext
             .getProvider(config)
@@ -50,11 +50,7 @@ public class OssServiceImpl implements OssService {
 
   @Override
   public boolean remove(String filePath) {
-    return fileStorageStrategyContext.getProvider(this.getConfig()).delete(filePath);
-  }
-
-  private FileConfig getConfig() {
-    return configService.getDefaultConfig(DictTypeEnum.FILE_CONFIG, FileConfig.class);
+    return fileStorageStrategyContext.getProvider(config).delete(filePath);
   }
 
   private String getRandomFilename(MultipartFile file) {

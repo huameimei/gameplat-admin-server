@@ -24,4 +24,8 @@ public interface MemberLevelMapper extends BaseMapper<MemberLevel> {
    * @param map Map
    */
   void batchUpdateMemberNum(@Param("map") Map<Integer, Integer> map);
+
+  MemberLevel getLevelLike(@Param("levelName") String levelName);
+
+  Integer getMaxLevelValue();
 }

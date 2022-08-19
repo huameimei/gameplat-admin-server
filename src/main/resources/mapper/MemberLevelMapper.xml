@@ -22,4 +22,17 @@
             WHERE level_value = #{key}
         </foreach>
     </update>
+
+    <select id="getLevelLike" resultType="com.gameplat.model.entity.member.MemberLevel">
+        select
+            level_name as levelName,
+            level_value as levelValue
+        from member_level
+        where #{levelName} like concat('%',level_name,'%') or level_name like concat('%',#{levelName},'%')
+        limit 1
+    </select>
+
+    <select id="getMaxLevelValue" resultType="integer">
+        select IFNULL(max(level_value),0) from member_level;
+    </select>
 </mapper>

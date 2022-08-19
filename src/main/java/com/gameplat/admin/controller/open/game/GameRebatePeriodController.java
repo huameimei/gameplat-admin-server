@@ -1,5 +1,6 @@
 package com.gameplat.admin.controller.open.game;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -131,7 +132,8 @@ public class GameRebatePeriodController {
               dto.getId(),
               gameRebateDetail.getMemberId(),
               gameRebateDetail.getRealRebateMoney(),
-              gameRebateDetail.getPeriodName() + "-游戏返水");
+              gameRebateDetail.getPeriodName() + "-游戏返水",
+              statTime);
         } catch (Exception e) {
           log.error("派发异常: " + JSONUtil.toJsonStr(gameRebateDetail));
           throw new RuntimeException("派发异常", e);
@@ -165,7 +167,7 @@ public class GameRebatePeriodController {
   @PreAuthorize("hasAuthority('game:gameRebatePeriod:rollBack')")
   public void rollBack(@RequestBody OperGameRebatePeriodDTO dto) {
     GameRebatePeriod rebatePeriod = gameRebatePeriodService.getById(dto.getId());
-    Assert.isNull(rebatePeriod, "游戏返水期号不存在");
+    Assert.isTrue(BeanUtil.isNotEmpty(rebatePeriod), "游戏返水期号不存在");
     if (rebatePeriod.getStatus() != GameRebatePeriodStatus.ACCEPTED.getValue()) {
       throw new ServiceException("期号状态不是派发状态,不能进入回收操作");
     }
@@ -198,7 +200,6 @@ public class GameRebatePeriodController {
               gameRebateDetail.getRemark());
         } catch (Exception e) {
           log.error("回收异常: " + JSONUtil.toJsonStr(gameRebateDetail));
-          throw new RuntimeException("回收异常", e);
         }
       }
       // 更新状态

@@ -212,9 +212,11 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
     this.preAddCheck(dto);
 
     Member member = memberConvert.toEntity(dto);
+    member.setAccount(dto.getAccount().toLowerCase());
     member.setRegisterType(MemberEnums.RegisterType.ADMIN_ADD.value());
     member.setRegisterSource(MemberEnums.RegisterSource.WEB.value());
-    member.setPassword(passwordService.encode(member.getPassword(), dto.getAccount()));
+    member.setPassword(
+        passwordService.encode(member.getPassword(), dto.getAccount().toLowerCase()));
 
     // 设置上级
     this.setMemberParent(member);

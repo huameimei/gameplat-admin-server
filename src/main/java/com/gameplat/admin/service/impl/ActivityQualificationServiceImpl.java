@@ -118,6 +118,8 @@ public class ActivityQualificationServiceImpl
             dto.getQualificationStatus() != null,
             ActivityQualification::getQualificationStatus,
             dto.getQualificationStatus())
+        .ge(ObjectUtils.isNotEmpty(dto.getApplyStartTime()), ActivityQualification::getApplyTime, dto.getApplyStartTime())
+        .le(ObjectUtils.isNotEmpty(dto.getApplyEndTime()), ActivityQualification::getApplyTime, dto.getApplyEndTime())
         .orderByDesc(ActivityQualification::getCreateTime);
     return queryChainWrapper.page(page).convert(activityQualificationConvert::toVo);
   }

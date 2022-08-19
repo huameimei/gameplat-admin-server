@@ -102,10 +102,6 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
               MemberInfo.builder()
                       .memberId(memberId)
                       .balance(newBalance)
-                      .lastRechAmount(memberInfo.getLastRechAmount())
-                      .lastRechTime(memberInfo.getLastRechTime())
-                      .totalRechAmount(memberInfo.getTotalRechAmount())
-                      .totalRechTimes(memberInfo.getTotalRechTimes())
                       .version(memberInfo.getVersion())
                       .build();
     }

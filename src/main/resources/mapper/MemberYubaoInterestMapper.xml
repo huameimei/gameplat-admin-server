@@ -14,6 +14,6 @@
     </select>
 
     <select id="getTotalYubaoInterest" resultType="java.lang.Double">
-        select sum(interest_money) from member_yu_bao_interest where member_id=#{memberId}
+        select ifnull(sum(interest_money), 0) as interestMoney from member_yu_bao_interest where member_id=#{memberId}
     </select>
 </mapper>

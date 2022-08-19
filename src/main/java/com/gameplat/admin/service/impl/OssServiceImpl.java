@@ -30,27 +30,52 @@ public class OssServiceImpl implements OssService {
     FileConfig config = this.getConfig();
     String randomFilename = this.getRandomFilename(file);
     fileStorageStrategyContext
-            .getProvider(config)
-            .upload(file.getInputStream(), file.getContentType(), randomFilename);
-
+        .getProvider(config)
+        .upload(file.getInputStream(), file.getContentType(), randomFilename);
 
     String accessUrl = this.getAccessUrl(config, randomFilename);
     // 异步保存文件记录
-    asyncSaveFileRecordService.asyncSave(file, accessUrl, config.getProvider(), SecurityUserHolder.getUsername());
+    asyncSaveFileRecordService.asyncSave(
+        file, accessUrl, config.getProvider(), SecurityUserHolder.getUsername());
     return accessUrl;
   }
 
   private String getAccessUrl(FileConfig config, String filename) {
     if (StringUtils.isNotEmpty(config.getAccessDomain())) {
-      return config.getAccessDomain().concat("/").concat(config.getBucket()).concat("/").concat(filename);
+      return config
+          .getAccessDomain()
+          .concat("/")
+          .concat(config.getBucket())
+          .concat("/")
+          .concat(filename);
     } else {
-      return config.getEndpoint().concat("/").concat(config.getBucket()).concat("/").concat(filename);
+      return config
+          .getEndpoint()
+          .concat("/")
+          .concat(config.getBucket())
+          .concat("/")
+          .concat(filename);
     }
   }
 
   @Override
   public boolean remove(String filePath) {
     return fileStorageStrategyContext.getProvider(this.getConfig()).delete(filePath);
+  }
+
+  @Override
+  @SneakyThrows
+  public String upload(MultipartFile file, String uploadBy) {
+    FileConfig config = this.getConfig();
+    String randomFilename = this.getRandomFilename(file);
+    fileStorageStrategyContext
+        .getProvider(config)
+        .upload(file.getInputStream(), file.getContentType(), randomFilename);
+
+    String accessUrl = this.getAccessUrl(config, randomFilename);
+    // 异步保存文件记录
+    asyncSaveFileRecordService.asyncSave(file, accessUrl, config.getProvider(), uploadBy);
+    return accessUrl;
   }
 
   private FileConfig getConfig() {

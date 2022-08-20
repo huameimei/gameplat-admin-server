@@ -1,10 +1,10 @@
 package com.gameplat.admin.controller.open.job;
 
-import cn.hutool.core.util.StrUtil;
-import com.baomidou.mybatisplus.core.metadata.IPage;
+import cn.hutool.core.bean.BeanUtil;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
-import com.gameplat.admin.model.bean.SysJobLog;
-import com.gameplat.admin.service.SysJobLogService;
+import com.gameplat.admin.feign.TaskServiceFeignClient;
+import com.gameplat.model.entity.sys.SysJobLog;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,22 +16,21 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/admin/sys/job/log")
 public class SysJobLogController {
-  @Autowired private SysJobLogService sysJobLogService;
+  @Autowired private TaskServiceFeignClient taskServiceFeignClient;
 
   @GetMapping("/list")
-  public IPage<SysJobLog> list(PageDTO<SysJobLog> page, SysJobLog dto) {
-    return sysJobLogService.queryPage(page, dto);
+  public Page<SysJobLog> list(PageDTO<SysJobLog> page, SysJobLog dto) {
+    BeanUtil.copyProperties(page, dto);
+    return taskServiceFeignClient.list(dto);
   }
 
   @PostMapping("/remove")
   public void remove(String ids) {
-    if (StrUtil.isNotBlank(ids)) {
-      sysJobLogService.deleteJobLogByIds(ids);
-    }
+    taskServiceFeignClient.remove(ids);
   }
 
   @PostMapping("/clean")
   public void clean() {
-    sysJobLogService.cleanJobLog();
+    taskServiceFeignClient.clean();
   }
 }

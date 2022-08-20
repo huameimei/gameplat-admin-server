@@ -127,6 +127,7 @@ public class ProxyPayServiceImpl implements ProxyPayService {
       UserCredential userCredential)
       throws Exception {
     MemberWithdraw memberWithdraw = memberWithdrawService.getById(id);
+    log.info("三方代付出款订单号==={}", memberWithdraw.getCashOrderNo());
     if (null == memberWithdraw) {
       throw new ServiceException("不存在的记录");
     }

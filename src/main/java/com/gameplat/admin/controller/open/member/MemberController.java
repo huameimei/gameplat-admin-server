@@ -162,7 +162,7 @@ public class MemberController {
   @PreAuthorize("hasAuthority('member:recoverTransform')")
   @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.MEMBER, desc = "'恢复转代理数据'")
   public void recoverTransform(@PathVariable String serialNo) {
-    memberTransferAgentService.recover(serialNo);
+    //    memberTransferAgentService.recover(serialNo);
   }
 
   @Operation(summary = "根据账号获取会员信息")

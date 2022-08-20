@@ -7,12 +7,14 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
+import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.convert.ActivityLobbyConvert;
 import com.gameplat.admin.convert.ActivityQualificationConvert;
+import com.gameplat.admin.enums.PushMessageEnum;
 import com.gameplat.admin.mapper.ActivityQualificationMapper;
 import com.gameplat.admin.model.dto.*;
 import com.gameplat.admin.model.vo.*;
@@ -30,11 +32,13 @@ import com.gameplat.model.entity.activity.ActivityDistribute;
 import com.gameplat.model.entity.activity.ActivityLobby;
 import com.gameplat.model.entity.activity.ActivityQualification;
 import com.gameplat.model.entity.recharge.RechargeOrderHistory;
+import com.gameplat.security.SecurityUserHolder;
 import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -67,6 +71,8 @@ public class ActivityQualificationServiceImpl
   @Autowired private RechargeOrderHistoryService rechargeOrderHistoryService;
 
   @Autowired private ActivityLobbyService activityLobbyService;
+
+  @Autowired private MessageInfoService messageInfoService;
 
   private static final String EST4_BEGIN = " 12:00:00";
 
@@ -112,6 +118,8 @@ public class ActivityQualificationServiceImpl
             dto.getQualificationStatus() != null,
             ActivityQualification::getQualificationStatus,
             dto.getQualificationStatus())
+        .ge(ObjectUtils.isNotEmpty(dto.getApplyStartTime()), ActivityQualification::getApplyTime, dto.getApplyStartTime())
+        .le(ObjectUtils.isNotEmpty(dto.getApplyEndTime()), ActivityQualification::getApplyTime, dto.getApplyEndTime())
         .orderByDesc(ActivityQualification::getCreateTime);
     return queryChainWrapper.page(page).convert(activityQualificationConvert::toVo);
   }
@@ -309,6 +317,7 @@ public class ActivityQualificationServiceImpl
   }
 
   @Override
+  @Transactional(rollbackFor = Exception.class)
   public void auditStatus(ActivityQualificationAuditStatusDTO dto) {
     List<ActivityQualification> qualificationManageStatusList =
         this.lambdaQuery().in(ActivityQualification::getId, dto.getIdList()).list();
@@ -328,6 +337,26 @@ public class ActivityQualificationServiceImpl
       }
       // 更新数据
       qualification.setStatus(ActivityInfoEnum.QualificationStatus.AUDITED.value());
+      String remark = "";
+      if (ObjectUtils.isNotNull(dto.getAdjustAmount())
+        && qualification.getMaxMoney().compareTo(dto.getAdjustAmount()) != 0) {
+        if(qualification.getActivityType() != 1){
+          throw new ServiceException("您选择的资格数据有非活动大厅类型的数据，目前只支持大厅类型的资格可以调整优惠金额");
+        }
+        qualification.setMaxMoney(dto.getAdjustAmount());
+        remark = remark + "，调整优惠金额：" + dto.getAdjustAmount();
+      }
+      if (ObjectUtils.isNotNull(dto.getAdjustDml())
+        && qualification.getWithdrawDml().compareTo(dto.getAdjustDml()) != 0) {
+        if(qualification.getActivityType() != 1){
+          throw new ServiceException("您选择的资格数据有非活动大厅类型的数据，目前只支持大厅类型的资格可以调整优惠打码量");
+        }
+        qualification.setWithdrawDml(dto.getAdjustDml());
+        remark = remark + "，调整优惠打码量：" + dto.getAdjustDml();
+      }
+      if (ObjectUtils.isNotEmpty(remark)) {
+        qualification.setRemark("操作人：" + SecurityUserHolder.getUsername() + remark);
+      }
       qualification.setAuditPerson(GlobalContextHolder.getContext().getUsername());
       qualification.setAuditTime(new Date());
     }
@@ -354,10 +383,18 @@ public class ActivityQualificationServiceImpl
           ad.setStatus(BooleanEnum.YES.value());
           //                ad.setDisabled(1);
           ad.setDeleteFlag(BooleanEnum.YES.value());
-          ad.setDiscountsMoney(NumberUtil.toBigDecimal(activityQualification.getMaxMoney()));
           ad.setQualificationActivityId(activityQualification.getQualificationActivityId());
           ad.setStatisItem(activityQualification.getStatisItem());
-          ad.setWithdrawDml(activityQualification.getWithdrawDml());
+          if (ObjectUtils.isNull(dto.getAdjustAmount())) {
+            ad.setDiscountsMoney(activityQualification.getMaxMoney());
+          } else {
+            ad.setDiscountsMoney(dto.getAdjustAmount());
+          }
+          if (ObjectUtils.isNull(dto.getAdjustDml())) {
+            ad.setWithdrawDml(activityQualification.getWithdrawDml());
+          } else {
+            ad.setWithdrawDml(dto.getAdjustDml());
+          }
           ad.setSoleIdentifier(activityQualification.getSoleIdentifier());
           ad.setStatisStartTime(activityQualification.getStatisStartTime());
           ad.setStatisEndTime(activityQualification.getStatisEndTime());
@@ -563,6 +600,42 @@ public class ActivityQualificationServiceImpl
       log.info("生成当天红包雨资格结束,消耗：{}ms", System.currentTimeMillis() - start);
     } catch (Exception e) {
       log.error("生成当天红包雨资格异常", e);
+    }
+  }
+
+  @Override
+  @Transactional(rollbackFor = Exception.class)
+  public void refuse(ActivityQualificationRefuseDTO dto) {
+    for (Long id : dto.getIdList()) {
+      ActivityQualification activityQualification = this.lambdaQuery()
+        .eq(ActivityQualification::getId, id)
+        .eq(ActivityQualification::getDeleteFlag, 1)
+        .one();
+      if (ObjectUtils.isNull(activityQualification)) {
+        throw new ServiceException("活动资格不存在");
+      }
+      if (activityQualification.getActivityType() != 1) {
+        throw new ServiceException("只有活动大厅类型的资格可以拒绝，转盘和红包雨等暂不支持拒绝");
+      }
+      if (activityQualification.getStatus() == ActivityInfoEnum.QualificationStatus.AUDITED.value()) {
+        throw new ServiceException("该活动资格已经审核通过，不能拒绝");
+      }
+
+      this.removeById(id);
+
+      // 通知 发个人消息
+      MessageInfoAddDTO message = new MessageInfoAddDTO();
+      message.setContent(dto.getRefuseReason());
+      message.setTitle(activityQualification.getActivityName() + ",活动资格被拒绝");
+      message.setPushRange(PushMessageEnum.UserRange.SOME_MEMBERS.getValue());
+      message.setLinkAccount(activityQualification.getUsername());
+      message.setCategory(PushMessageEnum.MessageCategory.SYS_SEND.getValue());
+      message.setPosition(PushMessageEnum.Location.LOCATION_DEF.getValue());
+      message.setShowType(PushMessageEnum.MessageShowType.SHOW_DEF.value());
+      message.setPopsCount(PushMessageEnum.PopCount.POP_COUNT_DEF.getValue());
+      message.setType(PushMessageEnum.MessageType.SYSTEM_INFORMATION.value());
+      message.setCreateBy(SecurityUserHolder.getUsername());
+      messageInfoService.insertMessage(message);
     }
   }
 

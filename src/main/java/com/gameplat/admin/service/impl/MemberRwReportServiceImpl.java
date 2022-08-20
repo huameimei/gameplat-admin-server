@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.constant.WithdrawTypeConstant;
 import com.gameplat.admin.mapper.MemberRwReportMapper;
 import com.gameplat.admin.service.MemberRwReportService;
+import com.gameplat.admin.service.PayTypeService;
 import com.gameplat.base.common.util.DateUtil;
 import com.gameplat.base.common.util.StringUtils;
 import com.gameplat.common.enums.CashEnum;
@@ -15,9 +16,11 @@ import com.gameplat.common.util.Convert;
 import com.gameplat.model.entity.member.Member;
 import com.gameplat.model.entity.member.MemberRwReport;
 import com.gameplat.model.entity.member.MemberWithdraw;
+import com.gameplat.model.entity.pay.PayType;
 import com.gameplat.model.entity.recharge.RechargeOrder;
 import jodd.util.StringUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,8 +35,13 @@ import java.util.Optional;
 public class MemberRwReportServiceImpl extends ServiceImpl<MemberRwReportMapper, MemberRwReport>
     implements MemberRwReportService {
 
+  @Autowired
+  private PayTypeService payTypeService;
+
+
   @Override
   public void addRecharge(Member member, Integer rechargeCount, RechargeOrder rechargeOrder) {
+
     log.info("充值订单数据：{}", JSONUtil.toJsonStr(rechargeOrder));
     MemberRwReport report = getOrCreateReportUserRw(member, rechargeOrder.getAuditTime());
     log.info("充值报表数据：{}", JSONUtil.toJsonStr(report));
@@ -86,13 +94,15 @@ public class MemberRwReportServiceImpl extends ServiceImpl<MemberRwReportMapper,
       report.setOtherDiscount(report.getOtherDiscount().add(rechargeOrder.getDiscountAmount()));
     }
 
-    // 计算虚拟币充值
-    if (ObjectUtil.isNotEmpty(rechargeOrder.getCurrencyCount())
-        && rechargeOrder.getCurrencyCount().compareTo(BigDecimal.ZERO) == 1) {
-      report.setVirtualRechargeNumber(
-          report.getVirtualRechargeNumber().add(rechargeOrder.getCurrencyCount()));
-      report.setVirtualRechargeMoney(
-          report.getVirtualRechargeMoney().add(rechargeOrder.getAmount()));
+    String payTypeCode = rechargeOrder.getPayType();
+    if (ObjectUtil.isNotEmpty(payTypeCode)) {
+      PayType payType = this.payTypeService.lambdaQuery().eq(PayType::getCode, payTypeCode).one();
+      if (payType != null && payType.getBankFlag() == 2) {
+        report.setVirtualRechargeNumber(
+                report.getVirtualRechargeNumber().add(rechargeOrder.getCurrencyCount()));
+        report.setVirtualRechargeMoney(
+                report.getVirtualRechargeMoney().add(rechargeOrder.getAmount()));
+      }
     }
 
     report.setMemberId(member.getId());
@@ -129,17 +139,15 @@ public class MemberRwReportServiceImpl extends ServiceImpl<MemberRwReportMapper,
         report.setFirstWithdrawMoney(
             report.getFirstWithdrawMoney().add(memberWithdraw.getCashMoney()));
       }
-      if (ObjectUtil.equals(memberWithdraw.getWithdrawType(), WithdrawTypeConstant.BTC)
-          || ObjectUtil.equals(memberWithdraw.getWithdrawType(), WithdrawTypeConstant.USDT)
-          || ObjectUtil.equals(memberWithdraw.getWithdrawType(), WithdrawTypeConstant.ETH)
-          || ObjectUtil.equals(memberWithdraw.getWithdrawType(), WithdrawTypeConstant.VIRTUAL)) {
+      if (!ObjectUtil.equals(memberWithdraw.getWithdrawType(), WithdrawTypeConstant.BANK)
+              || !ObjectUtil.equals(memberWithdraw.getWithdrawType(), WithdrawTypeConstant.DIRECT)) {
         BigDecimal count =
             StringUtils.isNotEmpty(memberWithdraw.getCurrencyCount())
                 ? Convert.toBigDecimal(memberWithdraw.getCurrencyCount())
                 : BigDecimal.ZERO;
         report.setVirtualWithdrawNumber(report.getVirtualWithdrawNumber().add(count));
         report.setVirtualWithdrawMoney(
-            report.getVirtualWithdrawMoney().add(memberWithdraw.getCashMoney()));
+                report.getVirtualWithdrawMoney().add(memberWithdraw.getApproveMoney()));
       }
 
     } else {

@@ -26,6 +26,7 @@ import com.gameplat.admin.service.MemberService;
 import com.gameplat.base.common.enums.EnableEnum;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.common.constant.NumberConstant;
+import com.gameplat.common.enums.UserTypes;
 import com.gameplat.common.lang.Assert;
 import com.gameplat.model.entity.game.GameKind;
 import com.gameplat.model.entity.member.Member;
@@ -82,10 +83,13 @@ public class DivideLayerConfigServiceImpl
   @Override
   public Map<String, Object> getLayerConfigForLinkAdd(String userName, String lang) {
     Assert.isTrue(StrUtil.isNotBlank(userName), "用户名参数缺失！");
+    // 校验账号的用户类型
     Member member =
-        memberService
-            .getAgentByAccount(userName)
-            .orElseThrow(() -> new ServiceException("代理账号不存在!"));
+        memberService.getByAccount(userName).orElseThrow(() -> new ServiceException("代理账号不存在!"));
+    Assert.isTrue(
+        UserTypes.AGENT.value().equalsIgnoreCase(member.getUserType())
+            || UserTypes.PROMOTION.value().equalsIgnoreCase(member.getUserType()),
+        "账号类型不支持！");
     // 获取到自己的分红配置
     DivideLayerConfig ownerLayerConfig = layerConfigMapper.getByUserName(userName);
     if (BeanUtil.isEmpty(ownerLayerConfig) || StrUtil.isBlank(ownerLayerConfig.getDivideConfig())) {

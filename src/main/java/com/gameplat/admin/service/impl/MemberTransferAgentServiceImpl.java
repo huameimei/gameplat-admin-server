@@ -2,6 +2,7 @@ package com.gameplat.admin.service.impl;
 
 import cn.hutool.core.collection.CollUtil;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.gameplat.admin.constant.MemberServiceKeyConstant;
 import com.gameplat.admin.constant.SystemConstant;
 import com.gameplat.admin.enums.MemberBackupEnums;
 import com.gameplat.admin.mapper.DivideLayerConfigMapper;
@@ -23,10 +24,12 @@ import com.gameplat.common.game.api.GameApi;
 import com.gameplat.common.lang.Assert;
 import com.gameplat.model.entity.member.Member;
 import com.gameplat.model.entity.member.MemberTransferRecord;
+import com.gameplat.redis.redisson.DistributedLocker;
 import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -35,6 +38,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -62,20 +66,51 @@ public class MemberTransferAgentServiceImpl implements MemberTransferAgentServic
 
   @Autowired private TransferAgentMapper transferAgentMapper;
 
+  @Autowired private DistributedLocker distributedLocker;
+
+  @Autowired private StringRedisTemplate stringRedisTemplate;
+
+  @Autowired private KgAgentService kgAgentService;
+
   @Override
   public void transform(MemberTransformDTO dto) {
+    // 添加一个锁，防止互转 造成ES数据转移死循环了
+    String lockKey =
+        MemberServiceKeyConstant.MEMBER_TRANSFER_AGENT_LOCK.concat(dto.getId().toString());
+    Boolean aBoolean =
+        stringRedisTemplate
+            .opsForValue()
+            .setIfAbsent(lockKey, dto.getId().toString(), 3, TimeUnit.HOURS);
+    if (!aBoolean) {
+      log.info("转代理获取不到锁{}", dto.getId());
+      throw new ServiceException("请等待上次转代理任务完成！");
+    }
     Member source = memberService.getById(dto.getId());
     Member target =
         memberService
             .getAgentByAccount(dto.getAgentAccount())
             .orElseThrow(() -> new ServiceException("账号不存在或当前账号不是代理账号！"));
-
-    // 检查条件
-    this.preCheck(source, target, dto.getExcludeSelf());
+    try {
+      // 检查条件
+      this.preCheck(source, target, dto.getExcludeSelf());
+    } catch (ServiceException detailMessage) {
+      stringRedisTemplate.delete(lockKey);
+      throw new ServiceException(detailMessage.getLocalizedMessage());
+    } catch (Exception e) {
+      stringRedisTemplate.delete(lockKey);
+      throw new ServiceException("转代理失败！");
+    }
     // 转移
-    this.doTransform(source, target, dto.getExcludeSelf(), dto.getSerialNo(), dto.getTransferWithData());
+    this.doTransform(
+        lockKey,
+        source,
+        target,
+        dto.getExcludeSelf(),
+        dto.getSerialNo(),
+        dto.getTransferWithData());
+
     // 更新彩票代理结构
-    //    this.changeKgLotteryProxy(source, target);
+    kgAgentService.changeKgLotteryProxy(source, target);
   }
 
   @Transactional(propagation = Propagation.NOT_SUPPORTED)
@@ -177,7 +212,7 @@ public class MemberTransferAgentServiceImpl implements MemberTransferAgentServic
    * @param target 目标代理
    */
   private void doTransform(Member source, Member target) {
-    this.doTransform(source, target, false, null, false);
+    this.doTransform("", source, target, false, null, false);
   }
 
   /**
@@ -188,41 +223,60 @@ public class MemberTransferAgentServiceImpl implements MemberTransferAgentServic
    * @param excludeSelf 是否包含会员本身
    * @param serialNo 流水号存在时备份
    */
-  private void doTransform(Member source, Member target, Boolean excludeSelf, String serialNo, Boolean transferWithData) {
-    // 流水号不为空时添加记录
-    if (StringUtils.isNotEmpty(serialNo)) {
-      this.addTransferAgentRecord(serialNo, source, target.getAccount(), excludeSelf);
+  private void doTransform(
+      String lockKey,
+      Member source,
+      Member target,
+      Boolean excludeSelf,
+      String serialNo,
+      Boolean transferWithData) {
+    String newSuperPath = "";
+    try {
+      // 流水号不为空时添加记录
+      if (StringUtils.isNotEmpty(serialNo)) {
+        this.addTransferAgentRecord(serialNo, source, target.getAccount(), excludeSelf);
+      }
+
+      // 仅转移直属下级，更新原直属下级的直接上级
+      if (Boolean.TRUE.equals(excludeSelf)) {
+        this.updateDirectSuper(source.getAccount(), target);
+      } else {
+        // 转移全部时，只需更新当前会员的直属上级
+        source.setParentId(target.getId());
+        source.setParentName(target.getAccount());
+        Assert.isTrue(source.updateById(), "更新会员信息失败!");
+      }
+
+      // 更新代理路径和代理/会员等级
+      newSuperPath = target.getSuperPath().concat(source.getAccount()).concat("/");
+      int agentLevel = source.getAgentLevel() - target.getAgentLevel();
+      BigDecimal userRebate = memberInfoService.findUserRebate(target.getAccount());
+
+      // 批量删除 分红配置  推广分红预设 修改彩票返点
+      this.delDivideConfig(
+          excludeSelf ? source.getAccount() : null, source.getSuperPath(), userRebate);
+
+      memberMapper.batchUpdateSuperPathAndAgentLevel(
+          excludeSelf ? source.getAccount() : null,
+          source.getSuperPath(),
+          newSuperPath,
+          agentLevel,
+          userRebate);
+      // 更新下级人数
+      this.updateLowerNum(source, target.getSuperPath(), excludeSelf);
+    } catch (ServiceException detailMessage) {
+      stringRedisTemplate.delete(lockKey);
+      throw new ServiceException(detailMessage.getLocalizedMessage());
+    } catch (Exception e) {
+      stringRedisTemplate.delete(lockKey);
+      throw new ServiceException("转代理失败！");
     }
-
-    // 仅转移直属下级，更新原直属下级的直接上级
-    if (Boolean.TRUE.equals(excludeSelf)) {
-      this.updateDirectSuper(source.getAccount(), target);
-    } else {
-      // 转移全部时，只需更新当前会员的直属上级
-      source.setParentId(target.getId());
-      source.setParentName(target.getAccount());
-      Assert.isTrue(source.updateById(), "更新会员信息失败!");
-    }
-
-    // 更新代理路径和代理/会员等级
-    String newSuperPath = target.getSuperPath().concat(source.getAccount()).concat("/");
-    int agentLevel = source.getAgentLevel() - target.getAgentLevel();
-    BigDecimal userRebate = memberInfoService.findUserRebate(target.getAccount());
-
-    // 批量删除 分红配置  推广分红预设 修改彩票返点
-    this.delDivideConfig(excludeSelf ? source.getAccount() : null, source.getSuperPath(), userRebate);
-
-    memberMapper.batchUpdateSuperPathAndAgentLevel(
-        excludeSelf ? source.getAccount() : null, source.getSuperPath(), newSuperPath, agentLevel, userRebate);
-
-    // 是否转移数据
     if (transferWithData) {
       transferAgentService.transferData(
-          excludeSelf ? source.getAccount() : null, source.getSuperPath(), newSuperPath);
+          lockKey, excludeSelf ? source.getAccount() : null, source.getSuperPath(), newSuperPath);
+    } else {
+      stringRedisTemplate.delete(lockKey);
     }
-
-    // 更新下级人数
-    this.updateLowerNum(source, target.getSuperPath(), excludeSelf);
   }
 
   /**

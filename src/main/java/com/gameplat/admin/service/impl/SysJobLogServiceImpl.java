@@ -27,7 +27,7 @@ public class SysJobLogServiceImpl extends ServiceImpl<SysJobLogMapper, SysJobLog
     queryWrapper.eq(StrUtil.isNotBlank(dto.getStatus()), SysJobLog::getStatus, dto.getStatus());
     queryWrapper.like(
         StrUtil.isNotBlank(dto.getMethodName()), SysJobLog::getMethodName, dto.getMethodName());
-    queryWrapper.orderByDesc(SysJobLog::getStartTime);
+    queryWrapper.orderByDesc(SysJobLog::getCreateTime);
     return sysJobLogMapper.selectPage(page, queryWrapper);
   }
 

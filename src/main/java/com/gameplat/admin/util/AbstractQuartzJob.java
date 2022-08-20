@@ -1,5 +1,6 @@
 package com.gameplat.admin.util;
 
+import cn.hutool.core.date.DateTime;
 import com.gameplat.admin.constant.ScheduleConstants;
 import com.gameplat.admin.model.bean.SysJob;
 import com.gameplat.admin.model.bean.SysJobLog;
@@ -66,9 +67,8 @@ public abstract class AbstractQuartzJob implements Job {
     sysJobLog.setJobGroup(sysJob.getJobGroup());
     sysJobLog.setMethodName(sysJob.getMethodName());
     sysJobLog.setMethodParams(sysJob.getMethodParams());
-    sysJobLog.setStartTime(startTime);
-    sysJobLog.setEndTime(new Date());
-    long runMs = sysJobLog.getEndTime().getTime() - sysJobLog.getStartTime().getTime();
+    sysJobLog.setCreateTime(startTime);
+    long runMs = DateTime.now().getTime() - sysJobLog.getCreateTime().getTime();
     sysJobLog.setJobMessage(sysJobLog.getJobName() + " 总共耗时：" + runMs + "毫秒");
     if (e != null) {
       sysJobLog.setStatus(Constants.FAIL);

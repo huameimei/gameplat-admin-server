@@ -139,6 +139,12 @@
 
         <dependency>
             <groupId>com.gameplat</groupId>
+            <artifactId>gameplat-common-lottery</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.gameplat</groupId>
             <artifactId>base-pay-spring-boot-starter</artifactId>
         </dependency>
 

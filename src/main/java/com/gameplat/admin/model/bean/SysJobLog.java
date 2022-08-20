@@ -47,8 +47,5 @@ public class SysJobLog implements Serializable {
   private String exceptionInfo;
 
   /** 开始时间 */
-  private Date startTime;
-
-  /** 结束时间 */
-  private Date endTime;
+  private Date createTime;
 }

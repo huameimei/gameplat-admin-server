@@ -1,6 +1,7 @@
 package com.gameplat.admin.service.impl;
 
 import cn.hutool.core.convert.Convert;
+import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -23,6 +24,9 @@ public class SysJobLogServiceImpl extends ServiceImpl<SysJobLogMapper, SysJobLog
   @Override
   public IPage<SysJobLog> queryPage(PageDTO<SysJobLog> page, SysJobLog dto) {
     LambdaQueryWrapper<SysJobLog> queryWrapper = new LambdaQueryWrapper<>();
+    queryWrapper.eq(StrUtil.isNotBlank(dto.getStatus()), SysJobLog::getStatus, dto.getStatus());
+    queryWrapper.like(
+        StrUtil.isNotBlank(dto.getMethodName()), SysJobLog::getMethodName, dto.getMethodName());
     queryWrapper.orderByDesc(SysJobLog::getStartTime);
     return sysJobLogMapper.selectPage(page, queryWrapper);
   }

@@ -48,10 +48,6 @@ public class MemberTransferAgentServiceImpl implements MemberTransferAgentServic
 
   @Autowired private MemberTransferRecordService memberTransferRecordService;
 
-  @Autowired private ApplicationContext applicationContext;
-
-  @Autowired private GameConfigService gameConfigService;
-
   @Autowired private MemberInfoService memberInfoService;
 
   @Autowired private DivideLayerConfigMapper layerConfigMapper;
@@ -61,6 +57,8 @@ public class MemberTransferAgentServiceImpl implements MemberTransferAgentServic
   @Autowired private TransferAgentService transferAgentService;
 
   @Autowired private TransferAgentMapper transferAgentMapper;
+
+  @Autowired private KgAgentService kgAgentService;
 
   @Override
   public void transform(MemberTransformDTO dto) {
@@ -75,38 +73,7 @@ public class MemberTransferAgentServiceImpl implements MemberTransferAgentServic
     // 转移
     this.doTransform(source, target, dto.getExcludeSelf(), dto.getSerialNo(), dto.getTransferWithData());
     // 更新彩票代理结构
-    //    this.changeKgLotteryProxy(source, target);
-  }
-
-  @Transactional(propagation = Propagation.NOT_SUPPORTED)
-  public GameApi getGameApi(String platformCode) {
-    GameApi api =
-      applicationContext.getBean(platformCode.toLowerCase() + GameApi.SUFFIX, GameApi.class);
-    TransferTypesEnum tt = TransferTypesEnum.get(platformCode);
-    // 1代表是否额度转换
-    if (tt == null || tt.getType() != 1) {
-      throw new ServiceException("游戏未接入");
-    }
-    return api;
-  }
-
-  private static final String backslash = "/";
-
-  /**
-   * 异步更新彩票代理结构
-   */
-  @Async
-  public void changeKgLotteryProxy(Member source, Member target) {
-
-    String superPath = target.getSuperPath().concat(source.getAccount()).concat(backslash);
-    GameApi gameApi = getGameApi(GamePlatformEnum.KGNL.getCode());
-    GameBizBean gameBizBean = GameBizBean.builder()
-      .account(source.getAccount())
-      .platformCode(GamePlatformEnum.KGNL.getCode())
-      .superPath(superPath)
-      .config(gameConfigService.getGameConfig(GamePlatformEnum.KGNL.getCode())).build();
-    gameApi.changeGameProxy(gameBizBean);
-
+    kgAgentService.changeKgLotteryProxy(source, target);
   }
 
   @Override

@@ -486,7 +486,8 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
     member.setParentName(parent.getAccount());
     member.setSuperPath(parent.getSuperPath().concat(member.getAccount()).concat("/"));
 
-    if (MemberEnums.Type.AGENT.match(member.getUserType())) {
+    if (MemberEnums.Type.AGENT.match(member.getUserType())
+        || MemberEnums.Type.PROMOTION.match(member.getUserType())) {
       member.setAgentLevel(parent.getAgentLevel() + 1);
     }
 

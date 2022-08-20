@@ -5,6 +5,7 @@ import com.gameplat.admin.model.dto.KgNlWinReportQueryDTO;
 import com.gameplat.admin.model.vo.KgNlBetDailyDetailVO;
 import com.gameplat.admin.model.vo.KgNlWinReportVO;
 import com.gameplat.admin.model.vo.PageDtoVO;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
@@ -23,4 +24,6 @@ public interface KgNlWinReportService {
   PageDtoVO<KgNlBetDailyDetailVO> findUserDetail(Page<KgNlBetDailyDetailVO> page, KgNlWinReportQueryDTO dto);
 
   void exportUserDetail(KgNlWinReportQueryDTO queryDTO, HttpServletResponse response);
+
+  void initReport(String days, String accounts);
 }

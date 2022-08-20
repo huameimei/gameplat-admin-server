@@ -98,7 +98,7 @@ public class TransferAgentServiceImpl implements TransferAgentService {
         log.info("转代理变更前数据={}", resultList);
         log.info("转代理获取到的转移的用户注册：{}", resultList.size());
         if (CollectionUtil.isNotEmpty(resultList)) {
-          log.info("开始更新ES注单记录的代理路径");
+          log.info("开始更新ES注单记录的代理路径={}", originSuperPath);
           Map<String, AgentInfoVo> agentInfoVoMap = new HashMap<>();
           List<BetRecord> listRecord = new ArrayList<>();
           for (GameBetRecord gameBetRecord : resultList) {

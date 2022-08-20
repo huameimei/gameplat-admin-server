@@ -88,6 +88,7 @@ public class GameKindServiceImpl extends ServiceImpl<GameKindMapper, GameKind>
       gameDB.setEnable(operGameKindDTO.getEnable() != null ? operGameKindDTO.getEnable() : 1);
       gameDB.setMaintenanceTimeStart(operGameKindDTO.getMaintenanceTimeStart());
       gameDB.setMaintenanceTimeEnd(operGameKindDTO.getMaintenanceTimeEnd());
+      gameDB.setDamaRate(operGameKindDTO.getDamaRate());
       //当租户的游戏状态为维护时，要避免出现维护起止时间为空的情况
       if (gameDB.getEnable() == 0) {
         gameDB.setMaintenanceTimeStart(gameDB.getMaintenanceTimeStart() == null ? new Date() : gameDB.getMaintenanceTimeStart());

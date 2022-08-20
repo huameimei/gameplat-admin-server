@@ -77,4 +77,7 @@ public class GameKindVO implements Serializable {
 
   /** 运营状态(0已下架、1下架中、2运营中) */
   private Integer status;
+
+  /** 打码量成长值倍数 */
+  private BigDecimal damaRate;
 }

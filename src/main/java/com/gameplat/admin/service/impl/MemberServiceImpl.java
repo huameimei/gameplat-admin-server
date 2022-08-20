@@ -369,11 +369,10 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
   @Override
   public void resetWithdrawPassword(MemberWithdrawPwdUpdateDTO dto) {
     Member member = this.getById(dto.getId());
-    String password = passwordService.encryptCashPassword(dto.getPassword());
     Assert.isTrue(
         memberInfoService
             .lambdaUpdate()
-            .set(MemberInfo::getCashPassword, password)
+                .set(MemberInfo::getCashPassword, "")
             .eq(MemberInfo::getMemberId, member.getId())
             .update(new MemberInfo()),
         "重置会员提现密码失败!");

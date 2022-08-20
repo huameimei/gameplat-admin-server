@@ -56,4 +56,7 @@ public class OperGameKindDTO implements Serializable {
 
   /** 游戏分类显示名称 */
   private String showName;
+
+  /** 打码量成长值倍数 */
+  private BigDecimal damaRate;
 }

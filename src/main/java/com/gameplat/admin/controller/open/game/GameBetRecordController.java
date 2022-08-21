@@ -5,7 +5,10 @@ import com.gameplat.admin.model.dto.GameBetRecordQueryDTO;
 import com.gameplat.admin.model.vo.GameBetRecordVO;
 import com.gameplat.admin.model.vo.PageDtoVO;
 import com.gameplat.admin.service.GameBetRecordInfoService;
+import com.gameplat.common.constant.ServiceName;
 import com.gameplat.common.game.GameResult;
+import com.gameplat.log.annotation.Log;
+import com.gameplat.log.enums.LogType;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.SneakyThrows;
@@ -46,6 +49,10 @@ public class GameBetRecordController {
   @Operation(summary = "导出游戏下注记录")
   @GetMapping(value = "/exportReport")
   @PreAuthorize("hasAuthority('game:gameBetRecord:export')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'游戏注单记录-->导出游戏下注记录:' + #dto" )
   public void exportReport(GameBetRecordQueryDTO dto, HttpServletResponse response) {
     gameBetRecordInfoService.exportReport(dto, response);
   }

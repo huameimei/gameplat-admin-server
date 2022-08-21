@@ -8,6 +8,9 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.gameplat.admin.model.dto.MemberWealRewordDTO;
 import com.gameplat.admin.model.vo.MemberWealRewordVO;
 import com.gameplat.admin.service.MemberWealRewordService;
+import com.gameplat.common.constant.ServiceName;
+import com.gameplat.log.annotation.Log;
+import com.gameplat.log.enums.LogType;
 import com.gameplat.model.entity.member.MemberWealReword;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -44,6 +47,10 @@ public class OpenMemberWealRewordController {
   @PostMapping("/updateRemark")
   @Operation(summary = "修改vip福利记录备注")
   @PreAuthorize("hasAuthority('member:wealReword:edit')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'VIP福利记录-->修改vip福利记录备注id:' + #id + 'remark:' + #remark")
   public void updateRemark(Long id, String remark) {
     rewordService.updateRemark(id, remark);
   }
@@ -52,6 +59,10 @@ public class OpenMemberWealRewordController {
   @Operation(summary = "导出VIP福利记录列表")
   @PostMapping(value = "/exportReword", produces = "application/vnd.ms-excel")
   @PreAuthorize("hasAuthority('member:wealReword:export')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'VIP福利记录-->导出VIP福利记录列表:' + #queryDTO")
   public void exportWealReword(MemberWealRewordDTO queryDTO, HttpServletResponse response) {
     List<MemberWealReword> list = rewordService.findList(queryDTO);
     List<MemberWealRewordVO> newList = BeanUtil.copyToList(list, MemberWealRewordVO.class);

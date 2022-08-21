@@ -6,6 +6,9 @@ import com.gameplat.admin.model.dto.DivideSummaryQueryDTO;
 import com.gameplat.admin.model.vo.DivideSummaryVO;
 import com.gameplat.admin.service.DivideSummaryService;
 import com.gameplat.base.common.exception.ServiceException;
+import com.gameplat.common.constant.ServiceName;
+import com.gameplat.log.annotation.Log;
+import com.gameplat.log.enums.LogType;
 import com.gameplat.model.entity.proxy.DivideSummary;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -53,6 +56,10 @@ public class DivideSummaryController {
   @Operation(summary = "删除分红汇总")
   @PostMapping("/remove")
   @PreAuthorize("hasAuthority('divide:periods:remove')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'分红汇总-->删除分红汇总:' + #del")
   public void removePeriods(@RequestBody DivideSummary del) {
     if (del.getId() == null) {
       throw new ServiceException("参数缺失");

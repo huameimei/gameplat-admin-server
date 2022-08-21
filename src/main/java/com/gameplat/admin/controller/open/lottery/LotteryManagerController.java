@@ -1,6 +1,9 @@
 package com.gameplat.admin.controller.open.lottery;
 
 import com.gameplat.admin.service.NewLotteryForwardService;
+import com.gameplat.common.constant.ServiceName;
+import com.gameplat.log.annotation.Log;
+import com.gameplat.log.enums.LogType;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.SneakyThrows;
@@ -45,6 +48,10 @@ public class LotteryManagerController {
   @Operation(summary = "开奖结果--编辑")
   @PostMapping("/editOpenNumber")
   @PreAuthorize("hasAuthority('lottery:open:editOpenNumber')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "彩票管理-->开奖结果--编辑" )
   public Object editOpenNumber(HttpServletRequest request, String lottCode, Long expectNo) {
     return serviceHandler.serviceHandler(request);
   }
@@ -59,6 +66,10 @@ public class LotteryManagerController {
   @Operation(summary = "开奖结果--补彩")
   @PostMapping("/buCai")
   @PreAuthorize("hasAuthority('lottery:open:buCai')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "彩票管理-->开奖结果--补彩" )
   public Object buCai(HttpServletRequest request) {
     return serviceHandler.serviceHandler(request);
   }
@@ -66,6 +77,10 @@ public class LotteryManagerController {
   @Operation(summary = "开奖结果--结算")
   @PostMapping("/settlement")
   @PreAuthorize("hasAuthority('lottery:open:settlement')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "彩票管理-->开奖结果--结算" )
   public Object settlement(HttpServletRequest request, String lottCode, Long expectNo) {
     return serviceHandler.serviceHandler(request);
   }
@@ -80,6 +95,10 @@ public class LotteryManagerController {
   @Operation(summary = "预设开奖--彩系和彩种列表")
   @PostMapping("/getPresetLottList")
   @PreAuthorize("hasAuthority('lottery:preset:getPresetLottList')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "彩票管理-->预设开奖--彩系和彩种列表" )
   public Object getPresetLottList(HttpServletRequest request) {
     return serviceHandler.serviceHandler(request);
   }
@@ -87,6 +106,10 @@ public class LotteryManagerController {
   @Operation(summary = "开奖预设开奖--批量添加预设号码")
   @PostMapping("/addPresetNumber")
   @PreAuthorize("hasAuthority('lottery:preset:addPresetNumber')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "彩票管理-->开奖预设开奖--批量添加预设号码" )
   public Object addPresetNumber(HttpServletRequest request) {
     return serviceHandler.serviceHandler(request);
   }
@@ -101,6 +124,10 @@ public class LotteryManagerController {
   @Operation(summary = "预设开奖--批量删除/删除")
   @PostMapping("/deletePresetNumber")
   @PreAuthorize("hasAuthority('lottery:preset:deletePresetNumber')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "彩票管理-->预设开奖--批量删除/删除" )
   public Object deletePresetNumber(HttpServletRequest request, String lottCode, String expectNos) {
     return serviceHandler.serviceHandler(request);
   }
@@ -157,6 +184,10 @@ public class LotteryManagerController {
   @Operation(summary = "彩系修改")
   @PostMapping("/updateLottType")
   @PreAuthorize("hasAuthority('lottery:type:edit')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "彩票管理-->彩系修改" )
   public Object updateLottType(HttpServletRequest request, String groupCode) {
     return serviceHandler.serviceHandler(request);
   }
@@ -171,6 +202,10 @@ public class LotteryManagerController {
   @Operation(summary = "修改彩种信息")
   @PostMapping("/updateLottInfo")
   @PreAuthorize("hasAuthority('lottery:kind:updateLottInfo')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "彩票管理-->修改彩种信息" )
   public Object updateLottInfo(HttpServletRequest request, String lottCode) {
     return serviceHandler.serviceHandler(request);
   }
@@ -178,6 +213,10 @@ public class LotteryManagerController {
   @Operation(summary = "彩票设置--批量修改")
   @PostMapping("/batchUpdateLottInfo")
   @PreAuthorize("hasAuthority('lottery:open:getOpenResult')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "彩票管理-->彩票设置--批量修改" )
   public Object batchUpdateLottInfo(HttpServletRequest request) {
     return serviceHandler.serviceHandler(request);
   }
@@ -206,6 +245,10 @@ public class LotteryManagerController {
   @PostMapping("/updateBetRestriction")
   @Operation(summary = "投注额配置(信用/官方)--修改单期最高投注额")
   @PreAuthorize("hasAuthority('lottery:bet:updateBetRestriction')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "彩票管理-->修改单期最高投注额" )
   public Object updateBetRestriction(
       HttpServletRequest request, String lottCode, BigDecimal expectRestriction) {
     return serviceHandler.serviceHandler(request);
@@ -228,6 +271,10 @@ public class LotteryManagerController {
   @PostMapping("/updateLottConfine")
   @Operation(summary = "玩法配置--保存修改")
   @PreAuthorize("hasAuthority('lottery:play:updateLottConfine')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "彩票管理-->玩法配置--保存修改" )
   public Object updateLottConfine(HttpServletRequest request) {
     return serviceHandler.serviceHandler(request);
   }
@@ -242,6 +289,10 @@ public class LotteryManagerController {
   @Operation(summary = "彩种玩法配置--一级玩法开关修改")
   @PostMapping("/onePlayUpdate")
   @PreAuthorize("hasAuthority('lottery:open:getOpenResult')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "彩票管理-->彩种玩法配置--一级玩法开关修改" )
   public Object onePlayUpdate(HttpServletRequest request) {
     return serviceHandler.serviceHandler(request);
   }
@@ -249,6 +300,10 @@ public class LotteryManagerController {
   @Operation(summary = "赔率设置(信用/官方)--批量修改赔率")
   @PostMapping("/updatePlayOdds")
   @PreAuthorize("hasAuthority('lottery:open:getOpenResult')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "彩票管理-->彩种玩法配置--赔率设置(信用/官方)--批量修改赔率" )
   public Object updatePlayOdds(HttpServletRequest request) {
     return serviceHandler.serviceHandler(request);
   }
@@ -277,6 +332,10 @@ public class LotteryManagerController {
   @Operation(summary = "未结算注单--删除")
   @PostMapping("/deleteNoSettlementBet")
   @PreAuthorize("hasAuthority('lottery:noSettlementBet:remove')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "彩票管理-->未结算注单--删除" )
   public Object deleteNoSettlementBet(HttpServletRequest request, String infoOrderNo) {
     return serviceHandler.serviceHandler(request);
   }
@@ -341,6 +400,10 @@ public class LotteryManagerController {
   @Operation(summary = "导出注单记录")
   @PostMapping("/exportBetRecord")
   @PreAuthorize("hasAuthority('lottery:open:getOpenResult')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "彩票管理-->导出注单记录" )
   public Object exportBetRecord(HttpServletRequest request) {
     return serviceHandler.serviceHandler(request);
   }
@@ -383,6 +446,10 @@ public class LotteryManagerController {
   @Operation(summary = "杀率设置--获取杀率信息")
   @PostMapping("/getKillInfo")
   @PreAuthorize("hasAuthority('lottery:open:getOpenResult')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "彩票管理-->杀率设置--获取杀率信息" )
   public Object getKillInfo(HttpServletRequest request) {
     return serviceHandler.serviceHandler(request);
   }
@@ -390,6 +457,10 @@ public class LotteryManagerController {
   @Operation(summary = "杀率设置--更新杀率信息")
   @PostMapping("/updateKillInfo")
   @PreAuthorize("hasAuthority('lottery:open:getOpenResult')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "彩票管理-->杀率设置--更新杀率信息" )
   public Object updateKillInfo(HttpServletRequest request) {
     return serviceHandler.serviceHandler(request);
   }
@@ -453,6 +524,10 @@ public class LotteryManagerController {
   @PostMapping("/addNotice")
   @Operation(summary = "公告配置-新增")
   @PreAuthorize("hasAuthority('lottery:notice:add')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "彩票管理-->公告配置-新增" )
   public Object addNotice(HttpServletRequest request) {
     return serviceHandler.serviceHandler(request);
   }
@@ -460,6 +535,10 @@ public class LotteryManagerController {
   @PostMapping("/updateNotice")
   @Operation(summary = "公告配置-编辑")
   @PreAuthorize("hasAuthority('lottery:notice:edit')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "彩票管理-->公告配置-编辑" )
   public Object updateNotice(HttpServletRequest request, Integer id) {
     return serviceHandler.serviceHandler(request);
   }
@@ -467,6 +546,10 @@ public class LotteryManagerController {
   @PostMapping("/deleteNotice")
   @Operation(summary = "公告配置-删除")
   @PreAuthorize("hasAuthority('lottery:notice:remove')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "彩票管理-->公告配置-删除" )
   public Object deleteNotice(HttpServletRequest request, String id) {
     return serviceHandler.serviceHandler(request);
   }
@@ -488,6 +571,10 @@ public class LotteryManagerController {
   @PostMapping("/getToDayPayoutSet")
   @Operation(summary = "今日派奖设置-设置")
   @PreAuthorize("hasAuthority('lottery:distribute:getToDayPayoutSet')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "彩票管理-->今日派奖设置-设置" )
   public Object getToDayPayoutSet(HttpServletRequest request) {
     return serviceHandler.serviceHandler(request);
   }
@@ -495,6 +582,10 @@ public class LotteryManagerController {
   @PostMapping("/toDayPayoutSet")
   @Operation(summary = "今日派奖设置-设置")
   @PreAuthorize("hasAuthority('lottery:distribute:toDayPayoutSet')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "彩票管理-->今日派奖设置-设置" )
   public Object toDayPayoutSet(
       HttpServletRequest request,
       BigDecimal initNumber,
@@ -528,6 +619,10 @@ public class LotteryManagerController {
   @PostMapping("/updateBlack")
   @Operation(summary = "更新用户官彩黑名单")
   //  @PreAuthorize("hasAuthority('lottery:open:getOpenResult')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "彩票管理-->更新用户官彩黑名单" )
   public Object updateBlack(HttpServletRequest request) {
     return serviceHandler.serviceHandler(request);
   }
@@ -535,12 +630,20 @@ public class LotteryManagerController {
   @PostMapping("/updateBetLimit")
   @Operation(summary = "更新用户投注限额")
   //  @PreAuthorize("hasAuthority('lottery:open:getOpenResult')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "彩票管理-->更新用户投注限额" )
   public Object updateBetLimit(HttpServletRequest request) {
     return serviceHandler.serviceHandler(request);
   }
 
   @PostMapping("/updateRebate")
   @Operation(summary = "更新用户反水等级")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "彩票管理-->更新用户反水等级" )
   //  @PreAuthorize("hasAuthority('lottery:open:getOpenResult')")
   public Object updateRebate(HttpServletRequest request) {
     return serviceHandler.serviceHandler(request);
@@ -563,6 +666,10 @@ public class LotteryManagerController {
   @Operation(summary = "竞速彩预设开奖--批量删除-删除")
   @PostMapping("deleteJscPresetNumber")
   @PreAuthorize("hasAuthority('lottery:racing:deleteJscPresetNumber')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "彩票管理-->竞速彩预设开奖--批量删除-删除" )
   public Object deleteJscPresetNumber(HttpServletRequest request) {
     return serviceHandler.serviceHandler(request);
   }
@@ -570,6 +677,10 @@ public class LotteryManagerController {
   @Operation(summary = "竞速彩开奖预设--批量添加预设号码")
   @PostMapping("addJscPresetNumber")
   @PreAuthorize("hasAuthority('lottery:racing:addJscPresetNumber')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "彩票管理-->竞速彩开奖预设--批量添加预设号码" )
   public Object addJscPresetNumber(HttpServletRequest request) {
     return serviceHandler.serviceHandler(request);
   }
@@ -577,6 +688,10 @@ public class LotteryManagerController {
   @Operation(summary = "批量竞速彩获取随机号码")
   @PostMapping("getJscRandomNumber")
   @PreAuthorize("hasAuthority('lottery:racing:getJscRandomNumber')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "彩票管理-->批量竞速彩获取随机号码" )
   public Object getJscRandomNumber(HttpServletRequest request) {
     return serviceHandler.serviceHandler(request);
   }

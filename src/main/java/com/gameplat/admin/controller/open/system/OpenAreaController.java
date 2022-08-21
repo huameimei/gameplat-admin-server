@@ -7,6 +7,9 @@ import com.gameplat.admin.model.dto.SmsAreaEditDTO;
 import com.gameplat.admin.model.dto.SmsAreaQueryDTO;
 import com.gameplat.admin.model.vo.SysSmsAreaVO;
 import com.gameplat.admin.service.SysSmsAreaService;
+import com.gameplat.common.constant.ServiceName;
+import com.gameplat.log.annotation.Log;
+import com.gameplat.log.enums.LogType;
 import com.gameplat.model.entity.sys.SysSmsArea;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -35,6 +38,10 @@ public class OpenAreaController {
   @Operation(summary = "新增")
   @PostMapping("/add")
   @PreAuthorize("hasAuthority('system:area:add')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'区号设置API-->新增:' + #addDTO")
   public void saveArea(@Validated @RequestBody SmsAreaAddDTO addDTO) {
     areaService.addSmsArea(addDTO);
   }
@@ -42,6 +49,10 @@ public class OpenAreaController {
   @Operation(summary = "编辑")
   @PostMapping("/edit")
   @PreAuthorize("hasAuthority('system:area:edit')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'区号设置API-->新增:' + #addDTO")
   public void updateArea(@Validated @RequestBody SmsAreaEditDTO editDTO) {
     areaService.editSmsArea(editDTO);
   }

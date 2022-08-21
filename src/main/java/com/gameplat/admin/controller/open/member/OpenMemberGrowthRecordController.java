@@ -10,7 +10,10 @@ import com.gameplat.admin.model.vo.MemberGrowthRecordVO;
 import com.gameplat.admin.service.MemberGrowthRecordService;
 import com.gameplat.admin.service.MemberGrowthStatisService;
 import com.gameplat.base.common.exception.ServiceException;
+import com.gameplat.common.constant.ServiceName;
 import com.gameplat.common.lang.Assert;
+import com.gameplat.log.annotation.Log;
+import com.gameplat.log.enums.LogType;
 import com.gameplat.model.entity.member.MemberGrowthRecord;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -49,6 +52,10 @@ public class OpenMemberGrowthRecordController {
   @PostMapping("/editGrowth")
   @Operation(summary = "修改单个会员成长值")
   @PreAuthorize("hasAuthority('member:growthRecord:edit')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'VIP成长记录-->修改单个会员成长值:' + #dto" )
   public void editMemberGrowth(@RequestBody MemberGrowthChangeDto dto, HttpServletRequest request) {
     log.info("单个会员成长值变动：MemberGrowthRecord={}", dto);
     if (dto == null || dto.getChangeGrowth() == null) {

@@ -3,6 +3,9 @@ package com.gameplat.admin.controller.open.member;
 import com.gameplat.admin.model.dto.MemberGrowthConfigEditDto;
 import com.gameplat.admin.model.vo.MemberGrowthConfigVO;
 import com.gameplat.admin.service.MemberGrowthConfigService;
+import com.gameplat.common.constant.ServiceName;
+import com.gameplat.log.annotation.Log;
+import com.gameplat.log.enums.LogType;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
@@ -37,6 +40,10 @@ public class MemberGrowthConfigController {
   @Operation(summary = "修改")
   @PostMapping("/edit")
   @PreAuthorize("hasAuthority('member:growthConfig:edit')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'VIP说明配置-->修改:' + #dto" )
   public void update(@Validated MemberGrowthConfigEditDto dto) {
     memberGrowthConfigService.updateGrowthConfig(dto);
   }

@@ -26,6 +26,10 @@ public class AgentConfigController {
   @GetMapping("/get")
   @Operation(summary = "获取层层代配置")
   @PreAuthorize("hasAuthority('system:config:view:agent')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'代理配置-->获取层层代配置:'")
   public AgentConfig getRecommendConfig() {
     return agentConfigService.getAgentConfig();
   }
@@ -33,6 +37,10 @@ public class AgentConfigController {
   @GetMapping("/getLayerConfig")
   @Operation(summary = "获取层层代分红模式配置预设")
   @PreAuthorize("hasAuthority('system:config:view:agent')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'代理配置-->获取层层代分红模式配置预设:'")
   public Map<String, List<GameDivideVo>> getLayerConfig() {
     return agentConfigService.getDefaultLayerDivideConfig();
   }

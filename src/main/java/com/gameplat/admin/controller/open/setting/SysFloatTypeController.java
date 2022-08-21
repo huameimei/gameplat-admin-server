@@ -5,6 +5,9 @@ import com.gameplat.admin.cache.AdminCache;
 import com.gameplat.admin.model.vo.SysFloatTypeVo;
 import com.gameplat.admin.service.SysFloatTypeService;
 import com.gameplat.common.constant.CacheKey;
+import com.gameplat.common.constant.ServiceName;
+import com.gameplat.log.annotation.Log;
+import com.gameplat.log.enums.LogType;
 import com.gameplat.model.entity.setting.SysFloatSetting;
 import com.gameplat.model.entity.setting.SysFloatType;
 import io.swagger.v3.oas.annotations.Operation;
@@ -43,6 +46,10 @@ public class SysFloatTypeController {
   @PostMapping("/insert")
   @PreAuthorize("hasAuthority('setting:float:add')")
   @Operation(summary = "游戏浮窗新增")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'游戏浮窗新增:' + #sysFloatSetting")
   public void add(@RequestBody SysFloatSetting sysFloatSetting) {
     sysFloatTypeService.insertSysFloat(sysFloatSetting);
     adminCache.deleteByPrefix(CacheKey.getTenantFloatPrefixKey());
@@ -52,6 +59,10 @@ public class SysFloatTypeController {
   @PostMapping("/update")
   @PreAuthorize("hasAuthority('setting:float:edit')")
   @Operation(summary = "游戏浮窗编辑")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'游戏浮窗编辑:' + #sysFloatSetting")
   public void update(@RequestBody SysFloatSetting sysFloatSetting) {
     sysFloatTypeService.updateFloat(sysFloatSetting);
     adminCache.deleteByPrefix(CacheKey.getTenantFloatPrefixKey());
@@ -61,6 +72,10 @@ public class SysFloatTypeController {
   @PostMapping("/updateBatch")
   @PreAuthorize("hasAuthority('setting:floatSort:save')")
   @Operation(summary = "批量编辑排序")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'批量编辑排序:' + #sysFloatSettings")
   public void updateBatch(@RequestBody List<SysFloatSetting> sysFloatSettings) {
     sysFloatTypeService.updateBatch(sysFloatSettings);
     adminCache.deleteByPrefix(CacheKey.getTenantFloatPrefixKey());
@@ -70,6 +85,10 @@ public class SysFloatTypeController {
   @PostMapping("/updateFloatType")
   @PreAuthorize("hasAuthority('setting:floatType:edit')")
   @Operation(summary = "游戏浮窗类型编辑")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'游戏浮窗类型编辑:' + #sysFloatType")
   public void updateFloatType(@RequestBody SysFloatType sysFloatType) {
     sysFloatTypeService.updateFloatType(sysFloatType);
     adminCache.deleteByPrefix(CacheKey.getTenantFloatPrefixKey());
@@ -79,6 +98,10 @@ public class SysFloatTypeController {
   @PostMapping("/showPosition")
   @PreAuthorize("hasAuthority('setting:showPosition:save')")
   @Operation(summary = "游戏浮窗类型编辑")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'游戏浮窗类型编辑:' + #showPosition")
   public void showPosition(@RequestBody Map<String, List<String>> showPosition) {
     if (showPosition != null && showPosition.get("midArr") != null) {
       sysFloatTypeService.updateShowPosition(JSON.toJSONString(showPosition.get("midArr")));

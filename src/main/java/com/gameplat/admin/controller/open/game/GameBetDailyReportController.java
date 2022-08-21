@@ -16,6 +16,9 @@ import com.gameplat.admin.service.GamePlatformService;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.DateUtil;
 import com.gameplat.base.common.util.StringUtils;
+import com.gameplat.common.constant.ServiceName;
+import com.gameplat.log.annotation.Log;
+import com.gameplat.log.enums.LogType;
 import com.gameplat.model.entity.game.GameBetDailyReport;
 import com.gameplat.model.entity.game.GamePlatform;
 import io.swagger.v3.oas.annotations.Operation;
@@ -55,6 +58,10 @@ public class GameBetDailyReportController {
   @Operation(summary = "游戏投注日报表导出")
   @GetMapping(value = "/exportGameBetDailyReport")
   @PreAuthorize("hasAuthority('game:gameBetDailyReport:export')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "游戏日报表-->游戏投注日报表导出")
   public void exportGameBetDailyReport(HttpServletResponse response, GameBetDailyReportQueryDTO dto) throws Exception {
     gameBetDailyReportService.exportGameBetDailyReport(response, dto);
   }
@@ -69,6 +76,10 @@ public class GameBetDailyReportController {
   @Operation(summary = "游戏平台维度数据导出")
   @GetMapping(value = "/exportGamePlatformReport")
   @PreAuthorize("hasAuthority('game:gamePlatformReport:export')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "游戏日报表-->游戏平台维度数据导出")
   public void exportGamePlatformReport(
       GameBetDailyReportQueryDTO dto, HttpServletResponse response) {
     gameBetDailyReportService.exportGamePlatformReport(dto, response);
@@ -105,6 +116,10 @@ public class GameBetDailyReportController {
   @Operation(summary = "游戏大类数据导出")
   @GetMapping(value = "/exportGameKindReport")
   @PreAuthorize("hasAuthority('game:gameKindReport:export')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "游戏日报表-->游戏大类数据导出")
   public void exportGameKindReport(GameBetDailyReportQueryDTO dto, HttpServletResponse response) {
     if (StringUtils.isBlank(dto.getBeginTime())) {
       String beginTime = DateUtil.getDateToString(new Date());
@@ -173,6 +188,10 @@ public class GameBetDailyReportController {
   @Operation(summary = "导出会员游戏报表")
   @GetMapping("exportUserGameBetRecord")
   @PreAuthorize("hasAuthority('game:gameReport:export')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "游戏日报表-->导出会员游戏报表")
   public void exportUserGameBetRecord(@Valid UserGameBetRecordDto dto, HttpServletResponse response) throws IOException {
     GameBetRecordQueryDTO gameBetRecordQueryDTO = new GameBetRecordQueryDTO();
     BeanUtils.copyProperties(dto, gameBetRecordQueryDTO);

@@ -10,6 +10,7 @@ import com.gameplat.common.constant.ServiceName;
 import com.gameplat.common.group.Groups;
 import com.gameplat.common.lang.Assert;
 import com.gameplat.log.annotation.Log;
+import com.gameplat.log.enums.LogType;
 import com.gameplat.model.entity.sys.SysMenu;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -37,7 +38,10 @@ public class OpenMenuController {
   @Operation(summary = "添加")
   @PostMapping("/add")
   @PreAuthorize("hasAuthority('system:menu:add')")
-  @Log(module = ServiceName.ADMIN_SERVICE, desc = "'添加菜单'")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'菜单管理-->添加' + #dto" )
   public void save(@Validated(Groups.INSERT.class) @RequestBody OperMenuDTO dto) {
     if (StringUtils.isBlank(dto.getMenuName())
         && !SysMenuEnums.TYPE.BUTTON.match(dto.getMenuType())) {
@@ -50,6 +54,10 @@ public class OpenMenuController {
   @Operation(summary = "编辑")
   @PostMapping("/edit")
   @PreAuthorize("hasAuthority('system:menu:edit')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'菜单管理-->编辑' + #dto" )
   public void update(@Validated(Groups.UPDATE.class) @RequestBody OperMenuDTO dto) {
     if (StringUtils.isBlank(dto.getMenuName())
         && !SysMenuEnums.TYPE.BUTTON.match(dto.getMenuType())) {
@@ -62,6 +70,10 @@ public class OpenMenuController {
   @Operation(summary = "删除")
   @PostMapping("/delete")
   @PreAuthorize("hasAuthority('system:menu:remove')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'菜单管理-->删除' + #ids" )
   public void remove(@RequestBody List<Long> ids) {
     menuService.deleteMenuById(ids);
   }

@@ -22,6 +22,8 @@ import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.ip.IpAddressParser;
 import com.gameplat.base.common.util.BeanUtils;
 import com.gameplat.base.common.util.ServletUtils;
+import com.gameplat.base.common.util.StringUtils;
+import com.gameplat.common.constant.CacheKey;
 import com.gameplat.common.constant.CachedKeys;
 import com.gameplat.common.constant.ServiceName;
 import com.gameplat.common.lang.Assert;
@@ -36,6 +38,7 @@ import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
@@ -43,8 +46,10 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @Tag(name = "会员管理")
 @RestController
@@ -57,6 +62,9 @@ public class MemberController {
   @Autowired private MemberTransferAgentService memberTransferAgentService;
 
   @Autowired private GameAdminService gameAdminService;
+
+  @Autowired
+  private RedisTemplate redisTemplate;
 
   @CreateCache(name = CachedKeys.MEMBER_FUND_PWD_ERR_COUNT, expire = -1)
 
@@ -321,5 +329,25 @@ public class MemberController {
   @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.MEMBER, desc = "'会员转变成代理'")
   public void changeToAgent(@RequestBody MemberTransformDTO dto) {
     memberTransferAgentService.changeToAgent(dto.getId());
+  }
+
+  @Operation(summary = "在线人数统计")
+  @GetMapping("/onLineCounter")
+  public Object onLineCounter() {
+    Set keys = redisTemplate.keys(CacheKey.getOnlineUserPrefix());
+    return keys != null ? keys.size() : 0;
+  }
+
+  @Operation(summary = "玩家在线检测")
+  @GetMapping("/onLineCheck")
+  public Object onLineCheck(@RequestParam String names) {
+    if (StringUtils.isEmpty(names)) {
+      return null;
+    }
+    Map<Object, Object> result = new HashMap<>();
+    for (String name : names.split("|")) {
+      result.put(name, redisTemplate.hasKey(CacheKey.getOnlineUserKey(name)));
+    }
+    return result;
   }
 }

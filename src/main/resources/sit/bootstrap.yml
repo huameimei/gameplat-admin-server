@@ -1,6 +1,8 @@
 spring:
   application:
     name: admin-server
+  main:
+    allow-circular-references: true
   profiles:
     active: @profiles.active@
   websocket:

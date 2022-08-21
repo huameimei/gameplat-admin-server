@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.Set;
 
-@Component
+@Component("BizBlacklistFacade")
 public class BizBlacklistFacade {
 
   @Autowired private BizBlacklistService bizBlacklistService;

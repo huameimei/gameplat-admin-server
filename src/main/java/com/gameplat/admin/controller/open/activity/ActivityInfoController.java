@@ -14,8 +14,11 @@ import com.gameplat.admin.service.ConfigService;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.DateUtil;
 import com.gameplat.base.common.util.StringUtils;
+import com.gameplat.common.constant.ServiceName;
 import com.gameplat.common.enums.ActivityInfoEnum;
 import com.gameplat.common.enums.DictDataEnum;
+import com.gameplat.log.annotation.Log;
+import com.gameplat.log.enums.LogType;
 import com.gameplat.model.entity.activity.ActivityInfo;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -72,6 +75,11 @@ public class ActivityInfoController {
   @Operation(summary = "新增活动")
   @PostMapping("/add")
   @PreAuthorize("hasAuthority('activity:info:add')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'活动发布管理->新增活动activityType:' + #activityInfoAddDTO.activityType + 'title:' + #activityInfoAddDTO.title +" +
+      "'typeName' + #activityInfoAddDTO.typeName")
   public void add(@RequestBody ActivityInfoAddDTO activityInfoAddDTO) {
     checkActivityInfo(
         activityInfoAddDTO.getValidStatus(),
@@ -99,6 +107,10 @@ public class ActivityInfoController {
   @Operation(summary = "编辑活动")
   @PostMapping("/update")
   @PreAuthorize("hasAuthority('activity:info:edit')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'活动发布管理->编辑活动activityInfoUpdateDTO:' + #activityInfoUpdateDTO")
   public void update(@RequestBody ActivityInfoUpdateDTO activityInfoUpdateDTO) {
     checkActivityInfo(
         activityInfoUpdateDTO.getValidStatus(),
@@ -113,6 +125,10 @@ public class ActivityInfoController {
   @Operation(summary = "修改活动排序")
   @PostMapping("/updateSort")
   @PreAuthorize("hasAuthority('activity:info:updateSort')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'活动发布管理->修改活动排序dto:' + #dto")
   public void updateSort(@Validated @RequestBody ActivityInfoUpdateSortDTO dto) {
     activityInfoService.updateSort(dto);
   }
@@ -120,6 +136,10 @@ public class ActivityInfoController {
   @Operation(summary = "删除活动")
   @PostMapping("/delete")
   @PreAuthorize("hasAuthority('activity:info:remove')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'活动发布管理->删除活动ids:' + #map.ids")
   public void delete(@RequestBody Map<String, String> map) {
     Assert.notNull(map.get("ids"), "id不能为空！");
     activityInfoService.delete(map.get("ids"));

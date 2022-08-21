@@ -9,6 +9,9 @@ import com.gameplat.admin.model.vo.ActivityDistributeVO;
 import com.gameplat.admin.service.ActivityDistributeService;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.StringUtils;
+import com.gameplat.common.constant.ServiceName;
+import com.gameplat.log.annotation.Log;
+import com.gameplat.log.enums.LogType;
 import com.gameplat.model.entity.activity.ActivityDistribute;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -46,6 +49,10 @@ public class ActivityDistributeController {
   @Operation(summary = "修改结算状态")
   @PostMapping("/updateStatus")
   @PreAuthorize("hasAuthority('activity:distribute:updateStatus')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'活动分发管理->修改结算状态ids:' + #ids")
   public void updateStatus(@RequestBody String ids) {
     activityDistributeService.updateStatus(ids);
   }
@@ -53,6 +60,10 @@ public class ActivityDistributeController {
   @Operation(summary = "删除分发")
   @PostMapping("/delete")
   @PreAuthorize("hasAuthority('activity:distribute:remove')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'活动分发管理->删除分发ids:' + #map.ids")
   public void remove(@RequestBody Map<String, String> map) {
     if (StringUtils.isBlank(map.get("ids"))) {
       throw new ServiceException("删除活动分发时，ids不能为空");

@@ -42,7 +42,7 @@ public class GameKindController {
   @Log(
           module = ServiceName.ADMIN_SERVICE,
           type = LogType.LIVEREBATE,
-          desc = "'编辑保存游戏:最新返水比例为:' + #rebateRate + ',最新打码计算成长值倍数为:' + #damaRate")
+          desc = "'编辑保存游戏:最新返水比例为:' + #dto.rebateRate + ',最新打码计算成长值倍数为:' + #dto.damaRate")
   public void updateGameKind(@RequestBody OperGameKindDTO dto) {
     gameKindService.updateGameKind(dto);
   }

@@ -13,9 +13,12 @@ import com.gameplat.admin.service.GameBetRecordInfoService;
 import com.gameplat.admin.service.KgNlWinReportService;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.DateUtil;
+import com.gameplat.common.constant.ServiceName;
 import com.gameplat.common.enums.GameKindEnum;
 import com.gameplat.common.enums.GameTypeEnum;
 import com.gameplat.common.enums.SettleStatusEnum;
+import com.gameplat.log.annotation.Log;
+import com.gameplat.log.enums.LogType;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
@@ -66,6 +69,10 @@ public class KgNlWinReportController {
   @GetMapping(value = "/exportReport")
   @PreAuthorize("hasAuthority('report:kgnl:export')")
   @Operation(summary = "导出KG新彩票输赢报表")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'KG新彩票输赢报表->导出KG新彩票输赢报表:' + #queryDTO")
   public void exportReport(@Valid KgNlWinReportQueryDTO queryDTO, HttpServletResponse response) {
     if (ObjectUtils.isEmpty(queryDTO.getBeginTime())) {
       queryDTO.setBeginTime(DateUtil.formatDateToStr(DateUtil.addDate(new Date(), -2), DateUtil.YYYY_MM_DD));

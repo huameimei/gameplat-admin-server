@@ -5,6 +5,9 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.gameplat.admin.model.dto.GameBlacklistQueryDTO;
 import com.gameplat.admin.model.dto.OperGameBlacklistDTO;
 import com.gameplat.admin.service.GameBlacklistService;
+import com.gameplat.common.constant.ServiceName;
+import com.gameplat.log.annotation.Log;
+import com.gameplat.log.enums.LogType;
 import com.gameplat.model.entity.game.GameBlacklist;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -22,6 +25,11 @@ public class OpenGameBlacklistController {
   @Operation(summary = "删除")
   @PostMapping("/del/{id}")
   @PreAuthorize("hasAuthority('account:gameBlack:remove')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'游戏黑名单->删除id:' + #id "
+  )
   public void delete(@PathVariable Long id) {
     gameBlacklistService.delete(id);
   }
@@ -37,6 +45,11 @@ public class OpenGameBlacklistController {
   @Operation(summary = "添加")
   @PostMapping("/add")
   @PreAuthorize("hasAuthority('account:gameBlack:add')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'游戏黑名单->添加target:' + #dto.target + 'blackType:' + #dto.blackType + 'liveCategory:' + #dto.liveCategory"
+  )
   public void add(@RequestBody OperGameBlacklistDTO dto) {
     gameBlacklistService.save(dto);
   }
@@ -44,6 +57,12 @@ public class OpenGameBlacklistController {
   @Operation(summary = "编辑")
   @PostMapping("/edit")
   @PreAuthorize("hasAuthority('account:gameBlack:edit')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'游戏黑名单->编辑id:' + #dto.id + 'target:' + #dto.target + 'blackType:' " +
+      "+ #dto.blackType + 'liveCategory:' + #dto.liveCategory"
+  )
   public void edit(@RequestBody OperGameBlacklistDTO dto) {
     gameBlacklistService.update(dto);
   }

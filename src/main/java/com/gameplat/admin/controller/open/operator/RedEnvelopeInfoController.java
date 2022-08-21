@@ -7,6 +7,9 @@ import com.gameplat.admin.model.dto.UserRedEnvelopeDTO;
 import com.gameplat.admin.model.vo.UserRedEnvelopeVO;
 import com.gameplat.admin.service.RedEnvelopeConfigService;
 import com.gameplat.admin.service.UserRedEnvelopeService;
+import com.gameplat.common.constant.ServiceName;
+import com.gameplat.log.annotation.Log;
+import com.gameplat.log.enums.LogType;
 import com.gameplat.model.entity.recharge.RedEnvelopeConfig;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -28,6 +31,10 @@ public class RedEnvelopeInfoController {
   @Operation(summary = "新增红包配置")
   @PostMapping("redAdd")
   @PreAuthorize("hasAuthority('operator:red:add')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'红包配置-->新增红包配置:' + #dto")
   public Object redAdd(@RequestBody RedEnvelopeConfigDTO dto) {
     return redEnvelopeService.redAdd(dto);
   }
@@ -42,6 +49,10 @@ public class RedEnvelopeInfoController {
   @Operation(summary = "红包设置")
   @PostMapping("/redEdit")
   @PreAuthorize("hasAuthority('operator:red:edit')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'红包配置-->红包设置:' + #dto")
   public Object redEdit(@RequestBody RedEnvelopeConfigDTO dto) {
     return redEnvelopeService.redEdit(dto);
   }
@@ -49,6 +60,10 @@ public class RedEnvelopeInfoController {
   @Operation(summary = "红包删除")
   @PostMapping("/redDelete")
   @PreAuthorize("hasAuthority('operator:red:remove')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'红包配置-->红包删除:' + #ids")
   public Object redDelete(@RequestBody List<Integer> ids) {
     return redEnvelopeService.redDelete(ids);
   }
@@ -63,6 +78,10 @@ public class RedEnvelopeInfoController {
   @Operation(summary = "红包回收")
   @PostMapping("/redRecycle")
   @PreAuthorize("hasAuthority('operator:red:reply')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'红包配置-->红包回收:'")
   public Object redRecycle() {
     return null;
   }

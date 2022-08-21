@@ -11,6 +11,9 @@ import com.gameplat.admin.model.vo.MemberVipSignHistoryVO;
 import com.gameplat.admin.model.vo.MemberVipSignStatisVO;
 import com.gameplat.admin.service.MemberVipSignHistoryService;
 import com.gameplat.admin.service.MemberVipSignStatisService;
+import com.gameplat.common.constant.ServiceName;
+import com.gameplat.log.annotation.Log;
+import com.gameplat.log.enums.LogType;
 import com.gameplat.model.entity.member.MemberVipSignHistory;
 import com.gameplat.model.entity.member.MemberVipSignStatis;
 import io.swagger.v3.oas.annotations.Operation;
@@ -54,6 +57,10 @@ public class OpenMemberVipSignStatisController {
   @GetMapping(value = "/exportSign", produces = "application/vnd.ms-excel")
   @Operation(summary = "导出VIP签到记录列表")
   @PreAuthorize("hasAuthority('member:sign:export')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'VIP会员签到汇总-->导出VIP签到记录列表:' + #queryDTO" )
   public void exportSign(MemberVipSignStatisDTO queryDTO, HttpServletResponse response) {
     List<MemberVipSignStatis> list = signStatisService.findSignList(queryDTO);
     List<MemberVipSignStatisVO> newList = BeanUtil.copyToList(list, MemberVipSignStatisVO.class);

@@ -10,6 +10,7 @@ import com.gameplat.common.constant.ServiceName;
 import com.gameplat.common.model.bean.RefreshToken;
 import com.gameplat.log.annotation.Log;
 import com.gameplat.log.annotation.LoginLog;
+import com.gameplat.log.enums.LogType;
 import com.gameplat.security.context.UserCredential;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -77,6 +78,10 @@ public class OpenAuthorityController {
 
   @Operation(summary = "绑定谷歌密钥")
   @PostMapping("/bindSecret")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'登录->绑定谷歌密钥:' + #dto")
   public void bindSecret(@Validated GoogleAuthDTO dto) {
     twoFactorAuthenticationService.bindSecret(dto);
   }

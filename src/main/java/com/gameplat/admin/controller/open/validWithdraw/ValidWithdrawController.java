@@ -1,5 +1,4 @@
 package com.gameplat.admin.controller.open.validwithdraw;
-
 import cn.hutool.core.util.ObjectUtil;
 import com.gameplat.admin.model.dto.ValidWithdrawDto;
 import com.gameplat.admin.model.dto.ValidWithdrawOperateDto;
@@ -8,8 +7,11 @@ import com.gameplat.admin.service.LimitInfoService;
 import com.gameplat.admin.service.ValidWithdrawService;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.StringUtils;
+import com.gameplat.common.constant.ServiceName;
 import com.gameplat.common.enums.LimitEnums;
 import com.gameplat.common.model.bean.limit.MemberWithdrawLimit;
+import com.gameplat.log.annotation.Log;
+import com.gameplat.log.enums.LogType;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -47,6 +49,10 @@ public class ValidWithdrawController {
   @Operation(summary = "调整单条打码量记录")
   @PreAuthorize("hasAuthority('funds:validWithdraw:edit')")
   @PostMapping("/updateValidWithdraw")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'打码量-->调整单条打码量记录:' + #dto")
   public void updateValidWithdraw(@Validated @RequestBody ValidWithdrawDto dto) {
     validWithdrawService.updateValidWithdraw(dto);
   }
@@ -54,6 +60,10 @@ public class ValidWithdrawController {
   @Operation(summary = "调整会员打码量")
   @PreAuthorize("hasAuthority('funds:validWithdraw:operate')")
   @PostMapping("/operateValidWithdraw")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'打码量-->调整会员打码量:' + #dto")
   public void operateValidWithdraw(@Validated @RequestBody ValidWithdrawOperateDto dto) {
     if (StringUtils.isBlank(dto.getUsername())) {
       throw new ServiceException("用户名不能为空！");
@@ -68,6 +78,10 @@ public class ValidWithdrawController {
   @Operation(summary = "清除会员打码量记录")
   @PostMapping("/delValidWithdraw")
   @PreAuthorize("hasAuthority('funds:validWithdraw:remove')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'打码量-->清除会员打码量记录:' + #member")
   public void delValidWithdraw(@RequestParam("member") String member) {
     if (StringUtils.isEmpty(member)) {
       throw new ServiceException("会员账号不能空！");

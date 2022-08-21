@@ -2,6 +2,9 @@ package com.gameplat.admin.controller.open.payment;
 
 import com.gameplat.admin.model.vo.PpInterfaceVO;
 import com.gameplat.admin.service.PpInterfaceService;
+import com.gameplat.common.constant.ServiceName;
+import com.gameplat.log.annotation.Log;
+import com.gameplat.log.enums.LogType;
 import com.gameplat.model.entity.pay.PpInterface;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -42,6 +45,10 @@ public class PpInterfaceController {
   @Operation(summary = "同步")
   @PostMapping("/synchronization")
   @PreAuthorize("hasAuthority('thirdParty:ppInterfaces:synchronization')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'代付管理-->同步:' + #ppInterface")
   public void synchronization(@RequestBody PpInterface ppInterface) {
     ppInterfaceService.synchronization(ppInterface);
   }

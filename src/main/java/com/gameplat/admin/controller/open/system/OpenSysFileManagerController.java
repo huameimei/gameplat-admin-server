@@ -5,6 +5,9 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.gameplat.admin.model.dto.SysFileManagerQueryDTO;
 import com.gameplat.admin.model.vo.SysFileManagerVO;
 import com.gameplat.admin.service.SysFileManagerService;
+import com.gameplat.common.constant.ServiceName;
+import com.gameplat.log.annotation.Log;
+import com.gameplat.log.enums.LogType;
 import com.gameplat.model.entity.sys.SysFileManager;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -42,6 +45,10 @@ public class OpenSysFileManagerController {
   @Operation(summary = "删除图片")
   @PostMapping("/delete")
   @PreAuthorize("hasAuthority('system:file:delete')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'文件上传管理-->删除图片:' + #ids")
   public void delete(String ids) {
     sysFileManagerService.delete(ids);
   }

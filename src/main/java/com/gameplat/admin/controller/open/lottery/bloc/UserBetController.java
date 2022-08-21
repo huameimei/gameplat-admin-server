@@ -366,80 +366,244 @@ public class UserBetController {
 //        if (po.getGameId() == null || po.getGameId() <= 0) {
 //            throw new ParaException("请求参数异常");
 //        }
-//        userBetService.updateCurrDayBet(po, admin.getAccount());
-    throw new ParaException("不允许修改注单");
-  }
-
-  /**
-   * 查找修改记录
-   */
-  @RequestMapping(value = "/queryModifyRecord", method = RequestMethod.GET)
-  @ResponseBody
-  public List<UserBetModifyRecord> queryModifyRecord(String orderNo, Integer gameId)
-      throws Exception {
-    if (StringUtil.isBlank(orderNo) || gameId == null || gameId.intValue() <= 0) {
-      throw new ParaException("请求参数异常");
-    }
-    return userBetService.queryModifyRecord(orderNo, gameId);
-  }
-
-  /**
-   * 撤销整期
-   */
-  @RequestMapping(value = "/revocate", method = RequestMethod.POST)
-  @ResponseBody
-  @Log(type = LogType.USER_BET, content = "'撤销整期,期号:'+#turnNum+',游戏:'+T(com.cz.gameplat.log.LogUtil).lotteryTypeTranslate(#gameId)")
-  public void revocateBets(Integer gameId, Integer model, String turnNum, @Session Admin admin,
-      HttpServletRequest request) throws BusinessException {
-    if (gameId == null || gameId.intValue() <= 0) {
-      throw new BusinessException("请求参数异常");
-    }
-    if (gameId == 70) {
-      String url = request.getServerName();
-      if (StringUtils.isNotBlank(admin.getType())) {
-        // && admin.getType().equals("OPEN") && url.contains(systemConfig.getDomain())
-        //如果是open类型的账号，并且是规定的域名，可以注销整期六合彩
-      } else {
-        throw new BusinessException("六合彩不允许注销整期");
-      }
-    }
-    betService.revocationByTurnNum(gameId, model, turnNum);
-  }
-
-  /**
-   * 查询及时注单某天下注明细（正式会员）
-   */
-  @RequestMapping(value = "/queryImmediateBets", method = RequestMethod.GET)
-  @ResponseBody
-  public PageData<UserBetRep> queryImmediateBets(UserBetQueryReq params, PageBean pageBean)
-      throws BusinessException {
-    params.setUserId(null);
-    //不清楚为什么设为NULL
-//    params.setAccount(null);
-    if(params.getSearchType().equals("DL")){
-      UserInfoVO userInfoVO = userService.get(params.getAccount());
-      if(userInfoVO==null){
-        return new PageData<>();
-      }
-      params.setAccount(null);
-      params.setSuperPath(userInfoVO.getUserInfo().getSuperPath());
-    }
-    params.setUserType(SysUserTypes.HY.getCode());
-    Integer gameId = params.getGameId();
-    String turnNum = params.getTurnNum();
-    // 非当前期且主表无数据的情况下，查询历史表
-    if (!StringUtils.equals(turnNum, lotteryService.getCurLottery(gameId).getTurnNum())
-        && userBetService.slaveCountByGameIdAndTurnNum(gameId, turnNum) == 0) {
-      return userBetService.slaveQueryUserBetHisPage(params, pageBean);
-    }
-    return userBetService.slaveQueryNonShardUserBetPage(params, pageBean);
-  }
-
-  @RequestMapping(value = "/queryLotteryTypes", method = RequestMethod.GET)
-  @ResponseBody
-  public List<UserPlayLotteryTypes> queryLotteryTypes(Long userId) {
-    return this.userBetReportService.queryReportTypesByUserId(userId);
-  }
-
-}
-
+//      } catch (Exception ep) {
+//        exportCache.update(exportCache.get(taskId).setStatus(Status.Fail));
+//        LogUtil.error(ep.toString());
+//      } finally {
+//        GenericDataCache.removeGenericData(GenericDataCache.lottery_game_info_map);
+//        long endTime = System.currentTimeMillis();
+//        LogUtil.info(String.format("导出七日历史注单记录成功，总耗时；%d秒", (endTime - startTime) / 1000));
+//        try {
+//          if (outStream != null) {
+//            outStream.flush();
+//            outStream.close();
+//          }
+//        } catch (IOException e) {
+//          LogUtil.error(e.toString());
+//        }
+//      }
+//    });
+//    return task;
+//  }
+//
+//
+//  /**
+//   * 查询用户对应的注单
+//   */
+//  @RequestMapping(value = "/queryUserBets", method = RequestMethod.GET)
+//  @ResponseBody
+//  public PageData<UserBetRep> queryUserBets(UserBetQueryReq params, PageBean pageBean)
+//      throws Exception {
+//    return userBetService.slaveQueryUserBetPage(params,false, pageBean);
+//  }
+//
+//  /**
+//   * 查询用户对应的注单
+//   */
+//  @RequestMapping(value = "/queryUserBetsHis", method = RequestMethod.GET)
+//  @ResponseBody
+//  public PageData<UserBetRep> queryUserBetsHis(UserBetQueryReq params, PageBean pageBean)
+//          throws Exception {
+//    return userBetService.slaveAnalysisUserBetPage(params, pageBean);
+//  }
+//  /**
+//   * 用户注单分析
+//   */
+//  @RequestMapping(value = "/queryUserAnalysis", method = RequestMethod.GET)
+//  @ResponseBody
+//  public PageData<UserBetAnalysis> queryUserAnalysis(
+//      @RequestParam(required = false) Integer gameId,
+//      @RequestParam(required = false) String account,
+//      @RequestParam(required = false) String turnNum,
+//      @RequestParam(required = false) String startDate,
+//      @RequestParam(required = false) String endDate,
+//      @RequestParam(defaultValue = "winRate") String orderBy,
+//      @RequestParam(defaultValue = "game_id") String groupBy,
+//      PageBean pageBean) throws Exception {
+//    SimpleDateFormat sdf = DateUtil.simpleDateFormat(DateUtil.YYYY_MM_DD);
+//    Date timeFrom = DateUtil
+//        .getDateStart(StringUtils.isBlank(startDate) ? new Date() : sdf.parse(startDate));
+//    Date timeTo = DateUtil
+//        .getDateEnd(StringUtils.isBlank(endDate) ? new Date() : sdf.parse(endDate));
+//    return userBetService.slaveAnalysisUserBet(gameId, account,turnNum, timeFrom, timeTo, groupBy, orderBy, pageBean);
+//  }
+//
+//  /**
+//   * 用户注单对打分析
+//   */
+//  @RequestMapping(value = "/queryUserDuiDaAnalysis", method = RequestMethod.GET)
+//  @ResponseBody
+//  public PageData<UserBetAnalysis> queryUserDuiDaAnalysis(
+//      @RequestParam(required = false) Integer gameId,
+//      @RequestParam(required = false) String account,
+//      @RequestParam(required = false) String startDate,
+//      @RequestParam(required = false) String endDate,
+//      @RequestParam(required = false) String cateCode,
+//      @RequestParam(required = false) String turnNum,
+//      @RequestParam(defaultValue = "winRate") String orderBy,
+//      @RequestParam(defaultValue = "game_id") String groupBy,
+//      PageBean pageBean) throws Exception {
+//    SimpleDateFormat sdf = DateUtil.simpleDateFormat(DateUtil.YYYY_MM_DD);
+//    Date timeFrom = DateUtil
+//        .getDateStart(StringUtils.isBlank(startDate) ? new Date() : sdf.parse(startDate));
+//    Date timeTo = DateUtil
+//        .getDateEnd(StringUtils.isBlank(endDate) ? new Date() : sdf.parse(endDate));
+//    return userBetService
+//        .slaveDuidaAnalysisUserBet(gameId, cateCode, turnNum, timeFrom, timeTo, groupBy,
+//            orderBy, pageBean);
+//  }
+//
+//  /**
+//   *  导出
+//   */
+//  @RequestMapping(value = "/export", method = RequestMethod.GET)
+//  @Log(type = LogType.EXPORT_HY,content = "'导出注单记录，导出时间区间：'+T(com.cz.gameplat.log.LogUtil).logExportTime(#param.getStartDate(),#param.getEndDate())")
+//  public void export(UserBetQueryReq param, HttpServletResponse response) throws Exception {
+//    List<UserBetRep> results = userBetService.slaveQueryUserBetList(param);
+//    String title = "注单记录";
+//    String fileName = URLEncoder
+//        .encode((title + DateUtil.getCurrentTime() + ".xlsx"), CharEncoding.UTF_8);
+//    response.setContentType("application/msexcel");
+//    response.setHeader("Content-disposition", "attachment;filename=" + fileName);
+//
+//    //缓存gameList信息供bean中显示名称使用
+//    GenericDataCache.cacheGenericData(GenericDataCache.Key_getGameList, gameService, "getGameList",
+//        Integer.class, null);
+//    Export.exportPoi(results, UserBetRep.class, response.getOutputStream(), null, title);
+//    GenericDataCache.removeGenericData(GenericDataCache.Key_getGameList);
+//  }
+//
+//  @RequestMapping(value = "/getTurnNums", method = RequestMethod.GET)
+//  @ResponseBody
+//  public List<String> getTurnNums(String aliasId, String cateCode, Integer status, String account)
+//      throws Exception {
+//    if (StringUtils.isEmpty(aliasId)) {
+//      throw new ParaException("请求参数异常");
+//    }
+//    return userBetService.slaveQueryTurnNums(aliasId, cateCode, status, account);
+//  }
+//
+//  /**
+//   * 获取下注内容的玩法信息
+//   */
+//  @RequestMapping(value = "/getBetPlayCate", method = RequestMethod.GET)
+//  @ResponseBody
+//  public List<Map<String, String>> getBetPlayCate(String aliasId, Integer status, String account) {
+//    return this.userBetService.slaveBetPlayCate(aliasId, status, account);
+//
+//  }
+//
+//  /**
+//   * 删除注单
+//   */
+//  @RequestMapping(value = "/delBet", method = RequestMethod.POST)
+//  @ResponseBody
+//  @Log(type = LogType.USER_BET, content = "'删除注单,订单号:'+#orderNo+ '并没收本金:'+#betMoney ")
+//  public void delBet(String orderNo, Integer gameId,String betMoney) throws Exception {
+//    if (StringUtil.isBlank(orderNo)) {
+//      throw new ParaException("请求参数异常");
+//    }
+//    userBetService.changeCurrDayBetStaus(gameId, orderNo, UserBetStatus.DELETE);
+//  }
+//
+//  /**
+//   * 注销注单
+//   */
+//  @RequestMapping(value = "/cancelBet", method = RequestMethod.POST)
+//  @ResponseBody
+//  @Lock(value = "admin_cancel_bet")
+//  @Log(type = LogType.USER_BET, content = "'注销注单,订单号:'+#orderNo")
+//  public void cancelBet(String orderNo) throws Exception {
+//    if (StringUtil.isBlank(orderNo)) {
+//      throw new ParaException("请求参数异常");
+//    }
+//    betService.revocation(orderNo);
+//  }
+//
+//  /**
+//   * 修改注单内容
+//   */
+//  @RequestMapping(value = "/updateBet", method = RequestMethod.POST)
+//  @ResponseBody
+//  @Log(type = LogType.USER_BET, content = "'修改注单,订单号:'+#po.orderNo")
+//  public void updateBet(UserBetRep po, @Session Admin admin) throws Exception {
+////        if (po.getGameId() == null || po.getGameId() <= 0) {
+////            throw new ParaException("请求参数异常");
+////        }
+////        userBetService.updateCurrDayBet(po, admin.getAccount());
+//    throw new ParaException("不允许修改注单");
+//  }
+//
+//  /**
+//   * 查找修改记录
+//   */
+//  @RequestMapping(value = "/queryModifyRecord", method = RequestMethod.GET)
+//  @ResponseBody
+//  public List<UserBetModifyRecord> queryModifyRecord(String orderNo, Integer gameId)
+//      throws Exception {
+//    if (StringUtil.isBlank(orderNo) || gameId == null || gameId.intValue() <= 0) {
+//      throw new ParaException("请求参数异常");
+//    }
+//    return userBetService.queryModifyRecord(orderNo, gameId);
+//  }
+//
+//  /**
+//   * 撤销整期
+//   */
+//  @RequestMapping(value = "/revocate", method = RequestMethod.POST)
+//  @ResponseBody
+//  @Log(type = LogType.USER_BET, content = "'撤销整期,期号:'+#turnNum+',游戏:'+T(com.cz.gameplat.log.LogUtil).lotteryTypeTranslate(#gameId)")
+//  public void revocateBets(Integer gameId, Integer model, String turnNum, @Session Admin admin,
+//      HttpServletRequest request) throws BusinessException {
+//    if (gameId == null || gameId.intValue() <= 0) {
+//      throw new BusinessException("请求参数异常");
+//    }
+//    if (gameId == 70) {
+//      String url = request.getServerName();
+//      if (StringUtils.isNotBlank(admin.getType())) {
+//        // && admin.getType().equals("OPEN") && url.contains(systemConfig.getDomain())
+//        //如果是open类型的账号，并且是规定的域名，可以注销整期六合彩
+//      } else {
+//        throw new BusinessException("六合彩不允许注销整期");
+//      }
+//    }
+//    betService.revocationByTurnNum(gameId, model, turnNum);
+//  }
+//
+//  /**
+//   * 查询及时注单某天下注明细（正式会员）
+//   */
+//  @RequestMapping(value = "/queryImmediateBets", method = RequestMethod.GET)
+//  @ResponseBody
+//  public PageData<UserBetRep> queryImmediateBets(UserBetQueryReq params, PageBean pageBean)
+//      throws BusinessException {
+//    params.setUserId(null);
+//    //不清楚为什么设为NULL
+////    params.setAccount(null);
+//    if(params.getSearchType().equals("DL")){
+//      UserInfoVO userInfoVO = userService.get(params.getAccount());
+//      if(userInfoVO==null){
+//        return new PageData<>();
+//      }
+//      params.setAccount(null);
+//      params.setSuperPath(userInfoVO.getUserInfo().getSuperPath());
+//    }
+//    params.setUserType(SysUserTypes.HY.getCode());
+//    Integer gameId = params.getGameId();
+//    String turnNum = params.getTurnNum();
+//    // 非当前期且主表无数据的情况下，查询历史表
+//    if (!StringUtils.equals(turnNum, lotteryService.getCurLottery(gameId).getTurnNum())
+//        && userBetService.slaveCountByGameIdAndTurnNum(gameId, turnNum) == 0) {
+//      return userBetService.slaveQueryUserBetHisPage(params, pageBean);
+//    }
+//    return userBetService.slaveQueryNonShardUserBetPage(params, pageBean);
+//  }
+//
+//  @RequestMapping(value = "/queryLotteryTypes", method = RequestMethod.GET)
+//  @ResponseBody
+//  public List<UserPlayLotteryTypes> queryLotteryTypes(Long userId) {
+//    return this.userBetReportService.queryReportTypesByUserId(userId);
+//  }
+//
+//}
+//

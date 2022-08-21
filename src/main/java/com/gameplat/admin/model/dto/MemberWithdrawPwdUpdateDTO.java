@@ -12,6 +12,5 @@ public class MemberWithdrawPwdUpdateDTO implements Serializable {
   @NotNull(message = "会员编号不能为空")
   private Long id;
 
-  @NotEmpty(message = "提现密码不能为空")
   private String password;
 }

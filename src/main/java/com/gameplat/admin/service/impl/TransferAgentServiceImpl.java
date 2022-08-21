@@ -161,7 +161,6 @@ public class TransferAgentServiceImpl implements TransferAgentService {
             elasticsearchTemplate.save(
                 listRecord, IndexCoordinates.of(ContextConstant.ES_INDEX.BET_RECORD_ + tenantCode));
           }
-          log.info("转代理变更后数据={}", baseElasticsearchService.searchDocList(indexName, searchSourceBuilder, GameBetRecord.class));
         }
       } while (CollectionUtil.isNotEmpty(resultList));
   }

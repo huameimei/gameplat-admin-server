@@ -9,6 +9,9 @@ import com.gameplat.admin.model.vo.SpreadUnionPackageVO;
 import com.gameplat.admin.model.vo.SpreadUnionVO;
 import com.gameplat.admin.service.SpreadUnionPackageService;
 import com.gameplat.admin.service.SpreadUnionService;
+import com.gameplat.common.constant.ServiceName;
+import com.gameplat.log.annotation.Log;
+import com.gameplat.log.enums.LogType;
 import com.gameplat.model.entity.spread.SpreadUnion;
 import com.gameplat.model.entity.spread.SpreadUnionPackage;
 import io.swagger.v3.oas.annotations.Operation;
@@ -32,6 +35,10 @@ public class SpreadUnionController {
   @Operation(summary = "联盟增加")
   @PostMapping("/creatUnion")
   @PreAuthorize("hasAuthority('spreadUnion:union:add')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'联盟管理-->联盟增加:' + #dto")
   public void creatUnion(@RequestBody SpreadUnionDTO dto) {
     spreadUnionService.creatUnion(dto);
   }
@@ -47,6 +54,10 @@ public class SpreadUnionController {
   @Operation(summary = "联盟修改")
   @PostMapping("/editUnion")
   @PreAuthorize("hasAuthority('spreadUnion:union:edit')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'联盟管理-->联盟修改:' + #dto")
   public void editUnion(@RequestBody SpreadUnionDTO dto) {
     spreadUnionService.editUnion(dto);
   }
@@ -54,6 +65,10 @@ public class SpreadUnionController {
   @Operation(summary = "联盟删除")
   @PostMapping("/removeUnion")
   @PreAuthorize("hasAuthority('spreadUnion:blacklist:remove')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'联盟管理-->联盟删除:' + #dto")
   public void removeUnion(@RequestBody List<Long> idList) {
     spreadUnionPackageService.removeByUnionId(idList);
     spreadUnionService.removeUnion(idList);
@@ -70,6 +85,10 @@ public class SpreadUnionController {
   @Operation(summary = "联盟包设置增加")
   @PostMapping("/insertUnionPackage")
   @PreAuthorize("hasAuthority('spreadUnion:unionpackage:add')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'联盟管理-->联盟包设置增加:' + #dto")
   public void insertUnionPackage(@RequestBody SpreadUnionPackageDTO dto) {
     spreadUnionPackageService.insertUnionPackage(dto);
   }
@@ -77,6 +96,10 @@ public class SpreadUnionController {
   @Operation(summary = "联盟包设置修改")
   @PostMapping("/editUnionPackage")
   @PreAuthorize("hasAuthority('spreadUnion:unionpackage:edit')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'联盟管理-->联盟包设置修改:' + #dto")
   public void editUnionPackage(@RequestBody SpreadUnionPackageDTO dto) {
     spreadUnionPackageService.editUnionPackage(dto);
   }
@@ -84,6 +107,10 @@ public class SpreadUnionController {
   @Operation(summary = "联盟包设置删除")
   @PostMapping("/removeUnionPackage")
   @PreAuthorize("hasAuthority('spreadUnion:unionpackage:remove')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'联盟管理-->联盟包设置删除:' + #idList")
   public void removeUnionPackage(@RequestBody List<Long> idList) {
     spreadUnionPackageService.removeUnionPackage(idList);
   }

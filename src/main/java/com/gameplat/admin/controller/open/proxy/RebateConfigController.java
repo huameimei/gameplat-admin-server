@@ -34,6 +34,10 @@ public class RebateConfigController {
 
   @Operation(summary = "平级分红->新增平级分红方案明细")
   @PostMapping(value = "/add")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'平级分红->新增平级分红方案明细:' + #rebateConfigPO")
   public void addRebateConfig(@RequestBody RebateConfig rebateConfigPO) {
     log.info("新增平级分红方案明细：rebateConfigPO={}", rebateConfigPO);
     UserCredential userCredential = SecurityUserHolder.getCredential();

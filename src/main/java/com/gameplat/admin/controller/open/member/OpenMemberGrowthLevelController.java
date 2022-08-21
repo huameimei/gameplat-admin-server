@@ -8,6 +8,9 @@ import com.gameplat.admin.model.vo.MemberGrowthLevelVO;
 import com.gameplat.admin.service.MemberGrowthConfigService;
 import com.gameplat.admin.service.MemberGrowthLevelService;
 import com.gameplat.base.common.exception.ServiceException;
+import com.gameplat.common.constant.ServiceName;
+import com.gameplat.log.annotation.Log;
+import com.gameplat.log.enums.LogType;
 import com.gameplat.security.SecurityUserHolder;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -46,6 +49,10 @@ public class OpenMemberGrowthLevelController {
   @Operation(summary = "修改VIP配置")
   @PostMapping("/update")
   @PreAuthorize("hasAuthority('member:growthLevel:edit')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'VIP等级配置-->修改VIP配置:' + #dto" )
   // @ApiParam(name = "修改VIP配置入参", value = "传入json格式", required = true)
   public void update(@Validated @RequestBody MemberGrowthConfigEditDto dto) {
     if (ObjectUtils.isEmpty(dto.getId())) {
@@ -60,6 +67,10 @@ public class OpenMemberGrowthLevelController {
   @Operation(summary = "后台批量修改VIP等级")
   @PreAuthorize("hasAuthority('member:growthLevel:edit')")
   @PostMapping("/updateLevel")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'VIP等级配置-->后台批量修改VIP等级:' + #obj" )
   public void batchUpdateLevel(@RequestBody JSONObject obj, HttpServletRequest request) {
     levelService.batchUpdateLevel(obj, request);
   }

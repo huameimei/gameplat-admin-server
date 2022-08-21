@@ -9,8 +9,11 @@ import com.gameplat.admin.model.vo.HgSportWinReportVO;
 import com.gameplat.admin.model.vo.PageDtoVO;
 import com.gameplat.admin.service.GameBetRecordInfoService;
 import com.gameplat.admin.service.HgSportWinReportService;
+import com.gameplat.common.constant.ServiceName;
 import com.gameplat.common.enums.GameKindEnum;
 import com.gameplat.common.enums.SettleStatusEnum;
+import com.gameplat.log.annotation.Log;
+import com.gameplat.log.enums.LogType;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
@@ -50,6 +53,10 @@ public class HgSportWinReportController {
   @GetMapping(value = "/exportReport")
   @PreAuthorize("hasAuthority('report:hg:export')")
   @Operation(summary = "导出皇冠输赢报表")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'皇冠输赢报表->导出皇冠输赢报表:' + #queryDTO")
   public void exportReport(@Valid HgSportWinReportQueryDTO queryDTO, HttpServletResponse response) {
     hgSportWinReportService.exportReport(queryDTO, response);
   }

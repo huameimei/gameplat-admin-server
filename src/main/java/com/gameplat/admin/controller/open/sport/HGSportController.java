@@ -2,6 +2,9 @@ package com.gameplat.admin.controller.open.sport;
 
 import com.gameplat.admin.model.dto.HGSportDTO;
 import com.gameplat.admin.service.HGSportService;
+import com.gameplat.common.constant.ServiceName;
+import com.gameplat.log.annotation.Log;
+import com.gameplat.log.enums.LogType;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
@@ -104,6 +107,10 @@ public class HGSportController {
   @Operation(summary = "参数设置/修改")
   @PostMapping("/updateHgConfigModify")
   @PreAuthorize("hasAuthority('sport:hGSport:updateHgConfigModify')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'皇冠体育-->参数设置/修改:' + #dto")
   public Object updateHgConfigModify(@RequestBody HGSportDTO dto) {
     return hgSportService.updateHgConfigModify(dto);
   }
@@ -118,6 +125,10 @@ public class HGSportController {
   @Operation(summary = "输入足球赛果")
   @PostMapping("/inputResultForFoot")
   @PreAuthorize("hasAuthority('sport:hGSport:inputResultForFoot')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'皇冠体育-->输入足球赛果:' + #dto")
   public Object inputResultForFoot(@RequestBody HGSportDTO dto) {
     return hgSportService.inputResultForFoot(dto);
   }
@@ -125,6 +136,10 @@ public class HGSportController {
   @Operation(summary = "输入篮球赛果")
   @PostMapping("/inputResultForBasketball")
   @PreAuthorize("hasAuthority('sport:hGSport:inputResultForBasketball')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'皇冠体育-->输入篮球赛果:' + #dto")
   public Object inputResultForBasketball(@RequestBody HGSportDTO dto) {
     return hgSportService.inputResultForBasketball(dto);
   }
@@ -132,6 +147,10 @@ public class HGSportController {
   @Operation(summary = "修改投注限制(停止投注，开启投注)")
   @PostMapping("/updateSportStatus")
   @PreAuthorize("hasAuthority('sport:hGSport:updateSportStatus')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'皇冠体育-->修改投注限制(停止投注，开启投注):' + #dto")
   public Object updateSportStatus(@RequestBody HGSportDTO dto) {
     return hgSportService.updateSportStatus(dto);
   }
@@ -139,6 +158,10 @@ public class HGSportController {
   @Operation(summary = "修改投注限制(单场投注金额)")
   @PostMapping("/updateSportBetLimitMoney")
   @PreAuthorize("hasAuthority('sport:hGSport:updateSportBetLimitMoney')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'皇冠体育-->修改投注限制(单场投注金额):' + #dto")
   public Object updateSportBetLimitMoney(@RequestBody HGSportDTO dto) {
     return hgSportService.updateSportBetLimitMoney(dto);
   }
@@ -146,6 +169,10 @@ public class HGSportController {
   @Operation(summary = "修改投注设置")
   @PostMapping("/updateBetConfig")
   @PreAuthorize("hasAuthority('sport:hGSport:updateBetConfig')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'皇冠体育-->修改投注设置:' + #dto")
   public Object updateBetConfig(@RequestBody HGSportDTO dto) {
     return hgSportService.updateBetConfig(dto);
   }
@@ -153,6 +180,10 @@ public class HGSportController {
   @Operation(summary = "重新结算")
   @PostMapping("/betUpdateActions")
   @PreAuthorize("hasAuthority('sport:hGSport:betUpdateActions')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'皇冠体育-->重新结算:' + #dto")
   public Object betUpdateActions(@RequestBody HGSportDTO dto) {
     return hgSportService.betUpdateActions(dto);
   }
@@ -160,6 +191,10 @@ public class HGSportController {
   @Operation(summary = "批量操作体育注单（确认， 取消）")
   @PostMapping("/batchActionsByStatus")
   @PreAuthorize("hasAuthority('sport:hGSport:batchActionsByStatus')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'皇冠体育-->批量操作体育注单:' + #dto")
   public Object batchActionsByStatus(@RequestBody HGSportDTO dto) {
     return hgSportService.batchActionsByStatus(dto);
   }
@@ -167,6 +202,10 @@ public class HGSportController {
   @Operation(summary = "手工结算足球")
   @PostMapping("/settlingResultForFoot")
   @PreAuthorize("hasAuthority('sport:hGSport:settlingResultForFoot')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'皇冠体育-->手工结算足球:' + #dto")
   public Object settlingResultForFoot(@RequestBody HGSportDTO dto) {
     return hgSportService.settlingResultForFoot(dto);
   }
@@ -174,6 +213,10 @@ public class HGSportController {
   @Operation(summary = "手工结算篮球")
   @PostMapping("/settlingResultForBasketball")
   @PreAuthorize("hasAuthority('sport:hGSport:settlingResultForBasketball')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'皇冠体育-->手工结算篮球:' + #dto")
   public Object settlingResultForBasketball(@RequestBody HGSportDTO dto) {
     return hgSportService.settlingResultForBasketball(dto);
   }
@@ -181,6 +224,10 @@ public class HGSportController {
   @Operation(summary = "单用户投注设置")
   @PostMapping("/saveUserLimit")
   @PreAuthorize("hasAuthority('sport:hGSport:saveUserLimit')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'皇冠体育-->单用户投注开关:' + #dto")
   public Object saveUserLimit(@RequestBody HGSportDTO dto) {
     return hgSportService.saveUserLimit(dto);
   }
@@ -188,6 +235,10 @@ public class HGSportController {
   @Operation(summary = "单用户投注开关")
   @PostMapping("/updateUserLimit")
   @PreAuthorize("hasAuthority('sport:hGSport:updateUserLimit')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'皇冠体育-->单用户投注开关:' + #dto")
   public Object updateUserLimit(@RequestBody HGSportDTO dto) {
     return hgSportService.updateUserLimit(dto);
   }
@@ -195,6 +246,10 @@ public class HGSportController {
   @Operation(summary = "删除单用户投注限制")
   @PostMapping("/removeUserLimit")
   @PreAuthorize("hasAuthority('sport:hGSport:removeUserLimit')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'皇冠体育-->删除单用户投注限制:' + #dto")
   public Object removeUserLimit(@RequestBody HGSportDTO dto) {
     return hgSportService.removeUserLimit(dto);
   }
@@ -202,6 +257,10 @@ public class HGSportController {
   @Operation(summary = "添加体育公告")
   @PostMapping("/saveSportMessage")
   @PreAuthorize("hasAuthority('sport:hGSport:saveSportMessage')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'皇冠体育-->添加体育公告:' + #dto")
   public Object saveSportMessage(@RequestBody HGSportDTO dto) {
     return hgSportService.saveSportMessage(dto);
   }
@@ -209,6 +268,10 @@ public class HGSportController {
   @Operation(summary = "删除体育公告")
   @PostMapping("/removeSportMessage")
   @PreAuthorize("hasAuthority('sport:hGSport:removeSportMessage')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'皇冠体育-->删除体育公告:' + #dto")
   public Object removeSportMessage(@RequestBody HGSportDTO dto) {
     return hgSportService.removeSportMessage(dto);
   }
@@ -216,6 +279,10 @@ public class HGSportController {
   @Operation(summary = "修改体育公告")
   @PostMapping("/modifySportMessage")
   @PreAuthorize("hasAuthority('sport:hGSport:modifySportMessage')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'皇冠体育-->修改体育公告:' + #dto")
   public Object modifySportMessage(@RequestBody HGSportDTO dto) {
     return hgSportService.modifySportMessage(dto);
   }
@@ -223,6 +290,10 @@ public class HGSportController {
   @Operation(summary = "赛果变更消息处理")
   @PostMapping("/sportChangeNotice")
   @PreAuthorize("hasAuthority('sport:hGSport:sportChangeNotice')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'皇冠体育-->赛果变更消息处理:' + #dto")
   public Object sportChangeNotice(@RequestBody HGSportDTO dto) {
     return hgSportService.sportChangeNotice(dto);
   }

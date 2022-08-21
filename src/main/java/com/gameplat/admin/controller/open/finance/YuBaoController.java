@@ -31,6 +31,10 @@ public class YuBaoController {
      * 结算余额宝
      */
     @RequestMapping(value = "/settle", method = RequestMethod.GET)
+    @Log(
+      module = ServiceName.ADMIN_SERVICE,
+      type =  LogType.ADMIN,
+      desc = "结算余额宝")
     public void settle() {
         memberYubaoService.settle();
     }

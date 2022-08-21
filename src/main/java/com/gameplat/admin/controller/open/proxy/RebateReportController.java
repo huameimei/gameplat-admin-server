@@ -15,6 +15,9 @@ import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.BeanUtils;
 import com.gameplat.base.common.util.StringUtils;
 import com.gameplat.common.constant.NumberConstant;
+import com.gameplat.common.constant.ServiceName;
+import com.gameplat.log.annotation.Log;
+import com.gameplat.log.enums.LogType;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.Cleanup;
@@ -74,6 +77,10 @@ public class RebateReportController {
   @Operation(summary = "导出")
   @GetMapping(value = "/export")
   @PreAuthorize("hasAuthority('dividend:report:export')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'平级分红->导出:' + #rebateReportDTO")
   public void export(
       RebateReportDTO rebateReportDTO, HttpServletRequest request, HttpServletResponse response) {
     // 参数初始化
@@ -125,6 +132,10 @@ public class RebateReportController {
   @Operation(summary = "更新佣金报表")
   @PostMapping(value = "/updateReport")
   @PreAuthorize("hasAuthority('dividend:report:edit')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'平级分红->更新佣金报表agentName:' + #agentName + 'countDate' + #countDate")
   public void updateReport(
       @RequestParam(required = false) String agentName, @RequestParam String countDate) {
     rebateReportService.updateRebateReport(countDate, agentName);
@@ -207,6 +218,10 @@ public class RebateReportController {
   @Operation(summary = "风控审核")
   @PostMapping(value = "/riskControlAudit")
   @PreAuthorize("hasAuthority('dividend:report:riskControlAudit')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'平级分红->风控审核:' + #reportId")
   public void riskControlAudit(@RequestParam Long reportId) {
     log.info("风控审核：reportId={}", reportId);
     rebateReportService.reviewOrSettlement(NumberConstant.ONE, reportId);
@@ -215,6 +230,10 @@ public class RebateReportController {
   @Operation(summary = "财务审核")
   @PostMapping(value = "/financialAudit")
   @PreAuthorize("hasAuthority('dividend:report:financialAudit')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'平级分红->财务审核:' + #reportId")
   public void financialAudit(@RequestParam Long reportId) {
     log.info("财务审核：reportId={}", reportId);
     rebateReportService.reviewOrSettlement(NumberConstant.TWO, reportId);
@@ -223,6 +242,10 @@ public class RebateReportController {
   @Operation(summary = "结算")
   @PostMapping(value = "/settlement")
   @PreAuthorize("hasAuthority('dividend:report:settlement')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'平级分红->结算:' + #reportId")
   public void settlement(@RequestParam Long reportId) {
     log.info("结算：reportId={}", reportId);
     rebateReportService.reviewOrSettlement(NumberConstant.THREE, reportId);
@@ -231,6 +254,10 @@ public class RebateReportController {
   @Operation(summary = "批量风控审核")
   @PostMapping(value = "/batchRiskControlAudit")
   @PreAuthorize("hasAuthority('dividend:report:batchRiskControlAudit')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'平级分红->批量风控审核:' + #countDate")
   public void batchRiskControlAudit(@RequestParam String countDate) {
     log.info("批量风控审核：countDate={}", countDate);
     rebateReportService.batchReviewOrSettlement(NumberConstant.ZERO, countDate);
@@ -239,6 +266,10 @@ public class RebateReportController {
   @Operation(summary = "批量财务审核")
   @PostMapping(value = "/batchFinancialAudit")
   @PreAuthorize("hasAuthority('dividend:report:batchFinancialAudit')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'平级分红->批量财务审核:' + #countDate")
   public void batchFinancialAudit(@RequestParam String countDate) {
     log.info("批量财务审核：countDate={}", countDate);
     rebateReportService.batchReviewOrSettlement(NumberConstant.ONE, countDate);
@@ -247,6 +278,10 @@ public class RebateReportController {
   @Operation(summary = "批量结算")
   @PostMapping(value = "/batchSettlement")
   @PreAuthorize("hasAuthority('dividend:report:batchSettlement')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'平级分红->批量结算:' + #countDate")
   public void batchSettlement(@RequestParam String countDate) {
     log.info("批量结算：countDate={}", countDate);
     rebateReportService.batchReviewOrSettlement(NumberConstant.TWO, countDate);

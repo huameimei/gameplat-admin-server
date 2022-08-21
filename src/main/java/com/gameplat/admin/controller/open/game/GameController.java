@@ -6,6 +6,9 @@ import com.gameplat.admin.model.dto.GameQueryDTO;
 import com.gameplat.admin.model.dto.OperGameDTO;
 import com.gameplat.admin.model.vo.GameVO;
 import com.gameplat.admin.service.GameService;
+import com.gameplat.common.constant.ServiceName;
+import com.gameplat.log.annotation.Log;
+import com.gameplat.log.enums.LogType;
 import com.gameplat.model.entity.game.Game;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -30,6 +33,10 @@ public class GameController {
   @Operation(summary = "编辑")
   @PostMapping("/edit")
   @PreAuthorize("hasAuthority('game:game:edit')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'游戏-->编辑:' + #operGameDTO" )
   public void updateGame(@RequestBody OperGameDTO operGameDTO) {
     gameService.updateGame(operGameDTO);
   }

@@ -8,7 +8,10 @@ import com.gameplat.admin.model.dto.SpreadLinkInfoDTO;
 import com.gameplat.admin.model.dto.SpreadLinkInfoEditDTO;
 import com.gameplat.admin.model.vo.SpreadConfigVO;
 import com.gameplat.admin.service.SpreadLinkInfoService;
+import com.gameplat.common.constant.ServiceName;
 import com.gameplat.common.enums.SpreadTypes;
+import com.gameplat.log.annotation.Log;
+import com.gameplat.log.enums.LogType;
 import com.gameplat.model.entity.spread.SpreadLinkInfo;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -38,6 +41,10 @@ public class OpenSpreadLinkInfoController {
   @Operation(summary = "导出")
   @GetMapping("/exportList")
   @PreAuthorize("hasAuthority('diffusion:spreadConfig:export')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'代理推广管理-->导出:' + #configDTO")
   public void exportList(SpreadLinkInfoDTO configDTO, HttpServletResponse response) {
     spreadLinkInfoService.exportList(configDTO, response);
   }
@@ -45,6 +52,10 @@ public class OpenSpreadLinkInfoController {
   @Operation(summary = "添加")
   @PostMapping("/add")
   @PreAuthorize("hasAuthority('diffusion:spreadConfig:add')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'代理推广管理-->添加:' + #configAddDTO")
   public void add(@RequestBody SpreadLinkInfoAddDTO configAddDTO) {
     spreadLinkInfoService.add(configAddDTO);
   }
@@ -52,6 +63,10 @@ public class OpenSpreadLinkInfoController {
   @Operation(summary = "编辑")
   @PostMapping("/edit")
   @PreAuthorize("hasAuthority('diffusion:spreadConfig:edit')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'代理推广管理-->编辑:' + #configEditDTO")
   public void edit(@RequestBody SpreadLinkInfoEditDTO configEditDTO) {
     spreadLinkInfoService.update(configEditDTO);
   }
@@ -59,6 +74,10 @@ public class OpenSpreadLinkInfoController {
   @Operation(summary = "删除")
   @PostMapping("/delete/{id}")
   @PreAuthorize("hasAuthority('diffusion:spreadConfig:remove')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'代理推广管理-->删除:' + #id")
   public void remove(@PathVariable Long id) {
     spreadLinkInfoService.deleteById(id);
   }
@@ -66,6 +85,10 @@ public class OpenSpreadLinkInfoController {
   @Operation(summary = "批量删除")
   @PostMapping("/batchDelete")
   @PreAuthorize("hasAuthority('diffusion:spreadConfig:batchRemove')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'代理推广管理-->批量删除:' + #ids")
   public void batchRemove(@RequestBody List<Long> ids) {
     spreadLinkInfoService.batchDeleteByIds(ids);
   }
@@ -73,6 +96,10 @@ public class OpenSpreadLinkInfoController {
   @Operation(summary = "改变状态")
   @PostMapping("/changeStatus")
   @PreAuthorize("hasAuthority('diffusion:spreadConfig:changeStatus')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'代理推广管理-->改变状态:' + #configEditDTO")
   public void changeStatus(@RequestBody SpreadLinkInfoEditDTO configEditDTO) {
     spreadLinkInfoService.changeStatus(configEditDTO);
   }
@@ -80,6 +107,10 @@ public class OpenSpreadLinkInfoController {
   @Operation(summary = "更新发布时间")
   @PostMapping("/changeReleaseTime/{id}")
   @PreAuthorize("hasAuthority('diffusion:spreadConfig:addEffectiveDay')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'代理推广管理-->更新发布时间:' + #id")
   public void changeReleaseTime(@PathVariable Long id) {
     spreadLinkInfoService.changeReleaseTime(id);
   }
@@ -87,6 +118,10 @@ public class OpenSpreadLinkInfoController {
   @Operation(summary = "批量启用")
   @PostMapping("/batchEnableStatus")
   @PreAuthorize("hasAuthority('diffusion:spreadConfig:batchEnableStatus')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'代理推广管理-->批量启用:' + #ids")
   public void batchEnableStatus(@RequestBody List<Long> ids) {
     spreadLinkInfoService.batchEnableStatus(ids);
   }
@@ -94,6 +129,10 @@ public class OpenSpreadLinkInfoController {
   @Operation(summary = "批量禁用")
   @PostMapping("/batchDisableStatus")
   @PreAuthorize("hasAuthority('diffusion:spreadConfig:batchDisableStatus')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'代理推广管理-->批量禁用:' + #ids")
   public void batchDisableStatus(@RequestBody List<Long> ids) {
     spreadLinkInfoService.batchDisableStatus(ids);
   }
@@ -114,12 +153,20 @@ public class OpenSpreadLinkInfoController {
 
   @Operation(summary = "添加推广码链接时，获取返点等级下拉框可选数据")
   @GetMapping("/getLinkRebateOptionsForAdd")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'代理推广管理-->添加推广码链接时，获取返点等级下拉框可选数据:' + #agentAccount")
   public JSONArray getLinkRebateOptionsForAdd(@RequestParam(required = false) String agentAccount) {
     return spreadLinkInfoService.getSpreadLinkRebate(agentAccount, true, false);
   }
 
   @Operation(summary = "编辑推广码链接时 获取返点等级下拉框可选数据")
   @GetMapping("/getLinkRebateOptionsForEdit")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'代理推广管理-->编辑推广码链接时 获取返点等级下拉框可选数据:' + #agentAccount")
   public JSONArray getLinkRebateOptionsForEdit(
       @RequestParam(required = false) String agentAccount) {
     return spreadLinkInfoService.getSpreadLinkRebate(agentAccount, true, false);

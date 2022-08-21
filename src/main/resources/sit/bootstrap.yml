@@ -20,7 +20,7 @@ spring:
         username: nacos
         password: qsaw12!@
         file-extension: yml
-        namespace: 9e4aa348-0463-4a08-bdf3-405e2e6d6806
+        namespace: ea9f2fb3-4fce-4cc9-a820-4508330af65b
         group: SERVICE_GROUP
         refresh-enabled: true
         shared-configs:

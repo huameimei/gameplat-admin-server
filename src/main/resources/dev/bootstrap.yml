@@ -1,6 +1,9 @@
 spring:
   application:
     name: admin-server
+  main:
+    allow-bean-definition-overriding: true
+    allow-circular-references: true
   profiles:
     active: @profiles.active@
   websocket:

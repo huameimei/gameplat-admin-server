@@ -35,6 +35,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -55,21 +56,21 @@ import java.util.*;
 @RequestMapping("/api/bet")
 public class UserBetController {
 
-  @Resource
+  @Autowired
   private BetService1 betService;
-  @Resource
+  @Autowired
   private UserBetService userBetService;
-  @Resource
+  @Autowired
   private GameService1 gameService;
-  @Resource
+  @Autowired
   private UserBetReportService userBetReportService;
-  @Resource
+  @Autowired
   private LotteryService lotteryService;
-  @Resource
+  @Autowired
   private SystemConfig systemConfig;
-  @Resource
+  @Autowired
   private UserService userService;
-  @Resource
+  @Autowired
   ExportCache exportCache;
 
   /**

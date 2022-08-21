@@ -35,7 +35,6 @@ import com.gameplat.model.entity.member.MemberDayReport;
 import com.gameplat.model.entity.member.MemberInfo;
 import com.gameplat.security.SecurityUserHolder;
 import com.gameplat.security.context.UserCredential;
-import com.gameplat.security.manager.JwtTokenAuthenticationManager;
 import com.google.common.collect.Lists;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -213,9 +212,11 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
     this.preAddCheck(dto);
 
     Member member = memberConvert.toEntity(dto);
+    member.setAccount(dto.getAccount().toLowerCase());
     member.setRegisterType(MemberEnums.RegisterType.ADMIN_ADD.value());
     member.setRegisterSource(MemberEnums.RegisterSource.WEB.value());
-    member.setPassword(passwordService.encode(member.getPassword(), dto.getAccount()));
+    member.setPassword(
+        passwordService.encode(member.getPassword(), dto.getAccount().toLowerCase()));
 
     // 设置上级
     this.setMemberParent(member);
@@ -485,7 +486,8 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
     member.setParentName(parent.getAccount());
     member.setSuperPath(parent.getSuperPath().concat(member.getAccount()).concat("/"));
 
-    if (MemberEnums.Type.AGENT.match(member.getUserType())) {
+    if (MemberEnums.Type.AGENT.match(member.getUserType())
+        || MemberEnums.Type.PROMOTION.match(member.getUserType())) {
       member.setAgentLevel(parent.getAgentLevel() + 1);
     }
 
@@ -750,13 +752,9 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
     Collection<? extends GrantedAuthority> authorities = credential.getAuthorities();
     log.info("权限列表={}", authorities);
     boolean flag = false;
-    if (ObjectUtil.isEmpty(
-            authorities.stream()
-                    .filter(
-                            ex ->
-                                    ex.getAuthority().equalsIgnoreCase(ROLES)
-                                            || UserTypes.ADMIN.value().equals(credential.getUserType()))
-                    .collect(Collectors.toList()))) {
+    // 无权限并且不为管理员
+    if (ObjectUtil.isEmpty(authorities.stream().filter(ex -> ex.getAuthority().equalsIgnoreCase(ROLES)).collect(Collectors.toList()))
+                                            && !UserTypes.ADMIN.value().equals(credential.getUserType())) {
       flag = true;
       log.info("flag1111={}", flag);
     }

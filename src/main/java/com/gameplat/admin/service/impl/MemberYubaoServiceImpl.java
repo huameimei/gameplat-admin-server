@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
+import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
@@ -191,17 +192,17 @@ public class MemberYubaoServiceImpl extends ServiceImpl<MemberYubaoMapper, Membe
     if (extInfo == null) {
       return;
     }
-//    if (bizBlacklistFacade.isUserInBlacklist(yuBao.getUserId(), BlacklistConstant.BizBlacklistType.YU_BAO_INTEREST)) {
-//      log.info("黑名单用户不发放余额宝收益,account={},userId={}", extInfo.getAccount(), extInfo.getUserId());
-//      return;
-//    }
+    //    if (bizBlacklistFacade.isUserInBlacklist(yuBao.getUserId(), BlacklistConstant.BizBlacklistType.YU_BAO_INTEREST)) {
+    //      log.info("黑名单用户不发放余额宝收益,account={},userId={}", extInfo.getAccount(), extInfo.getUserId());
+    //      return;
+    //    }
 
     MemberReportDto dto=new MemberReportDto();
     dto.setUsername(yuBao.getAccount());
     dto.setType(0);
     dto.setStartTime(DateUtil.getDateToString(date));
     dto.setEndTime(DateUtil.getDateToString(date));
-    PageDtoVO<MemberGameDayReportVo> result= gameMemberReportService.findSumMemberGameDayReport(new Page<>(), dto);
+    PageDtoVO<MemberGameDayReportVo> result = gameMemberReportService.findSumMemberGameDayReport(new Page<>(), dto);
 
     MemberGameDayReportVo busDayReport=null;
     if(result!=null){
@@ -217,7 +218,8 @@ public class MemberYubaoServiceImpl extends ServiceImpl<MemberYubaoMapper, Membe
         interestRate += activeRate;
       }
     }
-    interestRate = interestRate * extInfo.getYubaoDegrade() / 100; // 降级
+    Integer yubaoDegrade = ObjectUtils.isEmpty(extInfo.getYubaoDegrade()) ? 100 : extInfo.getYubaoDegrade();
+    interestRate = interestRate * yubaoDegrade / 100; // 降级
 
     interestRate = floor(interestRate, 4);
     double interestMoney = floor(yuBao.getMoney().doubleValue() * interestRate / 36500, 4);
@@ -236,11 +238,11 @@ public class MemberYubaoServiceImpl extends ServiceImpl<MemberYubaoMapper, Membe
     if(yubaoLimit!=null && yubaoLimit.getMaxTotalIncome()!=null){
       //查询会员总收益
       Double totalIncome=memberYubaoInterestMapper.getTotalYubaoInterest(yuBao.getMemberId());
-      if(totalIncome>=yubaoLimit.getMaxTotalIncome().doubleValue()){
-        log.info("账号={},日期={},总收益上限,上限金额={},结算收益金额={}",yuBao.getAccount(),settleDate,yubaoLimit.getMaxTotalIncome().doubleValue(),totalIncome);
-        return;
-      }
+    if(totalIncome>=yubaoLimit.getMaxTotalIncome().doubleValue()){
+      log.info("账号={},日期={},总收益上限,上限金额={},结算收益金额={}",yuBao.getAccount(),settleDate,yubaoLimit.getMaxTotalIncome().doubleValue(),totalIncome);
+      return;
     }
+  }
 
     // 添加收益金额
     memberYubaoInterestMapper.addYubaoInterest(yuBao.getId(),yuBao.getMemberId(), interestMoney);

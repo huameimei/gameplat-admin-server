@@ -76,7 +76,7 @@ public class MemberController {
   public IPage<MemberVO> list(PageDTO<Member> page, MemberQueryDTO dto) {
     IPage<MemberVO> iPage = memberService.queryPage(page, dto);
     iPage.getRecords().forEach(m -> {
-      m.setOnline(redisTemplate.hasKey(CacheKey.getOnlineUserKey(m.getAccount()));
+      m.setOnline(redisTemplate.hasKey(CacheKey.getOnlineUserKey(m.getAccount())));
     });
     return iPage;
   }

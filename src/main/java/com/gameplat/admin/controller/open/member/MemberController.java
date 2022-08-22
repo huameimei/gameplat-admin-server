@@ -67,7 +67,6 @@ public class MemberController {
   private RedisTemplate redisTemplate;
 
   @CreateCache(name = CachedKeys.MEMBER_FUND_PWD_ERR_COUNT, expire = -1)
-
   private Cache<String, Integer> memberFundPwdErrCount;
 
   @Operation(summary = "会员列表")
@@ -75,6 +74,7 @@ public class MemberController {
   @PreAuthorize("hasAuthority('member:view')")
   public IPage<MemberVO> list(PageDTO<Member> page, MemberQueryDTO dto) {
     IPage<MemberVO> iPage = memberService.queryPage(page, dto);
+    //重写玩家在线状态
     iPage.getRecords().forEach(m -> {
       m.setOnline(redisTemplate.hasKey(CacheKey.getOnlineUserKey(m.getAccount())));
     });

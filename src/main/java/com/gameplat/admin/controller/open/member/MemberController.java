@@ -76,7 +76,9 @@ public class MemberController {
     IPage<MemberVO> iPage = memberService.queryPage(page, dto);
     //重写玩家在线状态
     iPage.getRecords().forEach(m -> {
-      m.setOnline(redisTemplate.hasKey(CacheKey.getOnlineUserKey(m.getAccount())));
+      if (m.getOnline()) {
+        m.setOnline(redisTemplate.hasKey(CacheKey.getOnlineUserKey(m.getAccount())));
+      }
     });
     return iPage;
   }

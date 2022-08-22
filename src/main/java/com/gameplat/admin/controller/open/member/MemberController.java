@@ -74,7 +74,11 @@ public class MemberController {
   @GetMapping("/list")
   @PreAuthorize("hasAuthority('member:view')")
   public IPage<MemberVO> list(PageDTO<Member> page, MemberQueryDTO dto) {
-    return memberService.queryPage(page, dto);
+    IPage<MemberVO> iPage = memberService.queryPage(page, dto);
+    iPage.getRecords().forEach(m -> {
+      m.setOnline(redisTemplate.hasKey(CacheKey.getOnlineUserKey(m.getAccount()));
+    });
+    return iPage;
   }
 
   @Operation(summary = "会员详情")

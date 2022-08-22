@@ -99,6 +99,10 @@ public class MemberController {
   @Operation(summary = "会员联系方式")
   @GetMapping("/contact/{id}")
   @PreAuthorize("hasAuthority('member:contact:view')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'会员管理-->会员联系方式' + #id" )
   public MemberContactVo memberAccount(@PathVariable Long id) {
     MemberContactVo detail = memberService.getMemberDetail(id);
     detail.setRealName("");

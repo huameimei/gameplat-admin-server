@@ -2,6 +2,9 @@ package com.gameplat.admin.controller.open.game;
 
 import com.gameplat.admin.model.dto.OperGameRebateConfigDTO;
 import com.gameplat.admin.service.GameRebateConfigService;
+import com.gameplat.common.constant.ServiceName;
+import com.gameplat.log.annotation.Log;
+import com.gameplat.log.enums.LogType;
 import com.gameplat.model.entity.game.GameRebateConfig;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -35,6 +38,10 @@ public class GameRebateConfigController {
   @Operation(summary = "添加")
   @PostMapping(value = "/add")
   @PreAuthorize("hasAuthority('game:gameRebateConfig:add')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'游戏返水配置-->添加:' + #dto" )
   public void add(@RequestBody OperGameRebateConfigDTO dto) {
     gameRebateConfigService.addGameRebateConfig(dto);
   }
@@ -42,6 +49,10 @@ public class GameRebateConfigController {
   @Operation(summary = "修改")
   @PostMapping(value = "/update")
   @PreAuthorize("hasAuthority('game:gameRebateConfig:update')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'游戏返水配置-->修改:' + #dto" )
   public void update(@RequestBody OperGameRebateConfigDTO dto) {
     gameRebateConfigService.updateGameRebateConfig(dto);
   }
@@ -49,6 +60,10 @@ public class GameRebateConfigController {
   @Operation(summary = "根据ID删除")
   @PostMapping(value = "/delete/{id}")
   @PreAuthorize("hasAuthority('game:gameRebateConfig:remove')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'游戏返水配置-->根据ID删除:' + #id" )
   public void delete(@PathVariable("id") Long id) {
     gameRebateConfigService.delete(id);
   }

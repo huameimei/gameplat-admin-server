@@ -8,7 +8,10 @@ import com.gameplat.admin.model.vo.DictDataVo;
 import com.gameplat.admin.service.SysDictDataService;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.StringUtils;
+import com.gameplat.common.constant.ServiceName;
 import com.gameplat.common.enums.DictTypeEnum;
+import com.gameplat.log.annotation.Log;
+import com.gameplat.log.enums.LogType;
 import com.gameplat.model.entity.sys.SysDictData;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -34,6 +37,10 @@ public class RechargeVirtualController {
   @Operation(summary = "修改")
   @PostMapping("/edit")
   @PreAuthorize("hasAuthority('thirdParty:rechVirtual:edit')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'虚拟币-->修改:' + #dictData")
   public void update(@RequestBody OperDictDataDTO dictData) {
     if (StringUtils.isNull(dictData.getId())) {
       throw new ServiceException("主键不正确");
@@ -48,6 +55,10 @@ public class RechargeVirtualController {
   @Operation(summary = "添加")
   @PostMapping("/add")
   @PreAuthorize("hasAuthority('thirdParty:rechVirtual:add')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'虚拟币-->添加:' + #dictData")
   public void add(@RequestBody OperDictDataDTO dictData) {
     if (StringUtils.isBlank(dictData.getDictValue())) {
       throw new ServiceException("值不能为空");
@@ -59,6 +70,10 @@ public class RechargeVirtualController {
   @Operation(summary = "删除")
   @PostMapping("/delete/{id}")
   @PreAuthorize("hasAuthority('thirdParty:rechVirtual:remove')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'虚拟币-->删除:' + #id")
   public void remove(@PathVariable Long id) {
     dictDataService.removeById(id);
   }
@@ -66,6 +81,10 @@ public class RechargeVirtualController {
   @Operation(summary = "修改状态")
   @PostMapping("/editStatus")
   @PreAuthorize("hasAuthority('thirdParty:rechVirtual:editStatus')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'虚拟币-->修改状态:' + #status")
   public void updateStatus(Long id, Integer status) {
     dictDataService.updateStatus(id, status);
   }

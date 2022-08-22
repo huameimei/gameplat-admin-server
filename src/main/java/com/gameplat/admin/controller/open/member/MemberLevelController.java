@@ -45,6 +45,10 @@ public class MemberLevelController {
   @Operation(summary = "添加")
   @PostMapping("/add")
   @PreAuthorize("hasAuthority('member:level:add')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'会员层级-->添加:' + #dto" )
   public void add(@RequestBody @Validated MemberLevelAddDTO dto) {
     memberLevelService.add(dto);
   }
@@ -52,6 +56,10 @@ public class MemberLevelController {
   @Operation(summary = "修改")
   @PostMapping("/update")
   @PreAuthorize("hasAuthority('member:level:edit')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'会员层级-->修改:' + #dto" )
   public void update(@RequestBody @Validated MemberLevelEditDTO dto) {
     memberLevelService.update(dto);
   }
@@ -59,6 +67,10 @@ public class MemberLevelController {
   @Operation(summary = "删除")
   @PostMapping("/delete/{id}")
   @PreAuthorize("hasAuthority('member:level:remove')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'会员层级-->删除:' + #id" )
   public void delete(@PathVariable Long id) {
     memberLevelService.delete(id);
   }
@@ -66,6 +78,10 @@ public class MemberLevelController {
   @Operation(summary = "锁定层级")
   @PostMapping("/lock/{id}")
   @PreAuthorize("hasAuthority('member:level:lock')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'会员层级-->锁定层级:' + #id" )
   public void lock(@PathVariable Long id) {
     memberLevelService.lock(id);
   }
@@ -73,6 +89,10 @@ public class MemberLevelController {
   @Operation(summary = "解锁层级")
   @PostMapping("/unlock/{id}")
   @PreAuthorize("hasAuthority('member:level:unlock')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'会员层级-->解锁层级:' + #id" )
   public void unlock(@PathVariable Long id) {
     memberLevelService.unlock(id);
   }
@@ -80,6 +100,10 @@ public class MemberLevelController {
   @Operation(summary = "启用")
   @PostMapping("/enable/{id}")
   @PreAuthorize("hasAuthority('member:level:enable')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'会员层级-->启用:' + #id" )
   public void enable(@PathVariable Long id) {
     memberLevelService.enable(id);
   }
@@ -87,6 +111,10 @@ public class MemberLevelController {
   @Operation(summary = "禁用")
   @PostMapping("/disable/{id}")
   @PreAuthorize("hasAuthority('member:level:disable')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'会员层级-->禁用:' + #id" )
   public void disable(@PathVariable Long id) {
     memberLevelService.disable(id);
   }
@@ -94,6 +122,10 @@ public class MemberLevelController {
   @Operation(summary = "启用提现")
   @PostMapping("/enable/withdraw/{id}")
   @PreAuthorize("hasAuthority('member:level:enableWithdraw')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'会员层级-->禁用:' + #id" )
   public void enableWithdraw(@PathVariable Long id) {
     memberLevelService.enableWithdraw(id);
   }
@@ -101,6 +133,10 @@ public class MemberLevelController {
   @Operation(summary = "禁用提现")
   @PostMapping("/disable/withdraw/{id}")
   @PreAuthorize("hasAuthority('member:level:disableWithdraw')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'会员层级-->禁用:' + #id" )
   public void disableWithdraw(@PathVariable Long id) {
     memberLevelService.disableWithdraw(id);
   }
@@ -108,6 +144,10 @@ public class MemberLevelController {
   @Operation(summary = "批量分层")
   @PostMapping("/batchAllocate")
   @PreAuthorize("hasAuthority('member:level:ocate')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'会员层级-->批量分层:' + #dtos" )
   public void batchAllocate(@Valid @RequestBody List<MemberLevelAllocateDTO> dtos) {
     memberLevelService.batchAllocate(dtos);
   }
@@ -115,6 +155,10 @@ public class MemberLevelController {
   @Operation(summary = "根据输入账号分层")
   @PostMapping("/allocateByUserNames")
   @PreAuthorize("hasAuthority('member:level:allocateByUserNames')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'会员层级-->根据输入账号分层:' + #dto" )
   public void allocateByUserNames(@Valid @RequestBody MemberLevelAllocateByUserNameDTO dto) {
     memberLevelService.allocateByUserNames(dto);
   }
@@ -122,6 +166,10 @@ public class MemberLevelController {
   @Operation(summary = "根据上传文件分层")
   @PostMapping("/allocateByFile")
   @PreAuthorize("hasAuthority('member:level:allocateByFile')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'会员层级-->根据上传文件分层:' + #levelValue" )
   public void allocateByFile(
       @RequestParam("levelValue") Integer levelValue, @RequestPart MultipartFile file)
       throws IOException {
@@ -133,6 +181,10 @@ public class MemberLevelController {
   @Operation(summary = "根据筛选条件分层")
   @PostMapping("/allocateByCondition")
   @PreAuthorize("hasAuthority('member:level:allocateByCondition')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'会员层级-->根据筛选条件分层:' + #dto" )
   public void allocateByCondition(@Valid @RequestBody MemberLevelAllocateByConditionDTO dto) {
     memberLevelService.allocateByCondition(dto);
   }

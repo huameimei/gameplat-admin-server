@@ -10,6 +10,9 @@ import com.gameplat.admin.model.dto.MessageInfoQueryDTO;
 import com.gameplat.admin.model.vo.MessageDistributeVO;
 import com.gameplat.admin.model.vo.MessageInfoVO;
 import com.gameplat.admin.service.MessageInfoService;
+import com.gameplat.common.constant.ServiceName;
+import com.gameplat.log.annotation.Log;
+import com.gameplat.log.enums.LogType;
 import com.gameplat.model.entity.member.Member;
 import com.gameplat.model.entity.message.Message;
 import io.swagger.v3.oas.annotations.Operation;
@@ -46,6 +49,10 @@ public class OpenMessageInfoController {
   @Operation(summary = "新增消息")
   @PostMapping("/save")
   @PreAuthorize("hasAuthority('operator:message:add')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'消息管理-->新增消息:' + #dto")
   public void save(@Validated MessageInfoAddDTO dto) {
     messageInfoService.insertMessage(dto);
   }
@@ -53,6 +60,10 @@ public class OpenMessageInfoController {
   @Operation(summary = "编辑消息")
   @PostMapping("/edit")
   @PreAuthorize("hasAuthority('operator:message:edit')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'消息管理-->编辑消息:' + #dto")
   public void edit(@Validated MessageInfoEditDTO dto) {
     messageInfoService.editMessage(dto);
   }
@@ -60,6 +71,10 @@ public class OpenMessageInfoController {
   @Operation(summary = "删除消息")
   @PostMapping("/remove")
   @PreAuthorize("hasAuthority('operator:message:remove')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'消息管理-->删除消息:' + #ids")
   public void remove(String ids) {
     messageInfoService.deleteBatchMessage(ids);
   }

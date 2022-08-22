@@ -7,7 +7,10 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.gameplat.admin.model.dto.MemberBillDTO;
 import com.gameplat.admin.model.vo.MemberBillVO;
 import com.gameplat.admin.service.MemberBillService;
+import com.gameplat.common.constant.ServiceName;
 import com.gameplat.common.model.bean.TranTypeBean;
+import com.gameplat.log.annotation.Log;
+import com.gameplat.log.enums.LogType;
 import com.gameplat.model.entity.member.MemberBill;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -48,6 +51,10 @@ public class OpenMemberBillController {
   @GetMapping(value = "/exportBill", produces = "application/vnd.ms-excel")
   @Operation(summary = "导出现金流水列表")
   @PreAuthorize("hasAuthority('funds:cash:export')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'现金流水-->导出现金流水列表:' + #dto" )
   public void exportSign(MemberBillDTO dto, HttpServletResponse response) {
     List<MemberBillVO> list = memberBillService.queryList(dto);
     ExportParams exportParams = new ExportParams("现金流水列表", "现金流水列表");

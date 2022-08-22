@@ -16,8 +16,11 @@ import com.gameplat.admin.service.SysSettingService;
 import com.gameplat.base.common.enums.EnableEnum;
 import com.gameplat.base.common.web.Result;
 import com.gameplat.common.constant.CacheKey;
+import com.gameplat.common.constant.ServiceName;
 import com.gameplat.common.enums.DictDataEnum;
 import com.gameplat.common.enums.DictTypeEnum;
+import com.gameplat.log.annotation.Log;
+import com.gameplat.log.enums.LogType;
 import com.gameplat.model.entity.setting.SysSetting;
 import com.gameplat.model.entity.sys.SysDictData;
 import com.gameplat.security.SecurityUserHolder;
@@ -96,6 +99,10 @@ public class SysSettingController {
   @PostMapping("/insertStartImagePage")
   @Operation(summary = "启动图配置新增/修改")
   @PreAuthorize("hasAuthority('banner:startImage:edit')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'启动图配置新增/修改:' + #sysSetting")
   public Result<Object> insertStartImagePage(@RequestBody SysSetting sysSetting) {
     sysSetting.setSettingType(SysSettingEnum.START_UP_IMAGE.getCode());
 
@@ -126,6 +133,10 @@ public class SysSettingController {
   @PostMapping("/deleteStartImagePage")
   @Operation(summary = "启动图配置删除")
   @PreAuthorize("hasAuthority('banner:startImage:remove')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'启动图配置删除:' + #id")
   public Result<Object> deleteStartImagePage(@RequestParam(value = "id") int id) {
     SysSetting sysSetting = new SysSetting();
     sysSetting.setSettingType(SysSettingEnum.START_UP_IMAGE.getCode());
@@ -150,6 +161,10 @@ public class SysSettingController {
   @PostMapping("/updateDisplayAndSort")
   @PreAuthorize("hasAuthority('setting:config:edit')")
   @Operation(summary = "修改显示与排序")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'修改显示与排序:' + #tenantSettingVO")
   public void updateDisplayAndSort(@RequestBody SysSettingVO tenantSettingVO) {
     UserCredential user = SecurityUserHolder.getCredential();
     if (user != null) {
@@ -178,6 +193,10 @@ public class SysSettingController {
   @PostMapping("/updatePersonalCenter")
   @PreAuthorize("hasAuthority('setting:personalCenter:edit')")
   @Operation(summary = "个人中心编辑")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'个人中心编辑:' + #tenantSettingVO")
   public void updatePersonalCenter(@RequestBody SysSettingVO tenantSettingVO) {
     UserCredential user = SecurityUserHolder.getCredential();
     if (user != null) {
@@ -206,6 +225,10 @@ public class SysSettingController {
   @PostMapping("/updateBatchTenantSort")
   @PreAuthorize("hasAuthority('setting:sort:save')")
   @Operation(summary = "批量修改排序")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'批量修改排序:' + #sysSettings")
   public void updateBatchTenantSetting(@RequestBody List<SysSetting> sysSettings) {
     sysSettingService.updateBatchTenantSetting(sysSettings);
     adminCache.deleteByPrefix(CacheKey.getTenantNavPrefixKey());
@@ -214,6 +237,10 @@ public class SysSettingController {
   @PostMapping("/delById")
   @PreAuthorize("hasAuthority('setting:float:del')")
   @Operation(summary = "删除游戏浮窗类型")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'删除游戏浮窗类型:' + #id")
   public void remove(Integer id) {
     sysSettingService.deleteSysFloatById(id);
     adminCache.deleteByPrefix(CacheKey.getTenantFloatPrefixKey());
@@ -222,6 +249,10 @@ public class SysSettingController {
   @Operation(summary = "广场开关")
   @PreAuthorize("hasAuthority('setting:square:switch')")
   @RequestMapping(value = "/updateSquareSwitch", method = {RequestMethod.GET, RequestMethod.POST})
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'广场开关:' + #tenantSetting")
   public void updateSquareSwitch(SysSettingVO tenantSetting) {
     tenantSetting.setSettingType(Constants.SYSTEM_SETTING);
     tenantSetting.setSettingCode(Constants.SQUARE_SWITCH);
@@ -250,6 +281,10 @@ public class SysSettingController {
   /** 修改体育配置排序开关列表 */
   @PostMapping("/updateListSortConfig")
   @CacheEvict(cacheNames = Constants.TENANT_LIST_SORT, allEntries = true)
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'修改体育配置排序开关列表:' + #listSortConfigVOS")
   public void updateListSortConfig(@RequestBody List<ListSortConfigVO> listSortConfigVOS) {
     if (listSortConfigVOS == null || listSortConfigVOS.isEmpty()) {
       Result.failed("修改体育配置参数为空");
@@ -262,6 +297,10 @@ public class SysSettingController {
   @PostMapping("/updateSportConfig")
   @PreAuthorize("hasAuthority('setting:sportConfig:edit')")
   @CacheEvict(cacheNames = Constants.TENANT_SPORT_CONFIG, allEntries = true)
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'修改体育配置:' + #sportConfigVo")
   public void updateSportConfig(@RequestBody SportConfigVO sportConfigVo) {
     if (sportConfigVo == null) {
       Result.failed("修改体育配置参数为空");
@@ -275,6 +314,10 @@ public class SysSettingController {
    */
   @Operation(summary = "修改色值设置")
   @RequestMapping("/updateColorDict")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'修改色值设置:' + #appChangeSkinColorVO")
   public Result<Object> updateColorDict(@RequestBody AppChangeSkinColorVO appChangeSkinColorVO){
     SysDictData sysDictData =
             sysDictDataService.getDictData(

@@ -6,6 +6,9 @@ import com.gameplat.admin.model.dto.GameTypeQueryDTO;
 import com.gameplat.admin.model.dto.OperGameTypeDTO;
 import com.gameplat.admin.model.vo.GameTypeVO;
 import com.gameplat.admin.service.GameTypeService;
+import com.gameplat.common.constant.ServiceName;
+import com.gameplat.log.annotation.Log;
+import com.gameplat.log.enums.LogType;
 import com.gameplat.model.entity.game.GameType;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -34,6 +37,10 @@ public class GameTypeController {
   @Operation(summary = "编辑")
   @PostMapping("/edit")
   @PreAuthorize("hasAuthority('game:gameType:edit')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'游戏类型-->编辑:' + #dto" )
   public void updateGameType(@RequestBody OperGameTypeDTO dto) {
     gameTypeService.updateGameType(dto);
   }

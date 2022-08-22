@@ -42,7 +42,7 @@ public class GameKindController {
   @Log(
           module = ServiceName.ADMIN_SERVICE,
           type = LogType.LIVEREBATE,
-          desc = "'编辑保存游戏:最新返水比例为:' + #rebateRate + ',最新打码计算成长值倍数为:' + #damaRate")
+          desc = "'编辑保存游戏:最新返水比例为:' + #dto.rebateRate + ',最新打码计算成长值倍数为:' + #dto.damaRate")
   public void updateGameKind(@RequestBody OperGameKindDTO dto) {
     gameKindService.updateGameKind(dto);
   }
@@ -50,6 +50,10 @@ public class GameKindController {
   @Operation(summary = "游戏开关")
   @PostMapping("/updateEnable")
   @PreAuthorize("hasAuthority('game:gameKind:updateEnable')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'游戏分类-->游戏开关:' + #dto" )
   public void updateEnable(@RequestBody OperGameKindDTO dto) {
     gameKindService.updateEnable(dto);
   }
@@ -57,6 +61,10 @@ public class GameKindController {
   @Operation(summary = "试玩开关")
   @PostMapping("/updateDemoEnable")
   @PreAuthorize("hasAuthority('game:gameKind:updateDemoEnable')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'游戏分类-->试玩开关:' + #dto" )
   public void updateDemoEnable(@RequestBody OperGameKindDTO dto) {
     if (dto.getDemoEnable() != GameDemoEnableEnum.ENABLE.getCode()
         && dto.getDemoEnable() != GameDemoEnableEnum.DISABLE.getCode()) {

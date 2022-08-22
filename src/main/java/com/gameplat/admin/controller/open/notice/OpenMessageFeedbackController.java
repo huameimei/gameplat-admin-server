@@ -6,6 +6,9 @@ import com.gameplat.admin.model.dto.MessageFeedbackAddDTO;
 import com.gameplat.admin.model.dto.MessageFeedbackQueryDTO;
 import com.gameplat.admin.model.vo.MessageFeedbackVO;
 import com.gameplat.admin.service.MessageFeedbackService;
+import com.gameplat.common.constant.ServiceName;
+import com.gameplat.log.annotation.Log;
+import com.gameplat.log.enums.LogType;
 import com.gameplat.model.entity.message.MessageFeedback;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -53,6 +56,10 @@ public class OpenMessageFeedbackController {
   @Operation(summary = "新增意见反馈")
   @PostMapping("/add")
   @PreAuthorize("hasAuthority('notice:feedback:add')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'意见反馈-->新增意见反馈:' + #dto")
   public void insertMessage(@Validated MessageFeedbackAddDTO dto) {
     messageFeedbackService.insertMessage(dto);
   }
@@ -60,6 +67,10 @@ public class OpenMessageFeedbackController {
   @Operation(summary = "删除意见反馈")
   @PostMapping("/remove")
   @PreAuthorize("hasAuthority('notice:feedback:remove')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'意见反馈-->删除意见反馈:' + #id")
   public void removeMessage(@RequestParam(name = "id") Long id) {
     messageFeedbackService.removeMessage(id);
   }

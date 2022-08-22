@@ -7,6 +7,9 @@ import com.gameplat.admin.model.dto.BizBlacklistQueryDTO;
 import com.gameplat.admin.model.dto.OperBizBlacklistDTO;
 import com.gameplat.admin.model.dto.OptionDTO;
 import com.gameplat.admin.service.BizBlacklistService;
+import com.gameplat.common.constant.ServiceName;
+import com.gameplat.log.annotation.Log;
+import com.gameplat.log.enums.LogType;
 import com.gameplat.model.entity.blacklist.BizBlacklist;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -28,6 +31,10 @@ public class OpenBizBlacklistController {
   @Operation(summary = "删除")
   @PostMapping("/del/{id}")
   @PreAuthorize("hasAuthority('account:bizBlack:remove')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type = LogType.ADMIN,
+    desc = "'业务黑名单->删除id:' + #dto.id")
   public void delete(@PathVariable Long id) {
     bizBlacklistService.delete(id);
   }
@@ -49,6 +56,11 @@ public class OpenBizBlacklistController {
   @Operation(summary = "添加")
   @PostMapping("/add")
   @PreAuthorize("hasAuthority('account:bizBlack:add')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type = LogType.ADMIN,
+    desc = "'业务黑名单->添加targetType:' + #dto.targetType + 'target:' " +
+      "+ #dto.target + 'types' + #dto.types + 'status' + #dto.status")
   public void add(@RequestBody OperBizBlacklistDTO dto) {
     bizBlacklistService.save(dto);
   }
@@ -56,6 +68,12 @@ public class OpenBizBlacklistController {
   @Operation(summary = "编辑")
   @PostMapping("/edit")
   @PreAuthorize("hasAuthority('account:bizBlack:edit')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type = LogType.ADMIN,
+    desc = "'业务黑名单->编辑targetType:' + #dto.targetType + 'target:' " +
+      "+ #dto.target + 'types' + #dto.types + 'status' + #dto.status" +
+      "'id:' + dto.id")
   public void edit(@RequestBody OperBizBlacklistDTO dto) {
     bizBlacklistService.update(dto);
   }

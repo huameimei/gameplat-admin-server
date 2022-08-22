@@ -21,7 +21,7 @@ public class GameBetRecordSearchBuilder {
       builder.must(QueryBuilders.termQuery("account.keyword", dto.getAccount()));
     }
     if (StringUtils.isNotEmpty(dto.getBillNo())) {
-      builder.must(QueryBuilders.matchQuery("billNo", dto.getBillNo()));
+      builder.must(QueryBuilders.matchQuery("billNo.keyword", dto.getBillNo()));
     }
     if (StringUtils.isNotEmpty(dto.getPlatformCode())) {
       builder.must(QueryBuilders.matchQuery("platformCode", dto.getPlatformCode()));

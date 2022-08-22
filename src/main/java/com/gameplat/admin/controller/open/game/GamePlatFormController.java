@@ -5,7 +5,10 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.gameplat.admin.model.dto.GamePlatformQueryDTO;
 import com.gameplat.admin.model.dto.OperGamePlatformDTO;
 import com.gameplat.admin.service.GamePlatformService;
+import com.gameplat.common.constant.ServiceName;
 import com.gameplat.common.lang.Assert;
+import com.gameplat.log.annotation.Log;
+import com.gameplat.log.enums.LogType;
 import com.gameplat.model.entity.game.GamePlatform;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -29,6 +32,10 @@ public class GamePlatFormController {
 
   @PostMapping("/edit")
   @PreAuthorize("hasAuthority('game:gamePlatform:edit')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'GamePlat-->edit:' + #operGamePlatformDTO" )
   public void updateLiveGame(@RequestBody OperGamePlatformDTO operGamePlatformDTO) {
     Assert.notNull(operGamePlatformDTO.getId(), "缺少参数");
     Assert.notEmpty(operGamePlatformDTO.getCode(), "缺少编码参数");

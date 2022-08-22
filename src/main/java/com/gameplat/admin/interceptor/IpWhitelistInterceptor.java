@@ -1,6 +1,7 @@
 package com.gameplat.admin.interceptor;
 
 import cn.hutool.core.collection.CollUtil;
+import com.gameplat.admin.config.SysConfig;
 import com.gameplat.admin.enums.AuthIpEnum;
 import com.gameplat.admin.service.CommonService;
 import com.gameplat.admin.service.SysAuthIpService;
@@ -13,6 +14,7 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.servlet.HandlerInterceptor;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
@@ -27,6 +29,8 @@ public class IpWhitelistInterceptor implements HandlerInterceptor {
   @Autowired private SysAuthIpService authIpService;
 
   @Autowired private CommonService commonService;
+
+  @Resource private SysConfig sysConfig;
 
   @Override
   public boolean preHandle(
@@ -52,6 +56,11 @@ public class IpWhitelistInterceptor implements HandlerInterceptor {
 
   private boolean isAllowed(String ip) {
     List<SysAuthIp> authIps = authIpService.getAll();
+    if (CollUtil.isNotEmpty(sysConfig.getOfficeIpList())) {
+      if (sysConfig.getOfficeIpList().contains(ip)) {
+        return true;
+      }
+    }
     return CollUtil.isNotEmpty(authIps)
         && authIps.stream()
             .filter(e -> e.getIpType().contains(AuthIpEnum.Type.ADMIN.value()))

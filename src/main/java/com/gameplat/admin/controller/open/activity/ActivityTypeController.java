@@ -13,8 +13,11 @@ import com.gameplat.admin.service.ActivityTypeService;
 import com.gameplat.admin.service.ConfigService;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.StringUtils;
+import com.gameplat.common.constant.ServiceName;
 import com.gameplat.common.enums.BooleanEnum;
 import com.gameplat.common.enums.DictDataEnum;
+import com.gameplat.log.annotation.Log;
+import com.gameplat.log.enums.LogType;
 import com.gameplat.model.entity.activity.ActivityType;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -64,6 +67,10 @@ public class ActivityTypeController {
   @Operation(summary = "新增活动板块")
   @PostMapping("/add")
   @PreAuthorize("hasAuthority('activity:type:add')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'活动板块管理->新增活动板块:' + #dto")
   public void add(@Validated @RequestBody ActivityTypeAddDTO dto) {
     dto.setLanguage(LocaleContextHolder.getLocale().toLanguageTag());
     if (!dto.getLanguage().contains("zh-CN,en-US,in-ID,th-TH,vi-VN")) {
@@ -83,6 +90,10 @@ public class ActivityTypeController {
   @Operation(summary = "更新活动板块")
   @PostMapping("/update")
   @PreAuthorize("hasAuthority('activity:type:edit')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'活动板块管理->更新活动板块:' + #dto")
   public void update(@Validated @RequestBody ActivityTypeUpdateDTO dto) {
     dto.setLanguage(LocaleContextHolder.getLocale().toLanguageTag());
     if (!dto.getLanguage().contains("zh-CN,en-US,in-ID,th-TH,vi-VN")) {
@@ -102,6 +113,10 @@ public class ActivityTypeController {
   @Operation(summary = "删除活动板块")
   @PostMapping("/delete")
   @PreAuthorize("hasAuthority('activity:type:remove')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'活动板块管理->删除活动板块ids:' + #map.ids")
   public void remove(@RequestBody Map<String, String> map) {
     if (StringUtils.isBlank(map.get("ids"))) {
       throw new ServiceException("ids不能为空");

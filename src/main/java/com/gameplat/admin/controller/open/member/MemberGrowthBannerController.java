@@ -7,6 +7,9 @@ import com.gameplat.admin.model.dto.MemberGrowthBannerEditDTO;
 import com.gameplat.admin.model.dto.MemberGrowthBannerQueryDTO;
 import com.gameplat.admin.model.vo.MemberGrowthBannerVO;
 import com.gameplat.admin.service.MemberGrowthBannerService;
+import com.gameplat.common.constant.ServiceName;
+import com.gameplat.log.annotation.Log;
+import com.gameplat.log.enums.LogType;
 import com.gameplat.model.entity.member.MemberGrowthBanner;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -32,6 +35,10 @@ public class MemberGrowthBannerController {
   @PostMapping("/add")
   @Operation(summary = "新增banner图")
   @PreAuthorize("hasAuthority('member:banner:add')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'VIP轮播图配置-->新增banner图:' + #dto" )
   public void addBanner(@Validated MemberGrowthBannerAddDTO dto) {
     memberGrowthBannerService.addBanner(dto);
   }
@@ -39,6 +46,10 @@ public class MemberGrowthBannerController {
   @Operation(summary = "删除VIP banner图")
   @PostMapping("/remove/{id}")
   @PreAuthorize("hasAuthority('member:banner:remove')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'VIP轮播图配置-->删除VIP banner图:' + #id" )
   public void removeBanner(@PathVariable Long id) {
     memberGrowthBannerService.remove(id);
   }
@@ -46,6 +57,10 @@ public class MemberGrowthBannerController {
   @PostMapping("/edit")
   @Operation(summary = "修改VIP banner图")
   @PreAuthorize("hasAuthority('member:banner:edit')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'VIP轮播图配置-->修改VIP banner图:' + #dto" )
   public void updateBanner(@Validated MemberGrowthBannerEditDTO dto) {
     memberGrowthBannerService.updateBanner(dto);
   }

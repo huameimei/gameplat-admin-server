@@ -11,6 +11,9 @@ import com.gameplat.admin.model.vo.PushLottWinVo;
 import com.gameplat.admin.service.*;
 import com.gameplat.base.common.enums.EnableEnum;
 import com.gameplat.base.common.json.JsonUtils;
+import com.gameplat.common.constant.ServiceName;
+import com.gameplat.log.annotation.Log;
+import com.gameplat.log.enums.LogType;
 import com.google.common.base.Joiner;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -60,6 +63,10 @@ public class OtthController {
   @Operation(summary = "平台聊天室限制配置/聊天室成员管理/关键词管理/聊天室房间管理/角色管理/聊天室自定义消息管理")
   @PostMapping(value = "/{url}", produces = MediaType.APPLICATION_JSON_VALUE)
   @PreAuthorize("hasAuthority('chat:edit')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'聊天室侧滑菜单管理->平台聊天室限制配置/聊天室成员管理/关键词管理/聊天室房间管理/角色管理/聊天室自定义消息管理:' + #url")
   public String post(
       @PathVariable String url, @RequestBody String body, HttpServletRequest request) {
     String apiUrl = getApiUrl(url);
@@ -110,6 +117,10 @@ public class OtthController {
   @Operation(summary = "中奖推送接口")
   @PostMapping("/pushLotteryWin")
   @PreAuthorize("hasAuthority('chat:push')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'中奖推送接口:' + #lottWinVos")
   public void pushLotteryWin(
       @RequestBody List<PushLottWinVo> lottWinVos, HttpServletRequest request) {
     otthService.pushLotteryWin(lottWinVos, request);
@@ -118,6 +129,10 @@ public class OtthController {
   @Operation(summary = "分享彩票下注")
   @RequestMapping(value = "/cpbet", method = RequestMethod.POST)
   @PreAuthorize("hasAuthority('chat:share:bet')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "分享彩票下注")
   public void cpbet(@RequestBody List<PushCPBetMessageReq> req, HttpServletRequest request) {
     otthService.cpbet(req, request);
   }
@@ -142,6 +157,10 @@ public class OtthController {
   @Operation(summary = "给游戏调用的更新游戏状态")
   @PostMapping("updateGameStatus")
   @PreAuthorize("hasAuthority('chat:game:updateGameStatus')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'聊天室侧滑菜单管理-->给游戏调用的更新游戏状态gameId' + #gameId + 'gameStatus' + #gameStatus")
   public void updateGameStuats(String gameId, int gameStatus) {
     // 游戏维护更新自定义中奖推送
     chatPushPlanService.updatePushPlan(gameId, gameStatus);

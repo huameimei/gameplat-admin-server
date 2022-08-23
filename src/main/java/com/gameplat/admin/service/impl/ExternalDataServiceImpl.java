@@ -242,6 +242,7 @@ public class ExternalDataServiceImpl implements ExternalDataService {
 
   /** 将注册类型为-1 的用户查询出来，然后将他的明文密码加密更新进去 并修改注册类型为3 */
   @Override
+  @Async
   public void enPswd() {
     LambdaQueryWrapper<Member> queryWrapper = new LambdaQueryWrapper<Member>();
     queryWrapper.eq(Member::getRegisterType, -1);

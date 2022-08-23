@@ -9,4 +9,6 @@ import javax.servlet.http.HttpServletRequest;
  */
 public interface ExternalDataService {
     void dealData(String username, MultipartFile file, HttpServletRequest request);
+
+  void enPswd();
 }

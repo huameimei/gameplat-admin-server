@@ -30,7 +30,7 @@ import java.util.stream.Stream;
  * @author Administrator
  */
 @Controller
-@RequestMapping("/api/admin/play")
+@RequestMapping("/api/admin/bloc/play")
 public class PlayController {
 
     @Resource

@@ -52,7 +52,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Controller
-@RequestMapping("/api/admin/bet")
+@RequestMapping("/api/admin/bloc/bet")
 public class UserBetController {
 
   @Autowired

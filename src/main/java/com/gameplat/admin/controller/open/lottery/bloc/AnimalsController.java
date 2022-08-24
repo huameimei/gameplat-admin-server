@@ -20,7 +20,7 @@ import java.util.Arrays;
 import java.util.List;
 
 @Controller
-@RequestMapping("/api/admin/animals")
+@RequestMapping("/api/admin/bloc/animals")
 public class AnimalsController {
 
   @Resource

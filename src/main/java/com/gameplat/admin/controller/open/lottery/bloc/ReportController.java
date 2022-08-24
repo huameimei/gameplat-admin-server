@@ -51,7 +51,7 @@ import java.util.Map;
  */
 
 @Controller
-@RequestMapping("/api/admin/report")
+@RequestMapping("/api/admin/bloc/report")
 public class ReportController {
 
     @Resource

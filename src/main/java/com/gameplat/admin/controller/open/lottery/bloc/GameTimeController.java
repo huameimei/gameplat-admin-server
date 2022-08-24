@@ -30,7 +30,7 @@ import java.util.List;
  *
  */
 @Controller
-@RequestMapping("/api/admin/gameTime")
+@RequestMapping("/api/admin/bloc/gameTime")
 public class GameTimeController {
 
   @Resource

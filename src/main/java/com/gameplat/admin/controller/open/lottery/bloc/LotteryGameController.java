@@ -48,7 +48,7 @@ import java.util.stream.Stream;
  *
  */
 @Controller
-@RequestMapping("/api/admin/game")
+@RequestMapping("/api/admin/bloc/game")
 public class LotteryGameController {
   @Resource
   PlayCateService playCateService;

@@ -37,7 +37,7 @@ import java.util.*;
  * @author Administrator
  */
 @Controller
-@RequestMapping("/api/admin/lottery")
+@RequestMapping("/api/admin/bloc/lottery")
 public class LotteryController {
 
   @Resource

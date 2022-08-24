@@ -322,4 +322,13 @@ public class MemberController {
   public void changeToAgent(@RequestBody MemberTransformDTO dto) {
     memberTransferAgentService.changeToAgent(dto.getId());
   }
+
+  @Operation(summary = "会员解除设备限制")
+  @PostMapping("/memberDevice")
+  @PreAuthorize("hasAuthority('member:memberDevice')")
+  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.MEMBER, desc = "'会员解除设备限制'")
+  public void memberDevice(@RequestParam(required = true) String username) {
+    memberTransferAgentService.memberDevice(username);
+  }
+
 }

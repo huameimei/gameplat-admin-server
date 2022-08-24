@@ -2,6 +2,9 @@ package com.gameplat.admin.controller.open.chat;
 
 import com.gameplat.admin.model.vo.ChatSideMenuVO;
 import com.gameplat.admin.service.ChatSideMenuService;
+import com.gameplat.common.constant.ServiceName;
+import com.gameplat.log.annotation.Log;
+import com.gameplat.log.enums.LogType;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +36,10 @@ public class ChatSideMenuController {
   @Operation(summary = "编辑")
   @PreAuthorize("hasAuthority('chat:menu:edit')")
   @PostMapping("/edit")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'聊天室侧滑菜单管理->编辑:' + #config")
   public void edit(@RequestBody String config) {
     chatSideMenuService.edit(config);
   }

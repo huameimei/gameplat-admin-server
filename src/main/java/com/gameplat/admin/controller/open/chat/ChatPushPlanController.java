@@ -6,6 +6,9 @@ import com.gameplat.admin.model.dto.ChatPushPlanAddOrEditDTO;
 import com.gameplat.admin.model.dto.ChatPushPlanQueryDTO;
 import com.gameplat.admin.model.vo.ChatPushPlanVO;
 import com.gameplat.admin.service.ChatPushPlanService;
+import com.gameplat.common.constant.ServiceName;
+import com.gameplat.log.annotation.Log;
+import com.gameplat.log.enums.LogType;
 import com.gameplat.model.entity.chart.ChatPushPlan;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -36,6 +39,10 @@ public class ChatPushPlanController {
   @Operation(summary = "增")
   @PostMapping("/add")
   @PreAuthorize("hasAuthority('chat:pushPlan:add')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'聊天计划推送管理->增:' + #dto")
   public void add(@Validated @RequestBody ChatPushPlanAddOrEditDTO dto) {
     chatPushPlanService.add(dto);
   }
@@ -43,6 +50,10 @@ public class ChatPushPlanController {
   @Operation(summary = "编辑")
   @PostMapping("/edit")
   @PreAuthorize("hasAuthority('chat:pushPlan:edit')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'聊天计划推送管理->编辑:' + #dto")
   public void edit(@Validated @RequestBody  ChatPushPlanAddOrEditDTO dto) {
     chatPushPlanService.edit(dto);
   }
@@ -50,6 +61,10 @@ public class ChatPushPlanController {
   @Operation(summary = "删")
   @PostMapping("/remove/{id}")
   @PreAuthorize("hasAuthority('chat:pushPlan:remove')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'聊天计划推送管理->删:' + #id")
   public void remove(@PathVariable Long id) {
     chatPushPlanService.remove(id);
   }

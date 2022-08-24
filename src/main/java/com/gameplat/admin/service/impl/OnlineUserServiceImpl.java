@@ -18,6 +18,7 @@ import com.gameplat.admin.service.SysUserService;
 import com.gameplat.base.common.enums.ClientType;
 import com.gameplat.base.common.util.CollectorUtils;
 import com.gameplat.base.common.util.StringUtils;
+import com.gameplat.common.constant.CacheKey;
 import com.gameplat.common.enums.UserTypes;
 import com.gameplat.model.entity.sys.SysUser;
 import com.gameplat.security.SecurityUserHolder;
@@ -73,21 +74,28 @@ public class OnlineUserServiceImpl implements OnlineUserService {
     int size = (int) page.getSize();
 
     List<UserCredential> onlineUsers = new ArrayList<>(0);
+    List<UserCredential> onlineSocket = new ArrayList<>(0);
     OnlineCount onlineCount = null;
     Set<String> keys = this.getOnlineUserKeys();
 
     if (CollectionUtil.isNotEmpty(keys)) {
       onlineUsers = this.getOnlineUsers(keys);
+      onlineUsers.forEach(m -> {
+        if (redisTemplate.hasKey(CacheKey.getOnlineUserKey(m.getUsername()))) {
+          onlineSocket.add(m);
+        }
+      });
+
       // 在线会员统计
-      onlineCount = this.countOnline(onlineUsers, warningAccounts);
-      onlineUsers = this.filterOnlineUserByCondition(onlineUsers, dto, warningAccounts);
+      onlineCount = this.countOnline(onlineSocket, warningAccounts);
+      onlineUsers = this.filterOnlineUserByCondition(onlineSocket, dto, warningAccounts);
     }
 
     total = onlineUsers.size();
 
     // 分页
     List<OnlineUserVo> records =
-        CollectorUtils.page(onlineUsers, current, size).stream()
+        CollectorUtils.page(onlineSocket, current, size).stream()
             .map(this::convert)
             .collect(Collectors.toList());
 

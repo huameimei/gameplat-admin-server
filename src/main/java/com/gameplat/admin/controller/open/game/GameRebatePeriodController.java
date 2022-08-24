@@ -15,7 +15,10 @@ import com.gameplat.admin.service.GameRebateDetailService;
 import com.gameplat.admin.service.GameRebatePeriodService;
 import com.gameplat.admin.service.GameRebateReportService;
 import com.gameplat.base.common.exception.ServiceException;
+import com.gameplat.common.constant.ServiceName;
 import com.gameplat.common.lang.Assert;
+import com.gameplat.log.annotation.Log;
+import com.gameplat.log.enums.LogType;
 import com.gameplat.model.entity.game.GameRebateDetail;
 import com.gameplat.model.entity.game.GameRebatePeriod;
 import com.gameplat.model.entity.game.GameRebateReport;
@@ -73,6 +76,10 @@ public class GameRebatePeriodController {
   @Operation(summary = "删除期数")
   @PostMapping(value = "delete")
   @PreAuthorize("hasAuthority('game:gameRebatePeriod:remove')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'会员返水预设-->删除期数:' + #dto" )
   public void delete(@RequestBody OperGameRebatePeriodDTO dto) {
     gameRebatePeriodService.deleteGameRebatePeriod(dto.getId(), dto.getOnly());
   }
@@ -80,6 +87,10 @@ public class GameRebatePeriodController {
   @Operation(summary = "结算")
   @PostMapping(value = "settle")
   @PreAuthorize("hasAuthority('game:gameRebatePeriod:settle')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'会员返水预设-->结算:' + #dto" )
   public void settle(@RequestBody OperGameRebatePeriodDTO dto) {
     // 正在发放、回收，不允许进行结算操作
     distributedLocker.lock(GAME_REBATE_PAY_REDIS_LOCK, TimeUnit.SECONDS, 300);
@@ -103,6 +114,10 @@ public class GameRebatePeriodController {
   @Operation(summary = "发放")
   @PostMapping(value = "batchAccept")
   @PreAuthorize("hasAuthority('game:gameRebatePeriod:batchAccept')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'会员返水预设-->发放:' + #dto" )
   public void accept(@RequestBody OperGameRebatePeriodDTO dto) {
     GameRebatePeriod rebatePeriod = gameRebatePeriodService.getById(dto.getId());
     Assert.notNull(rebatePeriod, "游戏返水期号不存在");
@@ -165,6 +180,10 @@ public class GameRebatePeriodController {
   @Operation(summary = "回收")
   @PostMapping(value = "rollBack")
   @PreAuthorize("hasAuthority('game:gameRebatePeriod:rollBack')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'会员返水预设-->回收:' + #dto" )
   public void rollBack(@RequestBody OperGameRebatePeriodDTO dto) {
     GameRebatePeriod rebatePeriod = gameRebatePeriodService.getById(dto.getId());
     Assert.isTrue(BeanUtil.isNotEmpty(rebatePeriod), "游戏返水期号不存在");

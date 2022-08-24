@@ -3,6 +3,9 @@ package com.gameplat.admin.controller.open.member;
 import com.gameplat.admin.model.dto.GrowthLevelLogoEditDTO;
 import com.gameplat.admin.model.vo.LogoConfigVO;
 import com.gameplat.admin.service.MemberGrowthLevelService;
+import com.gameplat.common.constant.ServiceName;
+import com.gameplat.log.annotation.Log;
+import com.gameplat.log.enums.LogType;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
@@ -39,6 +42,10 @@ public class LogoConfigController {
   @Operation(summary = "修改logo配置")
   @PostMapping("/edit")
   @PreAuthorize("hasAuthority('member:logo:edit')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'Logo配置-->修改logo配置' + #dto" )
   public void edit(@Validated GrowthLevelLogoEditDTO dto) {
     memberGrowthLevelService.updateLogo(dto);
   }

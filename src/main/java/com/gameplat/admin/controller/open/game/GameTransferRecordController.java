@@ -7,6 +7,9 @@ import com.gameplat.admin.model.vo.PageDtoVO;
 import com.gameplat.admin.service.GameAdminService;
 import com.gameplat.admin.service.GamePlatformService;
 import com.gameplat.admin.service.GameTransferRecordService;
+import com.gameplat.common.constant.ServiceName;
+import com.gameplat.log.annotation.Log;
+import com.gameplat.log.enums.LogType;
 import com.gameplat.model.entity.game.GamePlatform;
 import com.gameplat.model.entity.game.GameTransferRecord;
 import io.swagger.v3.oas.annotations.Operation;
@@ -42,6 +45,10 @@ public class GameTransferRecordController {
   @Operation(summary = "后台补单")
   @PostMapping(value = "/fillOrders")
   @PreAuthorize("hasAuthority('game:gameTransferRecord:fillOrders')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'游戏额度转换记录-->后台补单:' + #dto" )
   public void fillOrders(@RequestBody OperGameTransferRecordDTO dto) throws Exception {
     gameAdminService.fillOrders(dto);
   }

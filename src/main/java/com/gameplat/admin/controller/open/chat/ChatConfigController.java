@@ -8,8 +8,11 @@ import com.gameplat.admin.model.bean.PushLotteryWin;
 import com.gameplat.admin.service.OtthService;
 import com.gameplat.admin.service.SysDictDataService;
 import com.gameplat.base.common.exception.ServiceException;
+import com.gameplat.common.constant.ServiceName;
 import com.gameplat.common.enums.DictDataEnum;
 import com.gameplat.common.util.HttpClientUtils;
+import com.gameplat.log.annotation.Log;
+import com.gameplat.log.enums.LogType;
 import com.gameplat.model.entity.sys.SysDictData;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -51,6 +54,10 @@ public class ChatConfigController {
   @Operation(summary = "修改彩票下注分享配置")
   @PostMapping("/editLottPushBet")
   @PreAuthorize("hasAuthority('chat:lottPushBet:edit')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'聊天配置->修改彩票下注分享配置:' + #chatPushCpBet")
   public void editLottPushBet(@RequestBody ChatPushCPBet chatPushCpBet) {
     // 获取额度转换配置
     JSONObject json = otthService.getLottConfig();
@@ -96,6 +103,10 @@ public class ChatConfigController {
   @Operation(summary = "修改彩票中奖推送配置")
   @PostMapping("/editPushLotteryWin")
   @PreAuthorize("hasAuthority('chat:pushLotteryWin:edit')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'聊天配置->修改彩票中奖推送配置:' + #pushLotteryWin")
   public void editPushLotteryWin(@RequestBody PushLotteryWin pushLotteryWin) {
     // 获取额度转换配置
     JSONObject json = otthService.getLottConfig();
@@ -138,6 +149,10 @@ public class ChatConfigController {
   @Operation(summary = "修改聊天室浮窗配置")
   @PostMapping("/updateChatConfig")
   @PreAuthorize("hasAuthority('chat:chatConfig:edit')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'聊天配置->修改聊天室浮窗配置:' + #chatConfig")
   public void updateChatConfig(@RequestBody ChatConfig chatConfig) {
     // 获取额度转换配置
     JSONObject json = otthService.getLottConfig();

@@ -6,6 +6,9 @@ import com.gameplat.admin.model.vo.ActivityRedPacketConfigVO;
 import com.gameplat.admin.model.vo.ActivityTurntablePrizeConfigVO;
 import com.gameplat.admin.service.ActivityRedPacketService;
 import com.gameplat.base.common.exception.ServiceException;
+import com.gameplat.common.constant.ServiceName;
+import com.gameplat.log.annotation.Log;
+import com.gameplat.log.enums.LogType;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
@@ -38,6 +41,10 @@ public class ActivityRedPacketController {
   @Operation(summary = "更新红包配置")
   @PostMapping("/updateConfig")
   @PreAuthorize("hasAuthority('activity:redpacket:updateConfig')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'活动红包配置->更新红包配置redenvelopeId:' + #dto.redenvelopeId")
   public void updateConfig(@RequestBody ActivityRedPacketConfigDTO dto) {
     activityRedPacketService.updateConfig(dto);
   }
@@ -52,6 +59,10 @@ public class ActivityRedPacketController {
   @Operation(summary = "更新转盘奖品配置")
   @PostMapping("/updateTurntablePrizeConfig")
   @PreAuthorize("hasAuthority('activity:redpacket:updateTurntablePrizeConfig')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'活动红包配置->更新红包配置:' + #dto")
   public void updateTurntablePrizeConfig(@RequestBody ActivityTurntablePrizeConfigDTO dto) {
     if (dto.getPrizeId() == null) {
       throw new ServiceException("奖品ID不能为空");

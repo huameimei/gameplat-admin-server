@@ -15,8 +15,11 @@ import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.DateUtil;
 import com.gameplat.base.common.util.DateUtils;
 import com.gameplat.base.common.util.StringUtils;
+import com.gameplat.common.constant.ServiceName;
 import com.gameplat.common.enums.ActivityInfoEnum;
 import com.gameplat.common.enums.DictTypeEnum;
+import com.gameplat.log.annotation.Log;
+import com.gameplat.log.enums.LogType;
 import com.gameplat.model.entity.activity.ActivityLobby;
 import com.gameplat.model.entity.activity.ActivityTurntable;
 import com.gameplat.model.entity.sys.SysDictData;
@@ -69,6 +72,10 @@ public class ActivityLobbyController {
   @Operation(summary = "新增活动大厅")
   @PostMapping("/add")
   @PreAuthorize("hasAuthority('activity:lobby:add')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'活动分发管理->新增活动大厅ids:' + #map.ids")
   public void add(@Validated @RequestBody ActivityLobbyAddDTO dto) {
     if (StringUtils.isNull(dto.getStatisDate())) {
       throw new ServiceException("请选择统计日期");
@@ -108,6 +115,10 @@ public class ActivityLobbyController {
   @Operation(summary = "修改活动大厅")
   @PostMapping("/update")
   @PreAuthorize("hasAuthority('activity:lobby:edit')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'活动大厅管理->修改活动大厅id:' + #dto.id + 'title:' + #dto.title + 'activityType:' + dto.activityType")
   public void update(@RequestBody ActivityLobbyUpdateDTO dto) {
     if (dto.getId() == null || dto.getId() == 0) {
       throw new ServiceException("id不能为空");
@@ -144,6 +155,10 @@ public class ActivityLobbyController {
   @Operation(summary = "删除活动大厅")
   @PostMapping("/delete")
   @PreAuthorize("hasAuthority('activity:lobby:remove')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'活动大厅管理->删除活动大厅ids:' + #map.id")
   public void remove(@RequestBody Map<String, String> map) {
     if (StringUtils.isBlank(map.get("ids"))) {
       throw new ServiceException("ids不能为空");
@@ -154,6 +169,10 @@ public class ActivityLobbyController {
   @Operation(summary = "更新活动大厅状态")
   @PostMapping("/updateStatus")
   @PreAuthorize("hasAuthority('activity:lobby:updateStatus')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'活动大厅管理->更新活动大厅状态id:' + #dto.id + 'status' + #dto.status")
   public void updateStatus(@RequestBody ActivityLobbyUpdateStatusDTO dto) {
     if (dto.getId() == null || dto.getId() == 0) {
       throw new ServiceException("id不能为空");
@@ -257,6 +276,10 @@ public class ActivityLobbyController {
   @Operation(summary = "新增或更新转盘活动详情")
   @PostMapping("/addActivityTurntable")
   @PreAuthorize("hasAuthority('activity:lobby:addActivityTurntable')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'活动大厅管理->新增或更新转盘活动详情bean:' + #bean")
   public boolean addActivityTurntable(@RequestBody ActivityTurntable bean) {
     return activityTurntableService.addActivityTurntable(bean);
   }
@@ -264,6 +287,10 @@ public class ActivityLobbyController {
   @Operation(summary = "删除转盘活动")
   @PostMapping("/removeActivityTurntable")
   @PreAuthorize("hasAuthority('activity:info:removeActivityTurntable')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'活动大厅管理->删除转盘活动ids:' + #ids")
   public void removeActivityTurntable(String ids) {
     Assert.notNull(ids, "id不能为空！");
     activityTurntableService.delete(ids);

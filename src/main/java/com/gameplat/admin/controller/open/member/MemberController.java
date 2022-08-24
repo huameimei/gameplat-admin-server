@@ -22,6 +22,8 @@ import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.ip.IpAddressParser;
 import com.gameplat.base.common.util.BeanUtils;
 import com.gameplat.base.common.util.ServletUtils;
+import com.gameplat.base.common.util.StringUtils;
+import com.gameplat.common.constant.CacheKey;
 import com.gameplat.common.constant.CachedKeys;
 import com.gameplat.common.constant.ServiceName;
 import com.gameplat.common.lang.Assert;
@@ -36,6 +38,7 @@ import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
@@ -43,8 +46,10 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @Tag(name = "会员管理")
 @RestController
@@ -58,15 +63,24 @@ public class MemberController {
 
   @Autowired private GameAdminService gameAdminService;
 
-  @CreateCache(name = CachedKeys.MEMBER_FUND_PWD_ERR_COUNT, expire = -1)
+  @Autowired
+  private RedisTemplate redisTemplate;
 
+  @CreateCache(name = CachedKeys.MEMBER_FUND_PWD_ERR_COUNT, expire = -1)
   private Cache<String, Integer> memberFundPwdErrCount;
 
   @Operation(summary = "会员列表")
   @GetMapping("/list")
   @PreAuthorize("hasAuthority('member:view')")
   public IPage<MemberVO> list(PageDTO<Member> page, MemberQueryDTO dto) {
-    return memberService.queryPage(page, dto);
+    IPage<MemberVO> iPage = memberService.queryPage(page, dto);
+    //重写玩家在线状态
+    iPage.getRecords().forEach(m -> {
+      if (m.getOnline()) {
+        m.setOnline(redisTemplate.hasKey(CacheKey.getOnlineUserKey(m.getAccount())));
+      }
+    });
+    return iPage;
   }
 
   @Operation(summary = "会员详情")
@@ -87,6 +101,10 @@ public class MemberController {
   @Operation(summary = "会员联系方式")
   @GetMapping("/contact/{id}")
   @PreAuthorize("hasAuthority('member:contact:view')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'会员管理-->会员联系方式' + #id" )
   public MemberContactVo memberAccount(@PathVariable Long id) {
     MemberContactVo detail = memberService.getMemberDetail(id);
     detail.setRealName("");
@@ -330,5 +348,4 @@ public class MemberController {
   public void memberDevice(@RequestParam(required = true) String username) {
     memberTransferAgentService.memberDevice(username);
   }
-
 }

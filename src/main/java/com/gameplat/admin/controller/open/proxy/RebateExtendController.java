@@ -3,6 +3,9 @@ package com.gameplat.admin.controller.open.proxy;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.gameplat.admin.service.RebateExtendService;
+import com.gameplat.common.constant.ServiceName;
+import com.gameplat.log.annotation.Log;
+import com.gameplat.log.enums.LogType;
 import com.gameplat.model.entity.proxy.RebateReportExtend;
 import com.gameplat.security.SecurityUserHolder;
 import io.swagger.v3.oas.annotations.Operation;
@@ -43,6 +46,10 @@ public class RebateExtendController {
    */
   @Operation(summary = "新增佣金调整记录")
   @PostMapping(value = "/add")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'平级分红->新增佣金调整记录:' + #extendPO")
   public void addReportExtend(@RequestBody RebateReportExtend extendPO) {
     log.info("新增佣金调整记录：extendPO={}", extendPO);
     extendPO.setUpdateBy(SecurityUserHolder.getUsername());
@@ -56,6 +63,10 @@ public class RebateExtendController {
    */
   @Operation(summary = "编辑佣金调整记录")
   @PostMapping(value = "/edit")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'平级分红->编辑佣金调整记录:' + #extendPO")
   public void editReportExtend(@RequestBody RebateReportExtend extendPO) {
     log.info("编辑佣金调整记录：extendPO={}", extendPO);
     extendPO.setUpdateBy(SecurityUserHolder.getUsername());
@@ -69,6 +80,10 @@ public class RebateExtendController {
    */
   @Operation(summary = "删除佣金调整记录")
   @PostMapping(value = "/remove")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'平级分红->删除佣金调整记录:' + #extendPO")
   public void removeReportExtend(@RequestBody RebateReportExtend extendPO) {
     extendPO.setUpdateBy(SecurityUserHolder.getUsername());
     rebateExtendService.removeReportExtend(extendPO);

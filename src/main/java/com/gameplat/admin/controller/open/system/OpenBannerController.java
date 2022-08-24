@@ -7,7 +7,10 @@ import com.gameplat.admin.model.dto.SysBannerInfoEditDTO;
 import com.gameplat.admin.model.dto.SysBannerInfoUpdateStatusDTO;
 import com.gameplat.admin.model.vo.SysBannerInfoVO;
 import com.gameplat.admin.service.SysBannerInfoService;
+import com.gameplat.common.constant.ServiceName;
 import com.gameplat.common.lang.Assert;
+import com.gameplat.log.annotation.Log;
+import com.gameplat.log.enums.LogType;
 import com.gameplat.model.entity.sys.SysBannerInfo;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -43,6 +46,10 @@ public class OpenBannerController {
   @Operation(summary = "新增banner")
   @PostMapping("/add")
   @PreAuthorize("hasAuthority('system:banner:add')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'banner管理-->新增banner:' + #dto")
   public void add(@Validated @RequestBody SysBannerInfoAddDTO dto) {
     sysBannerInfoService.add(dto);
   }
@@ -50,6 +57,10 @@ public class OpenBannerController {
   @Operation(summary = "编辑banner")
   @PostMapping("/edit")
   @PreAuthorize("hasAuthority('system:banner:edit')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'banner管理-->编辑banner:' + #dto")
   public void edit(@Validated @RequestBody SysBannerInfoEditDTO dto) {
     sysBannerInfoService.edit(dto);
   }
@@ -57,6 +68,10 @@ public class OpenBannerController {
   @Operation(summary = "删除banner")
   @PostMapping("/delete")
   @PreAuthorize("hasAuthority('system:banner:remove')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'banner管理-->编辑banner:' + #dto")
   public void delete(@RequestBody Map<String, String> map) {
     Assert.notEmpty(map.get("ids"), "ids不能为空");
     sysBannerInfoService.delete(map.get("ids"));
@@ -65,6 +80,10 @@ public class OpenBannerController {
   @Operation(summary = "修改banner状态")
   @PostMapping("/updateStatus")
   @PreAuthorize("hasAuthority('system:banner:edit')")
+  @Log(
+    module = ServiceName.ADMIN_SERVICE,
+    type =  LogType.ADMIN,
+    desc = "'banner管理-->修改banner状态:' + #dto")
   public void updateStatus(@Validated @RequestBody SysBannerInfoUpdateStatusDTO dto) {
     sysBannerInfoService.updateStatus(dto);
   }

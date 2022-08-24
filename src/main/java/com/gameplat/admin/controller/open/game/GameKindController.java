@@ -7,7 +7,10 @@ import com.gameplat.admin.model.dto.OperGameKindDTO;
 import com.gameplat.admin.model.vo.GameKindVO;
 import com.gameplat.admin.service.GameKindService;
 import com.gameplat.base.common.exception.ServiceException;
+import com.gameplat.common.constant.ServiceName;
 import com.gameplat.common.enums.GameDemoEnableEnum;
+import com.gameplat.log.annotation.Log;
+import com.gameplat.log.enums.LogType;
 import com.gameplat.model.entity.game.GameKind;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -36,6 +39,10 @@ public class GameKindController {
   @Operation(summary = "编辑")
   @PostMapping("/edit")
   @PreAuthorize("hasAuthority('game:gameKind:edit')")
+  @Log(
+          module = ServiceName.ADMIN_SERVICE,
+          type = LogType.LIVEREBATE,
+          desc = "'编辑保存游戏:最新返水比例为:' + #rebateRate + ',最新打码计算成长值倍数为:' + #damaRate")
   public void updateGameKind(@RequestBody OperGameKindDTO dto) {
     gameKindService.updateGameKind(dto);
   }

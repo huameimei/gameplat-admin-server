@@ -1,6 +1,7 @@
 package com.gameplat.admin.service.impl;
 
 import cn.hutool.core.util.NumberUtil;
+import cn.hutool.crypto.SecureUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -220,7 +221,7 @@ public class ActivityQualificationServiceImpl
       }
       qm.setMaxMoney(maxMoney);
       qm.setWithdrawDml(withdrawDml);
-      qm.setSoleIdentifier(RandomUtil.generateOrderCode());
+      qm.setSoleIdentifier(SecureUtil.md5(cn.hutool.core.date.DateUtil.formatDate(new Date())));
       lobbyDiscount.sort(Comparator.comparingLong(ActivityLobbyDiscountDTO::getTargetValue));
       qm.setAwardDetail(JSON.parseArray(JSONObject.toJSONString(lobbyDiscount)).toJSONString());
       qm.setGetWay(activityLobbyDTO.getGetWay());

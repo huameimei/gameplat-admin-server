@@ -135,7 +135,7 @@ public class PlayController {
         checkChangeOddsLimit(gameId, data, admin);
         playService.updatePlayMaxOdds(Arrays.asList(data.getPlays()));
         gameHtmlManager.createCreditJson(gameId);
-        gameHtmlManager.gameCateHtml(gameId,1);
+        gameHtmlManager.gameCateHtml(gameId);
     }
 
     private void checkChangeOddsLimit(Integer gameId, PlayArrayVO data, Admin admin) throws Exception {

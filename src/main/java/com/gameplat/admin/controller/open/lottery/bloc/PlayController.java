@@ -15,6 +15,7 @@ import com.cz.gameplat.game.service.PlayService;
 import com.cz.gameplat.log.Log;
 import com.cz.gameplat.log.LogType;
 import com.cz.gameplat.sys.entity.Admin;
+import com.gameplat.base.common.exception.ServiceException;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -132,7 +133,7 @@ public class PlayController {
     @ResponseBody
     @Log(type = LogType.LOTTERY, content = "'修改赔率,游戏:'+T(com.cz.gameplat.log.LogUtil).lotteryTypeTranslate(#gameId)")
     public void savePlayMaxOdds(@RequestBody PlayArrayVO data, @PathVariable Integer gameId, @Session Admin admin) throws Exception {
-        checkChangeOddsLimit(gameId, data, admin);
+//        checkChangeOddsLimit(gameId, data, admin);
         playService.updatePlayMaxOdds(Arrays.asList(data.getPlays()));
         gameHtmlManager.createCreditJson(gameId);
         gameHtmlManager.gameCateHtml(gameId);
@@ -146,17 +147,17 @@ public class PlayController {
 
     private void checkChangeOddsLimit(Game game, PlayArrayVO data, Admin admin) throws Exception {
         if (game == null) {
-            throw new BusinessException("游戏不存在！");
+            throw new ServiceException("游戏不存在！");
         }
         // 非 dev 帐号且时间处于可调整范围外不允许修改赔率
         if (!isBoss(admin) && !isChangeOddsTimeValid(game.getId() == 70 || game.getId() == 76|| game.getId() == 151)) {
-            throw new BusinessException("为了确保赔率的安全合理，请于【早上8点至晚上8点】进行修改操作，以便我司风控人员为您进一步核对！（香港六合彩、澳门六合彩可额外于【晚上9点30至晚上11点】操作）");
+            throw new ServiceException("为了确保赔率的安全合理，请于【早上8点至晚上8点】进行修改操作，以便我司风控人员为您进一步核对！（香港六合彩、澳门六合彩可额外于【晚上9点30至晚上11点】操作）");
         }
         List<Play> playList = Stream.of(data.getPlays())
             .filter(p -> (p.getMaxOdds() > p.getOdds()) && (p.getLimitOdds() != 1))
             .collect(Collectors.toList());
         if (playList.size() > 0) {
-            throw new BusinessException(String.format("存在%d个赔率大于允许修改的最大赔率的玩法：%s", playList.size(),playList.stream().map(Play::getValue).collect(Collectors.joining(","))));
+            throw new ServiceException(String.format("存在%d个赔率大于允许修改的最大赔率的玩法：%s", playList.size(),playList.stream().map(Play::getValue).collect(Collectors.joining(","))));
         }
 //        if (70 == game.getId()) {
 //            int maxCount = 17;

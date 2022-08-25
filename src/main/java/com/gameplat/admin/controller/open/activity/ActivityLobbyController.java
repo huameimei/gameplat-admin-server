@@ -81,10 +81,6 @@ public class ActivityLobbyController {
       throw new ServiceException("请选择统计日期");
     }
     if (dto.getApplyWay() == ActivityInfoEnum.ApplyWay.AUTOMATIC.value()
-        && dto.getNextDayApply() == ActivityInfoEnum.NextDayApply.NO.value()) {
-      throw new ServiceException("自动申请的活动必须勾选隔天申请");
-    }
-    if (dto.getApplyWay() == ActivityInfoEnum.ApplyWay.AUTOMATIC.value()
             && dto.getNextDayApply() == ActivityInfoEnum.NextDayApply.NO.value()
             && dto.getStatisItem() != ActivityInfoEnum.StatisItem.SINGLE_DAY_DEPOSIT_AMOUNT.getValue()
             && dto.getStatisItem() != ActivityInfoEnum.StatisItem.FIRST_DEPOSIT_AMOUNT.getValue()

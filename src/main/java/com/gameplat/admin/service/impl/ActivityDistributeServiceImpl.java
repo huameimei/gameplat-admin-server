@@ -1,5 +1,6 @@
 package com.gameplat.admin.service.impl;
 
+import cn.hutool.core.date.DateUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
@@ -111,11 +112,11 @@ public class ActivityDistributeServiceImpl
         .ge(
             StringUtils.isNotBlank(dto.getApplyStartTime()),
             ActivityDistribute::getApplyTime,
-            dto.getApplyStartTime())
+            DateUtil.beginOfDay(DateUtil.parse(dto.getApplyStartTime())))
         .le(
             StringUtils.isNotBlank(dto.getApplyEndTime()),
             ActivityDistribute::getApplyTime,
-            dto.getApplyEndTime())
+            DateUtil.endOfDay(DateUtil.parse(dto.getApplyEndTime())))
         .orderByDesc(ActivityDistribute::getApplyTime);
 
     IPage<ActivityDistributeVO> iPage =

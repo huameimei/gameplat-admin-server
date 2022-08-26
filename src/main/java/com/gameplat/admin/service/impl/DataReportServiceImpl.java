@@ -248,7 +248,6 @@ public class DataReportServiceImpl extends ServiceImpl<DataReportMapper, GameRec
     BigDecimal totalGameBalance = gameTransferInfos.stream()
       .map(GameTransferInfo :: getLastBalance)
       .reduce(BigDecimal.ZERO, BigDecimal::add);
-    accountReportVo.setTransferInfoList(gameTransferInfos);
     accountReportVo.setTotalGameBalance(totalGameBalance);
     return accountReportVo;
   }

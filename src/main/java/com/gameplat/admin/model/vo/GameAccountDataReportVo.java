@@ -33,7 +33,5 @@ public class GameAccountDataReportVo implements Serializable {
   @Schema(description = "全部游戏余额")
   private BigDecimal totalGameBalance;
 
-  private List<GameTransferInfo> transferInfoList = new ArrayList<>();
-
   private List<AccountReportVo> list = new ArrayList<>();
 }

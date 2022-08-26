@@ -14,3 +14,4 @@ security:
       - /api/admin/spread/management/**
       - /websocket/**
       - /api/internal/**
+      - /api/admin/chat/plan/**

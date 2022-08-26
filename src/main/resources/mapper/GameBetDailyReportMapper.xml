@@ -94,7 +94,7 @@
     u.user_level as userLevel
     FROM game_bet_daily_report t
     left join member u
-    on t.member_id = u.id WHERE valid_amount > 0 AND platform_code != 'KGNL'
+    on t.member_id = u.id WHERE valid_amount > 0
     <choose>
       <when test="endDate == startDate">
         AND stat_time = #{startDate}

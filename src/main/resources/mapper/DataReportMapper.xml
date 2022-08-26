@@ -274,9 +274,27 @@
 
 
     <select id="findReportMemberBalance" parameterType="com.gameplat.admin.model.dto.GameRWDataReportDto" resultType="com.gameplat.admin.model.vo.AccountReportVo" >
-        select a.account account,a.balance goodMoney from ( select m.account account,CONVERT(info.balance,DECIMAL(22,2)) balance from member m INNER join
-        member_info info on m.id = info.member_id and info.balance > 0 where m.account != 'webRoot' and user_type in
-        ('M','A')
+        SELECT
+        a.account account,
+        a.balance goodMoney,
+        a.userGameBalance userGameBalance
+        FROM
+        (
+        SELECT
+        m.account account,
+        CONVERT (info.balance,DECIMAL ( 22, 2 )) balance,
+        userGameBalance
+        FROM
+        member m
+        INNER JOIN member_info info ON m.id = info.member_id
+        AND info.balance > 0
+        left JOIN (
+        select member_id, account, sum(last_balance) as userGameBalance from game_transfer_info_1  GROUP BY account order by account
+        ) as gt on m.id = gt.member_id
+
+        WHERE
+        m.account != 'webRoot'
+        AND user_type IN ( 'M', 'A' )
         <if test="dto.account != null and dto.account != ''">
             and account = #{dto.account}
         </if>

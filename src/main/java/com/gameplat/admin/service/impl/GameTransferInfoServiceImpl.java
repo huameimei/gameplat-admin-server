@@ -1,5 +1,6 @@
 package com.gameplat.admin.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.mapper.GameTransferInfoMapper;
@@ -34,10 +35,10 @@ public class GameTransferInfoServiceImpl
   GameTransferInfoMapper gameTransferInfoMapper;
 
   @Override
-  public List<GameTransferInfo> getAllGameTransferInfo() {
-    return this.lambdaQuery()
-      .ne(GameTransferInfo::getPlatformCode, TransferTypesEnum.SELF)
-      .list();
+  public BigDecimal getAllGameBalance() {
+
+    return gameTransferInfoMapper.getAllGameBalance();
+
   }
 
   @Override
@@ -45,7 +46,7 @@ public class GameTransferInfoServiceImpl
 
     return this.lambdaQuery()
       .eq(ObjectUtils.isNotNull(memberId), GameTransferInfo::getMemberId, memberId)
-      .ne(GameTransferInfo::getPlatformCode, TransferTypesEnum.SELF)
+      .ne(GameTransferInfo::getPlatformCode, TransferTypesEnum.SELF.getCode())
       .list();
   }
 
@@ -54,7 +55,7 @@ public class GameTransferInfoServiceImpl
     return this.lambdaQuery()
       .eq(ObjectUtils.isNotNull(memberId), GameTransferInfo::getMemberId, memberId)
       .eq(ObjectUtils.isNotNull(platformCode), GameTransferInfo::getPlatformCode, platformCode)
-      .ne(GameTransferInfo::getPlatformCode, TransferTypesEnum.SELF)
+      .ne(GameTransferInfo::getPlatformCode, TransferTypesEnum.SELF.getCode())
       .one();
   }
 

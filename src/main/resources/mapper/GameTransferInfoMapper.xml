@@ -24,5 +24,10 @@
         last_balance = #{lastBalance}
     </insert>
 
+    <select id="getAllGameBalance" resultType="java.math.BigDecimal">
+        select ifnull(sum(last_balance), 0) as allGameBalance
+        from game_transfer_info
+        where platform_code != 'SELF'
+    </select>
 
 </mapper>

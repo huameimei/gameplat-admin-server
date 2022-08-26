@@ -4,11 +4,12 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.gameplat.common.game.GameBizBean;
 import com.gameplat.model.entity.game.GameTransferInfo;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 public interface GameTransferInfoService extends IService<GameTransferInfo> {
 
-  List<GameTransferInfo> getAllGameTransferInfo();
+  BigDecimal getAllGameBalance();
 
   List<GameTransferInfo> getGameTransferInfoList(Long memberId);
 

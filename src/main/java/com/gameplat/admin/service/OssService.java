@@ -19,4 +19,13 @@ public interface OssService {
    * @return boolean
    */
   boolean remove(String filePath);
+
+
+  /**
+   *  上传单个文件
+   * @param file
+   * @param uploadBy
+   * @return
+   */
+  String upload(MultipartFile file,String uploadBy);
 }

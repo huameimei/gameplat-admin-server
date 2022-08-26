@@ -8,6 +8,8 @@ import java.util.List;
 
 public interface GameTransferInfoService extends IService<GameTransferInfo> {
 
+  List<GameTransferInfo> getAllGameTransferInfo();
+
   List<GameTransferInfo> getGameTransferInfoList(Long memberId);
 
   GameTransferInfo getGameTransferInfo(Long memberId, String platformCode);

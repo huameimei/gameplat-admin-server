@@ -1,5 +1,6 @@
 package com.gameplat.admin.model.vo;
 
+import com.gameplat.model.entity.game.GameTransferInfo;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -28,6 +29,11 @@ public class GameAccountDataReportVo implements Serializable {
 
   @Schema(description = " 全部会员")
   private int accountNum;
+
+  @Schema(description = "全部游戏余额")
+  private BigDecimal totalGameBalance;
+
+  private List<GameTransferInfo> transferInfoList = new ArrayList<>();
 
   private List<AccountReportVo> list = new ArrayList<>();
 }

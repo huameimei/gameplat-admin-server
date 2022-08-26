@@ -15,6 +15,7 @@ import com.gameplat.admin.model.dto.GameRWDataReportDto;
 import com.gameplat.admin.model.vo.*;
 import com.gameplat.admin.service.DataReportService;
 import com.gameplat.admin.service.GameAmountControlService;
+import com.gameplat.admin.service.GameTransferInfoService;
 import com.gameplat.admin.service.RechargeOrderService;
 import com.gameplat.base.common.util.StringUtils;
 import com.gameplat.common.enums.GameAmountControlTypeEnum;
@@ -27,12 +28,15 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import com.gameplat.model.entity.game.GameTransferInfo;
 import com.gameplat.model.entity.member.MemberInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
+
+import javax.annotation.Resource;
 
 /**
  * @author kb @Date 2022/3/2 21:49 @Version 1.0
@@ -239,8 +243,18 @@ public class DataReportServiceImpl extends ServiceImpl<DataReportMapper, GameRec
     } else {
       accountReportVo.setGameQuota(BigDecimal.ZERO);
     }
+    // 获取全部用户游戏额度
+    List<GameTransferInfo> gameTransferInfos = transferInfoService.getAllGameTransferInfo();
+    BigDecimal totalGameBalance = gameTransferInfos.stream()
+      .map(GameTransferInfo :: getLastBalance)
+      .reduce(BigDecimal.ZERO, BigDecimal::add);
+    accountReportVo.setTransferInfoList(gameTransferInfos);
+    accountReportVo.setTotalGameBalance(totalGameBalance);
     return accountReportVo;
   }
+
+  @Resource
+  private GameTransferInfoService transferInfoService;
 
   @Override
   public PageDtoVO findYubaoReportData(Page<YuBaoMemberBalanceVo> page, GameRWDataReportDto dto) {

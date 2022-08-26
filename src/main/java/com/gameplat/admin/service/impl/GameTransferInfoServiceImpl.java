@@ -34,10 +34,18 @@ public class GameTransferInfoServiceImpl
   GameTransferInfoMapper gameTransferInfoMapper;
 
   @Override
+  public List<GameTransferInfo> getAllGameTransferInfo() {
+    return this.lambdaQuery()
+      .ne(GameTransferInfo::getPlatformCode, TransferTypesEnum.SELF)
+      .list();
+  }
+
+  @Override
   public List<GameTransferInfo> getGameTransferInfoList(Long memberId) {
 
     return this.lambdaQuery()
       .eq(ObjectUtils.isNotNull(memberId), GameTransferInfo::getMemberId, memberId)
+      .ne(GameTransferInfo::getPlatformCode, TransferTypesEnum.SELF)
       .list();
   }
 
@@ -46,6 +54,7 @@ public class GameTransferInfoServiceImpl
     return this.lambdaQuery()
       .eq(ObjectUtils.isNotNull(memberId), GameTransferInfo::getMemberId, memberId)
       .eq(ObjectUtils.isNotNull(platformCode), GameTransferInfo::getPlatformCode, platformCode)
+      .ne(GameTransferInfo::getPlatformCode, TransferTypesEnum.SELF)
       .one();
   }
 

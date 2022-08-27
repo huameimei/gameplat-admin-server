@@ -245,7 +245,7 @@ public class DataReportServiceImpl extends ServiceImpl<DataReportMapper, GameRec
     }
     // 获取全部用户游戏额度
     BigDecimal totalGameBalance = transferInfoService.getAllGameBalance();
-    accountReportVo.setTotalGameBalance(totalGameBalance);
+    accountReportVo.setTotalBalance(totalGameBalance.add(allBalance));
     return accountReportVo;
   }
 

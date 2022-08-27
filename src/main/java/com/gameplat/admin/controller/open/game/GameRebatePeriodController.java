@@ -222,17 +222,16 @@ public class GameRebatePeriodController {
         }
       }
       // 更新状态
-      GameRebatePeriod gameRebatePeriod = new GameRebatePeriod();
-      gameRebatePeriod.setStatus(GameRebatePeriodStatus.ROLLBACKED.getValue());
       LambdaUpdateWrapper<GameRebatePeriod> updateWrapper = Wrappers.lambdaUpdate();
+      updateWrapper.set(GameRebatePeriod::getStatus, GameRebatePeriodStatus.ROLLBACKED.getValue());
       updateWrapper.eq(GameRebatePeriod::getId, dto.getId());
-      gameRebatePeriodService.update(gameRebatePeriod, updateWrapper);
+      gameRebatePeriodService.update(updateWrapper);
 
-      GameRebateReport gameRebateReport = new GameRebateReport();
-      gameRebatePeriod.setStatus(GameRebateReportStatus.ROLLBACKED.getValue());
       LambdaUpdateWrapper<GameRebateReport> reportUpdateWrapper = Wrappers.lambdaUpdate();
+      reportUpdateWrapper.set(
+          GameRebateReport::getStatus, GameRebateReportStatus.ROLLBACKED.getValue());
       reportUpdateWrapper.eq(GameRebateReport::getPeriodId, dto.getId());
-      if (!gameRebateReportService.update(gameRebateReport, reportUpdateWrapper)) {
+      if (!gameRebateReportService.update(reportUpdateWrapper)) {
         throw new ServiceException("更新游戏返水报表状态失败！");
       }
       //  添加游戏返水每日统计 由定时任务处理

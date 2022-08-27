@@ -1,9 +1,10 @@
 package com.gameplat.admin.model.vo;
 
+import lombok.Data;
+
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
-import lombok.Data;
 
 @Data
 public class GameMemberDayReportVO implements Serializable {
@@ -19,6 +20,9 @@ public class GameMemberDayReportVO implements Serializable {
 
   /** 用户真实姓名 */
   private String realName;
+
+  /** 账号 */
+  private String superAccount;
 
   /** 代理路径 */
   private String userPaths;

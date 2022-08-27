@@ -162,6 +162,10 @@ public class GameRebateReportServiceImpl
             GameRebateReport::getAccount,
             dto.getUserAccount())
         .eq(
+            ObjectUtils.isNotEmpty(dto.getPeriodId()),
+            GameRebateReport::getPeriodId,
+            dto.getPeriodId())
+        .eq(
             ObjectUtils.isNotEmpty(dto.getPeriodName()),
             GameRebateReport::getPeriodName,
             dto.getPeriodName())
@@ -269,14 +273,26 @@ public class GameRebateReportServiceImpl
 
   private GameRebateReport formatGameRebateReport(
       GameRebatePeriod period, GameMemberDayReportVO memberDayReport, BigDecimal rebate) {
+    // 校验，此统计日期已存在的返水报表
+    String statTime = memberDayReport.getStatTime();
+    // 此会员当前统计日期已经结算了返水的有效投注了
+    BigDecimal existRebateValidAmount =
+        gameRebateReportMapper.statisValidAmountByTime(
+            statTime, memberDayReport.getAccount(), memberDayReport.getGameKind(), period.getId());
+    if (existRebateValidAmount.compareTo(BigDecimal.ZERO) > 0) {
+      BigDecimal subValidAmount = memberDayReport.getValidAmount().subtract(existRebateValidAmount);
+      memberDayReport.setValidAmount(
+          subValidAmount.compareTo(BigDecimal.ZERO) > 0 ? subValidAmount : BigDecimal.ZERO);
+    }
     GameRebateReport gameRebateReport = new GameRebateReport();
     BeanUtils.copyProperties(memberDayReport, gameRebateReport);
     gameRebateReport.setId(null);
-    gameRebateReport.setRemark(period.getName() + "-游戏返水");
+    gameRebateReport.setRemark(statTime + "-游戏返水, 返点率:" + rebate + "%");
     gameRebateReport.setPeriodId(period.getId());
     gameRebateReport.setPeriodName(period.getName());
-    gameRebateReport.setBeginDate(period.getBeginDate());
-    gameRebateReport.setEndDate(period.getEndDate());
+    gameRebateReport.setBeginDate(DateUtil.beginOfDay(DateUtil.parse(statTime)));
+    //    gameRebateReport.setEndDate(DateUtil.endOfDay(DateUtil.parse(statTime)));
+    gameRebateReport.setEndDate(DateUtil.beginOfDay(DateUtil.parse(statTime)));
     gameRebateReport.setStatus(GameRebateReportStatus.UNACCEPTED.getValue());
     BigDecimal rebateMoney =
         NumberUtil.div(
@@ -345,6 +361,10 @@ public class GameRebateReportServiceImpl
       Long periodId, Long memberId, BigDecimal realRebateMoney, String remark, String statTime)
       throws Exception {
     verifyAndUpdate(memberId, periodId, GameRebateReportStatus.ACCEPTED.getValue(), remark);
+    if (realRebateMoney.compareTo(BigDecimal.ZERO) <= 0) {
+      return;
+    }
+
     LimitInfo limitInfo = limitInfoService.getLimitInfo(LimitEnums.MEMBER_WITHDRAW_LIMIT.getName());
     if (ObjectUtils.isNull(limitInfo)) {
       throw new ServiceException("未找到会员提现限制配置");
@@ -446,11 +466,16 @@ public class GameRebateReportServiceImpl
       Long memberId, Long periodId, String periodName, BigDecimal realRebateMoney, String remark) {
 
     rollBackAndUpdate(memberId, periodId, GameRebateReportStatus.ROLLBACKED.getValue(), remark);
+    if (realRebateMoney.compareTo(BigDecimal.ZERO) <= 0) {
+      return;
+    }
+
     MemberInfoVO member = memberService.getInfo(memberId);
     // 批量修改打码量--游戏返水优惠打码量设为0
     validWithdrawService.rollGameRebateDml(remark);
     // 写账变
     MemberBill memberBill = new MemberBill();
+    memberBill.setOrderNo(String.valueOf(IdGeneratorSnowflake.getInstance().nextId()));
     memberBill.setMemberId(member.getId());
     memberBill.setAccount(member.getAccount());
     memberBill.setMemberPath(member.getSuperPath());

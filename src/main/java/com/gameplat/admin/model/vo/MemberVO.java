@@ -37,6 +37,18 @@ public class MemberVO implements Serializable {
   @Excel(name = "手机号", width = 18, isImportField = "true_st")
   private String phone;
 
+  /** QQ */
+  @Excel(name = "QQ", width = 18, isImportField = "true_st")
+  private String qq;
+
+  /** 微信 */
+  @Excel(name = "微信", width = 18, isImportField = "true_st")
+  private String wechat;
+
+  /** 邮箱 */
+  @Excel(name = "邮箱", width = 18, isImportField = "true_st")
+  private String email;
+
   @Excel(name = "VIP等级", width = 8, isImportField = "true_st")
   @Schema(description = "VIP等级")
   private Integer vipLevel;

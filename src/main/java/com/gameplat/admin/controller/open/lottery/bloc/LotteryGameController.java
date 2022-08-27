@@ -153,7 +153,7 @@ public class LotteryGameController {
     Date restEndDate = bean.getRestEndDate();
     for (Integer id : ids) {
       gameService.updateGameRestDate(id, restStartDate, restEndDate);
-      this.gameHtmlManager.gameCateHtml(id,1);
+      this.gameHtmlManager.gameCateHtml(id);
     }
     // operateLogService.saveOperateLog(userInfo.getUserId(), userInfo.getUserName(),
     // "设置游戏公休时间和排序号，游戏ID：" + game.getId());
@@ -171,7 +171,7 @@ public class LotteryGameController {
     if (gameId == null) {
       throw new ParaException("请求参数异常");
     }
-    this.gameHtmlManager.gameCateHtml(gameId, 1);
+    this.gameHtmlManager.gameCateHtml(gameId);
   }
 
   /**

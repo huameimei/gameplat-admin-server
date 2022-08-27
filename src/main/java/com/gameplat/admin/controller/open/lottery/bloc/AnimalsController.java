@@ -50,7 +50,7 @@ public class AnimalsController {
     List<Game> games = gameService.queryAll();
     for (Game game: games) {
       if ("lhc".equalsIgnoreCase(game.getType())) {
-        gameHtmlManager.gameCateHtml(game.getId(),1);
+        gameHtmlManager.gameCateHtml(game.getId());
       }
     }
     return;

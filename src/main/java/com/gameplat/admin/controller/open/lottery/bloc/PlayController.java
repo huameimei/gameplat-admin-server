@@ -118,7 +118,7 @@ public class PlayController {
         playCateService.updatePlayCates(Arrays.asList(vo.getPlayCates()), vo.getGameId(),
                 vo.getUserId());
         gameHtmlManager.createCreditJson(vo.getGameId());
-        gameHtmlManager.gameCateHtml(vo.getGameId(),1);
+        gameHtmlManager.gameCateHtml(vo.getGameId());
         return;
     }
 
@@ -209,7 +209,7 @@ public class PlayController {
             .collect(Collectors.toList());
         playService.batchUpdatePlayMaxOdds(plays);
         gameHtmlManager.createCreditJson(gameId);
-        gameHtmlManager.gameCateHtml(gameId,1);
+        gameHtmlManager.gameCateHtml(gameId);
     }
 
     private static final Set<String> TM_OR_YXZ = Stream.of("200101001", "202101").collect(Collectors.toSet());
@@ -269,7 +269,7 @@ public class PlayController {
         }
         for (Game game1 : gameList) {
             gameHtmlManager.createCreditJson(game1.getId());
-            gameHtmlManager.gameCateHtml(game1.getId(),1);
+            gameHtmlManager.gameCateHtml(game1.getId());
         }
     }
 }

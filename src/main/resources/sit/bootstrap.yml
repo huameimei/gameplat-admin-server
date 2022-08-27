@@ -1,4 +1,16 @@
 spring:
+  freemarker:
+    allow-request-override: false
+    cache: true
+    check-template-location: true
+    charset: UTF-8
+    suffix: .html
+    templateEncoding: UTF-8
+    templateLoaderPath: classpath:/template/
+    content-type: text/html
+    expose-request-attributes: false
+    expose-session-attributes: false
+    expose-spring-macro-helpers: false
   application:
     name: admin-server
   main:

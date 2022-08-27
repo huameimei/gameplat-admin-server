@@ -313,11 +313,13 @@ public class DataReportServiceImpl extends ServiceImpl<DataReportMapper, GameRec
     Page<AccountReportVo> reportMemberBalance = dataReportMapper.findReportMemberBalance(dto, page);
     // 全部平台钱包余额
     BigDecimal allPlatformBalance = dataReportMapper.findReportMemberAllBalance(dto);
-
+    // 获取全部用户游戏额度
+    BigDecimal totalGameBalance = transferInfoService.getAllGameBalance();
     PageDtoVO<AccountReportVo> pageDtoVO = new PageDtoVO<>();
     pageDtoVO.setPage(reportMemberBalance);
     Map<String, Object> map = new HashMap<String, Object>();
-    map.put("allPlatformBalance", allPlatformBalance);
+    map.put("allBalance", allPlatformBalance);
+    map.put("totalGameBalance", totalGameBalance);
     pageDtoVO.setOtherData(map);
     return pageDtoVO;
   }

@@ -12,7 +12,7 @@
         <if test="lastBalance != null and lastBalance != ''">last_balance,</if>
         create_time
         ) values (
-        #{memberId}
+        #{memberId},
         <if test="account != null and account != ''">#{account},</if>
         <if test="order_no != null and order_no != ''">#{orderNo},</if>
         <if test="platformCode != null and platformCode != ''">#{platformCode},</if>

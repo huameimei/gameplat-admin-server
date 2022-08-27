@@ -10,14 +10,14 @@
         <if test="orderNo != null and orderNo != ''">order_no,</if>
         <if test="platformCode != null and platformCode != ''">platform_code,</if>
         <if test="lastBalance != null and lastBalance != ''">last_balance,</if>
-        create_time
+        create_time, update_time
         ) values (
         #{memberId},
         <if test="account != null and account != ''">#{account},</if>
         <if test="orderNo != null and orderNo != ''">#{orderNo},</if>
         <if test="platformCode != null and platformCode != ''">#{platformCode},</if>
         <if test="lastBalance != null and lastBalance != ''">#{lastBalance},</if>
-        sysdate() )
+        sysdate(), sysdate())
         ON DUPLICATE KEY UPDATE
         <if test='orderNo != null and orderNo != ""'>order_no = #{orderNo},</if>
         update_time = sysdate(),

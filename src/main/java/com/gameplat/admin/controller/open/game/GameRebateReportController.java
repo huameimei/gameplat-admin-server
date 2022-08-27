@@ -46,7 +46,8 @@ public class GameRebateReportController {
     type =  LogType.ADMIN,
     desc = "'游戏返水报表-->游戏返点拒发:' + #dto" )
   public void reject(@RequestBody OperGameRebateDetailDTO dto) {
-    gameRebateReportService.reject(dto.getAccount(), dto.getPeriodName(), dto.getRemark());
+    gameRebateReportService.reject(
+        dto.getAccount(), dto.getPeriodId(), dto.getPeriodName(), dto.getRemark());
   }
 
   @Operation(summary = "游戏返点更改")

@@ -124,9 +124,9 @@ public class GameRebateReportServiceImpl
 
   /** 游戏返水拒发 */
   @Override
-  public void reject(String account, String periodName, String remark) {
+  public void reject(String account, Long periodId, String periodName, String remark) {
     QueryWrapper<GameRebateDetail> query = Wrappers.query();
-    query.eq("account", account).eq("period_name", periodName);
+    query.eq("account", account).eq("period_id", periodId).eq("period_name", periodName);
     GameRebateDetail gameRebateDetail = gameRebateDetailMapper.selectOne(query);
     verifyAndUpdate(
         gameRebateDetail.getMemberId(),

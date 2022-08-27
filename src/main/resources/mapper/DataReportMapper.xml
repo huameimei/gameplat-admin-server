@@ -289,7 +289,7 @@
         INNER JOIN member_info info ON m.id = info.member_id
         AND info.balance > 0
         left JOIN (
-        select member_id, account, sum(last_balance) as userGameBalance from game_transfer_info_1  GROUP BY account order by account
+        select member_id, account, sum(last_balance) as userGameBalance from game_transfer_info  GROUP BY account order by account
         ) as gt on m.id = gt.member_id
 
         WHERE

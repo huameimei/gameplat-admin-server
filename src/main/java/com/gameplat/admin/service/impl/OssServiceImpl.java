@@ -54,6 +54,21 @@ public class OssServiceImpl implements OssService {
     return fileStorageStrategyContext.getProvider(config).delete(filePath);
   }
 
+  @Override
+  @SneakyThrows
+  public String upload(MultipartFile file, String uploadBy) {
+    String randomFilename = this.getRandomFilename(file);
+    fileStorageStrategyContext
+            .getProvider(config)
+            .upload(file.getInputStream(), file.getContentType(), randomFilename);
+
+
+    String accessUrl = this.getAccessUrl(config, randomFilename);
+    // 异步保存文件记录
+    asyncSaveFileRecordService.asyncSave(file, accessUrl, config.getProvider(), uploadBy);
+    return accessUrl;
+  }
+
   private String getRandomFilename(MultipartFile file) {
     return UUID.fastUUID() + "." + FileUtil.getSuffix(file.getOriginalFilename());
   }

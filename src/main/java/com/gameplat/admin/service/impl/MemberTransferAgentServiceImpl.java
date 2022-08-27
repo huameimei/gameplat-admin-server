@@ -16,6 +16,7 @@ import com.gameplat.admin.service.*;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.json.JsonUtils;
 import com.gameplat.base.common.util.StringUtils;
+import com.gameplat.common.constant.CachedKeys;
 import com.gameplat.common.enums.GamePlatformEnum;
 import com.gameplat.common.enums.MemberEnums;
 import com.gameplat.common.enums.TransferTypesEnum;
@@ -30,6 +31,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -69,6 +71,9 @@ public class MemberTransferAgentServiceImpl implements MemberTransferAgentServic
   @Autowired private DistributedLocker distributedLocker;
 
   @Autowired private StringRedisTemplate stringRedisTemplate;
+
+  @Autowired(required = false)
+  private RedisTemplate<String, Object> redisTemplate;
 
   @Autowired private KgAgentService kgAgentService;
 
@@ -197,6 +202,13 @@ public class MemberTransferAgentServiceImpl implements MemberTransferAgentServic
             .update();
     // 修改相关表userType
     Integer integer = transferAgentMapper.changeToAgent(member.getAccount(), memberId);
+  }
+
+
+  @Override
+  public void memberDevice(String username) {
+    String keys = String.format(CachedKeys.MEMBER_VERIFY, username);
+    redisTemplate.opsForValue().set(keys, username, 600, TimeUnit.SECONDS);
   }
 
   private Member getMemberByAccount(String account, String errorMessage) {

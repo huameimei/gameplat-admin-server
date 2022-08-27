@@ -32,6 +32,7 @@ import com.gameplat.common.enums.RechargeStatus;
 import com.gameplat.model.entity.activity.ActivityDistribute;
 import com.gameplat.model.entity.activity.ActivityLobby;
 import com.gameplat.model.entity.activity.ActivityQualification;
+import com.gameplat.model.entity.member.Member;
 import com.gameplat.model.entity.recharge.RechargeOrderHistory;
 import com.gameplat.security.SecurityUserHolder;
 import com.google.common.collect.Lists;
@@ -372,6 +373,7 @@ public class ActivityQualificationServiceImpl
       for (ActivityQualification activityQualification : qualificationManageStatusList) {
         // 大厅活动添加派发记录
         if (activityQualification.getActivityType() == 1) {
+          Member member = memberService.getById(activityQualification.getUserId());
           // 插入活动大厅派发记录
           ad = new ActivityDistribute();
           ad.setUserId(Long.getLong(activityQualification.getUserId().toString()));
@@ -400,6 +402,9 @@ public class ActivityQualificationServiceImpl
           ad.setStatisStartTime(activityQualification.getStatisStartTime());
           ad.setStatisEndTime(activityQualification.getStatisEndTime());
           ad.setGetWay(activityQualification.getGetWay());
+          ad.setParentId(member.getParentId());
+          ad.setParentName(member.getParentName());
+          ad.setAgentPath(member.getSuperPath());
           activityDistributeList.add(ad);
         }
       }

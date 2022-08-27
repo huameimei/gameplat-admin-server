@@ -1,7 +1,10 @@
 package com.gameplat.admin.service.impl;
 
+import cn.hutool.core.date.DateTime;
+import cn.hutool.core.date.DateUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -32,6 +35,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * 活动分发类
@@ -92,34 +96,38 @@ public class ActivityDistributeServiceImpl
   public PageExt<IPage<ActivityDistributeVO>, ActivityDistributeStatisticsVO> list(
       PageDTO<ActivityDistribute> page, ActivityDistributeQueryDTO dto) {
     LambdaQueryChainWrapper<ActivityDistribute> lambdaQuery = this.lambdaQuery();
-    lambdaQuery
-        // 未删除
-        .eq(ActivityDistribute::getDeleteFlag, BooleanEnum.YES.value())
-        .like(
-            StringUtils.isNotBlank(dto.getUsername()),
-            ActivityDistribute::getUsername,
-            dto.getUsername())
-        .eq(
-            dto.getActivityId() != null && dto.getActivityId() != 0,
-            ActivityDistribute::getActivityId,
-            dto.getActivityId())
-        .eq(dto.getStatus() != null, ActivityDistribute::getStatus, dto.getStatus())
-        .eq(
-            dto.getGetWay() != null && dto.getGetWay() != 0,
-            ActivityDistribute::getGetWay,
-            dto.getGetWay())
-        .ge(
-            StringUtils.isNotBlank(dto.getApplyStartTime()),
-            ActivityDistribute::getApplyTime,
-            dto.getApplyStartTime())
-        .le(
-            StringUtils.isNotBlank(dto.getApplyEndTime()),
-            ActivityDistribute::getApplyTime,
-            dto.getApplyEndTime())
-        .orderByDesc(ActivityDistribute::getApplyTime);
-
     IPage<ActivityDistributeVO> iPage =
-        lambdaQuery.page(page).convert(activityDistributeConvert::toVo);
+      this.lambdaQuery()
+          // 未删除
+          .eq(ActivityDistribute::getDeleteFlag, BooleanEnum.YES.value())
+          .like(
+              StringUtils.isNotBlank(dto.getUsername()),
+              ActivityDistribute::getUsername,
+              dto.getUsername())
+          .eq(
+              dto.getActivityId() != null && dto.getActivityId() != 0,
+              ActivityDistribute::getActivityId,
+              dto.getActivityId())
+          .eq(dto.getStatus() != null, ActivityDistribute::getStatus, dto.getStatus())
+          .eq(
+              dto.getGetWay() != null && dto.getGetWay() != 0,
+              ActivityDistribute::getGetWay,
+              dto.getGetWay())
+          .le(
+              ObjectUtils.isNotEmpty(dto.getApplyEndTime()),
+              ActivityDistribute::getApplyTime,
+              DateUtil.endOfDay(
+                  Optional.ofNullable(DateUtil.parse(dto.getApplyEndTime()))
+                      .orElse(DateTime.now())))
+          .ge(
+              ObjectUtils.isNotEmpty(dto.getApplyStartTime()),
+              ActivityDistribute::getApplyTime,
+              DateUtil.beginOfDay(
+                  Optional.ofNullable(DateUtil.parse(dto.getApplyStartTime()))
+                      .orElse(DateTime.now())))
+          .orderByDesc(ActivityDistribute::getApplyTime)
+          .page(page)
+          .convert(activityDistributeConvert::toVo);
     BigDecimal subtotalMoney = BigDecimal.ZERO;
     if (CollectionUtils.isNotEmpty(iPage.getRecords())) {
       for (ActivityDistributeVO vo : iPage.getRecords()) {

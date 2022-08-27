@@ -20,4 +20,12 @@ public interface MemberTransferAgentService {
    * @param memberId
    */
   void changeToAgent(Long memberId);
+
+
+  /**
+   * 会员设备变更认证
+   *
+   * @param username
+   */
+  void memberDevice(String username);
 }

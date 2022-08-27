@@ -470,6 +470,11 @@ public class ProxyPayServiceImpl implements ProxyPayService {
         bankCode = ex.getCode();
         break;
       }
+      if (StringUtils.contains(ex.getName().toLowerCase(), memberWithdraw.getWithdrawType().toLowerCase())
+              || StringUtils.contains(memberWithdraw.getWithdrawType().toLowerCase(), ex.getName().toLowerCase())) {
+        bankCode = ex.getCode();
+        break;
+      }
     }
 
     if (StringUtils.isBlank(bankCode)) {

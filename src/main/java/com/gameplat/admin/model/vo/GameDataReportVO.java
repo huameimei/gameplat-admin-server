@@ -31,8 +31,4 @@ public class GameDataReportVO implements Serializable {
     this.allWaterAmount = BigDecimal.ZERO;
   }
 
-  // 以公司为维度取相反数
-  public BigDecimal getAllWinAmount() {
-    return this.allWinAmount.negate();
-  }
 }

@@ -307,6 +307,7 @@
                     <include>*.json</include>
                     <include>*.xml</include>
                     <include>*.txt</include>
+                    <include>template/**</include>
                     <include>*.xlsx</include>
                     <include>*.yml</include>
                     <include>**/*.sql</include>

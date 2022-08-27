@@ -287,13 +287,13 @@
         FROM
         member m
         INNER JOIN member_info info ON m.id = info.member_id
-        AND info.balance > 0
         left JOIN (
         select member_id, account, sum(last_balance) as userGameBalance from game_transfer_info  GROUP BY account order by account
         ) as gt on m.id = gt.member_id
 
         WHERE
-        m.account != 'webRoot'
+        (info.balance > 0 or gt.userGameBalance > 0)
+        AND m.account != 'webRoot'
         AND m.user_type IN ( 'M', 'A' )
         <if test="dto.account != null and dto.account != ''">
             and m.account = #{dto.account}

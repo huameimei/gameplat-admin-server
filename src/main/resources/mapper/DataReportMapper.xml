@@ -198,8 +198,8 @@
             game_type gameType,
             sum(bet_amount) betAmount,
             sum(valid_amount) validAmount,
-            sum(win_amount) winAmount,
-            sum(valid_amount+win_amount) payoutAmount,
+            sum(win_amount)*-1 winAmount,
+            sum(valid_amount + win_amount) payoutAmount,
             count(DISTINCT account) gameNum
         from game_bet_daily_report
         <where>

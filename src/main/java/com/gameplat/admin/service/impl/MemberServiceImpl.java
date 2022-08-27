@@ -662,14 +662,6 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
       member.setGameAccount(gameAccount.append(suffix).toString());
       Assert.isTrue(this.updateById(member), "添加会员游戏账号信息!");
     }
-    // 会员余额存在哪个游戏中
-    if (ObjectUtil.isNull(gameTransferInfoService.getInfoByMemberId(member.getId()))) {
-      GameTransferInfo gameTransferInfo = new GameTransferInfo();
-      gameTransferInfo.setPlatformCode(TransferTypesEnum.SELF.getCode());
-      gameTransferInfo.setAccount(member.getAccount());
-      gameTransferInfo.setMemberId(member.getId());
-      gameTransferInfoService.saveOrUpdate(gameTransferInfo);
-    }
     return member;
   }
 

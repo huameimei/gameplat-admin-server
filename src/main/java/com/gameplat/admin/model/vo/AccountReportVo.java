@@ -16,4 +16,9 @@ public class AccountReportVo implements Serializable {
 
   /** 余额 */
   private BigDecimal goodMoney;
+
+  /**
+   * 用户游戏总余额
+   */
+  private BigDecimal userGameBalance;
 }

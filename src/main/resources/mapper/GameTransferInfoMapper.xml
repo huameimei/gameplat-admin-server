@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gameplat.admin.mapper.GameTransferInfoMapper">
+
+    <insert id="saveOrUpdate" parameterType="com.gameplat.model.entity.game.GameTransferInfo">
+        insert into `game_transfer_info` (
+        member_id,
+        <if test="account != null and account != ''">account,</if>
+        <if test="order_no != null and order_no != ''">order_no,</if>
+        <if test="platform_code != null and platform_code != ''">platform_code,</if>
+        <if test="last_balance != null and last_balance != ''">last_balance,</if>
+        create_time
+        ) values (
+        #{memberId}
+        <if test="account != null and account != ''">#{account},</if>
+        <if test="order_no != null and order_no != ''">#{orderNo},</if>
+        <if test="platform_code != null and platform_code != ''">#{platformCode},</if>
+        <if test="last_balance != null and last_balance != ''">#{lastBalance},</if>
+        sysdate() )
+        ON DUPLICATE KEY UPDATE
+        <if test='orderNo != null and orderNo != ""'>order_no = #{orderNo},</if>
+        update_time = sysdate(),
+        last_balance = #{lastBalance}
+    </insert>
+
+    <select id="getAllGameBalance" resultType="java.math.BigDecimal">
+        select ifnull(sum(last_balance), 0) as allGameBalance
+        from game_transfer_info
+        where platform_code != 'SELF'
+    </select>
+
+</mapper>

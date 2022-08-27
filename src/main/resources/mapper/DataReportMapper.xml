@@ -294,17 +294,17 @@
 
         WHERE
         m.account != 'webRoot'
-        AND user_type IN ( 'M', 'A' )
+        AND m.user_type IN ( 'M', 'A' )
         <if test="dto.account != null and dto.account != ''">
-            and account = #{dto.account}
+            and m.account = #{dto.account}
         </if>
         <if test="dto.superAccount != null and dto.superAccount != null">
             <choose>
                 <when test="dto.flag != null and dto.flag == 1">
-                    AND parent_name = #{dto.superAccount}
+                    AND m.parent_name = #{dto.superAccount}
                 </when>
                 <otherwise>
-                    AND super_path like concat('%',#{dto.superAccount},'%')
+                    AND m.super_path like concat('%',#{dto.superAccount},'%')
                 </otherwise>
             </choose>
         </if>

@@ -29,7 +29,7 @@ public interface GameRebateReportService extends IService<GameRebateReport> {
 
   PageDtoVO<GameRebateDetail> queryPage(Page<GameRebateDetail> page, GameRebateReportQueryDTO dto);
 
-  void reject(String account, String periodName, String remark);
+  void reject(String account, Long periodId, String periodName, String remark);
 
   void modify(Long id, BigDecimal realRebateMoney, String remark);
 

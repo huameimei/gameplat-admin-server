@@ -113,4 +113,13 @@
     GROUP BY rr.platform_code) s2 on s1.platform_code=s2.platform_code
   </select>
 
+
+  <select id="statisValidAmountByTime" resultType="java.math.BigDecimal">
+    SELECT IFNULL(sum(valid_amount), 0) FROM `game_rebate_report`
+    where account = #{account}
+    and game_kind = #{gameKind}
+    and stat_time = #{statTime}
+    and period_id != #{periodId}
+  </select>
+
 </mapper>

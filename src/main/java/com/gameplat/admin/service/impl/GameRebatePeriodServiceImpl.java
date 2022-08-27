@@ -24,13 +24,14 @@ import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.DateUtils;
 import com.gameplat.base.common.util.StringUtils;
 import com.gameplat.model.entity.game.GameRebatePeriod;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
 
 @Service
 @Transactional(isolation = Isolation.DEFAULT, rollbackFor = Throwable.class)
@@ -83,7 +84,8 @@ public class GameRebatePeriodServiceImpl
   public void addGameRebatePeriod(OperGameRebatePeriodDTO dto) {
     GameRebatePeriod gameRebatePeriod = gameRebatePeriodConvert.toEntity(dto);
     gameRebatePeriod.setStatus(GameRebatePeriodStatus.UNSETTLED.getValue());
-    prePersist(gameRebatePeriod);
+    // 之后不需要校验了，结算时有做重复处理
+    //    prePersist(gameRebatePeriod);
     if (!this.save(gameRebatePeriod)) {
       throw new ServiceException("新增真人返点期数配置失败!");
     }

@@ -7,16 +7,16 @@
         insert into `game_transfer_info` (
         member_id,
         <if test="account != null and account != ''">account,</if>
-        <if test="order_no != null and order_no != ''">order_no,</if>
-        <if test="platform_code != null and platform_code != ''">platform_code,</if>
-        <if test="last_balance != null and last_balance != ''">last_balance,</if>
+        <if test="orderNo != null and orderNo != ''">order_no,</if>
+        <if test="platformCode != null and platformCode != ''">platform_code,</if>
+        <if test="lastBalance != null and lastBalance != ''">last_balance,</if>
         create_time
         ) values (
         #{memberId}
         <if test="account != null and account != ''">#{account},</if>
         <if test="order_no != null and order_no != ''">#{orderNo},</if>
-        <if test="platform_code != null and platform_code != ''">#{platformCode},</if>
-        <if test="last_balance != null and last_balance != ''">#{lastBalance},</if>
+        <if test="platformCode != null and platformCode != ''">#{platformCode},</if>
+        <if test="lastBalance != null and lastBalance != ''">#{lastBalance},</if>
         sysdate() )
         ON DUPLICATE KEY UPDATE
         <if test='orderNo != null and orderNo != ""'>order_no = #{orderNo},</if>

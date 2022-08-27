@@ -14,7 +14,7 @@
         ) values (
         #{memberId}
         <if test="account != null and account != ''">#{account},</if>
-        <if test="order_no != null and order_no != ''">#{orderNo},</if>
+        <if test="orderNo != null and orderNo != ''">#{orderNo},</if>
         <if test="platformCode != null and platformCode != ''">#{platformCode},</if>
         <if test="lastBalance != null and lastBalance != ''">#{lastBalance},</if>
         sysdate() )

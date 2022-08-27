@@ -17,6 +17,14 @@ public interface GameService extends IService<Game> {
   void updateGame(OperGameDTO operGameDTO);
 
   /**
+   * 检查游戏是否在维护中
+   *
+   * @param platformCode String
+   */
+  boolean checkTransferMainTime(String platformCode);
+
+
+  /**
    * 通过游戏类型查询游戏列表
    *
    * @param gameTypeCode

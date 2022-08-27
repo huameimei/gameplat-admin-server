@@ -3,4 +3,11 @@ package com.gameplat.admin.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.gameplat.model.entity.game.GameTransferInfo;
 
-public interface GameTransferInfoMapper extends BaseMapper<GameTransferInfo> {}
+import java.math.BigDecimal;
+
+public interface GameTransferInfoMapper extends BaseMapper<GameTransferInfo> {
+
+  void saveOrUpdate(GameTransferInfo gameTransferInfo);
+
+  BigDecimal getAllGameBalance();
+}

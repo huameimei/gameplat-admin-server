@@ -1,12 +1,22 @@
 package com.gameplat.admin.model.dto;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
 
 @Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class GameBizDTO implements Serializable {
+
+  private static final long serialVersionUID = 7651516062499623824L;
+  /** 会员账号 */
+  private String account;
   /** 平台编码 */
   private String platformCode;
 

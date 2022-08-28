@@ -85,8 +85,7 @@ public class GameTransferInfoServiceImpl
 
     GameApi gameApi = getGameApi(gameTransferInfo.getPlatformCode());
     BigDecimal balance = gameApi.getBalance(gameBizBean);
-    GameTransferInfo transferInfo = new GameTransferInfo();
-    transferInfo.setLastBalance(balance);
+    gameTransferInfo.setLastBalance(balance);
     // 更新游戏余额
     gameTransferInfoMapper.saveOrUpdate(gameTransferInfo);
   }

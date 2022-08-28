@@ -132,4 +132,10 @@ public interface SysSettingService extends IService<SysSetting> {
      * 修改体育配置
      */
     int updateSportConfig(SportConfigVO sportConfigVo);
+
+    /**
+     * 初始化注单菜单
+     * @return
+     */
+    List<SysSetting> initBettingMenu();
 }

@@ -8,6 +8,9 @@ public interface Constants {
   /** 租户设置类型常量类 */
   String TEMPLATE_CONFIG_THEME = "template_config_theme";
 
+  /**注单设置菜单*/
+  String TEMPLATE_BETTING_MENU = "template_betting_menu";
+
   String TEMPLATE_CONFIG_TYPE = "template_config_type";
   String SETTING_LANGUAGE = "tenant_language";
   String SETTING_APP_NAVIGATION = "app_navigation";
@@ -32,6 +35,12 @@ public interface Constants {
   String LIST_SORT_CODE = "listSort";
 
   String LIST_SORT_DESC = "体育配置场景6排序开关列表";
+
+  String SPORTS_BET = "体育注单";
+
+  String GAMES_BET = "游戏注单";
+
+  String LOTTERY_BET = "彩票注单";
   /**
    * 色值设置
    */

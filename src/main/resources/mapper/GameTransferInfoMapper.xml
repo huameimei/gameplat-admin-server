@@ -9,19 +9,19 @@
         <if test="account != null and account != ''">account,</if>
         <if test="orderNo != null and orderNo != ''">order_no,</if>
         <if test="platformCode != null and platformCode != ''">platform_code,</if>
-        <if test="lastBalance != null and lastBalance != ''">last_balance,</if>
-        create_time
+        <if test="lastBalance != null">last_balance,</if>
+        create_time, update_time
         ) values (
         #{memberId},
         <if test="account != null and account != ''">#{account},</if>
-        <if test="order_no != null and order_no != ''">#{orderNo},</if>
+        <if test="orderNo != null and orderNo != ''">#{orderNo},</if>
         <if test="platformCode != null and platformCode != ''">#{platformCode},</if>
-        <if test="lastBalance != null and lastBalance != ''">#{lastBalance},</if>
-        sysdate() )
+        <if test="lastBalance != null">#{lastBalance},</if>
+        sysdate(), sysdate())
         ON DUPLICATE KEY UPDATE
         <if test='orderNo != null and orderNo != ""'>order_no = #{orderNo},</if>
-        update_time = sysdate(),
-        last_balance = #{lastBalance}
+        <if test='lastBalance != null'>last_balance = #{lastBalance},</if>
+        update_time = sysdate()
     </insert>
 
     <select id="getAllGameBalance" resultType="java.math.BigDecimal">

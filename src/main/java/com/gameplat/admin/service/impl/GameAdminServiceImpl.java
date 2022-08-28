@@ -414,7 +414,7 @@ public class GameAdminServiceImpl implements GameAdminService {
               .build();
       gameApi.transfer(gameBizBean);
       status = GameTransferStatus.SUCCESS.getValue();
-      // 7. 更新游戏额度
+      // 7. 异步更新游戏额度
       GameTransferInfo transferInfo = new GameTransferInfo();
       transferInfo.setMemberId(member.getId());
       transferInfo.setAccount(member.getAccount());
@@ -547,7 +547,7 @@ public class GameAdminServiceImpl implements GameAdminService {
         bill.setBalance(memberInfo.getBalance());
         memberBillService.save(member, bill);
         remark.append("，系统转入成功");
-        // 异步更新游戏额度
+        // 6. 异步更新游戏额度
         GameTransferInfo transferInfo = new GameTransferInfo();
         transferInfo.setMemberId(member.getId());
         transferInfo.setAccount(member.getAccount());

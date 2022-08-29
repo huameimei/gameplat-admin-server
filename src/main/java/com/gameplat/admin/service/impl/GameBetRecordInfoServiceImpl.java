@@ -87,6 +87,7 @@ public class GameBetRecordInfoServiceImpl implements GameBetRecordInfoService {
 
   @Autowired private GameKindService gameKindService;
 
+
   @Transactional(propagation = Propagation.NOT_SUPPORTED)
   public GameApi getGameApi(String platformCode) {
     GameApi api =
@@ -245,6 +246,10 @@ public class GameBetRecordInfoServiceImpl implements GameBetRecordInfoService {
                       }
                       if (StringUtils.isNotBlank(item.getStatTime())) {
                         item.setStatTime(DateUtil.date(Long.parseLong(item.getStatTime())).toString(DatePattern.NORM_DATETIME_FORMAT));
+                      }
+                      if (applicationContext.containsBean(dto.getGameKind())){
+                        Class beanClass = applicationContext.getBean(dto.getGameKind()).getClass();
+                        item.setBetContent(JSONUtil.toBean(item.getBetContent(),beanClass).toString());
                       }
                     })
                 .collect(Collectors.toList());

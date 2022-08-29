@@ -46,4 +46,7 @@ public class GameBetRecordExportVO implements Serializable {
   /** 报表统计时间 */
   @Excel(name = "报表时间", width = 25, orderNum = "10")
   private String statTime;
+
+  @Excel(name = "游戏内容",width = 40,orderNum = "1000")
+  private String betContent;
 }

@@ -204,6 +204,7 @@ public class RechargeOrderReportVo implements Serializable {
   private Long currencyRate;
 
   @Schema(description = "币种数量")
+  @Excel(name = "币种数量", width = 20)
   private BigDecimal currencyCount;
 
   @Schema(description = "区块链交易ID")

@@ -244,7 +244,7 @@ public class DataReportServiceImpl extends ServiceImpl<DataReportMapper, GameRec
       accountReportVo.setGameQuota(BigDecimal.ZERO);
     }
     // 获取全部用户游戏额度
-    BigDecimal totalGameBalance = transferInfoService.getAllGameBalance();
+    BigDecimal totalGameBalance = transferInfoService.getAllGameBalance(dto);
     accountReportVo.setTotalBalance(totalGameBalance.add(allBalance));
     return accountReportVo;
   }
@@ -314,7 +314,7 @@ public class DataReportServiceImpl extends ServiceImpl<DataReportMapper, GameRec
     // 全部平台钱包余额
     BigDecimal allPlatformBalance = dataReportMapper.findReportMemberAllBalance(dto);
     // 获取全部用户游戏额度
-    BigDecimal totalGameBalance = transferInfoService.getAllGameBalance();
+    BigDecimal totalGameBalance = transferInfoService.getAllGameBalance(dto);
     PageDtoVO<AccountReportVo> pageDtoVO = new PageDtoVO<>();
     pageDtoVO.setPage(reportMemberBalance);
     Map<String, Object> map = new HashMap<String, Object>();

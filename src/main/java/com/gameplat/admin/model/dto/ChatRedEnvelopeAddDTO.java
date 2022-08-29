@@ -45,4 +45,7 @@ public class ChatRedEnvelopeAddDTO implements Serializable {
   @NotNull(message = "发送总次数不能为空！")
   @Schema(description = "发送总次数")
   private Integer totalSent;
+
+  @Schema(description = "1.自由领取 2.跟随禁言策越 ")
+  private Integer awardType;
 }

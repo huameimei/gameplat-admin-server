@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gameplat.admin.mapper.GameTransferInfoMapper;
+import com.gameplat.admin.model.dto.GameRWDataReportDto;
 import com.gameplat.admin.service.GameTransferInfoService;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.common.enums.TransferTypesEnum;
@@ -35,9 +36,9 @@ public class GameTransferInfoServiceImpl
   GameTransferInfoMapper gameTransferInfoMapper;
 
   @Override
-  public BigDecimal getAllGameBalance() {
+  public BigDecimal getAllGameBalance(GameRWDataReportDto dto) {
 
-    return gameTransferInfoMapper.getAllGameBalance();
+    return gameTransferInfoMapper.getAllGameBalance(dto);
 
   }
 

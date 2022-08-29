@@ -24,10 +24,26 @@
         update_time = sysdate()
     </insert>
 
-    <select id="getAllGameBalance" resultType="java.math.BigDecimal">
-        select ifnull(sum(last_balance), 0) as allGameBalance
-        from game_transfer_info
-        where platform_code != 'SELF'
+    <select id="getAllGameBalance" parameterType="com.gameplat.admin.model.dto.GameRWDataReportDto" resultType="java.math.BigDecimal">
+      select ifnull(sum(last_balance), 0) as allGameBalance
+        from game_transfer_info gt
+				inner join member m on m.id = gt.member_id
+				left join member_info mi on mi.member_id = m.id
+        where gt.platform_code != 'SELF'
+				 and m.account != 'webRoot' and user_type in ('M','A')
+        <if test="account != null and account != ''">
+            and m.account = #{account}
+        </if>
+        <if test="superAccount != null and superAccount != null">
+            <choose>
+                <when test="flag != null and flag == 1">
+                    AND m.parent_name = #{superAccount}
+                </when>
+                <otherwise>
+                    AND m.super_path like concat('%',#{superAccount},'%')
+                </otherwise>
+            </choose>
+        </if>
     </select>
 
 </mapper>

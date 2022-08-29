@@ -34,7 +34,7 @@ public interface SysSettingMapper extends BaseMapper<SysSetting> {
     /**
      * 插入配置信息
      */
-    void insetGameList(List<SysSetting> sysSettings);
+    int insetGameList(List<SysSetting> sysSettings);
 
     /**
      * 查询配置信息

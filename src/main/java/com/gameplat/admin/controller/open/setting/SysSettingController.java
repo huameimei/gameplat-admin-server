@@ -158,6 +158,27 @@ public class SysSettingController {
     return Result.succeedData(sysSettingService.getAppNavigation(tenantSettingVO));
   }
 
+  @RequestMapping("/getBettingMenu")
+  @PreAuthorize("hasAuthority('setting:bet:view')")
+  @Operation(summary = "注单菜单配置化")
+  public Result<Object> getBettingMenu(SysSettingVO tenantSettingVO) {
+
+    tenantSettingVO.setSettingType(Constants.TEMPLATE_BETTING_MENU);
+    List<SysSetting> rst = sysSettingService.getTenantSetting(tenantSettingVO);
+    if (CollectionUtils.isEmpty(rst)) {
+      //初始化数据
+      rst = sysSettingService.initBettingMenu();
+    }
+    return Result.succeedData(rst);
+  }
+
+  @RequestMapping("/updateBettingMenu")
+   @PreAuthorize("hasAuthority('setting:bet:edit')")
+  @Operation(summary = "注单菜单配置化修改")
+  public void updateBettingMenu(@RequestBody List<SysSetting> sysSettings) {
+    sysSettingService.updateBatchTenantSetting(sysSettings);
+  }
+
   @PostMapping("/updateDisplayAndSort")
   @PreAuthorize("hasAuthority('setting:config:edit')")
   @Operation(summary = "修改显示与排序")

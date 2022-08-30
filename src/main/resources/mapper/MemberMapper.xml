@@ -75,7 +75,7 @@
                t1.real_name,
                t1.lower_num,
                t2.vip_level vipLevel,
-               t2.vip_growth,
+               t2.vip_growth as growth,
                t2.last_login_ip,
                t2.last_login_time,
                t2.balance,

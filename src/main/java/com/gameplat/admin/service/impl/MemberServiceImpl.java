@@ -3,6 +3,7 @@ package com.gameplat.admin.service.impl;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.convert.Convert;
+import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.RandomUtil;
@@ -22,8 +23,10 @@ import com.gameplat.admin.model.bean.RechargeMemberFileBean;
 import com.gameplat.admin.model.dto.*;
 import com.gameplat.admin.model.vo.*;
 import com.gameplat.admin.service.*;
+import com.gameplat.admin.util.JxlsExcelUtils;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.StringUtils;
+import com.gameplat.base.common.util.UUIDUtils;
 import com.gameplat.common.constant.CachedKeys;
 import com.gameplat.common.enums.MemberEnums;
 import com.gameplat.common.enums.TransferTypesEnum;
@@ -37,6 +40,13 @@ import com.gameplat.security.SecurityUserHolder;
 import com.gameplat.security.context.UserCredential;
 import com.google.common.collect.Lists;
 import lombok.extern.log4j.Log4j2;
+import net.lingala.zip4j.ZipFile;
+import net.lingala.zip4j.model.ZipParameters;
+import net.lingala.zip4j.model.enums.AesKeyStrength;
+import net.lingala.zip4j.model.enums.CompressionLevel;
+import net.lingala.zip4j.model.enums.CompressionMethod;
+import net.lingala.zip4j.model.enums.EncryptionMethod;
+import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.GrantedAuthority;
@@ -44,8 +54,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.*;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.net.URLEncoder;
 import java.text.DecimalFormat;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -516,6 +529,93 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
             .set(Member::getUserLevel, dto.getLevel())
             .in(Member::getId, dto.getIds())
             .update();
+  }
+
+  private final String AGENT_REPORT_REMAKE = "";
+
+  /**
+   * 导出excel 文件
+   *
+   * @param dto
+   * @param response
+   */
+  @Override
+  public void exportMembersReport(MemberQueryDTO dto, HttpServletResponse response) {
+    try {
+      List<MemberVO> members = this.queryList(dto);
+      // 定义ZIP包的包名
+      String zipFileName = "会员信息";
+      response.setHeader(
+          "Content-Disposition",
+          "attachment;fileName=" + URLEncoder.encode(zipFileName + ".zip", "UTF-8"));
+      response.setContentType("application/zip");
+      String tmpUrl =
+          System.getProperty("java.io.tmpdir") + File.separator + "excel-" + UUIDUtils.getUUID32();
+      final File dir = new File(tmpUrl);
+      if (!dir.exists()) {
+        dir.mkdirs();
+      }
+      Map<String, Object> map = new HashMap<>();
+      map.put("dataList", members);
+      for (int i = 1; i <= 5; i++) {
+        String fileName = i + "会员信息.xlsx";
+        FileOutputStream fo = null;
+        try {
+          fo = new FileOutputStream(new File(dir + File.separator + fileName));
+        } catch (FileNotFoundException e1) {
+          e1.printStackTrace();
+        }
+        try {
+          JxlsExcelUtils.downLoadExcel(map, "membersTemplate.xlsx", fo);
+        } catch (InvalidFormatException | IOException e1) {
+          e1.printStackTrace();
+        } finally {
+          if (fo != null) {
+            try {
+              fo.close();
+            } catch (IOException e) {
+              e.printStackTrace();
+            }
+          }
+        }
+      }
+
+      ZipFile zipFile = new ZipFile(tmpUrl.concat(".zip"));
+      ZipParameters parameters = new ZipParameters();
+      // 压缩方式
+      parameters.setCompressionMethod(CompressionMethod.DEFLATE);
+      // 压缩级别
+      parameters.setCompressionLevel(CompressionLevel.NORMAL);
+      // 是否设置加密文件
+      parameters.setEncryptFiles(true);
+      // 设置加密算法
+      parameters.setEncryptionMethod(EncryptionMethod.AES);
+      // 设置AES加密密钥的密钥强度
+      parameters.setAesKeyStrength(AesKeyStrength.KEY_STRENGTH_256);
+      // 设置密码
+      if (StrUtil.isNotBlank(dto.getZipPswd())) {
+        zipFile.setPassword(dto.getZipPswd().toCharArray());
+      }
+      // 要打包的文件夹
+      File[] fList = dir.listFiles();
+
+      // 遍历test文件夹下所有的文件、文件夹
+      for (File f : fList) {
+        if (f.isDirectory()) {
+          zipFile.addFolder(f, parameters);
+        } else {
+          zipFile.addFile(f, parameters);
+        }
+      }
+
+      OutputStream out = response.getOutputStream();
+      out.write(FileUtil.readBytes(zipFile.getFile()));
+      out.flush();
+      FileUtil.del(dir);
+      FileUtil.del(tmpUrl.concat(".zip"));
+    } catch (Exception e) {
+      throw new ServiceException("会员信息导出IO错误:{}", e);
+    }
   }
 
   @Override

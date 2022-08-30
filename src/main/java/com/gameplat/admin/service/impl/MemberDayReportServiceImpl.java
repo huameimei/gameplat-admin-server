@@ -265,8 +265,8 @@ public class MemberDayReportServiceImpl extends ServiceImpl<MemberDayReportMappe
       // 设置AES加密密钥的密钥强度
       parameters.setAesKeyStrength(AesKeyStrength.KEY_STRENGTH_256);
       // 设置密码
-      if (StrUtil.isNotBlank("112233")) {
-        zipFile.setPassword("112233".toCharArray());
+      if (StrUtil.isNotBlank(dto.getZipPswd())) {
+        zipFile.setPassword(dto.getZipPswd().toCharArray());
       }
       // 要打包的文件夹
       File[] fList = dir.listFiles();

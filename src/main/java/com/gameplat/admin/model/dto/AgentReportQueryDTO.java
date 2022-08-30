@@ -16,4 +16,6 @@ public class AgentReportQueryDTO {
   private String isAsc;
 
   private String orderByColumn;
+
+  private String zipPswd;
 }

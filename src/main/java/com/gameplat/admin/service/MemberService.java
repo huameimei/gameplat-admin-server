@@ -28,6 +28,8 @@ public interface MemberService extends IService<Member> {
 
   List<MemberVO> queryList(MemberQueryDTO dto);
 
+  Integer countMembers(MemberQueryDTO dto);
+
   MemberInfoVO getInfo(Long id);
 
   MemberInfoVO getMemberInfo(Long id);
@@ -178,4 +180,6 @@ public interface MemberService extends IService<Member> {
   void batchLevel(MemberLevelBatchDTO dto);
 
   void exportMembersReport(MemberQueryDTO dto, HttpServletResponse response);
+
+  void asynExportMembersReport(MemberQueryDTO dto);
 }

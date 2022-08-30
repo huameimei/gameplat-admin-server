@@ -221,19 +221,25 @@ public class MemberController {
     memberService.changeWithdrawFlag(id, flag);
   }
 
+  @GetMapping(value = "/exportCount")
+  public Integer exportCount(MemberQueryDTO dto) {
+    return memberService.countMembers(dto);
+  }
+
   @Operation(summary = "导出会员列表")
   @PreAuthorize("hasAuthority('member:export')")
   @GetMapping(value = "/exportList")
   @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.MEMBER, desc = "'导出会员列表'")
   public void exportList(MemberQueryDTO dto, HttpServletResponse response) {
     memberService.exportMembersReport(dto, response);
-    //    ExportParams exportParams = new ExportParams("会员账号列表导出", "会员账号列表");
-    //    response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename = myExcel.xls");
-    //
-    //    try (Workbook workbook = ExcelExportUtil.exportExcel(exportParams, MemberVO.class,
-    // member)) {
-    //      workbook.write(response.getOutputStream());
-    //    }
+  }
+
+  @Operation(summary = "导出会员列表")
+  @PreAuthorize("hasAuthority('member:export')")
+  @GetMapping(value = "/asynExportList")
+  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.MEMBER, desc = "'导出会员列表'")
+  public void asynExportList(MemberQueryDTO dto) {
+    memberService.asynExportMembersReport(dto);
   }
 
   @Operation(summary = "添加用户或添加下级时 彩票投注返点数据集")

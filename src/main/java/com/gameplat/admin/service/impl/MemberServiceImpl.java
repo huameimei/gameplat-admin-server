@@ -3,6 +3,7 @@ package com.gameplat.admin.service.impl;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.convert.Convert;
+import cn.hutool.core.date.DateTime;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.ObjectUtil;
@@ -646,7 +647,7 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
   public void asynExportMembersReport(MemberQueryDTO dto) {
     List<MemberVO> members = this.queryList(dto);
     // 定义ZIP包的包名
-    String zipFileName = "会员信息";
+    String zipFileName = DateTime.now() + "会员信息";
     String tmpUrl =
         System.getProperty("java.io.tmpdir") + File.separator + "excel-" + UUIDUtils.getUUID32();
     final File dir = new File(tmpUrl);

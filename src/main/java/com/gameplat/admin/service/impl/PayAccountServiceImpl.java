@@ -25,7 +25,9 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -105,10 +107,10 @@ public class PayAccountServiceImpl extends ServiceImpl<PayAccountMapper, PayAcco
   }
 
   @Override
-  public List<String> queryAccounts() {
+  public List<Map<String,String>> queryAccounts() {
     QueryWrapper<PayAccount> query = Wrappers.query();
-    query.select("distinct account");
-    return this.list(query).stream().map(PayAccount::getAccount).collect(Collectors.toList());
+    query.select("distinct account,owner");
+    return this.list(query).stream().map(this::conver2Map).collect(Collectors.toList());
   }
 
   private void conver2LimitInfo(PayAccountVO vo) {
@@ -159,4 +161,12 @@ public class PayAccountServiceImpl extends ServiceImpl<PayAccountMapper, PayAcco
             dto.getCurrencyType());
     dto.setLimitInfo(JsonUtils.toJson(merBean));
   }
+
+  private Map<String,String> conver2Map(PayAccount payAccount) {
+    Map<String,String> map = new HashMap<>();
+    map.put("name",payAccount.getOwner());
+    map.put("account",payAccount.getAccount());
+    return map;
+  }
+
 }

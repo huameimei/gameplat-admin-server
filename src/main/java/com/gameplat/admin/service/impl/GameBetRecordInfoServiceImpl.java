@@ -2,6 +2,7 @@ package com.gameplat.admin.service.impl;
 
 import cn.afterturn.easypoi.excel.ExcelExportUtil;
 import cn.afterturn.easypoi.excel.entity.ExportParams;
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.json.JSONObject;
@@ -12,10 +13,8 @@ import com.gameplat.admin.convert.GameBetRecordConvert;
 import com.gameplat.admin.model.bean.ActivityStatisticItem;
 import com.gameplat.admin.model.bean.GameBetRecordSearchBuilder;
 import com.gameplat.admin.model.dto.GameBetRecordQueryDTO;
-import com.gameplat.admin.model.dto.UserGameBetRecordDto;
 import com.gameplat.admin.model.vo.GameBetRecordExportVO;
 import com.gameplat.admin.model.vo.GameBetRecordVO;
-import com.gameplat.admin.model.vo.GameReportVO;
 import com.gameplat.admin.model.vo.PageDtoVO;
 import com.gameplat.admin.service.GameBetRecordInfoService;
 import com.gameplat.admin.service.GameConfigService;
@@ -32,12 +31,6 @@ import com.gameplat.elasticsearch.page.PageResponse;
 import com.gameplat.elasticsearch.service.IBaseElasticsearchService;
 import com.gameplat.model.entity.game.GameBetRecord;
 import com.gameplat.model.entity.game.GameKind;
-import java.io.IOException;
-import java.math.BigDecimal;
-import java.util.*;
-import java.util.stream.Collectors;
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
@@ -67,6 +60,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -217,20 +217,23 @@ public class GameBetRecordInfoServiceImpl implements GameBetRecordInfoService {
         SortBuilder<FieldSortBuilder> sortBuilder =
             SortBuilders.fieldSort(GameBetRecordSearchBuilder.convertTimeType(dto.getTimeType()))
                 .order(SortOrder.DESC);
-        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
-        searchSourceBuilder.query(builder);
-        searchSourceBuilder.sort(sortBuilder);
-        searchSourceBuilder.size((int) sumCount);
-        SearchRequest searchRequest = new SearchRequest(indexName);
-        searchRequest.source(searchSourceBuilder);
-        log.info("exportReport DSL语句为：{}", searchRequest.source().toString());
-        List<GameBetRecord> resultList =
-            baseElasticsearchService.searchDocList(
-                indexName, searchSourceBuilder, GameBetRecord.class);
+        List<GameBetRecord> resultList = new ArrayList<>();
+        Integer divide =
+            new BigDecimal(sumCount)
+                .divide(new BigDecimal("10000"), BigDecimal.ROUND_UP)
+                .intValue();
+        for (int i = 1; i <= divide; i++) {
+          // 调用封装的分页 页码不用减1
+          PageResponse<GameBetRecord> result =
+              baseElasticsearchService.search(
+                  builder, indexName, GameBetRecord.class, i, 10000, sortBuilder);
+          if (CollectionUtil.isNotEmpty(result.getList())) {
+            resultList.addAll(result.getList());
+          }
+        }
         Map<String, String> gameKindMap =
             gameKindService.list().stream()
                 .collect(Collectors.toMap(GameKind::getCode, GameKind::getName));
-
         List<GameBetRecordExportVO> list =
             resultList.stream()
                 .map(gameBetRecordConvert::toExportVo)

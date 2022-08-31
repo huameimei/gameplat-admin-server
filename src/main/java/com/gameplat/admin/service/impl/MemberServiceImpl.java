@@ -1,5 +1,7 @@
 package com.gameplat.admin.service.impl;
 
+import cn.afterturn.easypoi.excel.ExcelExportUtil;
+import cn.afterturn.easypoi.excel.entity.ExportParams;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.convert.Convert;
@@ -25,7 +27,6 @@ import com.gameplat.admin.model.bean.RechargeMemberFileBean;
 import com.gameplat.admin.model.dto.*;
 import com.gameplat.admin.model.vo.*;
 import com.gameplat.admin.service.*;
-import com.gameplat.admin.util.JxlsExcelUtils;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.StringUtils;
 import com.gameplat.base.common.util.UUIDUtils;
@@ -56,7 +57,7 @@ import net.lingala.zip4j.model.enums.CompressionLevel;
 import net.lingala.zip4j.model.enums.CompressionMethod;
 import net.lingala.zip4j.model.enums.EncryptionMethod;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.mock.web.MockMultipartFile;
@@ -581,28 +582,17 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
       if (!dir.exists()) {
         dir.mkdirs();
       }
-      Map<String, Object> map = new HashMap<>();
-      map.put("dataList", members);
+      log.info("异步--生成excel文件开始{}", DateTime.now());
+      Workbook workbook =
+          ExcelExportUtil.exportExcel(new ExportParams("会员信息导出", "会员信息"), MemberVO.class, members);
+      log.info("异步--生成excel文件结束{}", DateTime.now());
       String fileName = "会员信息.xlsx";
-      FileOutputStream fo = null;
-      try {
-        fo = new FileOutputStream(new File(dir + File.separator + fileName));
-      } catch (FileNotFoundException e1) {
-        e1.printStackTrace();
-      }
-      try {
-        JxlsExcelUtils.downLoadExcel(map, "membersTemplate.xlsx", fo);
-      } catch (InvalidFormatException | IOException e1) {
-        e1.printStackTrace();
-      } finally {
-        if (fo != null) {
-          try {
-            fo.close();
-          } catch (IOException e) {
-            e.printStackTrace();
-          }
-        }
-      }
+      FileOutputStream fo = new FileOutputStream(new File(dir + File.separator + fileName));
+      // 写入成功后转化为输出流
+      workbook.write(fo);
+      workbook.close();
+      fo.flush();
+      fo.close();
 
       ZipFile zipFile = new ZipFile(tmpUrl.concat(".zip"));
       ZipParameters parameters = new ZipParameters();
@@ -654,27 +644,25 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
     if (!dir.exists()) {
       dir.mkdirs();
     }
-    Map<String, Object> map = new HashMap<>();
-    map.put("dataList", members);
+    log.info("异步--生成excel文件开始{}", DateTime.now());
+    Workbook workbook =
+        ExcelExportUtil.exportExcel(new ExportParams("会员信息导出", "会员信息"), MemberVO.class, members);
+    log.info("异步--生成excel文件结束{}", DateTime.now());
     String fileName = "会员信息.xlsx";
     FileOutputStream fo = null;
     try {
       fo = new FileOutputStream(new File(dir + File.separator + fileName));
-    } catch (FileNotFoundException e1) {
-      e1.printStackTrace();
+    } catch (FileNotFoundException e) {
+      e.printStackTrace();
     }
+    // 写入成功后转化为输出流
     try {
-      JxlsExcelUtils.downLoadExcel(map, "membersTemplate.xlsx", fo);
-    } catch (InvalidFormatException | IOException e1) {
-      e1.printStackTrace();
-    } finally {
-      if (fo != null) {
-        try {
-          fo.close();
-        } catch (IOException e) {
-          e.printStackTrace();
-        }
-      }
+      workbook.write(fo);
+      workbook.close();
+      fo.flush();
+      fo.close();
+    } catch (IOException ioException) {
+      ioException.printStackTrace();
     }
 
     ZipFile zipFile = new ZipFile(tmpUrl.concat(".zip"));

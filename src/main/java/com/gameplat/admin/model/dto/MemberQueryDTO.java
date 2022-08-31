@@ -161,4 +161,32 @@ public class MemberQueryDTO implements Serializable {
   private Integer vipLevel;
 
   private String zipPswd;
+
+  /**
+   * 银行卡号
+   */
+  private String cardNo;
+
+  /**
+   * 模糊查询银行卡号
+   */
+  private Boolean cardNoFuzzy;
+
+  /**
+   * 虚拟币
+   */
+  private String virtualCard;
+
+  private Boolean virtualCardFuzzy;
+
+  /**
+   * 开户行地址
+   */
+  private String address;
+
+  /**
+   * 开户行地址模糊查询
+   */
+  private Boolean addressFuzzy;
+
 }

@@ -369,7 +369,11 @@ public class ProxyPayServiceImpl implements ProxyPayService {
     return proxyPayBackResult.getResponseMsg();
   }
 
-  /** 固定地址回调 */
+  /**
+   * 在线固定地址代付异步回调处理
+   * 注意使用syncCallbackUrl字段作为回调地址
+   * 回调传递ppOrderNo为我们系统订单号
+   * */
   @Override
   public String fixedProxyPayAsyncCallback(
       String interfaceCode,

@@ -426,4 +426,49 @@ public class SysSettingServiceImpl extends ServiceImpl<SysSettingMapper, SysSett
         sysSetting.setSettingValue(settingValue);
         return sysSettingMapper.updateSportConfig(sysSetting);
     }
+
+    /**
+     * 初始化注单菜单
+     */
+    @Override
+    public List<SysSetting> initBettingMenu() {
+        List<SysSetting> list=new ArrayList<>();
+        UserCredential userCredential = SecurityUserHolder.getCredential();
+        SysSetting sportSetting = new SysSetting();
+        //初始化体育注单菜单数据
+        sportSetting.setDisplay(EnableEnum.ENABLED.code());
+        sportSetting.setSettingType(Constants.TEMPLATE_BETTING_MENU);
+        sportSetting.setSettingCode("SPORTS_BET");
+        sportSetting.setSettingLabel(Constants.SPORTS_BET);
+        sportSetting.setSort(1);
+
+        SysSetting lotterySetting = new SysSetting();
+        //初始化彩票彩票菜单数据
+        lotterySetting.setDisplay(EnableEnum.ENABLED.code());
+        lotterySetting.setSettingType(Constants.TEMPLATE_BETTING_MENU);
+        lotterySetting.setSettingCode("LOTTERY_BET");
+        lotterySetting.setSettingLabel(Constants.LOTTERY_BET);
+        lotterySetting.setSort(2);
+
+        SysSetting gamesSetting = new SysSetting();
+        //初始化体育游戏菜单数据
+        gamesSetting.setDisplay(EnableEnum.ENABLED.code());
+        gamesSetting.setSettingType(Constants.TEMPLATE_BETTING_MENU);
+        gamesSetting.setSettingCode("GAMES_BET");
+        gamesSetting.setSettingLabel(Constants.GAMES_BET);
+        gamesSetting.setSort(1);
+        if (userCredential != null) {
+            sportSetting.setCreateBy(userCredential.getUsername());
+            lotterySetting.setCreateBy(userCredential.getUsername());
+            gamesSetting.setCreateBy(userCredential.getUsername());
+        }
+        list.add(sportSetting);
+        list.add(lotterySetting);
+        list.add(gamesSetting);
+        int i= sysSettingMapper.insetGameList(list);
+        if (i != 3) {
+            throw new ServiceException("初始化注单菜单数据异常");
+        }
+        return list;
+    }
 }

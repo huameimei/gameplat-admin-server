@@ -75,6 +75,8 @@ public class MemberTransferAgentServiceImpl implements MemberTransferAgentServic
   @Autowired(required = false)
   private RedisTemplate<String, Object> redisTemplate;
 
+  @Autowired private KgAgentService kgAgentService;
+
   @Override
   public void transform(MemberTransformDTO dto) {
     // 添加一个锁，防止互转 造成ES数据转移死循环了
@@ -111,6 +113,9 @@ public class MemberTransferAgentServiceImpl implements MemberTransferAgentServic
         dto.getExcludeSelf(),
         dto.getSerialNo(),
         dto.getTransferWithData());
+
+    // 更新彩票代理结构
+    kgAgentService.changeKgLotteryProxy(source, target);
   }
 
   @Transactional(propagation = Propagation.NOT_SUPPORTED)

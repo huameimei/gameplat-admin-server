@@ -7,6 +7,7 @@ import com.gameplat.admin.model.vo.GameBalanceVO;
 import com.gameplat.admin.model.vo.GameKickOutVO;
 import com.gameplat.admin.model.vo.GameRecycleVO;
 import com.gameplat.admin.service.GameAdminService;
+import com.gameplat.admin.service.GameTransferInfoService;
 import com.gameplat.common.constant.ServiceName;
 import com.gameplat.log.annotation.Log;
 import com.gameplat.log.enums.LogType;
@@ -16,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Resource;
 import java.util.List;
 
 @Tag(name = "游戏控制")
@@ -24,6 +26,7 @@ import java.util.List;
 public class GameAdminController {
 
   @Autowired private GameAdminService gameAdminService;
+
 
   @Operation(summary = "查询单个游戏平台余额")
   @GetMapping(value = "/selectGameBalance")

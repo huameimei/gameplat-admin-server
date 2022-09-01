@@ -19,7 +19,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableDiscoveryClient
 @EnableFeignClients(basePackages = "com.gameplat")
 @MapperScan("com.gameplat.admin.mapper")
-@SpringBootApplication(scanBasePackages = "com.gameplat")
+@SpringBootApplication(scanBasePackages = {"com.gameplat","com.cz.gameplat"})
 public class AdminServiceApplication {
 
   public static void main(String[] args) {

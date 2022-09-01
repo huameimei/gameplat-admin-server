@@ -13,5 +13,7 @@ public class OperAccountBlacklistDTO implements Serializable {
 
   private String ip;
 
+  private String remark;
+
   @NotNull private String games;
 }

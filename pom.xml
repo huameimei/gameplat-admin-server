@@ -139,6 +139,12 @@
 
         <dependency>
             <groupId>com.gameplat</groupId>
+            <artifactId>gameplat-common-lottery</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.gameplat</groupId>
             <artifactId>base-pay-spring-boot-starter</artifactId>
         </dependency>
 
@@ -223,11 +229,21 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
+        <!--sleuth-->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-sleuth</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-test</artifactId>
             <version>5.2.8.RELEASE</version>
             <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.lingala.zip4j</groupId>
+            <artifactId>zip4j</artifactId>
+            <version>2.6.4</version>
         </dependency>
     </dependencies>
 
@@ -296,9 +312,11 @@
                     <include>*.json</include>
                     <include>*.xml</include>
                     <include>*.txt</include>
+                    <include>template/**</include>
                     <include>*.xlsx</include>
                     <include>*.yml</include>
                     <include>**/*.sql</include>
+                    <include>static/**</include>
                 </includes>
             </resource>
         </resources>

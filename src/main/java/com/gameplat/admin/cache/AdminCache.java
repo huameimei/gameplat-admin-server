@@ -17,7 +17,7 @@ import java.util.concurrent.TimeUnit;
  * @author three
  */
 @Slf4j
-@Component
+@Component("AdminCache")
 public class AdminCache extends AbstractRedis {
 
     @Autowired

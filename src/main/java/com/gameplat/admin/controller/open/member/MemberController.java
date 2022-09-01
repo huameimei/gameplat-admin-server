@@ -1,7 +1,5 @@
 package com.gameplat.admin.controller.open.member;
 
-import cn.afterturn.easypoi.excel.ExcelExportUtil;
-import cn.afterturn.easypoi.excel.entity.ExportParams;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.http.Header;
 import cn.hutool.http.useragent.UserAgent;
@@ -22,7 +20,6 @@ import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.ip.IpAddressParser;
 import com.gameplat.base.common.util.BeanUtils;
 import com.gameplat.base.common.util.ServletUtils;
-import com.gameplat.base.common.util.StringUtils;
 import com.gameplat.common.constant.CacheKey;
 import com.gameplat.common.constant.CachedKeys;
 import com.gameplat.common.constant.ServiceName;
@@ -34,22 +31,17 @@ import com.gameplat.model.entity.member.Member;
 import com.gameplat.security.SecurityUserHolder;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
-import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.http.HttpHeaders;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 @Tag(name = "会员管理")
 @RestController
@@ -229,19 +221,25 @@ public class MemberController {
     memberService.changeWithdrawFlag(id, flag);
   }
 
-  @SneakyThrows
+  @GetMapping(value = "/exportCount")
+  public Integer exportCount(MemberQueryDTO dto) {
+    return memberService.countMembers(dto);
+  }
+
   @Operation(summary = "导出会员列表")
   @PreAuthorize("hasAuthority('member:export')")
-  @GetMapping(value = "/exportList", produces = "application/vnd.ms-excel")
+  @GetMapping(value = "/exportList")
   @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.MEMBER, desc = "'导出会员列表'")
   public void exportList(MemberQueryDTO dto, HttpServletResponse response) {
-    List<MemberVO> member = memberService.queryList(dto);
-    ExportParams exportParams = new ExportParams("会员账号列表导出", "会员账号列表");
-    response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename = myExcel.xls");
+    memberService.exportMembersReport(dto, response);
+  }
 
-    try (Workbook workbook = ExcelExportUtil.exportExcel(exportParams, MemberVO.class, member)) {
-      workbook.write(response.getOutputStream());
-    }
+  @Operation(summary = "导出会员列表")
+  @PreAuthorize("hasAuthority('member:export')")
+  @GetMapping(value = "/asynExportList")
+  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.MEMBER, desc = "'导出会员列表'")
+  public void asynExportList(MemberQueryDTO dto) {
+    memberService.asynExportMembersReport(dto);
   }
 
   @Operation(summary = "添加用户或添加下级时 彩票投注返点数据集")

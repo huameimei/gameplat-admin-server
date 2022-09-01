@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gameplat.admin.mapper.GameTransferInfoMapper">
+
+    <insert id="saveOrUpdate" parameterType="com.gameplat.model.entity.game.GameTransferInfo">
+        insert into `game_transfer_info` (
+        member_id,
+        <if test="account != null and account != ''">account,</if>
+        <if test="orderNo != null and orderNo != ''">order_no,</if>
+        <if test="platformCode != null and platformCode != ''">platform_code,</if>
+        <if test="lastBalance != null and lastBalance != ''">last_balance,</if>
+        create_time, update_time
+        ) values (
+        #{memberId},
+        <if test="account != null and account != ''">#{account},</if>
+        <if test="orderNo != null and orderNo != ''">#{orderNo},</if>
+        <if test="platformCode != null and platformCode != ''">#{platformCode},</if>
+        <if test="lastBalance != null and lastBalance != ''">#{lastBalance},</if>
+        sysdate(), sysdate())
+        ON DUPLICATE KEY UPDATE
+        <if test='orderNo != null and orderNo != ""'>order_no = #{orderNo},</if>
+        <if test='lastBalance != null'>last_balance = #{lastBalance},</if>
+        update_time = sysdate()
+    </insert>
+
+    <select id="getAllGameBalance" parameterType="com.gameplat.admin.model.dto.GameRWDataReportDto" resultType="java.math.BigDecimal">
+      select ifnull(sum(last_balance), 0) as allGameBalance
+        from game_transfer_info gt
+				inner join member m on m.id = gt.member_id
+				left join member_info mi on mi.member_id = m.id
+        where gt.platform_code != 'SELF'
+				 and m.account != 'webRoot' and user_type in ('M','A')
+        <if test="account != null and account != ''">
+            and m.account = #{account}
+        </if>
+        <if test="superAccount != null and superAccount != null">
+            <choose>
+                <when test="flag != null and flag == 1">
+                    AND m.parent_name = #{superAccount}
+                </when>
+                <otherwise>
+                    AND m.super_path like concat('%',#{superAccount},'%')
+                </otherwise>
+            </choose>
+        </if>
+    </select>
+
+</mapper>

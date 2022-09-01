@@ -116,6 +116,8 @@ public class TransferAgentServiceImpl implements TransferAgentService {
         resultList =
             baseElasticsearchService.searchDocList(
                 indexName, searchSourceBuilder, GameBetRecord.class);
+        log.info("转代理变更前数据={}", resultList);
+        log.info("转代理获取到的转移的用户注册：{}", resultList.size());
         if (CollectionUtil.isNotEmpty(resultList)) {
           log.info("开始更新ES注单记录的代理路径={}", originSuperPath);
           Map<String, AgentInfoVo> agentInfoVoMap = new HashMap<>();

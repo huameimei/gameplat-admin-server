@@ -19,6 +19,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @Tag(name = "收款账户管理")
 @RestController
@@ -89,7 +90,7 @@ public class PayAccountController {
   @Operation(summary = "获取全部")
   @GetMapping("/queryAccounts")
   //  @PreAuthorize("hasAuthority('thirdParty:payAccount:queryAccounts')")
-  public List<String> queryAccounts() {
+  public List<Map<String,String>> queryAccounts() {
     return payAccountService.queryAccounts();
   }
 }

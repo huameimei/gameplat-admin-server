@@ -10,6 +10,7 @@ import com.gameplat.admin.model.vo.PayAccountVO;
 import com.gameplat.model.entity.pay.PayAccount;
 
 import java.util.List;
+import java.util.Map;
 
 public interface PayAccountService extends IService<PayAccount> {
 
@@ -25,5 +26,5 @@ public interface PayAccountService extends IService<PayAccount> {
 
   IPage<PayAccountVO> findPayAccountPage(Page<PayAccount> page, PayAccountQueryDTO dto);
 
-  List<String> queryAccounts();
+  List<Map<String,String>> queryAccounts();
 }

@@ -139,15 +139,17 @@ public class MemberRwReportServiceImpl extends ServiceImpl<MemberRwReportMapper,
         report.setFirstWithdrawMoney(
             report.getFirstWithdrawMoney().add(memberWithdraw.getCashMoney()));
       }
+      // 如果不是银行卡，免提直充，人工出款，则默认为虚拟币出款，记录虚拟币出款报表。如果后期有新增类型，则需要在此添加判断
       if (!ObjectUtil.equals(memberWithdraw.getWithdrawType(), WithdrawTypeConstant.BANK)
-              || !ObjectUtil.equals(memberWithdraw.getWithdrawType(), WithdrawTypeConstant.DIRECT)) {
+          && !ObjectUtil.equals(memberWithdraw.getWithdrawType(), WithdrawTypeConstant.DIRECT)
+          && !ObjectUtil.equals(memberWithdraw.getWithdrawType(), WithdrawTypeConstant.MANUAL)) {
         BigDecimal count =
             StringUtils.isNotEmpty(memberWithdraw.getCurrencyCount())
                 ? Convert.toBigDecimal(memberWithdraw.getCurrencyCount())
                 : BigDecimal.ZERO;
         report.setVirtualWithdrawNumber(report.getVirtualWithdrawNumber().add(count));
         report.setVirtualWithdrawMoney(
-                report.getVirtualWithdrawMoney().add(memberWithdraw.getApproveMoney()));
+            report.getVirtualWithdrawMoney().add(memberWithdraw.getApproveMoney()));
       }
 
     } else {

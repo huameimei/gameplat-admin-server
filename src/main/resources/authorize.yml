@@ -15,3 +15,5 @@ security:
       - /websocket/**
       - /api/internal/**
       - /api/admin/chat/plan/**
+      - /api/admin/callback/proxyPayAsyncCallback/**
+      - /api/admin/callback/fixedProxyPayAsyncCallback/**

@@ -4,6 +4,7 @@ import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.gameplat.admin.enums.CashEnum;
@@ -179,8 +180,12 @@ public class ProxyPayServiceImpl implements ProxyPayService {
       domain += "/";
     }
     String asyncUrl =
-            domain + "api/internal/admin/finance/asyncCallback/onlineProxyPayAsyncCallback";
+            domain + "api/admin/callback/proxyPayAsyncCallback";
+    String syncUrl =
+            domain + "api/admin/callback/fixedProxyPayAsyncCallback";
     context.setAsyncCallbackUrl(asyncUrl + "/" + memberWithdraw.getCashOrderNo());
+    // 固定回调地址
+    context.setSyncCallbackUrl(syncUrl + "/" + ppMerchant.getPpInterfaceCode());
     context.setSysPath(sysPath);
     // 设置第三方接口信息
     fillProxyDispatchContext(context, ppInterface, memberWithdraw);
@@ -359,6 +364,103 @@ public class ProxyPayServiceImpl implements ProxyPayService {
     updateStatus(memberWithdraw, orignCashStatus, ProxyPayStatusEnum.PAY_SUCCESS.getCode());
     /** 更新代付商户出款次数和金额 */
     PpMerchant ppMerchant = ppMerchantService.getById(memberWithdraw.getPpMerchantId());
+    updatePpMerchant(ppMerchant, memberWithdraw.getCashMoney());
+    log.info("第三方出款成功,出款商户为:{} ,出款订单信息为：{}", memberWithdraw.getPpMerchantName(), memberWithdraw);
+    return proxyPayBackResult.getResponseMsg();
+  }
+
+  /** 固定地址回调 */
+  @Override
+  public String fixedProxyPayAsyncCallback(
+      String interfaceCode,
+      String url,
+      String method,
+      List<NameValuePair> headers,
+      String ipAddress,
+      Map<String, String> callbackParameters,
+      String requestBody)
+      throws Exception {
+    log.info("出款固定地址回调商户==={}", interfaceCode);
+    PpInterface ppInterface = ppInterfaceService.get(interfaceCode);
+    if (ppInterface == null) {
+      throw new Exception("第三方代付接口已关闭");
+    }
+    List<PpMerchant> list =
+        ppMerchantService.lambdaQuery().eq(PpMerchant::getPpInterfaceCode, interfaceCode).list();
+    if (CollectionUtils.isEmpty(list)) {
+      throw new Exception("第三方代付接口已关闭");
+    }
+    PpMerchant ppMerchant = list.get(0);
+    ProxyCallbackContext proxyCallbackContext = new ProxyCallbackContext();
+    proxyCallbackContext.setUrl(url);
+    proxyCallbackContext.setMethod(method);
+    proxyCallbackContext.setHeaders(headers);
+    proxyCallbackContext.setIp(ipAddress);
+    proxyCallbackContext.setCallbackParameters(callbackParameters);
+    proxyCallbackContext.setRequestBody(requestBody);
+    proxyCallbackContext.setMerchantParameters(JSONObject.parseObject(ppMerchant.getParameters(), Map.class));
+    String resultStr =
+        paymentCenterFeign.asyncCallbackProxyPay(
+            proxyCallbackContext, interfaceCode, ppMerchant.getName());
+    log.info("代付查询请求中心响应{}", resultStr);
+    Result result = JSONUtil.toBean(resultStr, Result.class);
+    ProxyPayBackResult proxyPayBackResult = JSONObject.parseObject(JSONObject.toJSONString(result.getData()), ProxyPayBackResult.class);
+    if (!result.isSucceed() || 0 != result.getCode()) {
+      throw new ServiceException(
+          "第三方代付异步回调异常:" + proxyPayBackResult.getMessage() + "！！！请立即联系第三方核实再出款！！！");
+    }
+    String ppOrderNo = proxyPayBackResult.getPpOrderNo();
+    if (StringUtils.isEmpty(ppOrderNo)) {
+      throw new ServiceException("充值订单不存在或订单已处理");
+    }
+    log.info("代付回调订单号==={}", ppOrderNo);
+    MemberWithdraw memberWithdraw =
+        memberWithdrawService.lambdaQuery().eq(MemberWithdraw::getCashOrderNo, ppOrderNo).one();
+    /** 校验体现订单信息 */
+    if (memberWithdraw == null) {
+      throw new ServiceException("充值订单不存在或订单已处理");
+    }
+    /*String beanName = getProxyInterfaceCode(memberWithdraw);
+    proxyCallbackContext = getProxyCallbackContent(memberWithdraw);*/
+    if (memberWithdraw.getCashStatus() == WithdrawStatus.CANCELLED.getValue()
+        || memberWithdraw.getCashStatus() == WithdrawStatus.REFUSE.getValue()
+        || memberWithdraw.getCashStatus() == WithdrawStatus.SUCCESS.getValue()
+        || null == memberWithdraw.getProxyPayStatus()
+        || memberWithdraw.getProxyPayStatus() == ProxyPayStatusEnum.PAY_SUCCESS.getCode()) {
+      log.info(
+          "第三方出款订单"
+              + memberWithdraw.getCashOrderNo()
+              + "已经被处理了,响应第三方需要的信息:"
+              + proxyPayBackResult.getResponseMsg());
+      return proxyPayBackResult.getResponseMsg();
+    }
+
+    Member info = memberService.getById(memberWithdraw.getMemberId());
+    if (info == null) {
+      throw new ServiceException("用户不存在");
+    }
+
+    int orignCashStatus = memberWithdraw.getCashStatus();
+    if (!proxyPayBackResult.isSuccess()) {
+      /** 第三方出款失败，将代付状态改变 */
+      memberWithdraw.setApproveReason("第三方出款失败");
+      memberWithdraw.setProxyPayDesc("第三方出款失败");
+      updateStatus(memberWithdraw, orignCashStatus, ProxyPayStatusEnum.PAY_FAIL.getCode());
+      log.info("第三方出款订单 ：{} ！出款失败信息： {}", memberWithdraw.getCashOrderNo(), result.getMessage());
+      return proxyPayBackResult.getResponseMsg();
+    }
+
+    /** 第三方出款成功 */
+    memberWithdraw.setApproveReason("第三方出款成功");
+    memberWithdraw.setProxyPayDesc("第三方出款成功");
+    memberWithdraw.setProxyPayStatus(ProxyPayStatusEnum.PAY_SUCCESS.getCode());
+
+    if (WithdrawStatus.SUCCESS.getValue() != orignCashStatus) {
+      memberWithdraw.setCashStatus(WithdrawStatus.SUCCESS.getValue());
+    }
+    updateStatus(memberWithdraw, orignCashStatus, ProxyPayStatusEnum.PAY_SUCCESS.getCode());
+    /** 更新代付商户出款次数和金额 */
+    ppMerchant = ppMerchantService.getById(memberWithdraw.getPpMerchantId());
     updatePpMerchant(ppMerchant, memberWithdraw.getCashMoney());
     log.info("第三方出款成功,出款商户为:{} ,出款订单信息为：{}", memberWithdraw.getPpMerchantName(), memberWithdraw);
     return proxyPayBackResult.getResponseMsg();

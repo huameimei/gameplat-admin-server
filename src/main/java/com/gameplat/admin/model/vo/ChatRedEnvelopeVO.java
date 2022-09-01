@@ -48,4 +48,7 @@ public class ChatRedEnvelopeVO implements Serializable {
 
   @Schema(description = "禁止_启用1:启用，0：禁用")
   private Integer open;
+
+  @Schema(description = "1.自由领取 2.跟随禁言策越 ")
+  private Integer awardType;
 }

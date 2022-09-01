@@ -274,19 +274,37 @@
 
 
     <select id="findReportMemberBalance" parameterType="com.gameplat.admin.model.dto.GameRWDataReportDto" resultType="com.gameplat.admin.model.vo.AccountReportVo" >
-        select a.account account,a.balance goodMoney from ( select m.account account,CONVERT(info.balance,DECIMAL(22,2)) balance from member m INNER join
-        member_info info on m.id = info.member_id and info.balance > 0 where m.account != 'webRoot' and user_type in
-        ('M','A')
+        SELECT
+        a.account account,
+        a.balance goodMoney,
+        a.userGameBalance userGameBalance
+        FROM
+        (
+        SELECT
+        m.account account,
+        CONVERT (info.balance,DECIMAL ( 22, 2 )) balance,
+        userGameBalance
+        FROM
+        member m
+        INNER JOIN member_info info ON m.id = info.member_id
+        left JOIN (
+        select member_id, account, sum(last_balance) as userGameBalance from game_transfer_info  GROUP BY account order by account
+        ) as gt on m.id = gt.member_id
+
+        WHERE
+        (info.balance > 0 or gt.userGameBalance > 0)
+        AND m.account != 'webRoot'
+        AND m.user_type IN ( 'M', 'A' )
         <if test="dto.account != null and dto.account != ''">
-            and account = #{dto.account}
+            and m.account = #{dto.account}
         </if>
         <if test="dto.superAccount != null and dto.superAccount != null">
             <choose>
                 <when test="dto.flag != null and dto.flag == 1">
-                    AND parent_name = #{dto.superAccount}
+                    AND m.parent_name = #{dto.superAccount}
                 </when>
                 <otherwise>
-                    AND super_path like concat('%',#{dto.superAccount},'%')
+                    AND m.super_path like concat('%',#{dto.superAccount},'%')
                 </otherwise>
             </choose>
         </if>

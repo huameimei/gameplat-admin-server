@@ -36,7 +36,8 @@ public class OssServiceImpl implements OssService {
 
     String accessUrl = this.getAccessUrl(config, randomFilename);
     // 异步保存文件记录
-    asyncSaveFileRecordService.asyncSave(file, accessUrl, config.getProvider(), SecurityUserHolder.getUsername());
+    asyncSaveFileRecordService.asyncSave(
+            file, accessUrl, config.getProvider(), SecurityUserHolder.getUsername());
     return accessUrl;
   }
 
@@ -71,4 +72,5 @@ public class OssServiceImpl implements OssService {
   private String getRandomFilename(MultipartFile file) {
     return UUID.fastUUID() + "." + FileUtil.getSuffix(file.getOriginalFilename());
   }
+
 }

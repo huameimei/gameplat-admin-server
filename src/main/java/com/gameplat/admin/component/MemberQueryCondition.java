@@ -171,6 +171,7 @@ public class MemberQueryCondition {
     } else {
       queryWrapper.eq("t3.card_no", dto.getCardNo());
     }
+    queryWrapper.eq("t3.bank_type", "B");
   }
 
   private void builderAddressQuery(QueryWrapper<Member> queryWrapper, MemberQueryDTO dto) {
@@ -187,6 +188,7 @@ public class MemberQueryCondition {
     } else {
       queryWrapper.eq("t3.address", dto.getVirtualCard());
     }
+    queryWrapper.eq("t3.bank_type", "V");
   }
 
   /**

@@ -184,9 +184,9 @@ public class MemberQueryCondition {
 
   private void builderVirtualCardQuery(QueryWrapper<Member> queryWrapper, MemberQueryDTO dto) {
     if (Boolean.TRUE.equals(dto.getVirtualCardFuzzy())) {
-      queryWrapper.like("t3.address", dto.getVirtualCard());
+      queryWrapper.like("t3.card_no", dto.getVirtualCard());
     } else {
-      queryWrapper.eq("t3.address", dto.getVirtualCard());
+      queryWrapper.eq("t3.card_no", dto.getVirtualCard());
     }
     queryWrapper.eq("t3.type", "V");
   }

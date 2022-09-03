@@ -181,4 +181,9 @@ public class MemberVO implements Serializable {
   private BigDecimal yubaoAmount;
 
   private Date yubaoTime;
+
+  /**
+   * 用户的游戏总额度
+   */
+  private BigDecimal userGameBalance;
 }

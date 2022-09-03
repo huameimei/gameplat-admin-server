@@ -48,7 +48,7 @@
                  LEFT JOIN member_info t2 ON t1.id = t2.member_id
                  LEFT JOIN  member_bank t3 ON t1.id = t3.member_id
                  left JOIN
-                 (select member_id,sum(last_balance) as userGameBalance
+                 (select member_id,ifnull(sum(last_balance), 0) as userGameBalance
                  from game_transfer_info  GROUP BY account order by account) t4 on t1.id = t4.member_id
             ${ew.customSqlSegment}
     </select>

@@ -16,6 +16,7 @@ import com.gameplat.admin.service.*;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.json.JsonUtils;
 import com.gameplat.base.common.util.StringUtils;
+import com.gameplat.common.constant.CachedKeys;
 import com.gameplat.common.enums.GamePlatformEnum;
 import com.gameplat.common.enums.MemberEnums;
 import com.gameplat.common.enums.TransferTypesEnum;
@@ -30,6 +31,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -70,26 +72,29 @@ public class MemberTransferAgentServiceImpl implements MemberTransferAgentServic
 
   @Autowired private StringRedisTemplate stringRedisTemplate;
 
+  @Autowired(required = false)
+  private RedisTemplate<String, Object> redisTemplate;
+
   @Override
   public void transform(MemberTransformDTO dto) {
     // 添加一个锁，防止互转 造成ES数据转移死循环了
     String lockKey =
         MemberServiceKeyConstant.MEMBER_TRANSFER_AGENT_LOCK.concat(dto.getId().toString());
-    Boolean aBoolean =
-        stringRedisTemplate
-            .opsForValue()
-            .setIfAbsent(lockKey, dto.getId().toString(), 3, TimeUnit.HOURS);
-    if (!aBoolean) {
-      log.info("转代理获取不到锁{}", dto.getId());
-      throw new ServiceException("请等待上次转代理任务完成！");
-    }
-    Member source = memberService.getById(dto.getId());
-    Member target =
-        memberService
-            .getAgentByAccount(dto.getAgentAccount())
-            .orElseThrow(() -> new ServiceException("账号不存在或当前账号不是代理账号！"));
+    Member target;
+    Member source;
     try {
       // 检查条件
+      Boolean aBoolean =
+        stringRedisTemplate
+          .opsForValue()
+          .setIfAbsent(lockKey, dto.getId().toString(), 3, TimeUnit.HOURS);
+      if (!aBoolean) {
+        log.info("转代理获取不到锁{}", dto.getId());
+        throw new ServiceException("请等待上次转代理任务完成！");
+      }
+      source = memberService.getById(dto.getId());
+      target = memberService.getAgentByAccount(dto.getAgentAccount())
+          .orElseThrow(() -> new ServiceException("账号不存在或当前账号不是代理账号！"));
       this.preCheck(source, target, dto.getExcludeSelf());
     } catch (ServiceException detailMessage) {
       stringRedisTemplate.delete(lockKey);
@@ -192,6 +197,13 @@ public class MemberTransferAgentServiceImpl implements MemberTransferAgentServic
             .update();
     // 修改相关表userType
     Integer integer = transferAgentMapper.changeToAgent(member.getAccount(), memberId);
+  }
+
+
+  @Override
+  public void memberDevice(String username) {
+    String keys = String.format(CachedKeys.MEMBER_VERIFY, username);
+    redisTemplate.opsForValue().set(keys, username, 600, TimeUnit.SECONDS);
   }
 
   private Member getMemberByAccount(String account, String errorMessage) {

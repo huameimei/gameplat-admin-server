@@ -87,6 +87,7 @@ public class GameBetRecordInfoServiceImpl implements GameBetRecordInfoService {
 
   @Autowired private GameKindService gameKindService;
 
+
   @Transactional(propagation = Propagation.NOT_SUPPORTED)
   public GameApi getGameApi(String platformCode) {
     GameApi api =
@@ -237,15 +238,19 @@ public class GameBetRecordInfoServiceImpl implements GameBetRecordInfoService {
                     item -> {
                       item.setGameName(geti18nText(item.getGameName()));
                       item.setGameKind(gameKindMap.get(item.getGameKind()));
-                      item.setBetTime(
-                          DateUtil.date(Long.parseLong(item.getBetTime()))
-                              .toString(DatePattern.NORM_DATETIME_FORMAT));
-                      item.setSettleTime(
-                          DateUtil.date(Long.parseLong(item.getSettleTime()))
-                              .toString(DatePattern.NORM_DATETIME_FORMAT));
-                      item.setStatTime(
-                          DateUtil.date(Long.parseLong(item.getStatTime()))
-                              .toString(DatePattern.NORM_DATETIME_FORMAT));
+                      if (StringUtils.isNotBlank(item.getBetTime())) {
+                        item.setBetTime(DateUtil.date(Long.parseLong(item.getBetTime())).toString(DatePattern.NORM_DATETIME_FORMAT));
+                      }
+                      if (StringUtils.isNotBlank(item.getSettleTime())) {
+                        item.setSettleTime(DateUtil.date(Long.parseLong(item.getSettleTime())).toString(DatePattern.NORM_DATETIME_FORMAT));
+                      }
+                      if (StringUtils.isNotBlank(item.getStatTime())) {
+                        item.setStatTime(DateUtil.date(Long.parseLong(item.getStatTime())).toString(DatePattern.NORM_DATETIME_FORMAT));
+                      }
+                      if (applicationContext.containsBean(dto.getGameKind())){
+                        Class beanClass = applicationContext.getBean(dto.getGameKind()).getClass();
+                        item.setBetContent(JSONUtil.toBean(item.getBetContent(),beanClass).toString());
+                      }
                     })
                 .collect(Collectors.toList());
         ExportParams exportParams = new ExportParams("游戏投注记录", "游戏投注记录");

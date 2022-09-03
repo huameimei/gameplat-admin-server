@@ -1,6 +1,7 @@
 package com.gameplat.admin.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -122,6 +123,9 @@ public class GameRebateDetailServiceImpl
           BigDecimal realRebateMoney =
               isChangeRebateMoney(lr.getUserLevel(), lr.getRealRebateMoney(), lr.getValidAmount());
           gameRebateDetail.setRealRebateMoney(realRebateMoney);
+          gameRebateDetail.setBeginDate(DateUtil.beginOfDay(gameRebatePeriod.getBeginDate()));
+          gameRebateDetail.setEndDate(DateUtil.beginOfDay(gameRebatePeriod.getEndDate()));
+          gameRebateDetail.setRemark(gameRebatePeriod.getName() + "-游戏返水");
           temp.add(gameRebateDetail);
         }
       }

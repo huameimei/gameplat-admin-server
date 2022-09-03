@@ -22,6 +22,8 @@ import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.ip.IpAddressParser;
 import com.gameplat.base.common.util.BeanUtils;
 import com.gameplat.base.common.util.ServletUtils;
+import com.gameplat.base.common.util.StringUtils;
+import com.gameplat.common.constant.CacheKey;
 import com.gameplat.common.constant.CachedKeys;
 import com.gameplat.common.constant.ServiceName;
 import com.gameplat.common.lang.Assert;
@@ -36,6 +38,7 @@ import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
@@ -43,8 +46,10 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @Tag(name = "会员管理")
 @RestController
@@ -58,15 +63,24 @@ public class MemberController {
 
   @Autowired private GameAdminService gameAdminService;
 
-  @CreateCache(name = CachedKeys.MEMBER_FUND_PWD_ERR_COUNT, expire = -1)
+  @Autowired
+  private RedisTemplate redisTemplate;
 
+  @CreateCache(name = CachedKeys.MEMBER_FUND_PWD_ERR_COUNT, expire = -1)
   private Cache<String, Integer> memberFundPwdErrCount;
 
   @Operation(summary = "会员列表")
   @GetMapping("/list")
   @PreAuthorize("hasAuthority('member:view')")
   public IPage<MemberVO> list(PageDTO<Member> page, MemberQueryDTO dto) {
-    return memberService.queryPage(page, dto);
+    IPage<MemberVO> iPage = memberService.queryPage(page, dto);
+    //重写玩家在线状态
+    iPage.getRecords().forEach(m -> {
+      if (m.getOnline()) {
+        m.setOnline(redisTemplate.hasKey(CacheKey.getOnlineUserKey(m.getAccount())));
+      }
+    });
+    return iPage;
   }
 
   @Operation(summary = "会员详情")
@@ -325,5 +339,13 @@ public class MemberController {
   @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.MEMBER, desc = "'会员转变成代理'")
   public void changeToAgent(@RequestBody MemberTransformDTO dto) {
     memberTransferAgentService.changeToAgent(dto.getId());
+  }
+
+  @Operation(summary = "会员解除设备限制")
+  @PostMapping("/memberDevice")
+  @PreAuthorize("hasAuthority('member:memberDevice')")
+  @Log(module = ServiceName.ADMIN_SERVICE, type = LogType.MEMBER, desc = "'会员解除设备限制'")
+  public void memberDevice(@RequestParam(required = true) String username) {
+    memberTransferAgentService.memberDevice(username);
   }
 }

@@ -6,11 +6,13 @@ import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.gameplat.admin.mapper.*;
 import com.gameplat.admin.model.vo.ExternalDataVo;
 import com.gameplat.admin.model.vo.MemberInfoVO;
 import com.gameplat.admin.service.ExternalDataService;
+import com.gameplat.admin.service.PasswordService;
 import com.gameplat.base.common.util.EasyExcelUtil;
 import com.gameplat.common.enums.MemberEnums;
 import com.gameplat.model.entity.member.*;
@@ -50,6 +52,8 @@ public class ExternalDataServiceImpl implements ExternalDataService {
   @Autowired private MemberRwReportMapper memberRwReportMapper;
 
   @Autowired private MemberBankMapper memberBankMapper;
+
+  @Autowired private PasswordService passwordService;
 
   /**
    * 开始处理外部数据导入
@@ -233,6 +237,26 @@ public class ExternalDataServiceImpl implements ExternalDataService {
 
     } catch (IOException ioException) {
       ioException.printStackTrace();
+    }
+  }
+
+  /** 将注册类型为-1 的用户查询出来，然后将他的明文密码加密更新进去 并修改注册类型为3 */
+  @Override
+  @Async
+  public void enPswd() {
+    LambdaQueryWrapper<Member> queryWrapper = new LambdaQueryWrapper<Member>();
+    queryWrapper.eq(Member::getRegisterType, -1);
+    List<Member> members = memberMapper.selectList(queryWrapper);
+    log.info("共有{}个会员需要处理", members.size());
+    for (Member member : members) {
+      if (StrUtil.isBlank(member.getPassword())) {
+        continue;
+      }
+      String encode =
+          passwordService.encode(member.getPassword(), member.getAccount().toLowerCase());
+      member.setPassword(encode);
+      member.setRegisterType(3);
+      int i = memberMapper.updateById(member);
     }
   }
 

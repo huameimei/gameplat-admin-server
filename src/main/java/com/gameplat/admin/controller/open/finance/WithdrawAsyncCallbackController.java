@@ -17,14 +17,14 @@ import java.util.*;
 import java.util.stream.Stream;
 
 @RestController
-@RequestMapping("/api/internal/admin/finance/asyncCallback")
+@RequestMapping("/api/admin/callback")
 public class WithdrawAsyncCallbackController {
 
   @Autowired private ProxyPayService proxyPayService;
 
   @SneakyThrows
-  @RequestMapping("/onlineProxyPayAsyncCallback/{cashOrderNo}")
-  public void onlineProxyPayAsyncCallback(
+  @RequestMapping("/proxyPayAsyncCallback/{cashOrderNo}")
+  public void proxyPayAsyncCallback(
       @PathVariable String cashOrderNo,
       @RequestBody(required = false) String requestBody,
       HttpServletRequest request,
@@ -42,6 +42,28 @@ public class WithdrawAsyncCallbackController {
             requestParameters,
             requestBody);
 
+    response.getWriter().print(result);
+  }
+
+  @SneakyThrows
+  @RequestMapping("/fixedProxyPayAsyncCallback/{interfaceCode}")
+  public void fixedProxyPayAsyncCallback(
+          @PathVariable String interfaceCode,
+          @RequestBody(required = false) String requestBody,
+          HttpServletRequest request,
+          HttpServletResponse response) {
+    List<NameValuePair> headers = getHeaders(request);
+    Map<String, String> requestParameters = getRequestParameterMap(request);
+
+    String result =
+            proxyPayService.fixedProxyPayAsyncCallback(
+                    interfaceCode,
+                    request.getRequestURI(),
+                    request.getMethod(),
+                    headers,
+                    IPUtils.getIpAddress(request),
+                    requestParameters,
+                    requestBody);
     response.getWriter().print(result);
   }
 

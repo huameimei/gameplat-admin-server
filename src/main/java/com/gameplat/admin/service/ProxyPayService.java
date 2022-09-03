@@ -28,4 +28,14 @@ public interface ProxyPayService {
       Map<String, String> callbackParameters,
       String requestBody)
       throws Exception;
+
+  String fixedProxyPayAsyncCallback(
+      String interfaceCode,
+      String requestURI,
+      String method,
+      List<NameValuePair> headers,
+      String ipAddress,
+      Map<String, String> requestParameters,
+      String requestBody)
+      throws Exception;
 }

@@ -49,6 +49,9 @@ public class MemberQueryCondition {
             "t2.invitation_code",
             dto.getInvitationCode())
         .func(ObjectUtils.isNotEmpty(dto.getAccount()), q -> this.builderAccountQuery(query, dto))
+        .func(ObjectUtils.isNotEmpty(dto.getVirtualCard()), q -> this.builderVirtualCardQuery(query, dto))
+        .func(ObjectUtils.isNotEmpty(dto.getAddress()), q -> this.builderAddressQuery(query, dto))
+        .func(ObjectUtils.isNotEmpty(dto.getCardNo()), q -> this.builderCardNoQuery(query, dto))
         .func(
             ObjectUtils.isNotEmpty(dto.getAgentAccount()),
             q -> this.builderAgentAccountQuery(query, dto))
@@ -160,6 +163,32 @@ public class MemberQueryCondition {
     } else {
       queryWrapper.eq("t1.account", dto.getAccount());
     }
+  }
+
+  private void builderCardNoQuery(QueryWrapper<Member> queryWrapper, MemberQueryDTO dto) {
+    if (Boolean.TRUE.equals(dto.getCardNoFuzzy())) {
+      queryWrapper.like("t3.card_no", dto.getCardNo());
+    } else {
+      queryWrapper.eq("t3.card_no", dto.getCardNo());
+    }
+    queryWrapper.eq("t3.type", "B");
+  }
+
+  private void builderAddressQuery(QueryWrapper<Member> queryWrapper, MemberQueryDTO dto) {
+    if (Boolean.TRUE.equals(dto.getAddressFuzzy())) {
+      queryWrapper.like("t3.address", dto.getAddress());
+    } else {
+      queryWrapper.eq("t3.address", dto.getAddress());
+    }
+  }
+
+  private void builderVirtualCardQuery(QueryWrapper<Member> queryWrapper, MemberQueryDTO dto) {
+    if (Boolean.TRUE.equals(dto.getVirtualCardFuzzy())) {
+      queryWrapper.like("t3.card_no", dto.getVirtualCard());
+    } else {
+      queryWrapper.eq("t3.card_no", dto.getVirtualCard());
+    }
+    queryWrapper.eq("t3.type", "V");
   }
 
   /**

@@ -43,7 +43,6 @@ import com.gameplat.model.entity.member.Member;
 import com.gameplat.model.entity.member.MemberBill;
 import com.gameplat.model.entity.member.MemberInfo;
 import com.gameplat.model.entity.message.Message;
-import com.gameplat.model.entity.message.MessageDistribute;
 import com.gameplat.model.entity.proxy.DivideDetail;
 import com.gameplat.model.entity.proxy.DivideFissionConfig;
 import com.gameplat.model.entity.proxy.DividePeriods;
@@ -607,6 +606,10 @@ public class DividePeriodsServiceImpl extends ServiceImpl<DividePeriodsMapper, D
     for (int i = 0; i < nameStr.length; i++) {
       // 过滤黑名单
       String username = nameStr[i];
+      if (username.equalsIgnoreCase(gameReportVO.getAccount())) {
+        log.info("无法给自己分红:{}", gameReportVO.getAccount());
+        continue;
+      }
       // 顶级代理
       Member currentMember =
           memberService

@@ -8,6 +8,7 @@ import com.gameplat.admin.model.dto.*;
 import com.gameplat.admin.model.vo.*;
 import com.gameplat.model.entity.member.Member;
 
+import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -26,6 +27,8 @@ public interface MemberService extends IService<Member> {
   IPage<MemberBalanceVO> findPromoteMemberBalance(Page<Member> page, MemberQueryDTO dto);
 
   List<MemberVO> queryList(MemberQueryDTO dto);
+
+  Integer countMembers(MemberQueryDTO dto);
 
   MemberInfoVO getInfo(Long id);
 
@@ -175,4 +178,8 @@ public interface MemberService extends IService<Member> {
   MemberContactVo getMemberDetail(Long id);
 
   void batchLevel(MemberLevelBatchDTO dto);
+
+  void exportMembersReport(MemberQueryDTO dto, HttpServletResponse response);
+
+  void asynExportMembersReport(MemberQueryDTO dto);
 }

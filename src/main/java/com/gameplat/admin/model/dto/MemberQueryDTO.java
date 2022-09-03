@@ -187,4 +187,6 @@ public class MemberQueryDTO implements Serializable {
    */
   private Boolean addressFuzzy;
 
+
+  private String zipPswd;
 }

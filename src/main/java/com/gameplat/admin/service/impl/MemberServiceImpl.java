@@ -1,8 +1,12 @@
 package com.gameplat.admin.service.impl;
 
+import cn.afterturn.easypoi.excel.ExcelExportUtil;
+import cn.afterturn.easypoi.excel.entity.ExportParams;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.convert.Convert;
+import cn.hutool.core.date.DateTime;
+import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.RandomUtil;
@@ -18,37 +22,63 @@ import com.gameplat.admin.config.SysTheme;
 import com.gameplat.admin.constant.SystemConstant;
 import com.gameplat.admin.convert.MemberConvert;
 import com.gameplat.admin.mapper.MemberMapper;
+import com.gameplat.admin.mapper.SysFileManagerMapper;
 import com.gameplat.admin.model.bean.RechargeMemberFileBean;
 import com.gameplat.admin.model.dto.*;
 import com.gameplat.admin.model.vo.*;
 import com.gameplat.admin.service.*;
 import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.util.StringUtils;
+import com.gameplat.base.common.util.UUIDUtils;
+import com.gameplat.common.compent.oss.FileStorageEnum;
+import com.gameplat.common.compent.oss.FileStorageStrategyContext;
+import com.gameplat.common.compent.oss.config.FileConfig;
 import com.gameplat.common.constant.CachedKeys;
 import com.gameplat.common.enums.MemberEnums;
 import com.gameplat.common.enums.TransferTypesEnum;
 import com.gameplat.common.enums.UserTypes;
 import com.gameplat.common.lang.Assert;
+import com.gameplat.common.util.FileUtils;
 import com.gameplat.model.entity.game.GameTransferInfo;
 import com.gameplat.model.entity.member.Member;
 import com.gameplat.model.entity.member.MemberDayReport;
 import com.gameplat.model.entity.member.MemberInfo;
+import com.gameplat.model.entity.sys.SysFileManager;
 import com.gameplat.security.SecurityUserHolder;
 import com.gameplat.security.context.UserCredential;
 import com.google.common.collect.Lists;
+import com.qcloud.cos.utils.IOUtils;
 import lombok.extern.log4j.Log4j2;
+import net.lingala.zip4j.ZipFile;
+import net.lingala.zip4j.exception.ZipException;
+import net.lingala.zip4j.model.ZipParameters;
+import net.lingala.zip4j.model.enums.AesKeyStrength;
+import net.lingala.zip4j.model.enums.CompressionLevel;
+import net.lingala.zip4j.model.enums.CompressionMethod;
+import net.lingala.zip4j.model.enums.EncryptionMethod;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletResponse;
+import java.io.*;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.net.URLEncoder;
 import java.text.DecimalFormat;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static sun.security.provider.certpath.BuildStep.SUCCEED;
 
 @Log4j2
 @Service
@@ -109,6 +139,13 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
 
   private static final String MEMBER_TOKEN_PREFIX = "token:web:";
 
+  @Resource private FileConfig config;
+
+  @Autowired private FileStorageStrategyContext fileStorageStrategyContext;
+
+  @Autowired private SysFileManagerMapper sysFileManagerMapper;
+
+  @Autowired private OssService ossService;
 
   @Override
   public IPage<MessageDistributeVO> pageMessageDistribute(Page<Member> page, MemberQueryDTO dto) {
@@ -156,6 +193,11 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
   @Override
   public List<MemberVO> queryList(MemberQueryDTO dto) {
     return memberMapper.queryList(memberQueryCondition.builderQueryWrapper(dto));
+  }
+
+  @Override
+  public Integer countMembers(MemberQueryDTO dto) {
+    return memberMapper.countMmebers(memberQueryCondition.builderQueryWrapper(dto));
   }
 
   @Override
@@ -516,6 +558,197 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
             .set(Member::getUserLevel, dto.getLevel())
             .in(Member::getId, dto.getIds())
             .update();
+  }
+
+  /**
+   * 导出excel 文件
+   *
+   * @param dto
+   * @param response
+   */
+  @Override
+  public void exportMembersReport(MemberQueryDTO dto, HttpServletResponse response) {
+    try {
+      List<MemberVO> members = this.queryList(dto);
+      // 定义ZIP包的包名
+      String zipFileName = "会员信息";
+      response.setHeader(
+          "Content-Disposition",
+          "attachment;fileName=" + URLEncoder.encode(zipFileName + ".zip", "UTF-8"));
+      response.setContentType("application/zip");
+      String tmpUrl =
+          System.getProperty("java.io.tmpdir") + File.separator + "excel-" + UUIDUtils.getUUID32();
+      final File dir = new File(tmpUrl);
+      if (!dir.exists()) {
+        dir.mkdirs();
+      }
+      log.info("异步--生成excel文件开始{}", DateTime.now());
+      Workbook workbook =
+          ExcelExportUtil.exportExcel(new ExportParams("会员信息导出", "会员信息"), MemberVO.class, members);
+      log.info("异步--生成excel文件结束{}", DateTime.now());
+      String fileName = "会员信息.xlsx";
+      FileOutputStream fo = new FileOutputStream(new File(dir + File.separator + fileName));
+      // 写入成功后转化为输出流
+      workbook.write(fo);
+      workbook.close();
+      fo.flush();
+      fo.close();
+
+      ZipFile zipFile = new ZipFile(tmpUrl.concat(".zip"));
+      ZipParameters parameters = new ZipParameters();
+      // 压缩方式
+      parameters.setCompressionMethod(CompressionMethod.DEFLATE);
+      // 压缩级别
+      parameters.setCompressionLevel(CompressionLevel.NORMAL);
+      // 是否设置加密文件
+      parameters.setEncryptFiles(true);
+      // 设置加密算法
+      parameters.setEncryptionMethod(EncryptionMethod.AES);
+      // 设置AES加密密钥的密钥强度
+      parameters.setAesKeyStrength(AesKeyStrength.KEY_STRENGTH_256);
+      // 设置密码
+      if (StrUtil.isNotBlank(dto.getZipPswd())) {
+        zipFile.setPassword(dto.getZipPswd().toCharArray());
+      }
+      // 要打包的文件夹
+      File[] fList = dir.listFiles();
+
+      // 遍历test文件夹下所有的文件、文件夹
+      for (File f : fList) {
+        if (f.isDirectory()) {
+          zipFile.addFolder(f, parameters);
+        } else {
+          zipFile.addFile(f, parameters);
+        }
+      }
+
+      OutputStream out = response.getOutputStream();
+      out.write(FileUtil.readBytes(zipFile.getFile()));
+      out.flush();
+      FileUtil.del(dir);
+      FileUtil.del(tmpUrl.concat(".zip"));
+    } catch (Exception e) {
+      throw new ServiceException("会员信息导出IO错误:{}", e);
+    }
+  }
+
+  @Override
+  @Async
+  public void asynExportMembersReport(MemberQueryDTO dto) {
+    List<MemberVO> members = this.queryList(dto);
+    // 定义ZIP包的包名
+    String zipFileName = DateTime.now() + "会员信息";
+    String tmpUrl =
+        System.getProperty("java.io.tmpdir") + File.separator + "excel-" + UUIDUtils.getUUID32();
+    final File dir = new File(tmpUrl);
+    if (!dir.exists()) {
+      dir.mkdirs();
+    }
+    log.info("异步--生成excel文件开始{}", DateTime.now());
+    Workbook workbook =
+        ExcelExportUtil.exportExcel(new ExportParams("会员信息导出", "会员信息"), MemberVO.class, members);
+    log.info("异步--生成excel文件结束{}", DateTime.now());
+    String fileName = "会员信息.xlsx";
+    FileOutputStream fo = null;
+    try {
+      fo = new FileOutputStream(new File(dir + File.separator + fileName));
+    } catch (FileNotFoundException e) {
+      e.printStackTrace();
+    }
+    // 写入成功后转化为输出流
+    try {
+      workbook.write(fo);
+      workbook.close();
+      fo.flush();
+      fo.close();
+    } catch (IOException ioException) {
+      ioException.printStackTrace();
+    }
+
+    ZipFile zipFile = new ZipFile(tmpUrl.concat(".zip"));
+    ZipParameters parameters = new ZipParameters();
+    // 压缩方式
+    parameters.setCompressionMethod(CompressionMethod.DEFLATE);
+    // 压缩级别
+    parameters.setCompressionLevel(CompressionLevel.NORMAL);
+    // 是否设置加密文件
+    parameters.setEncryptFiles(true);
+    // 设置加密算法
+    parameters.setEncryptionMethod(EncryptionMethod.AES);
+    // 设置AES加密密钥的密钥强度
+    parameters.setAesKeyStrength(AesKeyStrength.KEY_STRENGTH_256);
+    // 设置密码
+    if (StrUtil.isNotBlank(dto.getZipPswd())) {
+      zipFile.setPassword(dto.getZipPswd().toCharArray());
+    }
+    // 要打包的文件夹
+    File[] fList = dir.listFiles();
+
+    // 遍历test文件夹下所有的文件、文件夹
+    for (File f : fList) {
+      if (f.isDirectory()) {
+        try {
+          zipFile.addFolder(f, parameters);
+        } catch (ZipException e) {
+          e.printStackTrace();
+        }
+      } else {
+        try {
+          zipFile.addFile(f, parameters);
+        } catch (ZipException e) {
+          e.printStackTrace();
+        }
+      }
+    }
+    FileInputStream input = null;
+    try {
+      input = new FileInputStream(zipFile.getFile());
+      MultipartFile multipartFile =
+          new MockMultipartFile(
+              "file", zipFileName, "application/x-zip-compressed", IOUtils.toByteArray(input));
+      fileStorageStrategyContext
+          .getProvider(config)
+          .upload(multipartFile.getInputStream(), "application/x-zip-compressed", zipFileName);
+      String accessUrl = "";
+      if (org.apache.commons.lang.StringUtils.isNotEmpty(config.getAccessDomain())) {
+        accessUrl =
+            config
+                .getAccessDomain()
+                .concat("/")
+                .concat(config.getBucket())
+                .concat("/")
+                .concat(zipFileName);
+      } else {
+        accessUrl =
+            config
+                .getEndpoint()
+                .concat("/")
+                .concat(config.getBucket())
+                .concat("/")
+                .concat(zipFileName);
+      }
+      // 异步保存文件记录
+      SysFileManager sysFileManager = new SysFileManager();
+      sysFileManager.setServiceProvider(config.getProvider());
+      sysFileManager.setProviderName(FileStorageEnum.valueOf(config.getProvider()).getDesc());
+      sysFileManager.setOldFileName(multipartFile.getOriginalFilename());
+      sysFileManager.setStoreFileName(FilenameUtils.getName(accessUrl));
+      sysFileManager.setFileUrl(accessUrl);
+      sysFileManager.setFileType("application/x-zip-compressed");
+      sysFileManager.setFileSize(FileUtils.getSize(multipartFile.getSize()));
+      sysFileManager.setStatus(SUCCEED);
+      sysFileManager.setCreateBy(SecurityUserHolder.getUsername());
+      int insert = sysFileManagerMapper.insert(sysFileManager);
+    } catch (Exception e) {
+    } finally {
+      try {
+        input.close();
+      } catch (IOException ioException) {
+        ioException.printStackTrace();
+      }
+      FileUtil.del(dir);
+      FileUtil.del(tmpUrl.concat(".zip"));
+    }
   }
 
   @Override

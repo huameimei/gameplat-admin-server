@@ -24,6 +24,8 @@ public interface MemberMapper extends BaseMapper<Member> {
 
   List<MemberVO> queryList(@Param(Constants.WRAPPER) Wrapper<Member> wrapper);
 
+  Integer countMmebers(@Param(Constants.WRAPPER) Wrapper<Member> wrapper);
+
   MemberInfoVO getMemberInfo(Long id);
 
   /**

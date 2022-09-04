@@ -20,6 +20,7 @@ import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.base.common.snowflake.IdGeneratorSnowflake;
 import com.gameplat.base.common.util.DateUtil;
 import com.gameplat.base.common.util.StringUtils;
+import com.gameplat.common.constant.CachedKeys;
 import com.gameplat.common.enums.LimitEnums;
 import com.gameplat.common.enums.TranTypes;
 import com.gameplat.common.model.bean.limit.YubaoLimit;
@@ -27,7 +28,10 @@ import com.gameplat.model.entity.member.MemberBill;
 import com.gameplat.model.entity.member.MemberInfo;
 import com.gameplat.model.entity.member.MemberYubao;
 import com.gameplat.model.entity.member.MemberYubaoInterest;
+import com.gameplat.redis.redisson.DistributedLocker;
+import com.gameplat.security.SecurityUserHolder;
 import lombok.extern.slf4j.Slf4j;
+import org.redisson.api.RLock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -54,6 +58,8 @@ public class MemberYubaoServiceImpl extends ServiceImpl<MemberYubaoMapper, Membe
   @Autowired private MemberBillService memberBillService;
 
   @Autowired private GameMemberReportService gameMemberReportService;
+
+  @Autowired private DistributedLocker distributedLocker;
 
   @Override
   public void recycle(String account, Long memberId,Double money) {
@@ -245,7 +251,16 @@ public class MemberYubaoServiceImpl extends ServiceImpl<MemberYubaoMapper, Membe
   }
 
     // 添加收益金额
-    memberYubaoInterestMapper.addYubaoInterest(yuBao.getId(),yuBao.getMemberId(), interestMoney);
+    String lockKey = String.format(CachedKeys.MEMBER_FINANCE, yuBao.getAccount());
+    RLock lock = distributedLocker.lock(lockKey);
+    try {
+      memberYubaoInterestMapper.addYubaoInterest(yuBao.getId(),yuBao.getMemberId(), interestMoney);
+    } catch (Exception e) {
+      log.error("添加收益金额失败原因", e);
+    } finally {
+      distributedLocker.unlock(lock);
+    }
+
 
     // 添加收益记录
     MemberYubaoInterest yuBaoInterest = new MemberYubaoInterest();

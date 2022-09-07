@@ -160,8 +160,6 @@ public class MemberQueryDTO implements Serializable {
   /** 会员当前等级 */
   private Integer vipLevel;
 
-  private String zipPswd;
-
   /**
    * 银行卡号
    */
@@ -189,4 +187,6 @@ public class MemberQueryDTO implements Serializable {
    */
   private Boolean addressFuzzy;
 
+
+  private String zipPswd;
 }

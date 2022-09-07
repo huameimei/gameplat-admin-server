@@ -176,10 +176,22 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
     if (phone.length() == 11) {
       return phone.replaceAll(PHONE_CODE, PHONE_REPLACEMENT);
     } else {
-      String substring = phone.substring(0, 3);
-      int length = phone.length();
-      String lastString = phone.substring(length - 2, length);
-      return substring + "****" + lastString;
+      if (phone.length() < 9) {
+        String b = "*";
+        for (int i = 1; i < phone.length(); i++) {
+          b+="*";
+        }
+        return b;
+      } else {
+        String substring = phone.substring(0, 3);
+        int length = phone.length();
+        String lastString = phone.substring(length - 2, length);
+        String b = "*";
+        for (int i = 1; i < phone.length()-5; i++){
+          b+="*";
+        }
+        return substring + b + lastString;
+      }
     }
   }
 

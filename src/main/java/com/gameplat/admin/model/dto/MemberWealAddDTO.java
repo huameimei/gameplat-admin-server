@@ -47,4 +47,7 @@ public class MemberWealAddDTO implements Serializable {
 
   @Schema(description = "0:未结算  1：未派发   2：已派发  3：已回收")
   private Integer status;
+
+  @Schema(description = "福利奖励打码量倍数")
+  private BigDecimal wealRewordDama;
 }

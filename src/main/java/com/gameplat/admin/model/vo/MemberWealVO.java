@@ -32,6 +32,9 @@ public class MemberWealVO implements Serializable {
   @Schema(description = "状态 0:未结算  1：未派发   2：已派发  3：已回收")
   private Integer status;
 
+  @Schema(description = "福利奖励打码量倍数")
+  private BigDecimal wealRewordDama;
+
   @Schema(description = "周期  开始时间")
   @JsonSerialize(using = Date2LongSerializerUtils.class)
   private Date startDate;

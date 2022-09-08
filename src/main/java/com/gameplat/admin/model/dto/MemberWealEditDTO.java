@@ -68,4 +68,7 @@ public class MemberWealEditDTO implements Serializable {
 
   @Schema(description = "状态")
   private Integer status;
+
+  @Schema(description = "福利奖励打码量倍数")
+  private BigDecimal wealRewordDama;
 }

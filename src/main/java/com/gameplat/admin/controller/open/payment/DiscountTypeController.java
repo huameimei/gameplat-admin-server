@@ -72,7 +72,7 @@ public class DiscountTypeController {
     List<DiscountType> list = discountTypeService
         .lambdaQuery()
         .eq(DiscountType::getStatus, EnableEnum.ENABLED.code())
-        .orderByDesc(DiscountType :: getSort)
+        .orderByAsc(DiscountType :: getSort)
         .list();
     return list;
   }

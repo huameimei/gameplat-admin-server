@@ -213,7 +213,7 @@
         select
           game_type gameType,
           sum(real_rebate_money) waterAmount
-        from game_rebate_detail
+        from game_rebate_report
         where status = 1
          <include refid="whereGameSql" />
          GROUP BY game_type

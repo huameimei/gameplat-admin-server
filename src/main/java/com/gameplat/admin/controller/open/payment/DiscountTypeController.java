@@ -69,9 +69,11 @@ public class DiscountTypeController {
   @GetMapping("/queryAll")
   //  @PreAuthorize("hasAuthority('thirdParty:discountType:queryAll')")
   public List<DiscountType> queryList() {
-    return discountTypeService
+    List<DiscountType> list = discountTypeService
         .lambdaQuery()
         .eq(DiscountType::getStatus, EnableEnum.ENABLED.code())
+        .orderByDesc(DiscountType :: getSort)
         .list();
+    return list;
   }
 }

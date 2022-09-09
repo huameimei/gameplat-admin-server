@@ -187,11 +187,11 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
 
   private BigDecimal getNewBalance(BigDecimal current, BigDecimal amount) {
     BigDecimal newBalance = current.add(amount);
-    if (BigDecimal.ZERO.compareTo(newBalance) > 0) {
+    // 如果会员余额本来是大于或等于0的，不允许把余额操作为负数
+    if (BigDecimal.ZERO.compareTo(current) <= 0 && BigDecimal.ZERO.compareTo(newBalance) > 0) {
       log.error("会员余额不足，当前余额：{}，变更金额：{}", current, amount);
       throw new ServiceException("余额不足");
     }
-
     return newBalance;
   }
 

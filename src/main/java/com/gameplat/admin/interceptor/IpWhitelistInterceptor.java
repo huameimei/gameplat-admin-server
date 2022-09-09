@@ -1,13 +1,13 @@
 package com.gameplat.admin.interceptor;
 
 import cn.hutool.core.collection.CollUtil;
-import com.gameplat.admin.config.SysConfig;
 import com.gameplat.admin.enums.AuthIpEnum;
 import com.gameplat.admin.service.CommonService;
 import com.gameplat.admin.service.SysAuthIpService;
 import com.gameplat.base.common.util.IPUtils;
 import com.gameplat.common.enums.BooleanEnum;
 import com.gameplat.common.lang.Assert;
+import com.gameplat.common.model.bean.SysProperty;
 import com.gameplat.common.model.bean.limit.AdminLoginLimit;
 import com.gameplat.model.entity.sys.SysAuthIp;
 import org.jetbrains.annotations.NotNull;
@@ -30,7 +30,7 @@ public class IpWhitelistInterceptor implements HandlerInterceptor {
 
   @Autowired private CommonService commonService;
 
-  @Resource private SysConfig sysConfig;
+  @Resource private SysProperty sysProperty;
 
   @Override
   public boolean preHandle(
@@ -56,8 +56,8 @@ public class IpWhitelistInterceptor implements HandlerInterceptor {
 
   private boolean isAllowed(String ip) {
     List<SysAuthIp> authIps = authIpService.getAll();
-    if (CollUtil.isNotEmpty(sysConfig.getOfficeIpList())) {
-      if (sysConfig.getOfficeIpList().contains(ip)) {
+    if (CollUtil.isNotEmpty(sysProperty.getOfficeIpList())) {
+      if (sysProperty.getOfficeIpList().contains(ip)) {
         return true;
       }
     }

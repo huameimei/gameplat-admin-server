@@ -17,3 +17,4 @@ security:
       - /api/admin/chat/plan/**
       - /api/admin/callback/proxyPayAsyncCallback/**
       - /api/admin/callback/fixedProxyPayAsyncCallback/**
+      - /api/admin/game/recyclingAllAmount

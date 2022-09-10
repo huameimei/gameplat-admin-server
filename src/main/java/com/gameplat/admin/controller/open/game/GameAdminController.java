@@ -59,6 +59,12 @@ public class GameAdminController {
     return gameAdminService.recyclingAmount(dto);
   }
 
+  @Operation(summary = "回收全部钱包")
+  @PostMapping(value = "/recyclingAllAmount")
+  public GameRecycleVO recyclingAllAmount(@RequestBody GameBalanceQueryDTO dto) {
+    return gameAdminService.recyclingAmount(dto);
+  }
+
   @Operation(summary = "没收游戏余额")
   @RequestMapping(value = "/confiscated", method = RequestMethod.POST)
   @PreAuthorize("hasAuthority('game:gameAdmin:confiscated')")

@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 
 /**
  * @author lily
@@ -27,4 +28,7 @@ public class MemberWealDTO implements Serializable {
 
   @Schema(description = "周期  结束时间")
   private String endDate;
+
+  @Schema(description = "福利奖励打码量倍数")
+  private BigDecimal wealRewordDama;
 }

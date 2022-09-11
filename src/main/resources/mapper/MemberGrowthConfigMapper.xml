@@ -10,6 +10,7 @@
         <result property="isEnableSign" column="is_enable_sign"/>
         <result property="isEnableDama" column="is_enable_dama"/>
         <result property="isPayUpReword" column="is_pay_up_reword"/>
+        <result property="payUpRewordDama" column="pay_up_reword_dama"/>
         <result property="isRepeatPayUpReword" column="is_repeat_pay_up_reword"/>
         <result property="isAutoPayReword" column="is_auto_pay_reword"/>
         <result property="signEveryDayGrowth" column="sign_every_day_growth"/>
@@ -60,6 +61,7 @@
         is_enable_sign,
         is_enable_dama,
         is_pay_up_reword,
+        pay_up_reword_dama,
         is_repeat_pay_up_reword,
         is_auto_pay_reword,
         sign_every_day_growth,
@@ -122,6 +124,7 @@
             <if test="isEnableSign != null">is_enable_sign = #{isEnableSign},</if>
             <if test="isEnableDama != null">is_enable_dama = #{isEnableDama},</if>
             <if test="isPayUpReword != null">is_pay_up_reword = #{isPayUpReword},</if>
+            <if test="payUpRewordDama != null">pay_up_reword_dama = #{payUpRewordDama},</if>
             <if test="isRepeatPayUpReword != null">is_repeat_pay_up_reword = #{isRepeatPayUpReword},</if>
             <if test="isAutoPayReword != null">is_auto_pay_reword = #{isAutoPayReword},</if>
             <if test="signEveryDayGrowth != null">sign_every_day_growth = #{signEveryDayGrowth},</if>

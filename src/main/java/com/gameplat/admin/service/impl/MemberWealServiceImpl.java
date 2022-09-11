@@ -29,10 +29,10 @@ import com.gameplat.base.common.util.IPUtils;
 import com.gameplat.common.enums.BooleanEnum;
 import com.gameplat.common.enums.TranTypes;
 import com.gameplat.common.lang.Assert;
-import com.gameplat.model.entity.ValidWithdraw;
 import com.gameplat.model.entity.blacklist.BizBlacklist;
 import com.gameplat.model.entity.member.*;
 import com.gameplat.model.entity.message.Message;
+import com.gameplat.model.entity.recharge.RechargeOrder;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -353,6 +353,10 @@ public class MemberWealServiceImpl extends ServiceImpl<MemberWealMapper, MemberW
                 list = list.stream().filter(item -> item.getStatus() == 1).collect(toList());
                 // 0:升级奖励 1：周俸禄  2：月俸禄  3：生日礼金 4：每月红包
                 Integer type = memberWeal.getType();
+        BigDecimal wealRewordDama =
+            memberWeal.getWealRewordDama() == null
+                ? BigDecimal.ONE
+                : memberWeal.getWealRewordDama();
                 // 查询成长值配置
                 MemberGrowthConfig growthConfig =
                         growthConfigMapper.findOneConfig(LanguageEnum.app_zh_CN.getCode());
@@ -444,19 +448,17 @@ public class MemberWealServiceImpl extends ServiceImpl<MemberWealMapper, MemberW
                                     // 将通知消息去掉请领取
                                     content = content.replaceAll("，请领取", "");
                                     String sourceId = String.valueOf(IdWorker.getId());
-                                    // 新增打码量记录
-                                    ValidWithdraw validWithdraw = new ValidWithdraw();
-                                    validWithdraw.setAccount(member.getAccount());
-                                    validWithdraw.setMemberId(member.getId());
-                                    validWithdraw.setRechId(sourceId);
-                                    validWithdraw.setRechMoney(
-                                            item.getRewordAmount().setScale(2, RoundingMode.HALF_UP));
-                                    validWithdraw.setCreateTime(new Date());
-                                    validWithdraw.setType(0);
-                                    validWithdraw.setStatus(0);
-                                    validWithdraw.setDiscountMoney(BigDecimal.ZERO);
-                                    validWithdraw.setRemark(member.getAccount() + content + "增加打码量");
-                                    validWithdrawService.saveValidWithdraw(validWithdraw);
+                  BigDecimal bigDecimal = item.getRewordAmount().setScale(2, RoundingMode.HALF_UP);
+                  // 添加打码量
+                  RechargeOrder rechargeOrder = new RechargeOrder();
+                  rechargeOrder.setMemberId(member.getId());
+                  rechargeOrder.setAmount(BigDecimal.ZERO);
+                  rechargeOrder.setNormalDml(BigDecimal.ZERO);
+                  rechargeOrder.setDiscountAmount(bigDecimal);
+                  rechargeOrder.setDiscountDml(bigDecimal.multiply(wealRewordDama));
+                  rechargeOrder.setRemarks(member.getAccount() + content + "增加打码量");
+                  rechargeOrder.setAccount(member.getAccount());
+                  validWithdrawService.addRechargeOrder(rechargeOrder);
                                     // 添加流水记录
                                     MemberBill memberBill = new MemberBill();
                                     memberBill.setMemberId(member.getId());

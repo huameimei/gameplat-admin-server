@@ -29,10 +29,10 @@ import com.gameplat.base.common.exception.ServiceException;
 import com.gameplat.common.enums.BooleanEnum;
 import com.gameplat.common.enums.GrowthChangeEnum;
 import com.gameplat.common.enums.TranTypes;
-import com.gameplat.model.entity.ValidWithdraw;
 import com.gameplat.model.entity.blacklist.BizBlacklist;
 import com.gameplat.model.entity.member.*;
 import com.gameplat.model.entity.message.Message;
+import com.gameplat.model.entity.recharge.RechargeOrder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -531,19 +531,23 @@ public class MemberGrowthStatisServiceImpl
 
                 //是否自动派发
                 if (EnableEnum.ENABLED.match(growthConfig.getIsAutoPayReword())) {
+          BigDecimal payUpRewordDama =
+              growthConfig.getPayUpRewordDama() == null
+                  ? BigDecimal.ONE
+                  : growthConfig.getPayUpRewordDama();
+          BigDecimal bigDecimal = rewordAmount.setScale(2, RoundingMode.HALF_UP);
           String sourceId = RandomUtil.randomNumbers(22);
-                    // 新增打码量记录
-                    ValidWithdraw validWithdraw = new ValidWithdraw();
-                    validWithdraw.setAccount(member.getAccount());
-                    validWithdraw.setMemberId(member.getId());
-                    validWithdraw.setRechId(sourceId);
-                    validWithdraw.setRechMoney(rewordAmount.setScale(2, RoundingMode.HALF_UP));
-                    validWithdraw.setCreateTime(new Date());
-                    validWithdraw.setType(0);
-                    validWithdraw.setStatus(0);
-                    validWithdraw.setDiscountMoney(BigDecimal.ZERO);
-                    validWithdraw.setRemark(member.getAccount() + "从VIP" + beforeLevel + "升至VIP" + afterLevel + "奖励金额增加打码量");
-                    validWithdrawService.saveValidWithdraw(validWithdraw);
+          // 添加打码量
+          RechargeOrder rechargeOrder = new RechargeOrder();
+          rechargeOrder.setMemberId(member.getId());
+          rechargeOrder.setAmount(BigDecimal.ZERO);
+          rechargeOrder.setNormalDml(BigDecimal.ZERO);
+          rechargeOrder.setDiscountAmount(bigDecimal);
+          rechargeOrder.setDiscountDml(bigDecimal.multiply(payUpRewordDama));
+          rechargeOrder.setRemarks(
+              member.getAccount() + "从VIP" + beforeLevel + "升至VIP" + afterLevel + "奖励金额增加打码量");
+          rechargeOrder.setAccount(member.getAccount());
+          validWithdrawService.addRechargeOrder(rechargeOrder);
 
                     synchronized (lockHelper) {
                         MemberInfo memberInfo = memberInfoService.lambdaQuery()

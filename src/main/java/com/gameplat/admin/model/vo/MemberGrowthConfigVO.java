@@ -34,6 +34,9 @@ public class MemberGrowthConfigVO implements Serializable {
   @Schema(description = "是否发放升级奖励")
   private Integer isPayUpReword;
 
+  @Schema(description = "升级奖励打码量")
+  private BigDecimal payUpRewordDama;
+
   @Schema(description = "是否重复发放升级奖励")
   private Integer isRepeatPayUpReword;
 

@@ -41,6 +41,9 @@ public class MemberGrowthConfigEditDto implements Serializable {
   @Schema(description = "是否发放升级奖励")
   private Integer isPayUpReword;
 
+  @Schema(description = "升级奖励打码量")
+  private BigDecimal payUpRewordDama;
+
   @Schema(description = "是否自动派发升级奖励:1：是  0：否")
   private Integer isAutoPayReword;
 
